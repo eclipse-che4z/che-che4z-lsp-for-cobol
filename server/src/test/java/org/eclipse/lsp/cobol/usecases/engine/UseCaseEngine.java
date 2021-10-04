@@ -17,43 +17,34 @@ package org.eclipse.lsp.cobol.usecases.engine;
 
 import com.google.common.collect.ImmutableList;
 import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-import org.eclipse.usecase.UseCasePreprocessorLexer;
-import org.eclipse.usecase.UseCasePreprocessorParser;
-import org.eclipse.usecase.UseCasePreprocessorParser.StartRuleContext;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
-import static org.antlr.v4.runtime.CharStreams.fromString;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
-import static org.eclipse.lsp.cobol.service.CopybookServiceImpl.PREF_IMPLICIT;
-import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.analyze;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -108,42 +99,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *     compared with expected one. Notice, that while checking lists, the order of elements doesn't
  *     matter.
  */
-@Slf4j
 @UtilityClass
 public class UseCaseEngine {
-
-  private static final String SQLCA = "SQLCA";
-  private static final String SQLCA_DATACOM_PATH = "/implicitCopybooks/SQLCA_DATACOM.cpy";
-  private static final String SQLCA_DB2_PATH = "/implicitCopybooks/SQLCA_DB2.cpy";
-  private static final String SQLDA_DB2_PATH = "/implicitCopybooks/SQLDA.cpy";
-
-  /**
-   * Checks if language engine applies required syntax and semantic checks correctly once code
-   * contains implicitly (If not content is explicitly provided for SQLCA and SQLDA) defined
-   * copybooks.
-   *
-   * @param text COBOL text to analyse
-   * @param expectedDiagnostics the map of id to the Diagnostic that should present in the analysis
-   *     result
-   * @param implicitCopybookNames the names of the implicit copybooks used in this test
-   * @param sqlBackend the options to be used for SQL copybooks processing
-   */
-  public void runTest(
-      String text,
-      Map<String, Diagnostic> expectedDiagnostics,
-      List<String> implicitCopybookNames,
-      SQLBackend sqlBackend) {
-    List<CobolText> copybooks = new ArrayList<>();
-    implicitCopybookNames.forEach(
-        i -> {
-          String uri = getUriForImplicitCopybook(i, sqlBackend);
-          copybooks.add(new CobolText(i, readContentForImplicitCopybook(uri)));
-        });
-
-    runTest(
-        text, copybooks, expectedDiagnostics, ImmutableList.of(), CopybookProcessingMode.ENABLED);
-  }
-
   /**
    * Check if the language engine applies required syntax and semantic checks. All the semantic
    * elements in the given text, as well as syntax errors, should be wrapped with according tags.
@@ -162,8 +119,7 @@ public class UseCaseEngine {
    */
   public void runTest(
       String text, List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics) {
-    runTest(
-        text, copybooks, expectedDiagnostics, ImmutableList.of(), CopybookProcessingMode.ENABLED);
+    runTest(text, copybooks, expectedDiagnostics, ImmutableList.of());
   }
 
   /**
@@ -188,14 +144,19 @@ public class UseCaseEngine {
       List<CobolText> copybooks,
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> subroutineNames) {
-    runTest(text, copybooks, expectedDiagnostics, subroutineNames, CopybookProcessingMode.ENABLED);
+    runTest(
+        text,
+        copybooks,
+        expectedDiagnostics,
+        subroutineNames,
+        new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER));
   }
 
   /**
    * Check if the language engine applies required syntax and semantic checks. All the semantic
    * elements in the given text, as well as syntax errors, should be wrapped with according tags.
-   * The same extraction operation applied also for the given copybooks. The copybook processing
-   * mode relies on processingMode parameter.
+   * The same extraction operation applied also for the given copybooks. The copybook configuration
+   * is built from processingMode and sqlBackend parameters.
    *
    * <p>Expected diagnostics should contain the full of list of syntax and semantic
    * errors/warnings/info messages for the document and copybooks. Existing positions, if they are,
@@ -207,7 +168,7 @@ public class UseCaseEngine {
    * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
    *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
    * @param subroutineNames - list of subroutine names used in the document
-   * @param processingMode - copybook processing mode
+   * @param copybookConfig - copybook processing mode and the SQL backend for the analysis
    * @return analysis result object
    */
   public AnalysisResult runTest(
@@ -215,104 +176,24 @@ public class UseCaseEngine {
       List<CobolText> copybooks,
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> subroutineNames,
-      CopybookProcessingMode processingMode) {
+      CopybookConfig copybookConfig) {
 
-    PreprocessedDocument document = prepareDocument(text, copybooks, expectedDiagnostics);
+    PreprocessedDocument document =
+        AnnotatedDocumentCleaning.prepareDocument(
+            text, copybooks, subroutineNames, expectedDiagnostics, copybookConfig.getSqlBackend());
     AnalysisResult actual =
         analyze(
-            DOCUMENT_URI,
-            document.getText(),
-            document.getCopybooks(),
-            subroutineNames,
-            new CopybookConfig(processingMode, SQLBackend.DB2_SERVER));
-    TestData expected =
-        document.getTestData().toBuilder()
-            .subroutineDefinitions(makeSubroutinesDefinitions(subroutineNames))
-            .build();
+            UseCase.builder()
+                .fileName(DOCUMENT_URI)
+                .text(document.getText())
+                .copybooks(document.getCopybooks())
+                .subroutines(subroutineNames)
+                .sqlBackend(copybookConfig.getSqlBackend())
+                .copybookProcessingMode(copybookConfig.getCopybookProcessingMode())
+                .build());
+    TestData expected = document.getTestData();
     assertResultEquals(actual, expected);
     return actual;
-  }
-
-  private String getUriForImplicitCopybook(String copybookName, SQLBackend sqlBackend) {
-    if (SQLCA.equals(copybookName)) {
-      if (SQLBackend.DATACOM_SERVER.equals(sqlBackend)) {
-        return SQLCA_DATACOM_PATH;
-      }
-      return SQLCA_DB2_PATH;
-    }
-    return SQLDA_DB2_PATH;
-  }
-
-  private String readContentForImplicitCopybook(String resourcePath) {
-    InputStream inputStream = CopybookServiceImpl.class.getResourceAsStream(resourcePath);
-    String content = null;
-    try {
-      content =
-          new WorkspaceFileService()
-              .readFromInputStream(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      LOG.error("Implicit copybook is not loaded. ", e);
-    }
-    return content;
-  }
-
-  private Map<String, List<Location>> makeSubroutinesDefinitions(List<String> subroutineNames) {
-    Range fileStart = new Range(new Position(0, 0), new Position(0, 0));
-    return subroutineNames.stream()
-        .collect(
-            toMap(
-                Function.identity(),
-                name -> ImmutableList.of(new Location("URI:" + name, fileStart))));
-  }
-
-  private PreprocessedDocument prepareDocument(
-      String text, List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics) {
-
-    TestData testData = processDocument(text, expectedDiagnostics);
-
-    return new PreprocessedDocument(
-        testData.getText(), processCopybooks(copybooks, expectedDiagnostics, testData), testData);
-  }
-
-  private List<CobolText> processCopybooks(
-      List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics, TestData testData) {
-    return copybooks.stream()
-        .map(
-            it ->
-                processDocument(
-                    it.getFullText(),
-                    it.getFileName(),
-                    toURI(it.getFileName()),
-                    expectedDiagnostics))
-        .map(collectDataFromCopybooks(testData))
-        .map(it -> new CobolText(it.getCopybookName(), it.getText()))
-        .collect(toList());
-  }
-
-  private TestData processDocument(String text, Map<String, Diagnostic> expectedDiagnostics) {
-    return processDocument(text, null, DOCUMENT_URI, expectedDiagnostics);
-  }
-
-  private TestData processDocument(
-      String text, String documentName, String uri, Map<String, Diagnostic> expectedDiagnostics) {
-    int numberOfLines = text.split("\r\n|\r|\n").length;
-
-    UseCasePreprocessorLexer lexer = new UseCasePreprocessorLexer(fromString(text));
-    lexer.removeErrorListeners();
-
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    UseCasePreprocessorParser parser = new UseCasePreprocessorParser(tokens);
-    parser.removeErrorListeners();
-
-    StartRuleContext startRule = parser.startRule();
-
-    ParseTreeWalker walker = new ParseTreeWalker();
-
-    UseCasePreprocessorListener listener =
-        new UseCasePreprocessorListener(
-            tokens, documentName, uri, numberOfLines, expectedDiagnostics);
-    walker.walk(listener, startRule);
-    return listener.getProcessingResult();
   }
 
   private static void assertResultEquals(AnalysisResult actual, TestData expected) {
@@ -325,7 +206,9 @@ public class UseCaseEngine {
     assertResult("Copybook usages:", expected.getCopybookUsages(), actual.getCopybookUsages());
 
     assertResult(
-        "Variable definition:", expected.getVariableDefinitions(), extractVariableDefinitions(actual));
+        "Variable definition:",
+        expected.getVariableDefinitions(),
+        extractVariableDefinitions(actual));
     assertResult("Variable usages:", expected.getVariableUsages(), extractVariableUsages(actual));
 
     assertResult(
@@ -355,12 +238,15 @@ public class UseCaseEngine {
         .collect(groupingBy(Variable::getName))
         .entrySet()
         .stream()
-        .collect(toMap(Entry::getKey,
-            entry -> entry.getValue().stream()
-                .map(Variable::getDefinition)
-                .map(Locality::toLocation)
-                .distinct()
-                .collect(toList())));
+        .collect(
+            toMap(
+                Entry::getKey,
+                entry ->
+                    entry.getValue().stream()
+                        .map(Variable::getDefinition)
+                        .map(Locality::toLocation)
+                        .distinct()
+                        .collect(toList())));
   }
 
   private Map<String, List<Location>> extractVariableUsages(AnalysisResult result) {
@@ -369,16 +255,20 @@ public class UseCaseEngine {
         .collect(groupingBy(Variable::getName))
         .entrySet()
         .stream()
-        .collect(toMap(Entry::getKey,
-            entry -> entry.getValue().stream()
-                .map(Variable::getUsages)
-                .flatMap(List::stream)
-                .map(Locality::toLocation)
-                .collect(toList())));
+        .collect(
+            toMap(
+                Entry::getKey,
+                entry ->
+                    entry.getValue().stream()
+                        .map(Variable::getUsages)
+                        .flatMap(List::stream)
+                        .map(Locality::toLocation)
+                        .collect(toList())));
   }
 
   private Stream<Variable> getVariableStream(AnalysisResult result) {
-    return result.getRootNode()
+    return result
+        .getRootNode()
         .getDepthFirstStream()
         .filter(hasType(PROGRAM))
         .map(ProgramNode.class::cast)
@@ -425,31 +315,5 @@ public class UseCaseEngine {
     return comparing(Location::getUri)
         .thenComparingInt(location -> location.getRange().getStart().getLine())
         .thenComparing(location -> location.getRange().getStart().getCharacter());
-  }
-
-  private Function<TestData, TestData> collectDataFromCopybooks(TestData accumulator) {
-    return copybookTestData -> {
-      mergeMaps(accumulator.getCopybookDefinitions(), copybookTestData.getCopybookDefinitions());
-      mergeMaps(accumulator.getCopybookUsages(), copybookTestData.getCopybookUsages());
-      mergeMaps(accumulator.getParagraphDefinitions(), copybookTestData.getParagraphDefinitions());
-      mergeMaps(accumulator.getParagraphUsages(), copybookTestData.getParagraphUsages());
-      mergeMaps(accumulator.getSectionDefinitions(), copybookTestData.getSectionDefinitions());
-      mergeMaps(accumulator.getSectionUsages(), copybookTestData.getSectionUsages());
-      mergeMaps(accumulator.getVariableDefinitions(), copybookTestData.getVariableDefinitions());
-      mergeMaps(accumulator.getVariableUsages(), copybookTestData.getVariableUsages());
-      mergeMaps(accumulator.getDiagnostics(), copybookTestData.getDiagnostics());
-      return copybookTestData;
-    };
-  }
-
-  private <T> void mergeMaps(Map<String, List<T>> to, Map<String, List<T>> from) {
-    from.forEach(
-        (key, value) -> {
-          if (to.containsKey(key)) {
-            to.get(key).addAll(value);
-          } else {
-            to.put(key, value);
-          }
-        });
   }
 }

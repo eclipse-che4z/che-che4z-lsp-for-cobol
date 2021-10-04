@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import org.eclipse.lsp.cobol.usecases.engine.UseCase;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.DISABLED;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
-import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /**
@@ -51,18 +50,9 @@ class TestUndefinedParentVariableUnderlined {
   @Test
   void assertCopybookProcessingModeNotChangesLogic() {
     Assertions.assertEquals(
+        UseCaseUtils.analyze(UseCase.builder().text(TEXT).copybookProcessingMode(ENABLED).build()),
         UseCaseUtils.analyze(
-            UseCaseUtils.DOCUMENT_URI,
-            TEXT,
-            ImmutableList.of(),
-            ImmutableList.of(),
-            new CopybookConfig(ENABLED, DB2_SERVER)),
-        UseCaseUtils.analyze(
-            UseCaseUtils.DOCUMENT_URI,
-            TEXT,
-            ImmutableList.of(),
-            ImmutableList.of(),
-            new CopybookConfig(DISABLED, DB2_SERVER)));
+            UseCase.builder().text(TEXT).copybookProcessingMode(DISABLED).build()));
   }
 
   @Test

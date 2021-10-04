@@ -37,9 +37,10 @@ import org.eclipse.lsp.cobol.core.semantics.PredefinedVariables;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.*;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.STATEMENT;
 import static org.eclipse.lsp.cobol.core.semantics.PredefinedVariables.PREDEFINED;
-import static org.eclipse.lsp.cobol.service.CopybookServiceImpl.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 
 /** This class represents program context in COBOL. */
 @ToString(callSuper = true)
@@ -47,7 +48,9 @@ import static org.eclipse.lsp.cobol.service.CopybookServiceImpl.PREF_IMPLICIT;
 @EqualsAndHashCode(callSuper = true)
 @Slf4j
 public class ProgramNode extends Node {
-  @EqualsAndHashCode.Exclude @ToString.Exclude private final NodeConverter nodeConverter = new NodeConverter();
+  @EqualsAndHashCode.Exclude @ToString.Exclude
+  private final NodeConverter nodeConverter = new NodeConverter();
+
   private final Multimap<String, VariableNode> variables = ArrayListMultimap.create();
   private final Collection<Variable> definedVariables = new ArrayList<>();
   private final List<VariableNode> variablesForConvert = new ArrayList<>();
@@ -79,14 +82,13 @@ public class ProgramNode extends Node {
   }
 
   private List<SyntaxError> processVariables() {
-    for (VariableNode variableForConvert: variablesForConvert)
+    for (VariableNode variableForConvert : variablesForConvert)
       definedVariables.add(nodeConverter.convertVariable(variableForConvert));
     variablesForConvert.clear();
-    for (VariableNode node: variables.values())
-      nodeConverter.updateUsage(node);
+    for (VariableNode node : variables.values()) nodeConverter.updateUsage(node);
     Map<Locality, Variable> variableUsages = new HashMap<>();
-    for (Variable variable: definedVariables)
-      for (Locality usageLocality: variable.getUsages())
+    for (Variable variable : definedVariables)
+      for (Locality usageLocality : variable.getUsages())
         variableUsages.put(usageLocality, variable);
     return validateStatements(variableUsages);
   }
@@ -108,10 +110,12 @@ public class ProgramNode extends Node {
    * @return the list of founded variable definitions
    */
   public List<VariableNode> getVariableDefinition(List<VariableUsageNode> usageNodes) {
-    List<VariableNode> foundDefinitions = VariableUsageUtils.findVariablesForUsage(variables, usageNodes);
+    List<VariableNode> foundDefinitions =
+        VariableUsageUtils.findVariablesForUsage(variables, usageNodes);
     if (foundDefinitions.isEmpty()) {
       Multimap<String, VariableNode> globals = ArrayListMultimap.create();
-      getMapOfGlobalVariables().values().stream()
+      getMapOfGlobalVariables()
+          .values()
           .forEach(variableNode -> globals.put(variableNode.getName(), variableNode));
       foundDefinitions = VariableUsageUtils.findVariablesForUsage(globals, usageNodes);
     }
@@ -153,10 +157,11 @@ public class ProgramNode extends Node {
   }
 
   private Map<String, VariableNode> getMapOfGlobalVariables() {
-    Map<String, VariableNode> result = getNearestParentByType(PROGRAM)
-        .map(ProgramNode.class::cast)
-        .map(ProgramNode::getMapOfGlobalVariables)
-        .orElseGet(HashMap::new);
+    Map<String, VariableNode> result =
+        getNearestParentByType(PROGRAM)
+            .map(ProgramNode.class::cast)
+            .map(ProgramNode::getMapOfGlobalVariables)
+            .orElseGet(HashMap::new);
     variables.values().stream()
         .filter(VariableNode::isGlobal)
         .forEach(variableNode -> result.put(variableNode.getName(), variableNode));
@@ -173,10 +178,8 @@ public class ProgramNode extends Node {
   }
 
   private void addPredefinedVariables() {
-    Locality location = Locality.builder()
-        .uri(PREF_IMPLICIT + PREDEFINED)
-        .build();
-    for (String predefinedVariableName: PredefinedVariables.getPredefinedVariablesNames())
+    Locality location = Locality.builder().uri(PREF_IMPLICIT + PREDEFINED).build();
+    for (String predefinedVariableName : PredefinedVariables.getPredefinedVariablesNames())
       addVariableDefinition(new MnemonicNameNode(location, PREDEFINED, predefinedVariableName));
   }
 }

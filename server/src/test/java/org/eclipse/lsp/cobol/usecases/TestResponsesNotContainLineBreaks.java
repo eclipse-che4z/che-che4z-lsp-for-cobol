@@ -18,7 +18,8 @@ package org.eclipse.lsp.cobol.usecases;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.delegates.communications.ServerCommunications;
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import org.eclipse.lsp.cobol.usecases.engine.UseCase;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
@@ -72,7 +73,7 @@ class TestResponsesNotContainLineBreaks {
     communications.publishDiagnostics(
         singletonMap(
             UseCaseUtils.DOCUMENT_URI,
-            UseCaseUtils.analyzeForErrors(UseCaseUtils.DOCUMENT_URI, TEXT)));
+            UseCaseUtils.analyzeForErrors(UseCase.builder().text(TEXT).build())));
 
     verify(client).publishDiagnostics(captor.capture());
     List<Diagnostic> diagnostics = captor.getValue().getDiagnostics();
