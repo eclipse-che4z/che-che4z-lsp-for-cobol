@@ -18,6 +18,8 @@
 
 //F96117 - Support for Copybooks in Git/bridge for Git
 
+const backspace3times = '{backspace}'.repeat(3);
+
 context('This is a F96117 spec', () => {
   describe('TC247497 - Local Copybooks - check .gitignore file and hidden folders under c4z', () => {
     it(['smoke', 'CI'], 'Finds .gitignore file under .c4z', () => {
@@ -148,6 +150,7 @@ context('This is a F96117 spec', () => {
 
       //Open the same file and check syntax error (BOOK3 cannot be found)
       cy.openFile('USERC1F.cbl')
+        .wait(500)
         .get('.squiggly-error')
         .getElementLineNumber()
         .then((lineNumber) => {
@@ -158,18 +161,18 @@ context('This is a F96117 spec', () => {
     });
   });
   describe('TC247996 - Nested copybooks with "no extension" are supported', () => {
-    afterEach(() => {
-      cy.openFile('A.cpy').goToLine(14);
+    beforeEach(() => {
+      cy.openFolder('testing').openFile('A.cpy').goToLine(1);
       cy.getMainEditor()
-        .type('{backspace}{backspace}{backspace}{backspace}')
-        .type('B. ', { delay: 100 })
+        .type('{selectall}{backspace}')
+        .type('COPY B. ', { delay: 100 })
         .type('{ctrl}{c}')
         .closeCurrentTab();
       cy.get('.theia-button.main').click();
       cy.closeCurrentTab();
       cy.closeFolder('testing');
     });
-    it(['flaky'], 'Nested copybooks with "no extension" are supported', () => {
+    it(['smoke'], 'Nested copybooks with "no extension" are supported', () => {
       cy.openFile('TEST.CBL');
 
       // Check that variable is available
@@ -177,20 +180,15 @@ context('This is a F96117 spec', () => {
       cy.getMainEditor().type('{ctrl} ').type('       PROGRAM');
       cy.get('[widgetid="editor.widget.suggestWidget"]').contains('PROGRAM-STATUS');
       cy.closeCurrentTab();
+      cy.get('.fa.fa-times.closeButton').click();
 
       //change in A.cpy to 'COPY CA.'
-      cy.openFolder('testing').openFile('A.cpy').wait(500).goToLine(14);
-      cy.getMainEditor()
-        .type('{backspace}')
-        .type('{backspace}')
-        .type('{backspace}')
-        .type('CA. ', { delay: 100 })
-        .type('{ctrl}{c}')
-        .closeCurrentTab();
+      cy.openFolder('testing').openFile('A.cpy').wait(500).goToLine(1);
+      cy.getMainEditor().type(backspace3times).type('CA. ', { delay: 100 }).type('{ctrl}{c}').closeCurrentTab();
       cy.get('.theia-button.main').click();
 
-      // Open file and check that vriable is not available
-      cy.openFile('TEST.CBL').goToLine(21).type('{end}{enter}');
+      // Open file and check that variable is not available
+      cy.openFile('TEST.CBL').getLineByNumber(21).type('{end}{enter}');
       cy.getMainEditor().type('{ctrl} ');
       cy.get('[widgetid="editor.widget.suggestWidget"]').should('not.have.text', 'PROGRAM-STATUS');
     });
