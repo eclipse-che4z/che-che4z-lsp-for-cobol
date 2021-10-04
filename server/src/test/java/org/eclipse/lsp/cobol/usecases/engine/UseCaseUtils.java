@@ -12,19 +12,22 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service.delegates.validations;
+package org.eclipse.lsp.cobol.usecases.engine;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.*;
+import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -35,13 +38,12 @@ import java.util.concurrent.CompletableFuture;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
-import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /** This utility class provides methods to run use cases with COBOL code examples. */
+@Slf4j
 @UtilityClass
 public class UseCaseUtils {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
@@ -61,28 +63,13 @@ public class UseCaseUtils {
 
   /**
    * Analyze the given text using a real language engine leaving only the diagnostics with the
-   * severe (level 1) errors.
-   *
-   * @param fileName - name of the processing file
-   * @param text - text to analyze
-   * @return list of diagnostics with only severe errors
-   */
-  public static List<Diagnostic> analyzeForErrors(String fileName, String text) {
-    return analyzeForErrors(fileName, text, emptyList());
-  }
-
-  /**
-   * Analyze the given text using a real language engine leaving only the diagnostics with the
    * severe (level 1) errors providing copybooks required for the analysis
    *
-   * @param fileName - name of the processing file
-   * @param text - text to analyze
-   * @param copybooks - list of copybooks required for the analysis
+   * @param useCase use case instance to analyze
    * @return list of diagnostics with only severe errors
    */
-  public static List<Diagnostic> analyzeForErrors(
-      String fileName, String text, List<CobolText> copybooks) {
-    return ofNullable(analyze(fileName, text, copybooks).getDiagnostics().get(fileName))
+  public static List<Diagnostic> analyzeForErrors(UseCase useCase) {
+    return ofNullable(analyze(useCase).getDiagnostics().get(useCase.getFileName()))
         .map(
             diagnostics ->
                 diagnostics.stream()
@@ -93,51 +80,12 @@ public class UseCaseUtils {
 
   /**
    * Analyze the given text using a real language engine providing copybooks required for the
-   * analysis
-   *
-   * @param fileName - name of the processing file
-   * @param text - text to analyze
-   * @param copybooks - list of copybooks required for the analysis
-   * @return the entire analysis result
-   */
-  public static AnalysisResult analyze(String fileName, String text, List<CobolText> copybooks) {
-    return analyze(
-        fileName, text, copybooks, ImmutableList.of(), new CopybookConfig(ENABLED, DB2_SERVER));
-  }
-
-  /**
-   * Analyze the given text using a real language engine providing copybooks required for the
-   * analysis
-   *
-   * @param fileName - name of the processing file
-   * @param text - text to analyze
-   * @param copybooks - list of copybooks required for the analysis
-   * @param subroutineNames - list of available subroutine names
-   * @return the entire analysis result
-   */
-  public static AnalysisResult analyze(
-      String fileName, String text, List<CobolText> copybooks, List<String> subroutineNames) {
-    return analyze(
-        fileName, text, copybooks, subroutineNames, new CopybookConfig(ENABLED, DB2_SERVER));
-  }
-
-  /**
-   * Analyze the given text using a real language engine providing copybooks required for the
    * analysis with the required sync type
    *
-   * @param fileName - name of the processing file
-   * @param text - text to analyze
-   * @param copybooks - list of copybooks required for the analysis
-   * @param subroutineNames - list of available subroutine names
-   * @param copybookConfig - contains config info like: copybook processing mode, backend server
+   * @param useCase use case instance to analyze
    * @return the entire analysis result
    */
-  public static AnalysisResult analyze(
-      String fileName,
-      String text,
-      List<CobolText> copybooks,
-      List<String> subroutineNames,
-      CopybookConfig copybookConfig) {
+  public static AnalysisResult analyze(UseCase useCase) {
     SettingsService mockSettingsService = mock(SettingsService.class);
     when(mockSettingsService.getConfiguration(any()))
         .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
@@ -161,18 +109,22 @@ public class UseCaseUtils {
             });
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
-    copybooks.stream().map(UseCaseUtils::toCopybookModel).forEach(copybookService::store);
+    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend())
+        .forEach(copybookService::store);
+
+    useCase.getCopybooks().stream()
+        .map(UseCaseUtils::toCopybookModel)
+        .forEach(copybookService::store);
 
     SubroutineService subroutines = injector.getInstance(SubroutineService.class);
-    subroutineNames.forEach(name -> subroutines.store(name, "URI:" + name));
+    useCase.getSubroutines().forEach(name -> subroutines.store(name, "URI:" + name));
 
     return injector
         .getInstance(CobolLanguageEngineFacade.class)
-        .analyze(fileName, text, copybookConfig);
+        .analyze(useCase.getFileName(), useCase.getText(), useCase.getCopybookConfig());
   }
-
   /**
-   * Convert CobolText into CopybookModel.
+   * Convert CobolText to CopybookModel
    *
    * @param cobolText the CobolText instance
    * @return the CopybookModel instance

@@ -16,8 +16,8 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
-import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.usecases.engine.UseCase;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -153,20 +153,20 @@ class TestMarginAB {
 
   @Test
   void checkForAreaA() {
-    AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_AREA_A, ImmutableList.of());
+    AnalysisResult result = UseCaseUtils.analyze(UseCase.builder().text(TEXT_AREA_A).build());
     assertEquals(5, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
   }
 
   @Test
   void checkForAreaB() {
-    AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_AREA_B, ImmutableList.of());
+    AnalysisResult result = UseCaseUtils.analyze(UseCase.builder().text(TEXT_AREA_B).build());
     assertEquals(5, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
   }
 
   @Test
   void checkCorrectProgramID() {
     AnalysisResult result =
-        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_PROGRAM_ID, ImmutableList.of());
+        UseCaseUtils.analyze(UseCase.builder().text(TEXT_PROGRAM_ID).build());
 
     assertEquals(1, result.getDiagnostics().size());
     assertEquals(
@@ -177,7 +177,7 @@ class TestMarginAB {
   @Test
   void checkDeclaratives() {
     AnalysisResult result =
-        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_DECLARATIVES, ImmutableList.of());
+        UseCaseUtils.analyze(UseCase.builder().text(TEXT_DECLARATIVES).build());
 
     assertEquals(3, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
     assertEquals(

@@ -36,6 +36,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
+import org.eclipse.lsp.cobol.service.PredefinedCopybooks;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -459,10 +460,14 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private void addCopybookDefinition(String copybookName, String uri) {
-    if (!(isEmpty(copybookName) || isEmpty(uri))) {
+    if (!(isEmpty(copybookName) || isEmpty(uri) || isPredefined(uri))) {
       copybooks.define(
           copybookName, new Location(uri, new Range(new Position(0, 0), new Position(0, 0))));
     }
+  }
+
+  private boolean isPredefined(String uri) {
+    return PredefinedCopybooks.isCopybookPredefined(uri);
   }
 
   @NonNull

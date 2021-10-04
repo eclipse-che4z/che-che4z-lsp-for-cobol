@@ -20,7 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.service.CFASTBuilder;
 import org.eclipse.lsp.cobol.service.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import org.eclipse.lsp.cobol.usecases.engine.UseCase;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -30,7 +31,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -55,7 +55,8 @@ class CFASTBuilderTest {
   @ParameterizedTest(name = "Test CFAST Builder: {2}")
   @MethodSource("casesToTest")
   void cfastBuilderTest(String src, String jsonTree, String caseName) {
-    AnalysisResult analysisResult = UseCaseUtils.analyze("fake/path", src, Collections.emptyList());
+    AnalysisResult analysisResult =
+        UseCaseUtils.analyze(UseCase.builder().fileName("fake/path").text(src).build());
     CFASTBuilder builder = new CFASTBuilderImpl();
     Assertions.assertEquals(
         GSON.toJson(GSON.fromJson(jsonTree, List.class)),
