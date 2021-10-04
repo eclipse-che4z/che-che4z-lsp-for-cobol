@@ -200,7 +200,7 @@
             {
                 "key": "shift+tab",
                 "command": "cobol-lsp.smart-outdent",
-                "when": "editorLangId == cobol || && !inSnippetMode"
+                "when": "editorLangId == cobol && !inSnippetMode"
             },
             {
                 "key": "shift+tab",
