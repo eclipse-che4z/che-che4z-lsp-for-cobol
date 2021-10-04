@@ -12,7 +12,7 @@ options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
    : .*? ((includeStatement | copyStatement | copyIdmsStatement | copyMaidStatement | replaceAreaStart | replaceOffStatement
-   | titleDirective | enterDirective | controlDirective)+ .*?)* EOF
+   | titleDirective | enterDirective | controlDirective | plusplusIncludeStatement)+ .*?)* EOF
    ;
 
 // copy statement
@@ -24,6 +24,11 @@ copyStatement
 includeStatement
    : EXEC SQL INCLUDE copySource END_EXEC DOT_FS
    ;
+
+// ++Include statement
+plusplusIncludeStatement
+    : PLUSPLUSINCLUDE copySource (DOT_FS | SEMICOLON_FS)?
+    ;
 
 // copy idms statement
 copyIdmsStatement
