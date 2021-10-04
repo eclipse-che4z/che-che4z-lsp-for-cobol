@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.eclipse.lsp.cobol.service.CopybookServiceImpl.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
  * This occurrences provider resolves the requests for the semantic elements based on its positions.

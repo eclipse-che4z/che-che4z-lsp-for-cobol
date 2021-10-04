@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.service;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
@@ -42,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
 /**
@@ -52,16 +52,6 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 @Singleton
 @SuppressWarnings("UnstableApiUsage")
 public class CopybookServiceImpl implements CopybookService {
-  private static final Map<String, PredefinedCopybooks> PREDEFINED_COPYBOOKS =
-      ImmutableMap.of(
-          "SQLCA",
-          PredefinedCopybooks.SQLCA,
-          "SQLDA",
-          PredefinedCopybooks.SQLDA,
-          "DFHEIBLK",
-          PredefinedCopybooks.DFHEIBLK);
-  public static final String PREF_IMPLICIT = "implicit://";
-
   private final SettingsService settingsService;
   private final FileSystemService files;
 
@@ -177,8 +167,9 @@ public class CopybookServiceImpl implements CopybookService {
    * @param copybookName - the name of copybook to check
    * @return true if copybook name is one of SQLDA or SQLCA
    */
-  private Optional<PredefinedCopybooks> retrievePredefinedCopybook(String copybookName) {
-    return Optional.ofNullable(PREDEFINED_COPYBOOKS.get(copybookName));
+  private Optional<PredefinedCopybooks.Copybook> retrievePredefinedCopybook(
+      String copybookName) {
+    return Optional.ofNullable(PredefinedCopybooks.forName(copybookName));
   }
 
   private String readContentForImplicitCopybook(String resourcePath) {
@@ -231,37 +222,5 @@ public class CopybookServiceImpl implements CopybookService {
 
   private String getUserInteractionType(CopybookProcessingMode copybookProcessingMode) {
     return copybookProcessingMode.userInteraction ? VERBOSE.label : QUIET.label;
-  }
-
-  /** Enumeration of predefined copybooks */
-  private enum PredefinedCopybooks {
-    SQLCA {
-      @Override
-      String uriForBackend(SQLBackend backend) {
-        return backend == SQLBackend.DATACOM_SERVER
-            ? "/implicitCopybooks/SQLCA_DATACOM.cpy"
-            : "/implicitCopybooks/SQLCA_DB2.cpy";
-      }
-    },
-    SQLDA {
-      @Override
-      String uriForBackend(SQLBackend backend) {
-        return "/implicitCopybooks/SQLDA.cpy";
-      }
-    },
-    DFHEIBLK {
-      @Override
-      String uriForBackend(SQLBackend backend) {
-        return "/implicitCopybooks/DFHEIBLK.cpy";
-      }
-    };
-
-    /**
-     * Retrieve the uri of this predefined copybook using the given SQL backend
-     *
-     * @param backend SQL backend for the program
-     * @return uri of the predefined copybook
-     */
-    abstract String uriForBackend(SQLBackend backend);
   }
 }

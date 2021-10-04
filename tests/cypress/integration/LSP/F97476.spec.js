@@ -26,7 +26,7 @@ context('This is a F97476 spec', () => {
     afterEach(() => {
       cy.closeCurrentTab();
     });
-    it(['smoke'], 'Checks basic REPLACING feature', () => {
+    it(['smoke', 'CI'], 'Checks basic REPLACING feature', () => {
       cy.openFile('REPLACING.CBL');
       cy.goToLine(22);
       cy.getCurrentLineErrors({ expectedLine: 22 }).getHoverErrorMessage().contains('Variable ABC-ID is not defined');

@@ -72,7 +72,7 @@ context('This is F95833 spec', () => {
   });
 
   describe('TC312753 Check EXEC CICS allows free arguments order', () => {
-    it("Try 'Go to Definition' on variables and paragraphs", () => {
+    it(['CI'], "Try 'Go to Definition' on variables and paragraphs", () => {
       cy.openFile('ADSORT.cbl').goToLine(59);
       cy.getCurrentLine().type("{end}{enter}EXEC CICS SEND MAP('DETAIL') MAPSET(DETAIL-MAPS)    ERASE END-EXEC.");
       cy.getLineByNumber(60).should('not.have.class', '.squiggly-error');

@@ -18,7 +18,9 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -27,7 +29,7 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Hovering over 88 with multiple VALUE clauses should show all of them */
@@ -61,7 +63,7 @@ class Test88ThruHover {
             ImmutableList.of(),
             ImmutableMap.of(),
             ImmutableList.of(),
-            CopybookProcessingMode.ENABLED);
+            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER));
 
     assertHover(result);
   }

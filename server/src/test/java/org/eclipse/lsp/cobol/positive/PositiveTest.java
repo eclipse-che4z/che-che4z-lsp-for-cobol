@@ -15,7 +15,8 @@
 package org.eclipse.lsp.cobol.positive;
 
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import org.eclipse.lsp.cobol.usecases.engine.UseCase;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -39,6 +40,12 @@ class PositiveTest extends FileBasedTest {
     String fileName = text.getFileName();
     LOG.debug("Processing: " + fileName);
     assertNoSyntaxErrorsFound(
-        UseCaseUtils.analyzeForErrors(fileName, text.getFullText(), getCopybooks()), fileName);
+        UseCaseUtils.analyzeForErrors(
+            UseCase.builder()
+                .fileName(fileName)
+                .text(text.getFullText())
+                .copybooks(getCopybooks())
+                .build()),
+        fileName);
   }
 }

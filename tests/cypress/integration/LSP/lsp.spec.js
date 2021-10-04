@@ -94,7 +94,7 @@ context('This is a LSP spec', () => {
     beforeEach(() => {
       cy.updateConfigs('basic');
     });
-    it(['smoke'], 'Checks behavior of go to definition action', () => {
+    it(['smoke', 'CI'], 'Checks behavior of go to definition action', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(29).findText('100-Print-User.').wait(5000).goToDefinition().wait(10000);
       cy.getCurrentLineNumber().should('eq', 32);
@@ -102,7 +102,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152080 Find all references from the word begin', () => {
-    it(['smoke'], 'Checks that LSP can find all references and navigate by them', () => {
+    it(['smoke', 'CI'], 'Checks that LSP can find all references and navigate by them', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(21).findText('User-Address.').type('{ctrl}{leftArrow}').goToDefinition();
       cy.get('.monaco-tl-contents')
@@ -117,7 +117,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152080 Find all references from the word middle', () => {
-    it(['smoke'], 'Checks that LSP can find all references and navigate by them', () => {
+    it(['smoke', 'CI'], 'Checks that LSP can find all references and navigate by them', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(21).findText('User-Address.').goToDefinition();
       cy.get('.monaco-tl-contents')
@@ -144,7 +144,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152052 Syntax Errors are marked in file', () => {
-    it(['smoke'], 'Checks that error lines are marked in a file', () => {
+    it(['smoke', 'CI'], 'Checks that error lines are marked in a file', () => {
       cy.openFile('USER2.cbl');
       cy.get('.squiggly-error')
         .should('have.length', 1)
@@ -198,7 +198,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152054 Auto format of right trailing spaces', () => {
-    it(['smoke'], 'Checks that auto format removed sight trailing spaces', () => {
+    it(['smoke', 'CI'], 'Checks that auto format removed sight trailing spaces', () => {
       cy.openFile('USER2.cbl');
       cy.getLineByNumber(35)
         .as('currentLine')
@@ -277,7 +277,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC266094 Underline the entire incorrect variable structure', () => {
-    it(['smoke'], 'This test checks that parser can find and underline an incorrect variable structure.', () => {
+    it(['smoke', 'CI'], 'This test checks that parser can find and underline an incorrect variable structure.', () => {
       cy.openFile('VAR.cbl').goToLine(23).wait(3000);
       cy.getMainEditor()
         .getCurrentLineOverlay()
@@ -417,7 +417,7 @@ context('This is a LSP spec', () => {
     afterEach(() => {
       cy.deleteFile(`${fileName}.cbl`);
     });
-    it(['smoke'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
+    it(['smoke', 'CI'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
       cy.getCurrentLine().type('{selectall}shell').wait(500);
       cy.get('[widgetid="editor.widget.suggestWidget"]').contains('shell').click();
@@ -544,7 +544,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC327254 Semicolon as a Separators Not Produces Error', () => {
-    it(['smoke'], 'Semicolon as a Separators Not Produces Error', () => {
+    it(['smoke', 'CI'], 'Semicolon as a Separators Not Produces Error', () => {
       cy.openFile('TEST.CBL');
       cy.goToLine(23).getLineByNumber(23).type('{end}{backspace};');
       cy.getLineByNumber(23).should('not.have.class', '.squiggly-error');

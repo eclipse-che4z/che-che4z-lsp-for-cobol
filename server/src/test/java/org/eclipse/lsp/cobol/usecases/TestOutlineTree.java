@@ -18,7 +18,8 @@ import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import org.eclipse.lsp.cobol.usecases.engine.UseCase;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.junit.jupiter.api.Test;
 
@@ -135,13 +136,15 @@ class TestOutlineTree {
 
   @Test
   void test() {
-    List<CobolText> copybooks =
-        ImmutableList.of(
-            new CobolText("FOO", ""),
-            new CobolText("BAR", "000100     01 HIDE-IT PIC 9(9)."),
-            new CobolText("BAZ", ""));
     List<DocumentSymbol> expectedNodes = getExpectedOutlineNodes();
-    AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, copybooks);
+    AnalysisResult result =
+        UseCaseUtils.analyze(
+            UseCase.builder()
+                .text(TEXT)
+                .copybook(new CobolText("FOO", ""))
+                .copybook(new CobolText("BAR", "000100     01 HIDE-IT PIC 9(9)."))
+                .copybook(new CobolText("BAZ", ""))
+                .build());
     assertNodeListEquals(expectedNodes, result.getOutlineTree(), "/");
   }
 

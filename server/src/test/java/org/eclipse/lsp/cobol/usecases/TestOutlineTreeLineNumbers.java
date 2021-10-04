@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import lombok.Value;
+import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp.cobol.usecases.engine.UseCase;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.junit.jupiter.api.Test;
 
@@ -41,26 +41,31 @@ class TestOutlineTreeLineNumbers {
 
   @Test
   void test() {
-    AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, ImmutableList.of(
-        new CobolText("BAR", "")
-    ));
-    Map<String, LineRange> expectedRanges = new ImmutableMap.Builder<String, LineRange>()
-        .put("PROGRAM", new LineRange(0, 4))
-        .put("IDENTIFICATION DIVISION", new LineRange(0, 0))
-        .put("DATA DIVISION", new LineRange(1, 4))
-        .put("WORKING-STORAGE SECTION", new LineRange(2, 4))
-        .put("STRUCTNAME", new LineRange(3, 4))
-        .put("VARNAME", new LineRange(4, 4))
-        .put("COPY BAR", new LineRange(5, 5))
-        .build();
+    AnalysisResult result =
+        UseCaseUtils.analyze(
+            UseCase.builder().text(TEXT).copybook(new CobolText("BAR", "")).build());
+
+    Map<String, LineRange> expectedRanges =
+        new ImmutableMap.Builder<String, LineRange>()
+            .put("PROGRAM", new LineRange(0, 4))
+            .put("IDENTIFICATION DIVISION", new LineRange(0, 0))
+            .put("DATA DIVISION", new LineRange(1, 4))
+            .put("WORKING-STORAGE SECTION", new LineRange(2, 4))
+            .put("STRUCTNAME", new LineRange(3, 4))
+            .put("VARNAME", new LineRange(4, 4))
+            .put("COPY BAR", new LineRange(5, 5))
+            .build();
     assertEquals(expectedRanges, extractLineRange(result.getOutlineTree()));
   }
 
   private Map<String, LineRange> extractLineRange(List<DocumentSymbol> documentSymbols) {
     Map<String, LineRange> result = new HashMap<>();
-    for (DocumentSymbol documentSymbol: documentSymbols) {
-      result.put(documentSymbol.getName(),
-          new LineRange(documentSymbol.getRange().getStart().getLine(), documentSymbol.getRange().getEnd().getLine()));
+    for (DocumentSymbol documentSymbol : documentSymbols) {
+      result.put(
+          documentSymbol.getName(),
+          new LineRange(
+              documentSymbol.getRange().getStart().getLine(),
+              documentSymbol.getRange().getEnd().getLine()));
       result.putAll(extractLineRange(documentSymbol.getChildren()));
     }
     return result;
