@@ -31,16 +31,15 @@
   },
   "dependencies": {
     "@eclipse/che-che4z": "https://github.com/eclipse/che-che4z.git",
-    "cypress": "7.7.0",
+    "cypress": "8.5.0",
     "typescript": "^4.3.5"
   },
   "scripts": {
     "lint": "eslint . ",
     "cy:run": "npm run allure:clear && cross-env CYPRESS_EXCLUDE_TAGS=flaky,flaky_theia,bug,investigation cypress run --env allure=true  -b chrome",
     "cy:run:all": "npm run cy:run -- --spec cypress/integration/LSP/*",
-    "cy:run:all:headless": "npm run cy:run:all  -- --headless",
     "cy:open": "cypress open --env allure=true",
-    "cy:run:all:headless:smoke": "cross-env CYPRESS_INCLUDE_TAGS=smoke npm run cy:run:all:headless --",
+    "cy:run:all:smoke": "cross-env CYPRESS_INCLUDE_TAGS=smoke npm run cy:run:all --",
     "ts:build": "tsc --build ./node_modules/@eclipse/che-che4z/tests/tsconfig.json",
     "allure:report": "allure generate allure-results --clean -o allure-report",
     "allure:open": "allure open",
@@ -50,6 +49,6 @@
     "delete:reports": "rm cypress/results/* || true",
     "prereport": "npm run delete:reports",
     "merge-reports": "jrm ui_tests_complete_logs.xml \"results/*.xml\"",
-    "cy:run:ci": "npm run prereport && cross-env CYPRESS_INCLUDE_TAGS=CI cypress run -b chrome --headless --reporter mocha-junit-reporter --config defaultCommandTimeout=60000 --env appLoadTimeout=60000"
+    "cy:run:ci": "npm run prereport && cross-env CYPRESS_INCLUDE_TAGS=CI cypress run -b chrome --reporter mocha-junit-reporter --config defaultCommandTimeout=60000 --env appLoadTimeout=60000"
   }
 }
