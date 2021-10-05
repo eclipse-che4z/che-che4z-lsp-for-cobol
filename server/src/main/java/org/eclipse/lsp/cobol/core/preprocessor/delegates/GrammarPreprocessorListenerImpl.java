@@ -67,6 +67,10 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private static final String UNDERSCORE = "_";
   private static final String SYNTAX_ERROR_CHECK_COPYBOOK_NAME =
       "Syntax error by checkCopybookName: {}";
+  private static final int MAX_COPYBOOK_NAME_LENGTH_DEFAULT = Integer.MAX_VALUE;
+  private static final int MAX_COPYBOOK_NAME_LENGTH_DATASET = 8;
+  private static final int MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB = 10;
+
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
   private final Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
   private final List<Pair<String, String>> copyReplacingClauses = new ArrayList<>();
@@ -192,7 +196,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         ctx.copyIdmsOptions().copyIdmsSource().copySource(),
         retrieveCopybookStatementPosition(ctx),
         ctx.getSourceInterval(),
-        false);
+        MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
   }
 
   @Override
@@ -203,7 +207,24 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyMaidStatement(CopyMaidStatementContext ctx) {
     collectAndAccumulateCopybookData(
-        ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval(), false);
+        ctx.copySource(),
+        retrieveCopybookStatementPosition(ctx),
+        ctx.getSourceInterval(),
+        MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
+  }
+
+  @Override
+  public void enterPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
+    collectAndAccumulateCopybookData(
+        ctx.copySource(),
+        retrieveCopybookStatementPosition(ctx),
+        ctx.getSourceInterval(),
+        MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB);
   }
 
   @Override
@@ -214,7 +235,10 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
     collectAndAccumulateCopybookData(
-        ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval(), true);
+        ctx.copySource(),
+        retrieveCopybookStatementPosition(ctx),
+        ctx.getSourceInterval(),
+        MAX_COPYBOOK_NAME_LENGTH_DATASET);
   }
 
   @Override
@@ -225,14 +249,17 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
     collectAndAccumulateCopybookData(
-        ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval(), true);
+        ctx.copySource(),
+        retrieveCopybookStatementPosition(ctx),
+        ctx.getSourceInterval(),
+        MAX_COPYBOOK_NAME_LENGTH_DATASET);
   }
 
   private void collectAndAccumulateCopybookData(
       CopySourceContext copySource,
       Locality copybookStatementPosition,
       Interval sourceInterval,
-      boolean checkCopybookNameLength) {
+      int maxLength) {
     if (!copybookConfig.getCopybookProcessingMode().analyze) {
       pop();
       return;
@@ -265,7 +292,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         processCopybook(copybookName, uri, copybookId, content, locality);
     String copybookContent = copybookDocument.getText();
 
-    checkCopybookName(copybookName, locality, checkCopybookNameLength);
+    checkCopybookName(copybookName, locality, maxLength);
     addCopybookUsage(copybookName, locality);
     addCopybookDefinition(copybookName, uri);
 
@@ -565,13 +592,14 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     errors.add(error);
   }
 
-  private void checkCopybookName(String copybookName, Locality locality, boolean checkLength) {
-    if (copybookName.length() > 8 && checkLength) {
+  private void checkCopybookName(String copybookName, Locality locality, int maxLength) {
+    if (copybookName.length() > maxLength) {
       addCopybookError(
           copybookName,
+          maxLength,
           locality,
           INFO,
-          "GrammarPreprocessorListener.copyBkOver8Chars",
+          "GrammarPreprocessorListener.copyBkOverMaxChars",
           SYNTAX_ERROR_CHECK_COPYBOOK_NAME);
     }
     // The first or last character must not be a hyphen.
@@ -604,6 +632,23 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         SyntaxError.syntaxError()
             .severity(info)
             .suggestion(messageService.getMessage(messageID, copybookName))
+            .locality(locality)
+            .build();
+    LOG.debug(logMessage + error.toString());
+    errors.add(error);
+  }
+
+  private void addCopybookError(
+      String copybookName,
+      int maxNameLength,
+      Locality locality,
+      ErrorSeverity info,
+      String messageID,
+      String logMessage) {
+    SyntaxError error =
+        SyntaxError.syntaxError()
+            .severity(info)
+            .suggestion(messageService.getMessage(messageID, maxNameLength, copybookName))
             .locality(locality)
             .build();
     LOG.debug(logMessage + error.toString());
