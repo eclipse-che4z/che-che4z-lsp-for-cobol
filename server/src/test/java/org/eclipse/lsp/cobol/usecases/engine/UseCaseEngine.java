@@ -20,6 +20,9 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
@@ -39,12 +42,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 import static org.antlr.v4.runtime.CharStreams.fromString;
+import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
+import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
+import static org.eclipse.lsp.cobol.service.CopybookServiceImpl.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -317,8 +325,8 @@ public class UseCaseEngine {
     assertResult("Copybook usages:", expected.getCopybookUsages(), actual.getCopybookUsages());
 
     assertResult(
-        "Variable definition:", expected.getVariableDefinitions(), actual.getVariableDefinitions());
-    assertResult("Variable usages:", expected.getVariableUsages(), actual.getVariableUsages());
+        "Variable definition:", expected.getVariableDefinitions(), extractVariableDefinitions(actual));
+    assertResult("Variable usages:", expected.getVariableUsages(), extractVariableUsages(actual));
 
     assertResult(
         "Constant definition:", expected.getConstantDefinitions(), actual.getConstantDefinitions());
@@ -339,6 +347,44 @@ public class UseCaseEngine {
         expected.getSubroutineDefinitions(),
         actual.getSubroutineDefinitions());
     assertResult("Subroutine usage:", expected.getSubroutineUsages(), actual.getSubroutineUsages());
+  }
+
+  private Map<String, List<Location>> extractVariableDefinitions(AnalysisResult result) {
+    return getVariableStream(result)
+        .filter(it -> !it.getDefinition().getUri().startsWith(PREF_IMPLICIT))
+        .collect(groupingBy(Variable::getName))
+        .entrySet()
+        .stream()
+        .collect(toMap(Entry::getKey,
+            entry -> entry.getValue().stream()
+                .map(Variable::getDefinition)
+                .map(Locality::toLocation)
+                .distinct()
+                .collect(toList())));
+  }
+
+  private Map<String, List<Location>> extractVariableUsages(AnalysisResult result) {
+    return getVariableStream(result)
+        .filter(variable -> !variable.getUsages().isEmpty())
+        .collect(groupingBy(Variable::getName))
+        .entrySet()
+        .stream()
+        .collect(toMap(Entry::getKey,
+            entry -> entry.getValue().stream()
+                .map(Variable::getUsages)
+                .flatMap(List::stream)
+                .map(Locality::toLocation)
+                .collect(toList())));
+  }
+
+  private Stream<Variable> getVariableStream(AnalysisResult result) {
+    return result.getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(PROGRAM))
+        .map(ProgramNode.class::cast)
+        .map(ProgramNode::getDefinedVariables)
+        .flatMap(Collection::stream)
+        .filter(it -> !FILLER_NAME.equals(it.getName()));
   }
 
   private void assertDiagnostics(

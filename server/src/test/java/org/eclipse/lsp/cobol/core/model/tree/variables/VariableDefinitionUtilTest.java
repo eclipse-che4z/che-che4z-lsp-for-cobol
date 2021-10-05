@@ -19,6 +19,8 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -30,11 +32,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Test {@link VariableDefinitionUtil} */
 class VariableDefinitionUtilTest {
-  private static final Locality LOCALITY = Locality.builder().build();
+  private static final Locality LOCALITY = Locality.builder()
+      .uri("")
+      .range(new Range(new Position(1, 1), new Position(2, 2)))
+      .build();
 
   @Test
   void simpleStructureTest() {
-    Node programNode = new ProgramNode(LOCALITY, null);
+    Node programNode = new ProgramNode(LOCALITY);
     // 01 Level-01-order-1
     // 01 Level-01-order-2
     //    05 Level-05-order-1
@@ -44,31 +49,37 @@ class VariableDefinitionUtilTest {
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-01-order-1", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-01-order-2", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-05-order-1", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(10)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-10-order-1", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-05-order-2", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-01-order-3", LOCALITY))
             .build());
     VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
@@ -82,7 +93,7 @@ class VariableDefinitionUtilTest {
 
   @Test
   void nonCorrectStructures() {
-    Node programNode = new ProgramNode(LOCALITY, null);
+    Node programNode = new ProgramNode(LOCALITY);
     // 05 Level-05
     // 01 Level-01
     //   10 Level-10
@@ -90,21 +101,25 @@ class VariableDefinitionUtilTest {
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-05", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-01", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(10)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-10", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(7)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-07", LOCALITY))
             .build());
     VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
@@ -116,23 +131,26 @@ class VariableDefinitionUtilTest {
 
   @Test
   void moveLevel66ToTop() {
-    Node programNode = new ProgramNode(LOCALITY, null);
+    Node programNode = new ProgramNode(LOCALITY);
     // 01 Level-01
     //    05 Level-05
     // 66 Level-66
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-01", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-05", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(66)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-66", LOCALITY))
             .build());
     VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
@@ -145,7 +163,7 @@ class VariableDefinitionUtilTest {
     List<ValueClause> valueClauses =
         ImmutableList.of(
             new ValueClause(ImmutableList.of(new ValueInterval("", "", "thru")), LOCALITY));
-    Node programNode = new ProgramNode(LOCALITY, null);
+    Node programNode = new ProgramNode(LOCALITY);
     // 01 Level-01
     //      88 Cond-1
     //    05 Level-05-1
@@ -154,28 +172,33 @@ class VariableDefinitionUtilTest {
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-01", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(88)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Cond-1", LOCALITY))
             .valueClauses(valueClauses)
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-05-1", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(88)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Cond-2", LOCALITY))
             .valueClauses(valueClauses)
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
+            .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-05-2", LOCALITY))
             .build());
     VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);

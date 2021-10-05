@@ -37,11 +37,8 @@ import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToOnOffStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetUpDownByStatement;
-import org.eclipse.lsp.cobol.core.model.tree.variables.OccursClause;
-import org.eclipse.lsp.cobol.core.model.tree.variables.ValueClause;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode.Builder;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
@@ -57,7 +54,6 @@ import org.eclipse.lsp4j.Range;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -213,7 +209,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitProgramUnit(ProgramUnitContext ctx) {
     outlineTreeBuilder.addProgram(ctx);
     fileControls = new HashMap<>();
-    return addTreeNode(ctx, locality -> new ProgramNode(locality, messageService));
+    return addTreeNode(ctx, ProgramNode::new);
   }
 
   @Override
@@ -651,33 +647,43 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
-    return addVariableUsage(
-        ctx.dataName(), visitChildren(ctx), ctx.inData().stream().map(InDataContext::dataName));
+    return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
   @Override
-  public List<Node> visitIdms_map_name(Idms_map_nameContext ctx) {
-    return addVariableUsage(ctx.dataName(), visitChildren(ctx), Stream.empty());
-  }
-
-  @Override
-  public List<Node> visitIdms_db_entity_name(Idms_db_entity_nameContext ctx) {
-    return addVariableUsage(ctx.dataName(), visitChildren(ctx), Stream.empty());
-  }
-
-  @Override
-  public List<Node> visitIdms_procedure_name(Idms_procedure_nameContext ctx) {
-    return addVariableUsage(ctx.dataName(), visitChildren(ctx), Stream.empty());
+  public List<Node> visitVariableUsageName(VariableUsageNameContext ctx) {
+    return addTreeNode(
+        ctx,
+        locality -> new VariableUsageNode(getName(ctx), locality)
+    );
   }
 
   @Override
   public List<Node> visitFileName(FileNameContext ctx) {
-    return addVariableUsage(ctx.cobolWord(), visitChildren(ctx), Stream.empty());
+    return addTreeNode(
+        ctx,
+        locality -> {
+          Node usage = new VariableUsageNode(getName(ctx), locality);
+          Node reference = new QualifiedReferenceNode(locality);
+          reference.addChild(usage);
+          return reference;
+        }
+    );
   }
 
-  private List<Node> addVariableUsage(
-      ParserRuleContext ctx, List<Node> children, Stream<ParserRuleContext> hierarchy) {
-    return VisitorHelper.createVariableUsage(positions, constants, ctx, children, hierarchy);
+  @Override
+  public List<Node> visitIdms_map_name(Idms_map_nameContext ctx) {
+    return addTreeNode(ctx, QualifiedReferenceNode::new);
+  }
+
+  @Override
+  public List<Node> visitIdms_db_entity_name(Idms_db_entity_nameContext ctx) {
+    return addTreeNode(ctx, QualifiedReferenceNode::new);
+  }
+
+  @Override
+  public List<Node> visitIdms_procedure_name(Idms_procedure_nameContext ctx) {
+    return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
   @Override

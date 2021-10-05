@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.engine;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
@@ -44,7 +42,6 @@ import org.eclipse.lsp.cobol.core.visitor.EmbeddedLanguagesListener;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
-import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,6 +57,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.EMBEDDED_CODE;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
+import static org.eclipse.lsp.cobol.service.CopybookServiceImpl.PREF_IMPLICIT;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
@@ -167,9 +165,7 @@ public class CobolLanguageEngine {
               .collect(toList());
       context =
           context.toBuilder()
-              .variableDefinitions(collectVariableDefinitions(definedVariables))
-              .variableUsages(collectVariableUsages(definedVariables))
-              .variables(definedVariables)
+              .variables(collectVariables(definedVariables))
               .rootNode(rootNode)
               .build();
       timingBuilder.getSyntaxTreeTimer().stop();
@@ -291,22 +287,10 @@ public class CobolLanguageEngine {
         .orElse(syntaxError);
   }
 
-  private Map<String, Collection<Location>> collectVariableDefinitions(
-      Collection<Variable> definedVariables) {
-    Multimap<String, Location> definitions = HashMultimap.create();
-    definedVariables.stream()
+  private List<Variable> collectVariables(Collection<Variable> definedVariables) {
+    return definedVariables.stream()
         .filter(it -> !FILLER_NAME.equals(it.getName()))
-        .forEach(it -> definitions.put(it.getName(), it.getDefinition().toLocation()));
-    return definitions.asMap();
-  }
-
-  private Map<String, Collection<Location>> collectVariableUsages(
-      Collection<Variable> definedVariables) {
-    Multimap<String, Location> usages = HashMultimap.create();
-    definedVariables.forEach(
-        it ->
-            usages.putAll(
-                it.getName(), it.getUsages().stream().map(Locality::toLocation).collect(toList())));
-    return usages.asMap();
+        .filter(it -> !it.getDefinition().getUri().startsWith(PREF_IMPLICIT))
+        .collect(toList());
   }
 }

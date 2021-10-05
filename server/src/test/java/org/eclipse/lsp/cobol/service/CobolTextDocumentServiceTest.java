@@ -442,10 +442,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     TextDocumentItem testHoverDocument =
         new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE);
 
-    AnalysisResult analysisResult =
-        AnalysisResult.builder()
-            .variableDefinitions(ImmutableMap.of("var1", ImmutableList.of(new Location())))
-            .build();
+    AnalysisResult analysisResult = AnalysisResult.builder().build();
     when(engine.analyze(eq(DOCUMENT_URI), eq(TEXT_EXAMPLE), any(CopybookConfig.class)))
         .thenReturn(analysisResult);
 

@@ -14,55 +14,44 @@
  */
 package org.eclipse.lsp.cobol.core.model;
 
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import lombok.experimental.UtilityClass;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.groupingBy;
 
 /**
  * The class take all defined variables and search through them by partial qualifier
  */
 @UtilityClass
 public class VariableUsageUtils {
-
-  /**
-   * Convert given defined variables into map, convenient for later search in findVariables function.
-   * The defined variables can be converted once and used for all subsequent searches.
-   *
-   * @param definedVariables the collection with defined variables
-   * @return the converted representation
-   */
-  public static Map<String, List<Variable>> convertDefinedVariables(Collection<Variable> definedVariables) {
-    return definedVariables.stream().collect(groupingBy(Variable::getName));
-  }
-
   /**
    * Return the list of variables matches the list of qualifiers
    *
    * @param definedVariables the map with all defined variables
-   * @param name the name of variable
-   * @param parents the list of parents in order they appear in COBOL.
-   *                Ex.: CHILD OF PARENT1 OF PARENT2 => ["PARENT1", "PARENT2"]
+   * @param usageNodes usage nodes consists of variable name and parents
    * @return the list of all matched variables
    */
-  public static List<Variable> findVariables(
-      Map<String, List<Variable>> definedVariables, String name, List<String> parents) {
-    return definedVariables.getOrDefault(name, ImmutableList.of()).stream()
-        .filter(it -> checkParents(it, parents))
+  public static List<VariableNode> findVariablesForUsage(
+      Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usageNodes) {
+    return definedVariables.get(usageNodes.get(0).getDataName()).stream()
+        .filter(it -> checkParents(it, usageNodes.subList(1, usageNodes.size())))
         .collect(Collectors.toList());
   }
 
-  private static boolean checkParents(Variable variable, List<String> parents) {
-    for (String parent : parents) {
+  private static boolean checkParents(VariableNode variable, List<VariableUsageNode> parents) {
+    for (VariableUsageNode parent : parents) {
+      String parentName = parent.getDataName();
       do {
-        variable = variable.getParent();
+        variable = variable.getNearestParentByType(NodeType.VARIABLE)
+            .map(VariableNode.class::cast)
+            .orElse(null);
         if (variable == null)
           return false;
-      } while (!variable.getName().equals(parent));
+      } while (!variable.getName().equals(parentName));
     }
     return true;
   }

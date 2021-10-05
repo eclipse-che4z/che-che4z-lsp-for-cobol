@@ -12,30 +12,27 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-
-/** This test verifies that the definition checks applies to the table calls */
-class TestIncorrectTableCallUnderlined {
+/** Typing EXEC SQL should not throw {@link StringIndexOutOfBoundsException}*/
+class TestNoStringIndexOutOfBoundsOnExecSql {
 
   private static final String TEXT =
-      "       Identification Division. \n"
-          + "       Program-id.    ProgramId.\n"
-          + "       Data Division.\n"
-          + "       Working-Storage Section.\n"
-          + "       Procedure Division.\n"
-          + "       {#*000-Main-Logic}.\n"
-          + "           MOVE 'ABC' TO {_OL-ACCT-NO({SUB1|2})|1_}.\n"
-          + "       End program ProgramId.";
+      "        IDENTIFICATION DIVISION.\n"
+          + "        PROGRAM-ID. test1.\n"
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        PROCEDURE DIVISION.\n"
+          + "            EXEC SQL\n"
+          + "       {|1}\n";
 
   @Test
   void test() {
@@ -46,11 +43,8 @@ class TestIncorrectTableCallUnderlined {
             "1",
             new Diagnostic(
                 null,
-                "Variable OL-ACCT-NO is not defined",
+                "Unexpected end of file",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
-            "2",
-            new Diagnostic(
-                null, "Variable SUB1 is not defined", DiagnosticSeverity.Error, ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())));
   }
 }

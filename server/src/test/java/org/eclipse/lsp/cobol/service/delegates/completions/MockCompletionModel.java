@@ -36,8 +36,6 @@ class MockCompletionModel {
   private static final Variable VAR_NOT_EXPECTED = mock(Variable.class);
   static final AnalysisResult RESULT =
       AnalysisResult.builder()
-          .variableDefinitions(of("varD1", LOCATIONS, "VarD2", LOCATIONS, "Not-varD", LOCATIONS))
-          .variableUsages(of("varU1", LOCATIONS, "VarU2", LOCATIONS, "Not-varU", LOCATIONS))
           .paragraphDefinitions(of("parD1", LOCATIONS, "ParD2", LOCATIONS, "Not-parD", LOCATIONS))
           .paragraphUsages(of("parU1", LOCATIONS, "ParU2", LOCATIONS, "Not-parU", LOCATIONS))
           .sectionDefinitions(of("secD1", LOCATIONS, "SecD2", LOCATIONS, "Not-secD", LOCATIONS))

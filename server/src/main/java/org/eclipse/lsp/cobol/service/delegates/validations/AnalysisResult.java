@@ -32,8 +32,6 @@ import java.util.*;
 @Builder(toBuilder = true)
 public class AnalysisResult {
   @Builder.Default Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
-  @Builder.Default Map<String, List<Location>> variableDefinitions = new HashMap<>();
-  @Builder.Default Map<String, List<Location>> variableUsages = new HashMap<>();
   @Builder.Default Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
   @Builder.Default Map<String, List<Location>> paragraphUsages = new HashMap<>();
   @Builder.Default Map<String, List<Location>> sectionDefinitions = new HashMap<>();
@@ -55,10 +53,6 @@ public class AnalysisResult {
    */
   public static AnalysisResult empty() {
     return AnalysisResult.builder().build();
-  }
-
-  public Set<String> getVariableNames() {
-    return variableDefinitions.keySet();
   }
 
   public Set<String> getConstants() {

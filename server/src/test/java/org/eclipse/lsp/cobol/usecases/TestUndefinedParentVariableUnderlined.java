@@ -45,7 +45,7 @@ class TestUndefinedParentVariableUnderlined {
           + "6              10 {$*MAMA} PIC 99 VALUE 3.\r\n"
           + "7       PROCEDURE DIVISION.\r\n"
           + "8       {#*PROCB}.\r\n"
-          + "9           MOVE 10 TO {MAMA|1} OF AGE OF BORROWE.\r\n"
+          + "9           MOVE 10 TO {_MAMA OF AGE OF BORROWE|1_}.\r\n"
           + "10      END PROGRAM TEST1.";
 
   @Test
