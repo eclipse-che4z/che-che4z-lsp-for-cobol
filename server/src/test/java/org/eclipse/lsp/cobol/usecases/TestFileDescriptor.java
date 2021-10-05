@@ -18,7 +18,9 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -28,13 +30,15 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the FD and SD.
- * 1. Hover shows the File Description and File control data.
- * 2. FD are checked before the use of file variable.
+ *
+ * <p>1. Hover shows the File Description and File control data.
+ *
+ * <p>2. FD are checked before the use of file variable.
  */
 class TestFileDescriptor {
   private static final String TEXT =
@@ -162,7 +166,7 @@ class TestFileDescriptor {
             ImmutableList.of(),
             ImmutableMap.of(),
             ImmutableList.of(),
-            CopybookProcessingMode.ENABLED);
+            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER));
 
     assertHover(analysisResult);
   }

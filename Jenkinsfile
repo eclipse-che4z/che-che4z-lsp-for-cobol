@@ -70,7 +70,7 @@ spec:
         memory: "2Gi"
         cpu: "1"
   - name: cypress
-    image: cypress/included:7.7.0
+    image: cypress/included:8.5.0
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
