@@ -14,7 +14,6 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
@@ -24,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-/** These test for DAF WRITE TRANSACTION statement */
+/** Tests the DAF WRITE TRANSACTION statement */
 class TestDAFWriteTransaction {
 
   private static final String TEXT =
@@ -65,7 +64,7 @@ class TestDAFWriteTransaction {
         "2",
         new Diagnostic(
             null,
-            "Exact length of task name should be 4 bytes",
+            "Exact length of task name must be 4 bytes",
             DiagnosticSeverity.Error,
             SourceInfoLevels.ERROR.getText()));
     diagnosticMap.put(

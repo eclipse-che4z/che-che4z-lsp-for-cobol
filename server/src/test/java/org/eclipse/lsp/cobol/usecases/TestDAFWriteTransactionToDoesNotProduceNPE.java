@@ -21,9 +21,6 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /** This test for DAF WRITE TRANSACTION TO statement for Null Pointer Exception */
 class TestDAFWriteTransactionToDoesNotProduceNPE {
 

@@ -21,7 +21,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/** These test for DAF READ TRANSACTION statement */
+/** Tests the DAF READ TRANSACTION statement */
 class TestDAFReadTransaction {
 
   private static final String TEXT =
@@ -53,7 +53,7 @@ class TestDAFReadTransaction {
             "2",
             new Diagnostic(
                 null,
-                "Exact length of task name should be 4 bytes",
+                "Exact length of task name must be 4 bytes",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }
