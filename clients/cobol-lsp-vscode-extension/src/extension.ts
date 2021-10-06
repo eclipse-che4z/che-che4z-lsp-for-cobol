@@ -55,15 +55,9 @@ function initialize() {
 
 export async function activate(context: vscode.ExtensionContext) {
     initialize();
-    TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
-    try {
-        await languageClientService.checkPrerequisites();
-    } catch (err) {
-        vscode.window.showErrorMessage(err.toString());
-        TelemetryService.registerExceptionEvent("RuntimeException", err.toString(), ["bootstrap", "experiment-tag"], "Client has wrong Java version installed");
+    initSmartTab(context);
 
-        return;
-    }
+    TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
 
     copyBooksDownloader.start();
 
@@ -89,8 +83,6 @@ export async function activate(context: vscode.ExtensionContext) {
         gotoCopybookSettings();
     }));
 
-    initSmartTab(context);
-
     // Custom client handlers
     languageClientService.addRequestHandler("cobol/resolveSubroutine", resolveSubroutineURI);
 
@@ -106,6 +98,15 @@ export async function activate(context: vscode.ExtensionContext) {
             {scheme: "file", language: LANGUAGE_ID},
             new CopybooksCodeActionProvider()));
 
+    try {
+        await languageClientService.checkPrerequisites();
+    } catch (err) {
+        vscode.window.showErrorMessage(err.toString());
+        TelemetryService.registerExceptionEvent("RuntimeException", err.toString(), ["bootstrap", "experiment-tag"], "Client has wrong Java version installed");
+
+        return;
+    }
+        
     // 'export' public api-surface
     return {
         analysis(uri: string, text: string): Promise<any> {
