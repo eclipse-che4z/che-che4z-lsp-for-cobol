@@ -55,15 +55,9 @@ function initialize() {
 
 export async function activate(context: vscode.ExtensionContext) {
     initialize();
-    TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
-    try {
-        await languageClientService.checkPrerequisites();
-    } catch (err) {
-        vscode.window.showErrorMessage(err.toString());
-        TelemetryService.registerExceptionEvent("RuntimeException", err.toString(), ["bootstrap", "experiment-tag"], "Client has wrong Java version installed");
+    initSmartTab(context);
 
-        return;
-    }
+    TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
 
     copyBooksDownloader.start();
 
@@ -89,13 +83,6 @@ export async function activate(context: vscode.ExtensionContext) {
         gotoCopybookSettings();
     }));
 
-    initSmartTab(context);
-
-    // Custom client handlers
-    languageClientService.addRequestHandler("cobol/resolveSubroutine", resolveSubroutineURI);
-
-    context.subscriptions.push(languageClientService.start());
-
     // create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
@@ -105,6 +92,20 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerCodeActionsProvider(
             {scheme: "file", language: LANGUAGE_ID},
             new CopybooksCodeActionProvider()));
+
+    try {
+        await languageClientService.checkPrerequisites();
+    } catch (err) {
+        vscode.window.showErrorMessage(err.toString());
+        TelemetryService.registerExceptionEvent("RuntimeException", err.toString(), ["bootstrap", "experiment-tag"], "Client has wrong Java version installed");
+
+        return;
+    }
+
+    // Custom client handlers
+    languageClientService.addRequestHandler("cobol/resolveSubroutine", resolveSubroutineURI);
+        
+    context.subscriptions.push(languageClientService.start());
 
     // 'export' public api-surface
     return {
