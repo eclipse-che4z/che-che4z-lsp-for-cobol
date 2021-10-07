@@ -360,8 +360,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   }
 
   private AnalysisConfig requestConfigs(CopybookProcessingMode processingMode) {
-    AnalysisConfig analysisConfig = AnalysisConfig.defaultConfig(new CopybookConfig(processingMode, SQLBackend.DB2_SERVER));
-
+    CopybookConfig copybookConfig = new CopybookConfig(processingMode, SQLBackend.DB2_SERVER);
     try {
       List<Object> objects = settingsService.getConfigurations(Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label)).get();
 
@@ -369,20 +368,22 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
           .map(SQLBackend::valueOf)
           .orElse(SQLBackend.DB2_SERVER);
 
+      copybookConfig = new CopybookConfig(processingMode, sqlBackend);
+
       Set<EmbeddedCodeNode.Language> features = new HashSet<>();
       JsonArray jsonArray = (JsonArray) objects.get(1);
       for (JsonElement element : jsonArray) {
         String feature = element.getAsString();
         features.add(EmbeddedCodeNode.Language.valueOf(feature));
       }
-      analysisConfig = new AnalysisConfig(features, new CopybookConfig(processingMode, sqlBackend));
+      return new AnalysisConfig(features, copybookConfig);
     } catch (InterruptedException e) {
       LOG.error("InterruptedException when getting settings", e);
       Thread.currentThread().interrupt();
     } catch (Exception e) {
-      LOG.error("Can't get config-data", e);
+      LOG.warn("Can't get config-data, default config will be used instead");
     }
-    return analysisConfig;
+    return AnalysisConfig.defaultConfig(copybookConfig);
   }
 
   private void registerToFutureMap(String uri, Future<?> docAnalysisFuture) {
