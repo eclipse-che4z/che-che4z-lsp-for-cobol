@@ -121,7 +121,7 @@ public class UseCaseUtils {
 
     return injector
         .getInstance(CobolLanguageEngineFacade.class)
-        .analyze(useCase.getFileName(), useCase.getText(), AnalysisConfig.defaultConfig(useCase.getCopybookConfig()));
+        .analyze(useCase.getFileName(), useCase.getText(), useCase.getAnalysisConfig());
   }
   /**
    * Convert CobolText to CopybookModel

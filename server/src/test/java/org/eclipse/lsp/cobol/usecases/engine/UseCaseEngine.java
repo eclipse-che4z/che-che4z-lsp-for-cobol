@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.SQLBackend;
@@ -149,7 +150,7 @@ public class UseCaseEngine {
         copybooks,
         expectedDiagnostics,
         subroutineNames,
-        new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER));
+        AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
   }
 
   /**
@@ -168,7 +169,7 @@ public class UseCaseEngine {
    * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
    *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
    * @param subroutineNames - list of subroutine names used in the document
-   * @param copybookConfig - copybook processing mode and the SQL backend for the analysis
+   * @param analysisConfig - analysis settings: copybook processing mode and the SQL backend for the analysis
    * @return analysis result object
    */
   public AnalysisResult runTest(
@@ -176,11 +177,11 @@ public class UseCaseEngine {
       List<CobolText> copybooks,
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> subroutineNames,
-      CopybookConfig copybookConfig) {
+      AnalysisConfig analysisConfig) {
 
     PreprocessedDocument document =
         AnnotatedDocumentCleaning.prepareDocument(
-            text, copybooks, subroutineNames, expectedDiagnostics, copybookConfig.getSqlBackend());
+            text, copybooks, subroutineNames, expectedDiagnostics, analysisConfig.getCopybookConfig().getSqlBackend());
     AnalysisResult actual =
         analyze(
             UseCase.builder()
@@ -188,8 +189,9 @@ public class UseCaseEngine {
                 .text(document.getText())
                 .copybooks(document.getCopybooks())
                 .subroutines(subroutineNames)
-                .sqlBackend(copybookConfig.getSqlBackend())
-                .copybookProcessingMode(copybookConfig.getCopybookProcessingMode())
+                .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
+                .copybookProcessingMode(analysisConfig.getCopybookConfig().getCopybookProcessingMode())
+                .features(analysisConfig.getFeatures())
                 .build());
     TestData expected = document.getTestData();
     assertResultEquals(actual, expected);
