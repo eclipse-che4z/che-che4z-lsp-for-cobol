@@ -18,6 +18,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -25,6 +27,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
@@ -45,13 +48,9 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
@@ -61,6 +60,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.ANALYSIS_FEATURES;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.TARGET_SQL_BACKEND;
 
 /**
@@ -334,11 +334,12 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                                 ? CopybookProcessingMode.ENABLED_VERBOSE
                                 : CopybookProcessingMode.ENABLED);
 
+                    AnalysisConfig config = requestConfigs(copybookProcessingMode);
                     AnalysisResult result =
                         engine.analyze(
                             uri,
                             text,
-                            new CopybookConfig(copybookProcessingMode, getTargetSqlBackend()));
+                            config);
                     ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
                     publishResult(uri, result, copybookProcessingMode);
                     outlineMap.computeIfPresent(
@@ -358,19 +359,30 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     registerToFutureMap(uri, docAnalysisFuture);
   }
 
-  private SQLBackend getTargetSqlBackend() {
+  private AnalysisConfig requestConfigs(CopybookProcessingMode processingMode) {
+    AnalysisConfig analysisConfig = AnalysisConfig.defaultConfig(new CopybookConfig(processingMode, SQLBackend.DB2_SERVER));
+
     try {
-      return SettingsService.getValueAsString(
-              settingsService.getConfiguration(TARGET_SQL_BACKEND.label).get())
+      List<Object> objects = settingsService.getConfigurations(Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label)).get();
+
+      SQLBackend sqlBackend = SettingsService.getValueAsString(objects.subList(0, 1))
           .map(SQLBackend::valueOf)
           .orElse(SQLBackend.DB2_SERVER);
+
+      Set<EmbeddedCodeNode.Language> features = new HashSet<>();
+      JsonArray jsonArray = (JsonArray) objects.get(1);
+      for (JsonElement element : jsonArray) {
+        String feature = element.getAsString();
+        features.add(EmbeddedCodeNode.Language.valueOf(feature));
+      }
+      analysisConfig = new AnalysisConfig(features, new CopybookConfig(processingMode, sqlBackend));
     } catch (InterruptedException e) {
-      LOG.error("InterruptedException when getting {}:\n {}", TARGET_SQL_BACKEND, e);
+      LOG.error("InterruptedException when getting settings", e);
       Thread.currentThread().interrupt();
-    } catch (ExecutionException e) {
-      LOG.error("Can't get config-data for {}: \n {}", TARGET_SQL_BACKEND, e);
+    } catch (Exception e) {
+      LOG.error("Can't get config-data", e);
     }
-    return SQLBackend.DB2_SERVER;
+    return analysisConfig;
   }
 
   private void registerToFutureMap(String uri, Future<?> docAnalysisFuture) {
@@ -384,14 +396,13 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
             .submit(
                 () -> {
                   try {
+                    CopybookProcessingMode processingMode = CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.SKIP);
+                    AnalysisConfig config = requestConfigs(processingMode);
                     AnalysisResult result =
                         engine.analyze(
                             uri,
                             text,
-                            new CopybookConfig(
-                                CopybookProcessingMode.getCopybookProcessingMode(
-                                    uri, CopybookProcessingMode.SKIP),
-                                getTargetSqlBackend()));
+                            config);
                     registerDocument(uri, new CobolDocumentModel(text, result));
                     communications.publishDiagnostics(result.getDiagnostics());
                     outlineMap.get(uri).complete(result.getOutlineTree());

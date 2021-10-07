@@ -45,6 +45,7 @@ import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.semantics.outline.OutlineTreeBuilder;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
@@ -84,6 +85,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final Map<Token, EmbeddedCode> embeddedCodeParts;
   private final MessageService messageService;
   private final SubroutineService subroutineService;
+  private final AnalysisConfig analysisConfig;
   private Map<String, FileControlEntryContext> fileControls = null;
 
   public CobolVisitor(
@@ -91,6 +93,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       @NonNull NamedSubContext copybooks,
       @NonNull CommonTokenStream tokenStream,
       @NonNull Map<Token, Locality> positions,
+      @NonNull AnalysisConfig analysisConfig,
       Map<Token, EmbeddedCode> embeddedCodeParts,
       MessageService messageService,
       SubroutineService subroutineService) {
@@ -100,6 +103,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     this.tokenStream = tokenStream;
     this.messageService = messageService;
     this.subroutineService = subroutineService;
+    this.analysisConfig = analysisConfig;
     outlineTreeBuilder = new OutlineTreeBuilder(documentUri, positions);
   }
 
