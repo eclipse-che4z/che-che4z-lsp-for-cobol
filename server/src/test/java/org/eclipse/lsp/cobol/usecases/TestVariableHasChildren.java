@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.variables.*;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorListenerImpl;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.SQLBackend;
@@ -54,7 +55,7 @@ class TestVariableHasChildren {
             ImmutableList.of(),
             ImmutableMap.of(),
             ImmutableList.of(),
-            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER));
+            AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
     List<Variable> actualGroupItemChildren =
         result.getVariables().stream()
             .filter(it -> it.getName().equals("TERMS-RECORD"))
