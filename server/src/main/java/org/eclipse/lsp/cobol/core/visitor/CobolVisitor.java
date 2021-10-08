@@ -396,13 +396,21 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitExecCicsStatement(ExecCicsStatementContext ctx) {
     areaBWarning(ctx);
-    return processEmbeddedNodes(ctx, ctx.cicsRules(), EmbeddedCodeNode.Language.CICS);
+    if (analysisConfig.getFeatures().contains(EmbeddedCodeNode.Language.CICS)) {
+      return processEmbeddedNodes(ctx, ctx.cicsRules(), EmbeddedCodeNode.Language.CICS);
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   @Override
   public List<Node> visitExecSqlStatement(ExecSqlStatementContext ctx) {
     areaBWarning(ctx);
-    return processEmbeddedNodes(ctx, ctx.sqlCode(), EmbeddedCodeNode.Language.SQL);
+    if (analysisConfig.getFeatures().contains(EmbeddedCodeNode.Language.SQL)) {
+      return processEmbeddedNodes(ctx, ctx.sqlCode(), EmbeddedCodeNode.Language.SQL);
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   private List<Node> processEmbeddedNodes(
