@@ -15,7 +15,6 @@
 
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -47,7 +46,6 @@ class MockCompletionModel {
           .copybookUsages(of("cpyU1", LOCATIONS, "CpyU2", LOCATIONS, "Not-cpyU", LOCATIONS))
           .subroutineDefinitions(of("subD1", LOCATIONS, "SubD2", LOCATIONS, "Not-subD", LOCATIONS))
           .subroutineUsages(of("subU1", LOCATIONS, "SubU2", LOCATIONS, "Not-subU", LOCATIONS))
-          .variables(ImmutableList.of(VAR1, VAR2, VAR_NOT_EXPECTED))
           .build();
   static final CobolDocumentModel MODEL = new CobolDocumentModel("some text", RESULT);
 

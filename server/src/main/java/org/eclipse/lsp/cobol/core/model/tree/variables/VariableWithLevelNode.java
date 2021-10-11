@@ -35,6 +35,7 @@ abstract class VariableWithLevelNode extends VariableNode {
   private final int level;
   private final boolean specifiedGlobal;
   private final boolean redefines;
+  private static final String GLOBAL_SUFFIX = " GLOBAL";
 
   protected VariableWithLevelNode(
       Locality location,
@@ -74,5 +75,10 @@ abstract class VariableWithLevelNode extends VariableNode {
     if (specifiedGlobal && level != LEVEL_01)
       errors.add(getError(MessageTemplate.of(GLOBAL_NON_01_LEVEL_MSG)));
     return errors;
+  }
+
+  protected String getFormattedSuffix() {
+    String globalSuffix = specifiedGlobal ? GLOBAL_SUFFIX : "";
+    return String.format("%1$02d %2$s%3$s", level, getName(), globalSuffix);
   }
 }

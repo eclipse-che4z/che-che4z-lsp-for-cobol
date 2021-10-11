@@ -77,4 +77,9 @@ public class GroupItemNode extends VariableWithLevelNode implements UsageClause 
       errors.add(getError(MessageTemplate.of(EMPTY_STRUCTURE_MSG, getName())));
     return errors;
   }
+
+  @Override
+  protected String getVariableDisplayString() {
+    return getFormattedSuffix() + ".";
+  }
 }

@@ -117,10 +117,11 @@ public class UseCaseEngine {
    * @param copybooks - list of the copybooks used in the document
    * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
    *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
+   * @return analysis result object
    */
-  public void runTest(
+  public AnalysisResult runTest(
       String text, List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics) {
-    runTest(text, copybooks, expectedDiagnostics, ImmutableList.of());
+    return runTest(text, copybooks, expectedDiagnostics, ImmutableList.of());
   }
 
   /**
@@ -139,13 +140,14 @@ public class UseCaseEngine {
    * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
    *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
    * @param subroutineNames - list of subroutine names used in the document
+   * @return analysis result object
    */
-  public void runTest(
+  public AnalysisResult runTest(
       String text,
       List<CobolText> copybooks,
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> subroutineNames) {
-    runTest(
+    return runTest(
         text,
         copybooks,
         expectedDiagnostics,

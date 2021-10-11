@@ -28,4 +28,9 @@ public class IndexItemNode extends VariableNode {
   protected IndexItemNode(Locality location, String name, boolean global) {
     super(location, name, VariableType.INDEX_ITEM, global);
   }
+
+  @Override
+  protected String getVariableDisplayString() {
+    return "INDEXED BY " + getName();
+  }
 }

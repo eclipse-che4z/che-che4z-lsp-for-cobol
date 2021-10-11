@@ -30,8 +30,6 @@ import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityFindingUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
@@ -44,7 +42,6 @@ import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -55,9 +52,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.EMBEDDED_CODE;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
-import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
@@ -156,19 +150,8 @@ public class CobolLanguageEngine {
       analyzeEmbeddedCode(syntaxTree, positionMapping, context.getConstants());
       Node rootNode = syntaxTree.get(0);
       accumulatedErrors.addAll(processSyntaxTree(rootNode));
-      // This is a temporal solution only for compatibility
-      // Definitions, usages and variables are set here for "Go to definition" feature and others
-      List<Variable> definedVariables =
-          rootNode
-              .getDepthFirstStream()
-              .filter(hasType(PROGRAM))
-              .map(ProgramNode.class::cast)
-              .map(ProgramNode::getDefinedVariables)
-              .flatMap(Collection::stream)
-              .collect(toList());
       context =
           context.toBuilder()
-              .variables(collectVariables(definedVariables))
               .rootNode(rootNode)
               .build();
       timingBuilder.getSyntaxTreeTimer().stop();
@@ -288,12 +271,5 @@ public class CobolLanguageEngine {
         .map(messageService::localizeTemplate)
         .map(message -> syntaxError.toBuilder().messageTemplate(null).suggestion(message).build())
         .orElse(syntaxError);
-  }
-
-  private List<Variable> collectVariables(Collection<Variable> definedVariables) {
-    return definedVariables.stream()
-        .filter(it -> !FILLER_NAME.equals(it.getName()))
-        .filter(it -> !it.getDefinition().getUri().startsWith(PREF_IMPLICIT))
-        .collect(toList());
   }
 }

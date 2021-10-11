@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.utils.SyntaxTreeUtil.findNodeByPosition;
 
 /**
  * This occurrences provider resolves the requests for the semantic elements based on its positions.
@@ -113,15 +114,6 @@ public class ElementOccurrences implements Occurrences {
                 .map(name -> new Element(
                     definitions.getOrDefault(name, Collections.emptyList()),
                     usages.getOrDefault(name, Collections.emptyList())));
-    }
-
-    private static Optional<Node> findNodeByPosition(Node node, TextDocumentPositionParams position) {
-        Optional<Node> child = node.getChildren().stream()
-            .filter(it -> RangeUtils.isInside(position, it.getLocality().toLocation()))
-            .findAny()
-            .flatMap(it -> findNodeByPosition(it, position));
-        if (child.isPresent()) return child;
-        return Optional.of(node).filter(it -> RangeUtils.isInside(position, it.getLocality().toLocation()));
     }
 
     private static Element convertToElement(Context contextNode) {
