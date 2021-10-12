@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.model;
 import lombok.Builder;
 import lombok.Value;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 /**
@@ -37,11 +38,11 @@ import org.eclipse.lsp4j.Range;
 @Value
 @Builder(toBuilder = true)
 public class Locality {
-  private String uri;
-  private Range range;
-  private String copybookId;
-  private String token;
-  private Class recognizer;
+  @Builder.Default private String uri = "";
+  @Builder.Default private Range range = new Range(new Position(0, 0), new Position(0, 0));
+  @Builder.Default private String copybookId = null;
+  @Builder.Default private String token = null;
+  @Builder.Default private Class recognizer = Object.class;
 
   /**
    * Convert this Locality instance to Location using its URI and Range

@@ -16,7 +16,9 @@ package org.eclipse.lsp.cobol.service.delegates.validations;
 
 import lombok.Builder;
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
@@ -42,7 +44,7 @@ public class AnalysisResult {
   @Builder.Default Map<String, List<Location>> subroutineDefinitions = new HashMap<>();
   @Builder.Default Map<String, List<Location>> subroutineUsages = new HashMap<>();
   @Builder.Default List<DocumentSymbol> outlineTree = new ArrayList<>();
-  Node rootNode;
+  @Builder.Default Node rootNode = new RootNode(Locality.builder().build());
 
   /**
    * Construct empty AnalysisResult.
@@ -50,7 +52,7 @@ public class AnalysisResult {
    * @return an empty analysis result
    */
   public static AnalysisResult empty() {
-    return AnalysisResult.builder().build();
+    return builder().build();
   }
 
   public Set<String> getConstants() {
