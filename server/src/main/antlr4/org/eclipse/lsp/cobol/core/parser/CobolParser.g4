@@ -948,7 +948,7 @@ sentence
    ;
 
 conditionalStatementCall
-   : (statement | idmsStatements) SEMICOLON_FS?
+   : (statement | idmsStatements | dafStatements) SEMICOLON_FS?
    ;
 
 statement
