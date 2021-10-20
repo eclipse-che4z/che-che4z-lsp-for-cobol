@@ -118,28 +118,34 @@ public class CopybookServiceImpl implements CopybookService {
   private CopybookModel resolveSync(
       @NonNull String copybookName,
       @NonNull String documentUri,
-      @NonNull CopybookConfig copybookConfig)
-      throws ExecutionException, InterruptedException {
+      @NonNull CopybookConfig copybookConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    String cobolFileName = files.getNameFromURI(documentUri);
-
-    return SettingsService.getValueAsString(
-            settingsService
-                .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
-                .get())
-        .map(uri -> loadCopybook(uri, copybookName, cobolFileName))
-        .orElseGet(() -> processEmptyUri(copybookName, copybookConfig, cobolFileName));
-  }
-
-  private CopybookModel processEmptyUri(
-      String copybookName, CopybookConfig copybookConfig, String cobolFileName) {
-    return retrievePredefinedCopybook(copybookName)
+    return tryResolvePredefinedCopybook(copybookName)
         .map(it -> it.uriForBackend(copybookConfig.getSqlBackend()))
         .map(
             uri ->
                 new CopybookModel(
                     copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri)))
+        .orElseGet(
+            () -> tryResolveCopybookFromWorkspace(copybookName, files.getNameFromURI(documentUri)));
+  }
+
+  private CopybookModel tryResolveCopybookFromWorkspace(String copybookName, String cobolFileName) {
+    return resolveLocalCopybook(copybookName, cobolFileName)
+        .map(uri -> loadCopybook(uri, copybookName, cobolFileName))
         .orElseGet(() -> registerForDownloading(copybookName, cobolFileName));
+  }
+
+  @SuppressWarnings("java:S2142")
+  private Optional<String> resolveLocalCopybook(String copybookName, String cobolFileName) {
+    try {
+      return SettingsService.getValueAsString(
+          settingsService
+              .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
+              .get());
+    } catch (InterruptedException | ExecutionException e) {
+      throw new UncheckedExecutionException(e);
+    }
   }
 
   private CopybookModel registerForDownloading(String copybookName, String cobolFileName) {
@@ -167,8 +173,7 @@ public class CopybookServiceImpl implements CopybookService {
    * @param copybookName - the name of copybook to check
    * @return true if copybook name is one of SQLDA or SQLCA
    */
-  private Optional<PredefinedCopybooks.Copybook> retrievePredefinedCopybook(
-      String copybookName) {
+  private Optional<PredefinedCopybooks.Copybook> tryResolvePredefinedCopybook(String copybookName) {
     return Optional.ofNullable(PredefinedCopybooks.forName(copybookName));
   }
 
