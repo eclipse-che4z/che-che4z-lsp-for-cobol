@@ -15,13 +15,13 @@
 
 package org.eclipse.lsp.cobol.core.semantics.outline;
 
-import org.eclipse.lsp.cobol.core.model.Locality;
 import com.google.common.collect.Multimap;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;

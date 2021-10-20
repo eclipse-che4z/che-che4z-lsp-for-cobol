@@ -52,7 +52,7 @@ public abstract class Node {
    * @return the predicate for testing node
    */
   public static Predicate<Node> hasType(NodeType type) {
-    return node -> node.nodeType == type;
+    return node -> node.getNodeType() == type;
   }
 
   /**

@@ -100,7 +100,7 @@ class LocalityMappingUtilsTest {
     when(token0.getType()).thenReturn(0);
     when(token0.getText()).thenReturn("token0");
     when(token1.getType()).thenReturn(1);
-    when(token1.getText()).thenReturn(".   ");
+    when(token1.getText()).thenReturn(".");
     when(token2.getType()).thenReturn(2);
     when(token2.getText()).thenReturn("token1");
     when(tokenEOF.getType()).thenReturn(3);

@@ -19,9 +19,7 @@ import lombok.experimental.UtilityClass;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * This class contains list of predefined variable names.
- */
+/** This class contains list of predefined variable names. */
 @UtilityClass
 public class PredefinedVariables {
   public static final String PREDEFINED = "predefined";
@@ -33,36 +31,6 @@ public class PredefinedVariables {
    */
   public List<String> getPredefinedVariablesNames() {
     List<String> result = new ArrayList<>();
-    // EXEC interface block fields
-    result.add("EIBAID");
-    result.add("EIBATT");
-    result.add("EIBCALEN");
-    result.add("EIBCOMPL");
-    result.add("EIBCONF");
-    result.add("EIBCPOSN");
-    result.add("EIBDATE");
-    result.add("EIBDS");
-    result.add("EIBEOC");
-    result.add("EIBERR");
-    result.add("EIBERRCD");
-    result.add("EIBFMH");
-    result.add("EIBFN");
-    result.add("EIBFREE");
-    result.add("EIBNODAT");
-    result.add("EIBRCODE");
-    result.add("EIBRECV");
-    result.add("EIBREQID");
-    result.add("EIBRESP");
-    result.add("EIBRESP2");
-    result.add("EIBRLDBK");
-    result.add("EIBRSRCE");
-    result.add("EIBSIG");
-    result.add("EIBSYNC");
-    result.add("EIBSYNRB");
-    result.add("EIBTASKN");
-    result.add("EIBTIME");
-    result.add("EIBTRMID");
-    result.add("EIBTRNID");
 
     // XML special registers
     result.add("XML-CODE");

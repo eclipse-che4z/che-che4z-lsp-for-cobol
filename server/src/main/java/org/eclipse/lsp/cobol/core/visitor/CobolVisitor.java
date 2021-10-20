@@ -41,7 +41,6 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode.Builder;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.semantics.outline.OutlineTreeBuilder;
@@ -76,7 +75,6 @@ import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
 public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private final List<SyntaxError> errors = new ArrayList<>();
-  private final PredefinedVariableContext constants = new PredefinedVariableContext();
   private final Multimap<String, Location> subroutineUsages = HashMultimap.create();
   private final NamedSubContext copybooks;
   private final CommonTokenStream tokenStream;
@@ -117,7 +115,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public ResultWithErrors<SemanticContext> finishAnalysis() {
     return new ResultWithErrors<>(
         SemanticContext.builder()
-            .constants(constants)
             .copybookDefinitions(copybooks.getDefinitions().asMap())
             .copybookUsages(copybooks.getUsages().asMap())
             .subroutinesDefinitions(getSubroutineDefinition())

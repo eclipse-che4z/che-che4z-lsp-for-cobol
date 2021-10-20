@@ -57,7 +57,7 @@ class CopybookServiceTest {
   private static final String CONTENT = "content";
   private static final String SQLCA = "SQLCA";
   private static final String SQLDA = "SQLDA";
-  private static final String DFHEIBLK = "DFHEIBLK";
+  private static final String DFHEIBLC = "DFHEIBLC";
   private static final String DOCUMENT_2_URI = "file:///c%3A/workspace/document2.cbl";
   private static final String DOCUMENT_3_URI = "implicit:///implicitCopybooks/SQLCA_DB2.cpy";
 
@@ -313,12 +313,12 @@ class CopybookServiceTest {
     verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(DOCUMENT_3_URI)).thenReturn("document2");
-    when(settingsService.getConfiguration("copybook-resolve", "document2", DFHEIBLK))
+    when(settingsService.getConfiguration("copybook-resolve", "document2", DFHEIBLC))
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
-    CopybookModel cpy = copybookService.resolve(DFHEIBLK, DOCUMENT_3_URI, cpyConfig);
+    CopybookModel cpy = copybookService.resolve(DFHEIBLC, DOCUMENT_3_URI, cpyConfig);
 
     assertEquals(
-        new CopybookModel(DFHEIBLK, "implicit:///implicitCopybooks/DFHEIBLK.cpy", null), cpy);
+        new CopybookModel(DFHEIBLC, "implicit:///implicitCopybooks/DFHEIBLC.cpy", null), cpy);
   }
 
   /**

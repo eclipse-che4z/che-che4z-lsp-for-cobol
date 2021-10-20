@@ -77,7 +77,6 @@ public class ElementOccurrences implements Occurrences {
         return fromTree.orElseGet(() -> Stream.<Supplier<Optional<Element>>>of(
                 () -> findElementByPosition(result.getParagraphDefinitions(), result.getParagraphUsages(), position),
                 () -> findElementByPosition(result.getSectionDefinitions(), result.getSectionUsages(), position),
-                () -> findElementByPosition(result.getConstantDefinitions(), result.getConstantUsages(), position),
                 () -> findElementByPosition(result.getCopybookDefinitions(), result.getCopybookUsages(), position),
                 () -> findElementByPosition(result.getSubroutineDefinitions(), result.getSubroutineUsages(), position))
             .map(Supplier::get)

@@ -18,9 +18,9 @@ import TechnicalLexer;
 channels{TECHNICAL}
 
 EJECT: E J E C T DOT_FS? -> channel(HIDDEN);
-SKIP1 : S K I P '1' DOT_FS? -> skip;
-SKIP2 : S K I P '2' DOT_FS? -> skip;
-SKIP3 : S K I P '3' DOT_FS? -> skip;
+SKIP1 : S K I P '1' DOT_FS? -> channel(HIDDEN);
+SKIP2 : S K I P '2' DOT_FS? -> channel(HIDDEN);
+SKIP3 : S K I P '3' DOT_FS? -> channel(HIDDEN);
 
 // keywords
 ABEND : A B E N D;
