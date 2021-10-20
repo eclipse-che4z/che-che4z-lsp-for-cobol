@@ -392,6 +392,17 @@ class CopybookServiceTest {
     assertEquals(new CopybookModel(VALID_CPY_NAME, null, null), copybookModel);
   }
 
+  @Test
+  void testPredefinedCopybooksDoNotTriggerWorkspace() {
+    final String copybookName = PredefinedCopybooks.Copybook.SQLCA.name();
+    CopybookService copybookService = createCopybookService();
+    final CopybookModel model =
+        copybookService.resolve(
+            copybookName, DOCUMENT_URI, new CopybookConfig(ENABLED, DB2_SERVER));
+    assertEquals("implicit:///implicitCopybooks/SQLCA_DB2.cpy", model.getUri());
+    verifyZeroInteractions(settingsService);
+  }
+
   private CopybookServiceImpl createCopybookService() {
     return new CopybookServiceImpl(broker, settingsService, files, 3, 3, "HOURS");
   }
