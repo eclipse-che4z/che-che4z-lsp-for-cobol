@@ -16,7 +16,7 @@ Useful Links:
   - Documentation: https://github.com/eclipse/che-che4z-lsp-for-cobol/blob/development/README.md
   - Contributing: https://github.com/eclipse/che-che4z-lsp-for-cobol/blob/development/CONTRIBUTING.md
   Eclipse Che has public chat on:
-  - Slack: https://che4z.slack.com/
+  - Slack: https://communityinviter.com/apps/che4z/code4z
 -->
 
 ## Description ##
