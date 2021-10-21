@@ -42,9 +42,6 @@ public class PredefinedVariables {
     result.add("XML-NTEXT");
     result.add("XML-TEXT");
 
-    // JNI special register
-    result.add("JNIENVPTR");
-
     // JSON special registers
     result.add("JSON-CODE");
     result.add("JSON-STATUS");
