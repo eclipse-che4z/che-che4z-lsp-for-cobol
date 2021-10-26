@@ -15,10 +15,10 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
+import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
-import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +39,7 @@ class DocumentHierarchyLevel {
     index = 0;
     localities = documentMapping.getLocalities();
     shifts = documentMapping.getShifts();
-    initialForward();
+    tryForward();
   }
 
   /**
@@ -50,11 +50,6 @@ class DocumentHierarchyLevel {
   @Nullable
   public Locality getCurrent() {
     return index < localities.size() ? localities.get(index) : null;
-  }
-
-  /** Increase the index by one or by shift if specified */
-  void forward() {
-    index += shifts.getOrDefault(index, 1);
   }
 
   /**
@@ -69,6 +64,19 @@ class DocumentHierarchyLevel {
     return localities.subList(index, index + tail);
   }
 
+  /** Increase the index by one or by shift if specified */
+  void forward() {
+    index += shifts.getOrDefault(index, 1);
+    tryForward();
+  }
+
+  /** Increase the index by shift if specified */
+  void tryForward() {
+    while (shifts.containsKey(index)) {
+      index += shifts.get(index);
+    }
+  }
+
   /**
    * Increase the index by the given value.
    *
@@ -79,10 +87,12 @@ class DocumentHierarchyLevel {
   }
 
   /**
-   * Increase the index by the shift assigned to the 0 position, or by zero. Useful to skip the
-   * positions of the compiler directives.
+   * Check if this locality is the last in the list
+   *
+   * @param locality Locality to check
+   * @return true if this locality is the last one in the list of localities
    */
-  private void initialForward() {
-    index += shifts.getOrDefault(index, 0);
+  public boolean isLastLocality(Locality locality) {
+    return localities.indexOf(locality) == localities.size() - 1;
   }
 }

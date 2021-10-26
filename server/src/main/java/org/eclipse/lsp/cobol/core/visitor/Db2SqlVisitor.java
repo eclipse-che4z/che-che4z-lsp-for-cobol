@@ -27,7 +27,6 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
-import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,6 @@ import static org.eclipse.lsp.cobol.core.Db2SqlParser.Dbs_rs_locator_variableCon
 @AllArgsConstructor
 public class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
   private final Map<Token, Locality> positions;
-  private final PredefinedVariableContext constants;
 
   @Override
   public List<Node> visitDbs_host_variable(Dbs_host_variableContext ctx) {

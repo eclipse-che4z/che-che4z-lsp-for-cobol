@@ -33,7 +33,6 @@ import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityFindingUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
-import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.EmbeddedLanguagesListener;
@@ -88,9 +87,9 @@ public class CobolLanguageEngine {
    *
    * @param documentUri unique resource identifier of the processed document
    * @param text the content of the document that should be processed
-   * @param analysisConfig contains analysis processing features info and copybook config with following information:
-   *                       target backend sql server, copybook processing mode which
-   *                       reflect the sync status of the document (DID_OPEN|DID_CHANGE)
+   * @param analysisConfig contains analysis processing features info and copybook config with
+   *     following information: target backend sql server, copybook processing mode which reflect
+   *     the sync status of the document (DID_OPEN|DID_CHANGE)
    * @return Semantic information wrapper object and list of syntax error that might send back to
    *     the client
    */
@@ -102,7 +101,9 @@ public class CobolLanguageEngine {
     timingBuilder.getPreprocessorTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =
-        preprocessor.process(documentUri, text, analysisConfig.getCopybookConfig()).unwrap(accumulatedErrors::addAll);
+        preprocessor
+            .process(documentUri, text, analysisConfig.getCopybookConfig())
+            .unwrap(accumulatedErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
 
     timingBuilder.getParserTimer().start();
@@ -147,13 +148,10 @@ public class CobolLanguageEngine {
     timingBuilder.getVisitorTimer().stop();
     if (syntaxTree.size() == 1) {
       timingBuilder.getSyntaxTreeTimer().start();
-      analyzeEmbeddedCode(syntaxTree, positionMapping, context.getConstants());
+      analyzeEmbeddedCode(syntaxTree, positionMapping);
       Node rootNode = syntaxTree.get(0);
       accumulatedErrors.addAll(processSyntaxTree(rootNode));
-      context =
-          context.toBuilder()
-              .rootNode(rootNode)
-              .build();
+      context = context.toBuilder().rootNode(rootNode).build();
       timingBuilder.getSyntaxTreeTimer().stop();
     } else LOG.warn("The root node for syntax tree was not constructed");
     timingBuilder.getLateErrorProcessingTimer().start();
@@ -186,7 +184,8 @@ public class CobolLanguageEngine {
     do {
       errors.addAll(rootNode.process());
       processCalls++;
-      if (processCalls > PROCESS_CALLS_THRESHOLD) throw new RuntimeException("Infinity loop in tree processing");
+      if (processCalls > PROCESS_CALLS_THRESHOLD)
+        throw new IllegalStateException("Infinity loop in tree processing");
     } while (!rootNode.isProcessed());
     return errors;
   }
@@ -215,14 +214,13 @@ public class CobolLanguageEngine {
         tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri, embeddedCodeParts);
   }
 
-  private void analyzeEmbeddedCode(
-      List<Node> syntaxTree, Map<Token, Locality> mapping, PredefinedVariableContext constants) {
+  private void analyzeEmbeddedCode(List<Node> syntaxTree, Map<Token, Locality> mapping) {
     syntaxTree.stream()
         .flatMap(Node::getDepthFirstStream)
         .filter(hasType(EMBEDDED_CODE))
         .map(EmbeddedCodeNode.class::cast)
         .collect(toList())
-        .forEach(it -> it.analyzeTree(mapping, constants));
+        .forEach(it -> it.analyzeTree(mapping));
   }
 
   @NonNull

@@ -29,7 +29,7 @@ import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.*;
 @UtilityClass
 public class PredefinedCopybooks {
   private static final Map<String, Copybook> PREDEFINED_COPYBOOKS =
-      ImmutableMap.of("SQLCA", SQLCA, "SQLDA", SQLDA, "DFHEIBLK", DFHEIBLK);
+      ImmutableMap.of("SQLCA", SQLCA, "SQLDA", SQLDA, "DFHEIBLC", DFHEIBLC);
 
   /** Prefix for uri of the predefined copybooks */
   public static final String PREF_IMPLICIT = "implicit://";
@@ -82,10 +82,10 @@ public class PredefinedCopybooks {
         return IMPLICIT_PATH + "SQLDA.cpy";
       }
     },
-    DFHEIBLK {
+    DFHEIBLC {
       @Override
       public String uriForBackend(SQLBackend backend) {
-        return IMPLICIT_PATH + "DFHEIBLK.cpy";
+        return IMPLICIT_PATH + "DFHEIBLC.cpy";
       }
     };
 

@@ -37,8 +37,6 @@ public class AnalysisResult {
   @Builder.Default Map<String, List<Location>> paragraphUsages = new HashMap<>();
   @Builder.Default Map<String, List<Location>> sectionDefinitions = new HashMap<>();
   @Builder.Default Map<String, List<Location>> sectionUsages = new HashMap<>();
-  @Builder.Default Map<String, List<Location>> constantDefinitions = new HashMap<>();
-  @Builder.Default Map<String, List<Location>> constantUsages = new HashMap<>();
   @Builder.Default Map<String, List<Location>> copybookDefinitions = new HashMap<>();
   @Builder.Default Map<String, List<Location>> copybookUsages = new HashMap<>();
   @Builder.Default Map<String, List<Location>> subroutineDefinitions = new HashMap<>();
@@ -53,10 +51,6 @@ public class AnalysisResult {
    */
   public static AnalysisResult empty() {
     return builder().build();
-  }
-
-  public Set<String> getConstants() {
-    return constantDefinitions.keySet();
   }
 
   public Set<String> getParagraphs() {

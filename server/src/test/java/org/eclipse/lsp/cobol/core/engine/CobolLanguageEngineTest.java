@@ -23,7 +23,6 @@ import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
@@ -160,7 +159,6 @@ class CobolLanguageEngineTest {
     ResultWithErrors<SemanticContext> expected =
         new ResultWithErrors<>(
             SemanticContext.builder()
-                .constants(new PredefinedVariableContext())
                 .outlineTree(expectedOutlineTree)
                 .rootNode(
                     new RootNode(

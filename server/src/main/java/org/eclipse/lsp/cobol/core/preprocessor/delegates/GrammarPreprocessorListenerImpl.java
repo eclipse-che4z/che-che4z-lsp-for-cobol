@@ -27,6 +27,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
+import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
@@ -54,6 +55,7 @@ import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.INFO;
 import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.*;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBLC;
 
 /**
  * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
@@ -67,6 +69,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private static final String UNDERSCORE = "_";
   private static final String SYNTAX_ERROR_CHECK_COPYBOOK_NAME =
       "Syntax error by checkCopybookName: {}";
+  private static final int DEFAULT_TOKEN_SHIFT = 2;
+  private static final int TOKEN_SHIFT_WITH_LINEBREAK = 3;
   private static final int MAX_COPYBOOK_NAME_LENGTH_DEFAULT = Integer.MAX_VALUE;
   private static final int MAX_COPYBOOK_NAME_LENGTH_DATASET = 8;
   private static final int MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB = 10;
@@ -145,7 +149,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitTitleDirective(TitleDirectiveContext ctx) {
     pop();
-    accumulateExcludedStatementShift(ctx.getSourceInterval());
+    accumulateTokenShift(ctx);
   }
 
   @Override
@@ -170,7 +174,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       errors.add(error);
     }
 
-    accumulateExcludedStatementShift(ctx.getSourceInterval());
+    accumulateTokenShift(ctx);
   }
 
   @Override
@@ -182,7 +186,24 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void exitControlDirective(ControlDirectiveContext ctx) {
     pop();
     if (ctx.controlOptions().isEmpty()) reportInvalidArgument(ctx.controlCbl());
-    accumulateExcludedStatementShift(ctx.getSourceInterval());
+    accumulateTokenShift(ctx);
+  }
+
+  @Override
+  public void exitLinkageSection(LinkageSectionContext ctx) {
+    String copybookName = DFHEIBLC.name();
+    Locality locality = retrievePosition(ctx);
+    CopybookModel model = getCopyBookContent(copybookName, locality, copybookConfig);
+    String uri = model.getUri();
+
+    String content = preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll);
+
+    ExtendedDocument copybookDocument =
+        processCopybook(copybookName, uri, copybookName, content, locality);
+    String copybookContent = copybookDocument.getText();
+
+    collectNestedSemanticData(uri, copybookName, copybookDocument);
+    writeCopybook(copybookName, copybookContent);
   }
 
   @Override
@@ -193,9 +214,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyIdmsStatement(@NonNull CopyIdmsStatementContext ctx) {
     collectAndAccumulateCopybookData(
+        ctx,
         ctx.copyIdmsOptions().copyIdmsSource().copySource(),
         retrieveCopybookStatementPosition(ctx),
-        ctx.getSourceInterval(),
         MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
   }
 
@@ -207,9 +228,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyMaidStatement(CopyMaidStatementContext ctx) {
     collectAndAccumulateCopybookData(
+        ctx,
         ctx.copySource(),
         retrieveCopybookStatementPosition(ctx),
-        ctx.getSourceInterval(),
         MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
   }
 
@@ -221,9 +242,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
     collectAndAccumulateCopybookData(
+        ctx,
         ctx.copySource(),
         retrieveCopybookStatementPosition(ctx),
-        ctx.getSourceInterval(),
         MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB);
   }
 
@@ -235,9 +256,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
     collectAndAccumulateCopybookData(
+        ctx,
         ctx.copySource(),
         retrieveCopybookStatementPosition(ctx),
-        ctx.getSourceInterval(),
         MAX_COPYBOOK_NAME_LENGTH_DATASET);
   }
 
@@ -249,18 +270,19 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
     collectAndAccumulateCopybookData(
+        ctx,
         ctx.copySource(),
         retrieveCopybookStatementPosition(ctx),
-        ctx.getSourceInterval(),
         MAX_COPYBOOK_NAME_LENGTH_DATASET);
   }
 
   private void collectAndAccumulateCopybookData(
+      ParserRuleContext context,
       CopySourceContext copySource,
       Locality copybookStatementPosition,
-      Interval sourceInterval,
       int maxLength) {
     if (!copybookConfig.getCopybookProcessingMode().analyze) {
+      accumulateTokenShift(context);
       pop();
       return;
     }
@@ -268,7 +290,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     Locality locality = retrievePosition(copySource);
     CopybookModel model = getCopyBookContent(copybookName, locality, copybookConfig);
     String uri = model.getUri();
-    String content = model.getContent();
 
     String copybookId = randomUUID().toString();
     // In a chain of copy statement, there could be only one replacing phrase
@@ -279,7 +300,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     }
 
     // Do preprocessor cleanup, before replacements.
-    content = preprocessor.cleanUpCode(uri, content).unwrap(errors::addAll);
+    String content = preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll);
 
     if (!recursiveReplaceStmtStack.isEmpty()) {
       for (List<Pair<String, String>> clause : recursiveReplaceStmtStack)
@@ -298,9 +319,10 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
     collectCopybookStatement(copybookId, copybookStatementPosition);
     collectNestedSemanticData(uri, copybookId, copybookDocument);
+    // throw away COPY terminals
+    pop();
     writeCopybook(copybookId, copybookContent);
-
-    accumulateCopybookShift(sourceInterval);
+    accumulateTokenShift(context);
   }
 
   private void checkRecursiveReplaceStatement(
@@ -353,7 +375,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitReplaceAreaStart(ReplaceAreaStartContext ctx) {
     pop();
-    accumulateExcludedStatementShift(ctx.getSourceInterval());
+    accumulateTokenShift(ctx);
   }
 
   @Override
@@ -365,7 +387,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void exitReplaceOffStatement(ReplaceOffStatementContext ctx) {
     replacingClauses.clear();
     pop();
-    accumulateExcludedStatementShift(ctx.getSourceInterval());
+    accumulateTokenShift(ctx);
   }
 
   private String handleReplace(String replaceableStmt) {
@@ -384,12 +406,19 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     }
   }
 
-  private void accumulateCopybookShift(Interval sourceInterval) {
-    shifts.put(sourceInterval.a - 1, sourceInterval.b - sourceInterval.a + 1);
+  private void accumulateTokenShift(ParserRuleContext context) {
+    final Interval sourceInterval = context.getSourceInterval();
+    shifts.put(
+        sourceInterval.a - 1, sourceInterval.b - sourceInterval.a + calculateTokenShift(context));
   }
 
-  private void accumulateExcludedStatementShift(Interval sourceInterval) {
-    shifts.put(sourceInterval.a - 1, sourceInterval.b - sourceInterval.a + 2);
+  private int calculateTokenShift(ParserRuleContext context) {
+    return tokens.getHiddenTokensToLeft(context.start.getTokenIndex()).stream()
+        .map(Token::getType)
+        .filter(it -> it == CobolPreprocessorLexer.NEWLINE)
+        .findAny()
+        .map(it -> TOKEN_SHIFT_WITH_LINEBREAK)
+        .orElse(DEFAULT_TOKEN_SHIFT);
   }
 
   private void collectCopybookStatement(String copybookId, Locality locality) {
@@ -405,8 +434,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private void writeCopybook(String copybookId, String copybookContent) {
-    // throw away COPY terminals
-    pop();
     // write copybook beginning trigger
     write(CPY_ENTER_TAG);
     write(copybookId);
