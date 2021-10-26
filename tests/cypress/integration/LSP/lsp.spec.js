@@ -592,4 +592,59 @@ context('This is a LSP spec', () => {
       expectErrors(29);
     });
   });
+
+  describe('TC331303 Define the constants as variables', () => {
+    function goToDefinitionExtended(line1, text, line2) {
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      return cy
+        .getLineByNumber(line1)
+        .findText(text)
+        .wait(500)
+        .goToDefinition()
+        .wait(500)
+        .getCurrentLineNumber()
+        .should('eq', line2);
+    }
+    beforeEach(() => {
+      cy.writeFile(
+        'test_files/project/1VSAMTEST.cbl',
+        `       IDENTIFICATION DIVISION.
+        PROGRAM-ID. VSAMTEST.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 RECORD-FILE-STATUS   PIC X(2).
+        
+        PROCEDURE DIVISION.
+            DISPLAY RECORD-FILE-STATUS.
+            DISPLAY EIBCALEN.
+            GOBACK. `,
+      );
+    });
+    it('Define the constants as variables - check the linkage section enabled', () => {
+      cy.openFile('1VSAMTEST.cbl');
+      cy.goToLine(9)
+        .getCurrentLineErrors({ expectedLine: 9 })
+        .getHoverErrorMessage()
+        .contains('Variable EIBCALEN is not defined');
+      cy.getLineByNumber(6).type('LINKAGE SECTION.');
+      cy.getLineByNumber(10).should('not.have.class', '.squiggly-error');
+    });
+    it('Define the constants as variables - check the go to definition', () => {
+      cy.openFile('1VSAMTEST.cbl');
+      cy.getLineByNumber(6).type('LINKAGE SECTION.');
+      goToDefinitionExtended(5, 'RECORD-FILE-STATUS', 8);
+      goToDefinitionExtended(8, 'RECORD-FILE-STATUS', 5);
+    });
+    it('Define the constants as variables - autocomplete', () => {
+      cy.openFile('1VSAMTEST.cbl');
+      cy.getLineByNumber(6).type('LINKAGE SECTION.');
+      cy.getLineByNumber(9)
+        // We should send twice the ctrl+space in order to check the var/constant documentation
+        .findText('EIBCALEN')
+        .type('{ctrl} ', { release: false })
+        .type('{ctrl} ', { release: false })
+        .get('.monaco-scrollable-element .docs')
+        .contains('01 DFHEIBLK. 02 EIBCALEN PIC S9(4) USAGE COMP.');
+    });
+  });
 });
