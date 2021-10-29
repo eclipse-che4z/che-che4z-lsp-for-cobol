@@ -230,7 +230,7 @@
         "coverage": "jest --coverage --runInBand"
     },
     "dependencies": {
-        "@zowe/imperative": "4.13.1",
+        "@zowe/imperative": "4.15.1",
         "vscode-extension-telemetry": "0.1.6",
         "vscode-languageclient": "5.2.1"
     },
