@@ -294,7 +294,7 @@ pipeline {
                             cp -r /root/.cache $CYPRESS_HOME 
                             cp -r /root/.local $CYPRESS_HOME 
                             cp -r /root/.npm $CYPRESS_HOME 
-                            rm -rf node_modules/
+                            rm -rf node_modules/ yarn.lock
                             yarn cache clean
                             yarn install --frozen-lockfile
                             npm run ts:build

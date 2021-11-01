@@ -16,6 +16,9 @@
 //@ts-ignore
 /// <reference types="../../support/" />
 
+// Import selectors from Theia object
+import { Theia } from '@eclipse/che-che4z/tests/dist/selectorsTheia';
+
 context('This is a Copybook spec', () => {
   beforeEach(() => {
     cy.updateConfigs('basic');
@@ -36,7 +39,8 @@ context('This is a Copybook spec', () => {
   describe('Copybook - not exist: no syntax ok message', () => {
     it(
       ['flaky_theia'],
-      'Checks that when opening Cobol file which refers to non-existent copybook, syntax ok message does not appear and copybook is underlined',
+      'Checks that when opening Cobol file which refers to non-existent copybook, \
+       syntax ok message does not appear and copybook is underlined',
       () => {
         cy.openFile('USERC1N1.cbl').wait(1000);
         cy.openFile('USERC1F.cbl');
@@ -49,7 +53,7 @@ context('This is a Copybook spec', () => {
     it(['smoke', 'CI'], 'Checks that error lines are marked in a file', () => {
       cy.openFile('USERC1F.cbl');
       cy.goToLine(19);
-      cy.get('.squiggly-error')
+      cy.get(Theia.editorError)
         .should('have.length', 2)
         .getElementLineNumber()
         .then((lineNumber) => {
@@ -62,15 +66,13 @@ context('This is a Copybook spec', () => {
   describe('TC174658 Copybook - not exist: detailed hint', () => {
     it(['smoke', 'CI'], 'Checks that error lines for missing copybook have detailed hints', () => {
       cy.openFile('USERC1F.cbl');
-      cy.get('.squiggly-error')
+      cy.get(Theia.editorError)
         .getElementLineNumber()
         .then((lineNumber) => {
           expect(lineNumber).to.be.equal(19);
           cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
         });
-      cy.get('div.monaco-editor-hover-content').contains(
-        'BOOK3: Copybook not foundCOBOL Language Support - E(MISSING_COPYBOOK)',
-      );
+      cy.get(Theia.hoverOverContent).contains('BOOK3: Copybook not foundCOBOL Language Support - E(MISSING_COPYBOOK)');
     });
   });
 
@@ -80,7 +82,7 @@ context('This is a Copybook spec', () => {
       'Checks that when opening Cobol file which recursively refers to copybooks, copybook is underlined with an error',
       () => {
         cy.openFile('USERC1R.cbl');
-        cy.get('.squiggly-error')
+        cy.get(Theia.editorError)
           .should('have.length', 2)
           .getElementLineNumber()
           .then((lineNumber) => {
@@ -97,13 +99,13 @@ context('This is a Copybook spec', () => {
       'Checks that when opening Cobol file which recursively refers to copybooks, have detailed error hint',
       () => {
         cy.openFile('USERC1R.cbl');
-        cy.get('.squiggly-error')
+        cy.get(Theia.editorError)
           .getElementLineNumber()
           .then((lineNumber) => {
             expect(lineNumber).to.be.equal(19);
             cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
           });
-        cy.get('div.monaco-editor-hover-content').contains('Recursive copybook declaration for: BOOK2R');
+        cy.get(Theia.hoverOverContent).contains('Recursive copybook declaration for: BOOK2R');
       },
     );
   });
@@ -111,11 +113,12 @@ context('This is a Copybook spec', () => {
   describe('TC174932 Copybook - invalid definition', () => {
     it(
       ['smoke', 'CI'],
-      'Checks that when opening Cobol file which uses invalid definition from copybook, this definition is underlined as a semantic error',
+      'Checks that when opening Cobol file which uses invalid definition from copybook, \
+       this definition is underlined as a semantic error',
       () => {
         cy.openFile('USERC1N2.cbl');
         cy.goToLine(52);
-        cy.get('.squiggly-error')
+        cy.get(Theia.editorError)
           .eq(1)
           .getElementLineNumber()
           .then((lineNumber) => {
@@ -133,14 +136,14 @@ context('This is a Copybook spec', () => {
       () => {
         cy.openFile('USERC1N2.cbl');
         cy.goToLine(52);
-        cy.get('.squiggly-error')
+        cy.get(Theia.editorError)
           .eq(1)
           .getElementLineNumber()
           .then((lineNumber) => {
             expect(lineNumber).to.be.equal(52);
             cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
           });
-        cy.get('div.monaco-editor-hover-content').contains('Variable USER-PHONE-MOBILE1 is not defined');
+        cy.get(Theia.hoverOverContent).contains('Variable USER-PHONE-MOBILE1 is not defined');
       },
     );
   });
@@ -179,7 +182,7 @@ context('This is a Copybook spec', () => {
     it(['smoke'], 'Checks that LSP can find all references (also in copybooks) and navigate by them', () => {
       cy.openFile('USERC1N1.cbl');
       cy.getLineByNumber(42).findText('User-Phone-Mobile.').goToReferences();
-      cy.get('.zone-widget')
+      cy.get(Theia.zoneWidget)
         .as('referenceWidget')
         .then(($referenceWidget) => {
           cy.wrap($referenceWidget)
@@ -216,11 +219,11 @@ context('This is a Copybook spec', () => {
         });
         cy.openFolder('.copybooks/zowe-profile-1/DATA.SET.PATH2');
         cy.openFile('USERC1F.cbl');
-        cy.get('.squiggly-error').should('not.exist');
+        cy.get(Theia.editorError).should('not.exist');
         cy.deleteFile('BOOK3.cpy');
         cy.closeCurrentTab();
         cy.openFile('USERC1F.cbl');
-        cy.get('.squiggly-error').should('have.length', 2).getElementLineNumber().should('eq', 19);
+        cy.get(Theia.editorError).should('have.length', 2).getElementLineNumber().should('eq', 19);
       },
     );
   });
@@ -235,13 +238,13 @@ context('This is a Copybook spec', () => {
       'Checks that LSP can dynamically detect definitions from an appeared copybook and rescan cobol file on the fly',
       () => {
         cy.openFile('USERC1F.cbl').goToLine(42);
-        cy.get('.squiggly-error').should('have.length', 1).getElementLineNumber().should('eq', 42);
+        cy.get(Theia.editorError).should('have.length', 1).getElementLineNumber().should('eq', 42);
         cy.goToLine(19);
         cy.getCurrentLine().type('{end}{backspace}T.').wait(500);
         cy.goToLine(42);
-        cy.get('.squiggly-info').should('not.have.length', 1);
+        cy.get(Theia.editorInfo).should('not.have.length', 1);
         cy.getCurrentLine().type('{end}{backspace}{backspace}');
-        cy.get('.squggly-info').should('have.length', 0);
+        cy.get(Theia.editorInfo).should('have.length', 0);
       },
     );
   });
@@ -269,7 +272,7 @@ context('This is a Copybook spec', () => {
         });
       cy.openFolder('testing').openFilePermanent('A.cpy').goToLine(14).wait(500);
       cy.getCurrentLineErrors({ expectedLine: 14 }).getHoverErrorMessage().eq(0);
-      cy.get('div.monaco-editor-hover-content').should(($content) => {
+      cy.get(Theia.hoverOverContent).should(($content) => {
         [
           "Syntax error on 'WORK-VARIABLES' expected SECTION",
           "Syntax error on 'PROGRAM-STATUS' expected SECTION",
@@ -290,14 +293,14 @@ context('This is a Copybook spec', () => {
       cy.openFolder('.c4z/.extsrcs').openFile('USER1.cbl');
       cy.goToLine(26);
       cy.getCurrentLine().type('           COPY ABC.');
-      cy.getCurrentLineOverlay().children().should('not.have.class', '.squiggly-error');
+      cy.getCurrentLineOverlay().children().should('not.have.class', Theia.editorError);
       cy.getCurrentLine().type('{end}{backspace}');
       cy.getCurrentLineErrors({ expectedLine: 26 })
         .eq(0)
         .getHoverErrorMessage()
         .contains("Syntax error on 'COPY' expected");
       cy.getCurrentLine().type('{end}{enter}Mov');
-      cy.getCurrentLineOverlay().children().should('not.have.class', '.squiggly-warning');
+      cy.getCurrentLineOverlay().children().should('not.have.class', Theia.editorWarn);
     });
 
     it(['smoke', 'CI'], '.c4z', () => {
@@ -326,13 +329,9 @@ context('This is a Copybook spec', () => {
       cy.openFile('USERC1F.cbl');
       cy.goToLine(19);
       cy.getCurrentLine().type('{end}{backspace}{backspace}123.');
-      cy.getCurrentLineErrors({ expectedLine: 19 })
-        .eq(0)
-        .getHoverErrorMessage()
-        .find('.action span[title^="Quick Fix"]')
-        .click();
-      cy.get('.p-Menu-itemLabel').contains('Resolve copybook').click();
-      cy.get('.theia-notification-message').should('contain.text', 'Missing copybooks: BOOK123');
+      cy.getCurrentLineErrors({ expectedLine: 19 }).eq(0).getHoverErrorMessage().find(Theia.quickFix).click();
+      cy.get(Theia.submenuItemLabel).contains('Resolve copybook').click();
+      cy.get(Theia.notificationMessage).should('contain.text', 'Missing copybooks: BOOK123');
     });
   });
 
@@ -340,7 +339,7 @@ context('This is a Copybook spec', () => {
     it(['smoke'], 'The variable used in a CALL statement should be found in the references list.', () => {
       cy.openFile('HELLO-WORLD.cbl');
       cy.getLineByNumber(23).findText('VARIABLE').goToReferences();
-      cy.get('.zone-widget')
+      cy.get(Theia.zoneWidget)
         .as('referenceWidget')
         .then(($referenceWidget) => {
           cy.get('@referenceWidget')
@@ -365,16 +364,17 @@ context('This is a Copybook spec', () => {
       cy.getLineByNumber(22).type('{end}{enter}COPY "BBB".').wait(500);
       cy.getCurrentLineErrors({ expectedLine: 23 }).eq(0).getHoverErrorMessage().contains('BBB: Copybook not found');
       cy.getLineByNumber(23).type('{end}{enter}COPY "NEW".').wait(500);
-      cy.getCurrentLine().should('not.have.class', '.squiggly-error');
+      cy.getCurrentLine().should('not.have.class', Theia.editorError);
       cy.getLineByNumber(24).type("{end}{enter}COPY 'NEW'.").wait(500);
-      cy.getCurrentLine().should('not.have.class', '.squiggly-error');
+      cy.getCurrentLine().should('not.have.class', Theia.editorError);
     });
   });
 
   describe("TC315293 program ID - 'COBOL Copybook'", () => {
     it(
       ['smoke', 'CI'],
-      "New program ID - 'COBOL copybook' is used in the following development for limited syntax awareness for the copybooks.",
+      "New program ID - 'COBOL copybook' is used in the following development \
+       for limited syntax awareness for the copybooks.",
       () => {
         cy.openFile('USERC1N1.cbl');
         cy.selectLangMode().should('contain.text', 'COBOL');
@@ -402,7 +402,7 @@ context('This is a Copybook spec', () => {
       });
     };
     const notHaveSyntaxError = () => {
-      return cy.openFile('USERC1F.cbl').getLineByNumber(19).should('not.have.class', '.squiggly-error');
+      return cy.openFile('USERC1F.cbl').getLineByNumber(19).should('not.have.class', Theia.editorError);
     };
     it(['smoke'], 'specify copybooks outside the current workspace ../test', () => {
       copyBookNotFound();

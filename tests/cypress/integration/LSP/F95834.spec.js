@@ -16,6 +16,9 @@
 //@ts-ignore
 /// <reference types="../../support/" />
 
+// Import selectors from Theia object
+import { Theia } from '@eclipse/che-che4z/tests/dist/selectorsTheia';
+
 //F95834: LSP for COBOL - support for EXEC SQL statements (basic intellisense)
 
 context('This is F95834 spec', () => {
@@ -26,16 +29,16 @@ context('This is F95834 spec', () => {
     it(['smoke'], 'Checks EXEC SQL with copybooks', () => {
       cy.openFile('TEST.CBL').goToLine(21);
       cy.getCurrentLine().type('exec-sql-include');
-      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('exec-sql-include').click();
+      cy.get(Theia.suggestWidget).contains('exec-sql-include').click();
       cy.getLineByNumber(21).contains('exec sql include sqlstatement.cpy end-exec.');
       cy.getCurrentLine().type('{selectall}       exec sql include A end-exec.');
-      cy.get('.squiggly-error')
+      cy.get(Theia.editorError)
         .getElementLineNumber()
         .then((lineNumber) => {
           expect(lineNumber).to.be.equal(21);
           cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
         });
-      cy.get('div.monaco-editor-hover-content').should(($content) => {
+      cy.get(Theia.hoverOverContent).should(($content) => {
         [
           "Syntax error on 'WORK-VARIABLES' expected SECTION",
           "Syntax error on 'PROGRAM-STATUS' expected SECTION",
