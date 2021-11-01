@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Value;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp.cobol.usecases.engine.UseCase;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.eclipse.lsp4j.DocumentSymbol;
@@ -32,12 +33,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /** This test checks that Outline tree has correct lines numbers for elements */
 class TestOutlineTreeLineNumbers {
   private static final String TEXT =
-      "00     IDENTIFICATION DIVISION.\n"
-          + "01     DATA DIVISION.\n"
-          + "02     WORKING-STORAGE SECTION.\n"
-          + "03     01 STRUCTNAME.\n"
-          + "04     03 VARNAME  PIC X(20).\n"
-          + "05     COPY BAR.";
+      "01     COPY BAR.\n"
+          + "02     IDENTIFICATION DIVISION.\n"
+          + "03     DATA DIVISION.\n"
+          + "04     WORKING-STORAGE SECTION.\n"
+          + "05     01 STRUCTNAME.\n"
+          + "06     03 VARNAME  PIC X(20).";
 
   @Test
   void test() {
@@ -47,15 +48,19 @@ class TestOutlineTreeLineNumbers {
 
     Map<String, LineRange> expectedRanges =
         new ImmutableMap.Builder<String, LineRange>()
-            .put("PROGRAM", new LineRange(0, 4))
-            .put("IDENTIFICATION DIVISION", new LineRange(0, 0))
-            .put("DATA DIVISION", new LineRange(1, 4))
-            .put("WORKING-STORAGE SECTION", new LineRange(2, 4))
-            .put("STRUCTNAME", new LineRange(3, 4))
-            .put("VARNAME", new LineRange(4, 4))
-            .put("COPY BAR", new LineRange(5, 5))
+            .put("COPY BAR", new LineRange(0, 0))
+            .put("PROGRAM", new LineRange(1, 5))
+            .put("IDENTIFICATION DIVISION", new LineRange(1, 1))
+            .put("DATA DIVISION", new LineRange(2, 5))
+            .put("WORKING-STORAGE SECTION", new LineRange(3, 5))
+            .put("STRUCTNAME", new LineRange(4, 5))
+            .put("VARNAME", new LineRange(5, 5))
             .build();
-    assertEquals(expectedRanges, extractLineRange(result.getOutlineTree()));
+    assertEquals(
+        expectedRanges,
+        extractLineRange(
+            BuildOutlineTreeFromSyntaxTree.convert(
+                result.getRootNode(), result.getRootNode().getLocality().getUri())));
   }
 
   private Map<String, LineRange> extractLineRange(List<DocumentSymbol> documentSymbols) {

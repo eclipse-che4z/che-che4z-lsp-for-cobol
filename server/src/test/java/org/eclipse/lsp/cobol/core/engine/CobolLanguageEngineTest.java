@@ -159,7 +159,6 @@ class CobolLanguageEngineTest {
     ResultWithErrors<SemanticContext> expected =
         new ResultWithErrors<>(
             SemanticContext.builder()
-                .outlineTree(expectedOutlineTree)
                 .rootNode(
                     new RootNode(
                         Locality.builder()

@@ -17,13 +17,12 @@ package org.eclipse.lsp.cobol.service.utils;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.semantics.outline.RangeUtils;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 
 import java.util.Optional;
 
-/**
- * Contains helper functions to work with the syntax tree.
- */
+/** Contains helper functions to work with the syntax tree. */
 @UtilityClass
 public class SyntaxTreeUtil {
 
@@ -35,11 +34,30 @@ public class SyntaxTreeUtil {
    * @return the found node
    */
   public static Optional<Node> findNodeByPosition(Node node, TextDocumentPositionParams position) {
-    Optional<Node> child = node.getChildren().stream()
-        .filter(it -> RangeUtils.isInside(position, it.getLocality().toLocation()))
-        .findAny()
-        .flatMap(it -> findNodeByPosition(it, position));
+    Optional<Node> child =
+        node.getChildren().stream()
+            .filter(it -> RangeUtils.isInside(position, it.getLocality().toLocation()))
+            .findAny()
+            .flatMap(it -> findNodeByPosition(it, position));
     if (child.isPresent()) return child;
-    return Optional.of(node).filter(it -> RangeUtils.isInside(position, it.getLocality().toLocation()));
+    return Optional.of(node)
+        .filter(it -> RangeUtils.isInside(position, it.getLocality().toLocation()));
+  }
+  /**
+   * Find the syntax tree node that contains the position.
+   *
+   * @param node a root node for finding
+   * @param position position
+   * @return the found node
+   */
+  public static Optional<Node> findNodeInRange(Node node, Position position) {
+    Optional<Node> child =
+        node.getChildren().stream()
+            .filter(it -> RangeUtils.isInsideRange(position, it.getLocality()))
+            .findAny()
+            .flatMap(it -> findNodeInRange(it, position));
+    if (child.isPresent()) return child;
+    return Optional.of(node)
+        .filter(it -> RangeUtils.isInsideRange(position, it.getLocality()));
   }
 }

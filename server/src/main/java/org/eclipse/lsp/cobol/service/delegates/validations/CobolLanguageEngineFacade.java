@@ -59,9 +59,9 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
    *
    * @param uri - URI of the processing document to define positions and errors properly
    * @param text of document opened in the client editor
-   * @param analysisConfig contains analysis processing features info and copybook config with following information:
-   *                       target backend sql server, copybook processing mode which
-   *                       reflect the sync status of the document (DID_OPEN|DID_CHANGE)
+   * @param analysisConfig contains analysis processing features info and copybook config with
+   *     following information: target backend sql server, copybook processing mode which reflect
+   *     the sync status of the document (DID_OPEN|DID_CHANGE)
    * @return a model containing full analysis result, e.g. errors and semantic elements
    */
   @Override
@@ -100,7 +100,6 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
         .paragraphUsages(retrieveUsages(paragraphNodes))
         .sectionDefinitions(retrieveDefinitions(sectionNodes))
         .sectionUsages(retrieveUsages(sectionNodes))
-        .outlineTree(context.getOutlineTree())
         .rootNode(context.getRootNode())
         .build();
   }
