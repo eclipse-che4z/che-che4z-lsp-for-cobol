@@ -43,6 +43,7 @@ import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -335,17 +336,14 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                                 : CopybookProcessingMode.ENABLED);
 
                     AnalysisConfig config = requestConfigs(copybookProcessingMode);
-                    AnalysisResult result =
-                        engine.analyze(
-                            uri,
-                            text,
-                            config);
+                    AnalysisResult result = engine.analyze(uri, text, config);
                     ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
                     publishResult(uri, result, copybookProcessingMode);
                     outlineMap.computeIfPresent(
                         uri,
                         (key, value) -> {
-                          value.complete(result.getOutlineTree());
+                          value.complete(
+                              BuildOutlineTreeFromSyntaxTree.convert(result.getRootNode(), uri));
                           return value;
                         });
                     cfAstMap.get(uri).complete(result.getRootNode());
@@ -362,11 +360,15 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private AnalysisConfig requestConfigs(CopybookProcessingMode processingMode) {
     CopybookConfig copybookConfig = new CopybookConfig(processingMode, SQLBackend.DB2_SERVER);
     try {
-      List<Object> objects = settingsService.getConfigurations(Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label)).get();
+      List<Object> objects =
+          settingsService
+              .getConfigurations(Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label))
+              .get();
 
-      SQLBackend sqlBackend = SettingsService.getValueAsString(objects.subList(0, 1))
-          .map(SQLBackend::valueOf)
-          .orElse(SQLBackend.DB2_SERVER);
+      SQLBackend sqlBackend =
+          SettingsService.getValueAsString(objects.subList(0, 1))
+              .map(SQLBackend::valueOf)
+              .orElse(SQLBackend.DB2_SERVER);
 
       copybookConfig = new CopybookConfig(processingMode, sqlBackend);
 
@@ -397,16 +399,17 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
             .submit(
                 () -> {
                   try {
-                    CopybookProcessingMode processingMode = CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.SKIP);
+                    CopybookProcessingMode processingMode =
+                        CopybookProcessingMode.getCopybookProcessingMode(
+                            uri, CopybookProcessingMode.SKIP);
                     AnalysisConfig config = requestConfigs(processingMode);
-                    AnalysisResult result =
-                        engine.analyze(
-                            uri,
-                            text,
-                            config);
+                    AnalysisResult result = engine.analyze(uri, text, config);
                     registerDocument(uri, new CobolDocumentModel(text, result));
                     communications.publishDiagnostics(result.getDiagnostics());
-                    outlineMap.get(uri).complete(result.getOutlineTree());
+                    outlineMap
+                        .get(uri)
+                        .complete(
+                            BuildOutlineTreeFromSyntaxTree.convert(result.getRootNode(), uri));
                     cfAstMap.get(uri).complete(result.getRootNode());
                   } catch (Exception ex) {
                     cfAstMap.get(uri).completeExceptionally(ex);

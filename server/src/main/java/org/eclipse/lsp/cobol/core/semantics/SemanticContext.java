@@ -19,7 +19,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 
 import java.util.*;
@@ -36,6 +35,5 @@ public class SemanticContext {
   @Builder.Default Map<String, Collection<Location>> copybookUsages = new HashMap<>();
   @Builder.Default Map<String, Collection<Location>> subroutinesDefinitions = new HashMap<>();
   @Builder.Default Map<String, Collection<Location>> subroutinesUsages = new HashMap<>();
-  @Builder.Default List<DocumentSymbol> outlineTree = new ArrayList<>();
   Node rootNode;
 }

@@ -20,7 +20,6 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 
 import java.util.*;
@@ -41,7 +40,6 @@ public class AnalysisResult {
   @Builder.Default Map<String, List<Location>> copybookUsages = new HashMap<>();
   @Builder.Default Map<String, List<Location>> subroutineDefinitions = new HashMap<>();
   @Builder.Default Map<String, List<Location>> subroutineUsages = new HashMap<>();
-  @Builder.Default List<DocumentSymbol> outlineTree = new ArrayList<>();
   @Builder.Default Node rootNode = new RootNode(Locality.builder().build());
 
   /**
