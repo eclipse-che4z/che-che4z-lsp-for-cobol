@@ -2085,5 +2085,22 @@
         ],
         "description": "[IDMS] Template Program",
         "scope": "cobol"
+    },
+    "READ TRANSACTION": {
+        "prefix": "READ TRANSACTION",
+        "body": [
+            "READ TRANSACTION ${1:task-name}."
+        ],
+        "description": "[DAF] Read Transaction Statement",
+        "scope": "cobol"
+    },
+    "WRITE TRANSACTION": {
+        "prefix": "WRITE TRANSACTION",
+        "body": [
+            "WRITE TRANSACTION ${1:task-name} LENGTH ${2:nn} TO ${3:dbu}."
+        ],
+        "description": "[DAF] Write Transaction Statement",
+        "scope": "cobol"
     }
+
 }
