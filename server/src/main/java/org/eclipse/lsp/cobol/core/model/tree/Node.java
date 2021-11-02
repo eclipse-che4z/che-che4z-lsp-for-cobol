@@ -38,7 +38,9 @@ public abstract class Node {
 
   @EqualsAndHashCode.Exclude private final List<Node> children = new ArrayList<>();
   @EqualsAndHashCode.Exclude @ToString.Exclude @Setter private Node parent;
-  @EqualsAndHashCode.Exclude private Optional<Supplier<List<SyntaxError>>> nextProcessingStep = Optional.empty();
+
+  @EqualsAndHashCode.Exclude
+  private Optional<Supplier<List<SyntaxError>>> nextProcessingStep = Optional.empty();
 
   protected Node(Locality location, NodeType nodeType) {
     this.locality = location;
@@ -52,7 +54,7 @@ public abstract class Node {
    * @return the predicate for testing node
    */
   public static Predicate<Node> hasType(NodeType type) {
-    return node -> node.nodeType == type;
+    return node -> node.getNodeType() == type;
   }
 
   /**
@@ -109,10 +111,9 @@ public abstract class Node {
     return errors;
   }
 
-
   /**
-   * Return true if this node and all its children was fully processed and there is no need to do extra `process`
-   * calls in order to finish node processing.
+   * Return true if this node and all its children was fully processed and there is no need to do
+   * extra `process` calls in order to finish node processing.
    *
    * @return true if no more `process` calls is needed
    */
@@ -121,19 +122,20 @@ public abstract class Node {
   }
 
   /**
-   * Add step for processing.
-   * See {@see NodeProcessingTest} for examples
+   * Add step for processing. See {@see NodeProcessingTest} for examples
    *
    * @param processCall the method for processing
    */
   protected final void addProcessStep(Supplier<List<SyntaxError>> processCall) {
     if (nextProcessingStep.isPresent()) {
       Supplier<List<SyntaxError>> previousProcessIt = nextProcessingStep.get();
-      nextProcessingStep = Optional.of(() -> {
-        List<SyntaxError> errors = new ArrayList<>(previousProcessIt.get());
-        errors.addAll(processCall.get());
-        return errors;
-      });
+      nextProcessingStep =
+          Optional.of(
+              () -> {
+                List<SyntaxError> errors = new ArrayList<>(previousProcessIt.get());
+                errors.addAll(processCall.get());
+                return errors;
+              });
     } else {
       nextProcessingStep = Optional.of(processCall);
     }

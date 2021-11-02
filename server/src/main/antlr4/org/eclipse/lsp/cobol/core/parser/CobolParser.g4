@@ -2999,43 +2999,47 @@ relationalOperator
    ;
 
 idms_map_name
-    : T=variableUsageName {validateLength($T.text, "map name", 8);}
+    : {validateLength(_input.LT(1).getText(), "map name", 8);} variableUsageName
     ;
 
 idms_map_name_definition
-    : T=dataName {validateLength($T.text, "map name", 8);}
+    : {validateLength(_input.LT(1).getText(), "map name", 8);} dataName
     ;
 
 idms_db_entity_name
-    : T=variableUsageName {validateLength($T.text, "db entity name", 16);}
+    : {validateLength(_input.LT(1).getText(), "db entity name", 16);} variableUsageName
     ;
 
 idms_dictionary_name
-    : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "dictionary name", 8);}
+    : {validateLength(_input.LT(1).getText().substring(1, _input.LT(1).getText().length() -1),
+     "dictionary name", 8);} literal
     ;
 
 idms_node_name
-    : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "node name", 8);}
+    : {validateLength(_input.LT(1).getText().substring(1, _input.LT(1).getText().length() -1),
+           "node name", 8);} literal
     ;
 
 idms_procedure_name
-    : T=variableUsageName {validateLength($T.text, "procedure name", 8);}
+    : {validateLength(_input.LT(1).getText(), "procedure name", 8);} variableUsageName
     ;
 
 idms_program_name
-    : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "program name", 8);}
+    : {validateLength(_input.LT(1).getText().substring(1, _input.LT(1).getText().length() -1),
+           "program name", 8);} literal
     ;
 
 idms_schema_name
-    : T=dataName {validateLength($T.text, "schema name", 8);}
+    : {validateLength(_input.LT(1).getText(), "schema name", 8);} dataName
     ;
 
 idms_subschema_name
-    : T=dataName {validateLength($T.text, "subschema name", 8);}
+    : {validateLength(_input.LT(1).getText(), "subschema name", 8);} dataName
     ;
 
 idms_table_name
-    : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "table name", 8);}
+    : {validateLength(_input.LT(1).getText().substring(1, _input.LT(1).getText().length() -1),
+           "table name", 8);} literal
     ;
 
 // DAF DaCo Identifiers
@@ -3084,6 +3088,7 @@ tableCall
 specialRegister
    : ADDRESS OF generalIdentifier
    | DATE | DAY | DAY_OF_WEEK | DEBUG_CONTENTS | DEBUG_ITEM | DEBUG_LINE | DEBUG_NAME | DEBUG_SUB_1 | DEBUG_SUB_2 | DEBUG_SUB_3
+   | JNIENVPTR
    | LENGTH OF? generalIdentifier | LINAGE_COUNTER | LINE_COUNTER
    | PAGE_COUNTER
    | RETURN_CODE

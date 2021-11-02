@@ -160,6 +160,19 @@
                     ],
                     "description": "The logging level for COBOL LS backend"
                 },
+                "cobol-lsp.analysis.features": {
+                    "type": "array",
+                    "default": ["SQL","CICS"],
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "SQL",
+                            "CICS"
+                        ]
+                    },
+                    "description": "List of supported language features",
+                    "uniqueItems": true
+                },
                 "cobol-lsp.target-sql-backend": {
                     "type": "string",
                     "default": "DB2_SERVER",
@@ -200,7 +213,7 @@
             {
                 "key": "shift+tab",
                 "command": "cobol-lsp.smart-outdent",
-                "when": "editorLangId == cobol || && !inSnippetMode"
+                "when": "editorLangId == cobol && !inSnippetMode"
             },
             {
                 "key": "shift+tab",
@@ -217,7 +230,7 @@
         "coverage": "jest --coverage --runInBand"
     },
     "dependencies": {
-        "@zowe/imperative": "4.13.1",
+        "@zowe/imperative": "4.15.1",
         "vscode-extension-telemetry": "0.1.6",
         "vscode-languageclient": "5.2.1"
     },

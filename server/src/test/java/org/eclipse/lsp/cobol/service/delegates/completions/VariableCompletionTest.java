@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.junit.jupiter.api.Test;
@@ -36,13 +36,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class VariableCompletionTest {
   private Completion completion = new VariableCompletion();
 
+  private static final String HEADER =
+      "       Identification Division.\n"
+          + "       Program-id. TEST.\n"
+          + "       Data Division.\n"
+          + "       Working-Storage Section.\n";
+
+  private static final String FULL_TEXT = HEADER
+      + "       01 {$*var1} PIC 9.\n"
+      + "       01 {$*VAR2} PIC 9.\n"
+      + "       01 {$*ANOTHER} PIC 9.\n";
+
   @Test
   void testCompletionEmptyResult() {
     assertThat(
         completion.getCompletionItems(
             "smth",
-            new CobolDocumentModel(
-                "", AnalysisResult.builder().constantDefinitions(ImmutableMap.of()).build())),
+            getModel(HEADER)),
         is(empty()));
   }
 
@@ -53,11 +63,11 @@ class VariableCompletionTest {
 
   @Test
   void testCompletionMock() {
-    assertEquals(createExpected(), completion.getCompletionItems("va", MockCompletionModel.MODEL));
+    assertEquals(createExpected(), completion.getCompletionItems("va", getModel(FULL_TEXT)));
   }
 
   private List<CompletionItem> createExpected() {
-    return ImmutableList.of(createItem("var1", "expected1"), createItem("VAR2", "expected2"));
+    return ImmutableList.of(createItem("VAR1", "01 VAR1 PIC 9."), createItem("VAR2", "01 VAR2 PIC 9."));
   }
 
   private CompletionItem createItem(String name, String desc) {
@@ -68,5 +78,9 @@ class VariableCompletionTest {
     item.setKind(CompletionItemKind.Variable);
     item.setSortText("0" + name);
     return item;
+  }
+
+  private CobolDocumentModel getModel(String text) {
+    return new CobolDocumentModel(text, UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of()));
   }
 }

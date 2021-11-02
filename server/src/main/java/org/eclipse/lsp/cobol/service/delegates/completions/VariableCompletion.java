@@ -14,12 +14,13 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import com.google.common.collect.Multimap;
 import com.google.inject.Singleton;
 import lombok.NonNull;
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
+import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
-import org.eclipse.lsp4j.CompletionItemKind;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -27,7 +28,13 @@ import java.util.function.Predicate;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.CONSTANTS;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.VARIABLES;
+import static org.eclipse.lsp4j.CompletionItemKind.Constant;
+import static org.eclipse.lsp4j.CompletionItemKind.Variable;
 
 /**
  * This completion provider returns all the defined variables as completion suggestions and their
@@ -40,24 +47,37 @@ public class VariableCompletion implements Completion {
   public @NonNull Collection<CompletionItem> getCompletionItems(
       @NonNull String token, @Nullable CobolDocumentModel document) {
     if (document == null) return emptyList();
-    return document.getAnalysisResult().getVariables().stream()
+    return document
+        .getAnalysisResult()
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(PROGRAM))
+        .map(ProgramNode.class::cast)
+        .map(ProgramNode::getVariables)
+        .map(Multimap::values)
+        .flatMap(Collection::stream)
         .filter(matchNames(token))
-        .map(this::toVariableCompletionItem)
+        .map(this::toCompletionItem)
         .collect(toList());
   }
 
-  private Predicate<Variable> matchNames(@NonNull String token) {
+  private Predicate<VariableNode> matchNames(@NonNull String token) {
     return it -> it.getName().regionMatches(true, 0, token, 0, token.length());
   }
 
-  private CompletionItem toVariableCompletionItem(Variable it) {
+  private CompletionItem toCompletionItem(VariableNode it) {
     String name = it.getName();
     CompletionItem item = new CompletionItem(name);
     item.setLabel(name);
     item.setInsertText(name);
-    item.setSortText(VARIABLES.prefix + name);
-    item.setDocumentation(DocumentationUtils.collectDescription(it));
-    item.setKind(CompletionItemKind.Variable);
+    item.setDocumentation(it.getFullVariableDescription());
+    if (it.getLocality().getUri().startsWith(PREF_IMPLICIT)) {
+      item.setSortText(CONSTANTS.prefix + name);
+      item.setKind(Constant);
+    } else {
+      item.setSortText(VARIABLES.prefix + name);
+      item.setKind(Variable);
+    }
     return item;
   }
 }

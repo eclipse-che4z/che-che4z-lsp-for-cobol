@@ -18,12 +18,16 @@ package org.eclipse.lsp.cobol.usecases.engine;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
+import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.SQLBackend;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /** Defines all the required data for the test */
 @Getter
@@ -41,13 +45,15 @@ public class UseCase {
   @Builder.Default CopybookProcessingMode copybookProcessingMode = CopybookProcessingMode.ENABLED;
   /** SQL Backend for the analysis */
   @Builder.Default SQLBackend sqlBackend = SQLBackend.DB2_SERVER;
+  /** Analysis features (SQL, CICS, etc.) */
+  @Builder.Default Set<EmbeddedCodeNode.Language> features = Collections.emptySet();
 
   /**
-   * Get the {@link CopybookConfig} using the specified processing mode and the {@link SQLBackend}
-   *
+   * Get the {@link AnalysisConfig} using the specified processing mode and the {@link SQLBackend}
+   * see {@link CopybookConfig}
    * @return CopybookConfig for the analysis
    */
-  public CopybookConfig getCopybookConfig() {
-    return new CopybookConfig(copybookProcessingMode, sqlBackend);
+  public AnalysisConfig getAnalysisConfig() {
+    return new AnalysisConfig(features, new CopybookConfig(copybookProcessingMode, sqlBackend));
   }
 }

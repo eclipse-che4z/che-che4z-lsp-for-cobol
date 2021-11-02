@@ -24,13 +24,12 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp.cobol.core.visitor.CICSVisitor;
 import org.eclipse.lsp.cobol.core.visitor.Db2SqlVisitor;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.EMBEDDED_CODE;
 
@@ -56,11 +55,10 @@ public class EmbeddedCodeNode extends Node {
    * content of the code part.
    *
    * @param mapping a map with actual token localities
-   * @param constants a context of predefined variables
    */
-  public void analyzeTree(Map<Token, Locality> mapping, PredefinedVariableContext constants) {
+  public void analyzeTree(Map<Token, Locality> mapping) {
     getParent().removeChild(this);
-    lang.visitor.apply(mapping, constants).visit(tree).forEach(getParent()::addChild);
+    lang.visitor.apply(mapping).visit(tree).forEach(getParent()::addChild);
   }
 
   /** This enum holds all the supported embedded languages that require a separate parsing */
@@ -68,8 +66,6 @@ public class EmbeddedCodeNode extends Node {
   public enum Language {
     SQL(Db2SqlVisitor::new),
     CICS(CICSVisitor::new);
-    private BiFunction<
-            Map<Token, Locality>, PredefinedVariableContext, ParseTreeVisitor<List<Node>>>
-        visitor;
+    private Function<Map<Token, Locality>, ParseTreeVisitor<List<Node>>> visitor;
   }
 }

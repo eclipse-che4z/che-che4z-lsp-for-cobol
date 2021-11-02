@@ -110,16 +110,6 @@ class ElementOccurrencesTest {
             AnalysisResult.builder().sectionDefinitions(definitionMap).sectionUsages(usageMap).build(),
             insideDefinition,
             ImmutableList.of(usage)),
-        // find constant usage by usage position
-        Arguments.of(
-            AnalysisResult.builder().constantDefinitions(definitionMap).constantUsages(usageMap).build(),
-            insideUsage,
-            ImmutableList.of(usage)),
-        // find constant usage by definition position
-        Arguments.of(
-            AnalysisResult.builder().constantDefinitions(definitionMap).constantUsages(usageMap).build(),
-            insideDefinition,
-            ImmutableList.of(usage)),
         // find copybook usage by usage position
         Arguments.of(
             AnalysisResult.builder().copybookDefinitions(definitionMap).copybookUsages(usageMap).build(),

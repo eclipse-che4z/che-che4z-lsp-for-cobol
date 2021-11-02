@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.SQLBackend;
@@ -170,6 +171,6 @@ class TestReplaceCompilerDirective {
         ImmutableList.of(new CobolText(REPL_NAME, REPL2), new CobolText(STRUCT1_NAME, STRUCT1)),
         ImmutableMap.of(),
         Collections.emptyList(),
-        new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER));
+        AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
   }
 }

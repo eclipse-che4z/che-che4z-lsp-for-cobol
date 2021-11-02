@@ -15,26 +15,13 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.delegates.communications.ServerCommunications;
-import org.eclipse.lsp.cobol.usecases.engine.UseCase;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
-import org.eclipse.lsp.cobol.service.utils.FileSystemService;
-import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-
-import java.util.List;
-
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.ofNullable;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.*;
 
 /**
  * This test verifies that all the responses from server escaped from line breaks to prevent
@@ -47,49 +34,34 @@ class TestResponsesNotContainLineBreaks {
           + "        PROGRAM-ID. test1.\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
+          + "        01 {$*A} PIC 9.\n"
+          + "        01 {$*B} PIC 9.\n"
           + "        PROCEDURE DIVISION.\n"
-          + "           PERFORM VARYING A FROM 10 BY 10 UNTIL  > 40\n" // May contain line break in
-          // a diagnostic message between 40 and PERFORM
-          + "               PERFORM VARYING b FROM 1 BY 1 UNTIL B > 4\n"
+          + "           PERFORM VARYING {$A} FROM 10 BY 10 UNTIL  {>|1} 40\n" // May contain line
+          // break in a diagnostic message between 40 and PERFORM
+          + "               PERFORM VARYING {$b} FROM 1 BY 1 UNTIL {$B} > 4\n"
           + "               END-PERFORM\n"
           + "            END-PERFORM.\n"
           + "            STOP RUN.";
 
   @Test
   void test() {
-    CobolLanguageClient client = mock(CobolLanguageClient.class);
-    ArgumentCaptor<PublishDiagnosticsParams> captor = forClass(PublishDiagnosticsParams.class);
-    FileSystemService files = mock(WorkspaceFileService.class);
-    when(files.decodeURI(anyString())).thenCallRealMethod();
-    MessageService mockMessageService = mock(MessageService.class);
-
-    ServerCommunications communications =
-        new ServerCommunications(
-            () -> client,
-            files,
-            mockMessageService,
-            new CustomThreadPoolExecutorService(3, 4, 60, 5));
-
-    communications.publishDiagnostics(
-        singletonMap(
-            UseCaseUtils.DOCUMENT_URI,
-            UseCaseUtils.analyzeForErrors(UseCase.builder().text(TEXT).build())));
-
-    verify(client).publishDiagnostics(captor.capture());
-    List<Diagnostic> diagnostics = captor.getValue().getDiagnostics();
-
-    diagnostics.forEach(it -> assertStringWithoutLineBreaks(it.getMessage()));
-    diagnostics.forEach(it -> assertStringWithoutLineBreaks(it.getCode()));
-    diagnostics.forEach(it -> assertStringWithoutLineBreaks(it.getSource()));
-  }
-
-  private void assertStringWithoutLineBreaks(String str) {
-    ofNullable(str)
-        .ifPresent(
-            it -> {
-              assertFalse(it.contains("\r\n"), it);
-              assertFalse(it.contains("\n"), it);
-              assertFalse(it.contains("\r"), it);
-            });
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Extraneous input '>' expected {ALL, DATE, DAY, DAY-OF-WEEK, DEBUG-CONTENTS, DEBUG-ITEM, "
+                    + "DEBUG-LINE, DEBUG-NAME, DEBUG-SUB-1, DEBUG-SUB-2, DEBUG-SUB-3, DFHRESP, DFHVALUE, FALSE, "
+                    + "FUNCTION, HIGH-VALUE, HIGH-VALUES, JNIENVPTR, LENGTH, LINAGE-COUNTER, LINE-COUNTER, "
+                    + "LOW-VALUE, LOW-VALUES, NOT, NULL, NULLS, PAGE-COUNTER, QUOTES, RETURN-CODE, SHIFT-IN, "
+                    + "SHIFT-OUT, SORT-CONTROL, SORT-CORE-SIZE, SORT-FILE-SIZE, SORT-MESSAGE, SORT-MODE-SIZE, "
+                    + "SORT-RETURN, SPACE, SPACES, TALLY, TIME, TRUE, WHEN-COMPILED, ZERO, ZEROES, ZEROS, "
+                    + "'(', '-', '+', '01-49', '66', '77', '88', INTEGERLITERAL, NUMERICLITERAL, "
+                    + "NONNUMERICLITERAL, IDENTIFIER, FINALCHARSTRING}",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

@@ -20,7 +20,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public final class ProcessingConstants {
   public static final String COMMENT_TAG = "*>";
-  public static final String NEWLINE = "\r\n";
+  public static final String NEWLINE = "\n";
   public static final String WS = " ";
   public static final String BLANK_SEQUENCE_AREA = "      ";
   public static final String CPY_ENTER_TAG = " *>CPYENTER<URI>";

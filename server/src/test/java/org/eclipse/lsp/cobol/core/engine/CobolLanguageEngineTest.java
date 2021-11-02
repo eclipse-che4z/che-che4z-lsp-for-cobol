@@ -23,11 +23,11 @@ import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
@@ -159,8 +159,6 @@ class CobolLanguageEngineTest {
     ResultWithErrors<SemanticContext> expected =
         new ResultWithErrors<>(
             SemanticContext.builder()
-                .constants(new PredefinedVariableContext())
-                .outlineTree(expectedOutlineTree)
                 .rootNode(
                     new RootNode(
                         Locality.builder()
@@ -171,12 +169,13 @@ class CobolLanguageEngineTest {
                 .build(),
             ImmutableList.of(error, eofError));
 
-    ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, cpyConfig);
+    ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(cpyConfig));
     assertEquals(expected, actual);
 
     // test nullity
-    assertThrows(IllegalArgumentException.class, () -> engine.run(null, TEXT, cpyConfig));
-    assertThrows(IllegalArgumentException.class, () -> engine.run(URI, null, cpyConfig));
+    assertThrows(IllegalArgumentException.class, () -> engine.run(null, TEXT, AnalysisConfig.defaultConfig(cpyConfig)));
+    assertThrows(IllegalArgumentException.class, () -> engine.run(URI, null, AnalysisConfig.defaultConfig(cpyConfig)));
+    assertThrows(IllegalArgumentException.class, () -> engine.run(URI, TEXT, AnalysisConfig.defaultConfig((CopybookConfig) null)));
     assertThrows(IllegalArgumentException.class, () -> engine.run(URI, TEXT, null));
   }
 }

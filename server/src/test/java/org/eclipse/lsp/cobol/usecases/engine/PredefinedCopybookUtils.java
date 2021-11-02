@@ -34,6 +34,8 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+
 /** This util class allows retrieving and processing the predefined copybooks for syntax analysis */
 @Slf4j
 @UtilityClass
@@ -75,7 +77,7 @@ class PredefinedCopybookUtils {
             ImmutableList.of(),
             ImmutableMap.of(),
             sqlBackend);
-    return new CopybookModel(name, uri, cleanCopybook.getText());
+    return new CopybookModel(name, PREF_IMPLICIT + uri, cleanCopybook.getText());
   }
 
   private String retrievePredefinedUri(String name, SQLBackend sqlBackend) {
