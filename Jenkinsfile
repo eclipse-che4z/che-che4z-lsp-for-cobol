@@ -294,6 +294,8 @@ pipeline {
                             cp -r /root/.cache $CYPRESS_HOME 
                             cp -r /root/.local $CYPRESS_HOME 
                             cp -r /root/.npm $CYPRESS_HOME 
+                            rm -rf node_modules/
+                            yarn cache clean
                             yarn install --frozen-lockfile
                             npm run ts:build
                             # To enable debug add this: DEBUG=*
