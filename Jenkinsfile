@@ -240,7 +240,7 @@ pipeline {
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
-                                sh 'npx vsce package'
+                                sh 'npm run package'
                                 archiveArtifacts "*.vsix"
                             }
                         }
