@@ -868,7 +868,36 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
-    return VisitorHelper.createTreeNode(positions, visitChildren(ctx), ctx, nodeConstructor);
+    List<Node> children = visitChildren(ctx);
+    return retrieveRangeLocalityWithSameUri(ctx)
+        .map(constructNode(nodeConstructor, children))
+        .orElse(children);
+  }
+
+  private Optional<Locality> retrieveRangeLocalityWithSameUri(ParserRuleContext ctx) {
+    return ofNullable(ctx)
+        .flatMap(context -> ofNullable(positions.get(context.getStart()))
+            .flatMap(start -> retrieveStopLocality(context.getStop().getTokenIndex(), start.getUri())
+                .map(stop -> start.toBuilder()
+                                .range(
+                                    new Range(
+                                        start.getRange().getStart(),
+                                        stop.getRange().getEnd()))
+                                .build())));
+  }
+
+  private Optional<Locality> retrieveStopLocality(int tokenIndex, String uri) {
+    for (int index = tokenIndex; index < tokenStream.size(); index++) {
+      Locality locality = positions.get(tokenStream.get(index));
+      if (locality != null && uri.equals(locality.getUri()))
+        return Optional.of(locality);
+    }
+    for (int index = tokenIndex - 1; index >= 0; index--) {
+      Locality locality = positions.get(tokenStream.get(index));
+      if (locality != null && uri.equals(locality.getUri()))
+        return Optional.of(locality);
+    }
+    return Optional.empty();
   }
 
   private List<Node> addTreeNode(Node node, List<Node> children) {
