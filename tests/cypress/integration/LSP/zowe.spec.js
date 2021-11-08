@@ -17,6 +17,8 @@
 //@ts-ignore
 /// <reference types="../../support/" />
 
+import { Theia } from '@eclipse/che-che4z/tests/dist/selectorsTheia';
+
 context('This is a Zowe integration spec file', () => {
   /* Variables Panel */
   const basePath = 'test_files/project/.c4z/.copybooks/local/CLIST/';
@@ -43,7 +45,7 @@ context('This is a Zowe integration spec file', () => {
   }
 
   function popupMsg(message) {
-    return cy.get('.theia-notification-list-item-content').should('contain', message);
+    return cy.get(Theia.popUpMsg).should('contain', message);
   }
 
   function resolveCopybook(line, text) {
@@ -120,7 +122,7 @@ context('This is a Zowe integration spec file', () => {
       popupMsg(
         'Invalid credentials for profile: wrongPass. Copybook retrieval is blocked. Ensure the profile contains correct credentials.',
       )
-        .get('.theia-button')
+        .get(Theia.theiaButton)
         .contains('Unblock and retry')
         .click();
 

@@ -16,6 +16,8 @@
 //@ts-ignore
 /// <reference types="../../support/" />
 
+import { Theia } from '@eclipse/che-che4z/tests/dist/selectorsTheia';
+
 //F97476 - Support for "REPLACING" statement
 
 context('This is a F97476 spec', () => {
@@ -34,7 +36,7 @@ context('This is a F97476 spec', () => {
         delay: 100,
       });
 
-      cy.get('.squiggly-error').should('not.exist');
+      cy.get(Theia.editorError).should('not.exist');
       cy.getLineByNumber(22).findText('ABC-ID').goToDefinition();
       cy.getCurrentTab().should('have.text', 'REPL');
       cy.getCurrentLineNumber().should('eq', 1);
@@ -49,7 +51,7 @@ context('This is a F97476 spec', () => {
     it('Checks REPLACING feature twice for one variable', () => {
       cy.openFile('REPLACING.CBL');
       cy.goToLine(22);
-      cy.get('.squiggly-error')
+      cy.get(Theia.editorError)
         .should('have.length', 1)
         .getElementLineNumber()
         .then((lineNumber) => {
@@ -67,13 +69,13 @@ context('This is a F97476 spec', () => {
           delay: 100,
         });
 
-      cy.get('.squiggly-error').should('not.exist');
+      cy.get(Theia.editorError).should('not.exist');
       cy.getLineByNumber(23).findText('XYZ-ID').goToDefinition();
       cy.getCurrentTab().should('have.text', 'REPL');
       cy.getCurrentLineNumber().should('eq', 1);
       cy.getCurrentLine().contains('05 TAG-ID PIC 9.').closeCurrentTab();
       cy.closeCurrentTab();
-      cy.get('.theia-button.secondary').contains("Don't save").click();
+      cy.get(Theia.theiaButtonDontSave).contains("Don't save").click();
     });
   });
 
@@ -87,11 +89,11 @@ context('This is a F97476 spec', () => {
     it('Checks REPLACING feature in one COPY statement', () => {
       cy.openFolder('testing').openFile('REPL');
       cy.getLineByNumber(1).type('{end}{enter}       05 TAR-ID PIC 9. {ctrl}{c}').closeCurrentTab();
-      cy.get('.theia-button.main').click();
+      cy.get(Theia.theiaButtonOK).click();
 
       cy.openFile('REPLACING.CBL');
       cy.goToLine(22);
-      cy.get('.squiggly-error')
+      cy.get(Theia.editorError)
         .should('have.length', 1)
         .getElementLineNumber()
         .then((lineNumber) => {
@@ -104,21 +106,21 @@ context('This is a F97476 spec', () => {
           delay: 100,
         });
       cy.getLineByNumber(23).contains('MOVE 0 TO ABC-ID.').type('{end}{enter} MOVE 0 TO XYZ-ID.');
-      cy.get('.squiggly-error').should('not.exist');
+      cy.get(Theia.editorError).should('not.exist');
 
       cy.getLineByNumber(23).findText('ABC-ID').goToDefinition();
       cy.getCurrentTab().should('have.text', 'REPL');
-      cy.get('.view-overlays .symbolHighlight');
+      cy.get(Theia.symbolHighlight);
       cy.getCurrentLineNumber().should('eq', 1);
       cy.getCurrentLine().contains('05 TAG-ID PIC 9.').closeCurrentTab();
 
       cy.getLineByNumber(24).findText('XYZ-ID').goToDefinition();
       cy.getCurrentTab().should('have.text', 'REPL');
-      cy.get('.view-overlays .symbolHighlight');
+      cy.get(Theia.symbolHighlight);
       cy.getCurrentLineNumber().should('eq', 2);
       cy.getCurrentLine().contains('05 TAR-ID PIC 9.').closeCurrentTab();
       cy.closeCurrentTab();
-      cy.get('.theia-button.secondary').contains("Don't save").click();
+      cy.get(Theia.theiaButtonDontSave).contains("Don't save").click();
     });
   });
 
@@ -130,7 +132,7 @@ context('This is a F97476 spec', () => {
     it('Checks REPLACING feature in several COPY statetment', () => {
       cy.openFolder('testing').openFile('REPL');
       cy.getLineByNumber(1).type('{end}{enter}       05 TAR-ID PIC 9. {ctrl}{c}').closeCurrentTab();
-      cy.get('.theia-button.main').click();
+      cy.get(Theia.theiaButtonOK).click();
 
       cy.openFile('REPLACING.CBL');
       cy.getLineByNumber(19)
@@ -166,7 +168,7 @@ context('This is a F97476 spec', () => {
       cy.getCurrentLineNumber().should('eq', 1);
       cy.getCurrentLine().contains('05 TAG-ID PIC 9.').closeCurrentTab();
       cy.closeCurrentTab();
-      cy.get('.theia-button.secondary').contains("Don't save").click();
+      cy.get(Theia.theiaButtonDontSave).contains("Don't save").click();
     });
   });
 
@@ -183,7 +185,7 @@ context('This is a F97476 spec', () => {
       cy.openFile('REPLA.CBL').goToLine(21);
       cy.getCurrentLine().type('{end}{enter}');
       cy.getCurrentLine().type('{ctrl} ');
-      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('NAME3');
+      cy.get(Theia.suggestWidget).contains('NAME3');
     });
   });
 
