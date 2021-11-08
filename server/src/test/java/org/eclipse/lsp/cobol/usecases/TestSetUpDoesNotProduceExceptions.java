@@ -29,8 +29,11 @@ class TestSetUpDoesNotProduceExceptions {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*A1} PIC 9.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           SET A1 UP{|1}";
+          + "           SET {$A1} UP{|1}";
 
   @Test
   void test() {

@@ -589,34 +589,36 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitSetUpDownByStatement(SetUpDownByStatementContext ctx) {
-    List<Locality> receivingFields = mapRulesToLocalities(ctx.receivingField());
-    return ofNullable(ctx.sendingField())
-        .map(
-            it ->
-                addTreeNode(
-                    ctx,
-                    locality ->
-                        new SetUpDownByStatement(
-                            locality,
-                            receivingFields,
-                            positions.get(it.getStart()),
-                            ofNullable(it.literal()).map(ParserRuleContext::getText).orElse(null))))
-        .orElseGet(ImmutableList::of);
+    List<Node> receivingField = ctx.receivingField().stream().map(this::visit).flatMap(List::stream).collect(toList());
+    List<Node> sendingField = ofNullable(ctx.sendingField()).map(this::visit).orElseGet(ImmutableList::of);
+    List<Node> children = new ArrayList<>();
+    children.addAll(receivingField);
+    children.addAll(sendingField);
+    if (sendingField.size() != 1) return children;
+    Node statement = new SetUpDownByStatement(
+        retrieveRangeLocality(ctx, positions).orElse(null),
+        receivingField,
+        sendingField.get(0));
+    return addTreeNode(statement, children);
   }
 
   @Override
   public List<Node> visitSetToOnOff(SetToOnOffContext ctx) {
-    return addTreeNode(
-        ctx,
-        locality -> new SetToOnOffStatement(locality, mapRulesToLocalities(ctx.receivingField())));
+    List<Node> receivingField = ctx.receivingField().stream().map(this::visit).flatMap(List::stream).collect(toList());
+    Node statement = new SetToOnOffStatement(retrieveRangeLocality(ctx, positions).orElse(null), receivingField);
+    return addTreeNode(statement, receivingField);
   }
 
   @Override
   public List<Node> visitSetToBoolean(SetToBooleanContext ctx) {
-    return addTreeNode(
-        ctx,
-        locality ->
-            new SetToBooleanStatement(locality, mapRulesToLocalities(ctx.receivingField())));
+    List<Node> receivingField = ctx.receivingField().stream().map(this::visit).flatMap(List::stream).collect(toList());
+    Node statement = new SetToBooleanStatement(retrieveRangeLocality(ctx, positions).orElse(null), receivingField);
+    return addTreeNode(statement, receivingField);
+  }
+
+  @Override
+  public List<Node> visitLiteral(LiteralContext ctx) {
+    return addTreeNode(ctx, locality -> new LiteralNode(locality, ctx.getText()));
   }
 
   @Override

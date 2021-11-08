@@ -27,6 +27,7 @@ import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -40,9 +41,15 @@ public class QualifiedReferenceNode extends Node {
   private static final String NOT_DEFINED_ERROR = "semantics.notDefined";
   private static final String DUPLICATED_DEFINITION_ERROR = "semantics.duplicated";
 
+  private VariableNode variableDefinitionNode;
+
   public QualifiedReferenceNode(Locality location) {
     super(location, NodeType.QUALIFIED_REFERENCE_NODE);
     addProcessStep(this::waitForVariableDefinitions);
+  }
+
+  public Optional<VariableNode> getVariableDefinitionNode() {
+    return Optional.ofNullable(variableDefinitionNode);
   }
 
   private List<SyntaxError> waitForVariableDefinitions() {
@@ -65,6 +72,7 @@ public class QualifiedReferenceNode extends Node {
         .orElseGet(ImmutableList::of);
     if (foundDefinitions.size() == 1) {
       VariableNode definitionNode = foundDefinitions.get(0);
+      variableDefinitionNode = definitionNode;
       for (VariableUsageNode usageNode: variableUsageNodes) {
         while (definitionNode != null && !usageNode.getDataName().equals(definitionNode.getName())) {
           definitionNode = definitionNode.getNearestParentByType(NodeType.VARIABLE)
