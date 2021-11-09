@@ -14,9 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
+
+import java.util.List;
 
 /**
  * This value class represents an Index item. It is defined using INDEXED BY statement in a {@link
@@ -27,6 +31,11 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 public class IndexItemNode extends VariableNode {
   protected IndexItemNode(Locality location, String name, boolean global) {
     super(location, name, VariableType.INDEX_ITEM, global);
+  }
+
+  @Override
+  public List<Node> getDefinitions() {
+    return ImmutableList.of(this);
   }
 
   @Override

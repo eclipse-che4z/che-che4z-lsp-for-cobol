@@ -47,5 +47,6 @@ public enum NodeType {
   CODE_BLOCK_USAGE,
   CODE_BLOCK_PARENT,
   COPY,
-  DIVISION
+  DIVISION,
+  LITERAL
 }

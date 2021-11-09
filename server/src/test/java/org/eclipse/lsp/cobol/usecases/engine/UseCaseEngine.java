@@ -16,10 +16,13 @@
 package org.eclipse.lsp.cobol.usecases.engine;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
@@ -234,8 +237,8 @@ public class UseCaseEngine {
 
   private Map<String, List<Location>> extractVariableDefinitions(AnalysisResult result) {
     return getVariableStream(result)
-        .filter(it -> !it.getDefinition().getUri().startsWith(PREF_IMPLICIT))
-        .collect(groupingBy(Variable::getName))
+        .filter(it -> !it.getLocality().getUri().startsWith(PREF_IMPLICIT))
+        .collect(groupingBy(VariableNode::getName))
         .entrySet()
         .stream()
         .collect(
@@ -243,7 +246,9 @@ public class UseCaseEngine {
                 Entry::getKey,
                 entry ->
                     entry.getValue().stream()
-                        .map(Variable::getDefinition)
+                        .map(VariableNode::getDefinitions)
+                        .flatMap(List::stream)
+                        .map(Node::getLocality)
                         .map(Locality::toLocation)
                         .distinct()
                         .collect(toList())));
@@ -252,7 +257,7 @@ public class UseCaseEngine {
   private Map<String, List<Location>> extractVariableUsages(AnalysisResult result) {
     return getVariableStream(result)
         .filter(variable -> !variable.getUsages().isEmpty())
-        .collect(groupingBy(Variable::getName))
+        .collect(groupingBy(VariableNode::getName))
         .entrySet()
         .stream()
         .collect(
@@ -260,19 +265,21 @@ public class UseCaseEngine {
                 Entry::getKey,
                 entry ->
                     entry.getValue().stream()
-                        .map(Variable::getUsages)
+                        .map(VariableNode::getUsages)
                         .flatMap(List::stream)
+                        .map(VariableUsageNode::getLocality)
                         .map(Locality::toLocation)
                         .collect(toList())));
   }
 
-  private Stream<Variable> getVariableStream(AnalysisResult result) {
+  private Stream<VariableNode> getVariableStream(AnalysisResult result) {
     return result
         .getRootNode()
         .getDepthFirstStream()
         .filter(hasType(PROGRAM))
         .map(ProgramNode.class::cast)
-        .map(ProgramNode::getDefinedVariables)
+        .map(ProgramNode::getVariables)
+        .map(Multimap::values)
         .flatMap(Collection::stream)
         .filter(it -> !FILLER_NAME.equals(it.getName()));
   }

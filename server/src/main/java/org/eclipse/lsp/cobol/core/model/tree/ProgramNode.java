@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -26,19 +25,14 @@ import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
-import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
-import org.eclipse.lsp.cobol.core.model.variables.NodeConverter;
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.core.semantics.PredefinedVariables;
 
 import java.util.*;
 
-import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.STATEMENT;
 import static org.eclipse.lsp.cobol.core.semantics.PredefinedVariables.PREDEFINED;
 import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 
@@ -48,18 +42,12 @@ import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 @EqualsAndHashCode(callSuper = true)
 @Slf4j
 public class ProgramNode extends Node {
-  @EqualsAndHashCode.Exclude @ToString.Exclude
-  private final NodeConverter nodeConverter = new NodeConverter();
-
   private final Multimap<String, VariableNode> variables = ArrayListMultimap.create();
-  private final Collection<Variable> definedVariables = new ArrayList<>();
-  private final List<VariableNode> variablesForConvert = new ArrayList<>();
   private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
   private String programName;
 
   public ProgramNode(Locality locality) {
     super(locality, PROGRAM);
-    addProcessStep(this::waitForVariableDefinition);
     addPredefinedVariables();
   }
 
@@ -71,28 +59,6 @@ public class ProgramNode extends Node {
     this.programName = programName;
   }
 
-  private List<SyntaxError> waitForVariableDefinition() {
-    addProcessStep(this::waitForVariableUsage);
-    return ImmutableList.of();
-  }
-
-  private List<SyntaxError> waitForVariableUsage() {
-    addProcessStep(this::processVariables);
-    return ImmutableList.of();
-  }
-
-  private List<SyntaxError> processVariables() {
-    for (VariableNode variableForConvert : variablesForConvert)
-      definedVariables.add(nodeConverter.convertVariable(variableForConvert));
-    variablesForConvert.clear();
-    for (VariableNode node : variables.values()) nodeConverter.updateUsage(node);
-    Map<Locality, Variable> variableUsages = new HashMap<>();
-    for (Variable variable : definedVariables)
-      for (Locality usageLocality : variable.getUsages())
-        variableUsages.put(usageLocality, variable);
-    return validateStatements(variableUsages);
-  }
-
   /**
    * Add the variable definition to that program context.
    *
@@ -100,7 +66,6 @@ public class ProgramNode extends Node {
    */
   public void addVariableDefinition(VariableNode node) {
     variables.put(node.getName(), node);
-    variablesForConvert.add(node);
   }
 
   /**
@@ -166,15 +131,6 @@ public class ProgramNode extends Node {
         .filter(VariableNode::isGlobal)
         .forEach(variableNode -> result.put(variableNode.getName(), variableNode));
     return result;
-  }
-
-  private List<SyntaxError> validateStatements(Map<Locality, Variable> variables) {
-    return getDepthFirstStream()
-        .filter(hasType(STATEMENT))
-        .map(StatementNode.class::cast)
-        .map(it -> it.validate(variables))
-        .flatMap(Collection::stream)
-        .collect(toList());
   }
 
   private void addPredefinedVariables() {

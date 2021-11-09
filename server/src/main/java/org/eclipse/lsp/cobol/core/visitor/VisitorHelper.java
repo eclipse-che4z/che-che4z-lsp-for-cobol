@@ -26,7 +26,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.ValueInterval;
-import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
+import org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormat;
 import org.eclipse.lsp4j.Range;
 
 import javax.annotation.Nonnull;
