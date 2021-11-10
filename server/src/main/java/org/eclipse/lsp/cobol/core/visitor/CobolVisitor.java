@@ -715,7 +715,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitIfStatement(IfStatementContext ctx) {
-    return addTreeNode(ctx, locality -> new IfNode(locality, ctx));
+    return addTreeNode(ctx, IfNode::new);
   }
 
   @Override
