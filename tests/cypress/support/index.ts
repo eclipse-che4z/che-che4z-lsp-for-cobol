@@ -28,7 +28,13 @@
 // ***********************************************************
 
 import '@eclipse/che-che4z/tests';
+import { Theia, VSCODE } from '@eclipse/che-che4z/tests/dist/selectors';
 import '@shelex/cypress-allure-plugin';
+import 'cypress-real-events/support';
+
+const env = Cypress.env('ide');
+const IDE = env === 'theia' ? Theia : VSCODE;
+
 /* eslint @typescript-eslint/no-var-requires: "off" */
 require('cypress-terminal-report/src/installLogsCollector')();
 
@@ -56,6 +62,9 @@ beforeEach(() => {
   cy.clearLocalStorage();
   cy.waitForAppStart();
   cy.openFileExplorer();
+  if (IDE === VSCODE) {
+    cy.closeCurrentTab();
+  }
 });
 
 Cypress.on('uncaught:exception', (err, runnable) => {

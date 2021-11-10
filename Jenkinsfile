@@ -299,7 +299,7 @@ pipeline {
                             yarn install --frozen-lockfile
                             npm run ts:build
                             # To enable debug add this: DEBUG=*
-                            NO_COLOR=1 npm run cy:run:ci
+                            NO_COLOR=1 npm run cy:run:ci -- --env ide=theia
                             TEST_STATUS=$?
                             npm run merge-reports
                             exit $TEST_STATUS

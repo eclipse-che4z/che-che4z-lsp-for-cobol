@@ -17,7 +17,7 @@
 /// <reference types="../../support/" />
 
 // Import selectors from Theia object
-import { Theia } from '../../../node_modules/@eclipse/che-che4z/tests/dist/selectorsTheia';
+import { Theia } from '../../../node_modules/@eclipse/che-che4z/tests/dist/selectors';
 
 //F95833 - LSP for COBOL - support for CICS statements (basic intellisense)
 
