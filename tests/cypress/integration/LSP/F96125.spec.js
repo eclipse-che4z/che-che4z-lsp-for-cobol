@@ -64,7 +64,7 @@ context('This is F96125 spec', () => {
             });
         });
     });
-    it(['smoke'], 'Check paragraph name warning when not in Area A', () => {
+    it(['smoke', 'CI'], 'Check paragraph name warning when not in Area A', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(32)
         .as('currentLine')
@@ -119,7 +119,7 @@ context('This is F96125 spec', () => {
   });
 
   describe('TC250108 Test Program Name', () => {
-    it('Check if program name is similar', () => {
+    it(['CI'], 'Check if program name is similar', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(49)
         .as('currentLine')

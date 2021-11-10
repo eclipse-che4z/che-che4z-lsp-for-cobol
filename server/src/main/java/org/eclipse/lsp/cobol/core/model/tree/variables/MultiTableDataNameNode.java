@@ -18,7 +18,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
 
 /**
  * This value class represents the multi-dimensional Table variable that may have nested variables,
@@ -42,5 +41,13 @@ public class MultiTableDataNameNode extends VariableWithLevelNode implements Usa
     super(location, level, name, redefines, VariableType.MULTI_TABLE_DATA_NAME, global);
     this.occursTimes = occursTimes;
     this.usageFormat = usageFormat;
+  }
+
+  @Override
+  protected String getVariableDisplayString() {
+    StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
+    stringBuilder.append(String.format(" OCCURS %1$d TIMES", occursTimes));
+    if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat);
+    return stringBuilder.append(".").toString();
   }
 }

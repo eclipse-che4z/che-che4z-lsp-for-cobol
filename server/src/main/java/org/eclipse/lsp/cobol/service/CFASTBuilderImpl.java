@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service;
 
 import org.eclipse.lsp.cobol.core.model.extendedapi.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
+import org.eclipse.lsp.cobol.core.model.variables.DivisionType;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -94,7 +95,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
 
   private void traverse(ProgramNode node, List<Program> programs) {
     node.getChildren().stream()
-        .filter(ProcedureDivisionNode.class::isInstance)
+        .filter(it -> ((DivisionNode) it).getDivisionType() == DivisionType.PROCEDURE_DIVISION)
         .findFirst()
         .ifPresent(
             n -> {

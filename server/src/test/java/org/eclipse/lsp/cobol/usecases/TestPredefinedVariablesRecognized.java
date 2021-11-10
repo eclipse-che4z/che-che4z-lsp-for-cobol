@@ -37,10 +37,10 @@ class TestPredefinedVariablesRecognized {
           + "          05  {$*LAST-MAP}                     PIC x.\n"
           + "       Procedure Division.\n"
           + "       {#*000-Main-Logic}.\n"
-          + "           MOVE {&EIBRESP}        TO {$WS-ERR-RESULT}.\n"
-          + "           MOVE {&EIBDATE} TO {$LDAY}.\n"
+          + "           MOVE {$EIBRESP}        TO {$WS-ERR-RESULT}.\n"
+          + "           MOVE {$EIBDATE} TO {$LDAY}.\n"
           + "           EXEC CICS RETURN\n"
-          + "                TRANSID({&EIBTRNID})\n"
+          + "                TRANSID({$EIBTRNID})\n"
           + "                COMMAREA({$DFHCOMMAREA})\n"
           + "                END-EXEC.\n"
           + "       End program ProgramId.";

@@ -70,7 +70,7 @@ spec:
         memory: "2Gi"
         cpu: "1"
   - name: cypress
-    image: cypress/included:7.7.0
+    image: cypress/included:8.5.0
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
@@ -240,7 +240,7 @@ pipeline {
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
-                                sh 'npx vsce package'
+                                sh 'npm run package'
                                 archiveArtifacts "*.vsix"
                             }
                         }
@@ -294,6 +294,8 @@ pipeline {
                             cp -r /root/.cache $CYPRESS_HOME 
                             cp -r /root/.local $CYPRESS_HOME 
                             cp -r /root/.npm $CYPRESS_HOME 
+                            rm -rf node_modules/ yarn.lock
+                            yarn cache clean
                             yarn install --frozen-lockfile
                             npm run ts:build
                             # To enable debug add this: DEBUG=*

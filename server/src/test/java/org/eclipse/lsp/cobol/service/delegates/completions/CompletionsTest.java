@@ -21,8 +21,7 @@ import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.CONSTANTS;
-import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.COPYBOOKS;
+import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.*;
 import static org.eclipse.lsp.cobol.service.delegates.completions.MockCompletionModel.RESULT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -36,7 +35,7 @@ class CompletionsTest {
     Completions completions =
         new Completions(
             ImmutableSet.of(
-                new CopybookCompletion(), new ConstantCompletion(), new ParagraphCompletion()));
+                new CopybookCompletion(), new VariableCompletion(), new ParagraphCompletion()));
     CompletionList actual =
         completions.collectFor(
             new CobolDocumentModel("Lorem ipsum dolor c amet", RESULT),
@@ -51,16 +50,22 @@ class CompletionsTest {
         ImmutableList.of(
             createItem("cpyU1", CompletionItemKind.Class, COPYBOOKS),
             createItem("CpyU2", CompletionItemKind.Class, COPYBOOKS),
-            createItem("constD1", CompletionItemKind.Constant, CONSTANTS),
-            createItem("ConstD2", CompletionItemKind.Constant, CONSTANTS)));
+            createItem("constD1", CompletionItemKind.Variable, VARIABLES, "sys IS constD1."),
+            createItem("ConstD2", CompletionItemKind.Variable, VARIABLES, "sys IS ConstD2.")));
   }
 
   private CompletionItem createItem(String name, CompletionItemKind kind, CompletionOrder order) {
+    return createItem(name, kind, order, null);
+  }
+
+  private CompletionItem createItem(String name, CompletionItemKind kind, CompletionOrder order, String documentation) {
     CompletionItem item = new CompletionItem(name);
     item.setLabel(name);
     item.setInsertText(name);
     item.setKind(kind);
     item.setSortText(order.prefix + name);
+    if (documentation != null)
+      item.setDocumentation(documentation);
     return item;
   }
 }

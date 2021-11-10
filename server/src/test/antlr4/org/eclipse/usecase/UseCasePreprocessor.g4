@@ -16,7 +16,8 @@
 grammar UseCasePreprocessor;
 
 startRule
-   : .*? ((copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement | constantStatement | errorStatement | multiTokenError | NEWLINE)+ .*?)+ EOF
+   : .*? ((copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement
+   | constantStatement | errorStatement | multiTokenError | linkageSection | NEWLINE)+ .*?)+ EOF
    ;
 
 multiTokenError
@@ -24,7 +25,12 @@ multiTokenError
    ;
 
 multiToken
-   : (word | copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement | constantStatement | errorStatement | multiTokenError | TEXT)+
+   : (word | copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement
+   | constantStatement | errorStatement | multiTokenError | TEXT)+
+   ;
+
+linkageSection
+   : LINKAGE SECTION DOT
    ;
 
 errorStatement
@@ -108,7 +114,7 @@ replacement
    ;
 
 identifier
-   : IDENTIFIER | NUMBERLITERAL
+   : IDENTIFIER | NUMBERLITERAL | LINKAGE | SECTION | DOT
    ;
 
 cpyIdentifier
@@ -116,32 +122,36 @@ cpyIdentifier
    ;
 
 cpyName
-   : IDENTIFIER | COPYBOOKNAME | QUOTED_COPYBOOKNAME | STRINGLITERAL | NUMBERLITERAL
+   : IDENTIFIER | COPYBOOKNAME | QUOTED_COPYBOOKNAME | STRINGLITERAL | NUMBERLITERAL | LINKAGE | SECTION
+   | LINKAGE
    ;
 
+LINKAGE : L I N K A G E;
+SECTION : S E C T I O N;
 START : '{';
 STOP : '}';
-VARIABLEDEFINITION : START + '$*';
-VARIABLEUSAGE : START + '$';
-CONSTANTUSAGE : START + '&';
-PARAGRPHDEFINITION : START + '#*';
-PARAGRPHUSAGE : START + '#';
-SECTIONDEFINITION : START + '@*';
-SECTIONUSAGE : START + '@';
-COPYBOOKDEFINITION : START + '~*';
-COPYBOOKUSAGE : START + '~';
-SUBROUTINEUSAGE : START + '%';
+VARIABLEDEFINITION : START '$*';
+VARIABLEUSAGE : START '$';
+CONSTANTUSAGE : START '&';
+PARAGRPHDEFINITION : START '#*';
+PARAGRPHUSAGE : START '#';
+SECTIONDEFINITION : START '@*';
+SECTIONUSAGE : START '@';
+COPYBOOKDEFINITION : START '~*';
+COPYBOOKUSAGE : START '~';
+SUBROUTINEUSAGE : START '%';
 DIAGNOSTICSTART : '|';
 REPLACEMENTSTART : '^';
-MULTITOKENSTART : START + '_';
-MULTITOKENSTOP : '_' + STOP;
+MULTITOKENSTART : START '_';
+MULTITOKENSTOP : '_' STOP;
+DOT : '.';
 
 NUMBERLITERAL : [\-+0-9.,]+;
-STRINGLITERAL : ['"] ~['"]* ['"];
+STRINGLITERAL : ['"] .*? ['"\n];
 IDENTIFIER : [a-zA-Z0-9:]+ ([-_]+ [a-zA-Z0-9:]+)*;
 
 COPYBOOKNAME : [a-zA-Z0-9#@$]+ ([-_]+ [a-zA-Z0-9#@$]+)*;
-QUOTED_COPYBOOKNAME : '\'' + COPYBOOKNAME + '\'';
+QUOTED_COPYBOOKNAME : '\'' COPYBOOKNAME '\'';
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);

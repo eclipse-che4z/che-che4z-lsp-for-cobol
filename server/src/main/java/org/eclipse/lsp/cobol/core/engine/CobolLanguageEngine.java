@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.engine;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
@@ -32,22 +30,17 @@ import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityFindingUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
-import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.EmbeddedLanguagesListener;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
-import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -58,8 +51,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.EMBEDDED_CODE;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
-import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
@@ -96,19 +87,23 @@ public class CobolLanguageEngine {
    *
    * @param documentUri unique resource identifier of the processed document
    * @param text the content of the document that should be processed
-   * @param copybookConfig contains config info like: copybook processing mode, backend server
+   * @param analysisConfig contains analysis processing features info and copybook config with
+   *     following information: target backend sql server, copybook processing mode which reflect
+   *     the sync status of the document (DID_OPEN|DID_CHANGE)
    * @return Semantic information wrapper object and list of syntax error that might send back to
    *     the client
    */
   @NonNull
   public ResultWithErrors<SemanticContext> run(
-      @NonNull String documentUri, @NonNull String text, @NonNull CopybookConfig copybookConfig) {
+      @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
     timingBuilder.getPreprocessorTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =
-        preprocessor.process(documentUri, text, copybookConfig).unwrap(accumulatedErrors::addAll);
+        preprocessor
+            .process(documentUri, text, analysisConfig.getCopybookConfig())
+            .unwrap(accumulatedErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
 
     timingBuilder.getParserTimer().start();
@@ -144,6 +139,7 @@ public class CobolLanguageEngine {
             extendedDocument.getCopybooks(),
             tokens,
             positionMapping,
+            analysisConfig,
             embeddedCodeParts,
             messageService,
             subroutineService);
@@ -152,26 +148,10 @@ public class CobolLanguageEngine {
     timingBuilder.getVisitorTimer().stop();
     if (syntaxTree.size() == 1) {
       timingBuilder.getSyntaxTreeTimer().start();
-      analyzeEmbeddedCode(syntaxTree, positionMapping, context.getConstants());
+      analyzeEmbeddedCode(syntaxTree, positionMapping);
       Node rootNode = syntaxTree.get(0);
       accumulatedErrors.addAll(processSyntaxTree(rootNode));
-      // This is a temporal solution only for compatibility
-      // Definitions, usages and variables are set here for "Go to definition" feature and others
-      List<Variable> definedVariables =
-          rootNode
-              .getDepthFirstStream()
-              .filter(hasType(PROGRAM))
-              .map(ProgramNode.class::cast)
-              .map(ProgramNode::getDefinedVariables)
-              .flatMap(Collection::stream)
-              .collect(toList());
-      context =
-          context.toBuilder()
-              .variableDefinitions(collectVariableDefinitions(definedVariables))
-              .variableUsages(collectVariableUsages(definedVariables))
-              .variables(definedVariables)
-              .rootNode(rootNode)
-              .build();
+      context = context.toBuilder().rootNode(rootNode).build();
       timingBuilder.getSyntaxTreeTimer().stop();
     } else LOG.warn("The root node for syntax tree was not constructed");
     timingBuilder.getLateErrorProcessingTimer().start();
@@ -204,7 +184,8 @@ public class CobolLanguageEngine {
     do {
       errors.addAll(rootNode.process());
       processCalls++;
-      if (processCalls > PROCESS_CALLS_THRESHOLD) throw new RuntimeException("Infinity loop in tree processing");
+      if (processCalls > PROCESS_CALLS_THRESHOLD)
+        throw new IllegalStateException("Infinity loop in tree processing");
     } while (!rootNode.isProcessed());
     return errors;
   }
@@ -233,14 +214,13 @@ public class CobolLanguageEngine {
         tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri, embeddedCodeParts);
   }
 
-  private void analyzeEmbeddedCode(
-      List<Node> syntaxTree, Map<Token, Locality> mapping, PredefinedVariableContext constants) {
+  private void analyzeEmbeddedCode(List<Node> syntaxTree, Map<Token, Locality> mapping) {
     syntaxTree.stream()
         .flatMap(Node::getDepthFirstStream)
         .filter(hasType(EMBEDDED_CODE))
         .map(EmbeddedCodeNode.class::cast)
         .collect(toList())
-        .forEach(it -> it.analyzeTree(mapping, constants));
+        .forEach(it -> it.analyzeTree(mapping));
   }
 
   @NonNull
@@ -289,24 +269,5 @@ public class CobolLanguageEngine {
         .map(messageService::localizeTemplate)
         .map(message -> syntaxError.toBuilder().messageTemplate(null).suggestion(message).build())
         .orElse(syntaxError);
-  }
-
-  private Map<String, Collection<Location>> collectVariableDefinitions(
-      Collection<Variable> definedVariables) {
-    Multimap<String, Location> definitions = HashMultimap.create();
-    definedVariables.stream()
-        .filter(it -> !FILLER_NAME.equals(it.getName()))
-        .forEach(it -> definitions.put(it.getName(), it.getDefinition().toLocation()));
-    return definitions.asMap();
-  }
-
-  private Map<String, Collection<Location>> collectVariableUsages(
-      Collection<Variable> definedVariables) {
-    Multimap<String, Location> usages = HashMultimap.create();
-    definedVariables.forEach(
-        it ->
-            usages.putAll(
-                it.getName(), it.getUsages().stream().map(Locality::toLocation).collect(toList())));
-    return usages.asMap();
   }
 }

@@ -17,20 +17,24 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.variables.*;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorListenerImpl;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableType;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /** This test checks that the variable structure is built correctly */
 class TestVariableHasChildren {
@@ -52,65 +56,30 @@ class TestVariableHasChildren {
             ImmutableList.of(),
             ImmutableMap.of(),
             ImmutableList.of(),
-            CopybookProcessingMode.ENABLED);
-    List<Variable> actualGroupItemChildren =
-        result.getVariables().stream()
-            .filter(it -> it.getName().equals("TERMS-RECORD"))
-            .findFirst()
-            .map(StructuredVariable.class::cast)
-            .map(StructuredVariable::getChildren)
-            .orElse(null);
+            AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
 
-    final ImmutableList<ElementItem> expected = expectedGroupItemChildren();
-    assertEquals(expected, actualGroupItemChildren);
-  }
+    VariableNode termsRecord = result.getRootNode().getDepthFirstStream()
+        .filter(Node.hasType(NodeType.PROGRAM))
+        .findFirst()
+        .map(ProgramNode.class::cast)
+        .map(ProgramNode::getVariables)
+        .map(variableMap -> variableMap.get("TERMS-RECORD").iterator().next())
+        .orElse(null);
 
-  private ImmutableList<ElementItem> expectedGroupItemChildren() {
-    GroupItem group =
-        new GroupItem(
-            1,
-            "TERMS-RECORD",
-            Locality.builder()
-                .uri(UseCaseUtils.DOCUMENT_URI)
-                .range(new Range(new Position(4, 11), new Position(4, 23)))
-                .token("TERMS-RECORD")
-                .recognizer(GrammarPreprocessorListenerImpl.class)
-                .build(),
-            false,
-            null);
-    ElementItem child1 =
-        new ElementItem(
-            5,
-            "TERMS-KEY",
-            Locality.builder()
-                .uri(UseCaseUtils.DOCUMENT_URI)
-                .range(new Range(new Position(5, 15), new Position(5, 24)))
-                .token("TERMS-KEY")
-                .recognizer(GrammarPreprocessorListenerImpl.class)
-                .build(),
-            false,
-            group,
-            "9(3)",
-            "",
-            UsageFormat.UNDEFINED);
-    ElementItem child2 =
-        new ElementItem(
-            5,
-            "FILLER",
-            Locality.builder()
-                .uri(UseCaseUtils.DOCUMENT_URI)
-                .range(new Range(new Position(6, 11), new Position(6, 64)))
-                .token("05")
-                .recognizer(GrammarPreprocessorListenerImpl.class)
-                .build(),
-            false,
-            group,
-            "X(69)",
-            "",
-            UsageFormat.UNDEFINED);
-    group.addChild(child1);
-    group.addChild(child2);
+    assertNotNull(termsRecord);
+    assertEquals(VariableType.GROUP_ITEM, termsRecord.getVariableType());
 
-    return ImmutableList.of(child1, child2);
+    List<VariableNode> children = termsRecord.getChildren().stream()
+        .filter(Node.hasType(NodeType.VARIABLE))
+        .map(VariableNode.class::cast)
+        .collect(Collectors.toList());
+
+    assertEquals(2, children.size());
+
+    VariableNode child1 = children.get(0);
+    VariableNode child2 = children.get(1);
+
+    assertEquals("TERMS-KEY", child1.getName());
+    assertEquals("FILLER", child2.getName());
   }
 }

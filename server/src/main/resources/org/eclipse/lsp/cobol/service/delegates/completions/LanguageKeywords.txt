@@ -1041,6 +1041,7 @@ JA=
 JAR=
 JAVA=
 JIS=
+JNIENVPTR=The JNIENVPTR special register references the Java Native Interface (JNI) environment pointer. The JNI environment pointer is used in calling Java callable services.<br>JNIENVPTR is implicitly defined as USAGE POINTER, and cannot be specified as a receiving data item.<br>[Read more](https://www.ibm.com/docs/en/cobol-zos/6.3?topic=registers-jnienvptr)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 JOBNAME=
 JOIN=
 JOURNAL=

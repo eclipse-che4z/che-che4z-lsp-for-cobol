@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
 /**
@@ -51,11 +52,6 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 @Singleton
 @SuppressWarnings("UnstableApiUsage")
 public class CopybookServiceImpl implements CopybookService {
-
-  public static final String SQLCA = "SQLCA";
-  public static final String SQLDA = "SQLDA";
-  public static final String PREF_IMPLICIT = "implicit://";
-
   private final SettingsService settingsService;
   private final FileSystemService files;
 
@@ -89,7 +85,7 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   /**
-   * Retrieve and return the copybook by its name. Copybook may cached to limit interactions with
+   * Retrieve and return the copybook by its name. Copybook may be cached to limit interactions with
    * the file system.
    *
    * <p>Resolving works in synchronous way. Resolutions with different copybook names will not block
@@ -122,40 +118,54 @@ public class CopybookServiceImpl implements CopybookService {
   private CopybookModel resolveSync(
       @NonNull String copybookName,
       @NonNull String documentUri,
-      @NonNull CopybookConfig copybookConfig)
-      throws ExecutionException, InterruptedException {
+      @NonNull CopybookConfig copybookConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    String cobolFileName = files.getNameFromURI(documentUri);
-    String uri =
-        SettingsService.getValueAsString(
-            settingsService
-                .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
-                .get());
-    if (uri.isEmpty()) {
-      if (isImplictlyDefinedCopybook(copybookName)) {
-        uri = getUriForImplicitCopybook(copybookName, copybookConfig);
-        return new CopybookModel(
-            copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri));
-      } else if (copybookConfig.getCopybookProcessingMode().download && cobolFileName != null) {
-        Optional.of(
-                copybooksForDownloading.computeIfAbsent(
-                    cobolFileName, s -> ConcurrentHashMap.newKeySet()))
-            .ifPresent(it -> it.add(copybookName));
-      }
-      return new CopybookModel(copybookName, null, null);
-    }
+    return tryResolvePredefinedCopybook(copybookName)
+        .map(it -> it.uriForBackend(copybookConfig.getSqlBackend()))
+        .map(
+            uri ->
+                new CopybookModel(
+                    copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri)))
+        .orElseGet(
+            () -> tryResolveCopybookFromWorkspace(copybookName, files.getNameFromURI(documentUri)));
+  }
 
-    Path file = files.getPathFromURI(uri);
-    if (files.fileExists(file)) {
-      return new CopybookModel(
-          copybookName, uri, files.getContentByPath(Objects.requireNonNull(file)));
-    } else {
-      return new CopybookModel(copybookName, null, null);
+  private CopybookModel tryResolveCopybookFromWorkspace(String copybookName, String cobolFileName) {
+    return resolveLocalCopybook(copybookName, cobolFileName)
+        .map(uri -> loadCopybook(uri, copybookName, cobolFileName))
+        .orElseGet(() -> registerForDownloading(copybookName, cobolFileName));
+  }
+
+  @SuppressWarnings("java:S2142")
+  private Optional<String> resolveLocalCopybook(String copybookName, String cobolFileName) {
+    try {
+      return SettingsService.getValueAsString(
+          settingsService
+              .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
+              .get());
+    } catch (InterruptedException | ExecutionException e) {
+      throw new UncheckedExecutionException(e);
     }
   }
 
+  private CopybookModel registerForDownloading(String copybookName, String cobolFileName) {
+    Optional.of(
+            copybooksForDownloading.computeIfAbsent(
+                cobolFileName, s -> ConcurrentHashMap.newKeySet()))
+        .ifPresent(it -> it.add(copybookName));
+    return new CopybookModel(copybookName, null, null);
+  }
+
+  private CopybookModel loadCopybook(String uri, String copybookName, String cobolFileName) {
+    Path file = files.getPathFromURI(uri);
+    return files.fileExists(file)
+        ? new CopybookModel(copybookName, uri, files.getContentByPath(Objects.requireNonNull(file)))
+        : registerForDownloading(copybookName, cobolFileName);
+  }
+
   /**
-   * Check if the copybook name is implicitly (no explicit copybook file) defined or not.
+   * Retrieve optional {@link PredefinedCopybooks} for the given name. Checks if the copybook name
+   * is implicitly (not an explicit copybook file) defined.
    *
    * <p>Application can use SQLCA and SQLDA names to define communication and description areas as
    * copybooks and both are implicitly defined by either co-processor or pre-processor.
@@ -163,18 +173,8 @@ public class CopybookServiceImpl implements CopybookService {
    * @param copybookName - the name of copybook to check
    * @return true if copybook name is one of SQLDA or SQLCA
    */
-  private boolean isImplictlyDefinedCopybook(String copybookName) {
-    return SQLCA.equals(copybookName) || SQLDA.equals(copybookName);
-  }
-
-  private String getUriForImplicitCopybook(String copybookName, CopybookConfig copybookConfig) {
-    if (SQLCA.equals(copybookName)) {
-      if (SQLBackend.DATACOM_SERVER.equals(copybookConfig.getSqlBackend())) {
-        return "/implicitCopybooks/SQLCA_DATACOM.cpy";
-      }
-      return "/implicitCopybooks/SQLCA_DB2.cpy";
-    }
-    return "/implicitCopybooks/SQLDA.cpy";
+  private Optional<PredefinedCopybooks.Copybook> tryResolvePredefinedCopybook(String copybookName) {
+    return Optional.ofNullable(PredefinedCopybooks.forName(copybookName));
   }
 
   private String readContentForImplicitCopybook(String resourcePath) {
@@ -190,7 +190,7 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   /**
-   * Sends downloading requests to the Client for copybooks not presented locally, if any.
+   * Send downloading requests to the Client for copybooks not presented locally, if any.
    *
    * <p>A list of missed copybooks grouped by document URI, including nested copybooks.
    *

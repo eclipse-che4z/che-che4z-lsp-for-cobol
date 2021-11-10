@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.core.model.tree.variables;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
 
 /** This value class represents the Table variable that may have an optional index */
 @Getter
@@ -54,5 +54,15 @@ public class TableDataNameNode extends ElementaryNode {
         usageFormat);
     this.value = value;
     this.occursTimes = occursTimes;
+  }
+
+  @Override
+  protected String getVariableDisplayString() {
+    StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
+    stringBuilder.append(String.format(" OCCURS %1$d TIMES", occursTimes));
+    if (picClause != null) stringBuilder.append(" PIC ").append(picClause);
+    if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat);
+    if (StringUtils.isNoneBlank(value)) stringBuilder.append(" VALUE ").append(value);
+    return stringBuilder.append(".").toString();
   }
 }

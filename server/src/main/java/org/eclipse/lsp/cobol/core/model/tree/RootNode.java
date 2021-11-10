@@ -14,9 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.service.utils.SyntaxTreeUtil;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.ROOT;
 
@@ -26,5 +32,24 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.ROOT;
 public class RootNode extends Node {
   public RootNode(Locality locality) {
     super(locality, ROOT);
+    addProcessStep(this::waitForVariableStructure);
+  }
+
+  private List<SyntaxError> waitForVariableStructure() {
+    addProcessStep(this::updateVariableStructure);
+    return ImmutableList.of();
+  }
+
+  private List<SyntaxError> updateVariableStructure() {
+    List<Node> node =
+        this.getChildren().stream().filter(hasType(NodeType.COPY)).collect(Collectors.toList());
+    node.forEach(it -> removeChild(it));
+    node.forEach(
+        it ->
+            SyntaxTreeUtil.findNodeInRange(this, it.getLocality().getRange().getStart())
+                .orElse(this)
+                .addChild(it));
+
+    return ImmutableList.of();
   }
 }

@@ -34,7 +34,7 @@ class TestIncorrectTableCallUnderlined {
           + "       Working-Storage Section.\n"
           + "       Procedure Division.\n"
           + "       {#*000-Main-Logic}.\n"
-          + "           MOVE 'ABC' TO {OL-ACCT-NO|1}({SUB1|2}).\n"
+          + "           MOVE 'ABC' TO {_OL-ACCT-NO({SUB1|2})|1_}.\n"
           + "       End program ProgramId.";
 
   @Test

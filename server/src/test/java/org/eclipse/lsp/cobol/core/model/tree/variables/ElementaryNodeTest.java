@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

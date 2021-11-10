@@ -16,7 +16,8 @@ package org.eclipse.lsp.cobol.negative;
 
 import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import org.eclipse.lsp.cobol.usecases.engine.UseCase;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
 
 import java.util.List;
@@ -41,10 +42,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public abstract class NegativeTest extends ConfigurableTest {
 
   private static final List<CobolText> TEXTS = retrieveTextsRegistry().getNegatives();
-  private String fileName;
-  private String text;
-  private int expectedErrorsNumber;
-  private List<CobolText> copybooks;
+  private final String fileName;
+  private final String text;
+  private final int expectedErrorsNumber;
+  private final List<CobolText> copybooks;
 
   NegativeTest(String fileName, int expectedErrorsNumber, List<CobolText> copybooks) {
     this.fileName = fileName;
@@ -55,7 +56,9 @@ public abstract class NegativeTest extends ConfigurableTest {
 
   protected void test() {
 
-    List<Diagnostic> diagnostics = UseCaseUtils.analyzeForErrors(fileName, text, copybooks);
+    List<Diagnostic> diagnostics =
+        UseCaseUtils.analyzeForErrors(
+            UseCase.builder().text(fileName).text(text).copybooks(copybooks).build());
 
     assertErrorNumber(diagnostics);
 

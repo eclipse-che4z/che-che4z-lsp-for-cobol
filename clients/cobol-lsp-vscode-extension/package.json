@@ -4,7 +4,7 @@
     "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "0.20.0",
+    "version": "0.21.0",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
@@ -24,7 +24,8 @@
         "z/os",
         "zos",
         "language-server",
-        "jcl"
+        "jcl",
+        "zowe"
     ],
     "categories": [
         "Programming Languages"
@@ -159,6 +160,22 @@
                     ],
                     "description": "The logging level for COBOL LS backend"
                 },
+                "cobol-lsp.analysis.features": {
+                    "type": "array",
+                    "default": [
+                        "SQL",
+                        "CICS"
+                    ],
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "SQL",
+                            "CICS"
+                        ]
+                    },
+                    "description": "List of supported language features",
+                    "uniqueItems": true
+                },
                 "cobol-lsp.target-sql-backend": {
                     "type": "string",
                     "default": "DB2_SERVER",
@@ -199,7 +216,7 @@
             {
                 "key": "shift+tab",
                 "command": "cobol-lsp.smart-outdent",
-                "when": "editorLangId == cobol || && !inSnippetMode"
+                "when": "editorLangId == cobol && !inSnippetMode"
             },
             {
                 "key": "shift+tab",
@@ -213,10 +230,11 @@
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "test": "jest -w 1 --unhandled-rejections=strict",
-        "coverage": "jest --coverage --runInBand"
+        "coverage": "jest --coverage --runInBand",
+        "package": "vsce package"
     },
     "dependencies": {
-        "@zowe/imperative": "4.13.1",
+        "@zowe/imperative": "4.15.1",
         "vscode-extension-telemetry": "0.1.6",
         "vscode-languageclient": "5.2.1"
     },
@@ -229,6 +247,7 @@
         "ts-jest": "^27.0.0",
         "tslint": "^5.18.0",
         "tslint-sonarts": "^1.9.0",
-        "typescript": "^3.5.3"
+        "typescript": "^3.5.3",
+        "vsce": "1.103.1"
     }
 }

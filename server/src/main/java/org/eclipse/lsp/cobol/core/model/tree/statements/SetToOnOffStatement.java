@@ -20,36 +20,28 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.variables.StructureType;
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableType;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
 
 /** This class implements the logic for SET TO ON/OFF statement. */
 @EqualsAndHashCode(callSuper = true)
 public class SetToOnOffStatement extends StatementNode {
   protected static final String INVALID_RECEIVING_FIELD_TEMPLATE =
       "statements.invalidReceivingField";
-  private static final List<StructureType> ALLOWED_TYPES =
-      ImmutableList.of(StructureType.MNEMONIC_NAME);
-  List<Locality> receivingFields;
+  private static final List<VariableType> ALLOWED_TYPES =
+      ImmutableList.of(VariableType.MNEMONIC_NAME);
+  List<Node> receivingFields;
 
-  public SetToOnOffStatement(Locality locality, List<Locality> receivingFields) {
+  public SetToOnOffStatement(Locality locality, List<Node> receivingFields) {
     super(locality);
     this.receivingFields = receivingFields;
   }
 
   @Override
   @NonNull
-  public List<SyntaxError> validate(Map<Locality, Variable> variableUsages) {
-    return receivingFields.stream()
-        .map(validateVariableType(variableUsages, ALLOWED_TYPES, INVALID_RECEIVING_FIELD_TEMPLATE))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .collect(toList());
+  public List<SyntaxError> validate() {
+    return validateVariableType(receivingFields, ALLOWED_TYPES, INVALID_RECEIVING_FIELD_TEMPLATE);
   }
 }

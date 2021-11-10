@@ -17,64 +17,53 @@ package org.eclipse.lsp.cobol.core.model.tree.variables;
 import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.Context;
+import org.eclipse.lsp.cobol.core.model.tree.Describable;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
- * The class represents variable usage in COBOL program. This must be extended with a link to
- * variable definition.
+ * The class represents variable usage in COBOL program.
  */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class VariableUsageNode extends Node {
+public class VariableUsageNode extends Node implements Context, Describable {
   private final String dataName;
-  private final List<VariableNameAndLocality> parents;
-  private final ReferenceType type;
-
-  public VariableUsageNode(
-          String dataName,
-          Locality locality,
-          List<VariableNameAndLocality> parents) {
-    this(dataName, locality, parents, ReferenceType.STRUCTURE);
-  }
+  @Setter
+  @EqualsAndHashCode.Exclude @ToString.Exclude private VariableNode definition;
 
   public VariableUsageNode(
       String dataName,
-      Locality locality,
-      List<VariableNameAndLocality> parents,
-      ReferenceType type) {
+      Locality locality) {
     super(locality, NodeType.VARIABLE_USAGE);
     this.dataName = dataName;
-    this.parents = parents;
-    this.type = type;
   }
 
   @Override
-  public List<SyntaxError> processNode() {
-    getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
-        .map(ProgramNode::getVariableUsageDelegate)
-        .ifPresent(
-            variableUsageDelegate ->
-                variableUsageDelegate.handleUsage(dataName, getLocality(), parents, type));
-
-    return ImmutableList.of();
+  public List<Node> getDefinitions() {
+    return Optional.ofNullable(definition)
+        .map(VariableNode::getDefinitions)
+        .orElseGet(ImmutableList::of);
   }
 
-  /**
-   * This enum determines the type of referencing the variable in the original document. E.g.
-   * STRUCTURE if the variable is referenced by its hierarchy (default case) or CONTEXT if the
-   * variable structure is clear from the context and don't have to be specified explicitly
-   */
-  public enum ReferenceType {
-    STRUCTURE,
-    CONTEXT
+  @Override
+  public List<? extends Node> getUsages() {
+    return Optional.ofNullable(definition)
+        .map(VariableNode::getUsages)
+        .orElseGet(ImmutableList::of);
+  }
+
+  @Override
+  public String getFormattedDisplayString() {
+    return Optional.ofNullable(definition)
+        .map(VariableNode::getFullVariableDescription)
+        .orElse("");
   }
 }

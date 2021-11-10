@@ -16,11 +16,10 @@
 package org.eclipse.lsp.cobol.core.semantics.outline;
 
 import lombok.experimental.UtilityClass;
+import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp4j.*;
 
-/**
- * The utility class for work with document positions and ranges.
- */
+/** The utility class for work with document positions and ranges. */
 @UtilityClass
 public class RangeUtils {
 
@@ -92,6 +91,7 @@ public class RangeUtils {
 
   /**
    * Tests if text document position located inside the location.
+   *
    * @param position - the document position
    * @param location - en element location
    * @return true if position is inside the location.
@@ -100,5 +100,16 @@ public class RangeUtils {
     return position.getTextDocument().getUri().equals(location.getUri())
         && !isBefore(position.getPosition(), location.getRange().getStart())
         && !isAfter(position.getPosition(), location.getRange().getEnd());
+  }
+  /**
+   * Check if position located inside the locality.
+   *
+   * @param position - the document position
+   * @param locality - en element's locality
+   * @return true if position is inside the location.
+   */
+  public boolean isInsideRange(Position position, Locality locality) {
+    return !isBefore(position, locality.getRange().getStart())
+        && !isAfter(position, locality.getRange().getEnd());
   }
 }

@@ -14,18 +14,31 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
-/** Enumeration of variable node types */
+import lombok.Getter;
+import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
+
+/**
+ * Enumeration of variable node types. It describes only types that are related to the
+ * level number or special definition clauses. They also contain a message template for
+ * localization.
+ */
 public enum VariableType {
-  CONDITION_DATA_NAME,
-  ELEMENTARY_ITEM,
-  GROUP_ITEM,
-  STAND_ALONE_DATA_ITEM,
-  INDEX_ITEM,
-  MNEMONIC_NAME,
-  MULTI_TABLE_DATA_NAME,
-  RENAME_ITEM,
-  TABLE_DATA_NAME,
-  MAP_NAME,
-  FD,
-  SD
+  CONDITION_DATA_NAME("variables.conditionName"),
+  ELEMENTARY_ITEM("variables.elementaryItem"),
+  GROUP_ITEM("variables.groupItem"),
+  STAND_ALONE_DATA_ITEM("variables.independent"),
+  INDEX_ITEM("variables.indexName"),
+  MNEMONIC_NAME("variables.mnemonicName"),
+  MULTI_TABLE_DATA_NAME("variables.tableDataName"),
+  RENAME_ITEM("variables.renameItem"),
+  TABLE_DATA_NAME("variables.tableDataName"),
+  MAP_NAME("variables.mapName"),
+  FD("variable.fdSd"),
+  SD("variable.fdSd");
+
+  @Getter private final MessageTemplate template;
+
+  VariableType(String id) {
+    template = MessageTemplate.of(id);
+  }
 }

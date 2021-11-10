@@ -18,7 +18,10 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
@@ -164,10 +167,10 @@ class TestReplaceCompilerDirective {
   @Test
   void testCorrectVariableDefinitionAfterReplace() {
     UseCaseEngine.runTest(
-            TEXT5,
-            ImmutableList.of(new CobolText(REPL_NAME, REPL2), new CobolText(STRUCT1_NAME, STRUCT1)),
-            ImmutableMap.of(),
-            Collections.emptyList(),
-            CopybookProcessingMode.ENABLED);
+        TEXT5,
+        ImmutableList.of(new CobolText(REPL_NAME, REPL2), new CobolText(STRUCT1_NAME, STRUCT1)),
+        ImmutableMap.of(),
+        Collections.emptyList(),
+        AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
   }
 }

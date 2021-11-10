@@ -18,16 +18,19 @@ package org.eclipse.lsp.cobol.core.visitor;
 import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.eclipse.lsp.cobol.core.CICSParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
+import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -40,16 +43,18 @@ import static org.eclipse.lsp.cobol.core.CICSParser.*;
 @AllArgsConstructor
 public class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   private final Map<Token, Locality> positions;
-  private final PredefinedVariableContext constants;
 
   @Override
   public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
-    return VisitorHelper.createVariableUsage(
-        positions,
-        constants,
-        ctx.dataName(),
-        visitChildren(ctx),
-        ctx.inData().stream().map(InDataContext::dataName));
+    return addTreeNode(ctx, QualifiedReferenceNode::new);
+  }
+
+  @Override
+  public List<Node> visitDataName(DataNameContext ctx) {
+    return addTreeNode(
+        ctx,
+        locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality)
+    );
   }
 
   @Override
@@ -76,5 +81,9 @@ public class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   @Override
   protected List<Node> aggregateResult(List<Node> aggregate, List<Node> nextResult) {
     return Stream.concat(aggregate.stream(), nextResult.stream()).collect(toList());
+  }
+
+  private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
+    return VisitorHelper.createTreeNode(positions, visitChildren(ctx), ctx, nodeConstructor);
   }
 }

@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree.variables;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -49,14 +50,21 @@ public class StandAloneDataItemNode extends VariableWithLevelNode {
     super(location, LEVEL_77, name, redefines, VariableType.STAND_ALONE_DATA_ITEM, global);
     this.picClause = picClause;
     this.value = value;
+    addProcessStep(this::processNode);
   }
 
-  @Override
-  public List<SyntaxError> processNode() {
+  private List<SyntaxError> processNode() {
     List<SyntaxError> errors = new ArrayList<>();
     if (picClause.isEmpty())
       errors.add(getError(MessageTemplate.of(EMPTY_STRUCTURE_MSG, getName())));
-    errors.addAll(super.processNode());
     return errors;
+  }
+
+  @Override
+  protected String getVariableDisplayString() {
+    StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
+    if (picClause != null) stringBuilder.append(" PIC ").append(picClause);
+    if (StringUtils.isNoneBlank(value)) stringBuilder.append(" VALUE ").append(value);
+    return stringBuilder.append(".").toString();
   }
 }

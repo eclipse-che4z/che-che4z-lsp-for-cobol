@@ -14,56 +14,41 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
+import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
+import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
-import org.eclipse.lsp.cobol.core.model.variables.NodeConverter;
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
-import org.eclipse.lsp.cobol.core.visitor.VariableUsageDelegate;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
+import org.eclipse.lsp.cobol.core.semantics.PredefinedVariables;
 
 import java.util.*;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.STATEMENT;
+import static org.eclipse.lsp.cobol.core.semantics.PredefinedVariables.PREDEFINED;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 
 /** This class represents program context in COBOL. */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
+@Slf4j
 public class ProgramNode extends Node {
-  private final Collection<Variable> definedVariables = new ArrayList<>();
+  private final Multimap<String, VariableNode> variables = ArrayListMultimap.create();
   private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
-  @EqualsAndHashCode.Exclude private final NodeConverter nodeConverter = new NodeConverter();
-  @EqualsAndHashCode.Exclude private VariableUsageDelegate variableUsageDelegate;
   private String programName;
-  private NodeState nodeState = NodeState.NEW;
 
-  /**
-   * Use for testing.
-   *
-   * @param locality the node location.
-   */
-  ProgramNode(Locality locality) {
-    super(locality, PROGRAM, false);
-  }
-
-  public ProgramNode(Locality locality, MessageService messageService) {
-    super(locality, PROGRAM, false);
-    variableUsageDelegate = new VariableUsageDelegate(messageService);
-  }
-
-  public VariableUsageDelegate getVariableUsageDelegate() {
-    return variableUsageDelegate;
+  public ProgramNode(Locality locality) {
+    super(locality, PROGRAM);
+    addPredefinedVariables();
   }
 
   public String getProgramName() {
@@ -74,46 +59,32 @@ public class ProgramNode extends Node {
     this.programName = programName;
   }
 
-  @Override
-  protected List<SyntaxError> processNode() {
-    switch (nodeState) {
-      case NEW:
-        nodeState = NodeState.WAIT_FOR_VARIABLES;
-        break;
-      case WAIT_FOR_VARIABLES:
-        nodeState = NodeState.DONE;
-        setNodeProcessed();
-        return processVariables();
-      case DONE:
-      default:
-        break;
-    }
-    return ImmutableList.of();
-  }
-
-  private List<SyntaxError> processVariables() {
-    List<SyntaxError> errors = new ArrayList<>();
-    Set<String> variableNames = definedVariables.stream().map(Variable::getName).collect(toSet());
-
-    List<Variable> availableVariables = new ArrayList<>(definedVariables);
-    getGlobalVariables().stream()
-        .filter(variable -> !variableNames.contains(variable.getName()))
-        .forEach(availableVariables::add);
-    Map<Locality, Variable> variableUsages =
-        variableUsageDelegate
-            .updateUsageAndGenerateErrors(availableVariables)
-            .unwrap(errors::addAll);
-    errors.addAll(validateStatements(variableUsages));
-    return errors;
-  }
-
   /**
    * Add the variable definition to that program context.
    *
    * @param node the variable definition node
    */
   public void addVariableDefinition(VariableNode node) {
-    definedVariables.add(nodeConverter.convertVariable(node));
+    variables.put(node.getName(), node);
+  }
+
+  /**
+   * Get variable definition node based on list of variable usage nodes.
+   *
+   * @param usageNodes represents variable name and its parents
+   * @return the list of founded variable definitions
+   */
+  public List<VariableNode> getVariableDefinition(List<VariableUsageNode> usageNodes) {
+    List<VariableNode> foundDefinitions =
+        VariableUsageUtils.findVariablesForUsage(variables, usageNodes);
+    if (foundDefinitions.isEmpty()) {
+      Multimap<String, VariableNode> globals = ArrayListMultimap.create();
+      getMapOfGlobalVariables()
+          .values()
+          .forEach(variableNode -> globals.put(variableNode.getName(), variableNode));
+      foundDefinitions = VariableUsageUtils.findVariablesForUsage(globals, usageNodes);
+    }
+    return foundDefinitions;
   }
 
   /**
@@ -150,31 +121,21 @@ public class ProgramNode extends Node {
                 .build());
   }
 
-  private List<Variable> getGlobalVariables() {
-    List<Variable> globalVariables =
-        definedVariables.stream().filter(Variable::isGlobal).collect(toList());
-    Set<String> globalVariablesNames =
-        globalVariables.stream().map(Variable::getName).collect(toSet());
-    getNearestParentByType(PROGRAM)
-        .map(ProgramNode.class::cast)
-        .map(ProgramNode::getGlobalVariables)
-        .orElseGet(ImmutableList::of)
-        .stream()
-        .filter(variable -> !globalVariablesNames.contains(variable.getName()))
-        .forEach(globalVariables::add);
-    return globalVariables;
+  private Map<String, VariableNode> getMapOfGlobalVariables() {
+    Map<String, VariableNode> result =
+        getNearestParentByType(PROGRAM)
+            .map(ProgramNode.class::cast)
+            .map(ProgramNode::getMapOfGlobalVariables)
+            .orElseGet(HashMap::new);
+    variables.values().stream()
+        .filter(VariableNode::isGlobal)
+        .forEach(variableNode -> result.put(variableNode.getName(), variableNode));
+    return result;
   }
 
-  private List<SyntaxError> validateStatements(Map<Locality, Variable> variables) {
-    return getDepthFirstStream()
-        .filter(hasType(STATEMENT))
-        .map(StatementNode.class::cast)
-        .map(it -> it.validate(variables))
-        .flatMap(Collection::stream)
-        .collect(toList());
-  }
-
-  private enum NodeState {
-    NEW, WAIT_FOR_VARIABLES, DONE;
+  private void addPredefinedVariables() {
+    Locality location = Locality.builder().uri(PREF_IMPLICIT + PREDEFINED).build();
+    for (String predefinedVariableName : PredefinedVariables.getPredefinedVariablesNames())
+      addVariableDefinition(new MnemonicNameNode(location, PREDEFINED, predefinedVariableName));
   }
 }

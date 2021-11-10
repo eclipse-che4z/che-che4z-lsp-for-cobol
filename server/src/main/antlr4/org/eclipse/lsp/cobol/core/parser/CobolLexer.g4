@@ -18,9 +18,9 @@ import TechnicalLexer;
 channels{TECHNICAL}
 
 EJECT: E J E C T DOT_FS? -> channel(HIDDEN);
-SKIP1 : S K I P '1' DOT_FS? -> skip;
-SKIP2 : S K I P '2' DOT_FS? -> skip;
-SKIP3 : S K I P '3' DOT_FS? -> skip;
+SKIP1 : S K I P '1' DOT_FS? -> channel(HIDDEN);
+SKIP2 : S K I P '2' DOT_FS? -> channel(HIDDEN);
+SKIP3 : S K I P '3' DOT_FS? -> channel(HIDDEN);
 
 // keywords
 ABEND : A B E N D;
@@ -385,6 +385,7 @@ I_CHAR : I;
 I_O : I MINUSCHAR O;
 I_O_CONTROL : I MINUSCHAR O MINUSCHAR C O N T R O L;
 JA : J A;
+JNIENVPTR: J N I E N V P T R;
 JOURNAL : J O U R N A L;
 JP : J P;
 JUST : J U S T;
@@ -931,11 +932,9 @@ CHARSTRING: PICTURECHARSGROUP1+ PICTURECHARSGROUP2? LParIntegralRPar? '.'? (PICT
 			PICTURECHARSGROUP2 PICTURECHARSGROUP1* LParIntegralRPar?
 ;
 
-DOT_FS2 : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ -> popMode;
 PICTURECHARSGROUP1: PICTURECharAcceptedMultipleTime+;
 PICTURECHARSGROUP2: PICTURECharAcceptedOneTime+;
-WS2 : [ \t\f;]+ -> channel(HIDDEN);
-IS2: I S;
+WS2 : [ \t\f]+ -> channel(HIDDEN);
 LParIntegralRPar: LPARENCHAR INTEGERLITERAL RPARENCHAR;
 fragment PICTUREPeriodAcceptables: ('0'|'9'|B|Z|CR|DB|ASTERISKCHAR|COMMACHAR|MINUSCHAR|PLUSCHAR|SLASHCHAR);
 fragment PICTURECharAcceptedMultipleTime: (A|G|N|P|X|DOLLARCHAR|PICTUREPeriodAcceptables);

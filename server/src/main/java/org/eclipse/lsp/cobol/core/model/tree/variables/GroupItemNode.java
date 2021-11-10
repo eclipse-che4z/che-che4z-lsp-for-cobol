@@ -21,7 +21,6 @@ import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,15 +66,19 @@ public class GroupItemNode extends VariableWithLevelNode implements UsageClause 
       UsageFormat usageFormat) {
     super(location, level, name, redefines, VariableType.GROUP_ITEM, global);
     this.usageFormat = usageFormat;
+    addProcessStep(this::processNode);
   }
 
-  @Override
-  public List<SyntaxError> processNode() {
+  private List<SyntaxError> processNode() {
     List<SyntaxError> errors = new ArrayList<>();
     if (getUsageFormat() == UsageFormat.UNDEFINED
         && getChildren().stream().noneMatch(hasType(NodeType.VARIABLE)))
       errors.add(getError(MessageTemplate.of(EMPTY_STRUCTURE_MSG, getName())));
-    errors.addAll(super.processNode());
     return errors;
+  }
+
+  @Override
+  protected String getVariableDisplayString() {
+    return getFormattedSuffix() + ".";
   }
 }

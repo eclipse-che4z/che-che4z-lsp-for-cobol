@@ -26,15 +26,12 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.ValueInterval;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
-import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
-import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
+import org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormat;
 import org.eclipse.lsp4j.Range;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -143,6 +140,7 @@ class VisitorHelper {
   List<UsageFormat> retrieveUsageFormat(List<DataUsageClauseContext> contexts) {
     return contexts.stream()
         .map(DataUsageClauseContext::usageFormat)
+        .filter(Objects::nonNull)
         .map(UsageFormatContext::getStart)
         .map(Token::getText)
         .map(UsageFormat::of)
@@ -152,11 +150,15 @@ class VisitorHelper {
   /**
    * Convert IntegerLiteralContext into an Integer
    *
-   * @param context the IntegerLiteralContext
-   * @return converted Integer
+   * @param context the IntegerLiteralContext, may be null
+   * @return converted Integer or null if the context is empty
    */
   Integer getInteger(IntegerLiteralContext context) {
-    return Integer.parseInt(context.getText());
+    return ofNullable(context)
+        .map(ParserRuleContext::getText)
+        .filter(it -> !it.isEmpty())
+        .map(Integer::parseInt)
+        .orElse(null);
   }
 
   /**
@@ -167,41 +169,39 @@ class VisitorHelper {
    * @return a string representation of the given context
    */
   String getIntervalText(ParserRuleContext ctx) {
-    int start = ctx.getStart().getStartIndex();
-    int stop = ctx.getStop().getStopIndex();
-    return ctx.getStart().getInputStream().getText(new Interval(start, stop));
+    return ofNullable(ctx).map(VisitorHelper::retrieveIntervalText).orElse("");
   }
 
-  /**
-   * Retrieve the text in the initial representation including the hidden tokens from the passed interval.
-   *
-   * @param ctx the rule context that contains the required tokens
-   * @param interval the interval for the required string in the passed context.
-   * @return a string representation of the given context
-   */
-  public String getIntervalText(ParserRuleContext ctx, Interval interval) {
-    return ctx.getStart().getInputStream().getText(interval);
+  private String retrieveIntervalText(@Nonnull ParserRuleContext ctx) {
+    int start = ctx.getStart().getStartIndex();
+    int stop = ctx.getStop().getStopIndex();
+    return stop < start ? "" : ctx.getStart().getInputStream().getText(new Interval(start, stop));
   }
 
   /**
    * Retrieve a locality from the given context with a range from the start to the end
    *
-   * @param ctx ParserRuleContext to extract locality
+   * @param context ParserRuleContext to extract locality
    * @param positions map of exact positions
    * @return locality which has a range from the start to the end of the rule
    */
-  Optional<Locality> retrieveRangeLocality(ParserRuleContext ctx, Map<Token, Locality> positions) {
-    return ofNullable(positions.get(ctx.getStart()))
+  Optional<Locality> retrieveRangeLocality(
+      ParserRuleContext context, Map<Token, Locality> positions) {
+    return ofNullable(context)
         .flatMap(
-            start ->
-                ofNullable(positions.get(ctx.getStop()))
-                    .map(
-                        stop ->
-                            start.toBuilder()
-                                .range(
-                                    new Range(
-                                        start.getRange().getStart(), stop.getRange().getEnd()))
-                                .build()));
+            ctx ->
+                ofNullable(positions.get(ctx.getStart()))
+                    .flatMap(
+                        start ->
+                            ofNullable(positions.get(ctx.getStop()))
+                                .map(
+                                    stop ->
+                                        start.toBuilder()
+                                            .range(
+                                                new Range(
+                                                    start.getRange().getStart(),
+                                                    stop.getRange().getEnd()))
+                                            .build())));
   }
 
   /**
@@ -235,38 +235,6 @@ class VisitorHelper {
    * Create a tree node from the given context
    *
    * @param positions map of localities
-   * @param constants predefined variable context
-   * @param nameContext context of name rule
-   * @param children children nodes
-   * @param hierarchy stream of parent variables
-   * @return list of variable nodes
-   */
-  List<Node> createVariableUsage(
-      Map<Token, Locality> positions,
-      PredefinedVariableContext constants,
-      ParserRuleContext nameContext,
-      List<Node> children,
-      Stream<ParserRuleContext> hierarchy) {
-    String dataName = getName(nameContext);
-    List<Node> result = new ArrayList<>();
-    getLocality(positions, nameContext.getStart())
-        .ifPresent(
-            locality -> {
-              if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
-              else {
-                result.add(
-                    new VariableUsageNode(
-                        dataName, locality, createParentsList(positions, hierarchy)));
-              }
-            });
-    result.addAll(children);
-    return result;
-  }
-
-  /**
-   * Create a tree node from the given context
-   *
-   * @param positions map of localities
    * @param children children nodes
    * @param ctx to retrieve the locality range
    * @param nodeConstructor function to create the node
@@ -290,17 +258,5 @@ class VisitorHelper {
    */
   Optional<Locality> getLocality(Map<Token, Locality> positions, Token childToken) {
     return ofNullable(positions.get(childToken));
-  }
-
-  private List<VariableNameAndLocality> createParentsList(
-      Map<Token, Locality> positions, Stream<ParserRuleContext> hierarchy) {
-    return hierarchy
-        .map(
-            it ->
-                getLocality(positions, it.getStart())
-                    .map(loc -> new VariableNameAndLocality(getName(it), loc))
-                    .orElse(null))
-        .filter(Objects::nonNull)
-        .collect(toList());
   }
 }

@@ -27,4 +27,9 @@ public class MapNameNode extends VariableNode {
   public MapNameNode(Locality location, String name) {
     super(location, name, VariableType.MAP_NAME, false);
   }
+
+  @Override
+  protected String getVariableDisplayString() {
+    return String.format("MAP %S.", getName());
+  }
 }

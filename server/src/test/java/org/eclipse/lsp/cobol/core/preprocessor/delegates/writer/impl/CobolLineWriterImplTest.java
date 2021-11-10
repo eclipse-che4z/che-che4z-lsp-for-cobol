@@ -40,15 +40,15 @@ class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
           + "078089-                     NEXT LINE\r\n";
 
   private static final String EXPECTED =
-      "CBL DATA(24)\r\n"
-          + "                       PERFORM BBAB-MOVE-TO-DETAIL-MAP\r\n"
-          + "                       MOVE -1 TO SNAMEDL\r\n"
-          + "                       MOVE 'PRESS \"CLEAR\" OR \"ENTER\" TO RETURN TO THE MENU WHEN FINISHED'\r\n"
-          + "\r\n"
-          + "\r\n"
-          + "                       MOVE \"PRESS 'CLEAR' OR 'ENTER' TO RETURN TO THE MENU WHEN FINISHED\"\r\n"
-          + "\r\n"
-          + "                       MOVE 'asd' NEXT LINE\r\n";
+      "CBL DATA(24)\n"
+          + "                       PERFORM BBAB-MOVE-TO-DETAIL-MAP\n"
+          + "                       MOVE -1 TO SNAMEDL\n"
+          + "                       MOVE 'PRESS \"CLEAR\" OR \"ENTER\" TO RETURN TO THE MENU WHEN FINISHED'\n"
+          + "\n"
+          + "\n"
+          + "                       MOVE \"PRESS 'CLEAR' OR 'ENTER' TO RETURN TO THE MENU WHEN FINISHED\"\n"
+          + "\n"
+          + "                       MOVE 'asd' NEXT LINE\n";
 
   @Test
   void test() {
