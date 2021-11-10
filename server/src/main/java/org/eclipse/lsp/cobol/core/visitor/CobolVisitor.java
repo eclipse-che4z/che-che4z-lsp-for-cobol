@@ -61,7 +61,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.antlr.v4.runtime.Lexer.HIDDEN;
 import static org.eclipse.lsp.cobol.core.CobolParser.*;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
-import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.*;
+import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
 import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
 
 /**
@@ -85,7 +85,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private Map<String, FileControlEntryContext> fileControls = null;
 
   public CobolVisitor(
-      @NonNull String documentUri,
       @NonNull NamedSubContext copybooks,
       @NonNull CommonTokenStream tokenStream,
       @NonNull Map<Token, Locality> positions,
@@ -148,10 +147,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .map(RuleContext::getText)
         .map(PreprocessorStringUtils::trimQuotes)
         .ifPresent(
-            name -> {
-              retrieveRangeLocality(ctx, positions)
-                  .ifPresent(locality -> result.add(new ProgramIdNode(locality, name)));
-            });
+            name ->
+                retrieveRangeLocality(ctx, positions)
+                    .ifPresent(locality -> result.add(new ProgramIdNode(locality, name))));
     return result;
   }
 
@@ -283,9 +281,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
     areaAWarning(firstDeclarative);
 
-    ofNullable(ctx.END())
-        .map(TerminalNode::getSymbol)
-        .ifPresent(endToken -> areaAWarning(endToken));
+    ofNullable(ctx.END()).map(TerminalNode::getSymbol).ifPresent(this::areaAWarning);
     return visitChildren(ctx);
   }
 
@@ -456,21 +452,19 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .map(Idms_map_name_definitionContext::dataName)
         .map(this::extractNameAndLocality)
         .map(
-            varName -> {
-              return addTreeNode(
-                  VariableDefinitionNode.builder()
-                      .level(LEVEL_MAP_NAME)
-                      .variableNameAndLocality(varName)
-                      .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null))
-                      .build(),
-                  visitChildren(ctx));
-            })
+            varName ->
+                addTreeNode(
+                    VariableDefinitionNode.builder()
+                        .level(LEVEL_MAP_NAME)
+                        .variableNameAndLocality(varName)
+                        .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null))
+                        .build(),
+                    visitChildren(ctx)))
         .orElseGet(() -> visitChildren(ctx));
   }
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
-    String name = getName(ctx.entryName());
     int level = getLevel(ctx.LEVEL_NUMBER());
     return addTreeNode(
         VariableDefinitionNode.builder()
@@ -513,7 +507,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat2(DataDescriptionEntryFormat2Context ctx) {
-    String name = getName(ctx.entryName());
     Builder builder =
         VariableDefinitionNode.builder()
             .level(LEVEL_66)
@@ -534,7 +527,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat3(DataDescriptionEntryFormat3Context ctx) {
-    String name = getName(ctx.entryName());
     return ofNullable(ctx.dataValueClause())
         .map(DataValueClauseContext::valueIsToken)
         .map(
@@ -564,7 +556,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitDataDescriptionEntryFormat1Level77(
       DataDescriptionEntryFormat1Level77Context ctx) {
-    String name = getName(ctx.entryName());
     return addTreeNode(
         VariableDefinitionNode.builder()
             .level(LEVEL_77)
@@ -589,30 +580,38 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitSetUpDownByStatement(SetUpDownByStatementContext ctx) {
-    List<Node> receivingField = ctx.receivingField().stream().map(this::visit).flatMap(List::stream).collect(toList());
-    List<Node> sendingField = ofNullable(ctx.sendingField()).map(this::visit).orElseGet(ImmutableList::of);
+    List<Node> receivingField =
+        ctx.receivingField().stream().map(this::visit).flatMap(List::stream).collect(toList());
+    List<Node> sendingField =
+        ofNullable(ctx.sendingField()).map(this::visit).orElseGet(ImmutableList::of);
     List<Node> children = new ArrayList<>();
     children.addAll(receivingField);
     children.addAll(sendingField);
     if (sendingField.size() != 1) return children;
-    Node statement = new SetUpDownByStatement(
-        retrieveRangeLocality(ctx, positions).orElse(null),
-        receivingField,
-        sendingField.get(0));
+    Node statement =
+        new SetUpDownByStatement(
+            retrieveRangeLocality(ctx, positions).orElse(null),
+            receivingField,
+            sendingField.get(0));
     return addTreeNode(statement, children);
   }
 
   @Override
   public List<Node> visitSetToOnOff(SetToOnOffContext ctx) {
-    List<Node> receivingField = ctx.receivingField().stream().map(this::visit).flatMap(List::stream).collect(toList());
-    Node statement = new SetToOnOffStatement(retrieveRangeLocality(ctx, positions).orElse(null), receivingField);
+    List<Node> receivingField =
+        ctx.receivingField().stream().map(this::visit).flatMap(List::stream).collect(toList());
+    Node statement =
+        new SetToOnOffStatement(retrieveRangeLocality(ctx, positions).orElse(null), receivingField);
     return addTreeNode(statement, receivingField);
   }
 
   @Override
   public List<Node> visitSetToBoolean(SetToBooleanContext ctx) {
-    List<Node> receivingField = ctx.receivingField().stream().map(this::visit).flatMap(List::stream).collect(toList());
-    Node statement = new SetToBooleanStatement(retrieveRangeLocality(ctx, positions).orElse(null), receivingField);
+    List<Node> receivingField =
+        ctx.receivingField().stream().map(this::visit).flatMap(List::stream).collect(toList());
+    Node statement =
+        new SetToBooleanStatement(
+            retrieveRangeLocality(ctx, positions).orElse(null), receivingField);
     return addTreeNode(statement, receivingField);
   }
 
@@ -764,15 +763,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     }
   }
 
-  private List<Locality> mapRulesToLocalities(List<? extends ParserRuleContext> rules) {
-    return rules.stream()
-        .map(ParserRuleContext::getStart)
-        .map(this::getLocality)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .collect(toList());
-  }
-
   private Optional<Locality> getLocality(Token childToken) {
     return ofNullable(positions.get(childToken));
   }
@@ -878,26 +868,30 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private Optional<Locality> retrieveRangeLocalityWithSameUri(ParserRuleContext ctx) {
     return ofNullable(ctx)
-        .flatMap(context -> ofNullable(positions.get(context.getStart()))
-            .flatMap(start -> retrieveStopLocality(context.getStop().getTokenIndex(), start.getUri())
-                .map(stop -> start.toBuilder()
-                                .range(
-                                    new Range(
-                                        start.getRange().getStart(),
-                                        stop.getRange().getEnd()))
-                                .build())));
+        .flatMap(
+            context ->
+                ofNullable(positions.get(context.getStart()))
+                    .flatMap(
+                        start ->
+                            retrieveStopLocality(context.getStop().getTokenIndex(), start.getUri())
+                                .map(
+                                    stop ->
+                                        start.toBuilder()
+                                            .range(
+                                                new Range(
+                                                    start.getRange().getStart(),
+                                                    stop.getRange().getEnd()))
+                                            .build())));
   }
 
   private Optional<Locality> retrieveStopLocality(int tokenIndex, String uri) {
     for (int index = tokenIndex; index < tokenStream.size(); index++) {
       Locality locality = positions.get(tokenStream.get(index));
-      if (locality != null && uri.equals(locality.getUri()))
-        return Optional.of(locality);
+      if (locality != null && uri.equals(locality.getUri())) return Optional.of(locality);
     }
     for (int index = tokenIndex - 1; index >= 0; index--) {
       Locality locality = positions.get(tokenStream.get(index));
-      if (locality != null && uri.equals(locality.getUri()))
-        return Optional.of(locality);
+      if (locality != null && uri.equals(locality.getUri())) return Optional.of(locality);
     }
     return Optional.empty();
   }
