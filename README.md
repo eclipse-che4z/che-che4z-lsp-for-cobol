@@ -41,7 +41,7 @@ COBOL Language Support provides the following COBOL syntax awareness features:
 Autocomplete speeds up the coding process by intuitively suggesting the most likely variables or paragraphs to follow existing code. The extension provides live suggestions while you type for:
 
 - COBOL keywords, variables, paragraphs and sections
-- CA IDMS DML keywords
+- IDMS DML keywords
 - CICS and DB2 SQL keywords
 - Code Snippets
 - Copybook variable and paragraph names
@@ -107,7 +107,7 @@ The COBOL Language Support extension supports copybooks used in your source code
 
 You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
 
-COBOL Language Support also supports IDMS copybooks called with the `COPY IDMS` statement. For more information, see the [CA IDMS documentation](https://techdocs.broadcom.com/us/en/ca-mainframe-software/database-management/ca-idms/19-0.html).
+COBOL Language Support also supports IDMS copybooks called with the `COPY IDMS` statement. For more information, see the [IDMS documentation](https://techdocs.broadcom.com/us/en/ca-mainframe-software/database-management/ca-idms/19-0.html).
 
 Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
 
