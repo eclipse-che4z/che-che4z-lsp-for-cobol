@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.semantics.outline.RangeUtils;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -43,7 +44,7 @@ public abstract class VariableNode extends Node {
   private final VariableType variableType;
   private final String name;
   @Setter private boolean global;
-  @EqualsAndHashCode.Exclude private final List<VariableUsageNode> usages = new ArrayList<>();
+  @EqualsAndHashCode.Exclude private final List<Location> usages = new ArrayList<>();
 
   protected VariableNode(
       Locality location, String name, VariableType variableType, boolean global) {
@@ -94,13 +95,13 @@ public abstract class VariableNode extends Node {
    * @param usageNode a variable usage node
    */
   public void addUsage(VariableUsageNode usageNode) {
-    usages.add(usageNode);
+    usages.add(usageNode.getLocality().toLocation());
     usageNode.setDefinition(this);
   }
 
-  public List<Node> getDefinitions() {
+  public List<Location> getDefinitions() {
     return getChildren().stream()
-            .filter(hasType(NodeType.VARIABLE_DEFINITION_NAME))
+            .filter(hasType(NodeType.VARIABLE_DEFINITION_NAME)).map(Node::getLocality).map(Locality::toLocation)
             .collect(Collectors.toList());
   }
 

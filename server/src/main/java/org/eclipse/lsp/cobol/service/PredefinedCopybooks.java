@@ -35,7 +35,7 @@ public class PredefinedCopybooks {
   public static final String PREF_IMPLICIT = "implicit://";
 
   @SuppressWarnings("java:S1075")
-  private static final String IMPLICIT_PATH = "/implicitCopybooks/";
+  public static final String IMPLICIT_PATH = "/implicitCopybooks/";
 
   /**
    * Get a predefined copybook instance for a given name or null
