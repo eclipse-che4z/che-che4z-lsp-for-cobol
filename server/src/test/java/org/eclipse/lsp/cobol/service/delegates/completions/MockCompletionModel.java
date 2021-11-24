@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
+import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Location;
@@ -44,7 +45,7 @@ class MockCompletionModel {
           .copybookUsages(of("cpyU1", LOCATIONS, "CpyU2", LOCATIONS, "Not-cpyU", LOCATIONS))
           .subroutineDefinitions(of("subD1", LOCATIONS, "SubD2", LOCATIONS, "Not-subD", LOCATIONS))
           .subroutineUsages(of("subU1", LOCATIONS, "SubU2", LOCATIONS, "Not-subU", LOCATIONS))
-          .rootNode(new RootNode(Locality.builder().build()))
+          .rootNode(new RootNode(Locality.builder().build(), new NamedSubContext()))
           .build();
   static final CobolDocumentModel MODEL = new CobolDocumentModel("some text", RESULT);
 

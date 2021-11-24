@@ -18,11 +18,8 @@ package org.eclipse.lsp.cobol.usecases.engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
@@ -248,8 +245,6 @@ public class UseCaseEngine {
                     entry.getValue().stream()
                         .map(VariableNode::getDefinitions)
                         .flatMap(List::stream)
-                        .map(Node::getLocality)
-                        .map(Locality::toLocation)
                         .distinct()
                         .collect(toList())));
   }
@@ -267,8 +262,6 @@ public class UseCaseEngine {
                     entry.getValue().stream()
                         .map(VariableNode::getUsages)
                         .flatMap(List::stream)
-                        .map(VariableUsageNode::getLocality)
-                        .map(Locality::toLocation)
                         .collect(toList())));
   }
 

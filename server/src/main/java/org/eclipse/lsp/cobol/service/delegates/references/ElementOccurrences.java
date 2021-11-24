@@ -16,9 +16,7 @@ package org.eclipse.lsp.cobol.service.delegates.references;
 
 import lombok.NonNull;
 import lombok.Value;
-import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Context;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.semantics.outline.RangeUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -77,7 +75,6 @@ public class ElementOccurrences implements Occurrences {
         return fromTree.orElseGet(() -> Stream.<Supplier<Optional<Element>>>of(
                 () -> findElementByPosition(result.getParagraphDefinitions(), result.getParagraphUsages(), position),
                 () -> findElementByPosition(result.getSectionDefinitions(), result.getSectionUsages(), position),
-                () -> findElementByPosition(result.getCopybookDefinitions(), result.getCopybookUsages(), position),
                 () -> findElementByPosition(result.getSubroutineDefinitions(), result.getSubroutineUsages(), position))
             .map(Supplier::get)
             .filter(Optional::isPresent)
@@ -120,10 +117,8 @@ public class ElementOccurrences implements Occurrences {
             convertToLocations(contextNode.getUsages()));
     }
 
-    private static List<Location> convertToLocations(List<? extends Node> nodes) {
+    private static List<Location> convertToLocations(List<Location> nodes) {
         return nodes.stream()
-            .map(Node::getLocality)
-            .map(Locality::toLocation)
             .collect(Collectors.toList());
     }
 

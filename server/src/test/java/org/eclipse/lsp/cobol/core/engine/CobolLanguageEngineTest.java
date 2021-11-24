@@ -165,7 +165,7 @@ class CobolLanguageEngineTest {
                             .uri(URI)
                             .range(new Range(new Position(0, 7), new Position(0, 31)))
                             .token("IDENTIFICATION")
-                            .build()))
+                            .build(), new NamedSubContext()))
                 .build(),
             ImmutableList.of(error, eofError));
 
