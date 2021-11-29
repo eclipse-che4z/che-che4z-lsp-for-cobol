@@ -18,7 +18,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
 
 /**
  * This value class represents the multi-dimensional Table variable that may have nested variables,

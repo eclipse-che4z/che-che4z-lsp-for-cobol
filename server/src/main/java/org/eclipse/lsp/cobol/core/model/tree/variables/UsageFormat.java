@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.model.variables;
+package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import java.util.Arrays;
 import java.util.Map;

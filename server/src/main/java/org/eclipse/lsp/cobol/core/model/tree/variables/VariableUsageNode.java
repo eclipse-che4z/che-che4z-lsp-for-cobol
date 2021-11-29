@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.core.model.tree.Context;
 import org.eclipse.lsp.cobol.core.model.tree.Describable;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp4j.Location;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,14 +48,14 @@ public class VariableUsageNode extends Node implements Context, Describable {
   }
 
   @Override
-  public List<Node> getDefinitions() {
+  public List<Location> getDefinitions() {
     return Optional.ofNullable(definition)
         .map(VariableNode::getDefinitions)
         .orElseGet(ImmutableList::of);
   }
 
   @Override
-  public List<? extends Node> getUsages() {
+  public List<Location> getUsages() {
     return Optional.ofNullable(definition)
         .map(VariableNode::getUsages)
         .orElseGet(ImmutableList::of);

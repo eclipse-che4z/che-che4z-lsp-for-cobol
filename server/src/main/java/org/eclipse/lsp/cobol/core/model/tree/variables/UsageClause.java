@@ -15,8 +15,6 @@
 
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
-import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
-
 /**
  * Contract for the data description entry which supports USAGE clause. Important thing to note that
  * elementary items as well as group item can have a usage clause. When specified at the group

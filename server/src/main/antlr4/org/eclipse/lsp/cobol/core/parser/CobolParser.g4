@@ -559,7 +559,12 @@ dataDivision
    ;
 
 dataDivisionSection
-   : fileSection | workingStorageSection | linkageSection | localStorageSection | schemaSection | mapSection | execSqlStatementInDataDivision
+   : fileSection | workingStorageSection | linkageSection | localStorageSection | schemaSection | mapSection
+   | execSqlStatementInDataDivision | externalSection
+   ;
+
+externalSection
+   : externalNodeHook
    ;
 
 // -- file section ----------------------------------
@@ -700,6 +705,7 @@ dataDescriptionEntry
    | dataDescriptionEntryFormat2
    | dataDescriptionEntryFormat1Level77
    | dataDescriptionEntryFormat3
+   | externalDescriptionEntry
    ;
 
 dataDescriptionEntryFormat1
@@ -726,6 +732,10 @@ dataDescriptionEntryFormat1Level77
 
 dataDescriptionEntryFormat3
    : LEVEL_NUMBER_88 entryName? dataValueClause DOT_FS
+   ;
+
+externalDescriptionEntry
+   : externalNodeHook
    ;
 
 entryName
@@ -958,7 +968,7 @@ statement
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
     serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | unstringStatement | writeStatement | xmlStatement
+    terminateStatement | unstringStatement | writeStatement | xmlStatement | externalStatement
    ;
 
 idmsStatements
@@ -978,6 +988,10 @@ idmsStmtsMandTermOn
 
 idmsOnClause
     : ON generalIdentifier
+    ;
+
+externalStatement
+    : externalNodeHook
     ;
 
 // DAF DaCo Statements
@@ -3059,6 +3073,11 @@ idms_subschema_name
 idms_table_name
     : {validateLength(_input.LT(1).getText().substring(1, _input.LT(1).getText().length() -1),
            "table name", 8);} literal
+    ;
+
+// external node
+externalNodeHook
+    : EXTERNAL_NODE_HOOK IDENTIFIER integerLiteral
     ;
 
 // DAF DaCo Identifiers

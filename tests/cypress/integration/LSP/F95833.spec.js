@@ -16,13 +16,16 @@
 //@ts-ignore
 /// <reference types="../../support/" />
 
+// Import selectors from Theia object
+import { Theia } from '../../../node_modules/@eclipse/che-che4z/tests/dist/selectorsTheia';
+
 //F95833 - LSP for COBOL - support for CICS statements (basic intellisense)
 
 context('This is F95833 spec', () => {
   describe('TC312735 Check EXEC CICS is in Procedure Division', () => {
     it(['smoke', 'CI'], 'Checks that EXEC CICS could be run *only* under Procedure Division.', () => {
       cy.openFile('ADSORT.cbl').goToLine(59);
-      cy.getCurrentLine().should('not.have.class', '.squiggly-error');
+      cy.getCurrentLine().should('not.have.class', Theia.editorError);
       cy.getCurrentLine().type('{selectall}{backspace}');
       cy.goToLine(35);
       cy.getCurrentLine().type('           EXEC CICS XCTL PROGRAM (XCTL1) END-EXEC.').wait(500);
@@ -36,7 +39,7 @@ context('This is F95833 spec', () => {
   describe('TC312745 Error check', () => {
     it(['smoke'], 'Error check in CICS', () => {
       cy.openFile('ADSORT.cbl').goToLine(59);
-      cy.getCurrentLine().should('not.have.class', '.squiggly-error');
+      cy.getCurrentLine().should('not.have.class', Theia.editorError);
       cy.getCurrentLine().type('{selectall}{backspace}');
       cy.getCurrentLine().type(
         `             EXEC CICS XCTL123 PROGRAM (XCTL1) END-EXEC.              
@@ -51,7 +54,7 @@ context('This is F95833 spec', () => {
       cy.getCurrentLineErrors({ expectedLine: 51 }).getHoverErrorMessage().contains("Syntax error on 'XCTL123'");
       cy.getLineByNumber(51).type('{home}{selectall}             EXEC CICS XCTL PROGRAM (XCTL1) END-EXEC.{enter}');
       cy.goToLine(51);
-      cy.getCurrentLine().should('not.have.class', '.squiggly-error');
+      cy.getCurrentLine().should('not.have.class', Theia.editorError);
     });
   });
 
@@ -75,11 +78,11 @@ context('This is F95833 spec', () => {
     it(['CI'], "Try 'Go to Definition' on variables and paragraphs", () => {
       cy.openFile('ADSORT.cbl').goToLine(59);
       cy.getCurrentLine().type("{end}{enter}EXEC CICS SEND MAP('DETAIL') MAPSET(DETAIL-MAPS)    ERASE END-EXEC.");
-      cy.getLineByNumber(60).should('not.have.class', '.squiggly-error');
+      cy.getLineByNumber(60).should('not.have.class', Theia.editorError);
       cy.getCurrentLine().type("{end}{enter}EXEC CICS SEND ERASE MAP('DETAIL') MAPSET(DETAIL-MAPS)    END-EXEC.");
-      cy.getLineByNumber(61).should('not.have.class', '.squiggly-error');
+      cy.getLineByNumber(61).should('not.have.class', Theia.editorError);
       cy.getCurrentLine().type("{end}{enter}EXEC CICS SEND MAPSET(DETAIL-MAPS) MAP('DETAIL')   ERASE   END-EXEC.");
-      cy.getLineByNumber(62).should('not.have.class', '.squiggly-error');
+      cy.getLineByNumber(62).should('not.have.class', Theia.editorError);
     });
   });
 
@@ -87,7 +90,7 @@ context('This is F95833 spec', () => {
     it('CICS is a valid variable name and syntax analysis should not return an error in this case.', () => {
       cy.openFile('ADSORT.cbl').goToLine(26);
       cy.getCurrentLine().type("08 CICS VALUE 'CICS'").wait(500);
-      cy.getLineByNumber(26).should('not.have.class', '.squiggly-error');
+      cy.getLineByNumber(26).should('not.have.class', Theia.editorError);
     });
   });
 });

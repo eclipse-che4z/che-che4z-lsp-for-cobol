@@ -162,7 +162,10 @@
                 },
                 "cobol-lsp.analysis.features": {
                     "type": "array",
-                    "default": ["SQL","CICS"],
+                    "default": [
+                        "SQL",
+                        "CICS"
+                    ],
                     "items": {
                         "type": "string",
                         "enum": [
@@ -227,7 +230,8 @@
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "test": "jest -w 1 --unhandled-rejections=strict",
-        "coverage": "jest --coverage --runInBand"
+        "coverage": "jest --coverage --runInBand",
+        "package": "vsce package"
     },
     "dependencies": {
         "@zowe/imperative": "4.15.1",
@@ -243,6 +247,7 @@
         "ts-jest": "^27.0.0",
         "tslint": "^5.18.0",
         "tslint-sonarts": "^1.9.0",
-        "typescript": "^3.5.3"
+        "typescript": "^3.5.3",
+        "vsce": "1.103.1"
     }
 }

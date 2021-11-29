@@ -21,14 +21,14 @@ import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.variables.ElementItem;
-import org.eclipse.lsp.cobol.core.model.variables.StructureType;
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
+import org.eclipse.lsp.cobol.core.model.tree.LiteralNode;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /** This class implements the logic for SET UP/DOWN BY statement. */
 @EqualsAndHashCode(callSuper = true)
@@ -37,58 +37,47 @@ public class SetUpDownByStatement extends StatementNode {
   protected static final String INVALID_RECEIVING_FIELD_TEMPLATE =
       "statements.invalidReceivingField";
   protected static final String INVALID_SENDING_FIELD_TEMPLATE = "statements.invalidSendingField";
-  private static final List<StructureType> RECEIVING_FIELD_TYPES =
-      ImmutableList.of(StructureType.INDEX_NAME);
+  private static final List<VariableType> RECEIVING_FIELD_TYPES =
+      ImmutableList.of(VariableType.INDEX_ITEM);
   private static final MessageTemplate[] SENDING_FIELD_TYPES =
-      new MessageTemplate[] {
+      {
         MessageTemplate.of("variables.elementaryWithType", MessageTemplate.of("variables.integer")),
         MessageTemplate.of("variables.nonzeroInteger")
       };
-  List<Locality> receivingFields;
-  Locality sendingField;
-  String literal;
+  List<Node> receivingFields;
+  Node sendingField;
 
-  public SetUpDownByStatement(
-      Locality locality, List<Locality> receivingFields, Locality sendingField, String literal) {
+  public SetUpDownByStatement(Locality locality, List<Node> receivingFields, Node sendingField) {
     super(locality);
     this.receivingFields = receivingFields;
     this.sendingField = sendingField;
-    this.literal = literal;
   }
 
   @NonNull
   @Override
-  public List<SyntaxError> validate(Map<Locality, Variable> variableUsages) {
+  public List<SyntaxError> validate() {
     List<SyntaxError> errors = new ArrayList<>();
-    receivingFields.stream()
-        .map(
-            validateVariableType(
-                variableUsages, RECEIVING_FIELD_TYPES, INVALID_RECEIVING_FIELD_TEMPLATE))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .forEach(errors::add);
-    if (shouldProcessLiteral(literal)) {
-      if (literalProducesError(literal)) {
-        errors.add(createError(sendingField, INVALID_SENDING_FIELD_TEMPLATE, SENDING_FIELD_TYPES));
-      }
-    } else {
-      Variable variable = variableUsages.get(sendingField);
-      if (variableProducesError(variable)) {
-        errors.add(createError(sendingField, INVALID_SENDING_FIELD_TEMPLATE, SENDING_FIELD_TYPES));
-      }
-    }
+    errors.addAll(validateVariableType(receivingFields, RECEIVING_FIELD_TYPES, INVALID_RECEIVING_FIELD_TEMPLATE));
+    if (checkSendingFieldProducesError())
+      errors.add(createError(sendingField.getLocality(), INVALID_SENDING_FIELD_TEMPLATE, SENDING_FIELD_TYPES));
     return errors;
   }
 
-  private boolean shouldProcessLiteral(String literal) {
-    return literal != null;
+  private boolean checkSendingFieldProducesError() {
+    if (sendingField.getNodeType() == NodeType.LITERAL)
+      return literalProducesError(((LiteralNode) sendingField).getText());
+    if (sendingField.getNodeType() == NodeType.QUALIFIED_REFERENCE_NODE)
+      return variableProducesError((QualifiedReferenceNode) sendingField);
+    return true;
   }
 
   private boolean literalProducesError(String literal) {
     return !literal.matches(INTEGER_LITERAL) || Integer.parseInt(literal) == 0;
   }
 
-  private boolean variableProducesError(Variable variable) {
-    return !(variable == null || variable instanceof ElementItem);
+  private boolean variableProducesError(QualifiedReferenceNode variable) {
+    return !variable.getVariableDefinitionNode()
+        .map(defNode -> defNode.getVariableType() == VariableType.ELEMENTARY_ITEM)
+        .orElse(true); // to ignore not defined variables
   }
 }

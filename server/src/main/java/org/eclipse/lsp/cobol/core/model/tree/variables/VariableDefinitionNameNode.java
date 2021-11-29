@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.core.model.tree.Context;
 import org.eclipse.lsp.cobol.core.model.tree.Describable;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp4j.Location;
 
 import java.util.List;
 
@@ -53,18 +54,18 @@ import java.util.List;
 public class VariableDefinitionNameNode extends Node implements Context, Describable {
   private final String name;
 
-  public VariableDefinitionNameNode(Locality location, String name) {
-    super(location, NodeType.VARIABLE_DEFINITION_NAME);
+  public VariableDefinitionNameNode(Locality locality, String name) {
+    super(locality, NodeType.VARIABLE_DEFINITION_NAME);
     this.name = name;
   }
 
   @Override
-  public List<? extends Node> getDefinitions() {
-    return ImmutableList.of(this);
+  public List<Location> getDefinitions() {
+    return ImmutableList.of(getLocality().toLocation());
   }
 
   @Override
-  public List<? extends Node> getUsages() {
+  public List<Location> getUsages() {
     return getNearestParentByType(NodeType.VARIABLE)
         .map(VariableNode.class::cast)
         .map(VariableNode::getUsages)

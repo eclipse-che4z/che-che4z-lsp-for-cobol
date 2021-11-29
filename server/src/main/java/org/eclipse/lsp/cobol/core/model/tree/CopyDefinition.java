@@ -17,35 +17,37 @@ package org.eclipse.lsp.cobol.core.model.tree;
 import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp4j.Location;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-/** The class represents the copyBookNode. */
+/** The class represents the CopyBookDefinition Node. */
 @ToString(callSuper = true)
 @Getter
-public class CopyNode extends Node implements Context {
+public class CopyDefinition {
   private final String copyBookName;
-  @Setter @EqualsAndHashCode.Exclude @ToString.Exclude private CopyDefinition definition;
+  private final Location location;
+  @EqualsAndHashCode.Exclude private final List<CopyNode> usages = new ArrayList<>();
 
-  public CopyNode(Locality locality, String copyBookName) {
-    super(locality, NodeType.COPY);
+  public CopyDefinition(Location locality, String copyBookName) {
+    this.location = locality;
     this.copyBookName = copyBookName;
   }
 
-  @Override
-  public List<Location> getDefinitions() {
-    return Optional.ofNullable(definition).map(CopyDefinition::getDefinitions).orElse(ImmutableList.of());
+  void addUsages(CopyNode node) {
+    usages.add(node);
+    node.setDefinition(this);
   }
 
-  @Override
+  public List<Location> getDefinitions() {
+    return ImmutableList.of(location);
+  }
+
   public List<Location> getUsages() {
-    return Optional.ofNullable(definition)
-        .map(CopyDefinition::getUsages)
-        .orElseGet(ImmutableList::of);
-    }
+    return usages.stream().map(Node::getLocality).map(Locality::toLocation).collect(Collectors.toList());
+  }
 }
