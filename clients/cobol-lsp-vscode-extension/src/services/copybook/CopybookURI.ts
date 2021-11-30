@@ -12,17 +12,13 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import {C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_LOCAL_KEY, PATHS_ZOWE, SETTINGS_CPY_SECTION, COPYBOOK_EXT_ARRAY} from "../../constants";
-import {ProfileService} from "../ProfileService";
-import {searchInWorkspace} from "../util/FSUtils";
+import { C4Z_FOLDER, COPYBOOK_EXT_ARRAY, COPYBOOKS_FOLDER, PATHS_LOCAL_KEY, PATHS_ZOWE, SETTINGS_CPY_SECTION } from "../../constants";
+import { searchInWorkspace } from "../util/FSUtils";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
  */
 export class CopybookURI {
-
-    constructor(private profileService: ProfileService) {
-    }
 
     /**
      * This function will try to resolve a given copybook name applying a two-step search strategy:
@@ -42,7 +38,7 @@ export class CopybookURI {
         // check in subfolders under .copybooks (copybook downloaded from MF)
         if (!result) {
             result = searchInWorkspace(copybookName,
-                this.createPathForCopybookDownloaded(await this.profileService.resolveProfile(cobolProgramName)),
+                this.createPathForCopybookDownloaded(vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles")),
                 COPYBOOK_EXT_ARRAY);
         }
         return result || "";
@@ -59,7 +55,8 @@ export class CopybookURI {
         const datasets: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);
         if (profile && datasets) {
             result = Object.assign([], datasets);
-            result.forEach((value, index) => result[index] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" + profile + "/" + value);
+            result.forEach((value, index) => result[index] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" +
+                profile + "/" + value);
         }
         return result;
     }

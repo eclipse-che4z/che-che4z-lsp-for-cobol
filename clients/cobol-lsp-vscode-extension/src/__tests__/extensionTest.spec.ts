@@ -13,19 +13,17 @@
  */
 
 import * as vscode from "vscode";
-import {changeDefaultZoweProfile} from "../commands/ChangeDefaultZoweProfile";
-import {editDatasetPaths} from "../commands/EditDatasetPaths";
-import {fetchCopybookCommand} from "../commands/FetchCopybookCommand";
-import {gotoCopybookSettings} from "../commands/OpenSettingsCommand";
-import {initSmartTab} from "../commands/SmartTabCommand";
-import {activate} from "../extension";
-import {CopybooksCodeActionProvider} from "../services/copybook/CopybooksCodeActionProvider";
-import {LanguageClientService} from "../services/LanguageClientService";
-import {TelemetryService} from "../services/reporter/TelemetryService";
-import {createFileWithGivenPath} from "../services/Settings";
+import { editDatasetPaths } from "../commands/EditDatasetPaths";
+import { fetchCopybookCommand } from "../commands/FetchCopybookCommand";
+import { gotoCopybookSettings } from "../commands/OpenSettingsCommand";
+import { initSmartTab } from "../commands/SmartTabCommand";
+import { activate } from "../extension";
+import { CopybooksCodeActionProvider } from "../services/copybook/CopybooksCodeActionProvider";
+import { LanguageClientService } from "../services/LanguageClientService";
+import { TelemetryService } from "../services/reporter/TelemetryService";
+import { createFileWithGivenPath } from "../services/Settings";
 
 jest.mock("../commands/SmartTabCommand");
-jest.mock("../commands/ChangeDefaultZoweProfile");
 jest.mock("../commands/EditDatasetPaths");
 jest.mock("../commands/FetchCopybookCommand");
 jest.mock("../commands/OpenSettingsCommand");
@@ -38,12 +36,12 @@ jest.mock("../services/Settings", () => ({
 }));
 jest.mock("vscode", () => ({
     commands: {
-        registerCommand : jest.fn().mockImplementation((command, callback) => callback()),
+        registerCommand: jest.fn().mockImplementation((command, callback) => callback()),
     },
     extensions: {
-        getExtension: jest.fn().mockReturnValue({extensionPath: "/test"}),
+        getExtension: jest.fn().mockReturnValue({ extensionPath: "/test" }),
     },
-    languages : {
+    languages: {
         registerCodeActionsProvider: jest.fn(),
     },
     window: {
@@ -53,12 +51,11 @@ jest.mock("vscode", () => ({
         getConfiguration: jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue(9),
         }),
-        getWorkspaceFolder : jest.fn().mockReturnValue({ name: "workspaceFolder1" }),
+        getWorkspaceFolder: jest.fn().mockReturnValue({ name: "workspaceFolder1" }),
         onDidChangeConfiguration: jest.fn().mockReturnValue("onDidChangeConfiguration"),
     },
-    }));
+}));
 
-jest.mock("../services/ProfileService");
 jest.mock("vscode-languageclient", () => ({
     LanguageClient: jest.fn(),
 }));
@@ -66,7 +63,7 @@ jest.mock("../services/reporter/TelemetryService");
 
 const context: any = {
     subscriptions: [],
-  };
+};
 
 beforeEach(() => {
     jest.clearAllMocks();
@@ -79,13 +76,9 @@ describe("Check plugin extension for cobol starts successfully.", () => {
         await activate(context);
         expect(TelemetryService.registerEvent).toHaveBeenCalledWith("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
 
-        expect(vscode.workspace.onDidChangeConfiguration).toBeCalled();
-        expect(context.subscriptions[0]).toContain("onDidChangeConfiguration");
-
-        expect(vscode.commands.registerCommand).toBeCalledTimes(4);
+        expect(vscode.commands.registerCommand).toBeCalledTimes(3);
 
         expect(fetchCopybookCommand).toHaveBeenCalled();
-        expect(changeDefaultZoweProfile).toHaveBeenCalled();
         expect(editDatasetPaths).toHaveBeenCalled();
         expect(gotoCopybookSettings).toHaveBeenCalled();
         expect(initSmartTab).toHaveBeenCalled();
@@ -93,15 +86,15 @@ describe("Check plugin extension for cobol starts successfully.", () => {
         expect(createFileWithGivenPath).toHaveBeenCalledTimes(1);
 
         expect(vscode.languages.registerCodeActionsProvider)
-        .toBeCalledWith({scheme: "file", language: "COBOL"}, expect.any(CopybooksCodeActionProvider));
+            .toBeCalledWith({ scheme: "file", language: "COBOL" }, expect.any(CopybooksCodeActionProvider));
 
     });
 
-    test("extension reruns extended API surface", async() => {
+    test("extension reruns extended API surface", async () => {
         const extendedApi = await activate(context);
         extendedApi.analysis("test", "text");
         expect(LanguageClientService.prototype.retrieveAnalysis).toBeCalledTimes(1);
-    })
+    });
 });
 
 describe("Check plugin extension for cobol fails.", () => {
@@ -110,10 +103,10 @@ describe("Check plugin extension for cobol fails.", () => {
             return {
                 checkPrerequisites: () => {
                     throw new Error("The error");
-                }
-            }
+                },
+            };
         });
-    })
+    });
 
     test("start fails.", async () => {
         await activate(context);
