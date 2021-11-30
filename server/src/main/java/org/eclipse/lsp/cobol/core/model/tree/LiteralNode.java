@@ -15,15 +15,21 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
-/** The class represents if in COBOL. */
+/**
+ * The class represents a literal in COBOL.
+ */
 @ToString(callSuper = true)
+@Getter
 @EqualsAndHashCode(callSuper = true)
-public class IfNode extends Node {
+public class LiteralNode extends Node {
+  private final String text;
 
-  public IfNode(Locality location) {
-    super(location, NodeType.IF);
+  public LiteralNode(Locality location, String text) {
+    super(location, NodeType.LITERAL);
+    this.text = text;
   }
 }

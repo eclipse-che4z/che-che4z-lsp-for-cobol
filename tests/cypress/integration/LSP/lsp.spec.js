@@ -13,9 +13,10 @@
  */
 
 /// <reference types="Cypress" />
-
 //@ts-ignore
 /// <reference types="../../support/" />
+
+import { Theia } from '@eclipse/che-che4z/tests/dist/selectorsTheia';
 
 context('This is a LSP spec', () => {
   const getCurrentLineSpanWidth = () => {
@@ -29,7 +30,7 @@ context('This is a LSP spec', () => {
 
   const getRulerOffsetLeft = (index) => {
     return cy
-      .get('.view-rulers')
+      .get(Theia.viewRulers)
       .children()
       .eq(index)
       .then(($ruler) => {
@@ -48,7 +49,7 @@ context('This is a LSP spec', () => {
       .findText(text)
       .click()
       .trigger('mousemove')
-      .get('div.monaco-editor-hover-content')
+      .get(Theia.hoverOverContent)
       .contains(hierarchy);
   };
 
@@ -64,7 +65,7 @@ context('This is a LSP spec', () => {
       .getCurrentLine()
       .type('{ctrl} ')
       .type(`${variable}{ctrl} `)
-      .get('.monaco-scrollable-element .docs')
+      .get(Theia.documentation)
       .contains(documentation);
   };
 
@@ -86,7 +87,7 @@ context('This is a LSP spec', () => {
     });
     it(['smoke', 'CI'], 'Cobol file is recognized by LSP - Cobol type is shown in status bar', () => {
       cy.openFile('USER1.cbl');
-      cy.get('.right.area .hasCommand[title="Select Language Mode"]').should('contain.text', 'COBOL');
+      cy.get(Theia.languageMode).should('contain.text', 'COBOL');
     });
   });
 
@@ -146,7 +147,7 @@ context('This is a LSP spec', () => {
   describe('TC152052 Syntax Errors are marked in file', () => {
     it(['smoke', 'CI'], 'Checks that error lines are marked in a file', () => {
       cy.openFile('USER2.cbl');
-      cy.get('.squiggly-error')
+      cy.get(Theia.editorError)
         .should('have.length', 1)
         .getElementLineNumber()
         .then((lineNumber) => {
@@ -159,13 +160,13 @@ context('This is a LSP spec', () => {
   describe('TC152051 Syntax Errors have more detailed hints', () => {
     it(['smoke', 'CI'], 'Syntax Errors have more detailed hints', () => {
       cy.openFile('USER2.cbl');
-      cy.get('.squiggly-error')
+      cy.get(Theia.editorError)
         .getElementLineNumber()
         .then((lineNumber) => {
           expect(lineNumber).to.be.equal(15);
           cy.getLineByNumber(lineNumber).children('span').click().trigger('mousemove');
         });
-      cy.get('div.monaco-editor-hover-content').contains("Syntax error on 'Program1-id' expected PROGRAM-ID");
+      cy.get(Theia.hoverOverContent).contains("Syntax error on 'Program1-id' expected PROGRAM-ID");
     });
   });
 
@@ -173,7 +174,7 @@ context('This is a LSP spec', () => {
     it(['smoke', 'CI'], 'Checks that Semantic Errors also marked in file', () => {
       cy.openFile('USER2.cbl');
       cy.goToLine(40);
-      cy.get('.squiggly-error')
+      cy.get(Theia.editorError)
         .should('have.length', 1)
         .getElementLineNumber()
         .then((lineNumber) => {
@@ -187,13 +188,13 @@ context('This is a LSP spec', () => {
     it(['smoke', 'CI'], 'Checks that semantic errors have detailed hints', () => {
       cy.openFile('USER2.cbl');
       cy.goToLine(40);
-      cy.get('.squiggly-error')
+      cy.get(Theia.editorError)
         .getElementLineNumber()
         .then((lineNumber) => {
           expect(lineNumber).to.be.equal(40);
           cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
         });
-      cy.get('div.monaco-editor-hover-content').contains('Variable USER-CITY1 is not defined');
+      cy.get(Theia.hoverOverContent).contains('Variable USER-CITY1 is not defined');
     });
   });
 
@@ -217,7 +218,7 @@ context('This is a LSP spec', () => {
       cy.goToLine(40);
       cy.getCurrentLine().type('{end}{enter}');
       cy.getCurrentLine().type('{ctrl} ').type('A'); // Ctrl+Space
-      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('ADD id TO id').click();
+      cy.get(Theia.suggestWidget).contains('ADD id TO id').click();
       cy.focused()
         .as('input')
         .then(() => {
@@ -239,12 +240,12 @@ context('This is a LSP spec', () => {
         .wait(500);
       cy.getMainEditor()
         .getCurrentLineOverlay()
-        .find('.squiggly-error')
+        .find(Theia.editorError)
         .then(($error) => {
           cy.wrap($error).getElementLineNumber().should('eq', 23);
           cy.getCurrentLine().trigger('mousemove', $error[0].offsetLeft, $error[0].offsetTop);
         });
-      cy.get('div.monaco-editor-hover-content').contains('Source text cannot go past column 80');
+      cy.get(Theia.hoverOverContent).contains('Source text cannot go past column 80');
     });
   });
 
@@ -261,16 +262,16 @@ context('This is a LSP spec', () => {
       cy.openFolder('.theia').openFile('settings.json').goToLine(4);
       cy.getCurrentLine().type('{end}{enter}').wait(500);
       cy.getCurrentLine().type('"cobol-lsp.logging.level.root": "ERROR"');
-      cy.getCurrentLine().should('not.have.class', '.squiggly-info');
+      cy.getCurrentLine().should('not.have.class', Theia.editorInfo);
       cy.getCurrentLine().type('{end}{backspace}1"');
       cy.getMainEditor()
         .getCurrentLineOverlay()
-        .find('.squiggly-info')
+        .find(Theia.editorInfo)
         .then(($error) => {
           cy.wrap($error).getElementLineNumber().should('eq', 4);
           cy.getCurrentLine().trigger('mousemove', $error[0].offsetLeft, $error[0].offsetTop);
         });
-      cy.get('div.monaco-editor-hover-content').contains(
+      cy.get(hoverOverContent).contains(
         'Value is not accepted. Valid values: "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL".',
       );
     });
@@ -281,21 +282,21 @@ context('This is a LSP spec', () => {
       cy.openFile('VAR.cbl').goToLine(23).wait(3000);
       cy.getMainEditor()
         .getCurrentLineOverlay()
-        .find('.squiggly-error')
+        .find(Theia.editorError)
         .then(($info) => {
           cy.wrap($info).getElementLineNumber().should('eq', 23);
           cy.getCurrentLine().trigger('mousemove', $info[0].offsetLeft, $info[0].offsetTop);
         });
-      cy.get('div.monaco-editor-hover-content').contains('Variable CHILD1 is not defined');
+      cy.get(Theia.hoverOverContent).contains('Variable CHILD1 is not defined');
       cy.goToLine(24).wait(2000);
       cy.getMainEditor()
         .getCurrentLineOverlay()
-        .find('.squiggly-error')
+        .find(Theia.editorError)
         .then(($info) => {
           cy.wrap($info).getElementLineNumber().should('eq', 24);
           cy.getCurrentLine().trigger('mousemove', $info[0].offsetLeft, $info[0].offsetTop);
         });
-      cy.get('div.monaco-editor-hover-content').should(($content) => {
+      cy.get(Theia.hoverOverContent).should(($content) => {
         ['Variable CHILD2 is not defined'].forEach((message) => {
           expect($content).to.contain.text(message);
         });
@@ -303,11 +304,11 @@ context('This is a LSP spec', () => {
 
       cy.getMainEditor()
         .getCurrentLineOverlay()
-        .find('.squiggly-error')
+        .find(Theia.editorError)
         .then(($info) => {
           cy.wrap($info).getElementLineNumber().should('eq', 24);
           cy.getCurrentLine().type('{end}').trigger('mousemove', $info[0].offsetLeft, $info[0].offsetTop);
-          cy.get('div.monaco-editor-hover-content').contains('Variable CHILD2 is not defined');
+          cy.get(Theia.hoverOverContent).contains('Variable CHILD2 is not defined');
         });
     });
   });
@@ -332,7 +333,7 @@ context('This is a LSP spec', () => {
 
     it('Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('USERC1N2.cbl').goToLine(32);
-      cy.getCurrentLine().should('not.have.class', '.squiggly-error');
+      cy.getCurrentLine().should('not.have.class', Theia.editorError);
       cy.goToLine(35);
       cy.getCurrentLine().type('{end}{backspace}{backspace}');
       cy.goToLine(32).wait(500);
@@ -420,7 +421,7 @@ context('This is a LSP spec', () => {
     it(['smoke', 'CI'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
       cy.getCurrentLine().type('{selectall}shell').wait(500);
-      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('shell').click();
+      cy.get(Theia.suggestWidget).contains('shell').click();
       cy.getLineByNumber(2).contains(`PROGRAM-ID. ${fileName}.`);
       cy.getLineByNumber(8).contains('DATA DIVISION.');
       cy.getLineByNumber(16).contains('STOP RUN.');
@@ -437,15 +438,15 @@ context('This is a LSP spec', () => {
     it('Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
       cy.getCurrentLine().type('{selectall}shell').wait(500);
-      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('shell').click();
+      cy.get(Theia.suggestWidget).contains('shell').click();
       cy.goToLine(15).getCurrentLine().type('COPY ABC.');
       cy.getCurrentLineErrors({ expectedLine: 15 }).eq(0).getHoverErrorMessage().contains('ABC: Copybook not found');
       cy.getCurrentLine().type('{end}{enter}');
       cy.getCurrentLine().type('FUNCTION-CO');
-      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('FUNCTION-COS');
+      cy.get(Theia.suggestWidget).contains('FUNCTION-COS');
       //lower case
       cy.getCurrentLine().type('{selectall}function-co', { delay: 200 });
-      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('function-cos');
+      cy.get(Theia.suggestWidget).contains('function-cos');
     });
   });
 
@@ -454,7 +455,7 @@ context('This is a LSP spec', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(14).type('{home}{enter}');
       cy.goToLine(14).getCurrentLine().type('TITLE "something"');
-      cy.getLineByNumber(14).should('not.have.class', '.squiggly-error');
+      cy.getLineByNumber(14).should('not.have.class', Theia.editorError);
       cy.getLineByNumber(14).type('{home}{enter}');
       cy.goToLine(14).getCurrentLine().type('TITLE "something"');
     });
@@ -465,8 +466,8 @@ context('This is a LSP spec', () => {
       cy.writeFile('test_files/project/some_text.txt', '');
       cy.openFile('some_text.txt');
       cy.changeLangMode('COBOL');
-      cy.get('.view-lines').type('{ctrl}{shift}I');
-      cy.get('.theia-TreeContainer').contains('No outline information available.');
+      cy.get(Theia.linesContent).type('{ctrl}{shift}I');
+      cy.get(Theia.treeContainer).contains('No outline information available.');
     });
   });
 
@@ -474,13 +475,13 @@ context('This is a LSP spec', () => {
     it('Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(49).type('{selectall}{backspace}        End program hello-world.');
-      cy.getCurrentLineOverlay().children().should('not.have.class', '.squiggly-warning');
+      cy.getCurrentLineOverlay().children().should('not.have.class', Theia.editorWarn);
       cy.getLineByNumber(41).type('{end}{backspace}{backspace}.');
-      cy.getMainEditor().find('.squiggly-warning');
+      cy.getMainEditor().find(Theia.editorWarn);
       cy.getCurrentLineOverlay()
         .children()
         .then((children) => {
-          return children.toArray().some((child) => child.classList.contains('squiggly-warning'));
+          return children.toArray().some((child) => child.classList.contains(Theia.editorWarn));
         })
         .should('be.true');
     });
@@ -547,7 +548,7 @@ context('This is a LSP spec', () => {
     it(['smoke', 'CI'], 'Semicolon as a Separators Not Produces Error', () => {
       cy.openFile('TEST.CBL');
       cy.goToLine(23).getLineByNumber(23).type('{end}{backspace};');
-      cy.getLineByNumber(23).should('not.have.class', '.squiggly-error');
+      cy.getLineByNumber(23).should('not.have.class', Theia.editorError);
     });
   });
 
@@ -557,9 +558,9 @@ context('This is a LSP spec', () => {
       return cy
         .goToLine(lineNumber)
         .getLineByNumber(lineNumber)
-        .should('not.have.class', '.squiggly-error')
+        .should('not.have.class', Theia.editorError)
         .getLineByNumber(lineNumber)
-        .should('not.have.class', '.squiggly-warning');
+        .should('not.have.class', Theia.editorWarn);
     }
 
     function expectErrors(lineNumber) {

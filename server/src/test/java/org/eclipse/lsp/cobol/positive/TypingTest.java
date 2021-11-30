@@ -23,12 +23,10 @@ import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * This test checks that the files in the positive test set don't produce any {@link
@@ -45,64 +43,70 @@ class TypingTest extends FileBasedTest {
   void typingTest() {
     if (!Boolean.TRUE.toString().equals(TEST_MODE)) return;
     List<CobolText> textsToTest = getTextsToTest();
-    AtomicInteger counter = new AtomicInteger();
     final int size = textsToTest.size();
-
-    textsToTest.parallelStream()
-        .filter(Objects::nonNull)
-        .forEach(text -> analyze(text, counter, size));
-  }
-
-  private void analyze(CobolText text, AtomicInteger counter, int size) {
-    String name = text.getFileName();
-    String fullText = text.getFullText();
-
-    LOG.info("Analyzing {}", name);
-
-    final long start = System.currentTimeMillis();
-    analyze(name, fullText);
-    final long duration = System.currentTimeMillis() - start;
-
-    LOG.info(
-        "{} analyzed in {}. Progress: {}/{}.",
-        name,
-        DurationFormatUtils.formatDurationHMS(duration),
-        counter.incrementAndGet(),
-        size);
+    for (int i = 0; i < size; i++) {
+      CobolText cobolText = textsToTest.get(i);
+      String name = cobolText.getFileName();
+      LOG.info("Analyzing {}", name);
+      final long start = System.currentTimeMillis();
+      analyze(name, cobolText.getFullText());
+      final long duration = System.currentTimeMillis() - start;
+      LOG.info("{} analyzed in {}. Progress: {}/{}.",
+          name,
+          DurationFormatUtils.formatDurationHMS(duration),
+          i + 1, size);
+    }
   }
 
   private void analyze(String name, String fullText) {
-    String accumulator = "";
-    ExecutorService es = Executors.newSingleThreadExecutor();
-    SimpleTimeLimiter timeLimiter = SimpleTimeLimiter.create(es);
-    try {
-      for (char c : fullText.toCharArray()) {
-        accumulator += c;
-        UseCaseRun useCaseRun = new UseCaseRun(name, accumulator, getCopybooks());
-        if (c != ' ') timeLimiter.callWithTimeout(useCaseRun, 30, TimeUnit.SECONDS);
-      }
-    } catch (Exception e) {
-      LOG.error("Text that produced the error:\n{}", accumulator, e);
-    } finally {
-      es.shutdown();
-    }
+    AtomicInteger position = new AtomicInteger();
+    ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(1);
+    int textSize = fullText.length();
+    scheduled.scheduleAtFixedRate(() -> {
+      int done = position.get();
+      String percents = String.format("%.2f", (float) 100 * done / textSize);
+      LOG.info("{}% in work. Position {} of {}", percents, done, textSize);
+    }, 10, 10, TimeUnit.MINUTES);
+    ForkJoinPool.commonPool().invokeAll(
+        IntStream.rangeClosed(0, ForkJoinPool.commonPool().getParallelism())
+            .mapToObj(i -> new UseCaseRun(name, fullText, position))
+            .collect(Collectors.toList())
+    );
+    scheduled.shutdown();
   }
 
   private final class UseCaseRun implements Callable<Void> {
-    private final String fileName;
-    private final String text;
-    private final List<CobolText> copybooks;
+    private final String name;
+    private final String fullText;
+    private final AtomicInteger position;
 
-    private UseCaseRun(String fileName, String text, List<CobolText> copybooks) {
-      this.fileName = fileName;
-      this.text = text;
-      this.copybooks = copybooks;
+    UseCaseRun(String name, String fullText, AtomicInteger position) {
+      this.name = name;
+      this.fullText = fullText;
+      this.position = position;
     }
 
     @Override
-    public Void call() {
-      UseCaseUtils.analyzeForErrors(
-          UseCase.builder().fileName(fileName).text(text).copybooks(getCopybooks()).build());
+    public Void call() throws Exception {
+      SimpleTimeLimiter timeLimiter = SimpleTimeLimiter.create(ForkJoinPool.commonPool());
+      for (int currentPos = position.incrementAndGet();
+           currentPos <= fullText.length();
+           currentPos = position.incrementAndGet()) {
+        if (fullText.charAt(currentPos - 1) == ' ') continue;
+        String text = fullText.substring(0, currentPos);
+        try {
+          timeLimiter.callWithTimeout(() -> {
+            UseCaseUtils.analyzeForErrors(UseCase.builder()
+                .text(text)
+                .fileName(name)
+                .copybooks(getCopybooks())
+                .build());
+            return null;
+          }, 30, TimeUnit.SECONDS);
+        } catch (Exception e) {
+          LOG.error("Text that produced the error:\n{}", text, e);
+        }
+      }
       return null;
     }
   }

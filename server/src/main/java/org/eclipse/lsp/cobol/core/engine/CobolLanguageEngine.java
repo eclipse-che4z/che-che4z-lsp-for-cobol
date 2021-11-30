@@ -135,7 +135,6 @@ public class CobolLanguageEngine {
     timingBuilder.getVisitorTimer().start();
     CobolVisitor visitor =
         new CobolVisitor(
-            documentUri,
             extendedDocument.getCopybooks(),
             tokens,
             positionMapping,

@@ -559,7 +559,12 @@ dataDivision
    ;
 
 dataDivisionSection
-   : fileSection | workingStorageSection | linkageSection | localStorageSection | schemaSection | mapSection | execSqlStatementInDataDivision
+   : fileSection | workingStorageSection | linkageSection | localStorageSection | schemaSection | mapSection
+   | execSqlStatementInDataDivision | externalSection
+   ;
+
+externalSection
+   : externalNodeHook
    ;
 
 // -- file section ----------------------------------
@@ -700,6 +705,7 @@ dataDescriptionEntry
    | dataDescriptionEntryFormat2
    | dataDescriptionEntryFormat1Level77
    | dataDescriptionEntryFormat3
+   | externalDescriptionEntry
    ;
 
 dataDescriptionEntryFormat1
@@ -726,6 +732,10 @@ dataDescriptionEntryFormat1Level77
 
 dataDescriptionEntryFormat3
    : LEVEL_NUMBER_88 entryName? dataValueClause DOT_FS
+   ;
+
+externalDescriptionEntry
+   : externalNodeHook
    ;
 
 entryName
@@ -958,7 +968,7 @@ statement
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
     serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | unstringStatement | writeStatement | xmlStatement
+    terminateStatement | unstringStatement | writeStatement | xmlStatement | externalStatement
    ;
 
 idmsStatements
@@ -994,6 +1004,10 @@ writeTransactionStatement
     : WRITE TRANSACTION daf_task_name
         (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 4, 2048);} integerLiteral))?
         (TO ({validateLength(_input.LT(1).getText(), "dbu", 19);} (cobolWord | integerLiteral)))?
+    ;
+
+externalStatement
+    : externalNodeHook
     ;
 
 // abend code statement
@@ -3047,6 +3061,11 @@ idms_table_name
 daf_task_name
     :{validateExactLength(_input.LT(1).getText(), "task name", 4); validateAlphaNumericPattern(_input.LT(1).getText(), "task name");}
         (cobolWord | integerLiteral)
+    ;
+
+// external node
+externalNodeHook
+    : EXTERNAL_NODE_HOOK IDENTIFIER integerLiteral
     ;
 
 // identifier ----------------------------------
