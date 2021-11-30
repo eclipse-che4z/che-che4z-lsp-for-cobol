@@ -990,6 +990,22 @@ idmsOnClause
     : ON generalIdentifier
     ;
 
+// DAF DaCo Statements
+
+dafStatements
+    : readTransactionStatement | writeTransactionStatement
+    ;
+
+readTransactionStatement
+    : READ TRANSACTION daf_task_name?
+    ;
+
+writeTransactionStatement
+    : WRITE TRANSACTION daf_task_name
+        (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 4, 2048);} integerLiteral))?
+        (TO ({validateLength(_input.LT(1).getText(), "dbu", 19);} (cobolWord | integerLiteral)))?
+    ;
+
 externalStatement
     : externalNodeHook
     ;
@@ -3073,6 +3089,13 @@ idms_subschema_name
 idms_table_name
     : {validateLength(_input.LT(1).getText().substring(1, _input.LT(1).getText().length() -1),
            "table name", 8);} literal
+    ;
+
+// DAF DaCo Identifiers
+
+daf_task_name
+    :{validateExactLength(_input.LT(1).getText(), "task name", 4); validateAlphaNumericPattern(_input.LT(1).getText(), "task name");}
+        (cobolWord | integerLiteral)
     ;
 
 // external node
