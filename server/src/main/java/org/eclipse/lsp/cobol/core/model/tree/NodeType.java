@@ -48,5 +48,6 @@ public enum NodeType {
   CODE_BLOCK_PARENT,
   COPY,
   DIVISION,
-  LITERAL
+  LITERAL,
+  COPY_DEFINITION_NODE
 }

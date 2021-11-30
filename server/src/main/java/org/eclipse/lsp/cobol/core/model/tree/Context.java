@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import org.eclipse.lsp4j.Location;
+
 import java.util.List;
 
 /**
@@ -23,14 +25,14 @@ public interface Context {
   /**
    * Get structure definitions.
    *
-   * @return the list of tree nodes
+   * @return the list of location for the definition
    */
-  List<? extends Node> getDefinitions();
+  List<Location> getDefinitions();
 
   /**
    * Get structure usages.
    *
-   * @return the list of tree nodes
+   * @return the list of locations for the usages
    */
-  List<? extends Node> getUsages();
+  List<Location> getUsages();
 }

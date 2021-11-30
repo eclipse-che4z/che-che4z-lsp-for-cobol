@@ -125,7 +125,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return retrieveRangeLocality(ctx, positions)
         .map(
             locality -> {
-              Node rootNode = new RootNode(locality);
+              Node rootNode = new RootNode(locality, copybooks);
               visitChildren(ctx).forEach(rootNode::addChild);
               addCopyNodes(rootNode, copybooks.getUsages());
               return ImmutableList.of(rootNode);

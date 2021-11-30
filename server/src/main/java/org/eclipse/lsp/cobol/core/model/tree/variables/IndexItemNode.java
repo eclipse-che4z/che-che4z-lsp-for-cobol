@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp4j.Location;
 
 import java.util.List;
 
@@ -29,13 +29,14 @@ import java.util.List;
 @Getter
 @ToString(callSuper = true)
 public class IndexItemNode extends VariableNode {
-  protected IndexItemNode(Locality location, String name, boolean global) {
-    super(location, name, VariableType.INDEX_ITEM, global);
+
+  protected IndexItemNode(Locality locality, String name, boolean global) {
+    super(locality, name, VariableType.INDEX_ITEM, global);
   }
 
   @Override
-  public List<Node> getDefinitions() {
-    return ImmutableList.of(this);
+  public List<Location> getDefinitions() {
+    return ImmutableList.of(getLocality().toLocation());
   }
 
   @Override
