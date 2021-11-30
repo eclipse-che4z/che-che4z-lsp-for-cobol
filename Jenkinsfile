@@ -163,6 +163,7 @@ pipeline {
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
+                                sh 'npm set-script postinstall ""'
                                 sh 'npm ci'
                             }
                         }
