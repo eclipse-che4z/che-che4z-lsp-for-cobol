@@ -163,8 +163,7 @@ pipeline {
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
-                                sh 'npm config set ignore-scripts true  '
-                                sh 'npm ci'
+                                sh 'npm ci --ignore-scripts  && (cd ./node_modules/typescript && npm ci)'
                             }
                         }
                     }
