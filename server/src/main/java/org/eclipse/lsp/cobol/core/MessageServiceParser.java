@@ -139,6 +139,18 @@ public abstract class MessageServiceParser extends Parser {
     }
   }
 
+  /**
+   * Validate string value for starts with substrings
+   *
+   * @param input string to check
+   * @param startsWith arrays of allowed starting string values for Input parameter
+   */
+  protected void validateStartsWith(String input, String... startsWith) {
+    if (input != null && !checkStartsWith(input, startsWith)) {
+      notifyError("parsers.startsWith", String.join(" or ", startsWith));
+    }
+  }
+
   private String getMessageForParser(String messageKey, String... parameters) {
     return ((CobolErrorStrategy) this.getErrorHandler())
         .getMessageService()
@@ -153,5 +165,13 @@ public abstract class MessageServiceParser extends Parser {
       parsedValue = null;
     }
     return parsedValue;
+  }
+
+  private Boolean checkStartsWith(String input, String[] startsWith) {
+    for (String item : startsWith) {
+      if (input.startsWith(item))
+        return true;
+    }
+    return false;
   }
 }
