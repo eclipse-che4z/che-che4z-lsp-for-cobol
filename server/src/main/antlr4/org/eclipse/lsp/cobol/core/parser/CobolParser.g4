@@ -988,10 +988,14 @@ idmsOnClause
     : ON generalIdentifier
     ;
 
+externalStatement
+    : externalNodeHook
+    ;
+
 // DAF DaCo Statements
 
 dafStatements
-    : readTransactionStatement | writeTransactionStatement
+    : readTransactionStatement | writeTransactionStatement | writeReportStatement
     ;
 
 readTransactionStatement
@@ -1002,6 +1006,27 @@ writeTransactionStatement
     : WRITE TRANSACTION daf_task_name
         (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 4, 2048);} integerLiteral))?
         (TO ({validateLength(_input.LT(1).getText(), "dbu", 19);} (cobolWord | integerLiteral)))?
+    ;
+
+writeReportStatement
+    : writeReportStatementWithName | endWriteReportStatement | autoWriteReportStatement
+    ;
+
+writeReportStatementWithName
+    : WRITE REPORT daf_report_name
+        FROM qualifiedDataName
+        (TO qualifiedDataName)?
+        (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 80, 200);} integerLiteral))?
+        (AFTER ((integerLiteral LINES) | PAGE | qualifiedDataName))?
+    ;
+
+endWriteReportStatement
+    : WRITE REPORT daf_report_name ENDRPT
+    ;
+
+autoWriteReportStatement
+    : WRITE REPORT AUTO qualifiedDataName
+        (END qualifiedDataName)?
     ;
 
 // abend code statement
@@ -3054,11 +3079,26 @@ idms_table_name
            "table name", 8);} literal
     ;
 
+// external node
+externalNodeHook
+    : EXTERNAL_NODE_HOOK IDENTIFIER integerLiteral
+    ;
+
 // DAF DaCo Identifiers
 
 daf_task_name
-    :{validateExactLength(_input.LT(1).getText(), "task name", 4); validateAlphaNumericPattern(_input.LT(1).getText(), "task name");}
+    :{validateExactLength(_input.LT(1).getText(), "task name", 4);
+      validateAlphaNumericPattern(_input.LT(1).getText(), "task name");
+     }
         (cobolWord | integerLiteral)
+    ;
+
+daf_report_name
+    :{validateExactLength(_input.LT(1).getText(), "report name", 5);
+      validateAlphaNumericPattern(_input.LT(1).getText(), "report name");
+      validateStartsWith(_input.LT(1).getText(), "R", "T");
+      }
+        (cobolWord)
     ;
 
 // identifier ----------------------------------
