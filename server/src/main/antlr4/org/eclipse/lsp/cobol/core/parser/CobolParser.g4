@@ -998,6 +998,7 @@ externalStatement
 
 dafStatements
     : readTransactionStatement | writeTransactionStatement | writeReportStatement
+    | openPacketStatement
     ;
 
 readTransactionStatement
@@ -1028,6 +1029,15 @@ autoWriteReportStatement
     : WRITE REPORT AUTO qualifiedDataName
         (END qualifiedDataName)?
     ;
+
+openPacketStatement
+    : OPEN PACKET daf_task_name
+           FOR (qualifiedDataName | ({validateExactLength(_input.LT(1).getText(), "receiver packet", 4);} cobolWord))
+           (SORT qualifiedDataName)?
+           (VERSION (qualifiedDataName | integerLiteral))?
+    ;
+
+// End of DaCo Statements
 
 // abend code statement
 
