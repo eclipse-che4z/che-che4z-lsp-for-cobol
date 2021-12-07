@@ -38,8 +38,7 @@ jest.mock("vscode-languageclient", () => ({
     LanguageClient: jest.fn(),
 }));
 
-const copyBooksDownloader: CopybookDownloadService =
-    new CopybookDownloadService(new CopybooksPathGenerator());
+const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService(new CopybooksPathGenerator());
 const middleware: Middleware = new Middleware(new CopybookURI(), copyBooksDownloader);
 let languageClientService: LanguageClientService;
 

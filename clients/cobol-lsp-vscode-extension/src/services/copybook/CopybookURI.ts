@@ -14,6 +14,8 @@
 import * as vscode from "vscode";
 import { C4Z_FOLDER, COPYBOOK_EXT_ARRAY, COPYBOOKS_FOLDER, PATHS_LOCAL_KEY, PATHS_ZOWE, SETTINGS_CPY_SECTION } from "../../constants";
 import { searchInWorkspace } from "../util/FSUtils";
+import { ProfileUtils } from "../util/ProfileUtils";
+
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
@@ -38,7 +40,7 @@ export class CopybookURI {
         // check in subfolders under .copybooks (copybook downloaded from MF)
         if (!result) {
             result = searchInWorkspace(copybookName,
-                this.createPathForCopybookDownloaded(vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles")),
+                this.createPathForCopybookDownloaded(ProfileUtils.getProfileNameForCopybook(cobolProgramName)),
                 COPYBOOK_EXT_ARRAY);
         }
         return result || "";

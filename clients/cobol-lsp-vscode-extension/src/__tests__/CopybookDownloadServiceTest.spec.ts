@@ -33,6 +33,7 @@ import {
     createDatasetPath,
 } from "../services/copybook/CopybooksPathGenerator";
 import { CopybookProfile } from "../services/copybook/DownloadQueue";
+import { ProfileUtils } from "../services/util/ProfileUtils";
 
 const profile = "zoweProfile";
 const wrongCredProfile = "wrongCredProfile";
@@ -175,39 +176,35 @@ describe("Test downloadCopybook user interaction", () => {
     });
 
     test("check profile not found", async () => {
+        ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(undefined);
         await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"]);
         expect(vscode.window.showErrorMessage).not.toBeCalled();
         expect(queuePush).not.toBeCalled();
     });
 
     test("check profile not found with user interaction", async () => {
+        ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(undefined);
         await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
         expect(vscode.window.showErrorMessage).toBeCalledWith(PROCESS_DOWNLOAD_ERROR_MSG + "copybook", anything());
         expect(queuePush).not.toBeCalled();
     });
 
     test("check good path", async () => {
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue("profile"),
-        });
+        ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue("profile");
         await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"]);
         expect(vscode.window.showErrorMessage).not.toBeCalled();
         expect(queuePush).toBeCalledWith("copybook", "profile", true);
     });
 
     test("check locked profile", async () => {
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue(wrongCredProfile),
-        });
+        ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(wrongCredProfile);
         await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"]);
         expect(vscode.window.showErrorMessage).not.toBeCalled();
         expect(queuePush).not.toBeCalled();
     });
 
     test("check locked profile and user kept it locked", async () => {
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue(wrongCredProfile),
-        });
+        ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(wrongCredProfile);
         await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
         expect(vscode.window.showErrorMessage).toBeCalledWith(downloadQueueLockedErrorMsg, anything());
         expect(queuePush).not.toBeCalled();
@@ -215,9 +212,7 @@ describe("Test downloadCopybook user interaction", () => {
     });
 
     test("queue locked and user unlocked it", async () => {
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue(wrongCredProfile),
-        });
+        ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(wrongCredProfile);
         vscode.window.showErrorMessage = jest.fn().mockResolvedValue(UNLOCK_DOWNLOAD_QUEUE_MSG);
         await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
         expect(vscode.window.showErrorMessage).toBeCalledWith(downloadQueueLockedErrorMsg, anything());

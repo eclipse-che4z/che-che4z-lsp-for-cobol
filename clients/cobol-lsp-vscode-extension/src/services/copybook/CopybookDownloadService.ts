@@ -15,6 +15,7 @@
 import { IZoweLogger, MessageSeverityEnum } from "@zowe/zowe-explorer-api/lib/logger";
 import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
 import * as fs from "fs";
+import { homedir } from "os";
 import * as Path from "path";
 import * as vscode from "vscode";
 import {
@@ -24,9 +25,12 @@ import {
     PROFILE_NAME_PLACEHOLDER, SETTINGS_CPY_SECTION, UNLOCK_DOWNLOAD_QUEUE_MSG,
 } from "../../constants";
 import { TelemetryService } from "../reporter/TelemetryService";
+import { ProfileUtils } from "../util/ProfileUtils";
+// tslint:disable-next-line:max-line-length
 import { checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath } from "./CopybooksPathGenerator";
 import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
 
+const experimentTag = "experiment-tag";
 export class CopybookDownloadService implements vscode.Disposable {
     private static async showQueueLockedDialog(profileName: string): Promise<boolean> {
         const action = await vscode.window.showErrorMessage(
@@ -58,7 +62,7 @@ export class CopybookDownloadService implements vscode.Disposable {
 
     private queue: DownloadQueue = new DownloadQueue();
     private lockedProfile: Set<string> = new Set();
-    private CobolLSzoweLogger = new IZoweLogger("ZOWE Explorer", Path.join(__dirname, "..", "..", ".."));
+    private CobolLSzoweLogger = new IZoweLogger("ZOWE Explorer", `${homedir()}/LSPCobol/logs`);
 
     public constructor(
         private pathGenerator: CopybooksPathGenerator) {
@@ -72,11 +76,12 @@ export class CopybookDownloadService implements vscode.Disposable {
      * @param copybookNames list of names of the copybooks required by the LSP server
      * @param quiet flag described that interaction with a user is not allowed
      */
-    public async downloadCopybooks(cobolFileName: string, copybookNames: string[], quiet: boolean = true): Promise<void> {
+    public async downloadCopybooks(cobolFileName: string, copybookNames: string[], quiet: boolean = true)
+        : Promise<void> {
         if (!checkWorkspace()) {
             return;
         }
-        const profile: string = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles");
+        const profile = ProfileUtils.getProfileNameForCopybook(cobolFileName);
         if (!profile) {
             if (!quiet) {
                 CopybookDownloadService.createErrorMessageForCopybooks(new Set<string>(copybookNames));
@@ -122,7 +127,10 @@ export class CopybookDownloadService implements vscode.Disposable {
                     }
 
                     if (this.queue.length === 0) {
-                        TelemetryService.registerEvent("Download copybooks from MF", ["copybook", "COBOL", "experiment-tag"], "total time to search copybooks on MF", new Map().set("time elapsed", TelemetryService.calculateTimeElapsed(startTime, Date.now())));
+                        TelemetryService.registerEvent("Download copybooks from MF", ["copybook",
+                            "COBOL", experimentTag], "total time to search copybooks on MF",
+                            new Map().set("time elapsed",
+                                TelemetryService.calculateTimeElapsed(startTime, Date.now())));
                         startTime = null;
                     }
                 });
@@ -152,9 +160,9 @@ export class CopybookDownloadService implements vscode.Disposable {
                 errorMessage = INVALID_CREDENTIALS_ERROR_MSG.replace(PROFILE_NAME_PLACEHOLDER, element.profile);
                 this.lockedProfile.add(element.profile);
                 this.queue.clean();
-                TelemetryService.registerEvent("invalidCredentials", ["copybook", "COBOL", "experiment-tag"], "Zowe credentials is not valid");
+                TelemetryService.registerEvent("invalidCredentials", ["copybook", "COBOL", experimentTag], "Zowe credentials is not valid");
             }
-            TelemetryService.registerExceptionEvent(undefined, errorMessage, ["copybook", "COBOL", "experiment-tag"], "There is an issue with zowe api layer");
+            TelemetryService.registerExceptionEvent(undefined, errorMessage, ["copybook", "COBOL", experimentTag], "There is an issue with zowe api layer");
             if (CopybookDownloadService.needsUserNotification(toDownload)) {
                 vscode.window.showErrorMessage(errorMessage);
             }
@@ -206,8 +214,10 @@ export class CopybookDownloadService implements vscode.Disposable {
         let members: string[] = [];
         try {
             const zoweExplorerApi = ZoweVsCodeExtension.getZoweExplorerApi();
-            const profileName: string = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles");
-            const loadedProfile = zoweExplorerApi.getExplorerExtenderApi().getProfilesCache().loadNamedProfile(profileName);
+            const loadedProfile = zoweExplorerApi
+                .getExplorerExtenderApi()
+                .getProfilesCache()
+                .loadNamedProfile(copybookProfile.profile);
             const response = await zoweExplorerApi.getMvsApi(loadedProfile).allMembers(dataset);
             members = response.apiResponse.items.map(el => el.member);
         } catch (error) {
@@ -232,7 +242,11 @@ export class CopybookDownloadService implements vscode.Disposable {
         if (!fs.existsSync(copybookPath)) {
             try {
                 const zoweExplorerApi = ZoweVsCodeExtension.getZoweExplorerApi();
-                const loadedProfile = zoweExplorerApi.getExplorerExtenderApi().getProfilesCache().loadNamedProfile(profileName);
+                const loadedProfile = zoweExplorerApi
+                    .getExplorerExtenderApi()
+                    .getProfilesCache()
+                    .loadNamedProfile(profileName);
+
                 await zoweExplorerApi.getMvsApi(loadedProfile).getContents(`${dataset}(${copybook})`, {
                     encoding: loadedProfile.profile.encoding,
                     file: Path.join(createDatasetPath(profileName, dataset), copybook),

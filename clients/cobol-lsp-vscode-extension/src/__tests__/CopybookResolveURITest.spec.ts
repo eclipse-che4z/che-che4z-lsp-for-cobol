@@ -17,6 +17,7 @@ import * as vscode from "vscode";
 import { COPYBOOK_EXT_ARRAY } from "../constants";
 import { CopybookURI } from "../services/copybook/CopybookURI";
 import * as fsUtils from "../services/util/FSUtils";
+import { ProfileUtils } from "../services/util/ProfileUtils";
 import { SettingsUtils } from "../services/util/SettingsUtils";
 
 const copybookURI: CopybookURI = new CopybookURI();
@@ -137,6 +138,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     });
     test("With no settings provided, two search strategies are applied and function return an empty string", async () => {
         provideMockValueForLocalAndDSN("", "");
+        ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(undefined);
         const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
         expect(uri).toBe("");
         expect(spySearchInWorkspace).toBeCalledTimes(2);
