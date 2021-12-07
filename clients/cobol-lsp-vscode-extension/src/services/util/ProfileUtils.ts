@@ -1,7 +1,7 @@
 import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
 import * as path from "path";
 import * as vscode from "vscode";
-import { COBOL_CBL_EXT, COBOL_COB_EXT, COBOL_COBOL_EXT, SETTINGS_CPY_SECTION } from "../../constants";
+import { SETTINGS_CPY_SECTION } from "../../constants";
 
 export class ProfileUtils {
     public static getProfileNameForCopybook(cobolFileName: string): (string | undefined) {
@@ -20,24 +20,15 @@ export class ProfileUtils {
 
     private static getProfileFromDocument(programName: string, availableProfiles: string[]): (string | undefined) {
         for (const doc of vscode.workspace.textDocuments) {
-            const docPath = doc.fileName;
-            if (!ProfileUtils.isCobolProgram(docPath)) {
-                continue;
-            }
-            const openName = path.basename(docPath);
+            const openName = path.basename(doc.fileName);
             if (unescape(programName) === openName) {
-                const profile = ProfileUtils.tryGetProfileFromDocumentPath(docPath, availableProfiles);
+                const profile = ProfileUtils.tryGetProfileFromDocumentPath(doc.fileName, availableProfiles);
                 if (profile) {
                     return profile;
                 }
             }
         }
         return undefined;
-    }
-
-    private static isCobolProgram(fsPath: string) {
-        const ext = path.extname(fsPath).toLocaleUpperCase();
-        return [COBOL_CBL_EXT, COBOL_COB_EXT, COBOL_COBOL_EXT].includes(ext);
     }
 
     private static tryGetProfileFromDocumentPath(docPath: string, availableProfiles: string[]): (string | undefined) {

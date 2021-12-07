@@ -245,7 +245,6 @@ export class CopybookDownloadService implements vscode.Disposable {
                     .getExplorerExtenderApi()
                     .getProfilesCache()
                     .loadNamedProfile(profileName);
-
                 await zoweExplorerApi.getMvsApi(loadedProfile).getContents(`${dataset}(${copybook})`, {
                     encoding: loadedProfile.profile.encoding,
                     file: Path.join(createDatasetPath(profileName, dataset), copybook),
