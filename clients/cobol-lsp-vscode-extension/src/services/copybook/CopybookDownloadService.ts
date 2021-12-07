@@ -25,8 +25,7 @@ import {
     PROFILE_NAME_PLACEHOLDER, SETTINGS_CPY_SECTION, UNLOCK_DOWNLOAD_QUEUE_MSG,
 } from "../../constants";
 import { TelemetryService } from "../reporter/TelemetryService";
-import { ProfileUtils } from "../util/ProfileUtils";
-// tslint:disable-next-line:max-line-length
+import {ProfileUtils} from "../util/ProfileUtils";
 import { checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath } from "./CopybooksPathGenerator";
 import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
 

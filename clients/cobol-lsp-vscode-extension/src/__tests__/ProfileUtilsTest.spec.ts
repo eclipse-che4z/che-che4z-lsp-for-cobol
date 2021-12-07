@@ -13,6 +13,7 @@
  */
 
 import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
+import * as path from "path";
 import * as vscode from "vscode";
 import { ProfileUtils } from "../services/util/ProfileUtils";
 
@@ -34,20 +35,22 @@ const getZoweExplorerMock = () => {
 };
 
 describe("Test profile Utils", () => {
+    const programName = "COBOLFILE.cbl";
+    const profile = "profile";
     it("checks that profile is fetched from the file path as 1st strategy", () => {
         ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
         (vscode.workspace.textDocuments as any) = [];
-        (vscode.workspace.textDocuments as any).push({ fileName: ".\\ABC\\XYZ\\profile\\COBOLFILE.cbl" } as any);
-        expect(ProfileUtils.getProfileNameForCopybook("COBOLFILE.cbl")).toBe("profile");
+        (vscode.workspace.textDocuments as any).push({ fileName: path.join(profile, programName) } as any);
+        expect(ProfileUtils.getProfileNameForCopybook(programName)).toBe(profile);
     });
 
     it("checks that profile is fetched from the settings if not a ZE downloaded file", () => {
         ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
         (vscode.workspace.textDocuments as any) = [];
-        (vscode.workspace.textDocuments as any).push({ fileName: ".\\ABC\\XYZ\\profileX\\COBOLFILE.cbl" } as any);
+        (vscode.workspace.textDocuments as any).push({ fileName: path.join("profileX", programName) } as any);
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue("profile2"),
         });
-        expect(ProfileUtils.getProfileNameForCopybook("COBOLFILE.cbl")).toBe("profile2");
+        expect(ProfileUtils.getProfileNameForCopybook(programName)).toBe("profile2");
     });
 });
