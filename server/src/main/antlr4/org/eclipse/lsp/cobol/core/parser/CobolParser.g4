@@ -1169,7 +1169,11 @@ bindDbNodeName
 // call statement
 
 callStatement
-   : CALL (generalIdentifier | literal) callUsingPhrase? callGivingPhrase? onOverflowPhrase? onExceptionClause? notOnExceptionClause? END_CALL?
+   : CALL (generalIdentifier | constantName) callUsingPhrase? callGivingPhrase? onOverflowPhrase? onExceptionClause? notOnExceptionClause? END_CALL?
+   ;
+
+constantName
+   : literal
    ;
 
 callUsingPhrase

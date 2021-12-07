@@ -74,8 +74,8 @@ public class ElementOccurrences implements Occurrences {
             .map(ElementOccurrences::constructElementsExcludingImplicits);
         return fromTree.orElseGet(() -> Stream.<Supplier<Optional<Element>>>of(
                 () -> findElementByPosition(result.getParagraphDefinitions(), result.getParagraphUsages(), position),
-                () -> findElementByPosition(result.getSectionDefinitions(), result.getSectionUsages(), position),
-                () -> findElementByPosition(result.getSubroutineDefinitions(), result.getSubroutineUsages(), position))
+                () -> findElementByPosition(result.getSectionDefinitions(), result.getSectionUsages(), position))
+
             .map(Supplier::get)
             .filter(Optional::isPresent)
             .map(Optional::get)
