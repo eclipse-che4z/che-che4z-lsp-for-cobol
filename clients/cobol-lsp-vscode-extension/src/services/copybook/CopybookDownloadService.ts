@@ -22,7 +22,7 @@ import {
     DOWNLOAD_QUEUE_LOCKED_ERROR_MSG,
     INVALID_CREDENTIALS_ERROR_MSG,
     PROCESS_DOWNLOAD_ERROR_MSG,
-    PROFILE_NAME_PLACEHOLDER, UNLOCK_DOWNLOAD_QUEUE_MSG,
+    PROFILE_NAME_PLACEHOLDER, SETTINGS_CPY_SECTION, UNLOCK_DOWNLOAD_QUEUE_MSG,
 } from "../../constants";
 import { TelemetryService } from "../reporter/TelemetryService";
 import {ProfileUtils} from "../util/ProfileUtils";
@@ -81,7 +81,6 @@ export class CopybookDownloadService implements vscode.Disposable {
             return;
         }
         const profile = ProfileUtils.getProfileNameForCopybook(cobolFileName);
-
         if (!profile) {
             if (!quiet) {
                 CopybookDownloadService.createErrorMessageForCopybooks(new Set<string>(copybookNames));
@@ -246,6 +245,7 @@ export class CopybookDownloadService implements vscode.Disposable {
                     .getExplorerExtenderApi()
                     .getProfilesCache()
                     .loadNamedProfile(profileName);
+
                 await zoweExplorerApi.getMvsApi(loadedProfile).getContents(`${dataset}(${copybook})`, {
                     encoding: loadedProfile.profile.encoding,
                     file: Path.join(createDatasetPath(profileName, dataset), copybook),
