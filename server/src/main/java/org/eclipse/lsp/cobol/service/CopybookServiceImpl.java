@@ -14,8 +14,10 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
@@ -120,24 +122,23 @@ public class CopybookServiceImpl implements CopybookService {
       @NonNull String documentUri,
       @NonNull CopybookConfig copybookConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    return tryResolvePredefinedCopybook(copybookName)
-        .map(it -> it.uriForBackend(copybookConfig.getSqlBackend()))
-        .map(
-            uri ->
-                new CopybookModel(
-                    copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri)))
+    final String cobolFileName = files.getNameFromURI(documentUri);
+
+    return tryResolveCopybookFromWorkspace(copybookName, cobolFileName)
         .orElseGet(
-            () -> tryResolveCopybookFromWorkspace(copybookName, files.getNameFromURI(documentUri)));
+            () ->
+                tryResolvePredefinedCopybook(copybookName, copybookConfig)
+                    .orElseGet(() -> registerForDownloading(copybookName, cobolFileName)));
   }
 
-  private CopybookModel tryResolveCopybookFromWorkspace(String copybookName, String cobolFileName) {
-    return resolveLocalCopybook(copybookName, cobolFileName)
-        .map(uri -> loadCopybook(uri, copybookName, cobolFileName))
-        .orElseGet(() -> registerForDownloading(copybookName, cobolFileName));
+  private Optional<CopybookModel> tryResolveCopybookFromWorkspace(
+      String copybookName, String cobolFileName) {
+    return resolveCopybookFromWorkspace(copybookName, cobolFileName)
+        .map(uri -> loadCopybook(uri, copybookName, cobolFileName));
   }
 
   @SuppressWarnings("java:S2142")
-  private Optional<String> resolveLocalCopybook(String copybookName, String cobolFileName) {
+  private Optional<String> resolveCopybookFromWorkspace(String copybookName, String cobolFileName) {
     try {
       return SettingsService.getValueAsString(
           settingsService
@@ -146,6 +147,24 @@ public class CopybookServiceImpl implements CopybookService {
     } catch (InterruptedException | ExecutionException e) {
       throw new UncheckedExecutionException(e);
     }
+  }
+
+  /**
+   * Retrieve optional {@link CopybookModel} of the {@link PredefinedCopybooks} for the given name
+   * if it is predefined.
+   *
+   * @param copybookName - the name of copybook to check
+   * @param copybookConfig - configuration for copybook resolution
+   * @return optional model of a predefined copybook if it exists
+   */
+  private Optional<CopybookModel> tryResolvePredefinedCopybook(
+      String copybookName, CopybookConfig copybookConfig) {
+    return Optional.ofNullable(PredefinedCopybooks.forName(copybookName))
+        .map(it -> it.uriForBackend(copybookConfig.getSqlBackend()))
+        .map(
+            uri ->
+                new CopybookModel(
+                    copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri)));
   }
 
   private CopybookModel registerForDownloading(String copybookName, String cobolFileName) {
@@ -161,20 +180,6 @@ public class CopybookServiceImpl implements CopybookService {
     return files.fileExists(file)
         ? new CopybookModel(copybookName, uri, files.getContentByPath(Objects.requireNonNull(file)))
         : registerForDownloading(copybookName, cobolFileName);
-  }
-
-  /**
-   * Retrieve optional {@link PredefinedCopybooks} for the given name. Checks if the copybook name
-   * is implicitly (not an explicit copybook file) defined.
-   *
-   * <p>Application can use SQLCA and SQLDA names to define communication and description areas as
-   * copybooks and both are implicitly defined by either co-processor or pre-processor.
-   *
-   * @param copybookName - the name of copybook to check
-   * @return true if copybook name is one of SQLDA or SQLCA
-   */
-  private Optional<PredefinedCopybooks.Copybook> tryResolvePredefinedCopybook(String copybookName) {
-    return Optional.ofNullable(PredefinedCopybooks.forName(copybookName));
   }
 
   private String readContentForImplicitCopybook(String resourcePath) {
@@ -223,6 +228,11 @@ public class CopybookServiceImpl implements CopybookService {
         settingsService.getConfigurations(copybooksToDownload);
       }
     }
+  }
+
+  @VisibleForTesting
+  Map<String, Set<String>> getCopybooksForDownloading() {
+    return ImmutableMap.copyOf(copybooksForDownloading);
   }
 
   private String getUserInteractionType(CopybookProcessingMode copybookProcessingMode) {
