@@ -63,6 +63,8 @@ import static org.eclipse.lsp.cobol.core.CobolParser.*;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
 import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.SubroutineService.IMPLICIT_SUBROUTINE_PATH;
 
 /**
  * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
@@ -83,6 +85,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final SubroutineService subroutineService;
   private final AnalysisConfig analysisConfig;
   private Map<String, FileControlEntryContext> fileControls = null;
+  private final Map<String, SubroutineDefinition> subroutineDefinitionMap = new HashMap<>();
 
   public CobolVisitor(
       @NonNull NamedSubContext copybooks,
@@ -659,21 +662,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitCallStatement(CallStatementContext ctx) {
-    if (ctx.literal() != null) {
-      String subroutineName =
-          PreprocessorStringUtils.trimQuotes(ctx.literal().getText()).toUpperCase();
-      Optional<Locality> locality = getLocality(ctx.literal().getStart());
-      locality.ifPresent(
-          it -> {
-            if (!subroutineService.getUri(subroutineName).isPresent()) {
-              reportSubroutineNotDefined(subroutineName, it);
-            }
-          });
-      locality
-          .map(Locality::toLocation)
-          .ifPresent(location -> subroutineUsages.put(subroutineName, location));
-    }
-    return visitChildren(ctx);
+    return addTreeNode(ctx, SubroutineNode::new);
   }
 
   @Override
@@ -727,6 +716,37 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitProcedureDivisionBody(ProcedureDivisionBodyContext ctx) {
     return addTreeNode(ctx, ProcedureDivisionBodyNode::new);
+  }
+
+  @Override
+  public List<Node> visitConstantName(ConstantNameContext ctx) {
+    String subroutineName = PreprocessorStringUtils.trimQuotes(ctx.getText()).toUpperCase();
+    return getLocality(ctx.getStart())
+        .map(
+            locality -> {
+              if (!subroutineService.getUri(subroutineName).isPresent()) {
+                reportSubroutineNotDefined(subroutineName, locality);
+              }
+              subroutineDefinitionMap.putIfAbsent(
+                  subroutineName,
+                  new SubroutineDefinition(
+                      getSubroutineLocation(
+                              new ImmutablePair<>(
+                                  subroutineName, subroutineService.getUri(subroutineName)))
+                          .stream()
+                          .findFirst()
+                          .orElseGet(
+                              () ->
+                                  new Location(
+                                      PREF_IMPLICIT + IMPLICIT_SUBROUTINE_PATH, new Range())),
+                      subroutineName));
+              SubroutineNameNode usage = new SubroutineNameNode(locality, subroutineName);
+              SubroutineDefinition foundDefinition = subroutineDefinitionMap.get(subroutineName);
+              foundDefinition.addUsages(usage);
+              usage.setDefinition(foundDefinition);
+              return ImmutableList.of((Node) usage);
+            })
+        .orElseGet(ImmutableList::of);
   }
 
   // NOTE: CobolVisitor is not managed by Guice DI, so can't use annotation here.
