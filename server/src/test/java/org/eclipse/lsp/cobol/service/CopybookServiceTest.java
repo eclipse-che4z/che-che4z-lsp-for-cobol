@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
@@ -38,6 +39,7 @@ import static org.eclipse.lsp.cobol.service.SQLBackend.DATACOM_SERVER;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -393,14 +395,46 @@ class CopybookServiceTest {
   }
 
   @Test
-  void testPredefinedCopybooksDoNotTriggerWorkspace() {
+  void testPredefinedCopybooksLoaded() {
     final String copybookName = PredefinedCopybooks.Copybook.SQLCA.name();
     CopybookService copybookService = createCopybookService();
+    when(settingsService.getConfiguration("copybook-resolve", "document", copybookName))
+        .thenReturn(supplyAsync(() -> ImmutableList.of(new JsonPrimitive(""))));
     final CopybookModel model =
         copybookService.resolve(
             copybookName, DOCUMENT_URI, new CopybookConfig(ENABLED, DB2_SERVER));
+
     assertEquals("implicit:///implicitCopybooks/SQLCA_DB2.cpy", model.getUri());
-    verifyZeroInteractions(settingsService);
+    verify(settingsService, times(1))
+        .getConfiguration("copybook-resolve", "document", copybookName);
+    verify(files, times(1)).getNameFromURI(DOCUMENT_URI);
+  }
+
+  @Test
+  void testPredefinedCopybooksResolvedInsteadOfStaticOnes() {
+    final String copybookName = PredefinedCopybooks.Copybook.SQLCA.name();
+    final String copybookUri = "file:///c%3A/workspace/.c4z/.copybooks/" + copybookName + ".cpy";
+
+    when(settingsService.getConfiguration("copybook-resolve", "document", copybookName))
+        .thenReturn(supplyAsync(() -> ImmutableList.of(new JsonPrimitive(copybookUri))));
+    when(files.getPathFromURI(copybookUri)).thenReturn(cpyPath);
+    when(files.fileExists(cpyPath)).thenReturn(true);
+    when(files.getContentByPath(cpyPath)).thenReturn("content");
+
+    CopybookServiceImpl copybookService = createCopybookService();
+    // Assert the copybook was resolved from the workspace
+    final CopybookModel model =
+        copybookService.resolve(
+            copybookName, DOCUMENT_URI, new CopybookConfig(ENABLED, DB2_SERVER));
+
+    // Assert the copybook was resolved from the workspace
+    assertEquals(copybookUri, model.getUri());
+    assertEquals("content", model.getContent());
+    verify(settingsService, times(1))
+        .getConfiguration("copybook-resolve", "document", copybookName);
+
+    // Assert the copybook was not added to the download queue
+    assertTrue(copybookService.getCopybooksForDownloading().isEmpty());
   }
 
   private CopybookServiceImpl createCopybookService() {

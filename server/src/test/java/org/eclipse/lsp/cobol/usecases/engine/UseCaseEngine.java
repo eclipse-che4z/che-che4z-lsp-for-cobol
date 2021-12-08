@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.core.model.tree.SubroutineNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
@@ -42,6 +43,7 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.SUBROUTINE_NAME_NODE;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
 import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
@@ -228,8 +230,9 @@ public class UseCaseEngine {
     assertResult(
         "Subroutine definitions: ",
         expected.getSubroutineDefinitions(),
-        actual.getSubroutineDefinitions());
-    assertResult("Subroutine usage:", expected.getSubroutineUsages(), actual.getSubroutineUsages());
+        extractSubroutineDefinitions(actual));
+    assertResult(
+        "Subroutine usage:", expected.getSubroutineUsages(), extractSubroutineUsages(actual));
   }
 
   private Map<String, List<Location>> extractVariableDefinitions(AnalysisResult result) {
@@ -275,6 +278,48 @@ public class UseCaseEngine {
         .map(Multimap::values)
         .flatMap(Collection::stream)
         .filter(it -> !FILLER_NAME.equals(it.getName()));
+  }
+
+  private Map<String, List<Location>> extractSubroutineDefinitions(AnalysisResult result) {
+    return result
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(SUBROUTINE_NAME_NODE))
+        .map(SubroutineNameNode.class::cast)
+        .filter(it -> !it.getDefinition().getLocation().getUri().startsWith(PREF_IMPLICIT))
+        .collect(groupingBy(SubroutineNameNode::getSubroutineName))
+        .entrySet()
+        .stream()
+        .collect(
+            toMap(
+                Entry::getKey,
+                entry ->
+                    entry.getValue().stream()
+                        .map(SubroutineNameNode::getDefinitions)
+                        .flatMap(List::stream)
+                        .distinct()
+                        .collect(toList())));
+  }
+
+  private static Map<String, List<Location>> extractSubroutineUsages(AnalysisResult result) {
+    return result
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(SUBROUTINE_NAME_NODE))
+        .map(SubroutineNameNode.class::cast)
+        .filter(it -> !it.getUsages().isEmpty())
+        .collect(groupingBy(SubroutineNameNode::getSubroutineName))
+        .entrySet()
+        .stream()
+        .collect(
+            toMap(
+                Entry::getKey,
+                entry ->
+                    entry.getValue().stream()
+                        .map(SubroutineNameNode::getUsages)
+                        .flatMap(List::stream)
+                        .distinct()
+                        .collect(toList())));
   }
 
   private void assertDiagnostics(
