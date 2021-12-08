@@ -20,6 +20,7 @@ package org.eclipse.lsp.cobol.core;
 import com.google.common.annotations.VisibleForTesting;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.TokenStream;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 
 import java.util.regex.Pattern;
@@ -149,6 +150,18 @@ public abstract class MessageServiceParser extends Parser {
     if (input != null && !checkStartsWith(input, startsWith)) {
       notifyError("parsers.startsWith", String.join(" or ", startsWith));
     }
+  }
+
+  /**
+   * Remove quotes from string literal
+   *
+   * @param input string to trim quotes
+   */
+  protected String trimQuotes(String input) {
+    if (input != null) {
+      return PreprocessorStringUtils.trimQuotes(input);
+    }
+    return input;
   }
 
   private String getMessageForParser(String messageKey, String... parameters) {

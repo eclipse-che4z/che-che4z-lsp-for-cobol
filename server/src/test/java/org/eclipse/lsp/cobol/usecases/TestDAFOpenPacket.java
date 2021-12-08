@@ -37,6 +37,7 @@ class TestDAFOpenPacket {
           + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
           + "        PROCEDURE DIVISION. \r\n"
           + "            OPEN PACKET ABCD FOR {$DET001-XW1}. \r\n"
+          + "            OPEN PACKET ABCD FOR 'DEF'. \r\n"
           + "            OPEN PACKET ABCD FOR {$DET001-XW1} SORT {$DET001-XW1}. \r\n"
           + "            OPEN PACKET ABCD FOR {$DET001-XW1} VERSION {$DET001-XW1}. \r\n"
           + "            OPEN PACKET ABCD FOR {$DET001-XW1} VERSION 3. \r\n"
@@ -46,6 +47,7 @@ class TestDAFOpenPacket {
           + "            VERSION 3. \r\n"
           // Negative tests
           + "            OPEN PACKET {A|1} FOR {$DET001-XW1}. \r\n"
+          + "            OPEN PACKET {A|1} FOR {'AS'|5}. \r\n"
           + "            OPEN PACKET {ABCDE|1} FOR {$DET001-XW1}. \r\n"
           + "            OPEN PACKET ABCD FOR {ASD|3}. \r\n"
           + "            OPEN PACKET ABCD FOR {$DET001-XW1} SORT {ASD|3}. \r\n"
@@ -84,6 +86,13 @@ class TestDAFOpenPacket {
         new Diagnostic(
             null,
             "Syntax error on 'FD' expected {'01-49', '66', '77', '88', INTEGERLITERAL, IDENTIFIER}",
+            DiagnosticSeverity.Error,
+            SourceInfoLevels.ERROR.getText()));
+    diagnosticMap.put(
+        "5",
+        new Diagnostic(
+            null,
+            "Exact length of receiver packet must be 3 bytes",
             DiagnosticSeverity.Error,
             SourceInfoLevels.ERROR.getText()));
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), diagnosticMap);

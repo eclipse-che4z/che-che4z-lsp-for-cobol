@@ -1032,7 +1032,8 @@ autoWriteReportStatement
 
 openPacketStatement
     : OPEN PACKET daf_task_name
-           FOR (qualifiedDataName | ({validateExactLength(_input.LT(1).getText(), "receiver packet", 4);} cobolWord))
+           (FOR (qualifiedDataName | {validateExactLength(trimQuotes(_input.LT(1).getText()), "receiver packet", 3);}
+           NONNUMERICLITERAL))
            (SORT qualifiedDataName)?
            (VERSION (qualifiedDataName | integerLiteral))?
     ;
