@@ -46,6 +46,7 @@ class TestDAFOpenPacket {
           + "            OPEN PACKET ABCD FOR {$DET001-XW1} SORT {$DET001-XW1} \r\n"
           + "            VERSION 3. \r\n"
           // Negative tests
+          + "            OPEN PACKET {A|1} FOR {.|6} \r\n"
           + "            OPEN PACKET {A|1} FOR {$DET001-XW1}. \r\n"
           + "            OPEN PACKET {A|1} FOR {'AS'|5}. \r\n"
           + "            OPEN PACKET {ABCDE|1} FOR {$DET001-XW1}. \r\n"
@@ -93,6 +94,13 @@ class TestDAFOpenPacket {
         new Diagnostic(
             null,
             "Exact length of receiver packet must be 3 bytes",
+            DiagnosticSeverity.Error,
+            SourceInfoLevels.ERROR.getText()));
+    diagnosticMap.put(
+        "6",
+        new Diagnostic(
+            null,
+            "Syntax error on '.' expected {NONNUMERICLITERAL, IDENTIFIER}",
             DiagnosticSeverity.Error,
             SourceInfoLevels.ERROR.getText()));
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), diagnosticMap);
