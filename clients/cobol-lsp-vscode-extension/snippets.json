@@ -2149,5 +2149,13 @@
         ],
         "description": "[DaCo] Write Report Auto Statement",
         "scope": "cobol"
+    },
+    "OPEN PACKET": {
+        "prefix": "OPEN PACKET",
+        "body": [
+            "OPEN PACKET ${1:task-name} FOR ${2:receiver-packet} SORT ${3:s} VERSION ${4:v}."
+        ],
+        "description": "[DaCo] Open Packet Statement",
+        "scope": "cobol"
     }
 }
