@@ -15,36 +15,32 @@
 import * as fs from "fs-extra";
 import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
-import {CopybookDownloadService} from "../services/copybook/CopybookDownloadService";
-import {CopybookURI} from "../services/copybook/CopybookURI";
-import {JavaCheck} from "../services/JavaCheck";
+import { CopybookDownloadService } from "../services/copybook/CopybookDownloadService";
+import { CopybooksPathGenerator } from "../services/copybook/CopybooksPathGenerator";
+import { CopybookURI } from "../services/copybook/CopybookURI";
+import { JavaCheck } from "../services/JavaCheck";
 import { LanguageClientService } from "../services/LanguageClientService";
 import { Middleware } from "../services/Middleware";
-import { ProfileService } from "../services/ProfileService";
-import {ZoweApi} from "../services/ZoweApi";
 
 jest.mock("../services/Middleware");
-jest.mock("../services/copybook/CopybookDownloadService");
 jest.mock("../services/copybook/CopybookURI");
-jest.mock("../services/ProfileService");
 jest.mock("vscode", () => ({
     extensions: {
-        getExtension: jest.fn().mockReturnValue({extensionPath: "/test"}),
+        getExtension: jest.fn().mockReturnValue({ extensionPath: "/test" }),
     },
     workspace: {
         getConfiguration: jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue(0),
-        })}}));
+        }),
+    },
+}));
 jest.mock("vscode-languageclient", () => ({
     LanguageClient: jest.fn(),
 }));
 
-const zoweApi: ZoweApi = new ZoweApi();
-const profileService: ProfileService = new ProfileService(zoweApi);
-const copyBooksDownloader: CopybookDownloadService =
-new CopybookDownloadService(zoweApi, null, null);
-const middleware: Middleware = new Middleware(new CopybookURI(profileService), copyBooksDownloader);
-let languageClientService: LanguageClientService ;
+const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService(new CopybooksPathGenerator());
+const middleware: Middleware = new Middleware(new CopybookURI(), copyBooksDownloader);
+let languageClientService: LanguageClientService;
 
 const SERVER_DESC = "LSP extension for COBOL language";
 const SERVER_ID = "COBOL";
@@ -77,11 +73,10 @@ describe("LanguageClientService positive scenario", () => {
     });
 
     test("Test LanguageClientService retrieve analysis passes", async () => {
-        let map: Map<string, vscode.Location[]> = new Map();
         const expectedResult = { programs: [] };
 
-        LanguageClient.prototype.sendRequest = () => Promise.resolve(expectedResult); 
-        LanguageClient.prototype.onReady = () => Promise.resolve(); 
+        LanguageClient.prototype.sendRequest = () => Promise.resolve(expectedResult);
+        LanguageClient.prototype.onReady = () => Promise.resolve();
         expect(await languageClientService.retrieveAnalysis("test", "text")).toBe(expectedResult);
     });
 
@@ -92,12 +87,12 @@ describe("LanguageClientService positive scenario", () => {
         expect(LanguageClient).toHaveBeenCalledWith(SERVER_ID, SERVER_DESC, {
             args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", "/test/server/server.jar", "pipeEnabled"],
             command: "java",
-            options: {stdio: "pipe", detached: false},
+            options: { stdio: "pipe", detached: false },
         }, {
             documentSelector: [SERVER_ID],
             middleware: {
                 workspace: {
-                    configuration : expect.any(Function),
+                    configuration: expect.any(Function),
                 },
             },
         });
@@ -109,11 +104,11 @@ describe("LanguageClientService positive scenario", () => {
         LanguageClient.prototype.start = jest.fn().mockReturnValue(SERVER_STARTED_MSG);
         expect(languageClientService.start()).toBe(SERVER_STARTED_MSG);
         expect(LanguageClient).toHaveBeenLastCalledWith(SERVER_ID, SERVER_DESC,
-        expect.any(Function), {
+            expect.any(Function), {
             documentSelector: [SERVER_ID],
             middleware: {
                 workspace: {
-                    configuration : expect.any(Function),
+                    configuration: expect.any(Function),
                 },
             },
         });

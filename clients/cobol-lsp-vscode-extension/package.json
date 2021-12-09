@@ -48,10 +48,6 @@
                 "title": "Fetch copybook"
             },
             {
-                "command": "cobol-lsp.cpy-manager.change-default-zowe-profile",
-                "title": "Change default Zowe profile"
-            },
-            {
                 "command": "cobol-lsp.cpy-manager.edit-dataset-paths",
                 "title": "Edit dataset paths"
             },
@@ -234,7 +230,7 @@
         "package": "vsce package"
     },
     "dependencies": {
-        "@zowe/imperative": "4.15.1",
+        "@zowe/zowe-explorer-api": "^1.17.0",
         "vscode-extension-telemetry": "0.1.6",
         "vscode-languageclient": "5.2.1"
     },
