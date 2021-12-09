@@ -1,0 +1,153 @@
+/*
+ * Copyright (c) 2021 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Broadcom, Inc. - initial API and implementation
+ */
+
+lexer grammar IdmsLexer;
+
+channels{COMMENTS}
+import TechnicalLexer;
+
+ABEND : A B E N D;
+ABORT : A B O R T;
+ACTIVE : A C T I V E;
+AID : A I D;
+ALARM : A L A R M;
+ALWAYS : A L W A Y S;
+ATTRIBUTE : A T T R I B U T E;
+AUTODISPLAY : A U T O D I S P L A Y;
+BACKPAGE : B A C K P A G E;
+BACKSCAN : B A C K S C A N;
+BIND : B I N D;
+BLINK : B L I N K;
+BLUE : B L U E;
+BRIGHT : B R I G H T;
+BROWSE : B R O W S E;
+BUT : B U T;
+CALC : C A L C;
+CONTENTS : C O N T E N T S;
+COPIES : C O P I E S;
+CORRECT : C O R R E C T;
+DARK : D A R K;
+DATASTREAM : D A T A S T R E A M;
+DBNAME : D B N A M E;
+DBNODE : D B N O D E;
+DB_KEY : D B MINUSCHAR K E Y;
+DC : D C;
+DEQUEUE : D E Q U E U E;
+DEST : D E S T;
+DETECT : D E T E C T;
+DFLD : D F L D;
+DICTNAME : D I C T N A M E;
+DICTNODE : D I C T N O D E;
+DIFFERENT : D I F F E R E N T;
+DUPLICATE : D U P L I C A T E;
+EAU : E A U;
+ECHO: E C H O;
+EDIT: E D I T;
+EIGHTYCR : '8' '0' C R;
+ENDPAGE : E N D P A G E;
+ENDRPT : E N D R P T;
+ENQUEUE : E N Q U E U E;
+EXITS : E X I T S;
+EXTRANEOUS : E X T R A N E O U S;
+FIELD : F I E L D;
+FIELDS : F I E L D S;
+FIND : F I N D;
+FORTYCR : '4' '0' C R;
+GET : G E T;
+GREEN : G R E E N;
+IDENTICAL : I D E N T I C A L;
+IDMS : I D M S;
+IDMS_CONTROL : I D M S MINUSCHAR C O N T R O L;
+IDMS_RECORDS : I D M S MINUSCHAR R E C O R D S;
+IDMS_STATISTICS : I D M S MINUSCHAR S T A T I S T I C S;
+INCREMENTED : I N C R E M E N T E D;
+INTERNAL : I N T E R N A L;
+INQUIRE : I N Q U I R E;
+JOURNAL : J O U R N A L;
+LEVELS : L E V E L S;
+LOADLIB : L O A D L I B;
+LOCATION : L O C A T I O N;
+LOG : L O G;
+LONGTERM : L O N G T E R M;
+MAP : M A P;
+MAPS : M A P S;
+MDT : M D T;
+MEMBERS : M E M B E R S;
+MODIFIED : M O D I F I E D;
+MODIFY : M O D I F Y;
+NEWPAGE : N E W P A G E;
+NOALARM : N O A L A R M;
+NOAUTODISPLAY : N O A U T O D I S P L A Y;
+NOBACKPAGE : N O B A C K P A G E;
+NOBACKSCAN : N O B A C K S C A N;
+NOBLINK : N O B L I N K;
+NOCOLOR : N O C O L O R;
+NODEADLOCK : N O D E A D L O C K;
+NODENAME : N O D E N A M E;
+NOIO : N O I O;
+NOKBD : N O K B D;
+NOLOCK : N O L O C K;
+NOMDT : N O M D T;
+NOPRT : N O P R T;
+NORETURN : N O R E T U R N;
+NORMAL : N O R M A L;
+NORMAL_VIDEO : N O R M A L MINUSCHAR V I D E O;
+NOSPAN : N O S P A N;
+NOTIFICATION: N O T I F I C A T I O N;
+NOTIFY : N O T I F Y;
+NOUNDERSCORE : N O U N D E R S C O R E;
+OBTAIN : O B T A I N;
+OUTIN : O U T I N;
+OWNER : O W N E R;
+PAGE_INFO : P A G E MINUSCHAR I N F O;
+PARMS : P A R M S;
+PERMANENT: P E R M A N E N T;
+PINK : P I N K;
+PRIOR : P R I O R;
+PROTECTED : P R O T E C T E D;
+PROTOCOL : P R O T O C O L;
+RED : R E D;
+REDISPATCH : R E D I S P A T C H;
+REPLY : R E P L Y;
+RESETKBD : R E S E T K B D;
+RESETMDT : R E S E T M D T;
+RETENTION : R E T E N T I O N;
+RETRIEVAL : R E T R I E V A L;
+RETURNKEY : R E T U R N K E Y;
+REVERSE_VIDEO : R E V E R S E MINUSCHAR V I D E O;
+RUN_UNIT : R U N MINUSCHAR U N I T;
+SCHEMA : S C H E M A;
+SCRATCH : S C R A T C H;
+SCREEN : S C R E E N;
+SELECTIVE : S E L E C T I V E;
+SHORT : S H O R T;
+SIXTYFOURCR: '6' '4' C R;
+SPAN : S P A N;
+STARTPAGE: S T A R T P A G E;
+STARTPRT : S T A R T P R T;
+STGID : S T G I D;
+STORE : S T O R E;
+SUBSCHEMA_NAMES : S U B S C H E M A MINUSCHAR N A M E S;
+TIMER : T I M E R;
+TURQUOISE : T U R Q U O I S E;
+UNDERSCORE : U N D E R S C O R E;
+UNFORMATTED : U N F O R M A T T E D;
+UNPROTECTED : U N P R O T E C T E D;
+UPGRADE : U P G R A D E;
+USAGE_MODE : U S A G E MINUSCHAR M O D E;
+VERSION : V E R S I O N;
+WCC: W C C;
+WHITE : W H I T E;
+WITHIN : W I T H I N;
+YELLOW : Y E L L O W;
