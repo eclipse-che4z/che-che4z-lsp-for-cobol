@@ -26,6 +26,7 @@ import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
+import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
@@ -59,13 +60,14 @@ class CobolLanguageEngineTest {
   void testLanguageEngineRun() {
     TextPreprocessor preprocessor = mock(TextPreprocessor.class);
     MessageService mockMessageService = mock(MessageService.class);
+    ErrorMessageHelper mockErrUtil = mock(ErrorMessageHelper.class);
     CobolErrorStrategy cobolErrorStrategy = new CobolErrorStrategy();
     ParseTreeListener treeListener = mock(ParseTreeListener.class);
     cobolErrorStrategy.setMessageService(mockMessageService);
+    cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
             preprocessor,
-            cobolErrorStrategy,
             mockMessageService,
             treeListener,
             mock(SubroutineService.class));

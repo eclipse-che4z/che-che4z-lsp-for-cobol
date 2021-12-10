@@ -20,7 +20,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -34,6 +33,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityFindingUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
+import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.EmbeddedLanguagesListener;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
@@ -62,7 +62,6 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.EMBEDDED_CODE;
 public class CobolLanguageEngine {
 
   private final TextPreprocessor preprocessor;
-  private final DefaultErrorStrategy defaultErrorStrategy;
   private final MessageService messageService;
   private final ParseTreeListener treeListener;
   private final SubroutineService subroutineService;
@@ -71,12 +70,10 @@ public class CobolLanguageEngine {
   @Inject
   public CobolLanguageEngine(
       TextPreprocessor preprocessor,
-      DefaultErrorStrategy defaultErrorStrategy,
       MessageService messageService,
       ParseTreeListener treeListener,
       SubroutineService subroutineService) {
     this.preprocessor = preprocessor;
-    this.defaultErrorStrategy = defaultErrorStrategy;
     this.messageService = messageService;
     this.treeListener = treeListener;
     this.subroutineService = subroutineService;
@@ -117,7 +114,7 @@ public class CobolLanguageEngine {
     CobolParser parser = getCobolParser(tokens);
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
-    parser.setErrorHandler(defaultErrorStrategy);
+    parser.setErrorHandler(new CobolErrorStrategy(messageService));
     parser.addParseListener(treeListener);
 
     CobolParser.StartRuleContext tree = parser.startRule();
@@ -192,7 +189,7 @@ public class CobolLanguageEngine {
   private Map<Token, EmbeddedCode> extractEmbeddedCode(
       ParserListener listener, CobolParser.StartRuleContext tree) {
     EmbeddedLanguagesListener embeddedLanguagesListener =
-        new EmbeddedLanguagesListener(defaultErrorStrategy, treeListener, listener);
+        new EmbeddedLanguagesListener(messageService, treeListener, listener);
     new ParseTreeWalker().walk(embeddedLanguagesListener, tree);
     return embeddedLanguagesListener.getEmbeddedCodeParts();
   }

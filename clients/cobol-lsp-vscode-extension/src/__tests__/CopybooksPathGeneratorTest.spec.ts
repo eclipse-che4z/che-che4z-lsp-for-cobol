@@ -18,7 +18,7 @@ import {
     checkWorkspace,
     CopybooksPathGenerator,
     createCopybookPath,
-    createDatasetPath
+    createDatasetPath,
 } from "../services/copybook/CopybooksPathGenerator";
 
 describe("CopybooksPathGenerator tests", () => {
@@ -26,7 +26,7 @@ describe("CopybooksPathGenerator tests", () => {
     const profile = "profile";
     const dataset = "dataset";
     beforeEach(() => {
-        (vscode.workspace.workspaceFolders as any) = [{uri: {fsPath}} as any];
+        (vscode.workspace.workspaceFolders as any) = [{ uri: { fsPath } } as any];
     });
 
     it("creates copybook path", () => {
@@ -43,11 +43,11 @@ describe("CopybooksPathGenerator tests", () => {
     });
 
     it("generates array of uris", async () => {
-        const profileService: any = {
-            getProfile: () => Promise.resolve(profile),
-            getProfileFromSettings: () => Promise.resolve(profile),
-        };
-        const gen: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue("profile"),
+        });
+
+        const gen: CopybooksPathGenerator = new CopybooksPathGenerator();
         gen.listDatasets = () => Promise.resolve(["DATASET1", "DATASET2"]);
         const result = await gen.listUris();
         expect(result[0].toString()).toContain("/projects/.c4z/.copybooks/profile/DATASET1");
