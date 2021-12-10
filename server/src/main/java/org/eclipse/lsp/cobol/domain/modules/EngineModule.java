@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.domain.modules;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
 import org.eclipse.lsp.cobol.core.messages.LocaleStore;
@@ -39,7 +38,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingServiceImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
-import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.InterruptingTreeListener;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.communications.ServerCommunications;
@@ -62,7 +60,6 @@ public class EngineModule extends AbstractModule {
     bind(CobolLineWriter.class).to(CobolLineWriterImpl.class);
     bind(CobolLinesTransformation.class).to(ContinuationLineTransformation.class);
     bind(CobolLineReWriter.class).to(CobolLineIndicatorProcessorImpl.class);
-    bind(DefaultErrorStrategy.class).to(CobolErrorStrategy.class);
     bind(MessageService.class).to(PropertiesMessageService.class);
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
