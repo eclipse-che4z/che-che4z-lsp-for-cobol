@@ -13,6 +13,7 @@
  */
 import * as path from "path";
 import * as vscode from "vscode";
+import { SPECIFY_DSN_OR_USS } from "../constants";
 // tslint:disable-next-line: max-line-length
 import {
     checkWorkspace,
@@ -52,5 +53,33 @@ describe("CopybooksPathGenerator tests", () => {
         const result = await gen.listUris();
         expect(result[0].toString()).toContain("/projects/.c4z/.copybooks/profile/DATASET1");
         expect(result[1].toString()).toContain("/projects/.c4z/.copybooks/profile/DATASET2");
+    });
+
+    it("lists path based on the datasets to be looked for copybooks", async () => {
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValueOnce("TEST.DSN").mockReturnValue("/test/uss/path"),
+            has: jest.fn().mockReturnValue(true),
+        });
+        const gen: CopybooksPathGenerator = new CopybooksPathGenerator();
+        const response = await gen.listDatasets();
+        expect(response).toStrictEqual("TEST.DSN");
+
+        const ussResponse = await gen.listUSSPaths();
+        expect(ussResponse).toStrictEqual("/test/uss/path");
+    });
+
+    it("show error message if no configuration provided for DSN and USS, for copybook download", async () => {
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            has: jest.fn().mockReturnValue(false),
+        });
+        vscode.window.showErrorMessage = jest.fn();
+        const gen: CopybooksPathGenerator = new CopybooksPathGenerator();
+        const response = await gen.listDatasets();
+        expect(response.length).toBe(0);
+        expect(vscode.window.showErrorMessage).toHaveBeenLastCalledWith(SPECIFY_DSN_OR_USS);
+
+        const ussResponse = await gen.listUSSPaths();
+        expect(ussResponse.length).toBe(0);
+        expect(vscode.window.showErrorMessage).toHaveBeenLastCalledWith(SPECIFY_DSN_OR_USS);
     });
 });
