@@ -21,7 +21,7 @@ import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** UseCase test example with replacing */
-public class TestReplacing {
+class TestReplacing {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST.\n"
@@ -36,8 +36,7 @@ public class TestReplacing {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(
-        new CobolText("THEBOOK", COPYBOOK_CONTENT)
-    ), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        TEXT, ImmutableList.of(new CobolText("THEBOOK", COPYBOOK_CONTENT)), ImmutableMap.of());
   }
 }
