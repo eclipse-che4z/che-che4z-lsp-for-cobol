@@ -24,6 +24,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
@@ -227,11 +228,21 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitCopyMaidStatement(CopyMaidStatementContext ctx) {
-    collectAndAccumulateCopybookData(
-        ctx,
-        ctx.copySource(),
-        retrieveCopybookStatementPosition(ctx),
-        MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
+    final Optional<TerminalNode> levelNumber = ofNullable(ctx.LEVEL_NUMBER());
+    final Locality copybookStatementPosition = retrieveCopybookStatementPosition(ctx);
+    final CopySourceContext copySource = ctx.copySource();
+    if (levelNumber.isPresent())
+      levelNumber
+          .map(ParseTree::getText)
+          .map(Integer::parseInt)
+          .ifPresent(
+              it ->
+                  collectAndAccumulateCopybookData(
+                      ctx,
+                      copySource,
+                      copybookStatementPosition,
+                      MAX_COPYBOOK_NAME_LENGTH_DEFAULT));
+    else skipCopybook(ctx, copySource, copybookStatementPosition, MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
   }
 
   @Override
@@ -274,6 +285,26 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         ctx.copySource(),
         retrieveCopybookStatementPosition(ctx),
         MAX_COPYBOOK_NAME_LENGTH_DATASET);
+  }
+
+  private void skipCopybook(
+      ParserRuleContext context,
+      CopySourceContext copySource,
+      Locality copybookStatementPosition,
+      int maxLength) {
+
+    String copybookName = retrieveCopybookName(copySource);
+    Locality locality = retrievePosition(copySource);
+
+    String copybookId = randomUUID().toString();
+
+    checkCopybookName(copybookName, locality, maxLength);
+    addCopybookUsage(copybookName, locality);
+
+    collectCopybookStatement(copybookId, copybookStatementPosition);
+
+    pop();
+    accumulateTokenShift(context);
   }
 
   private void collectAndAccumulateCopybookData(

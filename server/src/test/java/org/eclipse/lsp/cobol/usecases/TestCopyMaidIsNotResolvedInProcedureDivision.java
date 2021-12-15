@@ -20,22 +20,25 @@ import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** This test checks that COPY MAID statement is parsed correctly */
-class TestCopyMaidStatement {
+/** Test that COPY MAID statement is not resolved if it is in the PROCEDURE DIVISION */
+class TestCopyMaidIsNotResolvedInProcedureDivision {
   private static final String TEXT =
-      "        IDENTIFICATION DIVISION.\n"
-          + "          PROGRAM-ID. PARTEST.\n"
-          + "          DATA DIVISION.\n"
-          + "          WORKING-STORAGE SECTION.\n"
-          + "          01 COPY MAID {~NAME}.\n"
-          + "          PROCEDURE DIVISION.\n"
-          + "              DISPLAY {$ABC}.";
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 COPY MAID {~PMOREC}.\n"
+          + "       Procedure Division.\n"
+          + "           COPY MAID {~PMOREC}.\n"
+          + "           DISPLAY {$DEF}.";
 
-  private static final String COPYBOOK = "         01 {$*ABC} PIC 9.";
+  private static final String COPYBOOK_CONTENT =
+      "       01  {$*ABC}.\n" + "           05 {$*DEF}     PIC S9(4) COMP.";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
-        TEXT, ImmutableList.of(new CobolText("NAME", COPYBOOK)), ImmutableMap.of());
+        TEXT, ImmutableList.of(new CobolText("PMOREC", COPYBOOK_CONTENT)), ImmutableMap.of());
   }
 }
