@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.core.strategy;
 import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -88,7 +89,7 @@ class ErrorMessageHelperTest {
     when(token.getType()).thenReturn(2);
     when(token.getText()).thenReturn("EXEC_SQL");
     when(recognizer.getContext()).thenReturn(parserRuleContext);
-    when(parserRuleContext.getRuleIndex()).thenReturn(455);
+    when(parserRuleContext.getRuleIndex()).thenReturn(CobolParser.RULE_performInlineStatement);
 
     errorMessageHelper.getUnwantedTokenMessage(recognizer, token);
     verify(messageService).getMessage(PERFORM_MISSING_END, "'EXEC SQL'");
@@ -107,7 +108,7 @@ class ErrorMessageHelperTest {
     when(token.getType()).thenReturn(2);
     when(token.getText()).thenReturn("EXEC_SQL");
     when(recognizer.getContext()).thenReturn(parserRuleContext);
-    when(parserRuleContext.getRuleIndex()).thenReturn(433);
+    when(parserRuleContext.getRuleIndex()).thenReturn(CobolParser.RULE_modifyMapFieldOptionsClause);
     when(recognizer.getVocabulary()).thenReturn(vocabulary);
     when(recognizer.getExpectedTokens()).thenReturn(interval);
     when(interval.toString(any(Vocabulary.class))).thenReturn("INTERVAL");

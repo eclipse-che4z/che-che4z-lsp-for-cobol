@@ -28,7 +28,7 @@ class TestCompilerDirectivesNotCauseErrors {
 
   private static final String TEXT =
       "       PROCESS NODYNAM,CODEPAGE(1140),NSYMBOL(NATIONAL)\n"
-          + "       PROCESS ARITH(EXTEND),NOOPT,CICS\n"
+          + "       PROCESS ARITH(EXTEND),OPT(1),CICS\n"
           + "      ******************************************************************\n"
           + "      * TEST\n"
           + "      ******************************************************************\n"
