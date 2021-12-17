@@ -12,37 +12,33 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.usecases.example;
+package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/** UseCase test example when you expecting errors */
-class TestWithErrorCheck {
+/** Test that COPY MAID statement is not resolved if it is in the PROCEDURE DIVISION */
+class TestCopyMaidIsNotResolvedInProcedureDivision {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID.    TEST1.\n"
+          + "       PROGRAM-ID.    TEST.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01  {$*VAR}     PIC S9(4) COMP{|1}";
+          + "       01 COPY MAID {~PMOREC}.\n"
+          + "       Procedure Division.\n"
+          + "           COPY MAID {~PMOREC}.\n"
+          + "           DISPLAY {$DEF}.";
+
+  private static final String COPYBOOK_CONTENT =
+      "       01  {$*ABC}.\n" + "           05 {$*DEF}     PIC S9(4) COMP.";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null,
-                "Unexpected end of file",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+        TEXT, ImmutableList.of(new CobolText("PMOREC", COPYBOOK_CONTENT)), ImmutableMap.of());
   }
 }
