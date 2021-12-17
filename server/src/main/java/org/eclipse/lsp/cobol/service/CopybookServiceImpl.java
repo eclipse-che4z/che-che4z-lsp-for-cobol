@@ -82,6 +82,9 @@ public class CopybookServiceImpl implements CopybookService {
 
   @Override
   public void invalidateCache() {
+    LOG.debug("Copybooks for downloading: {}", copybooksForDownloading);
+    LOG.debug("Copybook cache: {}", copybookCache);
+    LOG.debug("Cache invalidated");
     copybooksForDownloading.clear();
     copybookCache.invalidateAll();
   }
@@ -123,7 +126,11 @@ public class CopybookServiceImpl implements CopybookService {
       @NonNull CopybookConfig copybookConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     final String cobolFileName = files.getNameFromURI(documentUri);
-
+    LOG.debug(
+        "Trying to resolve copybook {} for {}, using config {}",
+        copybookName,
+        documentUri,
+        copybookConfig);
     return tryResolveCopybookFromWorkspace(copybookName, cobolFileName)
         .orElseGet(
             () ->
@@ -133,8 +140,15 @@ public class CopybookServiceImpl implements CopybookService {
 
   private Optional<CopybookModel> tryResolveCopybookFromWorkspace(
       String copybookName, String cobolFileName) {
-    return resolveCopybookFromWorkspace(copybookName, cobolFileName)
-        .map(uri -> loadCopybook(uri, copybookName, cobolFileName));
+    LOG.debug(
+        "Trying to resolve copybook copybook {} for {} from workspace",
+        copybookName,
+        cobolFileName);
+    final Optional<CopybookModel> copybookModel =
+        resolveCopybookFromWorkspace(copybookName, cobolFileName)
+            .map(uri -> loadCopybook(uri, copybookName, cobolFileName));
+    LOG.debug("Copybook from workspace: {}", copybookModel);
+    return copybookModel;
   }
 
   @SuppressWarnings("java:S2142")
@@ -159,15 +173,21 @@ public class CopybookServiceImpl implements CopybookService {
    */
   private Optional<CopybookModel> tryResolvePredefinedCopybook(
       String copybookName, CopybookConfig copybookConfig) {
-    return Optional.ofNullable(PredefinedCopybooks.forName(copybookName))
-        .map(it -> it.uriForBackend(copybookConfig.getSqlBackend()))
-        .map(
-            uri ->
-                new CopybookModel(
-                    copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri)));
+    LOG.debug(
+        "Trying to resolve predefined copybook {}, using config {}", copybookName, copybookConfig);
+    final Optional<CopybookModel> copybookModel =
+        Optional.ofNullable(PredefinedCopybooks.forName(copybookName))
+            .map(it -> it.uriForBackend(copybookConfig.getSqlBackend()))
+            .map(
+                uri ->
+                    new CopybookModel(
+                        copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri)));
+    LOG.debug("Predefined copybook: {}", copybookModel);
+    return copybookModel;
   }
 
   private CopybookModel registerForDownloading(String copybookName, String cobolFileName) {
+    LOG.debug("Registering copybook {} of {} for further downloading", copybookName, cobolFileName);
     Optional.of(
             copybooksForDownloading.computeIfAbsent(
                 cobolFileName, s -> ConcurrentHashMap.newKeySet()))
@@ -177,6 +197,7 @@ public class CopybookServiceImpl implements CopybookService {
 
   private CopybookModel loadCopybook(String uri, String copybookName, String cobolFileName) {
     Path file = files.getPathFromURI(uri);
+    LOG.debug("Loading {} with URI {} for {} from path {}", copybookName, uri, cobolFileName, file);
     return files.fileExists(file)
         ? new CopybookModel(copybookName, uri, files.getContentByPath(Objects.requireNonNull(file)))
         : registerForDownloading(copybookName, cobolFileName);
@@ -203,6 +224,8 @@ public class CopybookServiceImpl implements CopybookService {
    */
   @Subscribe
   public void handleAnalysisFinishedEvent(AnalysisFinishedEvent event) {
+    LOG.debug("Received event {}", event);
+    LOG.debug("Copybooks expecting downloading: {}", copybooksForDownloading);
     Set<String> uris = new HashSet<>(event.getCopybookUris());
     String documentUri = event.getDocumentUri();
     uris.add(documentUri);
@@ -224,6 +247,7 @@ public class CopybookServiceImpl implements CopybookService {
                           document,
                           copybook))
               .collect(toList());
+      LOG.debug("Copybooks to download: {}", copybooksToDownload);
       if (!copybooksToDownload.isEmpty()) {
         settingsService.getConfigurations(copybooksToDownload);
       }
