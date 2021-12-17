@@ -52,10 +52,15 @@ function removeFolder(targetPath: string) {
     }
 }
 
-function buildResultArrayFrom(settingsMockValue: string[], profileName: string): number {
+function buildResultArrayFrom(settingsMockValue: string[], profileName: string, ussPath: string[] = []): number {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-        get: jest.fn().mockReturnValue(settingsMockValue),
+        get: jest.fn().mockReturnValueOnce(settingsMockValue),
     });
+    if (ussPath.length > 0) {
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue(ussPath),
+        });
+    }
     return (copybookURI as any).createPathForCopybookDownloaded(profileName).length;
 }
 
@@ -116,6 +121,9 @@ describe("With invalid input parameters, the list of URI that represent copybook
 describe("With allowed input parameters, the list of URI that represent copybook downloaded is correctly generated", () => {
     test("given profile and dataset list with one element, the result list is correctly generated with size 1 ", () => {
         expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "PRF")).toBe(1);
+    });
+    test("given profile, dataset and USS path, list with one element each, the result list is correctly generated with size 2 ", () => {
+        expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "PRF", ["/test/uss/path"])).toBe(2);
     });
 });
 describe("Prioritize search criteria for copybooks test suite", () => {

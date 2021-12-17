@@ -16,7 +16,7 @@ import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
 import * as fs from "fs";
 import * as Path from "path";
 import * as vscode from "vscode";
-import { PROCESS_DOWNLOAD_ERROR_MSG } from "../../constants";
+import { DOWNLOAD_QUEUE_LOCKED_ERROR_MSG, INVALID_CREDENTIALS_ERROR_MSG, PROCESS_DOWNLOAD_ERROR_MSG, PROFILE_NAME_PLACEHOLDER, UNLOCK_DOWNLOAD_QUEUE_MSG } from "../../constants";
 import { TelemetryService } from "../reporter/TelemetryService";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath } from "./CopybooksPathGenerator";
@@ -24,6 +24,7 @@ import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
 
 const experimentTag = "experiment-tag";
 export class CopybookDownloadService implements vscode.Disposable {
+
     private static createErrorMessageForCopybooks(datasets: Set<string>) {
         CopybookDownloadService.processDownloadError(PROCESS_DOWNLOAD_ERROR_MSG + Array.from(datasets));
     }
@@ -41,56 +42,95 @@ export class CopybookDownloadService implements vscode.Disposable {
         return queue.find(profile => !profile.quiet) !== undefined;
     }
 
-    private static async fetchCopybook(dataset: string, copybookProfile: CopybookProfile): Promise<boolean> {
+    private static async showQueueLockedDialog(profileName: string): Promise<boolean> {
+        const action = await vscode.window.showErrorMessage(
+            DOWNLOAD_QUEUE_LOCKED_ERROR_MSG.replace(PROFILE_NAME_PLACEHOLDER, profileName),
+            UNLOCK_DOWNLOAD_QUEUE_MSG);
+        return action === UNLOCK_DOWNLOAD_QUEUE_MSG;
+    }
+
+    private static isInvalidCredentials(e: any) {
+        return e?.mDetails?.errorCode === 401;
+    }
+
+    private static async fetchCopybook(dataset: string, copybookProfile: CopybookProfile, isUSS: boolean): Promise<boolean> {
         let members: string[] = [];
         try {
-            const zoweExplorerApi = ZoweVsCodeExtension.getZoweExplorerApi();
-            const loadedProfile = zoweExplorerApi
-                .getExplorerExtenderApi()
-                .getProfilesCache()
-                .loadNamedProfile(copybookProfile.profile);
-            const response = await zoweExplorerApi.getMvsApi(loadedProfile).allMembers(dataset);
-            members = response.apiResponse.items.map(el => el.member);
+            members = await CopybookDownloadService.getAllMembers(dataset, copybookProfile.profile, isUSS);
         } catch (error) {
+            if (CopybookDownloadService.isInvalidCredentials(error)) {
+                throw error;
+            }
             if (!copybookProfile.quiet) {
                 CopybookDownloadService.processDownloadError("Can't read members of dataset: " + dataset);
+                vscode.window.showErrorMessage(error.message);
             }
-            vscode.window.showErrorMessage(error.message);
             return false;
         }
         if (!members.includes(copybookProfile.copybook)) {
             return false;
         }
-        await CopybookDownloadService.downloadCopybookFromMFUsingZowe(dataset, copybookProfile.copybook,
-            copybookProfile.profile);
+        await CopybookDownloadService.downloadCopybookFromMFUsingZowe(dataset, copybookProfile, isUSS);
         return true;
     }
 
-    private static async downloadCopybookFromMFUsingZowe(dataset: string, copybook: string, profileName: string) {
-        const copybookPath = createCopybookPath(profileName, dataset, copybook);
+    private static async getAllMembers(dataset: string, profileName: string, isUSS: boolean) {
+        let members: string[];
+        const zoweExplorerApi = ZoweVsCodeExtension.getZoweExplorerApi();
+        const loadedProfile = zoweExplorerApi
+            .getExplorerExtenderApi()
+            .getProfilesCache()
+            .loadNamedProfile(profileName);
+        if (isUSS) {
+            const response = await zoweExplorerApi.getUssApi(loadedProfile).fileList(dataset);
+            members = response.apiResponse.items.map(el => el.name);
+        } else {
+            const response = await zoweExplorerApi.getMvsApi(loadedProfile).allMembers(dataset);
+            members = response.apiResponse.items.map(el => el.member);
+        }
+        return members;
+    }
+
+    private static async downloadCopybookFromMFUsingZowe(dataset: string, copybookprofile: CopybookProfile, isUSS: boolean) {
+        const copybookPath = createCopybookPath(copybookprofile.profile, dataset, copybookprofile.copybook);
         if (!fs.existsSync(copybookPath)) {
             try {
-                const zoweExplorerApi = ZoweVsCodeExtension.getZoweExplorerApi();
-                const loadedProfile = zoweExplorerApi
-                    .getExplorerExtenderApi()
-                    .getProfilesCache()
-                    .loadNamedProfile(profileName);
-                await zoweExplorerApi.getMvsApi(loadedProfile).getContents(`${dataset}(${copybook})`, {
-                    encoding: loadedProfile.profile.encoding,
-                    file: Path.join(createDatasetPath(profileName, dataset), copybook),
-                    returnEtag: true,
-                });
+                await CopybookDownloadService.downloadCopybookContent(dataset, copybookprofile.copybook, copybookprofile.profile, isUSS);
             } catch (err) {
-                vscode.window.showErrorMessage(err.message);
+                if (CopybookDownloadService.needsUserNotification([copybookprofile])) {
+                    vscode.window.showErrorMessage(err.message);
+                }
             }
         }
     }
 
-    private static async handleDataset(
+    private static async downloadCopybookContent(dataset: string, copybook: string, profileName: string, isUSS: boolean) {
+        const zoweExplorerApi = ZoweVsCodeExtension.getZoweExplorerApi();
+        const loadedProfile = zoweExplorerApi
+            .getExplorerExtenderApi()
+            .getProfilesCache()
+            .loadNamedProfile(profileName);
+
+        if (isUSS) {
+            await zoweExplorerApi.getUssApi(loadedProfile).getContents(`${dataset}/${copybook}`, {
+                encoding: loadedProfile.profile.encoding || "UTF-8",
+                file: Path.join(createDatasetPath(profileName, dataset), copybook),
+                returnEtag: true,
+            });
+        } else {
+            await zoweExplorerApi.getMvsApi(loadedProfile).getContents(`${dataset}(${copybook})`, {
+                encoding: loadedProfile.profile.encoding,
+                file: Path.join(createDatasetPath(profileName, dataset), copybook),
+                returnEtag: true,
+            });
+        }
+    }
+
+    private static async handleCopybooks(
         dataset: string,
         toDownload: CopybookProfile[],
         errors: Set<string>,
-        progress: vscode.Progress<{ message?: string; increment?: number }>) {
+        progress: vscode.Progress<{ message?: string; increment?: number }>, isUSS: boolean = false) {
         try {
             if (CopybookDownloadService.needsUserNotification(toDownload)) {
                 progress.report({
@@ -99,22 +139,28 @@ export class CopybookDownloadService implements vscode.Disposable {
                 });
             }
             for (const cp of toDownload) {
-                await CopybookDownloadService.handleCopybook(dataset, cp, errors);
+                await CopybookDownloadService.handleCopybook(dataset, cp, errors, isUSS);
             }
         } catch (e) {
+            if (CopybookDownloadService.isInvalidCredentials(e)) {
+                throw e;
+            }
             if (CopybookDownloadService.needsUserNotification(toDownload)) {
                 vscode.window.showErrorMessage(e.toString());
             }
         }
     }
 
-    private static async handleCopybook(dataset: string, cp: CopybookProfile, errors: Set<string>) {
+    private static async handleCopybook(dataset: string, cp: CopybookProfile, errors: Set<string>, isUSS: boolean) {
         try {
-            const fetchResult = await CopybookDownloadService.fetchCopybook(dataset, cp);
+            const fetchResult = await CopybookDownloadService.fetchCopybook(dataset, cp, isUSS);
             if (fetchResult) {
                 errors.delete(cp.copybook);
             }
         } catch (e) {
+            if (CopybookDownloadService.isInvalidCredentials(e)) {
+                throw e;
+            }
             if (!cp.quiet) {
                 vscode.window.showErrorMessage(e.toString());
             }
@@ -122,6 +168,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     }
 
     private queue: DownloadQueue = new DownloadQueue();
+    private lockedProfile: Set<string> = new Set();
 
     public constructor(
         private pathGenerator: CopybooksPathGenerator) {
@@ -148,6 +195,18 @@ export class CopybookDownloadService implements vscode.Disposable {
             }
             return;
         }
+
+        if (this.lockedProfile.has(profile)) {
+            if (quiet) {
+                return;
+            }
+            if (await CopybookDownloadService.showQueueLockedDialog(profile)) {
+                this.lockedProfile.delete(profile);
+            } else {
+                return;
+            }
+        }
+
         copybookNames.forEach(copybook => this.queue.push(copybook, profile, quiet));
     }
 
@@ -176,7 +235,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         {
             await this.handleQueue(element, errors, progress);
 
-            if (this.queue.length === 0 && errors.size > 0) {
+            if (!element.quiet && this.queue.length === 0 && errors.size > 0) {
                 CopybookDownloadService.createErrorMessageForCopybooks(errors);
                 errors.clear();
             }
@@ -210,13 +269,29 @@ export class CopybookDownloadService implements vscode.Disposable {
         while (this.queue.length > 0) {
             toDownload.push(await this.queue.pop());
         }
-        toDownload.filter(cp => !cp.quiet).map(cp => cp.copybook).forEach(cb => errors.add(cb));
+        toDownload.map(cp => cp.copybook).forEach(cb => errors.add(cb));
         try {
             for (const dataset of await this.pathGenerator.listDatasets()) {
-                await CopybookDownloadService.handleDataset(dataset, toDownload, errors, progress);
+                await CopybookDownloadService.handleCopybooks(dataset, toDownload, errors, progress);
+            }
+
+            const toDownloadUSS = toDownload.filter(cp => errors.has(cp.copybook)).map(cp => cp);
+            const quiteModeOffCopybooks = toDownloadUSS.filter(cp => !cp.quiet).map(cp => cp.copybook);
+            errors = new Set([...errors].filter(cp => quiteModeOffCopybooks.includes(cp)));
+            if (toDownloadUSS.length > 0) {
+                for (const ussPath of await this.pathGenerator.listUSSPaths()) {
+                    await CopybookDownloadService.handleCopybooks(ussPath, toDownloadUSS, errors, progress, true);
+                }
             }
         } catch (e) {
-            const errorMessage = e.toString();
+            let errorMessage = e.toString();
+            if (CopybookDownloadService.isInvalidCredentials(e)) {
+                errorMessage = INVALID_CREDENTIALS_ERROR_MSG.replace(PROFILE_NAME_PLACEHOLDER, element.profile);
+                this.lockedProfile.add(element.profile);
+                this.queue.clean();
+                TelemetryService.registerEvent("invalidCredentials", ["copybook", "COBOL", "experiment-tag"], "Zowe credentials is not valid");
+            }
+
             TelemetryService.registerExceptionEvent(undefined, errorMessage, ["copybook", "COBOL", experimentTag], "There is an issue with zowe api layer");
             if (CopybookDownloadService.needsUserNotification(toDownload)) {
                 vscode.window.showErrorMessage(errorMessage);

@@ -20,8 +20,8 @@ import * as Path from "path";
 import * as vscode from "vscode";
 import {
     C4Z_FOLDER,
-    COPYBOOKS_FOLDER,
-    PROCESS_DOWNLOAD_ERROR_MSG,
+    COPYBOOKS_FOLDER, DOWNLOAD_QUEUE_LOCKED_ERROR_MSG,
+    PROCESS_DOWNLOAD_ERROR_MSG, PROFILE_NAME_PLACEHOLDER, UNLOCK_DOWNLOAD_QUEUE_MSG,
 } from "../constants";
 import { CopybookDownloadService } from "../services/copybook/CopybookDownloadService";
 import {
@@ -33,10 +33,12 @@ import {
 import { CopybookProfile } from "../services/copybook/DownloadQueue";
 import { TelemetryService } from "../services/reporter/TelemetryService";
 import { ProfileUtils } from "../services/util/ProfileUtils";
+import clearAllMocks = jest.clearAllMocks;
 
 const profile = "zoweProfile";
 const wrongCredProfile = "wrongCredProfile";
 const copybookProfile = new CopybookProfile("copybook", profile, false);
+const downloadQueueLockedErrorMsg = DOWNLOAD_QUEUE_LOCKED_ERROR_MSG.replace(PROFILE_NAME_PLACEHOLDER, wrongCredProfile);
 
 (vscode.workspace.workspaceFolders as any) = [{ uri: { fsPath: "/projects" } } as any];
 vscode.window.showInformationMessage = () => Promise.resolve("Download Copybooks");
@@ -46,6 +48,7 @@ vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
 (vscode.ProgressLocation as any) = { Notification: "notify" };
 
 const getContentMock = jest.fn();
+const getUSSContentsMock = jest.fn();
 const getZoweExplorerMock = (forError: boolean = false, mentionedError?: any) => {
     const error = new Error("Error");
     (error as any).mDetails = {
@@ -59,6 +62,15 @@ const getZoweExplorerMock = (forError: boolean = false, mentionedError?: any) =>
                 }, { member: "DATASET2" }],
             },
         });
+    const allUSSFilemembers = forError ? jest.fn().mockRejectedValue(mentionedError ? mentionedError : error)
+        : jest.fn().mockReturnValue({
+            apiResponse: {
+                items: [
+                    { name: "uss_copybook" },
+                    { name: "USS_DATASET2" },
+                ],
+            },
+        });
     return jest.fn().mockReturnValue({
         getExplorerExtenderApi: jest.fn().mockReturnValue({
             getProfilesCache: jest.fn().mockReturnValue({
@@ -68,6 +80,10 @@ const getZoweExplorerMock = (forError: boolean = false, mentionedError?: any) =>
         getMvsApi: jest.fn().mockReturnValue({
             allMembers: allMemberMock,
             getContents: getContentMock,
+        }),
+        getUssApi: jest.fn().mockReturnValue({
+            fileList: allUSSFilemembers,
+            getContents: getUSSContentsMock,
         }),
     },
     );
@@ -79,9 +95,19 @@ beforeEach(() => {
 jest.mock("../services/reporter/TelemetryService");
 
 describe("Test fetchCopybook against bad and correct configurations", () => {
+    it("downloadCopybookFromMFUsingZowe is correctly invokes USS API's", async () => {
+        ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
+        await (CopybookDownloadService as any).downloadCopybookFromMFUsingZowe("HLQ.DSN1", copybookProfile, true);
+        expect(getUSSContentsMock).toBeCalledWith(`HLQ.DSN1/copybook`, {
+            encoding: "UTF-8",
+            file: Path.join(createDatasetPath(profile, "HLQ.DSN1"), "copybook"),
+            returnEtag: true,
+        });
+    });
+
     it("downloadCopybookFromMFUsingZowe is correctly invoked", async () => {
         ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
-        await (CopybookDownloadService as any).downloadCopybookFromMFUsingZowe("HLQ.DSN1", "copybook", profile);
+        await (CopybookDownloadService as any).downloadCopybookFromMFUsingZowe("HLQ.DSN1", copybookProfile);
         expect(getContentMock).toBeCalledWith(`HLQ.DSN1(copybook)`, {
             encoding: undefined,
             file: Path.join(createDatasetPath(profile, "HLQ.DSN1"), "copybook"),
@@ -94,6 +120,15 @@ describe("Test fetchCopybook against bad and correct configurations", () => {
             (CopybookDownloadService as any).downloadCopybookFromMFUsingZowe = jest.fn();
             ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
             const result = await (CopybookDownloadService as any).fetchCopybook("HLQ.DSN1", copybookProfile);
+            expect(result).toBe(true);
+        });
+
+    it("Given a copybook name that is a valid USS member on MF, the fetchCopybook correctly invoke download from MF",
+        async () => {
+            const ussCopybookProfile = new CopybookProfile("uss_copybook", profile, false);
+            (CopybookDownloadService as any).downloadCopybookFromMFUsingZowe = jest.fn();
+            ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
+            const result = await (CopybookDownloadService as any).fetchCopybook("HLQ.DSN1", ussCopybookProfile, true);
             expect(result).toBe(true);
         });
 
@@ -123,26 +158,26 @@ describe("Receiving an error from zowe api layer, copybooks are not retrivied an
             });
     });
 
-    describe("Suite of tests related to handleDataset", () => {
+    describe("Suite of tests related to handleCopybooks", () => {
         const progress = { report: jest.fn() };
         vscode.window.showErrorMessage = jest.fn();
 
-        it("handleDataset shows progress report", async () => {
+        it("handleCopybooks shows progress report", async () => {
             (CopybookDownloadService as any).needsUserNotification = jest.fn().mockReturnValue(true);
             const handleCopybook = (CopybookDownloadService as any).handleCopybook = jest.fn();
-            await (CopybookDownloadService as any).handleDataset("dataset", [copybookProfile], new Set(), progress);
+            await (CopybookDownloadService as any).handleCopybooks("dataset", [copybookProfile], new Set(), progress);
             expect(progress.report).toBeCalledWith(
                 {
                     message: "Looking in dataset. 1 copybook(s) left.",
                 });
 
-            expect(handleCopybook).toBeCalledWith("dataset", copybookProfile, new Set());
+            expect(handleCopybook).toBeCalledWith("dataset", copybookProfile, new Set(), false);
         });
 
-        it("handleDataset throws error incase download fails", async () => {
+        it("handleCopybooks throws error incase download fails", async () => {
             (CopybookDownloadService as any).needsUserNotification = jest.fn().mockReturnValue(true);
             (CopybookDownloadService as any).handleCopybook = jest.fn().mockRejectedValue(new Error("error"));
-            await (CopybookDownloadService as any).handleDataset("dataset", [copybookProfile], new Set(), progress);
+            await (CopybookDownloadService as any).handleCopybooks("dataset", [copybookProfile], new Set(), progress);
             expect(vscode.window.showErrorMessage).toBeCalledWith("Error: error");
         });
     });
@@ -150,15 +185,28 @@ describe("Receiving an error from zowe api layer, copybooks are not retrivied an
     describe("Suite of tests related to handleQueue", () => {
         const pathGenerator = new CopybooksPathGenerator();
         const cbd = new CopybookDownloadService(pathGenerator);
-        pathGenerator.listDatasets = jest.fn().mockResolvedValue(["dataset"]);
-        vscode.window.showErrorMessage = jest.fn();
 
+        beforeEach(() => {
+            clearAllMocks();
+            pathGenerator.listDatasets = jest.fn().mockResolvedValue(["dataset"]);
+            pathGenerator.listUSSPaths = jest.fn().mockReturnValue(["/test/uss/path"]);
+            vscode.window.showErrorMessage = jest.fn();
+        });
         it("handleQueue popup ZoweError", async () => {
             const error = new Error("Error");
-            (CopybookDownloadService as any).handleDataset = jest.fn().mockRejectedValue(error);
+            (CopybookDownloadService as any).handleCopybooks = jest.fn().mockRejectedValue(error);
             await (cbd as any).handleQueue(copybookProfile, new Set(), null);
             expect(vscode.window.showErrorMessage)
                 .toHaveBeenCalledWith("Error: Error");
+        });
+
+        it("handleQueue triggers call for USS copybook download", async () => {
+            (CopybookDownloadService as any).handleCopybooks = jest.fn().mockReturnValue({});
+            const errSet = new Set();
+            errSet.add("copybook");
+            await (cbd as any).handleQueue(copybookProfile, new Set(), null);
+            expect((CopybookDownloadService as any).handleCopybooks).toHaveBeenLastCalledWith("/test/uss/path",
+                [copybookProfile], errSet, null, true);
         });
     });
 });
@@ -226,6 +274,30 @@ describe("Test downloadCopybook user interaction", () => {
         await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"]);
         expect(vscode.window.showErrorMessage).not.toBeCalled();
         expect(queuePush).toBeCalledWith("copybook", "profile", true);
+    });
+
+    test("check locked profile", async () => {
+        ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(wrongCredProfile);
+        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"]);
+        expect(vscode.window.showErrorMessage).not.toBeCalled();
+        expect(queuePush).not.toBeCalled();
+    });
+
+    test("check locked profile and user kept it locked", async () => {
+        ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(wrongCredProfile);
+        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
+        expect(vscode.window.showErrorMessage).toBeCalledWith(downloadQueueLockedErrorMsg, anything());
+        expect(queuePush).not.toBeCalled();
+        expect((copybooksDownloadService as any).lockedProfile).toContain(wrongCredProfile);
+    });
+
+    test("queue locked and user unlocked it", async () => {
+        ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(wrongCredProfile);
+        vscode.window.showErrorMessage = jest.fn().mockResolvedValue(UNLOCK_DOWNLOAD_QUEUE_MSG);
+        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
+        expect(vscode.window.showErrorMessage).toBeCalledWith(downloadQueueLockedErrorMsg, anything());
+        expect(queuePush).toBeCalledWith("copybook", wrongCredProfile, false);
+        expect((copybooksDownloadService as any).lockedProfile).not.toContain(wrongCredProfile);
     });
 });
 
