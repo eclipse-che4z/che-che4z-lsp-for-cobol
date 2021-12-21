@@ -58,7 +58,7 @@ kind: Pod
 spec:
   containers:
   - name: theia
-    image: theiaide/theia-full:1.15.0
+    image: grianbrcom/theia-full:1.15.0
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
