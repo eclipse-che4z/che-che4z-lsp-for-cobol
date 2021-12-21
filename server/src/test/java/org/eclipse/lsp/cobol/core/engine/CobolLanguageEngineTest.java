@@ -27,9 +27,7 @@ import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
-import org.eclipse.lsp.cobol.service.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp.cobol.service.*;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -136,6 +134,7 @@ class CobolLanguageEngineTest {
             ImmutableMap.of());
 
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER);
+    when(preprocessor.cleanUpCode(URI, TEXT)).thenReturn(new ResultWithErrors<>(TEXT, ImmutableList.of()));
     when(preprocessor.process(URI, TEXT, cpyConfig))
         .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));
 

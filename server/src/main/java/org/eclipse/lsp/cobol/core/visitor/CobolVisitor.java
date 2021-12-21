@@ -46,6 +46,7 @@ import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp.cobol.service.utils.SyntaxTreeUtil;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -84,6 +85,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final MessageService messageService;
   private final SubroutineService subroutineService;
   private final AnalysisConfig analysisConfig;
+  private final List<Node> flavorNodes;
   private Map<String, FileControlEntryContext> fileControls = null;
   private final Map<String, SubroutineDefinition> subroutineDefinitionMap = new HashMap<>();
 
@@ -94,7 +96,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       @NonNull AnalysisConfig analysisConfig,
       Map<Token, EmbeddedCode> embeddedCodeParts,
       MessageService messageService,
-      SubroutineService subroutineService) {
+      SubroutineService subroutineService,
+      List<Node> flavorNodes) {
     this.copybooks = copybooks;
     this.positions = positions;
     this.embeddedCodeParts = embeddedCodeParts;
@@ -102,6 +105,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     this.messageService = messageService;
     this.subroutineService = subroutineService;
     this.analysisConfig = analysisConfig;
+    this.flavorNodes = flavorNodes;
   }
 
   /**
@@ -131,9 +135,18 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
               Node rootNode = new RootNode(locality, copybooks);
               visitChildren(ctx).forEach(rootNode::addChild);
               addCopyNodes(rootNode, copybooks.getUsages());
+              addFlavorNode(rootNode);
               return ImmutableList.of(rootNode);
             })
         .orElse(ImmutableList.of());
+  }
+
+  private void addFlavorNode(Node rootNode) {
+    for (Node flavorNode: flavorNodes) {
+      SyntaxTreeUtil.findNodeInRange(rootNode, flavorNode.getLocality().getRange().getStart())
+          .orElse(rootNode)
+          .addChild(flavorNode);
+    }
   }
 
   @Override

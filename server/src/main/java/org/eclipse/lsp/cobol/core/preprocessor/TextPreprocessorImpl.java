@@ -79,11 +79,10 @@ public class TextPreprocessorImpl implements TextPreprocessor {
       @NonNull CopybookConfig copybookConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     List<SyntaxError> errors = new ArrayList<>();
-    String cleanUpCode = cleanUpCode(documentUri, cobolSourceCode).unwrap(errors::addAll);
     ExtendedDocument extendedDocument =
         processCleanCode(
                 documentUri,
-                cleanUpCode,
+                cobolSourceCode,
                 new ArrayDeque<>(),
                 copybookConfig,
                 new ArrayDeque<>(),

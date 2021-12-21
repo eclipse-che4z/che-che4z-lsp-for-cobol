@@ -20,6 +20,7 @@ import lombok.Value;
 @Value
 class Timing {
   long preprocessorTime;
+  long flavorTime;
   long parserTime;
   long mappingTime;
   long splittingLanguageTimer;
@@ -35,6 +36,7 @@ class Timing {
   @Value
   static class Builder {
     Timer preprocessorTimer = new Timer();
+    Timer flavorTimer = new Timer();
     Timer parserTimer = new Timer();
     Timer mappingTimer = new Timer();
     Timer splittingLanguageTimer = new Timer();
@@ -45,6 +47,7 @@ class Timing {
     Timing build() {
       return new Timing(
           preprocessorTimer.getTotalTime(),
+          flavorTimer.getTotalTime(),
           parserTimer.getTotalTime(),
           mappingTimer.getTotalTime(),
           splittingLanguageTimer.getTotalTime(),
