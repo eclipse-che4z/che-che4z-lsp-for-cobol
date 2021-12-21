@@ -17,7 +17,7 @@
 /// <reference types="../../support/" />
 
 // Import selectors from Theia object
-import { Theia } from '@eclipse/che-che4z/tests/dist/selectorsTheia';
+import { Theia } from '@eclipse/che-che4z/tests/dist/selectors';
 
 //F95834: LSP for COBOL - support for EXEC SQL statements (basic intellisense)
 
