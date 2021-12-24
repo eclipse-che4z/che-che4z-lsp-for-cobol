@@ -153,6 +153,31 @@ public abstract class MessageServiceParser extends Parser {
   }
 
   /**
+   * Validate string length against range and throw an error if it is incorrect
+   *
+   * @param input string to check
+   * @param minLength allowed minimum length
+   * @param maxLength allowed maximum length
+   */
+  protected void validateStringLengthRange(String input, Integer minLength, Integer maxLength) {
+    if (input != null && !(input.length() >= minLength && input.length() <= maxLength)) {
+      notifyError("parsers.stringLengthRange", minLength.toString(), maxLength.toString());
+    }
+  }
+
+  /**
+   * Validate allowed string values and throw an error if it is incorrect
+   *
+   * @param input string to check
+   * @param allowedValues arrays of allowed starting string values for Input parameter
+   */
+  protected void validateAllowedValues(String input, String... allowedValues) {
+    if (input != null && !checkInputInAllowedValues(input, allowedValues)) {
+      notifyError("parsers.allowedStringValues", String.join(",", allowedValues));
+    }
+  }
+
+  /**
    * Remove quotes from string literal
    *
    * @param input string to trim quotes
@@ -182,8 +207,14 @@ public abstract class MessageServiceParser extends Parser {
 
   private Boolean checkStartsWith(String input, String[] startsWith) {
     for (String item : startsWith) {
-      if (input.startsWith(item))
-        return true;
+      if (input.startsWith(item)) return true;
+    }
+    return false;
+  }
+
+  private Boolean checkInputInAllowedValues(String input, String[] allowedValues) {
+    for (String item : allowedValues) {
+      if (input.equals(item)) return true;
     }
     return false;
   }

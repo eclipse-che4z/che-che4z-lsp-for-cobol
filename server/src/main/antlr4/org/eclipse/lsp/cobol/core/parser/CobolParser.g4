@@ -998,7 +998,8 @@ externalStatement
 
 dafStatements
     : readTransactionStatement | writeTransactionStatement | writeReportStatement
-    | openPacketStatement
+    | openPacketStatement | getEntityStatement | getUserStatements | getItemStatements
+    | getTaskStatement | getOdetteStatement | getJobStatement | getNetworkStatement
     ;
 
 readTransactionStatement
@@ -1038,6 +1039,92 @@ openPacketStatement
            (VERSION (qualifiedDataName | integerLiteral))?
     ;
 
+getEntityStatement
+    : getEntityNameByRoleStatement | getEntityDescriptionStatement | getEntityDescriptionForDomainStatement
+    ;
+
+getEntityNameByRoleStatement
+    : GET ENTITY
+            (qualifiedDataName |  {validateStringLengthRange(trimQuotes(_input.LT(1).getText()), 3, 4);}
+            NONNUMERICLITERAL)
+            (qualifiedDataName | {validateStringLengthRange(trimQuotes(_input.LT(1).getText()), 3, 16);}
+            NONNUMERICLITERAL)
+            ( daf_entity_role |
+            {validateAllowedValues(trimQuotes(_input.LT(1).getText()),
+                 "OWNER","OWN","DESIGNER","AVG","ANALIST","ANA");} NONNUMERICLITERAL)
+    ;
+
+getEntityDescriptionStatement
+    : GET ENTITY
+          (qualifiedDataName | {validateStringLengthRange(trimQuotes(_input.LT(1).getText()), 3, 4);}
+          NONNUMERICLITERAL)
+          (qualifiedDataName | {validateStringLengthRange(trimQuotes(_input.LT(1).getText()), 3, 16);}
+          NONNUMERICLITERAL)
+          DESCRIPTION
+          (qualifiedDataName | {validateExactLength(trimQuotes(_input.LT(1).getText()), "tal", 2);} NONNUMERICLITERAL)
+    ;
+
+getEntityDescriptionForDomainStatement
+    : GET ENTITY (DOM | {validateAllowedValues(trimQuotes(_input.LT(1).getText()), "DOM");} NONNUMERICLITERAL)
+      qualifiedDataName DESCRIPTION
+    ;
+
+getUserStatements
+    : getUserStatement | getUserNextStatement
+    ;
+
+getUserStatement
+    : GET USER
+          (qualifiedDataName |  {validateExactLength(trimQuotes(_input.LT(1).getText()),"kls", 3);}
+           NONNUMERICLITERAL)
+          (qualifiedDataName | NONNUMERICLITERAL)
+    ;
+
+getUserNextStatement
+    : GET USER NEXT
+    ;
+
+getItemStatements
+    : getItemAnyStatement | getItemSeqStatement | getItemGrsStatement
+    ;
+
+getItemAnyStatement
+    : GET ITEM ANY
+              (qualifiedDataName |  NONNUMERICLITERAL)
+              (qualifiedDataName |  NONNUMERICLITERAL)
+              (qualifiedDataName |  NONNUMERICLITERAL)
+    ;
+
+getItemSeqStatement
+    : GET ITEM SEQ
+              (qualifiedDataName |  NONNUMERICLITERAL)
+              (qualifiedDataName |  NONNUMERICLITERAL)?
+    ;
+
+getItemGrsStatement
+    : GET ITEM GRS
+               (qualifiedDataName | NONNUMERICLITERAL)
+               (qualifiedDataName |  NONNUMERICLITERAL)
+               (qualifiedDataName |  NONNUMERICLITERAL)?
+    ;
+
+
+getTaskStatement
+    : GET TASK (qualifiedDataName | {validateExactLength(trimQuotes(_input.LT(1).getText()), "task name", 4);}
+                NONNUMERICLITERAL)
+    ;
+
+getOdetteStatement
+    : GET ODETTE (qualifiedDataName | NONNUMERICLITERAL)
+    ;
+
+getJobStatement
+    : GET JOB (qualifiedDataName | NONNUMERICLITERAL)
+    ;
+
+getNetworkStatement
+    : GET NETWORK (qualifiedDataName | NONNUMERICLITERAL)
+    ;
 // End of DaCo Statements
 
 // abend code statement
@@ -3108,6 +3195,9 @@ daf_report_name
         (cobolWord)
     ;
 
+daf_entity_role
+    : (OWNER | DESIGNER | ANALIST | OWN | AVG | ANA)
+    ;
 // identifier ----------------------------------
 
 generalIdentifier

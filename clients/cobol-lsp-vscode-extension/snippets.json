@@ -2157,5 +2157,85 @@
         ],
         "description": "[DaCo] Open Packet Statement",
         "scope": "cobol"
+    },
+    "GET ENTITY": {
+        "prefix": "GET ENTITY",
+        "body": [
+            "GET ENTITY ${1:kls} ${2:att} ${3:rol}."
+        ],
+        "description": "[DaCo] GET Entity Statement",
+        "scope": "cobol"
+    },
+    "GET ENTITY DESCRIPTION": {
+        "prefix": "GET ENTITY DESCRIPTION",
+        "body": [
+            "GET ENTITY ${1:kls} ${2:att} DESCRIPTION ${3:tal}."
+        ],
+        "description": "[DaCo] GET Entity DESCRIPTION Statement",
+        "scope": "cobol"
+    },
+    "GET USER": {
+        "prefix": "GET USER",
+        "body": [
+            "GET USER ${1:kls} ${2:att}."
+        ],
+        "description": "[DaCo] GET USER Statement",
+        "scope": "cobol"
+    },
+    "GET ITEM ANY": {
+        "prefix": "GET ITEM ANY",
+        "body": [
+            "GET ITEM ANY ${1:geg} ${2:wrd} ${3:tal}."
+        ],
+        "description": "[DaCo] GET ITEM ANY",
+        "scope": "cobol"
+    },
+    "GET ITEM SEQ": {
+        "prefix": "GET ITEM SEQ",
+        "body": [
+            "GET ITEM SEQ ${1:geg} ${2:tal}."
+        ],
+        "description": "[DaCo] GET ITEM SEQ",
+        "scope": "cobol"
+    },
+    "GET ITEM GRS": {
+        "prefix": "GET ITEM GRS",
+        "body": [
+            "GET ITEM GRS ${1:geg} ${2:tak} ${3:tal}."
+        ],
+        "description": "[DaCo] GET ITEM GRS",
+        "scope": "cobol"
+    },
+    "GET TASK": {
+        "prefix": "GET TASK",
+        "body": [
+            "GET TASK ${1:task}."
+        ],
+        "description": "[DaCo] GET TASK",
+        "scope": "cobol"
+    },
+    "GET ODETTE": {
+        "prefix": "GET ODETTE",
+        "body": [
+            "GET ODETTE ${1:odt}."
+        ],
+        "description": "[DaCo] GET ODETTE",
+        "scope": "cobol"
+    },
+    "GET JOB": {
+        "prefix": "GET JOB",
+        "body": [
+            "GET JOB ${1:jobName}."
+        ],
+        "description": "[DaCo] GET JOB",
+        "scope": "cobol"
+    },
+    "GET NETWORK": {
+        "prefix": "GET NETWORK",
+        "body": [
+            "GET NETWORK ${1:networkName}."
+        ],
+        "description": "[DaCo] GET NETWORK",
+        "scope": "cobol"
     }
 }
