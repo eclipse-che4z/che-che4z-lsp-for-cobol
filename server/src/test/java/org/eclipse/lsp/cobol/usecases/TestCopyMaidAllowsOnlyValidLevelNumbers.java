@@ -12,34 +12,43 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.usecases.example;
+package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/** UseCase test example showing multi-token error */
-class TestMultiTokenError {
-  public static final String TEXT =
-      "       Identification Division.\n"
-          + "       Program-Id. 'P'.\n"
-          + "       Procedure Division.\n"
-          + "           MOVE 0 TO {_FOO OF BAR|1_}.";
+/** Test that COPY MAID statement allows only 01-49 level numbers */
+class TestCopyMaidAllowsOnlyValidLevelNumbers {
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       49 COPY MAID {~PMOREC}.\n"
+          + "       {50|1} COPY MAID {~PMOREC}.\n"
+          + "       Procedure Division.";
+
+  private static final String COPYBOOK_CONTENT =
+      "       01  {$*ABC}.\n" + "           05 {$*DEF}     PIC S9(4) COMP.";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(),
+        ImmutableList.of(new CobolText("PMOREC", COPYBOOK_CONTENT)),
         ImmutableMap.of(
             "1",
             new Diagnostic(
                 null,
-                "Variable FOO is not defined",
+                "Syntax error on '50' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, LINKAGE, "
+                    + "LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE, MAP, SCHEMA, '01-49', '66', '77', '88'}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

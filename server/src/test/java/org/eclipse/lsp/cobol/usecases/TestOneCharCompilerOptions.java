@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /** The test checks that one char options in the compiler directives do no produce any errors */
 class TestOneCharCompilerOptions {
   private static final String TEXT =
-      "   CBL NUMPROC(MIG),FLAG(I,W),RENT\n"
+      "   CBL ZONEDATA(MIG),FLAG(I,W),RENT\n"
           + "       ID DIVISION.\n"
           + "       PROGRAM-ID. EPSCSMRT.\n"
           + "       DATA DIVISION.\n"

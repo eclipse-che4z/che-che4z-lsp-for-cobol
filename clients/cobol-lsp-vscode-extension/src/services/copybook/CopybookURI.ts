@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import { C4Z_FOLDER, COPYBOOK_EXT_ARRAY, COPYBOOKS_FOLDER, PATHS_LOCAL_KEY, PATHS_ZOWE, SETTINGS_CPY_SECTION } from "../../constants";
+import { C4Z_FOLDER, COPYBOOK_EXT_ARRAY, COPYBOOKS_FOLDER, PATHS_LOCAL_KEY, PATHS_USS, PATHS_ZOWE, SETTINGS_CPY_SECTION } from "../../constants";
 import { searchInWorkspace } from "../util/FSUtils";
 import { ProfileUtils } from "../util/ProfileUtils";
 
@@ -47,7 +47,8 @@ export class CopybookURI {
 
     /**
      * This method produce an array with element that following the schema
-     * "file://[WORKSPACE_FOLDER]/.c4z/.copybooks/PROFILE/DATASET
+     * "file://[WORKSPACE_FOLDER]/.c4z/.copybooks/PROFILE/DATASET" or
+     * "file://[WORKSPACE_FOLDER]/.c4z/.copybooks/PROFILE/USS"
      * @param profile represent a name of a folder within the .copybooks folder that have the same name as the
      * connection name needed to download copybooks from mainframe.
      */
@@ -57,6 +58,13 @@ export class CopybookURI {
         if (profile && datasets) {
             result = Object.assign([], datasets);
             result.forEach((value, index) => result[index] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" +
+                profile + "/" + value);
+        }
+
+        const ussPaths: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_USS);
+        const baseIndex = result.length;
+        if (profile && ussPaths) {
+            Object.assign([], ussPaths).forEach((value, index) => result[index + baseIndex] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" +
                 profile + "/" + value);
         }
         return result;

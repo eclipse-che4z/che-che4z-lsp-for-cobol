@@ -17,7 +17,7 @@
 /// <reference types="../../support/" />
 
 // Import selectors from Theia object
-import { Theia } from '@eclipse/che-che4z/tests/dist/selectorsTheia';
+import { Theia } from '@eclipse/che-che4z/tests/dist/selectors';
 
 context('This is a Copybook spec', () => {
   beforeEach(() => {
@@ -493,18 +493,18 @@ context('This is a Copybook spec', () => {
     beforeEach(() => {
       cy.updateConfigs('testing');
     });
-    it(['smoke', 'CI'], 'Support COPY MAID statements', () => {
+    it(['smoke', 'ci'], 'Support COPY MAID statements', () => {
       cy.openFile('TEST.CBL');
       cy.goToLine(20);
-      cy.getLineByNumber(20).type('{end}{enter}    COPY MAID A.');
+      cy.getLineByNumber(20).type('{end}{enter}    05 COPY MAID A.');
       cy.goToLine(21);
       cy.getCurrentLineErrors({ expectedLine: 21 })
         .eq(0)
         .getHoverErrorMessage()
         .contains("Syntax error on 'WORK-VARIABLES' expected SECTION");
-      cy.getLineByNumber(21).type('{end}{enter}COPY MAID NEW.');
+      cy.getLineByNumber(21).type('{end}{enter}05 COPY MAID NEW.');
       cy.getLineByNumber(22).should('not.have.class', '.squiggly-error');
-      cy.getLineByNumber(22).type('{end}{enter}COPY MAID REPL.');
+      cy.getLineByNumber(22).type('{end}{enter}05 COPY MAID REPL.');
       cy.goToLine(23);
       cy.getCurrentLineErrors({ expectedLine: 23 })
         .eq(0)

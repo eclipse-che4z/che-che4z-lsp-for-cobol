@@ -27,7 +27,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 /** UseCase test example with variants */
-public class TestParametrised {
+class TestParametrised {
   private static final String TEXT_START =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST1.\n"
@@ -39,21 +39,22 @@ public class TestParametrised {
   private static final String END_2 = "       01  {$*VAR}     PIC S9(4){|eof}";
 
   private static Stream<String> textsGetter() {
-    return Stream.of(END_1, END_2)
-        .map(end -> TEXT_START + end);
+    return Stream.of(END_1, END_2).map(end -> TEXT_START + end);
   }
 
   @ParameterizedTest
   @MethodSource("textsGetter")
   @DisplayName("Parameterized - different ends")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of(
-        "eof",
-        new Diagnostic(
-            null,
-            "Unexpected end of file",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText())
-    ));
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "eof",
+            new Diagnostic(
+                null,
+                "Unexpected end of file",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

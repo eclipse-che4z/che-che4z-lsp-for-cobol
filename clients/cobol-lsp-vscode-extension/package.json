@@ -127,6 +127,14 @@
                     "description": "Default list of datasets to search for copybooks",
                     "uniqueItems": true
                 },
+                "cobol-lsp.cpy-manager.paths-uss": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of USS paths to search for copybooks",
+                    "uniqueItems": true
+                },
                 "cobol-lsp.subroutine-manager.paths-local": {
                     "type": "array",
                     "items": {

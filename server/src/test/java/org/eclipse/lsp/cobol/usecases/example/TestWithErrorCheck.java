@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
 /** UseCase test example when you expecting errors */
-public class TestWithErrorCheck {
+class TestWithErrorCheck {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST1.\n"
@@ -34,13 +34,15 @@ public class TestWithErrorCheck {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(
-        "1",
-        new Diagnostic(
-            null,
-            "Unexpected end of file",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText())
-    ));
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Unexpected end of file",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }
