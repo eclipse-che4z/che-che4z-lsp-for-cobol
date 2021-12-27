@@ -114,7 +114,7 @@ replacement
    ;
 
 identifier
-   : IDENTIFIER | NUMBERLITERAL | LINKAGE | SECTION | DOT
+   : (IDENTIFIER | NUMBERLITERAL | LINKAGE | SECTION | DOT | STRINGLITERAL | TEXT)+
    ;
 
 cpyIdentifier
