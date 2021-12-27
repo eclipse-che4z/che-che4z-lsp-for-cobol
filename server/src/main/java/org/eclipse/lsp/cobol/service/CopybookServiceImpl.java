@@ -158,8 +158,12 @@ public class CopybookServiceImpl implements CopybookService {
           settingsService
               .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
               .get());
-    } catch (InterruptedException | ExecutionException e) {
+    } catch (InterruptedException e) {
+      // rethrowing the InterruptedException to interrupt the parent thread.
       throw new UncheckedExecutionException(e);
+    } catch (ExecutionException e) {
+      LOG.warn("An exception thrown while resolving a copybook from the workspace", e);
+      return Optional.empty();
     }
   }
 
