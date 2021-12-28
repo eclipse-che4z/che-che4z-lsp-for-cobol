@@ -312,9 +312,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       CopySourceContext copySource,
       Locality copybookStatementPosition,
       int maxLength) {
-    if (!copybookConfig.getCopybookProcessingMode().analyze) {
-      accumulateTokenShift(context);
-      pop();
+    if (requiresEarlyReturn(context)) {
       return;
     }
     String copybookName = retrieveCopybookName(copySource);
@@ -338,6 +336,15 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     pop();
     writeCopybook(copybookId, copybookDocument.getText());
     accumulateTokenShift(context);
+  }
+
+  private boolean requiresEarlyReturn(ParserRuleContext context) {
+    if (!copybookConfig.getCopybookProcessingMode().analyze) {
+      accumulateTokenShift(context);
+      pop();
+      return true;
+    }
+    return false;
   }
 
   private String handleReplacing(
