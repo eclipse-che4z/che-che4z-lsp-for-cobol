@@ -292,7 +292,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       CopySourceContext copySource,
       Locality copybookStatementPosition,
       int maxLength) {
-
+    if (requiresEarlyReturn(context)) {
+      return;
+    }
     String copybookName = retrieveCopybookName(copySource);
     Locality locality = retrievePosition(copySource);
 
