@@ -9,7 +9,7 @@
 
 # COBOL Language Support
 
-COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using a Zowe CLI z/OSMF profile to automatically retrieve copybooks used in your programs and store them in your workspace. 
+COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using the Zowe Explorer extension to automatically retrieve copybooks used in your programs and store them in your workspace. 
 
 COBOL Language Support recognizes files with the extensions `.cob` and `.cbl` as COBOL files.
 
@@ -23,8 +23,8 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 - Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
 - To enable automatic copybook retrieval, the following are required:
-    - Configured TSO/E address space services, z/OS data set and file REST interface, and z/OS jobs REST interface. For more information, see [z/OS Requirements](https://docs.zowe.org/stable/user-guide/systemrequirements-zosmf.html#z-os-requirements).
-    - [Zowe CLI z/OSMF profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) with credentials.
+    - [Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=Zowe.vscode-extension-for-zowe) plugin version 1.15.0 or higher.
+    - A Zowe Explorer `zosmf` or `zftp` profile with credentials and a connection URL defined.
     
 ## Compatibility
 
@@ -103,7 +103,7 @@ If you specify your subroutine folders using absolute paths or paths containing 
 
 ## Copybook Support
 
-The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe CLI z/OSMF profile to automatically download them from the mainframe to your workspace. 
+The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace. 
 
 You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
 
@@ -135,15 +135,13 @@ To resolve copybook names manually, hover over the copybook name with the error 
 
 You can also set up automatic copybook retrieval from the mainframe to download copybooks from mainframe data sets to your workspace. 
 
-**Note:** Ensure that you do not have the [Secure Credentials Store plug-in for Zowe CLI](https://docs.zowe.org/stable/user-guide/cli-scsplugin/) enabled before you use this feature.
-
 **Follow these steps:**
 
-1. Ensure that you have a [Zowe CLI z/OSMF profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) configured, with credentials defined.
+1. Ensure that you have a [Zowe Explorer profile](https://docs.zowe.org/stable/user-guide/ze-profiles/) configured, with credentials and a connection URL defined.
 2. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
 3. Switch from **User** to **Workspace**.
 4. Under **Cpy-manager: Paths-dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
-5. Under **Profile**, enter the name of your Zowe CLI z/OSMF profile.
+5. Under **Profile**, enter the name of your Zowe Explorer profile.
 6. Open a program or project.  
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3.  
    Copybook support features are now enabled.
