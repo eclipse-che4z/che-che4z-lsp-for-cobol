@@ -23,7 +23,7 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 - Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
 - To enable automatic copybook retrieval, the following are required:
-    - [Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=Zowe.vscode-extension-for-zowe) plugin version 1.15.0 or higher.
+    - [Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=Zowe.vscode-extension-for-zowe) version 1.15.0 or higher.
     - A Zowe Explorer `zosmf` or `zftp` profile with credentials and a connection URL defined.
     
 ## Compatibility
