@@ -321,28 +321,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     Locality locality = retrievePosition(copySource);
     CopybookModel model = getCopyBookContent(copybookName, locality, copybookConfig);
     String uri = model.getUri();
-
     String copybookId = randomUUID().toString();
-    // In a chain of copy statement, there could be only one replacing phrase
 
-    if (!copyReplacingClauses.isEmpty()) {
-      recursiveReplaceStmtStack.add(new ArrayList<>(copyReplacingClauses));
-      copyReplacingClauses.clear();
-    }
-
-    // Do preprocessor cleanup, before replacements.
-    String content = preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll);
-
-    if (!recursiveReplaceStmtStack.isEmpty()) {
-      for (List<Pair<String, String>> clause : recursiveReplaceStmtStack)
-        content = applyReplacing(content, clause);
-    }
-
-    checkRecursiveReplaceStatement(recursiveReplaceStmtStack.size(), copybookName, locality);
+    String content = handleReplacing(copybookName, model.getContent(), uri, locality);
 
     ExtendedDocument copybookDocument =
         processCopybook(copybookName, uri, copybookId, content, locality);
-    String copybookContent = copybookDocument.getText();
 
     checkCopybookName(copybookName, locality, maxLength);
     addCopybookUsage(copybookName, locality);
@@ -352,8 +336,29 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     collectNestedSemanticData(uri, copybookId, copybookDocument);
     // throw away COPY terminals
     pop();
-    writeCopybook(copybookId, copybookContent);
+    writeCopybook(copybookId, copybookDocument.getText());
     accumulateTokenShift(context);
+  }
+
+  private String handleReplacing(
+      String copybookName, String copybookContent, String uri, Locality locality) {
+    // Do preprocessor cleanup, before replacements.
+    String text = preprocessor.cleanUpCode(uri, copybookContent).unwrap(errors::addAll);
+
+    // In a chain of copy statement, there could be only one replacing phrase
+
+    if (!copyReplacingClauses.isEmpty()) {
+      recursiveReplaceStmtStack.add(new ArrayList<>(copyReplacingClauses));
+      copyReplacingClauses.clear();
+    }
+
+    if (!recursiveReplaceStmtStack.isEmpty()) {
+      for (List<Pair<String, String>> clause : recursiveReplaceStmtStack)
+        text = applyReplacing(text, clause);
+    }
+
+    checkRecursiveReplaceStatement(recursiveReplaceStmtStack.size(), copybookName, locality);
+    return text;
   }
 
   private void checkRecursiveReplaceStatement(
