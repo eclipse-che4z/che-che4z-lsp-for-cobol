@@ -322,7 +322,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     String uri = model.getUri();
     String copybookId = randomUUID().toString();
 
-    String content = handleReplacing(copybookName, model.getContent(), uri, locality);
+    String text = preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll);
+    String content = handleReplacing(copybookName, text, locality);
 
     ExtendedDocument copybookDocument =
         processCopybook(copybookName, uri, copybookId, content, locality);
@@ -333,7 +334,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
     collectCopybookStatement(copybookId, copybookStatementPosition);
     collectNestedSemanticData(uri, copybookId, copybookDocument);
-    // throw away COPY terminals
+
+    finalizeCopybookProcessing(context, copybookId, copybookDocument);
+  }
+
+  private void finalizeCopybookProcessing(
+      ParserRuleContext context, String copybookId, ExtendedDocument copybookDocument) {
     pop();
     writeCopybook(copybookId, copybookDocument.getText());
     accumulateTokenShift(context);
@@ -348,11 +354,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     return false;
   }
 
-  private String handleReplacing(
-      String copybookName, String copybookContent, String uri, Locality locality) {
-    // Do preprocessor cleanup, before replacements.
-    String text = preprocessor.cleanUpCode(uri, copybookContent).unwrap(errors::addAll);
-
+  private String handleReplacing(String copybookName, String text, Locality locality) {
     // In a chain of copy statement, there could be only one replacing phrase
 
     if (!copyReplacingClauses.isEmpty()) {
