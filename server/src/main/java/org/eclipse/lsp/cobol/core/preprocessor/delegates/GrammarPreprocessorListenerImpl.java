@@ -323,7 +323,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     String copybookId = randomUUID().toString();
 
     String text = preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll);
-    String content = handleReplacing(copybookName, text, locality);
+    String content =
+        handleReplacing(
+            copybookName, text, locality, copyReplacingClauses, recursiveReplaceStmtStack);
 
     ExtendedDocument copybookDocument =
         processCopybook(copybookName, uri, copybookId, content, locality);
@@ -354,20 +356,24 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     return false;
   }
 
-  private String handleReplacing(String copybookName, String text, Locality locality) {
+  private String handleReplacing(
+      String copybookName,
+      String text,
+      Locality locality,
+      List<Pair<String, String>> replacingClauses,
+      Deque<List<Pair<String, String>>> replaceStack) {
     // In a chain of copy statement, there could be only one replacing phrase
 
-    if (!copyReplacingClauses.isEmpty()) {
-      recursiveReplaceStmtStack.add(new ArrayList<>(copyReplacingClauses));
-      copyReplacingClauses.clear();
+    if (!replacingClauses.isEmpty()) {
+      replaceStack.add(new ArrayList<>(replacingClauses));
+      replacingClauses.clear();
     }
 
-    if (!recursiveReplaceStmtStack.isEmpty()) {
-      for (List<Pair<String, String>> clause : recursiveReplaceStmtStack)
-        text = applyReplacing(text, clause);
+    if (!replaceStack.isEmpty()) {
+      for (List<Pair<String, String>> clause : replaceStack) text = applyReplacing(text, clause);
     }
 
-    checkRecursiveReplaceStatement(recursiveReplaceStmtStack.size(), copybookName, locality);
+    checkRecursiveReplaceStatement(replaceStack.size(), copybookName, locality);
     return text;
   }
 
