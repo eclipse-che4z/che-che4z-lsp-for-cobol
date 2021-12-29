@@ -368,13 +368,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       replaceStack.add(new ArrayList<>(replacingClauses));
       replacingClauses.clear();
     }
-
-    if (!replaceStack.isEmpty()) {
-      for (List<Pair<String, String>> clause : replaceStack) text = applyReplacing(text, clause);
-    }
-
     checkRecursiveReplaceStatement(replaceStack.size(), copybookName, locality);
-    return text;
+
+    return replaceStack.stream().reduce(text, replacingService::applyReplacing, (raw, res) -> res);
   }
 
   private void checkRecursiveReplaceStatement(
