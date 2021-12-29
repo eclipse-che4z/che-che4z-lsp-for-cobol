@@ -214,6 +214,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitCopyIdmsStatement(@NonNull CopyIdmsStatementContext ctx) {
+    if (requiresEarlyReturn(ctx)) return;
     collectAndAccumulateCopybookData(
         ctx,
         ctx.copyIdmsOptions().copyIdmsSource().copySource(),
@@ -228,6 +229,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitCopyMaidStatement(CopyMaidStatementContext ctx) {
+    if (requiresEarlyReturn(ctx)) return;
     final Optional<TerminalNode> levelNumber = ofNullable(ctx.LEVEL_NUMBER());
     final Locality copybookStatementPosition = retrieveCopybookStatementPosition(ctx);
     final CopySourceContext copySource = ctx.copySource();
@@ -252,6 +254,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
+    if (requiresEarlyReturn(ctx)) return;
     collectAndAccumulateCopybookData(
         ctx,
         ctx.copySource(),
@@ -266,6 +269,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
+    if (requiresEarlyReturn(ctx)) return;
     collectAndAccumulateCopybookData(
         ctx,
         ctx.copySource(),
@@ -280,6 +284,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
+    if (requiresEarlyReturn(ctx)) return;
     collectAndAccumulateCopybookData(
         ctx,
         ctx.copySource(),
@@ -292,9 +297,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       CopySourceContext copySource,
       Locality copybookStatementPosition,
       int maxLength) {
-    if (requiresEarlyReturn(context)) {
-      return;
-    }
     String copybookName = retrieveCopybookName(copySource);
     Locality locality = retrievePosition(copySource);
 
@@ -314,9 +316,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       CopySourceContext copySource,
       Locality copybookStatementPosition,
       int maxLength) {
-    if (requiresEarlyReturn(context)) {
-      return;
-    }
     String copybookName = retrieveCopybookName(copySource);
     Locality locality = retrievePosition(copySource);
     CopybookModel model = getCopyBookContent(copybookName, locality, copybookConfig);
