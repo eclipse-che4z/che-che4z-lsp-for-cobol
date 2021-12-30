@@ -219,7 +219,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         .analyzeCopybook(
             ctx,
             ctx.copyIdmsOptions().copyIdmsSource().copySource(),
-            retrieveCopybookStatementPosition(ctx),
             MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
   }
 
@@ -232,7 +231,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void exitCopyMaidStatement(CopyMaidStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
     final Optional<TerminalNode> levelNumber = ofNullable(ctx.LEVEL_NUMBER());
-    final Locality copybookStatementPosition = retrieveCopybookStatementPosition(ctx);
     final CopySourceContext copySource = ctx.copySource();
     if (levelNumber.isPresent())
       levelNumber
@@ -241,15 +239,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
           .ifPresent(
               it ->
                   new CobolAnalysis()
-                      .analyzeCopybook(
-                          ctx,
-                          copySource,
-                          copybookStatementPosition,
-                          MAX_COPYBOOK_NAME_LENGTH_DEFAULT));
-    else
-      new SkippingAnalysis()
-          .analyzeCopybook(
-              ctx, copySource, copybookStatementPosition, MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
+                      .analyzeCopybook(ctx, copySource, MAX_COPYBOOK_NAME_LENGTH_DEFAULT));
+    else new SkippingAnalysis().analyzeCopybook(ctx, copySource, MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
   }
 
   @Override
@@ -261,11 +252,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
     new CobolAnalysis()
-        .analyzeCopybook(
-            ctx,
-            ctx.copySource(),
-            retrieveCopybookStatementPosition(ctx),
-            MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB);
+        .analyzeCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB);
   }
 
   @Override
@@ -276,12 +263,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new CobolAnalysis()
-        .analyzeCopybook(
-            ctx,
-            ctx.copySource(),
-            retrieveCopybookStatementPosition(ctx),
-            MAX_COPYBOOK_NAME_LENGTH_DATASET);
+    new CobolAnalysis().analyzeCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_DATASET);
   }
 
   @Override
@@ -292,12 +274,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new CobolAnalysis()
-        .analyzeCopybook(
-            ctx,
-            ctx.copySource(),
-            retrieveCopybookStatementPosition(ctx),
-            MAX_COPYBOOK_NAME_LENGTH_DATASET);
+    new CobolAnalysis().analyzeCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_DATASET);
   }
 
   private boolean requiresEarlyReturn(ParserRuleContext context) {
@@ -666,13 +643,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     errors.add(error);
   }
 
+  /**
+   * This class is a framework for the copybook analysis. The actual implementations may change the
+   * behavior overriding the methods.
+   */
   private abstract class CopybookAnalysis {
 
-    void analyzeCopybook(
-        ParserRuleContext context,
-        CopySourceContext copySource,
-        Locality copybookStatementPosition,
-        int maxLength) {
+    void analyzeCopybook(ParserRuleContext context, CopySourceContext copySource, int maxLength) {
       String copybookName = retrieveCopybookName(copySource);
       Locality locality = retrievePosition(copySource);
       String copybookId = randomUUID().toString();
@@ -681,7 +658,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
       checkCopybookName(copybookName, locality, maxLength);
       addCopybookUsage(copybookName, locality);
-      collectCopybookStatement(copybookId, copybookStatementPosition);
+      collectCopybookStatement(copybookId, retrieveCopybookStatementPosition(context));
 
       pop();
       copybookDocument.ifPresent(it -> writeCopybook(copybookId, it));
