@@ -14,16 +14,14 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/** Tests the DAF GET ENTITY statement */
+/** Tests the DAF GET ODETTE statement */
 class TestDAFGetOdetteStatement {
 
   private static final String TEXT =
@@ -38,28 +36,28 @@ class TestDAFGetOdetteStatement {
           + "        PROCEDURE DIVISION. \r\n"
           + "            GET ODETTE 'TAKSDFE'. \r\n"
           + "            GET ODETTE {$DET001-XW1}. \r\n"
-      //Negative tests
+          // Negative tests
           + "            GET ODETTE {.|1} \r\n"
           + "            GET ODETTE {DET002-XW1|2}. \r\n";
 
   @Test
   void test() {
 
-    Map<String, Diagnostic> diagnosticMap = new HashMap<>();
-    diagnosticMap.put(
-        "1",
-        new Diagnostic(
-            null,
-            "Syntax error on '.' expected {NONNUMERICLITERAL, IDENTIFIER}",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText()));
-    diagnosticMap.put(
-        "2",
-        new Diagnostic(
-            null,
-            "Variable DET002-XW1 is not defined",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText()));
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), diagnosticMap);
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Syntax error on '.' expected {NONNUMERICLITERAL, IDENTIFIER}",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "2",
+            new Diagnostic(
+                null,
+                "Variable DET002-XW1 is not defined",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

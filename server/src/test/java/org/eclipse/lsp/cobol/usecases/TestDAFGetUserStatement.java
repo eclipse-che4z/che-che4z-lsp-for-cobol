@@ -14,16 +14,14 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/** Tests the DAF GET ENTITY statement */
+/** Tests the DAF GET USER statement */
 class TestDAFGetUserStatement {
 
   private static final String TEXT =
@@ -48,29 +46,27 @@ class TestDAFGetUserStatement {
   @Test
   void test() {
 
-    Map<String, Diagnostic> diagnosticMap = new HashMap<>();
-    diagnosticMap.put(
-        "1",
-        new Diagnostic(
-            null,
-            "Exact length of kls must be 3 bytes",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText()));
-    diagnosticMap.put(
-        "2",
-        new Diagnostic(
-            null,
-            "No viable alternative at input GET USER.",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText()));
-    diagnosticMap.put(
-        "3",
-        new Diagnostic(
-            null,
-            "Variable DETFR-EW is not defined",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText()));
-
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), diagnosticMap);
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Exact length of kls must be 3 bytes",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "2",
+            new Diagnostic(
+                null,
+                "Syntax error on '.' expected {NEXT, NONNUMERICLITERAL, IDENTIFIER}",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "3",
+            new Diagnostic(
+                null,
+                "Variable DETFR-EW is not defined",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

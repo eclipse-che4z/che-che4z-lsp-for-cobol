@@ -14,16 +14,15 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
 
-/** Tests the DAF GET ENTITY statement */
+/** Tests the DAF GET ITEM statement */
 class TestDAFGetItemStatement {
 
   private static final String TEXT =
@@ -39,14 +38,14 @@ class TestDAFGetItemStatement {
           + "            GET ITEM ANY {$DET001-XW1} {$DET001-XW1} {$DET001-XW1}. \r\n"
           + "            GET ITEM ANY 'SDF' 'GTERE' 'TYERWE'. \r\n"
           + "            GET ITEM ANY 'SDF' 'GTERE' 'TYERWE'. \r\n"
+          + "            GET ITEM GRS {$DET001-XW1} {$DET001-XW1}. \r\n"
           + "            GET ITEM SEQ 'SDF' 'GTERE'. \r\n"
           + "            GET ITEM SEQ 'SDF'. \r\n"
           + "            GET ITEM SEQ {$DET001-XW1} {$DET001-XW1}. \r\n"
           + "            GET ITEM SEQ {$DET001-XW1}. \r\n"
           + "            GET ITEM GRS 'RETERW' 'DFDFD'. \r\n"
           + "            GET ITEM GRS {$DET001-XW1} {$DET001-XW1} {$DET001-XW1}. \r\n"
-          + "            GET ITEM GRS {$DET001-XW1} {$DET001-XW1}. \r\n"
-      // Negative Tests
+          // Negative Tests
           + "            GET ITEM ANY {.|1} \r\n"
           + "            GET ITEM ANY 'GTEER' {.|1} \r\n"
           + "            GET ITEM ANY 'GTEER' 'FGTREW' {.|1} \r\n"
@@ -64,22 +63,21 @@ class TestDAFGetItemStatement {
   @Test
   void test() {
 
-    Map<String, Diagnostic> diagnosticMap = new HashMap<>();
-    diagnosticMap.put(
-        "1",
-        new Diagnostic(
-            null,
-            "Syntax error on '.' expected {NONNUMERICLITERAL, IDENTIFIER}",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText()));
-    diagnosticMap.put(
-        "2",
-        new Diagnostic(
-            null,
-            "Variable DSR443-RW1 is not defined",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText()));
-
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), diagnosticMap);
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Syntax error on '.' expected {NONNUMERICLITERAL, IDENTIFIER}",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "2",
+            new Diagnostic(
+                null,
+                "Variable DSR443-RW1 is not defined",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

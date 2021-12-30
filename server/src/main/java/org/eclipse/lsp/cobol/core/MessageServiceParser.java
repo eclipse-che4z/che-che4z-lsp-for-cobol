@@ -173,7 +173,7 @@ public abstract class MessageServiceParser extends Parser {
    */
   protected void validateAllowedValues(String input, String... allowedValues) {
     if (input != null && !checkInputInAllowedValues(input, allowedValues)) {
-      notifyError("parsers.allowedStringValues", String.join(",", allowedValues));
+      notifyError("parsers.allowedStringValues", String.join(", ", allowedValues));
     }
   }
 
@@ -214,7 +214,7 @@ public abstract class MessageServiceParser extends Parser {
 
   private Boolean checkInputInAllowedValues(String input, String[] allowedValues) {
     for (String item : allowedValues) {
-      if (input.equals(item)) return true;
+      if (input.equalsIgnoreCase(item)) return true;
     }
     return false;
   }

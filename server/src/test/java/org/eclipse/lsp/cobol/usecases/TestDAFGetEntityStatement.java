@@ -14,14 +14,13 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /** Tests the DAF GET ENTITY statement */
 class TestDAFGetEntityStatement {
@@ -52,7 +51,7 @@ class TestDAFGetEntityStatement {
           + "            GET ENTITY 'TAK' {$DET001-XW1} DESCRIPTION 'VD'. \r\n"
           + "            GET ENTITY DOM {$DET001-XW1} DESCRIPTION. \r\n"
           + "            GET ENTITY 'DOM' {$DET001-XW1} DESCRIPTION. \r\n"
-      // Negative tests
+          // Negative tests
           + "            GET ENTITY {'TA'|2} {$DET001-XW1} OWNER. \r\n"
           + "            GET ENTITY {'TAKSE'|2} {$DET001-XW1} 'OWNER'. \r\n"
           + "            GET ENTITY 'TAK' {$DET001-XW1} {'OWNERT'|3}. \r\n"
@@ -61,36 +60,33 @@ class TestDAFGetEntityStatement {
 
   @Test
   void test() {
-
-    Map<String, Diagnostic> diagnosticMap = new HashMap<>();
-    diagnosticMap.put(
-        "1",
-        new Diagnostic(
-            null,
-            "Exact length of tal must be 2 bytes",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText()));
-    diagnosticMap.put(
-        "2",
-        new Diagnostic(
-            null,
-            "String length must be between 3 and 4",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText()));
-    diagnosticMap.put(
-        "3",
-        new Diagnostic(
-            null,
-            "Only allowed value(s) OWNER,OWN,DESIGNER,AVG,ANALIST,ANA",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText()));
-    diagnosticMap.put(
-        "4",
-        new Diagnostic(
-            null,
-            "Only allowed value(s) DOM",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText()));
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), diagnosticMap);
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Exact length of tal must be 2 bytes",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "2",
+            new Diagnostic(
+                null,
+                "String length must be between 3 and 4",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "3",
+            new Diagnostic(
+                null,
+                "Only allowed value(s): OWNER, OWN, DESIGNER, AVG, ANALIST, ANA",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "4",
+            new Diagnostic(
+                null,
+                "Only allowed value(s): DOM",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }
