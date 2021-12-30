@@ -247,8 +247,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
                           copybookStatementPosition,
                           MAX_COPYBOOK_NAME_LENGTH_DEFAULT));
     else
-      new CobolAnalysis()
-          .skipCopybook(
+      new SkippingAnalysis()
+          .analyzeCopybook(
               ctx, copySource, copybookStatementPosition, MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
   }
 
@@ -675,53 +675,46 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         int maxLength) {
       String copybookName = retrieveCopybookName(copySource);
       Locality locality = retrievePosition(copySource);
-      CopybookModel model = getCopyBookContent(copybookName, locality, copybookConfig);
-      String uri = model.getUri();
       String copybookId = randomUUID().toString();
 
-      String cleanText = preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll);
+      Optional<String> copybookDocument = retrieveCopybookText(copybookName, locality, copybookId);
 
+      checkCopybookName(copybookName, locality, maxLength);
+      addCopybookUsage(copybookName, locality);
+      collectCopybookStatement(copybookId, copybookStatementPosition);
+
+      pop();
+      copybookDocument.ifPresent(it -> writeCopybook(copybookId, it));
+      accumulateTokenShift(context);
+    }
+
+    protected Optional<String> retrieveCopybookText(
+        String copybookName, Locality locality, String copybookId) {
+      CopybookModel model = getCopyBookContent(copybookName, locality, copybookConfig);
+      String uri = model.getUri();
+      String cleanText = preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll);
       String preparedText = handleReplacing(copybookName, cleanText, locality);
 
       ExtendedDocument copybookDocument =
           processCopybook(copybookName, uri, copybookId, preparedText, locality);
-
-      checkCopybookName(copybookName, locality, maxLength);
-      addCopybookUsage(copybookName, locality);
       addCopybookDefinition(copybookName, uri);
-
-      collectCopybookStatement(copybookId, copybookStatementPosition);
       collectNestedSemanticData(uri, copybookId, copybookDocument);
-
-      finalizeCopybookProcessing(context, copybookId, copybookDocument);
+      return Optional.of(copybookDocument.getText());
     }
 
     abstract String handleReplacing(String copybookName, String text, Locality locality);
+  }
 
-    void skipCopybook(
-        ParserRuleContext context,
-        CopySourceContext copySource,
-        Locality copybookStatementPosition,
-        int maxLength) {
-      String copybookName = retrieveCopybookName(copySource);
-      Locality locality = retrievePosition(copySource);
-
-      String copybookId = randomUUID().toString();
-
-      checkCopybookName(copybookName, locality, maxLength);
-      addCopybookUsage(copybookName, locality);
-
-      collectCopybookStatement(copybookId, copybookStatementPosition);
-
-      pop();
-      accumulateTokenShift(context);
+  private class SkippingAnalysis extends CopybookAnalysis {
+    @Override
+    protected Optional<String> retrieveCopybookText(
+        String copybookName, Locality locality, String copybookId) {
+      return Optional.empty();
     }
 
-    private void finalizeCopybookProcessing(
-        ParserRuleContext context, String copybookId, ExtendedDocument copybookDocument) {
-      pop();
-      writeCopybook(copybookId, copybookDocument.getText());
-      accumulateTokenShift(context);
+    @Override
+    String handleReplacing(String copybookName, String text, Locality locality) {
+      return copybookName;
     }
   }
 
