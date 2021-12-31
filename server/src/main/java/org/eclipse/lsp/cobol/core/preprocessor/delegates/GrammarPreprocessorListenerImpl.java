@@ -192,19 +192,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitLinkageSection(LinkageSectionContext ctx) {
-    String copybookName = DFHEIBLC.name();
-    Locality locality = retrievePosition(ctx);
-    CopybookModel model = getCopyBookContent(copybookName, locality, copybookConfig);
-    String uri = model.getUri();
-
-    String content = preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll);
-
-    ExtendedDocument copybookDocument =
-        processCopybook(copybookName, uri, copybookName, content, locality);
-    String copybookContent = copybookDocument.getText();
-
-    collectNestedSemanticData(uri, copybookName, copybookDocument);
-    writeCopybook(copybookName, copybookContent);
+    new PredefinedCopybookAnalysis().analyzeCopybook(ctx, ctx, MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
   }
 
   @Override
@@ -408,59 +396,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     return replacingService.applyReplacing(rawContent, replacePatterns);
   }
 
-  private CopybookModel getCopyBookContent(
-      String copybookName, Locality locality, CopybookConfig copybookConfig) {
-
-    if (copybookName.isEmpty()) return emptyModel(copybookName);
-
-    if (hasRecursion(copybookName)) {
-      copybookStack.forEach(this::reportRecursiveCopybook);
-      return emptyModel(copybookName);
-    }
-
-    CopybookModel copybook = copybookService.resolve(copybookName, documentUri, copybookConfig);
-    if (copybook.getContent() == null) {
-      reportMissingCopybooks(copybookName, locality);
-      return emptyModel(copybookName);
-    }
-
-    return copybook;
-  }
-
   private boolean hasRecursion(String copybookName) {
     return copybookStack.stream().map(CopybookUsage::getName).anyMatch(copybookName::equals);
   }
 
-  private ExtendedDocument processCopybook(
-      String copybookName, String uri, String copybookId, String content, Locality locality) {
-    copybookStack.push(new CopybookUsage(copybookName, copybookId, locality));
-    ExtendedDocument result =
-        preprocessor
-            .processCleanCode(
-                uri,
-                content,
-                copybookStack,
-                copybookConfig,
-                recursiveReplaceStmtStack,
-                replacingClauses)
-            .unwrap(errors::addAll);
-    copybookStack.pop();
-    if (Objects.nonNull(recursiveReplaceStmtStack.peek())) recursiveReplaceStmtStack.pop();
-    return result;
-  }
-
   private CopybookModel emptyModel(String copybookName) {
     return new CopybookModel(copybookName, "", "");
-  }
-
-  @NonNull
-  private String retrieveCopybookName(@NonNull CopySourceContext copySource) {
-    return retrieveCopybookName(
-        Optional.<RuleContext>ofNullable(copySource.cobolWord()).orElse(copySource.literal()));
-  }
-
-  private String retrieveCopybookName(@NonNull RuleContext context) {
-    return PreprocessorStringUtils.trimQuotes(context.getText().toUpperCase());
   }
 
   private String retrieveCopybookId() {
@@ -557,15 +498,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     LOG.debug("Syntax error by reportInvalidArgument: {}", error.toString());
   }
 
-  private void reportRecursiveCopybook(CopybookUsage usage) {
-    addCopybookError(
-        usage.getName(),
-        usage.getLocality(),
-        ERROR,
-        "GrammarPreprocessorListener.recursionDetected",
-        "Syntax error by reportRecursiveCopybook: {}");
-  }
-
   private void reportMissingCopybooks(String copybookName, Locality locality) {
     SyntaxError error =
         SyntaxError.syntaxError()
@@ -649,55 +581,138 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
    */
   private abstract class CopybookAnalysis {
 
-    void analyzeCopybook(ParserRuleContext context, CopySourceContext copySource, int maxLength) {
-      String copybookName = retrieveCopybookName(copySource);
-      Locality locality = retrievePosition(copySource);
+    void analyzeCopybook(ParserRuleContext context, ParserRuleContext copySource, int maxLength) {
+      String copybookName = retrieveCopybookName(context, copySource);
+      Locality copybookNameLocality = retrievePosition(copySource);
+      Locality copyStatementLocality = retrievePosition(context);
       String copybookId = randomUUID().toString();
 
-      Optional<String> copybookDocument = retrieveCopybookText(copybookName, locality, copybookId);
+      CopybookModel model = getCopyBookContent(copybookName, copybookNameLocality, copybookConfig);
 
-      checkCopybookName(copybookName, locality, maxLength);
-      addCopybookUsage(copybookName, locality);
-      collectCopybookStatement(copybookId, retrieveCopybookStatementPosition(context));
+      String uri = model.getUri();
+      String cleanText = preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll);
+      String preparedText = handleReplacing(copybookName, cleanText, copybookNameLocality);
 
+      storeCopyStatementSemantics(copybookName, copybookNameLocality, uri);
+      checkCopybookName(copybookName, copybookNameLocality, maxLength);
+      collectCopybookStatement(copybookId, copyStatementLocality);
+
+      Optional<ExtendedDocument> copybookDocument =
+          processCopybook(copybookName, uri, copybookId, preparedText, copybookNameLocality);
+
+      beforeWriting();
+      copybookDocument.ifPresent(
+          it -> {
+            writeCopybook(copybookId, it.getText());
+            collectNestedSemanticData(uri, copybookId, it);
+          });
+      afterWriting(context);
+    }
+
+    protected Optional<ExtendedDocument> processCopybook(
+        String copybookName, String uri, String copybookId, String content, Locality locality) {
+      copybookStack.push(new CopybookUsage(copybookName, copybookId, locality));
+      ExtendedDocument result =
+          preprocessor
+              .processCleanCode(
+                  uri,
+                  content,
+                  copybookStack,
+                  copybookConfig,
+                  recursiveReplaceStmtStack,
+                  replacingClauses)
+              .unwrap(errors::addAll);
+      copybookStack.pop();
+      if (Objects.nonNull(recursiveReplaceStmtStack.peek())) recursiveReplaceStmtStack.pop();
+      return Optional.of(result);
+    }
+
+    protected CopybookModel getCopyBookContent(
+        String copybookName, Locality locality, CopybookConfig copybookConfig) {
+
+      if (copybookName.isEmpty()) return emptyModel(copybookName);
+
+      if (hasRecursion(copybookName)) {
+        copybookStack.forEach(this::reportRecursiveCopybook);
+        return emptyModel(copybookName);
+      }
+
+      CopybookModel copybook = copybookService.resolve(copybookName, documentUri, copybookConfig);
+      if (copybook.getContent() == null) {
+        reportMissingCopybooks(copybookName, locality);
+        return emptyModel(copybookName);
+      }
+
+      return copybook;
+    }
+
+    protected String retrieveCopybookName(
+        ParserRuleContext mainContext, ParserRuleContext copySource) {
+      CopySourceContext ctx = (CopySourceContext) copySource;
+      return retrieveCopybookName(
+          Optional.<RuleContext>ofNullable(ctx.cobolWord()).orElse(ctx.literal()));
+    }
+
+    private String retrieveCopybookName(@NonNull RuleContext context) {
+      return PreprocessorStringUtils.trimQuotes(context.getText().toUpperCase());
+    }
+
+    protected void beforeWriting() {
       pop();
-      copybookDocument.ifPresent(it -> writeCopybook(copybookId, it));
+    }
+
+    protected void afterWriting(ParserRuleContext context) {
       accumulateTokenShift(context);
     }
 
-    protected Optional<String> retrieveCopybookText(
-        String copybookName, Locality locality, String copybookId) {
-      CopybookModel model = getCopyBookContent(copybookName, locality, copybookConfig);
-      String uri = model.getUri();
-      String cleanText = preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll);
-      String preparedText = handleReplacing(copybookName, cleanText, locality);
-
-      ExtendedDocument copybookDocument =
-          processCopybook(copybookName, uri, copybookId, preparedText, locality);
+    protected void storeCopyStatementSemantics(
+        String copybookName, Locality copybookNameLocality, String uri) {
+      addCopybookUsage(copybookName, copybookNameLocality);
       addCopybookDefinition(copybookName, uri);
-      collectNestedSemanticData(uri, copybookId, copybookDocument);
-      return Optional.of(copybookDocument.getText());
     }
 
-    abstract String handleReplacing(String copybookName, String text, Locality locality);
+    protected String handleReplacing(String copybookName, String text, Locality locality) {
+      return text;
+    }
+
+    private void reportRecursiveCopybook(CopybookUsage usage) {
+      addCopybookError(
+          usage.getName(),
+          usage.getLocality(),
+          ERROR,
+          "GrammarPreprocessorListener.recursionDetected",
+          "Syntax error by reportRecursiveCopybook: {}");
+    }
   }
 
   private class SkippingAnalysis extends CopybookAnalysis {
     @Override
-    protected Optional<String> retrieveCopybookText(
-        String copybookName, Locality locality, String copybookId) {
+    protected Optional<ExtendedDocument> processCopybook(
+        String copybookName, String uri, String copybookId, String content, Locality locality) {
       return Optional.empty();
     }
 
     @Override
-    String handleReplacing(String copybookName, String text, Locality locality) {
-      return copybookName;
+    protected CopybookModel getCopyBookContent(
+        String copybookName, Locality locality, CopybookConfig copybookConfig) {
+      return emptyModel(copybookName);
+    }
+
+    @Override
+    protected void storeCopyStatementSemantics(
+        String copybookName, Locality copybookNameLocality, String uri) {
+      addCopybookUsage(copybookName, copybookNameLocality);
+    }
+
+    @Override
+    protected String handleReplacing(String copybookName, String text, Locality locality) {
+      return text;
     }
   }
 
   private class CobolAnalysis extends CopybookAnalysis {
     @Override
-    String handleReplacing(String copybookName, String text, Locality locality) {
+    protected String handleReplacing(String copybookName, String text, Locality locality) {
       // In a chain of copy statement, there could be only one replacing phrase
 
       if (!copyReplacingClauses.isEmpty()) {
@@ -708,6 +723,29 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
       return recursiveReplaceStmtStack.stream()
           .reduce(text, replacingService::applyReplacing, (raw, res) -> res);
+    }
+  }
+
+  private class PredefinedCopybookAnalysis extends CopybookAnalysis {
+    @Override
+    protected String retrieveCopybookName(
+        ParserRuleContext mainContext, ParserRuleContext copySource) {
+      return DFHEIBLC.name();
+    }
+
+    @Override
+    protected void storeCopyStatementSemantics(
+        String copybookName, Locality copybookNameLocality, String uri) {}
+
+    @Override
+    protected void beforeWriting() {}
+
+    @Override
+    protected void afterWriting(ParserRuleContext context) {}
+
+    @Override
+    protected String handleReplacing(String copybookName, String text, Locality locality) {
+      return text;
     }
   }
 }
