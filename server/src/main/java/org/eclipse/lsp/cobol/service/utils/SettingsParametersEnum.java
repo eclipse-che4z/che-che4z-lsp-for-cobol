@@ -31,7 +31,8 @@ public enum SettingsParametersEnum {
   LOCALE("locale"),
   LOGGING_LEVEL("logging.level.root"),
   TARGET_SQL_BACKEND("target-sql-backend"),
-  ANALYSIS_FEATURES("analysis.features");
+  ANALYSIS_FEATURES("analysis.features"),
+  FLAVORS("flavors");
 
   public final String label;
 
