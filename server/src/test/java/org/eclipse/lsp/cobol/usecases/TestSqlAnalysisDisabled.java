@@ -58,6 +58,6 @@ class TestSqlAnalysisDisabled {
   void test() {
     UseCaseEngine.runTest(UPDATE_SQL_ENABLED, ImmutableList.of(), ImmutableMap.of());
     UseCaseEngine.runTest(UPDATE_SQL_DISABLED, ImmutableList.of(), ImmutableMap.of(), Collections.emptyList(),
-        new AnalysisConfig(Collections.emptySet(), new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
+        new AnalysisConfig(Collections.emptySet(), new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER), ImmutableList.of()));
   }
 }

@@ -32,13 +32,15 @@ class TestMultiTokenError {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(
-        "1",
-        new Diagnostic(
-            null,
-            "Variable FOO is not defined",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText())
-    ));
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Variable FOO is not defined",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

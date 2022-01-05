@@ -58,7 +58,7 @@ kind: Pod
 spec:
   containers:
   - name: theia
-    image: theiaide/theia-full:1.15.0
+    image: grianbrcom/theia-full:1.15.0
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
@@ -163,7 +163,7 @@ pipeline {
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
-                                sh 'npm ci'
+                                sh 'npm ci --ignore-scripts'
                             }
                         }
                     }
@@ -299,7 +299,7 @@ pipeline {
                             yarn install --frozen-lockfile
                             npm run ts:build
                             # To enable debug add this: DEBUG=*
-                            NO_COLOR=1 npm run cy:run:ci
+                            NO_COLOR=1 npm run cy:run:ci -- --env ide=theia
                             TEST_STATUS=$?
                             npm run merge-reports
                             exit $TEST_STATUS

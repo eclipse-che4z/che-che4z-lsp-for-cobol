@@ -12,15 +12,13 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {fetchCopybookCommand} from "../commands/FetchCopybookCommand";
-import {CopybookDownloadService} from "../services/copybook/CopybookDownloadService";
-import {TelemetryService} from "../services/reporter/TelemetryService";
-import {ZoweApi} from "../services/ZoweApi";
+import { fetchCopybookCommand } from "../commands/FetchCopybookCommand";
+import { CopybookDownloadService } from "../services/copybook/CopybookDownloadService";
+import { TelemetryService } from "../services/reporter/TelemetryService";
 
 jest.mock("../services/reporter/TelemetryService");
 jest.mock("../services/copybook/CopybookDownloadService");
-const zoweApi: ZoweApi = new ZoweApi();
-const copybookDownloadService: CopybookDownloadService = new CopybookDownloadService(zoweApi, null, null);
+const copybookDownloadService: CopybookDownloadService = new CopybookDownloadService(null);
 const copybook: string = "cobyBookTest";
 const progName: string = "progNameTest";
 

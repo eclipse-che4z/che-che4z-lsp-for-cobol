@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -42,6 +43,7 @@ public enum SearchPattern {
     @Override
     public String apply(String trim) {
       trim = getActualWordToReplace(trim);
+      if (isQuotedString(trim)) return Pattern.quote(trim);
       return SEPARATOR_REGEX_PREFIX + escapeSpecialCharacters(trim) + SEPARATOR_REGEX_SUFFIX;
     }
 
@@ -52,6 +54,12 @@ public enum SearchPattern {
       return trim;
     }
   };
+
+  private static boolean isQuotedString(String text) {
+    return text.length() > 2
+        && (text.startsWith("\"") && text.endsWith("\"")
+            || (text.startsWith("'") && text.endsWith("'")));
+  }
 
   // below regex matches cobol separator
   // Space {b},

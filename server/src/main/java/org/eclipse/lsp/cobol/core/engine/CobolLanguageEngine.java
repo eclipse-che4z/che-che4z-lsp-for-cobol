@@ -20,12 +20,13 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
+import org.eclipse.lsp.cobol.core.engine.flavors.FlavorUtils;
+import org.eclipse.lsp.cobol.core.engine.flavors.FlavorOutcome;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
@@ -34,6 +35,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityFindingUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
+import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.EmbeddedLanguagesListener;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
@@ -62,7 +64,6 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.EMBEDDED_CODE;
 public class CobolLanguageEngine {
 
   private final TextPreprocessor preprocessor;
-  private final DefaultErrorStrategy defaultErrorStrategy;
   private final MessageService messageService;
   private final ParseTreeListener treeListener;
   private final SubroutineService subroutineService;
@@ -71,12 +72,10 @@ public class CobolLanguageEngine {
   @Inject
   public CobolLanguageEngine(
       TextPreprocessor preprocessor,
-      DefaultErrorStrategy defaultErrorStrategy,
       MessageService messageService,
       ParseTreeListener treeListener,
       SubroutineService subroutineService) {
     this.preprocessor = preprocessor;
-    this.defaultErrorStrategy = defaultErrorStrategy;
     this.messageService = messageService;
     this.treeListener = treeListener;
     this.subroutineService = subroutineService;
@@ -98,11 +97,18 @@ public class CobolLanguageEngine {
       @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
-    timingBuilder.getPreprocessorTimer().start();
+
+    timingBuilder.getFlavorTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
+    text = preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
+    FlavorOutcome flavorsOutcome = FlavorUtils.process(documentUri, text, analysisConfig.getFlavors())
+        .unwrap(accumulatedErrors::addAll);
+    timingBuilder.getFlavorTimer().stop();
+
+    timingBuilder.getPreprocessorTimer().start();
     ExtendedDocument extendedDocument =
         preprocessor
-            .process(documentUri, text, analysisConfig.getCopybookConfig())
+            .process(documentUri, flavorsOutcome.getText(), analysisConfig.getCopybookConfig())
             .unwrap(accumulatedErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
 
@@ -117,7 +123,7 @@ public class CobolLanguageEngine {
     CobolParser parser = getCobolParser(tokens);
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
-    parser.setErrorHandler(defaultErrorStrategy);
+    parser.setErrorHandler(new CobolErrorStrategy(messageService));
     parser.addParseListener(treeListener);
 
     CobolParser.StartRuleContext tree = parser.startRule();
@@ -141,7 +147,8 @@ public class CobolLanguageEngine {
             analysisConfig,
             embeddedCodeParts,
             messageService,
-            subroutineService);
+            subroutineService,
+            flavorsOutcome.getFlavorNodes());
     List<Node> syntaxTree = visitor.visit(tree);
     SemanticContext context = visitor.finishAnalysis().unwrap(accumulatedErrors::addAll);
     timingBuilder.getVisitorTimer().stop();
@@ -162,9 +169,10 @@ public class CobolLanguageEngine {
     if (LOG.isDebugEnabled()) {
       Timing timing = timingBuilder.build();
       LOG.debug(
-          "Timing for parsing {}. Preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
+          "Timing for parsing {}. Flavors: {}, preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
               + "late error processing: {}",
           documentUri,
+          timing.getFlavorTime(),
           timing.getPreprocessorTime(),
           timing.getParserTime(),
           timing.getMappingTime(),
@@ -192,7 +200,7 @@ public class CobolLanguageEngine {
   private Map<Token, EmbeddedCode> extractEmbeddedCode(
       ParserListener listener, CobolParser.StartRuleContext tree) {
     EmbeddedLanguagesListener embeddedLanguagesListener =
-        new EmbeddedLanguagesListener(defaultErrorStrategy, treeListener, listener);
+        new EmbeddedLanguagesListener(messageService, treeListener, listener);
     new ParseTreeWalker().walk(embeddedLanguagesListener, tree);
     return embeddedLanguagesListener.getEmbeddedCodeParts();
   }

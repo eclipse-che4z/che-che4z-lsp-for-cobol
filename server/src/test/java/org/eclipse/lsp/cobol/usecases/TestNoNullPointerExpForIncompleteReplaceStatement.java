@@ -24,52 +24,54 @@ import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
-/**
- * Test no Null pointer exceptions are thrown for incomplete copy replace statements
- */
+/** Test no Null pointer exceptions are thrown for incomplete copy replace statements */
 class TestNoNullPointerExpForIncompleteReplaceStatement {
-    private static final String TEXT2 =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. TEST1.\n"
-                    + "       ENVIRONMENT DIVISION.\n"
-                    + "       INPUT-OUTPUT SECTION.\n"
-                    + "       FILE-CONTROL.\n"
-                    + "           SELECT {$CUSTOMER-FILE-OUT} ASSIGN TO CUSTOUT\n"
-                    + "               ACCESS IS SEQUENTIAL.\n"
-                    + "       DATA DIVISION.\n"
-                    + "       FILE SECTION.                                                    \n"
-                    + "       FD  {$*CUSTOMER-FILE-OUT}\n"
-                    + "           RECORDING MODE IS V\n"
-                    + "           BLOCK CONTAINS 0 RECORDS\n"
-                    + "           RECORD IS VARYING FROM 20 TO 596 CHARACTERS.\n"
-                    + "           {copy|1} custcopy REPLACING =";
+  private static final String TEXT2 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       INPUT-OUTPUT SECTION.\n"
+          + "       FILE-CONTROL.\n"
+          + "           SELECT {$CUSTOMER-FILE-OUT} ASSIGN TO CUSTOUT\n"
+          + "               ACCESS IS SEQUENTIAL.\n"
+          + "       DATA DIVISION.\n"
+          + "       FILE SECTION.                                                    \n"
+          + "       FD  {$*CUSTOMER-FILE-OUT}\n"
+          + "           RECORDING MODE IS V\n"
+          + "           BLOCK CONTAINS 0 RECORDS\n"
+          + "           RECORD IS VARYING FROM 20 TO 596 CHARACTERS.\n"
+          + "           {copy|1} custcopy REPLACING =";
 
-    private static final String TEXT =
-            TEXT2 + "=";
+  private static final String TEXT = TEXT2 + "=";
 
-    @Test
-    void testWhenTypingEndsAtDoubleEqualChar() {
-        UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(
-                "1",
-                new Diagnostic(
-                        null,
-                        "Syntax error on 'copy' expected {CBL, END, EXEC, FD, FILE, ID, "
-                                + "IDENTIFICATION, LINKAGE, LOCAL-STORAGE, MAP, PROCEDURE, PROCESS, SCHEMA, SD, "
-                                + "WORKING-STORAGE, '01-49', '66', '77', '88'}",
-                        DiagnosticSeverity.Error,
-                        ERROR.getText())));
-    }
+  @Test
+  void testWhenTypingEndsAtDoubleEqualChar() {
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Syntax error on 'copy' expected {CBL, END, EXEC, FD, FILE, ID, IDENTIFICATION, LINKAGE, "
+                    + "LOCAL-STORAGE, PROCEDURE, PROCESS, SD, WORKING-STORAGE, MAP, SCHEMA, '01-49', '66', '77', '88'}",
+                DiagnosticSeverity.Error,
+                ERROR.getText())));
+  }
 
-    @Test
-    void testWhenTypingEndsAtSingleEqualChar() {
-        UseCaseEngine.runTest(TEXT2, ImmutableList.of(), ImmutableMap.of(
-                "1",
-                new Diagnostic(
-                        null,
-                        "Syntax error on 'copy' expected {CBL, END, EXEC, FD, FILE, ID, "
-                                + "IDENTIFICATION, LINKAGE, LOCAL-STORAGE, MAP, PROCEDURE, PROCESS, SCHEMA, SD, "
-                                + "WORKING-STORAGE, '01-49', '66', '77', '88'}",
-                        DiagnosticSeverity.Error,
-                        ERROR.getText())));
-    }
+  @Test
+  void testWhenTypingEndsAtSingleEqualChar() {
+    UseCaseEngine.runTest(
+        TEXT2,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Syntax error on 'copy' expected {CBL, END, EXEC, FD, FILE, ID, IDENTIFICATION, "
+                    + "LINKAGE, LOCAL-STORAGE, PROCEDURE, PROCESS, SD, WORKING-STORAGE, MAP, SCHEMA, "
+                    + "'01-49', '66', '77', '88'}",
+                DiagnosticSeverity.Error,
+                ERROR.getText())));
+  }
 }

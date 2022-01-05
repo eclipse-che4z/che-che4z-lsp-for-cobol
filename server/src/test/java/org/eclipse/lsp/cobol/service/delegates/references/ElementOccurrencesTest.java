@@ -150,18 +150,12 @@ class ElementOccurrencesTest {
             ImmutableList.of(usage)),
         // find subroutine usage by usage position
         Arguments.of(
-            AnalysisResult.builder()
-                .subroutineDefinitions(definitionMap)
-                .subroutineUsages(usageMap)
-                .build(),
+            AnalysisResult.builder().rootNode(rootNodeForOneFile).build(),
             insideUsage,
             ImmutableList.of(usage)),
         // find subroutine usage by definition position
         Arguments.of(
-            AnalysisResult.builder()
-                .subroutineDefinitions(definitionMap)
-                .subroutineUsages(usageMap)
-                .build(),
+            AnalysisResult.builder().rootNode(rootNodeForOneFile).build(),
             insideDefinition,
             ImmutableList.of(usage)),
         // find all variables usages in all files by usage position
