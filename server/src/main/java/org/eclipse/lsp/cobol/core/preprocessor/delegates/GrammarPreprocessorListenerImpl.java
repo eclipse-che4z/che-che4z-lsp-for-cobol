@@ -21,7 +21,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -32,14 +31,14 @@ import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.CobolAnalysis;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PredefinedCopybookAnalysis;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.SkippingAnalysis;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
-import org.eclipse.lsp.cobol.service.PredefinedCopybooks;
-import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -47,16 +46,10 @@ import java.util.*;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
-import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Token.EOF;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.INFO;
-import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.*;
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBLC;
 
 /**
  * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
@@ -66,10 +59,6 @@ import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBL
 public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListener
     implements GrammarPreprocessorListener {
 
-  private static final String HYPHEN = "-";
-  private static final String UNDERSCORE = "_";
-  private static final String SYNTAX_ERROR_CHECK_COPYBOOK_NAME =
-      "Syntax error by checkCopybookName: {}";
   private static final int DEFAULT_TOKEN_SHIFT = 2;
   private static final int TOKEN_SHIFT_WITH_LINEBREAK = 3;
   private static final int MAX_COPYBOOK_NAME_LENGTH_DEFAULT = Integer.MAX_VALUE;
@@ -192,7 +181,26 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitLinkageSection(LinkageSectionContext ctx) {
-    new PredefinedCopybookAnalysis().analyzeCopybook(ctx, ctx, MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
+    new PredefinedCopybookAnalysis(
+            copybooks,
+            nestedMappings,
+            copybookStatements,
+            replacingClauses,
+            documentUri,
+            copybookConfig,
+            preprocessor,
+            copybookService,
+            copybookStack,
+            messageService,
+            recursiveReplaceStmtStack)
+        .handleCopybook(
+            ctx,
+            ctx,
+            MAX_COPYBOOK_NAME_LENGTH_DEFAULT,
+            retrievePosition(ctx),
+            retrievePosition(ctx))
+        .unwrap(errors::addAll)
+        .accept(this);
   }
 
   @Override
@@ -203,11 +211,28 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyIdmsStatement(@NonNull CopyIdmsStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new CobolAnalysis()
-        .analyzeCopybook(
+    new CobolAnalysis(
+            copybooks,
+            nestedMappings,
+            copybookStatements,
+            replacingClauses,
+            documentUri,
+            copybookConfig,
+            preprocessor,
+            copybookService,
+            copybookStack,
+            messageService,
+            recursiveReplaceStmtStack,
+            copyReplacingClauses,
+            replacingService)
+        .handleCopybook(
             ctx,
             ctx.copyIdmsOptions().copyIdmsSource().copySource(),
-            MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
+            MAX_COPYBOOK_NAME_LENGTH_DEFAULT,
+            retrievePosition(ctx),
+            retrievePosition(ctx.copyIdmsOptions().copyIdmsSource().copySource()))
+        .unwrap(errors::addAll)
+        .accept(this);
   }
 
   @Override
@@ -226,9 +251,49 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
           .map(Integer::parseInt)
           .ifPresent(
               it ->
-                  new CobolAnalysis()
-                      .analyzeCopybook(ctx, copySource, MAX_COPYBOOK_NAME_LENGTH_DEFAULT));
-    else new SkippingAnalysis().analyzeCopybook(ctx, copySource, MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
+                  new CobolAnalysis(
+                          copybooks,
+                          nestedMappings,
+                          copybookStatements,
+                          replacingClauses,
+                          documentUri,
+                          copybookConfig,
+                          preprocessor,
+                          copybookService,
+                          copybookStack,
+                          messageService,
+                          recursiveReplaceStmtStack,
+                          copyReplacingClauses,
+                          replacingService)
+                      .handleCopybook(
+                          ctx,
+                          copySource,
+                          MAX_COPYBOOK_NAME_LENGTH_DEFAULT,
+                          retrievePosition(ctx),
+                          retrievePosition(copySource))
+                      .unwrap(errors::addAll)
+                      .accept(this));
+    else
+      new SkippingAnalysis(
+              copybooks,
+              nestedMappings,
+              copybookStatements,
+              replacingClauses,
+              documentUri,
+              copybookConfig,
+              preprocessor,
+              copybookService,
+              copybookStack,
+              messageService,
+              recursiveReplaceStmtStack)
+          .handleCopybook(
+              ctx,
+              copySource,
+              MAX_COPYBOOK_NAME_LENGTH_DEFAULT,
+              retrievePosition(ctx),
+              retrievePosition(copySource))
+          .unwrap(errors::addAll)
+          .accept(this);
   }
 
   @Override
@@ -239,8 +304,28 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new CobolAnalysis()
-        .analyzeCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB);
+    new CobolAnalysis(
+            copybooks,
+            nestedMappings,
+            copybookStatements,
+            replacingClauses,
+            documentUri,
+            copybookConfig,
+            preprocessor,
+            copybookService,
+            copybookStack,
+            messageService,
+            recursiveReplaceStmtStack,
+            copyReplacingClauses,
+            replacingService)
+        .handleCopybook(
+            ctx,
+            ctx.copySource(),
+            MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB,
+            retrievePosition(ctx),
+            retrievePosition(ctx.copySource()))
+        .unwrap(errors::addAll)
+        .accept(this);
   }
 
   @Override
@@ -251,7 +336,28 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new CobolAnalysis().analyzeCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_DATASET);
+    new CobolAnalysis(
+            copybooks,
+            nestedMappings,
+            copybookStatements,
+            replacingClauses,
+            documentUri,
+            copybookConfig,
+            preprocessor,
+            copybookService,
+            copybookStack,
+            messageService,
+            recursiveReplaceStmtStack,
+            copyReplacingClauses,
+            replacingService)
+        .handleCopybook(
+            ctx,
+            ctx.copySource(),
+            MAX_COPYBOOK_NAME_LENGTH_DATASET,
+            retrievePosition(ctx),
+            retrievePosition(ctx.copySource()))
+        .unwrap(errors::addAll)
+        .accept(this);
   }
 
   @Override
@@ -262,7 +368,28 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new CobolAnalysis().analyzeCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_DATASET);
+    new CobolAnalysis(
+            copybooks,
+            nestedMappings,
+            copybookStatements,
+            replacingClauses,
+            documentUri,
+            copybookConfig,
+            preprocessor,
+            copybookService,
+            copybookStack,
+            messageService,
+            recursiveReplaceStmtStack,
+            copyReplacingClauses,
+            replacingService)
+        .handleCopybook(
+            ctx,
+            ctx.copySource(),
+            MAX_COPYBOOK_NAME_LENGTH_DATASET,
+            retrievePosition(ctx),
+            retrievePosition(ctx.copySource()))
+        .unwrap(errors::addAll)
+        .accept(this);
   }
 
   private boolean requiresEarlyReturn(ParserRuleContext context) {
@@ -344,7 +471,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     }
   }
 
-  private void accumulateTokenShift(ParserRuleContext context) {
+  @Override
+  public void accumulateTokenShift(ParserRuleContext context) {
     final Interval sourceInterval = context.getSourceInterval();
     shifts.put(
         sourceInterval.a - 1, sourceInterval.b - sourceInterval.a + calculateTokenShift(context));
@@ -424,312 +552,5 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             .build();
     errors.add(error);
     LOG.debug("Syntax error by reportInvalidArgument: {}", error.toString());
-  }
-
-  /**
-   * This class is a framework for the copybook analysis. The actual implementations may change the
-   * behavior overriding the methods.
-   */
-  private abstract class CopybookAnalysis {
-
-    void analyzeCopybook(ParserRuleContext context, ParserRuleContext copySource, int maxLength) {
-      String copybookName = retrieveCopybookName(context, copySource);
-      Locality copybookNameLocality = retrievePosition(copySource);
-      Locality copyStatementLocality = retrievePosition(context);
-      String copybookId = randomUUID().toString();
-
-      CopybookModel model = getCopyBookContent(copybookName, copybookNameLocality, copybookConfig);
-
-      String uri = model.getUri();
-      String cleanText = preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll);
-      String preparedText = handleReplacing(copybookName, cleanText, copybookNameLocality);
-
-      storeCopyStatementSemantics(copybookName, copybookNameLocality, uri);
-      checkCopybookName(copybookName, copybookNameLocality, maxLength);
-      collectCopybookStatement(copybookId, copyStatementLocality);
-
-      Optional<ExtendedDocument> copybookDocument =
-          processCopybook(copybookName, uri, copybookId, preparedText, copybookNameLocality);
-
-      beforeWriting();
-      copybookDocument.ifPresent(
-          it -> {
-            writeCopybook(copybookId, it.getText());
-            collectNestedSemanticData(uri, copybookId, it);
-          });
-      afterWriting(context);
-    }
-
-    protected Optional<ExtendedDocument> processCopybook(
-        String copybookName, String uri, String copybookId, String content, Locality locality) {
-      copybookStack.push(new CopybookUsage(copybookName, copybookId, locality));
-      ExtendedDocument result =
-          preprocessor
-              .processCleanCode(
-                  uri,
-                  content,
-                  copybookStack,
-                  copybookConfig,
-                  recursiveReplaceStmtStack,
-                  replacingClauses)
-              .unwrap(errors::addAll);
-      copybookStack.pop();
-      if (Objects.nonNull(recursiveReplaceStmtStack.peek())) recursiveReplaceStmtStack.pop();
-      return Optional.of(result);
-    }
-
-    protected CopybookModel getCopyBookContent(
-        String copybookName, Locality locality, CopybookConfig copybookConfig) {
-
-      if (copybookName.isEmpty()) return emptyModel(copybookName);
-
-      if (hasRecursion(copybookName)) {
-        copybookStack.forEach(this::reportRecursiveCopybook);
-        return emptyModel(copybookName);
-      }
-
-      CopybookModel copybook = copybookService.resolve(copybookName, documentUri, copybookConfig);
-      if (copybook.getContent() == null) {
-        reportMissingCopybooks(copybookName, locality);
-        return emptyModel(copybookName);
-      }
-
-      return copybook;
-    }
-
-    protected String retrieveCopybookName(
-        ParserRuleContext mainContext, ParserRuleContext copySource) {
-      CopySourceContext ctx = (CopySourceContext) copySource;
-      return retrieveCopybookName(
-          Optional.<RuleContext>ofNullable(ctx.cobolWord()).orElse(ctx.literal()));
-    }
-
-    private String retrieveCopybookName(@NonNull RuleContext context) {
-      return PreprocessorStringUtils.trimQuotes(context.getText().toUpperCase());
-    }
-
-    protected void beforeWriting() {
-      pop();
-    }
-
-    protected void afterWriting(ParserRuleContext context) {
-      accumulateTokenShift(context);
-    }
-
-    protected void storeCopyStatementSemantics(
-        String copybookName, Locality copybookNameLocality, String uri) {
-      addCopybookUsage(copybookName, copybookNameLocality);
-      addCopybookDefinition(copybookName, uri);
-    }
-
-    protected String handleReplacing(String copybookName, String text, Locality locality) {
-      return text;
-    }
-
-    private boolean hasRecursion(String copybookName) {
-      return copybookStack.stream().map(CopybookUsage::getName).anyMatch(copybookName::equals);
-    }
-
-    private void collectCopybookStatement(String copybookId, Locality locality) {
-      copybookStatements.put(copybookId, locality);
-    }
-
-    private void collectNestedSemanticData(
-        String uri, String copybookId, ExtendedDocument copybookDocument) {
-      copybooks.merge(copybookDocument.getCopybooks());
-      copybookStatements.putAll(copybookDocument.getCopyStatements());
-      nestedMappings.putAll(copybookDocument.getDocumentMapping());
-      nestedMappings.putIfAbsent(copybookId, nestedMappings.get(uri));
-    }
-
-    private void writeCopybook(String copybookId, String copybookContent) {
-      // write copybook beginning trigger
-      write(CPY_ENTER_TAG);
-      write(copybookId);
-      write(CPY_URI_CLOSE);
-      write(copybookContent);
-      // write copybook closing trigger
-      write(CPY_EXIT_TAG);
-    }
-
-    private void reportMissingCopybooks(String copybookName, Locality locality) {
-      SyntaxError error =
-          SyntaxError.syntaxError()
-              .locality(locality)
-              .suggestion(
-                  messageService.getMessage(
-                      "GrammarPreprocessorListener.errorSuggestion", copybookName))
-              .severity(ERROR)
-              .errorCode(MISSING_COPYBOOK)
-              .build();
-      LOG.debug("Syntax error by reportMissingCopybooks: {}", error.toString());
-      errors.add(error);
-    }
-
-    private void checkCopybookName(String copybookName, Locality locality, int maxLength) {
-      if (copybookName.length() > maxLength) {
-        addCopybookError(
-            copybookName,
-            maxLength,
-            locality,
-            INFO,
-            "GrammarPreprocessorListener.copyBkOverMaxChars",
-            SYNTAX_ERROR_CHECK_COPYBOOK_NAME);
-      }
-      // The first or last character must not be a hyphen.
-      if (copybookName.startsWith(HYPHEN) || copybookName.endsWith(HYPHEN)) {
-        addCopybookError(
-            copybookName,
-            locality,
-            ERROR,
-            "GrammarPreprocessorListener.copyBkStartsOrEndsWithHyphen",
-            SYNTAX_ERROR_CHECK_COPYBOOK_NAME);
-      }
-
-      // copybook Name can't contain _
-      if (copybookName.contains(UNDERSCORE))
-        addCopybookError(
-            copybookName,
-            locality,
-            ERROR,
-            "GrammarPreprocessorListener.copyBkContainsUnderScore",
-            SYNTAX_ERROR_CHECK_COPYBOOK_NAME);
-    }
-
-    protected CopybookModel emptyModel(String copybookName) {
-      return new CopybookModel(copybookName, "", "");
-    }
-
-    protected void addCopybookError(
-        String copybookName,
-        Locality locality,
-        ErrorSeverity info,
-        String messageID,
-        String logMessage) {
-      SyntaxError error =
-          SyntaxError.syntaxError()
-              .severity(info)
-              .suggestion(messageService.getMessage(messageID, copybookName))
-              .locality(locality)
-              .build();
-      LOG.debug(logMessage + error.toString());
-      errors.add(error);
-    }
-
-    protected void addCopybookError(
-        String copybookName,
-        int maxNameLength,
-        Locality locality,
-        ErrorSeverity info,
-        String messageID,
-        String logMessage) {
-      SyntaxError error =
-          SyntaxError.syntaxError()
-              .severity(info)
-              .suggestion(messageService.getMessage(messageID, maxNameLength, copybookName))
-              .locality(locality)
-              .build();
-      LOG.debug(logMessage + error.toString());
-      errors.add(error);
-    }
-
-    protected void addCopybookUsage(@NonNull String copybookName, @NonNull Locality locality) {
-      copybooks.addUsage(copybookName, locality.toLocation());
-    }
-
-    protected void addCopybookDefinition(String copybookName, String uri) {
-      if (!(isEmpty(copybookName) || isEmpty(uri) || isPredefined(uri))) {
-        copybooks.define(
-            copybookName, new Location(uri, new Range(new Position(0, 0), new Position(0, 0))));
-      }
-    }
-
-    private boolean isPredefined(String uri) {
-      return PredefinedCopybooks.isCopybookPredefined(uri);
-    }
-
-    private void reportRecursiveCopybook(CopybookUsage usage) {
-      addCopybookError(
-          usage.getName(),
-          usage.getLocality(),
-          ERROR,
-          "GrammarPreprocessorListener.recursionDetected",
-          "Syntax error by reportRecursiveCopybook: {}");
-    }
-  }
-
-  private class SkippingAnalysis extends CopybookAnalysis {
-    @Override
-    protected Optional<ExtendedDocument> processCopybook(
-        String copybookName, String uri, String copybookId, String content, Locality locality) {
-      return Optional.empty();
-    }
-
-    @Override
-    protected CopybookModel getCopyBookContent(
-        String copybookName, Locality locality, CopybookConfig copybookConfig) {
-      return emptyModel(copybookName);
-    }
-
-    @Override
-    protected void storeCopyStatementSemantics(
-        String copybookName, Locality copybookNameLocality, String uri) {
-      addCopybookUsage(copybookName, copybookNameLocality);
-    }
-
-    @Override
-    protected String handleReplacing(String copybookName, String text, Locality locality) {
-      return text;
-    }
-  }
-
-  private class CobolAnalysis extends CopybookAnalysis {
-    @Override
-    protected String handleReplacing(String copybookName, String text, Locality locality) {
-      // In a chain of copy statement, there could be only one replacing phrase
-
-      if (!copyReplacingClauses.isEmpty()) {
-        recursiveReplaceStmtStack.add(new ArrayList<>(copyReplacingClauses));
-        copyReplacingClauses.clear();
-      }
-      checkRecursiveReplaceStatement(recursiveReplaceStmtStack.size(), copybookName, locality);
-
-      return recursiveReplaceStmtStack.stream()
-          .reduce(text, replacingService::applyReplacing, (raw, res) -> res);
-    }
-
-    private void checkRecursiveReplaceStatement(
-        int recursiveReplaceCount, String copybookName, Locality locality) {
-      if (recursiveReplaceCount > 1 && !copybookStack.isEmpty())
-        addCopybookError(
-            copybookName,
-            locality,
-            ERROR,
-            "GrammarPreprocessorListener.copyBkNestedReplaceStmt",
-            SYNTAX_ERROR_CHECK_COPYBOOK_NAME);
-    }
-  }
-
-  private class PredefinedCopybookAnalysis extends CopybookAnalysis {
-    @Override
-    protected String retrieveCopybookName(
-        ParserRuleContext mainContext, ParserRuleContext copySource) {
-      return DFHEIBLC.name();
-    }
-
-    @Override
-    protected void storeCopyStatementSemantics(
-        String copybookName, Locality copybookNameLocality, String uri) {}
-
-    @Override
-    protected void beforeWriting() {}
-
-    @Override
-    protected void afterWriting(ParserRuleContext context) {}
-
-    @Override
-    protected String handleReplacing(String copybookName, String text, Locality locality) {
-      return text;
-    }
   }
 }

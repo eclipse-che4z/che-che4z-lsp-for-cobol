@@ -1,0 +1,96 @@
+/*
+ * Copyright (c) 2021 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ *
+ */
+
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
+import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.CopybookService;
+
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
+import java.util.Map;
+
+import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
+
+/**
+ * This implementation of the {@link CopybookAnalysis} provides logic for plain COBOL logic applying
+ * replacing if presents.
+ */
+public class CobolAnalysis extends CopybookAnalysis {
+
+  private final List<Pair<String, String>> copyReplacingClauses;
+  private final ReplacingService replacingService;
+
+  public CobolAnalysis(
+      NamedSubContext copybooks,
+      Map<String, DocumentMapping> nestedMappings,
+      Map<String, Locality> copybookStatements,
+      List<Pair<String, String>> replacingClauses,
+      String documentUri,
+      CopybookConfig copybookConfig,
+      TextPreprocessor preprocessor,
+      CopybookService copybookService,
+      Deque<CopybookUsage> copybookStack,
+      MessageService messageService,
+      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
+      List<Pair<String, String>> copyReplacingClauses,
+      ReplacingService replacingService) {
+    super(
+        copybooks,
+        nestedMappings,
+        copybookStatements,
+        replacingClauses,
+        documentUri,
+        copybookConfig,
+        preprocessor,
+        copybookService,
+        copybookStack,
+        messageService,
+        recursiveReplaceStmtStack);
+    this.copyReplacingClauses = copyReplacingClauses;
+    this.replacingService = replacingService;
+  }
+
+  @Override
+  protected ResultWithErrors<String> handleReplacing(
+      String copybookName, String text, Locality locality) {
+    // In a chain of copy statement, there could be only one replacing phrase
+    List<SyntaxError> errors = new ArrayList<>();
+    if (!copyReplacingClauses.isEmpty()) {
+      recursiveReplaceStmtStack.add(new ArrayList<>(copyReplacingClauses));
+      copyReplacingClauses.clear();
+    }
+    if (recursiveReplaceStmtStack.size() > 1 && !copybookStack.isEmpty())
+      errors.add(
+          addCopybookError(
+              copybookName,
+              locality,
+              ERROR,
+              "GrammarPreprocessorListener.copyBkNestedReplaceStmt",
+              "Syntax error by checkRecursiveReplaceStatement: {}"));
+
+    return new ResultWithErrors<>(
+        recursiveReplaceStmtStack.stream()
+            .reduce(text, replacingService::applyReplacing, (raw, res) -> res),
+        errors);
+  }
+}

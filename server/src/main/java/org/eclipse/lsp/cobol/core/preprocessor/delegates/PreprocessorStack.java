@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates;
 
 import lombok.NonNull;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.Deque;
 import java.util.Objects;
@@ -112,4 +113,11 @@ public interface PreprocessorStack {
     if (getTextAccumulator().isEmpty()) push();
     write(content);
   }
+
+  /**
+   * Accumulate the token shift for the given context to skip it while building the position mapping
+   *
+   * @param context the context to calculate the shift
+   */
+  default void accumulateTokenShift(ParserRuleContext context) {}
 }
