@@ -100,19 +100,16 @@ abstract class CopybookAnalysis {
    * @param context
    * @param copySource
    * @param maxLength
-   * @param copybookNameLocality
-   * @param statementPosition
    * @return the functions that should be applied to the preprocessor stack
    */
   public ResultWithErrors<Consumer<PreprocessorStack>> handleCopybook(
-      ParserRuleContext context,
-      @Nullable ParserRuleContext copySource,
-      int maxLength,
-      Locality statementPosition,
-      Locality copybookNameLocality) {
+      ParserRuleContext context, @Nullable ParserRuleContext copySource, int maxLength) {
     List<SyntaxError> errors = new ArrayList<>();
     String copybookName = retrieveCopybookName(copySource);
     String copybookId = randomUUID().toString();
+    Locality copybookNameLocality =
+        PreprocessorUtils.buildLocality(
+            Optional.ofNullable(copySource).orElse(context), documentUri, copybookStack.peek());
 
     CopybookModel model =
         getCopyBookContent(copybookName, copybookNameLocality, copybookConfig)
@@ -125,7 +122,8 @@ abstract class CopybookAnalysis {
 
     storeCopyStatementSemantics(copybookName, copybookNameLocality, uri);
     errors.addAll(checkCopybookName(copybookName, copybookNameLocality, maxLength));
-    collectCopybookStatement(copybookId, statementPosition);
+    collectCopybookStatement(
+        copybookId, PreprocessorUtils.buildLocality(context, documentUri, copybookStack.peek()));
 
     Optional<ExtendedDocument> copybookDocument =
         processCopybook(copybookName, uri, copybookId, preparedText, copybookNameLocality)

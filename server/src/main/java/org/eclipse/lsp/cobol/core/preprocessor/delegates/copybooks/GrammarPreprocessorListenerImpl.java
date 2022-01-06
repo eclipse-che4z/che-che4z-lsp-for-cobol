@@ -35,11 +35,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 
 import java.util.*;
-import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -123,7 +120,10 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     nestedMappings.put(
         documentUri,
         new DocumentMapping(
-            tokens.getTokens().stream().map(toPosition()).collect(toList()), shifts));
+            tokens.getTokens().stream()
+                .map(PreprocessorUtils.toLocality(documentUri, copybookStack.peek()))
+                .collect(toList()),
+            shifts));
     return new ResultWithErrors<>(
         new ExtendedDocument(accumulate(), copybooks, nestedMappings, copybookStatements), errors);
   }
@@ -151,7 +151,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (languageNameContext == null) {
       final SyntaxError error =
           SyntaxError.syntaxError()
-              .locality(retrievePosition(ctx))
+              .locality(getLocality(ctx))
               .severity(ERROR)
               .suggestion(
                   messageService.getMessage(
@@ -190,12 +190,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             copybookStack,
             messageService,
             recursiveReplaceStmtStack)
-        .handleCopybook(
-            ctx,
-            ctx,
-            MAX_COPYBOOK_NAME_LENGTH_DEFAULT,
-            retrievePosition(ctx),
-            retrievePosition(ctx))
+        .handleCopybook(ctx, ctx, MAX_COPYBOOK_NAME_LENGTH_DEFAULT)
         .unwrap(errors::addAll)
         .accept(this);
   }
@@ -225,9 +220,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         .handleCopybook(
             ctx,
             ctx.copyIdmsOptions().copyIdmsSource().copySource(),
-            MAX_COPYBOOK_NAME_LENGTH_DEFAULT,
-            retrievePosition(ctx),
-            retrievePosition(ctx.copyIdmsOptions().copyIdmsSource().copySource()))
+            MAX_COPYBOOK_NAME_LENGTH_DEFAULT)
         .unwrap(errors::addAll)
         .accept(this);
   }
@@ -262,12 +255,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
                           recursiveReplaceStmtStack,
                           copyReplacingClauses,
                           replacingService)
-                      .handleCopybook(
-                          ctx,
-                          copySource,
-                          MAX_COPYBOOK_NAME_LENGTH_DEFAULT,
-                          retrievePosition(ctx),
-                          retrievePosition(copySource))
+                      .handleCopybook(ctx, copySource, MAX_COPYBOOK_NAME_LENGTH_DEFAULT)
                       .unwrap(errors::addAll)
                       .accept(this));
     else
@@ -283,12 +271,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
               copybookStack,
               messageService,
               recursiveReplaceStmtStack)
-          .handleCopybook(
-              ctx,
-              copySource,
-              MAX_COPYBOOK_NAME_LENGTH_DEFAULT,
-              retrievePosition(ctx),
-              retrievePosition(copySource))
+          .handleCopybook(ctx, copySource, MAX_COPYBOOK_NAME_LENGTH_DEFAULT)
           .unwrap(errors::addAll)
           .accept(this);
   }
@@ -315,12 +298,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             recursiveReplaceStmtStack,
             copyReplacingClauses,
             replacingService)
-        .handleCopybook(
-            ctx,
-            ctx.copySource(),
-            MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB,
-            retrievePosition(ctx),
-            retrievePosition(ctx.copySource()))
+        .handleCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB)
         .unwrap(errors::addAll)
         .accept(this);
   }
@@ -347,12 +325,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             recursiveReplaceStmtStack,
             copyReplacingClauses,
             replacingService)
-        .handleCopybook(
-            ctx,
-            ctx.copySource(),
-            MAX_COPYBOOK_NAME_LENGTH_DATASET,
-            retrievePosition(ctx),
-            retrievePosition(ctx.copySource()))
+        .handleCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_DATASET)
         .unwrap(errors::addAll)
         .accept(this);
   }
@@ -379,12 +352,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             recursiveReplaceStmtStack,
             copyReplacingClauses,
             replacingService)
-        .handleCopybook(
-            ctx,
-            ctx.copySource(),
-            MAX_COPYBOOK_NAME_LENGTH_DATASET,
-            retrievePosition(ctx),
-            retrievePosition(ctx.copySource()))
+        .handleCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_DATASET)
         .unwrap(errors::addAll)
         .accept(this);
   }
@@ -488,51 +456,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     return replacingService.applyReplacing(rawContent, replacePatterns);
   }
 
-  private String retrieveCopybookId() {
-    return ofNullable(copybookStack)
-        .map(Deque::peek)
-        .map(CopybookUsage::getCopybookId)
-        .orElse(null);
-  }
-
-  @NonNull
-  private Locality retrievePosition(@NonNull ParserRuleContext ctx) {
-    return Locality.builder()
-        .uri(documentUri)
-        .copybookId(retrieveCopybookId())
-        .range(new Range(getStartPosition(ctx.getStart()), getStopPosition(ctx.getStop())))
-        .recognizer(GrammarPreprocessorListenerImpl.class)
-        .build();
-  }
-
-  @NonNull
-  private Function<Token, Locality> toPosition() {
-    return token ->
-        Locality.builder()
-            .uri(documentUri)
-            .copybookId(retrieveCopybookId())
-            .range(new Range(getStartPosition(token), getStopPosition(token)))
-            .token(token.getText())
-            .recognizer(GrammarPreprocessorListenerImpl.class)
-            .build();
-  }
-
-  private Position getStartPosition(Token token) {
-    return new Position(token.getLine() - 1, token.getCharPositionInLine());
-  }
-
-  private Position getStopPosition(Token token) {
-    return new Position(
-        token.getLine() - 1,
-        token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
-  }
-
   private void reportPseudoTextError(ReplacePseudoTextContext ctx, SyntaxError it) {
     final SyntaxError error =
         SyntaxError.syntaxError()
             .severity(ERROR)
             .suggestion(messageService.getMessage(it.getSuggestion()))
-            .locality(retrievePosition(ctx))
+            .locality(getLocality(ctx))
             .build();
     errors.add(error);
     LOG.debug("Syntax error by reportPseudoTextError: {}", error.toString());
@@ -545,9 +474,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             .suggestion(
                 messageService.getMessage(
                     "GrammarPreprocessorListener.controlDirectiveWrongArgs", ctx.getText()))
-            .locality(retrievePosition(ctx))
+            .locality(getLocality(ctx))
             .build();
     errors.add(error);
     LOG.debug("Syntax error by reportInvalidArgument: {}", error.toString());
+  }
+
+  private Locality getLocality(ParserRuleContext ctx) {
+    return PreprocessorUtils.buildLocality(ctx, documentUri, copybookStack.peek());
   }
 }
