@@ -429,7 +429,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testImmediateClosingOfDocumentDoNotCauseNPE() {
     service = getMockedTextDocumentServiceUsingSeparateThread();
     lenient()
-        .when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, new AnalysisConfig(Collections.emptySet(), cpyConfigEnabledMode)))
+        .when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, new AnalysisConfig(Collections.emptySet(), cpyConfigEnabledMode, ImmutableList.of())))
         .thenReturn(AnalysisResult.empty());
 
     lenient()

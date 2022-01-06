@@ -15,11 +15,13 @@
 
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 public class AnalysisConfig {
   Set<EmbeddedCodeNode.Language> features;
   @NonNull CopybookConfig copybookConfig;
+  List<String> flavors;
 
   /**
    * Creates the default language features config, containing all features and specified copybook config
@@ -37,7 +40,11 @@ public class AnalysisConfig {
    * @return the language config object
    */
   public static AnalysisConfig defaultConfig(CopybookConfig copybookConfig) {
-    return new AnalysisConfig(Arrays.stream(EmbeddedCodeNode.Language.values()).collect(Collectors.toSet()), copybookConfig);
+    return new AnalysisConfig(
+        Arrays.stream(EmbeddedCodeNode.Language.values()).collect(Collectors.toSet()),
+        copybookConfig,
+        ImmutableList.of()
+    );
   }
 
 }

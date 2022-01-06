@@ -25,6 +25,8 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
+import org.eclipse.lsp.cobol.core.engine.flavors.FlavorUtils;
+import org.eclipse.lsp.cobol.core.engine.flavors.FlavorOutcome;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
@@ -95,11 +97,18 @@ public class CobolLanguageEngine {
       @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
-    timingBuilder.getPreprocessorTimer().start();
+
+    timingBuilder.getFlavorTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
+    text = preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
+    FlavorOutcome flavorsOutcome = FlavorUtils.process(documentUri, text, analysisConfig.getFlavors())
+        .unwrap(accumulatedErrors::addAll);
+    timingBuilder.getFlavorTimer().stop();
+
+    timingBuilder.getPreprocessorTimer().start();
     ExtendedDocument extendedDocument =
         preprocessor
-            .process(documentUri, text, analysisConfig.getCopybookConfig())
+            .process(documentUri, flavorsOutcome.getText(), analysisConfig.getCopybookConfig())
             .unwrap(accumulatedErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
 
@@ -138,7 +147,8 @@ public class CobolLanguageEngine {
             analysisConfig,
             embeddedCodeParts,
             messageService,
-            subroutineService);
+            subroutineService,
+            flavorsOutcome.getFlavorNodes());
     List<Node> syntaxTree = visitor.visit(tree);
     SemanticContext context = visitor.finishAnalysis().unwrap(accumulatedErrors::addAll);
     timingBuilder.getVisitorTimer().stop();
@@ -159,9 +169,10 @@ public class CobolLanguageEngine {
     if (LOG.isDebugEnabled()) {
       Timing timing = timingBuilder.build();
       LOG.debug(
-          "Timing for parsing {}. Preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
+          "Timing for parsing {}. Flavors: {}, preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
               + "late error processing: {}",
           documentUri,
+          timing.getFlavorTime(),
           timing.getPreprocessorTime(),
           timing.getParserTime(),
           timing.getMappingTime(),

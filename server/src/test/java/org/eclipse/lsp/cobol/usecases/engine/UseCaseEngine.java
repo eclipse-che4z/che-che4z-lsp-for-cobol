@@ -196,6 +196,7 @@ public class UseCaseEngine {
                 .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
                 .copybookProcessingMode(analysisConfig.getCopybookConfig().getCopybookProcessingMode())
                 .features(analysisConfig.getFeatures())
+                .flavors(analysisConfig.getFlavors())
                 .build());
     TestData expected = document.getTestData();
     assertResultEquals(actual, expected);
