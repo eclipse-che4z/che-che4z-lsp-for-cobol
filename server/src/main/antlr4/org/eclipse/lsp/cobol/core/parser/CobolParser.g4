@@ -992,7 +992,7 @@ idmsOnClause
 
 dafStatements
     : readTransactionStatement | writeTransactionStatement | writeReportStatement
-    | openPacketStatement | getMetaInfoStatement
+    | openPacketStatement | getMetaInfoStatement | messageHandlingStatement
     ;
 
 readTransactionStatement
@@ -1102,6 +1102,36 @@ getTaskStatement
 
 getOdetteOrJobOrNetworkStatement
     : (ODETTE | JOB | NETWORK) (qualifiedDataName | NONNUMERICLITERAL)
+    ;
+
+messageHandlingStatement
+    : showDMLMessageStatement | returnStatusStatement
+    ;
+
+showDMLMessageStatement
+    : SHOW (showMessageStatement | showResultStatement | showErrorMessageStatement)
+    ;
+showMessageStatement
+    : STD? daf_message_types
+     ({validateExactLength(_input.LT(1).getText(), "message code", 3);} integerLiteral)
+     (qualifiedDataName | NONNUMERICLITERAL)?
+     (qualifiedDataName | NONNUMERICLITERAL)?
+     (qualifiedDataName | NONNUMERICLITERAL)?
+    ;
+
+returnStatusStatement
+    : RETURN daf_message_types
+      ({validateExactLength(_input.LT(1).getText(), "message code", 3);} integerLiteral)
+      (qualifiedDataName | NONNUMERICLITERAL)?
+    ;
+
+showResultStatement
+    : RESULT daf_task_name
+    ;
+
+showErrorMessageStatement
+    : MESSAGE (({validateExactLength(trimQuotes(_input.LT(1).getText()), "language code", 2);} NONNUMERICLITERAL)
+      | (qualifiedDataName | NONNUMERICLITERAL))?
     ;
 
 // End of DaCo Statements
@@ -3177,6 +3207,9 @@ daf_entity_role
     : (OWNER | DESIGNER | ANALIST | OWN | AVG | ANA)
     ;
 
+daf_message_types
+    : ERROR | INFO | WARNING
+    ;
 // identifier ----------------------------------
 
 generalIdentifier
