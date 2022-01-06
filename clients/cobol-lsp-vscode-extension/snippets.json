@@ -2237,5 +2237,93 @@
         ],
         "description": "[DaCo] GET NETWORK",
         "scope": "cobol"
+    },
+    "SHOW TASK INFO MESSAGE": {
+        "prefix": "SHOW INFO",
+        "body": [
+            "SHOW INFO ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
+        ],
+        "description": "[DaCo] SHOW INFO message",
+        "scope": "cobol"
+    },
+    "SHOW TASK WARNING MESSAGE": {
+        "prefix": "SHOW WARNING",
+        "body": [
+            "SHOW WARNING ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
+        ],
+        "description": "[DaCo] SHOW WARNING message",
+        "scope": "cobol"
+    },
+    "SHOW TASK ERROR MESSAGE": {
+        "prefix": "SHOW ERROR",
+        "body": [
+            "SHOW ERROR ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
+        ],
+        "description": "[DaCo] SHOW ERROR message",
+        "scope": "cobol"
+    },
+    "SHOW GENERAL INFO MESSAGE": {
+        "prefix": "SHOW STD INFO",
+        "body": [
+            "SHOW STD INFO ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
+        ],
+        "description": "[DaCo] SHOW STD INFO message",
+        "scope": "cobol"
+    },
+    "SHOW GENERAL WARNING MESSAGE": {
+        "prefix": "SHOW STD WARNING",
+        "body": [
+            "SHOW STD WARNING ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
+        ],
+        "description": "[DaCo] SHOW STD WARNING message",
+        "scope": "cobol"
+    },
+    "SHOW GENERAL ERROR MESSAGE": {
+        "prefix": "SHOW STD ERROR",
+        "body": [
+            "SHOW STD ERROR ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
+        ],
+        "description": "[DaCo] SHOW STD ERROR message",
+        "scope": "cobol"
+    },
+    "RETURN INFO STATUS": {
+        "prefix": "RETURN INFO",
+        "body": [
+            "RETURN INFO ${1:message}."
+        ],
+        "description": "[DaCo] RETURN INFO message",
+        "scope": "cobol"
+    },
+    "RETURN WARNING STATUS": {
+        "prefix": "RETURN WARNING",
+        "body": [
+            "RETURN WARNING ${1:message}."
+        ],
+        "description": "[DaCo] RETURN WARNING message",
+        "scope": "cobol"
+    },
+    "RETURN ERROR STATUS": {
+        "prefix": "RETURN ERROR",
+        "body": [
+            "RETURN ERROR ${1:message}."
+        ],
+        "description": "[DaCo] RETURN ERROR message",
+        "scope": "cobol"
+    },
+    "SHOW RESULT": {
+        "prefix": "SHOW RESULT",
+        "body": [
+            "SHOW RESULT ${1:task-code}."
+        ],
+        "description": "[DaCo] SHOW RESULT",
+        "scope": "cobol"
+    },
+    "SHOW LAST ERROR MESSAGE": {
+        "prefix": "SHOW MESSAGE",
+        "body": [
+            "SHOW MESSAGE ${1:language-code}."
+        ],
+        "description": "[DaCo] SHOW Last Error Message",
+        "scope": "cobol"
     }
 }
