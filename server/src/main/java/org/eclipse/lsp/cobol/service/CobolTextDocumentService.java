@@ -15,7 +15,9 @@
 package org.eclipse.lsp.cobol.service;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Streams;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -61,8 +63,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.ANALYSIS_FEATURES;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.TARGET_SQL_BACKEND;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -362,7 +363,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     try {
       List<Object> objects =
           settingsService
-              .getConfigurations(Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label))
+              .getConfigurations(Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, FLAVORS.label))
               .get();
 
       SQLBackend sqlBackend =
@@ -378,7 +379,12 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         String feature = element.getAsString();
         features.add(EmbeddedCodeNode.Language.valueOf(feature));
       }
-      return new AnalysisConfig(features, copybookConfig);
+      List<String> flavors = ImmutableList.of();
+      JsonElement flavorsSettings = (JsonElement) objects.get(2);
+      if (flavorsSettings.isJsonArray())
+        flavors = Streams.stream((JsonArray) flavorsSettings)
+          .map(JsonElement::getAsString).collect(toList());
+      return new AnalysisConfig(features, copybookConfig, flavors);
     } catch (InterruptedException e) {
       LOG.error("InterruptedException when getting settings", e);
       Thread.currentThread().interrupt();

@@ -14,16 +14,18 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
-import {C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_ZOWE, SETTINGS_CPY_SECTION} from "../../constants";
-import {ProfileService} from "../ProfileService";
+import { C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_USS, PATHS_ZOWE, SETTINGS_CPY_SECTION, SPECIFY_DSN_OR_USS } from "../../constants";
 
 export class CopybooksPathGenerator {
-    constructor(private profileService: ProfileService) {
+
+    private static isValidConfigurationNotProvided() {
+        return !vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).has(PATHS_ZOWE) &&
+            !vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).has(PATHS_USS);
     }
 
-    async listUris(): Promise<vscode.Uri[]> {
+    public async listUris(): Promise<vscode.Uri[]> {
         const result: vscode.Uri[] = [];
-        const profile: string = await this.profileService.getProfileFromSettings();
+        const profile: string = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles");
         if (profile) {
             for (const dataset of await this.listDatasets()) {
                 const uri: vscode.Uri = vscode.Uri.file(createDatasetPath(profile, dataset));
@@ -33,12 +35,20 @@ export class CopybooksPathGenerator {
         return result;
     }
 
-    async listDatasets(): Promise<string[]> {
-        if (!vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).has(PATHS_ZOWE)) {
-            vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
+    public async listDatasets(): Promise<string[]> {
+        if (CopybooksPathGenerator.isValidConfigurationNotProvided()) {
+            vscode.window.showErrorMessage(SPECIFY_DSN_OR_USS);
             return [];
         }
         return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);
+    }
+
+    public async listUSSPaths(): Promise<string[]> {
+        if (CopybooksPathGenerator.isValidConfigurationNotProvided()) {
+            vscode.window.showErrorMessage(SPECIFY_DSN_OR_USS);
+            return [];
+        }
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_USS);
     }
 }
 

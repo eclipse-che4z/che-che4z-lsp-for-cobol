@@ -22,9 +22,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/**
- * UseCase test example with subroutines
- */
+/** UseCase test example with subroutines */
 class TestWithSubroutines {
   public static final String TEXT =
       "       Identification Division.\n"
@@ -36,14 +34,16 @@ class TestWithSubroutines {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
                 null,
                 "SECOND: Subroutine not found",
                 DiagnosticSeverity.Information,
-                SourceInfoLevels.INFO.getText())
-        ),
+                SourceInfoLevels.INFO.getText())),
         ImmutableList.of("FIRST"));
   }
 }

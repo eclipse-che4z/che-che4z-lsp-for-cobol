@@ -16,7 +16,7 @@
 //@ts-ignore
 /// <reference types="../../support/" />
 
-import { Theia } from '@eclipse/che-che4z/tests/dist/selectorsTheia';
+import { Theia } from '@eclipse/che-che4z/tests/dist/selectors';
 
 //F102470 - LSP for COBOL: support Community requests and tech debt
 

@@ -17,7 +17,7 @@
 /// <reference types="../../support/" />
 
 // Import selectors from Theia object
-import { Theia, COBOLLS } from '@eclipse/che-che4z/tests/dist/selectorsTheia';
+import { Theia, COBOLLS } from '@eclipse/che-che4z/tests/dist/selectors';
 
 // F96117 - Support for Copybooks in Git/bridge for Git
 

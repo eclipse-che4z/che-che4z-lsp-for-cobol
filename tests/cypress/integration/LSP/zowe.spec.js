@@ -17,7 +17,7 @@
 //@ts-ignore
 /// <reference types="../../support/" />
 
-import { Theia } from '@eclipse/che-che4z/tests/dist/selectorsTheia';
+import { Theia } from '@eclipse/che-che4z/tests/dist/selectors';
 
 context('This is a Zowe integration spec file', () => {
   /* Variables Panel */

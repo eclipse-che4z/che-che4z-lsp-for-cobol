@@ -14,23 +14,20 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
-import { CopybookURI } from "../services/copybook/CopybookURI";
-import { ProfileService } from "../services/ProfileService";
-import { SettingsUtils } from "../services/util/SettingsUtils";
-import { ZoweApi } from "../services/ZoweApi";
-import * as fsUtils from "../services/util/FSUtils";
 import { COPYBOOK_EXT_ARRAY } from "../constants";
+import { CopybookURI } from "../services/copybook/CopybookURI";
+import * as fsUtils from "../services/util/FSUtils";
+import { ProfileUtils } from "../services/util/ProfileUtils";
+import { SettingsUtils } from "../services/util/SettingsUtils";
 
-const zoweApi: ZoweApi = new ZoweApi();
-const profileService: ProfileService = new ProfileService(zoweApi);
-const copybookURI: CopybookURI = new CopybookURI(profileService);
+const copybookURI: CopybookURI = new CopybookURI();
+
 const copybookName: string = "NSTCOPY1";
 const copybookNameWithExtension: string = "NSTCOPY2.CPY";
 const CPY_FOLDER_NAME = ".cobcopy";
 const RELATIVE_CPY_FOLDER_NAME = "../relativeCobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
 SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + __dirname]);
-profileService.resolveProfile = jest.fn().mockReturnValue("PRF");
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
     get: jest.fn().mockReturnValue(undefined),
 });
@@ -55,10 +52,15 @@ function removeFolder(targetPath: string) {
     }
 }
 
-function buildResultArrayFrom(settingsMockValue: string[], profileName: string): number {
+function buildResultArrayFrom(settingsMockValue: string[], profileName: string, ussPath: string[] = []): number {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-        get: jest.fn().mockReturnValue(settingsMockValue),
+        get: jest.fn().mockReturnValueOnce(settingsMockValue),
     });
+    if (ussPath.length > 0) {
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue(ussPath),
+        });
+    }
     return (copybookURI as any).createPathForCopybookDownloaded(profileName).length;
 }
 
@@ -120,12 +122,15 @@ describe("With allowed input parameters, the list of URI that represent copybook
     test("given profile and dataset list with one element, the result list is correctly generated with size 1 ", () => {
         expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "PRF")).toBe(1);
     });
+    test("given profile, dataset and USS path, list with one element each, the result list is correctly generated with size 2 ", () => {
+        expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "PRF", ["/test/uss/path"])).toBe(2);
+    });
 });
 describe("Prioritize search criteria for copybooks test suite", () => {
     function provideMockValueForLocalAndDSN(localPath: string, dsnPath: string) {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValueOnce({
             get: jest.fn().mockReturnValueOnce([localPath]),
-        }).mockReturnValueOnce({
+        }).mockReturnValue({
             get: jest.fn().mockReturnValueOnce([dsnPath]),
         });
     }
@@ -140,8 +145,8 @@ describe("Prioritize search criteria for copybooks test suite", () => {
         expect(spySearchInWorkspace).toBeCalledTimes(1);
     });
     test("With no settings provided, two search strategies are applied and function return an empty string", async () => {
-        profileService.resolveProfile = jest.fn().mockReturnValue("PRF");
         provideMockValueForLocalAndDSN("", "");
+        ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(undefined);
         const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
         expect(uri).toBe("");
         expect(spySearchInWorkspace).toBeCalledTimes(2);
