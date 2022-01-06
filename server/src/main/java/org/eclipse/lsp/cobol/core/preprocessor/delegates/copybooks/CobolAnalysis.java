@@ -35,12 +35,12 @@ import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
  * This implementation of the {@link CopybookAnalysis} provides logic for plain COBOL logic applying
  * replacing if presents.
  */
-public class CobolAnalysis extends CopybookAnalysis {
+class CobolAnalysis extends CopybookAnalysis {
 
   private final List<Pair<String, String>> copyReplacingClauses;
   private final ReplacingService replacingService;
 
-  public CobolAnalysis(
+  CobolAnalysis(
       NamedSubContext copybooks,
       Map<String, DocumentMapping> nestedMappings,
       Map<String, Locality> copybookStatements,

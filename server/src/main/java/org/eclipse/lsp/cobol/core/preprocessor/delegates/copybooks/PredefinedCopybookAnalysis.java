@@ -22,7 +22,6 @@ import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.PreprocessorStack;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
@@ -38,8 +37,8 @@ import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBL
  * This implementation of the {@link CopybookAnalysis} resolves only the DFHEIBLC copybook under the
  * LINKAGE SECTION.
  */
-public class PredefinedCopybookAnalysis extends CopybookAnalysis {
-  public PredefinedCopybookAnalysis(
+class PredefinedCopybookAnalysis extends CopybookAnalysis {
+  PredefinedCopybookAnalysis(
       NamedSubContext copybooks,
       Map<String, DocumentMapping> nestedMappings,
       Map<String, Locality> copybookStatements,

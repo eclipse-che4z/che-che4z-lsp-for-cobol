@@ -24,7 +24,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.PreprocessorStack;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
@@ -34,6 +33,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -51,25 +51,23 @@ import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.*;
  * behavior overriding the methods.
  */
 @Slf4j
-public abstract class CopybookAnalysis {
+abstract class CopybookAnalysis {
   private static final String HYPHEN = "-";
   private static final String UNDERSCORE = "_";
   private static final String SYNTAX_ERROR_CHECK_COPYBOOK_NAME =
       "Syntax error by checkCopybookName: {}";
-
+  protected final Deque<CopybookUsage> copybookStack;
+  protected final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack;
   private final NamedSubContext copybooks;
   private final Map<String, DocumentMapping> nestedMappings;
   // used for both copy and sql-include statements
   private final Map<String, Locality> copybookStatements;
-
   private final List<Pair<String, String>> replacingClauses;
   private final String documentUri;
   private final CopybookConfig copybookConfig;
   private final TextPreprocessor preprocessor;
   private final CopybookService copybookService;
   private final MessageService messageService;
-  protected final Deque<CopybookUsage> copybookStack;
-  protected final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack;
 
   CopybookAnalysis(
       NamedSubContext copybooks,
@@ -108,7 +106,7 @@ public abstract class CopybookAnalysis {
    */
   public ResultWithErrors<Consumer<PreprocessorStack>> handleCopybook(
       ParserRuleContext context,
-      ParserRuleContext copySource,
+      @Nullable ParserRuleContext copySource,
       int maxLength,
       Locality statementPosition,
       Locality copybookNameLocality) {

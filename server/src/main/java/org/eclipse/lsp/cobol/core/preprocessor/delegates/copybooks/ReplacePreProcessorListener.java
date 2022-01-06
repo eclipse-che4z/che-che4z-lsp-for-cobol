@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2021 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -156,8 +156,7 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
     String replaceOffStmt = pop();
     String content = applyReplacing(read(), replacingClauses);
     replacingClauses.clear();
-    mergeAndUpdateTopTwoElement(
-        content + replaceOffStmt);
+    mergeAndUpdateTopTwoElement(content + replaceOffStmt);
   }
 
   private String applyReplacing(String rawContent, List<Pair<String, String>> replacePatterns) {

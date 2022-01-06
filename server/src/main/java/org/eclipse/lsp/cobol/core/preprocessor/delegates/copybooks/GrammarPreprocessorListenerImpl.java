@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2021 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor.delegates;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
@@ -31,9 +31,6 @@ import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.CobolAnalysis;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PredefinedCopybookAnalysis;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.SkippingAnalysis;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
@@ -87,7 +84,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Inject
   @SuppressWarnings("squid:S107")
-  public GrammarPreprocessorListenerImpl(
+  GrammarPreprocessorListenerImpl(
       @Assisted String documentUri,
       @Assisted BufferedTokenStream tokens,
       @Assisted Deque<CopybookUsage> copybookStack,

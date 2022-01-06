@@ -33,8 +33,8 @@ import java.util.Optional;
  * This implementation of the {@link CopybookAnalysis} doesn't resolve copybook content, and only
  * collects the usage of the copybook
  */
-public class SkippingAnalysis extends CopybookAnalysis {
-  public SkippingAnalysis(
+class SkippingAnalysis extends CopybookAnalysis {
+  SkippingAnalysis(
       NamedSubContext copybooks,
       Map<String, DocumentMapping> nestedMappings,
       Map<String, Locality> copybookStatements,

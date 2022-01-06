@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2021 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import lombok.NonNull;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -27,7 +27,7 @@ import static java.util.Optional.ofNullable;
  * Provides a contract and default implementation of various stack operation. To be used while
  * assembling the {@link org.eclipse.lsp.cobol.core.model.ExtendedDocument} from pre-processors.
  */
-public interface PreprocessorStack {
+interface PreprocessorStack {
 
   /** @return A stack of accumulated text while preprocessing. */
   Deque<StringBuilder> getTextAccumulator();
