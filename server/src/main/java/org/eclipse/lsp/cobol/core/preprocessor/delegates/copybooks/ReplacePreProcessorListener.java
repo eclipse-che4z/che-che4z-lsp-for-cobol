@@ -15,7 +15,6 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BufferedTokenStream;
@@ -49,7 +48,7 @@ import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 @Slf4j
 public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
     implements GrammarPreprocessorListener {
-  @Getter private final List<SyntaxError> errors = new ArrayList<>();
+  private final List<SyntaxError> errors = new ArrayList<>();
   private final ReplacingService replacingService;
   private final List<Pair<String, String>> replacingClauses;
   private final BufferedTokenStream tokens;
@@ -77,11 +76,11 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
   }
 
   @Override
-  public ExtendedDocument getResult() {
+  public ResultWithErrors<ExtendedDocument> getResult() {
     if (!replacingClauses.isEmpty()) {
       replace();
     }
-    return new ExtendedDocument(accumulate(), null, null, null);
+    return new ResultWithErrors<>(new ExtendedDocument(accumulate(), null, null, null), errors);
   }
 
   private void replace() {

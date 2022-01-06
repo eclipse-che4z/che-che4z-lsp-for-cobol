@@ -16,9 +16,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import org.eclipse.lsp.cobol.core.CobolPreprocessorListener;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-
-import java.util.List;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 
 /**
  * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
@@ -27,16 +25,9 @@ import java.util.List;
 public interface GrammarPreprocessorListener extends CobolPreprocessorListener, PreprocessorStack {
 
   /**
-   * Get list of found syntax errors during building the extended document.
-   *
-   * @return list of errors.
-   */
-  List<SyntaxError> getErrors();
-
-  /**
    * Get the extended document of the COBOL file and the used copybooks.
    *
    * @return extended document
    */
-  ExtendedDocument getResult();
+  ResultWithErrors<ExtendedDocument> getResult();
 }

@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BufferedTokenStream;
@@ -62,7 +61,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private static final int MAX_COPYBOOK_NAME_LENGTH_DATASET = 8;
   private static final int MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB = 10;
 
-  @Getter private final List<SyntaxError> errors = new ArrayList<>();
+  private final List<SyntaxError> errors = new ArrayList<>();
   private final Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
   private final List<Pair<String, String>> copyReplacingClauses = new ArrayList<>();
   private final List<Pair<String, String>> replacingClauses;
@@ -115,7 +114,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @NonNull
   @Override
-  public ExtendedDocument getResult() {
+  public ResultWithErrors<ExtendedDocument> getResult() {
     if (!replacingClauses.isEmpty()) {
       String replaceableStmt = peek().toString();
       String content = handleReplace(replaceableStmt);
@@ -125,7 +124,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         documentUri,
         new DocumentMapping(
             tokens.getTokens().stream().map(toPosition()).collect(toList()), shifts));
-    return new ExtendedDocument(accumulate(), copybooks, nestedMappings, copybookStatements);
+    return new ResultWithErrors<>(
+        new ExtendedDocument(accumulate(), copybooks, nestedMappings, copybookStatements), errors);
   }
 
   @Override

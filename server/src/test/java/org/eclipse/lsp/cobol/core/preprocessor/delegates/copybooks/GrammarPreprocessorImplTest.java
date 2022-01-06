@@ -106,8 +106,7 @@ class GrammarPreprocessorImplTest {
             eq(replaceStmtStack),
             eq(new ArrayList<>())))
         .thenReturn(listener);
-    when(listener.getErrors()).thenReturn(errors);
-    when(listener.getResult()).thenReturn(expectedDocument);
+    when(listener.getResult()).thenReturn(new ResultWithErrors<>(expectedDocument, errors));
 
     GrammarPreprocessor preprocessor =
         new GrammarPreprocessorImpl(factory, replacingService, messageService);

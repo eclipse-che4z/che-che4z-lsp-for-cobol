@@ -68,8 +68,8 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
       @NonNull List<Pair<String, String>> replacingClauses) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     ReplacePreProcessorListener replaceListener = handleReplaceClauses(code, uri, replacingClauses);
-    code = replaceListener.getResult().getText();
-    List<SyntaxError> errors = new ArrayList<>(replaceListener.getErrors());
+    List<SyntaxError> errors = new ArrayList<>();
+    code = replaceListener.getResult().unwrap(errors::addAll).getText();
     Lexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     lexer.removeErrorListeners();
 
@@ -90,8 +90,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
             recursiveReplaceStmtStack,
             replacingClauses);
     walker.walk(listener, startRule);
-    errors.addAll(listener.getErrors());
-    return new ResultWithErrors<>(listener.getResult(), errors);
+    return new ResultWithErrors<>(listener.getResult().unwrap(errors::addAll), errors);
   }
 
   private ReplacePreProcessorListener handleReplaceClauses(
