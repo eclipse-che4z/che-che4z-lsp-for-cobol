@@ -113,7 +113,7 @@ public abstract class CopybookAnalysis {
       Locality statementPosition,
       Locality copybookNameLocality) {
     List<SyntaxError> errors = new ArrayList<>();
-    String copybookName = retrieveCopybookName(context, copySource);
+    String copybookName = retrieveCopybookName(copySource);
     String copybookId = randomUUID().toString();
 
     CopybookModel model =
@@ -179,8 +179,7 @@ public abstract class CopybookAnalysis {
     return new ResultWithErrors<>(copybook, errors);
   }
 
-  protected String retrieveCopybookName(
-      ParserRuleContext mainContext, ParserRuleContext copySource) {
+  protected String retrieveCopybookName(ParserRuleContext copySource) {
     CopySourceContext ctx = (CopySourceContext) copySource;
     return retrieveCopybookName(
         Optional.<RuleContext>ofNullable(ctx.cobolWord()).orElse(ctx.literal()));
