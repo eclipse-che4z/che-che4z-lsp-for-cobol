@@ -124,29 +124,30 @@ public class VariableDefinitionUtil {
   }
 
   /**
-   * In case of group variable the definition's locality contains only one line, but must contain all children.
+   * In case of group variable the definition's locality contains only one line, but must contain
+   * all children.
    *
    * @param node the node with Variable definitions
    */
   private void reshapeVariablesLocality(Node node) {
     List<Node> children = node.getChildren();
-    if (children.isEmpty())
-      return;
+    if (children.isEmpty()) return;
     children.forEach(VariableDefinitionUtil::reshapeVariablesLocality);
     if (node.getNodeType() == NodeType.VARIABLE)
-      ((VariableNode) node).extendLocality(children.get(children.size() - 1).getLocality().getRange().getEnd());
+      ((VariableNode) node)
+          .extendLocality(children.get(children.size() - 1).getLocality().getRange().getEnd());
   }
 
   private void registerVariablesInProgram(Node node) {
     // The variable can have nested variable definitions (like IndexItemNode), we need to
     // collect them
-    List<VariableNode> variables = node.getChildren().stream()
+    List<VariableNode> variables =
+        node.getChildren().stream()
             .flatMap(Node::getDepthFirstStream)
             .filter(hasType(NodeType.VARIABLE))
             .map(VariableNode.class::cast)
             .collect(Collectors.toList());
-    node
-        .getNearestParentByType(NodeType.PROGRAM)
+    node.getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
         .ifPresent(programNode -> variables.forEach(programNode::addVariableDefinition));
   }
@@ -174,11 +175,12 @@ public class VariableDefinitionUtil {
           // Reassign all children from definition node to converted variable definition node
           definitionNode.getChildren().forEach(variable::addChild);
         } else {
-          SyntaxError error = SyntaxError.syntaxError()
-              .severity(SEVERITY)
-              .locality(definitionNode.getLocality())
-              .messageTemplate(MessageTemplate.of(UNKNOWN_VARIABLE_DEFINITION))
-              .build();
+          SyntaxError error =
+              SyntaxError.syntaxError()
+                  .severity(SEVERITY)
+                  .locality(definitionNode.getLocality())
+                  .messageTemplate(MessageTemplate.of(UNKNOWN_VARIABLE_DEFINITION))
+                  .build();
           errors.add(error);
           LOG.debug("Syntax error by VariableDefinitionUtil " + error.toString());
         }
@@ -491,7 +493,8 @@ public class VariableDefinitionUtil {
     String renamesName = renames.getName();
     int renamesIndex = Iterables.indexOf(nodesForRenaming, it -> renamesName.equals(it.getName()));
     if (renamesIndex != -1) {
-      VariableUsageNode variableUsageNode = new VariableUsageNode(renamesName, renames.getLocality());
+      VariableUsageNode variableUsageNode =
+          new VariableUsageNode(renamesName, renames.getLocality());
       variable.addChild(variableUsageNode);
       nodesForRenaming.get(renamesIndex).addUsage(variableUsageNode);
     } else
@@ -518,8 +521,13 @@ public class VariableDefinitionUtil {
     Locality redefinesLocality = redefinesNameAndLocality.getLocality();
     VariableUsageNode redefineUsage = new VariableUsageNode(redefinesName, redefinesLocality);
     variableNode.addChild(redefineUsage);
-    VariableWithLevelNode variableForRedefine = getPrecedingVariableForRedefine(definitionNode, redefinesName);
-    if (variableForRedefine == null || !variableForRedefine.getName().equals(redefinesName)) {
+    List<VariableWithLevelNode> eligibleNodesForRedefine =
+        getEligibleNodesForRedefine(definitionNode);
+    Optional<VariableWithLevelNode> allowedRedefinedNode =
+        eligibleNodesForRedefine.stream()
+            .filter(node -> node.getName().equals(redefinesName))
+            .findFirst();
+    if (eligibleNodesForRedefine.isEmpty() || !allowedRedefinedNode.isPresent()) {
       errors.add(
           SyntaxError.syntaxError()
               .severity(SEVERITY)
@@ -527,8 +535,8 @@ public class VariableDefinitionUtil {
               .locality(redefinesLocality)
               .build());
     } else {
-      variableForRedefine.addUsage(redefineUsage);
-      if (variableForRedefine.getLevel() != definitionNode.getLevel()) {
+      allowedRedefinedNode.get().addUsage(redefineUsage);
+      if (checkLevel77Mismatch(definitionNode, allowedRedefinedNode.get())) {
         errors.add(
             SyntaxError.syntaxError()
                 .severity(SEVERITY)
@@ -551,16 +559,32 @@ public class VariableDefinitionUtil {
     return new ResultWithErrors<>(variableNode, errors);
   }
 
-  private VariableWithLevelNode getPrecedingVariableForRedefine(
-      VariableDefinitionNode definitionNode, String redefineName) {
+  private boolean checkLevel77Mismatch(
+      VariableDefinitionNode definitionNode, VariableWithLevelNode allowedRedefinedNode) {
+    return allowedRedefinedNode.getLevel() != definitionNode.getLevel()
+        && (allowedRedefinedNode.getLevel() == LEVEL_77
+            || definitionNode.getLevel() == LEVEL_77);
+  }
+
+  private static List<VariableWithLevelNode> getEligibleNodesForRedefine(
+      VariableDefinitionNode definitionNode) {
     Deque<Node> siblings = new LinkedList<>(definitionNode.getParent().getChildren());
-    while (!siblings.isEmpty()) {
-      Node precedingNode = siblings.pollLast();
-      if (precedingNode instanceof VariableWithLevelNode) {
-        VariableWithLevelNode variable = (VariableWithLevelNode) precedingNode;
-        if (!variable.isRedefines() || variable.getName().equals(redefineName)) return variable;
-      }
-    }
-    return null;
+    List<VariableWithLevelNode> eligibleNodesForRedefine = new ArrayList<>();
+    LinkedList<VariableWithLevelNode> availableNodes =
+        siblings.stream()
+            .filter(node -> node instanceof VariableWithLevelNode)
+            .map(VariableWithLevelNode.class::cast)
+            .filter(
+                node ->
+                    !node.getVariableType().equals(VariableType.CONDITION_DATA_NAME)
+                        && !node.getVariableType().equals(VariableType.RENAME_ITEM))
+            .collect(Collectors.toCollection(LinkedList::new));
+    if (availableNodes.isEmpty()) return eligibleNodesForRedefine;
+    VariableWithLevelNode variable;
+    do {
+      variable = availableNodes.pollLast();
+      eligibleNodesForRedefine.add(variable);
+    } while (Objects.requireNonNull(variable).isRedefines());
+    return eligibleNodesForRedefine;
   }
 }
