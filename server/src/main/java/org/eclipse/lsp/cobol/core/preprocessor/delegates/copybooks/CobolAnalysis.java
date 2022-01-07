@@ -41,7 +41,6 @@ class CobolAnalysis extends CopybookAnalysis {
   private final ReplacingService replacingService;
 
   CobolAnalysis(
-      NamedSubContext copybooks,
       Map<String, DocumentMapping> nestedMappings,
       Map<String, Locality> copybookStatements,
       List<Pair<String, String>> replacingClauses,
@@ -55,7 +54,6 @@ class CobolAnalysis extends CopybookAnalysis {
       List<Pair<String, String>> copyReplacingClauses,
       ReplacingService replacingService) {
     super(
-        copybooks,
         nestedMappings,
         copybookStatements,
         replacingClauses,

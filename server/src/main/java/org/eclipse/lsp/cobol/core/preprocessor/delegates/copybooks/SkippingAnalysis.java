@@ -28,6 +28,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * This implementation of the {@link CopybookAnalysis} doesn't resolve copybook content, and only
@@ -35,7 +36,6 @@ import java.util.Optional;
  */
 class SkippingAnalysis extends CopybookAnalysis {
   SkippingAnalysis(
-      NamedSubContext copybooks,
       Map<String, DocumentMapping> nestedMappings,
       Map<String, Locality> copybookStatements,
       List<Pair<String, String>> replacingClauses,
@@ -47,7 +47,6 @@ class SkippingAnalysis extends CopybookAnalysis {
       MessageService messageService,
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
     super(
-        copybooks,
         nestedMappings,
         copybookStatements,
         replacingClauses,
@@ -73,8 +72,9 @@ class SkippingAnalysis extends CopybookAnalysis {
   }
 
   @Override
-  protected void storeCopyStatementSemantics(
-      String copybookName, Locality copybookNameLocality, String uri) {
-    addCopybookUsage(copybookName, copybookNameLocality);
+  protected Consumer<NamedSubContext> storeCopyStatementSemantics(
+      String copybookName, Locality copybookNameLocality, String uri,
+      Optional<ExtendedDocument> copybookDocument) {
+    return addCopybookUsage(copybookName, copybookNameLocality);
   }
 }

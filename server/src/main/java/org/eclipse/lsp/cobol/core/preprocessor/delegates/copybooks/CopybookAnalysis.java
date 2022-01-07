@@ -36,6 +36,7 @@ import org.eclipse.lsp4j.Range;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
@@ -58,7 +59,6 @@ abstract class CopybookAnalysis {
       "Syntax error by checkCopybookName: {}";
   protected final Deque<CopybookUsage> copybookStack;
   protected final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack;
-  private final NamedSubContext copybooks;
   private final Map<String, DocumentMapping> nestedMappings;
   // used for both copy and sql-include statements
   private final Map<String, Locality> copybookStatements;
@@ -70,7 +70,6 @@ abstract class CopybookAnalysis {
   private final MessageService messageService;
 
   CopybookAnalysis(
-      NamedSubContext copybooks,
       Map<String, DocumentMapping> nestedMappings,
       Map<String, Locality> copybookStatements,
       List<Pair<String, String>> replacingClauses,
@@ -81,7 +80,6 @@ abstract class CopybookAnalysis {
       Deque<CopybookUsage> copybookStack,
       MessageService messageService,
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
-    this.copybooks = copybooks;
     this.nestedMappings = nestedMappings;
     this.copybookStatements = copybookStatements;
     this.replacingClauses = replacingClauses;
@@ -102,7 +100,7 @@ abstract class CopybookAnalysis {
    * @param maxLength
    * @return the functions that should be applied to the preprocessor stack
    */
-  public ResultWithErrors<Consumer<PreprocessorStack>> handleCopybook(
+  public ResultWithErrors<Function<PreprocessorStack, Consumer<NamedSubContext>>> handleCopybook(
       ParserRuleContext context, @Nullable ParserRuleContext copySource, int maxLength) {
     List<SyntaxError> errors = new ArrayList<>();
     String copybookName = retrieveCopybookName(copySource);
@@ -119,8 +117,6 @@ abstract class CopybookAnalysis {
     String cleanText = preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll);
     String preparedText =
         handleReplacing(copybookName, cleanText, copybookNameLocality).unwrap(errors::addAll);
-
-    storeCopyStatementSemantics(copybookName, copybookNameLocality, uri);
     errors.addAll(checkCopybookName(copybookName, copybookNameLocality, maxLength));
     collectCopybookStatement(
         copybookId, PreprocessorUtils.buildLocality(context, documentUri, copybookStack.peek()));
@@ -129,15 +125,30 @@ abstract class CopybookAnalysis {
         processCopybook(copybookName, uri, copybookId, preparedText, copybookNameLocality)
             .unwrap(errors::addAll);
     copybookDocument.ifPresent(it -> collectNestedSemanticData(uri, copybookId, it));
+
     return new ResultWithErrors<>(
-        beforeWriting()
-            .andThen(
-                copybookDocument
-                    .map(ExtendedDocument::getText)
-                    .map(it -> writeCopybook(copybookId, it))
-                    .orElse(it -> {}))
-            .andThen(afterWriting(context)),
+        compose(copybookDocument, context, copybookId, copybookName, copybookNameLocality, uri),
         errors);
+  }
+
+  private Function<PreprocessorStack, Consumer<NamedSubContext>> compose(
+      Optional<ExtendedDocument> copybookDocument,
+      ParserRuleContext context,
+      String copybookId,
+      String copybookName,
+      Locality copybookNameLocality,
+      String uri) {
+    return stack -> {
+      beforeWriting()
+          .andThen(
+              copybookDocument
+                  .map(ExtendedDocument::getText)
+                  .map(it -> writeCopybook(copybookId, it))
+                  .orElse(it -> {}))
+          .andThen(afterWriting(context))
+          .accept(stack);
+      return storeCopyStatementSemantics(copybookName, copybookNameLocality, uri, copybookDocument);
+    };
   }
 
   protected ResultWithErrors<Optional<ExtendedDocument>> processCopybook(
@@ -193,10 +204,32 @@ abstract class CopybookAnalysis {
     return it -> it.accumulateTokenShift(context);
   }
 
-  protected void storeCopyStatementSemantics(
-      String copybookName, Locality copybookNameLocality, String uri) {
-    addCopybookUsage(copybookName, copybookNameLocality);
-    addCopybookDefinition(copybookName, uri);
+  protected Consumer<NamedSubContext> storeCopyStatementSemantics(
+      String copybookName,
+      Locality copybookNameLocality,
+      String uri,
+      Optional<ExtendedDocument> copybookDocument) {
+    return addCopybookUsage(copybookName, copybookNameLocality)
+        .andThen(addCopybookDefinition(copybookName, uri))
+        .andThen(addNestedCopybook(copybookDocument));
+  }
+
+  protected Consumer<NamedSubContext> addCopybookUsage(
+      @NonNull String copybookName, @NonNull Locality locality) {
+    return copybooks -> copybooks.addUsage(copybookName, locality.toLocation());
+  }
+
+  protected Consumer<NamedSubContext> addCopybookDefinition(String copybookName, String uri) {
+    return copybooks -> {
+      if (!(isEmpty(copybookName) || isEmpty(uri) || isPredefined(uri)))
+        copybooks.define(
+            copybookName, new Location(uri, new Range(new Position(0, 0), new Position(0, 0))));
+    };
+  }
+
+  protected Consumer<NamedSubContext> addNestedCopybook(
+      Optional<ExtendedDocument> copybookDocument) {
+    return copybooks -> copybooks.merge(copybookDocument.get().getCopybooks());
   }
 
   protected ResultWithErrors<String> handleReplacing(
@@ -214,7 +247,6 @@ abstract class CopybookAnalysis {
 
   private void collectNestedSemanticData(
       String uri, String copybookId, ExtendedDocument copybookDocument) {
-    copybooks.merge(copybookDocument.getCopybooks());
     copybookStatements.putAll(copybookDocument.getCopyStatements());
     nestedMappings.putAll(copybookDocument.getDocumentMapping());
     nestedMappings.putIfAbsent(copybookId, nestedMappings.get(uri));
@@ -311,17 +343,6 @@ abstract class CopybookAnalysis {
             .build();
     LOG.debug(logMessage, error.toString());
     return error;
-  }
-
-  protected void addCopybookUsage(@NonNull String copybookName, @NonNull Locality locality) {
-    copybooks.addUsage(copybookName, locality.toLocation());
-  }
-
-  protected void addCopybookDefinition(String copybookName, String uri) {
-    if (!(isEmpty(copybookName) || isEmpty(uri) || isPredefined(uri))) {
-      copybooks.define(
-          copybookName, new Location(uri, new Range(new Position(0, 0), new Position(0, 0))));
-    }
   }
 
   private boolean isPredefined(String uri) {

@@ -20,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
@@ -29,6 +30,7 @@ import org.eclipse.lsp.cobol.service.CopybookService;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBLC;
@@ -39,7 +41,6 @@ import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBL
  */
 class PredefinedCopybookAnalysis extends CopybookAnalysis {
   PredefinedCopybookAnalysis(
-      NamedSubContext copybooks,
       Map<String, DocumentMapping> nestedMappings,
       Map<String, Locality> copybookStatements,
       List<Pair<String, String>> replacingClauses,
@@ -51,7 +52,6 @@ class PredefinedCopybookAnalysis extends CopybookAnalysis {
       MessageService messageService,
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
     super(
-        copybooks,
         nestedMappings,
         copybookStatements,
         replacingClauses,
@@ -70,9 +70,10 @@ class PredefinedCopybookAnalysis extends CopybookAnalysis {
   }
 
   @Override
-  protected void storeCopyStatementSemantics(
-      String copybookName, Locality copybookNameLocality, String uri) {
-    // do nothing in this implementation
+  protected Consumer<NamedSubContext> storeCopyStatementSemantics(
+      String copybookName, Locality copybookNameLocality, String uri,
+      Optional<ExtendedDocument> copybookDocument) {
+    return it -> {};
   }
 
   @Override
