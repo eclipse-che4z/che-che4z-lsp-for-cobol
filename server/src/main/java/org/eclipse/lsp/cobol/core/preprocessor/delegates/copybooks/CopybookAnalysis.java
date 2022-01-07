@@ -61,7 +61,6 @@ abstract class CopybookAnalysis {
   protected final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack;
   private final Map<String, DocumentMapping> nestedMappings;
   // used for both copy and sql-include statements
-  private final Map<String, Locality> copybookStatements;
   private final List<Pair<String, String>> replacingClauses;
   private final String documentUri;
   private final CopybookConfig copybookConfig;
@@ -71,7 +70,6 @@ abstract class CopybookAnalysis {
 
   CopybookAnalysis(
       Map<String, DocumentMapping> nestedMappings,
-      Map<String, Locality> copybookStatements,
       List<Pair<String, String>> replacingClauses,
       String documentUri,
       CopybookConfig copybookConfig,
@@ -81,7 +79,6 @@ abstract class CopybookAnalysis {
       MessageService messageService,
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
     this.nestedMappings = nestedMappings;
-    this.copybookStatements = copybookStatements;
     this.replacingClauses = replacingClauses;
     this.documentUri = documentUri;
     this.copybookConfig = copybookConfig;
@@ -118,8 +115,8 @@ abstract class CopybookAnalysis {
     String preparedText =
         handleReplacing(copybookName, cleanText, copybookNameLocality).unwrap(errors::addAll);
     errors.addAll(checkCopybookName(copybookName, copybookNameLocality, maxLength));
-    collectCopybookStatement(
-        copybookId, PreprocessorUtils.buildLocality(context, documentUri, copybookStack.peek()));
+    Locality copybookStatementLocality =
+        PreprocessorUtils.buildLocality(context, documentUri, copybookStack.peek());
 
     Optional<ExtendedDocument> copybookDocument =
         processCopybook(copybookName, uri, copybookId, preparedText, copybookNameLocality)
@@ -127,7 +124,14 @@ abstract class CopybookAnalysis {
     copybookDocument.ifPresent(it -> collectNestedSemanticData(uri, copybookId, it));
 
     return new ResultWithErrors<>(
-        compose(copybookDocument, context, copybookId, copybookName, copybookNameLocality, uri),
+        compose(
+            copybookDocument,
+            context,
+            copybookId,
+            copybookName,
+            copybookNameLocality,
+            copybookStatementLocality,
+            uri),
         errors);
   }
 
@@ -137,6 +141,7 @@ abstract class CopybookAnalysis {
       String copybookId,
       String copybookName,
       Locality copybookNameLocality,
+      Locality copyStatementLocality,
       String uri) {
     return stack -> {
       beforeWriting()
@@ -147,7 +152,13 @@ abstract class CopybookAnalysis {
                   .orElse(it -> {}))
           .andThen(afterWriting(context))
           .accept(stack);
-      return storeCopyStatementSemantics(copybookName, copybookNameLocality, uri, copybookDocument);
+      return storeCopyStatementSemantics(
+          copybookName,
+          copybookId,
+          copybookNameLocality,
+          copyStatementLocality,
+          uri,
+          copybookDocument);
     };
   }
 
@@ -206,12 +217,25 @@ abstract class CopybookAnalysis {
 
   protected Consumer<NamedSubContext> storeCopyStatementSemantics(
       String copybookName,
+      String copybookId,
       Locality copybookNameLocality,
+      Locality copyStatementLocality,
       String uri,
       Optional<ExtendedDocument> copybookDocument) {
     return addCopybookUsage(copybookName, copybookNameLocality)
         .andThen(addCopybookDefinition(copybookName, uri))
-        .andThen(addNestedCopybook(copybookDocument));
+        .andThen(collectCopybookStatement(copybookId, copyStatementLocality))
+        .andThen(copybookDocument.map(this::addNestedCopybook).orElseGet(() -> it -> {}));
+  }
+
+  private Consumer<NamedSubContext> collectCopybookStatement(String copybookId, Locality locality) {
+    return it -> it.addStatement(copybookId, locality);
+  }
+
+  private void collectNestedSemanticData(
+      String uri, String copybookId, ExtendedDocument copybookDocument) {
+    nestedMappings.putAll(copybookDocument.getDocumentMapping());
+    nestedMappings.putIfAbsent(copybookId, nestedMappings.get(uri));
   }
 
   protected Consumer<NamedSubContext> addCopybookUsage(
@@ -227,9 +251,8 @@ abstract class CopybookAnalysis {
     };
   }
 
-  protected Consumer<NamedSubContext> addNestedCopybook(
-      Optional<ExtendedDocument> copybookDocument) {
-    return copybooks -> copybooks.merge(copybookDocument.get().getCopybooks());
+  protected Consumer<NamedSubContext> addNestedCopybook(ExtendedDocument copybookDocument) {
+    return copybooks -> copybooks.merge(copybookDocument.getCopybooks());
   }
 
   protected ResultWithErrors<String> handleReplacing(
@@ -239,17 +262,6 @@ abstract class CopybookAnalysis {
 
   private boolean hasRecursion(String copybookName) {
     return copybookStack.stream().map(CopybookUsage::getName).anyMatch(copybookName::equals);
-  }
-
-  private void collectCopybookStatement(String copybookId, Locality locality) {
-    copybookStatements.put(copybookId, locality);
-  }
-
-  private void collectNestedSemanticData(
-      String uri, String copybookId, ExtendedDocument copybookDocument) {
-    copybookStatements.putAll(copybookDocument.getCopyStatements());
-    nestedMappings.putAll(copybookDocument.getDocumentMapping());
-    nestedMappings.putIfAbsent(copybookId, nestedMappings.get(uri));
   }
 
   private Consumer<PreprocessorStack> writeCopybook(String copybookId, String copybookContent) {

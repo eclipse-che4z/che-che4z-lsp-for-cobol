@@ -37,7 +37,6 @@ import java.util.function.Consumer;
 class SkippingAnalysis extends CopybookAnalysis {
   SkippingAnalysis(
       Map<String, DocumentMapping> nestedMappings,
-      Map<String, Locality> copybookStatements,
       List<Pair<String, String>> replacingClauses,
       String documentUri,
       CopybookConfig copybookConfig,
@@ -48,7 +47,6 @@ class SkippingAnalysis extends CopybookAnalysis {
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
     super(
         nestedMappings,
-        copybookStatements,
         replacingClauses,
         documentUri,
         copybookConfig,
@@ -72,9 +70,7 @@ class SkippingAnalysis extends CopybookAnalysis {
   }
 
   @Override
-  protected Consumer<NamedSubContext> storeCopyStatementSemantics(
-      String copybookName, Locality copybookNameLocality, String uri,
-      Optional<ExtendedDocument> copybookDocument) {
-    return addCopybookUsage(copybookName, copybookNameLocality);
+  protected Consumer<NamedSubContext> addCopybookDefinition(String copybookName, String uri) {
+    return it -> {};
   }
 }

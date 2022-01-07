@@ -91,10 +91,7 @@ class GrammarPreprocessorImplTest {
 
     ExtendedDocument expectedDocument =
         new ExtendedDocument(
-            RESULT,
-            copybooks,
-            ImmutableMap.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping),
-            ImmutableMap.of());
+            RESULT, copybooks, ImmutableMap.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping));
 
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER);
 

@@ -20,7 +20,6 @@ import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
 
@@ -42,7 +41,6 @@ class CobolAnalysis extends CopybookAnalysis {
 
   CobolAnalysis(
       Map<String, DocumentMapping> nestedMappings,
-      Map<String, Locality> copybookStatements,
       List<Pair<String, String>> replacingClauses,
       String documentUri,
       CopybookConfig copybookConfig,
@@ -55,7 +53,6 @@ class CobolAnalysis extends CopybookAnalysis {
       ReplacingService replacingService) {
     super(
         nestedMappings,
-        copybookStatements,
         replacingClauses,
         documentUri,
         copybookConfig,

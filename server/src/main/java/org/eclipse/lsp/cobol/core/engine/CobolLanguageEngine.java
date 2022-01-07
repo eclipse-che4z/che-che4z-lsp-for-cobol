@@ -163,7 +163,7 @@ public class CobolLanguageEngine {
     timingBuilder.getLateErrorProcessingTimer().start();
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
     accumulatedErrors.addAll(
-        collectErrorsForCopybooks(accumulatedErrors, extendedDocument.getCopyStatements()));
+        collectErrorsForCopybooks(accumulatedErrors, extendedDocument.getCopybooks().getDefinitionStatements()));
     timingBuilder.getLateErrorProcessingTimer().stop();
 
     if (LOG.isDebugEnabled()) {

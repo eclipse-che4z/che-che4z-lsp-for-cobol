@@ -66,7 +66,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
   private final Map<Integer, Integer> shifts = new HashMap<>();
   // used for both copy and sql-include statements
-  private final Map<String, Locality> copybookStatements = new HashMap<>();
 
   private final String documentUri;
   private final BufferedTokenStream tokens;
@@ -125,7 +124,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
                 .collect(toList()),
             shifts));
     return new ResultWithErrors<>(
-        new ExtendedDocument(accumulate(), copybooks, nestedMappings, copybookStatements), errors);
+        new ExtendedDocument(accumulate(), copybooks, nestedMappings), errors);
   }
 
   @Override
@@ -180,7 +179,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void exitLinkageSection(LinkageSectionContext ctx) {
     new PredefinedCopybookAnalysis(
             nestedMappings,
-            copybookStatements,
             replacingClauses,
             documentUri,
             copybookConfig,
@@ -205,7 +203,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (requiresEarlyReturn(ctx)) return;
     new CobolAnalysis(
             nestedMappings,
-            copybookStatements,
             replacingClauses,
             documentUri,
             copybookConfig,
@@ -243,7 +240,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
               it ->
                   new CobolAnalysis(
                           nestedMappings,
-                          copybookStatements,
                           replacingClauses,
                           documentUri,
                           copybookConfig,
@@ -261,7 +257,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     else
       new SkippingAnalysis(
               nestedMappings,
-              copybookStatements,
               replacingClauses,
               documentUri,
               copybookConfig,
@@ -286,7 +281,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (requiresEarlyReturn(ctx)) return;
     new CobolAnalysis(
             nestedMappings,
-            copybookStatements,
             replacingClauses,
             documentUri,
             copybookConfig,
@@ -313,7 +307,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (requiresEarlyReturn(ctx)) return;
     new CobolAnalysis(
             nestedMappings,
-            copybookStatements,
             replacingClauses,
             documentUri,
             copybookConfig,
@@ -340,7 +333,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (requiresEarlyReturn(ctx)) return;
     new CobolAnalysis(
             nestedMappings,
-            copybookStatements,
             replacingClauses,
             documentUri,
             copybookConfig,

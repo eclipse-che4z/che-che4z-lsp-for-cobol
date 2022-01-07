@@ -42,7 +42,6 @@ import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBL
 class PredefinedCopybookAnalysis extends CopybookAnalysis {
   PredefinedCopybookAnalysis(
       Map<String, DocumentMapping> nestedMappings,
-      Map<String, Locality> copybookStatements,
       List<Pair<String, String>> replacingClauses,
       String documentUri,
       CopybookConfig copybookConfig,
@@ -53,7 +52,6 @@ class PredefinedCopybookAnalysis extends CopybookAnalysis {
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
     super(
         nestedMappings,
-        copybookStatements,
         replacingClauses,
         documentUri,
         copybookConfig,
@@ -71,7 +69,11 @@ class PredefinedCopybookAnalysis extends CopybookAnalysis {
 
   @Override
   protected Consumer<NamedSubContext> storeCopyStatementSemantics(
-      String copybookName, Locality copybookNameLocality, String uri,
+      String copybookName,
+      String copybookId,
+      Locality copybookNameLocality,
+      Locality copyStatementLocality,
+      String uri,
       Optional<ExtendedDocument> copybookDocument) {
     return it -> {};
   }
