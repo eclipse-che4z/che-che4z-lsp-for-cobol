@@ -62,7 +62,7 @@ class PredefinedCopybookAnalysis extends CopybookAnalysis {
   }
 
   @Override
-  protected String retrieveCopybookName(ParserRuleContext copySource) {
+  protected String retrieveCopybookName(ParserRuleContext ctx) {
     return DFHEIBLC.name();
   }
 

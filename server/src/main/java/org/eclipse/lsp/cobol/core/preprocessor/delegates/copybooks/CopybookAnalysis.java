@@ -16,10 +16,8 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import com.google.common.collect.ImmutableList;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
@@ -33,7 +31,6 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -41,7 +38,6 @@ import java.util.function.Function;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
 import static org.codehaus.plexus.util.StringUtils.isEmpty;
-import static org.eclipse.lsp.cobol.core.CobolPreprocessor.CopySourceContext;
 import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.INFO;
@@ -98,7 +94,7 @@ abstract class CopybookAnalysis {
    * @return the functions that should be applied to the preprocessor stack
    */
   public ResultWithErrors<Function<PreprocessorStack, Consumer<NamedSubContext>>> handleCopybook(
-      ParserRuleContext context, @Nullable ParserRuleContext copySource, int maxLength) {
+      ParserRuleContext context, ParserRuleContext copySource, int maxLength) {
     List<SyntaxError> errors = new ArrayList<>();
     CopybookMetaData metaData =
         CopybookMetaData.builder()
@@ -107,10 +103,7 @@ abstract class CopybookAnalysis {
             .copybookId(randomUUID().toString())
             .config(copybookConfig)
             .nameLocality(
-                PreprocessorUtils.buildLocality(
-                    Optional.ofNullable(copySource).orElse(context),
-                    documentUri,
-                    copybookStack.peek()))
+                PreprocessorUtils.buildLocality(copySource, documentUri, copybookStack.peek()))
             .contextLocality(
                 PreprocessorUtils.buildLocality(context, documentUri, copybookStack.peek()))
             .build();
@@ -185,14 +178,8 @@ abstract class CopybookAnalysis {
     return new ResultWithErrors<>(copybook, errors);
   }
 
-  protected String retrieveCopybookName(ParserRuleContext copySource) {
-    CopySourceContext ctx = (CopySourceContext) copySource;
-    return retrieveCopybookName(
-        Optional.<RuleContext>ofNullable(ctx.cobolWord()).orElse(ctx.literal()));
-  }
-
-  private String retrieveCopybookName(@NonNull RuleContext context) {
-    return PreprocessorStringUtils.trimQuotes(context.getText().toUpperCase());
+  protected String retrieveCopybookName(ParserRuleContext ctx) {
+    return PreprocessorStringUtils.trimQuotes(ctx.getText().toUpperCase());
   }
 
   protected Consumer<PreprocessorStack> beforeWriting() {
