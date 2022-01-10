@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.apache.commons.lang3.tuple.Pair;
@@ -95,7 +96,6 @@ abstract class CopybookAnalysis {
    */
   public ResultWithErrors<Function<PreprocessorStack, Consumer<NamedSubContext>>> handleCopybook(
       ParserRuleContext context, ParserRuleContext copySource, int maxLength) {
-    List<SyntaxError> errors = new ArrayList<>();
     CopybookMetaData metaData =
         CopybookMetaData.builder()
             .name(retrieveCopybookName(copySource))
@@ -108,12 +108,13 @@ abstract class CopybookAnalysis {
                 PreprocessorUtils.buildLocality(context, documentUri, copybookStack.peek()))
             .build();
 
+    List<SyntaxError> errors = new ArrayList<>(checkCopybookName(metaData, maxLength));
+
     CopybookModel model = getCopyBookContent(metaData).unwrap(errors::addAll);
 
     String uri = model.getUri();
-    errors.addAll(checkCopybookName(metaData, maxLength));
 
-    Optional<ExtendedDocument> copybookDocument =
+    ExtendedDocument copybookDocument =
         processCopybook(
                 metaData,
                 uri,
@@ -122,27 +123,23 @@ abstract class CopybookAnalysis {
                         preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll))
                     .unwrap(errors::addAll))
             .unwrap(errors::addAll);
-    copybookDocument.ifPresent(it -> collectNestedSemanticData(uri, metaData.getCopybookId(), it));
+    collectNestedSemanticData(uri, metaData.getCopybookId(), copybookDocument);
 
     return new ResultWithErrors<>(compose(copybookDocument, uri, metaData), errors);
   }
 
   private Function<PreprocessorStack, Consumer<NamedSubContext>> compose(
-      Optional<ExtendedDocument> copybookDocument, String uri, CopybookMetaData metaData) {
+      ExtendedDocument copybookDocument, String uri, CopybookMetaData metaData) {
     return stack -> {
       beforeWriting()
-          .andThen(
-              copybookDocument
-                  .map(ExtendedDocument::getText)
-                  .map(it -> writeCopybook(metaData.getCopybookId(), it))
-                  .orElse(it -> {}))
+          .andThen(writeCopybook(metaData.getCopybookId(), copybookDocument.getText()))
           .andThen(afterWriting(metaData.getContext()))
           .accept(stack);
       return storeCopyStatementSemantics(metaData, uri, copybookDocument);
     };
   }
 
-  protected ResultWithErrors<Optional<ExtendedDocument>> processCopybook(
+  protected ResultWithErrors<ExtendedDocument> processCopybook(
       CopybookMetaData metaData, String uri, String content) {
     copybookStack.push(metaData.toCopybookUsage());
     final ResultWithErrors<ExtendedDocument> result =
@@ -155,7 +152,7 @@ abstract class CopybookAnalysis {
             replacingClauses);
     copybookStack.pop();
     if (Objects.nonNull(recursiveReplaceStmtStack.peek())) recursiveReplaceStmtStack.pop();
-    return new ResultWithErrors<>(Optional.of(result.getResult()), result.getErrors());
+    return result;
   }
 
   protected ResultWithErrors<CopybookModel> getCopyBookContent(CopybookMetaData metaData) {
@@ -191,11 +188,11 @@ abstract class CopybookAnalysis {
   }
 
   protected Consumer<NamedSubContext> storeCopyStatementSemantics(
-      CopybookMetaData metaData, String uri, Optional<ExtendedDocument> copybookDocument) {
+      CopybookMetaData metaData, String uri, ExtendedDocument copybookDocument) {
     return addCopybookUsage(metaData)
         .andThen(addCopybookDefinition(metaData, uri))
         .andThen(collectCopybookStatement(metaData))
-        .andThen(copybookDocument.map(this::addNestedCopybook).orElseGet(() -> it -> {}));
+        .andThen(addNestedCopybook(copybookDocument));
   }
 
   private Consumer<NamedSubContext> collectCopybookStatement(CopybookMetaData metaData) {
@@ -205,7 +202,10 @@ abstract class CopybookAnalysis {
   private void collectNestedSemanticData(
       String uri, String copybookId, ExtendedDocument copybookDocument) {
     nestedMappings.putAll(copybookDocument.getDocumentMapping());
-    nestedMappings.putIfAbsent(copybookId, nestedMappings.get(uri));
+    nestedMappings.putIfAbsent(
+        copybookId,
+        Optional.ofNullable(nestedMappings.get(uri))
+            .orElseGet(() -> new DocumentMapping(ImmutableList.of(), ImmutableMap.of())));
   }
 
   protected Consumer<NamedSubContext> addCopybookUsage(CopybookMetaData metaData) {

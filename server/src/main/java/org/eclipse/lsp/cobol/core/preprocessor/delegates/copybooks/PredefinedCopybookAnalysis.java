@@ -29,7 +29,6 @@ import org.eclipse.lsp.cobol.service.CopybookService;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBLC;
@@ -68,7 +67,7 @@ class PredefinedCopybookAnalysis extends CopybookAnalysis {
 
   @Override
   protected Consumer<NamedSubContext> storeCopyStatementSemantics(
-      CopybookMetaData metaData, String uri, Optional<ExtendedDocument> copybookDocument) {
+      CopybookMetaData metaData, String uri, ExtendedDocument copybookDocument) {
     return it -> {};
   }
 

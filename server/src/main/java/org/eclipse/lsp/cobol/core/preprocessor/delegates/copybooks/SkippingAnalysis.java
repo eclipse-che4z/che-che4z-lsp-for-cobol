@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
@@ -25,9 +26,9 @@ import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
 
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -58,9 +59,10 @@ class SkippingAnalysis extends CopybookAnalysis {
   }
 
   @Override
-  protected ResultWithErrors<Optional<ExtendedDocument>> processCopybook(
+  protected ResultWithErrors<ExtendedDocument> processCopybook(
       CopybookMetaData metaData, String uri, String content) {
-    return new ResultWithErrors<>(Optional.empty(), ImmutableList.of());
+    return new ResultWithErrors<>(
+        new ExtendedDocument("", new NamedSubContext(), ImmutableMap.of()), ImmutableList.of());
   }
 
   @Override
