@@ -100,71 +100,58 @@ abstract class CopybookAnalysis {
   public ResultWithErrors<Function<PreprocessorStack, Consumer<NamedSubContext>>> handleCopybook(
       ParserRuleContext context, @Nullable ParserRuleContext copySource, int maxLength) {
     List<SyntaxError> errors = new ArrayList<>();
-    String copybookName = retrieveCopybookName(copySource);
-    String copybookId = randomUUID().toString();
-    Locality copybookNameLocality =
-        PreprocessorUtils.buildLocality(
-            Optional.ofNullable(copySource).orElse(context), documentUri, copybookStack.peek());
+    CopybookMetaData metaData =
+        CopybookMetaData.builder()
+            .name(retrieveCopybookName(copySource))
+            .context(context)
+            .copybookId(randomUUID().toString())
+            .config(copybookConfig)
+            .nameLocality(
+                PreprocessorUtils.buildLocality(
+                    Optional.ofNullable(copySource).orElse(context),
+                    documentUri,
+                    copybookStack.peek()))
+            .contextLocality(
+                PreprocessorUtils.buildLocality(context, documentUri, copybookStack.peek()))
+            .build();
 
-    CopybookModel model =
-        getCopyBookContent(copybookName, copybookNameLocality, copybookConfig)
-            .unwrap(errors::addAll);
+    CopybookModel model = getCopyBookContent(metaData).unwrap(errors::addAll);
 
     String uri = model.getUri();
-    String cleanText = preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll);
-    String preparedText =
-        handleReplacing(copybookName, cleanText, copybookNameLocality).unwrap(errors::addAll);
-    errors.addAll(checkCopybookName(copybookName, copybookNameLocality, maxLength));
-    Locality copybookStatementLocality =
-        PreprocessorUtils.buildLocality(context, documentUri, copybookStack.peek());
+    errors.addAll(checkCopybookName(metaData, maxLength));
 
     Optional<ExtendedDocument> copybookDocument =
-        processCopybook(copybookName, uri, copybookId, preparedText, copybookNameLocality)
+        processCopybook(
+                metaData,
+                uri,
+                handleReplacing(
+                        metaData,
+                        preprocessor.cleanUpCode(uri, model.getContent()).unwrap(errors::addAll))
+                    .unwrap(errors::addAll))
             .unwrap(errors::addAll);
-    copybookDocument.ifPresent(it -> collectNestedSemanticData(uri, copybookId, it));
+    copybookDocument.ifPresent(it -> collectNestedSemanticData(uri, metaData.getCopybookId(), it));
 
-    return new ResultWithErrors<>(
-        compose(
-            copybookDocument,
-            context,
-            copybookId,
-            copybookName,
-            copybookNameLocality,
-            copybookStatementLocality,
-            uri),
-        errors);
+    return new ResultWithErrors<>(compose(copybookDocument, uri, metaData), errors);
   }
 
   private Function<PreprocessorStack, Consumer<NamedSubContext>> compose(
-      Optional<ExtendedDocument> copybookDocument,
-      ParserRuleContext context,
-      String copybookId,
-      String copybookName,
-      Locality copybookNameLocality,
-      Locality copyStatementLocality,
-      String uri) {
+      Optional<ExtendedDocument> copybookDocument, String uri, CopybookMetaData metaData) {
     return stack -> {
       beforeWriting()
           .andThen(
               copybookDocument
                   .map(ExtendedDocument::getText)
-                  .map(it -> writeCopybook(copybookId, it))
+                  .map(it -> writeCopybook(metaData.getCopybookId(), it))
                   .orElse(it -> {}))
-          .andThen(afterWriting(context))
+          .andThen(afterWriting(metaData.getContext()))
           .accept(stack);
-      return storeCopyStatementSemantics(
-          copybookName,
-          copybookId,
-          copybookNameLocality,
-          copyStatementLocality,
-          uri,
-          copybookDocument);
+      return storeCopyStatementSemantics(metaData, uri, copybookDocument);
     };
   }
 
   protected ResultWithErrors<Optional<ExtendedDocument>> processCopybook(
-      String copybookName, String uri, String copybookId, String content, Locality locality) {
-    copybookStack.push(new CopybookUsage(copybookName, copybookId, locality));
+      CopybookMetaData metaData, String uri, String content) {
+    copybookStack.push(metaData.toCopybookUsage());
     final ResultWithErrors<ExtendedDocument> result =
         preprocessor.processCleanCode(
             uri,
@@ -178,20 +165,21 @@ abstract class CopybookAnalysis {
     return new ResultWithErrors<>(Optional.of(result.getResult()), result.getErrors());
   }
 
-  protected ResultWithErrors<CopybookModel> getCopyBookContent(
-      String copybookName, Locality locality, CopybookConfig copybookConfig) {
+  protected ResultWithErrors<CopybookModel> getCopyBookContent(CopybookMetaData metaData) {
     List<SyntaxError> errors = new ArrayList<>();
-    if (copybookName.isEmpty()) return emptyModel(copybookName, errors);
+    if (metaData.getName().isEmpty()) return emptyModel(metaData.getName(), errors);
 
-    if (hasRecursion(copybookName)) {
+    if (hasRecursion(metaData.getName())) {
       errors.addAll(copybookStack.stream().map(this::reportRecursiveCopybook).collect(toList()));
-      return emptyModel(copybookName, errors);
+      return emptyModel(metaData.getName(), errors);
     }
 
-    CopybookModel copybook = copybookService.resolve(copybookName, documentUri, copybookConfig);
+    CopybookModel copybook =
+        copybookService.resolve(metaData.getName(), documentUri, metaData.getConfig());
     if (copybook.getContent() == null) {
       return emptyModel(
-          copybookName, ImmutableList.of(reportMissingCopybooks(copybookName, locality)));
+          metaData.getName(),
+          ImmutableList.of(reportMissingCopybooks(metaData.getName(), metaData.getNameLocality())));
     }
 
     return new ResultWithErrors<>(copybook, errors);
@@ -216,20 +204,15 @@ abstract class CopybookAnalysis {
   }
 
   protected Consumer<NamedSubContext> storeCopyStatementSemantics(
-      String copybookName,
-      String copybookId,
-      Locality copybookNameLocality,
-      Locality copyStatementLocality,
-      String uri,
-      Optional<ExtendedDocument> copybookDocument) {
-    return addCopybookUsage(copybookName, copybookNameLocality)
-        .andThen(addCopybookDefinition(copybookName, uri))
-        .andThen(collectCopybookStatement(copybookId, copyStatementLocality))
+      CopybookMetaData metaData, String uri, Optional<ExtendedDocument> copybookDocument) {
+    return addCopybookUsage(metaData)
+        .andThen(addCopybookDefinition(metaData, uri))
+        .andThen(collectCopybookStatement(metaData))
         .andThen(copybookDocument.map(this::addNestedCopybook).orElseGet(() -> it -> {}));
   }
 
-  private Consumer<NamedSubContext> collectCopybookStatement(String copybookId, Locality locality) {
-    return it -> it.addStatement(copybookId, locality);
+  private Consumer<NamedSubContext> collectCopybookStatement(CopybookMetaData metaData) {
+    return it -> it.addStatement(metaData.getCopybookId(), metaData.getContextLocality());
   }
 
   private void collectNestedSemanticData(
@@ -238,16 +221,17 @@ abstract class CopybookAnalysis {
     nestedMappings.putIfAbsent(copybookId, nestedMappings.get(uri));
   }
 
-  protected Consumer<NamedSubContext> addCopybookUsage(
-      @NonNull String copybookName, @NonNull Locality locality) {
-    return copybooks -> copybooks.addUsage(copybookName, locality.toLocation());
+  protected Consumer<NamedSubContext> addCopybookUsage(CopybookMetaData metaData) {
+    return copybooks ->
+        copybooks.addUsage(metaData.getName(), metaData.getNameLocality().toLocation());
   }
 
-  protected Consumer<NamedSubContext> addCopybookDefinition(String copybookName, String uri) {
+  protected Consumer<NamedSubContext> addCopybookDefinition(CopybookMetaData metaData, String uri) {
     return copybooks -> {
-      if (!(isEmpty(copybookName) || isEmpty(uri) || isPredefined(uri)))
+      if (!(isEmpty(metaData.getName()) || isEmpty(uri) || isPredefined(uri)))
         copybooks.define(
-            copybookName, new Location(uri, new Range(new Position(0, 0), new Position(0, 0))));
+            metaData.getName(),
+            new Location(uri, new Range(new Position(0, 0), new Position(0, 0))));
     };
   }
 
@@ -255,8 +239,7 @@ abstract class CopybookAnalysis {
     return copybooks -> copybooks.merge(copybookDocument.getCopybooks());
   }
 
-  protected ResultWithErrors<String> handleReplacing(
-      String copybookName, String text, Locality locality) {
+  protected ResultWithErrors<String> handleReplacing(CopybookMetaData metaData, String text) {
     return new ResultWithErrors<>(text, ImmutableList.of());
   }
 
@@ -283,9 +266,10 @@ abstract class CopybookAnalysis {
     return error;
   }
 
-  private List<SyntaxError> checkCopybookName(
-      String copybookName, Locality locality, int maxLength) {
+  private List<SyntaxError> checkCopybookName(CopybookMetaData metaData, int maxLength) {
     List<SyntaxError> errors = new ArrayList<>();
+    final String copybookName = metaData.getName();
+    final Locality locality = metaData.getNameLocality();
     if (copybookName.length() > maxLength) {
       errors.add(
           addCopybookError(

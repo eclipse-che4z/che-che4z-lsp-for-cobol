@@ -59,18 +59,17 @@ class SkippingAnalysis extends CopybookAnalysis {
 
   @Override
   protected ResultWithErrors<Optional<ExtendedDocument>> processCopybook(
-      String copybookName, String uri, String copybookId, String content, Locality locality) {
+      CopybookMetaData metaData, String uri, String content) {
     return new ResultWithErrors<>(Optional.empty(), ImmutableList.of());
   }
 
   @Override
-  protected ResultWithErrors<CopybookModel> getCopyBookContent(
-      String copybookName, Locality locality, CopybookConfig copybookConfig) {
-    return emptyModel(copybookName, ImmutableList.of());
+  protected ResultWithErrors<CopybookModel> getCopyBookContent(CopybookMetaData metaData) {
+    return emptyModel(metaData.getName(), ImmutableList.of());
   }
 
   @Override
-  protected Consumer<NamedSubContext> addCopybookDefinition(String copybookName, String uri) {
+  protected Consumer<NamedSubContext> addCopybookDefinition(CopybookMetaData metaData, String uri) {
     return it -> {};
   }
 }

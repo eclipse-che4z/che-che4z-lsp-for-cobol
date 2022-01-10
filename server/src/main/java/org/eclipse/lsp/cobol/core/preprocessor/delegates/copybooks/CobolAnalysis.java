@@ -17,7 +17,10 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.CopybookUsage;
+import org.eclipse.lsp.cobol.core.model.DocumentMapping;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
@@ -66,8 +69,7 @@ class CobolAnalysis extends CopybookAnalysis {
   }
 
   @Override
-  protected ResultWithErrors<String> handleReplacing(
-      String copybookName, String text, Locality locality) {
+  protected ResultWithErrors<String> handleReplacing(CopybookMetaData metaData, String text) {
     // In a chain of copy statement, there could be only one replacing phrase
     List<SyntaxError> errors = new ArrayList<>();
     if (!copyReplacingClauses.isEmpty()) {
@@ -77,8 +79,8 @@ class CobolAnalysis extends CopybookAnalysis {
     if (recursiveReplaceStmtStack.size() > 1 && !copybookStack.isEmpty())
       errors.add(
           addCopybookError(
-              copybookName,
-              locality,
+              metaData.getName(),
+              metaData.getNameLocality(),
               ERROR,
               "GrammarPreprocessorListener.copyBkNestedReplaceStmt",
               "Syntax error by checkRecursiveReplaceStatement: {}"));

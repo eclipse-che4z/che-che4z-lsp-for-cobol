@@ -21,7 +21,6 @@ import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
-import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
@@ -69,12 +68,7 @@ class PredefinedCopybookAnalysis extends CopybookAnalysis {
 
   @Override
   protected Consumer<NamedSubContext> storeCopyStatementSemantics(
-      String copybookName,
-      String copybookId,
-      Locality copybookNameLocality,
-      Locality copyStatementLocality,
-      String uri,
-      Optional<ExtendedDocument> copybookDocument) {
+      CopybookMetaData metaData, String uri, Optional<ExtendedDocument> copybookDocument) {
     return it -> {};
   }
 
