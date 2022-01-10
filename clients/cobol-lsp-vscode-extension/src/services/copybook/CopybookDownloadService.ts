@@ -16,7 +16,9 @@ import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
 import * as fs from "fs";
 import * as Path from "path";
 import * as vscode from "vscode";
-import { DOWNLOAD_QUEUE_LOCKED_ERROR_MSG, INVALID_CREDENTIALS_ERROR_MSG, PROCESS_DOWNLOAD_ERROR_MSG, PROFILE_NAME_PLACEHOLDER, UNLOCK_DOWNLOAD_QUEUE_MSG } from "../../constants";
+import { DOWNLOAD_QUEUE_LOCKED_ERROR_MSG, INVALID_CREDENTIALS_ERROR_MSG, PATHS_USS, PATHS_ZOWE,
+    PROCESS_DOWNLOAD_ERROR_MSG, PROFILE_NAME_PLACEHOLDER, PROVIDE_PROFILE_MSG, SETTINGS_CPY_SECTION,
+    UNLOCK_DOWNLOAD_QUEUE_MSG, ZOWE_EXT_MISSING_MSG } from "../../constants";
 import { TelemetryService } from "../reporter/TelemetryService";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath } from "./CopybooksPathGenerator";
@@ -62,7 +64,6 @@ export class CopybookDownloadService implements vscode.Disposable {
                 throw error;
             }
             if (!copybookProfile.quiet) {
-                CopybookDownloadService.processDownloadError("Can't read members of dataset: " + dataset);
                 vscode.window.showErrorMessage(error.message);
             }
             return false;
@@ -167,6 +168,13 @@ export class CopybookDownloadService implements vscode.Disposable {
         }
     }
 
+    private static isEligibleForCopybookDownload() {
+        const dsnPath: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);
+        const ussPath: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_USS);
+        const providedProfile: string = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles");
+        return dsnPath?.length > 0 || ussPath?.length > 0 || providedProfile?.length > 0;
+    }
+
     private queue: DownloadQueue = new DownloadQueue();
     private lockedProfile: Set<string> = new Set();
 
@@ -184,6 +192,15 @@ export class CopybookDownloadService implements vscode.Disposable {
      */
     public async downloadCopybooks(cobolFileName: string, copybookNames: string[], quiet: boolean = true)
         : Promise<void> {
+        if (!CopybookDownloadService.isEligibleForCopybookDownload()) {
+            if (!quiet) { CopybookDownloadService.createErrorMessageForCopybooks(new Set<string>(copybookNames)); }
+            return;
+        }
+        if (CopybookDownloadService.isEligibleForCopybookDownload() && !ZoweVsCodeExtension.getZoweExplorerApi()) {
+            if (!quiet) { vscode.window.showErrorMessage(ZOWE_EXT_MISSING_MSG); }
+            return;
+        }
+
         if (!checkWorkspace()) {
             return;
         }
@@ -191,7 +208,9 @@ export class CopybookDownloadService implements vscode.Disposable {
 
         if (!profile) {
             if (!quiet) {
-                CopybookDownloadService.createErrorMessageForCopybooks(new Set<string>(copybookNames));
+                const providedProfile: string = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles");
+                const message = providedProfile ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${providedProfile}` : `${PROVIDE_PROFILE_MSG}`;
+                CopybookDownloadService.processDownloadError(message);
             }
             return;
         }
