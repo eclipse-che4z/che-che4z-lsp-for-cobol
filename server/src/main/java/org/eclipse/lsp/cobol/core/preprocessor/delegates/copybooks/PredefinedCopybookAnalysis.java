@@ -67,7 +67,7 @@ class PredefinedCopybookAnalysis extends CopybookAnalysis {
 
   @Override
   protected Consumer<NamedSubContext> storeCopyStatementSemantics(
-      CopybookMetaData metaData, String uri, ExtendedDocument copybookDocument) {
+      CopybookMetaData metaData, ExtendedDocument copybookDocument) {
     return it -> {};
   }
 

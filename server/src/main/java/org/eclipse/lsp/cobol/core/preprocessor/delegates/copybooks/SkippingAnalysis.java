@@ -60,7 +60,7 @@ class SkippingAnalysis extends CopybookAnalysis {
 
   @Override
   protected ResultWithErrors<ExtendedDocument> processCopybook(
-      CopybookMetaData metaData, String uri, String content) {
+      CopybookMetaData metaData, String content) {
     return new ResultWithErrors<>(
         new ExtendedDocument("", new NamedSubContext(), ImmutableMap.of()), ImmutableList.of());
   }
@@ -71,7 +71,7 @@ class SkippingAnalysis extends CopybookAnalysis {
   }
 
   @Override
-  protected Consumer<NamedSubContext> addCopybookDefinition(CopybookMetaData metaData, String uri) {
+  protected Consumer<NamedSubContext> addCopybookDefinition(CopybookMetaData metaData) {
     return it -> {};
   }
 }
