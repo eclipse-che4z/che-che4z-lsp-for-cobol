@@ -30,13 +30,16 @@ import java.util.function.Function;
 /** A type alias for curried applicative functors to update the preprocessor */
 interface PreprocessorFunctor
     extends Function<
-        Deque<CopybookUsage>,
+        List<Pair<String, String>>,
         Function<
-            Deque<List<Pair<String, String>>>,
+            Deque<CopybookUsage>,
             Function<
-                List<Pair<String, String>>,
+                Deque<List<Pair<String, String>>>,
                 Function<
-                    PreprocessorStack,
+                    List<Pair<String, String>>,
                     Function<
-                        NamedSubContext,
-                        Function<Map<String, DocumentMapping>, Consumer<List<SyntaxError>>>>>>>> {}
+                        PreprocessorStack,
+                        Function<
+                            NamedSubContext,
+                            Function<
+                                Map<String, DocumentMapping>, Consumer<List<SyntaxError>>>>>>>>> {}
