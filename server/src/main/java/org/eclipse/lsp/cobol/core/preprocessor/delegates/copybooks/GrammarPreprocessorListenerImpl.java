@@ -179,14 +179,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void exitLinkageSection(LinkageSectionContext ctx) {
     new PredefinedCopybookAnalysis(
             replacingClauses,
-            documentUri,
-            copybookConfig,
             preprocessor,
             copybookService,
             copybookStack,
             messageService,
             recursiveReplaceStmtStack)
-        .handleCopybook(ctx, ctx, MAX_COPYBOOK_NAME_LENGTH_DEFAULT)
+        .handleCopybook(ctx, ctx, MAX_COPYBOOK_NAME_LENGTH_DEFAULT, copybookConfig, documentUri)
         .apply(this)
         .apply(copybooks)
         .apply(nestedMappings)
@@ -203,8 +201,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (requiresEarlyReturn(ctx)) return;
     new CobolAnalysis(
             replacingClauses,
-            documentUri,
-            copybookConfig,
             preprocessor,
             copybookService,
             copybookStack,
@@ -215,7 +211,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         .handleCopybook(
             ctx,
             ctx.copyIdmsOptions().copyIdmsSource().copySource(),
-            MAX_COPYBOOK_NAME_LENGTH_DEFAULT)
+            MAX_COPYBOOK_NAME_LENGTH_DEFAULT,
+            copybookConfig,
+            documentUri)
         .apply(this)
         .apply(copybooks)
         .apply(nestedMappings)
@@ -240,8 +238,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
               it ->
                   new CobolAnalysis(
                           replacingClauses,
-                          documentUri,
-                          copybookConfig,
                           preprocessor,
                           copybookService,
                           copybookStack,
@@ -249,7 +245,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
                           recursiveReplaceStmtStack,
                           copyReplacingClauses,
                           replacingService)
-                      .handleCopybook(ctx, copySource, MAX_COPYBOOK_NAME_LENGTH_DEFAULT)
+                      .handleCopybook(
+                          ctx,
+                          copySource,
+                          MAX_COPYBOOK_NAME_LENGTH_DEFAULT,
+                          copybookConfig,
+                          documentUri)
                       .apply(this)
                       .apply(copybooks)
                       .apply(nestedMappings)
@@ -257,14 +258,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     else
       new SkippingAnalysis(
               replacingClauses,
-              documentUri,
-              copybookConfig,
               preprocessor,
               copybookService,
               copybookStack,
               messageService,
               recursiveReplaceStmtStack)
-          .handleCopybook(ctx, copySource, MAX_COPYBOOK_NAME_LENGTH_DEFAULT)
+          .handleCopybook(
+              ctx, copySource, MAX_COPYBOOK_NAME_LENGTH_DEFAULT, copybookConfig, documentUri)
           .apply(this)
           .apply(copybooks)
           .apply(nestedMappings)
@@ -281,8 +281,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (requiresEarlyReturn(ctx)) return;
     new CobolAnalysis(
             replacingClauses,
-            documentUri,
-            copybookConfig,
             preprocessor,
             copybookService,
             copybookStack,
@@ -290,7 +288,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             recursiveReplaceStmtStack,
             copyReplacingClauses,
             replacingService)
-        .handleCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB)
+        .handleCopybook(
+            ctx,
+            ctx.copySource(),
+            MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB,
+            copybookConfig,
+            documentUri)
         .apply(this)
         .apply(copybooks)
         .apply(nestedMappings)
@@ -307,8 +310,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (requiresEarlyReturn(ctx)) return;
     new CobolAnalysis(
             replacingClauses,
-            documentUri,
-            copybookConfig,
             preprocessor,
             copybookService,
             copybookStack,
@@ -316,7 +317,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             recursiveReplaceStmtStack,
             copyReplacingClauses,
             replacingService)
-        .handleCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_DATASET)
+        .handleCopybook(
+            ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_DATASET, copybookConfig, documentUri)
         .apply(this)
         .apply(copybooks)
         .apply(nestedMappings)
@@ -333,8 +335,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (requiresEarlyReturn(ctx)) return;
     new CobolAnalysis(
             replacingClauses,
-            documentUri,
-            copybookConfig,
             preprocessor,
             copybookService,
             copybookStack,
@@ -342,7 +342,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             recursiveReplaceStmtStack,
             copyReplacingClauses,
             replacingService)
-        .handleCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_DATASET)
+        .handleCopybook(
+            ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_DATASET, copybookConfig, documentUri)
         .apply(this)
         .apply(copybooks)
         .apply(nestedMappings)

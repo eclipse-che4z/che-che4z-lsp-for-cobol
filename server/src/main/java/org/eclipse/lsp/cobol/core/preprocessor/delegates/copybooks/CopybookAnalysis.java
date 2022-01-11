@@ -56,24 +56,18 @@ abstract class CopybookAnalysis {
   protected final Deque<CopybookUsage> copybookStack;
   protected final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack;
   private final List<Pair<String, String>> replacingClauses;
-  private final String documentUri;
-  private final CopybookConfig copybookConfig;
   private final TextPreprocessor preprocessor;
   private final CopybookService copybookService;
   private final MessageService messageService;
 
   CopybookAnalysis(
       List<Pair<String, String>> replacingClauses,
-      String documentUri,
-      CopybookConfig copybookConfig,
       TextPreprocessor preprocessor,
       CopybookService copybookService,
       Deque<CopybookUsage> copybookStack,
       MessageService messageService,
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
     this.replacingClauses = replacingClauses;
-    this.documentUri = documentUri;
-    this.copybookConfig = copybookConfig;
     this.preprocessor = preprocessor;
     this.copybookService = copybookService;
     this.copybookStack = copybookStack;
@@ -90,13 +84,18 @@ abstract class CopybookAnalysis {
    * @return the functions that should be applied to the preprocessor
    */
   public PreprocessorFunctor handleCopybook(
-      ParserRuleContext context, ParserRuleContext copySource, int maxLength) {
+      ParserRuleContext context,
+      ParserRuleContext copySource,
+      int maxLength,
+      CopybookConfig config,
+      String documentUri) {
     CopybookMetaData metaData =
         CopybookMetaData.builder()
             .name(retrieveCopybookName(copySource))
             .context(context)
+            .documentUri(documentUri)
             .copybookId(randomUUID().toString())
-            .config(copybookConfig)
+            .config(config)
             .nameLocality(
                 PreprocessorUtils.buildLocality(copySource, documentUri, copybookStack.peek()))
             .contextLocality(
@@ -190,7 +189,8 @@ abstract class CopybookAnalysis {
     }
 
     CopybookModel copybook =
-        copybookService.resolve(metaData.getName(), documentUri, metaData.getConfig());
+        copybookService.resolve(
+            metaData.getName(), metaData.getDocumentUri(), metaData.getConfig());
     if (copybook.getContent() == null) {
       return emptyModel(metaData.getName(), ImmutableList.of(reportMissingCopybooks(metaData)));
     }

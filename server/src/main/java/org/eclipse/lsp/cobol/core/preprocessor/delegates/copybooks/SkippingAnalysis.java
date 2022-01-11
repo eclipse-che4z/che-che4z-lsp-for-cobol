@@ -25,7 +25,6 @@ import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
 
 import java.util.Deque;
@@ -39,8 +38,6 @@ import java.util.function.Consumer;
 class SkippingAnalysis extends CopybookAnalysis {
   SkippingAnalysis(
       List<Pair<String, String>> replacingClauses,
-      String documentUri,
-      CopybookConfig copybookConfig,
       TextPreprocessor preprocessor,
       CopybookService copybookService,
       Deque<CopybookUsage> copybookStack,
@@ -48,8 +45,6 @@ class SkippingAnalysis extends CopybookAnalysis {
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
     super(
         replacingClauses,
-        documentUri,
-        copybookConfig,
         preprocessor,
         copybookService,
         copybookStack,

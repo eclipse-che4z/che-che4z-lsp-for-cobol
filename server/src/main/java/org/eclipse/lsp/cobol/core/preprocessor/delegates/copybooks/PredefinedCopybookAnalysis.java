@@ -38,8 +38,6 @@ import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBL
 class PredefinedCopybookAnalysis extends CopybookAnalysis {
   PredefinedCopybookAnalysis(
       List<Pair<String, String>> replacingClauses,
-      String documentUri,
-      CopybookConfig copybookConfig,
       TextPreprocessor preprocessor,
       CopybookService copybookService,
       Deque<CopybookUsage> copybookStack,
@@ -47,8 +45,6 @@ class PredefinedCopybookAnalysis extends CopybookAnalysis {
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
     super(
         replacingClauses,
-        documentUri,
-        copybookConfig,
         preprocessor,
         copybookService,
         copybookStack,

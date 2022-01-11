@@ -30,6 +30,7 @@ import org.eclipse.lsp.cobol.service.CopybookConfig;
 class CopybookMetaData {
   String name;
   String copybookId;
+  String documentUri;
   CopybookConfig config;
   ParserRuleContext context;
   Locality contextLocality;
