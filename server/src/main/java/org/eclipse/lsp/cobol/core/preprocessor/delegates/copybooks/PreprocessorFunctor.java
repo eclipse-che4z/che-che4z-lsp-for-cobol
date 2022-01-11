@@ -24,19 +24,19 @@ import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 /** A type alias for curried applicative functors to update the preprocessor */
-public interface PreprocessorFunctor
+interface PreprocessorFunctor
     extends Function<
         Deque<CopybookUsage>,
-        BiFunction<
+        Function<
             Deque<List<Pair<String, String>>>,
-            List<Pair<String, String>>,
             Function<
-                PreprocessorStack,
+                List<Pair<String, String>>,
                 Function<
-                    NamedSubContext,
-                    Function<Map<String, DocumentMapping>, Consumer<List<SyntaxError>>>>>>> {}
+                    PreprocessorStack,
+                    Function<
+                        NamedSubContext,
+                        Function<Map<String, DocumentMapping>, Consumer<List<SyntaxError>>>>>>>> {}

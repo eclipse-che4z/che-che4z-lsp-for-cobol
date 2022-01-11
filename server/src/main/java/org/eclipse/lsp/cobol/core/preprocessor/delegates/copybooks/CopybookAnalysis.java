@@ -33,7 +33,6 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -85,40 +84,85 @@ abstract class CopybookAnalysis {
       ParserRuleContext copySource,
       CopybookConfig config,
       String documentUri) {
-    return copybookStack -> {
-      CopybookMetaData metaData =
-          CopybookMetaData.builder()
-              .name(retrieveCopybookName(copySource))
-              .context(context)
-              .documentUri(documentUri)
-              .copybookId(randomUUID().toString())
-              .config(config)
-              .nameLocality(
-                  PreprocessorUtils.buildLocality(copySource, documentUri, copybookStack.peek()))
-              .contextLocality(
-                  PreprocessorUtils.buildLocality(context, documentUri, copybookStack.peek()))
-              .build();
+    return copybookStack ->
+        recursiveReplaceStack ->
+            replacingClauses -> {
+              List<SyntaxError> errors = new ArrayList<>();
+              CopybookMetaData metaData =
+                  validateMetaData(maxCopybookNameLength)
+                      .apply(
+                          CopybookMetaData.builder()
+                              .name(retrieveCopybookName(copySource))
+                              .context(context)
+                              .documentUri(documentUri)
+                              .copybookId(randomUUID().toString())
+                              .config(config)
+                              .nameLocality(
+                                  PreprocessorUtils.buildLocality(
+                                      copySource, documentUri, copybookStack.peek()))
+                              .contextLocality(
+                                  PreprocessorUtils.buildLocality(
+                                      context, documentUri, copybookStack.peek()))
+                              .build())
+                      .unwrap(errors::addAll);
 
-      List<SyntaxError> errors =
-          new ArrayList<>(checkCopybookName(metaData, maxCopybookNameLength));
-
-      return (recursiveReplaceStack, replacingClauses) -> {
-        ExtendedDocument copybookDocument =
-            buildExtendedDocumentForCopybook(metaData)
-                .apply(copybookStack)
-                .apply(recursiveReplaceStack, replacingClauses)
-                .unwrap(errors::addAll);
-        return stack -> {
-          writeText(metaData, copybookDocument).accept(stack);
-          return subContext -> {
-            storeCopyStatementSemantics(metaData, copybookDocument).accept(subContext);
-            return nestedMappings -> {
-              collectNestedSemanticData(metaData, copybookDocument).accept(nestedMappings);
-              return allErrors -> allErrors.addAll(errors);
+              ExtendedDocument copybookDocument =
+                  buildExtendedDocumentForCopybook(metaData)
+                      .apply(copybookStack)
+                      .apply(recursiveReplaceStack)
+                      .apply(replacingClauses)
+                      .unwrap(errors::addAll);
+              return stack -> {
+                writeText(metaData, copybookDocument).accept(stack);
+                return subContext -> {
+                  storeCopyStatementSemantics(metaData, copybookDocument).accept(subContext);
+                  return nestedMappings -> {
+                    collectNestedSemanticData(metaData, copybookDocument).accept(nestedMappings);
+                    return allErrors -> allErrors.addAll(errors);
+                  };
+                };
+              };
             };
-          };
-        };
-      };
+  }
+
+  private Function<CopybookMetaData, ResultWithErrors<CopybookMetaData>> validateMetaData(
+      int maxCopybookNameLength) {
+    return metaData -> {
+      List<SyntaxError> errors = new ArrayList<>();
+      final String copybookName = metaData.getName();
+      final Locality locality = metaData.getNameLocality();
+      if (copybookName.length() > maxCopybookNameLength) {
+        errors.add(
+            addCopybookError(
+                copybookName,
+                maxCopybookNameLength,
+                locality,
+                INFO,
+                "GrammarPreprocessorListener.copyBkOverMaxChars",
+                SYNTAX_ERROR_CHECK_COPYBOOK_NAME));
+      }
+      // The first or last character must not be a hyphen.
+      if (copybookName.startsWith(HYPHEN) || copybookName.endsWith(HYPHEN)) {
+        errors.add(
+            addCopybookError(
+                copybookName,
+                locality,
+                ERROR,
+                "GrammarPreprocessorListener.copyBkStartsOrEndsWithHyphen",
+                SYNTAX_ERROR_CHECK_COPYBOOK_NAME));
+      }
+
+      // copybook Name can't contain _
+      if (copybookName.contains(UNDERSCORE))
+        errors.add(
+            addCopybookError(
+                copybookName,
+                locality,
+                ERROR,
+                "GrammarPreprocessorListener.copyBkContainsUnderScore",
+                SYNTAX_ERROR_CHECK_COPYBOOK_NAME));
+
+      return new ResultWithErrors<>(metaData, errors);
     };
   }
 
@@ -139,33 +183,34 @@ abstract class CopybookAnalysis {
 
   private Function<
           Deque<CopybookUsage>,
-          BiFunction<
+          Function<
               Deque<List<Pair<String, String>>>,
-              List<Pair<String, String>>,
-              ResultWithErrors<ExtendedDocument>>>
+              Function<List<Pair<String, String>>, ResultWithErrors<ExtendedDocument>>>>
       buildExtendedDocumentForCopybook(CopybookMetaData metaData) {
     List<SyntaxError> errors = new ArrayList<>();
     return copybookStack ->
-        (recursiveReplaceStack, replacingClauses) -> {
-          CopybookModel model = getCopyBookContent(metaData, copybookStack).unwrap(errors::addAll);
-          return new ResultWithErrors<>(
-              processCopybook(
-                      recursiveReplaceStack,
-                      replacingClauses,
-                      copybookStack,
-                      metaData,
-                      model.getUri(),
-                      handleReplacing(
-                              recursiveReplaceStack,
-                              copybookStack,
-                              metaData,
-                              preprocessor
-                                  .cleanUpCode(model.getUri(), model.getContent())
-                                  .unwrap(errors::addAll))
-                          .unwrap(errors::addAll))
-                  .unwrap(errors::addAll),
-              errors);
-        };
+        recursiveReplaceStack ->
+            replacingClauses -> {
+              CopybookModel model =
+                  getCopyBookContent(metaData, copybookStack).unwrap(errors::addAll);
+              return new ResultWithErrors<>(
+                  processCopybook(
+                          recursiveReplaceStack,
+                          replacingClauses,
+                          copybookStack,
+                          metaData,
+                          model.getUri(),
+                          handleReplacing(
+                                  recursiveReplaceStack,
+                                  copybookStack,
+                                  metaData,
+                                  preprocessor
+                                      .cleanUpCode(model.getUri(), model.getContent())
+                                      .unwrap(errors::addAll))
+                              .unwrap(errors::addAll))
+                      .unwrap(errors::addAll),
+                  errors);
+            };
   }
 
   private Consumer<Map<String, DocumentMapping>> collectNestedSemanticData(
@@ -283,43 +328,6 @@ abstract class CopybookAnalysis {
             .build();
     LOG.debug("Syntax error by reportMissingCopybooks: {}", error.toString());
     return error;
-  }
-
-  private List<SyntaxError> checkCopybookName(CopybookMetaData metaData, int maxLength) {
-    List<SyntaxError> errors = new ArrayList<>();
-    final String copybookName = metaData.getName();
-    final Locality locality = metaData.getNameLocality();
-    if (copybookName.length() > maxLength) {
-      errors.add(
-          addCopybookError(
-              copybookName,
-              maxLength,
-              locality,
-              INFO,
-              "GrammarPreprocessorListener.copyBkOverMaxChars",
-              SYNTAX_ERROR_CHECK_COPYBOOK_NAME));
-    }
-    // The first or last character must not be a hyphen.
-    if (copybookName.startsWith(HYPHEN) || copybookName.endsWith(HYPHEN)) {
-      errors.add(
-          addCopybookError(
-              copybookName,
-              locality,
-              ERROR,
-              "GrammarPreprocessorListener.copyBkStartsOrEndsWithHyphen",
-              SYNTAX_ERROR_CHECK_COPYBOOK_NAME));
-    }
-
-    // copybook Name can't contain _
-    if (copybookName.contains(UNDERSCORE))
-      errors.add(
-          addCopybookError(
-              copybookName,
-              locality,
-              ERROR,
-              "GrammarPreprocessorListener.copyBkContainsUnderScore",
-              SYNTAX_ERROR_CHECK_COPYBOOK_NAME));
-    return errors;
   }
 
   protected ResultWithErrors<CopybookModel> emptyModel(
