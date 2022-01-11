@@ -34,7 +34,6 @@ import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
@@ -88,13 +87,10 @@ abstract class CopybookAnalysis {
    * @param context
    * @param copySource
    * @param maxLength
-   * @return the functions that should be applied to the preprocessor stack
+   * @return the functions that should be applied to the preprocessor
    */
-  public Function<
-          PreprocessorStack,
-          Function<
-              NamedSubContext, Function<Map<String, DocumentMapping>, Consumer<List<SyntaxError>>>>>
-      handleCopybook(ParserRuleContext context, ParserRuleContext copySource, int maxLength) {
+  public PreprocessorFunctor handleCopybook(
+      ParserRuleContext context, ParserRuleContext copySource, int maxLength) {
     CopybookMetaData metaData =
         CopybookMetaData.builder()
             .name(retrieveCopybookName(copySource))
@@ -109,9 +105,41 @@ abstract class CopybookAnalysis {
 
     List<SyntaxError> errors = new ArrayList<>(checkCopybookName(metaData, maxLength));
 
-    CopybookModel model = getCopyBookContent(metaData).unwrap(errors::addAll);
-
     ExtendedDocument copybookDocument =
+        buildExtendedDocumentForCopybook(metaData).unwrap(errors::addAll);
+
+    return stack -> {
+      writeText(metaData, copybookDocument).accept(stack);
+      return subContext -> {
+        storeCopyStatementSemantics(metaData, copybookDocument).accept(subContext);
+        return nestedMappings -> {
+          collectNestedSemanticData(metaData, copybookDocument).accept(nestedMappings);
+          return allErrors -> allErrors.addAll(errors);
+        };
+      };
+    };
+  }
+
+  private Consumer<PreprocessorStack> writeText(
+      CopybookMetaData metaData, ExtendedDocument copybookDocument) {
+    return beforeWriting()
+        .andThen(writeCopybook(metaData.getCopybookId(), copybookDocument.getText()))
+        .andThen(afterWriting(metaData.getContext()));
+  }
+
+  protected Consumer<NamedSubContext> storeCopyStatementSemantics(
+      CopybookMetaData metaData, ExtendedDocument copybookDocument) {
+    return addCopybookUsage(metaData)
+        .andThen(addCopybookDefinition(metaData, copybookDocument.getUri()))
+        .andThen(collectCopybookStatement(metaData))
+        .andThen(addNestedCopybook(copybookDocument));
+  }
+
+  private ResultWithErrors<ExtendedDocument> buildExtendedDocumentForCopybook(
+      CopybookMetaData metaData) {
+    List<SyntaxError> errors = new ArrayList<>();
+    CopybookModel model = getCopyBookContent(metaData).unwrap(errors::addAll);
+    return new ResultWithErrors<>(
         processCopybook(
                 metaData,
                 model.getUri(),
@@ -121,19 +149,18 @@ abstract class CopybookAnalysis {
                             .cleanUpCode(model.getUri(), model.getContent())
                             .unwrap(errors::addAll))
                     .unwrap(errors::addAll))
-            .unwrap(errors::addAll);
-    return stack -> {
-      beforeWriting()
-          .andThen(writeCopybook(metaData.getCopybookId(), copybookDocument.getText()))
-          .andThen(afterWriting(metaData.getContext()))
-          .accept(stack);
-      return subContext -> {
-        storeCopyStatementSemantics(metaData, copybookDocument).accept(subContext);
-        return nestedMappings -> {
-          collectNestedSemanticData(metaData, copybookDocument).accept(nestedMappings);
-          return allErrors -> allErrors.addAll(errors);
-        };
-      };
+            .unwrap(errors::addAll),
+        errors);
+  }
+
+  private Consumer<Map<String, DocumentMapping>> collectNestedSemanticData(
+      CopybookMetaData metaData, ExtendedDocument copybookDocument) {
+    return nestedMapping -> {
+      nestedMapping.putAll(copybookDocument.getDocumentMapping());
+      nestedMapping.putIfAbsent(
+          metaData.getCopybookId(),
+          Optional.ofNullable(nestedMapping.get(copybookDocument.getUri()))
+              .orElseGet(() -> new DocumentMapping(ImmutableList.of(), ImmutableMap.of())));
     };
   }
 
@@ -145,7 +172,7 @@ abstract class CopybookAnalysis {
             uri,
             content,
             copybookStack,
-            copybookConfig,
+            metaData.getConfig(),
             recursiveReplaceStmtStack,
             replacingClauses);
     copybookStack.pop();
@@ -183,27 +210,8 @@ abstract class CopybookAnalysis {
     return it -> it.accumulateTokenShift(context);
   }
 
-  protected Consumer<NamedSubContext> storeCopyStatementSemantics(
-      CopybookMetaData metaData, ExtendedDocument copybookDocument) {
-    return addCopybookUsage(metaData)
-        .andThen(addCopybookDefinition(metaData, copybookDocument.getUri()))
-        .andThen(collectCopybookStatement(metaData))
-        .andThen(addNestedCopybook(copybookDocument));
-  }
-
   private Consumer<NamedSubContext> collectCopybookStatement(CopybookMetaData metaData) {
     return it -> it.addStatement(metaData.getCopybookId(), metaData.getContextLocality());
-  }
-
-  private Consumer<Map<String, DocumentMapping>> collectNestedSemanticData(
-      CopybookMetaData metaData, ExtendedDocument copybookDocument) {
-    return nestedMapping -> {
-      nestedMapping.putAll(copybookDocument.getDocumentMapping());
-      nestedMapping.putIfAbsent(
-          metaData.getCopybookId(),
-          Optional.ofNullable(nestedMapping.get(copybookDocument.getUri()))
-              .orElseGet(() -> new DocumentMapping(ImmutableList.of(), ImmutableMap.of())));
-    };
   }
 
   protected Consumer<NamedSubContext> addCopybookUsage(CopybookMetaData metaData) {
