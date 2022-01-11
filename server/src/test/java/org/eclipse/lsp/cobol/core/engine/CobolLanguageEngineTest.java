@@ -93,6 +93,7 @@ class CobolLanguageEngineTest {
 
     ExtendedDocument extendedDocument =
         new ExtendedDocument(
+            "",
             TEXT,
             new NamedSubContext(),
             ImmutableMap.of(

@@ -80,7 +80,7 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
     if (!replacingClauses.isEmpty()) {
       replace();
     }
-    return new ResultWithErrors<>(new ExtendedDocument(accumulate(), null, null), errors);
+    return new ResultWithErrors<>(new ExtendedDocument(null, accumulate(), null, null), errors);
   }
 
   private void replace() {

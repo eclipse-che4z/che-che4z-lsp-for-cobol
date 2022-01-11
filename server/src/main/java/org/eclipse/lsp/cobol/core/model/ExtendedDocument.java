@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @Value
 public class ExtendedDocument {
-  //uri
+  String uri;
   String text;
   NamedSubContext copybooks;
   Map<String, DocumentMapping> documentMapping;

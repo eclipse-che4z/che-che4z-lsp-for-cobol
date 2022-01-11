@@ -124,7 +124,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
                 .collect(toList()),
             shifts));
     return new ResultWithErrors<>(
-        new ExtendedDocument(accumulate(), copybooks, nestedMappings), errors);
+        new ExtendedDocument(documentUri, accumulate(), copybooks, nestedMappings), errors);
   }
 
   @Override

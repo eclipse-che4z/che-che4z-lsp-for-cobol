@@ -19,16 +19,17 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.CopybookModel;
+import org.eclipse.lsp.cobol.core.model.CopybookUsage;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
 
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -58,9 +59,9 @@ class SkippingAnalysis extends CopybookAnalysis {
 
   @Override
   protected ResultWithErrors<ExtendedDocument> processCopybook(
-      CopybookMetaData metaData, String content) {
+      CopybookMetaData metaData, String uri, String content) {
     return new ResultWithErrors<>(
-        new ExtendedDocument("", new NamedSubContext(), ImmutableMap.of()), ImmutableList.of());
+        new ExtendedDocument("", "", new NamedSubContext(), ImmutableMap.of()), ImmutableList.of());
   }
 
   @Override
@@ -69,7 +70,7 @@ class SkippingAnalysis extends CopybookAnalysis {
   }
 
   @Override
-  protected Consumer<NamedSubContext> addCopybookDefinition(CopybookMetaData metaData) {
+  protected Consumer<NamedSubContext> addCopybookDefinition(CopybookMetaData metaData, String uri) {
     return it -> {};
   }
 }

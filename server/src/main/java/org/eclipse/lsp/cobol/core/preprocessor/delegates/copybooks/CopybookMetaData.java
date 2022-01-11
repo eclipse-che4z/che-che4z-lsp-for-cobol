@@ -16,7 +16,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -25,16 +25,15 @@ import org.eclipse.lsp.cobol.service.CopybookConfig;
 /**
  * This value represents the metadata of the analysing copybook that is retrieved from the context
  */
-@Data
+@Value
 @Builder
 class CopybookMetaData {
-  final String name;
-  final String copybookId;
-  String uri;
-  final CopybookConfig config;
-  final ParserRuleContext context;
-  final Locality contextLocality;
-  final Locality nameLocality;
+  String name;
+  String copybookId;
+  CopybookConfig config;
+  ParserRuleContext context;
+  Locality contextLocality;
+  Locality nameLocality;
 
   /**
    * Build a copybook usage instance from the metadata

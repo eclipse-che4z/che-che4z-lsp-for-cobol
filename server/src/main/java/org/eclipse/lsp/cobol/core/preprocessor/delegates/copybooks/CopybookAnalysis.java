@@ -56,7 +56,6 @@ abstract class CopybookAnalysis {
       "Syntax error by checkCopybookName: {}";
   protected final Deque<CopybookUsage> copybookStack;
   protected final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack;
-  // used for both copy and sql-include statements
   private final List<Pair<String, String>> replacingClauses;
   private final String documentUri;
   private final CopybookConfig copybookConfig;
@@ -111,11 +110,11 @@ abstract class CopybookAnalysis {
     List<SyntaxError> errors = new ArrayList<>(checkCopybookName(metaData, maxLength));
 
     CopybookModel model = getCopyBookContent(metaData).unwrap(errors::addAll);
-    metaData.setUri(model.getUri());
 
     ExtendedDocument copybookDocument =
         processCopybook(
                 metaData,
+                model.getUri(),
                 handleReplacing(
                         metaData,
                         preprocessor
@@ -139,11 +138,11 @@ abstract class CopybookAnalysis {
   }
 
   protected ResultWithErrors<ExtendedDocument> processCopybook(
-      CopybookMetaData metaData, String content) {
+      CopybookMetaData metaData, String uri, String content) {
     copybookStack.push(metaData.toCopybookUsage());
     final ResultWithErrors<ExtendedDocument> result =
         preprocessor.processCleanCode(
-            metaData.uri,
+            uri,
             content,
             copybookStack,
             copybookConfig,
@@ -187,7 +186,7 @@ abstract class CopybookAnalysis {
   protected Consumer<NamedSubContext> storeCopyStatementSemantics(
       CopybookMetaData metaData, ExtendedDocument copybookDocument) {
     return addCopybookUsage(metaData)
-        .andThen(addCopybookDefinition(metaData))
+        .andThen(addCopybookDefinition(metaData, copybookDocument.getUri()))
         .andThen(collectCopybookStatement(metaData))
         .andThen(addNestedCopybook(copybookDocument));
   }
@@ -202,7 +201,7 @@ abstract class CopybookAnalysis {
       nestedMapping.putAll(copybookDocument.getDocumentMapping());
       nestedMapping.putIfAbsent(
           metaData.getCopybookId(),
-          Optional.ofNullable(nestedMapping.get(metaData.getUri()))
+          Optional.ofNullable(nestedMapping.get(copybookDocument.getUri()))
               .orElseGet(() -> new DocumentMapping(ImmutableList.of(), ImmutableMap.of())));
     };
   }
@@ -212,9 +211,8 @@ abstract class CopybookAnalysis {
         copybooks.addUsage(metaData.getName(), metaData.getNameLocality().toLocation());
   }
 
-  protected Consumer<NamedSubContext> addCopybookDefinition(CopybookMetaData metaData) {
+  protected Consumer<NamedSubContext> addCopybookDefinition(CopybookMetaData metaData, String uri) {
     return copybooks -> {
-      String uri = metaData.getUri();
       if (!(isEmpty(metaData.getName()) || isEmpty(uri) || isPredefined(uri)))
         copybooks.define(
             metaData.getName(),

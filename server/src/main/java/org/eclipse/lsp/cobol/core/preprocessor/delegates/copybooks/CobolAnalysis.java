@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
-import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
@@ -29,7 +28,6 @@ import org.eclipse.lsp.cobol.service.CopybookService;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-import java.util.Map;
 
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 
