@@ -16,29 +16,18 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.service.CopybookService;
-
-import java.util.Deque;
 
 /**
  * This implementation of the {@link CopybookAnalysis} provides the logic and the default parameters
  * for the copybook analysis, required by the COBOL dialects.
  */
 class DialectCopybookAnalysis extends CopybookAnalysis {
-  private static final int MAX_COPYBOOK_NAME_LENGTH_DEFAULT = Integer.MAX_VALUE;
-
   DialectCopybookAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
-      Deque<CopybookUsage> copybookStack,
       MessageService messageService) {
-    super(
-        preprocessor,
-        copybookService,
-        copybookStack,
-        messageService,
-        MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
+    super(preprocessor, copybookService, messageService, MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
   }
 }

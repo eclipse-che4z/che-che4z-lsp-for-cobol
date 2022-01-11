@@ -35,6 +35,7 @@ import org.eclipse.lsp4j.Range;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
@@ -56,21 +57,18 @@ abstract class CopybookAnalysis {
   private static final String SYNTAX_ERROR_CHECK_COPYBOOK_NAME =
       "Syntax error by checkCopybookName: {}";
 
-  protected final Deque<CopybookUsage> copybookStack;
   private final TextPreprocessor preprocessor;
   private final CopybookService copybookService;
   private final MessageService messageService;
-  protected int maxCopybookNameLength;
+  private final int maxCopybookNameLength;
 
   CopybookAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
-      Deque<CopybookUsage> copybookStack,
       MessageService messageService,
       int maxCopybookNameLength) {
     this.preprocessor = preprocessor;
     this.copybookService = copybookService;
-    this.copybookStack = copybookStack;
     this.messageService = messageService;
     this.maxCopybookNameLength = maxCopybookNameLength;
   }
@@ -87,32 +85,37 @@ abstract class CopybookAnalysis {
       ParserRuleContext copySource,
       CopybookConfig config,
       String documentUri) {
-    CopybookMetaData metaData =
-        CopybookMetaData.builder()
-            .name(retrieveCopybookName(copySource))
-            .context(context)
-            .documentUri(documentUri)
-            .copybookId(randomUUID().toString())
-            .config(config)
-            .nameLocality(
-                PreprocessorUtils.buildLocality(copySource, documentUri, copybookStack.peek()))
-            .contextLocality(
-                PreprocessorUtils.buildLocality(context, documentUri, copybookStack.peek()))
-            .build();
+    return copybookStack -> {
+      CopybookMetaData metaData =
+          CopybookMetaData.builder()
+              .name(retrieveCopybookName(copySource))
+              .context(context)
+              .documentUri(documentUri)
+              .copybookId(randomUUID().toString())
+              .config(config)
+              .nameLocality(
+                  PreprocessorUtils.buildLocality(copySource, documentUri, copybookStack.peek()))
+              .contextLocality(
+                  PreprocessorUtils.buildLocality(context, documentUri, copybookStack.peek()))
+              .build();
 
-    List<SyntaxError> errors = new ArrayList<>(checkCopybookName(metaData, maxCopybookNameLength));
-    return (recursiveReplaceStack, replacingClauses) -> {
-      ExtendedDocument copybookDocument =
-          buildExtendedDocumentForCopybook(metaData)
-              .apply(recursiveReplaceStack, replacingClauses)
-              .unwrap(errors::addAll);
-      return stack -> {
-        writeText(metaData, copybookDocument).accept(stack);
-        return subContext -> {
-          storeCopyStatementSemantics(metaData, copybookDocument).accept(subContext);
-          return nestedMappings -> {
-            collectNestedSemanticData(metaData, copybookDocument).accept(nestedMappings);
-            return allErrors -> allErrors.addAll(errors);
+      List<SyntaxError> errors =
+          new ArrayList<>(checkCopybookName(metaData, maxCopybookNameLength));
+
+      return (recursiveReplaceStack, replacingClauses) -> {
+        ExtendedDocument copybookDocument =
+            buildExtendedDocumentForCopybook(metaData)
+                .apply(copybookStack)
+                .apply(recursiveReplaceStack, replacingClauses)
+                .unwrap(errors::addAll);
+        return stack -> {
+          writeText(metaData, copybookDocument).accept(stack);
+          return subContext -> {
+            storeCopyStatementSemantics(metaData, copybookDocument).accept(subContext);
+            return nestedMappings -> {
+              collectNestedSemanticData(metaData, copybookDocument).accept(nestedMappings);
+              return allErrors -> allErrors.addAll(errors);
+            };
           };
         };
       };
@@ -134,29 +137,35 @@ abstract class CopybookAnalysis {
         .andThen(addNestedCopybook(copybookDocument));
   }
 
-  private BiFunction<
-          Deque<List<Pair<String, String>>>,
-          List<Pair<String, String>>,
-          ResultWithErrors<ExtendedDocument>>
+  private Function<
+          Deque<CopybookUsage>,
+          BiFunction<
+              Deque<List<Pair<String, String>>>,
+              List<Pair<String, String>>,
+              ResultWithErrors<ExtendedDocument>>>
       buildExtendedDocumentForCopybook(CopybookMetaData metaData) {
     List<SyntaxError> errors = new ArrayList<>();
-    CopybookModel model = getCopyBookContent(metaData).unwrap(errors::addAll);
-    return (recursiveReplaceStack, replacingClauses) ->
-        new ResultWithErrors<>(
-            processCopybook(
-                    recursiveReplaceStack,
-                    replacingClauses,
-                    metaData,
-                    model.getUri(),
-                    handleReplacing(
-                            recursiveReplaceStack,
-                            metaData,
-                            preprocessor
-                                .cleanUpCode(model.getUri(), model.getContent())
-                                .unwrap(errors::addAll))
-                        .unwrap(errors::addAll))
-                .unwrap(errors::addAll),
-            errors);
+    return copybookStack ->
+        (recursiveReplaceStack, replacingClauses) -> {
+          CopybookModel model = getCopyBookContent(metaData, copybookStack).unwrap(errors::addAll);
+          return new ResultWithErrors<>(
+              processCopybook(
+                      recursiveReplaceStack,
+                      replacingClauses,
+                      copybookStack,
+                      metaData,
+                      model.getUri(),
+                      handleReplacing(
+                              recursiveReplaceStack,
+                              copybookStack,
+                              metaData,
+                              preprocessor
+                                  .cleanUpCode(model.getUri(), model.getContent())
+                                  .unwrap(errors::addAll))
+                          .unwrap(errors::addAll))
+                  .unwrap(errors::addAll),
+              errors);
+        };
   }
 
   private Consumer<Map<String, DocumentMapping>> collectNestedSemanticData(
@@ -173,6 +182,7 @@ abstract class CopybookAnalysis {
   protected ResultWithErrors<ExtendedDocument> processCopybook(
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
       List<Pair<String, String>> replacingClauses,
+      Deque<CopybookUsage> copybookStack,
       CopybookMetaData metaData,
       String uri,
       String content) {
@@ -190,11 +200,12 @@ abstract class CopybookAnalysis {
     return result;
   }
 
-  protected ResultWithErrors<CopybookModel> getCopyBookContent(CopybookMetaData metaData) {
+  protected ResultWithErrors<CopybookModel> getCopyBookContent(
+      CopybookMetaData metaData, Deque<CopybookUsage> copybookStack) {
     List<SyntaxError> errors = new ArrayList<>();
     if (metaData.getName().isEmpty()) return emptyModel(metaData.getName(), errors);
 
-    if (hasRecursion(metaData.getName())) {
+    if (hasRecursion(metaData.getName(), copybookStack)) {
       errors.addAll(copybookStack.stream().map(this::reportRecursiveCopybook).collect(toList()));
       return emptyModel(metaData.getName(), errors);
     }
@@ -245,12 +256,13 @@ abstract class CopybookAnalysis {
 
   protected ResultWithErrors<String> handleReplacing(
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
+      Deque<CopybookUsage> copybookStack,
       CopybookMetaData metaData,
       String text) {
     return new ResultWithErrors<>(text, ImmutableList.of());
   }
 
-  private boolean hasRecursion(String copybookName) {
+  private boolean hasRecursion(String copybookName, Deque<CopybookUsage> copybookStack) {
     return copybookStack.stream().map(CopybookUsage::getName).anyMatch(copybookName::equals);
   }
 

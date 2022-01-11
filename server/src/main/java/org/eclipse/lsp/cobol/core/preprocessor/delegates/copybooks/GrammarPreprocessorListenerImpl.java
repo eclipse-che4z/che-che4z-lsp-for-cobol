@@ -174,8 +174,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitLinkageSection(LinkageSectionContext ctx) {
-    new PredefinedCopybookAnalysis(preprocessor, copybookService, copybookStack, messageService)
+    new PredefinedCopybookAnalysis(preprocessor, copybookService, messageService)
         .handleCopybook(ctx, ctx, copybookConfig, documentUri)
+        .apply(copybookStack)
         .apply(recursiveReplaceStmtStack, replacingClauses)
         .apply(this)
         .apply(copybooks)
@@ -191,9 +192,10 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyIdmsStatement(@NonNull CopyIdmsStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new DialectCopybookAnalysis(preprocessor, copybookService, copybookStack, messageService)
+    new DialectCopybookAnalysis(preprocessor, copybookService, messageService)
         .handleCopybook(
             ctx, ctx.copyIdmsOptions().copyIdmsSource().copySource(), copybookConfig, documentUri)
+        .apply(copybookStack)
         .apply(recursiveReplaceStmtStack, replacingClauses)
         .apply(this)
         .apply(copybooks)
@@ -217,17 +219,18 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
           .map(Integer::parseInt)
           .ifPresent(
               it ->
-                  new DialectCopybookAnalysis(
-                          preprocessor, copybookService, copybookStack, messageService)
+                  new DialectCopybookAnalysis(preprocessor, copybookService, messageService)
                       .handleCopybook(ctx, copySource, copybookConfig, documentUri)
+                      .apply(copybookStack)
                       .apply(recursiveReplaceStmtStack, replacingClauses)
                       .apply(this)
                       .apply(copybooks)
                       .apply(nestedMappings)
                       .accept(errors));
     else
-      new SkippingAnalysis(preprocessor, copybookService, copybookStack, messageService)
+      new SkippingAnalysis(preprocessor, copybookService, messageService)
           .handleCopybook(ctx, copySource, copybookConfig, documentUri)
+          .apply(copybookStack)
           .apply(recursiveReplaceStmtStack, replacingClauses)
           .apply(this)
           .apply(copybooks)
@@ -243,8 +246,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new PanvaletAnalysis(preprocessor, copybookService, copybookStack, messageService)
+    new PanvaletAnalysis(preprocessor, copybookService, messageService)
         .handleCopybook(ctx, ctx.copySource(), copybookConfig, documentUri)
+        .apply(copybookStack)
         .apply(recursiveReplaceStmtStack, replacingClauses)
         .apply(this)
         .apply(copybooks)
@@ -261,13 +265,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
     new CobolAnalysis(
-            preprocessor,
-            copybookService,
-            copybookStack,
-            messageService,
-            copyReplacingClauses,
-            replacingService)
+            preprocessor, copybookService, messageService, copyReplacingClauses, replacingService)
         .handleCopybook(ctx, ctx.copySource(), copybookConfig, documentUri)
+        .apply(copybookStack)
         .apply(recursiveReplaceStmtStack, replacingClauses)
         .apply(this)
         .apply(copybooks)
@@ -284,13 +284,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
     new CobolAnalysis(
-            preprocessor,
-            copybookService,
-            copybookStack,
-            messageService,
-            copyReplacingClauses,
-            replacingService)
+            preprocessor, copybookService, messageService, copyReplacingClauses, replacingService)
         .handleCopybook(ctx, ctx.copySource(), copybookConfig, documentUri)
+        .apply(copybookStack)
         .apply(recursiveReplaceStmtStack, replacingClauses)
         .apply(this)
         .apply(copybooks)

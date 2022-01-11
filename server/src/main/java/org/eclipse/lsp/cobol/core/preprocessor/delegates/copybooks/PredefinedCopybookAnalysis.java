@@ -17,13 +17,11 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookService;
 
-import java.util.Deque;
 import java.util.function.Consumer;
 
 import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBLC;
@@ -36,14 +34,8 @@ class PredefinedCopybookAnalysis extends CopybookAnalysis {
   PredefinedCopybookAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
-      Deque<CopybookUsage> copybookStack,
       MessageService messageService) {
-    super(
-        preprocessor,
-        copybookService,
-        copybookStack,
-        messageService,
-        MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
+    super(preprocessor, copybookService, messageService, MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
   }
 
   @Override

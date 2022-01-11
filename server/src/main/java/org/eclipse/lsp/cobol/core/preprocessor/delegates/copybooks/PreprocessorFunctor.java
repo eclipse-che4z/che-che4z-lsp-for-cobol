@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
@@ -29,11 +30,13 @@ import java.util.function.Function;
 
 /** A type alias for curried applicative functors to update the preprocessor */
 public interface PreprocessorFunctor
-    extends BiFunction<
-        Deque<List<Pair<String, String>>>,
-        List<Pair<String, String>>,
-        Function<
-            PreprocessorStack,
+    extends Function<
+        Deque<CopybookUsage>,
+        BiFunction<
+            Deque<List<Pair<String, String>>>,
+            List<Pair<String, String>>,
             Function<
-                NamedSubContext,
-                Function<Map<String, DocumentMapping>, Consumer<List<SyntaxError>>>>>> {}
+                PreprocessorStack,
+                Function<
+                    NamedSubContext,
+                    Function<Map<String, DocumentMapping>, Consumer<List<SyntaxError>>>>>>> {}

@@ -39,20 +39,15 @@ class SkippingAnalysis extends CopybookAnalysis {
   SkippingAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
-      Deque<CopybookUsage> copybookStack,
       MessageService messageService) {
-    super(
-        preprocessor,
-        copybookService,
-        copybookStack,
-        messageService,
-        MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
+    super(preprocessor, copybookService, messageService, MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
   }
 
   @Override
   protected ResultWithErrors<ExtendedDocument> processCopybook(
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
       List<Pair<String, String>> replacingClauses,
+      Deque<CopybookUsage> copybookStack,
       CopybookMetaData metaData,
       String uri,
       String content) {
@@ -61,7 +56,8 @@ class SkippingAnalysis extends CopybookAnalysis {
   }
 
   @Override
-  protected ResultWithErrors<CopybookModel> getCopyBookContent(CopybookMetaData metaData) {
+  protected ResultWithErrors<CopybookModel> getCopyBookContent(
+      CopybookMetaData metaData, Deque<CopybookUsage> copybookStack) {
     return emptyModel(metaData.getName(), ImmutableList.of());
   }
 

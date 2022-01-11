@@ -43,16 +43,10 @@ class CobolAnalysis extends CopybookAnalysis {
   CobolAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
-      Deque<CopybookUsage> copybookStack,
       MessageService messageService,
       List<Pair<String, String>> copyReplacingClauses,
       ReplacingService replacingService) {
-    super(
-        preprocessor,
-        copybookService,
-        copybookStack,
-        messageService,
-        MAX_COPYBOOK_NAME_LENGTH_DATASET);
+    super(preprocessor, copybookService, messageService, MAX_COPYBOOK_NAME_LENGTH_DATASET);
     this.copyReplacingClauses = copyReplacingClauses;
     this.replacingService = replacingService;
   }
@@ -60,6 +54,7 @@ class CobolAnalysis extends CopybookAnalysis {
   @Override
   protected ResultWithErrors<String> handleReplacing(
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
+      Deque<CopybookUsage> copybookStack,
       CopybookMetaData metaData,
       String text) {
     // In a chain of copy statement, there could be only one replacing phrase
