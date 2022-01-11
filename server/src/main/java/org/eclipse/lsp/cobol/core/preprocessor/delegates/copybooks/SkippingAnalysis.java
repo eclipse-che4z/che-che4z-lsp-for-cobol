@@ -37,7 +37,6 @@ import java.util.function.Consumer;
  */
 class SkippingAnalysis extends CopybookAnalysis {
   SkippingAnalysis(
-      Map<String, DocumentMapping> nestedMappings,
       List<Pair<String, String>> replacingClauses,
       String documentUri,
       CopybookConfig copybookConfig,
@@ -47,7 +46,6 @@ class SkippingAnalysis extends CopybookAnalysis {
       MessageService messageService,
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
     super(
-        nestedMappings,
         replacingClauses,
         documentUri,
         copybookConfig,
