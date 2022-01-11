@@ -33,6 +33,7 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import static java.util.UUID.randomUUID;
@@ -54,25 +55,19 @@ abstract class CopybookAnalysis {
   private static final String SYNTAX_ERROR_CHECK_COPYBOOK_NAME =
       "Syntax error by checkCopybookName: {}";
   protected final Deque<CopybookUsage> copybookStack;
-  protected final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack;
-  private final List<Pair<String, String>> replacingClauses;
   private final TextPreprocessor preprocessor;
   private final CopybookService copybookService;
   private final MessageService messageService;
 
   CopybookAnalysis(
-      List<Pair<String, String>> replacingClauses,
       TextPreprocessor preprocessor,
       CopybookService copybookService,
       Deque<CopybookUsage> copybookStack,
-      MessageService messageService,
-      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
-    this.replacingClauses = replacingClauses;
+      MessageService messageService) {
     this.preprocessor = preprocessor;
     this.copybookService = copybookService;
     this.copybookStack = copybookStack;
     this.messageService = messageService;
-    this.recursiveReplaceStmtStack = recursiveReplaceStmtStack;
   }
 
   /**
@@ -103,17 +98,19 @@ abstract class CopybookAnalysis {
             .build();
 
     List<SyntaxError> errors = new ArrayList<>(checkCopybookName(metaData, maxLength));
-
-    ExtendedDocument copybookDocument =
-        buildExtendedDocumentForCopybook(metaData).unwrap(errors::addAll);
-
-    return stack -> {
-      writeText(metaData, copybookDocument).accept(stack);
-      return subContext -> {
-        storeCopyStatementSemantics(metaData, copybookDocument).accept(subContext);
-        return nestedMappings -> {
-          collectNestedSemanticData(metaData, copybookDocument).accept(nestedMappings);
-          return allErrors -> allErrors.addAll(errors);
+    return (recursiveReplaceStack, replacingClauses) -> {
+      ExtendedDocument copybookDocument =
+          buildExtendedDocumentForCopybook(metaData)
+              .apply(recursiveReplaceStack, replacingClauses)
+              .unwrap(errors::addAll);
+      return stack -> {
+        writeText(metaData, copybookDocument).accept(stack);
+        return subContext -> {
+          storeCopyStatementSemantics(metaData, copybookDocument).accept(subContext);
+          return nestedMappings -> {
+            collectNestedSemanticData(metaData, copybookDocument).accept(nestedMappings);
+            return allErrors -> allErrors.addAll(errors);
+          };
         };
       };
     };
@@ -134,22 +131,29 @@ abstract class CopybookAnalysis {
         .andThen(addNestedCopybook(copybookDocument));
   }
 
-  private ResultWithErrors<ExtendedDocument> buildExtendedDocumentForCopybook(
-      CopybookMetaData metaData) {
+  private BiFunction<
+          Deque<List<Pair<String, String>>>,
+          List<Pair<String, String>>,
+          ResultWithErrors<ExtendedDocument>>
+      buildExtendedDocumentForCopybook(CopybookMetaData metaData) {
     List<SyntaxError> errors = new ArrayList<>();
     CopybookModel model = getCopyBookContent(metaData).unwrap(errors::addAll);
-    return new ResultWithErrors<>(
-        processCopybook(
-                metaData,
-                model.getUri(),
-                handleReplacing(
-                        metaData,
-                        preprocessor
-                            .cleanUpCode(model.getUri(), model.getContent())
-                            .unwrap(errors::addAll))
-                    .unwrap(errors::addAll))
-            .unwrap(errors::addAll),
-        errors);
+    return (recursiveReplaceStack, replacingClauses) ->
+        new ResultWithErrors<>(
+            processCopybook(
+                    recursiveReplaceStack,
+                    replacingClauses,
+                    metaData,
+                    model.getUri(),
+                    handleReplacing(
+                            recursiveReplaceStack,
+                            metaData,
+                            preprocessor
+                                .cleanUpCode(model.getUri(), model.getContent())
+                                .unwrap(errors::addAll))
+                        .unwrap(errors::addAll))
+                .unwrap(errors::addAll),
+            errors);
   }
 
   private Consumer<Map<String, DocumentMapping>> collectNestedSemanticData(
@@ -164,7 +168,11 @@ abstract class CopybookAnalysis {
   }
 
   protected ResultWithErrors<ExtendedDocument> processCopybook(
-      CopybookMetaData metaData, String uri, String content) {
+      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
+      List<Pair<String, String>> replacingClauses,
+      CopybookMetaData metaData,
+      String uri,
+      String content) {
     copybookStack.push(metaData.toCopybookUsage());
     final ResultWithErrors<ExtendedDocument> result =
         preprocessor.processCleanCode(
@@ -232,7 +240,10 @@ abstract class CopybookAnalysis {
     return copybooks -> copybooks.merge(copybookDocument.getCopybooks());
   }
 
-  protected ResultWithErrors<String> handleReplacing(CopybookMetaData metaData, String text) {
+  protected ResultWithErrors<String> handleReplacing(
+      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
+      CopybookMetaData metaData,
+      String text) {
     return new ResultWithErrors<>(text, ImmutableList.of());
   }
 

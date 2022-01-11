@@ -40,27 +40,22 @@ class CobolAnalysis extends CopybookAnalysis {
   private final ReplacingService replacingService;
 
   CobolAnalysis(
-      List<Pair<String, String>> replacingClauses,
       TextPreprocessor preprocessor,
       CopybookService copybookService,
       Deque<CopybookUsage> copybookStack,
       MessageService messageService,
-      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
       List<Pair<String, String>> copyReplacingClauses,
       ReplacingService replacingService) {
-    super(
-        replacingClauses,
-        preprocessor,
-        copybookService,
-        copybookStack,
-        messageService,
-        recursiveReplaceStmtStack);
+    super(preprocessor, copybookService, copybookStack, messageService);
     this.copyReplacingClauses = copyReplacingClauses;
     this.replacingService = replacingService;
   }
 
   @Override
-  protected ResultWithErrors<String> handleReplacing(CopybookMetaData metaData, String text) {
+  protected ResultWithErrors<String> handleReplacing(
+      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
+      CopybookMetaData metaData,
+      String text) {
     // In a chain of copy statement, there could be only one replacing phrase
     List<SyntaxError> errors = new ArrayList<>();
     if (!copyReplacingClauses.isEmpty()) {

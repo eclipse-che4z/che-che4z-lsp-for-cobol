@@ -37,24 +37,20 @@ import java.util.function.Consumer;
  */
 class SkippingAnalysis extends CopybookAnalysis {
   SkippingAnalysis(
-      List<Pair<String, String>> replacingClauses,
       TextPreprocessor preprocessor,
       CopybookService copybookService,
       Deque<CopybookUsage> copybookStack,
-      MessageService messageService,
-      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
-    super(
-        replacingClauses,
-        preprocessor,
-        copybookService,
-        copybookStack,
-        messageService,
-        recursiveReplaceStmtStack);
+      MessageService messageService) {
+    super(preprocessor, copybookService, copybookStack, messageService);
   }
 
   @Override
   protected ResultWithErrors<ExtendedDocument> processCopybook(
-      CopybookMetaData metaData, String uri, String content) {
+      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
+      List<Pair<String, String>> replacingClauses,
+      CopybookMetaData metaData,
+      String uri,
+      String content) {
     return new ResultWithErrors<>(
         new ExtendedDocument("", "", new NamedSubContext(), ImmutableMap.of()), ImmutableList.of());
   }
