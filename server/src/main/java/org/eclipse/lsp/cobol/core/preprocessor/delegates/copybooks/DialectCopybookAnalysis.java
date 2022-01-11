@@ -15,25 +15,21 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookService;
 
 import java.util.Deque;
-import java.util.function.Consumer;
-
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBLC;
 
 /**
- * This implementation of the {@link CopybookAnalysis} resolves only the DFHEIBLC copybook under the
- * LINKAGE SECTION.
+ * This implementation of the {@link CopybookAnalysis} provides the logic and the default parameters
+ * for the copybook analysis, required by the COBOL dialects.
  */
-class PredefinedCopybookAnalysis extends CopybookAnalysis {
-  PredefinedCopybookAnalysis(
+class DialectCopybookAnalysis extends CopybookAnalysis {
+  private static final int MAX_COPYBOOK_NAME_LENGTH_DEFAULT = Integer.MAX_VALUE;
+
+  DialectCopybookAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
       Deque<CopybookUsage> copybookStack,
@@ -44,26 +40,5 @@ class PredefinedCopybookAnalysis extends CopybookAnalysis {
         copybookStack,
         messageService,
         MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
-  }
-
-  @Override
-  protected String retrieveCopybookName(ParserRuleContext ctx) {
-    return DFHEIBLC.name();
-  }
-
-  @Override
-  protected Consumer<NamedSubContext> storeCopyStatementSemantics(
-      CopybookMetaData metaData, ExtendedDocument copybookDocument) {
-    return it -> {};
-  }
-
-  @Override
-  protected Consumer<PreprocessorStack> beforeWriting() {
-    return it -> {};
-  }
-
-  @Override
-  protected Consumer<PreprocessorStack> afterWriting(ParserRuleContext context) {
-    return it -> {};
   }
 }

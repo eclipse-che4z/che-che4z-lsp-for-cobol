@@ -54,9 +54,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   private static final int DEFAULT_TOKEN_SHIFT = 2;
   private static final int TOKEN_SHIFT_WITH_LINEBREAK = 3;
-  private static final int MAX_COPYBOOK_NAME_LENGTH_DEFAULT = Integer.MAX_VALUE;
-  private static final int MAX_COPYBOOK_NAME_LENGTH_DATASET = 8;
-  private static final int MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB = 10;
 
   private final List<SyntaxError> errors = new ArrayList<>();
   private final Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
@@ -178,7 +175,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitLinkageSection(LinkageSectionContext ctx) {
     new PredefinedCopybookAnalysis(preprocessor, copybookService, copybookStack, messageService)
-        .handleCopybook(ctx, ctx, MAX_COPYBOOK_NAME_LENGTH_DEFAULT, copybookConfig, documentUri)
+        .handleCopybook(ctx, ctx, copybookConfig, documentUri)
         .apply(recursiveReplaceStmtStack, replacingClauses)
         .apply(this)
         .apply(copybooks)
@@ -194,19 +191,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyIdmsStatement(@NonNull CopyIdmsStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new CobolAnalysis(
-            preprocessor,
-            copybookService,
-            copybookStack,
-            messageService,
-            copyReplacingClauses,
-            replacingService)
+    new DialectCopybookAnalysis(preprocessor, copybookService, copybookStack, messageService)
         .handleCopybook(
-            ctx,
-            ctx.copyIdmsOptions().copyIdmsSource().copySource(),
-            MAX_COPYBOOK_NAME_LENGTH_DEFAULT,
-            copybookConfig,
-            documentUri)
+            ctx, ctx.copyIdmsOptions().copyIdmsSource().copySource(), copybookConfig, documentUri)
         .apply(recursiveReplaceStmtStack, replacingClauses)
         .apply(this)
         .apply(copybooks)
@@ -230,19 +217,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
           .map(Integer::parseInt)
           .ifPresent(
               it ->
-                  new CobolAnalysis(
-                          preprocessor,
-                          copybookService,
-                          copybookStack,
-                          messageService,
-                          copyReplacingClauses,
-                          replacingService)
-                      .handleCopybook(
-                          ctx,
-                          copySource,
-                          MAX_COPYBOOK_NAME_LENGTH_DEFAULT,
-                          copybookConfig,
-                          documentUri)
+                  new DialectCopybookAnalysis(
+                          preprocessor, copybookService, copybookStack, messageService)
+                      .handleCopybook(ctx, copySource, copybookConfig, documentUri)
                       .apply(recursiveReplaceStmtStack, replacingClauses)
                       .apply(this)
                       .apply(copybooks)
@@ -250,8 +227,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
                       .accept(errors));
     else
       new SkippingAnalysis(preprocessor, copybookService, copybookStack, messageService)
-          .handleCopybook(
-              ctx, copySource, MAX_COPYBOOK_NAME_LENGTH_DEFAULT, copybookConfig, documentUri)
+          .handleCopybook(ctx, copySource, copybookConfig, documentUri)
           .apply(recursiveReplaceStmtStack, replacingClauses)
           .apply(this)
           .apply(copybooks)
@@ -267,19 +243,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new CobolAnalysis(
-            preprocessor,
-            copybookService,
-            copybookStack,
-            messageService,
-            copyReplacingClauses,
-            replacingService)
-        .handleCopybook(
-            ctx,
-            ctx.copySource(),
-            MAX_COPYBOOK_NAME_LENGTH_PANVALETLIB,
-            copybookConfig,
-            documentUri)
+    new PanvaletAnalysis(preprocessor, copybookService, copybookStack, messageService)
+        .handleCopybook(ctx, ctx.copySource(), copybookConfig, documentUri)
         .apply(recursiveReplaceStmtStack, replacingClauses)
         .apply(this)
         .apply(copybooks)
@@ -302,8 +267,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             messageService,
             copyReplacingClauses,
             replacingService)
-        .handleCopybook(
-            ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_DATASET, copybookConfig, documentUri)
+        .handleCopybook(ctx, ctx.copySource(), copybookConfig, documentUri)
         .apply(recursiveReplaceStmtStack, replacingClauses)
         .apply(this)
         .apply(copybooks)
@@ -326,8 +290,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             messageService,
             copyReplacingClauses,
             replacingService)
-        .handleCopybook(
-            ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_DATASET, copybookConfig, documentUri)
+        .handleCopybook(ctx, ctx.copySource(), copybookConfig, documentUri)
         .apply(recursiveReplaceStmtStack, replacingClauses)
         .apply(this)
         .apply(copybooks)

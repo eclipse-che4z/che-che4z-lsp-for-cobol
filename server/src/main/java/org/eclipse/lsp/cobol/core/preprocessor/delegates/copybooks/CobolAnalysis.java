@@ -35,6 +35,7 @@ import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
  * replacing if presents.
  */
 class CobolAnalysis extends CopybookAnalysis {
+  private static final int MAX_COPYBOOK_NAME_LENGTH_DATASET = 8;
 
   private final List<Pair<String, String>> copyReplacingClauses;
   private final ReplacingService replacingService;
@@ -46,7 +47,12 @@ class CobolAnalysis extends CopybookAnalysis {
       MessageService messageService,
       List<Pair<String, String>> copyReplacingClauses,
       ReplacingService replacingService) {
-    super(preprocessor, copybookService, copybookStack, messageService);
+    super(
+        preprocessor,
+        copybookService,
+        copybookStack,
+        messageService,
+        MAX_COPYBOOK_NAME_LENGTH_DATASET);
     this.copyReplacingClauses = copyReplacingClauses;
     this.replacingService = replacingService;
   }

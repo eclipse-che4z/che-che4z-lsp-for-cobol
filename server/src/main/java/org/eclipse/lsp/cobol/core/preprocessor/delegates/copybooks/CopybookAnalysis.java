@@ -50,24 +50,29 @@ import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.*;
  */
 @Slf4j
 abstract class CopybookAnalysis {
+  protected static final int MAX_COPYBOOK_NAME_LENGTH_DEFAULT = Integer.MAX_VALUE;
   private static final String HYPHEN = "-";
   private static final String UNDERSCORE = "_";
   private static final String SYNTAX_ERROR_CHECK_COPYBOOK_NAME =
       "Syntax error by checkCopybookName: {}";
+
   protected final Deque<CopybookUsage> copybookStack;
   private final TextPreprocessor preprocessor;
   private final CopybookService copybookService;
   private final MessageService messageService;
+  protected int maxCopybookNameLength;
 
   CopybookAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
       Deque<CopybookUsage> copybookStack,
-      MessageService messageService) {
+      MessageService messageService,
+      int maxCopybookNameLength) {
     this.preprocessor = preprocessor;
     this.copybookService = copybookService;
     this.copybookStack = copybookStack;
     this.messageService = messageService;
+    this.maxCopybookNameLength = maxCopybookNameLength;
   }
 
   /**
@@ -75,13 +80,11 @@ abstract class CopybookAnalysis {
    *
    * @param context
    * @param copySource
-   * @param maxLength
    * @return the functions that should be applied to the preprocessor
    */
   public PreprocessorFunctor handleCopybook(
       ParserRuleContext context,
       ParserRuleContext copySource,
-      int maxLength,
       CopybookConfig config,
       String documentUri) {
     CopybookMetaData metaData =
@@ -97,7 +100,7 @@ abstract class CopybookAnalysis {
                 PreprocessorUtils.buildLocality(context, documentUri, copybookStack.peek()))
             .build();
 
-    List<SyntaxError> errors = new ArrayList<>(checkCopybookName(metaData, maxLength));
+    List<SyntaxError> errors = new ArrayList<>(checkCopybookName(metaData, maxCopybookNameLength));
     return (recursiveReplaceStack, replacingClauses) -> {
       ExtendedDocument copybookDocument =
           buildExtendedDocumentForCopybook(metaData)

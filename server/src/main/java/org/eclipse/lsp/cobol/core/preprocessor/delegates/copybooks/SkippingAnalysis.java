@@ -41,7 +41,12 @@ class SkippingAnalysis extends CopybookAnalysis {
       CopybookService copybookService,
       Deque<CopybookUsage> copybookStack,
       MessageService messageService) {
-    super(preprocessor, copybookService, copybookStack, messageService);
+    super(
+        preprocessor,
+        copybookService,
+        copybookStack,
+        messageService,
+        MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
   }
 
   @Override
