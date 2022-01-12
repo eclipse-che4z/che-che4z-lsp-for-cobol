@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
@@ -31,10 +31,10 @@ import java.util.List;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 
 /**
- * This implementation of the {@link CopybookAnalysis} provides logic for plain COBOL logic applying
- * replacing if presents.
+ * This implementation of the {@link AbstractCopybookAnalysis} provides logic for plain COBOL logic
+ * applying replacing if presents.
  */
-class CobolAnalysis extends CopybookAnalysis {
+class CobolAnalysis extends AbstractCopybookAnalysis {
   private static final int MAX_COPYBOOK_NAME_LENGTH_DATASET = 8;
 
   private final ReplacingService replacingService;

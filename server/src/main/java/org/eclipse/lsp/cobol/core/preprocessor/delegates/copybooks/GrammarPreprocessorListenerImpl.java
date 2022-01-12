@@ -29,6 +29,8 @@ import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
@@ -41,8 +43,8 @@ import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Token.EOF;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.CopybookAnalysisFactory.AnalysisTypes;
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.CopybookAnalysisFactory.AnalysisTypes.*;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory.AnalysisTypes;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory.AnalysisTypes.*;
 
 /**
  * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY

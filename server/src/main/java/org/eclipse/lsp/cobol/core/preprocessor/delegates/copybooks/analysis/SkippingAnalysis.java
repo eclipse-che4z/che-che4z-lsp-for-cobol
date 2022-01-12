@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -32,10 +32,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * This implementation of the {@link CopybookAnalysis} doesn't resolve copybook content, and only
- * collects the usage of the copybook
+ * This implementation of the {@link AbstractCopybookAnalysis} doesn't resolve copybook content, and
+ * only collects the usage of the copybook
  */
-class SkippingAnalysis extends CopybookAnalysis {
+class SkippingAnalysis extends AbstractCopybookAnalysis {
   SkippingAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,

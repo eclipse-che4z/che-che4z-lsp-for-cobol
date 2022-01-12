@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -23,7 +23,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
@@ -49,7 +51,7 @@ import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.*;
  * behavior overriding the methods.
  */
 @Slf4j
-abstract class CopybookAnalysis {
+abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
   protected static final int MAX_COPYBOOK_NAME_LENGTH_DEFAULT = Integer.MAX_VALUE;
   private static final String HYPHEN = "-";
   private static final String UNDERSCORE = "_";
@@ -61,7 +63,7 @@ abstract class CopybookAnalysis {
   private final MessageService messageService;
   private final int maxCopybookNameLength;
 
-  CopybookAnalysis(
+  AbstractCopybookAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
       MessageService messageService,

@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerImpl;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -30,7 +31,7 @@ import static java.util.Optional.ofNullable;
 
 /** Utility class for localities */
 @UtilityClass
-class PreprocessorUtils {
+public class PreprocessorUtils {
   /**
    * Build a locality from the given context, document uri and the current copybook.
    *
@@ -40,7 +41,7 @@ class PreprocessorUtils {
    * @return locality pointing to the context in the current document
    */
   @NonNull
-  Locality buildLocality(ParserRuleContext context, String documentUri, CopybookUsage copybook) {
+  public Locality buildLocality(ParserRuleContext context, String documentUri, CopybookUsage copybook) {
     return Locality.builder()
         .uri(documentUri)
         .copybookId(retrieveCopybookId(copybook))

@@ -27,7 +27,7 @@ import static java.util.Optional.ofNullable;
  * Provides a contract and default implementation of various stack operation. To be used while
  * assembling the {@link org.eclipse.lsp.cobol.core.model.ExtendedDocument} from pre-processors.
  */
-interface PreprocessorStack {
+public interface PreprocessorStack {
 
   /** @return A stack of accumulated text while preprocessing. */
   Deque<StringBuilder> getTextAccumulator();

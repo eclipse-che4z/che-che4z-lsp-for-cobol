@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -31,7 +31,7 @@ import java.util.Map;
  */
 @Singleton
 public class CopybookAnalysisFactory {
-  private final Map<AnalysisTypes, CopybookAnalysis> analysisInstances =
+  private final Map<AnalysisTypes, AbstractCopybookAnalysis> analysisInstances =
       new EnumMap<>(AnalysisTypes.class);
 
   @Inject
@@ -68,7 +68,7 @@ public class CopybookAnalysisFactory {
   }
 
   /** An enumeration of all the supported copybook analysis implementations */
-  enum AnalysisTypes {
+  public enum AnalysisTypes {
     COBOL,
     DIALECT,
     SKIPPING,

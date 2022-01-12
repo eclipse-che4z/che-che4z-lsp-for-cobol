@@ -13,17 +13,17 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.service.CopybookService;
 
 /**
- * This implementation of the {@link CopybookAnalysis} provides the logic and the default parameters
- * for the copybook analysis, required by the COBOL dialects.
+ * This implementation of the {@link AbstractCopybookAnalysis} provides the logic and the default
+ * parameters for the copybook analysis, required by the COBOL dialects.
  */
-class DialectCopybookAnalysis extends CopybookAnalysis {
+class DialectCopybookAnalysis extends AbstractCopybookAnalysis {
   DialectCopybookAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,

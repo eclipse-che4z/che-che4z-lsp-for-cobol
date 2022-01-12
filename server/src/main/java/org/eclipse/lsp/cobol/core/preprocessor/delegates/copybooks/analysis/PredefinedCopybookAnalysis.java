@@ -13,12 +13,13 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookService;
 
@@ -27,10 +28,10 @@ import java.util.function.Consumer;
 import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBLC;
 
 /**
- * This implementation of the {@link CopybookAnalysis} resolves only the DFHEIBLC copybook under the
- * LINKAGE SECTION.
+ * This implementation of the {@link AbstractCopybookAnalysis} resolves only the DFHEIBLC copybook
+ * under the LINKAGE SECTION.
  */
-class PredefinedCopybookAnalysis extends CopybookAnalysis {
+class PredefinedCopybookAnalysis extends AbstractCopybookAnalysis {
   PredefinedCopybookAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
