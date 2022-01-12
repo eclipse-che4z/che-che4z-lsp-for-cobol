@@ -26,7 +26,7 @@ export const DOWNLOAD_QUEUE_LOCKED_ERROR_MSG = `Invalid credentials for profile:
 export const UNLOCK_DOWNLOAD_QUEUE_MSG = "Unblock and retry";
 export const INVALID_CREDENTIALS_ERROR_MSG = `Incorrect credentials in Zowe profile ${PROFILE_NAME_PLACEHOLDER}.`;
 export const PROCESS_DOWNLOAD_ERROR_MSG = "Some copybooks could not be located. Ensure your configuration contains correct paths to copybooks, including nested copybooks. Missing copybooks: ";
-export const SPECIFY_DSN_OR_USS = "Please specify DSNs or USS paths for copybooks in settings.";
+export const PROVIDE_PROFILE_MSG = "Please specify a valid Zowe Explorer profile to download copybooks from the mainframe.";
 export const SEGMENT_PLACEHOLDER = "<segment>";
 export const DSN_MUSTBE_NOT_EMPTY = "Dataset name segment must not be empty.";
 export const DSN_NOMORE_8CHARS = "Dataset name segment can't be more than 8 characters.";
@@ -41,6 +41,7 @@ export const COPYBOOK_CPY_EXT = ".CPY";
 export const COPYBOOK_EXT_ARRAY = [COPYBOOK_CPY_EXT];
 export const EXTENSION_ID = "broadcommfd.cobol-language-support";
 export const TELEMETRY_DEFAULT_CONTENT = "INVALID_INSTRUMENTATION_KEY";
+export const ZOWE_EXT_MISSING_MSG = "Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe."
 
 export enum PUNCH_CARD {
     SEQUENCE_AREA_END_POS = 6,

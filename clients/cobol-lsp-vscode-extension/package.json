@@ -109,7 +109,7 @@
             "properties": {
                 "cobol-lsp.cpy-manager.profiles": {
                     "type": "string",
-                    "description": "Current default profile for copybook downloader"
+                    "description": "Current default profile for copybook downloader\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe"
                 },
                 "cobol-lsp.cpy-manager.paths-local": {
                     "type": "array",
@@ -124,7 +124,7 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "Default list of datasets to search for copybooks",
+                    "description": "Default list of datasets to search for copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
                     "uniqueItems": true
                 },
                 "cobol-lsp.cpy-manager.paths-uss": {
@@ -132,7 +132,7 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "Default list of USS paths to search for copybooks",
+                    "description": "Default list of USS paths to search for copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
                     "uniqueItems": true
                 },
                 "cobol-lsp.subroutine-manager.paths-local": {

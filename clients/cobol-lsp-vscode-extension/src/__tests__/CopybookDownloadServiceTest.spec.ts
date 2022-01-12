@@ -21,7 +21,7 @@ import * as vscode from "vscode";
 import {
     C4Z_FOLDER,
     COPYBOOKS_FOLDER, DOWNLOAD_QUEUE_LOCKED_ERROR_MSG,
-    PROCESS_DOWNLOAD_ERROR_MSG, PROFILE_NAME_PLACEHOLDER, UNLOCK_DOWNLOAD_QUEUE_MSG,
+    PROFILE_NAME_PLACEHOLDER, PROVIDE_PROFILE_MSG, UNLOCK_DOWNLOAD_QUEUE_MSG,
 } from "../constants";
 import { CopybookDownloadService } from "../services/copybook/CopybookDownloadService";
 import {
@@ -140,8 +140,8 @@ describe("Test fetchCopybook against bad and correct configurations", () => {
         spyOnErrorMessage.mockResolvedValue("Change settings" as any);
         const result = await (CopybookDownloadService as any).fetchCopybook("TEST", copybookProfile);
         expect(result).toBeFalsy();
-        expect(spyOnErrorMessage).toBeCalledWith("Can't read members of dataset: TEST", "Change settings");
-        expect(vscode.window.showErrorMessage).toBeCalledWith("Error");
+        expect(spyOnErrorMessage).toBeCalledWith(err.message);
+        expect(vscode.window.showErrorMessage).toBeCalledWith(err.message);
     });
 });
 describe("Receiving an error from zowe api layer, copybooks are not retrivied and user is correctly notified", () => {
@@ -246,26 +246,45 @@ describe("Test downloadCopybook user interaction", () => {
         (copybooksDownloadService as any).queue.push = queuePush;
         (copybooksDownloadService as any).lockedProfile = new Set([wrongCredProfile]);
         vscode.window.showErrorMessage = jest.fn().mockResolvedValue(undefined);
+        (CopybookDownloadService as any).isEligibleForCopybookDownload = jest.fn().mockReturnValue(true);
+        ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
+    });
+
+    test("check download fails and pass message when download parameters are not provided", async () => {
+        (checkWorkspace as any) = jest.fn().mockReturnValue(false);
+        (CopybookDownloadService as any).isEligibleForCopybookDownload = jest.fn().mockReturnValue(false);
+        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
+        expect(vscode.window.showErrorMessage).toBeCalledWith("Some copybooks could not be located. Ensure your configuration contains correct paths to copybooks, including nested copybooks. Missing copybooks: copybook", "Change settings");
+        expect(queuePush).not.toBeCalled();
+    });
+
+    test("check download fails when ZE is not installed", async () => {
+        (checkWorkspace as any) = jest.fn().mockReturnValue(false);
+        ZoweVsCodeExtension.getZoweExplorerApi = jest.fn().mockReturnValue(undefined);
+        (CopybookDownloadService as any).isEligibleForCopybookDownload = jest.fn().mockReturnValue(true);
+        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
+        expect(vscode.window.showErrorMessage).toBeCalledWith("Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe.");
+        expect(queuePush).not.toBeCalled();
     });
 
     test("check workspace fail", async () => {
         (checkWorkspace as any) = jest.fn().mockReturnValue(false);
-        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"]);
+        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
         expect(vscode.window.showErrorMessage).not.toBeCalled();
         expect(queuePush).not.toBeCalled();
     });
 
     test("check profile not found", async () => {
         ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(undefined);
-        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"]);
-        expect(vscode.window.showErrorMessage).not.toBeCalled();
+        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
+        expect(vscode.window.showErrorMessage).toBeCalledWith("Please specify a valid Zowe Explorer profile to download copybooks from the mainframe.", "Change settings");
         expect(queuePush).not.toBeCalled();
     });
 
     test("check profile not found with user interaction", async () => {
         ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(undefined);
         await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
-        expect(vscode.window.showErrorMessage).toBeCalledWith(PROCESS_DOWNLOAD_ERROR_MSG + "copybook", anything());
+        expect(vscode.window.showErrorMessage).toBeCalledWith(PROVIDE_PROFILE_MSG , anything());
         expect(queuePush).not.toBeCalled();
     });
 
