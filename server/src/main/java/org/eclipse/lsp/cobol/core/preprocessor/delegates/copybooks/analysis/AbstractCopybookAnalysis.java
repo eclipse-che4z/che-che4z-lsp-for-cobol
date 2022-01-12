@@ -24,8 +24,8 @@ import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
@@ -74,13 +74,7 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
     this.maxCopybookNameLength = maxCopybookNameLength;
   }
 
-  /**
-   * Handle the copy statement applying the logic according to the specific implementation.
-   *
-   * @param context
-   * @param copySource
-   * @return the functions that should be applied to the preprocessor
-   */
+  @Override
   public PreprocessorFunctor handleCopybook(
       ParserRuleContext context,
       ParserRuleContext copySource,
@@ -101,10 +95,10 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
                                   .copybookId(randomUUID().toString())
                                   .config(config)
                                   .nameLocality(
-                                      PreprocessorUtils.buildLocality(
+                                      LocalityUtils.buildLocality(
                                           copySource, documentUri, copybookStack.peek()))
                                   .contextLocality(
-                                      PreprocessorUtils.buildLocality(
+                                      LocalityUtils.buildLocality(
                                           context, documentUri, copybookStack.peek()))
                                   .build())
                           .unwrap(errors::addAll);

@@ -30,8 +30,7 @@ import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
@@ -116,7 +115,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         documentUri,
         new DocumentMapping(
             tokens.getTokens().stream()
-                .map(PreprocessorUtils.toLocality(documentUri, copybookStack.peek()))
+                .map(LocalityUtils.toLocality(documentUri, copybookStack.peek()))
                 .collect(toList()),
             shifts));
     return new ResultWithErrors<>(
@@ -377,6 +376,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private Locality getLocality(ParserRuleContext ctx) {
-    return PreprocessorUtils.buildLocality(ctx, documentUri, copybookStack.peek());
+    return LocalityUtils.buildLocality(ctx, documentUri, copybookStack.peek());
   }
 }

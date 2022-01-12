@@ -32,7 +32,7 @@ import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityFindingUtils;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
@@ -244,7 +244,7 @@ public class CobolLanguageEngine {
     return err ->
         err.toBuilder()
             .locality(
-                LocalityFindingUtils.findPreviousVisibleLocality(err.getOffendedToken(), mapping))
+                LocalityUtils.findPreviousVisibleLocality(err.getOffendedToken(), mapping))
             .suggestion(messageService.getMessage(err.getSuggestion()))
             .build();
   }

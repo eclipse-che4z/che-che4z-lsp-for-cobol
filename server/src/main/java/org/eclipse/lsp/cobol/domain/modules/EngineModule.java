@@ -35,8 +35,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndic
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingServiceImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingServiceImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
 import org.eclipse.lsp.cobol.core.visitor.InterruptingTreeListener;

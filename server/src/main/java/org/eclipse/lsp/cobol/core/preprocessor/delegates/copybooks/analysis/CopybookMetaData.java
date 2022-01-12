@@ -23,7 +23,8 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 
 /**
- * This value represents the metadata of the analysing copybook that is retrieved from the context
+ * This value class represents the metadata of the analysing copybook that is retrieved from the
+ * context
  */
 @Value
 @Builder

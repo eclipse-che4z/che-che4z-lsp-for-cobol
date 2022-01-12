@@ -18,8 +18,8 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.util.impl;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingServiceImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingServiceImpl;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
