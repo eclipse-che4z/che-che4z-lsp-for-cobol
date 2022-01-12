@@ -18,9 +18,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
-import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.CobolLine;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
@@ -28,9 +30,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesT
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 
 /**
@@ -80,13 +80,7 @@ public class TextPreprocessorImpl implements TextPreprocessor {
     ThreadInterruptionUtil.checkThreadInterrupted();
     List<SyntaxError> errors = new ArrayList<>();
     ExtendedDocument extendedDocument =
-        processCleanCode(
-                documentUri,
-                cobolSourceCode,
-                new ArrayDeque<>(),
-                copybookConfig,
-                new ArrayDeque<>(),
-                new ArrayList<>())
+        processCleanCode(documentUri, cobolSourceCode, copybookConfig, new CopybookHierarchy())
             .unwrap(errors::addAll);
     return new ResultWithErrors<>(extendedDocument, errors);
   }
@@ -97,7 +91,6 @@ public class TextPreprocessorImpl implements TextPreprocessor {
    *
    * @param documentUri - URI of the processing document
    * @param cobolCode - source code to analyze
-   * @param copybookStack - stack that contains the previous document hierarchy
    * @param copybookConfig contains config info like: copybook processing mode, backend server
    * @return - the extended document of that text and all the found errors
    */
@@ -106,20 +99,12 @@ public class TextPreprocessorImpl implements TextPreprocessor {
   public ResultWithErrors<ExtendedDocument> processCleanCode(
       @NonNull String documentUri,
       @NonNull String cobolCode,
-      @NonNull Deque<CopybookUsage> copybookStack,
       @NonNull CopybookConfig copybookConfig,
-      @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
-      @NonNull List<Pair<String, String>> replacingClauses) {
+      @NonNull CopybookHierarchy hierarchy) {
     List<SyntaxError> errors = new ArrayList<>();
     ExtendedDocument parsedDocument =
         grammarPreprocessor
-            .buildExtendedDocument(
-                documentUri,
-                cobolCode,
-                copybookStack,
-                copybookConfig,
-                recursiveReplaceStmtStack,
-                replacingClauses)
+            .buildExtendedDocument(documentUri, cobolCode, copybookConfig, hierarchy)
             .unwrap(errors::addAll);
 
     return new ResultWithErrors<>(parsedDocument, errors);

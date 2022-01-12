@@ -17,18 +17,15 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookService;
 
-import java.util.Deque;
-import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -45,19 +42,14 @@ class SkippingAnalysis extends AbstractCopybookAnalysis {
 
   @Override
   protected ResultWithErrors<ExtendedDocument> processCopybook(
-      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
-      List<Pair<String, String>> replacingClauses,
-      Deque<CopybookUsage> copybookStack,
-      CopybookMetaData metaData,
-      String uri,
-      String content) {
+      CopybookMetaData metaData, CopybookHierarchy hierarchy, String uri, String content) {
     return new ResultWithErrors<>(
         new ExtendedDocument("", "", new NamedSubContext(), ImmutableMap.of()), ImmutableList.of());
   }
 
   @Override
   protected ResultWithErrors<CopybookModel> getCopyBookContent(
-      CopybookMetaData metaData, Deque<CopybookUsage> copybookStack) {
+      CopybookMetaData metaData, CopybookHierarchy hierarchy) {
     return emptyModel(metaData.getName(), ImmutableList.of());
   }
 

@@ -29,6 +29,7 @@ import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
@@ -58,8 +59,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   private final List<SyntaxError> errors = new ArrayList<>();
   private final Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
-  private final List<Pair<String, String>> copyReplacingClauses = new ArrayList<>();
-  private final List<Pair<String, String>> replacingClauses;
   private final NamedSubContext copybooks = new NamedSubContext();
   private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
   private final Map<Integer, Integer> shifts = new HashMap<>();
@@ -68,33 +67,27 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private final String documentUri;
   private final BufferedTokenStream tokens;
   private final CopybookConfig copybookConfig;
-  private final Deque<CopybookUsage> copybookStack;
   private final ReplacingService replacingService;
   private final MessageService messageService;
-  private final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack;
   private final CopybookAnalysisFactory analysisFactory;
+  private final CopybookHierarchy hierarchy;
 
   @Inject
-  @SuppressWarnings("squid:S107")
   GrammarPreprocessorListenerImpl(
       @Assisted String documentUri,
       @Assisted BufferedTokenStream tokens,
-      @Assisted Deque<CopybookUsage> copybookStack,
       @Assisted CopybookConfig copybookConfig,
-      @Assisted Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
-      @Assisted List<Pair<String, String>> replacingClauses,
+      @Assisted CopybookHierarchy hierarchy,
       ReplacingService replacingService,
       MessageService messageService,
       CopybookAnalysisFactory analysisFactory) {
     this.documentUri = documentUri;
     this.tokens = tokens;
-    this.copybookStack = copybookStack;
     this.copybookConfig = copybookConfig;
     this.replacingService = replacingService;
     this.messageService = messageService;
-    this.recursiveReplaceStmtStack = recursiveReplaceStmtStack;
-    this.replacingClauses = replacingClauses;
     this.analysisFactory = analysisFactory;
+    this.hierarchy = hierarchy;
     textAccumulator.push(new StringBuilder());
   }
 
@@ -106,16 +99,16 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @NonNull
   @Override
   public ResultWithErrors<ExtendedDocument> getResult() {
-    if (!replacingClauses.isEmpty()) {
+    if (hierarchy.requiresReplacing()) {
       String replaceableStmt = peek().toString();
-      String content = handleReplace(replaceableStmt);
+      String content = handleReplace(replaceableStmt, hierarchy.getTextReplacingClauses());
       mergeAndUpdateTopTwoElement(content);
     }
     nestedMappings.put(
         documentUri,
         new DocumentMapping(
             tokens.getTokens().stream()
-                .map(LocalityUtils.toLocality(documentUri, copybookStack.peek()))
+                .map(LocalityUtils.toLocality(documentUri, hierarchy.getCurrentCopybook()))
                 .collect(toList()),
             shifts));
     return new ResultWithErrors<>(
@@ -251,10 +244,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     analysisFactory
         .getInstanceFor(type)
         .handleCopybook(context, copyContext, copybookConfig, documentUri)
-        .apply(copyReplacingClauses)
-        .apply(copybookStack)
-        .apply(recursiveReplaceStmtStack)
-        .apply(replacingClauses)
+        .apply(hierarchy)
         .apply(this)
         .apply(copybooks)
         .apply(nestedMappings)
@@ -268,7 +258,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitReplaceLiteral(ReplaceLiteralContext ctx) {
-    copyReplacingClauses.add(replacingService.retrieveTokenReplacingPattern(read()));
+    hierarchy.addCopyReplacing(replacingService.retrieveTokenReplacingPattern(read()));
     pop();
   }
 
@@ -284,8 +274,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         replacingService.retrievePseudoTextReplacingPattern(read());
     if (clauseResponse.getErrors().isEmpty()) {
       if (ctx.getParent() instanceof ReplaceClauseContext)
-        copyReplacingClauses.add(clauseResponse.getResult());
-      else replacingClauses.add(clauseResponse.getResult());
+        hierarchy.addCopyReplacing(clauseResponse.getResult());
+      else hierarchy.addTextReplacing(clauseResponse.getResult());
     } else {
       clauseResponse.getErrors().forEach(it -> reportPseudoTextError(ctx, it));
     }
@@ -310,12 +300,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitReplaceOffStatement(ReplaceOffStatementContext ctx) {
-    replacingClauses.clear();
+    hierarchy.finishReplace();
     pop();
     accumulateTokenShift(ctx);
   }
 
-  private String handleReplace(String replaceableStmt) {
+  private String handleReplace(
+      String replaceableStmt, List<Pair<String, String>> replacingClauses) {
     return applyReplacing(replaceableStmt, replacingClauses);
   }
 
@@ -376,6 +367,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private Locality getLocality(ParserRuleContext ctx) {
-    return LocalityUtils.buildLocality(ctx, documentUri, copybookStack.peek());
+    return LocalityUtils.buildLocality(ctx, documentUri, hierarchy.getCurrentCopybook());
   }
 }

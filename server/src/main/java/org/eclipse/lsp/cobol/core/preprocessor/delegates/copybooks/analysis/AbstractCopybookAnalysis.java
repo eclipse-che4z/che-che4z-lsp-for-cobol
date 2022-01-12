@@ -19,9 +19,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
@@ -34,12 +34,14 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.util.UUID.randomUUID;
-import static java.util.stream.Collectors.toList;
 import static org.codehaus.plexus.util.StringUtils.isEmpty;
 import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
@@ -80,48 +82,39 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
       ParserRuleContext copySource,
       CopybookConfig config,
       String documentUri) {
-    return copyReplacingClauses ->
-        copybookStack ->
-            recursiveReplaceStack ->
-                replacingClauses -> {
-                  List<SyntaxError> errors = new ArrayList<>();
-                  CopybookMetaData metaData =
-                      validateMetaData(maxCopybookNameLength)
-                          .apply(
-                              CopybookMetaData.builder()
-                                  .name(retrieveCopybookName(copySource))
-                                  .context(context)
-                                  .documentUri(documentUri)
-                                  .copybookId(randomUUID().toString())
-                                  .config(config)
-                                  .nameLocality(
-                                      LocalityUtils.buildLocality(
-                                          copySource, documentUri, copybookStack.peek()))
-                                  .contextLocality(
-                                      LocalityUtils.buildLocality(
-                                          context, documentUri, copybookStack.peek()))
-                                  .build())
-                          .unwrap(errors::addAll);
+    return hierarchy -> {
+      List<SyntaxError> errors = new ArrayList<>();
+      CopybookMetaData metaData =
+          validateMetaData(maxCopybookNameLength)
+              .apply(
+                  CopybookMetaData.builder()
+                      .name(retrieveCopybookName(copySource))
+                      .context(context)
+                      .documentUri(documentUri)
+                      .copybookId(randomUUID().toString())
+                      .config(config)
+                      .nameLocality(
+                          LocalityUtils.buildLocality(
+                              copySource, documentUri, hierarchy.getCurrentCopybook()))
+                      .contextLocality(
+                          LocalityUtils.buildLocality(
+                              context, documentUri, hierarchy.getCurrentCopybook()))
+                      .build())
+              .unwrap(errors::addAll);
 
-                  ExtendedDocument copybookDocument =
-                      buildExtendedDocumentForCopybook(metaData)
-                          .apply(copyReplacingClauses)
-                          .apply(copybookStack)
-                          .apply(recursiveReplaceStack)
-                          .apply(replacingClauses)
-                          .unwrap(errors::addAll);
-                  return stack -> {
-                    writeText(metaData, copybookDocument).accept(stack);
-                    return subContext -> {
-                      storeCopyStatementSemantics(metaData, copybookDocument).accept(subContext);
-                      return nestedMappings -> {
-                        collectNestedSemanticData(metaData, copybookDocument)
-                            .accept(nestedMappings);
-                        return allErrors -> allErrors.addAll(errors);
-                      };
-                    };
-                  };
-                };
+      ExtendedDocument copybookDocument =
+          buildExtendedDocumentForCopybook(metaData).apply(hierarchy).unwrap(errors::addAll);
+      return stack -> {
+        writeText(metaData, copybookDocument).accept(stack);
+        return subContext -> {
+          storeCopyStatementSemantics(metaData, copybookDocument).accept(subContext);
+          return nestedMappings -> {
+            collectNestedSemanticData(metaData, copybookDocument).accept(nestedMappings);
+            return allErrors -> allErrors.addAll(errors);
+          };
+        };
+      };
+    };
   }
 
   private Function<CopybookMetaData, ResultWithErrors<CopybookMetaData>> validateMetaData(
@@ -180,40 +173,26 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
         .andThen(addNestedCopybook(copybookDocument));
   }
 
-  private Function<
-          List<Pair<String, String>>,
-          Function<
-              Deque<CopybookUsage>,
-              Function<
-                  Deque<List<Pair<String, String>>>,
-                  Function<List<Pair<String, String>>, ResultWithErrors<ExtendedDocument>>>>>
+  private Function<CopybookHierarchy, ResultWithErrors<ExtendedDocument>>
       buildExtendedDocumentForCopybook(CopybookMetaData metaData) {
     List<SyntaxError> errors = new ArrayList<>();
-    return copyReplacingClauses ->
-        copybookStack ->
-            recursiveReplaceStack ->
-                replacingClauses -> {
-                  CopybookModel model =
-                      getCopyBookContent(metaData, copybookStack).unwrap(errors::addAll);
-                  return new ResultWithErrors<>(
-                      processCopybook(
-                              recursiveReplaceStack,
-                              replacingClauses,
-                              copybookStack,
-                              metaData,
-                              model.getUri(),
-                              handleReplacing(
-                                      copyReplacingClauses,
-                                      recursiveReplaceStack,
-                                      copybookStack,
-                                      metaData,
-                                      preprocessor
-                                          .cleanUpCode(model.getUri(), model.getContent())
-                                          .unwrap(errors::addAll))
-                                  .unwrap(errors::addAll))
-                          .unwrap(errors::addAll),
-                      errors);
-                };
+    return hierarchy -> {
+      CopybookModel model = getCopyBookContent(metaData, hierarchy).unwrap(errors::addAll);
+      return new ResultWithErrors<>(
+          processCopybook(
+                  metaData,
+                  hierarchy,
+                  model.getUri(),
+                  handleReplacing(
+                          metaData,
+                          hierarchy,
+                          preprocessor
+                              .cleanUpCode(model.getUri(), model.getContent())
+                              .unwrap(errors::addAll))
+                      .unwrap(errors::addAll))
+              .unwrap(errors::addAll),
+          errors);
+    };
   }
 
   private Consumer<Map<String, DocumentMapping>> collectNestedSemanticData(
@@ -228,44 +207,30 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
   }
 
   protected ResultWithErrors<ExtendedDocument> processCopybook(
-      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
-      List<Pair<String, String>> replacingClauses,
-      Deque<CopybookUsage> copybookStack,
-      CopybookMetaData metaData,
-      String uri,
-      String content) {
-    copybookStack.push(metaData.toCopybookUsage());
+      CopybookMetaData metaData, CopybookHierarchy hierarchy, String uri, String content) {
+    hierarchy.push(metaData.toCopybookUsage());
     final ResultWithErrors<ExtendedDocument> result =
-        preprocessor.processCleanCode(
-            uri,
-            content,
-            copybookStack,
-            metaData.getConfig(),
-            recursiveReplaceStmtStack,
-            replacingClauses);
-    copybookStack.pop();
-    if (Objects.nonNull(recursiveReplaceStmtStack.peek())) recursiveReplaceStmtStack.pop();
+        preprocessor.processCleanCode(uri, content, metaData.getConfig(), hierarchy);
+    hierarchy.pop();
     return result;
   }
 
   protected ResultWithErrors<CopybookModel> getCopyBookContent(
-      CopybookMetaData metaData, Deque<CopybookUsage> copybookStack) {
-    List<SyntaxError> errors = new ArrayList<>();
-    if (metaData.getName().isEmpty()) return emptyModel(metaData.getName(), errors);
+      CopybookMetaData metaData, CopybookHierarchy hierarchy) {
+    if (metaData.getName().isEmpty()) return emptyModel(metaData.getName(), ImmutableList.of());
 
-    if (hasRecursion(metaData.getName(), copybookStack)) {
-      errors.addAll(copybookStack.stream().map(this::reportRecursiveCopybook).collect(toList()));
-      return emptyModel(metaData.getName(), errors);
-    }
+    if (hierarchy.hasRecursion(metaData.getName()))
+      return emptyModel(metaData.getName(), hierarchy.mapCopybooks(this::reportRecursiveCopybook));
 
     CopybookModel copybook =
         copybookService.resolve(
             metaData.getName(), metaData.getDocumentUri(), metaData.getConfig());
+
     if (copybook.getContent() == null) {
       return emptyModel(metaData.getName(), ImmutableList.of(reportMissingCopybooks(metaData)));
     }
 
-    return new ResultWithErrors<>(copybook, errors);
+    return new ResultWithErrors<>(copybook, ImmutableList.of());
   }
 
   protected String retrieveCopybookName(ParserRuleContext ctx) {
@@ -303,16 +268,8 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
   }
 
   protected ResultWithErrors<String> handleReplacing(
-      List<Pair<String, String>> copyReplacingClauses,
-      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
-      Deque<CopybookUsage> copybookStack,
-      CopybookMetaData metaData,
-      String text) {
+      CopybookMetaData metaData, CopybookHierarchy hierarchy, String text) {
     return new ResultWithErrors<>(text, ImmutableList.of());
-  }
-
-  private boolean hasRecursion(String copybookName, Deque<CopybookUsage> copybookStack) {
-    return copybookStack.stream().map(CopybookUsage::getName).anyMatch(copybookName::equals);
   }
 
   private Consumer<PreprocessorStack> writeCopybook(String copybookId, String copybookContent) {

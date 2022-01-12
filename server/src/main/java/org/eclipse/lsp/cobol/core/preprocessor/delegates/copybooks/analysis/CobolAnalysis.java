@@ -15,17 +15,15 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
 import org.eclipse.lsp.cobol.service.CopybookService;
 
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
@@ -50,18 +48,11 @@ class CobolAnalysis extends AbstractCopybookAnalysis {
 
   @Override
   protected ResultWithErrors<String> handleReplacing(
-      List<Pair<String, String>> copyReplacingClauses,
-      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
-      Deque<CopybookUsage> copybookStack,
-      CopybookMetaData metaData,
-      String text) {
+      CopybookMetaData metaData, CopybookHierarchy hierarchy, String text) {
     // In a chain of copy statement, there could be only one replacing phrase
     List<SyntaxError> errors = new ArrayList<>();
-    if (!copyReplacingClauses.isEmpty()) {
-      recursiveReplaceStmtStack.add(new ArrayList<>(copyReplacingClauses));
-      copyReplacingClauses.clear();
-    }
-    if (recursiveReplaceStmtStack.size() > 1 && !copybookStack.isEmpty())
+    hierarchy.collapseCopyReplacing();
+    if (hierarchy.containsRecursiveReplacement())
       errors.add(
           addCopybookError(
               metaData.getName(),
@@ -71,8 +62,6 @@ class CobolAnalysis extends AbstractCopybookAnalysis {
               "Syntax error by checkRecursiveReplaceStatement: {}"));
 
     return new ResultWithErrors<>(
-        recursiveReplaceStmtStack.stream()
-            .reduce(text, replacingService::applyReplacing, (raw, res) -> res),
-        errors);
+        hierarchy.replaceText(text, replacingService::applyReplacing), errors);
   }
 }

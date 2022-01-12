@@ -23,10 +23,10 @@ import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListener;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacePreProcessorListener;
@@ -34,7 +34,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingServ
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 
 /**
@@ -62,12 +61,11 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   public ResultWithErrors<ExtendedDocument> buildExtendedDocument(
       @NonNull String uri,
       @NonNull String code,
-      @NonNull Deque<CopybookUsage> copybookStack,
       @NonNull CopybookConfig copybookConfig,
-      @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
-      @NonNull List<Pair<String, String>> replacingClauses) {
+      @NonNull CopybookHierarchy hierarchy) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    ReplacePreProcessorListener replaceListener = handleReplaceClauses(code, uri, replacingClauses);
+    ReplacePreProcessorListener replaceListener =
+        handleReplaceClauses(code, uri, hierarchy.getTextReplacingClauses());
     List<SyntaxError> errors = new ArrayList<>();
     code = replaceListener.getResult().unwrap(errors::addAll).getText();
     Lexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
@@ -82,13 +80,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
 
     ParseTreeWalker walker = new ParseTreeWalker();
     GrammarPreprocessorListener listener =
-        listenerFactory.create(
-            uri,
-            tokens,
-            copybookStack,
-            copybookConfig,
-            recursiveReplaceStmtStack,
-            replacingClauses);
+        listenerFactory.create(uri, tokens, copybookConfig, hierarchy);
     walker.walk(listener, startRule);
     return new ResultWithErrors<>(listener.getResult().unwrap(errors::addAll), errors);
   }
