@@ -29,12 +29,10 @@ import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
-import org.eclipse.lsp.cobol.service.CopybookService;
 
 import java.util.*;
 
@@ -43,6 +41,8 @@ import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Token.EOF;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.CopybookAnalysisFactory.AnalysisTypes;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.CopybookAnalysisFactory.AnalysisTypes.*;
 
 /**
  * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
@@ -67,12 +67,11 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private final String documentUri;
   private final BufferedTokenStream tokens;
   private final CopybookConfig copybookConfig;
-  private final TextPreprocessor preprocessor;
-  private final CopybookService copybookService;
   private final Deque<CopybookUsage> copybookStack;
   private final ReplacingService replacingService;
   private final MessageService messageService;
   private final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack;
+  private final CopybookAnalysisFactory analysisFactory;
 
   @Inject
   @SuppressWarnings("squid:S107")
@@ -83,20 +82,18 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       @Assisted CopybookConfig copybookConfig,
       @Assisted Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
       @Assisted List<Pair<String, String>> replacingClauses,
-      TextPreprocessor preprocessor,
-      CopybookService copybookService,
       ReplacingService replacingService,
-      MessageService messageService) {
+      MessageService messageService,
+      CopybookAnalysisFactory analysisFactory) {
     this.documentUri = documentUri;
     this.tokens = tokens;
     this.copybookStack = copybookStack;
     this.copybookConfig = copybookConfig;
-    this.preprocessor = preprocessor;
-    this.copybookService = copybookService;
     this.replacingService = replacingService;
     this.messageService = messageService;
     this.recursiveReplaceStmtStack = recursiveReplaceStmtStack;
     this.replacingClauses = replacingClauses;
+    this.analysisFactory = analysisFactory;
     textAccumulator.push(new StringBuilder());
   }
 
@@ -174,16 +171,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitLinkageSection(LinkageSectionContext ctx) {
-    new PredefinedCopybookAnalysis(preprocessor, copybookService, messageService)
-        .handleCopybook(ctx, ctx, copybookConfig, documentUri)
-        .apply(copyReplacingClauses)
-        .apply(copybookStack)
-        .apply(recursiveReplaceStmtStack)
-        .apply(replacingClauses)
-        .apply(this)
-        .apply(copybooks)
-        .apply(nestedMappings)
-        .accept(errors);
+    analyzeCopybook(PREDEFINED, ctx, ctx);
   }
 
   @Override
@@ -194,17 +182,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyIdmsStatement(@NonNull CopyIdmsStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new DialectCopybookAnalysis(preprocessor, copybookService, messageService)
-        .handleCopybook(
-            ctx, ctx.copyIdmsOptions().copyIdmsSource().copySource(), copybookConfig, documentUri)
-        .apply(copyReplacingClauses)
-        .apply(copybookStack)
-        .apply(recursiveReplaceStmtStack)
-        .apply(replacingClauses)
-        .apply(this)
-        .apply(copybooks)
-        .apply(nestedMappings)
-        .accept(errors);
+    analyzeCopybook(DIALECT, ctx, ctx.copyIdmsOptions().copyIdmsSource().copySource());
   }
 
   @Override
@@ -221,29 +199,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       levelNumber
           .map(ParseTree::getText)
           .map(Integer::parseInt)
-          .ifPresent(
-              it ->
-                  new DialectCopybookAnalysis(preprocessor, copybookService, messageService)
-                      .handleCopybook(ctx, copySource, copybookConfig, documentUri)
-                      .apply(copyReplacingClauses)
-                      .apply(copybookStack)
-                      .apply(recursiveReplaceStmtStack)
-                      .apply(replacingClauses)
-                      .apply(this)
-                      .apply(copybooks)
-                      .apply(nestedMappings)
-                      .accept(errors));
-    else
-      new SkippingAnalysis(preprocessor, copybookService, messageService)
-          .handleCopybook(ctx, copySource, copybookConfig, documentUri)
-          .apply(copyReplacingClauses)
-          .apply(copybookStack)
-          .apply(recursiveReplaceStmtStack)
-          .apply(replacingClauses)
-          .apply(this)
-          .apply(copybooks)
-          .apply(nestedMappings)
-          .accept(errors);
+          .ifPresent(it -> analyzeCopybook(DIALECT, ctx, copySource));
+    else analyzeCopybook(SKIPPING, ctx, copySource);
   }
 
   @Override
@@ -254,16 +211,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new PanvaletAnalysis(preprocessor, copybookService, messageService)
-        .handleCopybook(ctx, ctx.copySource(), copybookConfig, documentUri)
-        .apply(copyReplacingClauses)
-        .apply(copybookStack)
-        .apply(recursiveReplaceStmtStack)
-        .apply(replacingClauses)
-        .apply(this)
-        .apply(copybooks)
-        .apply(nestedMappings)
-        .accept(errors);
+    analyzeCopybook(PANVALET, ctx, ctx.copySource());
   }
 
   @Override
@@ -274,16 +222,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new CobolAnalysis(preprocessor, copybookService, messageService, replacingService)
-        .handleCopybook(ctx, ctx.copySource(), copybookConfig, documentUri)
-        .apply(copyReplacingClauses)
-        .apply(copybookStack)
-        .apply(recursiveReplaceStmtStack)
-        .apply(replacingClauses)
-        .apply(this)
-        .apply(copybooks)
-        .apply(nestedMappings)
-        .accept(errors);
+    analyzeCopybook(COBOL, ctx, ctx.copySource());
   }
 
   @Override
@@ -294,16 +233,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    new CobolAnalysis(preprocessor, copybookService, messageService, replacingService)
-        .handleCopybook(ctx, ctx.copySource(), copybookConfig, documentUri)
-        .apply(copyReplacingClauses)
-        .apply(copybookStack)
-        .apply(recursiveReplaceStmtStack)
-        .apply(replacingClauses)
-        .apply(this)
-        .apply(copybooks)
-        .apply(nestedMappings)
-        .accept(errors);
+    analyzeCopybook(COBOL, ctx, ctx.copySource());
   }
 
   private boolean requiresEarlyReturn(ParserRuleContext context) {
@@ -313,6 +243,21 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       return true;
     }
     return false;
+  }
+
+  private void analyzeCopybook(
+      AnalysisTypes type, ParserRuleContext context, ParserRuleContext copyContext) {
+    analysisFactory
+        .getInstanceFor(type)
+        .handleCopybook(context, copyContext, copybookConfig, documentUri)
+        .apply(copyReplacingClauses)
+        .apply(copybookStack)
+        .apply(recursiveReplaceStmtStack)
+        .apply(replacingClauses)
+        .apply(this)
+        .apply(copybooks)
+        .apply(nestedMappings)
+        .accept(errors);
   }
 
   @Override
