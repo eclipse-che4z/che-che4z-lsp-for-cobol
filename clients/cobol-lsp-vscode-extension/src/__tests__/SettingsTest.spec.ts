@@ -14,8 +14,8 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
-import {C4Z_FOLDER, GITIGNORE_FILE} from "../constants";
-import {createFileWithGivenPath} from "../services/Settings";
+import {C4Z_FOLDER, GITIGNORE_FILE, PATHS_LOCAL_KEY, SETTINGS_CPY_SECTION} from "../constants";
+import {createFileWithGivenPath, SettingsService} from "../services/Settings";
 import {SettingsUtils} from "../services/util/SettingsUtils";
 
 const fsPath = "tmp-ws";
@@ -72,5 +72,15 @@ describe("Validate URI generation for a given workspace folder", () => {
         const path = "/ws-vscode";
         (vscode.workspace.workspaceFolders as any) = [{uri: {path, scheme}} as any];
         expect(SettingsUtils.getWorkspacesURI()[0]).toBe("file:///ws-vscode");
+    });
+});
+
+describe("SettingsService evaluate variables", () => {
+    test("Evaluate program_name", () => {
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue(["copybook/$program_name"]),
+        });
+        const paths = SettingsService.getCopybookLocalPath("PROGRAM");
+        expect(paths[0]).toEqual("copybook/PROGRAM")
     });
 });

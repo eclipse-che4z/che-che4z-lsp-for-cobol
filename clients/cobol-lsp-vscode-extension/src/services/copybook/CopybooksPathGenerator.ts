@@ -14,13 +14,14 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
-import { C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_USS, PATHS_ZOWE, SETTINGS_CPY_SECTION } from "../../constants";
+import { C4Z_FOLDER, COPYBOOKS_FOLDER } from "../../constants";
+import { SettingsService } from "../Settings";
 
 export class CopybooksPathGenerator {
 
     public async listUris(): Promise<vscode.Uri[]> {
         const result: vscode.Uri[] = [];
-        const profile: string = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles");
+        const profile: string = SettingsService.getProfileName();
         if (profile) {
             for (const dataset of await this.listDatasets()) {
                 const uri: vscode.Uri = vscode.Uri.file(createDatasetPath(profile, dataset));
@@ -31,11 +32,11 @@ export class CopybooksPathGenerator {
     }
 
     public async listDatasets(): Promise<string[]> {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);
+        return SettingsService.getDsnPath();
     }
 
     public async listUSSPaths(): Promise<string[]> {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_USS);
+        return SettingsService.getUssPath();
     }
 }
 

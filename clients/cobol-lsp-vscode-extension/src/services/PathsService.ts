@@ -18,23 +18,22 @@ import {
     DSN_MUSTBE_NOT_EMPTY,
     DSN_NOMORE_8CHARS,
     DSN_START_PROHIBITED_CHAR,
-    PATHS_ZOWE,
     SEGMENT_PLACEHOLDER,
-    SETTINGS_CPY_SECTION
 } from "../constants";
+import { SettingsService } from "./Settings";
 
 export class PathsService {
 
     async listPathDatasets(): Promise<string[]> {
-        if (!vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).has(PATHS_ZOWE)) {
+        if (!SettingsService.hasDsnPath()) {
             await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
             return [];
         }
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);
+        return SettingsService.getDsnPath();
     }
 
     setPathDatasets(paths: string[]) {
-        vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).update(PATHS_ZOWE, paths);
+        SettingsService.setDsnPath(paths);
     }
 }
 

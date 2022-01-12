@@ -1,7 +1,7 @@
 import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
 import * as path from "path";
 import * as vscode from "vscode";
-import { SETTINGS_CPY_SECTION } from "../../constants";
+import { SettingsService } from "../Settings";
 
 export class ProfileUtils {
     public static getProfileNameForCopybook(cobolFileName: string): (string | undefined) {
@@ -13,7 +13,7 @@ export class ProfileUtils {
     private static getValidProfileForCopybookDownload(programName: string, availableProfiles: string[]): string {
         const profileFromDoc = ProfileUtils.getProfileFromDocument(programName, availableProfiles);
         if (!profileFromDoc) {
-            return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles");
+            return SettingsService.getProfileName();
         }
         return profileFromDoc;
     }
