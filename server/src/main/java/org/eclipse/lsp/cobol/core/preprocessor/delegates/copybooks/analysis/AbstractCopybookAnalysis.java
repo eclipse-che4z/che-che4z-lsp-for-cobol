@@ -85,8 +85,7 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
     return hierarchy -> {
       List<SyntaxError> errors = new ArrayList<>();
       CopybookMetaData metaData =
-          validateMetaData(maxCopybookNameLength)
-              .apply(
+          validateMetaData(
                   CopybookMetaData.builder()
                       .name(retrieveCopybookName(copySource))
                       .context(context)
@@ -117,45 +116,42 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
     };
   }
 
-  private Function<CopybookMetaData, ResultWithErrors<CopybookMetaData>> validateMetaData(
-      int maxCopybookNameLength) {
-    return metaData -> {
-      List<SyntaxError> errors = new ArrayList<>();
-      final String copybookName = metaData.getName();
-      final Locality locality = metaData.getNameLocality();
-      if (copybookName.length() > maxCopybookNameLength) {
-        errors.add(
-            addCopybookError(
-                copybookName,
-                maxCopybookNameLength,
-                locality,
-                INFO,
-                "GrammarPreprocessorListener.copyBkOverMaxChars",
-                SYNTAX_ERROR_CHECK_COPYBOOK_NAME));
-      }
-      // The first or last character must not be a hyphen.
-      if (copybookName.startsWith(HYPHEN) || copybookName.endsWith(HYPHEN)) {
-        errors.add(
-            addCopybookError(
-                copybookName,
-                locality,
-                ERROR,
-                "GrammarPreprocessorListener.copyBkStartsOrEndsWithHyphen",
-                SYNTAX_ERROR_CHECK_COPYBOOK_NAME));
-      }
+  private ResultWithErrors<CopybookMetaData> validateMetaData(CopybookMetaData metaData) {
+    List<SyntaxError> errors = new ArrayList<>();
+    final String copybookName = metaData.getName();
+    final Locality locality = metaData.getNameLocality();
+    if (copybookName.length() > maxCopybookNameLength) {
+      errors.add(
+          addCopybookError(
+              copybookName,
+              maxCopybookNameLength,
+              locality,
+              INFO,
+              "GrammarPreprocessorListener.copyBkOverMaxChars",
+              SYNTAX_ERROR_CHECK_COPYBOOK_NAME));
+    }
+    // The first or last character must not be a hyphen.
+    if (copybookName.startsWith(HYPHEN) || copybookName.endsWith(HYPHEN)) {
+      errors.add(
+          addCopybookError(
+              copybookName,
+              locality,
+              ERROR,
+              "GrammarPreprocessorListener.copyBkStartsOrEndsWithHyphen",
+              SYNTAX_ERROR_CHECK_COPYBOOK_NAME));
+    }
 
-      // copybook Name can't contain _
-      if (copybookName.contains(UNDERSCORE))
-        errors.add(
-            addCopybookError(
-                copybookName,
-                locality,
-                ERROR,
-                "GrammarPreprocessorListener.copyBkContainsUnderScore",
-                SYNTAX_ERROR_CHECK_COPYBOOK_NAME));
+    // copybook Name can't contain _
+    if (copybookName.contains(UNDERSCORE))
+      errors.add(
+          addCopybookError(
+              copybookName,
+              locality,
+              ERROR,
+              "GrammarPreprocessorListener.copyBkContainsUnderScore",
+              SYNTAX_ERROR_CHECK_COPYBOOK_NAME));
 
-      return new ResultWithErrors<>(metaData, errors);
-    };
+    return new ResultWithErrors<>(metaData, errors);
   }
 
   private Consumer<PreprocessorStack> writeText(
