@@ -18,7 +18,6 @@ import com.google.inject.Inject;
 import lombok.NonNull;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
@@ -64,8 +63,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
       @NonNull CopybookConfig copybookConfig,
       @NonNull CopybookHierarchy hierarchy) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    ReplacePreProcessorListener replaceListener =
-        handleReplaceClauses(code, uri, hierarchy.getTextReplacingClauses());
+    ReplacePreProcessorListener replaceListener = handleReplaceClauses(code, uri, hierarchy);
     List<SyntaxError> errors = new ArrayList<>();
     code = replaceListener.getResult().unwrap(errors::addAll).getText();
     Lexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
@@ -86,12 +84,11 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   }
 
   private ReplacePreProcessorListener handleReplaceClauses(
-      String code, String uri, List<Pair<String, String>> replacingClauses) {
+      String code, String uri, CopybookHierarchy hierarchy) {
     Lexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     BufferedTokenStream tokens = new CommonTokenStream(lexer);
     ReplacePreProcessorListener replacePreProcessorListener =
-        new ReplacePreProcessorListener(
-            replacingService, messageService, tokens, uri, replacingClauses);
+        new ReplacePreProcessorListener(replacingService, messageService, tokens, uri, hierarchy);
     CobolPreprocessor parser = new CobolPreprocessor(tokens);
     CobolPreprocessor.StartRuleContext tree = parser.startRule();
     ParseTreeWalker walker = new ParseTreeWalker();

@@ -81,38 +81,6 @@ public interface PreprocessorStack {
     return getTextAccumulator().size() > 1;
   }
 
-  /**
-   * Merge the top 2 elements of the stack.
-   *
-   * <p>For example,
-   *
-   * <table>
-   *   <col width="50%"/>
-   *   <col width="50%"/>
-   *   <thead>
-   *     <tr><th>Initially</th>  <th>After <code>mergeAndUpdateTopTwoElement("elementN")</code></th></tr>
-   *   <thead>
-   *   <tbody>
-   *      <tr><td>|... element1 ...|</td><td></td></tr>
-   *      <tr><td>|... element2 ...|</td><td>|... element2 elementN ...|</td></tr>
-   *      <tr><td>|... element3 ...|</td><td>|... element3 ...|</td></tr>
-   *   </tbody>
-   * </table>
-   *
-   * <p>NOTE:
-   *
-   * <ul>
-   *   <li>1. In case of only single element in stack, element would be updated by passed value.
-   *   <li>2. In case stack is empty, an element would be added with passed value.
-   * </ul>
-   *
-   * @param content value to be updated with.
-   */
-  default void mergeAndUpdateTopTwoElement(String content) {
-    if (!getTextAccumulator().isEmpty()) pop();
-    if (getTextAccumulator().isEmpty()) push();
-    write(content);
-  }
 
   /**
    * Accumulate the token shift for the given context to skip it while building the position mapping

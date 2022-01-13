@@ -27,6 +27,7 @@ import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -49,7 +50,7 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
     implements GrammarPreprocessorListener {
   private final List<SyntaxError> errors = new ArrayList<>();
   private final ReplacingService replacingService;
-  private final List<Pair<String, String>> replacingClauses;
+  private final CopybookHierarchy hierarchy;
   private final BufferedTokenStream tokens;
   private final MessageService messageService;
   private final String documentUri;
@@ -60,12 +61,12 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
       MessageService messageService,
       BufferedTokenStream tokens,
       String documentUri,
-      List<Pair<String, String>> replacingClauses) {
+      CopybookHierarchy hierarchy) {
     this.replacingService = replacingService;
     this.tokens = tokens;
     this.messageService = messageService;
     this.documentUri = documentUri;
-    this.replacingClauses = replacingClauses;
+    this.hierarchy = hierarchy;
     textAccumulator.push(new StringBuilder());
   }
 
@@ -76,22 +77,15 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
 
   @Override
   public ResultWithErrors<ExtendedDocument> getResult() {
-    if (!replacingClauses.isEmpty()) {
+    if (hierarchy.requiresReplacing()) {
       replace();
     }
     return new ResultWithErrors<>(new ExtendedDocument(null, accumulate(), null, null), errors);
   }
 
-  private void replace() {
-    String content = applyReplacing(pop(), replacingClauses);
-    replacingClauses.clear();
-    if (getTextAccumulator().isEmpty()) push();
-    write(content);
-  }
-
   @Override
   public void enterReplaceAreaStart(@NonNull CobolPreprocessor.ReplaceAreaStartContext ctx) {
-    if (!replacingClauses.isEmpty()) {
+    if (hierarchy.requiresReplacing()) {
       replace();
     }
     push();
@@ -109,7 +103,7 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
       ResultWithErrors<Pair<String, String>> clauseResponse =
           replacingService.retrievePseudoTextReplacingPattern(read());
       if (clauseResponse.getErrors().isEmpty()) {
-        replacingClauses.add(clauseResponse.getResult());
+        hierarchy.addTextReplacing(clauseResponse.getResult());
       } else {
         clauseResponse.getErrors().forEach(storeSyntaxErrorConsumer(ctx));
       }
@@ -122,12 +116,11 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
   private Consumer<SyntaxError> storeSyntaxErrorConsumer(
       CobolPreprocessor.ReplacePseudoTextContext ctx) {
     return error -> {
-      Locality locality = retrievePosition(ctx);
       errors.add(
           SyntaxError.syntaxError()
               .severity(ERROR)
               .suggestion(messageService.getMessage(error.getSuggestion()))
-              .locality(locality)
+              .locality(retrievePosition(ctx))
               .build());
       LOG.error("pseudo text can't have COPY ");
     };
@@ -152,13 +145,16 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
   @Override
   public void exitReplaceOffStatement(CobolPreprocessor.ReplaceOffStatementContext ctx) {
     String replaceOffStmt = pop();
-    String content = applyReplacing(read(), replacingClauses);
-    replacingClauses.clear();
-    mergeAndUpdateTopTwoElement(content + replaceOffStmt);
+    String content = replacingService.applyReplacing(pop(), hierarchy.getTextReplacingClauses());
+    hierarchy.clearTextReplacing();
+    write(content + replaceOffStmt);
   }
 
-  private String applyReplacing(String rawContent, List<Pair<String, String>> replacePatterns) {
-    return replacingService.applyReplacing(rawContent, replacePatterns);
+  private void replace() {
+    String content = replacingService.applyReplacing(pop(), hierarchy.getTextReplacingClauses());
+    hierarchy.clearTextReplacing();
+    if (getTextAccumulator().isEmpty()) push();
+    write(content);
   }
 
   @Override

@@ -19,7 +19,10 @@ import lombok.Value;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -135,5 +138,9 @@ public class CopybookHierarchy {
   public String replaceText(
       String text, BiFunction<String, List<Pair<String, String>>, String> accumulator) {
     return recursiveReplaceStmtStack.stream().reduce(text, accumulator, (raw, res) -> res);
+  }
+
+  public void clearTextReplacing() {
+    textReplacingClauses.clear();
   }
 }

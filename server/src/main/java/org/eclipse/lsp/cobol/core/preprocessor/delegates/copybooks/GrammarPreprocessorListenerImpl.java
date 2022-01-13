@@ -270,7 +270,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (clauseResponse.getErrors().isEmpty()) {
       if (ctx.getParent() instanceof ReplaceClauseContext)
         hierarchy.addCopyReplacing(clauseResponse.getResult());
-      else hierarchy.addTextReplacing(clauseResponse.getResult());
+      else
+        hierarchy.addTextReplacing(clauseResponse.getResult());
     } else {
       clauseResponse.getErrors().forEach(it -> reportPseudoTextError(ctx, it));
     }
