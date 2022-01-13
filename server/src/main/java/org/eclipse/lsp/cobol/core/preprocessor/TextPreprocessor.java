@@ -25,11 +25,19 @@ import org.eclipse.lsp.cobol.service.CopybookConfig;
  */
 public interface TextPreprocessor {
 
-  ResultWithErrors<ExtendedDocument> process(
-      String documentUri, String cobolCode, CopybookConfig copybookConfig);
+  /**
+   * Check and clean of the code as per cobol program structure.
+   *
+   * @param documentUri unique resource identifier of the processed document
+   * @param cobolCode the content of the document that should be processed
+   * @return modified code wrapped object and list of syntax error that might send back to the
+   *     client
+   */
+  ResultWithErrors<String> cleanUpCode(String documentUri, String cobolCode);
 
   /**
-   * Process cleaned up code
+   * Process the given source code by removing all the unnecessary tokens and building in the nested
+   * copybook content with tracking the hierarchy of the text documents
    *
    * @param documentUri unique resource identifier of the processed document
    * @param cobolCode cleaned code derived from the content of the document that should be processed
@@ -44,15 +52,4 @@ public interface TextPreprocessor {
       @NonNull CopybookConfig copybookConfig,
       @NonNull CopybookHierarchy hierarchy);
 
-  /**
-   * Checks and clean of the code as per cobol program structure. Like - checking code length
-   * doesn't exceeds 80 char - removing line number and sequence number from source. - concatenating
-   * continued lines - Normalizing files in case of any compiler directives
-   *
-   * @param documentUri unique resource identifier of the processed document
-   * @param cobolCode the content of the document that should be processed
-   * @return modified code wrapped object and list of syntax error that might send back to the
-   *     client
-   */
-  ResultWithErrors<String> cleanUpCode(String documentUri, String cobolCode);
 }

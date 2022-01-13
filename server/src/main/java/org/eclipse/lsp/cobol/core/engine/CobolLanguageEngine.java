@@ -25,15 +25,16 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.core.engine.flavors.FlavorUtils;
 import org.eclipse.lsp.cobol.core.engine.flavors.FlavorOutcome;
+import org.eclipse.lsp.cobol.core.engine.flavors.FlavorUtils;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
@@ -101,14 +102,19 @@ public class CobolLanguageEngine {
     timingBuilder.getFlavorTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     text = preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
-    FlavorOutcome flavorsOutcome = FlavorUtils.process(documentUri, text, analysisConfig.getFlavors())
-        .unwrap(accumulatedErrors::addAll);
+    FlavorOutcome flavorsOutcome =
+        FlavorUtils.process(documentUri, text, analysisConfig.getFlavors())
+            .unwrap(accumulatedErrors::addAll);
     timingBuilder.getFlavorTimer().stop();
 
     timingBuilder.getPreprocessorTimer().start();
     ExtendedDocument extendedDocument =
         preprocessor
-            .process(documentUri, flavorsOutcome.getText(), analysisConfig.getCopybookConfig())
+            .processCleanCode(
+                documentUri,
+                flavorsOutcome.getText(),
+                analysisConfig.getCopybookConfig(),
+                new CopybookHierarchy())
             .unwrap(accumulatedErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
 
@@ -163,7 +169,8 @@ public class CobolLanguageEngine {
     timingBuilder.getLateErrorProcessingTimer().start();
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
     accumulatedErrors.addAll(
-        collectErrorsForCopybooks(accumulatedErrors, extendedDocument.getCopybooks().getDefinitionStatements()));
+        collectErrorsForCopybooks(
+            accumulatedErrors, extendedDocument.getCopybooks().getDefinitionStatements()));
     timingBuilder.getLateErrorProcessingTimer().stop();
 
     if (LOG.isDebugEnabled()) {
@@ -243,8 +250,7 @@ public class CobolLanguageEngine {
   private Function<SyntaxError, SyntaxError> convertError(@NonNull Map<Token, Locality> mapping) {
     return err ->
         err.toBuilder()
-            .locality(
-                LocalityUtils.findPreviousVisibleLocality(err.getOffendedToken(), mapping))
+            .locality(LocalityUtils.findPreviousVisibleLocality(err.getOffendedToken(), mapping))
             .suggestion(messageService.getMessage(err.getSuggestion()))
             .build();
   }

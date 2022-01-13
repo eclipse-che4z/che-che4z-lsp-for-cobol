@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
@@ -42,7 +43,7 @@ import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -133,8 +134,10 @@ class CobolLanguageEngineTest {
                     ImmutableMap.of())));
 
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER);
-    when(preprocessor.cleanUpCode(URI, TEXT)).thenReturn(new ResultWithErrors<>(TEXT, ImmutableList.of()));
-    when(preprocessor.process(URI, TEXT, cpyConfig))
+
+    when(preprocessor.cleanUpCode(URI, TEXT))
+        .thenReturn(new ResultWithErrors<>(TEXT, ImmutableList.of()));
+    when(preprocessor.processCleanCode(eq(URI), eq(TEXT), eq(cpyConfig), any(CopybookHierarchy.class)))
         .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));
 
     Range outlineRange =

@@ -18,7 +18,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
@@ -62,38 +61,17 @@ public class TextPreprocessorImpl implements TextPreprocessor {
     this.indicatorProcessor = indicatorProcessor;
   }
 
-  /**
-   * Process the given source code by removing all the unnecessary tokens and building in the nested
-   * copybook content.
-   *
-   * @param documentUri - URI of the processing document
-   * @param cobolSourceCode - source code to analyze
-   * @param copybookConfig contains config info like: copybook processing mode, backend server
-   * @return - the extended document of that text and all the found errors
-   */
-  @NonNull
   @Override
-  public ResultWithErrors<ExtendedDocument> process(
-      @NonNull String documentUri,
-      @NonNull String cobolSourceCode,
-      @NonNull CopybookConfig copybookConfig) {
-    ThreadInterruptionUtil.checkThreadInterrupted();
+  public ResultWithErrors<String> cleanUpCode(String documentUri, String cobolCode) {
     List<SyntaxError> errors = new ArrayList<>();
-    ExtendedDocument extendedDocument =
-        processCleanCode(documentUri, cobolSourceCode, copybookConfig, new CopybookHierarchy())
-            .unwrap(errors::addAll);
-    return new ResultWithErrors<>(extendedDocument, errors);
+    List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
+    List<CobolLine> transformedLines = transformLines(documentUri, lines).unwrap(errors::addAll);
+    List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
+
+    String code = writer.serialize(rewrittenLines);
+    return new ResultWithErrors<>(code, errors);
   }
 
-  /**
-   * Process the given source code by removing all the unnecessary tokens and building in the nested
-   * copybook content with tracking the hierarchy of the text documents
-   *
-   * @param documentUri - URI of the processing document
-   * @param cobolCode - source code to analyze
-   * @param copybookConfig contains config info like: copybook processing mode, backend server
-   * @return - the extended document of that text and all the found errors
-   */
   @NonNull
   @Override
   public ResultWithErrors<ExtendedDocument> processCleanCode(
@@ -108,17 +86,6 @@ public class TextPreprocessorImpl implements TextPreprocessor {
             .unwrap(errors::addAll);
 
     return new ResultWithErrors<>(parsedDocument, errors);
-  }
-
-  @Override
-  public ResultWithErrors<String> cleanUpCode(String documentUri, String cobolCode) {
-    List<SyntaxError> errors = new ArrayList<>();
-    List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
-    List<CobolLine> transformedLines = transformLines(documentUri, lines).unwrap(errors::addAll);
-    List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
-
-    String code = writer.serialize(rewrittenLines);
-    return new ResultWithErrors<>(code, errors);
   }
 
   private ResultWithErrors<List<CobolLine>> readLines(String cobolCode, String documentURI) {
