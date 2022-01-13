@@ -86,11 +86,6 @@ public class CopybookHierarchy {
     textReplacingClauses.add(pattern);
   }
 
-  /** Remove the rest of the text replacing patterns */
-  public void finishReplace() {
-    textReplacingClauses.clear();
-  }
-
   /**
    * Check if there already is a copybook with the given name in the hierarchy
    *

@@ -99,11 +99,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @NonNull
   @Override
   public ResultWithErrors<ExtendedDocument> getResult() {
-    if (hierarchy.requiresReplacing()) {
-      String replaceableStmt = peek().toString();
-      String content = handleReplace(replaceableStmt, hierarchy.getTextReplacingClauses());
-      mergeAndUpdateTopTwoElement(content);
-    }
     nestedMappings.put(
         documentUri,
         new DocumentMapping(
@@ -300,14 +295,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitReplaceOffStatement(ReplaceOffStatementContext ctx) {
-    hierarchy.finishReplace();
     pop();
     accumulateTokenShift(ctx);
-  }
-
-  private String handleReplace(
-      String replaceableStmt, List<Pair<String, String>> replacingClauses) {
-    return applyReplacing(replaceableStmt, replacingClauses);
   }
 
   @Override
@@ -336,10 +325,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         .findAny()
         .map(it -> TOKEN_SHIFT_WITH_LINEBREAK)
         .orElse(DEFAULT_TOKEN_SHIFT);
-  }
-
-  private String applyReplacing(String rawContent, List<Pair<String, String>> replacePatterns) {
-    return replacingService.applyReplacing(rawContent, replacePatterns);
   }
 
   private void reportPseudoTextError(ReplacePseudoTextContext ctx, SyntaxError it) {
