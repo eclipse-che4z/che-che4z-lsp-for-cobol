@@ -65,7 +65,7 @@ public class CopybookHierarchy {
   /** Remove the copybook from the top of the stack */
   public void pop() {
     copybookStack.pop();
-    if (Objects.nonNull(recursiveReplaceStmtStack.peek())) recursiveReplaceStmtStack.pop();
+    recursiveReplaceStmtStack.pollFirst();
   }
 
   /**
