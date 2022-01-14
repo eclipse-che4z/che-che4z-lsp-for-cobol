@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.core.model;
 
+import lombok.NonNull;
 import lombok.Value;
 
-import lombok.NonNull;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -41,5 +41,17 @@ public class ResultWithErrors<T> {
   public T unwrap(Consumer<List<SyntaxError>> errorsConsumer) {
     errorsConsumer.accept(errors);
     return result;
+  }
+
+  /**
+   * Process result is no errors found or consume the errors
+   *
+   * @param resultConsumer consumer that accepts the results if no errors found
+   * @param errorsConsumer consumer that accepts errors if found
+   */
+  public void processIfNoErrorsFound(
+      Consumer<T> resultConsumer, Consumer<List<SyntaxError>> errorsConsumer) {
+    if (errors.isEmpty()) resultConsumer.accept(result);
+    else errorsConsumer.accept(errors);
   }
 }

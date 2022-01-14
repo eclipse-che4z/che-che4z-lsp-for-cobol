@@ -21,7 +21,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
@@ -93,14 +92,9 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
   @Override
   public void exitReplacePseudoText(ReplacePseudoTextContext ctx) {
     if ((ctx.getParent() instanceof ReplaceAreaStartContext)) {
-      @NonNull
-      ResultWithErrors<Pair<String, String>> clauseResponse =
-          replacingService.retrievePseudoTextReplacingPattern(read(), retrieveLocality(ctx));
-      if (clauseResponse.getErrors().isEmpty()) {
-        hierarchy.addTextReplacing(clauseResponse.getResult());
-      } else {
-        errors.addAll(clauseResponse.getErrors());
-      }
+      replacingService
+          .retrievePseudoTextReplacingPattern(read(), retrieveLocality(ctx))
+          .processIfNoErrorsFound(hierarchy::addTextReplacing, errors::addAll);
       push();
     } else {
       write(pop());

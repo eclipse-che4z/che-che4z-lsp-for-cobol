@@ -37,6 +37,7 @@ import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -267,17 +268,16 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitReplacePseudoText(ReplacePseudoTextContext ctx) {
-    @NonNull
-    ResultWithErrors<Pair<String, String>> clauseResponse =
-        replacingService.retrievePseudoTextReplacingPattern(read(), retrieveLocality(ctx));
-    if (clauseResponse.getErrors().isEmpty()) {
-      if (ctx.getParent() instanceof ReplaceClauseContext)
-        hierarchy.addCopyReplacing(clauseResponse.getResult());
-      else hierarchy.addTextReplacing(clauseResponse.getResult());
-    } else {
-      errors.addAll(clauseResponse.getErrors());
-    }
+    replacingService
+        .retrievePseudoTextReplacingPattern(read(), retrieveLocality(ctx))
+        .processIfNoErrorsFound(consumeReplacePattern(ctx), errors::addAll);
     pop();
+  }
+
+  private Consumer<Pair<String, String>> consumeReplacePattern(ReplacePseudoTextContext ctx) {
+    return ctx.getParent() instanceof ReplaceClauseContext
+        ? hierarchy::addCopyReplacing
+        : hierarchy::addTextReplacing;
   }
 
   @Override
