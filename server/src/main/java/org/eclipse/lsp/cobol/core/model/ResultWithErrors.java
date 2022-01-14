@@ -54,4 +54,16 @@ public class ResultWithErrors<T> {
     if (errors.isEmpty()) resultConsumer.accept(result);
     else errorsConsumer.accept(errors);
   }
+
+  /**
+   * Add the given errors to this result. Helpful then several methods return results and errors,
+   * and the last one should accumulate them.
+   *
+   * @param errors external syntax that should be returned with this result
+   * @return this including given errors
+   */
+  public ResultWithErrors<T> accumulateErrors(List<SyntaxError> errors) {
+    this.errors.addAll(errors);
+    return this;
+  }
 }
