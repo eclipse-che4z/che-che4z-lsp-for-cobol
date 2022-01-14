@@ -15,7 +15,6 @@
 import * as fs from "fs";
 import * as net from "net";
 import * as vscode from "vscode";
-import { Location } from "vscode";
 import {
     ConfigurationParams,
     ConfigurationRequest,
@@ -28,6 +27,7 @@ import {LANGUAGE_ID} from "../constants";
 import {JavaCheck} from "./JavaCheck";
 import {Middleware} from "./Middleware";
 import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
+import { SettingsService } from "./Settings";
 
 export class LanguageClientService {
     private readonly jarPath: string;
@@ -41,7 +41,7 @@ export class LanguageClientService {
 
     public async checkPrerequisites(): Promise<void> {
         await new JavaCheck().isJavaInstalled();
-        if (!this.getLspPort() && !fs.existsSync(this.jarPath)) {
+        if (!SettingsService.getLspPort() && !fs.existsSync(this.jarPath)) {
             throw new Error("LSP server for " + LANGUAGE_ID + " not found");
         }
     }
@@ -88,10 +88,6 @@ export class LanguageClientService {
         return this.languageClient;
     }
 
-    private getLspPort(): number | undefined {
-        return +vscode.workspace.getConfiguration().get("cobol-lsp.server.port");
-    }
-
     private createClientOptions(): LanguageClientOptions {
         const signatureFunc: ConfigurationRequest.MiddlewareSignature = async (
             params: ConfigurationParams,
@@ -110,7 +106,7 @@ export class LanguageClientService {
     }
 
     private createServerOptions(jarPath: string) {
-        const port = this.getLspPort();
+        const port = SettingsService.getLspPort();
         if (port) {
             // Connect to language server via socket
             const connectionInfo = {

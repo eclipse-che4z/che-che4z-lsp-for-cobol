@@ -13,6 +13,7 @@
  */
 export const SETTINGS_CPY_SECTION: string = "cobol-lsp.cpy-manager";
 
+export const SERVER_PORT = "cobol-lsp.server.port"
 export const PATHS_LOCAL_KEY = "paths-local";
 export const PATHS_ZOWE = "paths-dsn";
 export const PATHS_USS = "paths-uss";
