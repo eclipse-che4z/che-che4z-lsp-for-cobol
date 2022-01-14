@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
@@ -28,9 +27,8 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -38,7 +36,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static org.antlr.v4.runtime.Token.EOF;
+import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 
 /**
@@ -84,7 +82,7 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
   }
 
   @Override
-  public void enterReplaceAreaStart(@NonNull CobolPreprocessor.ReplaceAreaStartContext ctx) {
+  public void enterReplaceAreaStart(@NonNull ReplaceAreaStartContext ctx) {
     if (hierarchy.requiresReplacing()) {
       replace();
     }
@@ -92,13 +90,13 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
   }
 
   @Override
-  public void enterReplacePseudoText(CobolPreprocessor.ReplacePseudoTextContext ctx) {
+  public void enterReplacePseudoText(ReplacePseudoTextContext ctx) {
     push();
   }
 
   @Override
-  public void exitReplacePseudoText(CobolPreprocessor.ReplacePseudoTextContext ctx) {
-    if ((ctx.getParent() instanceof CobolPreprocessor.ReplaceAreaStartContext)) {
+  public void exitReplacePseudoText(ReplacePseudoTextContext ctx) {
+    if ((ctx.getParent() instanceof ReplaceAreaStartContext)) {
       @NonNull
       ResultWithErrors<Pair<String, String>> clauseResponse =
           replacingService.retrievePseudoTextReplacingPattern(read());
@@ -113,37 +111,13 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
     }
   }
 
-  private Consumer<SyntaxError> storeSyntaxErrorConsumer(
-      CobolPreprocessor.ReplacePseudoTextContext ctx) {
-    return error -> {
-      errors.add(
-          SyntaxError.syntaxError()
-              .severity(ERROR)
-              .suggestion(messageService.getMessage(error.getSuggestion()))
-              .locality(retrievePosition(ctx))
-              .build());
-      LOG.error("pseudo text can't have COPY ");
-    };
-  }
-
-  private Locality retrievePosition(CobolPreprocessor.ReplacePseudoTextContext ctx) {
-    return Locality.builder()
-        .uri(documentUri)
-        .range(
-            new Range(
-                new Position(ctx.getStart().getLine() - 1, ctx.getStart().getCharPositionInLine()),
-                new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine())))
-        .recognizer(GrammarPreprocessorListenerImpl.class)
-        .build();
-  }
-
   @Override
-  public void enterReplaceOffStatement(CobolPreprocessor.ReplaceOffStatementContext ctx) {
+  public void enterReplaceOffStatement(ReplaceOffStatementContext ctx) {
     push();
   }
 
   @Override
-  public void exitReplaceOffStatement(CobolPreprocessor.ReplaceOffStatementContext ctx) {
+  public void exitReplaceOffStatement(ReplaceOffStatementContext ctx) {
     String replaceOffStmt = pop();
     String content = replacingService.applyReplacing(pop(), hierarchy.getTextReplacingClauses());
     hierarchy.clearTextReplacing();
@@ -159,13 +133,22 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
 
   @Override
   public void visitTerminal(TerminalNode node) {
-    int tokPos = node.getSourceInterval().a;
-    write(TokenUtils.retrieveHiddenTextToLeft(tokPos, tokens));
+    TokenUtils.writeHiddenTokens(tokens, this::write).accept(node);
+  }
 
-    if (node.getSymbol().getType() != EOF) {
-      write(node.getText());
-    } else {
-      write(TokenUtils.retrieveHiddenTextToRight(tokPos, tokens));
-    }
+  private Consumer<SyntaxError> storeSyntaxErrorConsumer(ReplacePseudoTextContext ctx) {
+    return error -> {
+      errors.add(
+          SyntaxError.syntaxError()
+              .severity(ERROR)
+              .suggestion(messageService.getMessage(error.getSuggestion()))
+              .locality(retrieveLocality(ctx))
+              .build());
+      LOG.error("pseudo text can't have COPY ");
+    };
+  }
+
+  private Locality retrieveLocality(ReplacePseudoTextContext ctx) {
+    return LocalityUtils.buildLocality(ctx, documentUri);
   }
 }

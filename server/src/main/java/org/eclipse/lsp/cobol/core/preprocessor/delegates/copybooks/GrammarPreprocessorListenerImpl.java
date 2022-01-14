@@ -40,7 +40,6 @@ import java.util.*;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.antlr.v4.runtime.Token.EOF;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory.AnalysisTypes;
@@ -270,8 +269,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (clauseResponse.getErrors().isEmpty()) {
       if (ctx.getParent() instanceof ReplaceClauseContext)
         hierarchy.addCopyReplacing(clauseResponse.getResult());
-      else
-        hierarchy.addTextReplacing(clauseResponse.getResult());
+      else hierarchy.addTextReplacing(clauseResponse.getResult());
     } else {
       clauseResponse.getErrors().forEach(it -> reportPseudoTextError(ctx, it));
     }
@@ -302,14 +300,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void visitTerminal(@NonNull TerminalNode node) {
-    int tokPos = node.getSourceInterval().a;
-    write(TokenUtils.retrieveHiddenTextToLeft(tokPos, tokens));
-
-    if (node.getSymbol().getType() != EOF) {
-      write(node.getText());
-    } else {
-      write(TokenUtils.retrieveHiddenTextToRight(tokPos, tokens));
-    }
+    TokenUtils.writeHiddenTokens(tokens, this::write).accept(node);
   }
 
   @Override

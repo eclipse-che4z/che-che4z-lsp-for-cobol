@@ -18,14 +18,38 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.util.function.Consumer;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static org.antlr.v4.runtime.Lexer.HIDDEN;
+import static org.antlr.v4.runtime.Token.EOF;
 
 /** Utility class for {@link org.antlr.v4.runtime.TokenStream} manipulation. */
 @UtilityClass
 public class TokenUtils {
+  /**
+   * Write the hidden tokens around the given node using the writer
+   *
+   * @param tokens the parent stream of tokens for the given node
+   * @param writer the consumer that accepts String containing the hidden tokens
+   * @return a consumer that accepts a TerminalNode to be processed
+   */
+  public Consumer<TerminalNode> writeHiddenTokens(
+      BufferedTokenStream tokens, Consumer<String> writer) {
+    return node -> {
+      int tokPos = node.getSourceInterval().a;
+      writer.accept(retrieveHiddenTextToLeft(tokPos, tokens));
+
+      if (node.getSymbol().getType() != EOF) {
+        writer.accept(node.getText());
+      } else {
+        writer.accept(retrieveHiddenTextToRight(tokPos, tokens));
+      }
+    };
+  }
 
   /**
    * Retrieve and join all tokens placed in the hidden channel to the left from a specified
@@ -35,7 +59,7 @@ public class TokenUtils {
    * @param tokens {@link BufferedTokenStream} being processed.
    * @return A joined string in hidden Channel, to the left of tokPos.
    */
-  public String retrieveHiddenTextToLeft(int tokPos, BufferedTokenStream tokens) {
+  private String retrieveHiddenTextToLeft(int tokPos, BufferedTokenStream tokens) {
     return ofNullable(tokens.getHiddenTokensToLeft(tokPos, HIDDEN))
         .map(it -> it.stream().map(Token::getText).collect(joining()))
         .orElse("");
@@ -49,7 +73,7 @@ public class TokenUtils {
    * @param tokens {@link BufferedTokenStream} being processed.
    * @return A joined string in hidden Channel, to the right of tokPos.
    */
-  public String retrieveHiddenTextToRight(int tokPos, BufferedTokenStream tokens) {
+  private String retrieveHiddenTextToRight(int tokPos, BufferedTokenStream tokens) {
     return ofNullable(tokens.getHiddenTokensToRight(tokPos, HIDDEN))
         .map(it -> it.stream().map(Token::getText).collect(joining()))
         .orElse("");

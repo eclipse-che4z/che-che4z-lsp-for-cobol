@@ -37,6 +37,23 @@ import static java.util.Optional.ofNullable;
 public class LocalityUtils {
 
   private static final int RANGE_LOOK_BACK_TOKENS = 5;
+
+  /**
+   * Build a locality from the given context and document uri.
+   *
+   * @param context context to retrieve the position range
+   * @param documentUri uri of the current document
+   * @return locality pointing to the context in the current document
+   */
+  @NonNull
+  public Locality buildLocality(ParserRuleContext context, String documentUri) {
+    return Locality.builder()
+        .uri(documentUri)
+        .range(retrieveRange(context.getStart(), context.getStop()))
+        .recognizer(LocalityUtils.class)
+        .build();
+  }
+
   /**
    * Build a locality from the given context, document uri and the current copybook.
    *
@@ -51,8 +68,8 @@ public class LocalityUtils {
     return Locality.builder()
         .uri(documentUri)
         .copybookId(retrieveCopybookId(copybook))
-        .range(new Range(getStartPosition(context.getStart()), getStopPosition(context.getStop())))
-        .recognizer(GrammarPreprocessorListenerImpl.class)
+        .range(retrieveRange(context.getStart(), context.getStop()))
+        .recognizer(LocalityUtils.class)
         .build();
   }
 
@@ -70,24 +87,10 @@ public class LocalityUtils {
         Locality.builder()
             .uri(documentUri)
             .copybookId(retrieveCopybookId(copybook))
-            .range(new Range(getStartPosition(token), getStopPosition(token)))
+            .range(retrieveRange(token, token))
             .token(token.getText())
             .recognizer(GrammarPreprocessorListenerImpl.class)
             .build();
-  }
-
-  private Position getStartPosition(Token token) {
-    return new Position(token.getLine() - 1, token.getCharPositionInLine());
-  }
-
-  private Position getStopPosition(Token token) {
-    return new Position(
-        token.getLine() - 1,
-        token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
-  }
-
-  private String retrieveCopybookId(CopybookUsage copybook) {
-    return ofNullable(copybook).map(CopybookUsage::getCopybookId).orElse(null);
   }
 
   /**
@@ -111,6 +114,24 @@ public class LocalityUtils {
         .max(Comparator.comparingInt(it -> it.getKey().getTokenIndex()))
         .map(Map.Entry::getValue)
         .orElse(null);
+  }
+
+  private Range retrieveRange(Token start, Token stop) {
+    return new Range(getStartPosition(start), getStopPosition(stop));
+  }
+
+  private Position getStartPosition(Token token) {
+    return new Position(token.getLine() - 1, token.getCharPositionInLine());
+  }
+
+  private Position getStopPosition(Token token) {
+    return new Position(
+        token.getLine() - 1,
+        token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
+  }
+
+  private String retrieveCopybookId(CopybookUsage copybook) {
+    return ofNullable(copybook).map(CopybookUsage::getCopybookId).orElse(null);
   }
 
   private Predicate<Map.Entry<Token, Locality>> isNotHidden() {
