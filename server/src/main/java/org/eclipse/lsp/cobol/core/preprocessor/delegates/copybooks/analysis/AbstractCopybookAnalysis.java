@@ -263,6 +263,7 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
     return copybooks -> copybooks.merge(copybookDocument.getCopybooks());
   }
 
+  @SuppressWarnings("unused")
   protected ResultWithErrors<String> handleReplacing(
       CopybookMetaData metaData, CopybookHierarchy hierarchy, String text) {
     return new ResultWithErrors<>(text, ImmutableList.of());
