@@ -21,7 +21,6 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -43,16 +42,12 @@ import java.util.List;
 public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   private final GrammarPreprocessorListenerFactory listenerFactory;
   private final ReplacingService replacingService;
-  private final MessageService messageService;
 
   @Inject
   public GrammarPreprocessorImpl(
-      GrammarPreprocessorListenerFactory listenerFactory,
-      ReplacingService replacingService,
-      MessageService messageService) {
+      GrammarPreprocessorListenerFactory listenerFactory, ReplacingService replacingService) {
     this.listenerFactory = listenerFactory;
     this.replacingService = replacingService;
-    this.messageService = messageService;
   }
 
   @NonNull
@@ -88,7 +83,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
     Lexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     BufferedTokenStream tokens = new CommonTokenStream(lexer);
     ReplacePreProcessorListener replacePreProcessorListener =
-        new ReplacePreProcessorListener(replacingService, messageService, tokens, uri, hierarchy);
+        new ReplacePreProcessorListener(replacingService, tokens, uri, hierarchy);
     CobolPreprocessor parser = new CobolPreprocessor(tokens);
     CobolPreprocessor.StartRuleContext tree = parser.startRule();
     ParseTreeWalker walker = new ParseTreeWalker();

@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +23,9 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.SearchPattern;
@@ -30,6 +33,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.SearchPattern;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -64,6 +68,13 @@ public class ReplacingServiceImpl implements ReplacingService {
   private static final String ERROR_REPLACING = "Error replacing on text: %s with the pattern: %s";
   private static final int INDIVIDUAL_WORD_VALID_LENGTH = 322;
 
+  private final MessageService messageService;
+
+  @Inject
+  public ReplacingServiceImpl(MessageService messageService) {
+    this.messageService = messageService;
+  }
+
   @NonNull
   @Override
   public String applyReplacing(
@@ -74,7 +85,7 @@ public class ReplacingServiceImpl implements ReplacingService {
   @NonNull
   @Override
   public ResultWithErrors<Pair<String, String>> retrievePseudoTextReplacingPattern(
-      @NonNull String clause) {
+      @NonNull String clause, @NonNull Locality locality) {
     ProcessedSearchClause processedSearchClause = getProcessedSearchClause(clause);
     String[] pattern = retrievePattern(processedSearchClause.clause);
     List<SyntaxError> errors = new ArrayList<>();
@@ -87,26 +98,44 @@ public class ReplacingServiceImpl implements ReplacingService {
           processedSearchClause.getSearchPattern().apply(extractPseudoText1).replace(" ", " +");
 
       rightAttribute = extractPseudoText(pattern[1], false);
-      checkInvalidWordUsage(errors, new String[] {extractPseudoText1, rightAttribute});
-      checkInvalidTextWordLength(errors, new String[] {extractPseudoText1, rightAttribute});
+      checkInvalidWordUsage(new String[] {extractPseudoText1, rightAttribute}, locality)
+          .ifPresent(errors::add);
+      checkInvalidTextWordLength(new String[] {extractPseudoText1, rightAttribute}, locality)
+          .ifPresent(errors::add);
     }
     Pair<String, String> replacePattern = Pair.of(leftAttribute, rightAttribute);
 
     return new ResultWithErrors<>(replacePattern, errors);
   }
 
-  private void checkInvalidTextWordLength(List<SyntaxError> errors, String[] attributes) {
+  private Optional<SyntaxError> checkInvalidTextWordLength(String[] attributes, Locality locality) {
     boolean isInvalidLength =
         logicAccumulator(
             checkIndividualTextWordLength(ReplacingServiceImpl.INDIVIDUAL_WORD_VALID_LENGTH),
             Boolean::logicalOr,
             attributes);
-    if (isInvalidLength)
-      errors.add(
-          SyntaxError.syntaxError()
-              .severity(ErrorSeverity.ERROR)
-              .suggestion("ReplacingServiceImpl.pseudoTxtInvalidLength")
-              .build());
+    return isInvalidLength
+        ? Optional.of(
+            SyntaxError.syntaxError()
+                .severity(ErrorSeverity.ERROR)
+                .locality(locality)
+                .suggestion(
+                    messageService.getMessage("ReplacingServiceImpl.pseudoTxtInvalidLength"))
+                .build())
+        : Optional.empty();
+  }
+
+  private Optional<SyntaxError> checkInvalidWordUsage(String[] attributes, Locality locality) {
+    boolean isInvalidWordPresent =
+        logicAccumulator(checkContainWord("copy"), Boolean::logicalOr, attributes);
+    return isInvalidWordPresent
+        ? Optional.of(
+            SyntaxError.syntaxError()
+                .severity(ErrorSeverity.ERROR)
+                .suggestion(messageService.getMessage("ReplacingServiceImpl.invalidWord"))
+                .locality(locality)
+                .build())
+        : Optional.empty();
   }
 
   private <T> Boolean logicAccumulator(
@@ -117,19 +146,6 @@ public class ReplacingServiceImpl implements ReplacingService {
   private Function<String, Boolean> checkIndividualTextWordLength(int validLength) {
     return rightAttribute ->
         Arrays.stream(rightAttribute.split("\b")).anyMatch(c -> c.length() > validLength);
-  }
-
-  private void checkInvalidWordUsage(List<SyntaxError> errors, String[] attributes) {
-    boolean isInvalidWordPresent =
-        logicAccumulator(checkContainWord("copy"), Boolean::logicalOr, attributes);
-
-    if (isInvalidWordPresent) {
-      errors.add(
-          SyntaxError.syntaxError()
-              .severity(ErrorSeverity.ERROR)
-              .suggestion("ReplacingServiceImpl.invalidWord")
-              .build());
-    }
   }
 
   @NonNull
@@ -194,7 +210,7 @@ public class ReplacingServiceImpl implements ReplacingService {
    * @return a pattern for replacing
    */
   @NonNull
-  private String extractPseudoText(@NonNull String text, @NonNull boolean isOperandOne) {
+  private String extractPseudoText(@NonNull String text, boolean isOperandOne) {
     String processedText =
         text.trim().replaceAll("^==", "").replaceAll("==$", "").replaceAll(" +", " ");
     if (isOperandOne && processedText.trim().equals(",") || processedText.trim().equals(";"))

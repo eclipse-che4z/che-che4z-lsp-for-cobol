@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.BufferedTokenStream;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
@@ -70,7 +69,6 @@ class GrammarPreprocessorImplTest {
     GrammarPreprocessorListenerImpl listener = mock(GrammarPreprocessorListenerImpl.class);
     GrammarPreprocessorListenerFactory factory = mock(GrammarPreprocessorListenerFactory.class);
     ReplacingServiceImpl replacingService = mock(ReplacingServiceImpl.class);
-    MessageService messageService = mock(MessageService.class);
 
     List<SyntaxError> errors = emptyList();
 
@@ -92,8 +90,7 @@ class GrammarPreprocessorImplTest {
         .thenReturn(listener);
     when(listener.getResult()).thenReturn(new ResultWithErrors<>(expectedDocument, errors));
 
-    GrammarPreprocessor preprocessor =
-        new GrammarPreprocessorImpl(factory, replacingService, messageService);
+    GrammarPreprocessor preprocessor = new GrammarPreprocessorImpl(factory, replacingService);
 
     ResultWithErrors<ExtendedDocument> extendedDocument =
         preprocessor.buildExtendedDocument(DOCUMENT, TEXT, cpyConfig, hierarchy);

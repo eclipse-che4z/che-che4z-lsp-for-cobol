@@ -21,7 +21,6 @@ import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
@@ -34,10 +33,8 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
-import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 
 /**
  * ANTLR listener, which deals only with the REPLACE compiler directives. So, that the rest of the
@@ -50,19 +47,16 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
   private final ReplacingService replacingService;
   private final CopybookHierarchy hierarchy;
   private final BufferedTokenStream tokens;
-  private final MessageService messageService;
   private final String documentUri;
   Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
 
   public ReplacePreProcessorListener(
       ReplacingService replacingService,
-      MessageService messageService,
       BufferedTokenStream tokens,
       String documentUri,
       CopybookHierarchy hierarchy) {
     this.replacingService = replacingService;
     this.tokens = tokens;
-    this.messageService = messageService;
     this.documentUri = documentUri;
     this.hierarchy = hierarchy;
     textAccumulator.push(new StringBuilder());
@@ -99,11 +93,11 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
     if ((ctx.getParent() instanceof ReplaceAreaStartContext)) {
       @NonNull
       ResultWithErrors<Pair<String, String>> clauseResponse =
-          replacingService.retrievePseudoTextReplacingPattern(read());
+          replacingService.retrievePseudoTextReplacingPattern(read(), retrieveLocality(ctx));
       if (clauseResponse.getErrors().isEmpty()) {
         hierarchy.addTextReplacing(clauseResponse.getResult());
       } else {
-        clauseResponse.getErrors().forEach(storeSyntaxErrorConsumer(ctx));
+        errors.addAll(clauseResponse.getErrors());
       }
       push();
     } else {
@@ -134,18 +128,6 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
   @Override
   public void visitTerminal(TerminalNode node) {
     TokenUtils.writeHiddenTokens(tokens, this::write).accept(node);
-  }
-
-  private Consumer<SyntaxError> storeSyntaxErrorConsumer(ReplacePseudoTextContext ctx) {
-    return error -> {
-      errors.add(
-          SyntaxError.syntaxError()
-              .severity(ERROR)
-              .suggestion(messageService.getMessage(error.getSuggestion()))
-              .locality(retrieveLocality(ctx))
-              .build());
-      LOG.error("pseudo text can't have COPY ");
-    };
   }
 
   private Locality retrieveLocality(ReplacePseudoTextContext ctx) {

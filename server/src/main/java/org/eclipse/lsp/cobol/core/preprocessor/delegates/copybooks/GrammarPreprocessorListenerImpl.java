@@ -132,7 +132,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (languageNameContext == null) {
       final SyntaxError error =
           SyntaxError.syntaxError()
-              .locality(getLocality(ctx))
+              .locality(retrieveLocality(ctx))
               .severity(ERROR)
               .suggestion(
                   messageService.getMessage(
@@ -265,13 +265,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void exitReplacePseudoText(ReplacePseudoTextContext ctx) {
     @NonNull
     ResultWithErrors<Pair<String, String>> clauseResponse =
-        replacingService.retrievePseudoTextReplacingPattern(read());
+        replacingService.retrievePseudoTextReplacingPattern(read(), retrieveLocality(ctx));
     if (clauseResponse.getErrors().isEmpty()) {
       if (ctx.getParent() instanceof ReplaceClauseContext)
         hierarchy.addCopyReplacing(clauseResponse.getResult());
       else hierarchy.addTextReplacing(clauseResponse.getResult());
     } else {
-      clauseResponse.getErrors().forEach(it -> reportPseudoTextError(ctx, it));
+      errors.addAll(clauseResponse.getErrors());
     }
     pop();
   }
@@ -319,17 +319,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         .orElse(DEFAULT_TOKEN_SHIFT);
   }
 
-  private void reportPseudoTextError(ReplacePseudoTextContext ctx, SyntaxError it) {
-    final SyntaxError error =
-        SyntaxError.syntaxError()
-            .severity(ERROR)
-            .suggestion(messageService.getMessage(it.getSuggestion()))
-            .locality(getLocality(ctx))
-            .build();
-    errors.add(error);
-    LOG.debug("Syntax error by reportPseudoTextError: {}", error.toString());
-  }
-
   private void reportInvalidArgument(ControlCblContext ctx) {
     SyntaxError error =
         SyntaxError.syntaxError()
@@ -337,13 +326,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             .suggestion(
                 messageService.getMessage(
                     "GrammarPreprocessorListener.controlDirectiveWrongArgs", ctx.getText()))
-            .locality(getLocality(ctx))
+            .locality(retrieveLocality(ctx))
             .build();
     errors.add(error);
     LOG.debug("Syntax error by reportInvalidArgument: {}", error.toString());
   }
 
-  private Locality getLocality(ParserRuleContext ctx) {
+  private Locality retrieveLocality(ParserRuleContext ctx) {
     return LocalityUtils.buildLocality(ctx, documentUri, hierarchy.getCurrentCopybook());
   }
 }
