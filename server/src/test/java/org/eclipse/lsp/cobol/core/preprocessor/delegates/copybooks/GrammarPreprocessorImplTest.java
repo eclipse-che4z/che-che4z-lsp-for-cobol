@@ -67,8 +67,10 @@ class GrammarPreprocessorImplTest {
   @Test
   void testBuildingExtendedDocument() {
     GrammarPreprocessorListenerImpl listener = mock(GrammarPreprocessorListenerImpl.class);
-    GrammarPreprocessorListenerFactory factory = mock(GrammarPreprocessorListenerFactory.class);
-    ReplacingServiceImpl replacingService = mock(ReplacingServiceImpl.class);
+    ReplacePreProcessorListener replaceListener = mock(ReplacePreProcessorListener.class);
+    GrammarPreprocessorListenerFactory listenerFactory =
+        mock(GrammarPreprocessorListenerFactory.class);
+    ReplacePreprocessorFactory replacingFactory = mock(ReplacePreprocessorFactory.class);
 
     List<SyntaxError> errors = emptyList();
 
@@ -86,17 +88,23 @@ class GrammarPreprocessorImplTest {
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER);
     CopybookHierarchy hierarchy = new CopybookHierarchy();
 
-    when(factory.create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(cpyConfig), eq(hierarchy)))
+    when(listenerFactory.create(
+            eq(DOCUMENT), any(BufferedTokenStream.class), eq(cpyConfig), eq(hierarchy)))
         .thenReturn(listener);
+    when(replacingFactory.create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(hierarchy)))
+        .thenReturn(replaceListener);
     when(listener.getResult()).thenReturn(new ResultWithErrors<>(expectedDocument, errors));
+    when(replaceListener.getResult()).thenReturn(new ResultWithErrors<>(RESULT, errors));
 
-    GrammarPreprocessor preprocessor = new GrammarPreprocessorImpl(factory, replacingService);
+    GrammarPreprocessor preprocessor =
+        new GrammarPreprocessorImpl(listenerFactory, replacingFactory);
 
     ResultWithErrors<ExtendedDocument> extendedDocument =
         preprocessor.buildExtendedDocument(DOCUMENT, TEXT, cpyConfig, hierarchy);
 
-    verify(factory)
+    verify(listenerFactory)
         .create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(cpyConfig), eq(hierarchy));
+    verify(replacingFactory).create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(hierarchy));
     assertEquals(RESULT, extendedDocument.getResult().getText());
     assertEquals(copybooks, extendedDocument.getResult().getCopybooks());
     assertEquals(mainMapping, expectedDocument.getDocumentMapping().get(DOCUMENT));

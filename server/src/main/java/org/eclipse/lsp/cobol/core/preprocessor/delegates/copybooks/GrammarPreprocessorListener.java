@@ -15,19 +15,16 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import org.eclipse.lsp.cobol.core.CobolPreprocessorListener;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 
-/**
- * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
- * and REPLACE statements and removing non-processable sections starting with EXEC statements.
- */
-public interface GrammarPreprocessorListener extends CobolPreprocessorListener, PreprocessorStack {
+/** A listener that processes the text of the COBOL document */
+public interface GrammarPreprocessorListener<T>
+    extends CobolPreprocessorListener, PreprocessorStack {
 
   /**
-   * Get the extended document of the COBOL file and the used copybooks.
+   * Get the result of the processing
    *
-   * @return extended document
+   * @return instance of T
    */
-  ResultWithErrors<ExtendedDocument> getResult();
+  ResultWithErrors<T> getResult();
 }

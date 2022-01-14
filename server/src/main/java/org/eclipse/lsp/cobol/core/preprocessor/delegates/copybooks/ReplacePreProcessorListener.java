@@ -15,13 +15,14 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -42,19 +43,20 @@ import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
  */
 @Slf4j
 public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
-    implements GrammarPreprocessorListener {
+    implements GrammarPreprocessorListener<String> {
   private final List<SyntaxError> errors = new ArrayList<>();
   private final ReplacingService replacingService;
-  private final CopybookHierarchy hierarchy;
-  private final BufferedTokenStream tokens;
   private final String documentUri;
+  private final BufferedTokenStream tokens;
+  private final CopybookHierarchy hierarchy;
   Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
 
+  @Inject
   public ReplacePreProcessorListener(
-      ReplacingService replacingService,
-      BufferedTokenStream tokens,
-      String documentUri,
-      CopybookHierarchy hierarchy) {
+      @Assisted String documentUri,
+      @Assisted BufferedTokenStream tokens,
+      @Assisted CopybookHierarchy hierarchy,
+      ReplacingService replacingService) {
     this.replacingService = replacingService;
     this.tokens = tokens;
     this.documentUri = documentUri;
@@ -68,11 +70,11 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
   }
 
   @Override
-  public ResultWithErrors<ExtendedDocument> getResult() {
+  public ResultWithErrors<String> getResult() {
     if (hierarchy.requiresReplacing()) {
       replace();
     }
-    return new ResultWithErrors<>(new ExtendedDocument(null, accumulate(), null, null), errors);
+    return new ResultWithErrors<>(accumulate(), errors);
   }
 
   @Override

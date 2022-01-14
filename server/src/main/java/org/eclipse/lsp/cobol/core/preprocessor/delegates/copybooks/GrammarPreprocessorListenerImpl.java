@@ -51,7 +51,7 @@ import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analys
  */
 @Slf4j
 public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListener
-    implements GrammarPreprocessorListener {
+    implements GrammarPreprocessorListener<ExtendedDocument> {
 
   private static final int DEFAULT_TOKEN_SHIFT = 2;
   private static final int TOKEN_SHIFT_WITH_LINEBREAK = 3;
@@ -94,7 +94,11 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public Deque<StringBuilder> getTextAccumulator() {
     return textAccumulator;
   }
-
+  /**
+   * Get the extended document of the COBOL file and the used copybooks.
+   *
+   * @return extended document
+   */
   @NonNull
   @Override
   public ResultWithErrors<ExtendedDocument> getResult() {
