@@ -38,7 +38,8 @@ import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
 
 /**
  * ANTLR listener, which deals only with the REPLACE compiler directives. So, that the rest of the
- * pre-processing works on the replaced source.
+ * pre-processing works on the replaced source. Should be applied before the copybook preprocessor
+ * in order to replace all the subsequent statements.
  */
 @Slf4j
 public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
@@ -109,14 +110,12 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
   @Override
   public void exitReplaceOffStatement(ReplaceOffStatementContext ctx) {
     String replaceOffStmt = pop();
-    String content = replacingService.applyReplacing(pop(), hierarchy.getTextReplacingClauses());
-    hierarchy.clearTextReplacing();
+    String content = hierarchy.replaceText(pop(), replacingService::applyReplacing);
     write(content + replaceOffStmt);
   }
 
   private void replace() {
-    String content = replacingService.applyReplacing(pop(), hierarchy.getTextReplacingClauses());
-    hierarchy.clearTextReplacing();
+    String content = hierarchy.replaceText(pop(), replacingService::applyReplacing);
     if (getTextAccumulator().isEmpty()) push();
     write(content);
   }
@@ -127,6 +126,6 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
   }
 
   private Locality retrieveLocality(ReplacePseudoTextContext ctx) {
-    return LocalityUtils.buildLocality(ctx, documentUri);
+    return LocalityUtils.buildLocality(ctx, documentUri, null);
   }
 }

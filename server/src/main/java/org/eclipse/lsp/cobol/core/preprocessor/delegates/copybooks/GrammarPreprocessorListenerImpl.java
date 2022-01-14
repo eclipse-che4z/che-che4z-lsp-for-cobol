@@ -107,7 +107,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         documentUri,
         new DocumentMapping(
             tokens.getTokens().stream()
-                .map(LocalityUtils.toLocality(documentUri, hierarchy.getCurrentCopybook()))
+                .map(LocalityUtils.toLocality(documentUri, hierarchy.getCurrentCopybookId()))
                 .collect(toList()),
             shifts));
     return new ResultWithErrors<>(
@@ -337,6 +337,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private Locality retrieveLocality(ParserRuleContext ctx) {
-    return LocalityUtils.buildLocality(ctx, documentUri, hierarchy.getCurrentCopybook());
+    return LocalityUtils.buildLocality(ctx, documentUri, hierarchy.getCurrentCopybookId());
   }
 }

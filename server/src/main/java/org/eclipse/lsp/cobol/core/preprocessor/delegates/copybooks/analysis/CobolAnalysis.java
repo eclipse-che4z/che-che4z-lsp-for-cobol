@@ -59,9 +59,9 @@ class CobolAnalysis extends AbstractCopybookAnalysis {
               metaData.getNameLocality(),
               ERROR,
               "GrammarPreprocessorListener.copyBkNestedReplaceStmt",
-              "Syntax error by checkRecursiveReplaceStatement: {}"));
+              "Syntax error by handleReplacing: {}"));
 
     return new ResultWithErrors<>(
-        hierarchy.replaceText(text, replacingService::applyReplacing), errors);
+        hierarchy.replaceCopybook(text, replacingService::applyReplacing), errors);
   }
 }

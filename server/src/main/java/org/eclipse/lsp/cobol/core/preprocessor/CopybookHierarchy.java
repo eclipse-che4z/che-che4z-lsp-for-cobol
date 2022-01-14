@@ -15,23 +15,19 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor;
 
-import lombok.Value;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
 
 /**
- * This value class tracks moving in copybook hierarchy and replacing while preprocessor analysis
+ * This value class tracks moving in copybook hierarchy and replacing while preprocessor analysis.
+ * Is not thread-safe.
  */
-@Value
 public class CopybookHierarchy {
   List<Pair<String, String>> copyReplacingClauses = new ArrayList<>();
   List<Pair<String, String>> textReplacingClauses = new ArrayList<>();
@@ -48,12 +44,12 @@ public class CopybookHierarchy {
   }
 
   /**
-   * Get the copybook from the top of the stack
+   * Get the id of the copybook from the top of the stack or null if absent
    *
-   * @return the current copybook
+   * @return the current copybook id
    */
-  public CopybookUsage getCurrentCopybook() {
-    return copybookStack.peek();
+  public String getCurrentCopybookId() {
+    return Optional.ofNullable(copybookStack.peek()).map(CopybookUsage::getCopybookId).orElse(null);
   }
 
   /**
@@ -129,6 +125,18 @@ public class CopybookHierarchy {
   }
 
   /**
+   * Replace the copybook text using the internal state of the hierarchy
+   *
+   * @param copybookText text to replace
+   * @param accumulator a function for applying the replacing
+   * @return replaced text
+   */
+  public String replaceCopybook(
+      String copybookText, BiFunction<String, List<Pair<String, String>>, String> accumulator) {
+    return recursiveReplaceStmtStack.stream().reduce(copybookText, accumulator, (raw, res) -> res);
+  }
+
+  /**
    * Replace the text using the internal state of the hierarchy
    *
    * @param text text to replace
@@ -137,10 +145,8 @@ public class CopybookHierarchy {
    */
   public String replaceText(
       String text, BiFunction<String, List<Pair<String, String>>, String> accumulator) {
-    return recursiveReplaceStmtStack.stream().reduce(text, accumulator, (raw, res) -> res);
-  }
-
-  public void clearTextReplacing() {
+    String result = accumulator.apply(text, textReplacingClauses);
     textReplacingClauses.clear();
+    return result;
   }
 }

@@ -94,10 +94,10 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
                       .config(config)
                       .nameLocality(
                           LocalityUtils.buildLocality(
-                              copySource, documentUri, hierarchy.getCurrentCopybook()))
+                              copySource, documentUri, hierarchy.getCurrentCopybookId()))
                       .contextLocality(
                           LocalityUtils.buildLocality(
-                              context, documentUri, hierarchy.getCurrentCopybook()))
+                              context, documentUri, hierarchy.getCurrentCopybookId()))
                       .build())
               .unwrap(errors::addAll);
 

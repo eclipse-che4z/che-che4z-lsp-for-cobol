@@ -19,18 +19,15 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerImpl;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
+import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import static java.util.Optional.ofNullable;
 
 /** Utilities for Locality building and retrieving */
 @UtilityClass
@@ -39,35 +36,19 @@ public class LocalityUtils {
   private static final int RANGE_LOOK_BACK_TOKENS = 5;
 
   /**
-   * Build a locality from the given context and document uri.
-   *
-   * @param context context to retrieve the position range
-   * @param documentUri uri of the current document
-   * @return locality pointing to the context in the current document
-   */
-  @NonNull
-  public Locality buildLocality(ParserRuleContext context, String documentUri) {
-    return Locality.builder()
-        .uri(documentUri)
-        .range(retrieveRange(context.getStart(), context.getStop()))
-        .recognizer(LocalityUtils.class)
-        .build();
-  }
-
-  /**
    * Build a locality from the given context, document uri and the current copybook.
    *
    * @param context context to retrieve the position range
    * @param documentUri uri of the current document
-   * @param copybook CopybookUsage from the top of the stack to retrieve the copybook id
+   * @param copybookId the id of the current copybook
    * @return locality pointing to the context in the current document
    */
   @NonNull
   public Locality buildLocality(
-      ParserRuleContext context, String documentUri, CopybookUsage copybook) {
+      ParserRuleContext context, String documentUri, @Nullable String copybookId) {
     return Locality.builder()
         .uri(documentUri)
-        .copybookId(retrieveCopybookId(copybook))
+        .copybookId(copybookId)
         .range(retrieveRange(context.getStart(), context.getStop()))
         .recognizer(LocalityUtils.class)
         .build();
@@ -78,18 +59,18 @@ public class LocalityUtils {
    * copybook.
    *
    * @param documentUri uri of the current document
-   * @param copybook CopybookUsage from the top of the stack to retrieve the copybook id
+   * @param copybookId the id of the current copybook
    * @return a functor Token -> Locality
    */
   @NonNull
-  public Function<Token, Locality> toLocality(String documentUri, CopybookUsage copybook) {
+  public Function<Token, Locality> toLocality(String documentUri, @Nullable String copybookId) {
     return token ->
         Locality.builder()
             .uri(documentUri)
-            .copybookId(retrieveCopybookId(copybook))
+            .copybookId(copybookId)
             .range(retrieveRange(token, token))
             .token(token.getText())
-            .recognizer(GrammarPreprocessorListenerImpl.class)
+            .recognizer(LocalityUtils.class)
             .build();
   }
 
@@ -128,10 +109,6 @@ public class LocalityUtils {
     return new Position(
         token.getLine() - 1,
         token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
-  }
-
-  private String retrieveCopybookId(CopybookUsage copybook) {
-    return ofNullable(copybook).map(CopybookUsage::getCopybookId).orElse(null);
   }
 
   private Predicate<Map.Entry<Token, Locality>> isNotHidden() {
