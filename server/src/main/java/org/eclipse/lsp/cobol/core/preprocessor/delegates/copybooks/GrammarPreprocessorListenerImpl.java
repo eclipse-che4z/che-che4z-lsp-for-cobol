@@ -62,7 +62,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private final NamedSubContext copybooks = new NamedSubContext();
   private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
   private final Map<Integer, Integer> shifts = new HashMap<>();
-  // used for both copy and sql-include statements
 
   private final String documentUri;
   private final BufferedTokenStream tokens;
