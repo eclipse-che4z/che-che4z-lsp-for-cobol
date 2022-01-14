@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.core.model;
 import lombok.NonNull;
 import lombok.Value;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -59,11 +60,12 @@ public class ResultWithErrors<T> {
    * Add the given errors to this result. Helpful then several methods return results and errors,
    * and the last one should accumulate them.
    *
-   * @param errors external syntax that should be returned with this result
+   * @param externalErrors external syntax errors that should be returned with this result
    * @return this including given errors
    */
-  public ResultWithErrors<T> accumulateErrors(List<SyntaxError> errors) {
-    this.errors.addAll(errors);
-    return this;
+  public ResultWithErrors<T> accumulateErrors(List<SyntaxError> externalErrors) {
+    final ArrayList<SyntaxError> allErrors = new ArrayList<>(errors);
+    allErrors.addAll(externalErrors);
+    return new ResultWithErrors<>(result, allErrors);
   }
 }

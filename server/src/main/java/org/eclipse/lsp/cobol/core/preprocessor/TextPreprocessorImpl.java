@@ -79,13 +79,8 @@ public class TextPreprocessorImpl implements TextPreprocessor {
       @NonNull String cobolCode,
       @NonNull CopybookConfig copybookConfig,
       @NonNull CopybookHierarchy hierarchy) {
-    List<SyntaxError> errors = new ArrayList<>();
-    ExtendedDocument parsedDocument =
-        grammarPreprocessor
-            .buildExtendedDocument(documentUri, cobolCode, copybookConfig, hierarchy)
-            .unwrap(errors::addAll);
-
-    return new ResultWithErrors<>(parsedDocument, errors);
+    return grammarPreprocessor.buildExtendedDocument(
+        documentUri, cobolCode, copybookConfig, hierarchy);
   }
 
   private ResultWithErrors<List<CobolLine>> readLines(String cobolCode, String documentURI) {

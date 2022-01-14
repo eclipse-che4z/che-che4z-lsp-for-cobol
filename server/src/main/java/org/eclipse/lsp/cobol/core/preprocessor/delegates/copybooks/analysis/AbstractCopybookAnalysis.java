@@ -174,20 +174,18 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
     List<SyntaxError> errors = new ArrayList<>();
     return hierarchy -> {
       CopybookModel model = getCopyBookContent(metaData, hierarchy).unwrap(errors::addAll);
-      return new ResultWithErrors<>(
-          processCopybook(
-                  metaData,
-                  hierarchy,
-                  model.getUri(),
-                  handleReplacing(
-                          metaData,
-                          hierarchy,
-                          preprocessor
-                              .cleanUpCode(model.getUri(), model.getContent())
-                              .unwrap(errors::addAll))
-                      .unwrap(errors::addAll))
-              .unwrap(errors::addAll),
-          errors);
+      return processCopybook(
+              metaData,
+              hierarchy,
+              model.getUri(),
+              handleReplacing(
+                      metaData,
+                      hierarchy,
+                      preprocessor
+                          .cleanUpCode(model.getUri(), model.getContent())
+                          .unwrap(errors::addAll))
+                  .unwrap(errors::addAll))
+          .accumulateErrors(errors);
     };
   }
 
