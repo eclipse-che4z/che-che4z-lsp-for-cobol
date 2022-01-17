@@ -108,7 +108,7 @@ public class CopybookHierarchy {
   }
 
   /** Move all the copy replacing clauses to the recursive replacement stack */
-  public void collapseCopyReplacing() {
+  public void prepareCopybookReplacement() {
     if (!copyReplacingClauses.isEmpty()) {
       recursiveReplaceStmtStack.add(new ArrayList<>(copyReplacingClauses));
       copyReplacingClauses.clear();

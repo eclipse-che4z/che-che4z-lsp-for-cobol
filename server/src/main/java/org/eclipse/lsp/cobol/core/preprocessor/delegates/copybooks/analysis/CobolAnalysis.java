@@ -51,7 +51,7 @@ class CobolAnalysis extends AbstractCopybookAnalysis {
       CopybookMetaData metaData, CopybookHierarchy hierarchy, String text) {
     // In a chain of copy statement, there could be only one replacing phrase
     List<SyntaxError> errors = new ArrayList<>();
-    hierarchy.collapseCopyReplacing();
+    hierarchy.prepareCopybookReplacement();
     if (hierarchy.containsRecursiveReplacement())
       errors.add(
           addCopybookError(
