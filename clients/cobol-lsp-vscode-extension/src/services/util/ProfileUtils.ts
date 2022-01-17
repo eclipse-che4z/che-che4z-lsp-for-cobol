@@ -6,14 +6,20 @@ import { SettingsService } from "../Settings";
 export class ProfileUtils {
     public static getProfileNameForCopybook(cobolFileName: string): (string | undefined) {
         const zoweExplorerApi = ZoweVsCodeExtension.getZoweExplorerApi();
-        const availableProfiles = zoweExplorerApi.getExplorerExtenderApi().getProfilesCache().getProfiles();
-        return ProfileUtils.getValidProfileForCopybookDownload(cobolFileName, availableProfiles.map(ele => ele.name));
+        let availableProfiles: string[] = [];
+        zoweExplorerApi.registeredApiTypes().forEach(profileType => {
+            availableProfiles = availableProfiles
+                .concat(zoweExplorerApi.getExplorerExtenderApi().getProfilesCache()
+                    .getProfiles(profileType).map(ele => ele.name));
+        });
+        return ProfileUtils.getValidProfileForCopybookDownload(cobolFileName, availableProfiles);
     }
 
     private static getValidProfileForCopybookDownload(programName: string, availableProfiles: string[]): string {
         const profileFromDoc = ProfileUtils.getProfileFromDocument(programName, availableProfiles);
-        if (!profileFromDoc) {
-            return SettingsService.getProfileName();
+        const passedProfile = SettingsService.getProfileName();
+        if (!profileFromDoc && availableProfiles.indexOf(passedProfile) >= 0) {
+            return passedProfile;
         }
         return profileFromDoc;
     }

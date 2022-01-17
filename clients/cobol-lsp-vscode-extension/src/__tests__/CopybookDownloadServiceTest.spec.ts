@@ -100,6 +100,7 @@ describe("Test fetchCopybook against bad and correct configurations", () => {
         await (CopybookDownloadService as any).downloadCopybookFromMFUsingZowe("HLQ.DSN1", copybookProfile, true);
         expect(getUSSContentsMock).toBeCalledWith(`HLQ.DSN1/copybook`, {
             encoding: "UTF-8",
+            binary: false,
             file: Path.join(createDatasetPath(profile, "HLQ.DSN1"), "copybook"),
             returnEtag: true,
         });
@@ -263,7 +264,7 @@ describe("Test downloadCopybook user interaction", () => {
         ZoweVsCodeExtension.getZoweExplorerApi = jest.fn().mockReturnValue(undefined);
         (CopybookDownloadService as any).isEligibleForCopybookDownload = jest.fn().mockReturnValue(true);
         await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
-        expect(vscode.window.showErrorMessage).toBeCalledWith("Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe.");
+        expect(vscode.window.showErrorMessage).toBeCalledWith("Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe.", "Install Zowe Explorer");
         expect(queuePush).not.toBeCalled();
     });
 
