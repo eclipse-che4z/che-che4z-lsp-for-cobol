@@ -11,8 +11,8 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as vscode from "vscode";
-import { C4Z_FOLDER, COPYBOOK_EXT_ARRAY, COPYBOOKS_FOLDER, PATHS_LOCAL_KEY, PATHS_USS, PATHS_ZOWE, SETTINGS_CPY_SECTION } from "../../constants";
+import { C4Z_FOLDER, COPYBOOK_EXT_ARRAY, COPYBOOKS_FOLDER } from "../../constants";
+import { SettingsService } from "../Settings";
 import { searchInWorkspace } from "../util/FSUtils";
 import { ProfileUtils } from "../util/ProfileUtils";
 
@@ -34,7 +34,7 @@ export class CopybookURI {
         // check on local paths provided by the user
         let result: string;
         result = searchInWorkspace(copybookName,
-            vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_LOCAL_KEY),
+            SettingsService.getCopybookLocalPath(cobolProgramName),
             COPYBOOK_EXT_ARRAY);
         // check in subfolders under .copybooks (copybook downloaded from MF)
         if (!result) {
@@ -54,14 +54,14 @@ export class CopybookURI {
      */
     private createPathForCopybookDownloaded(profile: string): string[] {
         let result: string[] = [];
-        const datasets: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);
+        const datasets: string[] = SettingsService.getDsnPath();
         if (profile && datasets) {
             result = Object.assign([], datasets);
             result.forEach((value, index) => result[index] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" +
                 profile + "/" + value);
         }
 
-        const ussPaths: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_USS);
+        const ussPaths: string[] = SettingsService.getUssPath();
         const baseIndex = result.length;
         if (profile && ussPaths) {
             Object.assign([], ussPaths).forEach((value, index) => result[index + baseIndex] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" +

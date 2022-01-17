@@ -12,9 +12,9 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as vscode from "vscode";
 import {searchInWorkspace} from "./FSUtils";
-import {COBOL_EXT_ARRAY, SETTINGS_SUBROUTINE_LOCAL_KEY} from "../../constants";
+import {COBOL_EXT_ARRAY} from "../../constants";
+import { SettingsService } from "../Settings";
 
 /**
  * This function try to resolve a given subroutine by searching COBOL source file with the same name
@@ -23,6 +23,6 @@ import {COBOL_EXT_ARRAY, SETTINGS_SUBROUTINE_LOCAL_KEY} from "../../constants";
  * @return subroutine file URI if it was found or undefined otherwise
  */
 export function resolveSubroutineURI(name: string): string {
-    const folders: string[] = vscode.workspace.getConfiguration().get(SETTINGS_SUBROUTINE_LOCAL_KEY);
+    const folders: string[] = SettingsService.getSubroutineLocalPath();
     return searchInWorkspace(name, folders, COBOL_EXT_ARRAY);
 }
