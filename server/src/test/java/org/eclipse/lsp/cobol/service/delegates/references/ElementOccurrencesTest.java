@@ -109,16 +109,14 @@ class ElementOccurrencesTest {
         // find paragraph usage by usage position
         Arguments.of(
             AnalysisResult.builder()
-                .paragraphDefinitions(definitionMap)
-                .paragraphUsages(usageMap)
+                .rootNode(rootNodeForOneFile)
                 .build(),
             insideUsage,
             ImmutableList.of(usage)),
         // find paragraph usage by definition position
         Arguments.of(
             AnalysisResult.builder()
-                .paragraphDefinitions(definitionMap)
-                .paragraphUsages(usageMap)
+                .rootNode(rootNodeForOneFile)
                 .build(),
             insideDefinition,
             ImmutableList.of(usage)),

@@ -732,6 +732,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitParagraphDefinitionName(ParagraphDefinitionNameContext ctx) {
+    return addTreeNode(ctx, locality -> new ParagraphDefinitionNameNode(ctx.getText(), locality));
+  }
+
+  @Override
   public List<Node> visitConstantName(ConstantNameContext ctx) {
     String subroutineName = PreprocessorStringUtils.trimQuotes(ctx.getText()).toUpperCase();
     return getLocality(ctx.getStart())

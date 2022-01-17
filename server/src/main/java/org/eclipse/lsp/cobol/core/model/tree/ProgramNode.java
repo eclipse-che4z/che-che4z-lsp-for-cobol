@@ -44,6 +44,8 @@ import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 public class ProgramNode extends Node {
   private final Multimap<String, VariableNode> variables = ArrayListMultimap.create();
   private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
+  private final Map<String, List<ParagraphDefinitionNameNode>> paragraphNodes = new HashMap<>();
+
   private String programName;
 
   public ProgramNode(Locality locality) {
@@ -110,6 +112,30 @@ public class ProgramNode extends Node {
     final Optional<CodeBlockDefinitionNode> definition =
         codeBlocks.stream().filter(it -> it.getName().equals(node.getName())).findAny();
     definition.ifPresent(it -> it.addUsage(node.getLocality()));
+    registerParagraphUsage(node);
+    return definition.isPresent()
+        ? Optional.empty()
+        : Optional.of(
+            SyntaxError.syntaxError()
+                .messageTemplate(
+                    MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
+                .severity(ErrorSeverity.ERROR)
+                .locality(node.getLocality())
+                .build());
+  }
+
+  private Optional<SyntaxError> registerParagraphUsage(CodeBlockUsageNode node) {
+    final Optional<List<ParagraphDefinitionNameNode>> definition =
+        Optional.ofNullable(paragraphNodes.get(node.getName()));
+    definition.ifPresent(
+        it -> {
+          it.forEach(
+              i -> {
+                i.addUsage(node.getLocality().toLocation());
+                node.setDefinition(i);
+              });
+        });
+
     return definition.isPresent()
         ? Optional.empty()
         : Optional.of(
@@ -137,5 +163,27 @@ public class ProgramNode extends Node {
     Locality location = Locality.builder().uri(PREF_IMPLICIT + PREDEFINED).build();
     for (String predefinedVariableName : PredefinedVariables.getPredefinedVariablesNames())
       addVariableDefinition(new MnemonicNameNode(location, PREDEFINED, predefinedVariableName));
+  }
+  /**
+   * Add a paragraph definition name node in the program context.
+   *
+   * @param node - the paragraph definition node
+   * @return syntax error if the code block duplicates
+   */
+  public Optional<SyntaxError> registerParagraphNameNode(ParagraphDefinitionNameNode node) {
+    List<ParagraphDefinitionNameNode> nodes =
+        paragraphNodes.get(node.getParagraphName().toUpperCase()) != null
+            ? paragraphNodes.get(node.getParagraphName().toUpperCase())
+            : new ArrayList<>();
+    nodes.add(node);
+
+    paragraphNodes.put(node.getParagraphName().toUpperCase(), nodes);
+
+    nodes.forEach(
+        it -> {
+          it.definitions.add(node.locality.toLocation());
+          node.setDefinitions(it.definitions);
+        });
+    return Optional.empty();
   }
 }
