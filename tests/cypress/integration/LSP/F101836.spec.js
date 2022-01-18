@@ -12,14 +12,23 @@
  *  Broadcom, Inc. - initial API and implementation
  */
 
+import { Theia, VSCODE } from '@eclipse/che-che4z/tests/dist/selectors';
+
 /// <reference types="Cypress" />
 //@ts-ignore
 /// <reference types="../../support/" />
 
+const env = Cypress.env('ide');
+const IDE = env === 'theia' ? Theia : VSCODE;
+
 //F101836 - COBOL LS: Improve user experience and reduce clashing errors by removing BitLang Dependency
 
 function expandOutlineElement(name) {
-  cy.get(`[data-node-id="${name}_0"]`).click();
+  if (IDE === Theia) {
+    cy.get(`[data-node-id="${name}_0"]`).click();
+  } else {
+    cy.wait(500).get('.monaco-highlighted-label').contains(name).click();
+  }
 }
 
 context('This is F101836 spec', () => {
@@ -28,14 +37,21 @@ context('This is F101836 spec', () => {
       cy.openFile('outline.cbl');
       cy.openOutlineView();
       cy.getOutlineViewTreeContainer().contains('PROGRAM: ABCDEF');
+
       expandOutlineElement('IDENTIFICATION DIVISION');
       cy.getOutlineViewTreeContainer().contains('PROGRAM-ID ABCDEF');
+
       expandOutlineElement('DATA DIVISION');
-      cy.get('[id="WORKING-STORAGE SECTION_0"]').click();
+
+      if (IDE === Theia) {
+        cy.get('[id="WORKING-STORAGE SECTION_0"]').click();
+      }
       cy.getOutlineViewTreeContainer().contains('PARENT');
       cy.getOutlineViewTreeContainer().contains('COPY AST');
+
       expandOutlineElement('PROCEDURE DIVISION');
       cy.getOutlineViewTreeContainer().contains('MAINLINE');
+
       cy.goToLine(18);
       cy.getCurrentLine().type('{end}{leftArrow}{backspace}{backspace}BC', { delay: 200 });
       cy.getOutlineViewTreeContainer().contains('COPY ABC');

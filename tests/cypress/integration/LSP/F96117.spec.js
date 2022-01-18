@@ -16,8 +16,10 @@
 //@ts-ignore
 /// <reference types="../../support/" />
 
-// Import selectors from Theia object
-import { Theia, COBOLLS } from '@eclipse/che-che4z/tests/dist/selectors';
+import { Theia, VSCODE } from '@eclipse/che-che4z/tests/dist/selectors';
+
+const env = Cypress.env('ide');
+const IDE = env === 'theia' ? Theia : VSCODE;
 
 // F96117 - Support for Copybooks in Git/bridge for Git
 
@@ -28,7 +30,7 @@ context('This is a F96117 spec', () => {
     it(['smoke', 'CI'], 'Finds .gitignore file under .c4z', () => {
       cy.openFolder('.c4z');
       cy.openFile('.gitignore');
-      cy.get(Theia.lineContent).findText('/**');
+      cy.get(IDE.lineContent).findText('/**');
     });
     it(['smoke', 'CI'], 'Delete .c4z folder and refresh', () => {
       cy.deleteFile('.c4z');
@@ -38,8 +40,10 @@ context('This is a F96117 spec', () => {
       cy.openFile('USER1.cbl');
       cy.openFolder('.c4z');
       cy.openFile('.gitignore');
-      cy.get(Theia.lineContent).findText('/**');
-      cy.closeCurrentTab();
+      cy.get(IDE.lineContent).findText('/**');
+      if (IDE === Theia) {
+        cy.closeCurrentTab();
+      }
       cy.closeFolder('.c4z');
     });
   });
@@ -49,12 +53,12 @@ context('This is a F96117 spec', () => {
       cy.updateConfigs('empty');
     });
     afterEach(() => {
-      cy.closeFolder('.theia');
+      cy.closeFolder('.vscode');
     });
 
     it(['smoke'], 'Lets check structure in settings.json file ', () => {
-      cy.openFolder('.theia').openFile('settings.json');
-      cy.get(Theia.lineContent).then(($line) => {
+      cy.openFolder('.vscode').openFile('settings.json');
+      cy.get(IDE.lineContent).then(($line) => {
         cy.wrap($line).eq(0).should('have.text', '{');
         cy.wrap($line).eq(1).contains('"cobol-lsp.cpy-manager.profiles": ""');
         cy.wrap($line).eq(2).contains('"cobol-lsp.cpy-manager.paths-local": [],');
@@ -78,30 +82,30 @@ context('This is a F96117 spec', () => {
       () => {
         // Find syntax error
         cy.openFile('USERC1F.cbl');
-        cy.get(Theia.editorError)
+        cy.get(IDE.editorError)
           .getElementLineNumber()
           .then((lineNumber) => {
             expect(lineNumber).to.be.equal(19);
             cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
           });
-        cy.get(Theia.hoverOverContent).contains('BOOK3: Copybook not found');
+        cy.get(IDE.hoverOverContent).contains('BOOK3: Copybook not found');
 
         // Navigate to missed copybook and click on 'Resolve copybook'
         cy.getLineByNumber(19).findText('BOOK3').click().type('{ctrl}{.}');
-        cy.get(Theia.widgetMenu)
+        cy.get(IDE.widgetMenu)
           .contains('Resolve copybook')
           .click()
-          .get(Theia.hoverOverContent)
+          .get(IDE.hoverOverContent)
           .contains('BOOK3: Copybook not found');
 
         // Navigate to missed copybook and click on 'open settings'
         cy.getLineByNumber(19).findText('BOOK3').click().type('{ctrl}{.}');
-        cy.get(Theia.widgetMenu).contains('Open settings').click();
+        cy.get(IDE.widgetMenu).contains('Open settings').click();
 
         // Open 'Preferences', filter with cobol-lsp, and find in 'User' tab 3
         // fields (Dsn, Local and Profiles)
-        cy.get(Theia.searchSettings).type('cobol-lsp');
-        cy.get(Theia.workspaceTabInSettings).contains('User').click();
+        cy.get(IDE.searchSettings).type('cobol-lsp');
+        cy.get(IDE.workspaceTabInSettings).contains('User').click();
         cy.get(COBOLLS.pathsDsnEditor).find('.preference-array-input');
         cy.get(COBOLLS.profilesEditor).find('.pref-input .theia-input');
         cy.get(COBOLLS.inputCopybookNameInSettingsLocal);
@@ -110,6 +114,7 @@ context('This is a F96117 spec', () => {
   });
 
   describe('TC247968 - Check "Change settings" button with local copybooks', () => {
+    // Rewrite for VSC
     afterEach(() => {
       cy.closeFolder('testing');
     });
@@ -146,7 +151,7 @@ context('This is a F96117 spec', () => {
       cy.closeCurrentTab();
 
       // Check that syntax error is not present
-      cy.openFile('USERC1F.cbl').get(Theia.editorError).should('not.exist');
+      cy.openFile('USERC1F.cbl').get(IDE.editorError).should('not.exist');
 
       // Delete settings.json file
       cy.task('deleteFile', 'test_files/project/.theia/settings.json');
@@ -155,13 +160,13 @@ context('This is a F96117 spec', () => {
       // Open the same file and check syntax error (BOOK3 cannot be found)
       cy.openFile('USERC1F.cbl')
         .wait(500)
-        .get(Theia.editorError)
+        .get(IDE.editorError)
         .getElementLineNumber()
         .then((lineNumber) => {
           expect(lineNumber).to.be.equal(19);
           cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
         });
-      cy.get(Theia.hoverOverContent).contains('BOOK3: Copybook not found');
+      cy.get(IDE.hoverOverContent).contains('BOOK3: Copybook not found');
     });
   });
   describe('TC247996 - Nested copybooks with "no extension" are supported', () => {
@@ -172,7 +177,7 @@ context('This is a F96117 spec', () => {
         .type('COPY B. ', { delay: 100 })
         .type('{ctrl}{c}')
         .closeCurrentTab();
-      cy.get(Theia.theiaButtonOK).click();
+      cy.get(IDE.theiaButtonOK).click();
       cy.closeCurrentTab();
       cy.closeFolder('testing');
     });
@@ -182,19 +187,19 @@ context('This is a F96117 spec', () => {
       // Check that variable is available
       cy.goToLine(21);
       cy.getMainEditor().type('{ctrl} ').type('       PROGRAM');
-      cy.get(Theia.suggestWidget).contains('PROGRAM-STATUS');
+      cy.get(IDE.suggestWidget).contains('PROGRAM-STATUS');
       cy.closeCurrentTab();
-      cy.get(Theia.closeButton).click();
+      cy.get(IDE.closeButton).click();
 
       // Change in A.cpy to 'COPY CA.'
       cy.openFolder('testing').openFile('A.cpy').wait(500).goToLine(1);
       cy.getMainEditor().type(backspace3times).type('CA. ', { delay: 100 }).type('{ctrl}{c}').closeCurrentTab();
-      cy.get(Theia.theiaButtonOK).click();
+      cy.get(IDE.theiaButtonOK).click();
 
       // Open file and check that variable is not available
       cy.openFile('TEST.CBL').getLineByNumber(21).type('{end}{enter}');
       cy.getMainEditor().type('{ctrl} ');
-      cy.get(Theia.suggestWidget).should('not.have.text', 'PROGRAM-STATUS');
+      cy.get(IDE.suggestWidget).should('not.have.text', 'PROGRAM-STATUS');
     });
   });
 });

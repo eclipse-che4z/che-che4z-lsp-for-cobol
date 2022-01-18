@@ -17,7 +17,10 @@
 //@ts-ignore
 /// <reference types="../../support/" />
 
-import { Theia } from '@eclipse/che-che4z/tests/dist/selectors';
+import { Theia, VSCODE } from '@eclipse/che-che4z/tests/dist/selectors';
+
+const env = Cypress.env('ide');
+const IDE = env === 'theia' ? Theia : VSCODE;
 
 context('This is a Zowe integration spec file', () => {
   /* Variables Panel */
@@ -45,7 +48,7 @@ context('This is a Zowe integration spec file', () => {
   }
 
   function popupMsg(message) {
-    return cy.get(Theia.popUpMsg).should('contain', message);
+    return cy.get(IDE.popUpMsg).should('contain', message);
   }
 
   function resolveCopybook(line, text) {
@@ -122,7 +125,7 @@ context('This is a Zowe integration spec file', () => {
       popupMsg(
         'Invalid credentials for profile: wrongPass. Copybook retrieval is blocked. Ensure the profile contains correct credentials.',
       )
-        .get(Theia.theiaButton)
+        .get(IDE.theiaButton)
         .contains('Unblock and retry')
         .click();
 
