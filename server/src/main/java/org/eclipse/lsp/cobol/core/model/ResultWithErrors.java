@@ -34,10 +34,10 @@ public class ResultWithErrors<T> {
 
   /**
    * Consume the found errors and return the result. May be used as <code>
-   *  Type variable = result.unpack(syntaxErrorList::addAll);</code>
+   * Type variable = result.unpack(syntaxErrorList::addAll);</code>
    *
-   * @param errorsConsumer - a Consumer to accept errors
-   * @return - the processing result
+   * @param errorsConsumer a Consumer to accept errors
+   * @return the processing result
    */
   public T unwrap(Consumer<List<SyntaxError>> errorsConsumer) {
     errorsConsumer.accept(errors);
@@ -45,7 +45,7 @@ public class ResultWithErrors<T> {
   }
 
   /**
-   * Process result is no errors found or consume the errors
+   * Process result if no errors found or consume the errors
    *
    * @param resultConsumer consumer that accepts the results if no errors found
    * @param errorsConsumer consumer that accepts errors if found
