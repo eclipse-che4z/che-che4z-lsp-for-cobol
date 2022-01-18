@@ -17,17 +17,23 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.util.impl;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingServiceImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingServiceImpl;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 /** This test checks the logic of {@link ReplacingServiceImpl} */
 class ReplacingServiceImplTest {
+
+  private final MessageService messageService = mock(MessageService.class);
+  private final Locality locality = Locality.builder().build();
   /**
    * Test the service applies replacing for the given text by provided patterns. The left value in
    * the pattern pair is a regex for replaceable, and the right one is a replacement text. Here:
@@ -37,7 +43,7 @@ class ReplacingServiceImplTest {
    */
   @Test
   void testApplyReplacing() {
-    ReplacingService replacingService = new ReplacingServiceImpl();
+    ReplacingService replacingService = new ReplacingServiceImpl(messageService);
     assertEquals(
         "   05\n\r.   .CHILD201\r\n.",
         replacingService.applyReplacing(
@@ -58,17 +64,17 @@ class ReplacingServiceImplTest {
    */
   @Test
   void retrievePseudoTextReplacingPattern() {
-    ReplacingService replacingService = new ReplacingServiceImpl();
+    ReplacingService replacingService = new ReplacingServiceImpl(messageService);
     assertEquals(
         new ResultWithErrors<>(
             Pair.of(
                 "(\\(|:|[.,;]\\s)?(?<=^|[.,;]\\s|\\s|[\\(:])01(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)[\\):,;]?",
                 "BY"),
             Collections.emptyList()),
-        replacingService.retrievePseudoTextReplacingPattern("==  01  == BY == BY   =="));
+        replacingService.retrievePseudoTextReplacingPattern("==  01  == BY == BY   ==", locality));
     assertEquals(
         new ResultWithErrors<>(Pair.of("", ""), Collections.emptyList()),
-        replacingService.retrievePseudoTextReplacingPattern(""));
+        replacingService.retrievePseudoTextReplacingPattern("", locality));
     assertEquals(
         new ResultWithErrors<>(
             Pair.of(
@@ -76,14 +82,15 @@ class ReplacingServiceImplTest {
                     + "c(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)[\\):,;]?",
                 ""),
             Collections.emptyList()),
-        replacingService.retrievePseudoTextReplacingPattern("==a   b  \nc== bY ===="));
+        replacingService.retrievePseudoTextReplacingPattern("==a   b  \nc== bY ====", locality));
     assertEquals(
         new ResultWithErrors<>(
             Pair.of(
                 "(\\(|:|[.,;]\\s)?(?<=^|[.,;]\\s|\\s|[\\(:])BY(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)[\\):,;]?",
                 ""),
             Collections.emptyList()),
-        replacingService.retrievePseudoTextReplacingPattern("==BY== by ==\n      \r\n   =="));
+        replacingService.retrievePseudoTextReplacingPattern(
+            "==BY== by ==\n      \r\n   ==", locality));
   }
 
   /**
@@ -93,7 +100,7 @@ class ReplacingServiceImplTest {
    */
   @Test
   void testRetrieveTokenReplacingPattern() {
-    ReplacingService replacingService = new ReplacingServiceImpl();
+    ReplacingService replacingService = new ReplacingServiceImpl(messageService);
     assertEquals(
         Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"),
         replacingService.retrieveTokenReplacingPattern("01 BY 05"));

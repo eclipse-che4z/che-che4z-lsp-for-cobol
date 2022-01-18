@@ -18,43 +18,70 @@ package org.eclipse.lsp.cobol.core.semantics;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp4j.Location;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class represents a semantic sub-context for specific types of elements that have names and
  * stores their definitions and variables.
  */
 @Value
-public class NamedSubContext implements SubContext<String> {
-
+public class NamedSubContext {
   Multimap<String, Location> definitions = HashMultimap.create();
   Multimap<String, Location> usages = HashMultimap.create();
+  Map<String, Locality> definitionStatements = new HashMap<>();
 
-  @Override
+  /**
+   * Add defined language element to the context
+   *
+   * @param name name of the element
+   * @param location location of the used element
+   */
   public void define(String name, Location location) {
     definitions.put(name, location);
   }
 
-  @Override
+  /**
+   * Add the position of a language element usage
+   *
+   * @param name name of the element
+   * @param location location of the used element
+   */
   public void addUsage(String name, Location location) {
     usages.put(name, location);
   }
 
-  @Override
-  public Collection<String> getAll() {
-    return definitions.keySet();
+  /**
+   * Add the definition statement of an element
+   *
+   * @param id the id of the element
+   * @param location the location of the definition statements
+   */
+  public void addStatement(String id, Locality location) {
+    definitionStatements.put(id, location);
   }
 
-  @Override
+  /**
+   * Check if the context contains a language element with the provided name already defined
+   *
+   * @param name a language element name to check
+   * @return true if the element already defined
+   */
   public boolean contains(String name) {
     return definitions.containsKey(name);
   }
 
-  @Override
-  public void merge(SubContext<String> subContext) {
+  /**
+   * Copy the content of the given subContext into this one.
+   *
+   * @param subContext a subContext that should be merged into this one
+   */
+  public void merge(NamedSubContext subContext) {
     definitions.putAll(subContext.getDefinitions());
     usages.putAll(subContext.getUsages());
+    definitionStatements.putAll(subContext.getDefinitionStatements());
   }
 }
