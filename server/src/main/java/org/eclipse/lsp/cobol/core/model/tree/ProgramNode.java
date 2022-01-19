@@ -44,7 +44,7 @@ import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 public class ProgramNode extends Node {
   private final Multimap<String, VariableNode> variables = ArrayListMultimap.create();
   private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
-  private final Map<String, List<ParagraphDefinitionNameNode>> paragraphNodes = new HashMap<>();
+  private final Map<String, ParagraphDefinitionNameNode> paragraphNodes = new HashMap<>();
 
   private String programName;
 
@@ -124,29 +124,6 @@ public class ProgramNode extends Node {
                 .build());
   }
 
-  private Optional<SyntaxError> registerParagraphUsage(CodeBlockUsageNode node) {
-    final Optional<List<ParagraphDefinitionNameNode>> definition =
-        Optional.ofNullable(paragraphNodes.get(node.getName()));
-    definition.ifPresent(
-        it -> {
-          it.forEach(
-              i -> {
-                i.addUsage(node.getLocality().toLocation());
-                node.setDefinition(i);
-              });
-        });
-
-    return definition.isPresent()
-        ? Optional.empty()
-        : Optional.of(
-            SyntaxError.syntaxError()
-                .messageTemplate(
-                    MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
-                .severity(ErrorSeverity.ERROR)
-                .locality(node.getLocality())
-                .build());
-  }
-
   private Map<String, VariableNode> getMapOfGlobalVariables() {
     Map<String, VariableNode> result =
         getNearestParentByType(PROGRAM)
@@ -171,19 +148,20 @@ public class ProgramNode extends Node {
    * @return syntax error if the code block duplicates
    */
   public Optional<SyntaxError> registerParagraphNameNode(ParagraphDefinitionNameNode node) {
-    List<ParagraphDefinitionNameNode> nodes =
-        paragraphNodes.get(node.getParagraphName().toUpperCase()) != null
-            ? paragraphNodes.get(node.getParagraphName().toUpperCase())
-            : new ArrayList<>();
-    nodes.add(node);
-
-    paragraphNodes.put(node.getParagraphName().toUpperCase(), nodes);
-
-    nodes.forEach(
-        it -> {
-          it.definitions.add(node.locality.toLocation());
-          node.setDefinitions(it.definitions);
-        });
+    paragraphNodes.putIfAbsent(node.getParagraphName(), node);
+    ParagraphDefinitionNameNode foundNode = paragraphNodes.get(node.getParagraphName());
+    foundNode.addDefinition(node.locality.toLocation());
     return Optional.empty();
   }
+
+  private void registerParagraphUsage(CodeBlockUsageNode node) {
+    final Optional<ParagraphDefinitionNameNode> definition =
+        Optional.ofNullable(paragraphNodes.get(node.getName()));
+    definition.ifPresent(
+        it -> {
+          it.addUsage(node.getLocality().toLocation());
+          node.setDefinition(it);
+        });
+  }
+
 }

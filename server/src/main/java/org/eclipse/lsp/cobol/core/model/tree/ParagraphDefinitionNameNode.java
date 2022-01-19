@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
-import lombok.Setter;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp4j.Location;
@@ -28,12 +27,12 @@ import java.util.List;
 @Getter
 public class ParagraphDefinitionNameNode extends Node implements Context {
   private final String paragraphName;
-  @Setter List<Location> definitions = new ArrayList<>();
+  List<Location> definitions = new ArrayList<>();
   List<Location> usageLocations = new ArrayList<>();
 
   public ParagraphDefinitionNameNode(String name, Locality location) {
     super(location, NodeType.PARAGRAPH_DEFINITION_NAME_NODE);
-    paragraphName = name;
+    paragraphName = name.toUpperCase();
     addProcessStep(this::processNode);
   }
 
@@ -43,11 +42,21 @@ public class ParagraphDefinitionNameNode extends Node implements Context {
 
   @Override
   public List<Location> getDefinitions() {
-    return definitions;
+    return getNearestParentByType(NodeType.PROGRAM)
+        .map(ProgramNode.class::cast)
+        .map(ProgramNode::getParagraphNodes)
+        .get()
+        .get(paragraphName)
+        .definitions;
   }
 
   public List<Location> getUsages() {
-    return usageLocations;
+    return getNearestParentByType(NodeType.PROGRAM)
+        .map(ProgramNode.class::cast)
+        .map(ProgramNode::getParagraphNodes)
+        .get()
+        .get(paragraphName)
+        .usageLocations;
   }
 
   private List<SyntaxError> registerParagraph() {
@@ -60,5 +69,9 @@ public class ParagraphDefinitionNameNode extends Node implements Context {
 
   void addUsage(Location location) {
     usageLocations.add(location);
+  }
+
+  void addDefinition(Location location) {
+    definitions.add(location);
   }
 }
