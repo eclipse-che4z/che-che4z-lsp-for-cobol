@@ -988,10 +988,6 @@ idmsOnClause
     : ON generalIdentifier
     ;
 
-externalStatement
-    : externalNodeHook
-    ;
-
 // DAF DaCo Statements
 
 dafStatements
@@ -3190,11 +3186,6 @@ idms_subschema_name
 idms_table_name
     : {validateLength(_input.LT(1).getText().substring(1, _input.LT(1).getText().length() -1),
            "table name", 8);} literal
-    ;
-
-// external node
-externalNodeHook
-    : EXTERNAL_NODE_HOOK IDENTIFIER integerLiteral
     ;
 
 // DAF DaCo Identifiers
