@@ -993,6 +993,7 @@ idmsOnClause
 dafStatements
     : readTransactionStatement | writeTransactionStatement | writeReportStatement
     | openPacketStatement | getMetaInfoStatement | messageHandlingStatement
+    | tableRowRetrievalStatement
     ;
 
 readTransactionStatement
@@ -1132,6 +1133,52 @@ showResultStatement
 showErrorMessageStatement
     : MESSAGE (({validateExactLength(trimQuotes(_input.LT(1).getText()), "language code", 2);} NONNUMERICLITERAL)
       | (qualifiedDataName | NONNUMERICLITERAL))?
+    ;
+
+tableRowRetrievalStatement
+    : ROW (rowStartStatement | rowSaveStatement | rowRestoreStatement
+      | rowGetStatement | rowNextStatement | rowPriorStatement
+      | rowAnyStatement | rowMatchStatement)
+    ;
+
+rowStartStatement
+    : START daf_table_name
+    ;
+
+rowSaveStatement
+    : SAVE daf_table_name
+      IN (qualifiedDataName | literal)
+    ;
+
+rowRestoreStatement
+    : RESTORE daf_table_name
+      FROM (qualifiedDataName | literal)
+    ;
+
+rowGetStatement
+    : GET daf_table_name
+      (ON (qualifiedDataName | literal))?
+      (TO qualifiedDataName)?
+    ;
+
+rowNextStatement
+    : NEXT daf_table_name
+      (TO qualifiedDataName)?
+    ;
+
+rowPriorStatement
+    : PRIOR daf_table_name
+      (TO qualifiedDataName)?
+    ;
+
+rowAnyStatement
+    : ANY daf_table_name
+      USING qualifiedDataName
+    ;
+
+rowMatchStatement
+    : MATCH daf_table_name
+      USING qualifiedDataName
     ;
 
 // End of DaCo Statements
@@ -3205,6 +3252,10 @@ daf_report_name
 
 daf_entity_role
     : (OWNER | DESIGNER | ANALIST | OWN | AVG | ANA)
+    ;
+
+daf_table_name
+    : { validateStartsWith(_input.LT(1).getText(), "TBL", "TBF"); } qualifiedDataName
     ;
 
 daf_message_types

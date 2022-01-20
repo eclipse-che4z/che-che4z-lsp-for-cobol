@@ -2325,5 +2325,69 @@
         ],
         "description": "[DaCo] SHOW Last Error Message",
         "scope": "cobol"
+    },
+    "TABLE ROW START": {
+        "prefix": "ROW START",
+        "body": [
+            "ROW START ${1:TBL|TBFnam}."
+        ],
+        "description": "[DaCo] ROW START",
+        "scope": "cobol"
+    },
+    "TABLE ROW SAVE": {
+        "prefix": "ROW SAVE",
+        "body": [
+            "ROW SAVE ${1:TBLnam} IN ${2:value}."
+        ],
+        "description": "[DaCo] ROW SAVE",
+        "scope": "cobol"
+    },
+    "TABLE ROW RESTORE": {
+        "prefix": "ROW RESTORE",
+        "body": [
+            "ROW RESTORE ${1:TBLnam} FROM ${2:value}."
+        ],
+        "description": "[DaCo] ROW RESTORE",
+        "scope": "cobol"
+    },
+    "TABLE ROW GET": {
+        "prefix": "ROW GET",
+        "body": [
+            "ROW GET ${1:TBL|TBFnam} ON ${2:value/dataname-1} TO ${3:dataname-2}."
+        ],
+        "description": "[DaCo] ROW GET",
+        "scope": "cobol"
+    },
+    "TABLE ROW NEXT": {
+        "prefix": "ROW NEXT",
+        "body": [
+            "ROW NEXT ${1:TBL|TBFnam} TO ${2:dataname}."
+        ],
+        "description": "[DaCo] ROW NEXT",
+        "scope": "cobol"
+    },
+    "TABLE ROW PRIOR": {
+        "prefix": "ROW PRIOR",
+        "body": [
+            "ROW PRIOR ${1:TBL|TBFnam} TO ${2:dataname}."
+        ],
+        "description": "[DaCo] ROW PRIOR",
+        "scope": "cobol"
+    },
+    "TABLE ROW ANY": {
+        "prefix": "ROW ANY",
+        "body": [
+            "ROW ANY ${1:TBL|TBFnam} USING ${2:dataname}."
+        ],
+        "description": "[DaCo] ROW ANY",
+        "scope": "cobol"
+    },
+    "TABLE ROW MATCH": {
+        "prefix": "ROW MATCH",
+        "body": [
+            "ROW MATCH ${1:TBL|TBFnam} FROM ${2:dataname}."
+        ],
+        "description": "[DaCo] ROW MATCH",
+        "scope": "cobol"
     }
 }
