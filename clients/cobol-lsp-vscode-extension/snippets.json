@@ -2385,7 +2385,7 @@
     "TABLE ROW MATCH": {
         "prefix": "ROW MATCH",
         "body": [
-            "ROW MATCH ${1:TBL|TBFnam} FROM ${2:dataname}."
+            "ROW MATCH ${1:TBL|TBFnam} USING ${2:dataname}."
         ],
         "description": "[DaCo] ROW MATCH",
         "scope": "cobol"
