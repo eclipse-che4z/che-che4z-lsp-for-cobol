@@ -993,156 +993,6 @@ idmsOnClause
 dafStatements
     : readTransactionStatement | writeTransactionStatement | writeReportStatement
     | openPacketStatement | getMetaInfoStatement | messageHandlingStatement
-    ;
-
-readTransactionStatement
-    : READ TRANSACTION daf_task_name?
-    ;
-
-writeTransactionStatement
-    : WRITE TRANSACTION daf_task_name
-        (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 4, 2048);} integerLiteral))?
-        (TO ({validateLength(_input.LT(1).getText(), "dbu", 19);} (cobolWord | integerLiteral)))?
-    ;
-
-writeReportStatement
-    : writeReportStatementWithName | endWriteReportStatement | autoWriteReportStatement
-    ;
-
-writeReportStatementWithName
-    : WRITE REPORT daf_report_name
-        FROM qualifiedDataName
-        (TO qualifiedDataName)?
-        (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 80, 200);} integerLiteral))?
-        (AFTER ((integerLiteral LINES) | PAGE | qualifiedDataName))?
-    ;
-
-endWriteReportStatement
-    : WRITE REPORT daf_report_name ENDRPT
-    ;
-
-autoWriteReportStatement
-    : WRITE REPORT AUTO qualifiedDataName
-        (END qualifiedDataName)?
-    ;
-
-openPacketStatement
-    : OPEN PACKET daf_task_name
-           (FOR (qualifiedDataName | {validateExactLength(trimQuotes(_input.LT(1).getText()), "receiver packet", 3);}
-           NONNUMERICLITERAL))
-           (SORT qualifiedDataName)?
-           (VERSION (qualifiedDataName | integerLiteral))?
-    ;
-
-getMetaInfoStatement
-    : GET (getEntityStatement | getUserStatement | getItemStatements
-         | getTaskStatement | getOdetteOrJobOrNetworkStatement)
-    ;
-
-getEntityStatement
-    : ENTITY (getEntityNameAndDescriptionStatement | getEntityDescriptionForDomainStatement)
-    ;
-
-getEntityNameAndDescriptionStatement
-    :  (qualifiedDataName |  {validateStringLengthRange(trimQuotes(_input.LT(1).getText()), 3, 4);}
-            NONNUMERICLITERAL)
-            (qualifiedDataName | {validateStringLengthRange(trimQuotes(_input.LT(1).getText()), 3, 16);}
-            NONNUMERICLITERAL)
-            ( ( daf_entity_role |
-                {validateAllowedValues(trimQuotes(_input.LT(1).getText()),
-                  "OWNER","OWN","DESIGNER","AVG","ANALIST","ANA");} NONNUMERICLITERAL
-              )
-            | ( DESCRIPTION
-                ( qualifiedDataName |
-                  {validateExactLength(trimQuotes(_input.LT(1).getText()), "tal", 2);} NONNUMERICLITERAL)
-              )
-            )
-    ;
-
-getEntityDescriptionForDomainStatement
-    : (DOM | {validateAllowedValues(trimQuotes(_input.LT(1).getText()), "DOM");} NONNUMERICLITERAL)
-      qualifiedDataName DESCRIPTION
-    ;
-
-
-getUserStatement
-    : USER (NEXT | getUserOptions)
-    ;
-
-getUserOptions
-    : (qualifiedDataName |  {validateExactLength(trimQuotes(_input.LT(1).getText()),"kls", 3);}
-                 NONNUMERICLITERAL)
-                (qualifiedDataName | NONNUMERICLITERAL)
-    ;
-
-getItemStatements
-    : ITEM (getItemAnyStatement | getItemSeqStatement | getItemGrsStatement)
-    ;
-
-getItemAnyStatement
-    : ANY (qualifiedDataName | NONNUMERICLITERAL)
-                   (qualifiedDataName | NONNUMERICLITERAL)
-                   (qualifiedDataName | NONNUMERICLITERAL)
-    ;
-
-getItemSeqStatement
-    : SEQ (qualifiedDataName | NONNUMERICLITERAL)
-                   (qualifiedDataName | NONNUMERICLITERAL)?
-    ;
-
-getItemGrsStatement
-    : GRS (qualifiedDataName | NONNUMERICLITERAL)
-                   (qualifiedDataName | NONNUMERICLITERAL)
-                   (qualifiedDataName | NONNUMERICLITERAL)?
-    ;
-
-
-getTaskStatement
-    : TASK (qualifiedDataName | {validateExactLength(trimQuotes(_input.LT(1).getText()), "task name", 4);}
-                NONNUMERICLITERAL)
-    ;
-
-getOdetteOrJobOrNetworkStatement
-    : (ODETTE | JOB | NETWORK) (qualifiedDataName | NONNUMERICLITERAL)
-    ;
-
-messageHandlingStatement
-    : showDMLMessageStatement | returnStatusStatement
-    ;
-
-showDMLMessageStatement
-    : SHOW (showMessageStatement | showResultStatement | showErrorMessageStatement)
-    ;
-showMessageStatement
-    : STD? daf_message_types
-     ({validateExactLength(_input.LT(1).getText(), "message code", 3);} integerLiteral)
-     (qualifiedDataName | NONNUMERICLITERAL)?
-     (qualifiedDataName | NONNUMERICLITERAL)?
-     (qualifiedDataName | NONNUMERICLITERAL)?
-    ;
-
-returnStatusStatement
-    : RETURN daf_message_types
-      ({validateExactLength(_input.LT(1).getText(), "message code", 3);} integerLiteral)
-      (qualifiedDataName | NONNUMERICLITERAL)?
-    ;
-
-showResultStatement
-    : RESULT daf_task_name
-    ;
-
-showErrorMessageStatement
-    : MESSAGE (({validateExactLength(trimQuotes(_input.LT(1).getText()), "language code", 2);} NONNUMERICLITERAL)
-      | (qualifiedDataName | NONNUMERICLITERAL))?
-    ;
-
-// End of DaCo Statements
-
-// DAF DaCo Statements
-
-dafStatements
-    : readTransactionStatement | writeTransactionStatement | writeReportStatement
-    | openPacketStatement | getMetaInfoStatement | messageHandlingStatement
     | tableRowRetrievalStatement
     ;
 
@@ -1159,6 +1009,7 @@ writeTransactionStatement
 writeReportStatement
     : writeReportStatementWithName | endWriteReportStatement | autoWriteReportStatement
     ;
+
 writeReportStatementWithName
     : WRITE REPORT daf_report_name
         FROM qualifiedDataName
@@ -1166,6 +1017,7 @@ writeReportStatementWithName
         (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 80, 200);} integerLiteral))?
         (AFTER ((integerLiteral LINES) | PAGE | qualifiedDataName))?
     ;
+
 endWriteReportStatement
     : WRITE REPORT daf_report_name ENDRPT
     ;
@@ -3407,34 +3259,11 @@ daf_entity_role
 daf_message_types
     : ERROR | INFO | WARNING
     ;
-// DAF DaCo Identifiers
-
-daf_task_name
-    :{validateExactLength(_input.LT(1).getText(), "task name", 4);
-      validateAlphaNumericPattern(_input.LT(1).getText(), "task name");
-     }
-        (cobolWord | integerLiteral)
-    ;
-
-daf_report_name
-    :{validateExactLength(_input.LT(1).getText(), "report name", 5);
-      validateAlphaNumericPattern(_input.LT(1).getText(), "report name");
-      validateStartsWith(_input.LT(1).getText(), "R", "T");
-      }
-        (cobolWord)
-    ;
-
-daf_entity_role
-    : (OWNER | DESIGNER | ANALIST | OWN | AVG | ANA)
-    ;
 
 daf_table_name
     : { validateStartsWith(_input.LT(1).getText(), "TBL", "TBF"); } qualifiedDataName
     ;
 
-daf_message_types
-    : ERROR | INFO | WARNING
-    ;
 // identifier ----------------------------------
 
 generalIdentifier
