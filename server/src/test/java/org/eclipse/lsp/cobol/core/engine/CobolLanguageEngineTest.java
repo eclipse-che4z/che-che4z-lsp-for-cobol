@@ -21,13 +21,16 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
-import org.eclipse.lsp.cobol.service.*;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -40,7 +43,7 @@ import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -65,10 +68,7 @@ class CobolLanguageEngineTest {
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
-            preprocessor,
-            mockMessageService,
-            treeListener,
-            mock(SubroutineService.class));
+            preprocessor, mockMessageService, treeListener, mock(SubroutineService.class));
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()
@@ -94,6 +94,7 @@ class CobolLanguageEngineTest {
 
     ExtendedDocument extendedDocument =
         new ExtendedDocument(
+            "",
             TEXT,
             new NamedSubContext(),
             ImmutableMap.of(
@@ -130,12 +131,13 @@ class CobolLanguageEngineTest {
                             .range(new Range(new Position(0, 31), new Position(0, 31)))
                             .token("<EOF>")
                             .build()),
-                    ImmutableMap.of())),
-            ImmutableMap.of());
+                    ImmutableMap.of())));
 
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER);
-    when(preprocessor.cleanUpCode(URI, TEXT)).thenReturn(new ResultWithErrors<>(TEXT, ImmutableList.of()));
-    when(preprocessor.process(URI, TEXT, cpyConfig))
+
+    when(preprocessor.cleanUpCode(URI, TEXT))
+        .thenReturn(new ResultWithErrors<>(TEXT, ImmutableList.of()));
+    when(preprocessor.processCleanCode(eq(URI), eq(TEXT), eq(cpyConfig), any(CopybookHierarchy.class)))
         .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));
 
     Range outlineRange =
@@ -166,17 +168,25 @@ class CobolLanguageEngineTest {
                             .uri(URI)
                             .range(new Range(new Position(0, 7), new Position(0, 31)))
                             .token("IDENTIFICATION")
-                            .build(), new NamedSubContext()))
+                            .build(),
+                        new NamedSubContext()))
                 .build(),
             ImmutableList.of(error, eofError));
 
-    ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(cpyConfig));
+    ResultWithErrors<SemanticContext> actual =
+        engine.run(URI, TEXT, AnalysisConfig.defaultConfig(cpyConfig));
     assertEquals(expected, actual);
 
     // test nullity
-    assertThrows(IllegalArgumentException.class, () -> engine.run(null, TEXT, AnalysisConfig.defaultConfig(cpyConfig)));
-    assertThrows(IllegalArgumentException.class, () -> engine.run(URI, null, AnalysisConfig.defaultConfig(cpyConfig)));
-    assertThrows(IllegalArgumentException.class, () -> engine.run(URI, TEXT, AnalysisConfig.defaultConfig((CopybookConfig) null)));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> engine.run(null, TEXT, AnalysisConfig.defaultConfig(cpyConfig)));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> engine.run(URI, null, AnalysisConfig.defaultConfig(cpyConfig)));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> engine.run(URI, TEXT, AnalysisConfig.defaultConfig((CopybookConfig) null)));
     assertThrows(IllegalArgumentException.class, () -> engine.run(URI, TEXT, null));
   }
 }

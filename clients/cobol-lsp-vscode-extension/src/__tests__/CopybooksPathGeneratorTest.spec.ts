@@ -13,8 +13,6 @@
  */
 import * as path from "path";
 import * as vscode from "vscode";
-import { SPECIFY_DSN_OR_USS } from "../constants";
-// tslint:disable-next-line: max-line-length
 import {
     checkWorkspace,
     CopybooksPathGenerator,
@@ -66,20 +64,5 @@ describe("CopybooksPathGenerator tests", () => {
 
         const ussResponse = await gen.listUSSPaths();
         expect(ussResponse).toStrictEqual("/test/uss/path");
-    });
-
-    it("show error message if no configuration provided for DSN and USS, for copybook download", async () => {
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            has: jest.fn().mockReturnValue(false),
-        });
-        vscode.window.showErrorMessage = jest.fn();
-        const gen: CopybooksPathGenerator = new CopybooksPathGenerator();
-        const response = await gen.listDatasets();
-        expect(response.length).toBe(0);
-        expect(vscode.window.showErrorMessage).toHaveBeenLastCalledWith(SPECIFY_DSN_OR_USS);
-
-        const ussResponse = await gen.listUSSPaths();
-        expect(ussResponse.length).toBe(0);
-        expect(vscode.window.showErrorMessage).toHaveBeenLastCalledWith(SPECIFY_DSN_OR_USS);
     });
 });

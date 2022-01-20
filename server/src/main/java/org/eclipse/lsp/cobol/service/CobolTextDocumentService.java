@@ -44,8 +44,8 @@ import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
+import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -321,6 +321,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     futureMap.remove(uri);
   }
 
+  @SuppressWarnings("java:S1181")
   private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
     registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.empty()));
     Future<?> docAnalysisFuture =
@@ -348,7 +349,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                           return value;
                         });
                     cfAstMap.get(uri).complete(result.getRootNode());
-                  } catch (Exception e) {
+                  } catch (Throwable e) {
                     cfAstMap.get(uri).completeExceptionally(e);
                     LOG.error(createDescriptiveErrorMessage("analysis", uri), e);
                   } finally {
@@ -363,7 +364,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     try {
       List<Object> objects =
           settingsService
-              .getConfigurations(Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, FLAVORS.label))
+              .getConfigurations(
+                  Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, FLAVORS.label))
               .get();
 
       SQLBackend sqlBackend =
@@ -382,8 +384,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       List<String> flavors = ImmutableList.of();
       JsonElement flavorsSettings = (JsonElement) objects.get(2);
       if (flavorsSettings.isJsonArray())
-        flavors = Streams.stream((JsonArray) flavorsSettings)
-          .map(JsonElement::getAsString).collect(toList());
+        flavors =
+            Streams.stream((JsonArray) flavorsSettings)
+                .map(JsonElement::getAsString)
+                .collect(toList());
       return new AnalysisConfig(features, copybookConfig, flavors);
     } catch (InterruptedException e) {
       LOG.error("InterruptedException when getting settings", e);
@@ -398,6 +402,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     futureMap.put(uri, docAnalysisFuture);
   }
 
+  @SuppressWarnings("java:S1181")
   void analyzeChanges(String uri, String text) {
     Future<?> analyseSubmitFuture =
         executors
@@ -417,7 +422,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                         .complete(
                             BuildOutlineTreeFromSyntaxTree.convert(result.getRootNode(), uri));
                     cfAstMap.get(uri).complete(result.getRootNode());
-                  } catch (Exception ex) {
+                  } catch (Throwable ex) {
                     cfAstMap.get(uri).completeExceptionally(ex);
                     LOG.error(createDescriptiveErrorMessage("analysis", uri), ex);
                   } finally {

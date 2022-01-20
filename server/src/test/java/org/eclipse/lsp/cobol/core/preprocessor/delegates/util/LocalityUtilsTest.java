@@ -27,8 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
-/** This test checks that {@link LocalityFindingUtils} works as expected */
-class LocalityFindingUtilsTest {
+/** This test checks that {@link LocalityUtils} works as expected */
+class LocalityUtilsTest {
   @Test
   void testLocalityFindingPositive() {
     Locality notExpected = Locality.builder().uri("notExpected").build();
@@ -44,7 +44,7 @@ class LocalityFindingUtilsTest {
     positions.put(placeholderToken, notExpected);
     positions.put(correctToken, expected);
 
-    Locality result = LocalityFindingUtils.findPreviousVisibleLocality(correctToken, positions);
+    Locality result = LocalityUtils.findPreviousVisibleLocality(correctToken, positions);
     assertEquals(expected, result);
   }
 
@@ -73,7 +73,7 @@ class LocalityFindingUtilsTest {
     positions.put(hiddenToken1, notExpected);
     positions.put(hiddenToken2, notExpected);
 
-    Locality result = LocalityFindingUtils.findPreviousVisibleLocality(tokenToCheck, positions);
+    Locality result = LocalityUtils.findPreviousVisibleLocality(tokenToCheck, positions);
     assertEquals(expected, result);
   }
 
@@ -114,7 +114,7 @@ class LocalityFindingUtilsTest {
     positions.put(hiddenToken4, notExpected);
     positions.put(hiddenToken5, notExpected);
 
-    Locality result = LocalityFindingUtils.findPreviousVisibleLocality(tokenToCheck, positions);
+    Locality result = LocalityUtils.findPreviousVisibleLocality(tokenToCheck, positions);
     assertNull(result);
   }
 
@@ -140,7 +140,7 @@ class LocalityFindingUtilsTest {
     positions.put(correctToken, expected);
     positions.put(hiddenToken, notExpected);
 
-    Locality result = LocalityFindingUtils.findPreviousVisibleLocality(tokenToCheck, positions);
+    Locality result = LocalityUtils.findPreviousVisibleLocality(tokenToCheck, positions);
     assertNull(result);
   }
 }
