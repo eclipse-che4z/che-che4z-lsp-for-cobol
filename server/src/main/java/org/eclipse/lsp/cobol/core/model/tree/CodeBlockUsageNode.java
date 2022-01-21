@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.core.model.tree;
 import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -33,9 +32,6 @@ import java.util.Optional;
 @EqualsAndHashCode(callSuper = true)
 public class CodeBlockUsageNode extends Node implements Context {
   String name;
-
-  @Setter @EqualsAndHashCode.Exclude @ToString.Exclude
-  private ParagraphDefinitionNameNode definition;
 
   public CodeBlockUsageNode(Locality location, String name) {
     super(location, NodeType.CODE_BLOCK_USAGE);
@@ -60,11 +56,17 @@ public class CodeBlockUsageNode extends Node implements Context {
 
   @Override
   public List<Location> getDefinitions() {
-    return definition.getDefinitions();
+    return getNearestParentByType(NodeType.PROGRAM)
+            .map(ProgramNode.class::cast)
+            .map(ProgramNode::getBlockReference)
+            .map(it -> it.get(getName()).getDefinitions()).orElse(ImmutableList.of());
   }
 
   @Override
   public List<Location> getUsages() {
-    return definition.getUsageLocations();
+    return getNearestParentByType(NodeType.PROGRAM)
+            .map(ProgramNode.class::cast)
+            .map(ProgramNode::getBlockReference)
+            .map(it -> it.get(getName()).getUsage()).orElse(ImmutableList.of());
   }
 }

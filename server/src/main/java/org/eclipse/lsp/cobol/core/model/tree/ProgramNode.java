@@ -44,7 +44,7 @@ import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 public class ProgramNode extends Node {
   private final Multimap<String, VariableNode> variables = ArrayListMultimap.create();
   private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
-  private final Map<String, ParagraphDefinitionNameNode> paragraphNodes = new HashMap<>();
+  private final Map<String, CodeBlockReference> blockReference = new HashMap<>();
 
   private String programName;
 
@@ -112,7 +112,13 @@ public class ProgramNode extends Node {
     final Optional<CodeBlockDefinitionNode> definition =
         codeBlocks.stream().filter(it -> it.getName().equals(node.getName())).findAny();
     definition.ifPresent(it -> it.addUsage(node.getLocality()));
-    registerParagraphUsage(node);
+    final Optional<CodeBlockReference> foundReference =
+        Optional.ofNullable(blockReference.get(node.getName()));
+    foundReference.ifPresent(
+        i -> {
+          i.addUsage(node.getLocality().toLocation());
+        });
+
     return definition.isPresent()
         ? Optional.empty()
         : Optional.of(
@@ -142,26 +148,15 @@ public class ProgramNode extends Node {
       addVariableDefinition(new MnemonicNameNode(location, PREDEFINED, predefinedVariableName));
   }
   /**
-   * Add a paragraph definition name node in the program context.
+   * Add a paragraph or section definition name node in the program context.
    *
-   * @param node - the paragraph definition node
+   * @param node - the paragraph or section definition node
    * @return syntax error if the code block duplicates
    */
-  public Optional<SyntaxError> registerParagraphNameNode(ParagraphDefinitionNameNode node) {
-    paragraphNodes.putIfAbsent(node.getParagraphName(), node);
-    ParagraphDefinitionNameNode foundNode = paragraphNodes.get(node.getParagraphName());
-    foundNode.addDefinition(node.locality.toLocation());
+  public Optional<SyntaxError> registerNameNode(CodeBlockNameNode node) {
+    blockReference.putIfAbsent(node.getName(), new CodeBlockReference());
+    CodeBlockReference references = blockReference.get(node.getName());
+    references.addDefinition(node.locality.toLocation());
     return Optional.empty();
   }
-
-  private void registerParagraphUsage(CodeBlockUsageNode node) {
-    final Optional<ParagraphDefinitionNameNode> definition =
-        Optional.ofNullable(paragraphNodes.get(node.getName()));
-    definition.ifPresent(
-        it -> {
-          it.addUsage(node.getLocality().toLocation());
-          node.setDefinition(it);
-        });
-  }
-
 }

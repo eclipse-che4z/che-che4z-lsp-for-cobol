@@ -20,58 +20,46 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp4j.Location;
 
-import java.util.ArrayList;
 import java.util.List;
 
-/** The class represents paragraphs name node in COBOL grammar. */
+/** The class represents paragraphs or section name node in COBOL grammar. */
 @Getter
-public class ParagraphDefinitionNameNode extends Node implements Context {
-  private final String paragraphName;
-  List<Location> definitions = new ArrayList<>();
-  List<Location> usageLocations = new ArrayList<>();
+public class CodeBlockNameNode extends Node implements Context {
+  private final String name;
 
-  public ParagraphDefinitionNameNode(String name, Locality location) {
-    super(location, NodeType.PARAGRAPH_DEFINITION_NAME_NODE);
-    paragraphName = name.toUpperCase();
+  public CodeBlockNameNode(Locality location, String name) {
+    super(location, NodeType.PARAGRAPH_SECTION_NAME_NODE);
+    this.name = name.toUpperCase();
     addProcessStep(this::processNode);
   }
 
   private List<SyntaxError> processNode() {
-    return registerParagraph();
+    return registerNode();
   }
 
   @Override
   public List<Location> getDefinitions() {
     return getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
-        .map(ProgramNode::getParagraphNodes)
-        .get()
-        .get(paragraphName)
-        .definitions;
+        .map(ProgramNode::getBlockReference)
+        .map(it -> it.get(getName()).getDefinitions())
+        .orElse(ImmutableList.of());
   }
 
+  @Override
   public List<Location> getUsages() {
     return getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
-        .map(ProgramNode::getParagraphNodes)
-        .get()
-        .get(paragraphName)
-        .usageLocations;
+        .map(ProgramNode::getBlockReference)
+        .map(it -> it.get(getName()).getUsage())
+        .orElse(ImmutableList.of());
   }
 
-  private List<SyntaxError> registerParagraph() {
+  private List<SyntaxError> registerNode() {
     return getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
-        .flatMap(parent -> parent.registerParagraphNameNode(this))
+        .flatMap(parent -> parent.registerNameNode(this))
         .map(ImmutableList::of)
         .orElseGet(() -> ImmutableList.of());
-  }
-
-  void addUsage(Location location) {
-    usageLocations.add(location);
-  }
-
-  void addDefinition(Location location) {
-    definitions.add(location);
   }
 }
