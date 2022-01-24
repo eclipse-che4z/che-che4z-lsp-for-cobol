@@ -54,6 +54,18 @@
             {
                 "command": "cobol-lsp.cpy-manager.goto-settings",
                 "title": "Open Copybook location settings"
+            },
+            {
+                "command": "cobol-lsp.commentLine.toggle",
+                "title": "Toggle COBOL Line Comment"
+            },
+            {
+                "command": "cobol-lsp.commentLine.comment",
+                "title": "Add Cobol Line Comment"
+            },
+            {
+                "command": "cobol-lsp.commentLine.uncomment",
+                "title": "Remove COBOL Line Comment"
             }
         ],
         "languages": [
@@ -226,6 +238,12 @@
                 "key": "shift+tab",
                 "command": "cobol-lsp.smart-outdent",
                 "when": "editorLangId == COBOL && !inSnippetMode"
+            },
+            {
+                "key": "ctrl+/",
+                "mac": "cmd+/",
+                "command": "cobol-lsp.commentLine.toggle",
+                "when": "editorLangId =~ /^cobol$/i && editorTextFocus && !editorReadonly"
             }
         ]
     },
