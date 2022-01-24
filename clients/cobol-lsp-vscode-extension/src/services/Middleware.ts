@@ -17,7 +17,7 @@ import {ConfigurationParams, ConfigurationRequest} from "vscode-languageclient";
 import {CopybookDownloadService} from "./copybook/CopybookDownloadService";
 import {CopybookURI} from "./copybook/CopybookURI";
 
-const PARAMS_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+)$/
+const PARAMS_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+)\.([^.]+)$/
 
 export class Middleware {
     constructor(
@@ -35,7 +35,7 @@ export class Middleware {
             switch (requestLines[0].command) {
                 case "copybook-resolve":
                     return [await this.copybookResolverURI.resolveCopybookURI(requestLines[0].copybookName,
-                        requestLines[0].cobolFileName)]
+                        requestLines[0].cobolFileName, requestLines[0].flavorName)]
                 case "copybook-download":
                     const copybookNames = requestLines.map(requestLine => requestLine.copybookName);
                     this.copybookDownloader.downloadCopybooks(requestLines[0].cobolFileName, copybookNames,
@@ -54,6 +54,7 @@ export class Middleware {
                 match[2],
                 match[5],
                 match[6],
+                match[7],
                 "verbose" != match[4]
             );
         }
@@ -66,6 +67,7 @@ export class RequestLine {
         readonly command: string,
         readonly cobolFileName: string,
         readonly copybookName: string,
+        readonly flavorName: string,
         readonly quiet: boolean
     ) { }
 }
