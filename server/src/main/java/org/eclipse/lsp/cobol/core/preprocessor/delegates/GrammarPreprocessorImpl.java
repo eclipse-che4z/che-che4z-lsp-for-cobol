@@ -18,21 +18,21 @@ import com.google.inject.Inject;
 import lombok.NonNull;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListener;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacePreprocessorFactory;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * This class runs pre-processing for COBOL using CobolPreprocessor.g4 grammar file. As a result, it
@@ -41,17 +41,14 @@ import java.util.List;
  */
 public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   private final GrammarPreprocessorListenerFactory listenerFactory;
-  private final ReplacingService replacingService;
-  private final MessageService messageService;
+  private final ReplacePreprocessorFactory replacingFactory;
 
   @Inject
   public GrammarPreprocessorImpl(
       GrammarPreprocessorListenerFactory listenerFactory,
-      ReplacingService replacingService,
-      MessageService messageService) {
+      ReplacePreprocessorFactory replacingFactory) {
     this.listenerFactory = listenerFactory;
-    this.replacingService = replacingService;
-    this.messageService = messageService;
+    this.replacingFactory = replacingFactory;
   }
 
   @NonNull
@@ -59,14 +56,23 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   public ResultWithErrors<ExtendedDocument> buildExtendedDocument(
       @NonNull String uri,
       @NonNull String code,
-      @NonNull Deque<CopybookUsage> copybookStack,
       @NonNull CopybookConfig copybookConfig,
-      @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
-      @NonNull List<Pair<String, String>> replacingClauses) {
+      @NonNull CopybookHierarchy hierarchy) {
+    List<SyntaxError> errors = new ArrayList<>();
+
+    String replacedCode =
+        runPreprocessorGrammar(code, tokens -> replacingFactory.create(uri, tokens, hierarchy))
+            .unwrap(errors::addAll);
+
+    return runPreprocessorGrammar(
+            replacedCode, tokens -> listenerFactory.create(uri, tokens, copybookConfig, hierarchy))
+        .accumulateErrors(errors);
+  }
+
+  private <T> ResultWithErrors<T> runPreprocessorGrammar(
+      String code, Function<BufferedTokenStream, GrammarPreprocessorListener<T>> listenerBuilder) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    ReplacePreProcessorListener replaceListener = handleReplaceClauses(code, uri, replacingClauses);
-    code = replaceListener.getResult().getText();
-    List<SyntaxError> errors = new ArrayList<>(replaceListener.getErrors());
+
     Lexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     lexer.removeErrorListeners();
 
@@ -78,30 +84,8 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
     RuleContext startRule = parser.startRule();
 
     ParseTreeWalker walker = new ParseTreeWalker();
-    GrammarPreprocessorListener listener =
-        listenerFactory.create(
-            uri,
-            tokens,
-            copybookStack,
-            copybookConfig,
-            recursiveReplaceStmtStack,
-            replacingClauses);
+    GrammarPreprocessorListener<T> listener = listenerBuilder.apply(tokens);
     walker.walk(listener, startRule);
-    errors.addAll(listener.getErrors());
-    return new ResultWithErrors<>(listener.getResult(), errors);
-  }
-
-  private ReplacePreProcessorListener handleReplaceClauses(
-      String code, String uri, List<Pair<String, String>> replacingClauses) {
-    Lexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
-    BufferedTokenStream tokens = new CommonTokenStream(lexer);
-    ReplacePreProcessorListener replacePreProcessorListener =
-        new ReplacePreProcessorListener(
-            replacingService, messageService, tokens, uri, replacingClauses);
-    CobolPreprocessor parser = new CobolPreprocessor(tokens);
-    CobolPreprocessor.StartRuleContext tree = parser.startRule();
-    ParseTreeWalker walker = new ParseTreeWalker();
-    walker.walk(replacePreProcessorListener, tree);
-    return replacePreProcessorListener;
+    return listener.getResult();
   }
 }
