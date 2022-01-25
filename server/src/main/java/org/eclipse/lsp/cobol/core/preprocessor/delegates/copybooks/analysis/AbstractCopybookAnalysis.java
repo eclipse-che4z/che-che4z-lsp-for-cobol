@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
@@ -81,7 +82,8 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
       ParserRuleContext context,
       ParserRuleContext copySource,
       CopybookConfig config,
-      String documentUri) {
+      String documentUri,
+      DialectType dialectType) {
     return hierarchy -> {
       List<SyntaxError> errors = new ArrayList<>();
       CopybookMetaData metaData =
@@ -90,6 +92,7 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
                       .name(retrieveCopybookName(copySource))
                       .context(context)
                       .documentUri(documentUri)
+                      .dialect(dialectType.name())
                       .copybookId(randomUUID().toString())
                       .config(config)
                       .nameLocality(
@@ -218,7 +221,7 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
 
     CopybookModel copybook =
         copybookService.resolve(
-            metaData.getName(), metaData.getDocumentUri(), metaData.getConfig());
+            metaData.getName(), metaData.getDocumentUri(), metaData.getDialect(), metaData.getConfig());
 
     if (copybook.getContent() == null) {
       return emptyModel(metaData.getName(), ImmutableList.of(reportMissingCopybooks(metaData)));
