@@ -372,6 +372,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitSectionName(SectionNameContext ctx) {
+    return addTreeNode(
+        ctx, locality -> new CodeBlockNameNode(locality, ctx.getText()));
+  }
+
+  @Override
   public List<Node> visitStatement(StatementContext ctx) {
     areaBWarning(ctx);
     throwWarning(ctx.getStart());
@@ -729,6 +735,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitProcedureDivisionBody(ProcedureDivisionBodyContext ctx) {
     return addTreeNode(ctx, ProcedureDivisionBodyNode::new);
+  }
+
+  @Override
+  public List<Node> visitParagraphDefinitionName(ParagraphDefinitionNameContext ctx) {
+    return addTreeNode(ctx, locality -> new CodeBlockNameNode(locality, ctx.getText()));
   }
 
   @Override

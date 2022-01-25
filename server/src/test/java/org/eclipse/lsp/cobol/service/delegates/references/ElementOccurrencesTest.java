@@ -108,34 +108,22 @@ class ElementOccurrencesTest {
             ImmutableList.of()),
         // find paragraph usage by usage position
         Arguments.of(
-            AnalysisResult.builder()
-                .paragraphDefinitions(definitionMap)
-                .paragraphUsages(usageMap)
-                .build(),
+            AnalysisResult.builder().rootNode(rootNodeForOneFile).build(),
             insideUsage,
             ImmutableList.of(usage)),
         // find paragraph usage by definition position
         Arguments.of(
-            AnalysisResult.builder()
-                .paragraphDefinitions(definitionMap)
-                .paragraphUsages(usageMap)
-                .build(),
+            AnalysisResult.builder().rootNode(rootNodeForOneFile).build(),
             insideDefinition,
             ImmutableList.of(usage)),
         // find section usage by usage position
         Arguments.of(
-            AnalysisResult.builder()
-                .sectionDefinitions(definitionMap)
-                .sectionUsages(usageMap)
-                .build(),
+            AnalysisResult.builder().rootNode(rootNodeForOneFile).build(),
             insideUsage,
             ImmutableList.of(usage)),
         // find section usage by definition position
         Arguments.of(
-            AnalysisResult.builder()
-                .sectionDefinitions(definitionMap)
-                .sectionUsages(usageMap)
-                .build(),
+            AnalysisResult.builder().rootNode(rootNodeForOneFile).build(),
             insideDefinition,
             ImmutableList.of(usage)),
         // find copybook usage by usage position
@@ -163,14 +151,13 @@ class ElementOccurrencesTest {
             AnalysisResult.builder().rootNode(rootNodeWithTwoUsages).build(),
             insideUsage,
             ImmutableList.of(usage, usageInOtherFile)),
-        // give only needed usage even if other kind use the same name
-        Arguments.of(
-            AnalysisResult.builder()
-                .rootNode(rootNodeForOneFile)
-                .paragraphUsages(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(usageInOtherFile)))
-                .build(),
-            insideUsage,
-            ImmutableList.of(usage)));
+     // give only needed usage even if other kind use the same name
+            Arguments.of(
+                AnalysisResult.builder()
+                    .rootNode(rootNodeForOneFile)
+                    .build(),
+                insideUsage,
+                ImmutableList.of(usage)));
   }
 
   static Stream<Arguments> insideTestData() {
