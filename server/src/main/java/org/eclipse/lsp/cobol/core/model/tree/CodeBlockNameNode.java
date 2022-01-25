@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;
+import java.util.function.Function;
 
 /** The class represents paragraphs or section name node in COBOL grammar. */
 @Getter
@@ -30,29 +31,17 @@ public class CodeBlockNameNode extends Node implements Context {
   public CodeBlockNameNode(Locality location, String name) {
     super(location, NodeType.PARAGRAPH_SECTION_NAME_NODE);
     this.name = name.toUpperCase();
-    addProcessStep(this::processNode);
-  }
-
-  private List<SyntaxError> processNode() {
-    return registerNode();
+    addProcessStep(this::registerNode);
   }
 
   @Override
   public List<Location> getDefinitions() {
-    return getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
-        .map(ProgramNode::getBlockReference)
-        .map(it -> it.get(getName()).getDefinitions())
-        .orElse(ImmutableList.of());
+    return getLocations(CodeBlockReference::getDefinitions);
   }
 
   @Override
   public List<Location> getUsages() {
-    return getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
-        .map(ProgramNode::getBlockReference)
-        .map(it -> it.get(getName()).getUsage())
-        .orElse(ImmutableList.of());
+    return getLocations(CodeBlockReference::getUsage);
   }
 
   private List<SyntaxError> registerNode() {
@@ -60,6 +49,16 @@ public class CodeBlockNameNode extends Node implements Context {
         .map(ProgramNode.class::cast)
         .flatMap(parent -> parent.registerNameNode(this))
         .map(ImmutableList::of)
-        .orElseGet(() -> ImmutableList.of());
+        .orElseGet(ImmutableList::of);
+  }
+
+  private List<Location> getLocations(
+      Function<CodeBlockReference, List<Location>> retriveLocations) {
+    return getNearestParentByType(NodeType.PROGRAM)
+        .map(ProgramNode.class::cast)
+        .map(ProgramNode::getBlockReference)
+        .map(it -> it.get(getName()))
+        .map(retriveLocations)
+        .orElse(ImmutableList.of());
   }
 }

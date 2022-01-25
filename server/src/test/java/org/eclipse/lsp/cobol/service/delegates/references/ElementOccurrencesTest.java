@@ -150,16 +150,14 @@ class ElementOccurrencesTest {
         Arguments.of(
             AnalysisResult.builder().rootNode(rootNodeWithTwoUsages).build(),
             insideUsage,
-            ImmutableList.of(usage, usageInOtherFile)));
-    // give only needed usage even if other kind use the same name
-    //        Arguments.of(
-    //            AnalysisResult.builder()
-    //                .rootNode(rootNodeForOneFile)
-    //                .paragraphUsages(ImmutableMap.of(ELEMENT_NAME,
-    // ImmutableList.of(usageInOtherFile)))
-    //                .build(),
-    //            insideUsage,
-    //            ImmutableList.of(usage)));
+            ImmutableList.of(usage, usageInOtherFile)),
+     // give only needed usage even if other kind use the same name
+            Arguments.of(
+                AnalysisResult.builder()
+                    .rootNode(rootNodeForOneFile)
+                    .build(),
+                insideUsage,
+                ImmutableList.of(usage)));
   }
 
   static Stream<Arguments> insideTestData() {
@@ -184,24 +182,6 @@ class ElementOccurrencesTest {
         Arguments.of(URI, locationEnd, location, true),
         Arguments.of(URI, fifthLineAfterLocation, location, false),
         Arguments.of(URI, seventhLine, location, false));
-  }
-
-  private static VariableNode createDefinitionNode(String name, String uri, Range range) {
-    VariableNode definitionNode =
-        new MnemonicNameNode(Locality.builder().uri(uri).range(range).build(), "systemName", name);
-    VariableDefinitionNameNode varNameNode =
-        new VariableDefinitionNameNode(definitionNode.getLocality(), name);
-    definitionNode.addChild(varNameNode);
-    return definitionNode;
-  }
-
-  private static VariableUsageNode createUsageNode(
-      VariableNode variableNode, String uri, Range range) {
-    VariableUsageNode usageNode =
-        new VariableUsageNode(
-            variableNode.getName(), Locality.builder().uri(uri).range(range).build());
-    variableNode.addUsage(usageNode);
-    return usageNode;
   }
 
   @Test
@@ -294,5 +274,23 @@ class ElementOccurrencesTest {
         result,
         RangeUtils.isInside(
             new TextDocumentPositionParams(new TextDocumentIdentifier(uri), position), location));
+  }
+
+  private static VariableNode createDefinitionNode(String name, String uri, Range range) {
+    VariableNode definitionNode =
+        new MnemonicNameNode(Locality.builder().uri(uri).range(range).build(), "systemName", name);
+    VariableDefinitionNameNode varNameNode =
+        new VariableDefinitionNameNode(definitionNode.getLocality(), name);
+    definitionNode.addChild(varNameNode);
+    return definitionNode;
+  }
+
+  private static VariableUsageNode createUsageNode(
+      VariableNode variableNode, String uri, Range range) {
+    VariableUsageNode usageNode =
+        new VariableUsageNode(
+            variableNode.getName(), Locality.builder().uri(uri).range(range).build());
+    variableNode.addUsage(usageNode);
+    return usageNode;
   }
 }

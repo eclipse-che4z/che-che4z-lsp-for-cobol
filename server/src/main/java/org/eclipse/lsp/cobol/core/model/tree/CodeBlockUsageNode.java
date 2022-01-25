@@ -25,6 +25,7 @@ import org.eclipse.lsp4j.Location;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 /** The class represents usages of paragraphs or sections. */
 @Getter
@@ -56,17 +57,21 @@ public class CodeBlockUsageNode extends Node implements Context {
 
   @Override
   public List<Location> getDefinitions() {
-    return getNearestParentByType(NodeType.PROGRAM)
-            .map(ProgramNode.class::cast)
-            .map(ProgramNode::getBlockReference)
-            .map(it -> it.get(getName()).getDefinitions()).orElse(ImmutableList.of());
+    return getLocations(CodeBlockReference::getDefinitions);
   }
 
   @Override
   public List<Location> getUsages() {
+    return getLocations(CodeBlockReference::getUsage);
+  }
+
+  private List<Location> getLocations(
+      Function<CodeBlockReference, List<Location>> retriveLocations) {
     return getNearestParentByType(NodeType.PROGRAM)
-            .map(ProgramNode.class::cast)
-            .map(ProgramNode::getBlockReference)
-            .map(it -> it.get(getName()).getUsage()).orElse(ImmutableList.of());
+        .map(ProgramNode.class::cast)
+        .map(ProgramNode::getBlockReference)
+        .map(it -> it.get(getName()))
+        .map(retriveLocations)
+        .orElse(ImmutableList.of());
   }
 }
