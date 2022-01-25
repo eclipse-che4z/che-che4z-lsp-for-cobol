@@ -31,12 +31,14 @@ public interface CopybookService {
    *
    * @param copybookName - the name of the copybook to be retrieved
    * @param documentUri - the currently processing document that contains the copy statement
+   * @param dialectType the COBOL dialect name
    * @param copybookConfig - contains config info like: copybook processing mode, target backend sql server
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   CopybookModel resolve(
       @NonNull String copybookName,
       @NonNull String documentUri,
+      @NonNull String dialectType,
       @NonNull CopybookConfig copybookConfig);
 
   /**

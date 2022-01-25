@@ -14,7 +14,7 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
-import {C4Z_FOLDER, GITIGNORE_FILE, PATHS_LOCAL_KEY, SETTINGS_CPY_SECTION} from "../constants";
+import {C4Z_FOLDER, GITIGNORE_FILE} from "../constants";
 import {createFileWithGivenPath, SettingsService} from "../services/Settings";
 import {SettingsUtils} from "../services/util/SettingsUtils";
 
@@ -80,7 +80,26 @@ describe("SettingsService evaluate variables", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue(["copybook/$program_name"]),
         });
-        const paths = SettingsService.getCopybookLocalPath("PROGRAM");
+        const paths = SettingsService.getCopybookLocalPath("PROGRAM", "COBOL");
         expect(paths[0]).toEqual("copybook/PROGRAM")
     });
+
+    test("Get local settings for a dialect", () => {
+        const tracking = jest.fn().mockReturnValue(["copybook"]);
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: tracking
+        });
+        SettingsService.getCopybookLocalPath("PROGRAM", "COBOL");
+        expect(tracking).toBeCalledWith("paths-local")
+    });
+
+    test("Get local settings for flavour", () => {
+        const tracking = jest.fn().mockReturnValue(["copybook"]);
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: tracking
+        });
+        SettingsService.getCopybookLocalPath("PROGRAM", "MAID");
+        expect(tracking).toBeCalledWith("paths-local.MAID")
+    });
+
 });

@@ -17,18 +17,18 @@ package org.eclipse.lsp.cobol.service.delegates.references;
 import lombok.NonNull;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.tree.Context;
-import org.eclipse.lsp.cobol.core.semantics.outline.RangeUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.*;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.service.utils.SyntaxTreeUtil.findNodeByPosition;
@@ -66,21 +66,13 @@ public class ElementOccurrences implements Occurrences {
 
     private static Element findElementByPosition(CobolDocumentModel document, TextDocumentPositionParams position) {
         AnalysisResult result = document.getAnalysisResult();
-        Optional<Element> fromTree = Optional.ofNullable(result.getRootNode())
+      return Optional.ofNullable(result.getRootNode())
             .flatMap(rootNode -> findNodeByPosition(rootNode, position))
             .filter(node -> node instanceof Context)
             .map(Context.class::cast)
             .map(ElementOccurrences::convertToElement)
-            .map(ElementOccurrences::constructElementsExcludingImplicits);
-        return fromTree.orElseGet(() -> Stream.<Supplier<Optional<Element>>>of(
-                () -> findElementByPosition(result.getParagraphDefinitions(), result.getParagraphUsages(), position),
-                () -> findElementByPosition(result.getSectionDefinitions(), result.getSectionUsages(), position))
-
-            .map(Supplier::get)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
             .map(ElementOccurrences::constructElementsExcludingImplicits)
-            .findFirst().orElse(new Element(Collections.emptyList(), Collections.emptyList())));
+              .orElseGet(() -> new Element(Collections.emptyList(), Collections.emptyList()));
     }
 
     private static Element constructElementsExcludingImplicits(Element e) {
@@ -99,27 +91,9 @@ public class ElementOccurrences implements Occurrences {
         List<Location> usages;
     }
 
-    private static Optional<Element> findElementByPosition(
-            Map<String, List<Location>> definitions,
-            Map<String, List<Location>> usages,
-            TextDocumentPositionParams position) {
-        return Stream.concat(definitions.entrySet().stream(), usages.entrySet().stream())
-                .filter(entry -> entry.getValue().stream().anyMatch(location -> RangeUtils.isInside(position, location)))
-                .findFirst()
-                .map(Map.Entry::getKey)
-                .map(name -> new Element(
-                    definitions.getOrDefault(name, Collections.emptyList()),
-                    usages.getOrDefault(name, Collections.emptyList())));
-    }
-
     private static Element convertToElement(Context contextNode) {
-        return new Element(convertToLocations(contextNode.getDefinitions()),
-            convertToLocations(contextNode.getUsages()));
-    }
-
-    private static List<Location> convertToLocations(List<Location> nodes) {
-        return nodes.stream()
-            .collect(Collectors.toList());
+        return new Element(contextNode.getDefinitions(),
+            contextNode.getUsages());
     }
 
     @NonNull

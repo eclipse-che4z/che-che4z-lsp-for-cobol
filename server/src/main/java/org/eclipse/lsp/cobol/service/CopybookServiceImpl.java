@@ -28,6 +28,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
@@ -98,6 +99,7 @@ public class CopybookServiceImpl implements CopybookService {
    *
    * @param copybookName - the name of the copybook to be retrieved
    * @param documentUri - the currently processing document that contains the copy statement
+   * @param dialectType the COBOL dialect
    * @param copybookConfig - contains config info like: copybook processing mode, target backend sql
    *     server
    * @return a CopybookModel that contains copybook name, its URI and the content
@@ -105,10 +107,11 @@ public class CopybookServiceImpl implements CopybookService {
   public CopybookModel resolve(
       @NonNull String copybookName,
       @NonNull String documentUri,
+      @NonNull String dialectType,
       @NonNull CopybookConfig copybookConfig) {
     try {
       return copybookCache.get(
-          copybookName, () -> resolveSync(copybookName, documentUri, copybookConfig));
+          copybookName, () -> resolveSync(copybookName, documentUri, dialectType, copybookConfig));
     } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
       return new CopybookModel(copybookName, null, null);
@@ -123,6 +126,7 @@ public class CopybookServiceImpl implements CopybookService {
   private CopybookModel resolveSync(
       @NonNull String copybookName,
       @NonNull String documentUri,
+      @NonNull String dialectType,
       @NonNull CopybookConfig copybookConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     final String cobolFileName = files.getNameFromURI(documentUri);
@@ -131,7 +135,7 @@ public class CopybookServiceImpl implements CopybookService {
         copybookName,
         documentUri,
         copybookConfig);
-    return tryResolveCopybookFromWorkspace(copybookName, cobolFileName)
+    return tryResolveCopybookFromWorkspace(copybookName, cobolFileName, dialectType)
         .orElseGet(
             () ->
                 tryResolvePredefinedCopybook(copybookName, copybookConfig)
@@ -139,24 +143,24 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private Optional<CopybookModel> tryResolveCopybookFromWorkspace(
-      String copybookName, String cobolFileName) {
+      String copybookName, String cobolFileName, String dialectType) {
     LOG.debug(
         "Trying to resolve copybook copybook {} for {} from workspace",
         copybookName,
         cobolFileName);
     final Optional<CopybookModel> copybookModel =
-        resolveCopybookFromWorkspace(copybookName, cobolFileName)
+        resolveCopybookFromWorkspace(copybookName, cobolFileName, dialectType)
             .map(uri -> loadCopybook(uri, copybookName, cobolFileName));
     LOG.debug("Copybook from workspace: {}", copybookModel);
     return copybookModel;
   }
 
   @SuppressWarnings("java:S2142")
-  private Optional<String> resolveCopybookFromWorkspace(String copybookName, String cobolFileName) {
+  private Optional<String> resolveCopybookFromWorkspace(String copybookName, String cobolFileName, String dialectType) {
     try {
       return SettingsService.getValueAsString(
           settingsService
-              .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
+              .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName, dialectType)
               .get());
     } catch (InterruptedException e) {
       // rethrowing the InterruptedException to interrupt the parent thread.
@@ -249,7 +253,8 @@ public class CopybookServiceImpl implements CopybookService {
                           COPYBOOK_DOWNLOAD.label,
                           getUserInteractionType(event.getCopybookProcessingMode()),
                           document,
-                          copybook))
+                          copybook,
+                          DialectType.COBOL.name()))
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
       if (!copybooksToDownload.isEmpty()) {

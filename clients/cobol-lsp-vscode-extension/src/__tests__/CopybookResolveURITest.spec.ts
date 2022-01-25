@@ -140,22 +140,31 @@ describe("Prioritize search criteria for copybooks test suite", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
         });
-        const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
+        const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME", "COBOL");
         expect(uri).toMatch(CPY_FOLDER_NAME);
         expect(spySearchInWorkspace).toBeCalledTimes(1);
     });
     test("With no settings provided, two search strategies are applied and function return an empty string", async () => {
         provideMockValueForLocalAndDSN("", "");
         ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(undefined);
-        const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
+        const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME", "COBOL");
         expect(uri).toBe("");
         expect(spySearchInWorkspace).toBeCalledTimes(2);
     });
     test("With both local and dsn references defined in the settings.json, the search is applied on local resources" +
         "first", async () => {
             provideMockValueForLocalAndDSN(CPY_FOLDER_NAME, "");
-            const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
+            const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME", "COBOL");
             expect(uri).not.toBe("");
             expect(spySearchInWorkspace).toBeCalledTimes(1);
+    });
+    test("With only a local folder defined for the flavour in the settings.json, the search is applied locally", async () => {
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
         });
+        const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME", "DIALECT");
+        expect(uri).toMatch(CPY_FOLDER_NAME);
+        expect(spySearchInWorkspace).toBeCalledTimes(1);
+    });
+
 });
