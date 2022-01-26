@@ -43,6 +43,7 @@ export const COPYBOOK_EXT_ARRAY = [COPYBOOK_CPY_EXT];
 export const EXTENSION_ID = "broadcommfd.cobol-language-support";
 export const TELEMETRY_DEFAULT_CONTENT = "INVALID_INSTRUMENTATION_KEY";
 export const ZOWE_EXT_MISSING_MSG = "Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe."
+export const INSTALL_ZOWE = "Install Zowe Explorer";
 
 export enum PUNCH_CARD {
     SEQUENCE_AREA_END_POS = 6,

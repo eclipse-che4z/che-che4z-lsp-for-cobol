@@ -30,6 +30,7 @@ const getZoweExplorerMock = () => {
                 loadNamedProfile: jest.fn().mockReturnValue("profile"),
             }),
         }),
+        registeredApiTypes: jest.fn().mockReturnValue(["zosmf"]),
     },
     );
 };
@@ -41,6 +42,9 @@ describe("Test profile Utils", () => {
         ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
         (vscode.workspace.textDocuments as any) = [];
         (vscode.workspace.textDocuments as any).push({ fileName: path.join(profile, programName) } as any);
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue([]),
+        });
         expect(ProfileUtils.getProfileNameForCopybook(programName)).toBe(profile);
     });
 
