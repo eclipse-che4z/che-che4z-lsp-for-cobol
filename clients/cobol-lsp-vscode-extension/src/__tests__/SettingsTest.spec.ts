@@ -99,7 +99,7 @@ describe("SettingsService evaluate variables", () => {
             get: tracking
         });
         SettingsService.getCopybookLocalPath("PROGRAM", "MAID");
-        expect(tracking).toBeCalledWith("paths-local.MAID")
+        expect(tracking).toBeCalledWith("paths-local.maid")
     });
 
 });
