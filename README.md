@@ -22,7 +22,7 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 ## Prerequisites
 
 - Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
-- To enable automatic copybook retrieval, the following are required:
+- To enable automatic copybook retrieval from the mainframe, the following are required:
     - [Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=Zowe.vscode-extension-for-zowe) version 1.15.0 or higher.
     - A Zowe Explorer `zosmf` or `zftp` profile with credentials and a connection URL defined.
     
@@ -107,7 +107,7 @@ The COBOL Language Support extension supports copybooks used in your source code
 
 You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
 
-COBOL Language Support also supports IDMS copybooks called with the `COPY IDMS` statement. For more information, see the [IDMS documentation](https://techdocs.broadcom.com/us/en/ca-mainframe-software/database-management/ca-idms/19-0.html).
+COBOL Language Support also supports copybooks for the IDMS and MAID dialects, called with the `COPY IDMS` and `COPY MAID` statements. For more information, see the [IDMS documentation](https://techdocs.broadcom.com/us/en/ca-mainframe-software/database-management/ca-idms/19-0.html).
 
 Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
 
@@ -121,15 +121,16 @@ You can store your copybooks locally in folders in your workspace and specify th
 
 1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
 2. Switch from **User** to **Workspace**.
-3. Under **Cpy-manager: Paths-local**, specify the paths of the folders containing copybooks.
+3. Specify the paths of the folders containing copybooks:
+   - Under **Cpy-manager: Paths-local** for standard IBM Enterprise COBOL.
+   - Under **Cpy-manager: Paths-local: Maid** for the MAID dialect.
+   - Under **Cpy-manager: Paths-local: Idms** for the IDMS dialect.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**. 
    - The folders are searched in the order they are listed. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
 4. Open a program or project.  
    Copybook support features are now enabled.
    
 If you specify your copybook folders using absolute paths or paths containing `../` or `./`, the copybook folders are not watched for changes. You might need to resolve names of recently added copybooks in your code manually. 
-
-Also, you can specify copybook folders for different dialects. I.e. for MAID or IDSM Under **Cpy-manager: Paths-local: Maid** and **Cpy-manager: Paths-local: Idms** respectively.
 
 To resolve copybook names manually, hover over the copybook name with the error underline, select **Quick Fix...** and **Resolve copybook**.
 
