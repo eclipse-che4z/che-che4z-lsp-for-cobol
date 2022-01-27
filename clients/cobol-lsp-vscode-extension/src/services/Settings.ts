@@ -64,19 +64,19 @@ export class SettingsService {
 
     /**
      * Get copybook local path based on program file name
-     * @param cobolProgramName is a program file name
+     * @param cobolFileName is a program file name
      * @param dialectType name of the cobol dialect type
      * @returns a list of local path
      */
-    public static getCopybookLocalPath(cobolProgramName: string, dialectType: string): string[] {
+    public static getCopybookLocalPath(cobolFileName: string, dialectType: string): string[] {
         if (dialectType !== "COBOL") {
-            const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(`${PATHS_LOCAL_KEY}.${dialectType}`);
+            const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(`${PATHS_LOCAL_KEY}.${dialectType.toLowerCase()}`);
             if (pathList && pathList.length > 0) {
-                return SettingsService.evaluateVariable(pathList, "program_name", cobolProgramName);
+                return SettingsService.evaluateVariable(pathList, "program_name", cobolFileName);
             }
         }
         const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_LOCAL_KEY);
-        return SettingsService.evaluateVariable(pathList, "program_name", cobolProgramName);
+        return SettingsService.evaluateVariable(pathList, "program_name", cobolFileName);
     }
 
     /**

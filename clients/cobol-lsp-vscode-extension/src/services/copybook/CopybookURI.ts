@@ -28,19 +28,19 @@ export class CopybookURI {
      * If it's not found in the previous steps than the user is notified and needs to download it from MF
      * or update the setting.json with an additional folder on the workspace where to search this missed copybook.
      * @param copybookName Name of the required copybook
-     * @param cobolProgramName name of the cobol file opened in the IDE
+     * @param cobolFileName name of the cobol file opened in the IDE
      * @param dialectType name of the cobol dialect type
      */
-    public async resolveCopybookURI(copybookName: string, cobolProgramName: string, dialectType: string): Promise<string> {
+    public async resolveCopybookURI(copybookName: string, cobolFileName: string, dialectType: string): Promise<string> {
         // check on local paths provided by the user
         let result: string;
         result = searchInWorkspace(copybookName,
-            SettingsService.getCopybookLocalPath(cobolProgramName, dialectType),
+            SettingsService.getCopybookLocalPath(cobolFileName, dialectType),
             COPYBOOK_EXT_ARRAY);
         // check in subfolders under .copybooks (copybook downloaded from MF)
         if (!result) {
             result = searchInWorkspace(copybookName,
-                this.createPathForCopybookDownloaded(ProfileUtils.getProfileNameForCopybook(cobolProgramName)),
+                this.createPathForCopybookDownloaded(ProfileUtils.getProfileNameForCopybook(cobolFileName)),
                 COPYBOOK_EXT_ARRAY);
         }
         return result || "";

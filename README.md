@@ -129,6 +129,8 @@ You can store your copybooks locally in folders in your workspace and specify th
    
 If you specify your copybook folders using absolute paths or paths containing `../` or `./`, the copybook folders are not watched for changes. You might need to resolve names of recently added copybooks in your code manually. 
 
+Also, you can specify copybook folders for different dialects. I.e. for MAID or IDSM Under **Cpy-manager: Paths-local: Maid** and **Cpy-manager: Paths-local: Idms** respectively.
+
 To resolve copybook names manually, hover over the copybook name with the error underline, select **Quick Fix...** and **Resolve copybook**.
 
 ### Retrieving Copybooks from the Mainframe
