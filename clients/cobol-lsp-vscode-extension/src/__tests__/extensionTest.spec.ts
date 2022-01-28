@@ -76,7 +76,7 @@ describe("Check plugin extension for cobol starts successfully.", () => {
         await activate(context);
         expect(TelemetryService.registerEvent).toHaveBeenCalledWith("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
 
-        expect(vscode.commands.registerCommand).toBeCalledTimes(3);
+        expect(vscode.commands.registerCommand).toBeCalledTimes(6);
 
         expect(fetchCopybookCommand).toHaveBeenCalled();
         expect(editDatasetPaths).toHaveBeenCalled();

@@ -14,22 +14,23 @@
 
 import * as vscode from "vscode";
 
-import { editDatasetPaths } from "./commands/EditDatasetPaths";
-import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
-import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
-import { C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID } from "./constants";
-import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
-import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
-import { CopybooksPathGenerator } from "./services/copybook/CopybooksPathGenerator";
+import {editDatasetPaths} from "./commands/EditDatasetPaths";
+import {fetchCopybookCommand} from "./commands/FetchCopybookCommand";
+import {gotoCopybookSettings} from "./commands/OpenSettingsCommand";
+import {C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID} from "./constants";
+import {CopybookDownloadService} from "./services/copybook/CopybookDownloadService";
+import {CopybooksCodeActionProvider} from "./services/copybook/CopybooksCodeActionProvider";
+import {CopybooksPathGenerator} from "./services/copybook/CopybooksPathGenerator";
 
-import { initSmartTab } from "./commands/SmartTabCommand";
-import { CopybookURI } from "./services/copybook/CopybookURI";
-import { LanguageClientService } from "./services/LanguageClientService";
-import { Middleware } from "./services/Middleware";
-import { PathsService } from "./services/PathsService";
-import { TelemetryService } from "./services/reporter/TelemetryService";
-import { createFileWithGivenPath } from "./services/Settings";
-import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
+import {initSmartTab} from "./commands/SmartTabCommand";
+import {CopybookURI} from "./services/copybook/CopybookURI";
+import {LanguageClientService} from "./services/LanguageClientService";
+import {Middleware} from "./services/Middleware";
+import {PathsService} from "./services/PathsService";
+import {TelemetryService} from "./services/reporter/TelemetryService";
+import {createFileWithGivenPath} from "./services/Settings";
+import {resolveSubroutineURI} from "./services/util/SubroutineUtils";
+import {CommentAction, commentCommand} from "./commands/CommentCommand";
 
 let copybooksPathGenerator: CopybooksPathGenerator;
 let copyBooksDownloader: CopybookDownloadService;
@@ -65,6 +66,9 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings", () => {
         gotoCopybookSettings();
     }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
 
     // create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
