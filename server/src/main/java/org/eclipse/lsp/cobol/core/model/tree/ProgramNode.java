@@ -44,6 +44,8 @@ import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 public class ProgramNode extends Node {
   private final Multimap<String, VariableNode> variables = ArrayListMultimap.create();
   private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
+  private final Map<String, CodeBlockReference> blockReference = new HashMap<>();
+
   private String programName;
 
   public ProgramNode(Locality locality) {
@@ -110,6 +112,10 @@ public class ProgramNode extends Node {
     final Optional<CodeBlockDefinitionNode> definition =
         codeBlocks.stream().filter(it -> it.getName().equals(node.getName())).findAny();
     definition.ifPresent(it -> it.addUsage(node.getLocality()));
+
+    Optional.ofNullable(blockReference.get(node.getName()))
+        .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
+
     return definition.isPresent()
         ? Optional.empty()
         : Optional.of(
@@ -137,5 +143,18 @@ public class ProgramNode extends Node {
     Locality location = Locality.builder().uri(PREF_IMPLICIT + PREDEFINED).build();
     for (String predefinedVariableName : PredefinedVariables.getPredefinedVariablesNames())
       addVariableDefinition(new MnemonicNameNode(location, PREDEFINED, predefinedVariableName));
+  }
+  /**
+   * Add a paragraph or section definition name node in the program context.
+   *
+   * @param node - the paragraph or section definition node
+   * @return syntax error if the code block duplicates
+   */
+  public Optional<SyntaxError> registerNameNode(CodeBlockNameNode node) {
+    blockReference.putIfAbsent(node.getName(), new CodeBlockReference());
+    CodeBlockReference references = blockReference.get(node.getName());
+    // TODO: add uniqueness check for paragraphs and section definition
+    references.addDefinition(node.locality.toLocation());
+    return Optional.empty();
   }
 }

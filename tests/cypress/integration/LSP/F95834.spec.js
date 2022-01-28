@@ -16,8 +16,10 @@
 //@ts-ignore
 /// <reference types="../../support/" />
 
-// Import selectors from Theia object
-import { Theia } from '@eclipse/che-che4z/tests/dist/selectors';
+import { Theia, VSCODE } from '@eclipse/che-che4z/tests/dist/selectors';
+
+const env = Cypress.env('ide');
+const IDE = env === 'theia' ? Theia : VSCODE;
 
 //F95834: LSP for COBOL - support for EXEC SQL statements (basic intellisense)
 
@@ -29,16 +31,16 @@ context('This is F95834 spec', () => {
     it(['smoke'], 'Checks EXEC SQL with copybooks', () => {
       cy.openFile('TEST.CBL').goToLine(21);
       cy.getCurrentLine().type('exec-sql-include');
-      cy.get(Theia.suggestWidget).contains('exec-sql-include').click();
+      cy.get(IDE.suggestWidget).contains('exec-sql-include').click();
       cy.getLineByNumber(21).contains('exec sql include sqlstatement.cpy end-exec.');
       cy.getCurrentLine().type('{selectall}       exec sql include A end-exec.');
-      cy.get(Theia.editorError)
+      cy.get(IDE.editorError)
         .getElementLineNumber()
         .then((lineNumber) => {
           expect(lineNumber).to.be.equal(21);
-          cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
+          cy.getLineByNumber(lineNumber).find('span').eq(-1).click().realHover({ position: 'center' });
         });
-      cy.get(Theia.hoverOverContent).should(($content) => {
+      cy.get(IDE.hoverOverContent).should(($content) => {
         [
           "Syntax error on 'WORK-VARIABLES' expected SECTION",
           "Syntax error on 'PROGRAM-STATUS' expected SECTION",

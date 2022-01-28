@@ -163,7 +163,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitLinkageSection(LinkageSectionContext ctx) {
-    analyzeCopybook(PREDEFINED, ctx, ctx);
+    analyzeCopybook(PREDEFINED, ctx, ctx, DialectType.COBOL);
   }
 
   @Override
@@ -174,7 +174,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyIdmsStatement(@NonNull CopyIdmsStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    analyzeCopybook(DIALECT, ctx, ctx.copyIdmsOptions().copyIdmsSource().copySource());
+    analyzeCopybook(DIALECT, ctx, ctx.copyIdmsOptions().copyIdmsSource().copySource(), DialectType.IDMS);
   }
 
   @Override
@@ -191,8 +191,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       levelNumber
           .map(ParseTree::getText)
           .map(Integer::parseInt)
-          .ifPresent(it -> analyzeCopybook(DIALECT, ctx, copySource));
-    else analyzeCopybook(SKIPPING, ctx, copySource);
+          .ifPresent(it -> analyzeCopybook(DIALECT, ctx, copySource, DialectType.MAID));
+    else analyzeCopybook(SKIPPING, ctx, copySource, DialectType.MAID);
   }
 
   @Override
@@ -203,7 +203,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    analyzeCopybook(PANVALET, ctx, ctx.copySource());
+    analyzeCopybook(PANVALET, ctx, ctx.copySource(), DialectType.COBOL);
   }
 
   @Override
@@ -214,7 +214,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    analyzeCopybook(COBOL, ctx, ctx.copySource());
+    analyzeCopybook(COBOL, ctx, ctx.copySource(), DialectType.COBOL);
   }
 
   @Override
@@ -225,7 +225,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    analyzeCopybook(COBOL, ctx, ctx.copySource());
+    analyzeCopybook(COBOL, ctx, ctx.copySource(), DialectType.COBOL);
   }
 
   private boolean requiresEarlyReturn(ParserRuleContext context) {
@@ -238,10 +238,11 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private void analyzeCopybook(
-      AnalysisTypes type, ParserRuleContext context, ParserRuleContext copyContext) {
+      AnalysisTypes type, ParserRuleContext context, ParserRuleContext copyContext,
+      DialectType dialectType) {
     analysisFactory
         .getInstanceFor(type)
-        .handleCopybook(context, copyContext, copybookConfig, documentUri)
+        .handleCopybook(context, copyContext, copybookConfig, documentUri, dialectType)
         .apply(hierarchy)
         .apply(this)
         .apply(copybooks)

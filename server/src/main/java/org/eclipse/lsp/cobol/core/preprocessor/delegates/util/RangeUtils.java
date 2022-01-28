@@ -13,15 +13,40 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.semantics.outline;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp4j.*;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
+
+import java.util.Optional;
 
 /** The utility class for work with document positions and ranges. */
 @UtilityClass
 public class RangeUtils {
+
+  /**
+   * Find the syntax tree node that contains the position.
+   *
+   * @param uri the uri of the node locality
+   * @param node a root node for finding
+   * @param position a cursor position
+   * @return the found node
+   */
+  public static Optional<Node> findNodeByPosition(Node node, String uri, Position position) {
+    if (!RangeUtils.isInside(uri, position, node.getLocality())) return Optional.empty();
+    if (node.getChildren().isEmpty()) return Optional.of(node);
+
+    return node.getChildren().stream()
+        .filter(it -> RangeUtils.isInside(uri, position, it.getLocality()))
+        .map(it -> findNodeByPosition(it, uri, position))
+        .filter(Optional::isPresent)
+        .findFirst()
+        .orElse(Optional.of(node));
+  }
 
   /**
    * Tests if innerSymbol programming construct is placed inside the outerSymbol programming
@@ -90,26 +115,16 @@ public class RangeUtils {
   }
 
   /**
-   * Tests if text document position located inside the location.
+   * Tests if text document position resides inside the location.
    *
-   * @param position - the document position
-   * @param location - en element location
+   * @param uri the uri of the node
+   * @param position the position of the node to add
+   * @param location the locality of the wrapping node
    * @return true if position is inside the location.
    */
-  public boolean isInside(TextDocumentPositionParams position, Location location) {
-    return position.getTextDocument().getUri().equals(location.getUri())
-        && !isBefore(position.getPosition(), location.getRange().getStart())
-        && !isAfter(position.getPosition(), location.getRange().getEnd());
-  }
-  /**
-   * Check if position located inside the locality.
-   *
-   * @param position - the document position
-   * @param locality - en element's locality
-   * @return true if position is inside the location.
-   */
-  public boolean isInsideRange(Position position, Locality locality) {
-    return !isBefore(position, locality.getRange().getStart())
-        && !isAfter(position, locality.getRange().getEnd());
+  public boolean isInside(String uri, Position position, Locality location) {
+    return uri.equals(location.getUri())
+        && !isBefore(position, location.getRange().getStart())
+        && !isAfter(position, location.getRange().getEnd());
   }
 }

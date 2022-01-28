@@ -32,6 +32,7 @@ class CopybookMetaData {
   String name;
   String copybookId;
   String documentUri;
+  String dialect;
   CopybookConfig config;
   ParserRuleContext context;
   Locality contextLocality;

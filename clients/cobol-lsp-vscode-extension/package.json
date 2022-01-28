@@ -119,6 +119,22 @@
                     "description": "Default list of relative local paths to search for copybooks",
                     "uniqueItems": true
                 },
+                "cobol-lsp.cpy-manager.paths-local.maid": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of relative local paths to search for MAID copybooks",
+                    "uniqueItems": true
+                },
+                "cobol-lsp.cpy-manager.paths-local.idms": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of relative local paths to search for IDMS copybooks",
+                    "uniqueItems": true
+                },
                 "cobol-lsp.cpy-manager.paths-dsn": {
                     "type": "array",
                     "items": {

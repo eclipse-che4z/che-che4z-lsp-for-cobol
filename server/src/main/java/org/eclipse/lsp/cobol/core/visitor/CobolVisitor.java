@@ -42,11 +42,11 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode.Bu
 import org.eclipse.lsp.cobol.core.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
-import org.eclipse.lsp.cobol.service.utils.SyntaxTreeUtil;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -142,8 +142,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private void addFlavorNode(Node rootNode) {
-    for (Node flavorNode: flavorNodes) {
-      SyntaxTreeUtil.findNodeInRange(rootNode, flavorNode.getLocality().getRange().getStart())
+    for (Node flavorNode : flavorNodes) {
+      RangeUtils.findNodeByPosition(
+              rootNode,
+              flavorNode.getLocality().getUri(),
+              flavorNode.getLocality().getRange().getStart())
           .orElse(rootNode)
           .addChild(flavorNode);
     }
@@ -369,6 +372,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitLocalStorageSection(LocalStorageSectionContext ctx) {
     return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.LOCAL_STORAGE));
+  }
+
+  @Override
+  public List<Node> visitSectionName(SectionNameContext ctx) {
+    return addTreeNode(ctx, locality -> new CodeBlockNameNode(locality, ctx.getText()));
   }
 
   @Override
@@ -729,6 +737,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitProcedureDivisionBody(ProcedureDivisionBodyContext ctx) {
     return addTreeNode(ctx, ProcedureDivisionBodyNode::new);
+  }
+
+  @Override
+  public List<Node> visitParagraphDefinitionName(ParagraphDefinitionNameContext ctx) {
+    return addTreeNode(ctx, locality -> new CodeBlockNameNode(locality, ctx.getText()));
   }
 
   @Override

@@ -22,8 +22,8 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.core.semantics.outline.RangeUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.*;
@@ -108,34 +108,22 @@ class ElementOccurrencesTest {
             ImmutableList.of()),
         // find paragraph usage by usage position
         Arguments.of(
-            AnalysisResult.builder()
-                .paragraphDefinitions(definitionMap)
-                .paragraphUsages(usageMap)
-                .build(),
+            AnalysisResult.builder().rootNode(rootNodeForOneFile).build(),
             insideUsage,
             ImmutableList.of(usage)),
         // find paragraph usage by definition position
         Arguments.of(
-            AnalysisResult.builder()
-                .paragraphDefinitions(definitionMap)
-                .paragraphUsages(usageMap)
-                .build(),
+            AnalysisResult.builder().rootNode(rootNodeForOneFile).build(),
             insideDefinition,
             ImmutableList.of(usage)),
         // find section usage by usage position
         Arguments.of(
-            AnalysisResult.builder()
-                .sectionDefinitions(definitionMap)
-                .sectionUsages(usageMap)
-                .build(),
+            AnalysisResult.builder().rootNode(rootNodeForOneFile).build(),
             insideUsage,
             ImmutableList.of(usage)),
         // find section usage by definition position
         Arguments.of(
-            AnalysisResult.builder()
-                .sectionDefinitions(definitionMap)
-                .sectionUsages(usageMap)
-                .build(),
+            AnalysisResult.builder().rootNode(rootNodeForOneFile).build(),
             insideDefinition,
             ImmutableList.of(usage)),
         // find copybook usage by usage position
@@ -165,16 +153,17 @@ class ElementOccurrencesTest {
             ImmutableList.of(usage, usageInOtherFile)),
         // give only needed usage even if other kind use the same name
         Arguments.of(
-            AnalysisResult.builder()
-                .rootNode(rootNodeForOneFile)
-                .paragraphUsages(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(usageInOtherFile)))
-                .build(),
+            AnalysisResult.builder().rootNode(rootNodeForOneFile).build(),
             insideUsage,
             ImmutableList.of(usage)));
   }
 
   static Stream<Arguments> insideTestData() {
-    Location location = new Location(URI, new Range(new Position(2, 5), new Position(5, 10)));
+    Locality location =
+        Locality.builder()
+            .uri(URI)
+            .range(new Range(new Position(2, 5), new Position(5, 10)))
+            .build();
     Position firstLine = new Position(1, 20);
     Position secondLineBeforeLocation = new Position(2, 3);
     Position locationStart = new Position(2, 5);
@@ -282,11 +271,8 @@ class ElementOccurrencesTest {
 
   @ParameterizedTest
   @MethodSource("insideTestData")
-  void isInsideTest(String uri, Position position, Location location, boolean result) {
-    assertEquals(
-        result,
-        RangeUtils.isInside(
-            new TextDocumentPositionParams(new TextDocumentIdentifier(uri), position), location));
+  void isInsideTest(String uri, Position position, Locality location, boolean result) {
+    assertEquals(result, RangeUtils.isInside(uri, position, location));
   }
 
   private static VariableNode createDefinitionNode(String name, String uri, Range range) {

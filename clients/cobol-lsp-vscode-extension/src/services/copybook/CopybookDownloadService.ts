@@ -16,7 +16,7 @@ import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
 import * as fs from "fs";
 import * as Path from "path";
 import * as vscode from "vscode";
-import { DOWNLOAD_QUEUE_LOCKED_ERROR_MSG, INVALID_CREDENTIALS_ERROR_MSG, PATHS_USS, PATHS_ZOWE,
+import { DOWNLOAD_QUEUE_LOCKED_ERROR_MSG, INSTALL_ZOWE, INVALID_CREDENTIALS_ERROR_MSG, PATHS_USS, PATHS_ZOWE,
     PROCESS_DOWNLOAD_ERROR_MSG, PROFILE_NAME_PLACEHOLDER, PROVIDE_PROFILE_MSG, SETTINGS_CPY_SECTION,
     UNLOCK_DOWNLOAD_QUEUE_MSG, ZOWE_EXT_MISSING_MSG } from "../../constants";
 import { TelemetryService } from "../reporter/TelemetryService";
@@ -115,6 +115,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         if (isUSS) {
             await zoweExplorerApi.getUssApi(loadedProfile).getContents(`${dataset}/${copybook}`, {
                 encoding: loadedProfile.profile.encoding || "UTF-8",
+                binary: false,
                 file: Path.join(createDatasetPath(profileName, dataset), copybook),
                 returnEtag: true,
             });
@@ -197,7 +198,14 @@ export class CopybookDownloadService implements vscode.Disposable {
             return;
         }
         if (CopybookDownloadService.isEligibleForCopybookDownload() && !ZoweVsCodeExtension.getZoweExplorerApi()) {
-            if (!quiet) { vscode.window.showErrorMessage(ZOWE_EXT_MISSING_MSG); }
+            if (!quiet) {
+                vscode.window.showErrorMessage(ZOWE_EXT_MISSING_MSG, INSTALL_ZOWE)
+                .then(action => {
+                    if (action === INSTALL_ZOWE) {
+                        vscode.commands.executeCommand("workbench.extensions.search", "zowe.vscode-extension-for-zowe");
+                    }
+                });
+            }
             return;
         }
 

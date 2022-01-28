@@ -18,9 +18,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.model.tree.Describable;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.service.utils.SyntaxTreeUtil;
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.MarkedString;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
@@ -39,7 +39,10 @@ public class VariableHover implements HoverProvider {
     return Optional.ofNullable(document)
         .map(CobolDocumentModel::getAnalysisResult)
         .map(AnalysisResult::getRootNode)
-        .flatMap(root -> SyntaxTreeUtil.findNodeByPosition(root, position))
+        .flatMap(
+            root ->
+                RangeUtils.findNodeByPosition(
+                    root, position.getTextDocument().getUri(), position.getPosition()))
         .filter(element -> element instanceof Describable)
         .map(Describable.class::cast)
         .map(VariableHover::createHoverInfo)
