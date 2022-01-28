@@ -15,14 +15,16 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.service.utils.SyntaxTreeUtil;
 import org.eclipse.lsp.cobol.usecases.engine.UseCase;
 import org.eclipse.lsp4j.Position;
 import org.junit.jupiter.api.Test;
 
+import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.analyze;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /** Check that copy statement produce correct ranges */
 class CopyNodeRangeTest {
@@ -36,11 +38,13 @@ class CopyNodeRangeTest {
           + "       Procedure Division.\n"
           + "       Mainline Section.\n"
           + "           MOVE 6 to FOO.";
+
   @Test
   void test() {
     AnalysisResult result = analyze(UseCase.builder().text(TEXT).build());
     Position fooUsage = new Position(8, 23);
-    Node usageNode = SyntaxTreeUtil.findNodeInRange(result.getRootNode(), fooUsage).orElse(null);
+    Node usageNode =
+        RangeUtils.findNodeByPosition(result.getRootNode(), DOCUMENT_URI, fooUsage).orElse(null);
     assertNotNull(usageNode);
     assertEquals(NodeType.VARIABLE_USAGE, usageNode.getNodeType());
     assertEquals("FOO", ((VariableUsageNode) usageNode).getDataName());

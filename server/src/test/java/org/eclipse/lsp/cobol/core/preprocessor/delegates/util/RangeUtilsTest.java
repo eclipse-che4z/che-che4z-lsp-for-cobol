@@ -13,9 +13,10 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.semantics.outline;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -30,8 +31,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Test to check RangeUtils */
 class RangeUtilsTest {
-  private Position firstLine = new Position(1, 0);
-  private Position secondLine = new Position(2, 0);
+  private final Position firstLine = new Position(1, 0);
+  private final Position secondLine = new Position(2, 0);
 
   @Test
   void isAfterPositive() {
@@ -63,7 +64,8 @@ class RangeUtilsTest {
       int startLine, int startSymbol, int stopLine, int stopSymbol) {
     Range range =
         new Range(new Position(startLine, startSymbol), new Position(stopLine, stopSymbol));
-    return new DocumentSymbol("", NodeType.FIELD.getSymbolKind(), range, range, "", ImmutableList.of());
+    return new DocumentSymbol(
+        "", NodeType.FIELD.getSymbolKind(), range, range, "", ImmutableList.of());
   }
 
   static Stream<Arguments> provideData() {

@@ -54,24 +54,35 @@ class TestFlavorCase {
           + "000000           {$*SOMETHING} \n"
           + "       01  {$*VAR}     PIC S9(4) COMP.";
 
-  private AnalysisConfig analysisConfig = new AnalysisConfig(
-      ImmutableSet.of(),
-      new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
-      ImmutableList.of(CobolFlavorImpl.NAME)
-  );
+  private final AnalysisConfig analysisConfig =
+      new AnalysisConfig(
+          ImmutableSet.of(),
+          new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
+          ImmutableList.of(CobolFlavorImpl.NAME));
 
   @Test
   void testWithout() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
+    UseCaseEngine.runTest(
+        TEXT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
   }
 
   @Test
   void testWith() {
-    UseCaseEngine.runTest(TEXT_WITH_FLAVOR, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
+    UseCaseEngine.runTest(
+        TEXT_WITH_FLAVOR,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        analysisConfig);
   }
 
   @Test
   void testWithComments() {
-    UseCaseEngine.runTest(TEXT_WITH_FLAVOR_2, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
+    UseCaseEngine.runTest(
+        TEXT_WITH_FLAVOR_2,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        analysisConfig);
   }
 }
