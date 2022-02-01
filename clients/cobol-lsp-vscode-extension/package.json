@@ -25,7 +25,10 @@
         "zos",
         "language-server",
         "jcl",
-        "zowe"
+        "zowe",
+        "ibm cobol",
+        "idms",
+        "datacom
     ],
     "categories": [
         "Programming Languages"
