@@ -41,6 +41,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.Continuatio
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
 import org.eclipse.lsp.cobol.core.visitor.InterruptingTreeListener;
+import org.eclipse.lsp.cobol.service.Configuration;
+import org.eclipse.lsp.cobol.service.ConfigurationImpl;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.communications.ServerCommunications;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
@@ -68,6 +70,7 @@ public class EngineModule extends AbstractModule {
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(ParseTreeListener.class).to(InterruptingTreeListener.class);
+    bind(Configuration.class).to(ConfigurationImpl.class);
     bind(String.class)
         .annotatedWith(named("resourceFileLocation"))
         .toInstance("resourceBundles/messages");

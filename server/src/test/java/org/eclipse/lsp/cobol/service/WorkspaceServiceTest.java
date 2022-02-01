@@ -67,10 +67,18 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     String copybookName = "COPYBOOK";
     SubroutineService subroutineService = mock(SubroutineService.class);
+    Configuration configuration = mock(Configuration.class);
 
     WorkspaceService service =
         new CobolWorkspaceServiceImpl(
-            broker, null, null, copybookService, null, subroutineService, stateService);
+            broker,
+            null,
+            null,
+            copybookService,
+            null,
+            subroutineService,
+            configuration,
+            stateService);
 
     CompletableFuture<Object> result =
         service.executeCommand(
@@ -96,9 +104,10 @@ class WorkspaceServiceTest {
   void testExecuteNonExistingCommand() {
     DataBusBroker broker = mock(DataBusBroker.class);
     CopybookService copybookService = mock(CopybookService.class);
+    Configuration configuration = mock(Configuration.class);
     WorkspaceService service =
         new CobolWorkspaceServiceImpl(
-            broker, null, null, copybookService, null, null, stateService);
+            broker, null, null, copybookService, null, null, configuration, stateService);
 
     CompletableFuture<Object> result =
         service.executeCommand(new ExecuteCommandParams("Missing command name", emptyList()));
@@ -120,6 +129,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
+    Configuration configuration = mock(Configuration.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
@@ -129,6 +139,7 @@ class WorkspaceServiceTest {
             copybookService,
             localeStore,
             subroutineService,
+            configuration,
             stateService);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
@@ -153,6 +164,7 @@ class WorkspaceServiceTest {
     verify(copybookService).invalidateCache();
     verify(subroutineService).invalidateCache();
     verify(localeStore).notifyLocaleStore();
+    verify(configuration).updateConfigurationFromSettings();
 
     assertEquals(path, watcherCaptor.getValue().get(0));
 
@@ -168,6 +180,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
+    Configuration configuration = mock(Configuration.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
@@ -177,6 +190,7 @@ class WorkspaceServiceTest {
             copybookService,
             localeStore,
             subroutineService,
+            configuration,
             stateService);
 
     JsonArray arr = new JsonArray();
@@ -211,6 +225,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
+    Configuration configuration = mock(Configuration.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
@@ -220,6 +235,7 @@ class WorkspaceServiceTest {
             copybookService,
             localeStore,
             subroutineService,
+            configuration,
             stateService);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
@@ -256,6 +272,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
+    Configuration configuration = mock(Configuration.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
@@ -265,6 +282,7 @@ class WorkspaceServiceTest {
             copybookService,
             localeStore,
             subroutineService,
+            configuration,
             stateService);
 
     when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
@@ -323,10 +341,18 @@ class WorkspaceServiceTest {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     CopybookService copybookService = mock(CopybookService.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
+    Configuration configuration = mock(Configuration.class);
 
     WorkspaceService service =
         new CobolWorkspaceServiceImpl(
-            broker, null, null, copybookService, null, subroutineService, stateService);
+            broker,
+            null,
+            null,
+            copybookService,
+            null,
+            subroutineService,
+            configuration,
+            stateService);
 
     DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));
     service.didChangeWatchedFiles(params);
