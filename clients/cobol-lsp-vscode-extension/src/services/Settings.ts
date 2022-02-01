@@ -71,7 +71,7 @@ export class SettingsService {
     public static getCopybookLocalPath(cobolFileName: string, dialectType: string): string[] {
         const programFile = cobolFileName.replace(/\.[^/.]+$/, "");
         if (dialectType !== "COBOL") {
-            const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(`${PATHS_LOCAL_KEY}.${dialectType.toLowerCase()}`);
+            const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(`${dialectType.toLowerCase()}.${PATHS_LOCAL_KEY}`);
             if (pathList && pathList.length > 0) {
                 return SettingsService.evaluateVariable(pathList, "program_file", programFile);
             }

@@ -131,7 +131,7 @@
                     "description": "Default list of relative local paths to search for copybooks",
                     "uniqueItems": true
                 },
-                "cobol-lsp.cpy-manager.paths-local.maid": {
+                "cobol-lsp.cpy-manager.maid.paths-local": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -139,7 +139,7 @@
                     "description": "Default list of relative local paths to search for MAID copybooks",
                     "uniqueItems": true
                 },
-                "cobol-lsp.cpy-manager.paths-local.idms": {
+                "cobol-lsp.cpy-manager.idms.paths-local": {
                     "type": "array",
                     "items": {
                         "type": "string"
