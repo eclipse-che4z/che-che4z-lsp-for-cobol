@@ -14,13 +14,11 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
-import { COPYBOOK_EXT_ARRAY } from "../constants";
-import { CopybookURI } from "../services/copybook/CopybookURI";
-import * as fsUtils from "../services/util/FSUtils";
-import { ProfileUtils } from "../services/util/ProfileUtils";
-import { SettingsUtils } from "../services/util/SettingsUtils";
-
-const copybookURI: CopybookURI = new CopybookURI();
+import { COPYBOOK_EXT_ARRAY } from "../../../constants";
+import { CopybookURI } from "../../../services/copybook/CopybookURI";
+import * as fsUtils from "../../../services/util/FSUtils";
+import { ProfileUtils } from "../../../services/util/ProfileUtils";
+import { SettingsUtils } from "../../../services/util/SettingsUtils";
 
 const copybookName: string = "NSTCOPY1";
 const copybookNameWithExtension: string = "NSTCOPY2.CPY";
@@ -61,7 +59,7 @@ function buildResultArrayFrom(settingsMockValue: string[], profileName: string, 
             get: jest.fn().mockReturnValue(ussPath),
         });
     }
-    return (copybookURI as any).createPathForCopybookDownloaded(profileName).length;
+    return (CopybookURI as any).createPathForCopybookDownloaded(profileName).length;
 }
 
 beforeEach(() => {
@@ -140,21 +138,21 @@ describe("Prioritize search criteria for copybooks test suite", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
         });
-        const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME", "COBOL");
+        const uri: string = await CopybookURI.resolveCopybookURI(copybookName, "PRGNAME", "COBOL");
         expect(uri).toMatch(CPY_FOLDER_NAME);
         expect(spySearchInWorkspace).toBeCalledTimes(1);
     });
     test("With no settings provided, two search strategies are applied and function return an empty string", async () => {
         provideMockValueForLocalAndDSN("", "");
         ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(undefined);
-        const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME", "COBOL");
+        const uri: string = await CopybookURI.resolveCopybookURI(copybookName, "PRGNAME", "COBOL");
         expect(uri).toBe("");
         expect(spySearchInWorkspace).toBeCalledTimes(2);
     });
     test("With both local and dsn references defined in the settings.json, the search is applied on local resources" +
         "first", async () => {
             provideMockValueForLocalAndDSN(CPY_FOLDER_NAME, "");
-            const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME", "COBOL");
+            const uri: string = await CopybookURI.resolveCopybookURI(copybookName, "PRGNAME", "COBOL");
             expect(uri).not.toBe("");
             expect(spySearchInWorkspace).toBeCalledTimes(1);
     });
@@ -162,7 +160,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
         });
-        const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME", "DIALECT");
+        const uri: string = await CopybookURI.resolveCopybookURI(copybookName, "PRGNAME", "DIALECT");
         expect(uri).toMatch(CPY_FOLDER_NAME);
         expect(spySearchInWorkspace).toBeCalledTimes(1);
     });

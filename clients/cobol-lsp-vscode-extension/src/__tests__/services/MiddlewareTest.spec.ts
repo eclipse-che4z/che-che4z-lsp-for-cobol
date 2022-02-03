@@ -12,7 +12,8 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {Middleware, RequestLine} from "../services/Middleware";
+import { CopybookURI } from "../../services/copybook/CopybookURI";
+import {Middleware, RequestLine} from "../../services/Middleware";
 
 function constructParams(sectionName: string): any {
     return {
@@ -22,19 +23,17 @@ function constructParams(sectionName: string): any {
     };
 }
 
-jest.mock("../services/reporter/TelemetryService");
+jest.mock("../../services/reporter/TelemetryService");
 
 // tslint:disable: no-unused-expression no-string-literal
 describe("Copybook downloader", () => {
     const resolveCopybookURIMock = jest.fn().mockResolvedValue("copybookUri");
-    const copybookResolverURI: any = {
-        resolveCopybookURI: resolveCopybookURIMock,
-    };
+    CopybookURI.resolveCopybookURI = resolveCopybookURIMock;
     const downloadCopybooksMock = jest.fn().mockResolvedValue(null);
     const copybookDownloader: any = {
         downloadCopybooks: downloadCopybooksMock,
     };
-    const middleware = new Middleware(copybookResolverURI, copybookDownloader);
+    const middleware = new Middleware(copybookDownloader);
 
     beforeEach(() => {
         jest.clearAllMocks();

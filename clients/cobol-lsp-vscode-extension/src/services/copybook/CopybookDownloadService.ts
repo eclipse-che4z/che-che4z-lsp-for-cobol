@@ -20,8 +20,9 @@ import { DOWNLOAD_QUEUE_LOCKED_ERROR_MSG, INSTALL_ZOWE, INVALID_CREDENTIALS_ERRO
     PROCESS_DOWNLOAD_ERROR_MSG, PROFILE_NAME_PLACEHOLDER, PROVIDE_PROFILE_MSG, SETTINGS_CPY_SECTION,
     UNLOCK_DOWNLOAD_QUEUE_MSG, ZOWE_EXT_MISSING_MSG } from "../../constants";
 import { TelemetryService } from "../reporter/TelemetryService";
+import { SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
-import { checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath } from "./CopybooksPathGenerator";
+import { CopybookURI } from "./CopybookURI";
 import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
 
 const experimentTag = "experiment-tag";
@@ -93,7 +94,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     }
 
     private static async downloadCopybookFromMFUsingZowe(dataset: string, copybookprofile: CopybookProfile, isUSS: boolean) {
-        const copybookPath = createCopybookPath(copybookprofile.profile, dataset, copybookprofile.copybook);
+        const copybookPath = CopybookURI.createCopybookPath(copybookprofile.profile, dataset, copybookprofile.copybook);
         if (!fs.existsSync(copybookPath)) {
             try {
                 await CopybookDownloadService.downloadCopybookContent(dataset, copybookprofile.copybook, copybookprofile.profile, isUSS);
@@ -116,13 +117,13 @@ export class CopybookDownloadService implements vscode.Disposable {
             await zoweExplorerApi.getUssApi(loadedProfile).getContents(`${dataset}/${copybook}`, {
                 encoding: loadedProfile.profile.encoding || "UTF-8",
                 binary: false,
-                file: Path.join(createDatasetPath(profileName, dataset), copybook),
+                file: Path.join(CopybookURI.createDatasetPath(profileName, dataset), copybook),
                 returnEtag: true,
             });
         } else {
             await zoweExplorerApi.getMvsApi(loadedProfile).getContents(`${dataset}(${copybook})`, {
                 encoding: loadedProfile.profile.encoding,
-                file: Path.join(createDatasetPath(profileName, dataset), copybook),
+                file: Path.join(CopybookURI.createDatasetPath(profileName, dataset), copybook),
                 returnEtag: true,
             });
         }
@@ -179,10 +180,6 @@ export class CopybookDownloadService implements vscode.Disposable {
     private queue: DownloadQueue = new DownloadQueue();
     private lockedProfile: Set<string> = new Set();
 
-    public constructor(
-        private pathGenerator: CopybooksPathGenerator) {
-    }
-
     /**
      * This method is invoked by {@link CopybookURI#resolveCopybookURI} when the target copybbok is not found on
      * local workspaces and should be added in the download queue for copybooks that the LSP client will try
@@ -209,14 +206,14 @@ export class CopybookDownloadService implements vscode.Disposable {
             return;
         }
 
-        if (!checkWorkspace()) {
+        if (!CopybookDownloadService.checkWorkspace()) {
             return;
         }
         const profile = ProfileUtils.getProfileNameForCopybook(cobolFileName);
 
         if (!profile) {
             if (!quiet) {
-                const providedProfile: string = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles");
+                const providedProfile: string = SettingsService.getProfileName();
                 const message = providedProfile ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${providedProfile}` : `${PROVIDE_PROFILE_MSG}`;
                 CopybookDownloadService.processDownloadError(message);
             }
@@ -257,6 +254,14 @@ export class CopybookDownloadService implements vscode.Disposable {
         this.queue.stop();
     }
 
+    public static checkWorkspace(): boolean {
+        if (vscode.workspace.workspaceFolders.length === 0) {
+            vscode.window.showErrorMessage("No workspace folder opened.");
+            return false;
+        }
+        return true;
+    }
+    
     private async process(progress: vscode.Progress<{ message?: string; increment?: number }>,
                           element: CopybookProfile, errors: Set<string>, startTime: number) {
         {
@@ -298,7 +303,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         }
         toDownload.map(cp => cp.copybook).forEach(cb => errors.add(cb));
         try {
-            for (const dataset of await this.pathGenerator.listDatasets()) {
+            for (const dataset of SettingsService.getUssPath(SettingsService.DEFAULT_DIALECT)) {
                 await CopybookDownloadService.handleCopybooks(dataset, toDownload, errors, progress);
             }
 
@@ -306,7 +311,7 @@ export class CopybookDownloadService implements vscode.Disposable {
             const quiteModeOffCopybooks = toDownloadUSS.filter(cp => !cp.quiet).map(cp => cp.copybook);
             errors = new Set([...errors].filter(cp => quiteModeOffCopybooks.includes(cp)));
             if (toDownloadUSS.length > 0) {
-                for (const ussPath of await this.pathGenerator.listUSSPaths()) {
+                for (const ussPath of SettingsService.getUssPath(SettingsService.DEFAULT_DIALECT)) {
                     await CopybookDownloadService.handleCopybooks(ussPath, toDownloadUSS, errors, progress, true);
                 }
             }

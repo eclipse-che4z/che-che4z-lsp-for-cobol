@@ -14,9 +14,9 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import {PATHS_LOCAL_KEY, SETTINGS_CPY_SECTION} from "../constants";
-import {LocalCopybookResolver} from "../services/copybook/LocalCopybookResolver";
-import {SettingsUtils} from "../services/util/SettingsUtils";
+import {PATHS_LOCAL_KEY, SETTINGS_CPY_SECTION} from "../../../constants";
+import {LocalCopybookResolver} from "../../../services/copybook/LocalCopybookResolver";
+import {SettingsUtils} from "../../../services/util/SettingsUtils";
 
 const settingsParser: LocalCopybookResolver = new LocalCopybookResolver();
 const STAR_LOCATION = "*";
