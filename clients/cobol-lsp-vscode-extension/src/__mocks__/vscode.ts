@@ -41,3 +41,17 @@ export enum ConfigurationTarget {
     Workspace = 2,
     WorkspaceFolder = 3
 }
+
+export enum EndOfLine {
+    /**
+     * The line feed `\n` character.
+     */
+    LF = 1,
+    /**
+     * The carriage return line feed `\r\n` sequence.
+     */
+    CRLF = 2
+}
+
+export const Range = jest.fn().mockImplementation((start, end) => { return {start: start, end: end} })
+export const Position = jest.fn().mockImplementation((line, character) => { return {line: line, character: character} });

@@ -15,15 +15,13 @@
 import * as fs from "fs-extra";
 import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
-import { CopybookDownloadService } from "../services/copybook/CopybookDownloadService";
-import { CopybooksPathGenerator } from "../services/copybook/CopybooksPathGenerator";
-import { CopybookURI } from "../services/copybook/CopybookURI";
-import { JavaCheck } from "../services/JavaCheck";
-import { LanguageClientService } from "../services/LanguageClientService";
-import { Middleware } from "../services/Middleware";
+import { CopybookDownloadService } from "../../services/copybook/CopybookDownloadService";
+import { JavaCheck } from "../../services/JavaCheck";
+import { LanguageClientService } from "../../services/LanguageClientService";
+import { Middleware } from "../../services/Middleware";
 
-jest.mock("../services/Middleware");
-jest.mock("../services/copybook/CopybookURI");
+jest.mock("../../services/Middleware");
+jest.mock("../../services/copybook/CopybookURI");
 jest.mock("vscode", () => ({
     extensions: {
         getExtension: jest.fn().mockReturnValue({ extensionPath: "/test" }),
@@ -38,8 +36,8 @@ jest.mock("vscode-languageclient", () => ({
     LanguageClient: jest.fn(),
 }));
 
-const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService(new CopybooksPathGenerator());
-const middleware: Middleware = new Middleware(new CopybookURI(), copyBooksDownloader);
+const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService();
+const middleware: Middleware = new Middleware(copyBooksDownloader);
 let languageClientService: LanguageClientService;
 
 const SERVER_DESC = "LSP extension for COBOL language";

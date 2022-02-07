@@ -11,6 +11,8 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import * as path from "path";
+import * as vscode from "vscode";
 import { C4Z_FOLDER, COPYBOOK_EXT_ARRAY, COPYBOOKS_FOLDER } from "../../constants";
 import { SettingsService } from "../Settings";
 import { searchInWorkspace } from "../util/FSUtils";
@@ -28,24 +30,34 @@ export class CopybookURI {
      * If it's not found in the previous steps than the user is notified and needs to download it from MF
      * or update the setting.json with an additional folder on the workspace where to search this missed copybook.
      * @param copybookName Name of the required copybook
-     * @param cobolProgramName name of the cobol file opened in the IDE
+     * @param cobolFileName name of the cobol file opened in the IDE
      * @param dialectType name of the cobol dialect type
      */
-    public async resolveCopybookURI(copybookName: string, cobolProgramName: string, dialectType: string): Promise<string> {
+    public static async resolveCopybookURI(copybookName: string, cobolFileName: string, dialectType: string): Promise<string> {
         // check on local paths provided by the user
         let result: string;
         result = searchInWorkspace(copybookName,
-            SettingsService.getCopybookLocalPath(cobolProgramName, dialectType),
+            SettingsService.getCopybookLocalPath(cobolFileName, dialectType),
             COPYBOOK_EXT_ARRAY);
         // check in subfolders under .copybooks (copybook downloaded from MF)
         if (!result) {
             result = searchInWorkspace(copybookName,
-                this.createPathForCopybookDownloaded(ProfileUtils.getProfileNameForCopybook(cobolProgramName)),
+                CopybookURI.createPathForCopybookDownloaded(ProfileUtils.getProfileNameForCopybook(cobolFileName)),
                 COPYBOOK_EXT_ARRAY);
         }
         return result || "";
     }
 
+    public static createCopybookPath(profileName: string, dataset: string, copybook: string): string {
+        const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        const copybookDirPath = path.join(rootPath, C4Z_FOLDER, COPYBOOKS_FOLDER, profileName, dataset);
+        return path.join(copybookDirPath, copybook + ".cpy");
+    }
+    
+    public static createDatasetPath(profileName: string, dataset: string): string {
+        const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        return path.join(rootPath, C4Z_FOLDER, COPYBOOKS_FOLDER, profileName, dataset);
+    }    
     /**
      * This method produce an array with element that following the schema
      * "file://[WORKSPACE_FOLDER]/.c4z/.copybooks/PROFILE/DATASET" or
@@ -53,16 +65,16 @@ export class CopybookURI {
      * @param profile represent a name of a folder within the .copybooks folder that have the same name as the
      * connection name needed to download copybooks from mainframe.
      */
-    private createPathForCopybookDownloaded(profile: string): string[] {
+    private static createPathForCopybookDownloaded(profile: string): string[] {
         let result: string[] = [];
-        const datasets: string[] = SettingsService.getDsnPath();
+        const datasets: string[] = SettingsService.getDsnPath(SettingsService.DEFAULT_DIALECT);
         if (profile && datasets) {
             result = Object.assign([], datasets);
             result.forEach((value, index) => result[index] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" +
                 profile + "/" + value);
         }
 
-        const ussPaths: string[] = SettingsService.getUssPath();
+        const ussPaths: string[] = SettingsService.getUssPath(SettingsService.DEFAULT_DIALECT);
         const baseIndex = result.length;
         if (profile && ussPaths) {
             Object.assign([], ussPaths).forEach((value, index) => result[index + baseIndex] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" +

@@ -13,10 +13,10 @@
  */
 
 import * as vscode from "vscode";
-import {gotoCopybookSettings} from "../commands/OpenSettingsCommand";
-import {TelemetryService} from "../services/reporter/TelemetryService";
+import {gotoCopybookSettings} from "../../commands/OpenSettingsCommand";
+import {TelemetryService} from "../../services/reporter/TelemetryService";
 
-jest.mock("../services/reporter/TelemetryService");
+jest.mock("../../services/reporter/TelemetryService");
 jest.mock("vscode", () => ({
     commands: {
         executeCommand: jest.fn(),

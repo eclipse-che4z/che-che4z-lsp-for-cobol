@@ -54,6 +54,8 @@ export function createFileWithGivenPath(folderPath: string, fileName: string, pa
  * SettingsService provides read/write configurstion settings functionality
  */
 export class SettingsService {
+
+    public static readonly DEFAULT_DIALECT = "COBOL";
     /**
      * Get list of local subroutine path
      * @returns a list of local subroutine path
@@ -64,19 +66,20 @@ export class SettingsService {
 
     /**
      * Get copybook local path based on program file name
-     * @param cobolProgramName is a program file name
+     * @param cobolFileName is a program file name
      * @param dialectType name of the cobol dialect type
      * @returns a list of local path
      */
-    public static getCopybookLocalPath(cobolProgramName: string, dialectType: string): string[] {
-        if (dialectType !== "COBOL") {
-            const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(`${PATHS_LOCAL_KEY}.${dialectType}`);
+    public static getCopybookLocalPath(cobolFileName: string, dialectType: string): string[] {
+        const programFile = cobolFileName.replace(/\.[^/.]+$/, "");
+        if (dialectType !== SettingsService.DEFAULT_DIALECT) {
+            const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(`${dialectType.toLowerCase()}.${PATHS_LOCAL_KEY}`);
             if (pathList && pathList.length > 0) {
-                return SettingsService.evaluateVariable(pathList, "program_name", cobolProgramName);
+                return SettingsService.evaluateVariable(pathList, "program_file", programFile);
             }
         }
         const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_LOCAL_KEY);
-        return SettingsService.evaluateVariable(pathList, "program_name", cobolProgramName);
+        return SettingsService.evaluateVariable(pathList, "program_file", programFile);
     }
 
     /**
@@ -88,18 +91,11 @@ export class SettingsService {
     }
 
     /**
-     * Determine if dsn path exists in the configurstion 
-     * @returns true if path exists and false otherwise
-     */
-    public static hasDsnPath(): boolean {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).has(PATHS_ZOWE)        
-    }
-
-    /**
      * Get list of dsn path
+     * @param dialectType name of the cobol dialect type
      * @returns a list of dsn path
      */
-    public static getDsnPath(): string[] {
+    public static getDsnPath(dialectType: string): string[] {
         return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);        
     }
 
@@ -112,18 +108,11 @@ export class SettingsService {
     }
 
     /**
-     * Determine if uss path exists in the configurstion 
-     * @returns true if path exists and false otherwise
-     */
-    public static hasUssPath(): boolean {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).has(PATHS_USS)        
-    }
-
-    /**
      * Get list of uss path
+     * @param dialectType name of the cobol dialect type
      * @returns a list of uss path
      */
-    public static getUssPath(): string[] {
+    public static getUssPath(dialectType: string): string[] {
         return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_USS)
     }
 
@@ -133,15 +122,6 @@ export class SettingsService {
      */
     public static getProfileName(): string {
         return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles")
-    }
-
-    /**
-     * Determine if confuguration is invalid
-     * @returns true if configurstion is invalid and false otherwise
-     */
-    public static isConfigurationInvalid() {
-        return !SettingsService.hasDsnPath() &&
-            !SettingsService.hasUssPath();
     }
 
     private static evaluateVariable(dataList: string[], variable: string, value: string): string[] {

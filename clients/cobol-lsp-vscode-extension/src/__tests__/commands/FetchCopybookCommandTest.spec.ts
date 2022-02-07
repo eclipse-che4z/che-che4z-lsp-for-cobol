@@ -12,13 +12,13 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { fetchCopybookCommand } from "../commands/FetchCopybookCommand";
-import { CopybookDownloadService } from "../services/copybook/CopybookDownloadService";
-import { TelemetryService } from "../services/reporter/TelemetryService";
+import { fetchCopybookCommand } from "../../commands/FetchCopybookCommand";
+import { CopybookDownloadService } from "../../services/copybook/CopybookDownloadService";
+import { TelemetryService } from "../../services/reporter/TelemetryService";
 
-jest.mock("../services/reporter/TelemetryService");
-jest.mock("../services/copybook/CopybookDownloadService");
-const copybookDownloadService: CopybookDownloadService = new CopybookDownloadService(null);
+jest.mock("../../services/reporter/TelemetryService");
+jest.mock("../../services/copybook/CopybookDownloadService");
+const copybookDownloadService: CopybookDownloadService = new CopybookDownloadService();
 const copybook: string = "cobyBookTest";
 const progName: string = "progNameTest";
 

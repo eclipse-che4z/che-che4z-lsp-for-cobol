@@ -20,14 +20,16 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.service.utils.SyntaxTreeUtil;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.ROOT;
 import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.IMPLICIT_PATH;
 import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
@@ -40,6 +42,7 @@ import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 @Getter
 public class RootNode extends Node {
   private final Map<String, CopyDefinition> copyDefinitionMap = new HashMap<>();
+
   public RootNode(Locality locality, NamedSubContext copybook) {
     super(locality, ROOT);
     addProcessStep(this::waitForVariableStructure);
@@ -54,22 +57,20 @@ public class RootNode extends Node {
   }
 
   private List<SyntaxError> waitForVariableStructure() {
-    addProcessStep(this::updateVariableStructure);
+    addProcessStep(this::addCopyNodesToTree);
     return ImmutableList.of();
   }
 
-  private List<SyntaxError> updateVariableStructure() {
-    List<Node> nodes =
-        this.getChildren().stream().filter(hasType(NodeType.COPY)).collect(Collectors.toList());
+  private List<SyntaxError> addCopyNodesToTree() {
+    List<Node> nodes = getChildren().stream().filter(hasType(NodeType.COPY)).collect(toList());
     nodes.forEach(this::removeChild);
     nodes.forEach(
         it ->
-            SyntaxTreeUtil.findNodeInRange(this, it.getLocality().getRange().getStart())
+            RangeUtils.findNodeByPosition(
+                    this, it.getLocality().getUri(), it.getLocality().getRange().getStart())
                 .orElse(this)
                 .addChild(it));
-    for (Node node : nodes) {
-      registerCopyUsage((CopyNode) node);
-    }
+    nodes.stream().map(CopyNode.class::cast).forEach(this::registerCopyUsage);
     return ImmutableList.of();
   }
 

@@ -15,14 +15,14 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import {TelemetryReporterImpl} from "../services/reporter/TelemetryReporterImpl";
-import {ExtensionUtils} from "../services/util/ExtensionUtils";
+import {TelemetryReporterImpl} from "../../../services/reporter/TelemetryReporterImpl";
+import {ExtensionUtils} from "../../../services/util/ExtensionUtils";
 
 const INVALID_TELEMETRY_KEY: string = "INVALID_INSTRUMENTATION_KEY";
 const INVALID_TELEMETRY_KEY_FOR_TESTING: string = "INSTRUMENTATION_KEY_FOR_TESTING";
 
 function generatePath(...pathSegments): string {
-    return path.join(path.join(__dirname, "../../"), ...pathSegments);
+    return path.join(path.join(__dirname, "../../../../"), ...pathSegments);
 }
 
 function mockFsPath(inputPath: string): void {

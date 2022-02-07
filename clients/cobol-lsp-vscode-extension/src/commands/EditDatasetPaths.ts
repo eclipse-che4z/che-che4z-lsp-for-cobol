@@ -12,19 +12,30 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import { PathsService, validateDatasetNames } from "../services/PathsService";
+import { validateDatasetNames } from "../services/util/DatasetUtils";
+import { SettingsService } from "../services/Settings";
 
 // command for "cobol-lsp.cpy-manager.edit-dataset-paths"
-export async function editDatasetPaths(pathsService: PathsService) {
+export async function editDatasetPaths() {
     const result = await vscode.window.showInputBox({
         "ignoreFocusOut": true,
         "placeHolder": "DATASET.ONE, DATASET.TWO, ...",
         "prompt": "Provide a comma-separated list of datasets",
-        "value": (await pathsService.listPathDatasets()).join(", "),
+        "value": (await listPathDatasets()).join(", "),
         "validateInput": validateDatasetNames,
     });
 
     if (result) {
-        pathsService.setPathDatasets(result.split(",").map(e => e.trim()));
+        SettingsService.setDsnPath(result.split(",").map(e => e.trim()));
     }
 }
+
+export async function listPathDatasets(): Promise<string[]> {
+    const datasets = SettingsService.getDsnPath(SettingsService.DEFAULT_DIALECT);
+    if (!datasets || datasets.length == 0) {
+        await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
+        return [];
+    }
+    return SettingsService.getDsnPath(SettingsService.DEFAULT_DIALECT);
+}
+
