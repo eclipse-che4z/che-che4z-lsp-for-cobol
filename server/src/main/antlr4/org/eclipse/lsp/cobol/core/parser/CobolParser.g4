@@ -993,7 +993,7 @@ idmsOnClause
 dafStatements
     : readTransactionStatement | writeTransactionStatement | writeReportStatement
     | openPacketStatement | getMetaInfoStatement | messageHandlingStatement
-    | tableRowRetrievalStatement
+    | tableRowRetrievalStatement | tableRowUpdateStatement
     ;
 
 readTransactionStatement
@@ -1181,6 +1181,51 @@ rowAnyStatement
 rowMatchStatement
     : MATCH daf_table_name
       USING qualifiedDataName
+    ;
+
+tableRowUpdateStatement
+    : ROW (rowDeleteStatement | rowAddStatement | rowInsertStatement |
+      rowModifyStatement | rowSortStatement | rowSingleStatement |
+      rowDuplicateStatement | rowInvertStatement)
+    ;
+
+rowDeleteStatement
+    : DELETE daf_table_name
+    ;
+
+rowAddStatement
+    : ADD daf_table_name
+      WITH qualifiedDataName
+    ;
+
+rowInsertStatement
+    : INSERT daf_table_name
+      WITH qualifiedDataName
+    ;
+
+rowModifyStatement
+    : MODIFY daf_table_name
+      ON (qualifiedDataName | literal)
+      WITH qualifiedDataName
+    ;
+
+rowSortStatement
+    : SORT daf_table_name (ASC | DES)
+      ON qualifiedDataName
+    ;
+
+rowSingleStatement
+    : SINGLE daf_table_name
+      ON qualifiedDataName
+    ;
+
+rowDuplicateStatement
+    : DUPLICATE daf_table_name
+      ON qualifiedDataName
+    ;
+
+rowInvertStatement
+    : INVERT daf_table_name
     ;
 
 // End of DaCo Statements
