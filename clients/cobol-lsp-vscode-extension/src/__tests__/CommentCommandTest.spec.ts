@@ -150,6 +150,10 @@ describe('Validate ToggleComments', () => {
     // selection[1]
     // 14:      *    DISPLAY 'From P1:' BAR of FOOBAR.
     //             selected  ^~~~~~~~~^
+    // selection[2]
+    // 20:      -    "LLLLLLLLLLMMMMMMMMMM"
+    // selection[3]
+    // 25:      d  debug command
 
     const documentLines = {
         5: {
@@ -163,6 +167,14 @@ describe('Validate ToggleComments', () => {
         14: {
             text: '      *    DISPLAY \'From P1:\' BAR of FOOBAR.',
             range: getRange(14, 0, 14, 44)
+        },
+        20: {
+            text: '      -    "LLLLLLLLLLMMMMMMMMMM"',
+            range: getRange(20, 0, 20, 33)
+        },
+        25: {
+            text: '      d  debug command',
+            range: getRange(25, 0, 25, 22)
         }
     }
     const editBuilder = {
@@ -171,7 +183,9 @@ describe('Validate ToggleComments', () => {
     const textEditor = {
         selections: [
             getRange(5, 12, 6, 25),
-            getRange(14, 20, 14, 30)
+            getRange(14, 20, 14, 30),
+            getRange(20, 13, 20, 20),
+            getRange(25, 15, 25, 20),
         ],
         document: {
             lineAt: jest.fn().mockImplementation(line => documentLines[line]),
@@ -198,6 +212,14 @@ describe('Validate ToggleComments', () => {
             getRange(14, 0, 14, 44),
             '           DISPLAY \'From P1:\' BAR of FOOBAR.'
         )
+        expect(editBuilder.replace).toBeCalledWith(
+            getRange(20, 0, 20, 33),
+            '      *    "LLLLLLLLLLMMMMMMMMMM"'
+        )
+        expect(editBuilder.replace).toBeCalledWith(
+            getRange(25, 0, 25, 22),
+            '      *  debug command'
+        )
     })
 
     test('with comment action', () => {
@@ -211,6 +233,14 @@ describe('Validate ToggleComments', () => {
         expect(editBuilder.replace).toBeCalledWith(
             getRange(14, 0, 14, 44),
             '      **    DISPLAY \'From P1:\' BAR of FOOBAR.'
+        )
+        expect(editBuilder.replace).toBeCalledWith(
+            getRange(20, 0, 20, 33),
+            '      *    "LLLLLLLLLLMMMMMMMMMM"'
+        )
+        expect(editBuilder.replace).toBeCalledWith(
+            getRange(25, 0, 25, 22),
+            '      *  debug command'
         )
     })
 
@@ -226,15 +256,23 @@ describe('Validate ToggleComments', () => {
             getRange(14, 0, 14, 44),
             '           DISPLAY \'From P1:\' BAR of FOOBAR.'
         )
+        expect(editBuilder.replace).toBeCalledWith(
+            getRange(20, 0, 20, 33),
+            '      -    "LLLLLLLLLLMMMMMMMMMM"'
+        )
+        expect(editBuilder.replace).toBeCalledWith(
+            getRange(25, 0, 25, 22),
+            '      d  debug command'
+        )
     })
 
     function checkCommonCalls() {
-        expect(textEditor.document.lineAt).toBeCalledTimes(3)
+        expect(textEditor.document.lineAt).toBeCalledTimes(5)
         expect(textEditor.document.lineAt).toBeCalledWith(5)
         expect(textEditor.document.lineAt).toBeCalledWith(6)
         expect(textEditor.document.lineAt).toBeCalledWith(14)
         expect(textEditor.edit).toBeCalledTimes(1)
-        expect(editBuilder.replace).toBeCalledTimes(2)
+        expect(editBuilder.replace).toBeCalledTimes(4)
     }
 })
 

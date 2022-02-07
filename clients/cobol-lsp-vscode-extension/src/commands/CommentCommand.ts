@@ -63,10 +63,10 @@ export class ToggleComments {
             case CommentAction.COMMENT: return commentLine;
             case CommentAction.UNCOMMENT: return uncommentLine;
             case CommentAction.TOGGLE:
-                const anyNonComment = textLines
+                const allIsComment = textLines
                     .map(getLineCommentStatus)
-                    .some(it => it === LineCommentStatus.NON_COMMENT);
-                return anyNonComment ? commentLine : uncommentLine;
+                    .every(it => it === LineCommentStatus.COMMENT || it === LineCommentStatus.COMMENTED_TWICE);
+                return allIsComment ? uncommentLine : commentLine;
         }
     }
 
