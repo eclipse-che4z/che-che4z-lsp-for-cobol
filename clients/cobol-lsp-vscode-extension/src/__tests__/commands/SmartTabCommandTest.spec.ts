@@ -14,7 +14,7 @@
 
 import * as vscode from "vscode";
 
-import {initSmartTab} from "../commands/SmartTabCommand";
+import {initSmartTab} from "../../commands/SmartTabCommand";
 
 const editor: any = {
     document: {

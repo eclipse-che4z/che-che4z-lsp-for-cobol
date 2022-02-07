@@ -12,30 +12,13 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as vscode from "vscode";
 import {
     DSN_CONTAINS_PROHIBITED_CHAR,
     DSN_MUSTBE_NOT_EMPTY,
     DSN_NOMORE_8CHARS,
     DSN_START_PROHIBITED_CHAR,
     SEGMENT_PLACEHOLDER,
-} from "../constants";
-import { SettingsService } from "./Settings";
-
-export class PathsService {
-
-    async listPathDatasets(): Promise<string[]> {
-        if (!SettingsService.hasDsnPath()) {
-            await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
-            return [];
-        }
-        return SettingsService.getDsnPath();
-    }
-
-    setPathDatasets(paths: string[]) {
-        SettingsService.setDsnPath(paths);
-    }
-}
+} from "../../constants";
 
 export function validateDatasetNames(inputValue: string): string | undefined {
     const datasets: string[] = inputValue.split(",").map(e => e.trim());

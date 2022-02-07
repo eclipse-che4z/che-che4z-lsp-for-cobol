@@ -12,41 +12,14 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as vscode from "vscode";
 import {
     DSN_CONTAINS_PROHIBITED_CHAR,
     DSN_MUSTBE_NOT_EMPTY,
     DSN_NOMORE_8CHARS,
     DSN_START_PROHIBITED_CHAR,
     SEGMENT_PLACEHOLDER,
-} from "../constants";
-import {PathsService, validateDatasetNames} from "../services/PathsService";
-
-let pathService: PathsService;
-beforeAll(() => {
-    pathService = new PathsService();
-});
-
-describe("Validate capability to return a list of dataset from settings.json", () => {
-    test("Given a not defined property in setting json, empty list of dataset is returned", async () => {
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            has: jest.fn().mockReturnValue(false),
-        });
-
-        const result = await pathService.listPathDatasets();
-        expect(result.length).toBe(0);
-    });
-
-    test("Given a list of dataset defined in the settings.json, a not empty result list is returned to the caller", async () => {
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue(["HLQ.DSNAME1", "HLQ.DSNAME2"]),
-            has: jest.fn().mockReturnValue(true),
-        });
-
-        const result = await pathService.listPathDatasets();
-        expect(result.length).toBe(2);
-    });
-});
+} from "../../../constants";
+import { validateDatasetNames} from "../../../services/util/DatasetUtils";
 
 describe("Validate dataset name against bad configurations", () => {
     test("Given a empty value as dataset name, the UI returns an appropriate message", () => {

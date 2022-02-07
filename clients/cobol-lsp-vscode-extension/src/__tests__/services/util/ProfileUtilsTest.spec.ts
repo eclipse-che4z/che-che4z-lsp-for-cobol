@@ -15,7 +15,7 @@
 import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
 import * as path from "path";
 import * as vscode from "vscode";
-import { ProfileUtils } from "../services/util/ProfileUtils";
+import { ProfileUtils } from "../../../services/util/ProfileUtils";
 
 const getZoweExplorerMock = () => {
     return jest.fn().mockReturnValue({
