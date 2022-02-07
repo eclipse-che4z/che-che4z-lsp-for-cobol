@@ -25,7 +25,10 @@
         "zos",
         "language-server",
         "jcl",
-        "zowe"
+        "zowe",
+        "ibm cobol",
+        "idms",
+        "datacom"
     ],
     "categories": [
         "Programming Languages"
@@ -54,6 +57,18 @@
             {
                 "command": "cobol-lsp.cpy-manager.goto-settings",
                 "title": "Open Copybook location settings"
+            },
+            {
+                "command": "cobol-lsp.commentLine.toggle",
+                "title": "Toggle COBOL Line Comment"
+            },
+            {
+                "command": "cobol-lsp.commentLine.comment",
+                "title": "Add Cobol Line Comment"
+            },
+            {
+                "command": "cobol-lsp.commentLine.uncomment",
+                "title": "Remove COBOL Line Comment"
             }
         ],
         "languages": [
@@ -119,7 +134,7 @@
                     "description": "Default list of relative local paths to search for copybooks",
                     "uniqueItems": true
                 },
-                "cobol-lsp.cpy-manager.paths-local.maid": {
+                "cobol-lsp.cpy-manager.maid.paths-local": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -127,7 +142,7 @@
                     "description": "Default list of relative local paths to search for MAID copybooks",
                     "uniqueItems": true
                 },
-                "cobol-lsp.cpy-manager.paths-local.idms": {
+                "cobol-lsp.cpy-manager.idms.paths-local": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -242,6 +257,12 @@
                 "key": "shift+tab",
                 "command": "cobol-lsp.smart-outdent",
                 "when": "editorLangId == COBOL && !inSnippetMode"
+            },
+            {
+                "key": "ctrl+/",
+                "mac": "cmd+/",
+                "command": "cobol-lsp.commentLine.toggle",
+                "when": "editorLangId =~ /^cobol$/i && editorTextFocus && !editorReadonly"
             }
         ]
     },
