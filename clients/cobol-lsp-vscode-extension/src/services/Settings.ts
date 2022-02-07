@@ -96,7 +96,7 @@ export class SettingsService {
      * @returns a list of dsn path
      */
     public static getDsnPath(dialectType: string): string[] {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);        
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);
     }
 
     /**
@@ -128,5 +128,13 @@ export class SettingsService {
         const result: string[] = [];
         dataList.forEach(d => result.push(d.replace("$" + variable, value)))
         return result;
+    }
+
+    /**
+     * Return the code page for the copybook file encoding supplied by user
+     * @returns string
+     */
+    public static getCopybookFileEncoding() {
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("copybook-file-encoding")
     }
 }
