@@ -91,24 +91,12 @@ beforeEach(() => {
 jest.mock("../../../services/reporter/TelemetryService");
 
 describe("Test fetchCopybook against bad and correct configurations", () => {
-    const fsPath = "/projects";
-
-    beforeEach(() => {
-        (vscode.workspace.workspaceFolders as any) = [{ uri: { fsPath } } as any];
-    })
-
-    it("check workspace", () => {
-        expect(CopybookDownloadService.checkWorkspace()).toEqual(true);
-        (vscode.workspace.workspaceFolders as any) = [];
-        expect(CopybookDownloadService.checkWorkspace()).toEqual(false);
-    });
-
     it("downloadCopybookFromMFUsingZowe is correctly invokes USS API's", async () => {
         ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
+        SettingsService.getCopybookFileEncoding = jest.fn().mockReturnValue("1147");
         await (CopybookDownloadService as any).downloadCopybookFromMFUsingZowe("HLQ.DSN1", copybookProfile, true);
         expect(getUSSContentsMock).toBeCalledWith(`HLQ.DSN1/copybook`, {
-            encoding: "UTF-8",
-            binary: false,
+            binary: true,
             file: Path.join(CopybookURI.createDatasetPath(profile, "HLQ.DSN1"), "copybook"),
             returnEtag: true,
         });
@@ -118,7 +106,7 @@ describe("Test fetchCopybook against bad and correct configurations", () => {
         ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
         await (CopybookDownloadService as any).downloadCopybookFromMFUsingZowe("HLQ.DSN1", copybookProfile);
         expect(getContentMock).toBeCalledWith(`HLQ.DSN1(copybook)`, {
-            encoding: undefined,
+            binary: true,
             file: Path.join(CopybookURI.createDatasetPath(profile, "HLQ.DSN1"), "copybook"),
             returnEtag: true,
         });
