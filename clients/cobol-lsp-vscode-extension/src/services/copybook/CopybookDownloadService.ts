@@ -303,7 +303,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         }
         toDownload.map(cp => cp.copybook).forEach(cb => errors.add(cb));
         try {
-            for (const dataset of SettingsService.getUssPath(SettingsService.DEFAULT_DIALECT)) {
+            for (const dataset of SettingsService.getDsnPath(SettingsService.DEFAULT_DIALECT)) {
                 await CopybookDownloadService.handleCopybooks(dataset, toDownload, errors, progress);
             }
 
