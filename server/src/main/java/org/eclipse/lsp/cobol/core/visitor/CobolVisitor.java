@@ -489,11 +489,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
-    int level = getLevel(ctx.LEVEL_NUMBER());
     return addTreeNode(
         VariableDefinitionNode.builder()
-            .level(level)
-            .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER()))
+            .level(getLevel(ctx.levelNumber().LEVEL_NUMBER()))
+            .levelLocality(getLevelLocality(ctx.levelNumber().LEVEL_NUMBER()))
             .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null))
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
             .global(!ctx.dataGlobalClause().isEmpty())

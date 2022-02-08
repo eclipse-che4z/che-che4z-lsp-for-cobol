@@ -690,7 +690,11 @@ linkageSection
 // -- local storage section ----------------------------------
 
 localStorageSection
-   : LOCAL_STORAGE SECTION DOT_FS dataDescriptionEntry*
+   : LOCAL_STORAGE SECTION DOT_FS dataDescriptionEntries
+   ;
+
+dataDescriptionEntries
+   : dataDescriptionEntry*
    ;
 
 dataDescriptionEntryForWorkingStorageSection
@@ -711,11 +715,15 @@ dataDescriptionEntry
    ;
 
 dataDescriptionEntryFormat1
-   : LEVEL_NUMBER entryName? (dataGroupUsageClause | dataRedefinesClause | dataExternalClause
+   : levelNumber entryName? (dataGroupUsageClause | dataRedefinesClause | dataExternalClause
    | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
    | dataOccursClause | dataSignClause | dataSynchronizedClause
    | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
    DOT_FS
+   ;
+
+levelNumber
+   : LEVEL_NUMBER
    ;
 
 
