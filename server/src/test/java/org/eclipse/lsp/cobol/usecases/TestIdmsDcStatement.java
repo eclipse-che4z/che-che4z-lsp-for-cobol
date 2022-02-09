@@ -42,7 +42,8 @@ class TestIdmsDcStatement {
   private static final String DC_RETURN_TIMEOUT_INTERVAL_WITH_ALL =
       "           MOVE 0030 TO {$WK_TIME}.\r\n "
           + "           DC RETURN NEXT TASK CODE 'TSTTASK' NORMAL TIMEOUT INTERVAL 12\r\n"
-          + "           NEXT TASK INTERVAL 10 EVENT TYPE INTERNAL EVENT NAME 'TSTEVENT'.\r\n";
+          + "           NEXT TASK INTERVAL 10 EVENT TYPE INTERNAL EVENT \r\n"
+          + "           NAME 'TSTEVENT'.\r\n";
 
   private static final String DC_RETURN_TIMEOUT_INTERVAL_WITH_ALL_2 =
       "           MOVE 30 TO {$WK_TIME}.\r\n "

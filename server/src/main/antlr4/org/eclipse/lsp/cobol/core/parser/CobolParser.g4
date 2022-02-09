@@ -952,7 +952,8 @@ paragraph
    ;
 
 sentence
-   : statement* endClause | idmsStatements endClause?
+   : idmsStmtsMandTermOn (SEMICOLON_FS idmsOnClause? | DOT_FS) |
+    ((idmsStmtsOptTermOn endClause? idmsOnClause? | statement)* endClause)
    ;
 
 conditionalStatementCall

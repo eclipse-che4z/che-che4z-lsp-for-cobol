@@ -40,7 +40,7 @@ class TestIdmsKeepStatement {
   private static final String KEEP1 = DEFS + "           KEEP CURRENT {$EMPLOYEE}.\n";
 
   private static final String KEEP2 =
-      DEFS + "           KEEP EXCLUSIVE CURRENT WITHIN {$DEPT-EMP}\n";
+      DEFS + "           KEEP EXCLUSIVE CURRENT WITHIN {$DEPT-EMP}.\n";
 
   private static final String KEEP3 = DEFS + "           KEEP CURRENT.\n";
 
