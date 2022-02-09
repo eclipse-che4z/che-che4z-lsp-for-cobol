@@ -57,11 +57,11 @@ public class RootNode extends Node {
   }
 
   private List<SyntaxError> waitForVariableStructure() {
-    addProcessStep(this::addCopyNodesToTree);
+    addProcessStep(this::updateCopyNodesByPositionInTree);
     return ImmutableList.of();
   }
 
-  private List<SyntaxError> addCopyNodesToTree() {
+  private List<SyntaxError> updateCopyNodesByPositionInTree() {
     List<Node> nodes = getChildren().stream().filter(hasType(NodeType.COPY)).collect(toList());
     nodes.forEach(this::removeChild);
     nodes.forEach(
@@ -76,10 +76,10 @@ public class RootNode extends Node {
 
   private void registerCopyUsage(CopyNode copyNode) {
     copyDefinitionMap.putIfAbsent(
-        copyNode.getCopyBookName(),
+        copyNode.getName(),
         new CopyDefinition(
-            new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), copyNode.getCopyBookName()));
-    CopyDefinition foundDefinition = copyDefinitionMap.get(copyNode.getCopyBookName());
+            new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), copyNode.getName()));
+    CopyDefinition foundDefinition = copyDefinitionMap.get(copyNode.getName());
     foundDefinition.addUsages(copyNode);
     copyNode.setDefinition(foundDefinition);
   }
