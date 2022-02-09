@@ -2461,5 +2461,37 @@
         ],
         "description": "[DaCo] ROW INVERT",
         "scope": "cobol"
+    },
+    "TABLE GET ANY": {
+        "prefix": "GET TABLE ANY",
+        "body": [
+            "GET TABLE ANY ${1:tttt}."
+        ],
+        "description": "[DaCo] GET TABLE ANY",
+        "scope": "cobol"
+    },
+    "TABLE GET SEQ": {
+        "prefix": "GET TABLE SEQ",
+        "body": [
+            "GET TABLE SEQ ${1:tttt}."
+        ],
+        "description": "[DaCo] GET TABLE SEQ",
+        "scope": "cobol"
+    },
+    "TABLE SORT ASCENDING": {
+        "prefix": "SORT TABLE ASCENDING",
+        "body": [
+            "SORT TABLE ${1:entry-1} TO ${2:entry-2} LENGTH ${3:nn} ASCENDING."
+        ],
+        "description": "[DaCo] SORT TABLE ASCENDING",
+        "scope": "cobol"
+    },
+    "TABLE SORT DESCENDING": {
+        "prefix": "SORT TABLE DESCENDING",
+        "body": [
+            "SORT TABLE ${1:entry-1} TO ${2:entry-2} LENGTH ${3:nn} DESCENDING."
+        ],
+        "description": "[DaCo] SORT TABLE DESCENDING",
+        "scope": "cobol"
     }
 }
