@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.service.SQLBackend;
@@ -70,7 +71,8 @@ class AnnotatedDocumentCleaning {
             subroutineNames,
             expectedDiagnostics,
             copybookNames,
-            sqlBackend);
+            sqlBackend,
+            DialectType.COBOL.name());
 
     return new PreprocessedDocument(
         testData.getText(),
@@ -112,7 +114,7 @@ class AnnotatedDocumentCleaning {
     return copybooks
         .map(processCopybook(expectedDiagnostics, explicitCopybooks, sqlBackend))
         .map(collectDataFromCopybooks(testData))
-        .map(it -> new CobolText(it.getCopybookName(), it.getText()))
+        .map(it -> new CobolText(it.getCopybookName(), it.getDialectType(), it.getText()))
         .collect(toList());
   }
 
@@ -128,7 +130,8 @@ class AnnotatedDocumentCleaning {
             ImmutableList.of(),
             expectedDiagnostics,
             explicitCopybooks,
-            sqlBackend);
+            sqlBackend,
+            it.getDialectType());
   }
 
   private TestData processDocument(
@@ -138,7 +141,8 @@ class AnnotatedDocumentCleaning {
       List<String> subroutineNames,
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> explicitCopybooks,
-      SQLBackend sqlBackend) {
+      SQLBackend sqlBackend,
+      String dialectType) {
     int numberOfLines = text.split("\\R").length;
 
     UseCasePreprocessorLexer lexer = new UseCasePreprocessorLexer(fromString(text));
@@ -157,7 +161,8 @@ class AnnotatedDocumentCleaning {
             uri,
             numberOfLines,
             subroutineNames,
-            expectedDiagnostics);
+            expectedDiagnostics,
+            dialectType);
     new ParseTreeWalker().walk(listener, startRule);
     return listener.getProcessingResult();
   }

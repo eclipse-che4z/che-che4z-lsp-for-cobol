@@ -214,17 +214,17 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
 
   protected ResultWithErrors<CopybookModel> getCopyBookContent(
       CopybookMetaData metaData, CopybookHierarchy hierarchy) {
-    if (metaData.getName().isEmpty()) return emptyModel(metaData.getName(), ImmutableList.of());
+    if (metaData.getName().isEmpty()) return emptyModel(metaData.getName(), metaData.getDialect(), ImmutableList.of());
 
     if (hierarchy.hasRecursion(metaData.getName()))
-      return emptyModel(metaData.getName(), hierarchy.mapCopybooks(this::reportRecursiveCopybook));
+      return emptyModel(metaData.getName(), metaData.getDialect(), hierarchy.mapCopybooks(this::reportRecursiveCopybook));
 
     CopybookModel copybook =
         copybookService.resolve(
             metaData.getName(), metaData.getDocumentUri(), metaData.getDialect(), metaData.getConfig());
 
     if (copybook.getContent() == null) {
-      return emptyModel(metaData.getName(), ImmutableList.of(reportMissingCopybooks(metaData)));
+      return emptyModel(metaData.getName(), metaData.getDialect(), ImmutableList.of(reportMissingCopybooks(metaData)));
     }
 
     return new ResultWithErrors<>(copybook, ImmutableList.of());
@@ -290,8 +290,8 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
   }
 
   protected ResultWithErrors<CopybookModel> emptyModel(
-      String copybookName, List<SyntaxError> errors) {
-    return new ResultWithErrors<>(new CopybookModel(copybookName, "", ""), errors);
+      String copybookName, String dialectType, List<SyntaxError> errors) {
+    return new ResultWithErrors<>(new CopybookModel(copybookName, dialectType, "", ""), errors);
   }
 
   protected SyntaxError addCopybookError(

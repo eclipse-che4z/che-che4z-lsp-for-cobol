@@ -247,7 +247,12 @@ export class CopybookDownloadService implements vscode.Disposable {
             }
         }
 
-        copybookNames.forEach(copybook => this.queue.push(copybook, InfoStorage.get(cobolFileName, copybook), profile, quiet));
+        ;
+        copybookNames.forEach(copybook => {
+            for (const dialectType of InfoStorage.get(cobolFileName, copybook)) {
+                this.queue.push(copybook, dialectType, profile, quiet)
+            }
+        });
     }
 
     public async start() {
