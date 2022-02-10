@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import { DownloadQueue } from "../../../services/copybook/DownloadQueue";
+import { SettingsService } from "../../../services/Settings";
 
 describe("Check download queue", () => {
     const element = "Test";
@@ -19,39 +20,39 @@ describe("Check download queue", () => {
     const elementExtra = "Test_Extra";
     it("can add elements to queue", async () => {
         const queue: DownloadQueue = new DownloadQueue();
-        queue.push(element, profile, false);
+        queue.push(element, SettingsService.DEFAULT_DIALECT, profile, false);
         const e = await queue.pop();
-        expect(e).toEqual({ copybook: element, profile, quiet:false });
+        expect(e).toEqual({ copybook: element, dialectType: SettingsService.DEFAULT_DIALECT, profile, quiet:false });
         expect(0).toEqual(queue.length);
     });
     it("can wait", async () => {
         const queue: DownloadQueue = new DownloadQueue();
         const result = queue.pop().then(e => {
-            expect(e).toEqual({ copybook: element, profile, quiet: true });
+            expect(e).toEqual({ copybook: element, dialectType: SettingsService.DEFAULT_DIALECT, profile, quiet: true });
         });
-        queue.push(element, profile, true);
+        queue.push(element, SettingsService.DEFAULT_DIALECT, profile, true);
         await result;
         expect(0).toEqual(queue.length);
     });
     it("can have more then one element", async () => {
         const queue: DownloadQueue = new DownloadQueue();
-        queue.push(element, profile, true);
-        queue.push(elementExtra, profile, false);
-        expect(await queue.pop()).toEqual({ copybook: elementExtra, profile, quiet: false});
+        queue.push(element, SettingsService.DEFAULT_DIALECT, profile, true);
+        queue.push(elementExtra, SettingsService.DEFAULT_DIALECT, profile, false);
+        expect(await queue.pop()).toEqual({ copybook: elementExtra, dialectType: SettingsService.DEFAULT_DIALECT, profile, quiet: false});
         expect(1).toEqual(queue.length);
-        expect(await queue.pop()).toEqual({ copybook: element, profile, quiet: true });
+        expect(await queue.pop()).toEqual({ copybook: element, dialectType: SettingsService.DEFAULT_DIALECT, profile, quiet: true });
         expect(0).toEqual(queue.length);
     });
     it("can ignore duplicates", async () => {
         const queue: DownloadQueue = new DownloadQueue();
-        queue.push(element, profile, false);
-        queue.push(element, profile, false);
+        queue.push(element, SettingsService.DEFAULT_DIALECT, profile, false);
+        queue.push(element, SettingsService.DEFAULT_DIALECT, profile, false);
         expect(1).toEqual(queue.length);
     });
     it("saves both elements with different quiet flag", async () => {
         const queue: DownloadQueue = new DownloadQueue();
-        queue.push(element, profile, false);
-        queue.push(element, profile, true);
+        queue.push(element, SettingsService.DEFAULT_DIALECT, profile, false);
+        queue.push(element, SettingsService.DEFAULT_DIALECT, profile, true);
         expect(2).toEqual(queue.length);
     });
     it("can stop", async () => {

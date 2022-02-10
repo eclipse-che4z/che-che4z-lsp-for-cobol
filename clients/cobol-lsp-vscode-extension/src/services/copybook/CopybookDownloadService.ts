@@ -25,6 +25,7 @@ import { ProfileUtils } from "../util/ProfileUtils";
 import { CopybookURI } from "./CopybookURI";
 import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
 import * as iconv from "iconv-lite"
+import { InfoStorage } from "./InfoStorage";
 
 const experimentTag = "experiment-tag";
 export class CopybookDownloadService implements vscode.Disposable {
@@ -143,19 +144,21 @@ export class CopybookDownloadService implements vscode.Disposable {
     }
 
     private static async handleCopybooks(
-        dataset: string,
         toDownload: CopybookProfile[],
         errors: Set<string>,
         progress: vscode.Progress<{ message?: string; increment?: number }>, isUSS: boolean = false) {
         try {
-            if (CopybookDownloadService.needsUserNotification(toDownload)) {
-                progress.report({
-                    message: "Looking in " + dataset + ". " + toDownload.length +
-                        " copybook(s) left.",
-                });
-            }
             for (const cp of toDownload) {
-                await CopybookDownloadService.handleCopybook(dataset, cp, errors, isUSS);
+                const datasets = isUSS ? SettingsService.getUssPath(cp.dialectType) : SettingsService.getDsnPath(cp.dialectType);
+                for (const dataset of datasets) {
+                    if (CopybookDownloadService.needsUserNotification(toDownload)) {
+                        progress.report({
+                            message: "Looking in " + dataset + ". " + toDownload.length +
+                                " copybook(s) left.",
+                        });
+                    }
+                    await CopybookDownloadService.handleCopybook(dataset, cp, errors, isUSS);
+                }
             }
         } catch (e) {
             if (CopybookDownloadService.isInvalidCredentials(e)) {
@@ -244,7 +247,7 @@ export class CopybookDownloadService implements vscode.Disposable {
             }
         }
 
-        copybookNames.forEach(copybook => this.queue.push(copybook, profile, quiet));
+        copybookNames.forEach(copybook => this.queue.push(copybook, InfoStorage.get(cobolFileName, copybook), profile, quiet));
     }
 
     public async start() {
@@ -316,9 +319,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         }
         toDownload.map(cp => cp.copybook).forEach(cb => errors.add(cb));
         try {
-            for (const dataset of SettingsService.getDsnPath(SettingsService.DEFAULT_DIALECT)) {
-                await CopybookDownloadService.handleCopybooks(dataset, toDownload, errors, progress);
-            }
+            await CopybookDownloadService.handleCopybooks(toDownload, errors, progress);
 
             const toDownloadUSS = toDownload.filter(cp => errors.has(cp.copybook)).map(cp => cp);
             const quiteModeOffCopybooks = toDownloadUSS.filter(cp => !cp.quiet).map(cp => cp.copybook);
@@ -328,9 +329,7 @@ export class CopybookDownloadService implements vscode.Disposable {
                 }
             })
             if (toDownloadUSS.length > 0) {
-                for (const ussPath of SettingsService.getUssPath(SettingsService.DEFAULT_DIALECT)) {
-                    await CopybookDownloadService.handleCopybooks(ussPath, toDownloadUSS, errors, progress, true);
-                }
+                await CopybookDownloadService.handleCopybooks(toDownloadUSS, errors, progress, true);                
             }
         } catch (e) {
             let errorMessage = e.toString();

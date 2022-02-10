@@ -71,15 +71,7 @@ export class SettingsService {
      * @returns a list of local path
      */
     public static getCopybookLocalPath(cobolFileName: string, dialectType: string): string[] {
-        const programFile = cobolFileName.replace(/\.[^/.]+$/, "");
-        if (dialectType !== SettingsService.DEFAULT_DIALECT) {
-            const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(`${dialectType.toLowerCase()}.${PATHS_LOCAL_KEY}`);
-            if (pathList && pathList.length > 0) {
-                return SettingsService.evaluateVariable(pathList, "program_file", programFile);
-            }
-        }
-        const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_LOCAL_KEY);
-        return SettingsService.evaluateVariable(pathList, "program_file", programFile);
+        return SettingsService.getCopybookConfigValues(PATHS_LOCAL_KEY, cobolFileName, dialectType);
     }
 
     /**
@@ -96,7 +88,7 @@ export class SettingsService {
      * @returns a list of dsn path
      */
     public static getDsnPath(dialectType: string): string[] {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);
+        return SettingsService.getCopybookConfigValues(PATHS_ZOWE, "", dialectType);
     }
 
     /**
@@ -113,7 +105,7 @@ export class SettingsService {
      * @returns a list of uss path
      */
     public static getUssPath(dialectType: string): string[] {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_USS)
+        return SettingsService.getCopybookConfigValues(PATHS_USS, "", dialectType);
     }
 
     /**
@@ -126,7 +118,9 @@ export class SettingsService {
 
     private static evaluateVariable(dataList: string[], variable: string, value: string): string[] {
         const result: string[] = [];
-        dataList.forEach(d => result.push(d.replace("$" + variable, value)))
+        if (dataList) {
+            dataList.forEach(d => result.push(d.replace("$" + variable, value)))
+        }
         return result;
     }
 
@@ -136,5 +130,16 @@ export class SettingsService {
      */
     public static getCopybookFileEncoding() {
         return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("copybook-file-encoding")
+    }
+    private static getCopybookConfigValues(section: string, cobolFileName: string, dialectType: string) {
+        const programFile = cobolFileName.replace(/\.[^/.]+$/, "");
+        if (dialectType !== SettingsService.DEFAULT_DIALECT) {
+            const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(`${dialectType.toLowerCase()}.${section}`);
+            if (pathList && pathList.length > 0) {
+                return SettingsService.evaluateVariable(pathList, "program_file", programFile);
+            }
+        }
+        const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(section);
+        return SettingsService.evaluateVariable(pathList, "program_file", programFile);
     }
 }

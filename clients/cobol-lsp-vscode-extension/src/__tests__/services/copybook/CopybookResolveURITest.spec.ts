@@ -16,6 +16,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { COPYBOOK_EXT_ARRAY } from "../../../constants";
 import { CopybookURI } from "../../../services/copybook/CopybookURI";
+import { SettingsService } from "../../../services/Settings";
 import * as fsUtils from "../../../services/util/FSUtils";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { SettingsUtils } from "../../../services/util/SettingsUtils";
@@ -59,7 +60,7 @@ function buildResultArrayFrom(settingsMockValue: string[], profileName: string, 
             get: jest.fn().mockReturnValue(ussPath),
         });
     }
-    return (CopybookURI as any).createPathForCopybookDownloaded(profileName).length;
+    return (CopybookURI as any).createPathForCopybookDownloaded(profileName, SettingsService.DEFAULT_DIALECT).length;
 }
 
 beforeEach(() => {
