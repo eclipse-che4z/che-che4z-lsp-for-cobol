@@ -47,7 +47,7 @@ public class RangeUtils {
   }
 
   /**
-   * Tests if one position is after the another position.
+   * Test if one position is after the another position.
    *
    * @param before a position.
    * @param after a position.
@@ -59,7 +59,7 @@ public class RangeUtils {
   }
 
   /**
-   * Tests if one position is before the another position.
+   * Test if one position is before the another position.
    *
    * @param after a position.
    * @param before a position.
@@ -70,6 +70,14 @@ public class RangeUtils {
     return compareTo(after, before) < 0;
   }
 
+  /**
+   * Test if text document position resides inside the location.
+   *
+   * @param uri the uri of the node
+   * @param position the position of the node to add
+   * @param location the locality of the wrapping node
+   * @return true if position is inside the location.
+   */
   private boolean isInside(String uri, Position position, Locality location) {
     return uri.equals(location.getUri())
         && !isBefore(position, location.getRange().getStart())

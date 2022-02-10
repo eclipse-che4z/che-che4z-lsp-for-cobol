@@ -60,6 +60,7 @@ public class ResultWithErrors<T> {
   /**
    * Create a ResultWithErrors of a given result without errors.
    *
+   * @param <T> the type of the wrapped value
    * @param result the value to be wrapped
    * @return new ResultWithErrors with empty list of errors
    */
