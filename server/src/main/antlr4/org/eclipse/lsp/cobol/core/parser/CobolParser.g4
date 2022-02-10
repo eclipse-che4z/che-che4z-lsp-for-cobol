@@ -993,7 +993,7 @@ idmsOnClause
 dafStatements
     : readTransactionStatement | writeTransactionStatement | writeReportStatement
     | openPacketStatement | getMetaInfoStatement | messageHandlingStatement
-    | tableRowRetrievalStatement | tableRowUpdateStatement
+    | tableRowRetrievalStatement | tableRowUpdateStatement | tableDMLStatement
     ;
 
 readTransactionStatement
@@ -1226,6 +1226,20 @@ rowDuplicateStatement
 
 rowInvertStatement
     : INVERT daf_table_name
+    ;
+
+tableDMLStatement
+    : getTableStatement | sortTableStatement
+    ;
+
+getTableStatement
+    : GET TABLE (ANY | SEQ) cobolWord
+    ;
+
+sortTableStatement
+    : SORT TABLE qualifiedDataName TO qualifiedDataName
+      LENGTH (qualifiedDataName | numericLiteral)
+      (ASCENDING | DESCENDING)
     ;
 
 // End of DaCo Statements

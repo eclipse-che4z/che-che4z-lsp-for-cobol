@@ -2389,5 +2389,109 @@
         ],
         "description": "[DaCo] ROW MATCH",
         "scope": "cobol"
+    },
+    "TABLE ROW DELETE": {
+        "prefix": "ROW DELETE",
+        "body": [
+            "ROW DELETE ${1:TBL|TBFnam}."
+        ],
+        "description": "[DaCo] ROW DELETE",
+        "scope": "cobol"
+    },
+    "TABLE ROW ADD": {
+        "prefix": "ROW ADD",
+        "body": [
+            "ROW ADD ${1:TBL|TBFnam} WITH ${2:dataname}."
+        ],
+        "description": "[DaCo] ROW ADD",
+        "scope": "cobol"
+    },
+    "TABLE ROW INSERT": {
+        "prefix": "ROW INSERT",
+        "body": [
+            "ROW INSERT ${1:TBL|TBFnam} WITH ${2:dataname}."
+        ],
+        "description": "[DaCo] ROW INSERT",
+        "scope": "cobol"
+    },
+    "TABLE ROW MODIFY": {
+        "prefix": "ROW MODIFY",
+        "body": [
+            "ROW MODIFY ${1:TBL|TBFnam} ON ${2:value|dataname-1} WITH ${3:dataname-2}."
+        ],
+        "description": "[DaCo] ROW MODIFY",
+        "scope": "cobol"
+    },
+    "TABLE ROW SORT ASC": {
+        "prefix": "ROW SORT ASC",
+        "body": [
+            "ROW SORT ${1:TBL|TBFnam} ASC ON ${2:tablerow-dataname}."
+        ],
+        "description": "[DaCo] ROW SORT ASC",
+        "scope": "cobol"
+    },
+    "TABLE ROW SORT DES": {
+        "prefix": "ROW SORT DES",
+        "body": [
+            "ROW SORT ${1:TBL|TBFnam} DES ON ${2:tablerow-dataname}."
+        ],
+        "description": "[DaCo] ROW SORT DES",
+        "scope": "cobol"
+    },
+    "TABLE ROW SINGLE": {
+        "prefix": "ROW SINGLE",
+        "body": [
+            "ROW SINGLE ${1:TBL|TBFnam} ON ${2:tablerow-dataname}."
+        ],
+        "description": "[DaCo] ROW SINGLE",
+        "scope": "cobol"
+    },
+    "TABLE ROW DUPLICATE": {
+        "prefix": "ROW DUPLICATE",
+        "body": [
+            "ROW DUPLICATE ${1:TBL|TBFnam} ON ${2:tablerow-dataname}."
+        ],
+        "description": "[DaCo] ROW DUPLICATE",
+        "scope": "cobol"
+    },
+    "TABLE ROW INVERT": {
+        "prefix": "ROW INVERT",
+        "body": [
+            "ROW INVERT ${1:TBL|TBFnam}."
+        ],
+        "description": "[DaCo] ROW INVERT",
+        "scope": "cobol"
+    },
+    "TABLE GET ANY": {
+        "prefix": "GET TABLE ANY",
+        "body": [
+            "GET TABLE ANY ${1:tttt}."
+        ],
+        "description": "[DaCo] GET TABLE ANY",
+        "scope": "cobol"
+    },
+    "TABLE GET SEQ": {
+        "prefix": "GET TABLE SEQ",
+        "body": [
+            "GET TABLE SEQ ${1:tttt}."
+        ],
+        "description": "[DaCo] GET TABLE SEQ",
+        "scope": "cobol"
+    },
+    "TABLE SORT ASCENDING": {
+        "prefix": "SORT TABLE ASCENDING",
+        "body": [
+            "SORT TABLE ${1:entry-1} TO ${2:entry-2} LENGTH ${3:nn} ASCENDING."
+        ],
+        "description": "[DaCo] SORT TABLE ASCENDING",
+        "scope": "cobol"
+    },
+    "TABLE SORT DESCENDING": {
+        "prefix": "SORT TABLE DESCENDING",
+        "body": [
+            "SORT TABLE ${1:entry-1} TO ${2:entry-2} LENGTH ${3:nn} DESCENDING."
+        ],
+        "description": "[DaCo] SORT TABLE DESCENDING",
+        "scope": "cobol"
     }
 }
