@@ -84,7 +84,8 @@
             {
                 "id": "COBOL Copybook",
                 "extensions": [
-                    ".cpy"
+                    ".cpy",
+                    ".copy"
                 ],
                 "configuration": "./syntaxes/lang-config.json"
             }
