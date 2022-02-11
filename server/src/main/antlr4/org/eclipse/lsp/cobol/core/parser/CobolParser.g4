@@ -994,6 +994,7 @@ dafStatements
     : readTransactionStatement | writeTransactionStatement | writeReportStatement
     | openPacketStatement | getMetaInfoStatement | messageHandlingStatement
     | tableRowRetrievalStatement | tableRowUpdateStatement | tableDMLStatement
+    | fileDMLStatement | stringDMLStatement
     ;
 
 readTransactionStatement
@@ -1238,8 +1239,74 @@ getTableStatement
 
 sortTableStatement
     : SORT TABLE qualifiedDataName TO qualifiedDataName
-      LENGTH (qualifiedDataName | numericLiteral)
+      LENGTH (qualifiedDataName | integerLiteral)
       (ASCENDING | DESCENDING)
+    ;
+
+fileDMLStatement
+    : openFileStatement | readFileStatement | writeFileStatement
+     | closeFileStatement | getFileStatement
+    ;
+
+openFileStatement
+    : OPEN FILE cobolWord (MAX LENGTH (integerLiteral | LAYOUT))?
+    ;
+
+readFileStatement
+    : READ FILE cobolWord (MAX LENGTH (integerLiteral | LAYOUT))?
+    ;
+
+writeFileStatement
+    : WRITE FILE cobolWord (LENGTH integerLiteral)?
+    ;
+
+closeFileStatement
+    : CLOSE FILE (INPUT | OUTPUT) (cobolWord | ALL)
+    ;
+
+getFileStatement
+    : GET FILE (qualifiedDataName | NONNUMERICLITERAL) INTO qualifiedDataName
+      VOLSER INTO qualifiedDataName
+    ;
+
+stringDMLStatement
+    : STRING (stringFindStatement | stringGetStatement | stringNextStatement
+    | stringMatchStatement | stringCheckStatement | stringUpdateStatement
+    | stringReplaceStatement | stringDeleteStatement)
+    ;
+
+stringFindStatement
+    : FIND qualifiedDataName daf_string_identifier
+    ;
+
+stringGetStatement
+    : GET qualifiedDataName
+    ;
+
+stringNextStatement
+    : NEXT qualifiedDataName (DELIMITER qualifiedDataName)?
+    ;
+
+stringMatchStatement
+    : MATCH daf_string_identifier daf_string_identifier daf_string_identifier
+    ;
+
+stringCheckStatement
+    : CHECK daf_string_command daf_string_identifier
+    ;
+
+stringUpdateStatement
+    : (ADD | INSERT | FILL) qualifiedDataName daf_string_identifier
+      LENGTH daf_string_identifier
+    ;
+
+stringReplaceStatement
+    : REPLACE ALL? qualifiedDataName daf_string_identifier
+      BY daf_string_identifier
+    ;
+
+stringDeleteStatement
+    : DELETE ALL? qualifiedDataName daf_string_identifier
     ;
 
 // End of DaCo Statements
@@ -3321,6 +3388,14 @@ daf_message_types
 
 daf_table_name
     : { validateStartsWith(_input.LT(1).getText(), "TBL", "TBF"); } qualifiedDataName
+    ;
+
+daf_string_command
+    : EMA
+    ;
+
+daf_string_identifier
+    : qualifiedDataName | literal
     ;
 
 // identifier ----------------------------------
