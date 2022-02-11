@@ -149,7 +149,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         progress: vscode.Progress<{ message?: string; increment?: number }>, isUSS: boolean = false) {
         try {
             for (const cp of toDownload) {
-                const datasets = isUSS ? SettingsService.getUssPath(cp.dialectType) : SettingsService.getDsnPath(cp.dialectType);
+                const datasets = isUSS ? SettingsService.getUssPath(cp.filename, cp.dialectType) : SettingsService.getDsnPath(cp.filename, cp.dialectType);
                 for (const dataset of datasets) {
                     if (CopybookDownloadService.needsUserNotification(toDownload)) {
                         progress.report({
@@ -250,7 +250,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         ;
         copybookNames.forEach(copybook => {
             for (const dialectType of InfoStorage.get(cobolFileName, copybook)) {
-                this.queue.push(copybook, dialectType, profile, quiet)
+                this.queue.push(cobolFileName, copybook, dialectType, profile, quiet)
             }
         });
     }
