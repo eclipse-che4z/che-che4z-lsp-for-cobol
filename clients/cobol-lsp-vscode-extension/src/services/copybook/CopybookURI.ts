@@ -42,7 +42,7 @@ export class CopybookURI {
         // check in subfolders under .copybooks (copybook downloaded from MF)
         if (!result) {
             result = searchInWorkspace(copybookName,
-                CopybookURI.createPathForCopybookDownloaded(ProfileUtils.getProfileNameForCopybook(cobolFileName), dialectType),
+                CopybookURI.createPathForCopybookDownloaded(cobolFileName, dialectType),
                 COPYBOOK_EXT_ARRAY);
         }
         return result || "";
@@ -65,16 +65,18 @@ export class CopybookURI {
      * @param profile represent a name of a folder within the .copybooks folder that have the same name as the
      * connection name needed to download copybooks from mainframe.
      */
-    private static createPathForCopybookDownloaded(profile: string, dialectType: string): string[] {
+    private static createPathForCopybookDownloaded(filename: string, dialectType: string): string[] {
+        const profile = ProfileUtils.getProfileNameForCopybook(filename);
+        
         let result: string[] = [];
-        const datasets: string[] = SettingsService.getDsnPath(dialectType);
+        const datasets: string[] = SettingsService.getDsnPath(filename, dialectType);
         if (profile && datasets) {
             result = Object.assign([], datasets);
             result.forEach((value, index) => result[index] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" +
                 profile + "/" + value);
         }
 
-        const ussPaths: string[] = SettingsService.getUssPath(dialectType);
+        const ussPaths: string[] = SettingsService.getUssPath(filename, dialectType);
         const baseIndex = result.length;
         if (profile && ussPaths) {
             Object.assign([], ussPaths).forEach((value, index) => result[index + baseIndex] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" +

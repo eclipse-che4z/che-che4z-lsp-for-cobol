@@ -84,28 +84,22 @@ export class SettingsService {
 
     /**
      * Get list of dsn path
+     * @param cobolFileName is a program file name
      * @param dialectType name of the cobol dialect type
      * @returns a list of dsn path
      */
-    public static getDsnPath(dialectType: string): string[] {
-        return SettingsService.getCopybookConfigValues(PATHS_ZOWE, "", dialectType);
-    }
-
-    /**
-     * Set list of dsn path to the configuration
-     * @param paths is a list of new values
-     */
-    public static setDsnPath(paths: string[]) {
-        vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).update(PATHS_ZOWE, paths);
+    public static getDsnPath(cobolFileName: string, dialectType: string): string[] {
+        return SettingsService.getCopybookConfigValues(PATHS_ZOWE, cobolFileName, dialectType);
     }
 
     /**
      * Get list of uss path
+     * @param cobolFileName is a program file name
      * @param dialectType name of the cobol dialect type
      * @returns a list of uss path
      */
-    public static getUssPath(dialectType: string): string[] {
-        return SettingsService.getCopybookConfigValues(PATHS_USS, "", dialectType);
+    public static getUssPath(cobolFileName: string, dialectType: string): string[] {
+        return SettingsService.getCopybookConfigValues(PATHS_USS, cobolFileName, dialectType);
     }
 
     /**
@@ -119,7 +113,7 @@ export class SettingsService {
     private static evaluateVariable(dataList: string[], variable: string, value: string): string[] {
         const result: string[] = [];
         if (dataList) {
-            dataList.forEach(d => result.push(d.replace("$" + variable, value)))
+            dataList.forEach(d => result.push(d.replace(`$\{${variable}\}`, value)))
         }
         return result;
     }

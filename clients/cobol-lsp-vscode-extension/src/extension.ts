@@ -14,7 +14,6 @@
 
 import * as vscode from "vscode";
 
-import { editDatasetPaths } from "./commands/EditDatasetPaths";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import { C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID } from "./constants";
@@ -53,9 +52,6 @@ export async function activate(context: vscode.ExtensionContext) {
         fetchCopybookCommand(copybook, copyBooksDownloader, programName);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.edit-dataset-paths", () => {
-        editDatasetPaths();
-    }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings", () => {
         gotoCopybookSettings();
     }));
