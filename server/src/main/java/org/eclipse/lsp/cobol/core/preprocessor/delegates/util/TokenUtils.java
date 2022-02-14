@@ -59,7 +59,7 @@ public class TokenUtils {
    * @param tokens {@link BufferedTokenStream} being processed.
    * @return A joined string in hidden Channel, to the left of tokPos.
    */
-  private String retrieveHiddenTextToLeft(int tokPos, BufferedTokenStream tokens) {
+  public String retrieveHiddenTextToLeft(int tokPos, BufferedTokenStream tokens) {
     return ofNullable(tokens.getHiddenTokensToLeft(tokPos, HIDDEN))
         .map(it -> it.stream().map(Token::getText).collect(joining()))
         .orElse("");
@@ -73,7 +73,7 @@ public class TokenUtils {
    * @param tokens {@link BufferedTokenStream} being processed.
    * @return A joined string in hidden Channel, to the right of tokPos.
    */
-  private String retrieveHiddenTextToRight(int tokPos, BufferedTokenStream tokens) {
+  public String retrieveHiddenTextToRight(int tokPos, BufferedTokenStream tokens) {
     return ofNullable(tokens.getHiddenTokensToRight(tokPos, HIDDEN))
         .map(it -> it.stream().map(Token::getText).collect(joining()))
         .orElse("");

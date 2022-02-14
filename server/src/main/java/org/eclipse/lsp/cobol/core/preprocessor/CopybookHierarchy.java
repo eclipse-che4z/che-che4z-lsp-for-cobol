@@ -29,10 +29,33 @@ import static java.util.stream.Collectors.toList;
  * Is not thread-safe.
  */
 public class CopybookHierarchy {
-  List<Pair<String, String>> copyReplacingClauses = new ArrayList<>();
-  List<Pair<String, String>> textReplacingClauses = new ArrayList<>();
-  Deque<CopybookUsage> copybookStack = new ArrayDeque<>();
-  Deque<List<Pair<String, String>>> recursiveReplaceStmtStack = new ArrayDeque<>();
+  private final List<Pair<String, String>> copyReplacingClauses = new ArrayList<>();
+  private final List<Pair<String, String>> textReplacingClauses = new ArrayList<>();
+  private final Deque<CopybookUsage> copybookStack = new ArrayDeque<>();
+  private final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack = new ArrayDeque<>();
+
+  private int levelNumber;
+
+  /**
+   * Set the level number for the subsequent copybook
+   *
+   * @param levelNumber the level number to adjust the variables
+   */
+  public void setLevelNumber(int levelNumber) {
+    this.levelNumber = levelNumber;
+  }
+
+  /**
+   * Return the specified level number for the copybook and set the current value to 0 to allow only
+   * one adjusting
+   *
+   * @return level number or 0 if not specified
+   */
+  public int takeLevelNumber() {
+    int res = levelNumber;
+    levelNumber = 0;
+    return res;
+  }
 
   /**
    * Check if the replacing is required

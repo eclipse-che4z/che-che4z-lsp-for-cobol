@@ -21,13 +21,9 @@ import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Test to check RangeUtils */
 class RangeUtilsTest {
@@ -66,21 +62,5 @@ class RangeUtilsTest {
         new Range(new Position(startLine, startSymbol), new Position(stopLine, stopSymbol));
     return new DocumentSymbol(
         "", NodeType.FIELD.getSymbolKind(), range, range, "", ImmutableList.of());
-  }
-
-  static Stream<Arguments> provideData() {
-    return Stream.of(
-        Arguments.of(constructNode(1, 1, 10, 1), constructNode(3, 40, 5, 10), true),
-        Arguments.of(constructNode(5, 1, 5, 20), constructNode(5, 3, 5, 10), true),
-        Arguments.of(constructNode(4, 1, 6, 7), constructNode(3, 40, 6, 3), false),
-        Arguments.of(constructNode(4, 1, 6, 8), constructNode(4, 5, 7, 5), false),
-        Arguments.of(constructNode(2, 1, 2, 9), constructNode(3, 1, 3, 8), false),
-        Arguments.of(constructNode(5, 1, 5, 20), constructNode(5, 3, 5, 30), false));
-  }
-
-  @ParameterizedTest
-  @MethodSource("provideData")
-  void isInside(DocumentSymbol first, DocumentSymbol second, boolean result) {
-    assertEquals(result, RangeUtils.isInsideRange(first, second));
   }
 }
