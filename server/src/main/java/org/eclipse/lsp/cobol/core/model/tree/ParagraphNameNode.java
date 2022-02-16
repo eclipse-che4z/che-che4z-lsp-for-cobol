@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2022 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,47 +12,26 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
-/** The class represents usages of paragraphs or sections. */
+/** The class represents paragraphs or section name node in COBOL grammar. */
 @Getter
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class CodeBlockUsageNode extends Node implements Context {
-  String name;
+public class ParagraphNameNode extends Node implements Context {
+  private final String name;
 
-  public CodeBlockUsageNode(Locality location, String name) {
-    super(location, NodeType.CODE_BLOCK_USAGE);
-    this.name = name;
-    addProcessStep(this::waitForBlockDefinitions);
-  }
-
-  private List<SyntaxError> waitForBlockDefinitions() {
+  public ParagraphNameNode(Locality location, String paragraphName) {
+    super(location, NodeType.PARAGRAPH_NAME_NODE);
+    this.name = paragraphName.toUpperCase();
     addProcessStep(this::registerNode);
-    return ImmutableList.of();
-  }
-
-  private List<SyntaxError> registerNode() {
-    return getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
-        .map(program -> program.registerCodeBlockUsage(this))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .map(ImmutableList::of)
-        .orElseGet(ImmutableList::of);
   }
 
   @Override
@@ -65,13 +44,21 @@ public class CodeBlockUsageNode extends Node implements Context {
     return getLocations(CodeBlockReference::getUsage);
   }
 
+  private List<SyntaxError> registerNode() {
+    return getNearestParentByType(NodeType.PROGRAM)
+        .map(ProgramNode.class::cast)
+        .flatMap(parent -> parent.registerParagraphNameNode(this))
+        .map(ImmutableList::of)
+        .orElseGet(ImmutableList::of);
+  }
+
   private List<Location> getLocations(
-      Function<CodeBlockReference, List<Location>> retriveLocations) {
+      Function<CodeBlockReference, List<Location>> retrieveLocations) {
     return getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
         .map(ProgramNode::getParagraphMap)
         .map(it -> it.get(getName()))
-        .map(retriveLocations)
+        .map(retrieveLocations)
         .orElse(ImmutableList.of());
   }
 }

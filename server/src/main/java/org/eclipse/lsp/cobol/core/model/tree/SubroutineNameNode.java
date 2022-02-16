@@ -26,12 +26,12 @@ import java.util.List;
 @ToString(callSuper = true)
 @Getter
 public class SubroutineNameNode extends Node implements Context {
-  private final String subroutineName;
+  private final String name;
   @Setter private SubroutineDefinition definition;
 
   public SubroutineNameNode(Locality locality, String subroutineName) {
     super(locality, NodeType.SUBROUTINE_NAME_NODE);
-    this.subroutineName = subroutineName;
+    this.name = subroutineName;
   }
 
   @Override

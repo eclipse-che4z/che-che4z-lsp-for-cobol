@@ -376,7 +376,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitSectionName(SectionNameContext ctx) {
-    return addTreeNode(ctx, locality -> new CodeBlockNameNode(locality, ctx.getText()));
+    return addTreeNode(ctx, locality -> new SectionNameNode(locality, ctx.getText()));
   }
 
   @Override
@@ -740,7 +740,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitParagraphDefinitionName(ParagraphDefinitionNameContext ctx) {
-    return addTreeNode(ctx, locality -> new CodeBlockNameNode(locality, ctx.getText()));
+    return addTreeNode(ctx, locality -> new ParagraphNameNode(locality, ctx.getText()));
   }
 
   @Override
