@@ -15,7 +15,9 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor;
 
+import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 
@@ -35,26 +37,17 @@ public class CopybookHierarchy {
   private final Deque<CopybookUsage> copybookStack = new ArrayDeque<>();
   private final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack = new ArrayDeque<>();
 
-  private int levelNumber;
+  @Setter private CopyStatementModifier modifier = null;
 
   /**
-   * Set the level number for the subsequent copybook
+   * Return the specified copy statement modifier if exists or null, and sets the current value to
+   * null
    *
-   * @param levelNumber the level number to adjust the variables
+   * @return a copy statement modifier for this copybook or null.
    */
-  public void setLevelNumber(int levelNumber) {
-    this.levelNumber = levelNumber;
-  }
-
-  /**
-   * Return the specified level number for the copybook and set the current value to 0 to allow only
-   * one adjusting
-   *
-   * @return level number or 0 if not specified
-   */
-  public int takeLevelNumber() {
-    int res = levelNumber;
-    levelNumber = 0;
+  public CopyStatementModifier takeCopyStatementModifier() {
+    CopyStatementModifier res = modifier;
+    modifier = null;
     return res;
   }
 
