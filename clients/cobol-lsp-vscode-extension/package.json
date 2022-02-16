@@ -51,10 +51,6 @@
                 "title": "Fetch copybook"
             },
             {
-                "command": "cobol-lsp.cpy-manager.edit-dataset-paths",
-                "title": "Edit dataset paths"
-            },
-            {
                 "command": "cobol-lsp.cpy-manager.goto-settings",
                 "title": "Open Copybook location settings"
             },
@@ -84,7 +80,8 @@
             {
                 "id": "COBOL Copybook",
                 "extensions": [
-                    ".cpy"
+                    ".cpy",
+                    ".copy"
                 ],
                 "configuration": "./syntaxes/lang-config.json"
             }
@@ -134,22 +131,6 @@
                     "description": "Default list of relative local paths to search for copybooks",
                     "uniqueItems": true
                 },
-                "cobol-lsp.cpy-manager.maid.paths-local": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of relative local paths to search for MAID copybooks",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.idms.paths-local": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of relative local paths to search for IDMS copybooks",
-                    "uniqueItems": true
-                },
                 "cobol-lsp.cpy-manager.paths-dsn": {
                     "type": "array",
                     "items": {
@@ -165,6 +146,192 @@
                     },
                     "description": "Default list of USS paths to search for copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
                     "uniqueItems": true
+                },
+                "cobol-lsp.cpy-manager.maid.paths-local": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of relative local paths to search for MAID copybooks",
+                    "uniqueItems": true
+                },
+                "cobol-lsp.cpy-manager.maid.paths-dsn": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of datasets to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+                    "uniqueItems": true
+                },
+                "cobol-lsp.cpy-manager.maid.paths-uss": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of USS paths to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+                    "uniqueItems": true
+                },
+                "cobol-lsp.cpy-manager.idms.paths-local": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of relative local paths to search for IDMS copybooks",
+                    "uniqueItems": true
+                },
+                "cobol-lsp.cpy-manager.idms.paths-dsn": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of datasets to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+                    "uniqueItems": true
+                },
+                "cobol-lsp.cpy-manager.idms.paths-uss": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of USS paths to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+                    "uniqueItems": true
+                },
+                "cobol-lsp.cpy-manager.copybook-file-encoding": {
+                    "type": "string",
+                    "markdownDescription": "The encoding for the copybooks. Alternatively edit in .vscode\\settings.json. Other supported encodings can be found at [supported encodings](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings) ",
+                    "enum": [
+                        "utf8",
+                        "ucs2",
+                        "utf16le",
+                        "ascii",
+                        "base64",
+                        "UTF7",
+                        "UTF7-IMAP",
+                        "UTF-16BE",
+                        "UTF-16",
+                        "UCS-4",
+                        "UTF-32",
+                        "UTF-32LE",
+                        "UTF-32BE",
+                        "ISO-8859-1",
+                        "ISO-8859-2",
+                        "ISO-8859-3",
+                        "ISO-8859-4",
+                        "ISO-8859-5",
+                        "ISO-8859-6",
+                        "ISO-8859-7",
+                        "ISO-8859-8",
+                        "ISO-8859-9",
+                        "ISO-8859-10",
+                        "ISO-8859-11",
+                        "ISO-8859-12",
+                        "ISO-8859-13",
+                        "ISO-8859-14",
+                        "ISO-8859-15",
+                        "ISO-8859-16",
+                        "cp437",
+                        "cp720",
+                        "cp737",
+                        "cp775",
+                        "cp808",
+                        "cp850",
+                        "cp852",
+                        "cp855",
+                        "cp856",
+                        "cp857",
+                        "cp858",
+                        "cp860",
+                        "cp861",
+                        "cp862",
+                        "cp863",
+                        "cp864",
+                        "cp865",
+                        "cp866",
+                        "cp869",
+                        "cp922",
+                        "cp1046",
+                        "cp1124",
+                        "cp1125",
+                        "cp1129",
+                        "cp1133",
+                        "cp1161",
+                        "cp1162",
+                        "cp1163",
+                        "cp1047",
+                        "cp1140",
+                        "cp1147",
+                        "cp1148",
+                        "cp037",
+                        "cp500",
+                        "iso646cn",
+                        "iso646jp"
+                    ],
+                    "enumDescriptions": [
+                        "utf8",
+                        "ucs2",
+                        "utf16le",
+                        "ascii",
+                        "base64",
+                        "UTF7",
+                        "UTF7-IMAP",
+                        "UTF-16BE",
+                        "UTF-16",
+                        "UCS-4",
+                        "UTF-32",
+                        "UTF-32LE",
+                        "UTF-32BE",
+                        "ISO-8859-1",
+                        "ISO-8859-2",
+                        "ISO-8859-3",
+                        "ISO-8859-4",
+                        "ISO-8859-5",
+                        "ISO-8859-6",
+                        "ISO-8859-7",
+                        "ISO-8859-8",
+                        "ISO-8859-9",
+                        "ISO-8859-10",
+                        "ISO-8859-11",
+                        "ISO-8859-12",
+                        "ISO-8859-13",
+                        "ISO-8859-14",
+                        "ISO-8859-15",
+                        "ISO-8859-16",
+                        "IBM-437",
+                        "IBM-720",
+                        "IBM-737",
+                        "IBM-775",
+                        "IBM-808",
+                        "IBM-850",
+                        "IBM-852",
+                        "IBM-855",
+                        "IBM-856",
+                        "IBM-857",
+                        "IBM-858",
+                        "IBM-860",
+                        "IBM-861",
+                        "IBM-862",
+                        "IBM-863",
+                        "IBM-864",
+                        "IBM-865",
+                        "IBM-866",
+                        "IBM-869",
+                        "IBM-922",
+                        "IBM-1046",
+                        "IBM-1124",
+                        "IBM-1125",
+                        "IBM-1129",
+                        "IBM-1133",
+                        "IBM-1161",
+                        "IBM-1162",
+                        "IBM-1163",
+                        "IBM-1047",
+                        "IBM-1140",
+                        "IBM-1147",
+                        "IBM-1148",
+                        "IBM-037",
+                        "IBM-500",
+                        "iso646cn",
+                        "iso646jp"
+                    ]
                 },
                 "cobol-lsp.subroutine-manager.paths-local": {
                     "type": "array",
@@ -268,6 +435,7 @@
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
+        "postinstall": "patch-package",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "test": "jest -w 1 --unhandled-rejections=strict",
@@ -276,6 +444,7 @@
     },
     "dependencies": {
         "@zowe/zowe-explorer-api": "^1.17.0",
+        "iconv-lite": "^0.6.3",
         "vscode-extension-telemetry": "0.1.6",
         "vscode-languageclient": "5.2.1"
     },
@@ -285,6 +454,7 @@
         "@types/vscode": "^1.56.0",
         "jest": "^27.0.0",
         "jest-sonar-reporter": "^2.0.0",
+        "patch-package": "^6.4.7",
         "ts-jest": "^27.0.0",
         "tslint": "^5.18.0",
         "tslint-sonarts": "^1.9.0",

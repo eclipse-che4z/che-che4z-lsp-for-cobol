@@ -13,7 +13,6 @@
  */
 
 import * as vscode from "vscode";
-import { editDatasetPaths } from "../commands/EditDatasetPaths";
 import { fetchCopybookCommand } from "../commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "../commands/OpenSettingsCommand";
 import { initSmartTab } from "../commands/SmartTabCommand";
@@ -24,7 +23,6 @@ import { TelemetryService } from "../services/reporter/TelemetryService";
 import { createFileWithGivenPath } from "../services/Settings";
 
 jest.mock("../commands/SmartTabCommand");
-jest.mock("../commands/EditDatasetPaths");
 jest.mock("../commands/FetchCopybookCommand");
 jest.mock("../commands/OpenSettingsCommand");
 jest.mock("../services/LanguageClientService");
@@ -76,10 +74,9 @@ describe("Check plugin extension for cobol starts successfully.", () => {
         await activate(context);
         expect(TelemetryService.registerEvent).toHaveBeenCalledWith("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
 
-        expect(vscode.commands.registerCommand).toBeCalledTimes(6);
+        expect(vscode.commands.registerCommand).toBeCalledTimes(5);
 
         expect(fetchCopybookCommand).toHaveBeenCalled();
-        expect(editDatasetPaths).toHaveBeenCalled();
         expect(gotoCopybookSettings).toHaveBeenCalled();
         expect(initSmartTab).toHaveBeenCalled();
 

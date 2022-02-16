@@ -22,7 +22,6 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -158,34 +157,6 @@ class ElementOccurrencesTest {
             ImmutableList.of(usage)));
   }
 
-  static Stream<Arguments> insideTestData() {
-    Locality location =
-        Locality.builder()
-            .uri(URI)
-            .range(new Range(new Position(2, 5), new Position(5, 10)))
-            .build();
-    Position firstLine = new Position(1, 20);
-    Position secondLineBeforeLocation = new Position(2, 3);
-    Position locationStart = new Position(2, 5);
-    Position secondLineInsideLocation = new Position(2, 9);
-    Position thirdLine = new Position(3, 4);
-    Position fifthLineInsideLocation = new Position(5, 2);
-    Position locationEnd = new Position(5, 10);
-    Position fifthLineAfterLocation = new Position(5, 20);
-    Position seventhLine = new Position(7, 4);
-    return Stream.of(
-        Arguments.of(URI, firstLine, location, false),
-        Arguments.of(URI, secondLineBeforeLocation, location, false),
-        Arguments.of(URI, locationStart, location, true),
-        Arguments.of(URI, secondLineInsideLocation, location, true),
-        Arguments.of(URI, thirdLine, location, true),
-        Arguments.of(URI2, thirdLine, location, false),
-        Arguments.of(URI, fifthLineInsideLocation, location, true),
-        Arguments.of(URI, locationEnd, location, true),
-        Arguments.of(URI, fifthLineAfterLocation, location, false),
-        Arguments.of(URI, seventhLine, location, false));
-  }
-
   @Test
   void simpleCaseOfDefinitionsAndUsages() {
     VariableNode definitionNode =
@@ -267,12 +238,6 @@ class ElementOccurrencesTest {
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), position),
                 new ReferenceContext(false));
     assertEquals(expectedLocations, actualLocations);
-  }
-
-  @ParameterizedTest
-  @MethodSource("insideTestData")
-  void isInsideTest(String uri, Position position, Locality location, boolean result) {
-    assertEquals(result, RangeUtils.isInside(uri, position, location));
   }
 
   private static VariableNode createDefinitionNode(String name, String uri, Range range) {

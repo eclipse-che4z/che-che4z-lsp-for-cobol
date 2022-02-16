@@ -13,10 +13,15 @@
  */
 
 export class CopybookProfile {
-    constructor(readonly copybook: string, readonly profile: string, readonly quiet: boolean) {}
+    constructor(readonly filename: string, readonly copybook: string, readonly dialectType: string,
+        readonly profile: string, readonly quiet: boolean) {}
 
     public equals(other: CopybookProfile): boolean {
-        return this.copybook == other.copybook && this.profile == other.profile && this.quiet == other.quiet;
+        return this.filename == other.filename &&
+         this.copybook == other.copybook && 
+         this.dialectType == other.dialectType && 
+         this.profile == other.profile && 
+         this.quiet == other.quiet;
     }
 }
 
@@ -24,12 +29,12 @@ export class DownloadQueue {
     private queue: CopybookProfile[] = [];
     private resolve: any;
 
-    public push(copybook: string, profile: string, quiet: boolean): void {
+    public push(filename: string, copybook: string, dialectType: string, profile: string, quiet: boolean): void {
         if (this.resolve) {
-            this.resolve(new CopybookProfile(copybook, profile, quiet));
+            this.resolve(new CopybookProfile(filename, copybook, dialectType, profile, quiet));
             this.resolve = undefined;
         } else {
-            const copybookProfile = new CopybookProfile(copybook, profile, quiet);
+            const copybookProfile = new CopybookProfile(filename, copybook, dialectType, profile, quiet);
             for (const item of this.queue) {
                 if (copybookProfile.equals(item)) {
                     return;

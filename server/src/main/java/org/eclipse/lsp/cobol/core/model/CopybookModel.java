@@ -24,6 +24,7 @@ import lombok.Value;
 @Value
 public class CopybookModel {
   String name;
+  String dialectType;
   String uri;
   String content;
 }

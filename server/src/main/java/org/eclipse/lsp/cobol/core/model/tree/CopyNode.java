@@ -29,12 +29,12 @@ import java.util.Optional;
 @ToString(callSuper = true)
 @Getter
 public class CopyNode extends Node implements Context {
-  private final String copyBookName;
+  private final String name;
   @Setter @EqualsAndHashCode.Exclude @ToString.Exclude private CopyDefinition definition;
 
   public CopyNode(Locality locality, String copyBookName) {
     super(locality, NodeType.COPY);
-    this.copyBookName = copyBookName;
+    this.name = copyBookName;
   }
 
   @Override

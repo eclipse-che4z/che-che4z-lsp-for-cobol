@@ -25,6 +25,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
@@ -58,9 +59,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -323,7 +325,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @SuppressWarnings("java:S1181")
   private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
-    registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.empty()));
+    registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.builder().build()));
     Future<?> docAnalysisFuture =
         executors
             .getThreadPoolExecutor()
@@ -408,27 +410,33 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   private void publishResult(
       String uri, AnalysisResult result, CopybookProcessingMode copybookProcessingMode) {
-    notifyAnalysisFinished(uri, result.getCopybookUsages(), copybookProcessingMode);
+    notifyAnalysisFinished(uri, extractCopybookUsages(result), copybookProcessingMode);
     communications.cancelProgressNotification(uri);
     communications.publishDiagnostics(result.getDiagnostics());
     if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
   }
 
   private void notifyAnalysisFinished(
-      String uri,
-      Map<String, List<Location>> copybooks,
-      CopybookProcessingMode copybookProcessingMode) {
+      String uri, List<String> copybooks, CopybookProcessingMode copybookProcessingMode) {
     dataBus.postData(
         AnalysisFinishedEvent.builder()
             .documentUri(uri)
-            .copybookUris(
-                ofNullable(copybooks).map(Map::values).orElse(emptyList()).stream()
-                    .flatMap(List::stream)
-                    .map(Location::getUri)
-                    .distinct()
-                    .collect(toList()))
+            .copybookUris(copybooks)
             .copybookProcessingMode(copybookProcessingMode)
             .build());
+  }
+
+  private List<String> extractCopybookUsages(AnalysisResult result) {
+    return result
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(COPY))
+        .map(CopyNode.class::cast)
+        .filter(it -> !it.getUsages().isEmpty())
+        .map(CopyNode::getUsages)
+        .flatMap(List::stream)
+        .map(Location::getUri)
+        .collect(toList());
   }
 
   @Override

@@ -81,6 +81,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private final String copybookName;
   private final List<String> subroutineNames;
   private final Map<String, Diagnostic> expectedDiagnostics;
+  private final String dialectType;
 
   UseCasePreprocessorListener(
       CommonTokenStream tokens,
@@ -88,12 +89,14 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
       String documentUri,
       int numberOfLines,
       List<String> subroutineNames,
-      Map<String, Diagnostic> expectedDiagnostics) {
+      Map<String, Diagnostic> expectedDiagnostics,
+      String dialectType) {
     this.tokens = tokens;
     this.documentUri = documentUri;
     this.copybookName = documentName;
     this.subroutineNames = subroutineNames;
     this.expectedDiagnostics = expectedDiagnostics;
+    this.dialectType = dialectType;
     lineShifts = new int[numberOfLines];
     contexts.push(new StringBuilder());
     diagnostics.put(documentUri, new ArrayList<>());
@@ -110,6 +113,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     return new TestData(
         peek().toString(),
         copybookName,
+        dialectType,
         diagnostics,
         variableDefinitions,
         variableUsages,

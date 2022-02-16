@@ -33,7 +33,7 @@ import { CopybookURI } from "../../../services/copybook/CopybookURI";
 
 const profile = "zoweProfile";
 const wrongCredProfile = "wrongCredProfile";
-const copybookProfile = new CopybookProfile("copybook", profile, false);
+const copybookProfile = new CopybookProfile("filename", "copybook", SettingsService.DEFAULT_DIALECT, profile, false);
 const downloadQueueLockedErrorMsg = DOWNLOAD_QUEUE_LOCKED_ERROR_MSG.replace(PROFILE_NAME_PLACEHOLDER, wrongCredProfile);
 
 (vscode.workspace.workspaceFolders as any) = [{ uri: { fsPath: "/projects" } } as any];
@@ -91,24 +91,12 @@ beforeEach(() => {
 jest.mock("../../../services/reporter/TelemetryService");
 
 describe("Test fetchCopybook against bad and correct configurations", () => {
-    const fsPath = "/projects";
-
-    beforeEach(() => {
-        (vscode.workspace.workspaceFolders as any) = [{ uri: { fsPath } } as any];
-    })
-
-    it("check workspace", () => {
-        expect(CopybookDownloadService.checkWorkspace()).toEqual(true);
-        (vscode.workspace.workspaceFolders as any) = [];
-        expect(CopybookDownloadService.checkWorkspace()).toEqual(false);
-    });
-
     it("downloadCopybookFromMFUsingZowe is correctly invokes USS API's", async () => {
         ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
+        SettingsService.getCopybookFileEncoding = jest.fn().mockReturnValue("1147");
         await (CopybookDownloadService as any).downloadCopybookFromMFUsingZowe("HLQ.DSN1", copybookProfile, true);
         expect(getUSSContentsMock).toBeCalledWith(`HLQ.DSN1/copybook`, {
-            encoding: "UTF-8",
-            binary: false,
+            binary: true,
             file: Path.join(CopybookURI.createDatasetPath(profile, "HLQ.DSN1"), "copybook"),
             returnEtag: true,
         });
@@ -118,7 +106,7 @@ describe("Test fetchCopybook against bad and correct configurations", () => {
         ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
         await (CopybookDownloadService as any).downloadCopybookFromMFUsingZowe("HLQ.DSN1", copybookProfile);
         expect(getContentMock).toBeCalledWith(`HLQ.DSN1(copybook)`, {
-            encoding: undefined,
+            binary: true,
             file: Path.join(CopybookURI.createDatasetPath(profile, "HLQ.DSN1"), "copybook"),
             returnEtag: true,
         });
@@ -134,7 +122,7 @@ describe("Test fetchCopybook against bad and correct configurations", () => {
 
     it("Given a copybook name that is a valid USS member on MF, the fetchCopybook correctly invoke download from MF",
         async () => {
-            const ussCopybookProfile = new CopybookProfile("uss_copybook", profile, false);
+            const ussCopybookProfile = new CopybookProfile("filename", "uss_copybook", SettingsService.DEFAULT_DIALECT, profile, false);
             (CopybookDownloadService as any).downloadCopybookFromMFUsingZowe = jest.fn();
             ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
             const result = await (CopybookDownloadService as any).fetchCopybook("HLQ.DSN1", ussCopybookProfile, true);
@@ -174,7 +162,8 @@ describe("Receiving an error from zowe api layer, copybooks are not retrivied an
         it("handleCopybooks shows progress report", async () => {
             (CopybookDownloadService as any).needsUserNotification = jest.fn().mockReturnValue(true);
             const handleCopybook = (CopybookDownloadService as any).handleCopybook = jest.fn();
-            await (CopybookDownloadService as any).handleCopybooks("dataset", [copybookProfile], new Set(), progress);
+            SettingsService.getDsnPath = jest.fn().mockReturnValue(["dataset"])
+            await (CopybookDownloadService as any).handleCopybooks([copybookProfile], new Set(), progress);
             expect(progress.report).toBeCalledWith(
                 {
                     message: "Looking in dataset. 1 copybook(s) left.",
@@ -186,7 +175,7 @@ describe("Receiving an error from zowe api layer, copybooks are not retrivied an
         it("handleCopybooks throws error incase download fails", async () => {
             (CopybookDownloadService as any).needsUserNotification = jest.fn().mockReturnValue(true);
             (CopybookDownloadService as any).handleCopybook = jest.fn().mockRejectedValue(new Error("error"));
-            await (CopybookDownloadService as any).handleCopybooks("dataset", [copybookProfile], new Set(), progress);
+            await (CopybookDownloadService as any).handleCopybooks([copybookProfile], new Set(), progress);
             expect(vscode.window.showErrorMessage).toBeCalledWith("Error: error");
         });
     });
@@ -213,8 +202,7 @@ describe("Receiving an error from zowe api layer, copybooks are not retrivied an
             const errSet = new Set();
             errSet.add("copybook");
             await (cbd as any).handleQueue(copybookProfile, new Set(), null);
-            expect((CopybookDownloadService as any).handleCopybooks).toHaveBeenLastCalledWith("/test/uss/path",
-                [copybookProfile], errSet, null, true);
+            expect((CopybookDownloadService as any).handleCopybooks).toHaveBeenLastCalledWith([copybookProfile], errSet, null, true);
         });
     });
 });
@@ -298,7 +286,7 @@ describe("Test downloadCopybook user interaction", () => {
         ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue("profile");
         await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"]);
         expect(vscode.window.showErrorMessage).not.toBeCalled();
-        expect(queuePush).toBeCalledWith("copybook", "profile", true);
+        expect(queuePush).toBeCalledWith("fileName", "copybook", SettingsService.DEFAULT_DIALECT, "profile", true);
     });
 
     test("check locked profile", async () => {
@@ -321,7 +309,7 @@ describe("Test downloadCopybook user interaction", () => {
         vscode.window.showErrorMessage = jest.fn().mockResolvedValue(UNLOCK_DOWNLOAD_QUEUE_MSG);
         await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
         expect(vscode.window.showErrorMessage).toBeCalledWith(downloadQueueLockedErrorMsg, anything());
-        expect(queuePush).toBeCalledWith("copybook", wrongCredProfile, false);
+        expect(queuePush).toBeCalledWith("fileName", "copybook", SettingsService.DEFAULT_DIALECT, wrongCredProfile, false);
         expect((copybooksDownloadService as any).lockedProfile).not.toContain(wrongCredProfile);
     });
 });

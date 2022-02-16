@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.CompletionItem;
@@ -40,9 +39,7 @@ class ParagraphCompletionTest {
   void testCompletionEmptyResult() {
     assertThat(
         completion.getCompletionItems(
-            "smth",
-            new CobolDocumentModel(
-                "", AnalysisResult.builder().paragraphDefinitions(ImmutableMap.of()).build())),
+            "smth", new CobolDocumentModel("", AnalysisResult.builder().build())),
         is(empty()));
   }
 
@@ -57,7 +54,7 @@ class ParagraphCompletionTest {
   }
 
   private List<CompletionItem> createExpected() {
-    return ImmutableList.of(createItem("parD1"), createItem("ParD2"));
+    return ImmutableList.of(createItem("PARD1"), createItem("PARD2"));
   }
 
   private CompletionItem createItem(String name) {

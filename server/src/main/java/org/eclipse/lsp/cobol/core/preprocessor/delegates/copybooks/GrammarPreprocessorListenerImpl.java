@@ -174,7 +174,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyIdmsStatement(@NonNull CopyIdmsStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    analyzeCopybook(DIALECT, ctx, ctx.copyIdmsOptions().copyIdmsSource().copySource(), DialectType.IDMS);
+    Optional.ofNullable(ctx.LEVEL_NUMBER())
+        .map(ParseTree::getText)
+        .map(Integer::parseInt)
+        .ifPresent(hierarchy::setLevelNumber);
+    analyzeCopybook(
+        DIALECT, ctx, ctx.copyIdmsOptions().copyIdmsSource().copySource(), DialectType.IDMS);
   }
 
   @Override
@@ -191,7 +196,11 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       levelNumber
           .map(ParseTree::getText)
           .map(Integer::parseInt)
-          .ifPresent(it -> analyzeCopybook(DIALECT, ctx, copySource, DialectType.MAID));
+          .ifPresent(
+              it -> {
+                hierarchy.setLevelNumber(it);
+                analyzeCopybook(DIALECT, ctx, copySource, DialectType.MAID);
+              });
     else analyzeCopybook(SKIPPING, ctx, copySource, DialectType.MAID);
   }
 
@@ -238,7 +247,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private void analyzeCopybook(
-      AnalysisTypes type, ParserRuleContext context, ParserRuleContext copyContext,
+      AnalysisTypes type,
+      ParserRuleContext context,
+      ParserRuleContext copyContext,
       DialectType dialectType) {
     analysisFactory
         .getInstanceFor(type)
