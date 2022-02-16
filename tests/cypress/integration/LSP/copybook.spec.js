@@ -66,7 +66,7 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC174658 Copybook - not exist: detailed hint', () => {
-    it(['smoke', 'CI'], 'Checks that error lines for missing copybook have detailed hints', () => {
+    it(['smoke', 'investigation'], 'Checks that error lines for missing copybook have detailed hints', () => {
       cy.openFile('USERC1F.cbl');
       cy.get(IDE.editorError)
         .getElementLineNumber()
@@ -97,7 +97,7 @@ context('This is a Copybook spec', () => {
 
   describe('TC174917 Copybook - recursive detailed hint', () => {
     it(
-      ['smoke', 'CI'],
+      ['smoke', 'investigation'],
       'Checks that when opening Cobol file which recursively refers to copybooks, have detailed error hint',
       () => {
         cy.openFile('USERC1R.cbl');
@@ -133,7 +133,7 @@ context('This is a Copybook spec', () => {
 
   describe('TC174933 Copybook - invalid definition hint', () => {
     it(
-      ['smoke', 'CI'],
+      ['smoke', 'investigation'],
       'Checks that when opening Cobol file which uses invalid definition from copybook, has detailed hint on mouse hover',
       () => {
         cy.openFile('USERC1N2.cbl');
@@ -155,7 +155,7 @@ context('This is a Copybook spec', () => {
       cy.closeFolder('.copybooks');
     });
     it(
-      ['smoke', 'CI'],
+      ['smoke', 'investigation'],
       'Checks that Peek Definition functionality works in theia in cobol file via context menu',
       () => {
         cy.openFile('USERC1N1.cbl').wait(3000);
