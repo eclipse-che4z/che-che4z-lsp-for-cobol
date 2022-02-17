@@ -127,3 +127,4 @@ tools
 logs/app.log
 dist
 clients/cobol-lsp-vscode-extensiontest-report
+clients/cobol-lsp-vscode-extension/test-report.xml

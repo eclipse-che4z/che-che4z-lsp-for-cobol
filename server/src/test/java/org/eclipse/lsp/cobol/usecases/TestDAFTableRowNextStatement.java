@@ -44,7 +44,7 @@ class TestDAFTableRowNextStatement {
           + "            ROW NEXT {$TBFPRO-XL1} TO {$DSAPRO-XL1}. \r\n"
           // Negative tests
           + "            ROW NEXT {$DSAPRO-XL1|1}. \r\n"
-          + "            ROW NEXT {$TBLPRO-XL1} TO {GBR4|2} \r\n";
+          + "            ROW NEXT {$TBLPRO-XL1} TO {GBR4|2}. \r\n";
 
   @Test
   void test() {

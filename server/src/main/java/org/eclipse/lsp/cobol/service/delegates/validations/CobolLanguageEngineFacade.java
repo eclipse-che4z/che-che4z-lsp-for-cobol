@@ -14,28 +14,28 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.validations;
 
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
-import org.eclipse.lsp.cobol.core.model.*;
-import org.eclipse.lsp.cobol.core.model.tree.CodeBlockDefinitionNode;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.ErrorCode;
+import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Location;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
-import static org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult.empty;
 
 /**
  * This class is a facade that maps the result of the syntax and semantic analysis to a model
@@ -67,7 +67,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   @Override
   public AnalysisResult analyze(String uri, String text, AnalysisConfig analysisConfig) {
     if (isEmpty(text)) {
-      return empty();
+      return AnalysisResult.builder().build();
     }
     return toAnalysisResult(engine.run(uri, text, analysisConfig), uri);
   }
@@ -84,53 +84,12 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private AnalysisResult toAnalysisResult(ResultWithErrors<SemanticContext> result, String uri) {
     SemanticContext context = result.getResult();
-    final List<CodeBlockDefinitionNode> paragraphNodes =
-        collectCodeBlockNodes(context, NodeType.PARAGRAPH);
-    final List<CodeBlockDefinitionNode> sectionNodes =
-        collectCodeBlockNodes(context, NodeType.PROCEDURE_SECTION);
     return AnalysisResult.builder()
         .diagnostics(
             collectDiagnosticsForAffectedDocuments(
                 convertErrors(result.getErrors()), context.getCopybookDefinitions(), uri))
-        .copybookDefinitions(convertEntities(context.getCopybookDefinitions()))
-        .copybookUsages(convertEntities(context.getCopybookUsages()))
-        .subroutineDefinitions(convertEntities(context.getSubroutinesDefinitions()))
-        .subroutineUsages(convertEntities(context.getSubroutinesUsages()))
-        .paragraphDefinitions(retrieveDefinitions(paragraphNodes))
-        .paragraphUsages(retrieveUsages(paragraphNodes))
-        .sectionDefinitions(retrieveDefinitions(sectionNodes))
-        .sectionUsages(retrieveUsages(sectionNodes))
         .rootNode(context.getRootNode())
         .build();
-  }
-
-  private List<CodeBlockDefinitionNode> collectCodeBlockNodes(
-      SemanticContext context, NodeType nodeType) {
-    return context
-        .getRootNode()
-        .getDepthFirstStream()
-        .filter(it -> it.getNodeType().equals(nodeType))
-        .map(CodeBlockDefinitionNode.class::cast)
-        .collect(toList());
-  }
-
-  private Map<String, List<Location>> retrieveDefinitions(List<CodeBlockDefinitionNode> nodes) {
-    return nodes.stream()
-        .collect(
-            Collectors.toMap(
-                CodeBlockDefinitionNode::getName,
-                it -> ImmutableList.of(it.getDefinition().toLocation()),
-                (x, y) -> Stream.concat(x.stream(), y.stream()).collect(toList())));
-  }
-
-  private Map<String, List<Location>> retrieveUsages(List<CodeBlockDefinitionNode> node) {
-    return node.stream()
-        .filter(it -> !it.getUsages().isEmpty())
-        .collect(
-            Collectors.toMap(
-                CodeBlockDefinitionNode::getName,
-                it -> it.getUsages().stream().map(Locality::toLocation).collect(toList()),
-                (x, y) -> Stream.concat(x.stream(), y.stream()).collect(toList())));
   }
 
   /**
@@ -179,10 +138,5 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private static DiagnosticSeverity checkSeverity(ErrorSeverity severity) {
     return DiagnosticSeverity.forValue(severity.ordinal() + 1);
-  }
-
-  private <T> Map<String, List<T>> convertEntities(Map<String, Collection<T>> source) {
-    return source.entrySet().stream()
-        .collect(toMap(Map.Entry::getKey, it -> new ArrayList<>(it.getValue())));
   }
 }

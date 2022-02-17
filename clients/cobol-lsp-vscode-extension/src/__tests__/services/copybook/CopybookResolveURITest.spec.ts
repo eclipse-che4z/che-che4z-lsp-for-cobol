@@ -16,6 +16,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { COPYBOOK_EXT_ARRAY } from "../../../constants";
 import { CopybookURI } from "../../../services/copybook/CopybookURI";
+import { SettingsService } from "../../../services/Settings";
 import * as fsUtils from "../../../services/util/FSUtils";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { SettingsUtils } from "../../../services/util/SettingsUtils";
@@ -50,7 +51,7 @@ function removeFolder(targetPath: string) {
     }
 }
 
-function buildResultArrayFrom(settingsMockValue: string[], profileName: string, ussPath: string[] = []): number {
+function buildResultArrayFrom(settingsMockValue: string[], filename: string, profileName: string, ussPath: string[] = []): number {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
         get: jest.fn().mockReturnValueOnce(settingsMockValue),
     });
@@ -59,7 +60,8 @@ function buildResultArrayFrom(settingsMockValue: string[], profileName: string, 
             get: jest.fn().mockReturnValue(ussPath),
         });
     }
-    return (CopybookURI as any).createPathForCopybookDownloaded(profileName).length;
+    ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(profileName);
+    return (CopybookURI as any).createPathForCopybookDownloaded(filename, SettingsService.DEFAULT_DIALECT).length;
 }
 
 beforeEach(() => {
@@ -110,18 +112,18 @@ describe("Resolve local copybook present in one or more folders specified by the
 });
 describe("With invalid input parameters, the list of URI that represent copybook downloaded are not generated", () => {
     test("given a profile but no dataset, the result list returned is empty", () => {
-        expect(buildResultArrayFrom(undefined, "PRF")).toBe(0);
+        expect(buildResultArrayFrom(undefined, "file", "PRF")).toBe(0);
     });
     test("given a list of dataset but no profile, the result list returned is empty", () => {
-        expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], undefined)).toBe(0);
+        expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "file", undefined)).toBe(0);
     });
 });
 describe("With allowed input parameters, the list of URI that represent copybook downloaded is correctly generated", () => {
     test("given profile and dataset list with one element, the result list is correctly generated with size 1 ", () => {
-        expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "PRF")).toBe(1);
+        expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "file", "PRF")).toBe(1);
     });
     test("given profile, dataset and USS path, list with one element each, the result list is correctly generated with size 2 ", () => {
-        expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "PRF", ["/test/uss/path"])).toBe(2);
+        expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "file", "PRF", ["/test/uss/path"])).toBe(2);
     });
 });
 describe("Prioritize search criteria for copybooks test suite", () => {

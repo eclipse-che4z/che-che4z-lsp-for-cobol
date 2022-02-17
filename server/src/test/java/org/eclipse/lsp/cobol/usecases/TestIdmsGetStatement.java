@@ -48,7 +48,7 @@ class TestIdmsGetStatement {
           + "           GET {$EMPLOYEE}.\n";
 
   private static final String GET2 =
-      DEFS + "           FIND FIRST {$EMPLOYEE} WITHIN {$EMP-AREA}\n" + "           GET\n";
+      DEFS + "           FIND FIRST {$EMPLOYEE} WITHIN {$EMP-AREA}\n" + "           GET.\n";
 
   private static final String GET_QUEUE =
       DEFS + "           GET QUEUE INTO {$WK_AREA1}\n" + "           TO {$WK_AREA2}.\n";

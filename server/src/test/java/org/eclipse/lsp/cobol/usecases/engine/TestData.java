@@ -29,6 +29,7 @@ import java.util.Map;
 class TestData {
   String text;
   String copybookName;
+  String dialectType;
   Map<String, List<Diagnostic>> diagnostics;
   Map<String, List<Location>> variableDefinitions;
   Map<String, List<Location>> variableUsages;

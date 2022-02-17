@@ -38,7 +38,11 @@ public class CopyDefinition {
     this.copyBookName = copyBookName;
   }
 
-  void addUsages(CopyNode node) {
+  /**
+   * Add CopyNode usages for the copybook definitions
+   * @param node
+   */
+  public void addUsages(CopyNode node) {
     usages.add(node);
     node.setDefinition(this);
   }

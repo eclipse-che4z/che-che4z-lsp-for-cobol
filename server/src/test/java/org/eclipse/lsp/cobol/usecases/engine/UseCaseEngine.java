@@ -18,8 +18,7 @@ package org.eclipse.lsp.cobol.usecases.engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
-import org.eclipse.lsp.cobol.core.model.tree.SubroutineNameNode;
+import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
@@ -42,8 +41,7 @@ import java.util.stream.Stream;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.SUBROUTINE_NAME_NODE;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.*;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
 import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
@@ -209,8 +207,8 @@ public class UseCaseEngine {
     assertResult(
         "Copybook definitions:",
         expected.getCopybookDefinitions(),
-        actual.getCopybookDefinitions());
-    assertResult("Copybook usages:", expected.getCopybookUsages(), actual.getCopybookUsages());
+        extractCopybookDefinitions(actual));
+    assertResult("Copybook usages:", expected.getCopybookUsages(), extractCopybookUsages(actual));
 
     assertResult(
         "Variable definition:",
@@ -221,12 +219,18 @@ public class UseCaseEngine {
     assertResult(
         "Paragraph definition:",
         expected.getParagraphDefinitions(),
-        actual.getParagraphDefinitions());
-    assertResult("Paragraph usages:", expected.getParagraphUsages(), actual.getParagraphUsages());
+        extractDefinitions(actual, PARAGRAPH_NAME_NODE));
+    assertResult(
+        "Paragraph usages:",
+        expected.getParagraphUsages(),
+        extractUsages(actual, PARAGRAPH_NAME_NODE));
 
     assertResult(
-        "Section definition:", expected.getSectionDefinitions(), actual.getSectionDefinitions());
-    assertResult("Section usages:", expected.getSectionUsages(), actual.getSectionUsages());
+        "Section definition:",
+        expected.getSectionDefinitions(),
+        extractDefinitions(actual, SECTION_NAME_NODE));
+    assertResult(
+        "Section usages:", expected.getSectionUsages(), extractUsages(actual, SECTION_NAME_NODE));
 
     assertResult(
         "Subroutine definitions: ",
@@ -288,7 +292,7 @@ public class UseCaseEngine {
         .filter(hasType(SUBROUTINE_NAME_NODE))
         .map(SubroutineNameNode.class::cast)
         .filter(it -> !it.getDefinition().getLocation().getUri().startsWith(PREF_IMPLICIT))
-        .collect(groupingBy(SubroutineNameNode::getSubroutineName))
+        .collect(groupingBy(SubroutineNameNode::getName))
         .entrySet()
         .stream()
         .collect(
@@ -302,6 +306,48 @@ public class UseCaseEngine {
                         .collect(toList())));
   }
 
+  private Map<String, List<Location>> extractCopybookDefinitions(AnalysisResult result) {
+    return result
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(COPY))
+        .map(CopyNode.class::cast)
+        .filter(it -> !it.getDefinition().getLocation().getUri().startsWith(PREF_IMPLICIT))
+        .collect(groupingBy(CopyNode::getName))
+        .entrySet()
+        .stream()
+        .collect(
+            toMap(
+                Entry::getKey,
+                entry ->
+                    entry.getValue().stream()
+                        .map(CopyNode::getDefinitions)
+                        .flatMap(List::stream)
+                        .distinct()
+                        .collect(toList())));
+  }
+
+  private Map<String, List<Location>> extractCopybookUsages(AnalysisResult actual) {
+    return actual
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(COPY))
+        .map(CopyNode.class::cast)
+        .filter(it -> !it.getUsages().isEmpty())
+        .collect(groupingBy(CopyNode::getName))
+        .entrySet()
+        .stream()
+        .collect(
+            toMap(
+                Entry::getKey,
+                entry ->
+                    entry.getValue().stream()
+                        .map(CopyNode::getUsages)
+                        .flatMap(List::stream)
+                        .distinct()
+                        .collect(toList())));
+  }
+
   private static Map<String, List<Location>> extractSubroutineUsages(AnalysisResult result) {
     return result
         .getRootNode()
@@ -309,7 +355,7 @@ public class UseCaseEngine {
         .filter(hasType(SUBROUTINE_NAME_NODE))
         .map(SubroutineNameNode.class::cast)
         .filter(it -> !it.getUsages().isEmpty())
-        .collect(groupingBy(SubroutineNameNode::getSubroutineName))
+        .collect(groupingBy(SubroutineNameNode::getName))
         .entrySet()
         .stream()
         .collect(
@@ -321,6 +367,34 @@ public class UseCaseEngine {
                         .flatMap(List::stream)
                         .distinct()
                         .collect(toList())));
+  }
+
+  private Map<String, List<Location>> extractDefinitions(AnalysisResult result, NodeType nodeType) {
+    return result
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(nodeType))
+        .map(Context.class::cast)
+        .filter(it -> !it.getDefinitions().isEmpty())
+        .collect(
+            toMap(
+                Context::getName,
+                Context::getDefinitions,
+                (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).collect(toList())));
+  }
+
+  private Map<String, List<Location>> extractUsages(AnalysisResult result, NodeType nodeType) {
+    return result
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(nodeType))
+        .map(Context.class::cast)
+        .filter(it -> !it.getUsages().isEmpty())
+        .collect(
+            toMap(
+                Context::getName,
+                Context::getUsages,
+                (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).collect(toList())));
   }
 
   private void assertDiagnostics(

@@ -44,7 +44,7 @@ class TestDAFTableRowPriorStatement {
           + "            ROW PRIOR {$TBFPRO-XL1} TO {$DSAPRO-XL1}. \r\n"
           // Negative tests
           + "            ROW PRIOR {$DSAPRO-XL1|1}. \r\n"
-          + "            ROW PRIOR {$TBLPRO-XL1} TO {GBR4|2} \r\n";
+          + "            ROW PRIOR {$TBLPRO-XL1} TO {GBR4|2}. \r\n";
 
   @Test
   void test() {

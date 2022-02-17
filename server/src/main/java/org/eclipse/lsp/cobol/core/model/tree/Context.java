@@ -23,6 +23,11 @@ import java.util.List;
  */
 public interface Context {
   /**
+   * Get the name of the Context Object
+   * @return name of the node
+   */
+  String getName();
+  /**
    * Get structure definitions.
    *
    * @return the list of location for the definition

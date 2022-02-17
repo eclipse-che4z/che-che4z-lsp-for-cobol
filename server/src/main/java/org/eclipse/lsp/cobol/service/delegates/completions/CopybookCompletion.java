@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
@@ -25,6 +26,8 @@ import java.util.Collection;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.COPYBOOKS;
 
 /** This class provides completion suggestions for copybook usages in the document */
@@ -35,7 +38,13 @@ public class CopybookCompletion implements Completion {
   public @NonNull Collection<CompletionItem> getCompletionItems(
       @NonNull String token, @Nullable CobolDocumentModel document) {
     if (document == null) return emptyList();
-    return document.getAnalysisResult().getCopybookUsages().keySet().stream()
+    return document
+        .getAnalysisResult()
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(COPY))
+        .map(CopyNode.class::cast)
+        .map(CopyNode::getName)
         .filter(DocumentationUtils.startsWithIgnoreCase(token))
         .map(this::toCopybookCompletion)
         .collect(toList());

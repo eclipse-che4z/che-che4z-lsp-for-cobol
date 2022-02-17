@@ -36,7 +36,7 @@ import java.util.Optional;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class VariableUsageNode extends Node implements Context, Describable {
-  private final String dataName;
+  private final String name;
   @Setter
   @EqualsAndHashCode.Exclude @ToString.Exclude private VariableNode definition;
 
@@ -44,7 +44,7 @@ public class VariableUsageNode extends Node implements Context, Describable {
       String dataName,
       Locality locality) {
     super(locality, NodeType.VARIABLE_USAGE);
-    this.dataName = dataName;
+    this.name = dataName;
   }
 
   @Override

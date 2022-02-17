@@ -17,34 +17,17 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
-import org.eclipse.lsp.cobol.core.model.tree.RootNode;
+import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp4j.Location;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.google.common.collect.ImmutableMap.of;
 
 /** This class stores a model to assert the completion providers */
 class MockCompletionModel {
-  private static final List<Location> LOCATIONS = new ArrayList<>();
-
   static final AnalysisResult RESULT =
       AnalysisResult.builder()
-          .paragraphDefinitions(of("parD1", LOCATIONS, "ParD2", LOCATIONS, "Not-parD", LOCATIONS))
-          .paragraphUsages(of("parU1", LOCATIONS, "ParU2", LOCATIONS, "Not-parU", LOCATIONS))
-          .sectionDefinitions(of("secD1", LOCATIONS, "SecD2", LOCATIONS, "Not-secD", LOCATIONS))
-          .sectionUsages(of("secU1", LOCATIONS, "SecU2", LOCATIONS, "Not-secU", LOCATIONS))
-          .copybookDefinitions(of("cpyD1", LOCATIONS, "CpyD2", LOCATIONS, "Not-cpyD", LOCATIONS))
-          .copybookUsages(of("cpyU1", LOCATIONS, "CpyU2", LOCATIONS, "Not-cpyU", LOCATIONS))
-          .subroutineDefinitions(of("subD1", LOCATIONS, "SubD2", LOCATIONS, "Not-subD", LOCATIONS))
-          .subroutineUsages(of("subU1", LOCATIONS, "SubU2", LOCATIONS, "Not-subU", LOCATIONS))
           .rootNode(new RootNode(Locality.builder().build(), new NamedSubContext()))
           .build();
   static final CobolDocumentModel MODEL = new CobolDocumentModel("some text", RESULT);
@@ -52,9 +35,35 @@ class MockCompletionModel {
   static {
     ProgramNode programNode = new ProgramNode(Locality.builder().build());
     RESULT.getRootNode().addChild(programNode);
-    ImmutableList.of("constD1", "ConstD2").forEach(name -> {
-      VariableNode variable = new MnemonicNameNode(Locality.builder().build(), "sys", name);
-      programNode.addVariableDefinition(variable);
-    });
+
+    ImmutableList.of("constD1", "ConstD2")
+        .forEach(
+            name -> {
+              VariableNode variable = new MnemonicNameNode(Locality.builder().build(), "sys", name);
+              programNode.addVariableDefinition(variable);
+            });
+
+    ImmutableList.of("parD1", "ParD2", "Not-parD")
+        .forEach(
+            name -> {
+              ParagraphNameNode nameNode = new ParagraphNameNode(Locality.builder().build(), name);
+              programNode.registerParagraphNameNode(nameNode);
+            });
+    ImmutableList.of("secD1", "SecD2", "Not-secD")
+        .forEach(
+            name -> {
+              SectionNameNode nameNode = new SectionNameNode(Locality.builder().build(), name);
+              programNode.registerSectionNameNode(nameNode);
+            });
+
+    RootNode rootNode = new RootNode(Locality.builder().build(), new NamedSubContext());
+    RESULT.getRootNode().addChild(rootNode);
+    ImmutableList.of("cpyU1", "CpyU2", "Not-cpyU")
+              .forEach(
+                      name -> {
+                          CopyNode nameNode = new CopyNode(Locality.builder().build(), name);
+                          rootNode.addChild(nameNode);
+                      });
+
   }
 }

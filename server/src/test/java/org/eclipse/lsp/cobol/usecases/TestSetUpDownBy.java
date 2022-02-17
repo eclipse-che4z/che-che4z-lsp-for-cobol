@@ -85,11 +85,14 @@ class TestSetUpDownBy {
             "3",
             new Diagnostic(
                 null,
-                "Extraneous input 'IND3' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, COMPUTE, CONTINUE, "
-                    + "DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, GENERATE, "
-                    + "GO, GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, PURGE, "
-                    + "READ, READY, RECEIVE, RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT, "
-                    + "START, STOP, STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, '.', ';'}",
+                "Extraneous input 'IND3' expected {ACCEPT, ADD, ALTER, ATTACH, CALL, CANCEL, CHANGE, CHECK, "
+                    + "CLOSE, COMMIT, COMPUTE, CONNECT, CONTINUE, DELETE, DISABLE, DISCONNECT, DISPLAY, DIVIDE, "
+                    + "ENABLE, END, ENTRY, ERASE, EVALUATE, EXEC, EXHIBIT, EXIT, FIND, FINISH, FREE, GENERATE, GO, "
+                    + "GOBACK, IF, INITIALIZE, INITIATE, INSPECT, KEEP, LOAD, MERGE, MODIFY, MOVE, MULTIPLY, OPEN, "
+                    + "PERFORM, POST, PURGE, PUT, READ, READY, RECEIVE, RELEASE, RESET, RETURN, REWRITE, ROLLBACK, "
+                    + "ROW, SEARCH, SEND, SERVICE, SET, SHOW, SNAP, SORT, START, STOP, STRING, SUBTRACT, TERMINATE, "
+                    + "UNSTRING, WAIT, WRITE, XML, ABEND, BIND, DC, DEQUEUE, ENDPAGE, ENQUEUE, GET, INQUIRE, MAP, "
+                    + "OBTAIN, STARTPAGE, STORE, '.', ';'}",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "4",
