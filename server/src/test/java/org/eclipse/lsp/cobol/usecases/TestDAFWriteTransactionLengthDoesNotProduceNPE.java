@@ -31,7 +31,7 @@ class TestDAFWriteTransactionLengthDoesNotProduceNPE {
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        PROCEDURE DIVISION. \r\n"
-          + "            WRITE TRANSACTION 3167 LENGTH{|1}\r\n";
+          + "            WRITE TRANSACTION 3167 LENGTH {.|1}\r\n";
 
   @Test
   void test() {
