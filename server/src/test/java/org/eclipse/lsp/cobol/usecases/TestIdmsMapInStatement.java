@@ -50,7 +50,7 @@ class TestIdmsMapInStatement {
       DEFS + "           MAP IN USING {$EMPMAP} IO HEADER MODIFIED.\n";
 
   private static final String TST3 =
-      DEFS + "           MAP IN USING {$EMPMAP} NOIO DATASTREAM FROM {$MFLD} LENGTH {$MFLD-LEN}.\n";
+      DEFS + "           MAP IN USING {$EMPMAP} NOIO DATASTREAM FROM {$MFLD} \n           LENGTH {$MFLD-LEN}.\n";
 
   private static final String TST4 =
       DEFS + "           MAP IN USING {$EMPMAP} NOIO DATASTREAM FROM {$MFLD} LENGTH 20.\n";
