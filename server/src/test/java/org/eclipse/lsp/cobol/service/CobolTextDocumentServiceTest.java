@@ -19,7 +19,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.awaitility.Awaitility;
+import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.core.model.tree.*;
+import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
@@ -43,6 +46,8 @@ import java.util.concurrent.ExecutionException;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.*;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.IMPLICIT_PATH;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -67,6 +72,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   private CopybookConfig cpyConfigEnabledMode;
   private CopybookConfig cpyConfigDisabledMode;
   private CopybookConfig cpyConfigSkipMode;
+  private Map<String, CopyDefinition> copyDefinitionMap = new HashMap<>();
 
   @BeforeEach
   void setupService() {
@@ -80,7 +86,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testCompletion() {
     doNothing().when(communications).notifyThatDocumentAnalysed(anyString());
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.empty());
+        .thenReturn(AnalysisResult.builder().build());
 
     CompletionItem completionItem = new CompletionItem();
     completionItem.setLabel("test");
@@ -101,7 +107,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
     doNothing().when(communications).publishDiagnostics(anyMap());
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.empty());
+        .thenReturn(AnalysisResult.builder().build());
     service.didChange(
         new DidChangeTextDocumentParams(
             new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0), textEdits));
@@ -114,7 +120,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testDidClose() throws ExecutionException, InterruptedException {
     doNothing().when(communications).publishDiagnostics(anyMap());
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.empty());
+        .thenReturn(AnalysisResult.builder().build());
     openDocument(service);
     service.getFutureMap().get(DOCUMENT_URI).get();
     assertEquals(1, closeGetter(service).size());
@@ -130,7 +136,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     DidSaveTextDocumentParams saveDocumentParams =
         new DidSaveTextDocumentParams(saveDocumentIdentifier);
     when(engine.analyze(eq(DOCUMENT_URI), eq(TEXT_EXAMPLE), any()))
-        .thenReturn(AnalysisResult.empty());
+        .thenReturn(AnalysisResult.builder().build());
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
@@ -145,7 +151,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   @Test
   void disableCopybookAnalysisOnExtendedDoc() throws ExecutionException, InterruptedException {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.empty());
+        .thenReturn(AnalysisResult.builder().build());
 
     service.didOpen(
         new DidOpenTextDocumentParams(
@@ -164,7 +170,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   @Test
   void enableCopybooksOnDidOpenTest() throws ExecutionException, InterruptedException {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.empty());
+        .thenReturn(AnalysisResult.builder().build());
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
@@ -182,7 +188,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   @Test
   void enableCopybooksOnDidChangeTest() throws ExecutionException, InterruptedException {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.empty());
+        .thenReturn(AnalysisResult.builder().build());
     doNothing().when(communications).publishDiagnostics(anyMap());
     service.didChange(
         new DidChangeTextDocumentParams(
@@ -328,7 +334,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    */
   @Test
   void testAnalysis() throws ExecutionException, InterruptedException {
-    doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.empty()))
+    doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.builder().build()))
         .when(engine)
         .analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(cpyConfigEnabledMode));
 
@@ -424,7 +430,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
                 TEXT_EXAMPLE,
                 new AnalysisConfig(
                     Collections.emptySet(), cpyConfigEnabledMode, ImmutableList.of())))
-        .thenReturn(AnalysisResult.empty());
+        .thenReturn(AnalysisResult.builder().build());
 
     service.didOpen(
         new DidOpenTextDocumentParams(
@@ -472,18 +478,35 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    */
   @Test
   void testAnalysisFinishedNotification() {
+    AnalysisResult analysisResult =
+        AnalysisResult.builder()
+            .rootNode(new RootNode(Locality.builder().build(), new NamedSubContext()))
+            .build();
 
-    Map<String, List<Location>> copybookUsages = new HashMap<>();
-    Location parentLocation = new Location(DOCUMENT_URI, null);
-    Location nestedLocation = new Location(PARENT_CPY_URI, null);
-    Location nested2Location = new Location(NESTED_CPY_URI, null);
-    copybookUsages.put("PARENT", asList(parentLocation, parentLocation));
-    copybookUsages.put("NESTED", singletonList(nestedLocation));
-    copybookUsages.put("NESTED2", singletonList(nested2Location));
-
+    RootNode rootNode = new RootNode(Locality.builder().build(), new NamedSubContext());
+    analysisResult.getRootNode().addChild(rootNode);
+    CopyNode parent = new CopyNode(Locality.builder().uri(DOCUMENT_URI).build(), "PARENT");
+    CopyNode nested = new CopyNode(Locality.builder().uri(PARENT_CPY_URI).build(), "NESTED");
+    CopyNode nested2 =
+        new CopyNode(Locality.builder().uri(NESTED_CPY_URI).build(), "NESTED_CPY_URI");
+    CopyDefinition parentDefinition = new CopyDefinition(
+            new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), "PARENT");
+    parentDefinition.addUsages(parent);
+    parent.setDefinition(parentDefinition);
+    CopyDefinition nestedDefinition = new CopyDefinition(
+            new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), "NESTED");
+    nestedDefinition.addUsages(nested);
+    nested.setDefinition(nestedDefinition);
+    CopyDefinition nested2Definition = new CopyDefinition(
+            new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), "NESTED_CPY_URI");
+    nested2Definition.addUsages(nested2);
+    nested2.setDefinition(nested2Definition);
+    rootNode.addChild(parent);
+    rootNode.addChild(nested);
+    rootNode.addChild(nested2);
     when(engine.analyze(
             DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(cpyConfigEnabledMode)))
-        .thenReturn(AnalysisResult.empty().toBuilder().copybookUsages(copybookUsages).build());
+        .thenReturn(analysisResult);
 
     service.didOpen(
         new DidOpenTextDocumentParams(
@@ -493,7 +516,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         .postData(
             AnalysisFinishedEvent.builder()
                 .documentUri(DOCUMENT_URI)
-                .copybookUris(asList(NESTED_CPY_URI, DOCUMENT_URI, PARENT_CPY_URI))
+                .copybookUris(asList(DOCUMENT_URI, PARENT_CPY_URI, NESTED_CPY_URI))
                 .copybookProcessingMode(CopybookProcessingMode.ENABLED)
                 .build());
   }
@@ -501,7 +524,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   @Test
   void testFormatCallDelegatesToFormationsObject() throws ExecutionException, InterruptedException {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.empty());
+        .thenReturn(AnalysisResult.builder().build());
     when(formations.format(any(CobolDocumentModel.class))).thenReturn(emptyList());
     service.didOpen(
         new DidOpenTextDocumentParams(
@@ -512,7 +535,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
             new DocumentFormattingParams(
                 new TextDocumentIdentifier(DOCUMENT_URI), new FormattingOptions(1, false)))
         .get();
-
     verify(formations).format(any(CobolDocumentModel.class));
   }
 
@@ -520,7 +542,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testDefinitionCallDelegatesToOccurrencesObject()
       throws ExecutionException, InterruptedException {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.empty());
+        .thenReturn(AnalysisResult.builder().build());
 
     when(occurrences.findDefinitions(
             any(CobolDocumentModel.class), any(TextDocumentPositionParams.class)))
@@ -542,7 +564,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testReferenceCallDelegatesToOccurrencesObject()
       throws ExecutionException, InterruptedException {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.empty());
+        .thenReturn(AnalysisResult.builder().build());
 
     when(occurrences.findReferences(
             any(CobolDocumentModel.class),

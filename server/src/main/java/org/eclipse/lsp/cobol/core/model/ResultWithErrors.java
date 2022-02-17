@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.core.model;
 
+import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -54,6 +55,17 @@ public class ResultWithErrors<T> {
       Consumer<T> resultConsumer, Consumer<List<SyntaxError>> errorsConsumer) {
     if (errors.isEmpty()) resultConsumer.accept(result);
     else errorsConsumer.accept(errors);
+  }
+
+  /**
+   * Create a ResultWithErrors of a given result without errors.
+   *
+   * @param <T> the type of the wrapped value
+   * @param result the value to be wrapped
+   * @return new ResultWithErrors with empty list of errors
+   */
+  public static <T> ResultWithErrors<T> of(T result) {
+    return new ResultWithErrors<>(result, ImmutableList.of());
   }
 
   /**

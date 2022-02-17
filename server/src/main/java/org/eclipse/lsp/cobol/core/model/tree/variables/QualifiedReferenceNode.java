@@ -74,7 +74,7 @@ public class QualifiedReferenceNode extends Node {
       VariableNode definitionNode = foundDefinitions.get(0);
       variableDefinitionNode = definitionNode;
       for (VariableUsageNode usageNode: variableUsageNodes) {
-        while (definitionNode != null && !usageNode.getDataName().equals(definitionNode.getName())) {
+        while (definitionNode != null && !usageNode.getName().equals(definitionNode.getName())) {
           definitionNode = definitionNode.getNearestParentByType(NodeType.VARIABLE)
               .map(VariableNode.class::cast)
               .orElse(null);
@@ -88,7 +88,7 @@ public class QualifiedReferenceNode extends Node {
       }
       return ImmutableList.of();
     }
-    String dataName = variableUsageNodes.get(0).getDataName();
+    String dataName = variableUsageNodes.get(0).getName();
     SyntaxError error = SyntaxError.syntaxError()
         .severity(ErrorSeverity.ERROR)
         .locality(getLocality())

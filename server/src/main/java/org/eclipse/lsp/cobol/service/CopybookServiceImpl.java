@@ -111,16 +111,20 @@ public class CopybookServiceImpl implements CopybookService {
       @NonNull CopybookConfig copybookConfig) {
     try {
       return copybookCache.get(
-          copybookName, () -> resolveSync(copybookName, documentUri, dialectType, copybookConfig));
+          buildCacheKey(copybookName, dialectType), () -> resolveSync(copybookName, documentUri, dialectType, copybookConfig));
     } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
-      return new CopybookModel(copybookName, null, null);
+      return new CopybookModel(copybookName, dialectType, null, null);
     }
   }
 
   @Override
   public void store(CopybookModel copybookModel) {
-    copybookCache.put(copybookModel.getName(), copybookModel);
+    copybookCache.put(buildCacheKey(copybookModel.getName(), copybookModel.getDialectType()), copybookModel);
+  }
+
+  private String buildCacheKey(@NonNull String copybookName, @NonNull String dialectType) {
+    return String.format("%s#%s", copybookName, dialectType);
   }
 
   private CopybookModel resolveSync(
@@ -138,8 +142,8 @@ public class CopybookServiceImpl implements CopybookService {
     return tryResolveCopybookFromWorkspace(copybookName, cobolFileName, dialectType)
         .orElseGet(
             () ->
-                tryResolvePredefinedCopybook(copybookName, copybookConfig)
-                    .orElseGet(() -> registerForDownloading(copybookName, cobolFileName)));
+                tryResolvePredefinedCopybook(copybookName, dialectType, copybookConfig)
+                    .orElseGet(() -> registerForDownloading(copybookName, dialectType, cobolFileName)));
   }
 
   private Optional<CopybookModel> tryResolveCopybookFromWorkspace(
@@ -150,7 +154,7 @@ public class CopybookServiceImpl implements CopybookService {
         cobolFileName);
     final Optional<CopybookModel> copybookModel =
         resolveCopybookFromWorkspace(copybookName, cobolFileName, dialectType)
-            .map(uri -> loadCopybook(uri, copybookName, cobolFileName));
+            .map(uri -> loadCopybook(uri, copybookName, dialectType, cobolFileName));
     LOG.debug("Copybook from workspace: {}", copybookModel);
     return copybookModel;
   }
@@ -176,11 +180,12 @@ public class CopybookServiceImpl implements CopybookService {
    * if it is predefined.
    *
    * @param copybookName - the name of copybook to check
+   * @param dialectType the COBOL dialect
    * @param copybookConfig - configuration for copybook resolution
    * @return optional model of a predefined copybook if it exists
    */
   private Optional<CopybookModel> tryResolvePredefinedCopybook(
-      String copybookName, CopybookConfig copybookConfig) {
+      String copybookName, String dialectType, CopybookConfig copybookConfig) {
     LOG.debug(
         "Trying to resolve predefined copybook {}, using config {}", copybookName, copybookConfig);
     final Optional<CopybookModel> copybookModel =
@@ -189,26 +194,26 @@ public class CopybookServiceImpl implements CopybookService {
             .map(
                 uri ->
                     new CopybookModel(
-                        copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri)));
+                        copybookName, dialectType, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri)));
     LOG.debug("Predefined copybook: {}", copybookModel);
     return copybookModel;
   }
 
-  private CopybookModel registerForDownloading(String copybookName, String cobolFileName) {
+  private CopybookModel registerForDownloading(String copybookName, String dialectType, String cobolFileName) {
     LOG.debug("Registering copybook {} of {} for further downloading", copybookName, cobolFileName);
     Optional.of(
             copybooksForDownloading.computeIfAbsent(
                 cobolFileName, s -> ConcurrentHashMap.newKeySet()))
         .ifPresent(it -> it.add(copybookName));
-    return new CopybookModel(copybookName, null, null);
+    return new CopybookModel(copybookName, dialectType, null, null);
   }
 
-  private CopybookModel loadCopybook(String uri, String copybookName, String cobolFileName) {
+  private CopybookModel loadCopybook(String uri, String copybookName, String dialectType, String cobolFileName) {
     Path file = files.getPathFromURI(uri);
     LOG.debug("Loading {} with URI {} for {} from path {}", copybookName, uri, cobolFileName, file);
     return files.fileExists(file)
-        ? new CopybookModel(copybookName, uri, files.getContentByPath(Objects.requireNonNull(file)))
-        : registerForDownloading(copybookName, cobolFileName);
+        ? new CopybookModel(copybookName, dialectType, uri, files.getContentByPath(Objects.requireNonNull(file)))
+        : registerForDownloading(copybookName, dialectType, cobolFileName);
   }
 
   private String readContentForImplicitCopybook(String resourcePath) {

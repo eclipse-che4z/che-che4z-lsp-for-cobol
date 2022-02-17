@@ -35,7 +35,7 @@ class SubroutineCompletionTest {
     SubroutineService subroutineService = new SubroutineServiceImpl(null, 3, 3, "HOURS");
     subroutineService.store("SUBCALL", "");
     SubroutineCompletion subroutineCompletion = new SubroutineCompletion(subroutineService);
-    CobolDocumentModel document = new CobolDocumentModel(TEXT, AnalysisResult.empty());
+    CobolDocumentModel document = new CobolDocumentModel(TEXT, AnalysisResult.builder().build());
     CompletionParams params =
         new CompletionParams(new TextDocumentIdentifier("id"), new Position(1, 16));
 

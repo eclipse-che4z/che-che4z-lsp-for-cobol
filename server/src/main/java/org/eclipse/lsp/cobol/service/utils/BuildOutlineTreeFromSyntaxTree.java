@@ -80,7 +80,7 @@ public class BuildOutlineTreeFromSyntaxTree {
   }
 
   private DocumentSymbol covertCopyNode(CopyNode node) {
-    return createDocumentSymbol("COPY " + node.getCopyBookName(), NodeType.COPYBOOK, node);
+    return createDocumentSymbol("COPY " + node.getName(), NodeType.COPYBOOK, node);
   }
 
   private DocumentSymbol convertSection(SectionNode node) {
