@@ -35,7 +35,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
-import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.EmbeddedLanguagesListener;
@@ -94,16 +93,17 @@ public class CobolLanguageEngine {
    *     the client
    */
   @NonNull
-  public ResultWithErrors<SemanticContext> run(
+  public ResultWithErrors<Node> run(
       @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
 
     timingBuilder.getFlavorTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
-    text = preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
+    String cleanText =
+        preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
     FlavorOutcome flavorsOutcome =
-        FlavorUtils.process(documentUri, text, analysisConfig.getFlavors())
+        FlavorUtils.process(documentUri, cleanText, analysisConfig.getFlavors())
             .unwrap(accumulatedErrors::addAll);
     timingBuilder.getFlavorTimer().stop();
 
@@ -155,17 +155,18 @@ public class CobolLanguageEngine {
             messageService,
             subroutineService,
             flavorsOutcome.getFlavorNodes());
+
     List<Node> syntaxTree = visitor.visit(tree);
-    SemanticContext context = visitor.finishAnalysis().unwrap(accumulatedErrors::addAll);
+    accumulatedErrors.addAll(visitor.getErrors());
     timingBuilder.getVisitorTimer().stop();
-    if (syntaxTree.size() == 1) {
-      timingBuilder.getSyntaxTreeTimer().start();
-      analyzeEmbeddedCode(syntaxTree, positionMapping);
-      Node rootNode = syntaxTree.get(0);
-      accumulatedErrors.addAll(processSyntaxTree(rootNode));
-      context = context.toBuilder().rootNode(rootNode).build();
-      timingBuilder.getSyntaxTreeTimer().stop();
-    } else LOG.warn("The root node for syntax tree was not constructed");
+
+    timingBuilder.getSyntaxTreeTimer().start();
+    analyzeEmbeddedCode(syntaxTree, positionMapping);
+
+    Node rootNode = syntaxTree.get(0);
+    accumulatedErrors.addAll(processSyntaxTree(rootNode));
+
+    timingBuilder.getSyntaxTreeTimer().stop();
     timingBuilder.getLateErrorProcessingTimer().start();
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
     accumulatedErrors.addAll(
@@ -189,7 +190,7 @@ public class CobolLanguageEngine {
     }
 
     return new ResultWithErrors<>(
-        context, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
+        rootNode, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
   private List<SyntaxError> processSyntaxTree(Node rootNode) {
