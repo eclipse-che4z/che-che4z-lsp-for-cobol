@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 
 /**
  * Provide API definition to search for copybooks files. The service also caches copybook to reduce
@@ -31,14 +32,12 @@ public interface CopybookService {
    *
    * @param copybookName - the name of the copybook to be retrieved
    * @param documentUri - the currently processing document that contains the copy statement
-   * @param dialectType the COBOL dialect name
    * @param copybookConfig - contains config info like: copybook processing mode, target backend sql server
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   CopybookModel resolve(
-      @NonNull String copybookName,
+      @NonNull CopybookName copybookName,
       @NonNull String documentUri,
-      @NonNull String dialectType,
       @NonNull CopybookConfig copybookConfig);
 
   /**

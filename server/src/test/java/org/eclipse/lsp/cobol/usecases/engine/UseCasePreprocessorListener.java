@@ -23,6 +23,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -124,9 +125,18 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
         getConstantDefinitions(),
         constantUsages,
         copybookDefinitions,
-        copybookUsages,
+        remap(copybookUsages),
         makeSubroutinesDefinitions(subroutineNames),
         subroutineUsages);
+  }
+
+  private Map<String, List<Location>> remap(Map<String, List<Location>> map) {
+    Set<String> keys = new HashSet<>(map.keySet());
+    keys.forEach(k -> {
+      map.put(new CopybookName(k, dialectType).getProcessingName(), map.get(k));
+      map.remove(k);
+    });
+    return map;
   }
 
   @Override
@@ -391,7 +401,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private Consumer<String> defineCopybook(String uri) {
     return copybookName ->
         copybookDefinitions.put(
-            copybookName,
+            new CopybookName(copybookName, dialectType).getProcessingName(),
             singletonList(new Location(uri, new Range(new Position(0, 0), new Position(0, 0)))));
   }
 

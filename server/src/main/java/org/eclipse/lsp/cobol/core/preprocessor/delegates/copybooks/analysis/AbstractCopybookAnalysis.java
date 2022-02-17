@@ -89,10 +89,9 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
       CopybookMetaData metaData =
           validateMetaData(
                   CopybookMetaData.builder()
-                      .name(retrieveCopybookName(copySource))
+                      .copybookName(new CopybookName(retrieveCopybookName(copySource), dialectType.name()))
                       .context(context)
                       .documentUri(documentUri)
-                      .dialect(dialectType.name())
                       .copybookId(randomUUID().toString())
                       .config(config)
                       .nameLocality(
@@ -121,7 +120,7 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
 
   private ResultWithErrors<CopybookMetaData> validateMetaData(CopybookMetaData metaData) {
     List<SyntaxError> errors = new ArrayList<>();
-    final String copybookName = metaData.getName();
+    final String copybookName = metaData.getCopybookName().getName();
     final Locality locality = metaData.getNameLocality();
     if (copybookName.length() > maxCopybookNameLength) {
       errors.add(
@@ -137,7 +136,7 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
     if (copybookName.startsWith(HYPHEN) || copybookName.endsWith(HYPHEN)) {
       errors.add(
           addCopybookError(
-              copybookName,
+              metaData.getCopybookName(),
               locality,
               ERROR,
               "GrammarPreprocessorListener.copyBkStartsOrEndsWithHyphen",
@@ -148,7 +147,7 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
     if (copybookName.contains(UNDERSCORE))
       errors.add(
           addCopybookError(
-              copybookName,
+              metaData.getCopybookName(),
               locality,
               ERROR,
               "GrammarPreprocessorListener.copyBkContainsUnderScore",
@@ -214,17 +213,17 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
 
   protected ResultWithErrors<CopybookModel> getCopyBookContent(
       CopybookMetaData metaData, CopybookHierarchy hierarchy) {
-    if (metaData.getName().isEmpty()) return emptyModel(metaData.getName(), metaData.getDialect(), ImmutableList.of());
+    if (metaData.getCopybookName().getName().isEmpty()) return emptyModel(metaData.getCopybookName(), ImmutableList.of());
 
-    if (hierarchy.hasRecursion(metaData.getName()))
-      return emptyModel(metaData.getName(), metaData.getDialect(), hierarchy.mapCopybooks(this::reportRecursiveCopybook));
+    if (hierarchy.hasRecursion(metaData.getCopybookName().getProcessingName()))
+      return emptyModel(metaData.getCopybookName(), hierarchy.mapCopybooks(this::reportRecursiveCopybook));
 
     CopybookModel copybook =
         copybookService.resolve(
-            metaData.getName(), metaData.getDocumentUri(), metaData.getDialect(), metaData.getConfig());
+            metaData.getCopybookName(), metaData.getDocumentUri(), metaData.getConfig());
 
     if (copybook.getContent() == null) {
-      return emptyModel(metaData.getName(), metaData.getDialect(), ImmutableList.of(reportMissingCopybooks(metaData)));
+      return emptyModel(metaData.getCopybookName(), ImmutableList.of(reportMissingCopybooks(metaData)));
     }
 
     return new ResultWithErrors<>(copybook, ImmutableList.of());
@@ -248,14 +247,14 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
 
   protected Consumer<NamedSubContext> addCopybookUsage(CopybookMetaData metaData) {
     return copybooks ->
-        copybooks.addUsage(metaData.getName(), metaData.getNameLocality().toLocation());
+        copybooks.addUsage(metaData.getCopybookName().getProcessingName(), metaData.getNameLocality().toLocation());
   }
 
   protected Consumer<NamedSubContext> addCopybookDefinition(CopybookMetaData metaData, String uri) {
     return copybooks -> {
-      if (!(isEmpty(metaData.getName()) || isEmpty(uri) || isPredefined(uri)))
+      if (!(metaData.getCopybookName() == null || isEmpty(metaData.getCopybookName().getName()) || isEmpty(uri) || isPredefined(uri)))
         copybooks.define(
-            metaData.getName(),
+            metaData.getCopybookName().getProcessingName(),
             new Location(uri, new Range(new Position(0, 0), new Position(0, 0))));
     };
   }
@@ -281,7 +280,7 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
             .locality(metaData.getNameLocality())
             .suggestion(
                 messageService.getMessage(
-                    "GrammarPreprocessorListener.errorSuggestion", metaData.getName()))
+                    "GrammarPreprocessorListener.errorSuggestion", metaData.getCopybookName().getName()))
             .severity(ERROR)
             .errorCode(MISSING_COPYBOOK)
             .build();
@@ -290,12 +289,12 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
   }
 
   protected ResultWithErrors<CopybookModel> emptyModel(
-      String copybookName, String dialectType, List<SyntaxError> errors) {
-    return new ResultWithErrors<>(new CopybookModel(copybookName, dialectType, "", ""), errors);
+      CopybookName copybookName, List<SyntaxError> errors) {
+    return new ResultWithErrors<>(new CopybookModel(copybookName, "", ""), errors);
   }
 
   protected SyntaxError addCopybookError(
-      String copybookName,
+      CopybookName copybookName,
       Locality locality,
       ErrorSeverity info,
       String messageID,
@@ -303,7 +302,7 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
     SyntaxError error =
         SyntaxError.syntaxError()
             .severity(info)
-            .suggestion(messageService.getMessage(messageID, copybookName))
+            .suggestion(messageService.getMessage(messageID, copybookName.getName()))
             .locality(locality)
             .build();
     LOG.debug(logMessage, error.toString());
