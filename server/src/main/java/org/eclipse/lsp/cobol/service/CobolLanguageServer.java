@@ -14,15 +14,15 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import org.eclipse.lsp.cobol.core.messages.LocaleStore;
-import org.eclipse.lsp.cobol.core.messages.LogLevelUtils;
-import org.eclipse.lsp.cobol.core.model.ErrorCode;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.messages.LocaleStore;
+import org.eclipse.lsp.cobol.core.messages.LogLevelUtils;
+import org.eclipse.lsp.cobol.core.model.ErrorCode;
+import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -32,12 +32,12 @@ import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
 
 /**
@@ -48,13 +48,14 @@ import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
 @Singleton
 public class CobolLanguageServer implements LanguageServer {
 
+  private final DisposableLSPStateService disposableLSPStateService;
   private TextDocumentService textService;
   private WorkspaceService workspaceService;
   private WatcherService watchingService;
   private SettingsService settingsService;
   private LocaleStore localeStore;
   private CustomThreadPoolExecutor customThreadPoolExecutor;
-  private final DisposableLSPStateService disposableLSPStateService;
+  private Configuration configuration;
 
   @Inject
   CobolLanguageServer(
@@ -64,7 +65,8 @@ public class CobolLanguageServer implements LanguageServer {
       SettingsService settingsService,
       LocaleStore localeStore,
       CustomThreadPoolExecutor customThreadPoolExecutor,
-      DisposableLSPStateService disposableLSPStateService) {
+      DisposableLSPStateService disposableLSPStateService,
+      Configuration configuration) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
@@ -72,6 +74,7 @@ public class CobolLanguageServer implements LanguageServer {
     this.localeStore = localeStore;
     this.customThreadPoolExecutor = customThreadPoolExecutor;
     this.disposableLSPStateService = disposableLSPStateService;
+    this.configuration = configuration;
   }
 
   @Override
@@ -122,6 +125,7 @@ public class CobolLanguageServer implements LanguageServer {
     addLocalFilesWatcher();
     getLocaleFromClient();
     getLogLevelFromClient();
+    configuration.updateConfigurationFromSettings();
   }
 
   private void getLogLevelFromClient() {

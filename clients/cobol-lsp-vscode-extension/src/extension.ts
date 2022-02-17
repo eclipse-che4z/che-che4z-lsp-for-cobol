@@ -14,36 +14,28 @@
 
 import * as vscode from "vscode";
 
-import {editDatasetPaths} from "./commands/EditDatasetPaths";
-import {fetchCopybookCommand} from "./commands/FetchCopybookCommand";
-import {gotoCopybookSettings} from "./commands/OpenSettingsCommand";
-import {C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID} from "./constants";
-import {CopybookDownloadService} from "./services/copybook/CopybookDownloadService";
-import {CopybooksCodeActionProvider} from "./services/copybook/CopybooksCodeActionProvider";
-import {CopybooksPathGenerator} from "./services/copybook/CopybooksPathGenerator";
+import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
+import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
+import { C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID } from "./constants";
+import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
+import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
-import {initSmartTab} from "./commands/SmartTabCommand";
-import {CopybookURI} from "./services/copybook/CopybookURI";
-import {LanguageClientService} from "./services/LanguageClientService";
-import {Middleware} from "./services/Middleware";
-import {PathsService} from "./services/PathsService";
-import {TelemetryService} from "./services/reporter/TelemetryService";
-import {createFileWithGivenPath} from "./services/Settings";
-import {resolveSubroutineURI} from "./services/util/SubroutineUtils";
-import {CommentAction, commentCommand} from "./commands/CommentCommand";
+import { initSmartTab } from "./commands/SmartTabCommand";
+import { LanguageClientService } from "./services/LanguageClientService";
+import { Middleware } from "./services/Middleware";
+import { TelemetryService } from "./services/reporter/TelemetryService";
+import { createFileWithGivenPath } from "./services/Settings";
+import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
+import { CommentAction, commentCommand } from "./commands/CommentCommand";
 
-let copybooksPathGenerator: CopybooksPathGenerator;
 let copyBooksDownloader: CopybookDownloadService;
-let pathsService: PathsService;
 let middleware: Middleware;
 let languageClientService: LanguageClientService;
 
 function initialize() {
     // We need lazy initialization to be able to mock this for unit testing
-    copybooksPathGenerator = new CopybooksPathGenerator();
-    copyBooksDownloader = new CopybookDownloadService(copybooksPathGenerator);
-    pathsService = new PathsService();
-    middleware = new Middleware(new CopybookURI(), copyBooksDownloader);
+    copyBooksDownloader = new CopybookDownloadService();
+    middleware = new Middleware(copyBooksDownloader);
     languageClientService = new LanguageClientService(middleware);
 }
 
@@ -60,9 +52,6 @@ export async function activate(context: vscode.ExtensionContext) {
         fetchCopybookCommand(copybook, copyBooksDownloader, programName);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.edit-dataset-paths", () => {
-        editDatasetPaths(pathsService);
-    }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings", () => {
         gotoCopybookSettings();
     }));

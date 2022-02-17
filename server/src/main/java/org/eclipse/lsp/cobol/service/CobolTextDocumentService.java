@@ -15,13 +15,9 @@
 package org.eclipse.lsp.cobol.service;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Streams;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -29,7 +25,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
-import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
@@ -51,7 +47,10 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -60,10 +59,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
+import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -97,6 +96,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final HoverProvider hoverProvider;
   private final CFASTBuilder cfastBuilder;
   private final SettingsService settingsService;
+  private final Configuration configuration;
   private DisposableLSPStateService disposableLSPStateService;
 
   @Inject
@@ -114,7 +114,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       HoverProvider hoverProvider,
       CFASTBuilder cfastBuilder,
       DisposableLSPStateService disposableLSPStateService,
-      SettingsService settingsService) {
+      SettingsService settingsService,
+      Configuration configuration) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -127,6 +128,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.cfastBuilder = cfastBuilder;
     this.settingsService = settingsService;
     this.disposableLSPStateService = disposableLSPStateService;
+    this.configuration = configuration;
 
     dataBus.subscribe(this);
   }
@@ -323,7 +325,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @SuppressWarnings("java:S1181")
   private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
-    registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.empty()));
+    registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.builder().build()));
     Future<?> docAnalysisFuture =
         executors
             .getThreadPoolExecutor()
@@ -362,36 +364,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private AnalysisConfig requestConfigs(CopybookProcessingMode processingMode) {
     CopybookConfig copybookConfig = new CopybookConfig(processingMode, SQLBackend.DB2_SERVER);
     try {
-      List<Object> objects =
-          settingsService
-              .getConfigurations(
-                  Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, FLAVORS.label))
-              .get();
-
-      SQLBackend sqlBackend =
-          SettingsService.getValueAsString(objects.subList(0, 1))
-              .map(SQLBackend::valueOf)
-              .orElse(SQLBackend.DB2_SERVER);
-
-      copybookConfig = new CopybookConfig(processingMode, sqlBackend);
-
-      Set<EmbeddedCodeNode.Language> features = new HashSet<>();
-      JsonArray jsonArray = (JsonArray) objects.get(1);
-      for (JsonElement element : jsonArray) {
-        String feature = element.getAsString();
-        features.add(EmbeddedCodeNode.Language.valueOf(feature));
-      }
-      List<String> flavors = ImmutableList.of();
-      JsonElement flavorsSettings = (JsonElement) objects.get(2);
-      if (flavorsSettings.isJsonArray())
-        flavors =
-            Streams.stream((JsonArray) flavorsSettings)
-                .map(JsonElement::getAsString)
-                .collect(toList());
-      return new AnalysisConfig(features, copybookConfig, flavors);
-    } catch (InterruptedException e) {
-      LOG.error("InterruptedException when getting settings", e);
-      Thread.currentThread().interrupt();
+      return new AnalysisConfig(
+          configuration.getFeatures(),
+          new CopybookConfig(processingMode, configuration.getSqlBackend()),
+          configuration.getFlavors());
     } catch (Exception e) {
       LOG.warn("Can't get config-data, default config will be used instead");
     }
@@ -434,27 +410,33 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   private void publishResult(
       String uri, AnalysisResult result, CopybookProcessingMode copybookProcessingMode) {
-    notifyAnalysisFinished(uri, result.getCopybookUsages(), copybookProcessingMode);
+    notifyAnalysisFinished(uri, extractCopybookUsages(result), copybookProcessingMode);
     communications.cancelProgressNotification(uri);
     communications.publishDiagnostics(result.getDiagnostics());
     if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
   }
 
   private void notifyAnalysisFinished(
-      String uri,
-      Map<String, List<Location>> copybooks,
-      CopybookProcessingMode copybookProcessingMode) {
+      String uri, List<String> copybooks, CopybookProcessingMode copybookProcessingMode) {
     dataBus.postData(
         AnalysisFinishedEvent.builder()
             .documentUri(uri)
-            .copybookUris(
-                ofNullable(copybooks).map(Map::values).orElse(emptyList()).stream()
-                    .flatMap(List::stream)
-                    .map(Location::getUri)
-                    .distinct()
-                    .collect(toList()))
+            .copybookUris(copybooks)
             .copybookProcessingMode(copybookProcessingMode)
             .build());
+  }
+
+  private List<String> extractCopybookUsages(AnalysisResult result) {
+    return result
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(COPY))
+        .map(CopyNode.class::cast)
+        .filter(it -> !it.getUsages().isEmpty())
+        .map(CopyNode::getUsages)
+        .flatMap(List::stream)
+        .map(Location::getUri)
+        .collect(toList());
   }
 
   @Override

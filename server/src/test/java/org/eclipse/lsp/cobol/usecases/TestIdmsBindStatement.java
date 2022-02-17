@@ -49,7 +49,7 @@ class TestIdmsBindStatement {
   private static final String BIND2 =
       DEFS + "           BIND RUN-UNIT DBNODE {$DB1} DICTNAME {$DC1}.\n";
 
-  private static final String BIND3 = DEFS + "           BIND RUN-UNIT\n";
+  private static final String BIND3 = DEFS + "           BIND RUN-UNIT.\n";
 
   private static final String BIND4 = DEFS + "           BIND RUN-UNIT DICTNAME {$DC1}.\n";
 
@@ -66,11 +66,11 @@ class TestIdmsBindStatement {
   private static final String BIND9 =
       DEFS + "           BIND PROCEDURE FOR {$ABCPROC} TO {$DB1}.\n";
 
-  private static final String BIND10 = DEFS + "          BIND {$EMPLOYEE}\n";
+  private static final String BIND10 = DEFS + "          BIND {$EMPLOYEE}.\n";
 
   private static final String BIND11 = DEFS + "          BIND {$EMPLOYEE} TO {$DB1}.\n";
 
-  private static final String BIND12 = DEFS + "          BIND {$DB1} WITH {$EMPLOYEE}\n";
+  private static final String BIND12 = DEFS + "          BIND {$DB1} WITH {$EMPLOYEE}.\n";
 
   private static final String BIND13 =
       DEFS + "           BIND PROCEDURE FOR {$ABCPROCTOOLONG|1} TO {$DB1}.\n";

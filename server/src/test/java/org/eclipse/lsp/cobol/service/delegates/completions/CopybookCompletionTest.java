@@ -16,7 +16,6 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.CompletionItem;
@@ -42,9 +41,7 @@ class CopybookCompletionTest {
   void testCompletionEmptyResult() {
     assertThat(
         completion.getCompletionItems(
-            "smth",
-            new CobolDocumentModel(
-                "", AnalysisResult.builder().copybookUsages(ImmutableMap.of()).build())),
+            "smth", new CobolDocumentModel("", AnalysisResult.builder().build())),
         is(empty()));
   }
 

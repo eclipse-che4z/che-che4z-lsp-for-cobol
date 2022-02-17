@@ -47,6 +47,6 @@ class CopyNodeRangeTest {
         RangeUtils.findNodeByPosition(result.getRootNode(), DOCUMENT_URI, fooUsage).orElse(null);
     assertNotNull(usageNode);
     assertEquals(NodeType.VARIABLE_USAGE, usageNode.getNodeType());
-    assertEquals("FOO", ((VariableUsageNode) usageNode).getDataName());
+    assertEquals("FOO", ((VariableUsageNode) usageNode).getName());
   }
 }

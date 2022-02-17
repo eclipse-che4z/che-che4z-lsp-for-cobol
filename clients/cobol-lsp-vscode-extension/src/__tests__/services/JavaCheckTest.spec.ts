@@ -13,9 +13,9 @@
  */
 
 import * as cp from "child_process";
-import {JavaCheck} from "../services/JavaCheck";
+import {JavaCheck} from "../../services/JavaCheck";
 
-jest.mock("../services/reporter/TelemetryService");
+jest.mock("../../services/reporter/TelemetryService");
 describe("Checks Java version", () => {
     it("If Java version is supported", async () => {
         expect(JavaCheck.isJavaVersionSupported('openjdk version "1.8.0-internal"')).toBeTruthy();

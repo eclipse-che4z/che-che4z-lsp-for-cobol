@@ -109,7 +109,7 @@ public class UseCaseUtils {
             });
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
-    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend())
+    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks())
         .forEach(copybookService::store);
 
     useCase.getCopybooks().stream()
@@ -131,6 +131,6 @@ public class UseCaseUtils {
    */
   public static CopybookModel toCopybookModel(CobolText cobolText) {
     return new CopybookModel(
-        cobolText.getFileName(), toURI(cobolText.getFileName()), cobolText.getFullText());
+        cobolText.getFileName(), cobolText.getDialectType(), toURI(cobolText.getFileName()), cobolText.getFullText());
   }
 }

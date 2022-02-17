@@ -16,14 +16,18 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.PARAGRAPHS;
 import static org.eclipse.lsp4j.CompletionItemKind.Method;
 
@@ -35,7 +39,15 @@ public class ParagraphCompletion implements Completion {
   public @NonNull Collection<CompletionItem> getCompletionItems(
       @NonNull String token, @Nullable CobolDocumentModel document) {
     if (document == null) return emptyList();
-    return document.getAnalysisResult().getParagraphs().stream()
+    return document
+        .getAnalysisResult()
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(PROGRAM))
+        .map(ProgramNode.class::cast)
+        .map(ProgramNode::getParagraphMap)
+        .map(Map::keySet)
+        .flatMap(Collection::stream)
         .filter(DocumentationUtils.startsWithIgnoreCase(token))
         .map(this::toParagraphCompletion)
         .collect(toList());

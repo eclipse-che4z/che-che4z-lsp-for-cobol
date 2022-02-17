@@ -14,9 +14,9 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
-import {C4Z_FOLDER, GITIGNORE_FILE} from "../constants";
-import {createFileWithGivenPath, SettingsService} from "../services/Settings";
-import {SettingsUtils} from "../services/util/SettingsUtils";
+import {C4Z_FOLDER, GITIGNORE_FILE} from "../../constants";
+import {createFileWithGivenPath, SettingsService} from "../../services/Settings";
+import {SettingsUtils} from "../../services/util/SettingsUtils";
 
 const fsPath = "tmp-ws";
 const scheme = "file";
@@ -78,7 +78,7 @@ describe("Validate URI generation for a given workspace folder", () => {
 describe("SettingsService evaluate variables", () => {
     test("Evaluate program_file", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue(["copybook/$program_file"]),
+            get: jest.fn().mockReturnValue(["copybook/${program_file}"]),
         });
         const paths = SettingsService.getCopybookLocalPath("program", "COBOL");
         expect(paths[0]).toEqual("copybook/program")
@@ -86,7 +86,7 @@ describe("SettingsService evaluate variables", () => {
     
     test("Evaluate program_file with extension", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue(["copybook/$program_file"]),
+            get: jest.fn().mockReturnValue(["copybook/${program_file}"]),
         });
         const paths = SettingsService.getCopybookLocalPath("program.cbl", "COBOL");
         expect(paths[0]).toEqual("copybook/program")
@@ -94,7 +94,7 @@ describe("SettingsService evaluate variables", () => {
 
     test("Evaluate program_file with extension and dots", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue(["copybook/$program_file"]),
+            get: jest.fn().mockReturnValue(["copybook/${program_file}"]),
         });
         const paths = SettingsService.getCopybookLocalPath("program.file.cbl", "COBOL");
         expect(paths[0]).toEqual("copybook/program.file")
@@ -115,7 +115,8 @@ describe("SettingsService evaluate variables", () => {
             get: tracking
         });
         SettingsService.getCopybookLocalPath("PROGRAM", "MAID");
-        expect(tracking).toBeCalledWith("paths-local.maid")
+        expect(tracking).toBeCalledWith("maid.paths-local")
     });
 
 });
+

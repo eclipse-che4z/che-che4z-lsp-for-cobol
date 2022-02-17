@@ -54,6 +54,8 @@ export function createFileWithGivenPath(folderPath: string, fileName: string, pa
  * SettingsService provides read/write configurstion settings functionality
  */
 export class SettingsService {
+
+    public static readonly DEFAULT_DIALECT = "COBOL";
     /**
      * Get list of local subroutine path
      * @returns a list of local subroutine path
@@ -69,15 +71,7 @@ export class SettingsService {
      * @returns a list of local path
      */
     public static getCopybookLocalPath(cobolFileName: string, dialectType: string): string[] {
-        const programFile = cobolFileName.replace(/\.[^/.]+$/, "");
-        if (dialectType !== "COBOL") {
-            const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(`${PATHS_LOCAL_KEY}.${dialectType.toLowerCase()}`);
-            if (pathList && pathList.length > 0) {
-                return SettingsService.evaluateVariable(pathList, "program_file", programFile);
-            }
-        }
-        const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_LOCAL_KEY);
-        return SettingsService.evaluateVariable(pathList, "program_file", programFile);
+        return SettingsService.getCopybookConfigValues(PATHS_LOCAL_KEY, cobolFileName, dialectType);
     }
 
     /**
@@ -89,43 +83,23 @@ export class SettingsService {
     }
 
     /**
-     * Determine if dsn path exists in the configurstion 
-     * @returns true if path exists and false otherwise
-     */
-    public static hasDsnPath(): boolean {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).has(PATHS_ZOWE)        
-    }
-
-    /**
      * Get list of dsn path
+     * @param cobolFileName is a program file name
+     * @param dialectType name of the cobol dialect type
      * @returns a list of dsn path
      */
-    public static getDsnPath(): string[] {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);        
-    }
-
-    /**
-     * Set list of dsn path to the configuration
-     * @param paths is a list of new values
-     */
-    public static setDsnPath(paths: string[]) {
-        vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).update(PATHS_ZOWE, paths);
-    }
-
-    /**
-     * Determine if uss path exists in the configurstion 
-     * @returns true if path exists and false otherwise
-     */
-    public static hasUssPath(): boolean {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).has(PATHS_USS)        
+    public static getDsnPath(cobolFileName: string, dialectType: string): string[] {
+        return SettingsService.getCopybookConfigValues(PATHS_ZOWE, cobolFileName, dialectType);
     }
 
     /**
      * Get list of uss path
+     * @param cobolFileName is a program file name
+     * @param dialectType name of the cobol dialect type
      * @returns a list of uss path
      */
-    public static getUssPath(): string[] {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_USS)
+    public static getUssPath(cobolFileName: string, dialectType: string): string[] {
+        return SettingsService.getCopybookConfigValues(PATHS_USS, cobolFileName, dialectType);
     }
 
     /**
@@ -136,18 +110,30 @@ export class SettingsService {
         return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles")
     }
 
-    /**
-     * Determine if confuguration is invalid
-     * @returns true if configurstion is invalid and false otherwise
-     */
-    public static isConfigurationInvalid() {
-        return !SettingsService.hasDsnPath() &&
-            !SettingsService.hasUssPath();
-    }
-
     private static evaluateVariable(dataList: string[], variable: string, value: string): string[] {
         const result: string[] = [];
-        dataList.forEach(d => result.push(d.replace("$" + variable, value)))
+        if (dataList) {
+            dataList.forEach(d => result.push(d.replace(`$\{${variable}\}`, value)))
+        }
         return result;
+    }
+
+    /**
+     * Return the code page for the copybook file encoding supplied by user
+     * @returns string
+     */
+    public static getCopybookFileEncoding() {
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("copybook-file-encoding")
+    }
+    private static getCopybookConfigValues(section: string, cobolFileName: string, dialectType: string) {
+        const programFile = cobolFileName.replace(/\.[^/.]+$/, "");
+        if (dialectType !== SettingsService.DEFAULT_DIALECT) {
+            const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(`${dialectType.toLowerCase()}.${section}`);
+            if (pathList && pathList.length > 0) {
+                return SettingsService.evaluateVariable(pathList, "program_file", programFile);
+            }
+        }
+        const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(section);
+        return SettingsService.evaluateVariable(pathList, "program_file", programFile);
     }
 }

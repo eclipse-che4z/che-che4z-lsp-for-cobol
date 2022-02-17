@@ -53,6 +53,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private final CopybookService copybookService;
   private final LocaleStore localeStore;
   private final SubroutineService subroutineService;
+  private final Configuration configuration;
   private final DisposableLSPStateService disposableLSPStateService;
 
   @Inject
@@ -63,6 +64,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
       CopybookService copybookService,
       LocaleStore localeStore,
       SubroutineService subroutineService,
+      Configuration configuration,
       DisposableLSPStateService disposableLSPStateService) {
     this.dataBus = dataBus;
     this.settingsService = settingsService;
@@ -70,6 +72,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     this.copybookService = copybookService;
     this.localeStore = localeStore;
     this.subroutineService = subroutineService;
+    this.configuration = configuration;
     this.disposableLSPStateService = disposableLSPStateService;
   }
 
@@ -117,6 +120,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     settingsService
         .getConfiguration(LOGGING_LEVEL.label)
         .thenAccept(LogLevelUtils.updateLogLevel());
+    configuration.updateConfigurationFromSettings();
   }
 
   private void acceptSettingsChange(List<String> localFolders) {

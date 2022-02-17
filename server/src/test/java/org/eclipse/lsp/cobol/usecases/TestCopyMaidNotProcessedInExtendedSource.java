@@ -15,11 +15,15 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.usecases.engine.UseCase;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.junit.jupiter.api.Test;
 
+import static java.util.stream.Collectors.groupingBy;
+import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.DISABLED;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,7 +45,14 @@ class TestCopyMaidNotProcessedInExtendedSource {
     final AnalysisResult res =
         UseCaseUtils.analyze(UseCase.builder().text(TEXT).copybookProcessingMode(DISABLED).build());
     assertTrue(res.getDiagnostics().get(DOCUMENT_URI).isEmpty());
-    assertTrue(res.getCopybookUsages().isEmpty());
-    assertTrue(res.getCopybookDefinitions().isEmpty());
+    assertTrue(
+        res.getRootNode()
+            .getDepthFirstStream()
+            .filter(hasType(COPY))
+            .map(CopyNode.class::cast)
+            .filter(it -> !it.getUsages().isEmpty())
+            .collect(groupingBy(CopyNode::getName))
+            .keySet()
+            .isEmpty());
   }
 }

@@ -37,14 +37,14 @@ public class VariableUsageUtils {
    */
   public static List<VariableNode> findVariablesForUsage(
       Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usageNodes) {
-    return definedVariables.get(usageNodes.get(0).getDataName()).stream()
+    return definedVariables.get(usageNodes.get(0).getName()).stream()
         .filter(it -> checkParents(it, usageNodes.subList(1, usageNodes.size())))
         .collect(Collectors.toList());
   }
 
   private static boolean checkParents(VariableNode variable, List<VariableUsageNode> parents) {
     for (VariableUsageNode parent : parents) {
-      String parentName = parent.getDataName();
+      String parentName = parent.getName();
       do {
         variable = variable.getNearestParentByType(NodeType.VARIABLE)
             .map(VariableNode.class::cast)
