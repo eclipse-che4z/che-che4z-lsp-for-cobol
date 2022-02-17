@@ -23,6 +23,10 @@ import org.eclipse.lsp4j.Range;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
+
 /** CF tree builder implementation */
 public class CFASTBuilderImpl implements CFASTBuilder {
   private static final int SNIPPET_LENGTH = 10;
@@ -33,7 +37,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     if (rootNode == null) {
       return result;
     }
-    for (Node node : rootNode.getChildren()) {
+    for (Node node : rootNode.getChildren().stream().filter(hasType(PROGRAM)).collect(toList())) {
       traverse((ProgramNode) node, result.getControlFlowAST());
     }
     return result;
