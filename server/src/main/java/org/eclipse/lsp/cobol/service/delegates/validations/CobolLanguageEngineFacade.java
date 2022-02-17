@@ -21,7 +21,8 @@ import org.eclipse.lsp.cobol.core.model.ErrorCode;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -36,6 +37,9 @@ import java.util.function.Function;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
+import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
  * This class is a facade that maps the result of the syntax and semantic analysis to a model
@@ -82,13 +86,23 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     return text.length() <= FIRST_LINE_SEQ_AND_EXTRA_OP;
   }
 
-  private AnalysisResult toAnalysisResult(ResultWithErrors<SemanticContext> result, String uri) {
-    SemanticContext context = result.getResult();
+  private AnalysisResult toAnalysisResult(ResultWithErrors<Node> result, String uri) {
+    Node rootNode = result.getResult();
     return AnalysisResult.builder()
         .diagnostics(
             collectDiagnosticsForAffectedDocuments(
-                convertErrors(result.getErrors()), context.getCopybookDefinitions(), uri))
-        .rootNode(context.getRootNode())
+                convertErrors(result.getErrors()),
+                rootNode
+                    .getDepthFirstStream()
+                    .filter(hasType(COPY))
+                    .map(CopyNode.class::cast)
+                    .map(CopyNode::getDefinitions)
+                    .flatMap(Collection::stream)
+                    .map(Location::getUri)
+                    .filter(it -> !it.startsWith(PREF_IMPLICIT))
+                    .collect(toList()),
+                uri))
+        .rootNode(rootNode)
         .build();
   }
 
@@ -98,19 +112,14 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
    * errors after the previous analysis.
    *
    * @param diagnostics - list of found syntax and semantic errors
-   * @param copybookDefinitions - list of copybook definitions used in this analysis
+   * @param copybookUris - URIs of copybook definitions used in this analysis
    * @param uri - current document URI
    * @return map with file URI as a key, and lists of diagnostics as values
    */
   private Map<String, List<Diagnostic>> collectDiagnosticsForAffectedDocuments(
-      Map<String, List<Diagnostic>> diagnostics,
-      Map<String, Collection<Location>> copybookDefinitions,
-      String uri) {
+      Map<String, List<Diagnostic>> diagnostics, List<String> copybookUris, String uri) {
     Map<String, List<Diagnostic>> result = new HashMap<>(diagnostics);
-    copybookDefinitions.values().stream()
-        .flatMap(Collection::stream)
-        .map(Location::getUri)
-        .forEach(it -> result.putIfAbsent(it, emptyList()));
+    copybookUris.forEach(it -> result.putIfAbsent(it, emptyList()));
     result.putIfAbsent(uri, emptyList());
     return result;
   }
