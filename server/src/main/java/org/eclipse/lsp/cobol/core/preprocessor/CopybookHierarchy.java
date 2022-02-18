@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor;
 
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
@@ -37,19 +38,7 @@ public class CopybookHierarchy {
   private final Deque<CopybookUsage> copybookStack = new ArrayDeque<>();
   private final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack = new ArrayDeque<>();
 
-  @Setter private CopyStatementModifier modifier = null;
-
-  /**
-   * Return the specified copy statement modifier if exists or null, and sets the current value to
-   * null
-   *
-   * @return a copy statement modifier for this copybook or null.
-   */
-  public CopyStatementModifier takeCopyStatementModifier() {
-    CopyStatementModifier res = modifier;
-    modifier = null;
-    return res;
-  }
+  @Setter @Getter private CopyStatementModifier modifier = null;
 
   /**
    * Check if the replacing is required
@@ -105,12 +94,11 @@ public class CopybookHierarchy {
   /**
    * Check if there already is a copybook with the given name in the hierarchy
    *
-   * @param copybookName name to check
+   * @param name CopybookName to check
    * @return true if a copybook with this name is already in the stack
    */
-  public boolean hasRecursion(String copybookName) {
-    return copybookStack.stream().map(CopybookUsage::getName)
-        .map(CopybookName::getProcessingName).anyMatch(copybookName::equals);
+  public boolean hasRecursion(CopybookName name) {
+    return copybookStack.stream().map(CopybookUsage::getName).anyMatch(name::equals);
   }
 
   /**
