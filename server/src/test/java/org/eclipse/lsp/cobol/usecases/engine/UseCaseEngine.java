@@ -20,6 +20,7 @@ import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
@@ -31,11 +32,9 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
@@ -197,18 +196,33 @@ public class UseCaseEngine {
                 .flavors(analysisConfig.getFlavors())
                 .build());
     TestData expected = document.getTestData();
-    assertResultEquals(actual, expected);
+    if (copybooks.isEmpty()) {
+      assertResultEquals(actual, expected, UseCaseEngine::normalize);
+    } else {
+      assertResultEquals(actual, expected);
+    }
     return actual;
   }
 
+  private Map<String, List<Location>> normalize(Map<String, List<Location>> map) {
+    Map<String, List<Location>> result = new HashMap<>();
+    map.forEach((k, v) -> result.put(CopybookName.extractName(k), v));
+    return result;
+  }
+
   private static void assertResultEquals(AnalysisResult actual, TestData expected) {
+    assertResultEquals(actual, expected, (map) -> map);
+  }
+
+  private static void assertResultEquals(AnalysisResult actual, TestData expected,
+                                         Function<Map<String, List<Location>>, Map<String, List<Location>>> normalize) {
     assertDiagnostics(expected.getDiagnostics(), actual.getDiagnostics());
 
     assertResult(
         "Copybook definitions:",
         expected.getCopybookDefinitions(),
         extractCopybookDefinitions(actual));
-    assertResult("Copybook usages:", expected.getCopybookUsages(), extractCopybookUsages(actual));
+    assertResult("Copybook usages:", normalize.apply(expected.getCopybookUsages()), normalize.apply(extractCopybookUsages(actual)));
 
     assertResult(
         "Variable definition:",

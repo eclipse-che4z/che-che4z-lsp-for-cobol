@@ -29,10 +29,9 @@ import org.eclipse.lsp.cobol.service.CopybookConfig;
 @Value
 @Builder
 class CopybookMetaData {
-  String name;
+  CopybookName copybookName;
   String copybookId;
   String documentUri;
-  String dialect;
   CopybookConfig config;
   ParserRuleContext context;
   Locality contextLocality;
@@ -44,6 +43,6 @@ class CopybookMetaData {
    * @return according copybook usage
    */
   CopybookUsage toCopybookUsage() {
-    return new CopybookUsage(name, copybookId, nameLocality);
+    return new CopybookUsage(copybookName, copybookId, nameLocality);
   }
 }

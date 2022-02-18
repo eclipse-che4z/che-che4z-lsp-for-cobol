@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model;
 
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 
 /**
  * This value class describes a usage of a copybook inside a COPY statement. Here, name is a copybook
@@ -23,7 +24,7 @@ import lombok.Value;
  */
 @Value
 public class CopybookUsage {
-  private String name;
-  private String copybookId;
-  private Locality locality;
+  CopybookName name;
+  String copybookId;
+  Locality locality;
 }

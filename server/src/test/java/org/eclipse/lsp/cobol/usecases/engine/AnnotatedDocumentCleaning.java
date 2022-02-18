@@ -20,6 +20,7 @@ import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.service.SQLBackend;
@@ -62,7 +63,9 @@ class AnnotatedDocumentCleaning {
       Map<String, Diagnostic> expectedDiagnostics,
       SQLBackend sqlBackend) {
     List<String> copybookNames =
-        explicitCopybooks.stream().map(CobolText::getFileName).collect(toList());
+        explicitCopybooks.stream().map(CobolText::getCopybookName)
+            .map(CopybookName::getProcessingName)
+            .collect(toList());
     TestData testData =
         processDocument(
             text,
@@ -72,7 +75,7 @@ class AnnotatedDocumentCleaning {
             expectedDiagnostics,
             copybookNames,
             sqlBackend,
-            DialectType.COBOL.name());
+            explicitCopybooks.stream().findFirst().map(CobolText::getDialectType).orElse(DialectType.COBOL.name()));
 
     return new PreprocessedDocument(
         testData.getText(),
@@ -92,7 +95,9 @@ class AnnotatedDocumentCleaning {
     return Stream.concat(
         explicitCopybooks.stream(),
         collectUsedPredefinedCopybooks(
-            usedCopybooks.keySet(),
+            usedCopybooks.keySet().stream()
+                .map(CopybookName::extractName)
+                .collect(Collectors.toSet()),
             explicitCopybooks.stream().map(CobolText::getFileName).collect(Collectors.toList()),
             sqlBackend));
   }

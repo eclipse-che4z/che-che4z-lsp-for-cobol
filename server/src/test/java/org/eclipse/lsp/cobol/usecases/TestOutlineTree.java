@@ -155,7 +155,7 @@ class TestOutlineTree {
 
   private List<DocumentSymbol> getExpectedOutlineNodes() {
     return nested(
-        node("COPY FOO", NodeType.COPYBOOK),
+        node("COPY FOO#COBOL", NodeType.COPYBOOK),
         node(
             "PROGRAM: HELLO-WORLD",
             NodeType.PROGRAM,
@@ -176,14 +176,14 @@ class TestOutlineTree {
                             "WORKING-STORAGE SECTION",
                             NodeType.SECTION,
                             nested(
-                                node("COPY BAR", NodeType.COPYBOOK),
+                                node("COPY BAR#COBOL", NodeType.COPYBOOK),
                                 node("USER-NUM1", NodeType.FIELD),
                                 node("USER-NUM2", NodeType.FIELD),
                                 node(
                                     "USER-ADDRESS",
                                     NodeType.STRUCT,
                                     nested(
-                                        node("COPY BAZ", NodeType.COPYBOOK),
+                                        node("COPY BAZ#COBOL", NodeType.COPYBOOK),
                                         node("USER-CITY", NodeType.FIELD),
                                         node("USER-COUNTRY", NodeType.FIELD),
                                         node("USER-INDEX", NodeType.FIELD),

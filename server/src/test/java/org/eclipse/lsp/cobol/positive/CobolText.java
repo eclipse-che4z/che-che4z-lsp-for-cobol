@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.positive;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 
 /** This class is used to represent a COBOL program text. */
 @Value
@@ -35,5 +36,9 @@ public class CobolText {
   @Override
   public String toString() {
     return fileName;
+  }
+
+  public CopybookName getCopybookName() {
+    return new CopybookName(fileName, dialectType);
   }
 }
