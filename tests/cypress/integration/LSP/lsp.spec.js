@@ -125,7 +125,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152080 Find all references from the word middle', () => {
-    it(['smoke', 'CI'], 'Checks that LSP can find all references and navigate by them', () => {
+    it(['smoke', 'investigation'], 'Checks that LSP can find all references and navigate by them', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(21).findText('User-Address.').goToDefinition();
       cy.get('.zone-widget .monaco-tl-contents')
