@@ -21,6 +21,7 @@ import com.google.inject.Injector;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
@@ -131,6 +132,6 @@ public class UseCaseUtils {
    */
   public static CopybookModel toCopybookModel(CobolText cobolText) {
     return new CopybookModel(
-        cobolText.getFileName(), cobolText.getDialectType(), toURI(cobolText.getFileName()), cobolText.getFullText());
+        new CopybookName(cobolText.getFileName(), cobolText.getDialectType()), toURI(cobolText.getFileName()), cobolText.getFullText());
   }
 }

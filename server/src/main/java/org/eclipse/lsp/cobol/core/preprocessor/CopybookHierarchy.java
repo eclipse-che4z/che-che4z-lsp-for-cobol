@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -115,7 +116,8 @@ public class CopybookHierarchy {
    * @return true if a copybook with this name is already in the stack
    */
   public boolean hasRecursion(String copybookName) {
-    return copybookStack.stream().map(CopybookUsage::getName).anyMatch(copybookName::equals);
+    return copybookStack.stream().map(CopybookUsage::getName)
+        .map(CopybookName::getProcessingName).anyMatch(copybookName::equals);
   }
 
   /**

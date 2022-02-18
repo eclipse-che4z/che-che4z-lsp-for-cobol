@@ -55,7 +55,7 @@ class CobolAnalysis extends AbstractCopybookAnalysis {
     if (hierarchy.containsRecursiveReplacement())
       errors.add(
           addCopybookError(
-              metaData.getName(),
+              metaData.getCopybookName(),
               metaData.getNameLocality(),
               ERROR,
               "GrammarPreprocessorListener.copyBkNestedReplaceStmt",

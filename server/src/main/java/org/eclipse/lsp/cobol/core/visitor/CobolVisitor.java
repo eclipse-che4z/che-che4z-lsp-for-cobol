@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.core.visitor;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -32,7 +33,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
+import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToOnOffStatement;
@@ -44,7 +48,6 @@ import org.eclipse.lsp.cobol.core.model.variables.SectionType;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp4j.Location;
@@ -76,7 +79,7 @@ import static org.eclipse.lsp.cobol.service.SubroutineService.IMPLICIT_SUBROUTIN
 @Slf4j
 public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
-  private final List<SyntaxError> errors = new ArrayList<>();
+  @Getter private final List<SyntaxError> errors = new ArrayList<>();
   private final Multimap<String, Location> subroutineUsages = HashMultimap.create();
   private final NamedSubContext copybooks;
   private final CommonTokenStream tokenStream;
@@ -108,37 +111,24 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     this.flavorNodes = flavorNodes;
   }
 
-  /**
-   * Get the semantic context of the document as an output of th semantic analysis
-   *
-   * @return the semantic context of the document, containing all the definitions and usages of
-   *     paragraphs, variables and copybooks
-   */
-  @NonNull
-  public ResultWithErrors<SemanticContext> finishAnalysis() {
-    return new ResultWithErrors<>(
-        SemanticContext.builder()
-            .copybookDefinitions(copybooks.getDefinitions().asMap())
-            .copybookUsages(copybooks.getUsages().asMap())
-            .subroutinesDefinitions(getSubroutineDefinition())
-            .subroutinesUsages(subroutineUsages.asMap())
-            .build(),
-        errors);
-  }
-
   @Override
   public List<Node> visitStartRule(StartRuleContext ctx) {
     // we can skip the other nodes, but not the root
-    return retrieveRangeLocality(ctx, positions)
-        .map(
-            locality -> {
-              Node rootNode = new RootNode(locality, copybooks);
-              visitChildren(ctx).forEach(rootNode::addChild);
-              addCopyNodes(rootNode, copybooks.getUsages());
-              addFlavorNode(rootNode);
-              return ImmutableList.of(rootNode);
-            })
-        .orElse(ImmutableList.of());
+    return ImmutableList.of(
+        retrieveRangeLocality(ctx, positions)
+            .map(it -> new RootNode(it, copybooks))
+            .map(
+                rootNode -> {
+                  visitChildren(ctx).forEach(rootNode::addChild);
+                  addCopyNodes(rootNode, copybooks.getUsages());
+                  addFlavorNode(rootNode);
+                  return rootNode;
+                })
+            .orElseGet(
+                () -> {
+                  LOG.warn("The root node for syntax tree was not constructed");
+                  return new RootNode(Locality.builder().build(), copybooks);
+                }));
   }
 
   private void addFlavorNode(Node rootNode) {

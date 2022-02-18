@@ -47,7 +47,7 @@ class TestIdmsReadyStatement {
       DEFS + "          BIND RUN-UNIT.\n" + "          READY {$EMP-AREA}.\n";
 
   private static final String READ3 =
-      DEFS + "          BIND RUN-UNIT.\n" + "          READY {$EMP-AREA} USAGE-MODE UPDATE\n";
+      DEFS + "          BIND RUN-UNIT.\n" + "          READY {$EMP-AREA} USAGE-MODE UPDATE.\n";
 
   private static final String READ4 =
       DEFS + "          BIND RUN-UNIT.\n" + "          READY {$EMP-AREA} USAGE-MODE RETRIEVAL.\n";
@@ -60,12 +60,12 @@ class TestIdmsReadyStatement {
   private static final String READ6 =
       DEFS
           + "          BIND RUN-UNIT.\n"
-          + "          READY {$EMP-AREA} USAGE-MODE EXCLUSIVE UPDATE\n";
+          + "          READY {$EMP-AREA} USAGE-MODE EXCLUSIVE UPDATE.\n";
 
   private static final String READ7 =
       DEFS
           + "          BIND RUN-UNIT.\n"
-          + "          READY {$EMP-AREA-TOO-LONG|1} USAGE-MODE EXCLUSIVE UPDATE\n";
+          + "          READY {$EMP-AREA-TOO-LONG|1} USAGE-MODE EXCLUSIVE UPDATE.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(READ1, READ2, READ3, READ4, READ5, READ6, READ7);

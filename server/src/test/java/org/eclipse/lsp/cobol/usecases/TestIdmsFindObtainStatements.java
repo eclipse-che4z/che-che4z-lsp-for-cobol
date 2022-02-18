@@ -52,9 +52,9 @@ class TestIdmsFindObtainStatements {
 
   private static final String FIND3 = DEFS + "           FIND KEEP ANY {$EMPLOYEE}.\n";
 
-  private static final String FIND4 = DEFS + "           OBTAIN CURRENT {$DEPARTMENT}\n";
+  private static final String FIND4 = DEFS + "           OBTAIN CURRENT {$DEPARTMENT}.\n";
 
-  private static final String FIND5 = DEFS + "           OBTAIN KEEP CURRENT WITHIN {$DEPT-AREA}\n";
+  private static final String FIND5 = DEFS + "           OBTAIN KEEP CURRENT WITHIN {$DEPT-AREA}.\n";
 
   private static final String FIND6 = DEFS + "           FIND DB-KEY IS {$EMPDBK}.\n";
 
@@ -66,12 +66,12 @@ class TestIdmsFindObtainStatements {
   private static final String FIND9 =
       DEFS + "           FIND DB-KEY IS {$EMPDBK} PAGE-INFO {$EMPPGI}.\n";
 
-  private static final String FIND10 = DEFS + "           OBTAIN OWNER WITHIN {$DEPT-EMPLOYEE}\n";
+  private static final String FIND10 = DEFS + "           OBTAIN OWNER WITHIN {$DEPT-EMPLOYEE}.\n";
 
-  private static final String FIND11 = DEFS + "           FIND FIRST WITHIN {$EMP-AREA}\n";
+  private static final String FIND11 = DEFS + "           FIND FIRST WITHIN {$EMP-AREA}.\n";
 
   private static final String FIND12 =
-      DEFS + "           OBTAIN KEEP EXCLUSIVE PRIOR {$DEPARTMENT} WITHIN {$DEPT-AREA}\n";
+      DEFS + "           OBTAIN KEEP EXCLUSIVE PRIOR {$DEPARTMENT} WITHIN {$DEPT-AREA}.\n";
 
   private static final String FIND13 =
       DEFS + "           OBTAIN -10 {$OFFICE} WITHIN {$OFFICE-AREA}.\n";
