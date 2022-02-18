@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.model;
 
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 
 /**
  * This value class represents a resolved copybook. It consists of the copybook name, its URI using
@@ -23,8 +24,7 @@ import lombok.Value;
  */
 @Value
 public class CopybookModel {
-  String name;
-  String dialectType;
+  CopybookName copybookName;
   String uri;
   String content;
 }

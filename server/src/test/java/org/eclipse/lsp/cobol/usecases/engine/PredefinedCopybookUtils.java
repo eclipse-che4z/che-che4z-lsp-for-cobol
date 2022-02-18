@@ -21,6 +21,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.PredefinedCopybooks;
@@ -64,7 +65,7 @@ class PredefinedCopybookUtils {
    */
   List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks) {
     return PredefinedCopybooks.getNames().stream()
-        .map(name -> retrieveModel(name, findDialect(name, copybooks), sqlBackend))
+        .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), sqlBackend))
         .collect(Collectors.toList());
   }
 
@@ -74,8 +75,8 @@ class PredefinedCopybookUtils {
         .orElse(DialectType.COBOL.name());
   }
 
-  private CopybookModel retrieveModel(String name, String dialectType, SQLBackend sqlBackend) {
-    final String uri = retrievePredefinedUri(name, sqlBackend);
+  private CopybookModel retrieveModel(CopybookName copybookName, SQLBackend sqlBackend) {
+    final String uri = retrievePredefinedUri(copybookName.getName(), sqlBackend);
 
     final PreprocessedDocument cleanCopybook =
         AnnotatedDocumentCleaning.prepareDocument(
@@ -84,7 +85,7 @@ class PredefinedCopybookUtils {
             ImmutableList.of(),
             ImmutableMap.of(),
             sqlBackend);
-    return new CopybookModel(name, dialectType, PREF_IMPLICIT + uri, cleanCopybook.getText());
+    return new CopybookModel(copybookName, PREF_IMPLICIT + uri, cleanCopybook.getText());
   }
 
   private String retrievePredefinedUri(String name, SQLBackend sqlBackend) {

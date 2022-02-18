@@ -20,11 +20,11 @@ import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
 /**
  * This test checks the logic of {@link CobolLanguageEngine}. It should first run {@link
  * TextPreprocessor} to clean up the given COBOL text, then apply syntax and semantic analysis. If
- * the text doesn't have any semantic elements, it should return an empty {@link SemanticContext}
+ * the text doesn't have any semantic elements, it should return an empty {@link Node}
  */
 class CobolLanguageEngineTest {
 
@@ -137,7 +137,8 @@ class CobolLanguageEngineTest {
 
     when(preprocessor.cleanUpCode(URI, TEXT))
         .thenReturn(new ResultWithErrors<>(TEXT, ImmutableList.of()));
-    when(preprocessor.processCleanCode(eq(URI), eq(TEXT), eq(cpyConfig), any(CopybookHierarchy.class)))
+    when(preprocessor.processCleanCode(
+            eq(URI), eq(TEXT), eq(cpyConfig), any(CopybookHierarchy.class)))
         .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));
 
     Range outlineRange =
@@ -159,22 +160,18 @@ class CobolLanguageEngineTest {
                         "",
                         ImmutableList.of()))));
 
-    ResultWithErrors<SemanticContext> expected =
+    ResultWithErrors<Node> expected =
         new ResultWithErrors<>(
-            SemanticContext.builder()
-                .rootNode(
-                    new RootNode(
-                        Locality.builder()
-                            .uri(URI)
-                            .range(new Range(new Position(0, 7), new Position(0, 31)))
-                            .token("IDENTIFICATION")
-                            .build(),
-                        new NamedSubContext()))
-                .build(),
+            new RootNode(
+                Locality.builder()
+                    .uri(URI)
+                    .range(new Range(new Position(0, 7), new Position(0, 31)))
+                    .token("IDENTIFICATION")
+                    .build(),
+                new NamedSubContext()),
             ImmutableList.of(error, eofError));
 
-    ResultWithErrors<SemanticContext> actual =
-        engine.run(URI, TEXT, AnalysisConfig.defaultConfig(cpyConfig));
+    ResultWithErrors<Node> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(cpyConfig));
     assertEquals(expected, actual);
 
     // test nullity

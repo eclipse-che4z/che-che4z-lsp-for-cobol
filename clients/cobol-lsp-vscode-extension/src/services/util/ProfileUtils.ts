@@ -10,7 +10,7 @@ export class ProfileUtils {
         zoweExplorerApi.registeredApiTypes().forEach(profileType => {
             availableProfiles = availableProfiles
                 .concat(zoweExplorerApi.getExplorerExtenderApi().getProfilesCache()
-                    .getProfiles(profileType).map(ele => ele.name));
+                    .getProfiles(profileType)?.map(ele => ele.name));
         });
         return ProfileUtils.getValidProfileForCopybookDownload(cobolFileName, availableProfiles);
     }

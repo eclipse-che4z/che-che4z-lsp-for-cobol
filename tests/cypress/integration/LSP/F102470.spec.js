@@ -39,7 +39,7 @@ context('This is F102470 spec', () => {
         .contains('SUB2: Subroutine not found');
     });
 
-    it(['smoke', 'CI'], 'Go to definition for subroutine', () => {
+    it(['smoke', 'investigation'], 'Go to definition for subroutine', () => {
       cy.openFile('CALL.cbl').goToLine(21);
       cy.getLineByNumber(21).findText('SUB1').goToDefinition();
       cy.getCurrentTab().should('contain.text', 'SUB1.cob');

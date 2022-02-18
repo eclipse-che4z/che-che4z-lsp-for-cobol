@@ -64,11 +64,11 @@ spec:
     args: [ "while true; do sleep 1000; done;" ]
     resources:
       limits:
-        memory: "2Gi"
-        cpu: "1"
+        memory: "4Gi"
+        cpu: "3"
       requests:
-        memory: "2Gi"
-        cpu: "1"
+        memory: "4Gi"
+        cpu: "3"
   - name: cypress
     image: cypress/included:8.5.0
     tty: true
@@ -77,18 +77,11 @@ spec:
     resources:
       limits:
         memory: "2Gi"
-        cpu: "800m"
+        cpu: "1"
       requests:
         memory: "2Gi"
-        cpu: "800m"
+        cpu: "1"
 """
-
-def projectName = 'lsp-for-cobol'
-def kubeLabelPrefix = "${projectName}_pod_${env.BUILD_NUMBER}_${env.BRANCH_NAME}"
-        // cleaning the branch name according K8s restrictions
-        .replaceAll(/[^a-zA-Z0-9._-]+/,"").take(52)
-def kubeBuildLabel = "${kubeLabelPrefix}_build"
-def kubeTestLabel = "${kubeLabelPrefix}_test"
 
 boolean isTimeTriggeredBuild() {
     for (currentBuildCause in currentBuild.buildCauses) {
@@ -120,7 +113,6 @@ pipeline {
         stage('Build a package') {
             agent {
                 kubernetes {
-                    label kubeBuildLabel
                     yaml kubernetes_build_config
                 }
             }
@@ -257,7 +249,6 @@ pipeline {
             }
             agent {
                 kubernetes {
-                    label kubeTestLabel
                     yaml kubernetes_test_config
                 }
             }
