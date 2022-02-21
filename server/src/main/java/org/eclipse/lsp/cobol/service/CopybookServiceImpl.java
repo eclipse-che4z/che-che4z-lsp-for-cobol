@@ -108,7 +108,9 @@ public class CopybookServiceImpl implements CopybookService {
       @NonNull String documentUri,
       @NonNull CopybookConfig copybookConfig) {
     try {
-      return copybookCache.get(copybookName.getProcessingName(), () -> resolveSync(copybookName, documentUri, copybookConfig));
+      return copybookCache.get(
+          copybookName.getProcessingName(),
+          () -> resolveSync(copybookName, documentUri, copybookConfig));
     } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
       return new CopybookModel(copybookName, null, null);
@@ -152,11 +154,16 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   @SuppressWarnings("java:S2142")
-  private Optional<String> resolveCopybookFromWorkspace(CopybookName copybookName, String cobolFileName) {
+  private Optional<String> resolveCopybookFromWorkspace(
+      CopybookName copybookName, String cobolFileName) {
     try {
       return SettingsService.getValueAsString(
           settingsService
-              .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName.getName(), copybookName.getDialectType())
+              .getConfiguration(
+                  COPYBOOK_RESOLVE.label,
+                  cobolFileName,
+                  copybookName.getQualifiedName(),
+                  copybookName.getDialectType())
               .get());
     } catch (InterruptedException e) {
       // rethrowing the InterruptedException to interrupt the parent thread.
@@ -180,7 +187,7 @@ public class CopybookServiceImpl implements CopybookService {
     LOG.debug(
         "Trying to resolve predefined copybook {}, using config {}", copybookName, copybookConfig);
     final Optional<CopybookModel> copybookModel =
-        Optional.ofNullable(PredefinedCopybooks.forName(copybookName.getName()))
+        Optional.ofNullable(PredefinedCopybooks.forName(copybookName.getQualifiedName()))
             .map(it -> it.uriForBackend(copybookConfig.getSqlBackend()))
             .map(
                 uri ->
@@ -249,7 +256,7 @@ public class CopybookServiceImpl implements CopybookService {
                           COPYBOOK_DOWNLOAD.label,
                           getUserInteractionType(event.getCopybookProcessingMode()),
                           document,
-                          copybook.getName(),
+                          copybook.getDisplayName(),
                           copybook.getDialectType()))
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);

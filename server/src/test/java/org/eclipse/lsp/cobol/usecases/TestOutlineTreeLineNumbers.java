@@ -48,7 +48,7 @@ class TestOutlineTreeLineNumbers {
 
     Map<String, LineRange> expectedRanges =
         new ImmutableMap.Builder<String, LineRange>()
-            .put("COPY BAR#COBOL", new LineRange(0, 0))
+            .put("COPY BAR", new LineRange(0, 0))
             .put("PROGRAM", new LineRange(1, 5))
             .put("IDENTIFICATION DIVISION", new LineRange(1, 1))
             .put("DATA DIVISION", new LineRange(2, 5))

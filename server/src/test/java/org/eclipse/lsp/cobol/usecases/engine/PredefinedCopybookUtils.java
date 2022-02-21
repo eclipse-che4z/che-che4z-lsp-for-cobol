@@ -76,7 +76,7 @@ class PredefinedCopybookUtils {
   }
 
   private CopybookModel retrieveModel(CopybookName copybookName, SQLBackend sqlBackend) {
-    final String uri = retrievePredefinedUri(copybookName.getName(), sqlBackend);
+    final String uri = retrievePredefinedUri(copybookName.getDisplayName(), sqlBackend);
 
     final PreprocessedDocument cleanCopybook =
         AnnotatedDocumentCleaning.prepareDocument(

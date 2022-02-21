@@ -15,32 +15,34 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
+import lombok.AllArgsConstructor;
 import lombok.Value;
 
 /**
- * This value class represents a copybook name with dialect info
- * context
+ * This value class represents a copybook name with dialect info context. Display name is the name
+ * as it is specified in the original COPY statement. Dialect type is the type of the dialect the
+ * copybook statement belongs to (default is COBOL). Qualified data name is the display name
+ * concatenated with the specified qualifier or usage (part of dialects processing).
  */
 @Value
+@AllArgsConstructor
 public class CopybookName {
-  String name;
+  String displayName;
   String dialectType;
+  String qualifiedName;
 
-  /**
-   * Extract a copybook name from processing copybook name
-   * @param processingName a processing name
-   * @return a copybook name
-   */
-  public static String extractName(String processingName) {
-    int index = processingName.indexOf('#');
-    return index > 0 ? processingName.substring(0,  index) : processingName;
+  public CopybookName(String displayName, String dialectType) {
+    this.displayName = displayName;
+    this.dialectType = dialectType;
+    this.qualifiedName = displayName;
   }
 
   /**
    * Creates a processing copybook name using a name and a dialect type
+   *
    * @return a processing copybook name
    */
   public String getProcessingName() {
-    return String.format("%s#%s", name, dialectType);
+    return String.format("%s#%s", qualifiedName, dialectType);
   }
 }
