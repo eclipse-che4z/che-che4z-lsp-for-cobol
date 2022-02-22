@@ -207,13 +207,13 @@ securityParagraph
 // remarks paragraph
 
 remarksParagraph
-   : {notifyError("cobolParser.remarksUnsupported");} REMARKS DOT_FS? optionalParagraphTermination
+   : REMARKS DOT_FS? optionalParagraphTermination
    ;
 
 // - end of comment entry
 optionalParagraphTermination
    : ~(AUTHOR | CBL| DATE_COMPILED | DATE_WRITTEN | IDENTIFICATION | INSTALLATION
-   | DATA | END | ENVIRONMENT | ID | PROCEDURE | PROCESS | SECURITY | REMARKS)*?
+   | DATA | END | ENVIRONMENT | ID | PROCEDURE | PROCESS | PROGRAM_ID | SECURITY | REMARKS)*?
    ;
 
 // --- environment division --------------------------------------------------------------------
