@@ -1243,7 +1243,8 @@ tableDMLStatement
     ;
 
 getTableStatement
-    : GET TABLE (ANY | SEQ) cobolWord
+    : GET TABLE (ANY | SEQ)
+      {validateExactLength(_input.LT(1).getText(), "table reference", 4);} cobolWord
     ;
 
 sortTableStatement
