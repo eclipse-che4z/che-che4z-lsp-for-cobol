@@ -2331,7 +2331,7 @@
         "body": [
             "ROW START ${1:TBL|TBFnam}."
         ],
-        "description": "[DaCo] ROW START",
+        "description": "[DaCo] Set the line-currency (RCU) to zero in order to be able to process the  \n table sequentially from the beginning.\n After this command is given, the ROW NEXT command can be used to move the\n currency 1 line forward.\n",
         "scope": "cobol"
     },
     "TABLE ROW SAVE": {
@@ -2339,7 +2339,7 @@
         "body": [
             "ROW SAVE ${1:TBLnam} IN ${2:value}."
         ],
-        "description": "[DaCo] ROW SAVE",
+        "description": "[DaCo] Place the TB-1 in TB-n with the offered value and save the RCU of this line.\n The offered value must be 2, 3 or 4.\n The TB-n table lines can be used in the program logic (eg calculate manupulations) involving multiple table lines.\n",
         "scope": "cobol"
     },
     "TABLE ROW RESTORE": {
