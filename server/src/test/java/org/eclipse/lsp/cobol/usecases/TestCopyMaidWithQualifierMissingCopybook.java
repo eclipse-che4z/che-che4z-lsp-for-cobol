@@ -57,7 +57,7 @@ class TestCopyMaidWithQualifierMissingCopybook {
             "2",
             new Diagnostic(
                 null,
-                "ABCDEFG123: Copybook not found",
+                "ABCDEFG123_ABC: Copybook not found",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText(),
                 "MISSING_COPYBOOK"),

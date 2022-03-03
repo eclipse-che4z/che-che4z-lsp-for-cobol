@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
@@ -40,8 +41,8 @@ class PredefinedCopybookAnalysis extends AbstractCopybookAnalysis {
   }
 
   @Override
-  protected String retrieveCopybookName(ParserRuleContext ctx) {
-    return DFHEIBLC.name();
+  protected CopybookName retrieveCopybookName(ParserRuleContext ctx, String dialect, CopybookHierarchy hierarchy) {
+    return new CopybookName(DFHEIBLC.name(), dialect);
   }
 
   @Override

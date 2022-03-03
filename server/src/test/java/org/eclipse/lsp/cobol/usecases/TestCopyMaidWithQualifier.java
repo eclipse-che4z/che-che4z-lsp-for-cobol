@@ -44,6 +44,8 @@ class TestCopyMaidWithQualifier {
   @Test
   void test() {
     UseCaseEngine.runTest(
-        TEXT, ImmutableList.of(new CobolText(COPYBOOK_NAME, DialectType.MAID.name(), COPYBOOK)), ImmutableMap.of());
+        TEXT,
+        ImmutableList.of(new CobolText(COPYBOOK_NAME, DialectType.MAID.name(), "ABC", COPYBOOK)),
+        ImmutableMap.of());
   }
 }

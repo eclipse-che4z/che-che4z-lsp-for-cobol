@@ -83,6 +83,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private final List<String> subroutineNames;
   private final Map<String, Diagnostic> expectedDiagnostics;
   private final String dialectType;
+  private final String qualifier;
 
   UseCasePreprocessorListener(
       CommonTokenStream tokens,
@@ -91,13 +92,15 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
       int numberOfLines,
       List<String> subroutineNames,
       Map<String, Diagnostic> expectedDiagnostics,
-      String dialectType) {
+      String dialectType,
+      String qualifier) {
     this.tokens = tokens;
     this.documentUri = documentUri;
     this.copybookName = documentName;
     this.subroutineNames = subroutineNames;
     this.expectedDiagnostics = expectedDiagnostics;
     this.dialectType = dialectType;
+    this.qualifier = qualifier;
     lineShifts = new int[numberOfLines];
     contexts.push(new StringBuilder());
     diagnostics.put(documentUri, new ArrayList<>());
@@ -115,6 +118,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
         peek().toString(),
         copybookName,
         dialectType,
+        qualifier,
         diagnostics,
         variableDefinitions,
         variableUsages,
@@ -125,18 +129,9 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
         getConstantDefinitions(),
         constantUsages,
         copybookDefinitions,
-        remap(copybookUsages),
+        copybookUsages,
         makeSubroutinesDefinitions(subroutineNames),
         subroutineUsages);
-  }
-
-  private Map<String, List<Location>> remap(Map<String, List<Location>> map) {
-    Set<String> keys = new HashSet<>(map.keySet());
-    keys.forEach(k -> {
-      map.put(new CopybookName(k, dialectType).getProcessingName(), map.get(k));
-      map.remove(k);
-    });
-    return map;
   }
 
   @Override
@@ -401,7 +396,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private Consumer<String> defineCopybook(String uri) {
     return copybookName ->
         copybookDefinitions.put(
-            new CopybookName(copybookName, dialectType).getProcessingName(),
+            new CopybookName(copybookName, dialectType).getDisplayName(),
             singletonList(new Location(uri, new Range(new Position(0, 0), new Position(0, 0)))));
   }
 

@@ -132,6 +132,11 @@ public class UseCaseUtils {
    */
   public static CopybookModel toCopybookModel(CobolText cobolText) {
     return new CopybookModel(
-        new CopybookName(cobolText.getFileName(), cobolText.getDialectType()), toURI(cobolText.getFileName()), cobolText.getFullText());
+        new CopybookName(
+            cobolText.getFileName()
+                + ofNullable(cobolText.getQualifier()).map(it -> "_" + it).orElse(""),
+            cobolText.getDialectType()),
+        toURI(cobolText.getFileName()),
+        cobolText.getFullText());
   }
 }

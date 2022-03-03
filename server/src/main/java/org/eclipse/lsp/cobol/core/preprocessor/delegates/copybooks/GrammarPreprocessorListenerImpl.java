@@ -174,10 +174,11 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyIdmsStatement(@NonNull CopyIdmsStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    Optional.ofNullable(ctx.LEVEL_NUMBER())
+    ofNullable(ctx.LEVEL_NUMBER())
         .map(ParseTree::getText)
         .map(Integer::parseInt)
-        .ifPresent(hierarchy::setLevelNumber);
+        .map(CopyStatementModifier::new)
+        .ifPresent(hierarchy::setModifier);
     analyzeCopybook(
         DIALECT, ctx, ctx.copyIdmsOptions().copyIdmsSource().copySource(), DialectType.IDMS);
   }
@@ -192,16 +193,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (requiresEarlyReturn(ctx)) return;
     final Optional<TerminalNode> levelNumber = ofNullable(ctx.LEVEL_NUMBER());
     final CopySourceContext copySource = ctx.copySource();
-    if (levelNumber.isPresent())
-      levelNumber
-          .map(ParseTree::getText)
-          .map(Integer::parseInt)
-          .ifPresent(
-              it -> {
-                hierarchy.setLevelNumber(it);
-                analyzeCopybook(DIALECT, ctx, copySource, DialectType.MAID);
-              });
-    else analyzeCopybook(SKIPPING, ctx, copySource, DialectType.MAID);
+    if (levelNumber.isPresent()) {
+      hierarchy.setModifier(
+          new CopyStatementModifier(
+              levelNumber.map(ParseTree::getText).map(Integer::parseInt).orElse(0),
+              ofNullable(ctx.qualifier()).map(ParseTree::getText).orElse(null)));
+      analyzeCopybook(DIALECT, ctx, copySource, DialectType.MAID);
+    } else analyzeCopybook(SKIPPING, ctx, copySource, DialectType.MAID);
   }
 
   @Override

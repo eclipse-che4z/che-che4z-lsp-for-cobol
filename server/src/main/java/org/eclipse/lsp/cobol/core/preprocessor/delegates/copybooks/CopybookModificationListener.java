@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.core.CobolParserBaseListener;
+import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 
 import java.util.ArrayDeque;
@@ -25,16 +26,16 @@ import java.util.Deque;
 
 import static org.eclipse.lsp.cobol.core.CobolParser.LevelNumberContext;
 
-/** This listener adjusts the variable level numbers of copybooks */
-public class LevelNumberAdjustingListener extends CobolParserBaseListener
+/** This listener adjusts the variable level numbers and apply other modifications of copybooks */
+public class CopybookModificationListener extends CobolParserBaseListener
     implements PreprocessorStack {
   private final Deque<StringBuilder> accumulator = new ArrayDeque<>();
   private final BufferedTokenStream tokens;
-  private final int copybookNumber;
+  private final CopyStatementModifier modifier;
   private int difference = Integer.MIN_VALUE;
 
-  public LevelNumberAdjustingListener(int copybookNumber, BufferedTokenStream tokens) {
-    this.copybookNumber = copybookNumber;
+  public CopybookModificationListener(CopyStatementModifier modifier, BufferedTokenStream tokens) {
+    this.modifier = modifier;
     this.tokens = tokens;
     accumulator.add(new StringBuilder());
   }
@@ -42,7 +43,7 @@ public class LevelNumberAdjustingListener extends CobolParserBaseListener
   @Override
   public void exitLevelNumber(LevelNumberContext ctx) {
     int number = Integer.parseInt(pop());
-    if (difference == Integer.MIN_VALUE) difference = copybookNumber - number;
+    if (difference == Integer.MIN_VALUE) difference = modifier.getLevelNumber() - number;
     write(String.format("%02d", number + difference));
   }
 
