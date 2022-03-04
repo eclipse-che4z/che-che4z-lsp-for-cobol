@@ -22,14 +22,17 @@ import lombok.Value;
 public class CopyStatementModifier {
   int levelNumber;
   String qualifier;
+  String suffix;
 
   public CopyStatementModifier(int levelNumber) {
     this.levelNumber = levelNumber;
     qualifier = null;
+    suffix = "";
   }
 
-  public CopyStatementModifier(int levelNumber, String qualifier) {
+  public CopyStatementModifier(int levelNumber, String qualifier, String suffix) {
     this.levelNumber = levelNumber;
     this.qualifier = qualifier;
+    this.suffix = suffix;
   }
 }

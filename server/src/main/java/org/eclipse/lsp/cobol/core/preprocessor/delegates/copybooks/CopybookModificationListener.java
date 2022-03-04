@@ -24,7 +24,9 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import static org.eclipse.lsp.cobol.core.CobolParser.EntryNameContext;
 import static org.eclipse.lsp.cobol.core.CobolParser.LevelNumberContext;
+import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.FILLER_VARIABLE_NAME;
 
 /** This listener adjusts the variable level numbers and apply other modifications of copybooks */
 public class CopybookModificationListener extends CobolParserBaseListener
@@ -32,11 +34,14 @@ public class CopybookModificationListener extends CobolParserBaseListener
   private final Deque<StringBuilder> accumulator = new ArrayDeque<>();
   private final BufferedTokenStream tokens;
   private final CopyStatementModifier modifier;
+  private final String suffix;
   private int difference = Integer.MIN_VALUE;
 
-  public CopybookModificationListener(CopyStatementModifier modifier, BufferedTokenStream tokens) {
+  public CopybookModificationListener(
+      CopyStatementModifier modifier, String suffix, BufferedTokenStream tokens) {
     this.modifier = modifier;
     this.tokens = tokens;
+    this.suffix = suffix;
     accumulator.add(new StringBuilder());
   }
 
@@ -45,6 +50,26 @@ public class CopybookModificationListener extends CobolParserBaseListener
     int number = Integer.parseInt(pop());
     if (difference == Integer.MIN_VALUE) difference = modifier.getLevelNumber() - number;
     write(String.format("%02d", number + difference));
+  }
+
+  @Override
+  public void enterEntryName(EntryNameContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitEntryName(EntryNameContext ctx) {
+    final String name = pop().trim();
+    write(TokenUtils.retrieveHiddenTextToLeft(ctx.getSourceInterval().a, tokens));
+    write(nameShouldRemain(name) ? name : replaceSuffix(name));
+  }
+
+  private boolean nameShouldRemain(String name) {
+    return suffix.isEmpty() || FILLER_VARIABLE_NAME.equalsIgnoreCase(name);
+  }
+
+  private String replaceSuffix(String name) {
+    return (name.length() > 1 ? name.substring(0, name.length() - 2) : "") + suffix;
   }
 
   @Override

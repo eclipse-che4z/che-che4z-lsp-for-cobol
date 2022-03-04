@@ -15,9 +15,7 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.eclipse.lsp.cobol.core.CobolLexer;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
@@ -26,18 +24,19 @@ import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.CopybookModificationListener;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.CobolParserUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.service.CopybookService;
 
 import static java.util.Optional.ofNullable;
+import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.MAID_WRK_QUALIFIER;
 
 /**
  * This implementation of the {@link AbstractCopybookAnalysis} provides the logic and the default
  * parameters for the copybook analysis, required by the COBOL dialects.
  */
 class DialectCopybookAnalysis extends AbstractCopybookAnalysis {
-
-  public static final String MAID_WRK_QUALIFIER = "WRK";
 
   DialectCopybookAnalysis(
       TextPreprocessor preprocessor,
@@ -72,19 +71,11 @@ class DialectCopybookAnalysis extends AbstractCopybookAnalysis {
       return ResultWithErrors.of(text);
     }
 
-    Lexer lexer = new CobolLexer(CharStreams.fromString(text));
-    lexer.removeErrorListeners();
-
-    BufferedTokenStream tokens = new CommonTokenStream(lexer);
-
-    CobolParser parser = new CobolParser(tokens);
-    parser.removeErrorListeners();
-
-    RuleContext startRule = parser.dataDescriptionEntries();
-
-    ParseTreeWalker walker = new ParseTreeWalker();
-    CopybookModificationListener listener = new CopybookModificationListener(modifier, tokens);
-    walker.walk(listener, startRule);
-    return ResultWithErrors.of(listener.accumulate());
+    return ResultWithErrors.of(
+        CobolParserUtils.parse(
+            text,
+            tokens -> new CopybookModificationListener(modifier, modifier.getSuffix(), tokens),
+            CobolParser::dataDescriptionEntries,
+            PreprocessorStack::accumulate));
   }
 }
