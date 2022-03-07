@@ -25,12 +25,21 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.Copy
 public class CobolText {
   String fileName;
   String dialectType;
+  String qualifier;
   String fullText;
 
   public CobolText(String fileName, String fullText) {
     this.fileName = fileName;
     this.fullText = fullText;
     this.dialectType = DialectType.COBOL.name();
+    this.qualifier = null;
+  }
+
+  public CobolText(String fileName, String dialectType, String fullText) {
+    this.fileName = fileName;
+    this.dialectType = dialectType;
+    this.fullText = fullText;
+    this.qualifier = null;
   }
 
   @Override

@@ -63,7 +63,8 @@ class AnnotatedDocumentCleaning {
       Map<String, Diagnostic> expectedDiagnostics,
       SQLBackend sqlBackend) {
     List<String> copybookNames =
-        explicitCopybooks.stream().map(CobolText::getCopybookName)
+        explicitCopybooks.stream()
+            .map(CobolText::getCopybookName)
             .map(CopybookName::getProcessingName)
             .collect(toList());
     TestData testData =
@@ -75,7 +76,11 @@ class AnnotatedDocumentCleaning {
             expectedDiagnostics,
             copybookNames,
             sqlBackend,
-            explicitCopybooks.stream().findFirst().map(CobolText::getDialectType).orElse(DialectType.COBOL.name()));
+            explicitCopybooks.stream()
+                .findFirst()
+                .map(CobolText::getDialectType)
+                .orElse(DialectType.COBOL.name()),
+            null);
 
     return new PreprocessedDocument(
         testData.getText(),
@@ -95,9 +100,7 @@ class AnnotatedDocumentCleaning {
     return Stream.concat(
         explicitCopybooks.stream(),
         collectUsedPredefinedCopybooks(
-            usedCopybooks.keySet().stream()
-                .map(CopybookName::extractName)
-                .collect(Collectors.toSet()),
+            usedCopybooks.keySet(),
             explicitCopybooks.stream().map(CobolText::getFileName).collect(Collectors.toList()),
             sqlBackend));
   }
@@ -119,7 +122,10 @@ class AnnotatedDocumentCleaning {
     return copybooks
         .map(processCopybook(expectedDiagnostics, explicitCopybooks, sqlBackend))
         .map(collectDataFromCopybooks(testData))
-        .map(it -> new CobolText(it.getCopybookName(), it.getDialectType(), it.getText()))
+        .map(
+            it ->
+                new CobolText(
+                    it.getCopybookName(), it.getDialectType(), it.getQualifier(), it.getText()))
         .collect(toList());
   }
 
@@ -136,7 +142,8 @@ class AnnotatedDocumentCleaning {
             expectedDiagnostics,
             explicitCopybooks,
             sqlBackend,
-            it.getDialectType());
+            it.getDialectType(),
+            it.getQualifier());
   }
 
   private TestData processDocument(
@@ -147,7 +154,8 @@ class AnnotatedDocumentCleaning {
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> explicitCopybooks,
       SQLBackend sqlBackend,
-      String dialectType) {
+      String dialectType,
+      String qualifier) {
     int numberOfLines = text.split("\\R").length;
 
     UseCasePreprocessorLexer lexer = new UseCasePreprocessorLexer(fromString(text));
@@ -167,7 +175,8 @@ class AnnotatedDocumentCleaning {
             numberOfLines,
             subroutineNames,
             expectedDiagnostics,
-            dialectType);
+            dialectType,
+            qualifier);
     new ParseTreeWalker().walk(listener, startRule);
     return listener.getProcessingResult();
   }

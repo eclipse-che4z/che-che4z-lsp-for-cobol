@@ -11,7 +11,7 @@
 
 COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using the Zowe Explorer extension to automatically retrieve copybooks used in your programs and store them in your workspace. 
 
-COBOL Language Support recognizes files with the extensions `.cob` and `.cbl` and `.cobol` as COBOL files and `.cpy` and `.copy` as COBOL copybooks.
+COBOL Language Support recognizes files with the extensions `.cob`, `.cbl` and `.cobol` as COBOL files, and `.cpy` and `.copy` as COBOL copybooks.
 
 > How can we improve COBOL Language Support? [Let us know on our Git repository](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues)
 

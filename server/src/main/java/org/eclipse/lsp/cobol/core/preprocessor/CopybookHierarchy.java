@@ -15,7 +15,10 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 
@@ -35,28 +38,7 @@ public class CopybookHierarchy {
   private final Deque<CopybookUsage> copybookStack = new ArrayDeque<>();
   private final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack = new ArrayDeque<>();
 
-  private int levelNumber;
-
-  /**
-   * Set the level number for the subsequent copybook
-   *
-   * @param levelNumber the level number to adjust the variables
-   */
-  public void setLevelNumber(int levelNumber) {
-    this.levelNumber = levelNumber;
-  }
-
-  /**
-   * Return the specified level number for the copybook and set the current value to 0 to allow only
-   * one adjusting
-   *
-   * @return level number or 0 if not specified
-   */
-  public int takeLevelNumber() {
-    int res = levelNumber;
-    levelNumber = 0;
-    return res;
-  }
+  @Setter @Getter private CopyStatementModifier modifier = null;
 
   /**
    * Check if the replacing is required
@@ -112,12 +94,11 @@ public class CopybookHierarchy {
   /**
    * Check if there already is a copybook with the given name in the hierarchy
    *
-   * @param copybookName name to check
+   * @param name CopybookName to check
    * @return true if a copybook with this name is already in the stack
    */
-  public boolean hasRecursion(String copybookName) {
-    return copybookStack.stream().map(CopybookUsage::getName)
-        .map(CopybookName::getProcessingName).anyMatch(copybookName::equals);
+  public boolean hasRecursion(CopybookName name) {
+    return copybookStack.stream().map(CopybookUsage::getName).anyMatch(name::equals);
   }
 
   /**

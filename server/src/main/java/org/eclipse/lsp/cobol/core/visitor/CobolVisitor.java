@@ -478,6 +478,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitRemarksParagraph(RemarksParagraphContext ctx) {
+    return addTreeNode(ctx, locality -> new RemarksNode(locality));
+  }
+
+  @Override
   public List<Node> visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
     return addTreeNode(
         VariableDefinitionNode.builder()
