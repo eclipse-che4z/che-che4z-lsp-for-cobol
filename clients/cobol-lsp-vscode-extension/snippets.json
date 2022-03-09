@@ -2347,7 +2347,7 @@
         "body": [
             "ROW RESTORE ${1:TBLnam} FROM ${2:value}."
         ],
-        "description": "[DaCo] Place the content of Table \nBuffer-<value> (back) in the \nTable Buffer-1 and put the line \nid of Table Buffer-value in RCU, \nwhere <value> is 2, 3 or 4.\n",
+        "description": "[DaCo] Restore the content of Table \nBuffer-<value> to \nTable Buffer-1 and put the line \nid of Table Buffer-value in RCU, \nwhere <value> is 2, 3 or 4.\n",
         "scope": "cobol"
     },
     "TABLE ROW GET": {
