@@ -69,6 +69,7 @@ public class TestModule extends AbstractModule {
     bind(TextDocumentService.class).to(CobolTextDocumentService.class);
     bind(WatcherService.class).to(WatcherServiceImpl.class);
     bind(FileSystemService.class).to(WorkspaceFileService.class);
+    bind(CopybookNameService.class).to(CopybookNameServiceImpl.class);
     bind(String.class)
         .annotatedWith(named(PATH_TO_TEST_RESOURCES))
         .toProvider(() -> ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));

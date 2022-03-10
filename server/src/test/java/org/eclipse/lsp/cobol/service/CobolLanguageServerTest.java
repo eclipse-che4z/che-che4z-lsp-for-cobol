@@ -69,6 +69,7 @@ class CobolLanguageServerTest {
     WatcherService watchingService = mock(WatcherService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     Configuration configuration = mock(Configuration.class);
+    CopybookNameService copybookNameService = mock(CopybookNameService.class);
 
     JsonArray arr = new JsonArray();
     String path = "foo/bar";
@@ -93,7 +94,8 @@ class CobolLanguageServerTest {
             localeStore,
             customExecutor,
             stateService,
-            configuration);
+            configuration,
+            copybookNameService);
 
     server.initialized(new InitializedParams());
 
@@ -114,7 +116,7 @@ class CobolLanguageServerTest {
   @Test
   void initialize() {
     CobolLanguageServer server =
-        new CobolLanguageServer(null, null, null, null, null, customExecutor, stateService, null);
+        new CobolLanguageServer(null, null, null, null, null, customExecutor, stateService, null, null);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
@@ -134,7 +136,7 @@ class CobolLanguageServerTest {
     TextDocumentService textDocumentService = mock(CobolTextDocumentService.class);
     CobolLanguageServer server =
         new CobolLanguageServer(
-            textDocumentService, null, null, null, null, customExecutor, stateService, null);
+            textDocumentService, null, null, null, null, customExecutor, stateService, null, null);
     assertEquals(1, stateService.getExitCode());
     server.shutdown();
     assertEquals(0, stateService.getExitCode());
