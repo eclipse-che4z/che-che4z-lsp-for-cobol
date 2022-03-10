@@ -2350,6 +2350,14 @@
         "description": "[DaCo] ROW RESTORE",
         "scope": "cobol"
     },
+    "TABLE ROW BUFFER": {
+        "prefix": "ROW BUFFER",
+        "body": [
+            "ROW BUFFER ${1:TBLnam} IS YES."
+        ],
+        "description": "[DaCo] ROW BUFFER",
+        "scope": "cobol"
+    },
     "TABLE ROW GET": {
         "prefix": "ROW GET",
         "body": [
@@ -2653,5 +2661,12 @@
         ],
         "description": "[DaCo] STRING DELETE",
         "scope": "cobol"
+    },
+    "DACO-CONTROL SECTION": {
+        "prefix": "DACO-CONTROL",
+        "body": [
+            "DACO-CONTROL SECTION.",
+            "$0"
+        ]
     }
 }
