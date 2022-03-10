@@ -1259,24 +1259,24 @@ fileDMLStatement
     ;
 
 openFileStatement
-    : OPEN FILE cobolWord (MAX LENGTH (integerLiteral | LAYOUT))?
+    : OPEN FILE daf_file_identifier (MAX LENGTH (qualifiedDataName | integerLiteral | LAYOUT))?
     ;
 
 readFileStatement
-    : READ FILE cobolWord (MAX LENGTH (integerLiteral | LAYOUT))?
+    : READ FILE daf_file_identifier (MAX LENGTH (qualifiedDataName | integerLiteral | LAYOUT))?
     ;
 
 writeFileStatement
-    : WRITE FILE cobolWord (LENGTH integerLiteral)?
+    : WRITE FILE daf_file_identifier (LENGTH (qualifiedDataName | integerLiteral))?
     ;
 
 closeFileStatement
-    : CLOSE FILE (INPUT | OUTPUT) (cobolWord | ALL)
+    : CLOSE FILE (INPUT | OUTPUT) (daf_file_identifier | ALL)
     ;
 
 getFileStatement
     : GET FILE (qualifiedDataName | NONNUMERICLITERAL) INTO qualifiedDataName
-      VOLSER INTO qualifiedDataName
+      (VOLSER INTO qualifiedDataName)?
     ;
 
 stringDMLStatement
@@ -3406,6 +3406,10 @@ daf_string_command
 
 daf_string_identifier
     : qualifiedDataName | literal
+    ;
+
+daf_file_identifier
+    : {validateExactLength(_input.LT(1).getText(), "file reference", 4);} integerLiteral
     ;
 
 // identifier ----------------------------------

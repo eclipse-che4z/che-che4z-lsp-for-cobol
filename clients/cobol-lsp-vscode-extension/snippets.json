@@ -2331,7 +2331,7 @@
         "body": [
             "ROW START ${1:TBL|TBFnam}."
         ],
-        "description": "[DaCo] ROW START",
+        "description": "[DaCo] Set the line-currency (RCU) to \nzero in order to process the table \nsequentially from the beginning. \nAfter this command is given, \nthe ROW NEXT command can be used \nto move the currency 1 line forward.\n",
         "scope": "cobol"
     },
     "TABLE ROW SAVE": {
@@ -2339,7 +2339,7 @@
         "body": [
             "ROW SAVE ${1:TBLnam} IN ${2:value}."
         ],
-        "description": "[DaCo] ROW SAVE",
+        "description": "[DaCo] Place the content of \nTable Buffer-1 in Table Buffer-<value>, \nwhere <value> is 2, 3 or 4. \nThe three Table Buffers (2, 3 and 4) \ncan be used in the program logic.\n",
         "scope": "cobol"
     },
     "TABLE ROW RESTORE": {
@@ -2347,7 +2347,7 @@
         "body": [
             "ROW RESTORE ${1:TBLnam} FROM ${2:value}."
         ],
-        "description": "[DaCo] ROW RESTORE",
+        "description": "[DaCo] Restore the content of Table \nBuffer-<value> to \nTable Buffer-1 and put the line \nid of Table Buffer-value in RCU, \nwhere <value> is 2, 3 or 4.\n",
         "scope": "cobol"
     },
     "TABLE ROW GET": {
