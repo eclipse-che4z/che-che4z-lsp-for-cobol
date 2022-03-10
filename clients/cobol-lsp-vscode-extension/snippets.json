@@ -2358,14 +2358,6 @@
         "description": "[DaCo] ROW BUFFER",
         "scope": "cobol"
     },
-    "TABLE ROW BUFFER": {
-        "prefix": "ROW BUFFER",
-        "body": [
-            "ROW BUFFER ${1:TBLnam} IS YES."
-        ],
-        "description": "[DaCo] ROW BUFFER",
-        "scope": "cobol"
-    },
     "TABLE ROW GET": {
         "prefix": "ROW GET",
         "body": [
