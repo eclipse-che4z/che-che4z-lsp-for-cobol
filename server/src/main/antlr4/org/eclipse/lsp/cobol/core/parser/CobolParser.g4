@@ -1003,7 +1003,7 @@ dafStatements
     : readTransactionStatement | writeTransactionStatement | writeReportStatement
     | openPacketStatement | getMetaInfoStatement | messageHandlingStatement
     | tableRowRetrievalStatement | tableRowUpdateStatement | tableDMLStatement
-    | fileDMLStatement | stringDMLStatement
+    | fileDMLStatement | stringDMLStatement | debugStatement
     ;
 
 readTransactionStatement
@@ -1318,6 +1318,23 @@ stringReplaceStatement
 stringDeleteStatement
     : DELETE ALL? qualifiedDataName daf_string_identifier
     ;
+
+debugStatement
+    : debugStatsStatement | debugFieldStatement
+    ;
+
+
+debugStatsStatement
+    : DEBUG STATS (qualifiedDataName | ({validateLength(_input.LT(1).getText(), "text", 32);} literal))?
+    ;
+
+debugFieldStatement
+    : DEBUG qualifiedDataName LENGTH (qualifiedDataName | integerLiteral)
+      (COLS ({validateIntegerRange(_input.LT(1).getText(), 0, 132);} numericLiteral))?
+      (TABLE (qualifiedDataName | integerLiteral))?
+      NO_POS? (HEX | DISPLAY | BOTH)?
+    ;
+
 
 // End of DaCo Statements
 
