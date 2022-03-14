@@ -31,7 +31,7 @@ class TestAccept {
           + "        PROGRAM-ID. test1. \r\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
-          + "        01 {$*STATS} PIC X(388) SYNC.\n"
+          + "        01 {$*ABC} PIC X(388) SYNC.\n"
           + "        01 {$*LTERMID} PIC X(8).\r\n"
           + "        01 {$*TASKID} PIC S9(8) COMP SYNC.\r\n"
           + "        01 {$*SYSVERSION_WK} PIC S9(4) COMP.\r\n"
@@ -55,7 +55,7 @@ class TestAccept {
       "           ACCEPT TRANSACTION STATISTICS.\r\n";
 
   private static final String ACCEPT_TRANSACTION_STATISTICS_INTO_VARIABLE =
-      "           ACCEPT TRANSACTION STATISTICS INTO {$STATS}.\r\n";
+      "           ACCEPT TRANSACTION STATISTICS INTO {$ABC}.\r\n";
 
   private static final String ACCEPT_TRANSACTION_STATISTICS_LENGTH =
       "           ACCEPT TRANSACTION STATISTICS LENGTH 500.\r\n";

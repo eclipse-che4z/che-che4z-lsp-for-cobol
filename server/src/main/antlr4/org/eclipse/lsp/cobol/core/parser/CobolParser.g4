@@ -1003,7 +1003,7 @@ dafStatements
     : readTransactionStatement | writeTransactionStatement | writeReportStatement
     | openPacketStatement | getMetaInfoStatement | messageHandlingStatement
     | tableRowRetrievalStatement | tableRowUpdateStatement | tableDMLStatement
-    | fileDMLStatement | stringDMLStatement | debugStatement
+    | fileDMLStatement | stringDMLStatement | debugStatement | execStatement
     ;
 
 readTransactionStatement
@@ -1335,6 +1335,9 @@ debugFieldStatement
       NO_POS? (HEX | DISPLAY | BOTH)?
     ;
 
+execStatement
+    : EXEC literal (USING qualifiedDataName)?
+    ;
 
 // End of DaCo Statements
 
