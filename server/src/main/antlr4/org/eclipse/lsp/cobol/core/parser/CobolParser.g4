@@ -223,7 +223,7 @@ environmentDivision
    ;
 
 environmentDivisionBody
-   : configurationSection | inputOutputSection | idmsControlSection
+   : configurationSection | inputOutputSection | idmsControlSection | dacoControlSection
    ;
 
 // -- configuration section ----------------------------------
@@ -999,6 +999,10 @@ idmsOnClause
 
 // DAF DaCo Statements
 
+dacoControlSection
+    : DACO_CONTROL SECTION
+    ;
+
 dafStatements
     : readTransactionStatement | writeTransactionStatement | writeReportStatement
     | openPacketStatement | getMetaInfoStatement | messageHandlingStatement
@@ -1150,7 +1154,11 @@ showErrorMessageStatement
 tableRowRetrievalStatement
     : ROW (rowStartStatement | rowSaveStatement | rowRestoreStatement
       | rowGetStatement | rowNextStatement | rowPriorStatement
-      | rowAnyStatement | rowMatchStatement)
+      | rowAnyStatement | rowMatchStatement | rowBufferStatement)
+    ;
+
+rowBufferStatement
+    : BUFFER daf_table_name IS YES
     ;
 
 rowStartStatement
