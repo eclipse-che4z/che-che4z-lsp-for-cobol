@@ -2668,5 +2668,29 @@
             "DACO-CONTROL SECTION.",
             "$0"
         ]
+    },
+    "DEBUG": {
+        "prefix": "DEBUG",
+        "body": [
+            "DEBUG ${1:field} LENGTH ${2:len1} COLS ${3:num} TABLE ${4:len2} NO-POS ${5| HEX, DISPLAY, BOTH|}."
+        ],
+        "description": "[DaCo] DEBUG ",
+        "scope": "cobol"
+    },
+    "DEBUG STATS": {
+        "prefix": "DEBUG STATS",
+        "body": [
+            "DEBUG STATS ${1:text}."
+        ],
+        "description": "[DaCo] DEBUG STATS",
+        "scope": "cobol"
+    },
+    "EXEC": {
+        "prefix": "EXEC",
+        "body": [
+            "EXEC ${1:text} USING ${2:variable}."
+        ],
+        "description": "[DaCo] EXEC",
+        "scope": "cobol"
     }
 }
