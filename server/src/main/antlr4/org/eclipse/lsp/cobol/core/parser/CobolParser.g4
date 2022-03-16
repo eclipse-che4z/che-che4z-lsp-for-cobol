@@ -3016,13 +3016,11 @@ idms_db_entity_name
     ;
 
 idms_dictionary_name
-    : {validateLength(_input.LT(1).getText().substring(1, _input.LT(1).getText().length() -1),
-     "dictionary name", 8);} literal
+    : {validateLengthTrimBorders(_input.LT(1).getText(), "dictionary name", 8);} literal
     ;
 
 idms_node_name
-    : {validateLength(_input.LT(1).getText().substring(1, _input.LT(1).getText().length() -1),
-           "node name", 8);} literal
+    : {validateLengthTrimBorders(_input.LT(1).getText(), "node name", 8);} literal
     ;
 
 idms_procedure_name
@@ -3030,8 +3028,7 @@ idms_procedure_name
     ;
 
 idms_program_name
-    : {validateLength(_input.LT(1).getText().substring(1, _input.LT(1).getText().length() -1),
-           "program name", 8);} literal
+    : {validateLengthTrimBorders(_input.LT(1).getText(), "program name", 8);} literal
     ;
 
 idms_schema_name
@@ -3043,8 +3040,7 @@ idms_subschema_name
     ;
 
 idms_table_name
-    : {validateLength(_input.LT(1).getText().substring(1, _input.LT(1).getText().length() -1),
-           "table name", 8);} literal
+    : {validateLengthTrimBorders(_input.LT(1).getText(), "table name", 8);} literal
     ;
 
 // identifier ----------------------------------
