@@ -47,7 +47,6 @@ class IdentifierReplacing {
               CobolParser.class,
               ImmutableList.of(
                   CobolParser.CobolCompilerDirectivesKeywordsContext.class,
-                  CobolParser.Idms_only_wordsContext.class,
                   CobolParser.CobolKeywordsContext.class),
               CICSParser.class,
               ImmutableList.of(CICSParser.CicsWordsContext.class));

@@ -84,6 +84,8 @@ class TestIdmsReadyStatement {
                 null,
                 "Max length limit of 16 bytes allowed for db entity name.",
                 Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

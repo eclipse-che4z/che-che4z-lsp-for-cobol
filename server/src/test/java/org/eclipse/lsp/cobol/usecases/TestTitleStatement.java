@@ -63,7 +63,7 @@ class TestTitleStatement {
             new Diagnostic(
                 null,
                 "Syntax error on 'TITLE' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, "
-                    + "LINKAGE, LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE, MAP, SCHEMA}",
+                    + "LINKAGE, LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

@@ -55,7 +55,7 @@ class TestCopyMaidAllowsOnlyValidLevelNumbers {
             new Diagnostic(
                 null,
                 "Syntax error on '50' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, LINKAGE, "
-                    + "LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE, MAP, SCHEMA, '01-49', '66', '77', '88'}",
+                    + "LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE, '01-49', '66', '77', '88'}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

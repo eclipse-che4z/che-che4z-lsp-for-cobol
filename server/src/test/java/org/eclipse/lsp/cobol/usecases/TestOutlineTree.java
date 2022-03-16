@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -145,6 +146,7 @@ class TestOutlineTree {
                 .copybook(new CobolText("FOO", ""))
                 .copybook(new CobolText("BAR", "000100     01 HIDE-IT PIC 9(9)."))
                 .copybook(new CobolText("BAZ", ""))
+                .dialects(ImmutableList.of(IdmsDialect.NAME))
                 .build());
     assertNodeListEquals(
         expectedNodes,

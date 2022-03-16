@@ -206,7 +206,7 @@ public class UseCaseEngine {
                 .copybookProcessingMode(
                     analysisConfig.getCopybookConfig().getCopybookProcessingMode())
                 .features(analysisConfig.getFeatures())
-                .flavors(analysisConfig.getFlavors())
+                .dialects(analysisConfig.getDialects())
                 .build());
     assertResultEquals(actual, document.getTestData());
     return actual;

@@ -12,19 +12,23 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.flavors;
+package org.eclipse.lsp.cobol.core.engine.dialects;
 
+import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 
-/** A COBOL flavor */
-@FunctionalInterface
-public interface CobolFlavor {
+/** A COBOL dialect */
+public interface CobolDialect {
   /**
    * Processing the text
    *
    * @param uri document URI
    * @param text document text
-   * @return the flavor processing result
+   * @param messageService error message service
+   * @return the dialect processing result
    */
-  ResultWithErrors<FlavorOutcome> processText(String uri, String text);
+  default ResultWithErrors<DialectOutcome> processText(String uri, String text, MessageService messageService) {
+    return new ResultWithErrors<>(new DialectOutcome(text, ImmutableList.of()), ImmutableList.of());
+  }
 }

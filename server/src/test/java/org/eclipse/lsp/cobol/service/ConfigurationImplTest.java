@@ -46,18 +46,18 @@ class ConfigurationImplTest {
     JsonArray featuresArray = new JsonArray();
     featuresArray.add("SQL");
 
-    JsonArray flavorSettings = new JsonArray();
-    flavorSettings.add("Flavour");
+    JsonArray dialectSettings = new JsonArray();
+    dialectSettings.add("Dialect");
 
     List<Object> clientConfig =
-        Arrays.asList(new JsonPrimitive("DATACOM_SERVER"), featuresArray, flavorSettings);
+        Arrays.asList(new JsonPrimitive("DATACOM_SERVER"), featuresArray, dialectSettings);
 
     when(settingsService.getConfigurations(
-            Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, FLAVORS.label)))
+            Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, DIALECTS.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
     configuration.updateConfigurationFromSettings();
     assertEquals(configuration.getSqlBackend(), SQLBackend.DATACOM_SERVER);
     assertEquals(configuration.getFeatures().contains(EmbeddedCodeNode.Language.SQL), true);
-    assertEquals(configuration.getFlavors().contains("Flavour"), true);
+    assertEquals(configuration.getDialects().contains("Dialect"), true);
   }
 }

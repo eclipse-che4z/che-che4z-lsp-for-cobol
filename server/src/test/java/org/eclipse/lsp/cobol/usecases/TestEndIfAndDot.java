@@ -49,11 +49,11 @@ class TestEndIfAndDot {
 
  @Test
  void testWithDot() {
-  UseCaseEngine.runTest(TEXT_WITH_DOT, ImmutableList.of(), ImmutableMap.of());
+  UseCaseEngine.runTest(TEXT_WITH_DOT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfig());
  }
 
  @Test
  void testWithoutDot() {
-  UseCaseEngine.runTest(TEXT_WITHOUT_DOT, ImmutableList.of(), ImmutableMap.of());
+  UseCaseEngine.runTest(TEXT_WITHOUT_DOT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfig());
  }
 }

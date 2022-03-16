@@ -9,13 +9,21 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ *    Broadcom, Inc. - initial API and implementation
+ *
  */
+package org.eclipse.lsp.cobol.core.engine.dialects;
 
-parser grammar FlavorParser;
-options {tokenVocab = FlavorLexer;}
+import lombok.Value;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
 
-startRule: .*? flavorRules*;
-flavorRules: (flavorRuleDefine | flavorRuleUse) .*?;
-flavorRuleDefine: FOO BAR IDENTIFIER;
-flavorRuleUse: FOO USE IDENTIFIER;
+import java.util.List;
+
+/**
+ * The result of dialect processing
+ */
+@Value
+public class DialectOutcome {
+  String text;
+  List<Node> dialectNodes;
+}

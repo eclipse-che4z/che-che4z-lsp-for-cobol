@@ -70,7 +70,7 @@ class TestDelete {
    * Must be defined in an FD entry in the data division and must be the name of an indexed or
    * relative file.
    */
-  private static final String DELETE_SCRATCH = "           DELETE {$SCRATCH}.\r\n";
+  private static final String DELETE_SCRATCH = "           DELETE SCRATCH.\r\n";
 
   private static final String DELETE_SCRATCH_AREA_ID_LITERAL =
       "           DELETE SCRATCH AREA ID 'TEST'.\r\n";
@@ -131,6 +131,6 @@ class TestDelete {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - varying tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfig());
   }
 }

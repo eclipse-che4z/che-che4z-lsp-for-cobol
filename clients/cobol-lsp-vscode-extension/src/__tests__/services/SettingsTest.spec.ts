@@ -83,7 +83,7 @@ describe("SettingsService evaluate variables", () => {
         const paths = SettingsService.getCopybookLocalPath("program", "COBOL");
         expect(paths[0]).toEqual("copybook/program")
     });
-    
+
     test("Evaluate program_file with extension", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue(["copybook/${program_file}"]),
@@ -109,7 +109,7 @@ describe("SettingsService evaluate variables", () => {
         expect(tracking).toBeCalledWith("paths-local")
     });
 
-    test("Get local settings for flavour", () => {
+    test("Get local settings for dialect", () => {
         const tracking = jest.fn().mockReturnValue(["copybook"]);
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: tracking

@@ -25,8 +25,8 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.core.engine.flavors.FlavorOutcome;
-import org.eclipse.lsp.cobol.core.engine.flavors.FlavorUtils;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
@@ -98,21 +98,20 @@ public class CobolLanguageEngine {
     ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
 
-    timingBuilder.getFlavorTimer().start();
+    timingBuilder.getDialectsTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
-    String cleanText =
-        preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
-    FlavorOutcome flavorsOutcome =
-        FlavorUtils.process(documentUri, cleanText, analysisConfig.getFlavors())
-            .unwrap(accumulatedErrors::addAll);
-    timingBuilder.getFlavorTimer().stop();
+    String cleanText = preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
+    DialectOutcome dialectOutcome = DialectUtils
+        .process(documentUri, cleanText, analysisConfig.getDialects(), messageService)
+        .unwrap(accumulatedErrors::addAll);
+    timingBuilder.getDialectsTimer().stop();
 
     timingBuilder.getPreprocessorTimer().start();
     ExtendedDocument extendedDocument =
         preprocessor
             .processCleanCode(
                 documentUri,
-                flavorsOutcome.getText(),
+                dialectOutcome.getText(),
                 analysisConfig.getCopybookConfig(),
                 new CopybookHierarchy())
             .unwrap(accumulatedErrors::addAll);
@@ -154,8 +153,7 @@ public class CobolLanguageEngine {
             embeddedCodeParts,
             messageService,
             subroutineService,
-            flavorsOutcome.getFlavorNodes());
-
+            dialectOutcome.getDialectNodes());
     List<Node> syntaxTree = visitor.visit(tree);
     accumulatedErrors.addAll(visitor.getErrors());
     timingBuilder.getVisitorTimer().stop();
@@ -177,10 +175,10 @@ public class CobolLanguageEngine {
     if (LOG.isDebugEnabled()) {
       Timing timing = timingBuilder.build();
       LOG.debug(
-          "Timing for parsing {}. Flavors: {}, preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
+          "Timing for parsing {}. Dialects: {}, preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
               + "late error processing: {}",
           documentUri,
-          timing.getFlavorTime(),
+          timing.getDialectsTime(),
           timing.getPreprocessorTime(),
           timing.getParserTime(),
           timing.getMappingTime(),
