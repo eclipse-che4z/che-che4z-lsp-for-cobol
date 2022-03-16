@@ -81,7 +81,7 @@ class TestPseudoTextContentConstraint {
             "1",
             new Diagnostic(
                 new Range(new Position(4, 27), new Position(4, 469)),
-                "Max 322 chars allowed for each individual words in a pseudo text.",
+                "Max 322 chars allowed for each individual word in pseudo text",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }
@@ -95,7 +95,7 @@ class TestPseudoTextContentConstraint {
             "1",
             new Diagnostic(
                 null,
-                "A pseudo text can't have COPY string.",
+                "COPY string is not allowed in pseudo text",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }
