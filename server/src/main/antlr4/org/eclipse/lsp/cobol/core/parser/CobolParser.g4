@@ -961,11 +961,11 @@ paragraph
 
 sentence
    : idmsStmtsMandTermOn (SEMICOLON_FS idmsOnClause? | DOT_FS) |
-    ((idmsStmtsOptTermOn endClause? idmsOnClause? | statement | dafStatements)* endClause)
+    ((idmsStmtsOptTermOn endClause? idmsOnClause? | dafStatements | statement)* endClause)
    ;
 
 conditionalStatementCall
-   : (statement | idmsStatements | dafStatements) SEMICOLON_FS?
+   : (idmsStatements | dafStatements | statement) SEMICOLON_FS?
    ;
 
 statement
