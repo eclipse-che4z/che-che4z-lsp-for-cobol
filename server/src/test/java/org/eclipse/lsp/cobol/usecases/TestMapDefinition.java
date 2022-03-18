@@ -16,6 +16,8 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.service.*;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -55,7 +57,10 @@ class TestMapDefinition {
             ImmutableList.of(),
             ImmutableMap.of(),
             ImmutableList.of(),
-            AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
+            new AnalysisConfig(
+                ImmutableSet.of(),
+                new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
+                ImmutableList.of(IdmsDialect.NAME)));
     final Hover mapHover =
         new VariableHover()
             .getHover(

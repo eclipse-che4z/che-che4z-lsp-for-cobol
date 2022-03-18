@@ -158,7 +158,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
             expect(uri).not.toBe("");
             expect(spySearchInWorkspace).toBeCalledTimes(1);
     });
-    test("With only a local folder defined for the flavour in the settings.json, the search is applied locally", async () => {
+    test("With only a local folder defined for the dialect in the settings.json, the search is applied locally", async () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
         });

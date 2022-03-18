@@ -66,6 +66,8 @@ class TestIdmsStartpageStatement {
                 null,
                 "Max length limit of 8 bytes allowed for map name.",
                 Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

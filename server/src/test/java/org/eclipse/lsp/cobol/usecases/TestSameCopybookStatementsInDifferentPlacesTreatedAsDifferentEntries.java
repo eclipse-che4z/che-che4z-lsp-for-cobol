@@ -49,7 +49,7 @@ class TestSameCopybookStatementsInDifferentPlacesTreatedAsDifferentEntries {
             new Diagnostic(
                 null,
                 "Syntax error on 'DATA' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, "
-                    + "LINKAGE, LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE, MAP, SCHEMA}",
+                    + "LINKAGE, LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE}",
                 DiagnosticSeverity.Error,
                 ERROR.getText(),
                 null)));

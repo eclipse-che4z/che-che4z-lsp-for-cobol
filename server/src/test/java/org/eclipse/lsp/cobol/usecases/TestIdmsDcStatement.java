@@ -41,9 +41,10 @@ class TestIdmsDcStatement {
 
   private static final String DC_RETURN_TIMEOUT_INTERVAL_WITH_ALL =
       "           MOVE 0030 TO {$WK_TIME}.\r\n "
-          + "           DC RETURN NEXT TASK CODE 'TSTTASK' NORMAL TIMEOUT INTERVAL 12\r\n"
-          + "           NEXT TASK INTERVAL 10 EVENT TYPE INTERNAL EVENT \r\n"
-          + "           NAME 'TSTEVENT'.\r\n";
+          + "           DC RETURN NEXT TASK CODE 'TSTTASK' NORMAL\r\n"
+          + "           TIMEOUT INTERVAL 12\r\n"
+          + "           NEXT TASK INTERVAL 10 EVENT TYPE INTERNAL\r\n"
+          + "           EVENT NAME 'TSTEVENT'.\r\n";
 
   private static final String DC_RETURN_TIMEOUT_INTERVAL_WITH_ALL_2 =
       "           MOVE 30 TO {$WK_TIME}.\r\n "
@@ -61,8 +62,8 @@ class TestIdmsDcStatement {
       "           MOVE 30 TO {$WK_TIME}.\r\n "
           + "           MOVE 'TESTPROG' TO {$WK_PROGRAM}.\r\n "
           + "           DC RETURN NEXT TASK CODE 'TSTTASK' NORMAL TIMEOUT PROGRAM\r\n"
-          + "           {$WK_PROGRAM} NEXT TASK INTERVAL 10 EVENT TYPE INTERNAL EVENT\r\n"
-          + "           NAME 'TSTEVENT'.\r\n";
+          + "           {$WK_PROGRAM} NEXT TASK INTERVAL 10 EVENT TYPE\r\n"
+          + "           INTERNAL EVENT NAME 'TSTEVENT'.\r\n";
 
   private static final String DC_RETURN_TIMEOUT_ALL =
       "           MOVE 30 TO {$WK_TIME}.\r\n "
@@ -74,21 +75,25 @@ class TestIdmsDcStatement {
   private static final String DC_RETURN_TIMEOUT_ALL_2 =
       "           MOVE 30 TO {$WK_TIME}.\r\n "
           + "           MOVE 'TESTPROG' TO {$WK_PROGRAM}.\r\n "
-          + "           DC RETURN NEXT TASK CODE 'TSTTASK' NORMAL TIMEOUT INTERVAL 10\r\n"
+          + "           DC RETURN NEXT TASK CODE 'TSTTASK' NORMAL\r\n"
+          + "           TIMEOUT INTERVAL 10\r\n"
           + "           PROGRAM {$WK_PROGRAM} NEXT TASK INTERVAL 10 EVENT TYPE\r\n"
           + "           INTERNAL EVENT NAME 'TSTEVENT'.\r\n";
 
   private static final String DC_RETURN_TIMEOUT_ALL_3 =
       "           MOVE 30 TO {$WK_TIME}.\r\n "
           + "           MOVE 'TESTPROG' TO {$WK_PROGRAM}.\r\n "
-          + "           DC RETURN NEXT TASK CODE 'TSTTASK' NORMAL TIMEOUT INTERVAL 10\r\n"
-          + "           PROGRAM {$WK_PROGRAM} INTERVAL 10 NEXT TASK INTERVAL 10 EVENT\r\n"
+          + "           DC RETURN NEXT TASK CODE 'TSTTASK' NORMAL\r\n"
+          + "           TIMEOUT INTERVAL 10\r\n"
+          + "           PROGRAM {$WK_PROGRAM} INTERVAL 10\r\n"
+          + "           NEXT TASK INTERVAL 10 EVENT\r\n"
           + "           TYPE INTERNAL EVENT NAME 'TSTEVENT'.\r\n";
 
   private static final String DC_RETURN_TASK_VARB_WITH_ALL =
       "           MOVE 'TEST' TO {$WK_TASK}.\r\n "
           + "           MOVE 'TESTPROG' TO {$WK_PROGRAM}.\r\n "
-          + "           DC RETURN NEXT TASK CODE {$WK_TASK} NORMAL TIMEOUT INTERVAL 10\r\n"
+          + "           DC RETURN NEXT TASK CODE {$WK_TASK} NORMAL\r\n"
+          + "           TIMEOUT INTERVAL 10\r\n"
           + "           NEXT TASK INTERVAL 10 EVENT TYPE INTERNAL EVENT\r\n"
           + "           NAME 'TSTEVENT'.\r\n";
 
@@ -109,6 +114,6 @@ class TestIdmsDcStatement {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - IDMS DC dml tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfig());
   }
 }

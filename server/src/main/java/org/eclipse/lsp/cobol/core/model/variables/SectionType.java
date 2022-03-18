@@ -23,6 +23,8 @@ public enum SectionType {
   LINKAGE("LINKAGE"),
   LOCAL_STORAGE("LOCAL-STORAGE"),
   MAP("MAP"),
+  SCHEMA("SCHEMA"),
+  IDMS_CONTROL("IDMS-CONTROL"),
   PROCEDURE("PROCEDURE"),
   WORKING_STORAGE("WORKING-STORAGE");
   @Getter private final String type;

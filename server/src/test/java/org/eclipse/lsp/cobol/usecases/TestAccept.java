@@ -78,6 +78,8 @@ class TestAccept {
     UseCaseEngine.runTest(
         text,
         ImmutableList.of(),
-        ImmutableMap.of());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

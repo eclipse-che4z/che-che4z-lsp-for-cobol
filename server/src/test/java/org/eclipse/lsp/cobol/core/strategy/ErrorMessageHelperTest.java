@@ -108,7 +108,6 @@ class ErrorMessageHelperTest {
     when(token.getType()).thenReturn(2);
     when(token.getText()).thenReturn("EXEC_SQL");
     when(recognizer.getContext()).thenReturn(parserRuleContext);
-    when(parserRuleContext.getRuleIndex()).thenReturn(CobolParser.RULE_modifyMapFieldOptionsClause);
     when(recognizer.getVocabulary()).thenReturn(vocabulary);
     when(recognizer.getExpectedTokens()).thenReturn(interval);
     when(interval.toString(any(Vocabulary.class))).thenReturn("INTERVAL");
