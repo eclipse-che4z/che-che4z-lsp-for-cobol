@@ -31,6 +31,7 @@ import org.eclipse.usecase.UseCasePreprocessorParser;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -79,8 +80,7 @@ class AnnotatedDocumentCleaning {
             explicitCopybooks.stream()
                 .findFirst()
                 .map(CobolText::getDialectType)
-                .orElse(DialectType.COBOL.name()),
-            null);
+                .orElse(DialectType.COBOL.name()));
 
     return new PreprocessedDocument(
         testData.getText(),
@@ -122,10 +122,7 @@ class AnnotatedDocumentCleaning {
     return copybooks
         .map(processCopybook(expectedDiagnostics, explicitCopybooks, sqlBackend))
         .map(collectDataFromCopybooks(testData))
-        .map(
-            it ->
-                new CobolText(
-                    it.getCopybookName(), it.getDialectType(), it.getQualifier(), it.getText()))
+        .map(it -> new CobolText(it.getCopybookName(), it.getDialectType(), it.getText()))
         .collect(toList());
   }
 
@@ -133,17 +130,18 @@ class AnnotatedDocumentCleaning {
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> explicitCopybooks,
       SQLBackend sqlBackend) {
-    return it ->
-        processDocument(
-            it.getFullText(),
-            it.getFileName(),
-            toURI(it.getFileName()),
-            ImmutableList.of(),
-            expectedDiagnostics,
-            explicitCopybooks,
-            sqlBackend,
-            it.getDialectType(),
-            it.getQualifier());
+    return it -> {
+      String qualifier = Optional.ofNullable(it.getQualifier()).map(q -> "_" + q).orElse("");
+      return processDocument(
+          it.getFullText(),
+          it.getFileName() + qualifier,
+          toURI(it.getFileName() + qualifier),
+          ImmutableList.of(),
+          expectedDiagnostics,
+          explicitCopybooks,
+          sqlBackend,
+          it.getDialectType());
+    };
   }
 
   private TestData processDocument(
@@ -154,8 +152,7 @@ class AnnotatedDocumentCleaning {
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> explicitCopybooks,
       SQLBackend sqlBackend,
-      String dialectType,
-      String qualifier) {
+      String dialectType) {
     int numberOfLines = text.split("\\R").length;
 
     UseCasePreprocessorLexer lexer = new UseCasePreprocessorLexer(fromString(text));
@@ -175,8 +172,7 @@ class AnnotatedDocumentCleaning {
             numberOfLines,
             subroutineNames,
             expectedDiagnostics,
-            dialectType,
-            qualifier);
+            dialectType);
     new ParseTreeWalker().walk(listener, startRule);
     return listener.getProcessingResult();
   }

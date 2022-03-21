@@ -31,7 +31,7 @@ class TestCopyMaidWithQualifier {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*MRB}.\n"
-          + "           03 COPY MAID {~ABCDEFG123} ABC.\n"
+          + "           03 COPY MAID {~ABCDEFG123`ABCDEFG123_ABC} ABC.\n"
           + "       01  {$*QWE} PIC 9.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$QWE}.\n"

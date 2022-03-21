@@ -254,17 +254,17 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
   protected Consumer<NamedSubContext> addCopybookUsage(CopybookMetaData metaData) {
     return copybooks ->
         copybooks.addUsage(
-            metaData.getCopybookName().getDisplayName(), metaData.getNameLocality().toLocation());
+            metaData.getCopybookName().getQualifiedName(), metaData.getNameLocality().toLocation());
   }
 
   protected Consumer<NamedSubContext> addCopybookDefinition(CopybookMetaData metaData, String uri) {
     return copybooks -> {
       if (!(metaData.getCopybookName() == null
-          || isEmpty(metaData.getCopybookName().getDisplayName())
+          || isEmpty(metaData.getCopybookName().getQualifiedName())
           || isEmpty(uri)
           || isPredefined(uri)))
         copybooks.define(
-            metaData.getCopybookName().getDisplayName(),
+            metaData.getCopybookName().getQualifiedName(),
             new Location(uri, new Range(new Position(0, 0), new Position(0, 0))));
     };
   }
