@@ -1,6 +1,45 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [1.0.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.21.0...1.0.0) (2022-03-21)
+
+### Bug Fixes
+* Add .copy as supported copybook extension ([444b31d](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/444b31d13837351d2ddd41ec935524c6e9d8e757))
+* Allow redefining when data names have the same level [#1211](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1211). ([3888bc5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/3888bc5242b4501f3eb3333d56a916fa894c19ee))
+* Download copybook even with IBM Z Open Editor ([82cbd50](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/82cbd502362717f8713d4d2ad3d0c79372780f98))
+* Fix copybook definition lookup ([d3f7089](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d3f7089a9f762077648092d49a3bfc92ae859684))
+* Fix exception on typing EXEC SQL [#1125](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1125) ([d422c18](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d422c1849d39245a7b1719c6afe653c0df8a8548))
+* Fix IDMS entity length error locations [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([#1146](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1146)) ([2890740](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/28907406a4020b454752eeb53fe63194ae1068a5))
+* Fix resolving SQLCA from workspace [#1189](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1189) ([f2d2972](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f2d29723945f771989664becd76bbd910fde3314))
+* Fix server freeze on EXEC statement ([befd48d](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/befd48d347c2e9858bad6d5da4cef310ae51bfc6)), closes [#1122](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1122)
+* Fix tab key for suggestions ([ecc7c13](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ecc7c13bce8f45fb543b0c081d0a510a8d8ae623))
+* Give option to download Zowe Explorer ([bf9bded](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/bf9bded5bbf38bf9a26388d71cc21e447a306583))
+* Make dot optional after END-IF ([db9b292](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/db9b292aebd9f45a11a598094bc6d3d3c4723c14))
+* Fix quoted string replacement ([fe15cb0](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/fe15cb041df1a0d8b5539847727305cbed486c81))
+* Fix ClassCastException while analysis for CCF ([032c469](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/032c46930db0da982bf8dc25496b77045609de9f))
+* Prompt proper error message for copybook download ([4eed5b1](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/4eed5b1491aefc39e273ccc3b9bce4d3ae7c7b83))
+* Provide a setting to define encoding for USS files ([62edeaf](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/62edeaf97bb4061d6c84340c08d306ae6059a744))
+* Remove confusing tokens from error messages ([3f2eefb](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/3f2eefb32188d065a7ae644604183f797e82b258))
+* Remove identifier tokens from error messages ([e343ebb](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/e343ebb92a5aefc74c9eb4aa99dbc8cd203f6cdf))
+* Remove technical tokens from error messages ([41434fd](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/41434fde94ec4d095e6fbf36726ff4b1e27756bf))
+* Remove unnecessary requests to Zowe ([6f7ffb2](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/6f7ffb225c8dae55d3fc5ed30729a4f866f69891)), closes [#1132](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1132)
+
+### Features
+* Add an ability to enable/disable analysis features ([d55dd09](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d55dd09c8df188437bb836d19223cc7488f8f579))
+* Add line commenting ability ([f4083a3](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f4083a3576ca066545929993b51593dd2d40d08c))
+* Add IDMS snippets [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([af98cbc](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/af98cbcacccd9b7a89a3d4da1da3c64b4af62776))
+* Adjust level numbers for COPY IDMS ([3757275](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/375727583dd559ecf216bed5d3e065953b8a354f))
+* Allow paths for different types of copybooks ([47a88f7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/47a88f72249b7721e43759f810a25fff55f251a6))
+* Evaluate variables for the path in the settings ([a33f0fb](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a33f0fb09704d17e99f15e8594f4e122f4d9ca0b))
+* Resolve local copybook names for autocompletion ([6f6f942](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/6f6f942fb1c1d88cb680a07f5515c95d3963f788))
+* Support ++INCLUDE statement for copybooks [#20](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/20) ([#1142](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1142)) ([a833604](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a833604cf70a6d94aba70a2563c2f95a3cfbe00a))
+* Support compiler directives for COBOL 6.3 ([d36f2af](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d36f2af794f94a9b13c8f48d416b55cec8d3e39f)), closes [#1210](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1210)
+* Support USS file download for copybooks ([5cdbc45](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/5cdbc457bc48ea9a53cb3fd99ff5dd7c117a48dc))
+
+### Performance Improvements
+* Remove memory leak in AST ([3f9dca9](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/3f9dca932c550b5f13b58a3e04c45a758cf4ff77))
+* Simplify replacing of special tokens in errors ([ed36da3](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ed36da3ac571c934e002c2c5985f1fc87cdb45e6))
+
 ## [0.21.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.20.0...0.21.0) (2021-09-09)
 
 ### Bug Fixes
