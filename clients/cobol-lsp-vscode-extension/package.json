@@ -390,6 +390,17 @@
                         "DATACOM_SERVER - CA DATACOM Server"
                     ],
                     "description": "The target SQL backend server which will be used in mainframe"
+                },
+                "cobol-lsp.dialects": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "IDMS"
+                        ]
+                    },
+                    "description": "List of enabled dialects",
+                    "uniqueItems": true
                 }
             }
         },
