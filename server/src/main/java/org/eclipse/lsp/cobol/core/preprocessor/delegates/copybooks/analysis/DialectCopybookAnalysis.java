@@ -30,7 +30,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorString
 import org.eclipse.lsp.cobol.service.CopybookService;
 
 import static java.util.Optional.ofNullable;
-import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.MAID_WRK_QUALIFIER;
 
 /**
  * This implementation of the {@link AbstractCopybookAnalysis} provides the logic and the default
@@ -56,7 +55,6 @@ class DialectCopybookAnalysis extends AbstractCopybookAnalysis {
             + ofNullable(hierarchy.getModifier())
                 .map(CopyStatementModifier::getQualifier)
                 .map(String::toUpperCase)
-                .filter(it -> !it.equals(MAID_WRK_QUALIFIER))
                 .map(it -> "_" + it)
                 .orElse(""));
   }

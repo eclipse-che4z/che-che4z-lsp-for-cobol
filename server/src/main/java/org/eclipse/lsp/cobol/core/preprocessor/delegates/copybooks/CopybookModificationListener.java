@@ -23,10 +23,10 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.regex.Pattern;
 
 import static org.eclipse.lsp.cobol.core.CobolParser.EntryNameContext;
 import static org.eclipse.lsp.cobol.core.CobolParser.LevelNumberContext;
-import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.FILLER_VARIABLE_NAME;
 
 /** This listener adjusts the variable level numbers and apply other modifications of copybooks */
 public class CopybookModificationListener extends CobolParserBaseListener
@@ -36,6 +36,7 @@ public class CopybookModificationListener extends CobolParserBaseListener
   private final CopyStatementModifier modifier;
   private final String suffix;
   private int difference = Integer.MIN_VALUE;
+  private static final Pattern REPLACEABLE_NAME = Pattern.compile("(?i).*?-[A-Z0-9]{3}$");
 
   public CopybookModificationListener(
       CopyStatementModifier modifier, String suffix, BufferedTokenStream tokens) {
@@ -59,17 +60,24 @@ public class CopybookModificationListener extends CobolParserBaseListener
 
   @Override
   public void exitEntryName(EntryNameContext ctx) {
-    final String name = pop().trim();
-    write(TokenUtils.retrieveHiddenTextToLeft(ctx.getSourceInterval().a, tokens));
-    write(nameShouldRemain(name) ? name : replaceSuffix(name));
+    if (ctx.FILLER() != null) {
+      write(pop());
+      return;
+    }
+    final String name = pop();
+    write(shouldReplaceName(name) ? replaceSuffix(name) : appendSuffix(name));
   }
 
-  private boolean nameShouldRemain(String name) {
-    return suffix.isEmpty() || FILLER_VARIABLE_NAME.equalsIgnoreCase(name);
+  private boolean shouldReplaceName(String name) {
+    return !suffix.isEmpty() && REPLACEABLE_NAME.matcher(name).matches();
   }
 
   private String replaceSuffix(String name) {
     return (name.length() > 1 ? name.substring(0, name.length() - 2) : "") + suffix;
+  }
+
+  private String appendSuffix(String name) {
+    return name + suffix;
   }
 
   @Override

@@ -26,8 +26,6 @@ public final class ProcessingConstants {
   public static final String CPY_ENTER_TAG = " *>CPYENTER<URI>";
   public static final String CPY_URI_CLOSE = "</URI>";
   public static final String CPY_EXIT_TAG = NEWLINE + "*>CPYEXIT" + NEWLINE;
-  public static final String MAID_WRK_QUALIFIER = "WRK";
-  public static final String FILLER_VARIABLE_NAME = "FILLER";
   public static final int START_INDEX_AREA_B = 11;
   public static final int INDICATOR_AREA = 7;
 }
