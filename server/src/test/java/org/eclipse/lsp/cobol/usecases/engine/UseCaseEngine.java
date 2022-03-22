@@ -67,7 +67,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * <li>~ - Copybook
  * <li>* - Definition
  * <li>| - Diagnostic
- * <li>^ - Replacement
+ * <li>^ - Replacement that calculates the position of the element after the replacement
+ * <li>` - Replacement that calculates the position of the element before the replacement
  * <li>& - Constant (predefined variable)
  * <li>% - Subroutine
  * <li>{_ _} - Multi-token error
@@ -89,9 +90,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *     one-token syntax or semantic errors.
  *
  *     <p>To show that the token will be replaced during the pre-processing on the actual language
- *     engine, you may mark it with '^' character with the result specified after. For example,
- *     {$*:TAG:-ID^CSTOUT-ID} will return ':TAG:-ID' as the text, and CSTOUT-ID as a variable
- *     definition. The position will be calculated as for the replacement.
+ *     engine, you may mark it with '^' or '`' characters with the result specified after. For
+ *     example, {$*:TAG:-ID^CSTOUT-ID} will return ':TAG:-ID' as the text, and CSTOUT-ID as a
+ *     variable definition. The position will be calculated as for the replacement. If you specify
+ *     {~CPYNM`CPYNM_ABC}, the result will be 'CPYNM' as the text and the 'CPYNM_ABC' as a copybook
+ *     usage name. The position will be calculated as for the original text.
  *
  *     <p>Some semantic errors may consist of several tokens. In order to show this, you may use
  *     multi-token error declaration: {_{$CHILD} OF {$PARENT}|id_}. The included semantic elements
