@@ -21,30 +21,43 @@ import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** WRK qualifier should work even with copybooks with too short name. */
-class TestCopyMaidWithWrkShortName {
+/**
+ * If a variable name in COPY MAID ends with pattern "-XXX", its last two characters should be
+ * replaced, or else the suffix should append to the end.
+ */
+class TestCopyMaidWithWrkAppendsSuffixToVariablesWithoutDash {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "        01 {$*PARENT}.\n"
+          + "        01 {$*ABC}.\n"
           + "            05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           DISPLAY {$ANT}.";
+          + "           DISPLAY {$BHTRGL-XBC}.\n"
+          + "           DISPLAY {$CHILDBC}.\n"
+          + "           DISPLAY {$BHT-XBC}.\n"
+          + "           DISPLAY {$BHT-3BC}.\n"
+          + "           DISPLAY {$BBC}.\n"
+          + "           DISPLAY {$BHTRGL-XABC}.\n";
 
-  private static final String BHTRGL_XBG =
-      "            09 {$*A^ANT} PIC X.\n"
-          + "            09 PIC X.\n"
-          + "            09 FILLER PIC x.";
+  private static final String COPYBOOK_CONTENT =
+      "1           05 {$*BHTRGL-X^BHTRGL-XBC} PIC X.\n"
+          + "2           05 {$*CHILD^CHILDBC} PIC X.\n"
+          + "3           05 {$*BHT-XAB^BHT-XBC} PIC X.\n"
+          + "3           05 {$*BHT-3iz^BHT-3BC} PIC X.\n"
+          + "4           05 FILLER PIC x(10).\n"
+          + "5           05 PIC 9.\n"
+          + "6           05 {$*B^BBC} PIC 9.\n"
+          + "7           05 {$*BHTRGL-XA^BHTRGL-XABC} PIC X.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", BHTRGL_XBG)),
+            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", COPYBOOK_CONTENT)),
         ImmutableMap.of());
   }
 }

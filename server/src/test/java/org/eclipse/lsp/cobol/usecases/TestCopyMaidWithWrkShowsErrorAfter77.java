@@ -33,17 +33,18 @@ class TestCopyMaidWithWrkShowsErrorAfter77 {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       77 {$*NOT-A-PARENT} PIC X.\n"
-          + "            {_05 COPY MAID {~BHTRGL-XBG} WRK.|1|2_}\n"
+          + "            {_05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.|1|2_}\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           DISPLAY {$BHTRGL-XA3}.";
+          + "           DISPLAY {$BHTRGL-X}.";
 
-  private static final String COPYBOOK_CONTENT = "1           09 {$*BHTRGL-XA3|2} PIC X.\n";
+  private static final String COPYBOOK_CONTENT = "1           09 {$*BHTRGL-X|2} PIC X.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(new CobolText("BHTRGL-XBG", DialectType.MAID.name(), COPYBOOK_CONTENT)),
+        ImmutableList.of(
+            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", COPYBOOK_CONTENT)),
         ImmutableMap.of(
             "1",
             new Diagnostic(
@@ -54,7 +55,7 @@ class TestCopyMaidWithWrkShowsErrorAfter77 {
             "2",
             new Diagnostic(
                 null,
-                "BHTRGL-XA3: Only 01, 66 and 77 level numbers are allowed at the highest level",
+                "BHTRGL-X: Only 01, 66 and 77 level numbers are allowed at the highest level",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }
