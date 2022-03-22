@@ -33,7 +33,7 @@ class TestCopyMaidAllowsOnlyValidLevelNumbers {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       {_44 COPY MAID {~PMOREC}.|1_}\n"
-          + "       {50|2} COPY MAID {~PMOREC}.\n"
+          + "       {50|2} COPY MAID PMOREC.\n"
           + "       Procedure Division.";
 
   private static final String COPYBOOK_CONTENT =
