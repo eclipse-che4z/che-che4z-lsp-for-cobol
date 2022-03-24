@@ -42,14 +42,13 @@ class TestDAFFileCloseStatement {
           + "            CLOSE FILE {.|2} \r\n"
           + "            CLOSE FILE INPUT {.|3} \r\n"
           + "            CLOSE FILE INPUT {01234|1}. \r\n"
-          + "            CLOSE FILE INPUT {AB|4}. \r\n"
+          + "            CLOSE FILE INPUT {#*AB|4|5}. \r\n"
           + "            CLOSE FILE OUTPUT {.|3} \r\n"
           + "            CLOSE FILE OUTPUT {01234|1}. \r\n"
-          + "            CLOSE FILE OUTPUT {AB|4}. \r\n";
+          + "            CLOSE FILE OUTPUT {#*AB|4|5}. \r\n";
 
   @Test
   void test() {
-
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(),
@@ -77,6 +76,14 @@ class TestDAFFileCloseStatement {
                 null,
                 "Syntax error on 'AB' expected {ALL, '01-49', '66', '77', '88', INTEGERLITERAL}",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText()),
+            "5",
+            new Diagnostic(
+                null,
+                "The following token must start in Area A: AB",
+                DiagnosticSeverity.Warning,
+                SourceInfoLevels.WARNING.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

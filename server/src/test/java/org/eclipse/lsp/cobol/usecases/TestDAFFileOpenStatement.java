@@ -44,7 +44,7 @@ class TestDAFFileOpenStatement {
           + "            OPEN FILE {.|1|2} \r\n"
           + "            OPEN FILE {01|1}. \r\n"
           + "            OPEN FILE {01234|1}. \r\n"
-          + "            OPEN FILE {ABCD|3}. \r\n"
+          + "            OPEN FILE {#*ABCD|3|7}. \r\n"
           + "            OPEN FILE 0123 MAX {.|4} \r\n"
           + "            OPEN FILE 0123 MAX LENGTH {.|5} \r\n"
           + "            OPEN FILE 0123 MAX LENGTH {ABCD|6}. \r\n";
@@ -95,6 +95,14 @@ class TestDAFFileOpenStatement {
             "Variable ABCD is not defined",
             DiagnosticSeverity.Error,
             SourceInfoLevels.ERROR.getText()));
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), diagnosticMap);
+    diagnosticMap.put(
+        "7",
+        new Diagnostic(
+            null,
+            "The following token must start in Area A: ABCD",
+            DiagnosticSeverity.Warning,
+            SourceInfoLevels.WARNING.getText()));
+    UseCaseEngine.runTest(
+        TEXT, ImmutableList.of(), diagnosticMap, ImmutableList.of(), IdmsBase.getAnalysisConfig());
   }
 }

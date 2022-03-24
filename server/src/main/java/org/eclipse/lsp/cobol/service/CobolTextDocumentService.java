@@ -367,7 +367,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       return new AnalysisConfig(
           configuration.getFeatures(),
           new CopybookConfig(processingMode, configuration.getSqlBackend()),
-          configuration.getFlavors());
+          configuration.getDialects());
     } catch (Exception e) {
       LOG.warn("Can't get config-data, default config will be used instead");
     }

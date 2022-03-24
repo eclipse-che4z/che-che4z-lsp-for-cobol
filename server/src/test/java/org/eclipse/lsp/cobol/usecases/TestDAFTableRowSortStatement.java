@@ -72,6 +72,8 @@ class TestDAFTableRowSortStatement {
                 null,
                 "Syntax error on '.' expected {ASC, DES, IN, OF, '('}",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

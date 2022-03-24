@@ -69,6 +69,8 @@ class TestDAFTableRowAnyStatement {
                 null,
                 "Syntax error on '.' expected {IN, OF, USING, '('}",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

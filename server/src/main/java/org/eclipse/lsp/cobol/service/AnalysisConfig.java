@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public class AnalysisConfig {
   Set<EmbeddedCodeNode.Language> features;
   @NonNull CopybookConfig copybookConfig;
-  List<String> flavors;
+  List<String> dialects;
 
   /**
    * Creates the default language features config, containing all features and specified copybook config

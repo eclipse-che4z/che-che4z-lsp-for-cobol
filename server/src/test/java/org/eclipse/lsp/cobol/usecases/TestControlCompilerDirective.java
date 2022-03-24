@@ -82,10 +82,10 @@ class TestControlCompilerDirective {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
-            new Diagnostic(null,
+            new Diagnostic(
+                null,
                 "Compiler directives cannot be continued on another line",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())
-            ));
+                SourceInfoLevels.ERROR.getText())));
   }
 }

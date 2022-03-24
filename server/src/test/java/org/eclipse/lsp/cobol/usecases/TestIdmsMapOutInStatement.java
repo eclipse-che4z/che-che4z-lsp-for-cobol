@@ -61,6 +61,11 @@ class TestIdmsMapOutInStatement {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms map outin tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

@@ -31,6 +31,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Hovering over 88 with multiple VALUE clauses should show all of them */
 class Test88ThruHover {
+  public static final String HOVER =
+      "01 EIGHT-BITS PIC X.\n"
+          + "  88 BIT-ONE VALUE IS X'80' THRU X'FF'.\n"
+          + "  88 BIT-TWO VALUES ARE X'40' THRU X'7F'\n"
+          + "                        X'C0' THRU X'FF'.\n"
+          + "  88 BIT-THREE VALUE X'80' THRU X'FF'.\n"
+          + "  88 BIT-FOUR VALUES X'40' THRU X'7F'\n"
+          + "                     X'C0' THRU X'FF'.";
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.  TEST.\n"
@@ -43,14 +51,6 @@ class Test88ThruHover {
           + "          88 {$*BIT-THREE}   VALUE  X'80' THRU X'FF'.\n"
           + "          88 {$*BIT-FOUR} VALUES X'40'  THRU  X'7F'\n"
           + "                              X'C0' THRU X'FF'.";
-  public static final String HOVER =
-      "01 EIGHT-BITS PIC X.\n"
-          + "  88 BIT-ONE VALUE IS X'80' THRU X'FF'.\n"
-          + "  88 BIT-TWO VALUES ARE X'40' THRU X'7F'\n"
-          + "                        X'C0' THRU X'FF'.\n"
-          + "  88 BIT-THREE VALUE X'80' THRU X'FF'.\n"
-          + "  88 BIT-FOUR VALUES X'40' THRU X'7F'\n"
-          + "                     X'C0' THRU X'FF'.";
 
   @Test
   void test() {
@@ -60,7 +60,8 @@ class Test88ThruHover {
             ImmutableList.of(),
             ImmutableMap.of(),
             ImmutableList.of(),
-            AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
+            AnalysisConfig.defaultConfig(
+                new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
 
     assertHover(result);
   }

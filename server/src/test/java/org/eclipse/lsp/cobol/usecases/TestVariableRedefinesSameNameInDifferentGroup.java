@@ -19,9 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * This test checks that redefined variable has correct usage even if names the same.
- */
+/** This test checks that redefined variable has correct usage even if names the same. */
 class TestVariableRedefinesSameNameInDifferentGroup {
   private static final String REDEFINES =
       "       IDENTIFICATION DIVISION.\n"

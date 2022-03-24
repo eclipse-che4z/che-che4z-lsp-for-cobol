@@ -151,6 +151,8 @@ class TestDAFShowMessageStatement {
                 null,
                 "Syntax error on '.' expected {ERROR, INFO, WARNING}",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

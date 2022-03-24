@@ -70,6 +70,8 @@ class TestDAFTableRowDuplicateStatement {
                 null,
                 "Syntax error on '.' expected {IN, OF, ON, '('}",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

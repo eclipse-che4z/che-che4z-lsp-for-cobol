@@ -22,9 +22,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test that not completely typed variable definition doesn't produce an exception.
- */
+/** Test that not completely typed variable definition doesn't produce an exception. */
 class TestHalfTypedVariableDefinition {
   private static final String TEXT =
       "       Identification Division.\n"
@@ -35,21 +33,32 @@ class TestHalfTypedVariableDefinition {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(
-        "1",
-        new Diagnostic(null, "Extraneous input '(' expected {BINARY, BLANK, COMP, COMPUTATIONAL, "
-            + "COMPUTATIONAL-1, COMPUTATIONAL-2, COMPUTATIONAL-3, COMPUTATIONAL-4, COMPUTATIONAL-5, COMP-1, COMP-2, "
-            + "COMP-3, COMP-4, COMP-5, DISPLAY, DISPLAY-1, DYNAMIC, EXTERNAL, FUNCTION-POINTER, GLOBAL, GROUP-USAGE, "
-            + "INDEX, IS, JUST, JUSTIFIED, LEADING, NATIONAL, OBJECT, OCCURS, PACKED-DECIMAL, PIC, PICTURE, POINTER, "
-            + "POINTER-32, PROCEDURE-POINTER, REDEFINES, SIGN, SYNC, SYNCHRONIZED, TRAILING, USAGE, UTF-8, VALUE, "
-            + "VALUES, VOLATILE, '.'}",
-            DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText()),
-        "2",
-        new Diagnostic(null, "No data definition entry found for rename",
-            DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText()),
-        "3",
-        new Diagnostic(null, "Unexpected end of file",
-            DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())
-    ));
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Extraneous input '(' expected {BINARY, BLANK, COMP, COMPUTATIONAL, "
+                    + "COMPUTATIONAL-1, COMPUTATIONAL-2, COMPUTATIONAL-3, COMPUTATIONAL-4, COMPUTATIONAL-5, COMP-1, COMP-2, "
+                    + "COMP-3, COMP-4, COMP-5, DISPLAY, DISPLAY-1, DYNAMIC, EXTERNAL, FUNCTION-POINTER, GLOBAL, GROUP-USAGE, "
+                    + "INDEX, IS, JUST, JUSTIFIED, LEADING, NATIONAL, OBJECT, OCCURS, PACKED-DECIMAL, PIC, PICTURE, POINTER, "
+                    + "POINTER-32, PROCEDURE-POINTER, REDEFINES, SIGN, SYNC, SYNCHRONIZED, TRAILING, USAGE, UTF-8, VALUE, "
+                    + "VALUES, VOLATILE, '.'}",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "2",
+            new Diagnostic(
+                null,
+                "No data definition entry found for rename",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "3",
+            new Diagnostic(
+                null,
+                "Unexpected end of file",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

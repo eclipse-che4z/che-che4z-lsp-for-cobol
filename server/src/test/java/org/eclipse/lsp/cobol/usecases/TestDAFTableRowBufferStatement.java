@@ -73,6 +73,8 @@ class TestDAFTableRowBufferStatement {
                 null,
                 "Missing token YES at rowBufferStatement",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

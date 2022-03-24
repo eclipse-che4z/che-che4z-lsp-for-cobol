@@ -15,15 +15,15 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /**
- * This test checks the positive scenario of using START in EXEC CICS statement. Note, the order
- * of parameters inside the grammar relaxed comparing to the CICS specification to avoid
- * false-positive errors caused by CICS preprocessor.
+ * This test checks the positive scenario of using START in EXEC CICS statement. Note, the order of
+ * parameters inside the grammar relaxed comparing to the CICS specification to avoid false-positive
+ * errors caused by CICS preprocessor.
  */
 class TestExecCicsStartStatementArgumentsOrder {
 

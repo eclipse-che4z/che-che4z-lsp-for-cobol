@@ -38,23 +38,24 @@ class TestCopyMaidWithWRK {
           + "             05 {$*TABMAX-PW7} PIC S9(4) VALUE ZERO COMP-3.\n"
           + "             05 {$*BHTTAB-XW7}.\n"
           + "               07 {$*BHTREG-XW8} OCCURS 50.\n"
-          + "                 09 COPY MAID {~BHTRGL-XBG} WRK.\n"
+          + "                 09 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-XW8} OF {$BHTTAB-XW7}.";
 
   private static final String COPYBOOK_CONTENT =
-      "1           09 {$*BHTRGL-XA3^BHTRGL-XW8}.\n"
-          + "2             11 {$*BHTRGLVLG-XA3^BHTRGLVLG-XW8}.\n"
-          + "3               13 {$*FABLYN-XA3^FABLYN-XW8}.\n"
-          + "4                 15 {$*FABLYNPOSEEN-XA3^FABLYNPOSEEN-XW8} PIC X.\n"
-          + "5                 15 {$*LYNKOD-XA3^LYNKOD-XW8} PIC X(2).\n"
-          + "6               13 {$*BHTORSKOD-XA3^BHTORSKOD-XW8} PIC X(2).";
+      "1           09 {$*BHTRGL-X^BHTRGL-XW8}.\n"
+          + "2             11 {$*BHTRGLVLG-X^BHTRGLVLG-XW8}.\n"
+          + "3               13 {$*FABLYN-X^FABLYN-XW8}.\n"
+          + "4                 15 {$*FABLYNPOSEEN-X^FABLYNPOSEEN-XW8} PIC X.\n"
+          + "5                 15 {$*LYNKOD-X^LYNKOD-XW8} PIC X(2).\n"
+          + "6               13 {$*BHTORSKOD-X^BHTORSKOD-XW8} PIC X(2).";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(new CobolText("BHTRGL-XBG", DialectType.MAID.name(), COPYBOOK_CONTENT)),
+        ImmutableList.of(
+            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", COPYBOOK_CONTENT)),
         ImmutableMap.of());
   }
 }

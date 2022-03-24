@@ -46,8 +46,6 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.FILLER_VARIABLE_NAME;
-import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.MAID_WRK_QUALIFIER;
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory.AnalysisTypes;
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory.AnalysisTypes.*;
 
@@ -58,7 +56,8 @@ import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analys
 @Slf4j
 public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListener
     implements GrammarPreprocessorListener<ExtendedDocument> {
-
+  private static final String MAID_WRK_QUALIFIER = "WRK";
+  private static final String FILLER_VARIABLE_NAME = "FILLER";
   private static final int DEFAULT_TOKEN_SHIFT = 2;
   private static final int TOKEN_SHIFT_WITH_LINEBREAK = 3;
   private static final int MAID_SUFFIX_LENGTH = 2;

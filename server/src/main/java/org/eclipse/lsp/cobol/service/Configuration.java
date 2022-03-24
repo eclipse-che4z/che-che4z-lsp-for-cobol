@@ -39,9 +39,9 @@ public interface Configuration {
   Set<EmbeddedCodeNode.Language> getFeatures();
 
   /**
-   * Get the list of Flavors
+   * Get the list of Dialects
    *
-   * @return List<String></String>
+   * @return the list of dialects
    */
-  List<String> getFlavors();
+  List<String> getDialects();
 }

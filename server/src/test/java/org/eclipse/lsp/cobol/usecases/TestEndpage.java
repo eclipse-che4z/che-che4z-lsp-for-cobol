@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -27,11 +27,11 @@ import java.util.stream.Stream;
 class TestEndpage {
 
   private static final String BOILERPLATE =
-          "        IDENTIFICATION DIVISION. \r\n"
-                  + "        PROGRAM-ID. test1. \r\n"
-                  + "        DATA DIVISION. \r\n"
-                  + "        WORKING-STORAGE SECTION. \r\n"
-                  + "        PROCEDURE DIVISION. \r\n";
+      "        IDENTIFICATION DIVISION. \r\n"
+          + "        PROGRAM-ID. test1. \r\n"
+          + "        DATA DIVISION. \r\n"
+          + "        WORKING-STORAGE SECTION. \r\n"
+          + "        PROCEDURE DIVISION. \r\n";
 
   private static final String ENDPAGE = "           ENDPAGE.\r\n";
 
@@ -45,6 +45,11 @@ class TestEndpage {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - varying tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

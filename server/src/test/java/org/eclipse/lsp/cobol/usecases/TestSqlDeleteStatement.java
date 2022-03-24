@@ -15,20 +15,20 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** This test checks if sql DELETE statement works correctly. */
 class TestSqlDeleteStatement {
   private static final String TEXT =
-          "       IDENTIFICATION DIVISION.\n"
-                  + "       PROGRAM-ID. HELLO-SQL.\n"
-                  + "       DATA DIVISION.\n"
-                  + "       WORKING-STORAGE SECTION.\n"
-                  + "       PROCEDURE DIVISION.\n"
-                  + "           EXEC SQL DELETE FROM EMP WHERE CURRENT OF C1 END-EXEC.\n";
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. HELLO-SQL.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL DELETE FROM EMP WHERE CURRENT OF C1 END-EXEC.\n";
 
   @Test
   void test() {

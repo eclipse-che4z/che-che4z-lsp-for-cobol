@@ -103,6 +103,7 @@ class TestDAFWriteTransaction {
             DiagnosticSeverity.Error,
             SourceInfoLevels.ERROR.getText()));
 
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), diagnosticMap);
+    UseCaseEngine.runTest(
+        TEXT, ImmutableList.of(), diagnosticMap, ImmutableList.of(), IdmsBase.getAnalysisConfig());
   }
 }

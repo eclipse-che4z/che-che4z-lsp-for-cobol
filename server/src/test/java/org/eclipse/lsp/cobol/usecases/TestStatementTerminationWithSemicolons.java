@@ -55,6 +55,11 @@ class TestStatementTerminationWithSemicolons {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of("SPACING"));
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of("SPACING"),
+        IdmsBase.getAnalysisConfig());
   }
 }

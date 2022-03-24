@@ -65,12 +65,15 @@ class PredefinedCopybookUtils {
    */
   List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks) {
     return PredefinedCopybooks.getNames().stream()
-        .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), sqlBackend))
+        .map(
+            name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), sqlBackend))
         .collect(Collectors.toList());
   }
 
   private String findDialect(String name, List<CobolText> copybooks) {
-    return copybooks.stream().filter(c -> c.getFileName().equals(name)).findFirst()
+    return copybooks.stream()
+        .filter(c -> c.getFileName().equals(name))
+        .findFirst()
         .map(CobolText::getDialectType)
         .orElse(DialectType.COBOL.name());
   }

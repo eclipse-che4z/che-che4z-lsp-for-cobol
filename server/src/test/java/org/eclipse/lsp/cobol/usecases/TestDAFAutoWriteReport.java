@@ -55,6 +55,7 @@ class TestDAFAutoWriteReport {
             "Variable ASD is not defined",
             DiagnosticSeverity.Error,
             SourceInfoLevels.ERROR.getText()));
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), diagnosticMap);
+    UseCaseEngine.runTest(
+        TEXT, ImmutableList.of(), diagnosticMap, ImmutableList.of(), IdmsBase.getAnalysisConfig());
   }
 }

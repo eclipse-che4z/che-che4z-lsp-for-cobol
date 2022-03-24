@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.service.utils;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +28,13 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This service implements API for low-level file systems access. It mainly oriented to work with
@@ -115,5 +120,20 @@ public class WorkspaceFileService implements FileSystemService {
       }
     }
     return resultStringBuilder.toString();
+  }
+
+  @Override
+  public List<String> listFilesInDirectory(Path path) {
+    try (Stream<Path> streamPath = Files.list(path)) {
+      return
+          streamPath
+              .map(Path::toFile)
+              .filter(File::isFile)
+              .map(File::getName)
+              .collect(Collectors.toList());
+    } catch (IOException e) {
+      LOG.error("An error occurred while reading list of files", e);
+    }
+    return ImmutableList.of();
   }
 }

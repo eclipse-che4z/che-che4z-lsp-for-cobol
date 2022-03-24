@@ -171,6 +171,7 @@ class TestReplaceCompilerDirective {
         ImmutableList.of(new CobolText(REPL_NAME, REPL2), new CobolText(STRUCT1_NAME, STRUCT1)),
         ImmutableMap.of(),
         Collections.emptyList(),
-        AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
+        AnalysisConfig.defaultConfig(
+            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
   }
 }

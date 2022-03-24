@@ -15,14 +15,11 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
 
 /**
@@ -38,10 +35,16 @@ class SkippingAnalysis extends AbstractCopybookAnalysis {
   }
 
   @Override
-  protected ResultWithErrors<ExtendedDocument> processCopybook(
-      CopybookMetaData metaData, CopybookHierarchy hierarchy, String uri, String content) {
-    return new ResultWithErrors<>(
-        new ExtendedDocument(uri, "", new NamedSubContext(), ImmutableMap.of()),
-        ImmutableList.of());
+  public PreprocessorFunctor handleCopybook(
+      ParserRuleContext context,
+      ParserRuleContext copySource,
+      CopybookConfig config,
+      String documentUri,
+      DialectType dialectType) {
+    return hierarchy ->
+        stack -> {
+          stack.pop();
+          return subContext -> nestedMappings -> allErrors -> {};
+        };
   }
 }

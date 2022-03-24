@@ -30,17 +30,12 @@ class TestCopyMaidWithWrkShortName {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "        01 {$*PARENT}.\n"
-          + "            05 COPY MAID {~BHTRGL-XBG} WRK.\n"
-          + "        01 {$*ABCD}.\n"
-          + "            05 COPY MAID {~BHTRGL-ABC} WRK.\n"
+          + "            05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           DISPLAY {$NT}.\n"
-          + "           DISPLAY {$CD}.";
+          + "           DISPLAY {$ANT}.";
 
-  private static final String BHTRGL_XBG = "1           09 {$*A3^NT} PIC X.\n";
-
-  private static final String BHTRGL_ABC =
-      "            09 {$*A^CD} PIC X.\n"
+  private static final String BHTRGL_XBG =
+      "            09 {$*A^ANT} PIC X.\n"
           + "            09 PIC X.\n"
           + "            09 FILLER PIC x.";
 
@@ -48,9 +43,7 @@ class TestCopyMaidWithWrkShortName {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), BHTRGL_XBG),
-            new CobolText("BHTRGL-ABC", DialectType.MAID.name(), BHTRGL_ABC)),
+        ImmutableList.of(new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", BHTRGL_XBG)),
         ImmutableMap.of());
   }
 }

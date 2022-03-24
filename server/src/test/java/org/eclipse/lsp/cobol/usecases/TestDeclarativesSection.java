@@ -22,9 +22,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test that typing the Declaratives section doesn't produce an Exception.
- */
+/** Test that typing the Declaratives section doesn't produce an Exception. */
 class TestDeclarativesSection {
   private static final String TEXT =
       "       Identification Division.\n"

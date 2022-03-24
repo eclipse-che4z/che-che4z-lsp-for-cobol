@@ -44,6 +44,8 @@ class TestDAFWriteTransactionToDoesNotProduceNPE {
                 null,
                 "Unexpected end of file",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

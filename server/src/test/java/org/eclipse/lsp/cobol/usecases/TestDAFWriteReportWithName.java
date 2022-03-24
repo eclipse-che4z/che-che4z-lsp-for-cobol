@@ -135,6 +135,7 @@ class TestDAFWriteReportWithName {
             "Syntax error on '.' expected {PAGE, '01-49', '66', '77', '88', INTEGERLITERAL, IDENTIFIER}",
             DiagnosticSeverity.Error,
             SourceInfoLevels.ERROR.getText()));
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), diagnosticMap);
+    UseCaseEngine.runTest(
+        TEXT, ImmutableList.of(), diagnosticMap, ImmutableList.of(), IdmsBase.getAnalysisConfig());
   }
 }

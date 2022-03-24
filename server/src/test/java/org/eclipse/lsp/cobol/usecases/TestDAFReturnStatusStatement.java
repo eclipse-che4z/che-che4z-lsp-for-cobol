@@ -43,7 +43,7 @@ class TestDAFReturnStatusStatement {
           + "            RETURN INFO 002 {$DET001-XW1}. \r\n"
           + "            RETURN WARNING 002 {$DET001-XW1}. \r\n"
           + "            RETURN ERROR 002 {$DET001-XW1}. \r\n"
-  // Negative tests
+          // Negative tests
           + "            RETURN{.|4} \r\n"
           + "            RETURN INFO {.|2|3}. \r\n"
           + "            RETURN WARNING {.|2|3}. \r\n"
@@ -88,6 +88,8 @@ class TestDAFReturnStatusStatement {
                 null,
                 "No viable alternative at input RETURN.",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

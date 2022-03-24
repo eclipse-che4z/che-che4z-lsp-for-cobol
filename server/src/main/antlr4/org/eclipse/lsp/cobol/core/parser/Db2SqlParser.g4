@@ -372,7 +372,7 @@ pattern_expression: ( (SLASHCHAR | DOUBLESLASHCHAR)  )*;
 other_opt_part1: (NOT? CLUSTER | PARTITIONED | NOT? PADDED | using_specification | free_specification | gbpcache_specification | DEFINE yes_or_no |  COMPRESS yes_or_no | (INCLUDE | EXCLUDE) NULL KEYS)*;
 other_opt_part2: (PARTITION BY (RANGE)? LPARENCHAR (partition_using_specification (COMMACHAR  partition_using_specification)*)? RPARENCHAR)?;
 other_opt_part3: (BUFFERPOOL dbs_bp_name | CLOSE yes_or_no | DEFER no_or_yes | DSSIZE dbs_integer G_CHAR
-               | PIECESIZE IDENTIFIER {if(!$IDENTIFIER.text.matches("\\d+[MmGgKk]")) { notifyError("db2SqlParser.pieceSize", $IDENTIFIER.text);}}
+               | PIECESIZE IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");}
                | COPY no_or_yes)*;
 partition_using_specification: partition_element (using_specification | free_specification | gbpcache_specification | DSSIZE dbs_integer G_CHAR)*;
 using_specification: USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name (PRIQTY dbs_integer? | SECQTY dbs_integer | ERASE yes_or_no?)*);
@@ -465,7 +465,7 @@ dbs_create_table_data_def: in_clause_def | partitioning_clause | organization_cl
 in_clause_def: (IN dbs_table_name? dbs_table_space_name | IN DATABASE dbs_database_name | IN ACCELERATOR dbs_accelerator_name);
 partitioning_clause:  PARTITION BY (RANGE? LPARENCHAR partition_expression (COMMACHAR partition_expression)*  RPARENCHAR
                         LPARENCHAR partitioning_element (COMMACHAR partitioning_element)*  RPARENCHAR
-                        |  SIZE (EVERY IDENTIFIER {if(!$IDENTIFIER.text.matches("\\d+[Gg]")) { notifyError("db2SqlParser.size", $IDENTIFIER.text);}})?);
+                        |  SIZE (EVERY IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[Gg]", "db2SqlParser.size");})?);
 partition_expression: dbs_column_name (NULLS LAST)? (ASC | DESC)?;
 partitioning_element: PARTITION dbs_integer ENDING AT? partition_element_loop partition_hash_space? INCLUSIVE?;
 partition_hash_space: HASH SPACE dbs_integer k_m_g;
@@ -480,7 +480,7 @@ partition_by_growth_spec: MAXPARTITIONS (dbs_integer256 | dbs_integer (NUMPARTS 
 partition_by_range_spec: NUMPARTS dbs_integer partition_by_range_spec_body*;
 partition_by_range_spec_body: LPARENCHAR partitions_opts (COMMACHAR partitions_opts)*  RPARENCHAR | PAGENUM (dbs_pageset_pagenum_param | ABSOLUTE | RELATIVE);
 partitions_opts: PARTITION dbs_integer (using_block | free_block | gbpcache_block | COMPRESS  yes_or_no | ERASE yes_or_no?  | dbs_imptkmod_param | TRACKMOD yes_or_no
-               | DSSIZE (dbs_integer G_CHAR | IDENTIFIER {if(!$IDENTIFIER.text.matches("\\d+[Gg]")) { notifyError("db2SqlParser.size", $IDENTIFIER.text);}}))+;
+               | DSSIZE (dbs_integer G_CHAR | IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[Gg]", "db2SqlParser.size");}))+;
 free_block: (FREEPAGE  dbs_integer | PCTFREE (dbs_smallint (FOR UPDATE dbs_smallint)?)?)+;
 locksize_block_tbl: LOCKSIZE (ANY | TABLESPACE | PAGE | ROW);
 
@@ -740,7 +740,7 @@ dbs_insert_data_type: (common_short_built_in_type | dbs_distinct_type);
 dbs_insert_values: VALUES ((dbs_expression | DEFAULT | NULL) | LPARENCHAR dbs_insert_values_sgloop RPARENCHAR) | (FOR (dbs_host_variable | dbs_integer_constant) ROWS)? VALUES dbs_insert_values_multi;
 dbs_insert_values_sgloop: (dbs_expression | DEFAULT | NULL) (COMMACHAR (dbs_expression | DEFAULT | NULL) | NUMERICLITERAL)*;
 dbs_insert_values_multi: (dbs_expression | dbs_host_variable_array | DEFAULT | NULL | LPARENCHAR dbs_insert_values_mloop RPARENCHAR)
-                        (FOR (dbs_host_variable | T=dbs_integer_constant {if(!(Integer.parseInt($T.text) > 0 && Integer.parseInt($T.text) <= 32767)) { notifyError("db2SqlParser.maxIntValue", $T.text);}}) ROWS)?
+                        (FOR (dbs_host_variable | T=dbs_integer_constant {validateDb2MaxInt($T.text);}) ROWS)?
                         (ATOMIC | NOT ATOMIC CONTINUE ON SQLEXCEPTION)?;
 dbs_insert_values_mloop: (dbs_expression | dbs_host_variable_array | DEFAULT | NULL) (COMMACHAR (dbs_expression |
                         dbs_host_variable_array | DEFAULT | NULL))*;
@@ -984,7 +984,7 @@ dbs_set_current_query_accel: CURRENT QUERY ACCELERATION EQUALCHAR? (NONE | ENABL
 
 //SET CURRENT QUERY ACCELARATION WAITFORDATA
 dbs_set_current_query_accel_wfdata: CURRENT QUERY ACCELERATION WAITFORDATA EQUALCHAR?
-                               (NUMERICLITERAL {if(!$NUMERICLITERAL.text.matches("\\d{1,4}.\\d\\b")) {notifyError("db2SqlParser.currentQueryAcceleration", $NUMERICLITERAL.text);}}
+                               (NUMERICLITERAL {validateTokenWithRegex($NUMERICLITERAL.text, "\\d{1,4}.\\d\\b", "db2SqlParser.currentQueryAcceleration");}
                                | dbs_variable);
 
 //SET CURRENT REFRESH AGE
@@ -1075,7 +1075,7 @@ common_bit_decimal_opt: (DECIMAL | DEC | NUMERIC);
 common_bit_decimal: common_bit_decimal_opt  (LPARENCHAR (dbs_integer (COMMACHAR dbs_integer)? | NUMERICLITERAL) RPARENCHAR)?;
 common_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
 common_bit_decfloat: DECFLOAT (LPARENCHAR (dbs_integer34
-             | LEVEL_NUMBER {if(! (Integer.parseInt($LEVEL_NUMBER.text) == 34 || Integer.parseInt($LEVEL_NUMBER.text) == 16)) {notifyError("paser.validValueMsg", $LEVEL_NUMBER.text, "34 or 16");}}
+             | LEVEL_NUMBER {validate34or16($LEVEL_NUMBER.text);}
              | dbs_integer16) RPARENCHAR)?;
 common_bit_char: (CHARACTER | CHAR) (VARYING common_bit_varandchar | LARGE OBJECT common_bit_clobandobj | LPARENCHAR dbs_integer RPARENCHAR common_bit_charopts);
 common_bit_char2: ((CHARACTER | CHAR) (LPARENCHAR dbs_integer RPARENCHAR)? | (VARCHAR | (CHARACTER | CHAR) VARYING) (LPARENCHAR dbs_integer RPARENCHAR)) (common_bit_fordata | CCSID dbs_integer1208)?;
@@ -1084,13 +1084,13 @@ common_bit_charopts: (CCSID oneof_encoding)? common_bit_fordata?;
 common_bit_varchar: VARCHAR common_bit_varandchar;
 common_bit_varandchar: LPARENCHAR dbs_integer RPARENCHAR common_bit_charopts;
 common_bit_clob: CLOB common_bit_clobandobj;
-common_bit_clobandobj: (LPARENCHAR (IDENTIFIER {if(!$IDENTIFIER.text.matches("\\d+[MmGgKk]")) { notifyError( "db2SqlParser.pieceSize", $IDENTIFIER.text);}})? RPARENCHAR)?
+common_bit_clobandobj: (LPARENCHAR (IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");})? RPARENCHAR)?
                         (CCSID oneof_encoding)? (FOR (SBCS | MIXED ) DATA)?;
 common_bit_graphic_core: GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR;
 common_bit_graphic: (common_bit_graphic_core | DBCLOB (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?) (CCSID oneof_encoding)?;
 common_bit_graphic2: common_bit_graphic_core CCSID dbs_integer256;
 common_bit_binary_core: BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR;
-common_bit_binary: (common_bit_binary_core | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR (IDENTIFIER {if(!$IDENTIFIER.text.matches("\\d+[MmGgKk]")) { notifyError( "db2SqlParser.pieceSize", $IDENTIFIER.text);}})? RPARENCHAR)?);
+common_bit_binary: (common_bit_binary_core | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR (IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");})? RPARENCHAR)?);
 common_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? (without_or_with TIME ZONE)?;
 common_bit_date_time: (DATE |  TIME | common_bit_timestamp);
 
@@ -1137,7 +1137,7 @@ dbs_option_list_trigger: (option_debug_mode | option_qualifier | option_asutime 
                          option_sensitive_system | option_sensitive_archive | option_app_compat | option_concentrate_statements)+;
 
 dbs_option_list_inl_def:  (option_specific | option_parameter | option_deterministic| option_action| option_sqldata_common| option_dispatch| option_called| option_secured | LANGUAGE SQL)+;
-option_acceleration: ACCELERATION WAITFORDATA NUMERICLITERAL {if(!$NUMERICLITERAL.text.matches("\\d{1,4}.\\d\\b")) {notifyError("db2SqlParser.currentQueryAcceleration", $NUMERICLITERAL.text);}};
+option_acceleration: ACCELERATION WAITFORDATA NUMERICLITERAL {validateTokenWithRegex($NUMERICLITERAL.text, "\\d{1,4}.\\d\\b", "db2SqlParser.currentQueryAcceleration");};
 option_accelerator: ACCELERATOR dbs_accelerator_name;
 option_action: NO?  EXTERNAL ACTION;
 option_after: (STOP AFTER (SYSTEM DEFAULT FAILURES | dbs_integer FAILURES) | CONTINUE AFTER FAILURE);
@@ -1160,7 +1160,7 @@ option_dbinfo: NO? DBINFO;
 option_debug_mode: (DISALLOW | ALLOW | DISABLE) DEBUG MODE;
 option_decimal: DECIMAL LPARENCHAR (dbs_integer15 (COMMACHAR dbs_s)? | dbs_integer31 (COMMACHAR dbs_s)?);
 option_defer: (DEFER | NODEFER) PREPARE;
-option_degree: DEGREE  (LEVEL_NUMBER  {if(! ($LEVEL_NUMBER.text.equals("1") || $LEVEL_NUMBER.text.equals("ANY"))) {notifyError( "paser.validValueMsg", $LEVEL_NUMBER.text, "1 or ANY");}} | ANY);
+option_degree: DEGREE  (LEVEL_NUMBER  {validateLevel($LEVEL_NUMBER.text);} | ANY);
 option_deterministic: NOT? DETERMINISTIC;
 option_dispatch: STATIC DISPATCH;
 option_dynamic: DYNAMIC RESULT SETS (ZERO_DIGIT | dbs_integer);
@@ -1556,7 +1556,7 @@ dbs_seclabel_name: IDENTIFIER {validateLength($IDENTIFIER.text, "security label"
 dbs_sequence_name: T=dbs_sql_identifier {validateLength($T.text, "sequence name", 128);};
 dbs_servauth_value: NONNUMERICLITERAL;
 dbs_simple_when_clause: (WHEN (dbs_basic_predicate | dbs_expressions) THEN (dbs_result_expression1 | NULL))+;
-dbs_smallint: T=dbs_integer_constant {if(!(Integer.parseInt($T.text) > -2 && Integer.parseInt($T.text) < 100)) { notifyError("paser.validValueMsg", $T.text, "in range -1 to 99");}};//MINUSCHAR? SINGLEDIGITLITERAL SINGLEDIGITLITERAL?;// java ref - -1 to 99
+dbs_smallint: T=dbs_integer_constant {validateTextInRange($T.text, -2, 100);};//MINUSCHAR? SINGLEDIGITLITERAL SINGLEDIGITLITERAL?;// java ref - -1 to 99
 dbs_specific_name: T=dbs_sql_identifier {validateLength($T.text, "specific name", 128);};
 dbs_sql_condition_name: T=dbs_generic_name {validateLength($T.text, "SQL condition name", 128);}; // No particular spec found in doc. Specifies the name of the condition.
 dbs_sql_control_statement: dbs_control_statement;
@@ -1609,7 +1609,7 @@ dbs_joined_table : (dbs_table_reference (INNER | (LEFT | RIGHT | FULL) OUTER?)? 
 dbs_join_condition: dbs_inner_left_outer_join | dbs_full_join_expression;
 dbs_inner_left_outer_join : dbs_search_condition;
 dbs_full_join_expression : (dbs_column_name | dbs_cast_specification) | COALESCE LPARENCHAR (dbs_column_name | dbs_cast_specification) (COMMACHAR dbs_column_name | COMMACHAR dbs_cast_specification)+ RPARENCHAR;
-dbs_table_space_name: T=dbs_sql_identifier {if($T.text.split("\\.").length > 1){validateLength($T.text.split("\\.")[0], "database name", 8);validateLength($T.text.split("\\.")[1], "table space name", 8);} else {validateLength($T.text, "table space name", 8);}};
+dbs_table_space_name: T=dbs_sql_identifier {validateDbNames($T.text);};
 dbs_target_namespace: dbs_hostname_identifier;
 dbs_token_host_variable: dbs_generic_name;
 dbs_transition_table_name: dbs_sql_identifier;
@@ -1630,7 +1630,7 @@ dbs_version_id: dbs_hostname_identifier | FILENAME | NONNUMERICLITERAL;
 dbs_version_name: IDENTIFIER | FILENAME;
 dbs_view_name: dbs_hostname_identifier? T=dbs_sql_identifier {validateLength($T.text, "view name", 128);};
 dbs_volume_id: IDENTIFIER;
-dbs_pieceSize : IDENTIFIER {if(!$IDENTIFIER.text.matches("\\d+[MmGgKk]")) { notifyError( "db2SqlParser.pieceSize", $IDENTIFIER.text);}};
+dbs_pieceSize : IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");};
 dbs_sql_identifier: NONNUMERICLITERAL | IDENTIFIER | FILENAME | FILENAME (DOT_FS IDENTIFIER)* | DSNDB04 | TRANSACTION | RECORDS;
 
 dbs_integer0: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "0");};

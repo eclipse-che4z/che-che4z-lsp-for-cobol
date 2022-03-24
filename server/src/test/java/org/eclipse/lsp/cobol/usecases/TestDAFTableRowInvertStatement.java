@@ -62,6 +62,8 @@ class TestDAFTableRowInvertStatement {
                 null,
                 "Variable GBR4 is not defined",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

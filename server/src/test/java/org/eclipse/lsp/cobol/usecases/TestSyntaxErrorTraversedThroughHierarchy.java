@@ -15,11 +15,11 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
@@ -57,9 +57,17 @@ class TestSyntaxErrorTraversedThroughHierarchy {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null, "Syntax error on 'TAG-ID' expected SECTION", Error, SourceInfoLevels.ERROR.getText(), null),
+                null,
+                "Syntax error on 'TAG-ID' expected SECTION",
+                Error,
+                SourceInfoLevels.ERROR.getText(),
+                null),
             "2",
             new Diagnostic(
-                null, "Syntax error on 'PIC' expected SECTION", Error, SourceInfoLevels.ERROR.getText(), null)));
+                null,
+                "Syntax error on 'PIC' expected SECTION",
+                Error,
+                SourceInfoLevels.ERROR.getText(),
+                null)));
   }
 }

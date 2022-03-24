@@ -77,6 +77,8 @@ class TestDAFDebugFieldStatement {
                 null,
                 "Syntax error on '.' expected {ZERO, '01-49', '66', '77', '88', INTEGERLITERAL, NUMERICLITERAL}",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

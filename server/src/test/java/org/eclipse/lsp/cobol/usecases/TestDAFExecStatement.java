@@ -58,6 +58,8 @@ class TestDAFExecStatement {
                 null,
                 "No viable alternative at input EXEC .",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

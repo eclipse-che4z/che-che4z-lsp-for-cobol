@@ -56,6 +56,7 @@ public class CobolLanguageServer implements LanguageServer {
   private LocaleStore localeStore;
   private CustomThreadPoolExecutor customThreadPoolExecutor;
   private Configuration configuration;
+  private CopybookNameService copybookNameService;
 
   @Inject
   CobolLanguageServer(
@@ -66,7 +67,8 @@ public class CobolLanguageServer implements LanguageServer {
       LocaleStore localeStore,
       CustomThreadPoolExecutor customThreadPoolExecutor,
       DisposableLSPStateService disposableLSPStateService,
-      Configuration configuration) {
+      Configuration configuration,
+      CopybookNameService copybookNameService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
@@ -75,6 +77,7 @@ public class CobolLanguageServer implements LanguageServer {
     this.customThreadPoolExecutor = customThreadPoolExecutor;
     this.disposableLSPStateService = disposableLSPStateService;
     this.configuration = configuration;
+    this.copybookNameService = copybookNameService;
   }
 
   @Override
@@ -126,6 +129,7 @@ public class CobolLanguageServer implements LanguageServer {
     getLocaleFromClient();
     getLogLevelFromClient();
     configuration.updateConfigurationFromSettings();
+    copybookNameService.collectLocalCopybookNames();
   }
 
   private void getLogLevelFromClient() {

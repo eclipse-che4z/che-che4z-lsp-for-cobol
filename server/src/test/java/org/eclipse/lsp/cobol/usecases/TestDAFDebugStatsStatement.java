@@ -59,6 +59,8 @@ class TestDAFDebugStatsStatement {
                 null,
                 "Max length limit of 32 bytes allowed for text.",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

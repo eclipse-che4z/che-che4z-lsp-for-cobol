@@ -33,17 +33,18 @@ class TestCopyMaidWithWrkShowsErrorAfterFiller {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "        01 FILLER.\n"
-          + "            {_05 COPY MAID {~BHTRGL-XBG} WRK.|1_}\n"
+          + "            {_05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.|1_}\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           DISPLAY {$BHTRGL-XA3}.";
+          + "           DISPLAY {$BHTRGL-X}.";
 
-  private static final String COPYBOOK_CONTENT = "1           09 {$*BHTRGL-XA3} PIC X.\n";
+  private static final String COPYBOOK_CONTENT = "1           09 {$*BHTRGL-X} PIC X.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(new CobolText("BHTRGL-XBG", DialectType.MAID.name(), COPYBOOK_CONTENT)),
+        ImmutableList.of(
+            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", COPYBOOK_CONTENT)),
         ImmutableMap.of(
             "1",
             new Diagnostic(

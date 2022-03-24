@@ -15,11 +15,11 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
@@ -54,6 +54,7 @@ class TestIdentificationDivisionInCopybookWithError {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(new CobolText(IDDIV_NAME, IDDIV), new CobolText(STRUCT1_NAME, STRUCT1)),
-        ImmutableMap.of("1", new Diagnostic(null, MESSAGE, Error, SourceInfoLevels.ERROR.getText())));
+        ImmutableMap.of(
+            "1", new Diagnostic(null, MESSAGE, Error, SourceInfoLevels.ERROR.getText())));
   }
 }

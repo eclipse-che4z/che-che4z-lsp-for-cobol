@@ -55,6 +55,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private final SubroutineService subroutineService;
   private final Configuration configuration;
   private final DisposableLSPStateService disposableLSPStateService;
+  private final CopybookNameService copybookNameService;
 
   @Inject
   public CobolWorkspaceServiceImpl(
@@ -65,7 +66,8 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
       LocaleStore localeStore,
       SubroutineService subroutineService,
       Configuration configuration,
-      DisposableLSPStateService disposableLSPStateService) {
+      DisposableLSPStateService disposableLSPStateService,
+      CopybookNameService copybookNameService) {
     this.dataBus = dataBus;
     this.settingsService = settingsService;
     this.watchingService = watchingService;
@@ -74,6 +76,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     this.subroutineService = subroutineService;
     this.configuration = configuration;
     this.disposableLSPStateService = disposableLSPStateService;
+    this.copybookNameService = copybookNameService;
   }
 
   /**
@@ -121,6 +124,8 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
         .getConfiguration(LOGGING_LEVEL.label)
         .thenAccept(LogLevelUtils.updateLogLevel());
     configuration.updateConfigurationFromSettings();
+    copybookNameService.collectLocalCopybookNames();
+
   }
 
   private void acceptSettingsChange(List<String> localFolders) {
@@ -147,6 +152,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   @Override
   public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) {
     if (disposableLSPStateService.isServerShutdown()) return;
+    copybookNameService.collectLocalCopybookNames();
     rerunAnalysis(false);
   }
 

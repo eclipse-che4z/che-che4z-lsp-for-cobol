@@ -37,6 +37,8 @@ class TestCopyMaidStatement {
   @Test
   void test() {
     UseCaseEngine.runTest(
-        TEXT, ImmutableList.of(new CobolText("NAME", DialectType.MAID.name(), COPYBOOK)), ImmutableMap.of());
+        TEXT,
+        ImmutableList.of(new CobolText("NAME", DialectType.MAID.name(), COPYBOOK)),
+        ImmutableMap.of());
   }
 }

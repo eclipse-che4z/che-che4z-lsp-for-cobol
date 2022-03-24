@@ -32,7 +32,7 @@ class TestEndIfDoesNotProduceError {
           + "       PROCEDURE DIVISION.\n"
           + "           IF (1 = 0) THEN\n"
           + "           DISPLAY 'asdfse'\n"
-          + "           END{|1}\n";
+          + "           {END|1|2}{|3}\n";
 
   @Test
   void test() {
@@ -41,6 +41,23 @@ class TestEndIfDoesNotProduceError {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
+            new Diagnostic(
+                null,
+                "Extraneous input 'END' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, COMPUTE, CONTINUE, "
+                    + "DEBUG, DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, "
+                    + "GENERATE, GET, GO, GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, "
+                    + "PERFORM, PURGE, READ, READY, RECEIVE, RELEASE, RESET, RETURN, REWRITE, ROW, SEARCH, SEND, "
+                    + "SERVICE, SET, SHOW, SORT, START, STOP, STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, "
+                    + "'.', ';'}",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "2",
+            new Diagnostic(
+                null,
+                "The following token must start in Area A: END",
+                DiagnosticSeverity.Warning,
+                SourceInfoLevels.WARNING.getText()),
+            "3",
             new Diagnostic(
                 null,
                 "Unexpected end of file",

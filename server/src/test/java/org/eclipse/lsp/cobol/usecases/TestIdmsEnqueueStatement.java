@@ -66,6 +66,11 @@ class TestIdmsEnqueueStatement {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - IDMS enqueue tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

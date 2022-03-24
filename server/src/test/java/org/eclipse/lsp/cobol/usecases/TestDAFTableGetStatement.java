@@ -65,7 +65,6 @@ class TestDAFTableGetStatement {
                 null,
                 "Syntax error on '.' expected {IDENTIFIER}",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())
-        ));
+                SourceInfoLevels.ERROR.getText())));
   }
 }

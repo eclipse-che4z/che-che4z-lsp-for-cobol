@@ -36,7 +36,7 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 public class ConfigurationImpl implements Configuration {
   SQLBackend sqlBackend;
   Set<EmbeddedCodeNode.Language> features = new HashSet<>();
-  List<String> flavors = ImmutableList.of();
+  List<String> dialects = ImmutableList.of();
 
   private SettingsService settingsService;
 
@@ -49,7 +49,7 @@ public class ConfigurationImpl implements Configuration {
   public void updateConfigurationFromSettings() {
     settingsService
         .getConfigurations(
-            Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, FLAVORS.label))
+            Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, DIALECTS.label))
         .thenAccept(this::updateConfigs);
   }
 
@@ -57,8 +57,8 @@ public class ConfigurationImpl implements Configuration {
     return unmodifiableSet(features);
   }
 
-  public List<String> getFlavors() {
-    return unmodifiableList(flavors);
+  public List<String> getDialects() {
+    return unmodifiableList(dialects);
   }
 
   public SQLBackend getSqlBackend() {
@@ -74,8 +74,8 @@ public class ConfigurationImpl implements Configuration {
       JsonArray analysisFeatures = (JsonArray) clientConfig.get(1);
       updateFeatures(analysisFeatures);
 
-      JsonElement flavors = (JsonElement) clientConfig.get(2);
-      updateFlavors(flavors);
+      JsonElement dialects = (JsonElement) clientConfig.get(2);
+      updateDialects(dialects);
     }
   }
 
@@ -93,10 +93,10 @@ public class ConfigurationImpl implements Configuration {
     }
   }
 
-  private void updateFlavors(JsonElement flavorsSettings) {
-    if (flavorsSettings.isJsonArray())
-      flavors =
-          Streams.stream((JsonArray) flavorsSettings)
+  private void updateDialects(JsonElement dialectsSettings) {
+    if (dialectsSettings.isJsonArray())
+      dialects =
+          Streams.stream((JsonArray) dialectsSettings)
               .map(JsonElement::getAsString)
               .collect(toList());
   }

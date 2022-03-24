@@ -107,6 +107,11 @@ class TestIdmsGetStatement {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms get test")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

@@ -193,6 +193,11 @@ class TestIdmsWriteClause {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - IDMS read tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

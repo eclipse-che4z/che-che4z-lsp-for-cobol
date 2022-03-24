@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -116,7 +116,9 @@ class TestSqlAllSetStatements {
       TEXT + "             SET CURRENT DEBUG MODE = ALLOW;\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_DECFLOAT_ROUNDING_MODE =
-      TEXT + "             SET CURRENT DECFLOAT ROUNDING MODE = ROUND_CEILING;\n" + "           END-EXEC.";
+      TEXT
+          + "             SET CURRENT DECFLOAT ROUNDING MODE = ROUND_CEILING;\n"
+          + "           END-EXEC.";
 
   private static final String SET_CURRENT_DEGREE =
       TEXT + "             SET CURRENT DEGREE = '1';\n" + "           END-EXEC.";
@@ -176,10 +178,14 @@ class TestSqlAllSetStatements {
       TEXT + "             SET CURRENT QUERY ACCELERATION NONE;\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_QUERY_ACCELERATION_WAITFORDATA =
-      TEXT + "             SET CURRENT QUERY ACCELERATION WAITFORDATA = 180.0;\n" + "           END-EXEC.";
+      TEXT
+          + "             SET CURRENT QUERY ACCELERATION WAITFORDATA = 180.0;\n"
+          + "           END-EXEC.";
 
   private static final String SET_CURRENT_QUERY_ACCELERATION_WAITFORDATA2 =
-      TEXT + "             SET CURRENT QUERY ACCELERATION WAITFORDATA = 2.5;\n" + "           END-EXEC.";
+      TEXT
+          + "             SET CURRENT QUERY ACCELERATION WAITFORDATA = 2.5;\n"
+          + "           END-EXEC.";
 
   private static final String SET_CURRENT_REFRESH_AGE =
       TEXT + "             SET CURRENT REFRESH AGE ANY;\n" + "           END-EXEC.";
@@ -215,7 +221,9 @@ class TestSqlAllSetStatements {
       TEXT + "             SET ENCRYPTION PASSWORD = :hv1\n" + "           END-EXEC.";
 
   private static final String SET_ENCRYPTION_PASSWORD2 =
-      TEXT + "             SET ENCRYPTION PASSWORD = 'somepwd' WITH HINT :{$hv2}\n" + "           END-EXEC.";
+      TEXT
+          + "             SET ENCRYPTION PASSWORD = 'somepwd' WITH HINT :{$hv2}\n"
+          + "           END-EXEC.";
 
   private static final String SET_PATH =
       TEXT + "             SET PATH = SCHEMA1,\"SCHEMA#2\", SYSIBM;\n" + "           END-EXEC.";

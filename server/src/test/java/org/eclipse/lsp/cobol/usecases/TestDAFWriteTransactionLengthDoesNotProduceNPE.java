@@ -21,7 +21,6 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-
 /** This test for DAF WRITE TRANSACTION LENGTH statement for Null Pointer Exception */
 class TestDAFWriteTransactionLengthDoesNotProduceNPE {
 
@@ -45,6 +44,8 @@ class TestDAFWriteTransactionLengthDoesNotProduceNPE {
                 null,
                 "Missing token {'01-49', '66', '77', '88', INTEGERLITERAL} at integerLiteral",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

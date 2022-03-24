@@ -56,23 +56,28 @@ class TestVariableHasChildren {
             ImmutableList.of(),
             ImmutableMap.of(),
             ImmutableList.of(),
-            AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
+            AnalysisConfig.defaultConfig(
+                new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
 
-    VariableNode termsRecord = result.getRootNode().getDepthFirstStream()
-        .filter(Node.hasType(NodeType.PROGRAM))
-        .findFirst()
-        .map(ProgramNode.class::cast)
-        .map(ProgramNode::getVariables)
-        .map(variableMap -> variableMap.get("TERMS-RECORD").iterator().next())
-        .orElse(null);
+    VariableNode termsRecord =
+        result
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(Node.hasType(NodeType.PROGRAM))
+            .findFirst()
+            .map(ProgramNode.class::cast)
+            .map(ProgramNode::getVariables)
+            .map(variableMap -> variableMap.get("TERMS-RECORD").iterator().next())
+            .orElse(null);
 
     assertNotNull(termsRecord);
     assertEquals(VariableType.GROUP_ITEM, termsRecord.getVariableType());
 
-    List<VariableNode> children = termsRecord.getChildren().stream()
-        .filter(Node.hasType(NodeType.VARIABLE))
-        .map(VariableNode.class::cast)
-        .collect(Collectors.toList());
+    List<VariableNode> children =
+        termsRecord.getChildren().stream()
+            .filter(Node.hasType(NodeType.VARIABLE))
+            .map(VariableNode.class::cast)
+            .collect(Collectors.toList());
 
     assertEquals(2, children.size());
 

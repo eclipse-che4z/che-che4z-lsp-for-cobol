@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 
 /** UseCase test example without errors */
 class TestEndIfAndDot {
-  private static final String TEXT_WITH_DOT_IDMS =
+  private static final String TEXT_WITH_DOT =
       "       Identification Division.\n"
           + "       Program-id. HELLO-WORLD.\n"
           + "       Data Division.\n"
@@ -34,7 +34,7 @@ class TestEndIfAndDot {
           + "           END-IF.\n"
           + "           ABEND CODE {$Var-1}.";
 
-  private static final String TEXT_WITHOUT_DOT_IDMS =
+  private static final String TEXT_WITHOUT_DOT =
       "       Identification Division.\n"
           + "       Program-id. HELLO-WORLD.\n"
           + "       Data Division.\n"
@@ -47,49 +47,23 @@ class TestEndIfAndDot {
           + "           END-IF\n"
           + "           ABEND CODE {$Var-1}.";
 
-  private static final String TEXT_WITH_DOT_DACO =
-      "       Identification Division.\n"
-          + "       Program-id. HELLO-WORLD.\n"
-          + "       Data Division.\n"
-          + "       Working-Storage Section.\n"
-          + "       01 {$*Var-1} PIC 9.\n"
-          + "       01 {$*Var-2} PIC 9.\n"
-          + "       Procedure Division.\n"
-          + "           IF {$Var-1} = {$Var-2}\n"
-          + "           ADD 1 TO {$Var-2}\n"
-          + "           END-IF.\n"
-          + "           WRITE TRANSACTION ABCD.";
-
-  private static final String TEXT_WITHOUT_DOT_DACO =
-      "       Identification Division.\n"
-          + "       Program-id. HELLO-WORLD.\n"
-          + "       Data Division.\n"
-          + "       Working-Storage Section.\n"
-          + "       01 {$*Var-1} PIC 9.\n"
-          + "       01 {$*Var-2} PIC 9.\n"
-          + "       Procedure Division.\n"
-          + "           IF {$Var-1} = {$Var-2}\n"
-          + "           ADD 1 TO {$Var-2}\n"
-          + "           END-IF\n"
-          + "           WRITE TRANSACTION ABCD.";
-
   @Test
-  void testWithDotIdms() {
-    UseCaseEngine.runTest(TEXT_WITH_DOT_IDMS, ImmutableList.of(), ImmutableMap.of());
+  void testWithDot() {
+    UseCaseEngine.runTest(
+        TEXT_WITH_DOT,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 
   @Test
-  void testWithoutDotIdms() {
-    UseCaseEngine.runTest(TEXT_WITHOUT_DOT_IDMS, ImmutableList.of(), ImmutableMap.of());
-  }
-
-  @Test
-  void testWithDotDaco() {
-   UseCaseEngine.runTest(TEXT_WITH_DOT_DACO, ImmutableList.of(), ImmutableMap.of());
-  }
-
-  @Test
-  void testWithoutDotDaco() {
-   UseCaseEngine.runTest(TEXT_WITHOUT_DOT_DACO, ImmutableList.of(), ImmutableMap.of());
+  void testWithoutDot() {
+    UseCaseEngine.runTest(
+        TEXT_WITHOUT_DOT,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

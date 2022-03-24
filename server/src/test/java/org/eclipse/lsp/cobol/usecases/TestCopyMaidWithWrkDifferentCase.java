@@ -30,17 +30,19 @@ class TestCopyMaidWithWrkDifferentCase {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "        01 {$*PARENT}.\n"
-          + "            05 COPY MAID {~BHTRGL-XBG} wrk.\n"
+          + "            05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} wrk.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-XNT}.";
 
-  private static final String COPYBOOK_CONTENT = "1           09 {$*BHTRGL-XA3^BHTRGL-XNT} PIC X.\n";
+  private static final String COPYBOOK_CONTENT =
+      "1           09 {$*BHTRGL-XA3^BHTRGL-XNT} PIC X.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(new CobolText("BHTRGL-XBG", DialectType.MAID.name(), COPYBOOK_CONTENT)),
+        ImmutableList.of(
+            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", COPYBOOK_CONTENT)),
         ImmutableMap.of());
   }
 }

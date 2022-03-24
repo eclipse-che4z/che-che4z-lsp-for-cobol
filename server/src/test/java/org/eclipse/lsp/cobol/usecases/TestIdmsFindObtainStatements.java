@@ -54,7 +54,8 @@ class TestIdmsFindObtainStatements {
 
   private static final String FIND4 = DEFS + "           OBTAIN CURRENT {$DEPARTMENT}.\n";
 
-  private static final String FIND5 = DEFS + "           OBTAIN KEEP CURRENT WITHIN {$DEPT-AREA}.\n";
+  private static final String FIND5 =
+      DEFS + "           OBTAIN KEEP CURRENT WITHIN {$DEPT-AREA}.\n";
 
   private static final String FIND6 = DEFS + "           FIND DB-KEY IS {$EMPDBK}.\n";
 
@@ -102,6 +103,11 @@ class TestIdmsFindObtainStatements {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms find/obtain tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

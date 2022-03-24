@@ -51,6 +51,7 @@ class TestSkipStatementsAllowedEverywhere {
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
-        AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DB2_SERVER)));
+        AnalysisConfig.defaultConfig(
+            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DB2_SERVER)));
   }
 }

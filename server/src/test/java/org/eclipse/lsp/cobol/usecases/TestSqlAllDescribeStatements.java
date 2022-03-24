@@ -50,19 +50,15 @@ class TestSqlAllDescribeStatements {
       TEXT + "            DESCRIBE CURSOR C1 INTO SQLDA\n" + "           END-EXEC.";
 
   private static final String DESCRIBE_INPUT =
-      TEXT
-          + "            DESCRIBE INPUT STMT1_NAME INTO SQLDA;\n"
-          + "           END-EXEC.";
+      TEXT + "            DESCRIBE INPUT STMT1_NAME INTO SQLDA;\n" + "           END-EXEC.";
 
   private static final String DESCRIBE_OUTPUT =
-          TEXT
-                  + "            DESCRIBE OUTPUT STMT1_NAME INTO SQLDA USING LABELS;\n"
-                  + "           END-EXEC.";
+      TEXT
+          + "            DESCRIBE OUTPUT STMT1_NAME INTO SQLDA USING LABELS;\n"
+          + "           END-EXEC.";
 
   private static final String DESCRIBE_PROCEDURE =
-      TEXT
-              + "           DESCRIBE PROCEDURE MyProc INTO procDesc;\n"
-              + "           END-EXEC.";
+      TEXT + "           DESCRIBE PROCEDURE MyProc INTO procDesc;\n" + "           END-EXEC.";
 
   private static final String DESCRIBE_TABLE =
       TEXT

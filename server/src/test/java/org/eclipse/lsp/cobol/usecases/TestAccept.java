@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -41,9 +41,11 @@ class TestAccept {
           + "        01 {$*STATS1} PIC S9(4) COMP.\r\n"
           + "        PROCEDURE DIVISION. \r\n";
 
-  private static final String ACCEPT_IDMS_DC_LTERM = "            ACCEPT LTERM ID INTO {$LTERMID}.\r\n";
+  private static final String ACCEPT_IDMS_DC_LTERM =
+      "            ACCEPT LTERM ID INTO {$LTERMID}.\r\n";
 
-  private static final String ACCEPT_IDMS_DC_TASK_ID = "            ACCEPT TASK ID INTO {$TASKID}.\r\n";
+  private static final String ACCEPT_IDMS_DC_TASK_ID =
+      "            ACCEPT TASK ID INTO {$TASKID}.\r\n";
 
   private static final String ACCEPT_IDMS_DC_SYSVERSION =
       "            ACCEPT SYSVERSION INTO {$SYSVERSION_WK}.\r\n";
@@ -78,6 +80,8 @@ class TestAccept {
     UseCaseEngine.runTest(
         text,
         ImmutableList.of(),
-        ImmutableMap.of());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

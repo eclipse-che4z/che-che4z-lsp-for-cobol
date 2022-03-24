@@ -46,13 +46,15 @@ class TestContinuationLine {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(
-        "1",
-        new Diagnostic(
-            null,
-            "A continuation line cannot contain values in the Content Area A",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText())
-    ));
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "A continuation line cannot contain values in the Content Area A",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

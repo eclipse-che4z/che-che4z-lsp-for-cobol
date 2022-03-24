@@ -67,7 +67,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * <li>~ - Copybook
  * <li>* - Definition
  * <li>| - Diagnostic
- * <li>^ - Replacement
+ * <li>^ - Replacement that calculates the position of the element after the replacement
+ * <li>` - Replacement that calculates the position of the element before the replacement
  * <li>& - Constant (predefined variable)
  * <li>% - Subroutine
  * <li>{_ _} - Multi-token error
@@ -89,9 +90,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *     one-token syntax or semantic errors.
  *
  *     <p>To show that the token will be replaced during the pre-processing on the actual language
- *     engine, you may mark it with '^' character with the result specified after. For example,
- *     {$*:TAG:-ID^CSTOUT-ID} will return ':TAG:-ID' as the text, and CSTOUT-ID as a variable
- *     definition. The position will be calculated as for the replacement.
+ *     engine, you may mark it with '^' or '`' characters with the result specified after. For
+ *     example, {$*:TAG:-ID^CSTOUT-ID} will return ':TAG:-ID' as the text, and CSTOUT-ID as a
+ *     variable definition. The position will be calculated as for the replacement. If you specify
+ *     {~CPYNM`CPYNM_ABC}, the result will be 'CPYNM' as the text and the 'CPYNM_ABC' as a copybook
+ *     usage name. The position will be calculated as for the original text.
  *
  *     <p>Some semantic errors may consist of several tokens. In order to show this, you may use
  *     multi-token error declaration: {_{$CHILD} OF {$PARENT}|id_}. The included semantic elements
@@ -107,6 +110,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @UtilityClass
 public class UseCaseEngine {
+  private final Comparator<Position> positionComparator =
+      comparing(Position::getLine).thenComparing(Position::getCharacter);
+  private final Comparator<Range> rangeComparator =
+      comparing(Range::getStart, positionComparator)
+          .thenComparing(Range::getEnd, positionComparator);
+  private final Comparator<Diagnostic> diagnosticComparator =
+      comparing(Diagnostic::getRange, rangeComparator).thenComparing(Diagnostic::getMessage);
+
   /**
    * Check if the language engine applies required syntax and semantic checks. All the semantic
    * elements in the given text, as well as syntax errors, should be wrapped with according tags.
@@ -206,7 +217,7 @@ public class UseCaseEngine {
                 .copybookProcessingMode(
                     analysisConfig.getCopybookConfig().getCopybookProcessingMode())
                 .features(analysisConfig.getFeatures())
-                .flavors(analysisConfig.getFlavors())
+                .dialects(analysisConfig.getDialects())
                 .build());
     assertResultEquals(actual, document.getTestData());
     return actual;
@@ -331,16 +342,6 @@ public class UseCaseEngine {
           expectedDiagnostic, actualDiagnostic, "Different diagnostics for: " + documentUri);
     }
   }
-
-  private final Comparator<Position> positionComparator =
-      comparing(Position::getLine).thenComparing(Position::getCharacter);
-
-  private final Comparator<Range> rangeComparator =
-      comparing(Range::getStart, positionComparator)
-          .thenComparing(Range::getEnd, positionComparator);
-
-  private final Comparator<Diagnostic> diagnosticComparator =
-      comparing(Diagnostic::getRange, rangeComparator).thenComparing(Diagnostic::getMessage);
 
   private void assertResult(
       String message, Map<String, List<Location>> expected, Map<String, List<Location>> actual) {

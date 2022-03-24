@@ -82,7 +82,8 @@ class TestDAFTableSortStatement {
                 null,
                 "Syntax error on '.' expected {IN, LENGTH, OF, '('}",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())
-        ));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

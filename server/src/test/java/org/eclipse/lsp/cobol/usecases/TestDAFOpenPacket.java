@@ -103,6 +103,7 @@ class TestDAFOpenPacket {
             "Syntax error on '.' expected {NONNUMERICLITERAL, IDENTIFIER}",
             DiagnosticSeverity.Error,
             SourceInfoLevels.ERROR.getText()));
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), diagnosticMap);
+    UseCaseEngine.runTest(
+        TEXT, ImmutableList.of(), diagnosticMap, ImmutableList.of(), IdmsBase.getAnalysisConfig());
   }
 }

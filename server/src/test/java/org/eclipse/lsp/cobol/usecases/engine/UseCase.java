@@ -47,15 +47,17 @@ public class UseCase {
   @Builder.Default SQLBackend sqlBackend = SQLBackend.DB2_SERVER;
   /** Analysis features (SQL, CICS, etc.) */
   @Builder.Default Set<EmbeddedCodeNode.Language> features = Collections.emptySet();
-  /** Analysis flavors */
-  @Builder.Default List<String> flavors = Collections.emptyList();
+  /** Analysis dialects */
+  @Builder.Default List<String> dialects = Collections.emptyList();
 
   /**
    * Get the {@link AnalysisConfig} using the specified processing mode and the {@link SQLBackend}
    * see {@link CopybookConfig}
+   *
    * @return CopybookConfig for the analysis
    */
   public AnalysisConfig getAnalysisConfig() {
-    return new AnalysisConfig(features, new CopybookConfig(copybookProcessingMode, sqlBackend), flavors);
+    return new AnalysisConfig(
+        features, new CopybookConfig(copybookProcessingMode, sqlBackend), dialects);
   }
 }

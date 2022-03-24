@@ -32,17 +32,18 @@ class TestCopyMaidWithWrkDoesNotTakeNameFrom88 {
           + "       01 {$*PARENT}.\n"
           + "            05 {$*CHILD} PIC X(2).\n"
           + "               88 {$*AB} VALUE \"AB\".\n"
-          + "            05 COPY MAID {~BHTRGL-XBG} WRK.\n"
+          + "            05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-XLD}.";
 
-  private static final String COPYBOOK_CONTENT = "1           09 {$*BHTRGL-XA3^BHTRGL-XLD} PIC X.\n";
+  private static final String COPYBOOK_CONTENT = "1           09 {$*BHTRGL-X^BHTRGL-XLD} PIC X.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(new CobolText("BHTRGL-XBG", DialectType.MAID.name(), COPYBOOK_CONTENT)),
+        ImmutableList.of(
+            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", COPYBOOK_CONTENT)),
         ImmutableMap.of());
   }
 }

@@ -59,7 +59,8 @@ class TestParagraphRange {
             ImmutableList.of(),
             ImmutableMap.of(),
             ImmutableList.of(),
-            AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
+            AnalysisConfig.defaultConfig(
+                new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
     List<Node> paragraphs =
         analysisResult
             .getRootNode()
