@@ -2,6 +2,39 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 Changelog:
 
+## [1.0.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.21.0...1.0.0) (2022-03-21)
+
+#### Added
+* Support for .copy copybook extension
+* Option to download Zowe Explorer
+* USS file download for copybooks
+* Setting to define encoding for USS files
+* Ability to enable/disable analysis features
+* Ability for commenting lines
+* Snippets for IDMS
+* Adjusting of level numbers in COPY IDMS copybooks
+* Compiler directives for COBOL 6.3
+* Support for ++INCLUDE statement for copybooks
+* Showing local copybook names in autocompletion suggestion list
+* Paths for different types of copybooks
+* Variables for the path in the settings
+
+#### Changed
+* Removed unnecessary requests to Zowe
+* Removed technical and confusing tokens from error messages
+* Proper error message for copybook downloading issues
+* Period is made optional after END-IF
+
+#### Fixed
+* Quoted string replacement
+* Tab key behavior for suggestions
+* Server freeze on EXEC statement
+* Resolving SQLCA from workspace
+* IDMS entity length error locations
+* Copybook definition lookup
+* Redefining when data names have the same level
+* Downloading copybook even with IBM Z Open Editor
+
 ## [0.21.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.20.0...0.21.0) (2021-09-09)
 
 #### Added
