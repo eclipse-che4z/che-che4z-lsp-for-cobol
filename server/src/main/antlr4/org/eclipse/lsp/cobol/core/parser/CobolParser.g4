@@ -1220,16 +1220,18 @@ stringNextStatement
     ;
 
 stringMatchStatement
-    : MATCH daf_string_identifier daf_string_identifier daf_string_identifier
+    : MATCH daf_string_identifier daf_string_identifier
+      (qualifiedDataName | ({validateIntegerRange(_input.LT(1).getText(), 0, 255);} numericLiteral))?
     ;
 
 stringCheckStatement
-    : CHECK daf_string_command daf_string_identifier
+    : CHECK daf_string_command
+      (qualifiedDataName | ({validateLength(_input.LT(1).getText(), "email", 55);} literal))
     ;
 
 stringUpdateStatement
     : (ADD | INSERT | FILL) qualifiedDataName daf_string_identifier
-      LENGTH daf_string_identifier
+      LENGTH (qualifiedDataName | integerLiteral)
     ;
 
 stringReplaceStatement
@@ -2501,7 +2503,7 @@ daf_string_command
     ;
 
 daf_string_identifier
-    : qualifiedDataName | literal
+    : qualifiedDataName | literal | SPACE
     ;
 
 daf_file_identifier
