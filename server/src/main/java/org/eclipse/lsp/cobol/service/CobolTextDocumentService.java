@@ -95,7 +95,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final CustomThreadPoolExecutor executors;
   private final HoverProvider hoverProvider;
   private final CFASTBuilder cfastBuilder;
-  private final SettingsService settingsService;
   private final Configuration configuration;
   private DisposableLSPStateService disposableLSPStateService;
 
@@ -114,7 +113,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       HoverProvider hoverProvider,
       CFASTBuilder cfastBuilder,
       DisposableLSPStateService disposableLSPStateService,
-      SettingsService settingsService,
       Configuration configuration) {
     this.communications = communications;
     this.engine = engine;
@@ -126,7 +124,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.executors = executors;
     this.hoverProvider = hoverProvider;
     this.cfastBuilder = cfastBuilder;
-    this.settingsService = settingsService;
     this.disposableLSPStateService = disposableLSPStateService;
     this.configuration = configuration;
 
@@ -432,8 +429,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         .getDepthFirstStream()
         .filter(hasType(COPY))
         .map(CopyNode.class::cast)
-        .filter(it -> !it.getUsages().isEmpty())
         .map(CopyNode::getUsages)
+        .filter(usages -> !usages.isEmpty())
         .flatMap(List::stream)
         .map(Location::getUri)
         .collect(toList());

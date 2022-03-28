@@ -44,7 +44,6 @@ public class MockTextDocumentService {
   @Mock protected CodeActions actions;
   @Mock protected Occurrences occurrences;
   @Mock protected Formations formations;
-  @Mock protected SettingsService settingsService;
   @Mock protected HoverProvider hoverProvider;
 
   /**
@@ -62,7 +61,6 @@ public class MockTextDocumentService {
         .formations(formations)
         .executors(new TestThreadPoolExecutor())
         .cfastBuilder(new CFASTBuilderImpl())
-        .settingsService(settingsService)
         .disposableLSPStateService(new CobolLSPServerStateService())
         .hoverProvider(hoverProvider)
         .build();
@@ -81,7 +79,6 @@ public class MockTextDocumentService {
         .actions(actions)
         .occurrences(occurrences)
         .formations(formations)
-        .settingsService(settingsService)
         .disposableLSPStateService(new CobolLSPServerStateService())
         .executors(new CustomThreadPoolExecutorService(1, 1, 60, 1))
         .hoverProvider(hoverProvider)
