@@ -470,6 +470,6 @@
         "tslint": "^5.18.0",
         "tslint-sonarts": "^1.9.0",
         "typescript": "^3.5.3",
-        "vsce": "1.103.1"
+        "vsce": "^2.7.0"
     }
 }
