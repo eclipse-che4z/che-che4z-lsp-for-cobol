@@ -21,7 +21,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/** Tests the DAF STRING FILL statement */
+/** Tests the DAF STRING DELETE statement */
 class TestDAFStringDeleteStatement {
 
   private static final String TEXT =
