@@ -28,7 +28,7 @@ spec:
     - name: sonar
       mountPath: /home/jenkins/.sonar
   - name: node
-    image: sonarsource/sonarcloud-scan:1.2.1
+    image: sonarsource/sonarcloud-scan:1.4.0
     command:
     - cat
     env:
