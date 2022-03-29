@@ -918,10 +918,14 @@ dacoControlSection
     ;
 
 dafStatements
-    : readTransactionStatement | writeTransactionStatement | writeReportStatement
+    : dafPrefixStatement? (readTransactionStatement | writeTransactionStatement | writeReportStatement
     | openPacketStatement | getMetaInfoStatement | messageHandlingStatement
     | tableRowRetrievalStatement | tableRowUpdateStatement | tableDMLStatement
-    | fileDMLStatement | stringDMLStatement | debugStatement | execStatement
+    | fileDMLStatement | stringDMLStatement | debugStatement | execStatement)
+    ;
+
+dafPrefixStatement
+    : (D_B | D_C)
     ;
 
 readTransactionStatement

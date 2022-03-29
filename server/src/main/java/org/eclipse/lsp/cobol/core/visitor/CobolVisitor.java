@@ -132,7 +132,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private void addDialectsNode(Node rootNode) {
-    for (Node dialectNode: dialectNodes) {
+    for (Node dialectNode : dialectNodes) {
       RangeUtils.findNodeByPosition(
               rootNode,
               dialectNode.getLocality().getUri(),
@@ -372,6 +372,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitDafPrefixStatement(DafPrefixStatementContext ctx) {
+    areaAWarning(ctx.getStart());
+    throwWarning(ctx.getStart());
+    return visitChildren(ctx);
+  }
+
+  @Override
   public List<Node> visitExecCicsStatement(ExecCicsStatementContext ctx) {
     areaBWarning(ctx);
     if (analysisConfig.getFeatures().contains(EmbeddedCodeNode.Language.CICS)) {
@@ -538,6 +545,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                         .build(),
                     visitChildren(ctx)))
         .orElse(ImmutableList.of());
+  }
+
+  @Override
+  public List<Node> visitSortTableStatement(SortTableStatementContext ctx) {
+    return addTreeNode(ctx, locality -> new SortTableNode(locality));
   }
 
   private String retrieveValueToken(ValueIsTokenContext ctx) {
