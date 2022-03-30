@@ -10,7 +10,7 @@ Changelog:
 * USS file download for copybooks
 * Setting to define encoding for USS files
 * Ability to enable/disable analysis features
-* Ability to enable/disable dialects
+* Enable/disable dialects functionality
 * Ability for commenting lines
 * Snippets for IDMS
 * Adjusting of level numbers in COPY IDMS copybooks
