@@ -99,7 +99,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
-        AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
+        AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
   }
 
   @Test
@@ -109,7 +109,10 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
-        AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER)));
+        new AnalysisConfig(
+            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
+            ImmutableList.of(),
+            ImmutableList.of()));
   }
 
   @Test
@@ -131,6 +134,9 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
                 Error,
                 SourceInfoLevels.ERROR.getText())),
         ImmutableList.of(),
-        AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER)));
+        new AnalysisConfig(
+            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
+            ImmutableList.of(),
+            ImmutableList.of()));
   }
 }

@@ -53,7 +53,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private final CopybookService copybookService;
   private final LocaleStore localeStore;
   private final SubroutineService subroutineService;
-  private final Configuration configuration;
+  private final ConfigurationService configurationService;
   private final DisposableLSPStateService disposableLSPStateService;
   private final CopybookNameService copybookNameService;
 
@@ -65,7 +65,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
       CopybookService copybookService,
       LocaleStore localeStore,
       SubroutineService subroutineService,
-      Configuration configuration,
+      ConfigurationService configurationService,
       DisposableLSPStateService disposableLSPStateService,
       CopybookNameService copybookNameService) {
     this.dataBus = dataBus;
@@ -74,7 +74,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     this.copybookService = copybookService;
     this.localeStore = localeStore;
     this.subroutineService = subroutineService;
-    this.configuration = configuration;
+    this.configurationService = configurationService;
     this.disposableLSPStateService = disposableLSPStateService;
     this.copybookNameService = copybookNameService;
   }
@@ -123,7 +123,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     settingsService
         .getConfiguration(LOGGING_LEVEL.label)
         .thenAccept(LogLevelUtils.updateLogLevel());
-    configuration.updateConfigurationFromSettings();
+    configurationService.updateConfigurationFromSettings();
     copybookNameService.collectLocalCopybookNames();
 
   }

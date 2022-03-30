@@ -42,7 +42,6 @@ import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -171,19 +170,7 @@ class CobolLanguageEngineTest {
                 new NamedSubContext()),
             ImmutableList.of(error, eofError));
 
-    ResultWithErrors<Node> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(cpyConfig));
+    ResultWithErrors<Node> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
     assertEquals(expected, actual);
-
-    // test nullity
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> engine.run(null, TEXT, AnalysisConfig.defaultConfig(cpyConfig)));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> engine.run(URI, null, AnalysisConfig.defaultConfig(cpyConfig)));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> engine.run(URI, TEXT, AnalysisConfig.defaultConfig((CopybookConfig) null)));
-    assertThrows(IllegalArgumentException.class, () -> engine.run(URI, TEXT, null));
   }
 }
