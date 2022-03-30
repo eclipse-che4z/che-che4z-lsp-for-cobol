@@ -21,8 +21,8 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/** Tests the DAF ROW Add statement */
-class TestDAFTableSortStatement {
+/** Tests the DAF Prefix D-B and D-C statement */
+class TestDAFPrefixStatement {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -34,10 +34,11 @@ class TestDAFTableSortStatement {
           + "             05 {$*A}. \r\n"
           + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
           + "        PROCEDURE DIVISION. \r\n"
-          + "            {_SORT TABLE {$A} TO {$A} LENGTH {$A} ASCENDING|unsupported_}. \r\n"
-          + "            {_SORT TABLE {$A} TO {$A} LENGTH {$A} DESCENDING|unsupported_}. \r\n"
-          + "            {_SORT TABLE {$A} TO {$A} LENGTH 2 ASCENDING|unsupported_}. \r\n"
-          + "            {_SORT TABLE {$A} TO {$A} LENGTH 2 DESCENDING|unsupported_}. \r\n";
+          + "        D-B OPEN PACKET ABCD FOR 'DEF'. \r\n"
+          + "        D-C OPEN PACKET ABCD FOR 'DEF'. \r\n"
+          // Negative tests
+          + "             {D-B|1} OPEN PACKET ABCD FOR 'DEF'. \r\n"
+          + "             {D-C|2} OPEN PACKET ABCD FOR 'DEF'. \r\n";
 
   @Test
   void test() {
@@ -46,10 +47,16 @@ class TestDAFTableSortStatement {
         TEXT,
         ImmutableList.of(),
         ImmutableMap.of(
-            "unsupported",
+            "1",
             new Diagnostic(
                 null,
-                "The code block is deprecated and not supported",
+                "The following token must start in Area A: D-B",
+                DiagnosticSeverity.Warning,
+                SourceInfoLevels.WARNING.getText()),
+            "2",
+            new Diagnostic(
+                null,
+                "The following token must start in Area A: D-C",
                 DiagnosticSeverity.Warning,
                 SourceInfoLevels.WARNING.getText())),
         ImmutableList.of(),
