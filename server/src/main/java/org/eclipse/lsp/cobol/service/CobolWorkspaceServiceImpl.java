@@ -53,8 +53,9 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private final CopybookService copybookService;
   private final LocaleStore localeStore;
   private final SubroutineService subroutineService;
-  private final Configuration configuration;
+  private final ConfigurationService configurationService;
   private final DisposableLSPStateService disposableLSPStateService;
+  private final CopybookNameService copybookNameService;
 
   @Inject
   public CobolWorkspaceServiceImpl(
@@ -64,16 +65,18 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
       CopybookService copybookService,
       LocaleStore localeStore,
       SubroutineService subroutineService,
-      Configuration configuration,
-      DisposableLSPStateService disposableLSPStateService) {
+      ConfigurationService configurationService,
+      DisposableLSPStateService disposableLSPStateService,
+      CopybookNameService copybookNameService) {
     this.dataBus = dataBus;
     this.settingsService = settingsService;
     this.watchingService = watchingService;
     this.copybookService = copybookService;
     this.localeStore = localeStore;
     this.subroutineService = subroutineService;
-    this.configuration = configuration;
+    this.configurationService = configurationService;
     this.disposableLSPStateService = disposableLSPStateService;
+    this.copybookNameService = copybookNameService;
   }
 
   /**
@@ -120,7 +123,9 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     settingsService
         .getConfiguration(LOGGING_LEVEL.label)
         .thenAccept(LogLevelUtils.updateLogLevel());
-    configuration.updateConfigurationFromSettings();
+    configurationService.updateConfigurationFromSettings();
+    copybookNameService.collectLocalCopybookNames();
+
   }
 
   private void acceptSettingsChange(List<String> localFolders) {
@@ -147,6 +152,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   @Override
   public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) {
     if (disposableLSPStateService.isServerShutdown()) return;
+    copybookNameService.collectLocalCopybookNames();
     rerunAnalysis(false);
   }
 

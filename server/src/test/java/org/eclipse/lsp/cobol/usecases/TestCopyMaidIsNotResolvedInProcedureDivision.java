@@ -31,7 +31,7 @@ class TestCopyMaidIsNotResolvedInProcedureDivision {
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 COPY MAID {~PMOREC}.\n"
           + "       Procedure Division.\n"
-          + "           COPY MAID {~PMOREC}.\n"
+          + "           COPY MAID PMOREC.\n"
           + "           DISPLAY {$DEF}.";
 
   private static final String COPYBOOK_CONTENT =

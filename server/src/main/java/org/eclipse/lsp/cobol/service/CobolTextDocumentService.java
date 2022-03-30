@@ -95,8 +95,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final CustomThreadPoolExecutor executors;
   private final HoverProvider hoverProvider;
   private final CFASTBuilder cfastBuilder;
-  private final SettingsService settingsService;
-  private final Configuration configuration;
+  private final ConfigurationService configurationService;
   private DisposableLSPStateService disposableLSPStateService;
 
   @Inject
@@ -114,8 +113,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       HoverProvider hoverProvider,
       CFASTBuilder cfastBuilder,
       DisposableLSPStateService disposableLSPStateService,
-      SettingsService settingsService,
-      Configuration configuration) {
+      ConfigurationService configurationService) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -126,9 +124,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.executors = executors;
     this.hoverProvider = hoverProvider;
     this.cfastBuilder = cfastBuilder;
-    this.settingsService = settingsService;
     this.disposableLSPStateService = disposableLSPStateService;
-    this.configuration = configuration;
+    this.configurationService = configurationService;
 
     dataBus.subscribe(this);
   }
@@ -332,17 +329,17 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
             .submit(
                 () -> {
                   try {
-                    CopybookProcessingMode copybookProcessingMode =
+                    CopybookProcessingMode processingMode =
                         CopybookProcessingMode.getCopybookProcessingMode(
                             uri,
                             userRequest
                                 ? CopybookProcessingMode.ENABLED_VERBOSE
                                 : CopybookProcessingMode.ENABLED);
 
-                    AnalysisConfig config = requestConfigs(copybookProcessingMode);
+                    AnalysisConfig config = configurationService.getConfig(processingMode);
                     AnalysisResult result = engine.analyze(uri, text, config);
                     ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
-                    publishResult(uri, result, copybookProcessingMode);
+                    publishResult(uri, result, processingMode);
                     outlineMap.computeIfPresent(
                         uri,
                         (key, value) -> {
@@ -361,19 +358,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     registerToFutureMap(uri, docAnalysisFuture);
   }
 
-  private AnalysisConfig requestConfigs(CopybookProcessingMode processingMode) {
-    CopybookConfig copybookConfig = new CopybookConfig(processingMode, SQLBackend.DB2_SERVER);
-    try {
-      return new AnalysisConfig(
-          configuration.getFeatures(),
-          new CopybookConfig(processingMode, configuration.getSqlBackend()),
-          configuration.getFlavors());
-    } catch (Exception e) {
-      LOG.warn("Can't get config-data, default config will be used instead");
-    }
-    return AnalysisConfig.defaultConfig(copybookConfig);
-  }
-
   private void registerToFutureMap(String uri, Future<?> docAnalysisFuture) {
     futureMap.put(uri, docAnalysisFuture);
   }
@@ -389,7 +373,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                     CopybookProcessingMode processingMode =
                         CopybookProcessingMode.getCopybookProcessingMode(
                             uri, CopybookProcessingMode.SKIP);
-                    AnalysisConfig config = requestConfigs(processingMode);
+                    AnalysisConfig config = configurationService.getConfig(processingMode);
                     AnalysisResult result = engine.analyze(uri, text, config);
                     registerDocument(uri, new CobolDocumentModel(text, result));
                     communications.publishDiagnostics(result.getDiagnostics());
@@ -432,8 +416,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         .getDepthFirstStream()
         .filter(hasType(COPY))
         .map(CopyNode.class::cast)
-        .filter(it -> !it.getUsages().isEmpty())
         .map(CopyNode::getUsages)
+        .filter(usages -> !usages.isEmpty())
         .flatMap(List::stream)
         .map(Location::getUri)
         .collect(toList());

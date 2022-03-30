@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -145,6 +146,7 @@ class TestOutlineTree {
                 .copybook(new CobolText("FOO", ""))
                 .copybook(new CobolText("BAR", "000100     01 HIDE-IT PIC 9(9)."))
                 .copybook(new CobolText("BAZ", ""))
+                .dialects(ImmutableList.of(IdmsDialect.NAME))
                 .build());
     assertNodeListEquals(
         expectedNodes,
@@ -155,7 +157,7 @@ class TestOutlineTree {
 
   private List<DocumentSymbol> getExpectedOutlineNodes() {
     return nested(
-        node("COPY FOO#COBOL", NodeType.COPYBOOK),
+        node("COPY FOO", NodeType.COPYBOOK),
         node(
             "PROGRAM: HELLO-WORLD",
             NodeType.PROGRAM,
@@ -176,14 +178,14 @@ class TestOutlineTree {
                             "WORKING-STORAGE SECTION",
                             NodeType.SECTION,
                             nested(
-                                node("COPY BAR#COBOL", NodeType.COPYBOOK),
+                                node("COPY BAR", NodeType.COPYBOOK),
                                 node("USER-NUM1", NodeType.FIELD),
                                 node("USER-NUM2", NodeType.FIELD),
                                 node(
                                     "USER-ADDRESS",
                                     NodeType.STRUCT,
                                     nested(
-                                        node("COPY BAZ#COBOL", NodeType.COPYBOOK),
+                                        node("COPY BAZ", NodeType.COPYBOOK),
                                         node("USER-CITY", NodeType.FIELD),
                                         node("USER-COUNTRY", NodeType.FIELD),
                                         node("USER-INDEX", NodeType.FIELD),

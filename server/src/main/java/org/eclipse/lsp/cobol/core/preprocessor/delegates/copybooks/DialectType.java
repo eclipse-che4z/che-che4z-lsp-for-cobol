@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 /**
- * Represents supported dialect types, used for resolving copybooks for different flavors
+ * Represents supported dialect types, used for resolving copybooks for different dialects
  */
 public enum DialectType {
   COBOL,

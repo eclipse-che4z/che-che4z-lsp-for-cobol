@@ -79,15 +79,6 @@ class TestIdmsCopy {
           + "       PROCEDURE DIVISION.\n"
           + "           MOVE 'ABC' TO {$MRB-ABCMAP-ID}.\n";
 
-  private static final String COPY_IDMS_PD1 =
-      "        PROCEDURE DIVISION.\n" + "           COPY IDMS {~SUBSCHEMA-BINDS}\n";
-
-  private static final String COPY_IDMS_PD2 =
-      "        PROCEDURE DIVISION.\n" + "           COPY IDMS {~ABCD} VERSION 103.\n";
-
-  private static final String COPY_IDMS_PD3 =
-      "        PROCEDURE DIVISION.\n" + "           COPY IDMS MODULE {~ABCD};\n";
-
   private static final String CB_NAME1 = "EMPLOYEE";
   private static final String CB1 = "          01 {$*EMPNAME}    PIC X(8).\n";
 
@@ -102,11 +93,6 @@ class TestIdmsCopy {
   private static final String CB_NAME3A = "MAPS";
   private static final String CB3 =
       "       01  {$*MRB-ABCMAP}.\n" + "            03  {$*MRB-ABCMAP-ID}          PIC X(8).\n";
-
-  private static final String CB_NAME4 = "SUBSCHEMA-BINDS";
-  private static final String CB_NAME4A = "ABCD";
-  private static final String CB4 =
-      "           BIND RUN-UNIT.\n" + "            BIND {$EMPLOYEE}.\n";
 
   private static final String CB_NAME5 = "FL002";
   private static final String CB5 = "       FD {$*EMP-FILE}.\n" + "       RECORD CONTAINS 80.\n";
@@ -139,24 +125,6 @@ class TestIdmsCopy {
   void testIdmsCopyWS5() {
     UseCaseEngine.runTest(
         TEXT + COPY_IDMS_WS5, ImmutableList.of(new CobolText(CB_NAME3, DialectType.IDMS.name(), CB3)), ImmutableMap.of());
-  }
-
-  @Test
-  void testIdmsCopyPD1() {
-    UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_PD1, ImmutableList.of(new CobolText(CB_NAME4, DialectType.IDMS.name(), CB4)), ImmutableMap.of());
-  }
-
-  @Test
-  void testIdmsCopyPD2() {
-    UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_PD2, ImmutableList.of(new CobolText(CB_NAME4A, DialectType.IDMS.name(), CB4)), ImmutableMap.of());
-  }
-
-  @Test
-  void testIdmsCopyPD3() {
-    UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_PD3, ImmutableList.of(new CobolText(CB_NAME4A, DialectType.IDMS.name(), CB4)), ImmutableMap.of());
   }
 
   @Test

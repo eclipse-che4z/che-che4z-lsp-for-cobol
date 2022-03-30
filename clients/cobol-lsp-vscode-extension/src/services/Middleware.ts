@@ -34,9 +34,9 @@ export class Middleware {
         if (requestLines.length > 0 && requestLines[0] !== undefined && requestLines[0].prefix == "cobol-lsp") {
             switch (requestLines[0].command) {
                 case "copybook-resolve":
-                    InfoStorage.set(requestLines[0].cobolFileName, requestLines[0].copybookName, requestLines[0].flavorName);
+                    InfoStorage.set(requestLines[0].cobolFileName, requestLines[0].copybookName, requestLines[0].dialectName);
                     return [await CopybookURI.resolveCopybookURI(requestLines[0].copybookName,
-                        requestLines[0].cobolFileName, requestLines[0].flavorName)]
+                        requestLines[0].cobolFileName, requestLines[0].dialectName)]
                 case "copybook-download":
                     const copybookNames = requestLines.map(requestLine => requestLine.copybookName);
                     this.copybookDownloader.downloadCopybooks(requestLines[0].cobolFileName, copybookNames,
@@ -68,7 +68,7 @@ export class RequestLine {
         readonly command: string,
         readonly cobolFileName: string,
         readonly copybookName: string,
-        readonly flavorName: string,
+        readonly dialectName: string,
         readonly quiet: boolean
     ) { }
 }

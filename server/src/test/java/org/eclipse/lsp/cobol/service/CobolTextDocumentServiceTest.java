@@ -21,7 +21,9 @@ import com.google.gson.JsonPrimitive;
 import org.awaitility.Awaitility;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
-import org.eclipse.lsp.cobol.core.model.tree.*;
+import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
@@ -48,7 +50,6 @@ import static java.util.Collections.*;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.*;
 import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.IMPLICIT_PATH;
 import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
-import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -69,17 +70,11 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
       "file:///c%3A/workspace/incorrect_document.cbl";
 
   private CobolTextDocumentService service;
-  private CopybookConfig cpyConfigEnabledMode;
-  private CopybookConfig cpyConfigDisabledMode;
-  private CopybookConfig cpyConfigSkipMode;
-  private Map<String, CopyDefinition> copyDefinitionMap = new HashMap<>();
+  private final Map<String, CopyDefinition> copyDefinitionMap = new HashMap<>();
 
   @BeforeEach
   void setupService() {
     service = getMockedTextDocumentServiceUsingSameThread();
-    cpyConfigEnabledMode = new CopybookConfig(ENABLED, DB2_SERVER);
-    cpyConfigDisabledMode = new CopybookConfig(DISABLED, DB2_SERVER);
-    cpyConfigSkipMode = new CopybookConfig(SKIP, DB2_SERVER);
   }
 
   @Test
@@ -87,7 +82,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     doNothing().when(communications).notifyThatDocumentAnalysed(anyString());
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
-
+    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
     CompletionItem completionItem = new CompletionItem();
     completionItem.setLabel("test");
     when(completions.collectFor(any(CobolDocumentModel.class), any(CompletionParams.class)))
@@ -108,6 +103,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     doNothing().when(communications).publishDiagnostics(anyMap());
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
+    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
     service.didChange(
         new DidChangeTextDocumentParams(
             new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0), textEdits));
@@ -121,6 +117,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     doNothing().when(communications).publishDiagnostics(anyMap());
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
+    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
     openDocument(service);
     service.getFutureMap().get(DOCUMENT_URI).get();
     assertEquals(1, closeGetter(service).size());
@@ -137,6 +134,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         new DidSaveTextDocumentParams(saveDocumentIdentifier);
     when(engine.analyze(eq(DOCUMENT_URI), eq(TEXT_EXAMPLE), any()))
         .thenReturn(AnalysisResult.builder().build());
+    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
@@ -152,6 +150,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void disableCopybookAnalysisOnExtendedDoc() throws ExecutionException, InterruptedException {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
+    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(DISABLED));
 
     service.didOpen(
         new DidOpenTextDocumentParams(
@@ -160,7 +159,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
     ArgumentCaptor<AnalysisConfig> argument = ArgumentCaptor.forClass(AnalysisConfig.class);
     verify(engine).analyze(eq(EXT_SRC_DOC_URI), anyString(), argument.capture());
-    assertEquals(cpyConfigDisabledMode, argument.getValue().getCopybookConfig());
+    assertEquals(DISABLED, argument.getValue().getCopybookConfig().getCopybookProcessingMode());
   }
 
   /**
@@ -171,6 +170,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void enableCopybooksOnDidOpenTest() throws ExecutionException, InterruptedException {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
+    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
@@ -178,7 +178,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
     ArgumentCaptor<AnalysisConfig> argument = ArgumentCaptor.forClass(AnalysisConfig.class);
     verify(engine).analyze(eq(DOCUMENT_URI), anyString(), argument.capture());
-    assertEquals(cpyConfigEnabledMode, argument.getValue().getCopybookConfig());
+    assertEquals(ENABLED, argument.getValue().getCopybookConfig().getCopybookProcessingMode());
   }
 
   /**
@@ -189,6 +189,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void enableCopybooksOnDidChangeTest() throws ExecutionException, InterruptedException {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
+    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(SKIP));
     doNothing().when(communications).publishDiagnostics(anyMap());
     service.didChange(
         new DidChangeTextDocumentParams(
@@ -198,7 +199,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
     ArgumentCaptor<AnalysisConfig> argument = ArgumentCaptor.forClass(AnalysisConfig.class);
     verify(engine).analyze(eq(DOCUMENT_URI), anyString(), argument.capture());
-    assertEquals(cpyConfigSkipMode, argument.getValue().getCopybookConfig());
+    assertEquals(SKIP, argument.getValue().getCopybookConfig().getCopybookProcessingMode());
   }
 
   /**
@@ -206,6 +207,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    * may re-run analysis of the open documents if it receives a notification.
    */
   @Test
+
   void observerCallback() {
     Map<String, List<Diagnostic>> diagnosticsNoErrors = emptyMap();
     Map<String, List<Diagnostic>> diagnosticsWithErrors = createDefaultDiagnostics();
@@ -224,22 +226,22 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
      */
     doReturn(resultNoErrors)
         .when(engine)
-        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(cpyConfigEnabledMode));
+        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(ENABLED));
     doReturn(resultWithErrors)
         .when(engine)
         .analyze(
             DOCUMENT_WITH_ERRORS_URI,
             INCORRECT_TEXT_EXAMPLE,
-            AnalysisConfig.defaultConfig(cpyConfigEnabledMode));
+            AnalysisConfig.defaultConfig(ENABLED));
     doReturn(resultNoErrors)
         .when(engine)
-        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(cpyConfigSkipMode));
+        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(SKIP));
     doReturn(resultWithErrors)
         .when(engine)
         .analyze(
-            DOCUMENT_WITH_ERRORS_URI,
-            INCORRECT_TEXT_EXAMPLE,
-            AnalysisConfig.defaultConfig(cpyConfigSkipMode));
+            DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, AnalysisConfig.defaultConfig(SKIP));
+    lenient().when(configurationService.getConfig(SKIP)).thenReturn(AnalysisConfig.defaultConfig(SKIP));
+    lenient().when(configurationService.getConfig(ENABLED)).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
 
     // create a service and verify is subscribed to the required event
     CobolTextDocumentService service = verifyServiceStart();
@@ -336,8 +338,8 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testAnalysis() throws ExecutionException, InterruptedException {
     doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.builder().build()))
         .when(engine)
-        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(cpyConfigEnabledMode));
-
+        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(ENABLED));
+    when(configurationService.getConfig(ENABLED)).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
@@ -368,7 +370,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
     verify(communications).notifyThatLoadingInProgress(uri);
-    verify(engine).analyze(uri, textToAnalyse, AnalysisConfig.defaultConfig(cpyConfigEnabledMode));
+    verify(engine).analyze(uri, textToAnalyse, AnalysisConfig.defaultConfig(ENABLED));
     verify(dataBus)
         .postData(
             AnalysisFinishedEvent.builder()
@@ -394,7 +396,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
             new VersionedTextDocumentIdentifier(uri, newVersion),
             ImmutableList.of(new TextDocumentContentChangeEvent(textToAnalyse))));
 
-    verify(engine).analyze(uri, textToAnalyse, AnalysisConfig.defaultConfig(cpyConfigSkipMode));
+    verify(engine).analyze(uri, textToAnalyse, AnalysisConfig.defaultConfig(SKIP));
     verify(communications, times(2)).publishDiagnostics(diagnostics);
   }
 
@@ -406,9 +408,9 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
       String uri) {
 
     // for didOpen and after RunAnalysisEvent
-    verify(engine, times(2)).analyze(uri, text, AnalysisConfig.defaultConfig(cpyConfigEnabledMode));
+    verify(engine, times(2)).analyze(uri, text, AnalysisConfig.defaultConfig(ENABLED));
     // for didChange
-    verify(engine, times(1)).analyze(uri, text, AnalysisConfig.defaultConfig(cpyConfigSkipMode));
+    verify(engine, times(1)).analyze(uri, text, AnalysisConfig.defaultConfig(SKIP));
     // all three above produces the same diagnostics
     verify(communications, times(3)).publishDiagnostics(diagnostics);
   }
@@ -424,12 +426,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testImmediateClosingOfDocumentDoNotCauseNPE() {
     service = getMockedTextDocumentServiceUsingSeparateThread();
     lenient()
-        .when(
-            engine.analyze(
-                DOCUMENT_URI,
-                TEXT_EXAMPLE,
-                new AnalysisConfig(
-                    Collections.emptySet(), cpyConfigEnabledMode, ImmutableList.of())))
+        .when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(ENABLED)))
         .thenReturn(AnalysisResult.builder().build());
 
     service.didOpen(
@@ -455,6 +452,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     AnalysisResult analysisResult = AnalysisResult.builder().build();
     when(engine.analyze(eq(DOCUMENT_URI), eq(TEXT_EXAMPLE), any(AnalysisConfig.class)))
         .thenReturn(analysisResult);
+    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
 
     service.didOpen(new DidOpenTextDocumentParams(testHoverDocument));
 
@@ -489,24 +487,25 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     CopyNode nested = new CopyNode(Locality.builder().uri(PARENT_CPY_URI).build(), "NESTED");
     CopyNode nested2 =
         new CopyNode(Locality.builder().uri(NESTED_CPY_URI).build(), "NESTED_CPY_URI");
-    CopyDefinition parentDefinition = new CopyDefinition(
-            new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), "PARENT");
+    CopyDefinition parentDefinition =
+        new CopyDefinition(new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), "PARENT");
     parentDefinition.addUsages(parent);
     parent.setDefinition(parentDefinition);
-    CopyDefinition nestedDefinition = new CopyDefinition(
-            new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), "NESTED");
+    CopyDefinition nestedDefinition =
+        new CopyDefinition(new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), "NESTED");
     nestedDefinition.addUsages(nested);
     nested.setDefinition(nestedDefinition);
-    CopyDefinition nested2Definition = new CopyDefinition(
+    CopyDefinition nested2Definition =
+        new CopyDefinition(
             new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), "NESTED_CPY_URI");
     nested2Definition.addUsages(nested2);
     nested2.setDefinition(nested2Definition);
     rootNode.addChild(parent);
     rootNode.addChild(nested);
     rootNode.addChild(nested2);
-    when(engine.analyze(
-            DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(cpyConfigEnabledMode)))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(ENABLED)))
         .thenReturn(analysisResult);
+    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
 
     service.didOpen(
         new DidOpenTextDocumentParams(
@@ -526,6 +525,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
     when(formations.format(any(CobolDocumentModel.class))).thenReturn(emptyList());
+    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
@@ -543,6 +543,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
       throws ExecutionException, InterruptedException {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
+    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
 
     when(occurrences.findDefinitions(
             any(CobolDocumentModel.class), any(TextDocumentPositionParams.class)))
@@ -565,6 +566,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
       throws ExecutionException, InterruptedException {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
+    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
 
     when(occurrences.findReferences(
             any(CobolDocumentModel.class),

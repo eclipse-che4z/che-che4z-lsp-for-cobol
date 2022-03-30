@@ -18,32 +18,66 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.core.CobolParserBaseListener;
+import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.regex.Pattern;
 
+import static org.eclipse.lsp.cobol.core.CobolParser.EntryNameContext;
 import static org.eclipse.lsp.cobol.core.CobolParser.LevelNumberContext;
 
-/** This listener adjusts the variable level numbers of copybooks */
-public class LevelNumberAdjustingListener extends CobolParserBaseListener
+/** This listener adjusts the variable level numbers and apply other modifications of copybooks */
+public class CopybookModificationListener extends CobolParserBaseListener
     implements PreprocessorStack {
   private final Deque<StringBuilder> accumulator = new ArrayDeque<>();
   private final BufferedTokenStream tokens;
-  private final int copybookNumber;
+  private final CopyStatementModifier modifier;
+  private final String suffix;
   private int difference = Integer.MIN_VALUE;
+  private static final Pattern REPLACEABLE_NAME = Pattern.compile("(?i).*?-[A-Z0-9]{3}$");
 
-  public LevelNumberAdjustingListener(int copybookNumber, BufferedTokenStream tokens) {
-    this.copybookNumber = copybookNumber;
+  public CopybookModificationListener(
+      CopyStatementModifier modifier, String suffix, BufferedTokenStream tokens) {
+    this.modifier = modifier;
     this.tokens = tokens;
+    this.suffix = suffix;
     accumulator.add(new StringBuilder());
   }
 
   @Override
   public void exitLevelNumber(LevelNumberContext ctx) {
     int number = Integer.parseInt(pop());
-    if (difference == Integer.MIN_VALUE) difference = copybookNumber - number;
+    if (difference == Integer.MIN_VALUE) difference = modifier.getLevelNumber() - number;
     write(String.format("%02d", number + difference));
+  }
+
+  @Override
+  public void enterEntryName(EntryNameContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitEntryName(EntryNameContext ctx) {
+    if (ctx.FILLER() != null) {
+      write(pop());
+      return;
+    }
+    final String name = pop();
+    write(shouldReplaceName(name) ? replaceSuffix(name) : appendSuffix(name));
+  }
+
+  private boolean shouldReplaceName(String name) {
+    return !suffix.isEmpty() && REPLACEABLE_NAME.matcher(name).matches();
+  }
+
+  private String replaceSuffix(String name) {
+    return (name.length() > 1 ? name.substring(0, name.length() - 2) : "") + suffix;
+  }
+
+  private String appendSuffix(String name) {
+    return name + suffix;
   }
 
   @Override

@@ -57,15 +57,12 @@ class TestIdmsTransferStatement {
   private static final String TRANSFER_ALL =
       "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1};\r\n";
 
-  private static final String TRANSFER_NO_TERM =
-      "           TRANSFER CONTROL TO 'TSTPROG' LINK {DISPLAY|1} 'ERROR'.\r\n";
-
   private static final String TRANSFER_ON =
       "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1};\r\n"
           + "             ON {$ANY-ERROR-STATUS} DISPLAY 'TRANSFER ERROR'.\r\n";
 
   private static final String TRANSFER_PGM_TOO_LONG_ERROR =
-      "           TRANSFER CONTROL TO {'TSTPROGXXX'|2} XCTL.\r\n";
+      "           TRANSFER CONTROL TO {'TSTPROGXXX'|1} XCTL.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
@@ -74,7 +71,6 @@ class TestIdmsTransferStatement {
         BOILERPLATE + TRANSFER_PARMS2,
         BOILERPLATE + TRANSFER_USING_PARMS,
         BOILERPLATE + TRANSFER_ALL,
-        BOILERPLATE + TRANSFER_NO_TERM,
         BOILERPLATE + TRANSFER_ON,
         BOILERPLATE + TRANSFER_PGM_TOO_LONG_ERROR);
   }
@@ -90,14 +86,10 @@ class TestIdmsTransferStatement {
             "1",
             new Diagnostic(
                 null,
-                "Syntax error on 'DISPLAY' expected {'.', ';'}",
-                Error,
-                SourceInfoLevels.ERROR.getText()),
-            "2",
-            new Diagnostic(
-                null,
                 "Max length limit of 8 bytes allowed for program name.",
                 Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

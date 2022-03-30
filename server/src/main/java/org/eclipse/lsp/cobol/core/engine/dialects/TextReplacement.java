@@ -12,19 +12,17 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.flavors;
+package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The class for replacing entire ParserRuleContext's with spaces.
  */
 public class TextReplacement {
   private final String text;
-  private List<ParserRuleContext> contexts = new ArrayList<>();
+  private int textIndexPointer = 0;
+  private final StringBuilder resultingText = new StringBuilder();
 
   public TextReplacement(String text) {
     this.text = text;
@@ -34,8 +32,23 @@ public class TextReplacement {
    * Add a context which will be replaced with spaces
    * @param ctx the ANTLR context
    */
-  public void addReplacementContest(ParserRuleContext ctx) {
-    contexts.add(ctx);
+  public void addReplacementContext(ParserRuleContext ctx) {
+    addReplacementContext(ctx, "");
+  }
+
+  /**
+   * Add a context which will be replaced with spaces with specified prefix
+   * @param ctx the ANTLR context
+   * @param prefix the prefix to inserting before the context
+   */
+  public void addReplacementContext(ParserRuleContext ctx, String prefix) {
+    resultingText
+        .append(text, textIndexPointer, ctx.start.getStartIndex())
+        .append(prefix)
+        .append(text
+            .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
+            .replaceAll("[^\n]", "\u200B"));
+    textIndexPointer = ctx.stop.getStopIndex() + 1;
   }
 
   /**
@@ -43,16 +56,6 @@ public class TextReplacement {
    * @return the replaced text
    */
   public String getResultingText() {
-    int textIndexPointer = 0;
-    StringBuilder resultingText = new StringBuilder();
-    for (ParserRuleContext ctx: contexts) {
-      resultingText
-          .append(text, textIndexPointer, ctx.start.getStartIndex())
-          .append(text
-              .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
-              .replaceAll("[^\n]", " "));
-      textIndexPointer = ctx.stop.getStopIndex() + 1;
-    }
     resultingText.append(text.substring(textIndexPointer));
     return resultingText.toString();
   }

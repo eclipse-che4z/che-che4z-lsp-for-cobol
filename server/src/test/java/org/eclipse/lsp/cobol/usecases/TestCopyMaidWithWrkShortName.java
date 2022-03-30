@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2022 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -18,39 +18,33 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/**
- * The COPY MAID statement without the level number specified should not be resolved, but the
- * semantic data should be collected.
- */
-class TestSkippingCopybookAnalysis {
+/** WRK qualifier should work even with copybooks with too short name. */
+class TestCopyMaidWithWrkShortName {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. VSAMTEST.\n"
+          + "       PROGRAM-ID.    TEST.\n"
+          + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       COPY MAID {~ABCD}.\n"
+          + "        01 {$*PARENT}.\n"
+          + "            05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           DISPLAY {ABCD1|1}.";
+          + "           DISPLAY {$ANT}.";
 
-  private static final String COPYBOOK = "       01 ABCD1 PIC 9.";
+  private static final String BHTRGL_XBG =
+      "            09 {$*A^ANT} PIC X.\n"
+          + "            09 PIC X.\n"
+          + "            09 FILLER PIC x.";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(new CobolText("ABCD", DialectType.MAID.name(), COPYBOOK)),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null,
-                "Variable ABCD1 is not defined",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+        ImmutableList.of(
+            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", BHTRGL_XBG)),
+        ImmutableMap.of());
   }
 }

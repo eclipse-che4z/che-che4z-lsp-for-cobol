@@ -147,30 +147,6 @@
                     "description": "Default list of USS paths to search for copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
                     "uniqueItems": true
                 },
-                "cobol-lsp.cpy-manager.maid.paths-local": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of relative local paths to search for MAID copybooks",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.maid.paths-dsn": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of datasets to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.maid.paths-uss": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of USS paths to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-                    "uniqueItems": true
-                },
                 "cobol-lsp.cpy-manager.idms.paths-local": {
                     "type": "array",
                     "items": {
@@ -390,6 +366,17 @@
                         "DATACOM_SERVER - CA DATACOM Server"
                     ],
                     "description": "The target SQL backend server which will be used in mainframe"
+                },
+                "cobol-lsp.dialects": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "IDMS"
+                        ]
+                    },
+                    "description": "List of enabled dialects",
+                    "uniqueItems": true
                 }
             }
         },
@@ -459,6 +446,6 @@
         "tslint": "^5.18.0",
         "tslint-sonarts": "^1.9.0",
         "typescript": "^3.5.3",
-        "vsce": "1.103.1"
+        "vsce": "^2.7.0"
     }
 }

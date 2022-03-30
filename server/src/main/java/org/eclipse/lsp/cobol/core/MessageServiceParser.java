@@ -94,6 +94,102 @@ public abstract class MessageServiceParser extends Parser {
     }
   }
 
+  /**
+   * Validate a string length without first and the last symbol and throw an error if it is incorrect
+   *
+   * @param input string to check
+   * @param objectType type of the object to be passed as a message argument
+   * @param validLength expected length for this input
+   */
+  protected void validateLengthTrimBorders(String input, String objectType, Integer validLength) {
+    validateLength(input.substring(1, input.length() - 1), objectType, validLength);
+  }
+
+  /**
+   * Validate a string with a regex and throw an error if it is incorrect
+   *
+   * @param input string to check
+   * @param regex regex string
+   * @param error error code name
+   */
+  @VisibleForTesting
+  protected void validateTokenWithRegex(String input, String regex, String error) {
+    if (!input.matches(regex)) {
+      notifyError(error, input);
+    }
+  }
+
+  /**
+   * Validate a string value if it is an integer between 0 and 32767
+   * and throw an error if it is incorrect
+   *
+   * @param input string to check
+   */
+  @VisibleForTesting
+  protected void validateDb2MaxInt(String input) {
+    int value = Integer.parseInt(input);
+    if (!(value > 0 &&  value <= 32767)) {
+      notifyError("db2SqlParser.maxIntValue", input);
+    }
+  }
+
+  /**
+   * Validate a string value if it is an integer between -2 and 99
+   * and throw an error if it is incorrect
+   *
+   * @param input string to check
+   */
+  @VisibleForTesting
+  protected void validateTextInRange(String input, int min, int max) {
+    int value = Integer.parseInt(input);
+    if (!(value > min && value < max)) {
+      notifyError("paser.validValueMsg", input,
+          String.format("in range %d to %d", min + 1, max - 1));
+    }
+  }
+
+  /**
+   * Validate a string value if it is an integer 34 or 16
+   * and throw an error if it is incorrect
+   *
+   * @param input string to check
+   */
+  @VisibleForTesting
+  protected void validate34or16(String input) {
+    int value = Integer.parseInt(input);
+    if (!(value == 34 || value == 16)) {
+      notifyError("paser.validValueMsg", input, "34 or 16");
+    }
+  }
+
+  /**
+   * Validate a string value if it is a level number
+   *
+   * @param input string to check
+   */
+  @VisibleForTesting
+  protected void validateLevel(String input) {
+    if (!(input.equals("1") || input.equals("ANY"))) {
+      notifyError("paser.validValueMsg", input, "1 or ANY");
+    }
+  }
+
+  /**
+   * Validate database and table names
+   *
+   * @param input string to check
+   */
+  @VisibleForTesting
+  protected void validateDbNames(String input) {
+    String[] names = input.split("\\.");
+    if (names.length > 1) {
+      validateLength(names[0], "database name", 8);
+      validateLength(names[1], "table space name", 8);
+    } else {
+      validateLength(input, "table space name", 8);
+    }
+  }
+
   private String getMessageForParser(String messageKey, String... parameters) {
     return ((CobolErrorStrategy) this.getErrorHandler())
         .getMessageService()

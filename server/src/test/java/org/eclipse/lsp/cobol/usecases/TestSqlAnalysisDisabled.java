@@ -26,7 +26,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-/** This test checks if sql UPDATE statement works correctly when SQL id enabled and do not work if disabled. */
+/**
+ * This test checks if sql UPDATE statement works correctly when SQL id enabled and do not work if
+ * disabled.
+ */
 class TestSqlAnalysisDisabled {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -57,7 +60,14 @@ class TestSqlAnalysisDisabled {
   @Test
   void test() {
     UseCaseEngine.runTest(UPDATE_SQL_ENABLED, ImmutableList.of(), ImmutableMap.of());
-    UseCaseEngine.runTest(UPDATE_SQL_DISABLED, ImmutableList.of(), ImmutableMap.of(), Collections.emptyList(),
-        new AnalysisConfig(Collections.emptySet(), new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER), ImmutableList.of()));
+    UseCaseEngine.runTest(
+        UPDATE_SQL_DISABLED,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        Collections.emptyList(),
+        new AnalysisConfig(
+            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
+            ImmutableList.of(),
+            ImmutableList.of()));
   }
 }

@@ -23,7 +23,6 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -125,18 +124,9 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
         getConstantDefinitions(),
         constantUsages,
         copybookDefinitions,
-        remap(copybookUsages),
+        copybookUsages,
         makeSubroutinesDefinitions(subroutineNames),
         subroutineUsages);
-  }
-
-  private Map<String, List<Location>> remap(Map<String, List<Location>> map) {
-    Set<String> keys = new HashSet<>(map.keySet());
-    keys.forEach(k -> {
-      map.put(new CopybookName(k, dialectType).getProcessingName(), map.get(k));
-      map.remove(k);
-    });
-    return map;
   }
 
   @Override
@@ -401,7 +391,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private Consumer<String> defineCopybook(String uri) {
     return copybookName ->
         copybookDefinitions.put(
-            new CopybookName(copybookName, dialectType).getProcessingName(),
+            copybookName,
             singletonList(new Location(uri, new Range(new Position(0, 0), new Position(0, 0)))));
   }
 
@@ -423,8 +413,20 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
       boolean stripQuotes) {
 
     String replacementText =
-        ofNullable(replacement).map(it -> it.identifier().getText()).orElse(text);
-    Range range = retrieveRange(ctx, replacementText);
+        ofNullable(replacement)
+            .map(ReplacementContext::identifier)
+            .map(ParserRuleContext::getText)
+            .orElse(text);
+
+    int tokenLength =
+        ofNullable(replacement)
+            .filter(it -> it.FINAL_SIZE_REPLACEMENT_START() != null)
+            .map(ReplacementContext::identifier)
+            .map(ParserRuleContext::getText)
+            .map(String::length)
+            .orElseGet(text::length);
+
+    Range range = retrieveRange(ctx, tokenLength);
     ofNullable(storage)
         .ifPresent(
             it -> {
@@ -436,7 +438,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
             });
 
     ofNullable(replacement).ifPresent(addPositionShift());
-    lineShifts[getLine(ctx.start)] += text.length() - replacementText.length();
+    lineShifts[getLine(ctx.start)] += text.length() - tokenLength;
     registerDiagnostics(range, diagnosticIds);
     write(getHiddenText(tokens.getHiddenTokensToLeft(ctx.start.getTokenIndex())));
     write(text);
@@ -487,13 +489,13 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                     it.getCode()));
   }
 
-  private Range retrieveRange(ParserRuleContext ctx, String text) {
+  private Range retrieveRange(ParserRuleContext ctx, int length) {
     int line = getLine(ctx.getStart());
     int start = ctx.start.getCharPositionInLine() - lineShifts[line];
     // accumulate lengths of removable symbols (opening and closing marks) to calculate the trailing
     // positions in the line correctly
     lineShifts[line] += ctx.start.getText().length() + ctx.stop.getText().length();
-    return new Range(new Position(line, start), new Position(line, start + text.length()));
+    return new Range(new Position(line, start), new Position(line, start + length));
   }
 
   /**

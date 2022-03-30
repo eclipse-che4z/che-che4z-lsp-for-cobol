@@ -18,27 +18,31 @@ package org.eclipse.lsp.cobol.usecases.engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.core.model.tree.*;
+import org.eclipse.lsp.cobol.core.model.tree.Context;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.*;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
@@ -61,7 +65,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * <li>~ - Copybook
  * <li>* - Definition
  * <li>| - Diagnostic
- * <li>^ - Replacement
+ * <li>^ - Replacement that calculates the position of the element after the replacement
+ * <li>` - Replacement that calculates the position of the element before the replacement
  * <li>& - Constant (predefined variable)
  * <li>% - Subroutine
  * <li>{_ _} - Multi-token error
@@ -83,9 +88,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *     one-token syntax or semantic errors.
  *
  *     <p>To show that the token will be replaced during the pre-processing on the actual language
- *     engine, you may mark it with '^' character with the result specified after. For example,
- *     {$*:TAG:-ID^CSTOUT-ID} will return ':TAG:-ID' as the text, and CSTOUT-ID as a variable
- *     definition. The position will be calculated as for the replacement.
+ *     engine, you may mark it with '^' or '`' characters with the result specified after. For
+ *     example, {$*:TAG:-ID^CSTOUT-ID} will return ':TAG:-ID' as the text, and CSTOUT-ID as a
+ *     variable definition. The position will be calculated as for the replacement. If you specify
+ *     {~CPYNM`CPYNM_ABC}, the result will be 'CPYNM' as the text and the 'CPYNM_ABC' as a copybook
+ *     usage name. The position will be calculated as for the original text.
  *
  *     <p>Some semantic errors may consist of several tokens. In order to show this, you may use
  *     multi-token error declaration: {_{$CHILD} OF {$PARENT}|id_}. The included semantic elements
@@ -151,7 +158,7 @@ public class UseCaseEngine {
         copybooks,
         expectedDiagnostics,
         subroutineNames,
-        AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
+        AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
   }
 
   /**
@@ -170,7 +177,8 @@ public class UseCaseEngine {
    * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
    *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
    * @param subroutineNames - list of subroutine names used in the document
-   * @param analysisConfig - analysis settings: copybook processing mode and the SQL backend for the analysis
+   * @param analysisConfig - analysis settings: copybook processing mode and the SQL backend for the
+   *     analysis
    * @return analysis result object
    */
   public AnalysisResult runTest(
@@ -182,7 +190,11 @@ public class UseCaseEngine {
 
     PreprocessedDocument document =
         AnnotatedDocumentCleaning.prepareDocument(
-            text, copybooks, subroutineNames, expectedDiagnostics, analysisConfig.getCopybookConfig().getSqlBackend());
+            text,
+            copybooks,
+            subroutineNames,
+            expectedDiagnostics,
+            analysisConfig.getCopybookConfig().getSqlBackend());
     AnalysisResult actual =
         analyze(
             UseCase.builder()
@@ -191,38 +203,23 @@ public class UseCaseEngine {
                 .copybooks(document.getCopybooks())
                 .subroutines(subroutineNames)
                 .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
-                .copybookProcessingMode(analysisConfig.getCopybookConfig().getCopybookProcessingMode())
+                .copybookProcessingMode(
+                    analysisConfig.getCopybookConfig().getCopybookProcessingMode())
                 .features(analysisConfig.getFeatures())
-                .flavors(analysisConfig.getFlavors())
+                .dialects(analysisConfig.getDialects())
                 .build());
-    TestData expected = document.getTestData();
-    if (copybooks.isEmpty()) {
-      assertResultEquals(actual, expected, UseCaseEngine::normalize);
-    } else {
-      assertResultEquals(actual, expected);
-    }
+    assertResultEquals(actual, document.getTestData());
     return actual;
   }
 
-  private Map<String, List<Location>> normalize(Map<String, List<Location>> map) {
-    Map<String, List<Location>> result = new HashMap<>();
-    map.forEach((k, v) -> result.put(CopybookName.extractName(k), v));
-    return result;
-  }
-
   private static void assertResultEquals(AnalysisResult actual, TestData expected) {
-    assertResultEquals(actual, expected, (map) -> map);
-  }
-
-  private static void assertResultEquals(AnalysisResult actual, TestData expected,
-                                         Function<Map<String, List<Location>>, Map<String, List<Location>>> normalize) {
     assertDiagnostics(expected.getDiagnostics(), actual.getDiagnostics());
 
     assertResult(
         "Copybook definitions:",
         expected.getCopybookDefinitions(),
-        extractCopybookDefinitions(actual));
-    assertResult("Copybook usages:", normalize.apply(expected.getCopybookUsages()), normalize.apply(extractCopybookUsages(actual)));
+        extractDefinitions(actual, COPY));
+    assertResult("Copybook usages:", expected.getCopybookUsages(), extractUsages(actual, COPY));
 
     assertResult(
         "Variable definition:",
@@ -249,45 +246,30 @@ public class UseCaseEngine {
     assertResult(
         "Subroutine definitions: ",
         expected.getSubroutineDefinitions(),
-        extractSubroutineDefinitions(actual));
+        extractDefinitions(actual, SUBROUTINE_NAME_NODE));
     assertResult(
-        "Subroutine usage:", expected.getSubroutineUsages(), extractSubroutineUsages(actual));
+        "Subroutine usage:",
+        expected.getSubroutineUsages(),
+        extractUsages(actual, SUBROUTINE_NAME_NODE));
   }
 
   private Map<String, List<Location>> extractVariableDefinitions(AnalysisResult result) {
-    return getVariableStream(result)
-        .filter(it -> !it.getLocality().getUri().startsWith(PREF_IMPLICIT))
-        .collect(groupingBy(VariableNode::getName))
-        .entrySet()
-        .stream()
-        .collect(
-            toMap(
-                Entry::getKey,
-                entry ->
-                    entry.getValue().stream()
-                        .map(VariableNode::getDefinitions)
-                        .flatMap(List::stream)
-                        .distinct()
-                        .collect(toList())));
+    return extractVariables(
+        result,
+        it -> !it.getLocality().getUri().startsWith(PREF_IMPLICIT),
+        Context::getDefinitions);
   }
 
   private Map<String, List<Location>> extractVariableUsages(AnalysisResult result) {
-    return getVariableStream(result)
-        .filter(variable -> !variable.getUsages().isEmpty())
-        .collect(groupingBy(VariableNode::getName))
-        .entrySet()
-        .stream()
-        .collect(
-            toMap(
-                Entry::getKey,
-                entry ->
-                    entry.getValue().stream()
-                        .map(VariableNode::getUsages)
-                        .flatMap(List::stream)
-                        .collect(toList())));
+    return extractVariables(
+        result, variable -> !variable.getUsages().isEmpty(), Context::getUsages);
   }
 
-  private Stream<VariableNode> getVariableStream(AnalysisResult result) {
+  private Map<String, List<Location>> extractVariables(
+      AnalysisResult result,
+      Predicate<VariableNode> predicate,
+      Function<Context, List<Location>> extractor) {
+
     return result
         .getRootNode()
         .getDepthFirstStream()
@@ -296,119 +278,45 @@ public class UseCaseEngine {
         .map(ProgramNode::getVariables)
         .map(Multimap::values)
         .flatMap(Collection::stream)
-        .filter(it -> !FILLER_NAME.equals(it.getName()));
-  }
-
-  private Map<String, List<Location>> extractSubroutineDefinitions(AnalysisResult result) {
-    return result
-        .getRootNode()
-        .getDepthFirstStream()
-        .filter(hasType(SUBROUTINE_NAME_NODE))
-        .map(SubroutineNameNode.class::cast)
-        .filter(it -> !it.getDefinition().getLocation().getUri().startsWith(PREF_IMPLICIT))
-        .collect(groupingBy(SubroutineNameNode::getName))
-        .entrySet()
-        .stream()
-        .collect(
-            toMap(
-                Entry::getKey,
-                entry ->
-                    entry.getValue().stream()
-                        .map(SubroutineNameNode::getDefinitions)
-                        .flatMap(List::stream)
-                        .distinct()
-                        .collect(toList())));
-  }
-
-  private Map<String, List<Location>> extractCopybookDefinitions(AnalysisResult result) {
-    return result
-        .getRootNode()
-        .getDepthFirstStream()
-        .filter(hasType(COPY))
-        .map(CopyNode.class::cast)
-        .filter(it -> !it.getDefinition().getLocation().getUri().startsWith(PREF_IMPLICIT))
-        .collect(groupingBy(CopyNode::getName))
-        .entrySet()
-        .stream()
-        .collect(
-            toMap(
-                Entry::getKey,
-                entry ->
-                    entry.getValue().stream()
-                        .map(CopyNode::getDefinitions)
-                        .flatMap(List::stream)
-                        .distinct()
-                        .collect(toList())));
-  }
-
-  private Map<String, List<Location>> extractCopybookUsages(AnalysisResult actual) {
-    return actual
-        .getRootNode()
-        .getDepthFirstStream()
-        .filter(hasType(COPY))
-        .map(CopyNode.class::cast)
-        .filter(it -> !it.getUsages().isEmpty())
-        .collect(groupingBy(CopyNode::getName))
-        .entrySet()
-        .stream()
-        .collect(
-            toMap(
-                Entry::getKey,
-                entry ->
-                    entry.getValue().stream()
-                        .map(CopyNode::getUsages)
-                        .flatMap(List::stream)
-                        .distinct()
-                        .collect(toList())));
-  }
-
-  private static Map<String, List<Location>> extractSubroutineUsages(AnalysisResult result) {
-    return result
-        .getRootNode()
-        .getDepthFirstStream()
-        .filter(hasType(SUBROUTINE_NAME_NODE))
-        .map(SubroutineNameNode.class::cast)
-        .filter(it -> !it.getUsages().isEmpty())
-        .collect(groupingBy(SubroutineNameNode::getName))
-        .entrySet()
-        .stream()
-        .collect(
-            toMap(
-                Entry::getKey,
-                entry ->
-                    entry.getValue().stream()
-                        .map(SubroutineNameNode::getUsages)
-                        .flatMap(List::stream)
-                        .distinct()
-                        .collect(toList())));
+        .filter(it -> !FILLER_NAME.equals(it.getName()))
+        .filter(predicate)
+        .collect(toMap(extractor));
   }
 
   private Map<String, List<Location>> extractDefinitions(AnalysisResult result, NodeType nodeType) {
-    return result
-        .getRootNode()
-        .getDepthFirstStream()
-        .filter(hasType(nodeType))
-        .map(Context.class::cast)
-        .filter(it -> !it.getDefinitions().isEmpty())
-        .collect(
-            toMap(
-                Context::getName,
-                Context::getDefinitions,
-                (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).collect(toList())));
+    return extract(
+        result,
+        nodeType,
+        Context::getDefinitions,
+        context ->
+            !(context.getDefinitions().isEmpty()
+                || context.getDefinitions().get(0).getUri().startsWith(PREF_IMPLICIT)));
   }
 
   private Map<String, List<Location>> extractUsages(AnalysisResult result, NodeType nodeType) {
+    return extract(result, nodeType, Context::getUsages, context -> !context.getUsages().isEmpty());
+  }
+
+  private Map<String, List<Location>> extract(
+      AnalysisResult result,
+      NodeType nodeType,
+      Function<Context, List<Location>> extractor,
+      Predicate<Context> predicate) {
     return result
         .getRootNode()
         .getDepthFirstStream()
         .filter(hasType(nodeType))
         .map(Context.class::cast)
-        .filter(it -> !it.getUsages().isEmpty())
-        .collect(
-            toMap(
-                Context::getName,
-                Context::getUsages,
-                (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).collect(toList())));
+        .filter(predicate)
+        .collect(toMap(extractor));
+  }
+
+  private Collector<Context, ?, Map<String, List<Location>>> toMap(
+      Function<Context, List<Location>> extractor) {
+    return Collectors.toMap(
+        Context::getName,
+        extractor,
+        (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).distinct().collect(toList()));
   }
 
   private void assertDiagnostics(

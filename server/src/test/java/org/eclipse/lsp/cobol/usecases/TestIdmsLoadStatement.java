@@ -89,6 +89,8 @@ class TestIdmsLoadStatement {
                 null,
                 "Max length limit of 8 bytes allowed for dictionary name.",
                 Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

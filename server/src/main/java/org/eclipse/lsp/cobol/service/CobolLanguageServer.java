@@ -49,15 +49,17 @@ import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
 public class CobolLanguageServer implements LanguageServer {
 
   private final DisposableLSPStateService disposableLSPStateService;
-  private TextDocumentService textService;
-  private WorkspaceService workspaceService;
-  private WatcherService watchingService;
-  private SettingsService settingsService;
-  private LocaleStore localeStore;
-  private CustomThreadPoolExecutor customThreadPoolExecutor;
-  private Configuration configuration;
+  private final TextDocumentService textService;
+  private final WorkspaceService workspaceService;
+  private final WatcherService watchingService;
+  private final SettingsService settingsService;
+  private final LocaleStore localeStore;
+  private final CustomThreadPoolExecutor customThreadPoolExecutor;
+  private final ConfigurationService configurationService;
+  private final CopybookNameService copybookNameService;
 
   @Inject
+  @SuppressWarnings("squid:S107")
   CobolLanguageServer(
       TextDocumentService textService,
       WorkspaceService workspaceService,
@@ -66,7 +68,8 @@ public class CobolLanguageServer implements LanguageServer {
       LocaleStore localeStore,
       CustomThreadPoolExecutor customThreadPoolExecutor,
       DisposableLSPStateService disposableLSPStateService,
-      Configuration configuration) {
+      ConfigurationService configurationService,
+      CopybookNameService copybookNameService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
@@ -74,7 +77,8 @@ public class CobolLanguageServer implements LanguageServer {
     this.localeStore = localeStore;
     this.customThreadPoolExecutor = customThreadPoolExecutor;
     this.disposableLSPStateService = disposableLSPStateService;
-    this.configuration = configuration;
+    this.configurationService = configurationService;
+    this.copybookNameService = copybookNameService;
   }
 
   @Override
@@ -120,12 +124,13 @@ public class CobolLanguageServer implements LanguageServer {
    */
   @Override
   public void initialized(@Nullable InitializedParams params) {
+    configurationService.updateConfigurationFromSettings();
     watchingService.watchConfigurationChange();
     watchingService.watchPredefinedFolder();
     addLocalFilesWatcher();
     getLocaleFromClient();
     getLogLevelFromClient();
-    configuration.updateConfigurationFromSettings();
+    copybookNameService.collectLocalCopybookNames();
   }
 
   private void getLogLevelFromClient() {

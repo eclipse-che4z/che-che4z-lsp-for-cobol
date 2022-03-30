@@ -33,7 +33,7 @@ class TestCopyMaidAllowsOnlyValidLevelNumbers {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       {_44 COPY MAID {~PMOREC}.|1_}\n"
-          + "       {50|2} COPY MAID {~PMOREC}.\n"
+          + "       {50|2} COPY MAID PMOREC.\n"
           + "       Procedure Division.";
 
   private static final String COPYBOOK_CONTENT =
@@ -55,7 +55,7 @@ class TestCopyMaidAllowsOnlyValidLevelNumbers {
             new Diagnostic(
                 null,
                 "Syntax error on '50' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, LINKAGE, "
-                    + "LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE, MAP, SCHEMA, '01-49', '66', '77', '88'}",
+                    + "LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE, '01-49', '66', '77', '88'}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

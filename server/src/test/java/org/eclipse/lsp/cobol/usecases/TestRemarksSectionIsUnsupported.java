@@ -34,8 +34,8 @@ class TestRemarksSectionIsUnsupported {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
+          + "          {REMARKS.|unsupported}\n"
           + "       AUTHOR.     SE.\n"
-          + "           {REMARKS|unsupported}.\n"
           + "              PURPOSE.\n"
           + "              THIS PROGRAM IS DEFINED TO TEST A NUMBER OF THE\n"
           + "              APPLICATION TESTING COLLECTION AND DEBUG TOOL FUNCTIONS\n"
@@ -50,8 +50,8 @@ class TestRemarksSectionIsUnsupported {
             "unsupported",
             new Diagnostic(
                 null,
-                "REMARKS paragraph is deprecated and not supported",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                "The code block is deprecated and not supported",
+                DiagnosticSeverity.Warning,
+                SourceInfoLevels.WARNING.getText())));
   }
 }

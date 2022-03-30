@@ -31,6 +31,7 @@ import org.eclipse.usecase.UseCasePreprocessorParser;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -63,7 +64,8 @@ class AnnotatedDocumentCleaning {
       Map<String, Diagnostic> expectedDiagnostics,
       SQLBackend sqlBackend) {
     List<String> copybookNames =
-        explicitCopybooks.stream().map(CobolText::getCopybookName)
+        explicitCopybooks.stream()
+            .map(CobolText::getCopybookName)
             .map(CopybookName::getProcessingName)
             .collect(toList());
     TestData testData =
@@ -75,7 +77,10 @@ class AnnotatedDocumentCleaning {
             expectedDiagnostics,
             copybookNames,
             sqlBackend,
-            explicitCopybooks.stream().findFirst().map(CobolText::getDialectType).orElse(DialectType.COBOL.name()));
+            explicitCopybooks.stream()
+                .findFirst()
+                .map(CobolText::getDialectType)
+                .orElse(DialectType.COBOL.name()));
 
     return new PreprocessedDocument(
         testData.getText(),
@@ -95,9 +100,7 @@ class AnnotatedDocumentCleaning {
     return Stream.concat(
         explicitCopybooks.stream(),
         collectUsedPredefinedCopybooks(
-            usedCopybooks.keySet().stream()
-                .map(CopybookName::extractName)
-                .collect(Collectors.toSet()),
+            usedCopybooks.keySet(),
             explicitCopybooks.stream().map(CobolText::getFileName).collect(Collectors.toList()),
             sqlBackend));
   }
@@ -127,16 +130,18 @@ class AnnotatedDocumentCleaning {
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> explicitCopybooks,
       SQLBackend sqlBackend) {
-    return it ->
-        processDocument(
-            it.getFullText(),
-            it.getFileName(),
-            toURI(it.getFileName()),
-            ImmutableList.of(),
-            expectedDiagnostics,
-            explicitCopybooks,
-            sqlBackend,
-            it.getDialectType());
+    return it -> {
+      String qualifier = Optional.ofNullable(it.getQualifier()).map(q -> "_" + q).orElse("");
+      return processDocument(
+          it.getFullText(),
+          it.getFileName() + qualifier,
+          toURI(it.getFileName() + qualifier),
+          ImmutableList.of(),
+          expectedDiagnostics,
+          explicitCopybooks,
+          sqlBackend,
+          it.getDialectType());
+    };
   }
 
   private TestData processDocument(

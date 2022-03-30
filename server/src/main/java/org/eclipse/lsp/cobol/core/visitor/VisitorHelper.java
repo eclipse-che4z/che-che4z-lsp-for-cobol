@@ -41,7 +41,7 @@ import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILL
 /** Utility class for visitor and delegates classes with useful methods */
 @Slf4j
 @UtilityClass
-class VisitorHelper {
+public class VisitorHelper {
 
   /**
    * Get variable level from TerminalNode object
@@ -73,7 +73,7 @@ class VisitorHelper {
    * @param context is a statement context
    * @return a text of statement context
    */
-  String getName(ParserRuleContext context) {
+  public String getName(ParserRuleContext context) {
     return ofNullable(context).map(RuleContext::getText).map(String::toUpperCase).orElse("");
   }
 

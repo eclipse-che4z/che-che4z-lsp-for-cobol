@@ -25,12 +25,14 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.CobolParserUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
@@ -40,6 +42,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
@@ -53,9 +56,11 @@ import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analys
 @Slf4j
 public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListener
     implements GrammarPreprocessorListener<ExtendedDocument> {
-
+  private static final String MAID_WRK_QUALIFIER = "WRK";
+  private static final String FILLER_VARIABLE_NAME = "FILLER";
   private static final int DEFAULT_TOKEN_SHIFT = 2;
   private static final int TOKEN_SHIFT_WITH_LINEBREAK = 3;
+  private static final int MAID_SUFFIX_LENGTH = 2;
 
   private final List<SyntaxError> errors = new ArrayList<>();
   private final Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
@@ -174,10 +179,11 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyIdmsStatement(@NonNull CopyIdmsStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    Optional.ofNullable(ctx.LEVEL_NUMBER())
+    ofNullable(ctx.LEVEL_NUMBER())
         .map(ParseTree::getText)
         .map(Integer::parseInt)
-        .ifPresent(hierarchy::setLevelNumber);
+        .map(CopyStatementModifier::new)
+        .ifPresent(hierarchy::setModifier);
     analyzeCopybook(
         DIALECT, ctx, ctx.copyIdmsOptions().copyIdmsSource().copySource(), DialectType.IDMS);
   }
@@ -192,15 +198,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (requiresEarlyReturn(ctx)) return;
     final Optional<TerminalNode> levelNumber = ofNullable(ctx.LEVEL_NUMBER());
     final CopySourceContext copySource = ctx.copySource();
-    if (levelNumber.isPresent())
-      levelNumber
-          .map(ParseTree::getText)
-          .map(Integer::parseInt)
-          .ifPresent(
-              it -> {
-                hierarchy.setLevelNumber(it);
-                analyzeCopybook(DIALECT, ctx, copySource, DialectType.MAID);
-              });
+    if (levelNumber.isPresent()) analyzeCopybook(levelNumber.get(), ctx, copySource);
     else analyzeCopybook(SKIPPING, ctx, copySource, DialectType.MAID);
   }
 
@@ -247,6 +245,15 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private void analyzeCopybook(
+      TerminalNode levelNumber, CopyMaidStatementContext ctx, CopySourceContext copySource) {
+    final String qualifier = ofNullable(ctx.qualifier()).map(ParseTree::getText).orElse(null);
+    hierarchy.setModifier(
+        new CopyStatementModifier(
+            Integer.parseInt(levelNumber.getText()), qualifier, retrieveSuffix(qualifier, ctx)));
+    analyzeCopybook(DIALECT, ctx, copySource, DialectType.MAID);
+  }
+
+  private void analyzeCopybook(
       AnalysisTypes type,
       ParserRuleContext context,
       ParserRuleContext copyContext,
@@ -259,6 +266,36 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         .apply(copybooks)
         .apply(nestedMappings)
         .accept(errors);
+  }
+
+  private String retrieveSuffix(String qualifier, CopyMaidStatementContext ctx) {
+    if (!MAID_WRK_QUALIFIER.equalsIgnoreCase(qualifier)) {
+      return "";
+    }
+    String lastVariableName = retrieveLastVariableName();
+    if (variableCannotContainSuffix(lastVariableName)) {
+      reportCannotRetrieveSuffix(ctx);
+      return "";
+    }
+    return lastVariableName.substring(lastVariableName.length() - MAID_SUFFIX_LENGTH);
+  }
+
+  private boolean variableCannotContainSuffix(String lastVariableName) {
+    return lastVariableName == null
+        || lastVariableName.length() < MAID_SUFFIX_LENGTH
+        || FILLER_VARIABLE_NAME.equalsIgnoreCase(lastVariableName);
+  }
+
+  private String retrieveLastVariableName() {
+    return CobolParserUtils.parse(
+        retrieveTextBeforeCopyStatement(),
+        t -> new LastVariableNameListener(),
+        CobolParser::startRule,
+        LastVariableNameListener::getResult);
+  }
+
+  private String retrieveTextBeforeCopyStatement() {
+    return textAccumulator.stream().skip(1).map(StringBuilder::toString).collect(joining());
   }
 
   @Override
@@ -345,6 +382,18 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             .build();
     errors.add(error);
     LOG.debug("Syntax error by reportInvalidArgument: {}", error.toString());
+  }
+
+  private void reportCannotRetrieveSuffix(CopyMaidStatementContext ctx) {
+    SyntaxError error =
+        SyntaxError.syntaxError()
+            .severity(ERROR)
+            .suggestion(
+                messageService.getMessage("GrammarPreprocessorListener.cannotRetrieveMaidSuffix"))
+            .locality(retrieveLocality(ctx))
+            .build();
+    errors.add(error);
+    LOG.debug("Syntax error by reportCannotRetrieveSuffix: {}", error.toString());
   }
 
   private Locality retrieveLocality(ParserRuleContext ctx) {

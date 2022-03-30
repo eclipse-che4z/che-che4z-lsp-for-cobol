@@ -15,23 +15,28 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.eclipse.lsp.cobol.core.CobolLexer;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.LevelNumberAdjustingListener;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.CopybookModificationListener;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.CobolParserUtils;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.service.CopybookService;
+
+import static java.util.Optional.ofNullable;
 
 /**
  * This implementation of the {@link AbstractCopybookAnalysis} provides the logic and the default
  * parameters for the copybook analysis, required by the COBOL dialects.
  */
 class DialectCopybookAnalysis extends AbstractCopybookAnalysis {
+
   DialectCopybookAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
@@ -40,27 +45,35 @@ class DialectCopybookAnalysis extends AbstractCopybookAnalysis {
   }
 
   @Override
+  protected CopybookName retrieveCopybookName(
+      ParserRuleContext ctx, String dialect, CopybookHierarchy hierarchy) {
+    final String name = PreprocessorStringUtils.trimQuotes(ctx.getText().toUpperCase());
+    return new CopybookName(
+        name,
+        dialect,
+        name
+            + ofNullable(hierarchy.getModifier())
+                .map(CopyStatementModifier::getQualifier)
+                .map(String::toUpperCase)
+                .map(it -> "_" + it)
+                .orElse(""));
+  }
+
+  @Override
   protected ResultWithErrors<String> handleReplacing(
       CopybookMetaData metaData, CopybookHierarchy hierarchy, String text) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    final int level = hierarchy.takeLevelNumber();
-    if (level == 0) {
+    final CopyStatementModifier modifier = hierarchy.getModifier();
+    hierarchy.setModifier(null);
+    if (modifier == null || modifier.getLevelNumber() == 0) {
       return ResultWithErrors.of(text);
     }
 
-    Lexer lexer = new CobolLexer(CharStreams.fromString(text));
-    lexer.removeErrorListeners();
-
-    BufferedTokenStream tokens = new CommonTokenStream(lexer);
-
-    CobolParser parser = new CobolParser(tokens);
-    parser.removeErrorListeners();
-
-    RuleContext startRule = parser.dataDescriptionEntries();
-
-    ParseTreeWalker walker = new ParseTreeWalker();
-    LevelNumberAdjustingListener listener = new LevelNumberAdjustingListener(level, tokens);
-    walker.walk(listener, startRule);
-    return ResultWithErrors.of(listener.accumulate());
+    return ResultWithErrors.of(
+        CobolParserUtils.parse(
+            text,
+            tokens -> new CopybookModificationListener(modifier, modifier.getSuffix(), tokens),
+            CobolParser::dataDescriptionEntries,
+            PreprocessorStack::accumulate));
   }
 }

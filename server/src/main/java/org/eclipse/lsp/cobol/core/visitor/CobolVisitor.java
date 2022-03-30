@@ -88,7 +88,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final MessageService messageService;
   private final SubroutineService subroutineService;
   private final AnalysisConfig analysisConfig;
-  private final List<Node> flavorNodes;
+  private final List<Node> dialectNodes;
   private Map<String, FileControlEntryContext> fileControls = null;
   private final Map<String, SubroutineDefinition> subroutineDefinitionMap = new HashMap<>();
 
@@ -100,7 +100,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       Map<Token, EmbeddedCode> embeddedCodeParts,
       MessageService messageService,
       SubroutineService subroutineService,
-      List<Node> flavorNodes) {
+      List<Node> dialectNodes) {
     this.copybooks = copybooks;
     this.positions = positions;
     this.embeddedCodeParts = embeddedCodeParts;
@@ -108,7 +108,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     this.messageService = messageService;
     this.subroutineService = subroutineService;
     this.analysisConfig = analysisConfig;
-    this.flavorNodes = flavorNodes;
+    this.dialectNodes = dialectNodes;
   }
 
   @Override
@@ -121,7 +121,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                 rootNode -> {
                   visitChildren(ctx).forEach(rootNode::addChild);
                   addCopyNodes(rootNode, copybooks.getUsages());
-                  addFlavorNode(rootNode);
+                  addDialectsNode(rootNode);
                   return rootNode;
                 })
             .orElseGet(
@@ -131,14 +131,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                 }));
   }
 
-  private void addFlavorNode(Node rootNode) {
-    for (Node flavorNode : flavorNodes) {
+  private void addDialectsNode(Node rootNode) {
+    for (Node dialectNode: dialectNodes) {
       RangeUtils.findNodeByPosition(
               rootNode,
-              flavorNode.getLocality().getUri(),
-              flavorNode.getLocality().getRange().getStart())
+              dialectNode.getLocality().getUri(),
+              dialectNode.getLocality().getRange().getStart())
           .orElse(rootNode)
-          .addChild(flavorNode);
+          .addChild(dialectNode);
     }
   }
 
@@ -345,11 +345,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitMapSection(MapSectionContext ctx) {
-    return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.MAP));
-  }
-
-  @Override
   public List<Node> visitFileSection(FileSectionContext ctx) {
     return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.FILE));
   }
@@ -461,20 +456,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitMapClause(MapClauseContext ctx) {
-    return ofNullable(ctx.idms_map_name_definition())
-        .map(Idms_map_name_definitionContext::dataName)
-        .map(this::extractNameAndLocality)
-        .map(
-            varName ->
-                addTreeNode(
-                    VariableDefinitionNode.builder()
-                        .level(LEVEL_MAP_NAME)
-                        .variableNameAndLocality(varName)
-                        .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null))
-                        .build(),
-                    visitChildren(ctx)))
-        .orElseGet(() -> visitChildren(ctx));
+  public List<Node> visitRemarksParagraph(RemarksParagraphContext ctx) {
+    return addTreeNode(ctx, locality -> new RemarksNode(locality));
   }
 
   @Override
@@ -653,21 +636,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
           reference.addChild(usage);
           return reference;
         });
-  }
-
-  @Override
-  public List<Node> visitIdms_map_name(Idms_map_nameContext ctx) {
-    return addTreeNode(ctx, QualifiedReferenceNode::new);
-  }
-
-  @Override
-  public List<Node> visitIdms_db_entity_name(Idms_db_entity_nameContext ctx) {
-    return addTreeNode(ctx, QualifiedReferenceNode::new);
-  }
-
-  @Override
-  public List<Node> visitIdms_procedure_name(Idms_procedure_nameContext ctx) {
-    return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
   @Override
