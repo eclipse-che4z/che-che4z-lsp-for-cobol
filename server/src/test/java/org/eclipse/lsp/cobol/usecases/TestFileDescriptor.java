@@ -17,7 +17,9 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.*;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -163,7 +165,7 @@ class TestFileDescriptor {
             ImmutableList.of(),
             ImmutableMap.of(),
             ImmutableList.of(),
-            AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
+            AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
 
     assertHover(analysisResult);
   }

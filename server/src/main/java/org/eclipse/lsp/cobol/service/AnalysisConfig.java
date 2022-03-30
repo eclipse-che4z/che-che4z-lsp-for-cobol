@@ -16,35 +16,49 @@
 package org.eclipse.lsp.cobol.service;
 
 import com.google.common.collect.ImmutableList;
-import lombok.NonNull;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
- * This dto class is used to hold config data for analysis features processing (SQL, CICS, etc.)
+ * This dto class is used to hold config data for analysis, such as supported features, dialects and
+ * copybook configuration
  */
 @Value
 public class AnalysisConfig {
-  Set<EmbeddedCodeNode.Language> features;
-  @NonNull CopybookConfig copybookConfig;
+  CopybookConfig copybookConfig;
+  List<EmbeddedCodeNode.Language> features;
   List<String> dialects;
 
   /**
-   * Creates the default language features config, containing all features and specified copybook config
-   * @param copybookConfig contains copybook config information
-   * @return the language config object
+   * Create the default language features config, containing all features and the given copybook
+   * processing mode
+   *
+   * @param mode the mode of copybook processing for this analysis
+   * @return the analysis configuration
    */
-  public static AnalysisConfig defaultConfig(CopybookConfig copybookConfig) {
+  public static AnalysisConfig defaultConfig(CopybookProcessingMode mode) {
     return new AnalysisConfig(
-        Arrays.stream(EmbeddedCodeNode.Language.values()).collect(Collectors.toSet()),
-        copybookConfig,
-        ImmutableList.of()
-    );
+        new CopybookConfig(mode, SQLBackend.DB2_SERVER),
+        Arrays.asList(EmbeddedCodeNode.Language.values()),
+        ImmutableList.of());
   }
 
+  /**
+   * Create the analysis config based on the given copybook processing mode and the configuration
+   * entity from the settings
+   *
+   * @param mode the mode of copybook processing for this analysis
+   * @param entity the configuration from the settings file
+   * @return the analysis configuration
+   */
+  public static AnalysisConfig fromConfigEntity(
+      CopybookProcessingMode mode, ConfigurationService.ConfigurationEntity entity) {
+    return new AnalysisConfig(
+        new CopybookConfig(mode, entity.getSqlBackend()),
+        entity.getFeatures(),
+        entity.getDialects());
+  }
 }

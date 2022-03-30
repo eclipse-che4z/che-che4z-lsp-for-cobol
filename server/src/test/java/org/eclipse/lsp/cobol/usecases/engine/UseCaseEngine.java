@@ -24,9 +24,7 @@ import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -160,8 +158,7 @@ public class UseCaseEngine {
         copybooks,
         expectedDiagnostics,
         subroutineNames,
-        AnalysisConfig.defaultConfig(
-            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
+        AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
   }
 
   /**

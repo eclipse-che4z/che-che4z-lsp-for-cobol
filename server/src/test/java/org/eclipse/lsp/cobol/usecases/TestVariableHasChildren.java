@@ -23,9 +23,7 @@ import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableType;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
@@ -56,23 +54,27 @@ class TestVariableHasChildren {
             ImmutableList.of(),
             ImmutableMap.of(),
             ImmutableList.of(),
-            AnalysisConfig.defaultConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER)));
+            AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
 
-    VariableNode termsRecord = result.getRootNode().getDepthFirstStream()
-        .filter(Node.hasType(NodeType.PROGRAM))
-        .findFirst()
-        .map(ProgramNode.class::cast)
-        .map(ProgramNode::getVariables)
-        .map(variableMap -> variableMap.get("TERMS-RECORD").iterator().next())
-        .orElse(null);
+    VariableNode termsRecord =
+        result
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(Node.hasType(NodeType.PROGRAM))
+            .findFirst()
+            .map(ProgramNode.class::cast)
+            .map(ProgramNode::getVariables)
+            .map(variableMap -> variableMap.get("TERMS-RECORD").iterator().next())
+            .orElse(null);
 
     assertNotNull(termsRecord);
     assertEquals(VariableType.GROUP_ITEM, termsRecord.getVariableType());
 
-    List<VariableNode> children = termsRecord.getChildren().stream()
-        .filter(Node.hasType(NodeType.VARIABLE))
-        .map(VariableNode.class::cast)
-        .collect(Collectors.toList());
+    List<VariableNode> children =
+        termsRecord.getChildren().stream()
+            .filter(Node.hasType(NodeType.VARIABLE))
+            .map(VariableNode.class::cast)
+            .collect(Collectors.toList());
 
     assertEquals(2, children.size());
 

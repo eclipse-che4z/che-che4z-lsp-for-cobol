@@ -14,10 +14,10 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -29,20 +29,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-/** Test to check ConfigurationImpl */
-class ConfigurationImplTest {
+/** Test to check CachingConfigurationServiceTest */
+class CachingConfigurationServiceTest {
 
-  ConfigurationImpl configuration;
-  private SettingsService settingsService;
+  @Test
+  void testInitialLoading() {
+    SettingsService settingsService = spy(SettingsService.class);
+    CachingConfigurationService configuration = new CachingConfigurationService(settingsService);
 
-  @BeforeEach
-  void setupMocks() {
-    settingsService = spy(SettingsService.class);
-    configuration = new ConfigurationImpl(settingsService);
+    assertEquals(
+        new AnalysisConfig(
+            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
+            ImmutableList.of(),
+            ImmutableList.of()),
+        configuration.getConfig(CopybookProcessingMode.ENABLED));
   }
 
   @Test
-  void testUpdateConfigurationFromSettings() {
+  void testUpdatingConfiguration() {
+    SettingsService settingsService = spy(SettingsService.class);
     JsonArray featuresArray = new JsonArray();
     featuresArray.add("SQL");
 
@@ -55,9 +60,15 @@ class ConfigurationImplTest {
     when(settingsService.getConfigurations(
             Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, DIALECTS.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
+
+    CachingConfigurationService configuration = new CachingConfigurationService(settingsService);
     configuration.updateConfigurationFromSettings();
-    assertEquals(configuration.getSqlBackend(), SQLBackend.DATACOM_SERVER);
-    assertEquals(configuration.getFeatures().contains(EmbeddedCodeNode.Language.SQL), true);
-    assertEquals(configuration.getDialects().contains("Dialect"), true);
+
+    assertEquals(
+        new AnalysisConfig(
+            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
+            ImmutableList.of(EmbeddedCodeNode.Language.SQL),
+            ImmutableList.of("Dialect")),
+        configuration.getConfig(CopybookProcessingMode.DISABLED));
   }
 }
