@@ -84,6 +84,6 @@ class TestDAFFileCloseStatement {
                 DiagnosticSeverity.Warning,
                 SourceInfoLevels.WARNING.getText())),
         ImmutableList.of(),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

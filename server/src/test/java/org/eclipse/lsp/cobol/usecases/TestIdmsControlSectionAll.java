@@ -80,6 +80,6 @@ class TestIdmsControlSectionAll {
             new Diagnostic(
                 null, MESSAGE_1, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())),
         ImmutableList.of(),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

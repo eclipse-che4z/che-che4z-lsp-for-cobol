@@ -94,6 +94,6 @@ class TestDAFFileWriteStatement {
             SourceInfoLevels.WARNING.getText()));
 
     UseCaseEngine.runTest(
-        TEXT, ImmutableList.of(), diagnostics, ImmutableList.of(), IdmsBase.getAnalysisConfig());
+        TEXT, ImmutableList.of(), diagnostics, ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 }

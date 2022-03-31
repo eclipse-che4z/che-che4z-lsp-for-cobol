@@ -61,6 +61,6 @@ class TestDAFDebugStatsStatement {
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())),
         ImmutableList.of(),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

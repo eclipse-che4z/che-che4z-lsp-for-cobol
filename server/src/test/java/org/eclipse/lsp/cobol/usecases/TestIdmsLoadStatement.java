@@ -91,6 +91,6 @@ class TestIdmsLoadStatement {
                 Error,
                 SourceInfoLevels.ERROR.getText())),
         ImmutableList.of(),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

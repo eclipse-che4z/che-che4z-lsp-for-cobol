@@ -58,6 +58,8 @@ class TestDAFGetTaskStatement {
                 null,
                 "Variable SDFRE is not defined",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

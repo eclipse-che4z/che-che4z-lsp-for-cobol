@@ -60,6 +60,6 @@ class TestIdmsSendStatement {
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

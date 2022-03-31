@@ -103,6 +103,6 @@ class TestIdmsSections {
                 Error,
                 SourceInfoLevels.ERROR.getText())),
         ImmutableList.of(),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

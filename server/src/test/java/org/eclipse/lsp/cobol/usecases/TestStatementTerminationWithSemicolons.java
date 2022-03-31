@@ -60,6 +60,6 @@ class TestStatementTerminationWithSemicolons {
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of("SPACING"),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

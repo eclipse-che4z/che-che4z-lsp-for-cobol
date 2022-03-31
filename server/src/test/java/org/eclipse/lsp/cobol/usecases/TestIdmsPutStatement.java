@@ -86,6 +86,6 @@ class TestIdmsPutStatement {
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

@@ -78,6 +78,6 @@ class TestIdmsWaitStatement {
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

@@ -86,6 +86,8 @@ class TestDAFGetEntityStatement {
                 null,
                 "Only allowed value(s): DOM",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

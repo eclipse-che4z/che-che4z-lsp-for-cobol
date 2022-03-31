@@ -103,6 +103,6 @@ class TestSetUpDownBy {
                 DiagnosticSeverity.Warning,
                 WARNING.getText())),
         ImmutableList.of(),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

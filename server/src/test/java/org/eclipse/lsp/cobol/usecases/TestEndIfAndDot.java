@@ -54,7 +54,7 @@ class TestEndIfAndDot {
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test
@@ -64,6 +64,6 @@ class TestEndIfAndDot {
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

@@ -12,12 +12,12 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.dialects.idms;
+package org.eclipse.lsp.cobol.core.engine.dialects.daco;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.eclipse.lsp.cobol.core.IdmsLexer;
-import org.eclipse.lsp.cobol.core.IdmsParser;
+import org.eclipse.lsp.cobol.core.DaCoLexer;
+import org.eclipse.lsp.cobol.core.DaCoParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectParserListener;
@@ -30,12 +30,12 @@ import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Process the text according to the IDMS rules */
-public final class IdmsDialect implements CobolDialect {
-  public static final String NAME = "IDMS";
+/** Process the text according to the DaCo rules */
+public final class DaCoDialect implements CobolDialect {
+  public static final String NAME = "DaCo";
 
   /**
-   * Processing the text according to the IDMS rules
+   * Processing the text according to the DaCo rules
    *
    * @param uri document URI
    * @param text document text
@@ -44,16 +44,16 @@ public final class IdmsDialect implements CobolDialect {
    */
   @Override
   public ResultWithErrors<DialectOutcome> processText(String uri, String text, MessageService messageService) {
-    IdmsLexer lexer = new IdmsLexer(CharStreams.fromString(text));
+    DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(text));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
-    IdmsParser parser = new IdmsParser(tokens);
+    DaCoParser parser = new DaCoParser(tokens);
     DialectParserListener listener = new DialectParserListener(uri);
     lexer.removeErrorListeners();
     lexer.addErrorListener(listener);
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
-    IdmsVisitor visitor = new IdmsVisitor(uri, text);
+    DaCoVisitor visitor = new DaCoVisitor(uri, text);
     List<Node> nodes = visitor.visitStartRule(parser.startRule());
     List<SyntaxError> errors = new ArrayList<>(listener.getErrors());
     return new ResultWithErrors<>(new DialectOutcome(visitor.getResultedText(), nodes), errors);

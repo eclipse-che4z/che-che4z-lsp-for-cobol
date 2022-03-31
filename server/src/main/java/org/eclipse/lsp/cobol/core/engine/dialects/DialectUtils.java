@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
@@ -35,6 +36,7 @@ import java.util.Map;
 @UtilityClass
 public class DialectUtils {
   private static final Map<String, CobolDialect> DIALECTS_SUPPLIERS = ImmutableMap.of(
+      DaCoDialect.NAME, new DaCoDialect(),
       IdmsDialect.NAME, new IdmsDialect()
   );
 

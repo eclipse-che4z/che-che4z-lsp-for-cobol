@@ -82,6 +82,6 @@ class TestAccept {
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }
