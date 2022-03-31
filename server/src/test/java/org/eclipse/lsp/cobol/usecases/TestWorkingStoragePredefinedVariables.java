@@ -42,7 +42,7 @@ class TestWorkingStoragePredefinedVariables {
             + "          05  {$*LAST-MAP}                     PIC x.\n"
             + "       Procedure Division.\n"
             + "       {#*000-Main-Logic}.\n"
-            + "           MOVE {$EIBRESP}        TO {XML-TEXT|1}.\n"
+            + "           MOVE {$EIBRESP}        TO {$XML-TEXT|1}.\n"
             + "           MOVE {$EIBDATE} TO {$LDAY}.\n"
             + "           EXEC CICS RETURN\n"
             + "                TRANSID({$EIBTRNID})\n"

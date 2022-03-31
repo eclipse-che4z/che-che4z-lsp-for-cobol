@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.model.tree.variables;
 import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Context;
@@ -26,8 +25,10 @@ import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp4j.Location;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * The class represents variable usage in COBOL program.
@@ -37,8 +38,7 @@ import java.util.Optional;
 @EqualsAndHashCode(callSuper = true)
 public class VariableUsageNode extends Node implements Context, Describable {
   private final String name;
-  @Setter
-  @EqualsAndHashCode.Exclude @ToString.Exclude private VariableNode definition;
+  @EqualsAndHashCode.Exclude @ToString.Exclude private List<VariableNode> definitions = new ArrayList<>();
 
   public VariableUsageNode(
       String dataName,
@@ -49,21 +49,32 @@ public class VariableUsageNode extends Node implements Context, Describable {
 
   @Override
   public List<Location> getDefinitions() {
-    return Optional.ofNullable(definition)
-        .map(VariableNode::getDefinitions)
-        .orElseGet(ImmutableList::of);
+    return definitions.stream().map(VariableNode::getLocality).map(Locality::toLocation).collect(Collectors.toList());
+  }
+
+  /**
+   * Add a definition to the node.
+   * @param definition the definition node
+   */
+  public void addDefinition(VariableNode definition) {
+    definitions.add(definition);
+  }
+
+  private Optional<VariableNode> getDefinition() {
+    if (definitions.isEmpty()) return Optional.empty();
+    return Optional.of(definitions.get(0));
   }
 
   @Override
   public List<Location> getUsages() {
-    return Optional.ofNullable(definition)
+    return getDefinition()
         .map(VariableNode::getUsages)
         .orElseGet(ImmutableList::of);
   }
 
   @Override
   public String getFormattedDisplayString() {
-    return Optional.ofNullable(definition)
+    return getDefinition()
         .map(VariableNode::getFullVariableDescription)
         .orElse("");
   }
