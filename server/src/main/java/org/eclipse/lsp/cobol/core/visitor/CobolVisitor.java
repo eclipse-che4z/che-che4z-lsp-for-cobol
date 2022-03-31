@@ -372,7 +372,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitDafPrefixStatement(DafPrefixStatementContext ctx) {
+  public List<Node> visitStatementPrefix(StatementPrefixContext ctx) {
     areaAWarning(ctx.getStart());
     throwWarning(ctx.getStart());
     return visitChildren(ctx);

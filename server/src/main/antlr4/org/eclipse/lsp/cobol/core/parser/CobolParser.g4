@@ -890,11 +890,11 @@ paragraph
    ;
 
 sentence
-   :  (dafStatements | statement)* (endClause | dialectStatement)
+   : statementPrefix? ((dafStatements | statement)* (endClause | dialectStatement))
    ;
 
 conditionalStatementCall
-   : (dafStatements | statement) SEMICOLON_FS? | dialectStatement
+   : statementPrefix? ((dafStatements | statement) SEMICOLON_FS? | dialectStatement)
    ;
 
 statement
@@ -918,13 +918,13 @@ dacoControlSection
     ;
 
 dafStatements
-    : dafPrefixStatement? (readTransactionStatement | writeTransactionStatement | writeReportStatement
+    : readTransactionStatement | writeTransactionStatement | writeReportStatement
     | openPacketStatement | getMetaInfoStatement | messageHandlingStatement
     | tableRowRetrievalStatement | tableRowUpdateStatement | tableDMLStatement
-    | fileDMLStatement | stringDMLStatement | debugStatement | execStatement)
+    | fileDMLStatement | stringDMLStatement | debugStatement | execStatement
     ;
 
-dafPrefixStatement
+statementPrefix
     : (D_B | D_C)
     ;
 
