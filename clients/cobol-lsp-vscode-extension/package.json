@@ -28,7 +28,9 @@
         "zowe",
         "ibm cobol",
         "idms",
-        "datacom"
+        "datacom",
+        "cics",
+        "db2"
     ],
     "categories": [
         "Programming Languages"
