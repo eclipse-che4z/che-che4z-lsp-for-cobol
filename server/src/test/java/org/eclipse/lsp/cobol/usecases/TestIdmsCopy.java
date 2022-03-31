@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
@@ -78,15 +79,6 @@ class TestIdmsCopy {
           + "       PROCEDURE DIVISION.\n"
           + "           MOVE 'ABC' TO {$MRB-ABCMAP-ID}.\n";
 
-  private static final String COPY_IDMS_PD1 =
-      "        PROCEDURE DIVISION.\n" + "           COPY IDMS {~SUBSCHEMA-BINDS}\n";
-
-  private static final String COPY_IDMS_PD2 =
-      "        PROCEDURE DIVISION.\n" + "           COPY IDMS {~ABCD} VERSION 103.\n";
-
-  private static final String COPY_IDMS_PD3 =
-      "        PROCEDURE DIVISION.\n" + "           COPY IDMS MODULE {~ABCD};\n";
-
   private static final String CB_NAME1 = "EMPLOYEE";
   private static final String CB1 = "          01 {$*EMPNAME}    PIC X(8).\n";
 
@@ -102,65 +94,42 @@ class TestIdmsCopy {
   private static final String CB3 =
       "       01  {$*MRB-ABCMAP}.\n" + "            03  {$*MRB-ABCMAP-ID}          PIC X(8).\n";
 
-  private static final String CB_NAME4 = "SUBSCHEMA-BINDS";
-  private static final String CB_NAME4A = "ABCD";
-  private static final String CB4 =
-      "           BIND RUN-UNIT.\n" + "            BIND {$EMPLOYEE}.\n";
-
   private static final String CB_NAME5 = "FL002";
   private static final String CB5 = "       FD {$*EMP-FILE}.\n" + "       RECORD CONTAINS 80.\n";
 
   @Test
   void testIdmsCopyWS1() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS1, ImmutableList.of(new CobolText(CB_NAME1, CB1)), ImmutableMap.of());
+        TEXT + COPY_IDMS_WS1, ImmutableList.of(new CobolText(CB_NAME1, DialectType.IDMS.name(), CB1)), ImmutableMap.of());
   }
 
   @Test
   void testIdmsCopyWS2() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS2, ImmutableList.of(new CobolText(CB_NAME2, CB2)), ImmutableMap.of());
+        TEXT + COPY_IDMS_WS2, ImmutableList.of(new CobolText(CB_NAME2, DialectType.IDMS.name(), CB2)), ImmutableMap.of());
   }
 
   @Test
   void testIdmsCopyWS3() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS3, ImmutableList.of(new CobolText(CB_NAME3, CB3)), ImmutableMap.of());
+        TEXT + COPY_IDMS_WS3, ImmutableList.of(new CobolText(CB_NAME3, DialectType.IDMS.name(), CB3)), ImmutableMap.of());
   }
 
   @Test
   void testIdmsCopyWS4() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS4, ImmutableList.of(new CobolText(CB_NAME3A, CB3)), ImmutableMap.of());
+        TEXT + COPY_IDMS_WS4, ImmutableList.of(new CobolText(CB_NAME3A, DialectType.IDMS.name(), CB3)), ImmutableMap.of());
   }
 
   @Test
   void testIdmsCopyWS5() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS5, ImmutableList.of(new CobolText(CB_NAME3, CB3)), ImmutableMap.of());
-  }
-
-  @Test
-  void testIdmsCopyPD1() {
-    UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_PD1, ImmutableList.of(new CobolText(CB_NAME4, CB4)), ImmutableMap.of());
-  }
-
-  @Test
-  void testIdmsCopyPD2() {
-    UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_PD2, ImmutableList.of(new CobolText(CB_NAME4A, CB4)), ImmutableMap.of());
-  }
-
-  @Test
-  void testIdmsCopyPD3() {
-    UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_PD3, ImmutableList.of(new CobolText(CB_NAME4A, CB4)), ImmutableMap.of());
+        TEXT + COPY_IDMS_WS5, ImmutableList.of(new CobolText(CB_NAME3, DialectType.IDMS.name(), CB3)), ImmutableMap.of());
   }
 
   @Test
   void testIdmsCopyFile() {
     UseCaseEngine.runTest(
-            TEXT_IDMS_COPY_FILE + COPY_IDMS_FILE, ImmutableList.of(new CobolText(CB_NAME5, CB5)), ImmutableMap.of());
+            TEXT_IDMS_COPY_FILE + COPY_IDMS_FILE, ImmutableList.of(new CobolText(CB_NAME5, DialectType.IDMS.name(), CB5)), ImmutableMap.of());
   }
 }

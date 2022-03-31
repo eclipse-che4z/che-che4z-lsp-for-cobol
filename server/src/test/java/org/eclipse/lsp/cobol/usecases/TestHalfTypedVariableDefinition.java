@@ -42,7 +42,7 @@ class TestHalfTypedVariableDefinition {
             + "COMP-3, COMP-4, COMP-5, DISPLAY, DISPLAY-1, DYNAMIC, EXTERNAL, FUNCTION-POINTER, GLOBAL, GROUP-USAGE, "
             + "INDEX, IS, JUST, JUSTIFIED, LEADING, NATIONAL, OBJECT, OCCURS, PACKED-DECIMAL, PIC, PICTURE, POINTER, "
             + "POINTER-32, PROCEDURE-POINTER, REDEFINES, SIGN, SYNC, SYNCHRONIZED, TRAILING, USAGE, UTF-8, VALUE, "
-            + "VALUES, VOLATILE, '.', '.'2}",
+            + "VALUES, VOLATILE, '.'}",
             DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText()),
         "2",
         new Diagnostic(null, "No data definition entry found for rename",

@@ -76,6 +76,8 @@ class TestAttachTaskCode {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null, MESSAGE_1, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
+                null, MESSAGE_1, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

@@ -21,7 +21,9 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.*;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
+import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +38,7 @@ import static org.eclipse.lsp.cobol.core.CobolParser.*;
 @AllArgsConstructor
 public class EmbeddedLanguagesListener extends CobolParserBaseListener {
 
-  private final DefaultErrorStrategy errorStrategy;
+  private final MessageService messageService;
   private final ParseTreeListener treeListener;
   private final ParserListener errorListener;
   @Getter private final Map<Token, EmbeddedCode> embeddedCodeParts = new HashMap<>();
@@ -121,11 +123,11 @@ public class EmbeddedLanguagesListener extends CobolParserBaseListener {
     parser.removeErrorListeners();
     parser.addErrorListener(errorListener);
     parser.addParseListener(treeListener);
-    parser.setErrorHandler(errorStrategy);
+    parser.setErrorHandler(new CobolErrorStrategy(messageService));
   }
 
   private int calculateShift(ParserRuleContext ctx) {
     Interval interval = ctx.getSourceInterval();
-    return interval.b - interval.a;
+    return Math.max(interval.b - interval.a, 0);
   }
 }

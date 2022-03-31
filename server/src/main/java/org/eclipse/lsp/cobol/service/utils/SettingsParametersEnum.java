@@ -30,7 +30,9 @@ public enum SettingsParametersEnum {
   LSP_PREFIX("cobol-lsp"),
   LOCALE("locale"),
   LOGGING_LEVEL("logging.level.root"),
-  TARGET_SQL_BACKEND("target-sql-backend");
+  TARGET_SQL_BACKEND("target-sql-backend"),
+  ANALYSIS_FEATURES("analysis.features"),
+  DIALECTS("dialects");
 
   public final String label;
 

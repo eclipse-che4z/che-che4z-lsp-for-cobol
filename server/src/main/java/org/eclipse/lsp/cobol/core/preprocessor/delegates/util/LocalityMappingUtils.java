@@ -79,6 +79,7 @@ public class LocalityMappingUtils {
    * @param documentHierarchyStack stack of processing documents
    * @param tokenAccumulator a map that stores all the currently mapped tokens
    */
+  @SuppressWarnings("java:S127")
   private void mapTokens(
       List<Token> tokens,
       Map<Token, EmbeddedCode> embeddedCodeParts,
@@ -88,7 +89,7 @@ public class LocalityMappingUtils {
 
     for (int i = 0; i < tokens.size(); i++) {
       Token token = tokens.get(i);
-      if (embeddedCodeParts.containsKey(token)) {
+      if (embeddedCodeParts.containsKey(token) && token.getType() != Token.EOF) {
         EmbeddedCode embeddedCode = embeddedCodeParts.get(token);
         List<Token> nestedTokens = embeddedCode.getTokens();
         mapTokens(
@@ -118,21 +119,19 @@ public class LocalityMappingUtils {
     } else if (token.getType() == COPYEXIT && token.getTokenSource() instanceof CobolLexer) {
       exitDocument(documentHierarchyStack);
     } else {
-      mapTokenToPosition(token, result, documentHierarchyStack);
+      mapTokenToPosition(token, result, currentDocument(documentHierarchyStack));
     }
   }
 
   private void mapTokenToPosition(
-      Token token,
-      Map<Token, Locality> mappingAccumulator,
-      Deque<DocumentHierarchyLevel> documentHierarchyStack) {
-    Locality locality = currentDocument(documentHierarchyStack).getCurrent();
+      Token token, Map<Token, Locality> mappingAccumulator, DocumentHierarchyLevel document) {
+    Locality locality = document.getCurrent();
     if (locality == null) return;
-    if (tokenMatches(token.getText(), locality.getToken())) {
+    if (tokenMatches(token.getText(), locality, document)) {
       mappingAccumulator.put(token, locality);
-      currentDocument(documentHierarchyStack).forward();
+      document.forward();
     } else {
-      applyLookAhead(token, mappingAccumulator, documentHierarchyStack);
+      applyLookAhead(token, mappingAccumulator, document);
     }
   }
 
@@ -146,21 +145,33 @@ public class LocalityMappingUtils {
    *
    * @param token token to find a position
    * @param mappingAccumulator map to add the found position
-   * @param documentHierarchyStack stack of processing documents
+   * @param document currently processing documents
    */
   private void applyLookAhead(
-      Token token,
-      Map<Token, Locality> mappingAccumulator,
-      Deque<DocumentHierarchyLevel> documentHierarchyStack) {
-    List<Locality> positionsInFront = currentDocument(documentHierarchyStack).lookahead();
+      Token token, Map<Token, Locality> mappingAccumulator, DocumentHierarchyLevel document) {
+    if (tryMatchNext(token, mappingAccumulator, document)) return;
+
+    List<Locality> positionsInFront = document.lookahead();
     for (int pos = 0; pos < positionsInFront.size(); pos++) {
       Locality forwardedLocality = positionsInFront.get(pos);
-      if (tokenMatches(token.getText(), forwardedLocality.getToken())) {
+      if (tokenMatches(token.getText(), forwardedLocality, document)) {
         mappingAccumulator.put(token, forwardedLocality);
-        currentDocument(documentHierarchyStack).forceForward(pos + 1);
+        document.forceForward(pos + 1);
         break;
       }
     }
+  }
+
+  private boolean tryMatchNext(
+      Token token, Map<Token, Locality> mappingAccumulator, DocumentHierarchyLevel document) {
+    Locality locality = document.getCurrent();
+    if (locality == null) return false;
+    if (tokenMatches(token.getText(), locality, document)) {
+      mappingAccumulator.put(token, locality);
+      document.forward();
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -184,7 +195,6 @@ public class LocalityMappingUtils {
    */
   private void exitDocument(Deque<DocumentHierarchyLevel> documentHierarchyStack) {
     documentHierarchyStack.pop();
-    currentDocument(documentHierarchyStack).forward();
   }
 
   /**
@@ -211,18 +221,16 @@ public class LocalityMappingUtils {
   }
 
   /**
-   * Check the token matches the position. Tokens may match even with line breaks or if the position
-   * points to the end of file due to different lexer rules applied by the parser and the
-   * preprocessor.
+   * Check the token matches the position. If the position is the last in the list, it will match in
+   * any case.
    *
    * @param token text of the token
    * @param position text of the position
+   * @param localitySource the document that contains the given locality
    * @return true if token and position match
    */
-  private boolean tokenMatches(String token, String position) {
-    String positionText = position.trim();
-    String trimmedToken = token.trim();
-    return trimmedToken.equals(positionText)
-        || trimmedToken.equals(positionText.replace("<EOF>", ""));
+  private boolean tokenMatches(
+      String token, Locality position, @NonNull DocumentHierarchyLevel localitySource) {
+    return token.equals(position.getToken()) || localitySource.isLastLocality(position);
   }
 }

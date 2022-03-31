@@ -35,7 +35,7 @@ class TestElementWithPICNotAllowedAsGroup {
           + "       01  {$*PARENT} PIC 99.\n"
           + "           10  {$*CHILD1|1} PIC 99.\n"
           + "       PROCEDURE DIVISION. \n"
-          + "           MOVE 00 TO {CHILD1|2} OF PARENT.\n";
+          + "           MOVE 00 TO {_CHILD1 OF PARENT|2_}.\n";
 
   @Test
   void test() {

@@ -24,8 +24,8 @@ import com.google.inject.Singleton;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
@@ -40,6 +40,7 @@ import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
 import org.eclipse.lsp4j.*;
@@ -52,17 +53,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.TARGET_SQL_BACKEND;
+import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -95,7 +95,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final CustomThreadPoolExecutor executors;
   private final HoverProvider hoverProvider;
   private final CFASTBuilder cfastBuilder;
-  private final SettingsService settingsService;
+  private final ConfigurationService configurationService;
   private DisposableLSPStateService disposableLSPStateService;
 
   @Inject
@@ -113,7 +113,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       HoverProvider hoverProvider,
       CFASTBuilder cfastBuilder,
       DisposableLSPStateService disposableLSPStateService,
-      SettingsService settingsService) {
+      ConfigurationService configurationService) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -124,8 +124,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.executors = executors;
     this.hoverProvider = hoverProvider;
     this.cfastBuilder = cfastBuilder;
-    this.settingsService = settingsService;
     this.disposableLSPStateService = disposableLSPStateService;
+    this.configurationService = configurationService;
 
     dataBus.subscribe(this);
   }
@@ -320,36 +320,35 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     futureMap.remove(uri);
   }
 
+  @SuppressWarnings("java:S1181")
   private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
-    registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.empty()));
+    registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.builder().build()));
     Future<?> docAnalysisFuture =
         executors
             .getThreadPoolExecutor()
             .submit(
                 () -> {
                   try {
-                    CopybookProcessingMode copybookProcessingMode =
+                    CopybookProcessingMode processingMode =
                         CopybookProcessingMode.getCopybookProcessingMode(
                             uri,
                             userRequest
                                 ? CopybookProcessingMode.ENABLED_VERBOSE
                                 : CopybookProcessingMode.ENABLED);
 
-                    AnalysisResult result =
-                        engine.analyze(
-                            uri,
-                            text,
-                            new CopybookConfig(copybookProcessingMode, getTargetSqlBackend()));
+                    AnalysisConfig config = configurationService.getConfig(processingMode);
+                    AnalysisResult result = engine.analyze(uri, text, config);
                     ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
-                    publishResult(uri, result, copybookProcessingMode);
+                    publishResult(uri, result, processingMode);
                     outlineMap.computeIfPresent(
                         uri,
                         (key, value) -> {
-                          value.complete(result.getOutlineTree());
+                          value.complete(
+                              BuildOutlineTreeFromSyntaxTree.convert(result.getRootNode(), uri));
                           return value;
                         });
                     cfAstMap.get(uri).complete(result.getRootNode());
-                  } catch (Exception e) {
+                  } catch (Throwable e) {
                     cfAstMap.get(uri).completeExceptionally(e);
                     LOG.error(createDescriptiveErrorMessage("analysis", uri), e);
                   } finally {
@@ -359,28 +358,11 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     registerToFutureMap(uri, docAnalysisFuture);
   }
 
-  private SQLBackend getTargetSqlBackend() {
-    try {
-      String sqlServer =
-          SettingsService.getValueAsString(
-              settingsService.getConfiguration(TARGET_SQL_BACKEND.label).get());
-      if (StringUtils.isEmpty(sqlServer)) {
-        return SQLBackend.DB2_SERVER;
-      }
-      return SQLBackend.valueOf(sqlServer);
-    } catch (InterruptedException e) {
-      LOG.error("InterruptedException when getting {}:\n {}", TARGET_SQL_BACKEND, e);
-      Thread.currentThread().interrupt();
-    } catch (ExecutionException e) {
-      LOG.error("Can't get config-data for {}: \n {}", TARGET_SQL_BACKEND, e);
-    }
-    return SQLBackend.DB2_SERVER;
-  }
-
   private void registerToFutureMap(String uri, Future<?> docAnalysisFuture) {
     futureMap.put(uri, docAnalysisFuture);
   }
 
+  @SuppressWarnings("java:S1181")
   void analyzeChanges(String uri, String text) {
     Future<?> analyseSubmitFuture =
         executors
@@ -388,19 +370,19 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
             .submit(
                 () -> {
                   try {
-                    AnalysisResult result =
-                        engine.analyze(
-                            uri,
-                            text,
-                            new CopybookConfig(
-                                CopybookProcessingMode.getCopybookProcessingMode(
-                                    uri, CopybookProcessingMode.SKIP),
-                                getTargetSqlBackend()));
+                    CopybookProcessingMode processingMode =
+                        CopybookProcessingMode.getCopybookProcessingMode(
+                            uri, CopybookProcessingMode.SKIP);
+                    AnalysisConfig config = configurationService.getConfig(processingMode);
+                    AnalysisResult result = engine.analyze(uri, text, config);
                     registerDocument(uri, new CobolDocumentModel(text, result));
                     communications.publishDiagnostics(result.getDiagnostics());
-                    outlineMap.get(uri).complete(result.getOutlineTree());
+                    outlineMap
+                        .get(uri)
+                        .complete(
+                            BuildOutlineTreeFromSyntaxTree.convert(result.getRootNode(), uri));
                     cfAstMap.get(uri).complete(result.getRootNode());
-                  } catch (Exception ex) {
+                  } catch (Throwable ex) {
                     cfAstMap.get(uri).completeExceptionally(ex);
                     LOG.error(createDescriptiveErrorMessage("analysis", uri), ex);
                   } finally {
@@ -412,27 +394,33 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   private void publishResult(
       String uri, AnalysisResult result, CopybookProcessingMode copybookProcessingMode) {
-    notifyAnalysisFinished(uri, result.getCopybookUsages(), copybookProcessingMode);
+    notifyAnalysisFinished(uri, extractCopybookUsages(result), copybookProcessingMode);
     communications.cancelProgressNotification(uri);
     communications.publishDiagnostics(result.getDiagnostics());
     if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
   }
 
   private void notifyAnalysisFinished(
-      String uri,
-      Map<String, List<Location>> copybooks,
-      CopybookProcessingMode copybookProcessingMode) {
+      String uri, List<String> copybooks, CopybookProcessingMode copybookProcessingMode) {
     dataBus.postData(
         AnalysisFinishedEvent.builder()
             .documentUri(uri)
-            .copybookUris(
-                ofNullable(copybooks).map(Map::values).orElse(emptyList()).stream()
-                    .flatMap(List::stream)
-                    .map(Location::getUri)
-                    .distinct()
-                    .collect(toList()))
+            .copybookUris(copybooks)
             .copybookProcessingMode(copybookProcessingMode)
             .build());
+  }
+
+  private List<String> extractCopybookUsages(AnalysisResult result) {
+    return result
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(COPY))
+        .map(CopyNode.class::cast)
+        .map(CopyNode::getUsages)
+        .filter(usages -> !usages.isEmpty())
+        .flatMap(List::stream)
+        .map(Location::getUri)
+        .collect(toList());
   }
 
   @Override

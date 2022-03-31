@@ -45,7 +45,7 @@ class TestVariableRedefineLevel {
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*WS-DATA-A}.\n"
           + "             05 {$*WS-DATA} PIC X(20).\n"
-          + "             {04|1} {$*WS-DATA-RED} REDEFINES {$WS-DATA} PIC X(20).\n"
+          + "             {04} {$*WS-DATA-RED} REDEFINES {$WS-DATA} PIC X(20).\n"
           + "       PROCEDURE DIVISION.\n";
 
 
@@ -68,13 +68,7 @@ class TestVariableRedefineLevel {
     UseCaseEngine.runTest(
         TEXT_LEVEL_5,
         ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null,
-                "The redefining and redefined items must have the same level: WS-DATA",
-                DiagnosticSeverity.Error,
-                ERROR.getText())));
+        ImmutableMap.of());
   }
 
 }

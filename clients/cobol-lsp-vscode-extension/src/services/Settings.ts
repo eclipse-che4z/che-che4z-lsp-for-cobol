@@ -15,7 +15,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { SETTINGS_CPY_SECTION } from "../constants";
+import { PATHS_LOCAL_KEY, PATHS_USS, PATHS_ZOWE, SERVER_PORT, SETTINGS_CPY_SECTION, SETTINGS_SUBROUTINE_LOCAL_KEY } from "../constants";
 
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
@@ -48,4 +48,92 @@ export function createFileWithGivenPath(folderPath: string, fileName: string, pa
         vscode.window.showErrorMessage("File error: " + e.toString());
     }
 
+}
+
+/**
+ * SettingsService provides read/write configurstion settings functionality
+ */
+export class SettingsService {
+
+    public static readonly DEFAULT_DIALECT = "COBOL";
+    /**
+     * Get list of local subroutine path
+     * @returns a list of local subroutine path
+     */
+    public static getSubroutineLocalPath(): string[] {
+        return vscode.workspace.getConfiguration().get(SETTINGS_SUBROUTINE_LOCAL_KEY);
+    }
+
+    /**
+     * Get copybook local path based on program file name
+     * @param cobolFileName is a program file name
+     * @param dialectType name of the cobol dialect type
+     * @returns a list of local path
+     */
+    public static getCopybookLocalPath(cobolFileName: string, dialectType: string): string[] {
+        return SettingsService.getCopybookConfigValues(PATHS_LOCAL_KEY, cobolFileName, dialectType);
+    }
+
+    /**
+     * Get Lsp Port from configuration
+     * @returns lsp port number
+     */
+    public static getLspPort(): number | undefined {
+        return +vscode.workspace.getConfiguration().get(SERVER_PORT);
+    }
+
+    /**
+     * Get list of dsn path
+     * @param cobolFileName is a program file name
+     * @param dialectType name of the cobol dialect type
+     * @returns a list of dsn path
+     */
+    public static getDsnPath(cobolFileName: string, dialectType: string): string[] {
+        return SettingsService.getCopybookConfigValues(PATHS_ZOWE, cobolFileName, dialectType);
+    }
+
+    /**
+     * Get list of uss path
+     * @param cobolFileName is a program file name
+     * @param dialectType name of the cobol dialect type
+     * @returns a list of uss path
+     */
+    public static getUssPath(cobolFileName: string, dialectType: string): string[] {
+        return SettingsService.getCopybookConfigValues(PATHS_USS, cobolFileName, dialectType);
+    }
+
+    /**
+     * Get profile name
+     * @returns a profile name
+     */
+    public static getProfileName(): string {
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles")
+    }
+
+    private static evaluateVariable(dataList: string[], variable: string, value: string): string[] {
+        const result: string[] = [];
+        if (dataList) {
+            dataList.forEach(d => result.push(d.replace(`$\{${variable}\}`, value)))
+        }
+        return result;
+    }
+
+    /**
+     * Return the code page for the copybook file encoding supplied by user
+     * @returns string
+     */
+    public static getCopybookFileEncoding() {
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("copybook-file-encoding")
+    }
+    private static getCopybookConfigValues(section: string, cobolFileName: string, dialectType: string) {
+        const programFile = cobolFileName.replace(/\.[^/.]+$/, "");
+        if (dialectType !== SettingsService.DEFAULT_DIALECT) {
+            const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(`${dialectType.toLowerCase()}.${section}`);
+            if (pathList && pathList.length > 0) {
+                return SettingsService.evaluateVariable(pathList, "fileBasenameNoExtension", programFile);
+            }
+        }
+        const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(section);
+        return SettingsService.evaluateVariable(pathList, "fileBasenameNoExtension", programFile);
+    }
 }

@@ -12,7 +12,12 @@ options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
    : .*? ((includeStatement | copyStatement | copyIdmsStatement | copyMaidStatement | replaceAreaStart | replaceOffStatement
-   | titleDirective | enterDirective | controlDirective)+ .*?)* EOF
+   | titleDirective | enterDirective | controlDirective | linkageSection | plusplusIncludeStatement)+ .*?)* EOF
+   ;
+
+// linkage section for resolving predefined variables
+linkageSection
+   : LINKAGE SECTION DOT_FS
    ;
 
 // copy statement
@@ -24,6 +29,11 @@ copyStatement
 includeStatement
    : EXEC SQL INCLUDE copySource END_EXEC DOT_FS
    ;
+
+// ++Include statement
+plusplusIncludeStatement
+    : PLUSPLUSINCLUDE copySource (DOT_FS | SEMICOLON_FS)?
+    ;
 
 // copy idms statement
 copyIdmsStatement
@@ -156,7 +166,7 @@ charDataLine
    ;
 
 cobolWord
-   : COPYBOOK_IDENTIFIER | IDENTIFIER | MAID | SOURCE | NOSOURCE | LIST | NOLIST | MAP | NOMAP
+   : COPYBOOK_IDENTIFIER | IDENTIFIER | MAID | SOURCE | NOSOURCE | LIST | NOLIST | MAP | NOMAP | LINKAGE | SECTION
    ;
 
 literal

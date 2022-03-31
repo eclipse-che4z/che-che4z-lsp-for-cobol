@@ -68,6 +68,8 @@ class CobolLanguageServerTest {
     SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
+    ConfigurationService configurationService = mock(ConfigurationService.class);
+    CopybookNameService copybookNameService = mock(CopybookNameService.class);
 
     JsonArray arr = new JsonArray();
     String path = "foo/bar";
@@ -91,7 +93,9 @@ class CobolLanguageServerTest {
             settingsService,
             localeStore,
             customExecutor,
-            stateService);
+            stateService,
+            configurationService,
+            copybookNameService);
 
     server.initialized(new InitializedParams());
 
@@ -101,6 +105,7 @@ class CobolLanguageServerTest {
     verify(settingsService).getConfiguration(LOCALE.label);
     verify(watchingService).addWatchers(singletonList(path));
     verify(localeStore).notifyLocaleStore();
+    verify(configurationService).updateConfigurationFromSettings();
   }
 
   /**
@@ -111,7 +116,8 @@ class CobolLanguageServerTest {
   @Test
   void initialize() {
     CobolLanguageServer server =
-        new CobolLanguageServer(null, null, null, null, null, customExecutor, stateService);
+        new CobolLanguageServer(
+            null, null, null, null, null, customExecutor, stateService, null, null);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
@@ -131,7 +137,7 @@ class CobolLanguageServerTest {
     TextDocumentService textDocumentService = mock(CobolTextDocumentService.class);
     CobolLanguageServer server =
         new CobolLanguageServer(
-            textDocumentService, null, null, null, null, customExecutor, stateService);
+            textDocumentService, null, null, null, null, customExecutor, stateService, null, null);
     assertEquals(1, stateService.getExitCode());
     server.shutdown();
     assertEquals(0, stateService.getExitCode());

@@ -14,12 +14,18 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.Context;
+import org.eclipse.lsp.cobol.core.model.tree.Describable;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp4j.Location;
+
+import java.util.List;
 
 /**
  * The class represents the name of variable definition.
@@ -45,11 +51,32 @@ import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class VariableDefinitionNameNode extends Node {
+public class VariableDefinitionNameNode extends Node implements Context, Describable {
   private final String name;
 
-  protected VariableDefinitionNameNode(Locality location, String name) {
-    super(location, NodeType.VARIABLE_DEFINITION_NAME);
+  public VariableDefinitionNameNode(Locality locality, String name) {
+    super(locality, NodeType.VARIABLE_DEFINITION_NAME);
     this.name = name;
+  }
+
+  @Override
+  public List<Location> getDefinitions() {
+    return ImmutableList.of(getLocality().toLocation());
+  }
+
+  @Override
+  public List<Location> getUsages() {
+    return getNearestParentByType(NodeType.VARIABLE)
+        .map(VariableNode.class::cast)
+        .map(VariableNode::getUsages)
+        .orElseGet(ImmutableList::of);
+  }
+
+  @Override
+  public String getFormattedDisplayString() {
+    return getNearestParentByType(NodeType.VARIABLE)
+        .map(VariableNode.class::cast)
+        .map(VariableNode::getFullVariableDescription)
+        .orElse("");
   }
 }

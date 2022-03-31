@@ -52,7 +52,7 @@ class TestIdmsModifyMapStatement {
   private static final String TST3 =
       DEFS
           + "           MODIFY MAP {$EMPMAP} CURSOR AT {$CURROW} {$CURCOL}\n"
-          + "           WCC RESETMDT 40CR ALARM \n";
+          + "           WCC RESETMDT 40CR ALARM .\n";
 
   private static final String TST4 =
       DEFS
@@ -67,13 +67,13 @@ class TestIdmsModifyMapStatement {
   private static final String TST6 =
       DEFS
           + "           MODIFY MAP {$EMPMAP} PERMANENT FOR ALL FIELDS PAD '0' OPTIONAL\n"
-          + "           ATTRIBUTES UNPROTECTED SKIP REVERSE-VIDEO BLUE \n";
+          + "           ATTRIBUTES UNPROTECTED SKIP REVERSE-VIDEO BLUE .\n";
 
   private static final String TST7 =
       DEFS
           + "           MODIFY MAP {$EMPMAP} FOR ALL ERROR FIELDS\n"
           + "            LEFT JUSTIFY\n"
-          + "            PAD {$PADFLD}\n";
+          + "            PAD {$PADFLD}.\n";
 
   private static final String TST8 =
       DEFS
@@ -95,6 +95,6 @@ class TestIdmsModifyMapStatement {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms modify map in tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfig());
   }
 }

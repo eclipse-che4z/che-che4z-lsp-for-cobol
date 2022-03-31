@@ -34,4 +34,9 @@ public class MnemonicNameNode extends VariableNode {
     super(location, name, VariableType.MNEMONIC_NAME, false);
     this.systemName = systemName;
   }
+
+  @Override
+  protected String getVariableDisplayString() {
+    return String.format("%1$s IS %2$s.", systemName, getName());
+  }
 }

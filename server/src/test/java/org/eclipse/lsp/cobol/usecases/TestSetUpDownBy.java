@@ -23,6 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.WARNING;
 
 /**
  * This test checks that a variable used in SET UP/DOWN BY statement flagged when it is not allowed
@@ -55,7 +56,7 @@ class TestSetUpDownBy {
           + "           SET {$NOT-A-TABLE|1} {$IND1} UP BY 1.\n"
           + "           SET {$IND1} UP BY {$INTVAL}.\n"
           + "           SET {$IND1} UP BY {$SUBINT} OF {$GROUP-VAR}.\n"
-          + "           SET {$IND1} UP BY {$SUBINT} {IND3|3}.\n"
+          + "           SET {$IND1} UP BY {$SUBINT} {#*IND3|3|5}.\n"
           + "           SET {$INTVAL|1} DOWN BY {$SUBINT} OF {$GROUP-VAR}.\n"
           + "           SET {$IND1} DOWN BY {IND4|4}.\n"
           + "           SET {IND4|4} DOWN BY {$INTVAL}.\n"
@@ -86,14 +87,19 @@ class TestSetUpDownBy {
             new Diagnostic(
                 null,
                 "Extraneous input 'IND3' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, COMPUTE, CONTINUE, "
-                    + "DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, GENERATE, "
-                    + "GO, GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, PURGE, "
-                    + "READ, READY, RECEIVE, RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT, "
-                    + "START, STOP, STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, '.', ';'}",
+                    + "DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, GENERATE, GO, "
+                    + "GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, PURGE, READ, "
+                    + "READY, RECEIVE, RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT, START, STOP, "
+                    + "STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, '.', ';'}",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "4",
             new Diagnostic(
-                null, "Variable IND4 is not defined", DiagnosticSeverity.Error, ERROR.getText())));
+                null, "Variable IND4 is not defined", DiagnosticSeverity.Error, ERROR.getText()),
+            "5",
+            new Diagnostic(
+                null, "The following token must start in Area A: IND3", DiagnosticSeverity.Warning, WARNING.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

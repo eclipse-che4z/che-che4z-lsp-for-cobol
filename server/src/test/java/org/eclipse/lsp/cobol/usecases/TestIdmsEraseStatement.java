@@ -34,11 +34,11 @@ class TestIdmsEraseStatement {
           + "        01 {$*EMPLOYEE} PIC X(8).\n"
           + "        PROCEDURE DIVISION.\n";
 
-  private static final String ERAS1 = DEFS + "           ERASE {$EMPLOYEE} SELECTIVE MEMBERS\n";
+  private static final String ERAS1 = DEFS + "           ERASE {$EMPLOYEE} SELECTIVE MEMBERS.\n";
 
-  private static final String ERAS2 = DEFS + "           ERASE {$EMPLOYEE} ALL MEMBERS\n";
+  private static final String ERAS2 = DEFS + "           ERASE {$EMPLOYEE} ALL MEMBERS.\n";
 
-  private static final String ERAS3 = DEFS + "           ERASE {$EMPLOYEE} PERMANENT MEMBERS\n";
+  private static final String ERAS3 = DEFS + "           ERASE {$EMPLOYEE} PERMANENT MEMBERS.\n";
 
   private static final String ERAS4 = DEFS + "           ERASE {$EMPLOYEE}.\n";
 
@@ -50,6 +50,6 @@ class TestIdmsEraseStatement {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms erase tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfig());
   }
 }

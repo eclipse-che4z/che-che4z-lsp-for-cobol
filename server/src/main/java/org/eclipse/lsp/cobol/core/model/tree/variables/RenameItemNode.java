@@ -32,4 +32,9 @@ public class RenameItemNode extends VariableWithLevelNode {
   public RenameItemNode(Locality location, String name, boolean redefines, boolean global) {
     super(location, LEVEL_66, name, redefines, VariableType.RENAME_ITEM, global);
   }
+
+  @Override
+  protected String getVariableDisplayString() {
+    return getFormattedSuffix() + ".";
+  }
 }

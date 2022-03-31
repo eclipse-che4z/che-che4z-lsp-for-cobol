@@ -16,36 +16,39 @@
 package org.eclipse.lsp.cobol.usecases.engine;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.eclipse.lsp.cobol.core.model.tree.Context;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.CopybookServiceImpl;
-import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-import org.eclipse.usecase.UseCasePreprocessorLexer;
-import org.eclipse.usecase.UseCasePreprocessorParser;
-import org.eclipse.usecase.UseCasePreprocessorParser.StartRuleContext;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static org.antlr.v4.runtime.CharStreams.fromString;
-import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
+import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.*;
+import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.analyze;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -62,7 +65,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * <li>~ - Copybook
  * <li>* - Definition
  * <li>| - Diagnostic
- * <li>^ - Replacement
+ * <li>^ - Replacement that calculates the position of the element after the replacement
+ * <li>` - Replacement that calculates the position of the element before the replacement
  * <li>& - Constant (predefined variable)
  * <li>% - Subroutine
  * <li>{_ _} - Multi-token error
@@ -84,9 +88,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *     one-token syntax or semantic errors.
  *
  *     <p>To show that the token will be replaced during the pre-processing on the actual language
- *     engine, you may mark it with '^' character with the result specified after. For example,
- *     {$*:TAG:-ID^CSTOUT-ID} will return ':TAG:-ID' as the text, and CSTOUT-ID as a variable
- *     definition. The position will be calculated as for the replacement.
+ *     engine, you may mark it with '^' or '`' characters with the result specified after. For
+ *     example, {$*:TAG:-ID^CSTOUT-ID} will return ':TAG:-ID' as the text, and CSTOUT-ID as a
+ *     variable definition. The position will be calculated as for the replacement. If you specify
+ *     {~CPYNM`CPYNM_ABC}, the result will be 'CPYNM' as the text and the 'CPYNM_ABC' as a copybook
+ *     usage name. The position will be calculated as for the original text.
  *
  *     <p>Some semantic errors may consist of several tokens. In order to show this, you may use
  *     multi-token error declaration: {_{$CHILD} OF {$PARENT}|id_}. The included semantic elements
@@ -100,42 +106,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *     compared with expected one. Notice, that while checking lists, the order of elements doesn't
  *     matter.
  */
-@Slf4j
 @UtilityClass
 public class UseCaseEngine {
-
-  private static final String SQLCA = "SQLCA";
-  private static final String SQLCA_DATACOM_PATH = "/implicitCopybooks/SQLCA_DATACOM.cpy";
-  private static final String SQLCA_DB2_PATH = "/implicitCopybooks/SQLCA_DB2.cpy";
-  private static final String SQLDA_DB2_PATH = "/implicitCopybooks/SQLDA.cpy";
-
-  /**
-   * Checks if language engine applies required syntax and semantic checks correctly once code
-   * contains implicitly (If not content is explicitly provided for SQLCA and SQLDA) defined
-   * copybooks.
-   *
-   * @param text COBOL text to analyse
-   * @param expectedDiagnostics the map of id to the Diagnostic that should present in the analysis
-   *     result
-   * @param implicitCopybookNames the names of the implicit copybooks used in this test
-   * @param sqlBackend the options to be used for SQL copybooks processing
-   */
-  public void runTest(
-      String text,
-      Map<String, Diagnostic> expectedDiagnostics,
-      List<String> implicitCopybookNames,
-      SQLBackend sqlBackend) {
-    List<CobolText> copybooks = new ArrayList<>();
-    implicitCopybookNames.forEach(
-        i -> {
-          String uri = getUriForImplicitCopybook(i, sqlBackend);
-          copybooks.add(new CobolText(i, readContentForImplicitCopybook(uri)));
-        });
-
-    runTest(
-        text, copybooks, expectedDiagnostics, ImmutableList.of(), CopybookProcessingMode.ENABLED);
-  }
-
   /**
    * Check if the language engine applies required syntax and semantic checks. All the semantic
    * elements in the given text, as well as syntax errors, should be wrapped with according tags.
@@ -151,11 +123,11 @@ public class UseCaseEngine {
    * @param copybooks - list of the copybooks used in the document
    * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
    *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
+   * @return analysis result object
    */
-  public void runTest(
+  public AnalysisResult runTest(
       String text, List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics) {
-    runTest(
-        text, copybooks, expectedDiagnostics, ImmutableList.of(), CopybookProcessingMode.ENABLED);
+    return runTest(text, copybooks, expectedDiagnostics, ImmutableList.of());
   }
 
   /**
@@ -174,20 +146,26 @@ public class UseCaseEngine {
    * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
    *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
    * @param subroutineNames - list of subroutine names used in the document
+   * @return analysis result object
    */
-  public void runTest(
+  public AnalysisResult runTest(
       String text,
       List<CobolText> copybooks,
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> subroutineNames) {
-    runTest(text, copybooks, expectedDiagnostics, subroutineNames, CopybookProcessingMode.ENABLED);
+    return runTest(
+        text,
+        copybooks,
+        expectedDiagnostics,
+        subroutineNames,
+        AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
   }
 
   /**
    * Check if the language engine applies required syntax and semantic checks. All the semantic
    * elements in the given text, as well as syntax errors, should be wrapped with according tags.
-   * The same extraction operation applied also for the given copybooks. The copybook processing
-   * mode relies on processingMode parameter.
+   * The same extraction operation applied also for the given copybooks. The copybook configuration
+   * is built from processingMode and sqlBackend parameters.
    *
    * <p>Expected diagnostics should contain the full of list of syntax and semantic
    * errors/warnings/info messages for the document and copybooks. Existing positions, if they are,
@@ -199,7 +177,8 @@ public class UseCaseEngine {
    * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
    *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
    * @param subroutineNames - list of subroutine names used in the document
-   * @param processingMode - copybook processing mode
+   * @param analysisConfig - analysis settings: copybook processing mode and the SQL backend for the
+   *     analysis
    * @return analysis result object
    */
   public AnalysisResult runTest(
@@ -207,104 +186,30 @@ public class UseCaseEngine {
       List<CobolText> copybooks,
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> subroutineNames,
-      CopybookProcessingMode processingMode) {
+      AnalysisConfig analysisConfig) {
 
-    PreprocessedDocument document = prepareDocument(text, copybooks, expectedDiagnostics);
+    PreprocessedDocument document =
+        AnnotatedDocumentCleaning.prepareDocument(
+            text,
+            copybooks,
+            subroutineNames,
+            expectedDiagnostics,
+            analysisConfig.getCopybookConfig().getSqlBackend());
     AnalysisResult actual =
         analyze(
-            DOCUMENT_URI,
-            document.getText(),
-            document.getCopybooks(),
-            subroutineNames,
-            new CopybookConfig(processingMode, SQLBackend.DB2_SERVER));
-    TestData expected =
-        document.getTestData().toBuilder()
-            .subroutineDefinitions(makeSubroutinesDefinitions(subroutineNames))
-            .build();
-    assertResultEquals(actual, expected);
+            UseCase.builder()
+                .fileName(DOCUMENT_URI)
+                .text(document.getText())
+                .copybooks(document.getCopybooks())
+                .subroutines(subroutineNames)
+                .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
+                .copybookProcessingMode(
+                    analysisConfig.getCopybookConfig().getCopybookProcessingMode())
+                .features(analysisConfig.getFeatures())
+                .dialects(analysisConfig.getDialects())
+                .build());
+    assertResultEquals(actual, document.getTestData());
     return actual;
-  }
-
-  private String getUriForImplicitCopybook(String copybookName, SQLBackend sqlBackend) {
-    if (SQLCA.equals(copybookName)) {
-      if (SQLBackend.DATACOM_SERVER.equals(sqlBackend)) {
-        return SQLCA_DATACOM_PATH;
-      }
-      return SQLCA_DB2_PATH;
-    }
-    return SQLDA_DB2_PATH;
-  }
-
-  private String readContentForImplicitCopybook(String resourcePath) {
-    InputStream inputStream = CopybookServiceImpl.class.getResourceAsStream(resourcePath);
-    String content = null;
-    try {
-      content =
-          new WorkspaceFileService()
-              .readFromInputStream(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      LOG.error("Implicit copybook is not loaded. ", e);
-    }
-    return content;
-  }
-
-  private Map<String, List<Location>> makeSubroutinesDefinitions(List<String> subroutineNames) {
-    Range fileStart = new Range(new Position(0, 0), new Position(0, 0));
-    return subroutineNames.stream()
-        .collect(
-            toMap(
-                Function.identity(),
-                name -> ImmutableList.of(new Location("URI:" + name, fileStart))));
-  }
-
-  private PreprocessedDocument prepareDocument(
-      String text, List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics) {
-
-    TestData testData = processDocument(text, expectedDiagnostics);
-
-    return new PreprocessedDocument(
-        testData.getText(), processCopybooks(copybooks, expectedDiagnostics, testData), testData);
-  }
-
-  private List<CobolText> processCopybooks(
-      List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics, TestData testData) {
-    return copybooks.stream()
-        .map(
-            it ->
-                processDocument(
-                    it.getFullText(),
-                    it.getFileName(),
-                    toURI(it.getFileName()),
-                    expectedDiagnostics))
-        .map(collectDataFromCopybooks(testData))
-        .map(it -> new CobolText(it.getCopybookName(), it.getText()))
-        .collect(toList());
-  }
-
-  private TestData processDocument(String text, Map<String, Diagnostic> expectedDiagnostics) {
-    return processDocument(text, null, DOCUMENT_URI, expectedDiagnostics);
-  }
-
-  private TestData processDocument(
-      String text, String documentName, String uri, Map<String, Diagnostic> expectedDiagnostics) {
-    int numberOfLines = text.split("\r\n|\r|\n").length;
-
-    UseCasePreprocessorLexer lexer = new UseCasePreprocessorLexer(fromString(text));
-    lexer.removeErrorListeners();
-
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    UseCasePreprocessorParser parser = new UseCasePreprocessorParser(tokens);
-    parser.removeErrorListeners();
-
-    StartRuleContext startRule = parser.startRule();
-
-    ParseTreeWalker walker = new ParseTreeWalker();
-
-    UseCasePreprocessorListener listener =
-        new UseCasePreprocessorListener(
-            tokens, documentName, uri, numberOfLines, expectedDiagnostics);
-    walker.walk(listener, startRule);
-    return listener.getProcessingResult();
   }
 
   private static void assertResultEquals(AnalysisResult actual, TestData expected) {
@@ -313,32 +218,105 @@ public class UseCaseEngine {
     assertResult(
         "Copybook definitions:",
         expected.getCopybookDefinitions(),
-        actual.getCopybookDefinitions());
-    assertResult("Copybook usages:", expected.getCopybookUsages(), actual.getCopybookUsages());
+        extractDefinitions(actual, COPY));
+    assertResult("Copybook usages:", expected.getCopybookUsages(), extractUsages(actual, COPY));
 
     assertResult(
-        "Variable definition:", expected.getVariableDefinitions(), actual.getVariableDefinitions());
-    assertResult("Variable usages:", expected.getVariableUsages(), actual.getVariableUsages());
-
-    assertResult(
-        "Constant definition:", expected.getConstantDefinitions(), actual.getConstantDefinitions());
-    assertResult("Constant usages:", expected.getConstantUsages(), actual.getConstantUsages());
+        "Variable definition:",
+        expected.getVariableDefinitions(),
+        extractVariableDefinitions(actual));
+    assertResult("Variable usages:", expected.getVariableUsages(), extractVariableUsages(actual));
 
     assertResult(
         "Paragraph definition:",
         expected.getParagraphDefinitions(),
-        actual.getParagraphDefinitions());
-    assertResult("Paragraph usages:", expected.getParagraphUsages(), actual.getParagraphUsages());
+        extractDefinitions(actual, PARAGRAPH_NAME_NODE));
+    assertResult(
+        "Paragraph usages:",
+        expected.getParagraphUsages(),
+        extractUsages(actual, PARAGRAPH_NAME_NODE));
 
     assertResult(
-        "Section definition:", expected.getSectionDefinitions(), actual.getSectionDefinitions());
-    assertResult("Section usages:", expected.getSectionUsages(), actual.getSectionUsages());
+        "Section definition:",
+        expected.getSectionDefinitions(),
+        extractDefinitions(actual, SECTION_NAME_NODE));
+    assertResult(
+        "Section usages:", expected.getSectionUsages(), extractUsages(actual, SECTION_NAME_NODE));
 
     assertResult(
         "Subroutine definitions: ",
         expected.getSubroutineDefinitions(),
-        actual.getSubroutineDefinitions());
-    assertResult("Subroutine usage:", expected.getSubroutineUsages(), actual.getSubroutineUsages());
+        extractDefinitions(actual, SUBROUTINE_NAME_NODE));
+    assertResult(
+        "Subroutine usage:",
+        expected.getSubroutineUsages(),
+        extractUsages(actual, SUBROUTINE_NAME_NODE));
+  }
+
+  private Map<String, List<Location>> extractVariableDefinitions(AnalysisResult result) {
+    return extractVariables(
+        result,
+        it -> !it.getLocality().getUri().startsWith(PREF_IMPLICIT),
+        Context::getDefinitions);
+  }
+
+  private Map<String, List<Location>> extractVariableUsages(AnalysisResult result) {
+    return extractVariables(
+        result, variable -> !variable.getUsages().isEmpty(), Context::getUsages);
+  }
+
+  private Map<String, List<Location>> extractVariables(
+      AnalysisResult result,
+      Predicate<VariableNode> predicate,
+      Function<Context, List<Location>> extractor) {
+
+    return result
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(PROGRAM))
+        .map(ProgramNode.class::cast)
+        .map(ProgramNode::getVariables)
+        .map(Multimap::values)
+        .flatMap(Collection::stream)
+        .filter(it -> !FILLER_NAME.equals(it.getName()))
+        .filter(predicate)
+        .collect(toMap(extractor));
+  }
+
+  private Map<String, List<Location>> extractDefinitions(AnalysisResult result, NodeType nodeType) {
+    return extract(
+        result,
+        nodeType,
+        Context::getDefinitions,
+        context ->
+            !(context.getDefinitions().isEmpty()
+                || context.getDefinitions().get(0).getUri().startsWith(PREF_IMPLICIT)));
+  }
+
+  private Map<String, List<Location>> extractUsages(AnalysisResult result, NodeType nodeType) {
+    return extract(result, nodeType, Context::getUsages, context -> !context.getUsages().isEmpty());
+  }
+
+  private Map<String, List<Location>> extract(
+      AnalysisResult result,
+      NodeType nodeType,
+      Function<Context, List<Location>> extractor,
+      Predicate<Context> predicate) {
+    return result
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(nodeType))
+        .map(Context.class::cast)
+        .filter(predicate)
+        .collect(toMap(extractor));
+  }
+
+  private Collector<Context, ?, Map<String, List<Location>>> toMap(
+      Function<Context, List<Location>> extractor) {
+    return Collectors.toMap(
+        Context::getName,
+        extractor,
+        (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).distinct().collect(toList()));
   }
 
   private void assertDiagnostics(
@@ -379,31 +357,5 @@ public class UseCaseEngine {
     return comparing(Location::getUri)
         .thenComparingInt(location -> location.getRange().getStart().getLine())
         .thenComparing(location -> location.getRange().getStart().getCharacter());
-  }
-
-  private Function<TestData, TestData> collectDataFromCopybooks(TestData accumulator) {
-    return copybookTestData -> {
-      mergeMaps(accumulator.getCopybookDefinitions(), copybookTestData.getCopybookDefinitions());
-      mergeMaps(accumulator.getCopybookUsages(), copybookTestData.getCopybookUsages());
-      mergeMaps(accumulator.getParagraphDefinitions(), copybookTestData.getParagraphDefinitions());
-      mergeMaps(accumulator.getParagraphUsages(), copybookTestData.getParagraphUsages());
-      mergeMaps(accumulator.getSectionDefinitions(), copybookTestData.getSectionDefinitions());
-      mergeMaps(accumulator.getSectionUsages(), copybookTestData.getSectionUsages());
-      mergeMaps(accumulator.getVariableDefinitions(), copybookTestData.getVariableDefinitions());
-      mergeMaps(accumulator.getVariableUsages(), copybookTestData.getVariableUsages());
-      mergeMaps(accumulator.getDiagnostics(), copybookTestData.getDiagnostics());
-      return copybookTestData;
-    };
-  }
-
-  private <T> void mergeMaps(Map<String, List<T>> to, Map<String, List<T>> from) {
-    from.forEach(
-        (key, value) -> {
-          if (to.containsKey(key)) {
-            to.get(key).addAll(value);
-          } else {
-            to.put(key, value);
-          }
-        });
   }
 }

@@ -13,23 +13,22 @@
  */
 export const SETTINGS_CPY_SECTION: string = "cobol-lsp.cpy-manager";
 
+export const SERVER_PORT = "cobol-lsp.server.port"
 export const PATHS_LOCAL_KEY = "paths-local";
 export const PATHS_ZOWE = "paths-dsn";
+export const PATHS_USS = "paths-uss";
 export const SETTINGS_SUBROUTINE_LOCAL_KEY = "cobol-lsp.subroutine-manager.paths-local";
 export const C4Z_FOLDER: string = ".c4z";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
 export const GITIGNORE_FILE: string = ".gitignore";
 export const LANGUAGE_ID = "COBOL";
-export const PROCESS_DOWNLOAD_ERROR_MSG = "Some copybooks could not be located. Ensure your configuration contains correct paths to copybooks, including nested copybooks. Missing copybooks: ";
 export const PROFILE_NAME_PLACEHOLDER = "<profilename>";
 export const DOWNLOAD_QUEUE_LOCKED_ERROR_MSG = `Invalid credentials for profile: ${PROFILE_NAME_PLACEHOLDER}. Copybook retrieval is blocked. Ensure the profile contains correct credentials.`;
 export const UNLOCK_DOWNLOAD_QUEUE_MSG = "Unblock and retry";
-export const SEGMENT_PLACEHOLDER = "<segment>";
-export const NO_PASSWORD_ERROR_MSG = `No password in Zowe profile ${PROFILE_NAME_PLACEHOLDER}.`;
-export const CONN_REFUSED_ERROR_MSG = `Connection to mainframe using Zowe profile ${PROFILE_NAME_PLACEHOLDER} failed.`;
 export const INVALID_CREDENTIALS_ERROR_MSG = `Incorrect credentials in Zowe profile ${PROFILE_NAME_PLACEHOLDER}.`;
-export const DSN_PLACEHOLDER = "<DSN>";
-export const DSN_NOT_FOUND_ERROR_MSG = `Dataset ${DSN_PLACEHOLDER} not found.`;
+export const PROCESS_DOWNLOAD_ERROR_MSG = "Some copybooks could not be located. Ensure your configuration contains correct paths to copybooks, including nested copybooks. Missing copybooks: ";
+export const PROVIDE_PROFILE_MSG = "Please specify a valid Zowe Explorer profile to download copybooks from the mainframe.";
+export const SEGMENT_PLACEHOLDER = "<segment>";
 export const DSN_MUSTBE_NOT_EMPTY = "Dataset name segment must not be empty.";
 export const DSN_NOMORE_8CHARS = "Dataset name segment can't be more than 8 characters.";
 export const DSN_START_PROHIBITED_CHAR = `Dataset name segment: ${SEGMENT_PLACEHOLDER} starts with a prohibited character.`;
@@ -43,6 +42,8 @@ export const COPYBOOK_CPY_EXT = ".CPY";
 export const COPYBOOK_EXT_ARRAY = [COPYBOOK_CPY_EXT];
 export const EXTENSION_ID = "broadcommfd.cobol-language-support";
 export const TELEMETRY_DEFAULT_CONTENT = "INVALID_INSTRUMENTATION_KEY";
+export const ZOWE_EXT_MISSING_MSG = "Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe."
+export const INSTALL_ZOWE = "Install Zowe Explorer";
 
 export enum PUNCH_CARD {
     SEQUENCE_AREA_END_POS = 6,
@@ -50,4 +51,4 @@ export enum PUNCH_CARD {
     AREA_A_END_POS = 11,
     AREA_B_END_POS = 72,
     IDENTIFICATION_AREA_END_POS = 80,
-};
+}

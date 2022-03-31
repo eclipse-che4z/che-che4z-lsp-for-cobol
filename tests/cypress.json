@@ -16,11 +16,12 @@
       "interTestPort": "",
       "convertedJCL": "",
       "originalJCL": "",
-      "dap_cb": ""
+      "dap_cb": "",
+      "ide": ""
   },
   "retries":  {
     "runMode": 2,
-    "openMode": 2
+    "openMode": 0
   },
   "supportFile": "cypress/support/index.ts",
     "reporter": "mocha-junit-reporter",

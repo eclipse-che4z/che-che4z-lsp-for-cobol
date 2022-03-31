@@ -67,6 +67,7 @@ public class ServiceModule extends AbstractModule {
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(HoverProvider.class).to(VariableHover.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
+    bind(CopybookNameService.class).to(CopybookNameServiceImpl.class);
 
     bindFormations();
     bindCompletions();
@@ -88,8 +89,8 @@ public class ServiceModule extends AbstractModule {
     completionBinding.addBinding().to(SnippetCompletion.class);
     completionBinding.addBinding().to(KeywordCompletion.class);
     completionBinding.addBinding().to(CopybookCompletion.class);
-    completionBinding.addBinding().to(ConstantCompletion.class);
     completionBinding.addBinding().to(SubroutineCompletion.class);
+    completionBinding.addBinding().to(CopybookNameCompletion.class);
 
     bind(CompletionStorage.class).annotatedWith(named("Keywords")).to(Keywords.class);
     bind(CompletionStorage.class).annotatedWith(named("Snippets")).to(Snippets.class);

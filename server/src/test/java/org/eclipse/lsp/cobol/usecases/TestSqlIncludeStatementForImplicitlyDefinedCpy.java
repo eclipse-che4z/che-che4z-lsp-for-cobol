@@ -17,6 +17,9 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
@@ -93,24 +96,30 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
   void test1() {
     UseCaseEngine.runTest(
         TEXT_BACKEND_DB2,
+        ImmutableList.of(),
         ImmutableMap.of(),
-        ImmutableList.of("SQLCA", "SQLDA"),
-        SQLBackend.DB2_SERVER);
+        ImmutableList.of(),
+        AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
   }
 
   @Test
   void test2() {
     UseCaseEngine.runTest(
         TEXT_BACKEND_DATACOM,
+        ImmutableList.of(),
         ImmutableMap.of(),
-        ImmutableList.of("SQLCA", "SQLDA"),
-        SQLBackend.DATACOM_SERVER);
+        ImmutableList.of(),
+        new AnalysisConfig(
+            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
+            ImmutableList.of(),
+            ImmutableList.of()));
   }
 
   @Test
   void test3() {
     UseCaseEngine.runTest(
         TEXT_ERR_PRG,
+        ImmutableList.of(),
         ImmutableMap.of(
             "err1",
             new Diagnostic(
@@ -124,7 +133,10 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
                 String.format(ERR_MESSAGE, "SQLEXT"),
                 Error,
                 SourceInfoLevels.ERROR.getText())),
-        ImmutableList.of("SQLCA", "SQLDA"),
-        SQLBackend.DATACOM_SERVER);
+        ImmutableList.of(),
+        new AnalysisConfig(
+            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
+            ImmutableList.of(),
+            ImmutableList.of()));
   }
 }

@@ -23,7 +23,6 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
 
 /** This test checks that there are no NPE thrown while typing in MAP SECTION. */
 class TestIdmsMapSectionDoesntProduceNPE {
@@ -31,9 +30,9 @@ class TestIdmsMapSectionDoesntProduceNPE {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    EMPRPT.\n"
           + "       DATA DIVISION.\n"
-          + "       MAP SECTION.\n"
-          + "           MAX {FILE|1|2} {LIST|3} 30.\n"
-          + "           {MAP|4} {MCAR100|5}.\n"
+          + "       {MAP|1} SECTION.\n"
+          + "           MAX FILE LIST 30.\n"
+          + "           MAP MCAR100.\n"
           + "       FILE SECTION.";
 
   @Test
@@ -45,32 +44,11 @@ class TestIdmsMapSectionDoesntProduceNPE {
             "1",
             new Diagnostic(
                 null,
-                "Syntax error on 'FILE' expected FIELD",
+                "Syntax error on 'MAP' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, LINKAGE, "
+                    + "LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE}",
                 Error,
-                SourceInfoLevels.ERROR.getText()),
-            "2",
-            new Diagnostic(
-                null,
-                "The following token must start in Area A: FILE",
-                Warning,
-                SourceInfoLevels.WARNING.getText()),
-            "3",
-            new Diagnostic(
-                null,
-                "Syntax error on 'LIST' expected SECTION",
-                Error,
-                SourceInfoLevels.ERROR.getText()),
-            "4",
-            new Diagnostic(
-                null,
-                "The following token must start in Area A: MAP",
-                Warning,
-                SourceInfoLevels.WARNING.getText()),
-            "5",
-            new Diagnostic(
-                null,
-                "Syntax error on 'MCAR100' expected SECTION",
-                Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

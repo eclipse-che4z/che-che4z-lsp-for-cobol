@@ -19,7 +19,7 @@ import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.service.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.service.CobolLSPServerStateService;
 import org.eclipse.lsp.cobol.service.CobolTextDocumentService;
-import org.eclipse.lsp.cobol.service.SettingsService;
+import org.eclipse.lsp.cobol.service.ConfigurationService;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
@@ -44,8 +44,8 @@ public class MockTextDocumentService {
   @Mock protected CodeActions actions;
   @Mock protected Occurrences occurrences;
   @Mock protected Formations formations;
-  @Mock protected SettingsService settingsService;
   @Mock protected HoverProvider hoverProvider;
+  @Mock protected ConfigurationService configurationService;
 
   /**
    * Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing. All tasks run
@@ -62,9 +62,9 @@ public class MockTextDocumentService {
         .formations(formations)
         .executors(new TestThreadPoolExecutor())
         .cfastBuilder(new CFASTBuilderImpl())
-        .settingsService(settingsService)
         .disposableLSPStateService(new CobolLSPServerStateService())
         .hoverProvider(hoverProvider)
+        .configurationService(configurationService)
         .build();
   }
 
@@ -81,10 +81,10 @@ public class MockTextDocumentService {
         .actions(actions)
         .occurrences(occurrences)
         .formations(formations)
-        .settingsService(settingsService)
         .disposableLSPStateService(new CobolLSPServerStateService())
         .executors(new CustomThreadPoolExecutorService(1, 1, 60, 1))
         .hoverProvider(hoverProvider)
+        .configurationService(configurationService)
         .build();
   }
 }

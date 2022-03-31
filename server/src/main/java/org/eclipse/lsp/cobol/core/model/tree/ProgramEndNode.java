@@ -35,10 +35,10 @@ public class ProgramEndNode extends Node {
   public ProgramEndNode(Locality locality, String programId) {
     super(locality, NodeType.PROGRAM_END);
     this.programId = programId;
+    addProcessStep(this::processNode);
   }
 
-  @Override
-  public List<SyntaxError> processNode() {
+  private List<SyntaxError> processNode() {
     List<SyntaxError> errors = new ArrayList<>(1);
     getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)

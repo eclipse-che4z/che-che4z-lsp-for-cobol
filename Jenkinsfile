@@ -28,7 +28,7 @@ spec:
     - name: sonar
       mountPath: /home/jenkins/.sonar
   - name: node
-    image: sonarsource/sonarcloud-scan:1.2.1
+    image: sonarsource/sonarcloud-scan:1.4.0
     command:
     - cat
     env:
@@ -58,37 +58,30 @@ kind: Pod
 spec:
   containers:
   - name: theia
-    image: theiaide/theia-full:1.15.0
+    image: grianbrcom/theia-full:1.15.0
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
     resources:
       limits:
-        memory: "2Gi"
-        cpu: "1"
+        memory: "4Gi"
+        cpu: "3"
       requests:
-        memory: "2Gi"
-        cpu: "1"
+        memory: "4Gi"
+        cpu: "3"
   - name: cypress
-    image: cypress/included:7.7.0
+    image: cypress/included:8.5.0
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
     resources:
       limits:
         memory: "2Gi"
-        cpu: "800m"
+        cpu: "1"
       requests:
         memory: "2Gi"
-        cpu: "800m"
+        cpu: "1"
 """
-
-def projectName = 'lsp-for-cobol'
-def kubeLabelPrefix = "${projectName}_pod_${env.BUILD_NUMBER}_${env.BRANCH_NAME}"
-        // cleaning the branch name according K8s restrictions
-        .replaceAll(/[^a-zA-Z0-9._-]+/,"").take(52)
-def kubeBuildLabel = "${kubeLabelPrefix}_build"
-def kubeTestLabel = "${kubeLabelPrefix}_test"
 
 boolean isTimeTriggeredBuild() {
     for (currentBuildCause in currentBuild.buildCauses) {
@@ -120,7 +113,6 @@ pipeline {
         stage('Build a package') {
             agent {
                 kubernetes {
-                    label kubeBuildLabel
                     yaml kubernetes_build_config
                 }
             }
@@ -163,7 +155,8 @@ pipeline {
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
-                                sh 'npm ci'
+                                sh 'npm ci --ignore-scripts'
+                                sh 'npm run postinstall'
                             }
                         }
                     }
@@ -240,7 +233,7 @@ pipeline {
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
-                                sh 'npx vsce package'
+                                sh 'npm run package'
                                 archiveArtifacts "*.vsix"
                             }
                         }
@@ -256,7 +249,6 @@ pipeline {
             }
             agent {
                 kubernetes {
-                    label kubeTestLabel
                     yaml kubernetes_test_config
                 }
             }
@@ -294,10 +286,12 @@ pipeline {
                             cp -r /root/.cache $CYPRESS_HOME 
                             cp -r /root/.local $CYPRESS_HOME 
                             cp -r /root/.npm $CYPRESS_HOME 
+                            rm -rf node_modules/ yarn.lock
+                            yarn cache clean
                             yarn install --frozen-lockfile
                             npm run ts:build
                             # To enable debug add this: DEBUG=*
-                            NO_COLOR=1 npm run cy:run:ci
+                            NO_COLOR=1 npm run cy:run:ci -- --env ide=theia
                             TEST_STATUS=$?
                             npm run merge-reports
                             exit $TEST_STATUS

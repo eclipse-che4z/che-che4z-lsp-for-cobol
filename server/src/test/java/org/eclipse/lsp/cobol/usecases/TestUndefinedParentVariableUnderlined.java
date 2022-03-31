@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import org.eclipse.lsp.cobol.usecases.engine.UseCase;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.DISABLED;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
-import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /**
@@ -45,24 +44,15 @@ class TestUndefinedParentVariableUnderlined {
           + "6              10 {$*MAMA} PIC 99 VALUE 3.\r\n"
           + "7       PROCEDURE DIVISION.\r\n"
           + "8       {#*PROCB}.\r\n"
-          + "9           MOVE 10 TO {MAMA|1} OF AGE OF BORROWE.\r\n"
+          + "9           MOVE 10 TO {_MAMA OF AGE OF BORROWE|1_}.\r\n"
           + "10      END PROGRAM TEST1.";
 
   @Test
   void assertCopybookProcessingModeNotChangesLogic() {
     Assertions.assertEquals(
+        UseCaseUtils.analyze(UseCase.builder().text(TEXT).copybookProcessingMode(ENABLED).build()),
         UseCaseUtils.analyze(
-            UseCaseUtils.DOCUMENT_URI,
-            TEXT,
-            ImmutableList.of(),
-            ImmutableList.of(),
-            new CopybookConfig(ENABLED, DB2_SERVER)),
-        UseCaseUtils.analyze(
-            UseCaseUtils.DOCUMENT_URI,
-            TEXT,
-            ImmutableList.of(),
-            ImmutableList.of(),
-            new CopybookConfig(DISABLED, DB2_SERVER)));
+            UseCase.builder().text(TEXT).copybookProcessingMode(DISABLED).build()));
   }
 
   @Test

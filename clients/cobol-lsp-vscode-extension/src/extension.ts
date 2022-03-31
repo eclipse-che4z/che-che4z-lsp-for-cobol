@@ -14,48 +14,61 @@
 
 import * as vscode from "vscode";
 
-import {changeDefaultZoweProfile} from "./commands/ChangeDefaultZoweProfile";
-import {editDatasetPaths} from "./commands/EditDatasetPaths";
-import {fetchCopybookCommand} from "./commands/FetchCopybookCommand";
-import {gotoCopybookSettings} from "./commands/OpenSettingsCommand";
-import {C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID, SETTINGS_CPY_SECTION} from "./constants";
-import {CopybookDownloadService} from "./services/copybook/CopybookDownloadService";
-import {CopybooksCodeActionProvider} from "./services/copybook/CopybooksCodeActionProvider";
-import {CopybooksPathGenerator} from "./services/copybook/CopybooksPathGenerator";
+import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
+import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
+import { C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID } from "./constants";
+import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
+import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
-import {CopybookURI} from "./services/copybook/CopybookURI";
-import {LanguageClientService} from "./services/LanguageClientService";
-import {Middleware} from "./services/Middleware";
-import {PathsService} from "./services/PathsService";
-import {ProfileService} from "./services/ProfileService";
-import {TelemetryService} from "./services/reporter/TelemetryService";
-import {createFileWithGivenPath} from "./services/Settings";
-import {ZoweApi} from "./services/ZoweApi";
-import {resolveSubroutineURI} from "./services/util/SubroutineUtils";
-import {initSmartTab} from "./commands/SmartTabCommand";
+import { initSmartTab } from "./commands/SmartTabCommand";
+import { LanguageClientService } from "./services/LanguageClientService";
+import { Middleware } from "./services/Middleware";
+import { TelemetryService } from "./services/reporter/TelemetryService";
+import { createFileWithGivenPath } from "./services/Settings";
+import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
+import { CommentAction, commentCommand } from "./commands/CommentCommand";
 
-let zoweApi: ZoweApi;
-let profileService: ProfileService;
-let copybooksPathGenerator: CopybooksPathGenerator;
 let copyBooksDownloader: CopybookDownloadService;
-let pathsService: PathsService;
 let middleware: Middleware;
 let languageClientService: LanguageClientService;
 
 function initialize() {
     // We need lazy initialization to be able to mock this for unit testing
-    zoweApi = new ZoweApi();
-    profileService = new ProfileService(zoweApi);
-    copybooksPathGenerator = new CopybooksPathGenerator(profileService);
-    copyBooksDownloader = new CopybookDownloadService(zoweApi, profileService, copybooksPathGenerator);
-    pathsService = new PathsService();
-    middleware = new Middleware(new CopybookURI(profileService), copyBooksDownloader);
+    copyBooksDownloader = new CopybookDownloadService();
+    middleware = new Middleware(copyBooksDownloader);
     languageClientService = new LanguageClientService(middleware);
 }
 
 export async function activate(context: vscode.ExtensionContext) {
     initialize();
+    initSmartTab(context);
+
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
+
+    copyBooksDownloader.start();
+
+    // Commands
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
+        fetchCopybookCommand(copybook, copyBooksDownloader, programName);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings", () => {
+        gotoCopybookSettings();
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
+
+    // create .gitignore file within .c4z folder
+    createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
+
+    context.subscriptions.push(copyBooksDownloader);
+
+    context.subscriptions.push(
+        vscode.languages.registerCodeActionsProvider(
+            { scheme: "file", language: LANGUAGE_ID },
+            new CopybooksCodeActionProvider()));
+
     try {
         await languageClientService.checkPrerequisites();
     } catch (err) {
@@ -65,52 +78,16 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
     }
 
-    copyBooksDownloader.start();
-
-    // Listeners
-    context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
-        if (event.affectsConfiguration(SETTINGS_CPY_SECTION) &&
-            vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles")) {
-            profileService.updateStatusBar();
-        }
-    }));
-
-    // Commands
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
-        fetchCopybookCommand(copybook, copyBooksDownloader, programName);
-    }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.change-default-zowe-profile", () => {
-        changeDefaultZoweProfile(profileService);
-    }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.edit-dataset-paths", () => {
-        editDatasetPaths(pathsService);
-    }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings", () => {
-        gotoCopybookSettings();
-    }));
-
-    initSmartTab(context);
-
     // Custom client handlers
     languageClientService.addRequestHandler("cobol/resolveSubroutine", resolveSubroutineURI);
 
     context.subscriptions.push(languageClientService.start());
 
-    // create .gitignore file within .c4z folder
-    createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
-
-    context.subscriptions.push(copyBooksDownloader);
-
-    context.subscriptions.push(
-        vscode.languages.registerCodeActionsProvider(
-            {scheme: "file", language: LANGUAGE_ID},
-            new CopybooksCodeActionProvider()));
-
     // 'export' public api-surface
     return {
         analysis(uri: string, text: string): Promise<any> {
             return languageClientService.retrieveAnalysis(uri, text);
-        }
+        },
     };
 }
 

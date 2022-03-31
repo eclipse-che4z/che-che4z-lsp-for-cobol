@@ -33,10 +33,10 @@ public class ProgramIdNode extends Node {
   public ProgramIdNode(Locality locality, String programId) {
     super(locality, NodeType.PROGRAM_ID);
     this.programId = programId;
+    addProcessStep(this::processNode);
   }
 
-  @Override
-  public List<SyntaxError> processNode() {
+  private List<SyntaxError> processNode() {
     getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
         .ifPresent(it -> it.setProgramName(programId));

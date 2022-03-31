@@ -17,6 +17,9 @@ package org.eclipse.lsp.cobol.core.model.tree;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
+import org.eclipse.lsp.cobol.core.model.variables.SectionType;
+
+import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -25,17 +28,16 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Test {@link Node}
- */
+/** Test {@link Node} */
 class NodeTest {
   private static final Locality LOCALITY = Locality.builder().build();
+  private static final NamedSubContext COPYBOOK = new NamedSubContext();
 
   @Test
   void getDepthFirstStream() {
-    Node rootNode = new RootNode(LOCALITY);
+    Node rootNode = new RootNode(LOCALITY, COPYBOOK);
     Node firstProg = new ProgramNode(LOCALITY);
-    Node sectionNode = new SectionNode(LOCALITY);
+    Node sectionNode = new SectionNode(LOCALITY, SectionType.WORKING_STORAGE);
     Node definition = VariableDefinitionNode.builder().build();
     Node nestedProg = new ProgramNode(LOCALITY);
     Node secondProg = new ProgramNode(LOCALITY);
@@ -48,20 +50,26 @@ class NodeTest {
     rootNode.addChild(secondProg);
     secondProg.addChild(anotherDefinition);
 
-    List<Node> expectedResult = ImmutableList.of(
-        rootNode, firstProg, sectionNode, definition, nestedProg, secondProg, anotherDefinition
-    );
+    List<Node> expectedResult =
+        ImmutableList.of(
+            rootNode,
+            firstProg,
+            sectionNode,
+            definition,
+            nestedProg,
+            secondProg,
+            anotherDefinition);
     assertEquals(expectedResult, rootNode.getDepthFirstStream().collect(Collectors.toList()));
   }
 
   @Test
   void getParentByType() {
-    Node rootNode = new RootNode(LOCALITY);
+    Node rootNode = new RootNode(LOCALITY, COPYBOOK);
     Node program = new ProgramNode(LOCALITY);
     rootNode.addChild(program);
     Node nestedProgram = new ProgramNode(LOCALITY);
     program.addChild(nestedProgram);
-    Node section = new SectionNode(LOCALITY);
+    Node section = new SectionNode(LOCALITY, SectionType.WORKING_STORAGE);
     nestedProgram.addChild(section);
     Node definition = VariableDefinitionNode.builder().build();
     section.addChild(definition);

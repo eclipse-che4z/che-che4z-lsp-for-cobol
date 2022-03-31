@@ -42,8 +42,8 @@ class TestSyntaxErrorOnCommunicationSection {
             "1",
             new Diagnostic(
                 null,
-                "Syntax error on 'COMMUNICATION' expected {<EOF>, CBL, END, EXEC, FILE, ID, IDENTIFICATION, "
-                    + "LINKAGE, LOCAL-STORAGE, MAP, PROCEDURE, PROCESS, SCHEMA, WORKING-STORAGE}",
+                "Syntax error on 'COMMUNICATION' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, "
+                    + "LINKAGE, LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE}",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
   }

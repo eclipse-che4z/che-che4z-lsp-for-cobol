@@ -20,13 +20,15 @@ import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
-import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
+import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp4j.DocumentSymbol;
@@ -40,15 +42,14 @@ import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * This test checks the logic of {@link CobolLanguageEngine}. It should first run {@link
  * TextPreprocessor} to clean up the given COBOL text, then apply syntax and semantic analysis. If
- * the text doesn't have any semantic elements, it should return an empty {@link SemanticContext}
+ * the text doesn't have any semantic elements, it should return an empty {@link Node}
  */
 class CobolLanguageEngineTest {
 
@@ -59,16 +60,14 @@ class CobolLanguageEngineTest {
   void testLanguageEngineRun() {
     TextPreprocessor preprocessor = mock(TextPreprocessor.class);
     MessageService mockMessageService = mock(MessageService.class);
+    ErrorMessageHelper mockErrUtil = mock(ErrorMessageHelper.class);
     CobolErrorStrategy cobolErrorStrategy = new CobolErrorStrategy();
     ParseTreeListener treeListener = mock(ParseTreeListener.class);
     cobolErrorStrategy.setMessageService(mockMessageService);
+    cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
-            preprocessor,
-            cobolErrorStrategy,
-            mockMessageService,
-            treeListener,
-            mock(SubroutineService.class));
+            preprocessor, mockMessageService, treeListener, mock(SubroutineService.class));
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()
@@ -94,6 +93,7 @@ class CobolLanguageEngineTest {
 
     ExtendedDocument extendedDocument =
         new ExtendedDocument(
+            "",
             TEXT,
             new NamedSubContext(),
             ImmutableMap.of(
@@ -130,11 +130,14 @@ class CobolLanguageEngineTest {
                             .range(new Range(new Position(0, 31), new Position(0, 31)))
                             .token("<EOF>")
                             .build()),
-                    ImmutableMap.of())),
-            ImmutableMap.of());
+                    ImmutableMap.of())));
 
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER);
-    when(preprocessor.process(URI, TEXT, cpyConfig))
+
+    when(preprocessor.cleanUpCode(URI, TEXT))
+        .thenReturn(new ResultWithErrors<>(TEXT, ImmutableList.of()));
+    when(preprocessor.processCleanCode(
+            eq(URI), eq(TEXT), eq(cpyConfig), any(CopybookHierarchy.class)))
         .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));
 
     Range outlineRange =
@@ -156,27 +159,18 @@ class CobolLanguageEngineTest {
                         "",
                         ImmutableList.of()))));
 
-    ResultWithErrors<SemanticContext> expected =
+    ResultWithErrors<Node> expected =
         new ResultWithErrors<>(
-            SemanticContext.builder()
-                .constants(new PredefinedVariableContext())
-                .outlineTree(expectedOutlineTree)
-                .rootNode(
-                    new RootNode(
-                        Locality.builder()
-                            .uri(URI)
-                            .range(new Range(new Position(0, 7), new Position(0, 31)))
-                            .token("IDENTIFICATION")
-                            .build()))
-                .build(),
+            new RootNode(
+                Locality.builder()
+                    .uri(URI)
+                    .range(new Range(new Position(0, 7), new Position(0, 31)))
+                    .token("IDENTIFICATION")
+                    .build(),
+                new NamedSubContext()),
             ImmutableList.of(error, eofError));
 
-    ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, cpyConfig);
+    ResultWithErrors<Node> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
     assertEquals(expected, actual);
-
-    // test nullity
-    assertThrows(IllegalArgumentException.class, () -> engine.run(null, TEXT, cpyConfig));
-    assertThrows(IllegalArgumentException.class, () -> engine.run(URI, null, cpyConfig));
-    assertThrows(IllegalArgumentException.class, () -> engine.run(URI, TEXT, null));
   }
 }

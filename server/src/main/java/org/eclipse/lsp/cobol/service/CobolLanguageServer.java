@@ -14,15 +14,15 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import org.eclipse.lsp.cobol.core.messages.LocaleStore;
-import org.eclipse.lsp.cobol.core.messages.LogLevelUtils;
-import org.eclipse.lsp.cobol.core.model.ErrorCode;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.messages.LocaleStore;
+import org.eclipse.lsp.cobol.core.messages.LogLevelUtils;
+import org.eclipse.lsp.cobol.core.model.ErrorCode;
+import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -32,12 +32,12 @@ import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
 
 /**
@@ -48,15 +48,18 @@ import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
 @Singleton
 public class CobolLanguageServer implements LanguageServer {
 
-  private TextDocumentService textService;
-  private WorkspaceService workspaceService;
-  private WatcherService watchingService;
-  private SettingsService settingsService;
-  private LocaleStore localeStore;
-  private CustomThreadPoolExecutor customThreadPoolExecutor;
   private final DisposableLSPStateService disposableLSPStateService;
+  private final TextDocumentService textService;
+  private final WorkspaceService workspaceService;
+  private final WatcherService watchingService;
+  private final SettingsService settingsService;
+  private final LocaleStore localeStore;
+  private final CustomThreadPoolExecutor customThreadPoolExecutor;
+  private final ConfigurationService configurationService;
+  private final CopybookNameService copybookNameService;
 
   @Inject
+  @SuppressWarnings("squid:S107")
   CobolLanguageServer(
       TextDocumentService textService,
       WorkspaceService workspaceService,
@@ -64,7 +67,9 @@ public class CobolLanguageServer implements LanguageServer {
       SettingsService settingsService,
       LocaleStore localeStore,
       CustomThreadPoolExecutor customThreadPoolExecutor,
-      DisposableLSPStateService disposableLSPStateService) {
+      DisposableLSPStateService disposableLSPStateService,
+      ConfigurationService configurationService,
+      CopybookNameService copybookNameService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
@@ -72,6 +77,8 @@ public class CobolLanguageServer implements LanguageServer {
     this.localeStore = localeStore;
     this.customThreadPoolExecutor = customThreadPoolExecutor;
     this.disposableLSPStateService = disposableLSPStateService;
+    this.configurationService = configurationService;
+    this.copybookNameService = copybookNameService;
   }
 
   @Override
@@ -117,11 +124,13 @@ public class CobolLanguageServer implements LanguageServer {
    */
   @Override
   public void initialized(@Nullable InitializedParams params) {
+    configurationService.updateConfigurationFromSettings();
     watchingService.watchConfigurationChange();
     watchingService.watchPredefinedFolder();
     addLocalFilesWatcher();
     getLocaleFromClient();
     getLogLevelFromClient();
+    copybookNameService.collectLocalCopybookNames();
   }
 
   private void getLogLevelFromClient() {

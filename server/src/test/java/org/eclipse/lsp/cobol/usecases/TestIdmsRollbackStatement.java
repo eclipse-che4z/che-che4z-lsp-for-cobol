@@ -33,11 +33,11 @@ class TestIdmsRollbackStatement {
 
   private static final String ROLL1 = DEFS + "           ROLLBACK.\n";
 
-  private static final String ROLL2 = DEFS + "           ROLLBACK CONTINUE\n";
+  private static final String ROLL2 = DEFS + "           ROLLBACK CONTINUE.\n";
 
   private static final String ROLL3 = DEFS + "           ROLLBACK TASK.\n";
 
-  private static final String ROLL4 = DEFS + "           ROLLBACK TASK CONTINUE\n";
+  private static final String ROLL4 = DEFS + "           ROLLBACK TASK CONTINUE.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(ROLL1, ROLL2, ROLL3, ROLL4);
@@ -47,6 +47,6 @@ class TestIdmsRollbackStatement {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms rollback tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfig());
   }
 }

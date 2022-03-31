@@ -35,6 +35,7 @@ abstract class VariableWithLevelNode extends VariableNode {
   private final int level;
   private final boolean specifiedGlobal;
   private final boolean redefines;
+  private static final String GLOBAL_SUFFIX = " GLOBAL";
 
   protected VariableWithLevelNode(
       Locality location,
@@ -47,6 +48,7 @@ abstract class VariableWithLevelNode extends VariableNode {
     this.level = level;
     this.redefines = redefines;
     this.specifiedGlobal = global;
+    addProcessStep(this::checkLevel);
   }
 
   protected VariableWithLevelNode(
@@ -55,6 +57,7 @@ abstract class VariableWithLevelNode extends VariableNode {
     this.level = level;
     this.redefines = redefines;
     this.specifiedGlobal = false;
+    addProcessStep(this::checkLevel);
   }
 
   @Override
@@ -64,8 +67,7 @@ abstract class VariableWithLevelNode extends VariableNode {
       setGlobal(((VariableWithLevelNode) parent).isGlobal());
   }
 
-  @Override
-  protected List<SyntaxError> processNode() {
+  private List<SyntaxError> checkLevel() {
     List<SyntaxError> errors = new ArrayList<>();
     if ((level == LEVEL_01 || level == LEVEL_77)
         && getLocality().getRange().getStart().getCharacter() > AREA_A_FINISH)
@@ -73,5 +75,10 @@ abstract class VariableWithLevelNode extends VariableNode {
     if (specifiedGlobal && level != LEVEL_01)
       errors.add(getError(MessageTemplate.of(GLOBAL_NON_01_LEVEL_MSG)));
     return errors;
+  }
+
+  protected String getFormattedSuffix() {
+    String globalSuffix = specifiedGlobal ? GLOBAL_SUFFIX : "";
+    return String.format("%1$02d %2$s%3$s", level, getName(), globalSuffix);
   }
 }

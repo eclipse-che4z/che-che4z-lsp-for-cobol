@@ -20,18 +20,16 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 /** Test IDMS TRANSFER DML statement */
 class TestIdmsTransferStatement {
-
-  private static final String MESSAGE_1 = "Syntax error on 'DISPLAY' expected {'.', ';'}";
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -59,12 +57,12 @@ class TestIdmsTransferStatement {
   private static final String TRANSFER_ALL =
       "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1};\r\n";
 
-  private static final String TRANSFER_NO_TERM =
-      "           TRANSFER CONTROL TO 'TSTPROG' LINK {DISPLAY|1} 'ERROR'.\r\n";
-
   private static final String TRANSFER_ON =
       "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1};\r\n"
           + "             ON {$ANY-ERROR-STATUS} DISPLAY 'TRANSFER ERROR'.\r\n";
+
+  private static final String TRANSFER_PGM_TOO_LONG_ERROR =
+      "           TRANSFER CONTROL TO {'TSTPROGXXX'|1} XCTL.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
@@ -73,24 +71,25 @@ class TestIdmsTransferStatement {
         BOILERPLATE + TRANSFER_PARMS2,
         BOILERPLATE + TRANSFER_USING_PARMS,
         BOILERPLATE + TRANSFER_ALL,
-        BOILERPLATE + TRANSFER_ON);
-  }
-
-  @Test
-  void testWithError() {
-    UseCaseEngine.runTest(
-        BOILERPLATE + TRANSFER_NO_TERM,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null, MESSAGE_1, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
+        BOILERPLATE + TRANSFER_ON,
+        BOILERPLATE + TRANSFER_PGM_TOO_LONG_ERROR);
   }
 
   @ParameterizedTest
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - IDMS transfer tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Max length limit of 8 bytes allowed for program name.",
+                Error,
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

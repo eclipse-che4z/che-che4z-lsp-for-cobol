@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -48,15 +49,27 @@ public class FileDescriptionNode extends VariableNode {
     super(location, name, variableType, global);
     this.fileDescriptorText = fileDescriptorText;
     this.fileControlClause = fileControlClause;
+    addProcessStep(this::processNode);
   }
 
-  @Override
-  public List<SyntaxError> processNode() {
+  private List<SyntaxError> processNode() {
     List<SyntaxError> errors = new ArrayList<>();
-    if (StringUtils.isBlank(this.fileControlClause)) {
+    if (StringUtils.isBlank(fileControlClause)) {
       errors.add(getError(MessageTemplate.of(FD_WITHOUT_FILE_CONTROL, getName()), ErrorSeverity.ERROR));
     }
     errors.addAll(VariableDefinitionUtil.processNodeWithVariableDefinitions(this));
     return errors;
+  }
+
+  @Override
+  protected String getVariableDisplayString() {
+    return String.format(
+        "DESCRIPTION %n----------- %n%S%n %nFILE-CONTROL%n------------ %n%S %n",
+        fileDescriptorText, fileControlClause);
+  }
+
+  @Override
+  protected List<String> getChildrenDescription(String prefix) {
+    return ImmutableList.of();
   }
 }

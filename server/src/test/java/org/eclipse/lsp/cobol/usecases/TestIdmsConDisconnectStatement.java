@@ -38,7 +38,7 @@ class TestIdmsConDisconnectStatement {
           + "       PROCEDURE DIVISION.\n";
 
   private static final String DISC1 =
-      DEFS + "           DISCONNECT {$EMPLOYEE} FROM {$OFFICE-EMPLOYEE}\n";
+      DEFS + "           DISCONNECT {$EMPLOYEE} FROM {$OFFICE-EMPLOYEE}.\n";
 
   private static final String DISC2 =
       DEFS
@@ -46,7 +46,7 @@ class TestIdmsConDisconnectStatement {
           + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.  \n";
 
   private static final String CONN1 =
-      DEFS + "           CONNECT {$EMPLOYEE} TO {$OFFICE-EMPLOYEE}\n";
+      DEFS + "           CONNECT {$EMPLOYEE} TO {$OFFICE-EMPLOYEE}.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(DISC1, DISC2, CONN1);
@@ -56,6 +56,6 @@ class TestIdmsConDisconnectStatement {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms connect and disconnect tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfig());
   }
 }

@@ -54,7 +54,7 @@ class TestIdmsMapOutStatement {
           + "               RESUME PAGE {$PAG-NUM}.\n";
 
   private static final String TST3 =
-      DEFS + "           MAP OUT USING {$EMPMAP} IO OUTPUT LITERALS DETAIL KEY IS {$DETKEY} .\n";
+      DEFS + "           MAP OUT USING {$EMPMAP} IO OUTPUT LITERALS DETAIL KEY IS {$DETKEY}.\n";
 
   private static final String TST4 =
       DEFS + "           MAP OUT USING {$EMPMAP} NOIO DATASTREAM INTO {$MFLD} LENGTH 20.\n";
@@ -85,6 +85,6 @@ class TestIdmsMapOutStatement {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms map out tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfig());
   }
 }

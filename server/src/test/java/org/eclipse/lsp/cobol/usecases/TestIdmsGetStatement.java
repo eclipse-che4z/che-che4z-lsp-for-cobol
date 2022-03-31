@@ -48,7 +48,7 @@ class TestIdmsGetStatement {
           + "           GET {$EMPLOYEE}.\n";
 
   private static final String GET2 =
-      DEFS + "           FIND FIRST {$EMPLOYEE} WITHIN {$EMP-AREA}\n" + "           GET\n";
+      DEFS + "           FIND FIRST {$EMPLOYEE} WITHIN {$EMP-AREA}\n" + "           GET.\n";
 
   private static final String GET_QUEUE =
       DEFS + "           GET QUEUE INTO {$WK_AREA1}\n" + "           TO {$WK_AREA2}.\n";
@@ -107,6 +107,6 @@ class TestIdmsGetStatement {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms get test")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfig());
   }
 }

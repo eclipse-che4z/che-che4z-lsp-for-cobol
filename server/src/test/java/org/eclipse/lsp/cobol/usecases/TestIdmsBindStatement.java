@@ -16,12 +16,16 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
+
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** Test IDMS Bind DML statements */
 class TestIdmsBindStatement {
@@ -36,6 +40,7 @@ class TestIdmsBindStatement {
           + "       01 {$*EMPINFO} PIC X(8).\n"
           + "       01 {$*EMPLOYEE} PIC X(8).\n"
           + "       01 {$*ABCPROC} PIC X(8).\n"
+          + "       01 {$*ABCPROCTOOLONG} PIC X(8).\n"
           + "       PROCEDURE DIVISION.\n";
 
   private static final String BIND1 =
@@ -44,7 +49,7 @@ class TestIdmsBindStatement {
   private static final String BIND2 =
       DEFS + "           BIND RUN-UNIT DBNODE {$DB1} DICTNAME {$DC1}.\n";
 
-  private static final String BIND3 = DEFS + "           BIND RUN-UNIT\n";
+  private static final String BIND3 = DEFS + "           BIND RUN-UNIT.\n";
 
   private static final String BIND4 = DEFS + "           BIND RUN-UNIT DICTNAME {$DC1}.\n";
 
@@ -61,21 +66,36 @@ class TestIdmsBindStatement {
   private static final String BIND9 =
       DEFS + "           BIND PROCEDURE FOR {$ABCPROC} TO {$DB1}.\n";
 
-  private static final String BIND10 = DEFS + "          BIND {$EMPLOYEE}\n";
+  private static final String BIND10 = DEFS + "          BIND {$EMPLOYEE}.\n";
 
   private static final String BIND11 = DEFS + "          BIND {$EMPLOYEE} TO {$DB1}.\n";
 
-  private static final String BIND12 = DEFS + "          BIND {$DB1} WITH {$EMPLOYEE}\n";
+  private static final String BIND12 = DEFS + "          BIND {$DB1} WITH {$EMPLOYEE}.\n";
+
+  private static final String BIND13 =
+      DEFS + "           BIND PROCEDURE FOR {$ABCPROCTOOLONG|1} TO {$DB1}.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
-        BIND1, BIND2, BIND3, BIND4, BIND5, BIND6, BIND7, BIND8, BIND9, BIND10, BIND11, BIND12);
+        BIND1, BIND2, BIND3, BIND4, BIND5, BIND6, BIND7, BIND8, BIND9, BIND10, BIND11, BIND12,
+        BIND13);
   }
 
   @ParameterizedTest
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms bind tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Max length limit of 8 bytes allowed for procedure name.",
+                Error,
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

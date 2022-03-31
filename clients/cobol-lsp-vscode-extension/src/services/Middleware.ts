@@ -16,12 +16,12 @@ import {CancellationToken, HandlerResult} from "vscode-jsonrpc";
 import {ConfigurationParams, ConfigurationRequest} from "vscode-languageclient";
 import {CopybookDownloadService} from "./copybook/CopybookDownloadService";
 import {CopybookURI} from "./copybook/CopybookURI";
+import { InfoStorage } from "./copybook/InfoStorage";
 
-const PARAMS_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+)$/
+const PARAMS_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+)\.([^.]+)$/
 
 export class Middleware {
     constructor(
-        private copybookResolverURI: CopybookURI,
         private copybookDownloader: CopybookDownloadService) {
     }
 
@@ -34,8 +34,9 @@ export class Middleware {
         if (requestLines.length > 0 && requestLines[0] !== undefined && requestLines[0].prefix == "cobol-lsp") {
             switch (requestLines[0].command) {
                 case "copybook-resolve":
-                    return [await this.copybookResolverURI.resolveCopybookURI(requestLines[0].copybookName,
-                        requestLines[0].cobolFileName)]
+                    InfoStorage.set(requestLines[0].cobolFileName, requestLines[0].copybookName, requestLines[0].dialectName);
+                    return [await CopybookURI.resolveCopybookURI(requestLines[0].copybookName,
+                        requestLines[0].cobolFileName, requestLines[0].dialectName)]
                 case "copybook-download":
                     const copybookNames = requestLines.map(requestLine => requestLine.copybookName);
                     this.copybookDownloader.downloadCopybooks(requestLines[0].cobolFileName, copybookNames,
@@ -54,6 +55,7 @@ export class Middleware {
                 match[2],
                 match[5],
                 match[6],
+                match[7],
                 "verbose" != match[4]
             );
         }
@@ -66,6 +68,7 @@ export class RequestLine {
         readonly command: string,
         readonly cobolFileName: string,
         readonly copybookName: string,
+        readonly dialectName: string,
         readonly quiet: boolean
     ) { }
 }

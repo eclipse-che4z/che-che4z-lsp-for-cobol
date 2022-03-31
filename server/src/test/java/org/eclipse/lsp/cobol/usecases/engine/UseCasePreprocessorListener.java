@@ -15,10 +15,7 @@
 
 package org.eclipse.lsp.cobol.usecases.engine;
 
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
-import org.eclipse.usecase.UseCasePreprocessorBaseListener;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import lombok.NonNull;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -26,58 +23,33 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.eclipse.usecase.UseCasePreprocessorBaseListener;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.eclipse.usecase.UseCasePreprocessorParser.*;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 import static org.antlr.v4.runtime.Lexer.HIDDEN;
+import static org.eclipse.usecase.UseCasePreprocessorParser.*;
 
 /**
  * This ANTLR listener removes all the technical tokens from the given text, extracts semantic
  * context and diagnostics applying correct positions. The grammar for this listener written inside
  * UseCasePreprocessor.g4
  */
-public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
+class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private static final List<String> PREDEFINED_VARIABLES =
       ImmutableList.of(
-          "EIBAID",
-          "EIBATT",
-          "EIBCALEN",
-          "EIBCOMPL",
-          "EIBCONF",
-          "EIBCPOSN",
-          "EIBDATE",
-          "EIBDS",
-          "EIBEOC",
-          "EIBERR",
-          "EIBERRCD",
-          "EIBFMH",
-          "EIBFN",
-          "EIBFREE",
-          "EIBNODAT",
-          "EIBRCODE",
-          "EIBRECV",
-          "EIBREQID",
-          "EIBRESP",
-          "EIBRESP2",
-          "EIBRLDBK",
-          "EIBRSRCE",
-          "EIBSIG",
-          "EIBSYNC",
-          "EIBSYNRB",
-          "EIBTASKN",
-          "EIBTIME",
-          "EIBTRMID",
-          "EIBTRNID",
           "XML-CODE",
           "XML-EVENT",
           "XML-NAMESPACE",
@@ -89,37 +61,43 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
           "JNIENVPTR",
           "JSON-CODE",
           "JSON-STATUS");
-  private Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
-  private Map<String, List<Location>> variableDefinitions = new HashMap<>();
-  private Map<String, List<Location>> variableUsages = new HashMap<>();
-  private Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
-  private Map<String, List<Location>> paragraphUsages = new HashMap<>();
-  private Map<String, List<Location>> sectionDefinitions = new HashMap<>();
-  private Map<String, List<Location>> sectionUsages = new HashMap<>();
-  private Map<String, List<Location>> constantUsages = new HashMap<>();
-  private Map<String, List<Location>> copybookDefinitions = new HashMap<>();
-  private Map<String, List<Location>> copybookUsages = new HashMap<>();
-  private Map<String, List<Location>> subroutineUsages = new HashMap<>();
+  private final Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
+  private final Map<String, List<Location>> variableDefinitions = new HashMap<>();
+  private final Map<String, List<Location>> variableUsages = new HashMap<>();
+  private final Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
+  private final Map<String, List<Location>> paragraphUsages = new HashMap<>();
+  private final Map<String, List<Location>> sectionDefinitions = new HashMap<>();
+  private final Map<String, List<Location>> sectionUsages = new HashMap<>();
+  private final Map<String, List<Location>> constantUsages = new HashMap<>();
+  private final Map<String, List<Location>> copybookDefinitions = new HashMap<>();
+  private final Map<String, List<Location>> copybookUsages = new HashMap<>();
+  private final Map<String, List<Location>> subroutineUsages = new HashMap<>();
 
-  private Deque<StringBuilder> contexts = new ArrayDeque<>();
+  private final Deque<StringBuilder> contexts = new ArrayDeque<>();
 
-  private int[] lineShifts;
-  private CommonTokenStream tokens;
-  private String documentUri;
-  private String copybookName;
-  private Map<String, Diagnostic> expectedDiagnostics;
+  private final int[] lineShifts;
+  private final CommonTokenStream tokens;
+  private final String documentUri;
+  private final String copybookName;
+  private final List<String> subroutineNames;
+  private final Map<String, Diagnostic> expectedDiagnostics;
+  private final String dialectType;
 
   UseCasePreprocessorListener(
       CommonTokenStream tokens,
       String documentName,
       String documentUri,
       int numberOfLines,
-      Map<String, Diagnostic> expectedDiagnostics) {
+      List<String> subroutineNames,
+      Map<String, Diagnostic> expectedDiagnostics,
+      String dialectType) {
     this.tokens = tokens;
     this.documentUri = documentUri;
     this.copybookName = documentName;
-    lineShifts = new int[numberOfLines];
+    this.subroutineNames = subroutineNames;
     this.expectedDiagnostics = expectedDiagnostics;
+    this.dialectType = dialectType;
+    lineShifts = new int[numberOfLines];
     contexts.push(new StringBuilder());
     diagnostics.put(documentUri, new ArrayList<>());
     ofNullable(documentName).ifPresent(defineCopybook(documentUri));
@@ -135,6 +113,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
     return new TestData(
         peek().toString(),
         copybookName,
+        dialectType,
         diagnostics,
         variableDefinitions,
         variableUsages,
@@ -146,7 +125,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
         constantUsages,
         copybookDefinitions,
         copybookUsages,
-        ImmutableMap.of(),
+        makeSubroutinesDefinitions(subroutineNames),
         subroutineUsages);
   }
 
@@ -192,7 +171,11 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
       CopybookStatementContext ctx, Map<String, List<Location>> copybookUsages) {
     return it ->
         processToken(
-            PreprocessorStringUtils.trimQuotes(it.cpyName().getText().toUpperCase()), ctx, it.replacement(), copybookUsages, ctx.diagnostic());
+            PreprocessorStringUtils.trimQuotes(it.cpyName().getText().toUpperCase()),
+            ctx,
+            it.replacement(),
+            copybookUsages,
+            ctx.diagnostic());
   }
 
   @Override
@@ -264,25 +247,25 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
   public void exitSectionStatement(SectionStatementContext ctx) {
     pop();
     ofNullable(ctx.sectionUsage())
-            .map(SectionUsageContext::word)
-            .ifPresent(
-                    it ->
-                            processToken(
-                                    it.identifier().getText(),
-                                    ctx,
-                                    it.replacement(),
-                                    sectionUsages,
-                                    ctx.diagnostic()));
+        .map(SectionUsageContext::word)
+        .ifPresent(
+            it ->
+                processToken(
+                    it.identifier().getText(),
+                    ctx,
+                    it.replacement(),
+                    sectionUsages,
+                    ctx.diagnostic()));
     ofNullable(ctx.sectionDefinition())
-            .map(SectionDefinitionContext::word)
-            .ifPresent(
-                    it ->
-                            processToken(
-                                    it.identifier().getText(),
-                                    ctx,
-                                    it.replacement(),
-                                    sectionDefinitions,
-                                    ctx.diagnostic()));
+        .map(SectionDefinitionContext::word)
+        .ifPresent(
+            it ->
+                processToken(
+                    it.identifier().getText(),
+                    ctx,
+                    it.replacement(),
+                    sectionDefinitions,
+                    ctx.diagnostic()));
   }
 
   @Override
@@ -322,8 +305,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
                     it.replacement(),
                     subroutineUsages,
                     ctx.diagnostic(),
-                    true
-                ));
+                    true));
   }
 
   @Override
@@ -369,8 +351,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
 
   private Map<String, List<Location>> getConstantDefinitions() {
     List<Location> defaultLocation = ImmutableList.of(new Location());
-    return PREDEFINED_VARIABLES.stream()
-        .collect(Collectors.toMap(it -> it, it -> defaultLocation));
+    return PREDEFINED_VARIABLES.stream().collect(Collectors.toMap(it -> it, it -> defaultLocation));
   }
 
   @NonNull
@@ -391,11 +372,20 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
     peek().append(text);
   }
 
+  private Map<String, List<Location>> makeSubroutinesDefinitions(List<String> subroutineNames) {
+    Range fileStart = new Range(new Position(0, 0), new Position(0, 0));
+    return subroutineNames.stream()
+        .collect(
+            toMap(
+                Function.identity(),
+                name -> ImmutableList.of(new Location("URI:" + name, fileStart))));
+  }
+
   /**
    * Add copybook definition. In the current implementation, copybook definition points to the
    * beginning of the copybook file.
    *
-   * @param uri - URI of the copybook
+   * @param uri URI of the copybook
    * @return consumer that turns the given copybook name into a definition using given URI
    */
   private Consumer<String> defineCopybook(String uri) {
@@ -423,18 +413,32 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
       boolean stripQuotes) {
 
     String replacementText =
-        ofNullable(replacement).map(it -> it.identifier().getText()).orElse(text);
-    Range range = retrieveRange(ctx, replacementText);
-    ofNullable(storage).ifPresent(it -> {
-      String storedText = replacementText;
-      if (stripQuotes) {
-        storedText = PreprocessorStringUtils.trimQuotes(storedText);
-      }
-      addTokenLocation(it, storedText.toUpperCase(), range);
-    });
+        ofNullable(replacement)
+            .map(ReplacementContext::identifier)
+            .map(ParserRuleContext::getText)
+            .orElse(text);
+
+    int tokenLength =
+        ofNullable(replacement)
+            .filter(it -> it.FINAL_SIZE_REPLACEMENT_START() != null)
+            .map(ReplacementContext::identifier)
+            .map(ParserRuleContext::getText)
+            .map(String::length)
+            .orElseGet(text::length);
+
+    Range range = retrieveRange(ctx, tokenLength);
+    ofNullable(storage)
+        .ifPresent(
+            it -> {
+              String storedText = replacementText;
+              if (stripQuotes) {
+                storedText = PreprocessorStringUtils.trimQuotes(storedText);
+              }
+              addTokenLocation(it, storedText.toUpperCase(), range);
+            });
 
     ofNullable(replacement).ifPresent(addPositionShift());
-    lineShifts[getLine(ctx.start)] += text.length() - replacementText.length();
+    lineShifts[getLine(ctx.start)] += text.length() - tokenLength;
     registerDiagnostics(range, diagnosticIds);
     write(getHiddenText(tokens.getHiddenTokensToLeft(ctx.start.getTokenIndex())));
     write(text);
@@ -477,25 +481,28 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
             .get(documentUri)
             .add(
                 new Diagnostic(
-                        // honour the range provided by tester.
-                   Objects.nonNull(it.getRange()) ? it.getRange() : range, it.getMessage(), it.getSeverity(), it.getSource(),
-                        it.getCode()));
+                    // honour the range provided by tester.
+                    Objects.nonNull(it.getRange()) ? it.getRange() : range,
+                    it.getMessage(),
+                    it.getSeverity(),
+                    it.getSource(),
+                    it.getCode()));
   }
 
-  private Range retrieveRange(ParserRuleContext ctx, String text) {
+  private Range retrieveRange(ParserRuleContext ctx, int length) {
     int line = getLine(ctx.getStart());
     int start = ctx.start.getCharPositionInLine() - lineShifts[line];
     // accumulate lengths of removable symbols (opening and closing marks) to calculate the trailing
     // positions in the line correctly
     lineShifts[line] += ctx.start.getText().length() + ctx.stop.getText().length();
-    return new Range(new Position(line, start), new Position(line, start + text.length()));
+    return new Range(new Position(line, start), new Position(line, start + length));
   }
 
   /**
    * Get number of line of the given token. ANTLR counts lines from 1, and IDEs count them from 0,
    * so for user-visible positions this number should be less on 1
    *
-   * @param token - token to retrieve the line number
+   * @param token token to retrieve the line number
    * @return 0-based line number
    */
   private int getLine(Token token) {

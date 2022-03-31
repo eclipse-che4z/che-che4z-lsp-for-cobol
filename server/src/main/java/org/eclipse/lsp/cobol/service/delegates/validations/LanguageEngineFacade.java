@@ -14,15 +14,16 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.validations;
 
-import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
 
 public interface LanguageEngineFacade {
   /**
    * @param uri - URI of the processing document to define positions and errors properly
    * @param text of document opened in the client editor
-   * @param copybookConfig contains config info like: target backend sql server, copybook processing mode which
+   * @param analysisConfig contains analysis processing features info and copybook config with following information:
+   *                       target backend sql server, copybook processing mode which
    *                       reflect the sync status of the document (DID_OPEN|DID_CHANGE)
    * @return list of LSP diagnostic object used to display errors in the editor
    */
-  AnalysisResult analyze(String uri, String text, CopybookConfig copybookConfig);
+  AnalysisResult analyze(String uri, String text, AnalysisConfig analysisConfig);
 }

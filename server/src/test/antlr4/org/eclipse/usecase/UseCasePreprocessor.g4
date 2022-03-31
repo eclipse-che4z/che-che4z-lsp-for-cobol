@@ -16,7 +16,8 @@
 grammar UseCasePreprocessor;
 
 startRule
-   : .*? ((copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement | constantStatement | errorStatement | multiTokenError | NEWLINE)+ .*?)+ EOF
+   : .*? ((copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement
+   | constantStatement | errorStatement | multiTokenError | linkageSection | NEWLINE)+ .*?)+ EOF
    ;
 
 multiTokenError
@@ -24,7 +25,12 @@ multiTokenError
    ;
 
 multiToken
-   : (word | copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement | constantStatement | errorStatement | multiTokenError | TEXT)+
+   : (word | copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement
+   | constantStatement | errorStatement | multiTokenError | TEXT)+
+   ;
+
+linkageSection
+   : LINKAGE SECTION DOT
    ;
 
 errorStatement
@@ -104,11 +110,11 @@ word
    ;
 
 replacement
-   : REPLACEMENTSTART identifier
+   : (FINAL_SIZE_REPLACEMENT_START | ORIGINAL_SIZE_REPLACEMENT_START) identifier
    ;
 
 identifier
-   : IDENTIFIER | NUMBERLITERAL
+   : (IDENTIFIER | NUMBERLITERAL | LINKAGE | SECTION | DOT | STRINGLITERAL | TEXT)+
    ;
 
 cpyIdentifier
@@ -116,9 +122,12 @@ cpyIdentifier
    ;
 
 cpyName
-   : IDENTIFIER | COPYBOOKNAME | QUOTED_COPYBOOKNAME | STRINGLITERAL | NUMBERLITERAL
+   : IDENTIFIER | COPYBOOKNAME | QUOTED_COPYBOOKNAME | STRINGLITERAL | NUMBERLITERAL | LINKAGE | SECTION
+   | LINKAGE
    ;
 
+LINKAGE : L I N K A G E;
+SECTION : S E C T I O N;
 START : '{';
 STOP : '}';
 VARIABLEDEFINITION : START '$*';
@@ -132,9 +141,11 @@ COPYBOOKDEFINITION : START '~*';
 COPYBOOKUSAGE : START '~';
 SUBROUTINEUSAGE : START '%';
 DIAGNOSTICSTART : '|';
-REPLACEMENTSTART : '^';
+ORIGINAL_SIZE_REPLACEMENT_START : '`';
+FINAL_SIZE_REPLACEMENT_START : '^';
 MULTITOKENSTART : START '_';
 MULTITOKENSTOP : '_' STOP;
+DOT : '.';
 
 NUMBERLITERAL : [\-+0-9.,]+;
 STRINGLITERAL : ['"] .*? ['"\n];

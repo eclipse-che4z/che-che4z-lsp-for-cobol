@@ -16,11 +16,15 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
+
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** These test for variations other idms SECTION definitions */
 class TestIdmsSections {
@@ -47,7 +51,6 @@ class TestIdmsSections {
 
   private static final String IDMSMS_WITH_ALL_CLAUSES =
       "        DATA DIVISION.\n"
-          + "        WORKING-STORAGE SECTION.\n"
           + "        SCHEMA SECTION.\n"
           + "            DB EMPSS012 WITHIN EMPSCHM.\n"
           + "        MAP SECTION.\n"
@@ -56,16 +59,50 @@ class TestIdmsSections {
           + "        MAP {$*MAP2}\n"
           + "        MAP {$*MAP3} TYPE STANDARD.\n";
 
+  private static final String IDMSMS_WITH_ALL_CLAUSES_ERRORS =
+      "        DATA DIVISION.\n"
+          + "        SCHEMA SECTION.\n"
+          + "            DB {EMPSS012X|1} WITHIN {EMPSCHMXX|2}.\n"
+          + "        MAP SECTION.\n"
+          + "        MAX FIELD LIST IS 12 \n"
+          + "        MAP {$*MAP1TOOLONG|3} TYPE IS EXTENDED PAGING.\n"
+          + "        MAP {$*MAP2}\n"
+          + "        MAP {$*MAP3} TYPE STANDARD.\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + IDMSSS_WITH_ALL_CLAUSES,
         BOILERPLATE + IDMSSS_NO_CS_NO_VERSION,
-        BOILERPLATE + IDMSMS_WITH_ALL_CLAUSES);
+        BOILERPLATE + IDMSMS_WITH_ALL_CLAUSES,
+        BOILERPLATE + IDMSMS_WITH_ALL_CLAUSES_ERRORS);
   }
 
   @ParameterizedTest
   @MethodSource("textsToTest")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Max length limit of 8 bytes allowed for subschema name.",
+                Error,
+                SourceInfoLevels.ERROR.getText()),
+            "2",
+            new Diagnostic(
+                null,
+                "Max length limit of 8 bytes allowed for schema name.",
+                Error,
+                SourceInfoLevels.ERROR.getText()),
+            "3",
+            new Diagnostic(
+                null,
+                "Max length limit of 8 bytes allowed for map name.",
+                Error,
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

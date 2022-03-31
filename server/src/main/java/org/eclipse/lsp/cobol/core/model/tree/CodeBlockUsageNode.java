@@ -21,37 +21,27 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp4j.Location;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 /** The class represents usages of paragraphs or sections. */
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class CodeBlockUsageNode extends Node {
+public class CodeBlockUsageNode extends Node implements Context {
   String name;
-  private NodeState nodeState = NodeState.NEW;
 
   public CodeBlockUsageNode(Locality location, String name) {
-    super(location, NodeType.CODE_BLOCK_USAGE, false);
+    super(location, NodeType.CODE_BLOCK_USAGE);
     this.name = name;
+    addProcessStep(this::waitForBlockDefinitions);
   }
 
-  @Override
-  protected List<SyntaxError> processNode() {
-    switch (nodeState) {
-      case NEW:
-        nodeState = NodeState.WAIT_FOR_BLOCKS;
-        break;
-      case WAIT_FOR_BLOCKS:
-        nodeState = NodeState.DONE;
-        setNodeProcessed();
-        return registerNode();
-      case DONE:
-      default:
-        break;
-    }
+  private List<SyntaxError> waitForBlockDefinitions() {
+    addProcessStep(this::registerNode);
     return ImmutableList.of();
   }
 
@@ -62,10 +52,26 @@ public class CodeBlockUsageNode extends Node {
         .filter(Optional::isPresent)
         .map(Optional::get)
         .map(ImmutableList::of)
-        .orElse(ImmutableList.of());
+        .orElseGet(ImmutableList::of);
   }
 
-  private enum NodeState {
-    NEW, WAIT_FOR_BLOCKS, DONE;
+  @Override
+  public List<Location> getDefinitions() {
+    return getLocations(CodeBlockReference::getDefinitions);
+  }
+
+  @Override
+  public List<Location> getUsages() {
+    return getLocations(CodeBlockReference::getUsage);
+  }
+
+  private List<Location> getLocations(
+      Function<CodeBlockReference, List<Location>> retriveLocations) {
+    return getNearestParentByType(NodeType.PROGRAM)
+        .map(ProgramNode.class::cast)
+        .map(ProgramNode::getParagraphMap)
+        .map(it -> it.get(getName()))
+        .map(retriveLocations)
+        .orElse(ImmutableList.of());
   }
 }

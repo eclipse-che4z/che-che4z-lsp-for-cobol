@@ -77,6 +77,7 @@ class SmartTabCommandProvider extends SmartCommandProvider {
             newSelections.push(new vscode.Selection(newPosition, newPosition));
         }
         editor.selections = newSelections;
+        vscode.commands.executeCommand('acceptSelectedSuggestion');
     }
 }
 

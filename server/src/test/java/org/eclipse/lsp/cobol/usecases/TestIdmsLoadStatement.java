@@ -14,14 +14,18 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
+
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** Test IDMS LOAD DML statements */
 class TestIdmsLoadStatement {
@@ -51,14 +55,42 @@ class TestIdmsLoadStatement {
           + "           LOAD TABLE {$WK_TABLE} INTO {$WK_1} TO {$WK_2} DICTNODE \r\n"
           + "           {$WK_NAME} DICTNAME {$WK_NODE} LOADLIB {$WK_LOAD} NOWAIT.\n";
 
+  private static final String LOAD_LITERALS_ERROR =
+      DEFS
+          + "           LOAD TABLE {'TSTTABLXX'|1} INTO {$WK_1} TO {$WK_2} DICTNODE \r\n"
+          + "           {'TSTDICTXXX'|2} DICTNAME {'TSTDICTXXX'|3} LOADLIB 'TSTLOAD' NOWAIT.\n";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(LOAD_LITERALS, LOAD_VARIABLES);
+    return Stream.of(LOAD_LITERALS, LOAD_VARIABLES, LOAD_LITERALS_ERROR);
   }
 
   @ParameterizedTest
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms load tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Max length limit of 8 bytes allowed for table name.",
+                Error,
+                SourceInfoLevels.ERROR.getText()),
+            "2",
+            new Diagnostic(
+                null,
+                "Max length limit of 8 bytes allowed for node name.",
+                Error,
+                SourceInfoLevels.ERROR.getText()),
+            "3",
+            new Diagnostic(
+                null,
+                "Max length limit of 8 bytes allowed for dictionary name.",
+                Error,
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }

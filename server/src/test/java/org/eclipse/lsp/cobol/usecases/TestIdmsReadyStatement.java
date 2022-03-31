@@ -16,12 +16,16 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
+
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** Test IDMS READY DML statements */
 class TestIdmsReadyStatement {
@@ -34,6 +38,7 @@ class TestIdmsReadyStatement {
           + "       01 {$*DB1} PIC X(8).\n"
           + "       01 {$*DC1} PIC X(8).\n"
           + "       01 {$*EMP-AREA} PIC X(8).\n"
+          + "       01 {$*EMP-AREA-TOO-LONG} PIC X(8).\n"
           + "       PROCEDURE DIVISION.\n";
 
   private static final String READ1 = DEFS + "          BIND RUN-UNIT.\n" + "          READY.\n";
@@ -42,7 +47,7 @@ class TestIdmsReadyStatement {
       DEFS + "          BIND RUN-UNIT.\n" + "          READY {$EMP-AREA}.\n";
 
   private static final String READ3 =
-      DEFS + "          BIND RUN-UNIT.\n" + "          READY {$EMP-AREA} USAGE-MODE UPDATE\n";
+      DEFS + "          BIND RUN-UNIT.\n" + "          READY {$EMP-AREA} USAGE-MODE UPDATE.\n";
 
   private static final String READ4 =
       DEFS + "          BIND RUN-UNIT.\n" + "          READY {$EMP-AREA} USAGE-MODE RETRIEVAL.\n";
@@ -55,16 +60,32 @@ class TestIdmsReadyStatement {
   private static final String READ6 =
       DEFS
           + "          BIND RUN-UNIT.\n"
-          + "          READY {$EMP-AREA} USAGE-MODE EXCLUSIVE UPDATE\n";
+          + "          READY {$EMP-AREA} USAGE-MODE EXCLUSIVE UPDATE.\n";
+
+  private static final String READ7 =
+      DEFS
+          + "          BIND RUN-UNIT.\n"
+          + "          READY {$EMP-AREA-TOO-LONG|1} USAGE-MODE EXCLUSIVE UPDATE.\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(READ1, READ2, READ3, READ4, READ5, READ6);
+    return Stream.of(READ1, READ2, READ3, READ4, READ5, READ6, READ7);
   }
 
   @ParameterizedTest
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms ready tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Max length limit of 16 bytes allowed for db entity name.",
+                Error,
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        IdmsBase.getAnalysisConfig());
   }
 }
