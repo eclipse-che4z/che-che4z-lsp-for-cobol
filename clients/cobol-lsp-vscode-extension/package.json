@@ -4,7 +4,7 @@
     "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "0.21.0",
+    "version": "1.0.0",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
@@ -28,7 +28,9 @@
         "zowe",
         "ibm cobol",
         "idms",
-        "datacom"
+        "datacom",
+        "cics",
+        "db2"
     ],
     "categories": [
         "Programming Languages"
@@ -337,22 +339,6 @@
                         "ALL level is used to turn on all logging"
                     ],
                     "description": "The logging level for COBOL LS backend"
-                },
-                "cobol-lsp.analysis.features": {
-                    "type": "array",
-                    "default": [
-                        "SQL",
-                        "CICS"
-                    ],
-                    "items": {
-                        "type": "string",
-                        "enum": [
-                            "SQL",
-                            "CICS"
-                        ]
-                    },
-                    "description": "List of supported language features",
-                    "uniqueItems": true
                 },
                 "cobol-lsp.target-sql-backend": {
                     "type": "string",
