@@ -26,6 +26,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ### Features
 * Add an ability to enable/disable analysis features ([d55dd09](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d55dd09c8df188437bb836d19223cc7488f8f579))
+* Add the enable/disable dialects feature ([8972150](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/897215099eed0de262832713403b324510935d9f))
 * Add line commenting ability ([f4083a3](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f4083a3576ca066545929993b51593dd2d40d08c))
 * Add IDMS snippets [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([af98cbc](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/af98cbcacccd9b7a89a3d4da1da3c64b4af62776))
 * Adjust level numbers for COPY IDMS ([3757275](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/375727583dd559ecf216bed5d3e065953b8a354f))
