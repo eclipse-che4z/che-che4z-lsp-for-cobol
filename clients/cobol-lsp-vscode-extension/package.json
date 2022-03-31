@@ -338,22 +338,6 @@
                     ],
                     "description": "The logging level for COBOL LS backend"
                 },
-                "cobol-lsp.analysis.features": {
-                    "type": "array",
-                    "default": [
-                        "SQL",
-                        "CICS"
-                    ],
-                    "items": {
-                        "type": "string",
-                        "enum": [
-                            "SQL",
-                            "CICS"
-                        ]
-                    },
-                    "description": "List of supported language features",
-                    "uniqueItems": true
-                },
                 "cobol-lsp.target-sql-backend": {
                     "type": "string",
                     "default": "DB2_SERVER",
