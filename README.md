@@ -83,6 +83,12 @@ You can also insert a code snippet by typing the name of the snippet in your cod
 
 The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder.
 
+### Dialects
+
+The dialects setting lets you include the specific language analysis in your COBOL files. For now you can include IDMS as a language of choice. The dialects setting is not enabled by default. To enbale the setting, go to **VS Code Settings** > **User** > **Extensions** > **COBOL Language Support** > **Cobol-lsp: Dialects**.
+
+**Note:** If you disable the setting, your IDMS bits of code are highlighted as errors.
+
 ## Subroutine Support
 
 The COBOL Language Support extension supports subroutines specified in CALL statements if the called program is stored in a local folder in your workspace. The Go To Definition and Find All References functionalities, as well as autocomplete, are extended to work for names of subroutines. 
