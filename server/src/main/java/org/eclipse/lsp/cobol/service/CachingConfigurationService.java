@@ -74,9 +74,10 @@ public class CachingConfigurationService implements ConfigurationService {
   }
 
   private ConfigurationEntity parseSettings(List<Object> clientConfig) {
+
     return new ConfigurationEntity(
         parseSQLBackend(clientConfig.subList(0, 1)),
-        parseFeatures((JsonArray) clientConfig.get(1)),
+        parseFeatures((JsonElement) clientConfig.get(1)),
         parseDialects((JsonArray) clientConfig.get(2)));
   }
 
@@ -90,10 +91,13 @@ public class CachingConfigurationService implements ConfigurationService {
     return Streams.stream(dialects).map(JsonElement::getAsString).collect(toList());
   }
 
-  private List<EmbeddedCodeNode.Language> parseFeatures(JsonArray features) {
-    return Streams.stream(features)
-        .map(JsonElement::getAsString)
-        .map(EmbeddedCodeNode.Language::valueOf)
-        .collect(toList());
+  private List<EmbeddedCodeNode.Language> parseFeatures(JsonElement features) {
+    if (features.isJsonArray()) {
+      return Streams.stream((JsonArray) features)
+          .map(JsonElement::getAsString)
+          .map(EmbeddedCodeNode.Language::valueOf)
+          .collect(toList());
+    }
+    return Arrays.asList(EmbeddedCodeNode.Language.values());
   }
 }
