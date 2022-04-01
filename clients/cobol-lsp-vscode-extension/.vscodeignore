@@ -42,3 +42,10 @@ node_modules/jsonschema/schema
 node_modules/isarray/
 node_modules/promise-retry/
 node_modules/minimist/test
+node_modules/qs
+node_modules/ansi-regex
+node_modules/extsprintf
+node_modules/imurmurhash
+node_modules/isstream
+node_modules/concat-map
+node_modules/pend

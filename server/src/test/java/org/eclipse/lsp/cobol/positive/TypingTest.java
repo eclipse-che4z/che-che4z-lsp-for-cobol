@@ -18,6 +18,14 @@ package org.eclipse.lsp.cobol.positive;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
 import org.eclipse.lsp.cobol.usecases.engine.UseCase;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.junit.jupiter.api.Test;
@@ -49,13 +57,27 @@ class TypingTest extends FileBasedTest {
       String name = cobolText.getFileName();
       LOG.info("Analyzing {}", name);
       final long start = System.currentTimeMillis();
-      analyze(name, cobolText.getFullText());
+      analyze(name, getCleanText(cobolText));
       final long duration = System.currentTimeMillis() - start;
       LOG.info("{} analyzed in {}. Progress: {}/{}.",
           name,
           DurationFormatUtils.formatDurationHMS(duration),
           i + 1, size);
     }
+  }
+
+  private String getCleanText(CobolText cobolText) {
+    TextPreprocessor preprocessor = new TextPreprocessorImpl(
+        null,
+        new CobolLineReaderImpl(null),
+        new CobolLineWriterImpl(),
+        new ContinuationLineTransformation(null),
+        new CobolLineIndicatorProcessorImpl()
+    );
+    ResultWithErrors<String> cleanTextResult = preprocessor.cleanUpCode(cobolText.getFileName(), cobolText.getFullText());
+    for (SyntaxError error: cleanTextResult.getErrors())
+      LOG.error(error.toString());
+    return cleanTextResult.getResult();
   }
 
   private void analyze(String name, String fullText) {

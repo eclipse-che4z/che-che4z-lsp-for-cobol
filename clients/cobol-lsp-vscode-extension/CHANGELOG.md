@@ -2,7 +2,7 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 Changelog:
 
-## [1.0.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.21.0...1.0.0) (2022-03-21)
+## [1.0.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.21.0...1.0.0) (2022-03-31)
 
 #### Added
 * Support for .copy copybook extension
@@ -10,6 +10,7 @@ Changelog:
 * USS file download for copybooks
 * Setting to define encoding for USS files
 * Ability to enable/disable analysis features
+* Enable/disable dialects functionality
 * Ability for commenting lines
 * Snippets for IDMS
 * Adjusting of level numbers in COPY IDMS copybooks

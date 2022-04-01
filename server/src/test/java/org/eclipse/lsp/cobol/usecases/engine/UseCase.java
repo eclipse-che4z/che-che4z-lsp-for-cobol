@@ -27,7 +27,6 @@ import org.eclipse.lsp.cobol.service.SQLBackend;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /** Defines all the required data for the test */
 @Getter
@@ -46,7 +45,7 @@ public class UseCase {
   /** SQL Backend for the analysis */
   @Builder.Default SQLBackend sqlBackend = SQLBackend.DB2_SERVER;
   /** Analysis features (SQL, CICS, etc.) */
-  @Builder.Default Set<EmbeddedCodeNode.Language> features = Collections.emptySet();
+  @Builder.Default List<EmbeddedCodeNode.Language> features = Collections.emptyList();
   /** Analysis dialects */
   @Builder.Default List<String> dialects = Collections.emptyList();
 
@@ -58,6 +57,6 @@ public class UseCase {
    */
   public AnalysisConfig getAnalysisConfig() {
     return new AnalysisConfig(
-        features, new CopybookConfig(copybookProcessingMode, sqlBackend), dialects);
+        new CopybookConfig(copybookProcessingMode, sqlBackend), features, dialects);
   }
 }

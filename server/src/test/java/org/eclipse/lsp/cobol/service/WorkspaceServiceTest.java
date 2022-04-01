@@ -67,7 +67,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     String copybookName = "COPYBOOK";
     SubroutineService subroutineService = mock(SubroutineService.class);
-    Configuration configuration = mock(Configuration.class);
+    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
 
     WorkspaceService service =
@@ -78,8 +78,9 @@ class WorkspaceServiceTest {
             copybookService,
             null,
             subroutineService,
-            configuration,
-            stateService, copybookNameService);
+            configurationService,
+            stateService,
+            copybookNameService);
 
     CompletableFuture<Object> result =
         service.executeCommand(
@@ -105,11 +106,19 @@ class WorkspaceServiceTest {
   void testExecuteNonExistingCommand() {
     DataBusBroker broker = mock(DataBusBroker.class);
     CopybookService copybookService = mock(CopybookService.class);
-    Configuration configuration = mock(Configuration.class);
+    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     WorkspaceService service =
         new CobolWorkspaceServiceImpl(
-            broker, null, null, copybookService, null, null, configuration, stateService, copybookNameService);
+            broker,
+            null,
+            null,
+            copybookService,
+            null,
+            null,
+            configurationService,
+            stateService,
+            copybookNameService);
 
     CompletableFuture<Object> result =
         service.executeCommand(new ExecuteCommandParams("Missing command name", emptyList()));
@@ -131,7 +140,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
-    Configuration configuration = mock(Configuration.class);
+    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
 
     WorkspaceService workspaceService =
@@ -142,8 +151,9 @@ class WorkspaceServiceTest {
             copybookService,
             localeStore,
             subroutineService,
-            configuration,
-            stateService, copybookNameService);
+            configurationService,
+            stateService,
+            copybookNameService);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     JsonArray arr = new JsonArray();
@@ -167,7 +177,7 @@ class WorkspaceServiceTest {
     verify(copybookService).invalidateCache();
     verify(subroutineService).invalidateCache();
     verify(localeStore).notifyLocaleStore();
-    verify(configuration).updateConfigurationFromSettings();
+    verify(configurationService).updateConfigurationFromSettings();
 
     assertEquals(path, watcherCaptor.getValue().get(0));
 
@@ -183,7 +193,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
-    Configuration configuration = mock(Configuration.class);
+    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
 
     WorkspaceService workspaceService =
@@ -194,8 +204,9 @@ class WorkspaceServiceTest {
             copybookService,
             localeStore,
             subroutineService,
-            configuration,
-            stateService, copybookNameService);
+            configurationService,
+            stateService,
+            copybookNameService);
 
     JsonArray arr = new JsonArray();
     String path = "foo/bar";
@@ -229,7 +240,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
-    Configuration configuration = mock(Configuration.class);
+    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
 
     WorkspaceService workspaceService =
@@ -240,8 +251,9 @@ class WorkspaceServiceTest {
             copybookService,
             localeStore,
             subroutineService,
-            configuration,
-            stateService, copybookNameService);
+            configurationService,
+            stateService,
+            copybookNameService);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     JsonArray arr = new JsonArray();
@@ -277,7 +289,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
-    Configuration configuration = mock(Configuration.class);
+    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
 
     WorkspaceService workspaceService =
@@ -288,8 +300,9 @@ class WorkspaceServiceTest {
             copybookService,
             localeStore,
             subroutineService,
-            configuration,
-            stateService, copybookNameService);
+            configurationService,
+            stateService,
+            copybookNameService);
 
     when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(emptyList()));
@@ -347,7 +360,7 @@ class WorkspaceServiceTest {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     CopybookService copybookService = mock(CopybookService.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
-    Configuration configuration = mock(Configuration.class);
+    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
 
     WorkspaceService service =
@@ -358,8 +371,9 @@ class WorkspaceServiceTest {
             copybookService,
             null,
             subroutineService,
-            configuration,
-            stateService, copybookNameService);
+            configurationService,
+            stateService,
+            copybookNameService);
 
     DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));
     service.didChangeWatchedFiles(params);

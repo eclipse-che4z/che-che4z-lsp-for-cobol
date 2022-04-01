@@ -18,9 +18,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +49,6 @@ class TestSkipStatementsAllowedEverywhere {
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
-        AnalysisConfig.defaultConfig(
-            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DB2_SERVER)));
+        AnalysisConfig.defaultConfig(CopybookProcessingMode.DISABLED));
   }
 }

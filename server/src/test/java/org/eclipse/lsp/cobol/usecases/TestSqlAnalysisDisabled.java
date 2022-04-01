@@ -66,8 +66,8 @@ class TestSqlAnalysisDisabled {
         ImmutableMap.of(),
         Collections.emptyList(),
         new AnalysisConfig(
-            Collections.emptySet(),
             new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
+            ImmutableList.of(),
             ImmutableList.of()));
   }
 }
