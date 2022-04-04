@@ -375,6 +375,15 @@
                     72,
                     80
                 ]
+            },
+            "[COBOL Copybook]": {
+                "editor.renderIndentGuides": false,
+                "editor.rulers": [
+                    7,
+                    11,
+                    72,
+                    80
+                ]
             }
         },
         "keybindings": [
