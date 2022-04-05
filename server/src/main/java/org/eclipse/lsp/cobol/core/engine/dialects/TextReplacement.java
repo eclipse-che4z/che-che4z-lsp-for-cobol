@@ -47,7 +47,7 @@ public class TextReplacement {
         .append(prefix)
         .append(text
             .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
-            .replaceAll("[^\n]", "\u200B"));
+            .replaceAll("[^ \n]", "\u200B"));
     textIndexPointer = ctx.stop.getStopIndex() + 1;
   }
 
