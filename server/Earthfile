@@ -1,0 +1,14 @@
+VERSION 0.6
+FROM openjdk:8-jdk-alpine
+RUN apk add --update --no-cache maven
+WORKDIR /server
+
+deps:
+    COPY pom.xml ./
+    RUN mvn dependency:go-offline
+
+build:
+    FROM +deps
+    COPY --dir lombok.config src ./
+    RUN mvn verify
+    SAVE ARTIFACT target/server.jar server.jar
