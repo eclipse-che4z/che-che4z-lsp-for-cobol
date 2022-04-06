@@ -22,11 +22,12 @@ import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.service.CopybookService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.function.Consumer;
 
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBLC;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.Copybook.DFHEIBLC;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.Copybook.PLABEL;
 
 /**
  * This implementation of the {@link AbstractCopybookAnalysis} resolves only the DFHEIBLC copybook
@@ -42,6 +43,9 @@ class PredefinedCopybookAnalysis extends AbstractCopybookAnalysis {
 
   @Override
   protected CopybookName retrieveCopybookName(ParserRuleContext ctx, String dialect, CopybookHierarchy hierarchy) {
+    if ("PROCEDUREDIVISION.".equalsIgnoreCase(ctx.getText())) {
+      return new CopybookName(PLABEL.name(), dialect);
+    }
     return new CopybookName(DFHEIBLC.name(), dialect);
   }
 

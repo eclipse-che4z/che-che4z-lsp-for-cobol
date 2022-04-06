@@ -12,7 +12,12 @@ options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
    : .*? ((includeStatement | copyStatement | copyIdmsStatement | copyMaidStatement | replaceAreaStart | replaceOffStatement
-   | titleDirective | enterDirective | controlDirective | linkageSection | plusplusIncludeStatement)+ .*?)* EOF
+   | titleDirective | enterDirective | controlDirective | linkageSection | plusplusIncludeStatement | procedureDivision)+ .*?)* EOF
+   ;
+
+// procedure devision for resolving predefined labels
+procedureDivision
+   : PROCEDURE DIVISION DOT_FS
    ;
 
 // linkage section for resolving predefined variables
@@ -166,7 +171,7 @@ charDataLine
    ;
 
 cobolWord
-   : COPYBOOK_IDENTIFIER | IDENTIFIER | MAID | SOURCE | NOSOURCE | LIST | NOLIST | MAP | NOMAP | LINKAGE | SECTION
+   : COPYBOOK_IDENTIFIER | IDENTIFIER | MAID | SOURCE | NOSOURCE | LIST | NOLIST | MAP | NOMAP | LINKAGE | SECTION | PROCEDURE | DIVISION
    ;
 
 literal

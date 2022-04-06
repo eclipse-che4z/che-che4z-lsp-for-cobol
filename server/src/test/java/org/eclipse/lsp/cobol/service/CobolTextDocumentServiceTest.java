@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -47,9 +48,9 @@ import java.util.concurrent.ExecutionException;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
-import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.*;
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.IMPLICIT_PATH;
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.*;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.IMPLICIT_PATH;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -376,7 +377,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
             AnalysisFinishedEvent.builder()
                 .documentUri(uri)
                 .copybookUris(emptyList())
-                .copybookProcessingMode(CopybookProcessingMode.ENABLED)
+                .copybookProcessingMode(ENABLED)
                 .build());
     verify(communications).cancelProgressNotification(uri);
     verify(communications).publishDiagnostics(diagnostics);
@@ -516,7 +517,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
             AnalysisFinishedEvent.builder()
                 .documentUri(DOCUMENT_URI)
                 .copybookUris(asList(DOCUMENT_URI, PARENT_CPY_URI, NESTED_CPY_URI))
-                .copybookProcessingMode(CopybookProcessingMode.ENABLED)
+                .copybookProcessingMode(ENABLED)
                 .build());
   }
 

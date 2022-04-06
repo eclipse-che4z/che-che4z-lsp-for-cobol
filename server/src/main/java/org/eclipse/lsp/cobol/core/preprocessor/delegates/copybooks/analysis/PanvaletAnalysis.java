@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.service.CopybookService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 /**
  * This implementation of the {@link AbstractCopybookAnalysis} provides the logic and the default

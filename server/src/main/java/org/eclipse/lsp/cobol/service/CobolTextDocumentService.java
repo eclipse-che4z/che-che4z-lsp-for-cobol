@@ -32,6 +32,7 @@ import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
 import org.eclipse.lsp.cobol.jrpc.ExtendedApi;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
@@ -144,11 +145,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   @VisibleForTesting
   Map<String, Future<?>> getFutureMap() {
     return new HashMap<>(futureMap);
-  }
-
-  @VisibleForTesting
-  public Map<String, CompletableFuture<List<DocumentSymbol>>> getOutlineMap() {
-    return outlineMap;
   }
 
   @Override

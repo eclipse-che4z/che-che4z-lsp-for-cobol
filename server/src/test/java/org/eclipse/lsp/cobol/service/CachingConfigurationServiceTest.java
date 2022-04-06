@@ -19,6 +19,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -40,7 +42,7 @@ class CachingConfigurationServiceTest {
 
     assertEquals(
         new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
+            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of()),
             ImmutableList.of(),
             ImmutableList.of()),
         configuration.getConfig(CopybookProcessingMode.ENABLED));
@@ -55,11 +57,13 @@ class CachingConfigurationServiceTest {
     JsonArray dialectSettings = new JsonArray();
     dialectSettings.add("Dialect");
 
+    JsonArray predefinedLabels = new JsonArray();
+
     List<Object> clientConfig =
-        Arrays.asList(new JsonPrimitive("DATACOM_SERVER"), featuresArray, dialectSettings);
+        Arrays.asList(new JsonPrimitive("DATACOM_SERVER"), featuresArray, dialectSettings, predefinedLabels);
 
     when(settingsService.getConfigurations(
-            Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, DIALECTS.label)))
+            Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, DIALECTS.label, PREDEFINED_LABELS.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration = new CachingConfigurationService(settingsService);
@@ -67,7 +71,7 @@ class CachingConfigurationServiceTest {
 
     assertEquals(
         new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
+            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(EmbeddedCodeNode.Language.SQL),
             ImmutableList.of("Dialect")),
         configuration.getConfig(CopybookProcessingMode.DISABLED));
@@ -80,9 +84,9 @@ class CachingConfigurationServiceTest {
     JsonArray dialectSettings = new JsonArray();
     dialectSettings.add("Dialect");
     List<Object> clientConfig =
-        Arrays.asList(new JsonPrimitive("DATACOM_SERVER"), new JsonNull(), dialectSettings);
+        Arrays.asList(new JsonPrimitive("DATACOM_SERVER"), new JsonNull(), dialectSettings, new JsonNull());
     when(settingsService.getConfigurations(
-            Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, DIALECTS.label)))
+            Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, DIALECTS.label, PREDEFINED_LABELS.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration = new CachingConfigurationService(settingsService);
@@ -90,7 +94,7 @@ class CachingConfigurationServiceTest {
 
     assertEquals(
         new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
+            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(EmbeddedCodeNode.Language.SQL, EmbeddedCodeNode.Language.CICS),
             ImmutableList.of("Dialect")),
         configuration.getConfig(CopybookProcessingMode.DISABLED));
