@@ -30,7 +30,7 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.CONSTANTS;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.VARIABLES;
 import static org.eclipse.lsp4j.CompletionItemKind.Constant;

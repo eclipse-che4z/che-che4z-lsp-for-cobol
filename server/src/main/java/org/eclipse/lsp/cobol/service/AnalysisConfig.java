@@ -18,6 +18,8 @@ package org.eclipse.lsp.cobol.service;
 import com.google.common.collect.ImmutableList;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +43,7 @@ public class AnalysisConfig {
    */
   public static AnalysisConfig defaultConfig(CopybookProcessingMode mode) {
     return new AnalysisConfig(
-        new CopybookConfig(mode, SQLBackend.DB2_SERVER),
+        new CopybookConfig(mode, SQLBackend.DB2_SERVER, ImmutableList.of()),
         Arrays.asList(EmbeddedCodeNode.Language.values()),
         ImmutableList.of());
   }
@@ -56,8 +58,10 @@ public class AnalysisConfig {
    */
   public static AnalysisConfig fromConfigEntity(
       CopybookProcessingMode mode, ConfigurationService.ConfigurationEntity entity) {
+    CopybookConfig copybookConfig = new CopybookConfig(mode, entity.getSqlBackend(), entity.getPredefinedLabels());
+
     return new AnalysisConfig(
-        new CopybookConfig(mode, entity.getSqlBackend()),
+        copybookConfig,
         entity.getFeatures(),
         entity.getDialects());
   }

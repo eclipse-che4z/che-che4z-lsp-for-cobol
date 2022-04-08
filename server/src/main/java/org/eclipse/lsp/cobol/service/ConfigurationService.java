@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 
 import java.util.List;
 
@@ -45,11 +46,13 @@ public interface ConfigurationService {
     SQLBackend sqlBackend;
     List<EmbeddedCodeNode.Language> features;
     List<String> dialects;
+    List<String> predefinedLabels;
 
     public ConfigurationEntity() {
       sqlBackend = SQLBackend.DB2_SERVER;
       features = ImmutableList.of();
       dialects = ImmutableList.of();
+      predefinedLabels = ImmutableList.of();
     }
   }
 }

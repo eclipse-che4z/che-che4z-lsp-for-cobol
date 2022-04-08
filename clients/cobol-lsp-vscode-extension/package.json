@@ -363,6 +363,14 @@
                     },
                     "description": "List of enabled dialects",
                     "uniqueItems": true
+                },
+                "cobol-lsp.predefined-labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of predefined labels",
+                    "uniqueItems": true
                 }
             }
         },

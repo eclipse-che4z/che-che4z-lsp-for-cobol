@@ -16,8 +16,8 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableSet;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.CopybookNameService;
-import org.eclipse.lsp.cobol.service.CopybookNameServiceImpl;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
