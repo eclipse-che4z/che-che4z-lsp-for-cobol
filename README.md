@@ -85,7 +85,7 @@ The COBOL Language Support extension also supports user snippets. Add your custo
 
 ### Dialects
 
-The dialects setting lets you include the specific language analysis in your COBOL files. For now you can include IDMS as a language of choice. The dialects setting is not enabled by default. To enbale the setting, go to **VS Code Settings** > **User** > **Extensions** > **COBOL Language Support** > **Cobol-lsp: Dialects**.
+The dialects setting lets you include specific language analysis in your COBOL files. For now you can include IDMS as a language of choice. The dialects setting is not enabled by default. To enable the setting, go to **VS Code Settings** > **User** > **Extensions** > **COBOL Language Support** > **Cobol-lsp: Dialects**.
 
 **Note:** If you disable the setting, your IDMS bits of code are highlighted as errors.
 
