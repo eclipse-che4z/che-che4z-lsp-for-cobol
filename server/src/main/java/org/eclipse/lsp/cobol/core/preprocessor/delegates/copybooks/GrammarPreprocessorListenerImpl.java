@@ -177,6 +177,11 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
+  public void exitWorkingStorageSection(WorkingStorageSectionContext ctx) {
+    analyzeCopybook(SPECIALREGISTER, ctx, ctx, DialectType.COBOL);
+  }
+
+  @Override
   public void enterCopyIdmsStatement(CopyIdmsStatementContext ctx) {
     push();
   }

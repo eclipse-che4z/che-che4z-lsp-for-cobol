@@ -15,16 +15,13 @@
 
 package org.eclipse.lsp.cobol.service;
 
-import com.google.common.collect.ImmutableList;
-import com.google.inject.Inject;
+import com.google.inject.*;
+import org.eclipse.lsp.cobol.ClientServerTestModule;
 import org.eclipse.lsp.cobol.ConfigurableTest;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
+import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
+import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.Test;
 
@@ -52,39 +49,33 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
   private static final Position TEST_COPYBOOK1 = new Position(20, 14);
   private static final Position TEST_COPYBOOK2 = new Position(21, 14);
   private static final int COPY_LENGTH = "CPYBK1".length();
-  private static final String COPYBOOK1 = "       COPY CPYBK1.";
-  private static final String COPYBOOK2 = "       COPY CPYBK2.";
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
           + "       Data Division.\n"
           + "       Working-Storage Section.\n"
-          + "       01   outer1. \n"
-          + "        02   inner1      PIC 9(4) Binary. \n"
-          + "        02   inner2      PIC X(10).\n"
-          + "       01   outer2.\n"
-          + "        02   inner1      PIC 9(4) Binary. \n"
-          + "        02   inner2      PIC X(10).\n"
-          + "       02   Str          PIC 9(4) Binary. \n"
+          + "       01   {$*outer1}. \n"
+          + "        02   {$*inner1}      PIC 9(4) Binary. \n"
+          + "        02   {$*inner2}      PIC X(10).\n"
+          + "       01   {$*outer2}.\n"
+          + "        02   {$*inner1}      PIC 9(4) Binary. \n"
+          + "        02   {$*inner2}      PIC X(10).\n"
+          + "       02   {$*Str}          PIC 9(4) Binary. \n"
           + "       Procedure Division.\n"
-          + "       000-Main-Logic.\n"
-          + "           Perform 100-Test.\n"
+          + "       {#*000-Main-Logic}.\n"
+          + "           Perform {#100-Test}.\n"
           + "           Stop Run.\n"
-          + "       100-Test.\n"
-          + "           Move inner1 of outer1 to Str.\n"
-          + "           Move inner2 of outer1 to Str.\n"
-          + "           Move inner1 of outer2 to Str.\n"
-          + "           Move inner2 of outer2 to Str.\n"
-          + "       COPY CPYBK1.\n"
-          + "       COPY CPYBK2.\n"
-          + "       COPY CPYBK1.\n"
+          + "       {#*100-Test}.\n"
+          + "           Move {$inner1} of {$outer1} to {$Str}.\n"
+          + "           Move {$inner2} of {$outer1} to {$Str}.\n"
+          + "           Move {$inner1} of {$outer2} to {$Str}.\n"
+          + "           Move {$inner2} of {$outer2} to {$Str}.\n"
+          + "       COPY {~CPYBK1|1}.\n"
+          + "       COPY {~CPYBK2|2}.\n"
+          + "       COPY {~CPYBK1|1}.\n"
           + "       End program ProgramId.";
   @Inject TextDocumentService service;
-  @Inject LanguageServer server;
-  @Inject CobolLanguageClient cobolLanguageClient;
   @Inject MockLanguageClient client;
-  @Inject
-  CopybookService copybookService;
   @Inject DisposableLSPStateService stateService;
 
   /**
@@ -141,8 +132,11 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
 
   @Test
   void testFindMultipleCopybookReferences() throws ExecutionException, InterruptedException {
-    setUpCopybook();
-    List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK1, true);
+    client.clean();
+    TextDocumentService textService = getInjector().getInstance(TextDocumentService.class);
+    textService.didOpen(
+        new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
+    List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK1, true, textService);
     assertEquals(4, locations.size());
 
     assertContainsRange(locations, range(20, 12, COPY_LENGTH));
@@ -151,22 +145,29 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
 
   @Test
   void testFindSingleCopybookReference() throws ExecutionException, InterruptedException {
-    setUpCopybook();
-    List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK2, true);
+    client.clean();
+
+    TextDocumentService textService = getInjector().getInstance(TextDocumentService.class);
+
+    textService.didOpen(
+        new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
+    List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK2, true, textService);
     assertEquals(3, locations.size());
 
     assertContainsRange(locations, range(21, 12, COPY_LENGTH));
   }
 
-  private void setUpCopybook() throws ExecutionException, InterruptedException {
-    client.clean();
-    ImmutableList.of(new CobolText("CPYBK1", COPYBOOK1), new CobolText("CPYBK2", COPYBOOK2))
-        .stream()
-        .map(UseCaseUtils::toCopybookModel)
-        .forEach(copybookService::store);
-    service.didOpen(
-        new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
-    ((CobolTextDocumentService) service).getFutureMap().get(DOCUMENT_URI).get();
+  private Injector getInjector() {
+    return Guice.createInjector(
+        new DatabusModule(),
+        new ClientServerTestModule(),
+        new AbstractModule() {
+          @Override
+          protected void configure() {
+            bind(LanguageEngineFacade.class).to(ClientServerIntegrationTestImpl.class);
+            bind(TextDocumentService.class).to(CobolTextDocumentService.class);
+          }
+        });
   }
 
   private void assertContainsRange(List<? extends Location> locations, Predicate<Range> range) {
@@ -179,11 +180,11 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
   }
 
   private List<? extends Location> invokeReferencesRequest(
-      Position position, boolean includeDeclaration)
+      Position position, boolean includeDeclaration, TextDocumentService textService)
       throws ExecutionException, InterruptedException {
     ReferenceParams referenceParams = new ReferenceParams(new ReferenceContext(includeDeclaration));
     referenceParams.setPosition(position);
     referenceParams.setTextDocument(new TextDocumentIdentifier(DOCUMENT_URI));
-    return service.references(referenceParams).get();
+    return textService.references(referenceParams).get();
   }
 }
