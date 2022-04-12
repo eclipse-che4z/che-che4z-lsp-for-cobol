@@ -63,6 +63,7 @@ const getZoweExplorerMock = (forError: boolean = false, mentionedError?: any) =>
             apiResponse: {
                 items: [
                     { name: "uss_copybook" },
+                    { name: "uss_withExt.cpy"},
                     { name: "USS_DATASET2" },
                 ],
             },
@@ -129,6 +130,15 @@ describe("Test fetchCopybook against bad and correct configurations", () => {
             expect(result).toBe(true);
         });
 
+    it("Given a copybook name with extension that is a valid USS member on MF, the fetchCopybook correctly invoke download from MF",
+        async () => {
+            const ussCopybookProfile = new CopybookProfile("filename", "uss_withExt", SettingsService.DEFAULT_DIALECT, profile, false);
+            (CopybookDownloadService as any).downloadCopybookFromMFUsingZowe = jest.fn();
+            ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
+            const result = await (CopybookDownloadService as any).fetchCopybook("HLQ.DSN1", ussCopybookProfile, true);
+            expect(result).toBe(true);
+        });
+
     it("checks if handleCopybook can't find copybook, it shows a popup to update settings", async () => {
         const err = new Error("Error");
         ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock(true, err);
@@ -149,14 +159,14 @@ describe("Receiving an error from zowe api layer, copybooks are not retrivied an
 
                 const errorQueue: Set<string> = new Set();
                 errorQueue.add("copybook");
-
-                await (CopybookDownloadService as any).handleCopybook("DSNAME1", copybookProfile, errorQueue);
+                const progress = { report: jest.fn(), increment: jest.fn() };
+                await (CopybookDownloadService as any).handleCopybook(progress, "DSNAME1", copybookProfile, errorQueue);
                 expect(errorQueue.size).toBe(0);
             });
     });
 
     describe("Suite of tests related to handleCopybooks", () => {
-        const progress = { report: jest.fn() };
+        const progress = { report: jest.fn(), increment: jest.fn() };
         vscode.window.showErrorMessage = jest.fn();
 
         it("handleCopybooks shows progress report", async () => {
@@ -169,7 +179,7 @@ describe("Receiving an error from zowe api layer, copybooks are not retrivied an
                     message: "Looking in dataset. 1 copybook(s) left.",
                 });
 
-            expect(handleCopybook).toBeCalledWith("dataset", copybookProfile, new Set(), false);
+            expect(handleCopybook).toBeCalledWith(progress, "dataset", copybookProfile, new Set(), false);
         });
 
         it("handleCopybooks throws error incase download fails", async () => {
