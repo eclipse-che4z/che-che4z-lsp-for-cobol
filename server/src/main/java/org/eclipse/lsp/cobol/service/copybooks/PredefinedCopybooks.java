@@ -29,14 +29,22 @@ import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.Copybo
 /** This util class encapsulates the logic of resolving the predefined variable names. */
 @UtilityClass
 public class PredefinedCopybooks {
-  private static final Map<String, Copybook> PREDEFINED_COPYBOOKS =
-      ImmutableMap.of("SQLCA", SQLCA, "SQLDA", SQLDA, "DFHEIBLC", DFHEIBLC, "PLABEL", PLABEL);
-
   /** Prefix for uri of the predefined copybooks */
   public static final String PREF_IMPLICIT = "implicit://";
-
   @SuppressWarnings("java:S1075")
   public static final String IMPLICIT_PATH = "/implicitCopybooks/";
+  private static final Map<String, Copybook> PREDEFINED_COPYBOOKS =
+      ImmutableMap.of(
+          "SQLCA",
+          SQLCA,
+          "SQLDA",
+          SQLDA,
+          "DFHEIBLC",
+          DFHEIBLC,
+          "PLABEL",
+          PLABEL,
+          "SPECIALREGISTERS",
+          SPECIALREGISTERS);
 
   /**
    * Get a predefined copybook instance for a given name or null
@@ -67,9 +75,7 @@ public class PredefinedCopybooks {
     return uri.startsWith(IMPLICIT_PATH);
   }
 
-  /**
-   * Enumeration of predefined copybook content types
-   */
+  /** Enumeration of predefined copybook content types */
   public enum CopybookContentType {
     FILE,
     GENERATED
@@ -107,6 +113,12 @@ public class PredefinedCopybooks {
       public CopybookContentType getContentType() {
         return CopybookContentType.GENERATED;
       }
+    },
+    SPECIALREGISTERS {
+      @Override
+      public String uriForBackend(SQLBackend backend) {
+        return IMPLICIT_PATH + "SPECIALREGISTERS.cpy";
+      }
     };
 
     /**
@@ -119,6 +131,7 @@ public class PredefinedCopybooks {
 
     /**
      * Get predefined copybook's content type
+     *
      * @return predefined copybook content type
      */
     public CopybookContentType getContentType() {

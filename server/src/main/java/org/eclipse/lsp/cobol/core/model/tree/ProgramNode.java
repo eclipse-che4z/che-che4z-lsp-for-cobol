@@ -25,17 +25,13 @@ import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
-import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
-import org.eclipse.lsp.cobol.core.semantics.PredefinedVariables;
 import org.eclipse.lsp4j.Location;
 
 import java.util.*;
 
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
-import static org.eclipse.lsp.cobol.core.semantics.PredefinedVariables.PREDEFINED;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /** This class represents program context in COBOL. */
 @ToString(callSuper = true)
@@ -52,7 +48,6 @@ public class ProgramNode extends Node {
 
   public ProgramNode(Locality locality) {
     super(locality, PROGRAM);
-    addPredefinedVariables();
   }
 
   public String getProgramName() {
@@ -141,12 +136,6 @@ public class ProgramNode extends Node {
         .filter(VariableNode::isGlobal)
         .forEach(variableNode -> result.put(variableNode.getName(), variableNode));
     return result;
-  }
-
-  private void addPredefinedVariables() {
-    Locality location = Locality.builder().uri(PREF_IMPLICIT + PREDEFINED).build();
-    for (String predefinedVariableName : PredefinedVariables.getPredefinedVariablesNames())
-      addVariableDefinition(new MnemonicNameNode(location, PREDEFINED, predefinedVariableName));
   }
   /**
    * Add a paragraph definition name node in the program context.
