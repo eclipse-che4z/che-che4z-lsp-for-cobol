@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import static java.util.stream.Collectors.groupingBy;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
-import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.DISABLED;
+import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.DISABLED;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

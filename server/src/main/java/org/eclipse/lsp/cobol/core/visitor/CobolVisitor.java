@@ -67,7 +67,7 @@ import static org.eclipse.lsp.cobol.core.CobolParser.*;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
 import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.service.SubroutineService.IMPLICIT_SUBROUTINE_PATH;
 
 /**

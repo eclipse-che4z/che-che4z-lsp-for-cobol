@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service;
+package org.eclipse.lsp.cobol.service.copybooks;
 
 import static org.eclipse.lsp.cobol.service.utils.WorkspaceFileService.isFileUnderExtendedSourceFolder;
 
@@ -45,4 +45,5 @@ public enum CopybookProcessingMode {
       String uri, CopybookProcessingMode copybookProcessingMode) {
     return isFileUnderExtendedSourceFolder(uri) ? DISABLED : copybookProcessingMode;
   }
+
 }

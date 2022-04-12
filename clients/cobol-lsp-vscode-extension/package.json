@@ -4,7 +4,7 @@
     "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
@@ -363,11 +363,28 @@
                     },
                     "description": "List of enabled dialects",
                     "uniqueItems": true
+                },
+                "cobol-lsp.predefined-labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of predefined labels",
+                    "uniqueItems": true
                 }
             }
         },
         "configurationDefaults": {
             "[COBOL]": {
+                "editor.renderIndentGuides": false,
+                "editor.rulers": [
+                    7,
+                    11,
+                    72,
+                    80
+                ]
+            },
+            "[COBOL Copybook]": {
                 "editor.renderIndentGuides": false,
                 "editor.rulers": [
                     7,

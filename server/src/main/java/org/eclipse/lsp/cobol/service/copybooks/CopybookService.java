@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service;
+package org.eclipse.lsp.cobol.service.copybooks;
 
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 

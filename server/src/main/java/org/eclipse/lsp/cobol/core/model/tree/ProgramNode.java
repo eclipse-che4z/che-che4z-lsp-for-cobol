@@ -35,7 +35,7 @@ import java.util.*;
 
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 import static org.eclipse.lsp.cobol.core.semantics.PredefinedVariables.PREDEFINED;
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /** This class represents program context in COBOL. */
 @ToString(callSuper = true)

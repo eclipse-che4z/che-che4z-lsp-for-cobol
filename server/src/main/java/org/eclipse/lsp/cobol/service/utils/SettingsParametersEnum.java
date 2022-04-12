@@ -32,7 +32,8 @@ public enum SettingsParametersEnum {
   LOGGING_LEVEL("logging.level.root"),
   TARGET_SQL_BACKEND("target-sql-backend"),
   ANALYSIS_FEATURES("analysis.features"),
-  DIALECTS("dialects");
+  DIALECTS("dialects"),
+  PREDEFINED_LABELS("predefined-labels");
 
   public final String label;
 

@@ -14,12 +14,14 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 
 import javax.inject.Inject;
 import java.util.Arrays;
@@ -49,7 +51,7 @@ public class CachingConfigurationService implements ConfigurationService {
     config =
         settingsService
             .getConfigurations(
-                Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, DIALECTS.label))
+                Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, DIALECTS.label, PREDEFINED_LABELS.label))
             .thenApply(this::parseConfig);
   }
 
@@ -78,7 +80,8 @@ public class CachingConfigurationService implements ConfigurationService {
     return new ConfigurationEntity(
         parseSQLBackend(clientConfig.subList(0, 1)),
         parseFeatures((JsonElement) clientConfig.get(1)),
-        parseDialects((JsonArray) clientConfig.get(2)));
+        parseDialects((JsonArray) clientConfig.get(2)),
+        parsePredefinedLabels((JsonElement) clientConfig.get(3)));
   }
 
   private SQLBackend parseSQLBackend(List<Object> objects) {
@@ -100,4 +103,14 @@ public class CachingConfigurationService implements ConfigurationService {
     }
     return Arrays.asList(EmbeddedCodeNode.Language.values());
   }
+
+  private List<String> parsePredefinedLabels(JsonElement labels) {
+    if (labels.isJsonArray()) {
+      return Streams.stream((JsonArray) labels).
+          map(JsonElement::getAsString)
+          .collect(toList());
+    }
+    return ImmutableList.of();
+  }
+
 }

@@ -38,7 +38,7 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 @Singleton
 public class SettingsServiceImpl implements SettingsService {
-  private Provider<CobolLanguageClient> clientProvider;
+  private final Provider<CobolLanguageClient> clientProvider;
 
   @Inject
   SettingsServiceImpl(Provider<CobolLanguageClient> clientProvider) {

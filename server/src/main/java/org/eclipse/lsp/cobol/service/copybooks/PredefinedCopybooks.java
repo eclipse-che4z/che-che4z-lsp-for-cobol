@@ -13,23 +13,24 @@
  *
  */
 
-package org.eclipse.lsp.cobol.service;
+package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.experimental.UtilityClass;
+import org.eclipse.lsp.cobol.service.SQLBackend;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.*;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.Copybook.*;
 
 /** This util class encapsulates the logic of resolving the predefined variable names. */
 @UtilityClass
 public class PredefinedCopybooks {
   private static final Map<String, Copybook> PREDEFINED_COPYBOOKS =
-      ImmutableMap.of("SQLCA", SQLCA, "SQLDA", SQLDA, "DFHEIBLC", DFHEIBLC);
+      ImmutableMap.of("SQLCA", SQLCA, "SQLDA", SQLDA, "DFHEIBLC", DFHEIBLC, "PLABEL", PLABEL);
 
   /** Prefix for uri of the predefined copybooks */
   public static final String PREF_IMPLICIT = "implicit://";
@@ -66,6 +67,14 @@ public class PredefinedCopybooks {
     return uri.startsWith(IMPLICIT_PATH);
   }
 
+  /**
+   * Enumeration of predefined copybook content types
+   */
+  public enum CopybookContentType {
+    FILE,
+    GENERATED
+  }
+
   /** Enumeration of predefined copybooks */
   public enum Copybook {
     SQLCA {
@@ -87,6 +96,17 @@ public class PredefinedCopybooks {
       public String uriForBackend(SQLBackend backend) {
         return IMPLICIT_PATH + "DFHEIBLC.cpy";
       }
+    },
+    PLABEL {
+      @Override
+      public String uriForBackend(SQLBackend backend) {
+        return IMPLICIT_PATH + "PLABEL.cpy";
+      }
+
+      @Override
+      public CopybookContentType getContentType() {
+        return CopybookContentType.GENERATED;
+      }
     };
 
     /**
@@ -96,5 +116,13 @@ public class PredefinedCopybooks {
      * @return uri of the predefined copybook
      */
     public abstract String uriForBackend(SQLBackend backend);
+
+    /**
+     * Get predefined copybook's content type
+     * @return predefined copybook content type
+     */
+    public CopybookContentType getContentType() {
+      return CopybookContentType.FILE;
+    }
   }
 }

@@ -15,7 +15,7 @@
 
 package org.eclipse.lsp.cobol.domain.databus.model;
 
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

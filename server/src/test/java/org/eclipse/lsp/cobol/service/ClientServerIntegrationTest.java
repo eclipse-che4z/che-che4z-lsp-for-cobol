@@ -20,6 +20,7 @@ import com.google.inject.Inject;
 import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp4j.*;
@@ -82,7 +83,8 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
   @Inject LanguageServer server;
   @Inject CobolLanguageClient cobolLanguageClient;
   @Inject MockLanguageClient client;
-  @Inject CopybookService copybookService;
+  @Inject
+  CopybookService copybookService;
   @Inject DisposableLSPStateService stateService;
 
   /**
