@@ -19,8 +19,49 @@ startRule: .*? dacoRules* EOF;
 dacoRules: dacoStatements .*?;
 
 dacoStatements
-    : dafPrefixStatement? (getMetaInfoStatement | tableRowRetrievalStatement | getTableStatement
-    | getFileStatement | stringDMLStatement) DOT_FS?
+    : readTransactionStatement | writeTransactionStatement
+    | writeReportStatement | openPacketStatement | getMetaInfoStatement
+    | messageHandlingStatement | tableRowRetrievalStatement | tableRowUpdateStatement
+    | getTableStatement | getFileStatement | stringDMLStatement DOT_FS?
+    ;
+
+readTransactionStatement
+    : READ TRANSACTION daco_task_name?
+    ;
+
+writeTransactionStatement
+    : WRITE TRANSACTION daco_task_name
+        (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 4, 2048);} integerLiteral))?
+        (TO ({validateLength(_input.LT(1).getText(), "dbu", 19);} (cobolWord | integerLiteral)))?
+    ;
+
+writeReportStatement
+    : writeReportStatementWithName | endWriteReportStatement | autoWriteReportStatement
+    ;
+
+writeReportStatementWithName
+    : WRITE REPORT daco_report_name
+        FROM qualifiedDataName
+        (TO qualifiedDataName)?
+        (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 80, 200);} integerLiteral))?
+        (AFTER ((integerLiteral LINES) | PAGE | qualifiedDataName))?
+    ;
+
+endWriteReportStatement
+    : WRITE REPORT daco_report_name ENDRPT
+    ;
+
+autoWriteReportStatement
+    : WRITE REPORT AUTO qualifiedDataName
+        (END qualifiedDataName)?
+    ;
+
+openPacketStatement
+    : OPEN PACKET daco_task_name
+           (FOR (qualifiedDataName | {validateExactLength(trimQuotes(_input.LT(1).getText()), "receiver packet", 3);}
+           NONNUMERICLITERAL))
+           (SORT qualifiedDataName)?
+           (VERSION (qualifiedDataName | integerLiteral))?
     ;
 
 getMetaInfoStatement
@@ -37,7 +78,7 @@ getEntityNameAndDescriptionStatement
             NONNUMERICLITERAL)
             (qualifiedDataName | {validateStringLengthRange(trimQuotes(_input.LT(1).getText()), 3, 16);}
             NONNUMERICLITERAL)
-            ( ( daf_entity_role |
+            ( ( daco_entity_role |
                 {validateAllowedValues(trimQuotes(_input.LT(1).getText()),
                   "OWNER","OWN","DESIGNER","AVG","ANALIST","ANA");} NONNUMERICLITERAL
               )
@@ -48,7 +89,7 @@ getEntityNameAndDescriptionStatement
             )
     ;
 
-daf_entity_role
+daco_entity_role
     : (OWNER | DESIGNER | ANALIST | OWN | AVG | ANA)
     ;
 
@@ -97,14 +138,130 @@ getOdetteOrJobOrNetworkStatement
     : (ODETTE | JOB | NETWORK) (qualifiedDataName | NONNUMERICLITERAL)
     ;
 
+messageHandlingStatement
+    : showDMLMessageStatement | returnStatusStatement
+    ;
+
+showDMLMessageStatement
+    : SHOW (showMessageStatement | showResultStatement | showErrorMessageStatement)
+    ;
+
+showMessageStatement
+    : STD? daco_message_types
+     ({validateExactLength(_input.LT(1).getText(), "message code", 3);} integerLiteral)
+     (qualifiedDataName | NONNUMERICLITERAL)?
+     (qualifiedDataName | NONNUMERICLITERAL)?
+     (qualifiedDataName | NONNUMERICLITERAL)?
+    ;
+
+showResultStatement
+    : RESULT daco_task_name
+    ;
+
+showErrorMessageStatement
+    : MESSAGE (({validateExactLength(trimQuotes(_input.LT(1).getText()), "language code", 2);} NONNUMERICLITERAL)
+      | (qualifiedDataName | NONNUMERICLITERAL))?
+    ;
+
+returnStatusStatement
+    : RETURN daco_message_types
+      ({validateExactLength(_input.LT(1).getText(), "message code", 3);} integerLiteral)
+      (qualifiedDataName | NONNUMERICLITERAL)?
+    ;
+
 tableRowRetrievalStatement
-    : ROW rowGetStatement
+    : ROW (rowStartStatement | rowSaveStatement | rowRestoreStatement
+      | rowGetStatement | rowNextStatement | rowPriorStatement
+      | rowAnyStatement | rowMatchStatement | rowBufferStatement)
+    ;
+
+rowBufferStatement
+    : BUFFER daf_table_name IS YES
+    ;
+
+rowStartStatement
+    : START daf_table_name
+    ;
+
+rowSaveStatement
+    : SAVE daf_table_name
+      IN (qualifiedDataName | literal)
+    ;
+
+rowRestoreStatement
+    : RESTORE daf_table_name
+      FROM (qualifiedDataName | literal)
     ;
 
 rowGetStatement
     : GET daf_table_name
       (ON (qualifiedDataName | literal))?
       (TO qualifiedDataName)?
+    ;
+
+rowNextStatement
+    : NEXT daf_table_name
+      (TO qualifiedDataName)?
+    ;
+
+rowPriorStatement
+    : PRIOR daf_table_name
+      (TO qualifiedDataName)?
+    ;
+
+rowAnyStatement
+    : ANY daf_table_name
+      USING qualifiedDataName
+    ;
+
+rowMatchStatement
+    : MATCH daf_table_name
+      USING qualifiedDataName
+    ;
+
+tableRowUpdateStatement
+    : ROW (rowDeleteStatement | rowAddStatement | rowInsertStatement |
+      rowModifyStatement | rowSortStatement | rowSingleStatement |
+      rowDuplicateStatement | rowInvertStatement)
+    ;
+
+rowDeleteStatement
+    : DELETE daf_table_name
+    ;
+
+rowAddStatement
+    : ADD daf_table_name
+      WITH qualifiedDataName
+    ;
+
+rowInsertStatement
+    : INSERT daf_table_name
+      WITH qualifiedDataName
+    ;
+
+rowModifyStatement
+    : MODIFY daf_table_name
+      ON (qualifiedDataName | literal)
+      WITH qualifiedDataName
+    ;
+
+rowSortStatement
+    : SORT daf_table_name (ASC | DES)
+      ON qualifiedDataName
+    ;
+
+rowSingleStatement
+    : SINGLE daf_table_name
+      ON qualifiedDataName
+    ;
+
+rowDuplicateStatement
+    : DUPLICATE daf_table_name
+      ON qualifiedDataName
+    ;
+
+rowInvertStatement
+    : INVERT daf_table_name
     ;
 
 getTableStatement
@@ -123,10 +280,6 @@ stringDMLStatement
 
 stringGetStatement
     : GET qualifiedDataName
-    ;
-
-dafPrefixStatement
-    : (D_B | D_C)
     ;
 
 daf_table_name
@@ -252,3 +405,24 @@ cobolWord
 cobolKeywords
    : ADDRESS | CR
    ;
+
+// DaCo Identifiers
+
+daco_task_name
+    :{validateExactLength(_input.LT(1).getText(), "task name", 4);
+      validateAlphaNumericPattern(_input.LT(1).getText(), "task name");
+     }
+        (cobolWord | integerLiteral)
+    ;
+
+daco_report_name
+    :{validateExactLength(_input.LT(1).getText(), "report name", 5);
+      validateAlphaNumericPattern(_input.LT(1).getText(), "report name");
+      validateStartsWith(_input.LT(1).getText(), "R", "T");
+      }
+        (cobolWord)
+    ;
+
+daco_message_types
+    : ERROR | INFO | WARNING
+    ;
