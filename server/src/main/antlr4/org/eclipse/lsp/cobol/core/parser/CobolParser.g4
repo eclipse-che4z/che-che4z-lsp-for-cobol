@@ -890,11 +890,11 @@ paragraph
    ;
 
 sentence
-   : statementPrefix? ((dafStatements | statement)* (endClause | dialectStatement))
+   : statementPrefix? (statement* (endClause | dialectStatement))
    ;
 
 conditionalStatementCall
-   : statementPrefix? ((dafStatements | statement) SEMICOLON_FS? | dialectStatement)
+   : statementPrefix? (statement SEMICOLON_FS? | dialectStatement)
    ;
 
 statement
@@ -917,115 +917,8 @@ dacoControlSection
     : DACO_CONTROL SECTION
     ;
 
-dafStatements
-    : tableDMLStatement
-    | fileDMLStatement | stringDMLStatement | debugStatement | execStatement
-    ;
-
 statementPrefix
     : (D_B | D_C)
-    ;
-
-tableDMLStatement
-    : getTableStatement | sortTableStatement
-    ;
-
-getTableStatement
-    : GET TABLE (ANY | SEQ)
-      {validateExactLength(_input.LT(1).getText(), "table reference", 4);} cobolWord
-    ;
-
-sortTableStatement
-    : SORT TABLE qualifiedDataName TO qualifiedDataName
-      LENGTH (qualifiedDataName | integerLiteral)
-      (ASCENDING | DESCENDING)
-    ;
-
-fileDMLStatement
-    : openFileStatement | readFileStatement | writeFileStatement
-     | closeFileStatement | getFileStatement
-    ;
-
-openFileStatement
-    : OPEN FILE daf_file_identifier (MAX LENGTH (qualifiedDataName | integerLiteral | LAYOUT))?
-    ;
-
-readFileStatement
-    : READ FILE daf_file_identifier (MAX LENGTH (qualifiedDataName | integerLiteral | LAYOUT))?
-    ;
-
-writeFileStatement
-    : WRITE FILE daf_file_identifier (LENGTH (qualifiedDataName | integerLiteral))?
-    ;
-
-closeFileStatement
-    : CLOSE FILE (INPUT | OUTPUT) (daf_file_identifier | ALL)
-    ;
-
-getFileStatement
-    : GET FILE (qualifiedDataName | NONNUMERICLITERAL) INTO qualifiedDataName
-      (VOLSER INTO qualifiedDataName)?
-    ;
-
-stringDMLStatement
-    : STRING (stringFindStatement | stringGetStatement | stringNextStatement
-    | stringMatchStatement | stringCheckStatement | stringUpdateStatement
-    | stringReplaceStatement | stringDeleteStatement)
-    ;
-
-stringFindStatement
-    : FIND qualifiedDataName daf_string_identifier
-    ;
-
-stringGetStatement
-    : GET qualifiedDataName
-    ;
-
-stringNextStatement
-    : NEXT qualifiedDataName (DELIMITER qualifiedDataName)?
-    ;
-
-stringMatchStatement
-    : MATCH daf_string_identifier daf_string_identifier
-      (qualifiedDataName | ({validateIntegerRange(_input.LT(1).getText(), 0, 255);} numericLiteral))?
-    ;
-
-stringCheckStatement
-    : CHECK daf_string_command
-      (qualifiedDataName | ({validateLength(_input.LT(1).getText(), "email", 55);} literal))
-    ;
-
-stringUpdateStatement
-    : (ADD | INSERT | FILL) qualifiedDataName daf_string_identifier
-      LENGTH (qualifiedDataName | integerLiteral)
-    ;
-
-stringReplaceStatement
-    : REPLACE ALL? qualifiedDataName daf_string_identifier
-      BY daf_string_identifier
-    ;
-
-stringDeleteStatement
-    : DELETE ALL? qualifiedDataName daf_string_identifier
-    ;
-
-debugStatement
-    : debugStatsStatement | debugFieldStatement
-    ;
-
-debugStatsStatement
-    : DEBUG STATS (qualifiedDataName | ({validateLength(_input.LT(1).getText(), "text", 32);} literal))?
-    ;
-
-debugFieldStatement
-    : DEBUG qualifiedDataName LENGTH (qualifiedDataName | integerLiteral)
-      (COLS ({validateIntegerRange(_input.LT(1).getText(), 0, 132);} numericLiteral))?
-      (TABLE (qualifiedDataName | integerLiteral))?
-      NO_POS? (HEX | DISPLAY | BOTH)?
-    ;
-
-execStatement
-    : EXEC literal (USING qualifiedDataName)?
     ;
 
 // End of DaCo Statements
@@ -2234,39 +2127,6 @@ relationalOperator
    : (IS | ARE)? (NOT? (GREATER THAN? | MORETHANCHAR | LESS THAN? | LESSTHANCHAR | EQUAL TO? | EQUALCHAR)
    | NOTEQUALCHAR | GREATER THAN? OR EQUAL TO? | MORETHANOREQUAL | LESS THAN? OR EQUAL TO? | LESSTHANOREQUAL)
    ;
-
-// DAF DaCo Identifiers
-
-daf_task_name
-    :{validateExactLength(_input.LT(1).getText(), "task name", 4);
-      validateAlphaNumericPattern(_input.LT(1).getText(), "task name");
-     }
-        (cobolWord | integerLiteral)
-    ;
-
-daf_entity_role
-    : (OWNER | DESIGNER | ANALIST | OWN | AVG | ANA)
-    ;
-
-daf_message_types
-    : ERROR | INFO | WARNING
-    ;
-
-daf_table_name
-    : { validateStartsWith(_input.LT(1).getText(), "TBL", "TBF"); } qualifiedDataName
-    ;
-
-daf_string_command
-    : EMA
-    ;
-
-daf_string_identifier
-    : qualifiedDataName | literal | SPACE
-    ;
-
-daf_file_identifier
-    : {validateExactLength(_input.LT(1).getText(), "file reference", 4);} integerLiteral
-    ;
 
 // identifier ----------------------------------
 

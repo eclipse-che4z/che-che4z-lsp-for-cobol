@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects.daco;
 
 import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.eclipse.lsp.cobol.core.DaCoParser;
 import org.eclipse.lsp.cobol.core.DaCoParser.DacoStatementsContext;
 import org.eclipse.lsp.cobol.core.DaCoParser.QualifiedDataNameContext;
 import org.eclipse.lsp.cobol.core.DaCoParser.VariableUsageNameContext;
@@ -24,6 +25,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.SortTableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
@@ -53,6 +55,11 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
   public List<Node> visitDacoStatements(DacoStatementsContext ctx) {
     textReplacement.addReplacementContext(ctx);
     return visitChildren(ctx);
+  }
+
+  @Override
+  public List<Node> visitSortTableStatement(DaCoParser.SortTableStatementContext ctx) {
+    return addTreeNode(ctx, locality -> new SortTableNode(locality));
   }
 
   @Override
