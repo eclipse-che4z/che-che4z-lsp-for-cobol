@@ -1,4 +1,3 @@
-
  /*
 * Copyright (C) 2017, Ulrich Wolffgang <ulrich.wolffgang@proleap.io>
 * All rights reserved.
@@ -12,12 +11,22 @@ options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
    : .*? ((includeStatement | copyStatement | copyIdmsStatement | copyMaidStatement | replaceAreaStart | replaceOffStatement
-   | titleDirective | enterDirective | controlDirective | linkageSection | plusplusIncludeStatement)+ .*?)* EOF
+   | titleDirective | enterDirective | controlDirective | linkageSection | plusplusIncludeStatement | procedureDivision | workingStorageSection)+ .*?)* EOF
+   ;
+
+// procedure devision for resolving predefined labels
+procedureDivision
+   : PROCEDURE DIVISION DOT_FS
    ;
 
 // linkage section for resolving predefined variables
 linkageSection
    : LINKAGE SECTION DOT_FS
+   ;
+
+// working storage section for resolving speacal registers as variables
+workingStorageSection
+   : WORKING_STORAGE SECTION DOT_FS
    ;
 
 // copy statement
@@ -166,7 +175,7 @@ charDataLine
    ;
 
 cobolWord
-   : COPYBOOK_IDENTIFIER | IDENTIFIER | MAID | SOURCE | NOSOURCE | LIST | NOLIST | MAP | NOMAP | LINKAGE | SECTION
+   : COPYBOOK_IDENTIFIER | IDENTIFIER | MAID | SOURCE | NOSOURCE | LIST | NOLIST | MAP | NOMAP | LINKAGE | SECTION | PROCEDURE | DIVISION
    ;
 
 literal

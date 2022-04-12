@@ -31,7 +31,7 @@ class TestJniEnvSpecialRegister {
           + "       01   {$*JNIEnv} PIC 9. \n"
           + "       Procedure Division.\n"
           + "       {#*000-Main-Logic}.\n"
-          + "            Set address of {$JNIEnv} to JNIEnvPtr.\n"
+          + "            Set address of {$JNIEnv} to {$JNIEnvPtr}.\n"
           + "       End program ProgramId.";
 
   @Test
