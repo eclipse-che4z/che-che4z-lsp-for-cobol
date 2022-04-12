@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 import org.junit.jupiter.api.Test;
@@ -68,6 +69,29 @@ class CachingConfigurationServiceTest {
         new AnalysisConfig(
             new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
             ImmutableList.of(EmbeddedCodeNode.Language.SQL),
+            ImmutableList.of("Dialect")),
+        configuration.getConfig(CopybookProcessingMode.DISABLED));
+  }
+
+  @Test
+  void testUpdatingConfigurationWithNUllFeatures() {
+    SettingsService settingsService = spy(SettingsService.class);
+
+    JsonArray dialectSettings = new JsonArray();
+    dialectSettings.add("Dialect");
+    List<Object> clientConfig =
+        Arrays.asList(new JsonPrimitive("DATACOM_SERVER"), new JsonNull(), dialectSettings);
+    when(settingsService.getConfigurations(
+            Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, DIALECTS.label)))
+        .thenReturn(supplyAsync(() -> clientConfig));
+
+    CachingConfigurationService configuration = new CachingConfigurationService(settingsService);
+    configuration.updateConfigurationFromSettings();
+
+    assertEquals(
+        new AnalysisConfig(
+            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
+            ImmutableList.of(EmbeddedCodeNode.Language.SQL, EmbeddedCodeNode.Language.CICS),
             ImmutableList.of("Dialect")),
         configuration.getConfig(CopybookProcessingMode.DISABLED));
   }
