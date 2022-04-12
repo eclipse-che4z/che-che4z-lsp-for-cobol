@@ -51,7 +51,12 @@ public class CachingConfigurationService implements ConfigurationService {
     config =
         settingsService
             .getConfigurations(
-                Arrays.asList(TARGET_SQL_BACKEND.label, ANALYSIS_FEATURES.label, DIALECTS.label, PREDEFINED_LABELS.label))
+                Arrays.asList(
+                    TARGET_SQL_BACKEND.label,
+                    ANALYSIS_FEATURES.label,
+                    DIALECTS.label,
+                    PREDEFINED_LABELS.label,
+                    SUBROUTINE_LOCAL_PATHS.label))
             .thenApply(this::parseConfig);
   }
 
@@ -69,6 +74,19 @@ public class CachingConfigurationService implements ConfigurationService {
     return AnalysisConfig.defaultConfig(mode);
   }
 
+  @Override
+  public List<String> getSubroutineDirectories() {
+    try {
+      return AnalysisConfig.getSubroutineDirectories(config.get());
+    } catch (InterruptedException e) {
+      LOG.error("Issue while resolving subroutine configuration", e);
+      Thread.currentThread().interrupt();
+    } catch (ExecutionException e) {
+      LOG.error("Issue while resolving subroutine configuration", e);
+    }
+    return ImmutableList.of();
+  }
+
   private ConfigurationEntity parseConfig(List<Object> clientConfig) {
     return Optional.ofNullable(clientConfig)
         .map(this::parseSettings)
@@ -81,7 +99,8 @@ public class CachingConfigurationService implements ConfigurationService {
         parseSQLBackend(clientConfig.subList(0, 1)),
         parseFeatures((JsonElement) clientConfig.get(1)),
         parseDialects((JsonArray) clientConfig.get(2)),
-        parsePredefinedLabels((JsonElement) clientConfig.get(3)));
+        parsePredefinedLabels((JsonElement) clientConfig.get(3)),
+        parseSubroutineFolder((JsonElement) clientConfig.get(4)));
   }
 
   private SQLBackend parseSQLBackend(List<Object> objects) {
@@ -106,11 +125,15 @@ public class CachingConfigurationService implements ConfigurationService {
 
   private List<String> parsePredefinedLabels(JsonElement labels) {
     if (labels.isJsonArray()) {
-      return Streams.stream((JsonArray) labels).
-          map(JsonElement::getAsString)
-          .collect(toList());
+      return Streams.stream((JsonArray) labels).map(JsonElement::getAsString).collect(toList());
     }
     return ImmutableList.of();
   }
 
+  private List<String> parseSubroutineFolder(JsonElement subroutine) {
+    if (subroutine.isJsonArray()) {
+      return Streams.stream((JsonArray) subroutine).map(JsonElement::getAsString).collect(toList());
+    }
+    return ImmutableList.of();
+  }
 }
