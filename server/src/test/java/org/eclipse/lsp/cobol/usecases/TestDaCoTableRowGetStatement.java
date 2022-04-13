@@ -21,8 +21,8 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/** Tests the DAF DEBUG STATS statement */
-class TestDAFDebugStatsStatement {
+/** Tests the DaCo ROW GET statement */
+class TestDaCoTableRowGetStatement {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -31,15 +31,31 @@ class TestDAFDebugStatsStatement {
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WS-AREA}. \r\n"
           + "           03 {$*AREA-XW1}. \r\n"
+          + "             05 {$*TBLPRO-XL1}. \r\n"
+          + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
+          + "             05 {$*TBFPRO-XL1}. \r\n"
+          + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
           + "             05 {$*DSAPRO-XL1}. \r\n"
           + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
           + "        PROCEDURE DIVISION. \r\n"
-          + "            DEBUG STATS. \r\n"
-          + "            DEBUG STATS 'SDFDF'. \r\n"
-          + "            DEBUG STATS {$DSAPRO-XL1}. \r\n"
+          + "            ROW GET {$TBLPRO-XL1}. \r\n"
+          + "            ROW GET {$TBFPRO-XL1}. \r\n"
+          + "            ROW GET {$TBLPRO-XL1} ON 2. \r\n"
+          + "            ROW GET {$TBFPRO-XL1} ON 2. \r\n"
+          + "            ROW GET {$TBLPRO-XL1} ON 'ABC'. \r\n"
+          + "            ROW GET {$TBFPRO-XL1} ON 'ABC'. \r\n"
+          + "            ROW GET {$TBLPRO-XL1} ON {$DSAPRO-XL1}. \r\n"
+          + "            ROW GET {$TBFPRO-XL1} ON {$DSAPRO-XL1}. \r\n"
+          + "            ROW GET {$TBLPRO-XL1} ON {$DSAPRO-XL1} TO {$DSAPRO-XL1}. \r\n"
+          + "            ROW GET {$TBFPRO-XL1} ON {$DSAPRO-XL1} TO {$DSAPRO-XL1}. \r\n"
+          + "            ROW GET {$TBLPRO-XL1} TO {$DSAPRO-XL1}. \r\n"
+          + "            ROW GET {$TBFPRO-XL1} TO {$DSAPRO-XL1}. \r\n"
           // Negative tests
-          + "            DEBUG STATS {GBR4|1}. \r\n"
-          + "            DEBUG STATS {'ASDSDADDSDFSDFDSFDSFDSFFFSFSFSSFSDF'|2}. \r\n";
+          + "            ROW GET {$DSAPRO-XL1|1}. \r\n"
+          + "            ROW GET {GBR4|1|2}. \r\n"
+          + "            ROW GET {$TBLPRO-XL1} ON {GBR4|2}. \r\n"
+          + "            ROW GET {$TBLPRO-XL1} ON {$DSAPRO-XL1} TO {GBR4|2}. \r\n"
+          + "            ROW GET {$TBLPRO-XL1} TO {GBR4|2}. \r\n";
 
   @Test
   void test() {
@@ -51,16 +67,16 @@ class TestDAFDebugStatsStatement {
             "1",
             new Diagnostic(
                 null,
-                "Variable GBR4 is not defined",
+                "String must starts with TBL or TBF values",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText()),
             "2",
             new Diagnostic(
                 null,
-                "Max length limit of 32 bytes allowed for text.",
+                "Variable GBR4 is not defined",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())),
         ImmutableList.of(),
-        DialectConfigs.getIDMSAnalysisConfig());
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

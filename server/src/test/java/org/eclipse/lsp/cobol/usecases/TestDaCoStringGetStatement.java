@@ -21,25 +21,22 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/** Tests the DAF ROW Add statement */
-class TestDAFTableGetStatement {
+/** Tests the DaCo STRING GET statement */
+class TestDaCoStringGetStatement {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
+          + "        01 {$*WS-AREA}. \r\n"
+          + "           03 {$*AREA-XW1}. \r\n"
+          + "             05 {$*DSAPRO-XL1}. \r\n"
+          + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
           + "        PROCEDURE DIVISION. \r\n"
-          + "            GET TABLE ANY GACP. \r\n"
-          + "            GET TABLE SEQ GACP. \r\n"
+          + "            STRING GET {$DSAPRO-XL1}. \r\n"
           // Negative tests
-          + "            GET TABLE {.|1} \r\n"
-          + "            GET TABLE ANY {.|2|3} \r\n"
-          + "            GET TABLE SEQ {.|2|3} \r\n"
-          + "            GET TABLE ANY {GA|2}. \r\n"
-          + "            GET TABLE SEQ {GA|2}. \r\n"
-          + "            GET TABLE ANY {GAFSD|2}. \r\n"
-          + "            GET TABLE SEQ {GAFSD|2}. \r\n";
+          + "            STRING GET {GBR4|1}. \r\n";
 
   @Test
   void test() {
@@ -51,20 +48,10 @@ class TestDAFTableGetStatement {
             "1",
             new Diagnostic(
                 null,
-                "Syntax error on '.' expected {ANY, SEQ}",
+                "Variable GBR4 is not defined",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
-            "2",
-            new Diagnostic(
-                null,
-                "Exact length of table reference must be 4 bytes",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
-            "3",
-            new Diagnostic(
-                null,
-                "Syntax error on '.' expected {IDENTIFIER}",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

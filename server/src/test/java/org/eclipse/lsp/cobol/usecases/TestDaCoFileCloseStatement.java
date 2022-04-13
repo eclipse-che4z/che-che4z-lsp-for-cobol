@@ -21,8 +21,8 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/** Tests the DAF GET FILE statement */
-class TestDAFFileGetStatement {
+/** Tests the DaCo CLOSE FILE statement */
+class TestDaCoFileCloseStatement {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -34,21 +34,16 @@ class TestDAFFileGetStatement {
           + "             05 {$*DET001-XW1}. \r\n"
           + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
           + "        PROCEDURE DIVISION. \r\n"
-          + "            GET FILE {$DET001-XW1} INTO {$DET001-XW1}. \r\n"
-          + "            GET FILE {$DET001-XW1} INTO {$DET001-XW1} VOLSER INTO {$DET001-XW1}. \r\n"
-          + "            GET FILE 'SDFSE' INTO {$DET001-XW1}. \r\n"
-          + "            GET FILE 'SDFSE' INTO {$DET001-XW1} VOLSER INTO {$DET001-XW1}. \r\n"
+          + "            CLOSE FILE INPUT 0123. \r\n"
+          + "            CLOSE FILE INPUT ALL. \r\n"
+          + "            CLOSE FILE OUTPUT 0123. \r\n"
+          + "            CLOSE FILE OUTPUT ALL. \r\n"
           // Negative Tests
-          // This can't be processed correctly due to the way of dialect matching
-          //+ "            GET FILE {.|1} \r\n"
-          //+ "            GET FILE {$DET001-XW1} {.|2} \r\n"
-          + "            GET FILE {$DET001-XW1} INTO {ABCD|3}. \r\n"
-          //+ "            GET FILE {$DET001-XW1} INTO {$DET001-XW1} VOLSER {.|4} \r\n"
-          + "            GET FILE {$DET001-XW1} INTO {$DET001-XW1} VOLSER INTO {ABCD|3}. \r\n";
+          + "            CLOSE FILE INPUT {01234|1}. \r\n"
+          + "            CLOSE FILE OUTPUT {01234|1}. \r\n";
 
   @Test
   void test() {
-
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(),
@@ -56,25 +51,7 @@ class TestDAFFileGetStatement {
             "1",
             new Diagnostic(
                 null,
-                "Syntax error on '.' expected {NONNUMERICLITERAL, IDENTIFIER}",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
-            "2",
-            new Diagnostic(
-                null,
-                "Syntax error on '.' expected {IN, INTO, OF, '('}",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
-            "3",
-            new Diagnostic(
-                null,
-                "Variable ABCD is not defined",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
-            "4",
-            new Diagnostic(
-                null,
-                "Syntax error on '.' expected INTO",
+                "Exact length of file reference must be 4 bytes",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())),
         ImmutableList.of(),

@@ -547,11 +547,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .orElse(ImmutableList.of());
   }
 
-  @Override
-  public List<Node> visitSortTableStatement(SortTableStatementContext ctx) {
-    return addTreeNode(ctx, locality -> new SortTableNode(locality));
-  }
-
   private String retrieveValueToken(ValueIsTokenContext ctx) {
     return ctx.valueToken().getText().toUpperCase()
         + Optional.ofNullable(ctx.isAreToken())

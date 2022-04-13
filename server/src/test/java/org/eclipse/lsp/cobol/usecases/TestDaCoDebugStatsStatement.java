@@ -21,8 +21,8 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/** Tests the DAF DEBUG FIELD statement */
-class TestDAFDebugFieldStatement {
+/** Tests the DaCo DEBUG STATS statement */
+class TestDaCoDebugStatsStatement {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -34,24 +34,12 @@ class TestDAFDebugFieldStatement {
           + "             05 {$*DSAPRO-XL1}. \r\n"
           + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
           + "        PROCEDURE DIVISION. \r\n"
-          + "            DEBUG {$DSAPRO-XL1} LENGTH 2. \r\n"
-          + "            DEBUG {$DSAPRO-XL1} LENGTH {$DSAPRO-XL1}. \r\n"
-          + "            DEBUG {$DSAPRO-XL1} LENGTH {$DSAPRO-XL1} COLS 10. \r\n"
-          + "            DEBUG {$DSAPRO-XL1} LENGTH {$DSAPRO-XL1} COLS 10 TABLE 20. \r\n"
-          + "            DEBUG {$DSAPRO-XL1} LENGTH {$DSAPRO-XL1} COLS 10 TABLE 20 NO-POS. \r\n"
-          + "            DEBUG {$DSAPRO-XL1} LENGTH {$DSAPRO-XL1} COLS 10 TABLE 20 NO-POS \r\n"
-          + "            HEX. \r\n"
-          + "            DEBUG {$DSAPRO-XL1} LENGTH {$DSAPRO-XL1} COLS 10 TABLE 20 NO-POS \r\n"
-          + "            DISPLAY. \r\n"
-          + "            DEBUG {$DSAPRO-XL1} LENGTH {$DSAPRO-XL1} COLS 10 TABLE 20 NO-POS \r\n"
-          + "            BOTH. \r\n"
+          + "            DEBUG STATS. \r\n"
+          + "            DEBUG STATS 'SDFDF'. \r\n"
+          + "            DEBUG STATS {$DSAPRO-XL1}. \r\n"
           // Negative tests
-          + "            DEBUG {GBR4|1} LENGTH 2. \r\n"
-          + "            DEBUG {$DSAPRO-XL1} LENGTH {.|2} \r\n"
-          + "            DEBUG {$DSAPRO-XL1} LENGTH {GBR4|1}. \r\n"
-          + "            DEBUG {$DSAPRO-XL1} LENGTH {$DSAPRO-XL1} COLS {.|3} \r\n"
-          + "            DEBUG {$DSAPRO-XL1} LENGTH {$DSAPRO-XL1} COLS 10 TABLE {.|2} \r\n"
-          + "            DEBUG {$DSAPRO-XL1} LENGTH {$DSAPRO-XL1} COLS 10 TABLE {GBR4|1}. \r\n";
+          + "            DEBUG STATS {GBR4|1}. \r\n"
+          + "            DEBUG STATS {'ASDSDADDSDFSDFDSFDSFDSFFFSFSFSSFSDF'|2}. \r\n";
 
   @Test
   void test() {
@@ -69,16 +57,10 @@ class TestDAFDebugFieldStatement {
             "2",
             new Diagnostic(
                 null,
-                "Syntax error on '.' expected {'01-49', '66', '77', '88', INTEGERLITERAL, IDENTIFIER}",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
-            "3",
-            new Diagnostic(
-                null,
-                "Syntax error on '.' expected {ZERO, '01-49', '66', '77', '88', INTEGERLITERAL, NUMERICLITERAL}",
+                "Max length limit of 32 bytes allowed for text.",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())),
         ImmutableList.of(),
-        DialectConfigs.getIDMSAnalysisConfig());
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }
