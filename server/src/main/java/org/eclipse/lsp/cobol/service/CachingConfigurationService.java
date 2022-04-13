@@ -77,7 +77,7 @@ public class CachingConfigurationService implements ConfigurationService {
   @Override
   public List<String> getSubroutineDirectories() {
     try {
-      return AnalysisConfig.getSubroutineDirectories(config.get());
+      return config.get().getSubroutines();
     } catch (InterruptedException e) {
       LOG.error("Issue while resolving subroutine configuration", e);
       Thread.currentThread().interrupt();

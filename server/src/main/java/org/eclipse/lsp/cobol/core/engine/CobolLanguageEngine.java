@@ -76,7 +76,8 @@ public class CobolLanguageEngine {
       TextPreprocessor preprocessor,
       MessageService messageService,
       ParseTreeListener treeListener,
-      SubroutineService subroutineService, CachingConfigurationService cachingConfigurationService) {
+      SubroutineService subroutineService,
+      CachingConfigurationService cachingConfigurationService) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.treeListener = treeListener;

@@ -62,14 +62,4 @@ public class AnalysisConfig {
 
     return new AnalysisConfig(copybookConfig, entity.getFeatures(), entity.getDialects());
   }
-
-  /**
-   * Set the list of Subroutines directories for analysis
-   * @param entity the configuration from the settings file
-   * @return List of Subroutines
-   */
-  public static List<String> getSubroutineDirectories(
-      ConfigurationService.ConfigurationEntity entity) {
-    return entity.getSubroutines();
-  }
 }
