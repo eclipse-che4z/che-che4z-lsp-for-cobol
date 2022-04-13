@@ -113,11 +113,11 @@ public class UseCaseUtils {
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
     PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.getAnalysisConfig().getCopybookConfig().getPredefinedLabels())
-        .forEach(copybookService::store);
+        .forEach(copybookModel -> copybookService.store(copybookModel, useCase.fileName));
 
     useCase.getCopybooks().stream()
         .map(UseCaseUtils::toCopybookModel)
-        .forEach(copybookService::store);
+        .forEach(copybookModel -> copybookService.store(copybookModel, useCase.fileName));
 
     SubroutineService subroutines = injector.getInstance(SubroutineService.class);
     useCase.getSubroutines().forEach(name -> subroutines.store(name, "URI:" + name));
