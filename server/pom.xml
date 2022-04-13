@@ -38,7 +38,7 @@
         <junit-jupiter.version>5.6.0</junit-jupiter.version>
         <junit.platform.version>1.6.0</junit.platform.version>
         <logback.classic.version>1.2.3</logback.classic.version>
-        <lombok.version>1.18.10</lombok.version>
+        <lombok.version>1.18.22</lombok.version>
         <lsp4j.version>0.5.0</lsp4j.version>
         <maven.antlr4.plugin.version>4.7</maven.antlr4.plugin.version>
         <maven.assembly.plugin.version>3.2.0</maven.assembly.plugin.version>
@@ -287,7 +287,7 @@
                         </property>
                     </systemProperties>
                     <!--suppress UnresolvedMavenProperty -->
-                    <argLine>${argLine} -Xmx2048m -XX:MaxPermSize=1024m -Djava.awt.headless=true</argLine>
+                    <argLine>${argLine} -Xmx2048m -Djava.awt.headless=true</argLine>
                 </configuration>
             </plugin>
 
