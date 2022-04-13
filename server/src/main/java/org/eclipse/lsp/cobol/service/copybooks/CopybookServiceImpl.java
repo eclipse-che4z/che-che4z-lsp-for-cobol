@@ -249,7 +249,7 @@ public class CopybookServiceImpl implements CopybookService {
                           COPYBOOK_DOWNLOAD.label,
                           getUserInteractionType(event.getCopybookProcessingMode()),
                           document,
-                          copybook.getDisplayName(),
+                          copybook.getQualifiedName(),
                           copybook.getDialectType()))
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
