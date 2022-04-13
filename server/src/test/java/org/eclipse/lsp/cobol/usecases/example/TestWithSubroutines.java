@@ -16,34 +16,21 @@ package org.eclipse.lsp.cobol.usecases.example;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
 /** UseCase test example with subroutines */
 class TestWithSubroutines {
-  public static final String TEXT =
-      "       Identification Division.\n"
-          + "       Program-Id. 'P'.\n"
-          + "       Procedure Division.\n"
-          + "       {@*Mainline} Section.\n"
-          + "           call {%\"FIRST\"}."
-          + "           call {%\"SECOND\"|1}.";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null,
-                "SECOND: Subroutine not found",
-                DiagnosticSeverity.Information,
-                SourceInfoLevels.INFO.getText())),
-        ImmutableList.of("FIRST"));
+    final String text =
+        "       Identification Division.\n"
+            + "       Program-Id. 'P'.\n"
+            + "       Procedure Division.\n"
+            + "       {@*Mainline} Section.\n"
+            + "           call {%\"FIRST\"}."
+            + "           call {%\"SECOND\"}.";
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of("FIRST"));
   }
 }
