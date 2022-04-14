@@ -85,6 +85,7 @@
                     ".cpy",
                     ".copy"
                 ],
+                "filenamePatterns": ["**/*copybook*/**"],
                 "configuration": "./syntaxes/lang-config.json"
             }
         ],
