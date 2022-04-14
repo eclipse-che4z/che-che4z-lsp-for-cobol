@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.core.IdmsParser.IdmsIfConditionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.IdmsIfStatementContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.IdmsSectionsContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.IdmsStatementsContext;
+import org.eclipse.lsp.cobol.core.IdmsParser.CopyIdmsStatementContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.Idms_db_entity_nameContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.Idms_map_nameContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.Idms_map_name_definitionContext;
@@ -69,6 +70,12 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   public String getResultedText() {
     return textReplacement.getResultingText();
+  }
+
+  @Override
+  public List<Node> visitCopyIdmsStatement(CopyIdmsStatementContext ctx) {
+    textReplacement.addReplacementContext(ctx);
+    return visitChildren(ctx);
   }
 
   @Override
