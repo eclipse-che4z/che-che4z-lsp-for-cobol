@@ -67,7 +67,7 @@ class CobolLanguageEngineTest {
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
-            preprocessor, mockMessageService, treeListener, mock(SubroutineService.class));
+            preprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()
