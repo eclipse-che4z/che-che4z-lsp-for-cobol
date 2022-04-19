@@ -36,7 +36,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.CobolParserUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -169,6 +169,16 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitLinkageSection(LinkageSectionContext ctx) {
     analyzeCopybook(PREDEFINED, ctx, ctx, DialectType.COBOL);
+  }
+
+  @Override
+  public void exitProcedureDivision(ProcedureDivisionContext ctx) {
+    analyzeCopybook(PREDEFINED, ctx, ctx, DialectType.COBOL);
+  }
+
+  @Override
+  public void exitWorkingStorageSection(WorkingStorageSectionContext ctx) {
+    analyzeCopybook(SPECIALREGISTER, ctx, ctx, DialectType.COBOL);
   }
 
   @Override

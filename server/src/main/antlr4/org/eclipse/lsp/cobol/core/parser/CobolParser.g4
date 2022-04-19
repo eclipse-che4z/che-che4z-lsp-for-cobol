@@ -890,11 +890,11 @@ paragraph
    ;
 
 sentence
-   : statementPrefix? ((dafStatements | statement)* (endClause | dialectStatement))
+   : statementPrefix? (statement* (endClause | dialectStatement))
    ;
 
 conditionalStatementCall
-   : statementPrefix? ((dafStatements | statement) SEMICOLON_FS? | dialectStatement)
+   : statementPrefix? (statement SEMICOLON_FS? | dialectStatement)
    ;
 
 statement
@@ -917,353 +917,8 @@ dacoControlSection
     : DACO_CONTROL SECTION
     ;
 
-dafStatements
-    : readTransactionStatement | writeTransactionStatement | writeReportStatement
-    | openPacketStatement | getMetaInfoStatement | messageHandlingStatement
-    | tableRowRetrievalStatement | tableRowUpdateStatement | tableDMLStatement
-    | fileDMLStatement | stringDMLStatement | debugStatement | execStatement
-    ;
-
 statementPrefix
     : (D_B | D_C)
-    ;
-
-readTransactionStatement
-    : READ TRANSACTION daf_task_name?
-    ;
-
-writeTransactionStatement
-    : WRITE TRANSACTION daf_task_name
-        (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 4, 2048);} integerLiteral))?
-        (TO ({validateLength(_input.LT(1).getText(), "dbu", 19);} (cobolWord | integerLiteral)))?
-    ;
-
-writeReportStatement
-    : writeReportStatementWithName | endWriteReportStatement | autoWriteReportStatement
-    ;
-
-writeReportStatementWithName
-    : WRITE REPORT daf_report_name
-        FROM qualifiedDataName
-        (TO qualifiedDataName)?
-        (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 80, 200);} integerLiteral))?
-        (AFTER ((integerLiteral LINES) | PAGE | qualifiedDataName))?
-    ;
-
-endWriteReportStatement
-    : WRITE REPORT daf_report_name ENDRPT
-    ;
-
-autoWriteReportStatement
-    : WRITE REPORT AUTO qualifiedDataName
-        (END qualifiedDataName)?
-    ;
-
-openPacketStatement
-    : OPEN PACKET daf_task_name
-           (FOR (qualifiedDataName | {validateExactLength(trimQuotes(_input.LT(1).getText()), "receiver packet", 3);}
-           NONNUMERICLITERAL))
-           (SORT qualifiedDataName)?
-           (VERSION (qualifiedDataName | integerLiteral))?
-    ;
-
-getMetaInfoStatement
-    : GET (getEntityStatement | getUserStatement | getItemStatements
-         | getTaskStatement | getOdetteOrJobOrNetworkStatement)
-    ;
-
-getEntityStatement
-    : ENTITY (getEntityNameAndDescriptionStatement | getEntityDescriptionForDomainStatement)
-    ;
-
-getEntityNameAndDescriptionStatement
-    :  (qualifiedDataName |  {validateStringLengthRange(trimQuotes(_input.LT(1).getText()), 3, 4);}
-            NONNUMERICLITERAL)
-            (qualifiedDataName | {validateStringLengthRange(trimQuotes(_input.LT(1).getText()), 3, 16);}
-            NONNUMERICLITERAL)
-            ( ( daf_entity_role |
-                {validateAllowedValues(trimQuotes(_input.LT(1).getText()),
-                  "OWNER","OWN","DESIGNER","AVG","ANALIST","ANA");} NONNUMERICLITERAL
-              )
-            | ( DESCRIPTION
-                ( qualifiedDataName |
-                  {validateExactLength(trimQuotes(_input.LT(1).getText()), "tal", 2);} NONNUMERICLITERAL)
-              )
-            )
-    ;
-
-getEntityDescriptionForDomainStatement
-    : (DOM | {validateAllowedValues(trimQuotes(_input.LT(1).getText()), "DOM");} NONNUMERICLITERAL)
-      qualifiedDataName DESCRIPTION
-    ;
-
-
-getUserStatement
-    : USER (NEXT | getUserOptions)
-    ;
-
-getUserOptions
-    : (qualifiedDataName |  {validateExactLength(trimQuotes(_input.LT(1).getText()),"kls", 3);}
-                 NONNUMERICLITERAL)
-                (qualifiedDataName | NONNUMERICLITERAL)
-    ;
-
-getItemStatements
-    : ITEM (getItemAnyStatement | getItemSeqStatement | getItemGrsStatement)
-    ;
-
-getItemAnyStatement
-    : ANY (qualifiedDataName | NONNUMERICLITERAL)
-                   (qualifiedDataName | NONNUMERICLITERAL)
-                   (qualifiedDataName | NONNUMERICLITERAL)
-    ;
-
-getItemSeqStatement
-    : SEQ (qualifiedDataName | NONNUMERICLITERAL)
-                   (qualifiedDataName | NONNUMERICLITERAL)?
-    ;
-
-getItemGrsStatement
-    : GRS (qualifiedDataName | NONNUMERICLITERAL)
-                   (qualifiedDataName | NONNUMERICLITERAL)
-                   (qualifiedDataName | NONNUMERICLITERAL)?
-    ;
-
-getTaskStatement
-    : TASK (qualifiedDataName | {validateExactLength(trimQuotes(_input.LT(1).getText()), "task name", 4);}
-                NONNUMERICLITERAL)
-    ;
-
-getOdetteOrJobOrNetworkStatement
-    : (ODETTE | JOB | NETWORK) (qualifiedDataName | NONNUMERICLITERAL)
-    ;
-
-messageHandlingStatement
-    : showDMLMessageStatement | returnStatusStatement
-    ;
-
-showDMLMessageStatement
-    : SHOW (showMessageStatement | showResultStatement | showErrorMessageStatement)
-    ;
-
-showMessageStatement
-    : STD? daf_message_types
-     ({validateExactLength(_input.LT(1).getText(), "message code", 3);} integerLiteral)
-     (qualifiedDataName | NONNUMERICLITERAL)?
-     (qualifiedDataName | NONNUMERICLITERAL)?
-     (qualifiedDataName | NONNUMERICLITERAL)?
-    ;
-
-returnStatusStatement
-    : RETURN daf_message_types
-      ({validateExactLength(_input.LT(1).getText(), "message code", 3);} integerLiteral)
-      (qualifiedDataName | NONNUMERICLITERAL)?
-    ;
-
-showResultStatement
-    : RESULT daf_task_name
-    ;
-
-showErrorMessageStatement
-    : MESSAGE (({validateExactLength(trimQuotes(_input.LT(1).getText()), "language code", 2);} NONNUMERICLITERAL)
-      | (qualifiedDataName | NONNUMERICLITERAL))?
-    ;
-
-tableRowRetrievalStatement
-    : ROW (rowStartStatement | rowSaveStatement | rowRestoreStatement
-      | rowGetStatement | rowNextStatement | rowPriorStatement
-      | rowAnyStatement | rowMatchStatement | rowBufferStatement)
-    ;
-
-rowBufferStatement
-    : BUFFER daf_table_name IS YES
-    ;
-
-rowStartStatement
-    : START daf_table_name
-    ;
-
-rowSaveStatement
-    : SAVE daf_table_name
-      IN (qualifiedDataName | literal)
-    ;
-
-rowRestoreStatement
-    : RESTORE daf_table_name
-      FROM (qualifiedDataName | literal)
-    ;
-
-rowGetStatement
-    : GET daf_table_name
-      (ON (qualifiedDataName | literal))?
-      (TO qualifiedDataName)?
-    ;
-
-rowNextStatement
-    : NEXT daf_table_name
-      (TO qualifiedDataName)?
-    ;
-
-rowPriorStatement
-    : PRIOR daf_table_name
-      (TO qualifiedDataName)?
-    ;
-
-rowAnyStatement
-    : ANY daf_table_name
-      USING qualifiedDataName
-    ;
-
-rowMatchStatement
-    : MATCH daf_table_name
-      USING qualifiedDataName
-    ;
-
-tableRowUpdateStatement
-    : ROW (rowDeleteStatement | rowAddStatement | rowInsertStatement |
-      rowModifyStatement | rowSortStatement | rowSingleStatement |
-      rowDuplicateStatement | rowInvertStatement)
-    ;
-
-rowDeleteStatement
-    : DELETE daf_table_name
-    ;
-
-rowAddStatement
-    : ADD daf_table_name
-      WITH qualifiedDataName
-    ;
-
-rowInsertStatement
-    : INSERT daf_table_name
-      WITH qualifiedDataName
-    ;
-
-rowModifyStatement
-    : MODIFY daf_table_name
-      ON (qualifiedDataName | literal)
-      WITH qualifiedDataName
-    ;
-
-rowSortStatement
-    : SORT daf_table_name (ASC | DES)
-      ON qualifiedDataName
-    ;
-
-rowSingleStatement
-    : SINGLE daf_table_name
-      ON qualifiedDataName
-    ;
-
-rowDuplicateStatement
-    : DUPLICATE daf_table_name
-      ON qualifiedDataName
-    ;
-
-rowInvertStatement
-    : INVERT daf_table_name
-    ;
-
-tableDMLStatement
-    : getTableStatement | sortTableStatement
-    ;
-
-getTableStatement
-    : GET TABLE (ANY | SEQ)
-      {validateExactLength(_input.LT(1).getText(), "table reference", 4);} cobolWord
-    ;
-
-sortTableStatement
-    : SORT TABLE qualifiedDataName TO qualifiedDataName
-      LENGTH (qualifiedDataName | integerLiteral)
-      (ASCENDING | DESCENDING)
-    ;
-
-fileDMLStatement
-    : openFileStatement | readFileStatement | writeFileStatement
-     | closeFileStatement | getFileStatement
-    ;
-
-openFileStatement
-    : OPEN FILE daf_file_identifier (MAX LENGTH (qualifiedDataName | integerLiteral | LAYOUT))?
-    ;
-
-readFileStatement
-    : READ FILE daf_file_identifier (MAX LENGTH (qualifiedDataName | integerLiteral | LAYOUT))?
-    ;
-
-writeFileStatement
-    : WRITE FILE daf_file_identifier (LENGTH (qualifiedDataName | integerLiteral))?
-    ;
-
-closeFileStatement
-    : CLOSE FILE (INPUT | OUTPUT) (daf_file_identifier | ALL)
-    ;
-
-getFileStatement
-    : GET FILE (qualifiedDataName | NONNUMERICLITERAL) INTO qualifiedDataName
-      (VOLSER INTO qualifiedDataName)?
-    ;
-
-stringDMLStatement
-    : STRING (stringFindStatement | stringGetStatement | stringNextStatement
-    | stringMatchStatement | stringCheckStatement | stringUpdateStatement
-    | stringReplaceStatement | stringDeleteStatement)
-    ;
-
-stringFindStatement
-    : FIND qualifiedDataName daf_string_identifier
-    ;
-
-stringGetStatement
-    : GET qualifiedDataName
-    ;
-
-stringNextStatement
-    : NEXT qualifiedDataName (DELIMITER qualifiedDataName)?
-    ;
-
-stringMatchStatement
-    : MATCH daf_string_identifier daf_string_identifier
-      (qualifiedDataName | ({validateIntegerRange(_input.LT(1).getText(), 0, 255);} numericLiteral))?
-    ;
-
-stringCheckStatement
-    : CHECK daf_string_command
-      (qualifiedDataName | ({validateLength(_input.LT(1).getText(), "email", 55);} literal))
-    ;
-
-stringUpdateStatement
-    : (ADD | INSERT | FILL) qualifiedDataName daf_string_identifier
-      LENGTH (qualifiedDataName | integerLiteral)
-    ;
-
-stringReplaceStatement
-    : REPLACE ALL? qualifiedDataName daf_string_identifier
-      BY daf_string_identifier
-    ;
-
-stringDeleteStatement
-    : DELETE ALL? qualifiedDataName daf_string_identifier
-    ;
-
-debugStatement
-    : debugStatsStatement | debugFieldStatement
-    ;
-
-debugStatsStatement
-    : DEBUG STATS (qualifiedDataName | ({validateLength(_input.LT(1).getText(), "text", 32);} literal))?
-    ;
-
-debugFieldStatement
-    : DEBUG qualifiedDataName LENGTH (qualifiedDataName | integerLiteral)
-      (COLS ({validateIntegerRange(_input.LT(1).getText(), 0, 132);} numericLiteral))?
-      (TABLE (qualifiedDataName | integerLiteral))?
-      NO_POS? (HEX | DISPLAY | BOTH)?
-    ;
-
-execStatement
-    : EXEC literal (USING qualifiedDataName)?
     ;
 
 // End of DaCo Statements
@@ -2473,47 +2128,6 @@ relationalOperator
    | NOTEQUALCHAR | GREATER THAN? OR EQUAL TO? | MORETHANOREQUAL | LESS THAN? OR EQUAL TO? | LESSTHANOREQUAL)
    ;
 
-// DAF DaCo Identifiers
-
-daf_task_name
-    :{validateExactLength(_input.LT(1).getText(), "task name", 4);
-      validateAlphaNumericPattern(_input.LT(1).getText(), "task name");
-     }
-        (cobolWord | integerLiteral)
-    ;
-
-daf_report_name
-    :{validateExactLength(_input.LT(1).getText(), "report name", 5);
-      validateAlphaNumericPattern(_input.LT(1).getText(), "report name");
-      validateStartsWith(_input.LT(1).getText(), "R", "T");
-      }
-        (cobolWord)
-    ;
-
-daf_entity_role
-    : (OWNER | DESIGNER | ANALIST | OWN | AVG | ANA)
-    ;
-
-daf_message_types
-    : ERROR | INFO | WARNING
-    ;
-
-daf_table_name
-    : { validateStartsWith(_input.LT(1).getText(), "TBL", "TBF"); } qualifiedDataName
-    ;
-
-daf_string_command
-    : EMA
-    ;
-
-daf_string_identifier
-    : qualifiedDataName | literal | SPACE
-    ;
-
-daf_file_identifier
-    : {validateExactLength(_input.LT(1).getText(), "file reference", 4);} integerLiteral
-    ;
-
 // identifier ----------------------------------
 
 generalIdentifier
@@ -2552,14 +2166,7 @@ tableCall
 
 specialRegister
    : ADDRESS OF generalIdentifier
-   | DATE | DAY | DAY_OF_WEEK | DEBUG_CONTENTS | DEBUG_ITEM | DEBUG_LINE | DEBUG_NAME | DEBUG_SUB_1 | DEBUG_SUB_2 | DEBUG_SUB_3
-   | JNIENVPTR
-   | LENGTH OF? generalIdentifier | LINAGE_COUNTER | LINE_COUNTER
-   | PAGE_COUNTER
-   | RETURN_CODE
-   | SHIFT_IN | SHIFT_OUT | SORT_CONTROL | SORT_CORE_SIZE | SORT_FILE_SIZE | SORT_MESSAGE | SORT_MODE_SIZE | SORT_RETURN
-   | TALLY | TIME
-   | WHEN_COMPILED
+   | LENGTH OF? generalIdentifier | LINAGE_COUNTER
    ;
 
 // in ----------------------------------
@@ -2735,8 +2342,8 @@ cobolWord
    ;
 
 cobolKeywords
-   : ADDRESS | BOTTOM | COUNT | CR | FIRST | MMDDYYYY | PRINTER
-   | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | TOP | YEAR | YYYYDDD | YYYYMMDD
+   : ADDRESS | BOTTOM | COUNT | CR | FIELD | FIRST | MMDDYYYY | PRINTER | DAY | TIME | DATE | DAY_OF_WEEK
+   | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | TOP | YEAR | YYYYDDD | YYYYMMDD | WHEN_COMPILED
    ;
 
 cobolCompilerDirectivesKeywords

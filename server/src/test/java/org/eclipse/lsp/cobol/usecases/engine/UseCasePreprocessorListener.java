@@ -33,7 +33,6 @@ import org.eclipse.usecase.UseCasePreprocessorBaseListener;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
@@ -48,19 +47,6 @@ import static org.eclipse.usecase.UseCasePreprocessorParser.*;
  * UseCasePreprocessor.g4
  */
 class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
-  private static final List<String> PREDEFINED_VARIABLES =
-      ImmutableList.of(
-          "XML-CODE",
-          "XML-EVENT",
-          "XML-NAMESPACE",
-          "XML-NNAMESPACE",
-          "XML-NAMESPACE-PREFIX",
-          "XML-NNAMESPACE-PREFIX",
-          "XML-NTEXT",
-          "XML-TEXT",
-          "JNIENVPTR",
-          "JSON-CODE",
-          "JSON-STATUS");
   private final Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
   private final Map<String, List<Location>> variableDefinitions = new HashMap<>();
   private final Map<String, List<Location>> variableUsages = new HashMap<>();
@@ -121,7 +107,6 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
         paragraphUsages,
         sectionDefinitions,
         sectionUsages,
-        getConstantDefinitions(),
         constantUsages,
         copybookDefinitions,
         copybookUsages,
@@ -284,7 +269,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                     it.identifier().getText(),
                     ctx,
                     it.replacement(),
-                    constantUsages,
+                    variableUsages,
                     ctx.diagnostic()));
   }
 
@@ -347,11 +332,6 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     if (node.getSymbol().getType() != EOF) {
       write(node.getText());
     }
-  }
-
-  private Map<String, List<Location>> getConstantDefinitions() {
-    List<Location> defaultLocation = ImmutableList.of(new Location());
-    return PREDEFINED_VARIABLES.stream().collect(Collectors.toMap(it -> it, it -> defaultLocation));
   }
 
   @NonNull

@@ -31,8 +31,8 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.ROOT;
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.IMPLICIT_PATH;
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.IMPLICIT_PATH;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
  * The class represents the root. All trees must start with one root node. This class also creates

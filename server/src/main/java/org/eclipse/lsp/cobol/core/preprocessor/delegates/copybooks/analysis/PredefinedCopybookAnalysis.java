@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
+import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
@@ -22,27 +23,37 @@ import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.service.CopybookService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.function.Consumer;
 
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.Copybook.DFHEIBLC;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.Copybook.PLABEL;
 
 /**
- * This implementation of the {@link AbstractCopybookAnalysis} resolves only the DFHEIBLC copybook
- * under the LINKAGE SECTION.
+ * This implementation of the {@link AbstractCopybookAnalysis} resolves the DFHEIBLC and SPECIALREGISTERS copybook
+ * under the LINKAGE and WORKING_STORAGE SECTION respectively.
  */
 class PredefinedCopybookAnalysis extends AbstractCopybookAnalysis {
+  @Getter
+  private String predefinedCopybookName;
+
   PredefinedCopybookAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
-      MessageService messageService) {
+      MessageService messageService,
+      String copybookName) {
+
     super(preprocessor, copybookService, messageService, MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
+    predefinedCopybookName = copybookName;
   }
 
   @Override
-  protected CopybookName retrieveCopybookName(ParserRuleContext ctx, String dialect, CopybookHierarchy hierarchy) {
-    return new CopybookName(DFHEIBLC.name(), dialect);
+  protected CopybookName retrieveCopybookName(
+      ParserRuleContext ctx, String dialect, CopybookHierarchy hierarchy) {
+    if ("PROCEDUREDIVISION.".equalsIgnoreCase(ctx.getText())) {
+      return new CopybookName(PLABEL.name(), dialect);
+    }
+    return new CopybookName(getPredefinedCopybookName(), dialect);
   }
 
   @Override

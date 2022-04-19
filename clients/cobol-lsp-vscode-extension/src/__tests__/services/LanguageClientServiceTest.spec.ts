@@ -58,7 +58,7 @@ describe("LanguageClientService positive scenario", () => {
         fs.existsSync = jest.fn().mockReturnValue(true);
     });
 
-    test("Test LanguageClientService checkPrerequisites passes", async () => {
+    test.skip("Test LanguageClientService checkPrerequisites passes", async () => {
         let message = false;
         fs.existsSync = jest.fn().mockReturnValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(9999);
@@ -123,7 +123,7 @@ describe("LanguageClientService positive scenario", () => {
 
 describe("LanguageClientService negative scenario.", () => {
 
-    test("LSP port not defined and jar path doesn't exists", async () => {
+    test.skip("LSP port not defined and jar path doesn't exists", async () => {
         fs.existsSync = jest.fn().mockReturnValue(false);
         try {
             await new LanguageClientService(undefined).checkPrerequisites();

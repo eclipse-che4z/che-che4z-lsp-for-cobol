@@ -39,7 +39,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
  * This class is a facade that maps the result of the syntax and semantic analysis to a model

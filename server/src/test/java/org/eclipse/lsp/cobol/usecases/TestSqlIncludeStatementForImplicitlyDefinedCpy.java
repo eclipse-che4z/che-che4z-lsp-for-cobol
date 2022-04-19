@@ -18,8 +18,8 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
@@ -110,7 +110,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         ImmutableMap.of(),
         ImmutableList.of(),
         new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
+            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(),
             ImmutableList.of()));
   }
@@ -135,7 +135,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
                 SourceInfoLevels.ERROR.getText())),
         ImmutableList.of(),
         new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
+            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(),
             ImmutableList.of()));
   }

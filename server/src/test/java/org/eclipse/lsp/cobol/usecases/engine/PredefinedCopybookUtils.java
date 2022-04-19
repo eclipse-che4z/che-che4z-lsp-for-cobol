@@ -23,9 +23,12 @@ import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.CopybookServiceImpl;
-import org.eclipse.lsp.cobol.service.PredefinedCopybooks;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
+import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.service.SQLBackend;
+import org.eclipse.lsp.cobol.service.copybooks.providers.LabelsContentProvider;
 import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
 
 import java.io.IOException;
@@ -36,7 +39,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /** This util class allows retrieving and processing the predefined copybooks for syntax analysis */
 @Slf4j
@@ -61,12 +64,12 @@ class PredefinedCopybookUtils {
    * Load and clean up all the predefined copybooks
    *
    * @param sqlBackend backend for the copybooks
+   * @param predefinedLabels is a list of user predefined labels
    * @return list of models for predefined copybooks
    */
-  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks) {
+  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks, List<String> predefinedLabels) {
     return PredefinedCopybooks.getNames().stream()
-        .map(
-            name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), sqlBackend))
+        .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), sqlBackend, predefinedLabels))
         .collect(Collectors.toList());
   }
 
@@ -78,12 +81,17 @@ class PredefinedCopybookUtils {
         .orElse(DialectType.COBOL.name());
   }
 
-  private CopybookModel retrieveModel(CopybookName copybookName, SQLBackend sqlBackend) {
+  private CopybookModel retrieveModel(CopybookName copybookName, SQLBackend sqlBackend, List<String> predefinedLabels) {
     final String uri = retrievePredefinedUri(copybookName.getDisplayName(), sqlBackend);
+
+    PredefinedCopybooks.Copybook copybook = PredefinedCopybooks.forName(copybookName.getQualifiedName());
+
+    String content = copybook.getContentType()
+        .equals(PredefinedCopybooks.CopybookContentType.FILE) ? readContentForImplicitCopybook(uri) : generateContent(predefinedLabels);
 
     final PreprocessedDocument cleanCopybook =
         AnnotatedDocumentCleaning.prepareDocument(
-            readContentForImplicitCopybook(uri),
+            content,
             ImmutableList.of(),
             ImmutableList.of(),
             ImmutableMap.of(),
@@ -106,5 +114,10 @@ class PredefinedCopybookUtils {
       LOG.error("Implicit copybook is not loaded. ", e);
     }
     return content;
+  }
+
+  private String generateContent(List<String> predefinedLabels) {
+    LabelsContentProvider provider = new LabelsContentProvider();
+    return provider.read(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, predefinedLabels), "");
   }
 }

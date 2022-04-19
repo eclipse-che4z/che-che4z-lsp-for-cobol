@@ -27,7 +27,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.CopybookModif
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.CobolParserUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
-import org.eclipse.lsp.cobol.service.CopybookService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import static java.util.Optional.ofNullable;
 

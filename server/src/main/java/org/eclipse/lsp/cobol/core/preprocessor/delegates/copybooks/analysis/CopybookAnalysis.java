@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 /** This interface defines a common API for all the implementation of the copybook analysis logic */
 public interface CopybookAnalysis {

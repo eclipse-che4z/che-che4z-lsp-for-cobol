@@ -20,7 +20,10 @@ import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
-import org.eclipse.lsp.cobol.service.CopybookService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.Copybook.DFHEIBLC;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.Copybook.SPECIALREGISTERS;
+
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -54,7 +57,10 @@ public class CopybookAnalysisFactory {
         new PanvaletAnalysis(preprocessor, copybookService, messageService));
     analysisInstances.put(
         AnalysisTypes.PREDEFINED,
-        new PredefinedCopybookAnalysis(preprocessor, copybookService, messageService));
+        new PredefinedCopybookAnalysis(preprocessor, copybookService, messageService, DFHEIBLC.name()));
+    analysisInstances.put(
+        AnalysisTypes.SPECIALREGISTER,
+        new PredefinedCopybookAnalysis(preprocessor, copybookService, messageService, SPECIALREGISTERS.name()));
   }
 
   /**
@@ -73,6 +79,7 @@ public class CopybookAnalysisFactory {
     DIALECT,
     SKIPPING,
     PANVALET,
-    PREDEFINED
+    PREDEFINED,
+    SPECIALREGISTER
   }
 }
