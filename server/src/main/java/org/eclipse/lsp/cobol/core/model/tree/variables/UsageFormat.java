@@ -57,7 +57,7 @@ public enum UsageFormat {
   static {
     MAP =
         Arrays.stream(values())
-            .collect(toMap(it -> it.toString().replace("_", "-"), Function.identity()));
+            .collect(toMap(it -> it.toDisplayString(), Function.identity()));
   }
 
   /**
@@ -68,5 +68,14 @@ public enum UsageFormat {
    */
   public static UsageFormat of(String text) {
     return MAP.getOrDefault(text.toUpperCase(), UNDEFINED);
+  }
+
+  /**
+   * Return correct display representation of the format.
+   *
+   * @return the name to display
+   */
+  public String toDisplayString() {
+    return toString().replace("_", "-");
   }
 }

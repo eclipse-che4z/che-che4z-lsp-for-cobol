@@ -61,7 +61,7 @@ public class TableDataNameNode extends ElementaryNode {
     StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
     stringBuilder.append(String.format(" OCCURS %1$d TIMES", occursTimes));
     if (picClause != null) stringBuilder.append(" PIC ").append(picClause);
-    if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat);
+    if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat.toDisplayString());
     if (StringUtils.isNoneBlank(value)) stringBuilder.append(" VALUE ").append(value);
     return stringBuilder.append(".").toString();
   }
