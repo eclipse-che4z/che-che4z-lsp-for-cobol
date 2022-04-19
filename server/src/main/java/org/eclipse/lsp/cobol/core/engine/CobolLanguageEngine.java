@@ -26,15 +26,18 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
+import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.EmbeddedLanguagesListener;
@@ -69,6 +72,7 @@ public class CobolLanguageEngine {
   private final ParseTreeListener treeListener;
   private final SubroutineService subroutineService;
   private final CachingConfigurationService cachingConfigurationService;
+  private final DialectService dialectService;
   private static final int PROCESS_CALLS_THRESHOLD = 10;
 
   @Inject
@@ -77,13 +81,14 @@ public class CobolLanguageEngine {
       MessageService messageService,
       ParseTreeListener treeListener,
       SubroutineService subroutineService,
-      CachingConfigurationService cachingConfigurationService) {
+      CachingConfigurationService cachingConfigurationService,
+      DialectService dialectService) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.treeListener = treeListener;
     this.subroutineService = subroutineService;
     this.cachingConfigurationService = cachingConfigurationService;
-
+    this.dialectService = dialectService;
   }
 
   /**
@@ -106,8 +111,8 @@ public class CobolLanguageEngine {
     timingBuilder.getDialectsTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     String cleanText = preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
-    DialectOutcome dialectOutcome = DialectUtils
-        .process(documentUri, cleanText, analysisConfig.getDialects(), messageService)
+    DialectOutcome dialectOutcome = dialectService
+        .process(documentUri, cleanText, analysisConfig.getDialects(), messageService, analysisConfig.getCopybookConfig())
         .unwrap(accumulatedErrors::addAll);
     timingBuilder.getDialectsTimer().stop();
 
@@ -151,7 +156,7 @@ public class CobolLanguageEngine {
     timingBuilder.getVisitorTimer().start();
     CobolVisitor visitor =
         new CobolVisitor(
-            extendedDocument.getCopybooks(),
+            applyDialectCopybooks(extendedDocument.getCopybooks(), dialectOutcome),
             tokens,
             positionMapping,
             analysisConfig,
@@ -196,6 +201,16 @@ public class CobolLanguageEngine {
 
     return new ResultWithErrors<>(
         rootNode, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
+  }
+
+  private NamedSubContext applyDialectCopybooks(NamedSubContext copybooks, DialectOutcome dialectOutcome) {
+    dialectOutcome.getDialectNodes().stream()
+        .filter(n -> n.getNodeType().equals(NodeType.COPY))
+        .map(CopyNode.class::cast)
+        .forEach(n -> {
+          copybooks.define(n.getName(), n.getLocality().toLocation());
+        });
+    return copybooks;
   }
 
   private List<SyntaxError> processSyntaxTree(Node rootNode) {

@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
 import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.eclipse.lsp.cobol.core.IdmsParser;
 import org.eclipse.lsp.cobol.core.IdmsParser.CobolWordContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.DataNameContext;
@@ -35,9 +36,10 @@ import org.eclipse.lsp.cobol.core.IdmsParser.QualifiedDataNameContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.SchemaSectionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.VariableUsageNameContext;
 import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
+import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
@@ -45,7 +47,13 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.CopybookService;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,10 +68,14 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  */
 public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private static final String IF = "_IF_ ";
+  private final CopybookService copybookService;
+  private final CopybookConfig copybookConfig;
   private final String uri;
   private final TextReplacement textReplacement;
 
-  public IdmsVisitor(String uri, String text) {
+  public IdmsVisitor(CopybookService copybookService, CopybookConfig copybookConfig, String uri, String text) {
+    this.copybookService = copybookService;
+    this.copybookConfig = copybookConfig;
     this.uri = uri;
     textReplacement = new TextReplacement(text);
   }
@@ -74,8 +86,20 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitCopyIdmsStatement(CopyIdmsStatementContext ctx) {
+    ParseTree nameToken = ctx.copyIdmsOptions().copyIdmsSource();
+    CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken.getText().toUpperCase()), IdmsDialect.NAME);
+
+    CopybookModel copybookModel = copybookService.resolve(copybookName, uri, copybookConfig);
     textReplacement.addReplacementContext(ctx);
-    return visitChildren(ctx);
+    Range range = constructRange(ctx);
+    Locality locality = Locality.builder()
+        .uri(copybookModel.getUri())
+        .range(range)
+        .build();
+    CopyNode node = new CopyNode(locality, copybookName.getDisplayName());
+
+    visitChildren(ctx).forEach(node::addChild);
+    return ImmutableList.of(node);
   }
 
   @Override
@@ -194,7 +218,25 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private Locality constructLocality(ParserRuleContext ctx) {
     return Locality.builder()
         .uri(uri)
-        .range(DialectUtils.constructRange(ctx))
+        .range(constructRange(ctx))
         .build();
   }
+
+  /**
+   * Construct the range from ANTLR context
+   *
+   * @param ctx the ANTLR context
+   * @return the range
+   */
+  private Range constructRange(ParserRuleContext ctx) {
+    return new Range(
+        new Position(
+            ctx.start.getLine() - 1,
+            ctx.start.getCharPositionInLine()),
+        new Position(
+            ctx.stop.getLine() - 1,
+            ctx.stop.getCharPositionInLine() + ctx.stop.getStopIndex() - ctx.stop.getStartIndex() + 1)
+    );
+  }
+
 }
