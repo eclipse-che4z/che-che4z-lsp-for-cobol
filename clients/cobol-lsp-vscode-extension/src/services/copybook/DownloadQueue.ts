@@ -13,8 +13,11 @@
  */
 
 export class CopybookProfile {
-    constructor(readonly filename: string, readonly copybook: string, readonly dialectType: string,
-        readonly profile: string, readonly quiet: boolean) {}
+    private copybook: any;
+    constructor(readonly filename: string, copybook: string, readonly dialectType: string,
+        readonly profile: string, readonly quiet: boolean) {
+            this.copybook = copybook;
+        }
 
     public equals(other: CopybookProfile): boolean {
         return this.filename == other.filename &&
@@ -23,6 +26,15 @@ export class CopybookProfile {
          this.profile == other.profile && 
          this.quiet == other.quiet;
     }
+
+    public updateCopybook(copybook: string) {
+        this.copybook = copybook;
+    }
+
+    public getCopybook() {
+        return this.copybook;
+    }
+
 }
 
 export class DownloadQueue {

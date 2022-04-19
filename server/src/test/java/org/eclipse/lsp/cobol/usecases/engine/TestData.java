@@ -37,7 +37,6 @@ class TestData {
   Map<String, List<Location>> paragraphUsages;
   Map<String, List<Location>> sectionDefinitions;
   Map<String, List<Location>> sectionUsages;
-  Map<String, List<Location>> constantDefinitions;
   Map<String, List<Location>> constantUsages;
   Map<String, List<Location>> copybookDefinitions;
   Map<String, List<Location>> copybookUsages;

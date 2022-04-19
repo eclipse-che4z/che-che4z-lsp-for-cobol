@@ -27,6 +27,8 @@ import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.*;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
@@ -110,12 +112,12 @@ public class UseCaseUtils {
             });
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
-    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks())
-        .forEach(copybookService::store);
+    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.getAnalysisConfig().getCopybookConfig().getPredefinedLabels())
+        .forEach(copybookModel -> copybookService.store(copybookModel, useCase.fileName));
 
     useCase.getCopybooks().stream()
         .map(UseCaseUtils::toCopybookModel)
-        .forEach(copybookService::store);
+        .forEach(copybookModel -> copybookService.store(copybookModel, useCase.fileName));
 
     SubroutineService subroutines = injector.getInstance(SubroutineService.class);
     useCase.getSubroutines().forEach(name -> subroutines.store(name, "URI:" + name));

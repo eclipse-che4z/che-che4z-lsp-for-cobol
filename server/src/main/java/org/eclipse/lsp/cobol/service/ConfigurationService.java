@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 
 import java.util.List;
 
@@ -36,6 +37,12 @@ public interface ConfigurationService {
   AnalysisConfig getConfig(CopybookProcessingMode mode);
 
   /**
+   *Get a Subroutine configuration for the analysis using the settings file
+   * @return the list from the Subroutine directories defined in user settings
+   */
+  List<String> getSubroutineDirectories();
+
+  /**
    * A value class to store the configuration. Reflects the required values from the settings.json
    * file
    */
@@ -45,11 +52,15 @@ public interface ConfigurationService {
     SQLBackend sqlBackend;
     List<EmbeddedCodeNode.Language> features;
     List<String> dialects;
+    List<String> predefinedLabels;
+    List<String> subroutines;
 
     public ConfigurationEntity() {
       sqlBackend = SQLBackend.DB2_SERVER;
       features = ImmutableList.of();
       dialects = ImmutableList.of();
+      predefinedLabels = ImmutableList.of();
+      subroutines = ImmutableList.of();
     }
   }
 }

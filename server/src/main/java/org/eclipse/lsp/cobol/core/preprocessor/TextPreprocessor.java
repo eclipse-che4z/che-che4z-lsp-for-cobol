@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 /**
  * This interface describes the text preprocessor which prepares the given string for analysis by

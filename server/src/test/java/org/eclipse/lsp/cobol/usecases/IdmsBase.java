@@ -18,8 +18,8 @@ import com.google.common.collect.ImmutableList;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.SQLBackend;
 
 /** IDMS related getter */
@@ -27,7 +27,7 @@ import org.eclipse.lsp.cobol.service.SQLBackend;
 public class IdmsBase {
   AnalysisConfig getAnalysisConfig() {
     return new AnalysisConfig(
-        new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
+        new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
         ImmutableList.of(),
         ImmutableList.of(IdmsDialect.NAME));
   }

@@ -12,9 +12,12 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service;
+package org.eclipse.lsp.cobol.service.copybooks;
 
 import lombok.Value;
+import org.eclipse.lsp.cobol.service.SQLBackend;
+
+import java.util.List;
 
 /**
  * This dto class is used to hold config data for copybook like: copybook procassing mode, and which
@@ -24,4 +27,5 @@ import lombok.Value;
 public class CopybookConfig {
   CopybookProcessingMode copybookProcessingMode;
   SQLBackend sqlBackend;
+  List<String> predefinedLabels;
 }

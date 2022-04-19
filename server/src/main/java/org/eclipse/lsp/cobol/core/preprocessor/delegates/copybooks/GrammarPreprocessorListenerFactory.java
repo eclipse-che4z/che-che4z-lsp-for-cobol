@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 import lombok.NonNull;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 /** A factory for {@link GrammarPreprocessorListener} */
 public interface GrammarPreprocessorListenerFactory {

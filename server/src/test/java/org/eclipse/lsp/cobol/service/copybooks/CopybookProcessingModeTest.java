@@ -12,11 +12,11 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service;
+package org.eclipse.lsp.cobol.service.copybooks;
 
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.*;
+import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This test check getCopybookProcessingMode function of the {@link CopybookProcessingMode}. */

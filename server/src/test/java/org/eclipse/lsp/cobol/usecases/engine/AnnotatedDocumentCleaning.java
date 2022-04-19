@@ -20,9 +20,8 @@ import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.PredefinedCopybooks;
+import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -66,7 +65,8 @@ class AnnotatedDocumentCleaning {
     List<String> copybookNames =
         explicitCopybooks.stream()
             .map(CobolText::getCopybookName)
-            .map(CopybookName::getProcessingName)
+            .map(cbName -> String.format("%s#%s#%s",
+                    cbName.getQualifiedName(), cbName.getDialectType(), DOCUMENT_URI))
             .collect(toList());
     TestData testData =
         processDocument(

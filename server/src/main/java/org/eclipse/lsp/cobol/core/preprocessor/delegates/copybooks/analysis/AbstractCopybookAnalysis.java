@@ -28,9 +28,9 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorS
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
-import org.eclipse.lsp.cobol.service.CopybookService;
-import org.eclipse.lsp.cobol.service.PredefinedCopybooks;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -212,21 +212,24 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
   }
 
   protected ResultWithErrors<CopybookModel> getCopyBookContent(
-      CopybookMetaData metaData, CopybookHierarchy hierarchy) {
-    if (metaData.getCopybookName().getDisplayName().isEmpty())
-      return emptyModel(metaData.getCopybookName(), ImmutableList.of());
+      CopybookMetaData copybookMetaData, CopybookHierarchy hierarchy) {
+    if (copybookMetaData.getCopybookName().getDisplayName().isEmpty())
+      return emptyModel(copybookMetaData.getCopybookName(), ImmutableList.of());
 
-    if (hierarchy.hasRecursion(metaData.getCopybookName()))
+    if (hierarchy.hasRecursion(copybookMetaData.getCopybookName()))
       return emptyModel(
-          metaData.getCopybookName(), hierarchy.mapCopybooks(this::reportRecursiveCopybook));
+          copybookMetaData.getCopybookName(), hierarchy.mapCopybooks(this::reportRecursiveCopybook));
 
     CopybookModel copybook =
         copybookService.resolve(
-            metaData.getCopybookName(), metaData.getDocumentUri(), metaData.getConfig());
+            copybookMetaData.getCopybookName(),
+                hierarchy.getRootDocumentUri().orElse(copybookMetaData.getDocumentUri()),
+                copybookMetaData.getDocumentUri(),
+                copybookMetaData.getConfig());
 
     if (copybook.getContent() == null) {
       return emptyModel(
-          metaData.getCopybookName(), ImmutableList.of(reportMissingCopybooks(metaData)));
+          copybookMetaData.getCopybookName(), ImmutableList.of(reportMissingCopybooks(copybookMetaData)));
     }
 
     return new ResultWithErrors<>(copybook, ImmutableList.of());

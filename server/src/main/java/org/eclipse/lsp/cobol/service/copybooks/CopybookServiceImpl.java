@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service;
+package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
@@ -31,11 +31,11 @@ import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
+import org.eclipse.lsp.cobol.service.SettingsService;
+import org.eclipse.lsp.cobol.service.copybooks.providers.ContentProvider;
+import org.eclipse.lsp.cobol.service.copybooks.providers.ContentProviderFactory;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
 /**
@@ -57,6 +57,7 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 public class CopybookServiceImpl implements CopybookService {
   private final SettingsService settingsService;
   private final FileSystemService files;
+  private final ContentProviderFactory contentProviderFactory;
 
   private final Map<String, Set<CopybookName>> copybooksForDownloading =
       new ConcurrentHashMap<>(8, 0.9f, 1);
@@ -68,11 +69,13 @@ public class CopybookServiceImpl implements CopybookService {
       DataBusBroker dataBus,
       SettingsService settingsService,
       FileSystemService files,
+      ContentProviderFactory contentProviderFactory,
       @Named("CACHE-MAX-SIZE") int cacheSize,
       @Named("CACHE-DURATION") int duration,
       @Named("CACHE-TIME-UNIT") String timeUnitName) {
     this.settingsService = settingsService;
     this.files = files;
+    this.contentProviderFactory = contentProviderFactory;
     copybookCache =
         CacheBuilder.newBuilder()
             .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName))
@@ -98,6 +101,7 @@ public class CopybookServiceImpl implements CopybookService {
    * each other.
    *
    * @param copybookName - the name of the copybook to be retrieved
+   * @param programDocumentUri - the currently processing program document
    * @param documentUri - the currently processing document that contains the copy statement
    * @param copybookConfig - contains config info like: copybook processing mode, target backend sql
    *     server
@@ -105,12 +109,12 @@ public class CopybookServiceImpl implements CopybookService {
    */
   public CopybookModel resolve(
       @NonNull CopybookName copybookName,
+      @NonNull String programDocumentUri,
       @NonNull String documentUri,
       @NonNull CopybookConfig copybookConfig) {
     try {
-      return copybookCache.get(
-          copybookName.getProcessingName(),
-          () -> resolveSync(copybookName, documentUri, copybookConfig));
+      String cacheKay = makeCopybookCacheKay(copybookName, programDocumentUri);
+      return copybookCache.get(cacheKay, () -> resolveSync(copybookName, documentUri, copybookConfig));
     } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
       return new CopybookModel(copybookName, null, null);
@@ -118,8 +122,9 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   @Override
-  public void store(CopybookModel copybookModel) {
-    copybookCache.put(copybookModel.getCopybookName().getProcessingName(), copybookModel);
+  public void store(CopybookModel copybookModel, String documentUri) {
+    String cacheKay = makeCopybookCacheKay(copybookModel.getCopybookName(), documentUri);
+    copybookCache.put(cacheKay, copybookModel);
   }
 
   private CopybookModel resolveSync(
@@ -188,11 +193,11 @@ public class CopybookServiceImpl implements CopybookService {
         "Trying to resolve predefined copybook {}, using config {}", copybookName, copybookConfig);
     final Optional<CopybookModel> copybookModel =
         Optional.ofNullable(PredefinedCopybooks.forName(copybookName.getQualifiedName()))
-            .map(it -> it.uriForBackend(copybookConfig.getSqlBackend()))
-            .map(
-                uri ->
-                    new CopybookModel(
-                        copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri)));
+            .map(it -> {
+              String uri = it.uriForBackend(copybookConfig.getSqlBackend());
+              ContentProvider contentProvider = contentProviderFactory.getInstanceFor(it.getContentType());
+              return new CopybookModel(copybookName, PREF_IMPLICIT + uri, contentProvider.read(copybookConfig, uri));
+            });
     LOG.debug("Predefined copybook: {}", copybookModel);
     return copybookModel;
   }
@@ -212,18 +217,6 @@ public class CopybookServiceImpl implements CopybookService {
     return files.fileExists(file)
         ? new CopybookModel(copybookName, uri, files.getContentByPath(Objects.requireNonNull(file)))
         : registerForDownloading(copybookName, cobolFileName);
-  }
-
-  private String readContentForImplicitCopybook(String resourcePath) {
-    InputStream inputStream = CopybookServiceImpl.class.getResourceAsStream(resourcePath);
-    String content = null;
-    try {
-      content =
-          files.readFromInputStream(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      LOG.error("Implicit copybook is not loaded. ", e);
-    }
-    return content;
   }
 
   /**
@@ -256,7 +249,7 @@ public class CopybookServiceImpl implements CopybookService {
                           COPYBOOK_DOWNLOAD.label,
                           getUserInteractionType(event.getCopybookProcessingMode()),
                           document,
-                          copybook.getDisplayName(),
+                          copybook.getQualifiedName(),
                           copybook.getDialectType()))
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
@@ -273,5 +266,9 @@ public class CopybookServiceImpl implements CopybookService {
 
   private String getUserInteractionType(CopybookProcessingMode copybookProcessingMode) {
     return copybookProcessingMode.userInteraction ? VERBOSE.label : QUIET.label;
+  }
+
+  private static String makeCopybookCacheKay(CopybookName copybookName, String documentUri) {
+    return String.format("%s#%s#%s", copybookName.getQualifiedName(), copybookName.getDialectType(), documentUri);
   }
 }
