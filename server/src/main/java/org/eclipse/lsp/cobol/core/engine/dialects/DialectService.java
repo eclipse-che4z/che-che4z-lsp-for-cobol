@@ -15,30 +15,32 @@
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import lombok.experimental.UtilityClass;
-import org.antlr.v4.runtime.ParserRuleContext;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.CopybookService;
 
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /** Dialect utility class */
-@UtilityClass
-public class DialectUtils {
-  private static final Map<String, CobolDialect> DIALECTS_SUPPLIERS = ImmutableMap.of(
-      IdmsDialect.NAME, new IdmsDialect()
-  );
+@Singleton
+public class DialectService {
+  private static final CobolDialect EMPTY_DIALECT = () -> "COBOL";
 
-  private static final CobolDialect EMPTY_DIALECT = new CobolDialect() {};
+  private final Map<String, CobolDialect> dialectSuppliers;
+
+  @Inject
+  public DialectService(CopybookService copybookService) {
+    dialectSuppliers = new HashMap<>();
+
+    CobolDialect dialect = new IdmsDialect(copybookService);
+    dialectSuppliers.put(dialect.getName(), dialect);
+  }
 
   /**
    * Process the source file text with dialects
@@ -47,30 +49,32 @@ public class DialectUtils {
    * @param text the source text
    * @param dialects the list of enabled dialects
    * @param messageService error message service
+   * @param copybookConfig is a copybook config
    * @return dialects outcome
    */
   public ResultWithErrors<DialectOutcome> process(String uri, String text, List<String> dialects,
-                                                  MessageService messageService) {
+                                                  MessageService messageService, CopybookConfig copybookConfig) {
     return dialects.stream()
-        .map(DialectUtils::getDialectByName)
+        .map(this::getDialectByName)
         .reduce(
             ResultWithErrors.of(new DialectOutcome(text, ImmutableList.of())),
-            (previousResult, dialect) -> processDialect(previousResult, dialect, uri, messageService),
-            DialectUtils::mergeResults
+            (previousResult, dialect) -> processDialect(previousResult, dialect, uri, messageService, copybookConfig),
+            DialectService::mergeResults
         );
   }
 
-  private static CobolDialect getDialectByName(String dialectName) {
-    return DIALECTS_SUPPLIERS.getOrDefault(dialectName, EMPTY_DIALECT);
+  private CobolDialect getDialectByName(String dialectName) {
+    return dialectSuppliers.getOrDefault(dialectName, EMPTY_DIALECT);
   }
 
   private static ResultWithErrors<DialectOutcome> processDialect(ResultWithErrors<DialectOutcome> previousResult,
                                                                  CobolDialect dialect,
                                                                  String uri,
-                                                                 MessageService messageService) {
+                                                                 MessageService messageService,
+                                                                 CopybookConfig copybookConfig) {
     List<Node> nodes = new ArrayList<>(previousResult.getResult().getDialectNodes());
     List<SyntaxError> errors = new ArrayList<>(previousResult.getErrors());
-    DialectOutcome result = dialect.processText(uri, previousResult.getResult().getText(), messageService)
+    DialectOutcome result = dialect.processText(uri, previousResult.getResult().getText(), messageService, copybookConfig)
         .unwrap(errors::addAll);
     nodes.addAll(result.getDialectNodes());
     return new ResultWithErrors<>(new DialectOutcome(result.getText(), nodes), errors);
@@ -81,20 +85,4 @@ public class DialectUtils {
     throw new ConcurrentModificationException("The reduction must be done sequentially");
   }
 
-  /**
-   * Construct the range from ANTLR context
-   *
-   * @param ctx the ANTLR context
-   * @return the range
-   */
-  public Range constructRange(ParserRuleContext ctx) {
-    return new Range(
-        new Position(
-            ctx.start.getLine() - 1,
-            ctx.start.getCharPositionInLine()),
-        new Position(
-            ctx.stop.getLine() - 1,
-            ctx.stop.getCharPositionInLine() + ctx.stop.getStopIndex() - ctx.stop.getStartIndex() + 1)
-    );
-  }
 }
