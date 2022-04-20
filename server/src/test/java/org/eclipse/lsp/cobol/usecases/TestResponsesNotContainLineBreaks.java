@@ -53,12 +53,10 @@ class TestResponsesNotContainLineBreaks {
             "1",
             new Diagnostic(
                 null,
-                "Extraneous input '>' expected {ALL, DATE, DAY, DAY-OF-WEEK, DEBUG-CONTENTS, DEBUG-ITEM, "
-                    + "DEBUG-LINE, DEBUG-NAME, DEBUG-SUB-1, DEBUG-SUB-2, DEBUG-SUB-3, DFHRESP, DFHVALUE, FALSE, "
-                    + "FUNCTION, HIGH-VALUE, HIGH-VALUES, JNIENVPTR, LENGTH, LINAGE-COUNTER, LINE-COUNTER, "
-                    + "LOW-VALUE, LOW-VALUES, NOT, NULL, NULLS, PAGE-COUNTER, QUOTES, RETURN-CODE, SHIFT-IN, "
-                    + "SHIFT-OUT, SORT-CONTROL, SORT-CORE-SIZE, SORT-FILE-SIZE, SORT-MESSAGE, SORT-MODE-SIZE, "
-                    + "SORT-RETURN, SPACE, SPACES, TALLY, TIME, TRUE, WHEN-COMPILED, ZERO, ZEROES, ZEROS, "
+                "Extraneous input '>' expected {ALL, DFHRESP, DFHVALUE, FALSE, "
+                    + "FUNCTION, HIGH-VALUE, HIGH-VALUES, LENGTH, LINAGE-COUNTER, "
+                    + "LOW-VALUE, LOW-VALUES, NOT, NULL, NULLS, QUOTES, "
+                    + "SPACE, SPACES, TRUE, ZERO, ZEROES, ZEROS, "
                     + "'(', '-', '+', '01-49', '66', '77', '88', INTEGERLITERAL, NUMERICLITERAL, "
                     + "NONNUMERICLITERAL, IDENTIFIER, FINALCHARSTRING}",
                 DiagnosticSeverity.Error,

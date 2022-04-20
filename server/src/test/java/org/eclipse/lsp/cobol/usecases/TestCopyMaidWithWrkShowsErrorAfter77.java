@@ -31,13 +31,15 @@ class TestCopyMaidWithWrkShowsErrorAfter77 {
           + "       PROGRAM-ID.    TEST.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
+          + "       LINKAGE SECTION.\n"
           + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*F00-XWD} PIC X.\n"
           + "       77 {$*NOT-A-PARENT} PIC X.\n"
-          + "            {_05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.|1|2_}\n"
+          + "            {_05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.|2_}\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           DISPLAY {$BHTRGL-X}.";
+          + "           DISPLAY {$BHTRGL-XWD}.";
 
-  private static final String COPYBOOK_CONTENT = "1           09 {$*BHTRGL-X|2} PIC X.\n";
+  private static final String COPYBOOK_CONTENT = "1           09 {$*BHTRGL-X^BHTRGL-XWD|2} PIC X.\n";
 
   @Test
   void test() {
@@ -46,16 +48,10 @@ class TestCopyMaidWithWrkShowsErrorAfter77 {
         ImmutableList.of(
             new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", COPYBOOK_CONTENT)),
         ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null,
-                "Cannot retrieve suffix for WRK usage",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
             "2",
             new Diagnostic(
                 null,
-                "BHTRGL-X: Only 01, 66 and 77 level numbers are allowed at the highest level",
+                "BHTRGL-XWD: Only 01, 66 and 77 level numbers are allowed at the highest level",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

@@ -36,13 +36,4 @@ public class CopybookName {
     this.dialectType = dialectType;
     this.qualifiedName = displayName;
   }
-
-  /**
-   * Creates a processing copybook name using a name and a dialect type
-   *
-   * @return a processing copybook name
-   */
-  public String getProcessingName() {
-    return String.format("%s#%s", qualifiedName, dialectType);
-  }
 }

@@ -913,13 +913,7 @@ tableCall
 
 specialRegister
    : ADDRESS OF generalIdentifier
-   | DATE | DAY | DAY_OF_WEEK | DEBUG_CONTENTS | DEBUG_ITEM | DEBUG_LINE | DEBUG_NAME | DEBUG_SUB_1 | DEBUG_SUB_2 | DEBUG_SUB_3
-   | LENGTH OF? generalIdentifier | LINAGE_COUNTER | LINE_COUNTER
-   | PAGE_COUNTER
-   | RETURN_CODE
-   | SHIFT_IN | SHIFT_OUT | SORT_CONTROL | SORT_CORE_SIZE | SORT_FILE_SIZE | SORT_MESSAGE | SORT_MODE_SIZE | SORT_RETURN
-   | TALLY | TIME
-   | WHEN_COMPILED
+   | LENGTH OF? generalIdentifier | LINAGE_COUNTER
    ;
 
 // in ----------------------------------

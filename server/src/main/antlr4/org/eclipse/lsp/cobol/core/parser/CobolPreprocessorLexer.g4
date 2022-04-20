@@ -59,6 +59,7 @@ SOURCE: S O U R C E;
 SQL: S Q L;
 SUPPRESS: S U P P R E S S;
 VERSION : V E R S I O N;
+WORKING_STORAGE : W O R K I N G MINUSCHAR S T O R A G E;
 EJECT: E J E C T DOT_FS? -> channel(HIDDEN);
 SKIP1 : S K I P '1' DOT_FS? -> channel(HIDDEN);
 SKIP2 : S K I P '2' DOT_FS? -> channel(HIDDEN);

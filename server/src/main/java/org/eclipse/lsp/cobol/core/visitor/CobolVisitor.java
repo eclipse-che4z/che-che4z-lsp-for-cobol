@@ -49,6 +49,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorString
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.service.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -91,6 +92,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final List<Node> dialectNodes;
   private Map<String, FileControlEntryContext> fileControls = null;
   private final Map<String, SubroutineDefinition> subroutineDefinitionMap = new HashMap<>();
+  private final CachingConfigurationService cachingConfigurationService;
 
   public CobolVisitor(
       @NonNull NamedSubContext copybooks,
@@ -100,7 +102,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       Map<Token, EmbeddedCode> embeddedCodeParts,
       MessageService messageService,
       SubroutineService subroutineService,
-      List<Node> dialectNodes) {
+      List<Node> dialectNodes,
+      CachingConfigurationService cachingConfigurationService) {
     this.copybooks = copybooks;
     this.positions = positions;
     this.embeddedCodeParts = embeddedCodeParts;
@@ -109,6 +112,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     this.subroutineService = subroutineService;
     this.analysisConfig = analysisConfig;
     this.dialectNodes = dialectNodes;
+    this.cachingConfigurationService = cachingConfigurationService;
   }
 
   @Override
@@ -707,7 +711,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return getLocality(ctx.getStart())
         .map(
             locality -> {
-              if (!subroutineService.getUri(subroutineName).isPresent()) {
+              if (cachingConfigurationService.getSubroutineDirectories().size() > 0
+                  && !subroutineService.getUri(subroutineName).isPresent()) {
                 reportSubroutineNotDefined(subroutineName, locality);
               }
               subroutineDefinitionMap.putIfAbsent(
