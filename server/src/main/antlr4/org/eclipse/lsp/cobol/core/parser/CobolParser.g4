@@ -890,11 +890,11 @@ paragraph
    ;
 
 sentence
-   : statementPrefix? (statement* (endClause | dialectStatement))
+   : statement* (endClause | dialectStatement)
    ;
 
 conditionalStatementCall
-   : statementPrefix? (statement SEMICOLON_FS? | dialectStatement)
+   : statement SEMICOLON_FS? | dialectStatement
    ;
 
 statement
@@ -915,10 +915,6 @@ dialectStatement
 
 dacoControlSection
     : DACO_CONTROL SECTION
-    ;
-
-statementPrefix
-    : (D_B | D_C)
     ;
 
 // End of DaCo Statements

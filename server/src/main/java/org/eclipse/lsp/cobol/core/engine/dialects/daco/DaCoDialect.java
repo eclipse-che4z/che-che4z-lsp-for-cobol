@@ -53,9 +53,10 @@ public final class DaCoDialect implements CobolDialect {
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
-    DaCoVisitor visitor = new DaCoVisitor(uri, text);
+    DaCoVisitor visitor = new DaCoVisitor(uri, text, messageService);
     List<Node> nodes = visitor.visitStartRule(parser.startRule());
     List<SyntaxError> errors = new ArrayList<>(listener.getErrors());
+    errors.addAll(visitor.getErrors());
     return new ResultWithErrors<>(new DialectOutcome(visitor.getResultedText(), nodes), errors);
   }
 }

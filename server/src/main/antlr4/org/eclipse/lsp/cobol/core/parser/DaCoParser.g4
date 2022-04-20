@@ -16,14 +16,25 @@ parser grammar DaCoParser;
 options {tokenVocab = DaCoLexer;  superClass = MessageServiceParser;}
 
 startRule: .*? dacoRules* EOF;
-dacoRules: dacoStatements .*?;
+dacoRules: (dacoStatements | statementPrefix) .*?;
 
+statementPrefix
+    : (D_B | D_C)
+    ;
 dacoStatements
-    : readTransactionStatement | writeTransactionStatement
-    | writeReportStatement | openPacketStatement | getMetaInfoStatement
-    | messageHandlingStatement | tableRowRetrievalStatement | tableRowUpdateStatement
-    | tableDMLStatement | fileDMLStatement | stringDMLStatement
-    | debugStatement | execStatement DOT_FS?
+    : readTransactionStatement
+    | writeTransactionStatement
+    | writeReportStatement
+    | openPacketStatement
+    | getMetaInfoStatement
+    | messageHandlingStatement
+    | tableRowRetrievalStatement
+    | tableRowUpdateStatement
+    | tableDMLStatement
+    | fileDMLStatement
+    | stringDMLStatement
+    | debugStatement
+    | execStatement DOT_FS?
     ;
 
 readTransactionStatement
