@@ -56,7 +56,7 @@ writeReportStatementWithName
         FROM qualifiedDataName
         (TO qualifiedDataName)?
         (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 80, 200);} integerLiteral))?
-        (AFTER ((integerLiteral LINES) | PAGE | qualifiedDataName))?
+        (AFTER ((integerLiteral (LINE | LINES)) | PAGE | qualifiedDataName))?
     ;
 
 endWriteReportStatement
@@ -243,7 +243,7 @@ rowDeleteStatement
 
 rowAddStatement
     : ADD daco_table_name
-      WITH qualifiedDataName
+      (WITH qualifiedDataName)?
     ;
 
 rowInsertStatement
