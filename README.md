@@ -113,7 +113,7 @@ The COBOL Language Support extension supports copybooks used in your source code
 
 You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
 
-COBOL Language Support also supports copybooks for the IDMS and MAID dialects, called with the `COPY IDMS` and `COPY MAID` statements. For more information, see the [IDMS documentation](https://techdocs.broadcom.com/us/en/ca-mainframe-software/database-management/ca-idms/19-0.html).
+COBOL Language Support also supports copybooks for the IDMS dialect, called with the `COPY IDMS` statement. For more information, see the [IDMS documentation](https://techdocs.broadcom.com/us/en/ca-mainframe-software/database-management/ca-idms/19-0.html).
 
 Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
 
@@ -129,7 +129,6 @@ You can store your copybooks locally in folders in your workspace and specify th
 2. Switch from **User** to **Workspace**.
 3. Specify the paths of the folders containing copybooks:
    - Under **Cpy-manager: Paths-local** for standard IBM Enterprise COBOL.
-   - Under **Cpy-manager: Paths-local: Maid** for the MAID dialect.
    - Under **Cpy-manager: Paths-local: Idms** for the IDMS dialect.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**. 
    - The folders are searched in the order they are listed. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
