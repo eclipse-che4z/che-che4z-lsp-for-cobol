@@ -376,13 +376,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitStatementPrefix(StatementPrefixContext ctx) {
-    areaAWarning(ctx.getStart());
-    throwWarning(ctx.getStart());
-    return visitChildren(ctx);
-  }
-
-  @Override
   public List<Node> visitExecCicsStatement(ExecCicsStatementContext ctx) {
     areaBWarning(ctx);
     if (analysisConfig.getFeatures().contains(EmbeddedCodeNode.Language.CICS)) {

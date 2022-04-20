@@ -35,19 +35,27 @@ public class TextReplacement {
   public void addReplacementContext(ParserRuleContext ctx) {
     addReplacementContext(ctx, "");
   }
-
   /**
    * Add a context which will be replaced with spaces with specified prefix
    * @param ctx the ANTLR context
    * @param prefix the prefix to inserting before the context
    */
   public void addReplacementContext(ParserRuleContext ctx, String prefix) {
+    addReplacementContext(ctx, prefix, "\u200B");
+  }
+  /**
+   * Add a context which will be replaced with spaces with specified prefix
+   * @param ctx the ANTLR context
+   * @param prefix the prefix to inserting before the context
+   * @param replacement the replacement string
+   */
+  public void addReplacementContext(ParserRuleContext ctx, String prefix, String replacement) {
     resultingText
         .append(text, textIndexPointer, ctx.start.getStartIndex())
         .append(prefix)
         .append(text
             .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
-            .replaceAll("[^ \n]", "\u200B"));
+            .replaceAll("[^ \n]", replacement));
     textIndexPointer = ctx.stop.getStopIndex() + 1;
   }
 
