@@ -40,6 +40,7 @@ class TestDaCoTableRowAddStatement {
           + "        PROCEDURE DIVISION. \r\n"
           + "            ROW ADD {$TBLPRO-XL1} WITH {$DSAPRO-XL1}. \r\n"
           + "            ROW ADD {$TBFPRO-XL1} WITH {$DSAPRO-XL1}. \r\n"
+          + "            ROW ADD {$TBFPRO-XL1}. \r\n"
           // Negative tests
           + "            ROW ADD {$DSAPRO-XL1|1} WITH {$DSAPRO-XL1}. \r\n"
           + "            ROW ADD {GBR4|1|2} WITH {$DSAPRO-XL1}. \r\n"
