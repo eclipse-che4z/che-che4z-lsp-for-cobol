@@ -2097,8 +2097,8 @@ notOnExceptionClause
 // condition ----------------------------------
 
 condition
-   : NOT? (simpleCondition | nestedCondition)
-    ((AND | OR) NOT? (simpleCondition | nestedCondition | relationCombinedComparison))*
+   : NOT? (simpleCondition | nestedCondition | dialectNodeFiller+)
+    ((AND | OR) NOT? (simpleCondition | nestedCondition | relationCombinedComparison | dialectNodeFiller+))*
    ;
 
 simpleCondition

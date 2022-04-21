@@ -70,10 +70,9 @@ public class QualifiedReferenceNode extends Node {
         .map(ProgramNode.class::cast)
         .map(programNode -> programNode.getVariableDefinition(variableUsageNodes))
         .orElseGet(ImmutableList::of);
-    if (foundDefinitions.size() == 1) {
-      VariableNode definitionNode = foundDefinitions.get(0);
+    for (VariableNode definitionNode: foundDefinitions) {
       variableDefinitionNode = definitionNode;
-      for (VariableUsageNode usageNode: variableUsageNodes) {
+      for (VariableUsageNode usageNode : variableUsageNodes) {
         while (definitionNode != null && !usageNode.getName().equals(definitionNode.getName())) {
           definitionNode = definitionNode.getNearestParentByType(NodeType.VARIABLE)
               .map(VariableNode.class::cast)
@@ -86,8 +85,9 @@ public class QualifiedReferenceNode extends Node {
         }
         definitionNode.addUsage(usageNode);
       }
-      return ImmutableList.of();
     }
+    if (foundDefinitions.size() == 1)
+      return ImmutableList.of();
     String dataName = variableUsageNodes.get(0).getName();
     SyntaxError error = SyntaxError.syntaxError()
         .severity(ErrorSeverity.ERROR)
