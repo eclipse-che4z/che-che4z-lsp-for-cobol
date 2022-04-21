@@ -63,7 +63,7 @@ public class ElementaryItemNode extends ElementaryNode {
   protected String getVariableDisplayString() {
     StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
     if (picClause != null) stringBuilder.append(" PIC ").append(picClause);
-    if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat);
+    if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat.toDisplayString());
     if (StringUtils.isNoneBlank(value)) stringBuilder.append(" VALUE ").append(value);
     return stringBuilder.append(".").toString();
   }

@@ -41,8 +41,11 @@ class TestIdmsIfStatement {
   private static final String TST2 =
       DEFS + "           IF {$IX-EMP} EMPTY MOVE 'X' TO {$MT-FLAG}.\n";
 
+  private static final String TST3 =
+      DEFS + "           IF {$IX-EMP} EMPTY and {$MT-FLAG} empty MOVE 'X' TO {$MT-FLAG}.\n";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(TST1, TST2);
+    return Stream.of(TST1, TST2, TST3);
   }
 
   @ParameterizedTest

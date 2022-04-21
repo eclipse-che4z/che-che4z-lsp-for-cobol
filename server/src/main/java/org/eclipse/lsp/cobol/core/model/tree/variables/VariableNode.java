@@ -98,7 +98,7 @@ public abstract class VariableNode extends Node implements Context {
    */
   public void addUsage(VariableUsageNode usageNode) {
     usages.add(usageNode.getLocality().toLocation());
-    usageNode.setDefinition(this);
+    usageNode.addDefinition(this);
   }
 
   public List<Location> getDefinitions() {

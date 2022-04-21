@@ -45,7 +45,7 @@ class TestProgramContexts {
           + "       01 {$*VARNAME}  PIC X(20).\n"
           + "       01 {$*VARNAME}  PIC X(2).\n"
           + "       Procedure Division.\n"
-          + "           move 1 to {VARNAME|1}.\n"
+          + "           move 1 to {$VARNAME|1}.\n"
           + "       End program SECOND.";
 
   private static final String TEXT_NESTED_PROGRAMS =
