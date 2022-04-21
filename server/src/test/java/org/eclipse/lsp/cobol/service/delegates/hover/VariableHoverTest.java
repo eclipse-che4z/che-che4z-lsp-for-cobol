@@ -42,7 +42,8 @@ class VariableHoverTest {
       + "           10 {$*LEAF-2} PIC 9.\n"
       + "           88 {$*COND-ITEM1} VALUE 0.\n"
       + "           88 {$*COND-ITEM2} VALUES 1 THRU 3\n"
-      + "                                4 THROUGH 5.";
+      + "                                4 THROUGH 5.\n"
+      + "       01 {$*ANOTHER} PIC X(6) USAGE UTF-8.";
 
   @Test
   void getHoverForNullDocument() {
@@ -83,6 +84,15 @@ class VariableHoverTest {
     MarkedString markedString = hover.getContents().getLeft().get(0).getRight();
     assertEquals("cobol", markedString.getLanguage());
     assertEquals(result, markedString.getValue());
+  }
+
+  @Test
+  void getHoverWithUsage() {
+    Hover hover = variableHover.getHover(getModel(FULL_TEXT), getPosition(13, 16));
+    assertNotNull(hover);
+    MarkedString markedString = hover.getContents().getLeft().get(0).getRight();
+    assertEquals("cobol", markedString.getLanguage());
+    assertEquals("01 ANOTHER PIC X(6) USAGE UTF-8.", markedString.getValue());
   }
 
   private CobolDocumentModel getModel(String text) {
