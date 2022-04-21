@@ -8,7 +8,7 @@
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
-        "vscode": "^1.56.0"
+        "vscode": "^1.55.0"
     },
     "repository": {
         "type": "git",
@@ -467,7 +467,7 @@
     "devDependencies": {
         "@types/jest": "^26.0.0",
         "@types/node": "^12.6.2",
-        "@types/vscode": "^1.56.0",
+        "@types/vscode": "^1.55.0",
         "jest": "^27.0.0",
         "jest-sonar-reporter": "^2.0.0",
         "patch-package": "^6.4.7",
