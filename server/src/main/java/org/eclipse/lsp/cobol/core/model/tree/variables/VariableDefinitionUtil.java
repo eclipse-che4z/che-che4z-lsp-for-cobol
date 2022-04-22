@@ -109,7 +109,7 @@ public class VariableDefinitionUtil {
    */
   public List<SyntaxError> processNodeWithVariableDefinitions(Node node) {
     Deque<VariableDefinitionNode> variableDefinitionNodes =
-        node.getChildren().stream()
+        node.getDepthFirstStream()
             .filter(hasType(NodeType.VARIABLE_DEFINITION))
             .map(VariableDefinitionNode.class::cast)
             .collect(Collectors.toCollection(LinkedList::new));

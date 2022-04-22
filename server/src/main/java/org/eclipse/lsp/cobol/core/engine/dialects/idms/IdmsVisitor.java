@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
@@ -46,6 +45,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNode;
@@ -62,6 +62,7 @@ import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -106,18 +107,29 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitCopyIdmsStatement(CopyIdmsStatementContext ctx) {
-    ParseTree nameToken = ctx.copyIdmsOptions().copyIdmsSource();
-    CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken.getText().toUpperCase()), IdmsDialect.NAME);
+    IdmsParser.CopyIdmsOptionsContext optionsContext = ctx.copyIdmsOptions();
+    String nameToken = optionsContext.copyIdmsSource().getText().toUpperCase();
+    CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
 
     CopybookModel copybookModel = copybookService.resolve(copybookName, uri, copybookConfig);
     textReplacement.addReplacementContext(ctx);
-    Range range = constructRange(ctx);
+    Range range = new Range(
+        new Position(optionsContext.start.getLine() - 1, optionsContext.start.getCharPositionInLine()),
+        new Position(optionsContext.stop.getLine() - 1, optionsContext.start.getCharPositionInLine() + copybookName.getDisplayName().length())
+    );
+
     Locality locality = Locality.builder()
         .uri(uri)
         .range(range)
         .build();
     CopyNode node = new CopyNode(locality, copybookName.getDisplayName());
     visitChildren(ctx).forEach(node::addChild);
+
+    Location location = new Location();
+    location.setUri(copybookModel.getUri());
+    location.setRange(new Range(new Position(0, 0), new Position(0, 0)));
+
+    node.setDefinition(new CopyDefinition(location, copybookModel.getUri()));
 
     parseIdmsCopybook(copybookModel).forEach(node::addChild);
     return ImmutableList.of(node);
@@ -233,7 +245,7 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
     CobolParser.DataDescriptionEntriesContext tree = parser.dataDescriptionEntries();
 
-    IdmsCopybookVisitor visitor = new IdmsCopybookVisitor(tokens);
+    IdmsCopybookVisitor visitor = new IdmsCopybookVisitor(tokens, copybookModel.getUri());
     return visitor.visit(tree);
   }
 

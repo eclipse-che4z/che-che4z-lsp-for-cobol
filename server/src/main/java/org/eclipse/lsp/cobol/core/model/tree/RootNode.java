@@ -70,7 +70,8 @@ public class RootNode extends Node {
                     this, it.getLocality().getUri(), it.getLocality().getRange().getStart())
                 .orElse(this)
                 .addChild(it));
-    nodes.stream().map(CopyNode.class::cast).forEach(this::registerCopyUsage);
+
+    getDepthFirstStream().filter(hasType(NodeType.COPY)).map(CopyNode.class::cast).forEach(this::registerCopyUsage);
     return ImmutableList.of();
   }
 

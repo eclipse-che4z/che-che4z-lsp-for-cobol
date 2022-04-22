@@ -207,9 +207,7 @@ public class CobolLanguageEngine {
     dialectOutcome.getDialectNodes().stream()
         .filter(n -> n.getNodeType().equals(NodeType.COPY))
         .map(CopyNode.class::cast)
-        .forEach(n -> {
-          copybooks.define(n.getName(), n.getLocality().toLocation());
-        });
+        .forEach(n -> copybooks.define(n.getName(), n.getDefinition().getLocation()));
     return copybooks;
   }
 

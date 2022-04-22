@@ -49,6 +49,7 @@ import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
 @AllArgsConstructor
 public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
   private final CommonTokenStream tokenStream;
+  private final String uri;
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat1(CobolParser.DataDescriptionEntryFormat1Context ctx) {
@@ -152,10 +153,21 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
 
   private Locality retrieveRangeLocality(ParserRuleContext ctx) {
     Range range = new Range(
-        new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()),
-        new Position(ctx.stop.getLine(), ctx.stop.getCharPositionInLine()));
+        new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
+        new Position(ctx.stop.getLine() - 1, ctx.stop.getCharPositionInLine()));
 
     return Locality.builder()
+        .range(range)
+        .build();
+  }
+
+  private Locality retrieveNameRangeLocality(ParserRuleContext ctx, String name) {
+    Range range = new Range(
+        new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
+        new Position(ctx.stop.getLine() - 1, ctx.start.getCharPositionInLine() + name.length()));
+
+    return Locality.builder()
+        .uri(uri)
         .range(range)
         .build();
   }
@@ -178,8 +190,8 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
   }
 
   private VariableNameAndLocality extractNameAndLocality(CobolParser.CobolWordContext context) {
-    return new VariableNameAndLocality(
-        getName(context), retrieveRangeLocality(context));
+    String name = getName(context);
+    return new VariableNameAndLocality(name, retrieveNameRangeLocality(context, name));
   }
 
   private List<ValueClause> retrieveValues(List<CobolParser.DataValueClauseContext> clauses) {
