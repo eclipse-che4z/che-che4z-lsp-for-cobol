@@ -137,7 +137,7 @@ class CobolLanguageEngineTest {
 
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of());
 
-    when(dialectService.process(anyString(), anyString(), anyList(), any(), any()))
+    when(dialectService.process(anyString(), anyString(), anyList(), any()))
         .thenReturn(new ResultWithErrors<>(new DialectOutcome(TEXT, ImmutableList.of()), ImmutableList.of()));
     when(preprocessor.cleanUpCode(URI, TEXT))
         .thenReturn(new ResultWithErrors<>(TEXT, ImmutableList.of()));

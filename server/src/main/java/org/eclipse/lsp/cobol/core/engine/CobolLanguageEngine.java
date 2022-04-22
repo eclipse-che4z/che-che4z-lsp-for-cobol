@@ -112,7 +112,7 @@ public class CobolLanguageEngine {
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     String cleanText = preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
     DialectOutcome dialectOutcome = dialectService
-        .process(documentUri, cleanText, analysisConfig.getDialects(), messageService, analysisConfig.getCopybookConfig())
+        .process(documentUri, cleanText, analysisConfig.getDialects(), analysisConfig.getCopybookConfig())
         .unwrap(accumulatedErrors::addAll);
     timingBuilder.getDialectsTimer().stop();
 
