@@ -250,16 +250,6 @@ public class VisitorHelper {
         .map(constructNode(nodeConstructor, children))
         .orElse(children);
   }
-  /**
-   * Retrieve a locality from the given mapping
-   *
-   * @param positions map of localities
-   * @param childToken token to retrieve
-   * @return optional of locality
-   */
-  Optional<Locality> getLocality(Map<Token, Locality> positions, Token childToken) {
-    return ofNullable(positions.get(childToken));
-  }
 
   /**
    * Gets a value from DataOccursClauseContext context
