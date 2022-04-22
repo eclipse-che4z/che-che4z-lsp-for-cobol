@@ -23,6 +23,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.ValueInterval;
@@ -49,7 +50,7 @@ public class VisitorHelper {
    * @param terminalNode is a TerminalNode
    * @return a level of defined variable
    */
-  int getLevel(TerminalNode terminalNode) {
+  public int getLevel(TerminalNode terminalNode) {
     String levelNumber = terminalNode.getText();
     return Integer.parseInt(levelNumber);
   }
@@ -60,7 +61,7 @@ public class VisitorHelper {
    * @param context is a statement context object
    * @return a text of the statement
    */
-  String getName(EntryNameContext context) {
+  public String getName(EntryNameContext context) {
     return ofNullable(context)
         .map(EntryNameContext::dataName)
         .map(VisitorHelper::getName)
@@ -99,7 +100,7 @@ public class VisitorHelper {
    * @param clauses a list of ANTLR picture clauses
    * @return the list of picture texts
    */
-  List<String> retrievePicTexts(List<DataPictureClauseContext> clauses) {
+  public List<String> retrievePicTexts(List<DataPictureClauseContext> clauses) {
     return clauses.stream()
         .map(clause -> clause.getText().replaceAll(clause.getStart().getText(), "").trim())
         .collect(toList());
@@ -112,7 +113,7 @@ public class VisitorHelper {
    * @param contexts a list of ANTLR value intervals
    * @return the list of value intervals
    */
-  List<ValueInterval> retrieveValueIntervals(List<DataValueIntervalContext> contexts) {
+  public List<ValueInterval> retrieveValueIntervals(List<DataValueIntervalContext> contexts) {
     return contexts.stream()
         .map(
             context ->
@@ -137,7 +138,7 @@ public class VisitorHelper {
    * @param contexts a list of ANTLR usage clauses
    * @return the list of usage formats
    */
-  List<UsageFormat> retrieveUsageFormat(List<DataUsageClauseContext> contexts) {
+  public List<UsageFormat> retrieveUsageFormat(List<DataUsageClauseContext> contexts) {
     return contexts.stream()
         .map(DataUsageClauseContext::usageFormat)
         .filter(Objects::nonNull)
@@ -153,7 +154,7 @@ public class VisitorHelper {
    * @param context the IntegerLiteralContext, may be null
    * @return converted Integer or null if the context is empty
    */
-  Integer getInteger(IntegerLiteralContext context) {
+  public Integer getInteger(IntegerLiteralContext context) {
     return ofNullable(context)
         .map(ParserRuleContext::getText)
         .filter(it -> !it.isEmpty())
@@ -185,7 +186,7 @@ public class VisitorHelper {
    * @param positions map of exact positions
    * @return locality which has a range from the start to the end of the rule
    */
-  Optional<Locality> retrieveRangeLocality(
+   Optional<Locality> retrieveRangeLocality(
       ParserRuleContext context, Map<Token, Locality> positions) {
     return ofNullable(context)
         .flatMap(
@@ -259,4 +260,31 @@ public class VisitorHelper {
   Optional<Locality> getLocality(Map<Token, Locality> positions, Token childToken) {
     return ofNullable(positions.get(childToken));
   }
+
+  /**
+   * Gets a value from DataOccursClauseContext context
+   * @param ctx a context object
+   * @return extracted value
+   */
+  public Integer retrieveOccursToValue(CobolParser.DataOccursClauseContext ctx) {
+    return ofNullable(ctx.dataOccursTo())
+        .map(CobolParser.DataOccursToContext::integerLiteral)
+        .map(VisitorHelper::getInteger)
+        .orElse(null);
+  }
+
+  /**
+   * Gets value from ValueIsTokenContext context
+   * @param ctx a context object
+   * @return extracted value
+   */
+  public String retrieveValueToken(ValueIsTokenContext ctx) {
+    return ctx.valueToken().getText().toUpperCase()
+        + Optional.ofNullable(ctx.isAreToken())
+        .map(ParserRuleContext::getText)
+        .map(String::toUpperCase)
+        .map(" "::concat)
+        .orElse("");
+  }
+
 }

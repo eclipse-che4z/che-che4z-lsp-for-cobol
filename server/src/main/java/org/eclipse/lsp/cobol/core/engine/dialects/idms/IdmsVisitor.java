@@ -15,8 +15,13 @@
 package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
 import com.google.common.collect.ImmutableList;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.core.CobolLexer;
+import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.IdmsParser;
 import org.eclipse.lsp.cobol.core.IdmsParser.CobolWordContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.DataNameContext;
@@ -36,7 +41,9 @@ import org.eclipse.lsp.cobol.core.IdmsParser.QualifiedDataNameContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.SchemaSectionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.VariableUsageNameContext;
 import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
+import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
@@ -49,9 +56,12 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
+import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
+import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
+import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -69,12 +79,22 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
 public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private static final String IF = "_IF_ ";
   private final CopybookService copybookService;
+  private final ParseTreeListener treeListener;
+  private final MessageService messageService;
+  private final SubroutineService subroutineService;
   private final CopybookConfig copybookConfig;
   private final String uri;
   private final TextReplacement textReplacement;
 
-  public IdmsVisitor(CopybookService copybookService, CopybookConfig copybookConfig, String uri, String text) {
+  public IdmsVisitor(CopybookService copybookService,
+                     ParseTreeListener treeListener,
+                     MessageService messageService,
+                     SubroutineService subroutineService,
+                     CopybookConfig copybookConfig, String uri, String text) {
+    this.treeListener = treeListener;
     this.copybookService = copybookService;
+    this.messageService = messageService;
+    this.subroutineService = subroutineService;
     this.copybookConfig = copybookConfig;
     this.uri = uri;
     textReplacement = new TextReplacement(text);
@@ -93,12 +113,13 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     textReplacement.addReplacementContext(ctx);
     Range range = constructRange(ctx);
     Locality locality = Locality.builder()
-        .uri(copybookModel.getUri())
+        .uri(uri)
         .range(range)
         .build();
     CopyNode node = new CopyNode(locality, copybookName.getDisplayName());
-
     visitChildren(ctx).forEach(node::addChild);
+
+    parseIdmsCopybook(copybookModel).forEach(node::addChild);
     return ImmutableList.of(node);
   }
 
@@ -194,6 +215,31 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     result.addAll(aggregate);
     result.addAll(nextResult);
     return result;
+  }
+
+  private List<Node> parseIdmsCopybook(CopybookModel copybookModel) {
+    CobolLexer lexer = new CobolLexer(CharStreams.fromString(copybookModel.getContent()));
+    lexer.removeErrorListeners();
+
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    ParserListener listener = new ParserListener();
+    lexer.addErrorListener(listener);
+
+    CobolParser parser = getCobolParser(tokens);
+    parser.removeErrorListeners();
+    parser.addErrorListener(listener);
+    parser.setErrorHandler(new CobolErrorStrategy(messageService));
+    parser.addParseListener(treeListener);
+
+    CobolParser.DataDescriptionEntriesContext tree = parser.dataDescriptionEntries();
+
+    IdmsCopybookVisitor visitor = new IdmsCopybookVisitor(tokens);
+    return visitor.visit(tree);
+  }
+
+  private CobolParser getCobolParser(CommonTokenStream tokens) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
+    return new CobolParser(tokens);
   }
 
   private List<Node> addTreeNode(Node node, List<Node> children) {

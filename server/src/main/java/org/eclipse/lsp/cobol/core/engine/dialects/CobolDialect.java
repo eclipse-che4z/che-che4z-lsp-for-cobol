@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 
@@ -33,13 +32,11 @@ public interface CobolDialect {
    *
    * @param uri document URI
    * @param text document text
-   * @param messageService error message service
    * @param copybookConfig is a copybook config
    * @return the dialect processing result
    */
   default ResultWithErrors<DialectOutcome> processText(String uri,
                                                        String text,
-                                                       MessageService messageService,
                                                        CopybookConfig copybookConfig) {
     return new ResultWithErrors<>(new DialectOutcome(text, ImmutableList.of()), ImmutableList.of());
   }

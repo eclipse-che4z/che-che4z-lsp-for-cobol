@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.IdmsLexer;
 import org.eclipse.lsp.cobol.core.IdmsParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
@@ -28,6 +29,7 @@ import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
+import org.eclipse.lsp.cobol.service.SubroutineService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +38,18 @@ import java.util.List;
 public final class IdmsDialect implements CobolDialect {
   public static final String NAME = "IDMS";
   private final CopybookService copybookService;
+  private final ParseTreeListener treeListener;
+  private final MessageService messageService;
+  private final SubroutineService subroutineService;
 
-  public IdmsDialect(CopybookService copybookService) {
+  public IdmsDialect(CopybookService copybookService,
+                     ParseTreeListener treeListener,
+                     MessageService messageService,
+                     SubroutineService subroutineService) {
     this.copybookService = copybookService;
+    this.treeListener = treeListener;
+    this.messageService = messageService;
+    this.subroutineService = subroutineService;
   }
 
   /**
@@ -55,13 +66,11 @@ public final class IdmsDialect implements CobolDialect {
    *
    * @param uri document URI
    * @param text document text
-   * @param messageService error message service
    * @param copybookConfig is a copybook config
    * @return the dialect processing result
    */
   public ResultWithErrors<DialectOutcome> processText(String uri,
                                                       String text,
-                                                      MessageService messageService,
                                                       CopybookConfig copybookConfig) {
     IdmsLexer lexer = new IdmsLexer(CharStreams.fromString(text));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -72,7 +81,7 @@ public final class IdmsDialect implements CobolDialect {
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
-    IdmsVisitor visitor = new IdmsVisitor(copybookService, copybookConfig, uri, text);
+    IdmsVisitor visitor = new IdmsVisitor(copybookService, treeListener, messageService, subroutineService, copybookConfig, uri, text);
     List<Node> nodes = visitor.visitStartRule(parser.startRule());
     List<SyntaxError> errors = new ArrayList<>(listener.getErrors());
     return new ResultWithErrors<>(new DialectOutcome(visitor.getResultedText(), nodes), errors);
