@@ -14,11 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.impl;
 
+import com.google.common.collect.ImmutableList;
+import lombok.val;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
-import com.google.common.collect.ImmutableList;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -100,7 +100,25 @@ class CobolLineIndicatorProcessorImplTest {
     CobolLine actual = outcome.get(0);
 
     assertEquals(
-        ProcessingConstants.COMMENT_TAG + ProcessingConstants.WS + "    THIS IS A COMMENT",
+        ProcessingConstants.WS + EMPTY_STRING, actual.getIndicatorArea() + actual.getContentArea());
+  }
+
+  /** Testing floating comment lines pre-formatting for Token analysis */
+  @Test
+  void floatingCommentLineTest() {
+    val commentLine = new CobolLine();
+    commentLine.setType(NORMAL);
+    commentLine.setIndicatorArea(ProcessingConstants.WS);
+    commentLine.setContentAreaA("PROGRAM-ID. comments  *> Floating");
+    commentLine.setContentAreaB(" comment");
+
+    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+
+    List<CobolLine> outcome = processor.processLines(ImmutableList.of(commentLine));
+    CobolLine actual = outcome.get(0);
+
+    assertEquals(
+        ProcessingConstants.WS + "PROGRAM-ID. comments  ",
         actual.getIndicatorArea() + actual.getContentArea());
   }
 
@@ -191,7 +209,8 @@ class CobolLineIndicatorProcessorImplTest {
     startContinuationLine.setSuccessor(trailingCommaContinuationLine);
     trailingCommaContinuationLine.setPredecessor(startContinuationLine);
 
-    List<CobolLine> listOfLines = ImmutableList.of(startContinuationLine, trailingCommaContinuationLine);
+    List<CobolLine> listOfLines =
+        ImmutableList.of(startContinuationLine, trailingCommaContinuationLine);
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
