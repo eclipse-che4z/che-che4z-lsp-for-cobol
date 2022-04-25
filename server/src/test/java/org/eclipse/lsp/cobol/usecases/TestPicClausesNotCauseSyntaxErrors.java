@@ -49,9 +49,29 @@ class TestPicClausesNotCauseSyntaxErrors {
           + "       05 {$*:TAG:-FIVE^ABC-FIVE} PIC 9(6)V9(2).\n";
   private static final String REPL_NAME = "REPL";
 
+  private static final String TEXT2 =
+      "0      IDENTIFICATION DIVISION.\n"
+          + "1      PROGRAM-ID. TESTREPL.\n"
+          + "2      DATA DIVISION.\n"
+          + "3      WORKING-STORAGE SECTION.\n"
+          + "014600 01  {$*CCVS-C-1}.                                                    DB2014.2\n"
+          + "014700     02 FILLER PICTURE IS X(99) VALUE IS \" FEATURE              PADB2014.2\n"
+          + "014800-    \"SS  PARAGRAPH-NAME                                          DB2014.2\n"
+          + "014900-    \"        REMARKS\".                                           DB2014.2\n"
+          + "015000     02 FILLER PICTURE IS X(20) VALUE IS SPACE.                   DB2014.2";
+
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT, ImmutableList.of(new CobolText(REPL_NAME, REPL)), ImmutableMap.of());
+  }
+
+  /**
+   * Ref - https://www.ibm.com/docs/en/cobol-zos/6.2?topic=entry-picture-clause
+   */
+  @Test
+  void testWhenPictureClauseSucceededByIS_thenNoError() {
+    UseCaseEngine.runTest(
+            TEXT2, ImmutableList.of(), ImmutableMap.of());
   }
 }

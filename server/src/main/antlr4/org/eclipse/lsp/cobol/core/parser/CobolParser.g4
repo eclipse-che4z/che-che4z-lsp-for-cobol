@@ -739,7 +739,7 @@ dataOccursSort
    ;
 
 dataPictureClause
-   : (PICTURE | PIC) IS? pictureString+
+   : (PICTURE | PIC) PICTUREIS? pictureString+
    ;
 
 pictureString
