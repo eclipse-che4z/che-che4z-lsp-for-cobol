@@ -324,9 +324,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitFileControlEntry(FileControlEntryContext ctx) {
     String filename = VisitorHelper.getName(ctx.selectClause().fileName());
     if (StringUtils.isNotBlank(filename)) {
+      String fileControlClause = getIntervalText(ctx.fileControlClauses());
       checkFileControlUniqueness(ctx, filename);
+      return addTreeNode(ctx, locality -> new FileEntryNode(locality, filename, fileControlClause));
     }
-    return addTreeNode(ctx, locality -> new FileEntryNode(locality, filename));
+    return addTreeNode(ctx, locality -> new FileEntryNode(locality, filename, ""));
   }
 
   private void checkFileControlUniqueness(FileControlEntryContext ctx, String filename) {
