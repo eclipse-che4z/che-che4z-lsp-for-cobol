@@ -108,11 +108,19 @@ public class VariableDefinitionUtil {
    * @return the list of errors
    */
   public List<SyntaxError> processNodeWithVariableDefinitions(Node node) {
-    Deque<VariableDefinitionNode> variableDefinitionNodes =
-        node.getDepthFirstStream()
+    Deque<VariableDefinitionNode> variableDefinitionNodes = new LinkedList<>();
+    node.getChildren().forEach(n -> {
+      if (n.getNodeType() == NodeType.VARIABLE_DEFINITION) {
+        variableDefinitionNodes.add((VariableDefinitionNode) n);
+      } else if (n.getNodeType() == NodeType.COPY) {
+        variableDefinitionNodes.addAll(n.getDepthFirstStream()
+            .filter(hasType(NodeType.COPY))
+            .flatMap(Node::getDepthFirstStream)
             .filter(hasType(NodeType.VARIABLE_DEFINITION))
             .map(VariableDefinitionNode.class::cast)
-            .collect(Collectors.toCollection(LinkedList::new));
+            .collect(Collectors.toCollection(LinkedList::new)));
+      }
+    });
     variableDefinitionNodes.forEach(node::removeChild);
     List<SyntaxError> errors = new ArrayList<>();
     errors.addAll(processDefinition(node, 1, variableDefinitionNodes));
