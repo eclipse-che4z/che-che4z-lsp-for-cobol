@@ -27,9 +27,7 @@ import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
-import org.eclipse.lsp.cobol.service.SubroutineService;
 
 import java.util.*;
 
@@ -42,29 +40,26 @@ public class DialectService {
   @Inject
   public DialectService(CopybookService copybookService,
                         ParseTreeListener treeListener,
-                        MessageService messageService,
-                        SubroutineService subroutineService) {
+                        MessageService messageService) {
     dialectSuppliers = new HashMap<>();
 
-    CobolDialect dialect = new IdmsDialect(copybookService, treeListener, messageService, subroutineService);
+    CobolDialect dialect = new IdmsDialect(copybookService, treeListener, messageService);
     dialectSuppliers.put(dialect.getName(), dialect);
   }
 
   /**
    * Process the source file text with dialects
    *
-   * @param uri the source file URI
-   * @param text the source text
    * @param dialects the list of enabled dialects
-   * @param copybookConfig is a copybook config
+   * @param context is a DialectProcessingContext class with all needed data for dialect processing
    * @return dialects outcome
    */
-  public ResultWithErrors<DialectOutcome> process(String uri, String text, List<String> dialects, CopybookConfig copybookConfig) {
+  public ResultWithErrors<DialectOutcome> process(List<String> dialects, DialectProcessingContext context) {
     return dialects.stream()
         .map(this::getDialectByName)
         .reduce(
-            ResultWithErrors.of(new DialectOutcome(text, ImmutableList.of())),
-            (previousResult, dialect) -> processDialect(previousResult, dialect, uri, copybookConfig),
+            ResultWithErrors.of(new DialectOutcome(context.getText(), ImmutableList.of())),
+            (previousResult, dialect) -> processDialect(previousResult, dialect, context),
             DialectService::mergeResults
         );
   }
@@ -75,11 +70,13 @@ public class DialectService {
 
   private static ResultWithErrors<DialectOutcome> processDialect(ResultWithErrors<DialectOutcome> previousResult,
                                                                  CobolDialect dialect,
-                                                                 String uri,
-                                                                 CopybookConfig copybookConfig) {
+                                                                 DialectProcessingContext context) {
     List<Node> nodes = new ArrayList<>(previousResult.getResult().getDialectNodes());
     List<SyntaxError> errors = new ArrayList<>(previousResult.getErrors());
-    DialectOutcome result = dialect.processText(uri, previousResult.getResult().getText(), copybookConfig)
+
+    DialectOutcome result = dialect.processText(context.toBuilder()
+            .text(previousResult.getResult().getText())
+            .build())
         .unwrap(errors::addAll);
     nodes.addAll(result.getDialectNodes());
     return new ResultWithErrors<>(new DialectOutcome(result.getText(), nodes), errors);

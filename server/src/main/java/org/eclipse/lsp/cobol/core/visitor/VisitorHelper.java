@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.ValueInterval;
 import org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormat;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import javax.annotation.Nonnull;
@@ -169,7 +170,7 @@ public class VisitorHelper {
    * @param ctx the rule context that contains the required tokens
    * @return a string representation of the given context
    */
-  String getIntervalText(ParserRuleContext ctx) {
+  public String getIntervalText(ParserRuleContext ctx) {
     return ofNullable(ctx).map(VisitorHelper::retrieveIntervalText).orElse("");
   }
 
@@ -275,6 +276,24 @@ public class VisitorHelper {
         .map(String::toUpperCase)
         .map(" "::concat)
         .orElse("");
+  }
+
+  /**
+   * Builds context name locality based on the name and uri of the document
+   * @param ctx is a parse rule context
+   * @param name is a name of the entity
+   * @param uri is an uri of the document
+   * @return locality object
+   */
+  public Locality buildNameRangeLocality(ParserRuleContext ctx, String name, String uri) {
+    Range range = new Range(
+        new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
+        new Position(ctx.stop.getLine() - 1, ctx.start.getCharPositionInLine() + name.length()));
+
+    return Locality.builder()
+        .uri(uri)
+        .range(range)
+        .build();
   }
 
 }
