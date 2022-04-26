@@ -29,11 +29,12 @@ import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /** Process the text according to the DaCo rules */
 public final class DaCoDialect implements CobolDialect {
   public static final String NAME = "DaCo";
-
+  private final Pattern dcdbPattern = Pattern.compile("^[\\s\\d]{7,8}D-[BC]", Pattern.MULTILINE);
   /**
    * Processing the text according to the DaCo rules
    *
@@ -44,6 +45,7 @@ public final class DaCoDialect implements CobolDialect {
    */
   @Override
   public ResultWithErrors<DialectOutcome> processText(String uri, String text, MessageService messageService) {
+    text = dcdbPattern.matcher(text).replaceAll("          ");
     DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(text));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     DaCoParser parser = new DaCoParser(tokens);
@@ -53,7 +55,7 @@ public final class DaCoDialect implements CobolDialect {
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
-    DaCoVisitor visitor = new DaCoVisitor(uri, text, messageService);
+    DaCoVisitor visitor = new DaCoVisitor(uri, text);
     List<Node> nodes = visitor.visitStartRule(parser.startRule());
     List<SyntaxError> errors = new ArrayList<>(listener.getErrors());
     errors.addAll(visitor.getErrors());

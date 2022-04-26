@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /** Tests the DaCo Prefix D-B and D-C statement */
@@ -41,6 +42,7 @@ class TestDaCoPrefixStatement {
           + "             {D-C|2} OPEN PACKET ABCD FOR 'DEF'. \r\n";
 
   @Test
+  @Disabled("D-C, D-B tokens are ignored now")
   void test() {
 
     UseCaseEngine.runTest(
