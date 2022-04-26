@@ -243,6 +243,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitFileDescriptionEntry(FileDescriptionEntryContext ctx) {
+    if (ctx.fileDescriptionEntryClauses() == null) {
+      return ImmutableList.of();
+    }
     areaAWarning(ctx.getStart());
     String fileControlClause = "";
     String fileName = getName(ctx.fileDescriptionEntryClauses().cobolWord());

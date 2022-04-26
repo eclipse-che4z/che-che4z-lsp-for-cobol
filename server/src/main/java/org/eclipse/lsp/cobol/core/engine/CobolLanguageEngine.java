@@ -26,6 +26,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
@@ -111,8 +112,13 @@ public class CobolLanguageEngine {
     timingBuilder.getDialectsTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     String cleanText = preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
+
     DialectOutcome dialectOutcome = dialectService
-        .process(documentUri, cleanText, analysisConfig.getDialects(), analysisConfig.getCopybookConfig())
+        .process(analysisConfig.getDialects(), DialectProcessingContext.builder()
+            .uri(documentUri)
+            .text(cleanText)
+            .copybookConfig(analysisConfig.getCopybookConfig())
+            .build())
         .unwrap(accumulatedErrors::addAll);
     timingBuilder.getDialectsTimer().stop();
 

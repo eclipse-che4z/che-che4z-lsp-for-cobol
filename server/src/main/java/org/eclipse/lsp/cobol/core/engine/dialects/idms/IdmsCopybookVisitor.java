@@ -33,7 +33,9 @@ import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
@@ -140,8 +142,35 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
   }
 
   @Override
+  public List<Node> visitFileDescriptionEntry(CobolParser.FileDescriptionEntryContext ctx) {
+    if (ctx.fileDescriptionEntryClauses() == null || ctx.fileDescriptionEntryClauses().cobolWord() == null) {
+      return ImmutableList.of();
+    }
+    String fileControlClause = "";
+    return addTreeNode(
+        VariableDefinitionNode.builder()
+            .level(LEVEL_FD_SD)
+            .variableNameAndLocality(
+                extractNameAndLocality(ctx.fileDescriptionEntryClauses().cobolWord()))
+            .statementLocality(retrieveRangeLocality(ctx.fileDescriptionEntryClauses().cobolWord()))
+            .fileDescriptor(getIntervalText(ctx.fileDescriptionEntryClauses()))
+            .fileControlClause(fileControlClause)
+            .isSortDescription(Objects.nonNull(ctx.fileDescriptionEntryClauses().SD()))
+            .build(),
+        visitChildren(ctx));
+  }
+
+  @Override
   protected List<Node> defaultResult() {
     return ImmutableList.of();
+  }
+
+  @Override
+  protected List<Node> aggregateResult(List<Node> aggregate, List<Node> nextResult) {
+    List<Node> result = new ArrayList<>(aggregate.size() + nextResult.size());
+    result.addAll(aggregate);
+    result.addAll(nextResult);
+    return result;
   }
 
   private List<Node> addTreeNode(Node node, List<Node> children) {
@@ -155,16 +184,6 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
     Range range = new Range(
         new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
         new Position(ctx.stop.getLine() - 1, ctx.stop.getCharPositionInLine()));
-
-    return Locality.builder()
-        .range(range)
-        .build();
-  }
-
-  private Locality retrieveNameRangeLocality(ParserRuleContext ctx, String name) {
-    Range range = new Range(
-        new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
-        new Position(ctx.stop.getLine() - 1, ctx.start.getCharPositionInLine() + name.length()));
 
     return Locality.builder()
         .uri(uri)
@@ -191,7 +210,7 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
 
   private VariableNameAndLocality extractNameAndLocality(CobolParser.CobolWordContext context) {
     String name = getName(context);
-    return new VariableNameAndLocality(name, retrieveNameRangeLocality(context, name));
+    return new VariableNameAndLocality(name, buildNameRangeLocality(context, name, uri));
   }
 
   private List<ValueClause> retrieveValues(List<CobolParser.DataValueClauseContext> clauses) {

@@ -41,6 +41,7 @@ import org.eclipse.lsp.cobol.core.IdmsParser.SchemaSectionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.VariableUsageNameContext;
 import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
@@ -61,12 +62,12 @@ import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
-import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -82,7 +83,6 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private final CopybookService copybookService;
   private final ParseTreeListener treeListener;
   private final MessageService messageService;
-  private final SubroutineService subroutineService;
   private final CopybookConfig copybookConfig;
   private final String uri;
   private final TextReplacement textReplacement;
@@ -90,15 +90,14 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   public IdmsVisitor(CopybookService copybookService,
                      ParseTreeListener treeListener,
                      MessageService messageService,
-                     SubroutineService subroutineService,
-                     CopybookConfig copybookConfig, String uri, String text) {
+                     DialectProcessingContext context) {
     this.treeListener = treeListener;
     this.copybookService = copybookService;
     this.messageService = messageService;
-    this.subroutineService = subroutineService;
-    this.copybookConfig = copybookConfig;
-    this.uri = uri;
-    textReplacement = new TextReplacement(text);
+    this.copybookConfig = context.getCopybookConfig();
+    this.uri = context.getUri();
+
+    textReplacement = new TextReplacement(context.getText());
   }
 
   public String getResultedText() {
@@ -107,21 +106,14 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitCopyIdmsStatement(CopyIdmsStatementContext ctx) {
-    IdmsParser.CopyIdmsOptionsContext optionsContext = ctx.copyIdmsOptions();
-    String nameToken = optionsContext.copyIdmsSource().getText().toUpperCase();
+    IdmsParser.CopyIdmsSourceContext optionsContext = ctx.copyIdmsOptions().copyIdmsSource();
+    String nameToken = optionsContext.getText().toUpperCase();
     CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
 
     CopybookModel copybookModel = copybookService.resolve(copybookName, uri, copybookConfig);
     textReplacement.addReplacementContext(ctx);
-    Range range = new Range(
-        new Position(optionsContext.start.getLine() - 1, optionsContext.start.getCharPositionInLine()),
-        new Position(optionsContext.stop.getLine() - 1, optionsContext.start.getCharPositionInLine() + copybookName.getDisplayName().length())
-    );
 
-    Locality locality = Locality.builder()
-        .uri(uri)
-        .range(range)
-        .build();
+    Locality locality = VisitorHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), uri);
     CopyNode node = new CopyNode(locality, copybookName.getDisplayName());
     visitChildren(ctx).forEach(node::addChild);
 
@@ -229,7 +221,7 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     return result;
   }
 
-  private List<Node> parseIdmsCopybook(CopybookModel copybookModel) {
+  private List<Node> processNodes(CopybookModel copybookModel, Function<CobolParser, ParserRuleContext> parseFunc) {
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(copybookModel.getContent()));
     lexer.removeErrorListeners();
 
@@ -243,10 +235,17 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
     parser.addParseListener(treeListener);
 
-    CobolParser.DataDescriptionEntriesContext tree = parser.dataDescriptionEntries();
-
     IdmsCopybookVisitor visitor = new IdmsCopybookVisitor(tokens, copybookModel.getUri());
-    return visitor.visit(tree);
+
+    ParserRuleContext node = parseFunc.apply(parser);
+    return visitor.visit(node);
+  }
+
+  private List<Node> parseIdmsCopybook(CopybookModel copybookModel) {
+    List<Node> resultNodes = new LinkedList<>();
+    resultNodes.addAll(processNodes(copybookModel, CobolParser::fileDescriptionEntry));
+    resultNodes.addAll(processNodes(copybookModel, CobolParser::dataDescriptionEntries));
+    return resultNodes;
   }
 
   private CobolParser getCobolParser(CommonTokenStream tokens) {
