@@ -16,9 +16,8 @@
 package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
 import com.google.common.collect.ImmutableList;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.core.CobolParser;
@@ -48,16 +47,18 @@ import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
  * abstract syntax tree built by {@link CobolParser} for IDMS copybooks.
  */
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
-  private final CommonTokenStream tokenStream;
   private final String uri;
+  private final int parentLevel;
+
+  private int firstCopybookLevel = 0;
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat1(CobolParser.DataDescriptionEntryFormat1Context ctx) {
     return addTreeNode(
         VariableDefinitionNode.builder()
-            .level(getLevel(ctx.levelNumber().LEVEL_NUMBER()))
+            .level(calculateLevel(getLevel(ctx.levelNumber().LEVEL_NUMBER())))
             .levelLocality(getLevelLocality(ctx.levelNumber().LEVEL_NUMBER()))
             .statementLocality(retrieveRangeLocality(ctx))
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
@@ -171,6 +172,14 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
     result.addAll(aggregate);
     result.addAll(nextResult);
     return result;
+  }
+
+  private int calculateLevel(int level) {
+    if (firstCopybookLevel == 0) {
+      firstCopybookLevel = level;
+      return parentLevel;
+    }
+    return level - firstCopybookLevel + parentLevel;
   }
 
   private List<Node> addTreeNode(Node node, List<Node> children) {

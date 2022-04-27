@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
@@ -69,6 +70,7 @@ import org.eclipse.lsp4j.Range;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
@@ -123,7 +125,7 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
     node.setDefinition(new CopyDefinition(location, copybookModel.getUri()));
 
-    parseIdmsCopybook(copybookModel).forEach(node::addChild);
+    parseIdmsCopybook(copybookModel, getLevel(ctx)).forEach(node::addChild);
     return ImmutableList.of(node);
   }
 
@@ -221,7 +223,14 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     return result;
   }
 
-  private List<Node> processNodes(CopybookModel copybookModel, Function<CobolParser, ParserRuleContext> parseFunc) {
+  private int getLevel(CopyIdmsStatementContext ctx) {
+    return Optional.ofNullable(ctx.LEVEL_NUMBER())
+        .map(ParseTree::getText)
+        .map(Integer::parseInt)
+        .orElse(0);
+  }
+
+  private List<Node> processNodes(CopybookModel copybookModel, Function<CobolParser, ParserRuleContext> parseFunc, int parentLevel) {
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(copybookModel.getContent()));
     lexer.removeErrorListeners();
 
@@ -235,16 +244,16 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
     parser.addParseListener(treeListener);
 
-    IdmsCopybookVisitor visitor = new IdmsCopybookVisitor(tokens, copybookModel.getUri());
+    IdmsCopybookVisitor visitor = new IdmsCopybookVisitor(copybookModel.getUri(), parentLevel);
 
     ParserRuleContext node = parseFunc.apply(parser);
     return visitor.visit(node);
   }
 
-  private List<Node> parseIdmsCopybook(CopybookModel copybookModel) {
+  private List<Node> parseIdmsCopybook(CopybookModel copybookModel, int parentLevel) {
     List<Node> resultNodes = new LinkedList<>();
-    resultNodes.addAll(processNodes(copybookModel, CobolParser::fileDescriptionEntry));
-    resultNodes.addAll(processNodes(copybookModel, CobolParser::dataDescriptionEntries));
+    resultNodes.addAll(processNodes(copybookModel, CobolParser::fileDescriptionEntry, parentLevel));
+    resultNodes.addAll(processNodes(copybookModel, CobolParser::dataDescriptionEntries, parentLevel));
     return resultNodes;
   }
 
