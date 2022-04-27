@@ -34,7 +34,7 @@ public class IdmsBase {
 
   AnalysisConfig getAnalysisConfigWithCopybooks() {
     return new AnalysisConfig(
-        new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
+        new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
         ImmutableList.of(),
         ImmutableList.of(IdmsDialect.NAME));
   }

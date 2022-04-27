@@ -61,8 +61,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorString
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
-import org.eclipse.lsp.cobol.service.CopybookService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -86,6 +86,7 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private final ParseTreeListener treeListener;
   private final MessageService messageService;
   private final CopybookConfig copybookConfig;
+  private final String programDocumentUri;
   private final String uri;
   private final TextReplacement textReplacement;
 
@@ -97,6 +98,7 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     this.copybookService = copybookService;
     this.messageService = messageService;
     this.copybookConfig = context.getCopybookConfig();
+    this.programDocumentUri = context.getProgramDocumentUri();
     this.uri = context.getUri();
 
     textReplacement = new TextReplacement(context.getText());
@@ -112,7 +114,7 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     String nameToken = optionsContext.getText().toUpperCase();
     CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
 
-    CopybookModel copybookModel = copybookService.resolve(copybookName, uri, copybookConfig);
+    CopybookModel copybookModel = copybookService.resolve(copybookName, programDocumentUri, uri, copybookConfig);
     textReplacement.addReplacementContext(ctx);
 
     Locality locality = VisitorHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), uri);

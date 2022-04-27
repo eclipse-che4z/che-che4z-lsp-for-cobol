@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import lombok.Builder;
 import lombok.Value;
-import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 /**
  * Contains all needed data for dialect processing
@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.service.CopybookConfig;
 @Value
 @Builder(toBuilder = true)
 public class DialectProcessingContext {
+  String programDocumentUri;
   String uri;
   String text;
   CopybookConfig copybookConfig;

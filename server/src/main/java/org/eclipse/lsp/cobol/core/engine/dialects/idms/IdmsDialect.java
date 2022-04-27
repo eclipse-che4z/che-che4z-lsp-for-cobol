@@ -28,7 +28,7 @@ import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
-import org.eclipse.lsp.cobol.service.CopybookService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.ArrayList;
 import java.util.List;
