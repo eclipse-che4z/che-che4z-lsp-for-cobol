@@ -175,11 +175,14 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
   }
 
   private int calculateLevel(int level) {
-    if (firstCopybookLevel == 0) {
-      firstCopybookLevel = level;
-      return parentLevel;
+    if (parentLevel != 0) {
+      if (firstCopybookLevel == 0) {
+        firstCopybookLevel = level;
+        return parentLevel;
+      }
+      return level - firstCopybookLevel + parentLevel;
     }
-    return level - firstCopybookLevel + parentLevel;
+    return level;
   }
 
   private List<Node> addTreeNode(Node node, List<Node> children) {
