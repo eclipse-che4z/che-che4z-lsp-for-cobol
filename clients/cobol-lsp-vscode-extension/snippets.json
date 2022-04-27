@@ -2102,6 +2102,14 @@
         "description": "[DaCo] Write Transaction Statement",
         "scope": "cobol"
     },
+    "WRITE TRANSACTION INPUT": {
+        "prefix": "WRITE TRANSACTION",
+        "body": [
+            "WRITE TRANSACTION INPUT LENGTH ${2:nn} TO ${3:dbu}."
+        ],
+        "description": "[DaCo] Write Transaction INPUT Statement",
+        "scope": "cobol"
+    },
     "WRITE REPORT": {
         "prefix": "WRITE REPORT",
         "body": [

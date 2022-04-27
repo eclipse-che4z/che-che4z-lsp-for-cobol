@@ -34,6 +34,7 @@ class TestDaCoEndWriteReport {
                     + "        DATA DIVISION. \r\n"
                     + "        WORKING-STORAGE SECTION. \r\n"
                     + "        PROCEDURE DIVISION. \r\n"
+                    + "            WRITE REPORT ENDRPT. \r\n"
                     + "            WRITE REPORT TGD11 ENDRPT. \r\n"
                     + "            WRITE REPORT RGD11 ENDRPT. \r\n"
                     // Negative tests
