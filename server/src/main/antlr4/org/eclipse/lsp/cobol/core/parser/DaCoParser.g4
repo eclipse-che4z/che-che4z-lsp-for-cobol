@@ -42,7 +42,7 @@ readTransactionStatement
     ;
 
 writeTransactionStatement
-    : WRITE TRANSACTION daco_task_name
+    : WRITE TRANSACTION (daco_task_name | INPUT)
         (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 4, 2048);} integerLiteral))?
         (TO ({validateLength(_input.LT(1).getText(), "dbu", 19);} (cobolWord | integerLiteral)))?
     ;
@@ -52,7 +52,7 @@ writeReportStatement
     ;
 
 writeReportStatementWithName
-    : WRITE REPORT daco_report_name
+    : WRITE REPORT daco_report_name?
         FROM qualifiedDataName
         (TO qualifiedDataName)?
         (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 80, 200);} integerLiteral))?
@@ -60,7 +60,7 @@ writeReportStatementWithName
     ;
 
 endWriteReportStatement
-    : WRITE REPORT daco_report_name ENDRPT
+    : WRITE REPORT daco_report_name? ENDRPT
     ;
 
 autoWriteReportStatement
