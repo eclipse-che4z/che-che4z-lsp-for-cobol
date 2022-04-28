@@ -21,10 +21,11 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.CobolLineUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.COMMENT_TAG;
 import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.WS;
 
 /**
@@ -36,6 +37,8 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
   private static final String EMPTY_STRING = "";
   private static final String DOUBLE_QUOTE_LITERAL = "\"([^\"]|\"\"|'')*+\"";
   private static final String SINGLE_QUOTE_LITERAL = "'([^']|''|\"\")*+'";
+  private static final Pattern FLOATING_COMMENT_LINE =
+      Pattern.compile("(?<validText>.*?)(?<floatingComment>\\*> .+)?");
 
   /**
    * Normalizes the lines by stripping the sequence number and line indicator, and interpreting the
@@ -65,23 +68,29 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
         result = processContinuationLine(line, conditionalRightTrimmedContentArea);
         break;
       case COMMENT:
-        result =
-            CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-                COMMENT_TAG + WS, conditionalRightTrimmedContentArea, line);
-        break;
       case COMPILER_DIRECTIVE:
         result = CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, EMPTY_STRING, line);
         break;
       case NORMAL:
       case DEBUG:
       default:
-        result =
-            CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-                WS, conditionalRightTrimmedContentArea, line);
+        result = processLineWithFloatingComment(line, conditionalRightTrimmedContentArea);
         break;
     }
 
     return result;
+  }
+
+  private CobolLine processLineWithFloatingComment(
+      CobolLine line, String conditionalRightTrimmedContentArea) {
+    Matcher matchedLine = FLOATING_COMMENT_LINE.matcher(conditionalRightTrimmedContentArea);
+
+    if (matchedLine.matches()) {
+      String trimmedResult = matchedLine.group("validText");
+      return CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, trimmedResult, line);
+    }
+    return CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
+        WS, conditionalRightTrimmedContentArea, line);
   }
 
   private CobolLine processContinuationLine(
