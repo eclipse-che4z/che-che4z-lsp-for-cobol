@@ -18,6 +18,8 @@ package org.eclipse.lsp.cobol.core.engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -63,11 +65,12 @@ class CobolLanguageEngineTest {
     ErrorMessageHelper mockErrUtil = mock(ErrorMessageHelper.class);
     CobolErrorStrategy cobolErrorStrategy = new CobolErrorStrategy();
     ParseTreeListener treeListener = mock(ParseTreeListener.class);
+    DialectService dialectService = mock(DialectService.class);
     cobolErrorStrategy.setMessageService(mockMessageService);
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
-            preprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null);
+            preprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null, dialectService);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()
@@ -134,6 +137,8 @@ class CobolLanguageEngineTest {
 
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of());
 
+    when(dialectService.process(anyList(), any()))
+        .thenReturn(new ResultWithErrors<>(new DialectOutcome(TEXT, ImmutableList.of()), ImmutableList.of()));
     when(preprocessor.cleanUpCode(URI, TEXT))
         .thenReturn(new ResultWithErrors<>(TEXT, ImmutableList.of()));
     when(preprocessor.processCleanCode(

@@ -15,20 +15,24 @@
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 
 /** A COBOL dialect */
 public interface CobolDialect {
+
+  /**
+   * Gets the name of the dialect
+   * @return the name of the dialect
+   */
+  String getName();
+
   /**
    * Processing the text
    *
-   * @param uri document URI
-   * @param text document text
-   * @param messageService error message service
+   * @param context is a DialectProcessingContext class with all needed data for dialect processing
    * @return the dialect processing result
    */
-  default ResultWithErrors<DialectOutcome> processText(String uri, String text, MessageService messageService) {
-    return new ResultWithErrors<>(new DialectOutcome(text, ImmutableList.of()), ImmutableList.of());
+  default ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
+    return new ResultWithErrors<>(new DialectOutcome(context.getText(), ImmutableList.of()), ImmutableList.of());
   }
 }
