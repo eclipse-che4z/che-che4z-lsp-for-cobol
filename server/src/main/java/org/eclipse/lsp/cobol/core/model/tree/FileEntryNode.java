@@ -25,7 +25,7 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 
 import java.util.List;
 
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.ROOT;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 
 /** The class represents file entry item in COBOL */
 @ToString(callSuper = true)
@@ -44,10 +44,9 @@ public class FileEntryNode extends Node {
   }
 
   private List<SyntaxError> processNode() {
-    this.getNearestParentByType(ROOT)
+    this.getNearestParentByType(PROGRAM)
         .ifPresent(o -> o.getDepthFirstStream()
-            .filter(n -> n.getNodeType() == NodeType.VARIABLE_DEFINITION)
-            .filter(n -> n instanceof VariableDefinitionNode)
+            .filter(hasType(NodeType.VARIABLE_DEFINITION))
             .map(VariableDefinitionNode.class::cast)
             .filter(n -> n.getLevel() == VariableDefinitionUtil.LEVEL_FD_SD)
             .filter(n -> n.getVariableName().getName().equals(fileName))

@@ -121,7 +121,7 @@ public class VariableDefinitionUtil {
             .collect(Collectors.toCollection(LinkedList::new)));
       }
     });
-    variableDefinitionNodes.forEach(node::removeChild);
+    variableDefinitionNodes.forEach(n -> n.getParent().removeChild(n));
     List<SyntaxError> errors = new ArrayList<>();
     errors.addAll(processDefinition(node, 1, variableDefinitionNodes));
     errors.addAll(checkGlobalUniqueNames(node));

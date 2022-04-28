@@ -25,7 +25,6 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 @Builder(toBuilder = true)
 public class DialectProcessingContext {
   String programDocumentUri;
-  String uri;
   String text;
   CopybookConfig copybookConfig;
 }

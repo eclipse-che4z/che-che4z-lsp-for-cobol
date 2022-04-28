@@ -187,7 +187,7 @@ public class VisitorHelper {
    * @param positions map of exact positions
    * @return locality which has a range from the start to the end of the rule
    */
-   Optional<Locality> retrieveRangeLocality(
+  Optional<Locality> retrieveRangeLocality(
       ParserRuleContext context, Map<Token, Locality> positions) {
     return ofNullable(context)
         .flatMap(
@@ -257,11 +257,10 @@ public class VisitorHelper {
    * @param ctx a context object
    * @return extracted value
    */
-  public Integer retrieveOccursToValue(CobolParser.DataOccursClauseContext ctx) {
+  public Optional<Integer> retrieveOccursToValue(CobolParser.DataOccursClauseContext ctx) {
     return ofNullable(ctx.dataOccursTo())
         .map(CobolParser.DataOccursToContext::integerLiteral)
-        .map(VisitorHelper::getInteger)
-        .orElse(null);
+        .map(VisitorHelper::getInteger);
   }
 
   /**

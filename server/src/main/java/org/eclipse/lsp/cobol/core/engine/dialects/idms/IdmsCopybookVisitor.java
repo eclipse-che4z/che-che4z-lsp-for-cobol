@@ -247,7 +247,7 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
     return ofNullable(VisitorHelper.getInteger(ctx.integerLiteral()))
         .map(
             intLit ->
-                new OccursClause(intLit, retrieveOccursToValue(ctx), retrieveIndexNames(ctx)));
+                new OccursClause(intLit, retrieveOccursToValue(ctx).orElse(null), retrieveIndexNames(ctx)));
   }
 
   private List<VariableNameAndLocality> retrieveIndexNames(CobolParser.DataOccursClauseContext ctx) {
