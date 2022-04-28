@@ -31,6 +31,9 @@ class TestDaCoWriteTransaction {
                     + "        PROGRAM-ID. test1. \r\n"
                     + "        DATA DIVISION. \r\n"
                     + "        WORKING-STORAGE SECTION. \r\n"
+                    + "        01 {$*TRANSACTION-SIZE} PIC 9(5).\r\n"
+                    + "        01 {$*FDERESS4342} PIC 9(5).\r\n"
+                    + "        01 {$*SDFERTSFERTSQAWED5GHT} PIC 9(5).\r\n"
                     + "        PROCEDURE DIVISION. \r\n"
                     + "            WRITE TRANSACTION INPUT. \r\n"
                     + "            WRITE TRANSACTION PIBV. \r\n"
@@ -40,8 +43,9 @@ class TestDaCoWriteTransaction {
                     + "            WRITE TRANSACTION INPUT LENGTH 4. \r\n"
                     + "            WRITE TRANSACTION 3167 LENGTH 2048. \r\n"
                     + "            WRITE TRANSACTION INPUT LENGTH 2048. \r\n"
-                    + "            WRITE TRANSACTION 3167 LENGTH 2048 TO FDERESS4342. \r\n"
-                    + "            WRITE TRANSACTION INPUT LENGTH 2048 TO FDERESS4342. \r\n"
+                    + "            WRITE TRANSACTION 3167 LENGTH {$TRANSACTION-SIZE}. \r\n"
+                    + "            WRITE TRANSACTION 3167 LENGTH 2048 TO {$FDERESS4342}. \r\n"
+                    + "            WRITE TRANSACTION INPUT LENGTH 2048 TO {$FDERESS4342}. \r\n"
                     // Negative Tests
                     + "            WRITE TRANSACTION {R-DS|1}. \r\n"
                     + "            WRITE TRANSACTION {RD|2}. \r\n"
@@ -50,8 +54,8 @@ class TestDaCoWriteTransaction {
                     + "            WRITE TRANSACTION INPUT LENGTH {3|3}. \r\n"
                     + "            WRITE TRANSACTION 3167 LENGTH {2049|3}. \r\n"
                     + "            WRITE TRANSACTION INPUT LENGTH {2049|3}. \r\n"
-                    + "            WRITE TRANSACTION 3167 LENGTH 25 TO {SDFERTSFERTSQAWED5GHT|4}. \r\n"
-                    + "            WRITE TRANSACTION INPUT LENGTH 25 TO {SDFERTSFERTSQAWED5GHT|4}. \r\n";
+                    + "            WRITE TRANSACTION 3167 LENGTH 25 TO {$SDFERTSFERTSQAWED5GHT|4}. \r\n"
+                    + "            WRITE TRANSACTION INPUT LENGTH 25 TO {$SDFERTSFERTSQAWED5GHT|4}. \r\n";
 
     @Test
     void test() {

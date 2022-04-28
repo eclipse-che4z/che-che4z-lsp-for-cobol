@@ -44,6 +44,7 @@ class TestDaCoWriteReportWithName {
                     + "            WRITE REPORT FROM {$DET001-XW1} LENGTH 80 \r\n"
                     + "                  AFTER {$DET001-XW1}. \r\n"
                     + "            WRITE REPORT TGD11 FROM {$DET001-XW1}. \r\n"
+                    + "            WRITE REPORT FROM {$DET001-XW1}. \r\n"
                     + "            WRITE REPORT RGD11 FROM {$DET001-XW1} AFTER 85 LINES. \r\n"
                     + "            WRITE REPORT RGD11 FROM {$DET001-XW1} AFTER 1 LINE. \r\n"
                     + "            WRITE REPORT RGD11 FROM {$DET001-XW1} AFTER PAGE. \r\n"

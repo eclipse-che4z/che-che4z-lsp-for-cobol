@@ -40,8 +40,8 @@ readTransactionStatement
 
 writeTransactionStatement
     : WRITE TRANSACTION (daco_task_name | INPUT)
-        (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 4, 2048);} integerLiteral))?
-        (TO ({validateLength(_input.LT(1).getText(), "dbu", 19);} (cobolWord | integerLiteral)))?
+        (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 4, 2048);} integerLiteral | qualifiedDataName))?
+        (TO ({validateLength(_input.LT(1).getText(), "dbu", 19);} (qualifiedDataName | integerLiteral)))?
     ;
 
 writeReportStatement
