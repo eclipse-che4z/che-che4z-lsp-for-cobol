@@ -530,7 +530,7 @@ fileSection
    ;
 
 fileDescriptionEntry
-   : fileDescriptionEntryClauses dataDescriptionEntry*
+   : (fileDescriptionEntryClauses dataDescriptionEntry* | dialectNodeFiller)
    ;
 
 fileDescriptionEntryClauses

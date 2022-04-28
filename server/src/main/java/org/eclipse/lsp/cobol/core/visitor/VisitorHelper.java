@@ -23,10 +23,12 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.ValueInterval;
 import org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormat;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import javax.annotation.Nonnull;
@@ -49,7 +51,7 @@ public class VisitorHelper {
    * @param terminalNode is a TerminalNode
    * @return a level of defined variable
    */
-  int getLevel(TerminalNode terminalNode) {
+  public int getLevel(TerminalNode terminalNode) {
     String levelNumber = terminalNode.getText();
     return Integer.parseInt(levelNumber);
   }
@@ -60,7 +62,7 @@ public class VisitorHelper {
    * @param context is a statement context object
    * @return a text of the statement
    */
-  String getName(EntryNameContext context) {
+  public String getName(EntryNameContext context) {
     return ofNullable(context)
         .map(EntryNameContext::dataName)
         .map(VisitorHelper::getName)
@@ -99,7 +101,7 @@ public class VisitorHelper {
    * @param clauses a list of ANTLR picture clauses
    * @return the list of picture texts
    */
-  List<String> retrievePicTexts(List<DataPictureClauseContext> clauses) {
+  public List<String> retrievePicTexts(List<DataPictureClauseContext> clauses) {
     return clauses.stream()
         .map(clause -> clause.getText().replaceAll(clause.getStart().getText(), "").trim())
         .collect(toList());
@@ -112,7 +114,7 @@ public class VisitorHelper {
    * @param contexts a list of ANTLR value intervals
    * @return the list of value intervals
    */
-  List<ValueInterval> retrieveValueIntervals(List<DataValueIntervalContext> contexts) {
+  public List<ValueInterval> retrieveValueIntervals(List<DataValueIntervalContext> contexts) {
     return contexts.stream()
         .map(
             context ->
@@ -137,7 +139,7 @@ public class VisitorHelper {
    * @param contexts a list of ANTLR usage clauses
    * @return the list of usage formats
    */
-  List<UsageFormat> retrieveUsageFormat(List<DataUsageClauseContext> contexts) {
+  public List<UsageFormat> retrieveUsageFormat(List<DataUsageClauseContext> contexts) {
     return contexts.stream()
         .map(DataUsageClauseContext::usageFormat)
         .filter(Objects::nonNull)
@@ -153,7 +155,7 @@ public class VisitorHelper {
    * @param context the IntegerLiteralContext, may be null
    * @return converted Integer or null if the context is empty
    */
-  Integer getInteger(IntegerLiteralContext context) {
+  public Integer getInteger(IntegerLiteralContext context) {
     return ofNullable(context)
         .map(ParserRuleContext::getText)
         .filter(it -> !it.isEmpty())
@@ -168,7 +170,7 @@ public class VisitorHelper {
    * @param ctx the rule context that contains the required tokens
    * @return a string representation of the given context
    */
-  String getIntervalText(ParserRuleContext ctx) {
+  public String getIntervalText(ParserRuleContext ctx) {
     return ofNullable(ctx).map(VisitorHelper::retrieveIntervalText).orElse("");
   }
 
@@ -249,14 +251,48 @@ public class VisitorHelper {
         .map(constructNode(nodeConstructor, children))
         .orElse(children);
   }
+
   /**
-   * Retrieve a locality from the given mapping
-   *
-   * @param positions map of localities
-   * @param childToken token to retrieve
-   * @return optional of locality
+   * Gets a value from DataOccursClauseContext context
+   * @param ctx a context object
+   * @return extracted value
    */
-  Optional<Locality> getLocality(Map<Token, Locality> positions, Token childToken) {
-    return ofNullable(positions.get(childToken));
+  public Optional<Integer> retrieveOccursToValue(CobolParser.DataOccursClauseContext ctx) {
+    return ofNullable(ctx.dataOccursTo())
+        .map(CobolParser.DataOccursToContext::integerLiteral)
+        .map(VisitorHelper::getInteger);
   }
+
+  /**
+   * Gets value from ValueIsTokenContext context
+   * @param ctx a context object
+   * @return extracted value
+   */
+  public String retrieveValueToken(ValueIsTokenContext ctx) {
+    return ctx.valueToken().getText().toUpperCase()
+        + Optional.ofNullable(ctx.isAreToken())
+        .map(ParserRuleContext::getText)
+        .map(String::toUpperCase)
+        .map(" "::concat)
+        .orElse("");
+  }
+
+  /**
+   * Builds context name locality based on the name and uri of the document
+   * @param ctx is a parse rule context
+   * @param name is a name of the entity
+   * @param uri is an uri of the document
+   * @return locality object
+   */
+  public Locality buildNameRangeLocality(ParserRuleContext ctx, String name, String uri) {
+    Range range = new Range(
+        new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
+        new Position(ctx.stop.getLine() - 1, ctx.start.getCharPositionInLine() + name.length()));
+
+    return Locality.builder()
+        .uri(uri)
+        .range(range)
+        .build();
+  }
+
 }

@@ -16,10 +16,35 @@ parser grammar IdmsParser;
 options {tokenVocab = IdmsLexer;  superClass = MessageServiceParser;}
 
 startRule: .*? idmsRules* EOF;
-idmsRules: (idmsStatements | idmsSections | idmsIfStatement | ifStatement) .*?;
+idmsRules: (idmsStatements | idmsSections | idmsIfStatement | ifStatement | copyIdmsStatement) .*?;
 
 idmsSections
    : idmsControlSection | schemaSection | mapSection
+   ;
+
+// -- copy section ----------------------------------
+
+copyIdmsStatement
+    : LEVEL_NUMBER? COPY IDMS copyIdmsOptions (DOT_FS | SEMICOLON_FS)?
+    ;
+
+copyIdmsOptions
+    : (RECORD copyIdmsSource versionClause? (REDEFINES cobolWord)?) |
+    (FILE copyIdmsSource versionClause?) |
+    ((MAP | MAP_CONTROL) copyIdmsSource) |
+    (MODULE? copyIdmsSource versionClause?)
+    ;
+
+copyIdmsSource
+    : copySource
+    ;
+
+copySource
+   : (literal | cobolWord) ((OF | IN) copyLibrary)?
+   ;
+
+copyLibrary
+   : literal | cobolWord
    ;
 
 // -- schema section ----------------------------------
