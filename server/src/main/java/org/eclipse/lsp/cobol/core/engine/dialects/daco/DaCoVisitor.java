@@ -24,8 +24,6 @@ import org.eclipse.lsp.cobol.core.DaCoParser.VariableUsageNameContext;
 import org.eclipse.lsp.cobol.core.DaCoParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -38,8 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.AREA_A_FINISH;
-
 /**
  *  This extension of {@link DaCoParserBaseVisitor} applies the semantic analysis based on the
  *  abstract syntax tree built by {@link DaCoParser}.
@@ -49,11 +45,9 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
   private final List<SyntaxError> errors = new ArrayList<>();
   private final String uri;
   private final TextReplacement textReplacement;
-  private final MessageService messageService;
 
-  public DaCoVisitor(String uri, String text, MessageService messageService) {
+  public DaCoVisitor(String uri, String text) {
     this.uri = uri;
-    this.messageService = messageService;
     textReplacement = new TextReplacement(text);
   }
 
@@ -64,13 +58,6 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitDacoStatements(DacoStatementsContext ctx) {
     textReplacement.addReplacementContext(ctx);
-    return visitChildren(ctx);
-  }
-
-  @Override
-  public List<Node> visitStatementPrefix(DaCoParser.StatementPrefixContext ctx) {
-    areaAWarning(ctx);
-    textReplacement.addReplacementContext(ctx, "",  " ");
     return visitChildren(ctx);
   }
 
@@ -100,21 +87,6 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
     result.addAll(aggregate);
     result.addAll(nextResult);
     return result;
-  }
-  private void areaAWarning(ParserRuleContext ctx) {
-    Locality locality = constructLocality(ctx);
-    if (locality.getRange().getStart().getCharacter() > AREA_A_FINISH) {
-      SyntaxError error =
-              SyntaxError.syntaxError()
-                      .locality(locality)
-                      .suggestion(messageService.getMessage("DaCoVisitor.AreaAWarningMsg") + ctx.getStart().getText())
-                      .severity(ErrorSeverity.WARNING)
-                      .build();
-      LOG.debug("Syntax error by DaCoVisitor#throwException: {}", error);
-      if (!errors.contains(error)) {
-        errors.add(error);
-      }
-    }
   }
 
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {

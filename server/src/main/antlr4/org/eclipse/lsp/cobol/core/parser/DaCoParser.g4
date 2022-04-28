@@ -16,11 +16,8 @@ parser grammar DaCoParser;
 options {tokenVocab = DaCoLexer;  superClass = MessageServiceParser;}
 
 startRule: .*? dacoRules* EOF;
-dacoRules: (dacoStatements | statementPrefix) .*?;
+dacoRules: dacoStatements .*?;
 
-statementPrefix
-    : (D_B | D_C)
-    ;
 dacoStatements
     : readTransactionStatement
     | writeTransactionStatement
