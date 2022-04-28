@@ -67,7 +67,7 @@ public final class IdmsDialect implements CobolDialect {
     IdmsLexer lexer = new IdmsLexer(CharStreams.fromString(context.getText()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     IdmsParser parser = new IdmsParser(tokens);
-    DialectParserListener listener = new DialectParserListener(context.getUri());
+    DialectParserListener listener = new DialectParserListener(context.getProgramDocumentUri());
     lexer.removeErrorListeners();
     lexer.addErrorListener(listener);
     parser.removeErrorListeners();

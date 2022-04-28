@@ -116,7 +116,6 @@ public class CobolLanguageEngine {
     DialectOutcome dialectOutcome = dialectService
         .process(analysisConfig.getDialects(), DialectProcessingContext.builder()
             .programDocumentUri(documentUri)
-            .uri(documentUri)
             .text(cleanText)
             .copybookConfig(analysisConfig.getCopybookConfig())
             .build())

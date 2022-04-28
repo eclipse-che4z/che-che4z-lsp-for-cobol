@@ -87,7 +87,6 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private final MessageService messageService;
   private final CopybookConfig copybookConfig;
   private final String programDocumentUri;
-  private final String uri;
   private final TextReplacement textReplacement;
 
   public IdmsVisitor(CopybookService copybookService,
@@ -99,7 +98,6 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     this.messageService = messageService;
     this.copybookConfig = context.getCopybookConfig();
     this.programDocumentUri = context.getProgramDocumentUri();
-    this.uri = context.getUri();
 
     textReplacement = new TextReplacement(context.getText());
   }
@@ -114,10 +112,10 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     String nameToken = optionsContext.getText().toUpperCase();
     CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
 
-    CopybookModel copybookModel = copybookService.resolve(copybookName, programDocumentUri, uri, copybookConfig);
+    CopybookModel copybookModel = copybookService.resolve(copybookName, programDocumentUri, programDocumentUri, copybookConfig);
     textReplacement.addReplacementContext(ctx);
 
-    Locality locality = VisitorHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), uri);
+    Locality locality = VisitorHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), programDocumentUri);
     CopyNode node = new CopyNode(locality, copybookName.getDisplayName());
     visitChildren(ctx).forEach(node::addChild);
 
@@ -285,7 +283,7 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   private Locality constructLocality(ParserRuleContext ctx) {
     return Locality.builder()
-        .uri(uri)
+        .uri(programDocumentUri)
         .range(constructRange(ctx))
         .build();
   }
