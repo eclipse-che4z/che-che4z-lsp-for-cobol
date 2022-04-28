@@ -10,7 +10,7 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((includeStatement | copyStatement | copyIdmsStatement | copyMaidStatement | replaceAreaStart | replaceOffStatement
+   : .*? ((includeStatement | copyStatement | copyMaidStatement | replaceAreaStart | replaceOffStatement
    | titleDirective | enterDirective | controlDirective | linkageSection | plusplusIncludeStatement | procedureDivision | workingStorageSection)+ .*?)* EOF
    ;
 
@@ -44,25 +44,6 @@ plusplusIncludeStatement
     : PLUSPLUSINCLUDE copySource (DOT_FS | SEMICOLON_FS)?
     ;
 
-// copy idms statement
-copyIdmsStatement
-    : LEVEL_NUMBER? COPY IDMS copyIdmsOptions (DOT_FS | SEMICOLON_FS)?
-    ;
-
-copyIdmsOptions
-    : (RECORD copyIdmsSource versionClause? (REDEFINES cobolWord)?) |
-    (FILE copyIdmsSource versionClause?) |
-    ((MAP | MAP_CONTROL) copyIdmsSource) |
-    (MODULE? copyIdmsSource versionClause?)
-    ;
-
-copyIdmsSource
-    : copySource
-    ;
-
-versionClause
-    : VERSION integerLiteral
-    ;
 // copy maid statement
 copyMaidStatement
     : LEVEL_NUMBER? COPY MAID copySource qualifier? DOT_FS?
