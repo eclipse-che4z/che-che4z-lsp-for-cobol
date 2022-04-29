@@ -28,7 +28,7 @@
     <!-- https://checkstyle.org/config_filters.html#SuppressionFilter -->
     <module name="SuppressionFilter">
         <property name="file" value="${org.checkstyle.sun.suppressionfilter.config}"
-                  default="src/style/checkstyle-suppressions.xml" />
+                  default="engine/src/style/checkstyle-suppressions.xml" />
         <property name="optional" value="true"/>
     </module>
 
@@ -65,7 +65,7 @@
     <!-- Checks for Headers                                -->
     <!-- See https://checkstyle.org/config_header.html   -->
      <module name="RegexpHeader">
-       <property name="headerFile" value="src/style/javaHeader.txt"/>
+       <property name="headerFile" value="engine/src/style/javaHeader.txt"/>
        <property name="fileExtensions" value="java"/>
      </module>
 
