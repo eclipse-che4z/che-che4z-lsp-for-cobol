@@ -22,7 +22,7 @@
     <artifactId>engine</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
-    <name>COBOL LSP :: Server</name>
+    <name>COBOL LSP :: Engine</name>
 
     <properties>
         <antlr.version>4.7.1</antlr.version>
