@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.core.CobolParser.DataNameContext;
 import org.eclipse.lsp.cobol.core.CobolParserBaseListener;
 import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
@@ -25,7 +26,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.regex.Pattern;
 
-import static org.eclipse.lsp.cobol.core.CobolParser.EntryNameContext;
 import static org.eclipse.lsp.cobol.core.CobolParser.LevelNumberContext;
 
 /** This listener adjusts the variable level numbers and apply other modifications of copybooks */
@@ -54,16 +54,12 @@ public class CopybookModificationListener extends CobolParserBaseListener
   }
 
   @Override
-  public void enterEntryName(EntryNameContext ctx) {
+  public void enterDataName(DataNameContext ctx) {
     push();
   }
 
   @Override
-  public void exitEntryName(EntryNameContext ctx) {
-    if (ctx.FILLER() != null) {
-      write(pop());
-      return;
-    }
+  public void exitDataName(DataNameContext ctx) {
     final String name = pop();
     write(shouldReplaceName(name) ? replaceSuffix(name) : appendSuffix(name));
   }
