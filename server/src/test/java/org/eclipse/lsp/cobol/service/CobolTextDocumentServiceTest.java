@@ -21,9 +21,7 @@ import com.google.gson.JsonPrimitive;
 import org.awaitility.Awaitility;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
-import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
-import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.core.model.tree.RootNode;
+import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
@@ -45,6 +43,7 @@ import org.mockito.internal.stubbing.answers.AnswersWithDelay;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.BiConsumer;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
@@ -208,7 +207,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    * may re-run analysis of the open documents if it receives a notification.
    */
   @Test
-
   void observerCallback() {
     Map<String, List<Diagnostic>> diagnosticsNoErrors = emptyMap();
     Map<String, List<Diagnostic>> diagnosticsWithErrors = createDefaultDiagnostics();
@@ -588,6 +586,54 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
             any(CobolDocumentModel.class),
             any(TextDocumentPositionParams.class),
             any(ReferenceContext.class));
+  }
+
+  @Test
+  void testFoldingCodeWhenAnalysisIsNotStarted() {
+    service = getMockedTextDocumentServiceUsingSeparateThread();
+    TextDocumentIdentifier testFoldingCode = new TextDocumentIdentifier(DOCUMENT_URI);
+    CompletableFuture<List<FoldingRange>> listCompletableFuture =
+        service.foldingRange(new FoldingRangeRequestParams(testFoldingCode));
+    @SuppressWarnings("unchecked") BiConsumer<? super List<FoldingRange>, ? super Throwable> consumer = mock(BiConsumer.class);
+    listCompletableFuture.whenComplete(consumer);
+    assertTrue(listCompletableFuture.isDone());
+    verify(consumer).accept(Collections.emptyList(), null);
+  }
+
+  @Test
+  void testFoldingCodeWhenAnalysisIsStarted() throws ExecutionException, InterruptedException {
+    service = getMockedTextDocumentServiceUsingSeparateThread();
+    TextDocumentIdentifier testFoldingCode = new TextDocumentIdentifier(DOCUMENT_URI);
+    int startLine = 1;
+    int endLine = 3;
+
+    AnalysisResult analysisResult =
+        AnalysisResult.builder()
+            .rootNode(new RootNode(Locality.builder().build(), new NamedSubContext()))
+            .build();
+
+    Node programNode =
+        new ProgramNode(
+            Locality.builder()
+                .uri(DOCUMENT_URI)
+                .range(new Range(new Position(startLine, 0), new Position(endLine, 0)))
+                .build());
+    analysisResult.getRootNode().addChild(programNode);
+
+    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
+    when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
+        .thenReturn(analysisResult);
+    service.didOpen(
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
+
+    CompletableFuture<List<FoldingRange>> listCompletableFuture =
+        service.foldingRange(new FoldingRangeRequestParams(testFoldingCode));
+    listCompletableFuture.get();
+    @SuppressWarnings("unchecked") BiConsumer<? super List<FoldingRange>, ? super Throwable> consumer = mock(BiConsumer.class);
+    listCompletableFuture.whenComplete(consumer);
+    assertTrue(listCompletableFuture.isDone());
+    verify(consumer).accept(Collections.singletonList(new FoldingRange(startLine, endLine)), null);
   }
 
   private void openDocument(TextDocumentService service) {

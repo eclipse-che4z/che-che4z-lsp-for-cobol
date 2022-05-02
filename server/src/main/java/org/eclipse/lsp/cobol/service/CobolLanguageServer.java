@@ -107,6 +107,7 @@ public class CobolLanguageServer implements LanguageServer {
     capabilities.setExecuteCommandProvider(collectExecuteCommandList());
     capabilities.setDocumentSymbolProvider(TRUE);
     capabilities.setHoverProvider(TRUE);
+    capabilities.setFoldingRangeProvider(TRUE);
 
     WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
     workspaceFoldersOptions.setSupported(TRUE);
