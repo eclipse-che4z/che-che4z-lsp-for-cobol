@@ -312,7 +312,10 @@ public class VariableDefinitionUtil {
             definitionNode.isGlobal(),
             definitionNode.getPic(),
             definitionNode.getValue(),
-            definitionNode.hasRedefines());
+            definitionNode.hasRedefines(),
+            definitionNode.getUsage(),
+            definitionNode.isBlankWhenZeroPresent(),
+            definitionNode.isSignClausePresent());
     createVariableNameNode(variable, definitionNode.getVariableName());
     return new ResultWithErrors<>(variable, ImmutableList.of());
   }

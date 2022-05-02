@@ -54,7 +54,7 @@ class TestMissingCopybookNotInVariableList {
             "nopic",
             new Diagnostic(
                 null,
-                "A \"PICTURE\" clause was not found for elementary item PARENT",
+                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item PARENT",
                 Error,
                 SourceInfoLevels.ERROR.getText())));
   }
