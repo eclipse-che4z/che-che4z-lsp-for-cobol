@@ -43,6 +43,7 @@ import org.eclipse.lsp.cobol.core.IdmsParser.VariableUsageNameContext;
 import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
@@ -284,25 +285,8 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private Locality constructLocality(ParserRuleContext ctx) {
     return Locality.builder()
         .uri(programDocumentUri)
-        .range(constructRange(ctx))
+        .range(DialectUtils.constructRange(ctx))
         .build();
-  }
-
-  /**
-   * Construct the range from ANTLR context
-   *
-   * @param ctx the ANTLR context
-   * @return the range
-   */
-  private Range constructRange(ParserRuleContext ctx) {
-    return new Range(
-        new Position(
-            ctx.start.getLine() - 1,
-            ctx.start.getCharPositionInLine()),
-        new Position(
-            ctx.stop.getLine() - 1,
-            ctx.stop.getCharPositionInLine() + ctx.stop.getStopIndex() - ctx.stop.getStartIndex() + 1)
-    );
   }
 
 }

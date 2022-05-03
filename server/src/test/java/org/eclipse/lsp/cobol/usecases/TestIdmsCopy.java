@@ -112,43 +112,43 @@ class TestIdmsCopy {
   @Test
   void testIdmsCopyWS1() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS1, ImmutableList.of(new CobolText(CB_NAME1, DialectType.IDMS.name(), CB1)), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfigWithCopybooks());
+        TEXT + COPY_IDMS_WS1, ImmutableList.of(new CobolText(CB_NAME1, DialectType.IDMS.name(), CB1)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test
   void testIdmsCopyWS2() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS2, ImmutableList.of(new CobolText(CB_NAME2, DialectType.IDMS.name(), CB2)), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfigWithCopybooks());
+        TEXT + COPY_IDMS_WS2, ImmutableList.of(new CobolText(CB_NAME2, DialectType.IDMS.name(), CB2)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test
   void testIdmsCopyWS3() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS3, ImmutableList.of(new CobolText(CB_NAME3, DialectType.IDMS.name(), CB3)), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfigWithCopybooks());
+        TEXT + COPY_IDMS_WS3, ImmutableList.of(new CobolText(CB_NAME3, DialectType.IDMS.name(), CB3)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test
   void testIdmsCopyWS4() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS4, ImmutableList.of(new CobolText(CB_NAME3A, DialectType.IDMS.name(), CB3)), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfigWithCopybooks());
+        TEXT + COPY_IDMS_WS4, ImmutableList.of(new CobolText(CB_NAME3A, DialectType.IDMS.name(), CB3)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test
   void testIdmsCopyWS5() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS5, ImmutableList.of(new CobolText(CB_NAME3, DialectType.IDMS.name(), CB3)), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfigWithCopybooks());
+        TEXT + COPY_IDMS_WS5, ImmutableList.of(new CobolText(CB_NAME3, DialectType.IDMS.name(), CB3)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test
   void testIdmsCopyFile() {
     UseCaseEngine.runTest(
-            TEXT_IDMS_COPY_FILE + COPY_IDMS_FILE, ImmutableList.of(new CobolText(CB_NAME5, DialectType.IDMS.name(), CB5)), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfigWithCopybooks());
+            TEXT_IDMS_COPY_FILE + COPY_IDMS_FILE, ImmutableList.of(new CobolText(CB_NAME5, DialectType.IDMS.name(), CB5)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test
   void testIdmsCopyVariableLevel() throws Exception {
     AnalysisResult result = UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_LEVELS, ImmutableList.of(new CobolText(CB_NAME1, DialectType.IDMS.name(), CB6)), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfigWithCopybooks());
+        TEXT + COPY_IDMS_LEVELS, ImmutableList.of(new CobolText(CB_NAME1, DialectType.IDMS.name(), CB6)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
 
     ElementaryItemNode copybookNode = result.getRootNode()
         .getDepthFirstStream()
