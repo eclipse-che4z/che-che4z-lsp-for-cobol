@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 /** Process the text according to the DaCo rules */
 public final class DaCoDialect implements CobolDialect {
   public static final String NAME = "DaCo";
-  private final Pattern dcdbPattern = Pattern.compile("^[\\s\\d]{7,8}D-[BC]", Pattern.MULTILINE);
+  private final Pattern dcdbPattern = Pattern.compile("^[\\s\\d]{7}D-[BC]", Pattern.MULTILINE);
   /**
    * Processing the text according to the DaCo rules
    *
