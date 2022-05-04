@@ -30,12 +30,12 @@ import java.util.function.Consumer;
 import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.Copybook.PLABEL;
 
 /**
- * This implementation of the {@link AbstractCopybookAnalysis} resolves the DFHEIBLC and SPECIALREGISTERS copybook
- * under the LINKAGE and WORKING_STORAGE SECTION respectively.
+ * This implementation of the {@link AbstractCopybookAnalysis} resolves the DFHEIBLC and
+ * SPECIALREGISTERS copybook under the LINKAGE and WORKING_STORAGE SECTION respectively.
  */
 class PredefinedCopybookAnalysis extends AbstractCopybookAnalysis {
-  @Getter
-  private String predefinedCopybookName;
+  private static final String PROCEDURE_DIVISION = "PROCEDUREDIVISION";
+  @Getter private String predefinedCopybookName;
 
   PredefinedCopybookAnalysis(
       TextPreprocessor preprocessor,
@@ -50,7 +50,7 @@ class PredefinedCopybookAnalysis extends AbstractCopybookAnalysis {
   @Override
   protected CopybookName retrieveCopybookName(
       ParserRuleContext ctx, String dialect, CopybookHierarchy hierarchy) {
-    if ("PROCEDUREDIVISION.".equalsIgnoreCase(ctx.getText())) {
+    if (ctx.getText().toUpperCase().startsWith(PROCEDURE_DIVISION)) {
       return new CopybookName(PLABEL.name(), dialect);
     }
     return new CopybookName(getPredefinedCopybookName(), dialect);
