@@ -47,7 +47,7 @@ class TestEmptyGroupShowsError {
             "nopic",
             new Diagnostic(
                 null,
-                "A \"PICTURE\" clause was not found for elementary item PARENT",
+                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item PARENT",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

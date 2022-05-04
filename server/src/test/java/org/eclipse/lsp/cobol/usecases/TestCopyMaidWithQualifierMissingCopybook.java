@@ -51,7 +51,7 @@ class TestCopyMaidWithQualifierMissingCopybook {
             "1",
             new Diagnostic(
                 null,
-                "A \"PICTURE\" clause was not found for elementary item MRB",
+                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item MRB",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText()),
             "2",
