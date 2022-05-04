@@ -116,6 +116,8 @@ class TestIdmsCopy {
       "       05  {$*SKILL}.\n"
           + "         10  {$*SKILL-ID-0455}           PIC 9(4).\n";
 
+  private static final String COMMENTED_TEXT = "           * Commented text \n";
+
   @Test
   void testIdmsCopyWS1() {
     UseCaseEngine.runTest(
@@ -156,6 +158,12 @@ class TestIdmsCopy {
   void testIdmsCopySubschemaNames() {
     UseCaseEngine.runTest(
         COPY_IDMS_SUBSCHEMA_NAMES, ImmutableList.of(new CobolText("SUBSCHEMA-NAMES", IdmsDialect.NAME, "")), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
+  }
+
+  @Test
+  void testIdmsCopyWithComments() {
+    UseCaseEngine.runTest(
+        TEXT + COPY_IDMS_WS1, ImmutableList.of(new CobolText(CB_NAME1, IdmsDialect.NAME, COMMENTED_TEXT + CB1)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test

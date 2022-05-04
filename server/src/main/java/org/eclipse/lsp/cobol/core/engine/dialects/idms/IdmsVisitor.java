@@ -136,9 +136,11 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     String[] lines = text.split("\\r?\\n");
     StringBuilder result = new StringBuilder();
     for (String line : lines) {
-      line = StringUtils.leftPad(line.substring(7), line.length());
-      if (line.length() > 11 && line.substring(11).trim().startsWith("*")) {
-        line = "";
+      if (line.length() > 7) {
+        line = StringUtils.leftPad(line.substring(7), line.length());
+        if (line.length() > 11 && line.substring(11).trim().startsWith("*")) {
+          line = "";
+        }
       }
       result.append(line);
       result.append("\r\n");
