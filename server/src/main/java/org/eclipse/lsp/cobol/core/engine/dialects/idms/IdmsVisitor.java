@@ -20,6 +20,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.IdmsParser;
@@ -126,8 +127,24 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
     node.setDefinition(new CopyDefinition(location, copybookModel.getUri()));
 
-    parseIdmsCopybook(copybookModel, getLevel(ctx)).forEach(node::addChild);
+    parseIdmsCopybook(preprocessIdmsCopybook(copybookModel), getLevel(ctx)).forEach(node::addChild);
     return ImmutableList.of(node);
+  }
+
+  private CopybookModel preprocessIdmsCopybook(CopybookModel copybookModel) {
+    String text = copybookModel.getContent();
+    String[] lines = text.split("\\r?\\n");
+    StringBuilder result = new StringBuilder();
+    for (String line : lines) {
+      line = StringUtils.leftPad(line.substring(7), line.length());
+      if (line.length() > 11 && line.substring(11).trim().startsWith("*")) {
+        line = "";
+      }
+      result.append(line);
+      result.append("\r\n");
+    }
+
+    return new CopybookModel(copybookModel.getCopybookName(), copybookModel.getUri(), result.toString());
   }
 
   @Override
@@ -232,6 +249,9 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   }
 
   private List<Node> processNodes(CopybookModel copybookModel, Function<CobolParser, ParserRuleContext> parseFunc, int parentLevel) {
+    if (copybookModel.getContent() == null) {
+      return ImmutableList.of();
+    }
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(copybookModel.getContent()));
     lexer.removeErrorListeners();
 

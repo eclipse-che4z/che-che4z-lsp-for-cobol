@@ -19,6 +19,5 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
  */
 public enum DialectType {
   COBOL,
-  IDMS,
   MAID
 }
