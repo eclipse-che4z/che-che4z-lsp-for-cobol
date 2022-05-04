@@ -35,15 +35,21 @@ public class RangeUtils {
    * @return the found node
    */
   public static Optional<Node> findNodeByPosition(Node node, String uri, Position position) {
-    if (!isInside(uri, position, node.getLocality())) return Optional.empty();
-    if (node.getChildren().isEmpty()) return Optional.of(node);
+    Node candidate = null;
+    if (isInside(uri, position, node.getLocality())) {
+      if (node.getChildren().isEmpty()) {
+        return Optional.of(node);
+      }
+      candidate = node;
+    }
 
-    return node.getChildren().stream()
-        .filter(it -> isInside(uri, position, it.getLocality()))
-        .map(it -> findNodeByPosition(it, uri, position))
-        .filter(Optional::isPresent)
-        .findFirst()
-        .orElse(Optional.of(node));
+    for (Node child : node.getChildren()) {
+      Optional<Node> nodeByPosition = findNodeByPosition(child, uri, position);
+      if (nodeByPosition.isPresent()) {
+        return nodeByPosition;
+      }
+    }
+    return candidate == null ? Optional.empty() : Optional.of(candidate);
   }
 
   /**
