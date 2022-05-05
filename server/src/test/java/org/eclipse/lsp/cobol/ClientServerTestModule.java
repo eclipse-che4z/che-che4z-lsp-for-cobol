@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
+import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.*;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
@@ -41,6 +42,7 @@ import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageServer;
+import org.eclipse.lsp.cobol.service.mocks.MockTextPreprocessor;
 import org.eclipse.lsp.cobol.service.utils.*;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.WorkspaceService;
@@ -83,6 +85,7 @@ public class ClientServerTestModule extends AbstractModule {
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(HoverProvider.class).to(VariableHover.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
+    bind(TextPreprocessor.class).to(MockTextPreprocessor.class);
 
     bindFormations();
     bindCompletions();

@@ -28,6 +28,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
+import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
@@ -58,11 +59,13 @@ public class CopybookServiceImpl implements CopybookService {
   private final SettingsService settingsService;
   private final FileSystemService files;
   private final ContentProviderFactory contentProviderFactory;
+  public final TextPreprocessor preprocessor;
 
   private final Map<String, Set<CopybookName>> copybooksForDownloading =
       new ConcurrentHashMap<>(8, 0.9f, 1);
 
   private final Cache<String, CopybookModel> copybookCache;
+  private final Set<String> processedCopybooks = new HashSet<>();
 
   @Inject
   public CopybookServiceImpl(
@@ -70,12 +73,14 @@ public class CopybookServiceImpl implements CopybookService {
       SettingsService settingsService,
       FileSystemService files,
       ContentProviderFactory contentProviderFactory,
+      TextPreprocessor preprocessor,
       @Named("CACHE-MAX-SIZE") int cacheSize,
       @Named("CACHE-DURATION") int duration,
       @Named("CACHE-TIME-UNIT") String timeUnitName) {
     this.settingsService = settingsService;
     this.files = files;
     this.contentProviderFactory = contentProviderFactory;
+    this.preprocessor = preprocessor;
     copybookCache =
         CacheBuilder.newBuilder()
             .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName))
@@ -91,6 +96,7 @@ public class CopybookServiceImpl implements CopybookService {
     LOG.debug("Cache invalidated");
     copybooksForDownloading.clear();
     copybookCache.invalidateAll();
+    processedCopybooks.clear();
   }
 
   /**
@@ -105,16 +111,22 @@ public class CopybookServiceImpl implements CopybookService {
    * @param documentUri - the currently processing document that contains the copy statement
    * @param copybookConfig - contains config info like: copybook processing mode, target backend sql
    *     server
+   * @param preprocess - indicates if copybook needs to be preprocessed after resolving
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   public CopybookModel resolve(
       @NonNull CopybookName copybookName,
       @NonNull String programDocumentUri,
       @NonNull String documentUri,
-      @NonNull CopybookConfig copybookConfig) {
+      @NonNull CopybookConfig copybookConfig,
+      boolean preprocess) {
     try {
-      String cacheKay = makeCopybookCacheKay(copybookName, programDocumentUri);
-      return copybookCache.get(cacheKay, () -> resolveSync(copybookName, documentUri, copybookConfig));
+      String cacheKey = makeCopybookCacheKay(copybookName, programDocumentUri);
+      CopybookModel copybookModel = copybookCache.get(cacheKey, () -> resolveSync(copybookName, documentUri, copybookConfig));
+      if (preprocess) {
+        copybookModel = cleanupCopybook(cacheKey, copybookModel);
+      }
+      return copybookModel;
     } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
       return new CopybookModel(copybookName, null, null);
@@ -143,6 +155,16 @@ public class CopybookServiceImpl implements CopybookService {
             () ->
                 tryResolvePredefinedCopybook(copybookName, copybookConfig)
                     .orElseGet(() -> registerForDownloading(copybookName, cobolFileName)));
+  }
+
+  private CopybookModel cleanupCopybook(String cacheKey, CopybookModel dirtyCopybook) {
+    CopybookModel cleanCopybook = dirtyCopybook;
+    if (!processedCopybooks.contains(cacheKey)) {
+      String cleanText = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent()).getResult();
+      cleanCopybook = new CopybookModel(dirtyCopybook.getCopybookName(), dirtyCopybook.getUri(), cleanText);
+      processedCopybooks.add(cacheKey);
+    }
+    return cleanCopybook;
   }
 
   private Optional<CopybookModel> tryResolveCopybookFromWorkspace(

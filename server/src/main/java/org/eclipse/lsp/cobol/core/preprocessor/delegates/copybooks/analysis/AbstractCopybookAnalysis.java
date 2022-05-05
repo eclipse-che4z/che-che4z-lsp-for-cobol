@@ -225,7 +225,8 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
             copybookMetaData.getCopybookName(),
                 hierarchy.getRootDocumentUri().orElse(copybookMetaData.getDocumentUri()),
                 copybookMetaData.getDocumentUri(),
-                copybookMetaData.getConfig());
+                copybookMetaData.getConfig(),
+            false);
 
     if (copybook.getContent() == null) {
       return emptyModel(

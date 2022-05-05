@@ -116,7 +116,10 @@ class TestIdmsCopy {
       "       05  {$*SKILL}.\n"
           + "         10  {$*SKILL-ID-0455}           PIC 9(4).\n";
 
-  private static final String COMMENTED_TEXT = "           * Commented text \n";
+  private static final String COMMENTED_TEXT = "      * Commented text \n";
+  private static final String CB7 =
+      "     1 01  {$*EMPLOYEE}.                                                       560  \n"
+          + "     2     03 {$*EMPNAME}                  PIC S9(4)   VALUE ZERO  COMP.         1  \n";
 
   @Test
   void testIdmsCopyWS1() {
@@ -167,6 +170,12 @@ class TestIdmsCopy {
   }
 
   @Test
+  void testIdmsCopyCleanup() {
+    UseCaseEngine.runTest(
+        TEXT + COPY_IDMS_WS1, ImmutableList.of(new CobolText(CB_NAME1, IdmsDialect.NAME,  CB7)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
+  }
+
+  @Test
   void testIdmsCopyVariableLevel() throws Exception {
     AnalysisResult result = UseCaseEngine.runTest(
         TEXT + COPY_IDMS_LEVELS, ImmutableList.of(new CobolText(CB_NAME1, IdmsDialect.NAME, CB6)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
@@ -182,6 +191,5 @@ class TestIdmsCopy {
 
     assertEquals(6, copybookNode.getLevel());
   }
-
 
 }

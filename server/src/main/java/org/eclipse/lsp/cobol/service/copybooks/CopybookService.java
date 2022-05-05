@@ -34,13 +34,15 @@ public interface CopybookService {
    * @param programDocumentUri - the currently processing program document
    * @param documentUri - the currently processing document that contains the copy statement
    * @param copybookConfig - contains config info like: copybook processing mode, target backend sql server
+   * @param preprocess - indicates if copybook needs to be preprocessed after resolving
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   CopybookModel resolve(
       @NonNull CopybookName copybookName,
       @NonNull String programDocumentUri,
       @NonNull String documentUri,
-      @NonNull CopybookConfig copybookConfig);
+      @NonNull CopybookConfig copybookConfig,
+      boolean preprocess);
 
   /**
    * Store the copybookModel in cache. Copybook depends on a document from where it is imported.

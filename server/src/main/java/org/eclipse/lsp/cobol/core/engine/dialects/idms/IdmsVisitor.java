@@ -20,7 +20,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.IdmsParser;
@@ -114,7 +113,7 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     String nameToken = optionsContext.getText().toUpperCase();
     CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
 
-    CopybookModel copybookModel = copybookService.resolve(copybookName, programDocumentUri, programDocumentUri, copybookConfig);
+    CopybookModel copybookModel = copybookService.resolve(copybookName, programDocumentUri, programDocumentUri, copybookConfig, true);
     textReplacement.addReplacementContext(ctx);
 
     Locality locality = VisitorHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), programDocumentUri);
@@ -127,26 +126,8 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
     node.setDefinition(new CopyDefinition(location, copybookModel.getUri()));
 
-    parseIdmsCopybook(preprocessIdmsCopybook(copybookModel), getLevel(ctx)).forEach(node::addChild);
+    parseIdmsCopybook(copybookModel, getLevel(ctx)).forEach(node::addChild);
     return ImmutableList.of(node);
-  }
-
-  private CopybookModel preprocessIdmsCopybook(CopybookModel copybookModel) {
-    String text = copybookModel.getContent();
-    String[] lines = text.split("\\r?\\n");
-    StringBuilder result = new StringBuilder();
-    for (String line : lines) {
-      if (line.length() > 7) {
-        line = StringUtils.leftPad(line.substring(7), line.length());
-        if (line.length() > 11 && line.substring(11).trim().startsWith("*")) {
-          line = "";
-        }
-      }
-      result.append(line);
-      result.append("\r\n");
-    }
-
-    return new CopybookModel(copybookModel.getCopybookName(), copybookModel.getUri(), result.toString());
   }
 
   @Override
