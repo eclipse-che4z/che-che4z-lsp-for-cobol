@@ -136,6 +136,7 @@ public class ErrorMessageHelper {
         .map(it -> SPECIAL_TOKEN_MAPPING.getOrDefault(it, it))
         .filter(it -> !it.isEmpty())
         .map(it -> it.replace("_", "-"))
+        .distinct()
         .collect(joining(MSG_DELIMITER));
   }
 
