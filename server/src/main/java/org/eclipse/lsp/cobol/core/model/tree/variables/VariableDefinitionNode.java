@@ -56,7 +56,7 @@ public final class VariableDefinitionNode extends Node {
   private final boolean isSignClausePresent;
   private final String valueToken;
   private final String fileDescriptor;
-  private final String fileControlClause;
+  @Setter private String fileControlClause;
   private final boolean isSortDescription;
   @Setter private List<UsageFormat> usageClauses;
 

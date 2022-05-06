@@ -182,23 +182,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void enterCopyIdmsStatement(CopyIdmsStatementContext ctx) {
-    push();
-  }
-
-  @Override
-  public void exitCopyIdmsStatement(@NonNull CopyIdmsStatementContext ctx) {
-    if (requiresEarlyReturn(ctx)) return;
-    ofNullable(ctx.LEVEL_NUMBER())
-        .map(ParseTree::getText)
-        .map(Integer::parseInt)
-        .map(CopyStatementModifier::new)
-        .ifPresent(hierarchy::setModifier);
-    analyzeCopybook(
-        DIALECT, ctx, ctx.copyIdmsOptions().copyIdmsSource().copySource(), DialectType.IDMS);
-  }
-
-  @Override
   public void enterCopyMaidStatement(CopyMaidStatementContext ctx) {
     push();
   }

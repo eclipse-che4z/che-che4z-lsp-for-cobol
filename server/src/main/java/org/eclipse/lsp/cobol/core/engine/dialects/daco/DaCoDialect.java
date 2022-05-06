@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects.daco;
 
+import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.core.DaCoLexer;
@@ -21,6 +22,7 @@ import org.eclipse.lsp.cobol.core.DaCoParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectParserListener;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -32,30 +34,40 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /** Process the text according to the DaCo rules */
+@RequiredArgsConstructor
 public final class DaCoDialect implements CobolDialect {
   public static final String NAME = "DaCo";
   private final Pattern dcdbPattern = Pattern.compile("^[\\s\\d]{7}D-[BC]", Pattern.MULTILINE);
+
+  private final MessageService messageService;
+
+  /**
+   * Gets the name of the dialect
+   * @return the name of the dialect
+   */
+  @Override
+  public String getName() {
+    return DaCoDialect.NAME;
+  }
   /**
    * Processing the text according to the DaCo rules
    *
-   * @param uri document URI
-   * @param text document text
-   * @param messageService error message service
+   * @param context is a DialectProcessingContext class with all needed data for dialect processing
    * @return the dialect processing result
    */
   @Override
-  public ResultWithErrors<DialectOutcome> processText(String uri, String text, MessageService messageService) {
-    text = dcdbPattern.matcher(text).replaceAll("          ");
+  public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
+    String text = dcdbPattern.matcher(context.getText()).replaceAll("          ");
     DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(text));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     DaCoParser parser = new DaCoParser(tokens);
-    DialectParserListener listener = new DialectParserListener(uri);
+    DialectParserListener listener = new DialectParserListener(context.getProgramDocumentUri());
     lexer.removeErrorListeners();
     lexer.addErrorListener(listener);
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
-    DaCoVisitor visitor = new DaCoVisitor(uri, text);
+    DaCoVisitor visitor = new DaCoVisitor(context.getProgramDocumentUri(), text);
     List<Node> nodes = visitor.visitStartRule(parser.startRule());
     List<SyntaxError> errors = new ArrayList<>(listener.getErrors());
     errors.addAll(visitor.getErrors());

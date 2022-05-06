@@ -29,7 +29,6 @@ import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
@@ -62,7 +61,6 @@ import java.util.function.Predicate;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.antlr.v4.runtime.Lexer.HIDDEN;
 import static org.eclipse.lsp.cobol.core.CobolParser.*;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
@@ -245,6 +243,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitFileDescriptionEntry(FileDescriptionEntryContext ctx) {
+    if (ctx.fileDescriptionEntryClauses() == null) {
+      return ImmutableList.of();
+    }
     areaAWarning(ctx.getStart());
     String fileControlClause = "";
     String fileName = getName(ctx.fileDescriptionEntryClauses().cobolWord());
@@ -323,9 +324,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitFileControlEntry(FileControlEntryContext ctx) {
     String filename = VisitorHelper.getName(ctx.selectClause().fileName());
     if (StringUtils.isNotBlank(filename)) {
+      String fileControlClause = getIntervalText(ctx.fileControlClauses());
       checkFileControlUniqueness(ctx, filename);
+      return addTreeNode(ctx, locality -> new FileEntryNode(locality, filename, fileControlClause));
     }
-    return addTreeNode(ctx, locality -> new FileEntryNode(locality, filename));
+    return addTreeNode(ctx, locality -> new FileEntryNode(locality, filename, ""));
   }
 
   private void checkFileControlUniqueness(FileControlEntryContext ctx, String filename) {
@@ -542,15 +545,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                         .build(),
                     visitChildren(ctx)))
         .orElse(ImmutableList.of());
-  }
-
-  private String retrieveValueToken(ValueIsTokenContext ctx) {
-    return ctx.valueToken().getText().toUpperCase()
-        + Optional.ofNullable(ctx.isAreToken())
-            .map(ParserRuleContext::getText)
-            .map(String::toUpperCase)
-            .map(" "::concat)
-            .orElse("");
   }
 
   @Override
@@ -851,13 +845,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     };
   }
 
-  private Map<String, Collection<Location>> getSubroutineDefinition() {
-    return subroutineUsages.keySet().stream()
-        .map(name -> new ImmutablePair<>(name, subroutineService.getUri(name)))
-        .filter(pair -> pair.getValue().isPresent())
-        .collect(toMap(Pair::getKey, CobolVisitor::getSubroutineLocation));
-  }
-
   private static Collection<Location> getSubroutineLocation(
       ImmutablePair<String, Optional<String>> subroutinePair) {
     return subroutinePair
@@ -938,7 +925,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return ofNullable(VisitorHelper.getInteger(ctx.integerLiteral()))
         .map(
             intLit ->
-                new OccursClause(intLit, retrieveOccursToValue(ctx), retrieveIndexNames(ctx)));
+                new OccursClause(intLit, retrieveOccursToValue(ctx).orElse(null), retrieveIndexNames(ctx)));
   }
 
   private List<VariableNameAndLocality> retrieveIndexNames(DataOccursClauseContext ctx) {
@@ -946,13 +933,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .map(IndexNameContext::cobolWord)
         .map(this::extractNameAndLocality)
         .collect(toList());
-  }
-
-  private Integer retrieveOccursToValue(DataOccursClauseContext ctx) {
-    return ofNullable(ctx.dataOccursTo())
-        .map(DataOccursToContext::integerLiteral)
-        .map(VisitorHelper::getInteger)
-        .orElse(null);
   }
 
   private List<ValueClause> retrieveValues(List<DataValueClauseContext> clauses) {

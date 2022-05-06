@@ -12,12 +12,19 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+package org.eclipse.lsp.cobol.core.engine.dialects;
+
+import lombok.Builder;
+import lombok.Value;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 /**
- * Represents supported dialect types, used for resolving copybooks for different dialects
+ * Contains all needed data for dialect processing
  */
-public enum DialectType {
-  COBOL,
-  MAID
+@Value
+@Builder(toBuilder = true)
+public class DialectProcessingContext {
+  String programDocumentUri;
+  String text;
+  CopybookConfig copybookConfig;
 }

@@ -24,12 +24,14 @@ import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -108,12 +110,8 @@ public class VariableDefinitionUtil {
    * @return the list of errors
    */
   public List<SyntaxError> processNodeWithVariableDefinitions(Node node) {
-    Deque<VariableDefinitionNode> variableDefinitionNodes =
-        node.getChildren().stream()
-            .filter(hasType(NodeType.VARIABLE_DEFINITION))
-            .map(VariableDefinitionNode.class::cast)
-            .collect(Collectors.toCollection(LinkedList::new));
-    variableDefinitionNodes.forEach(node::removeChild);
+    Deque<VariableDefinitionNode> variableDefinitionNodes = new LinkedList<>(unwrapVariables(node));
+    variableDefinitionNodes.forEach(n -> n.getParent().removeChild(n));
     List<SyntaxError> errors = new ArrayList<>();
     errors.addAll(processDefinition(node, 1, variableDefinitionNodes));
     errors.addAll(checkGlobalUniqueNames(node));
@@ -121,6 +119,47 @@ public class VariableDefinitionUtil {
     reshapeVariablesLocality(node);
     registerVariablesInProgram(node);
     return errors;
+  }
+
+  /**
+   * Collects node children variables including copybook nested variables
+   * @param node - node for processing
+   * @return a list of unwrapped variables
+   */
+  private List<VariableDefinitionNode> unwrapVariables(Node node) {
+    List<VariableDefinitionNode> variables = new ArrayList<>();
+    List<CopyNode> copybooks = new LinkedList<>();
+
+    node.getChildren()
+        .forEach(c -> {
+          if (c.getNodeType() == NodeType.VARIABLE_DEFINITION) {
+            variables.add((VariableDefinitionNode) c);
+          }
+          if (c.getNodeType() == NodeType.COPY) {
+            copybooks.add((CopyNode) c);
+          }
+        });
+
+    copybooks.forEach(copyNode -> {
+      int copybookLine = copyNode.getLocality().getRange().getStart().getLine();
+      String uri = copyNode.getLocality().getUri();
+      AtomicInteger index = new AtomicInteger();
+      for (Node variable : variables) {
+        int variableLine = variable.getLocality().getRange().getStart().getLine();
+        if (variable.getLocality().getUri().equals(uri) && variableLine > copybookLine) {
+          break;
+        }
+        index.incrementAndGet();
+      }
+
+      copyNode.getDepthFirstStream()
+          .filter(hasType(NodeType.COPY))
+          .flatMap(Node::getDepthFirstStream)
+          .filter(hasType(NodeType.VARIABLE_DEFINITION))
+          .map(VariableDefinitionNode.class::cast)
+          .forEach(copyNodeVariable -> variables.add(index.getAndIncrement(), copyNodeVariable));
+    });
+    return variables;
   }
 
   /**

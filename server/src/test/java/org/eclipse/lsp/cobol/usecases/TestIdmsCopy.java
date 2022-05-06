@@ -16,10 +16,15 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
+import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.tree.variables.ElementaryItemNode;
 import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * These test for COPY IDMS statements in FILE SECTION, WS/LINKAGE SECTIONS AND PROCEDURE DIVISION
@@ -79,6 +84,17 @@ class TestIdmsCopy {
           + "       PROCEDURE DIVISION.\n"
           + "           MOVE 'ABC' TO {$MRB-ABCMAP-ID}.\n";
 
+  private static final String COPY_IDMS_SUBSCHEMA_NAMES =
+      "        IDENTIFICATION DIVISION. \n"
+          + "        PROGRAM-ID. test1.\n"
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "             01 COPY IDMS {~SUBSCHEMA-NAMES}.\n";
+
+  private static final String COPY_IDMS_LEVELS =
+      "       WORKING-STORAGE SECTION.\n"
+          + "         01 COPY IDMS {~EMPLOYEE} VERSION 03.\n";
+
   private static final String CB_NAME1 = "EMPLOYEE";
   private static final String CB1 = "          01 {$*EMPNAME}    PIC X(8).\n";
 
@@ -96,52 +112,84 @@ class TestIdmsCopy {
 
   private static final String CB_NAME5 = "FL002";
   private static final String CB5 = "       FD {$*EMP-FILE}.\n" + "       RECORD CONTAINS 80.\n";
+  private static final String CB6 =
+      "       05  {$*SKILL}.\n"
+          + "         10  {$*SKILL-ID-0455}           PIC 9(4).\n";
+
+  private static final String COMMENTED_TEXT = "      * Commented text \n";
+  private static final String CB7 =
+      "     1 01  {$*EMPLOYEE}.                                                       560  \n"
+          + "     2     03 {$*EMPNAME}                  PIC S9(4)   VALUE ZERO  COMP.         1  \n";
 
   @Test
   void testIdmsCopyWS1() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS1,
-        ImmutableList.of(new CobolText(CB_NAME1, DialectType.IDMS.name(), CB1)),
-        ImmutableMap.of());
+        TEXT + COPY_IDMS_WS1, ImmutableList.of(new CobolText(CB_NAME1, IdmsDialect.NAME, CB1)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test
   void testIdmsCopyWS2() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS2,
-        ImmutableList.of(new CobolText(CB_NAME2, DialectType.IDMS.name(), CB2)),
-        ImmutableMap.of());
+        TEXT + COPY_IDMS_WS2, ImmutableList.of(new CobolText(CB_NAME2, IdmsDialect.NAME, CB2)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test
   void testIdmsCopyWS3() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS3,
-        ImmutableList.of(new CobolText(CB_NAME3, DialectType.IDMS.name(), CB3)),
-        ImmutableMap.of());
+        TEXT + COPY_IDMS_WS3, ImmutableList.of(new CobolText(CB_NAME3, IdmsDialect.NAME, CB3)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test
   void testIdmsCopyWS4() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS4,
-        ImmutableList.of(new CobolText(CB_NAME3A, DialectType.IDMS.name(), CB3)),
-        ImmutableMap.of());
+        TEXT + COPY_IDMS_WS4, ImmutableList.of(new CobolText(CB_NAME3A, IdmsDialect.NAME, CB3)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test
   void testIdmsCopyWS5() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS5,
-        ImmutableList.of(new CobolText(CB_NAME3, DialectType.IDMS.name(), CB3)),
-        ImmutableMap.of());
+        TEXT + COPY_IDMS_WS5, ImmutableList.of(new CobolText(CB_NAME3, IdmsDialect.NAME, CB3)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test
   void testIdmsCopyFile() {
     UseCaseEngine.runTest(
-        TEXT_IDMS_COPY_FILE + COPY_IDMS_FILE,
-        ImmutableList.of(new CobolText(CB_NAME5, DialectType.IDMS.name(), CB5)),
-        ImmutableMap.of());
+            TEXT_IDMS_COPY_FILE + COPY_IDMS_FILE, ImmutableList.of(new CobolText(CB_NAME5, IdmsDialect.NAME, CB5)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
+
+  @Test
+  void testIdmsCopySubschemaNames() {
+    UseCaseEngine.runTest(
+        COPY_IDMS_SUBSCHEMA_NAMES, ImmutableList.of(new CobolText("SUBSCHEMA-NAMES", IdmsDialect.NAME, "")), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
+  }
+
+  @Test
+  void testIdmsCopyWithComments() {
+    UseCaseEngine.runTest(
+        TEXT + COPY_IDMS_WS1, ImmutableList.of(new CobolText(CB_NAME1, IdmsDialect.NAME, COMMENTED_TEXT + CB1)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
+  }
+
+  @Test
+  void testIdmsCopyCleanup() {
+    UseCaseEngine.runTest(
+        TEXT + COPY_IDMS_WS1, ImmutableList.of(new CobolText(CB_NAME1, IdmsDialect.NAME,  CB7)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
+  }
+
+  @Test
+  void testIdmsCopyVariableLevel() throws Exception {
+    AnalysisResult result = UseCaseEngine.runTest(
+        TEXT + COPY_IDMS_LEVELS, ImmutableList.of(new CobolText(CB_NAME1, IdmsDialect.NAME, CB6)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
+
+    ElementaryItemNode copybookNode = result.getRootNode()
+        .getDepthFirstStream()
+        .filter(n -> n.getNodeType() == NodeType.VARIABLE)
+        .filter(n -> n instanceof ElementaryItemNode)
+        .map(ElementaryItemNode.class::cast)
+        .filter(n -> n.getName().equals("SKILL-ID-0455"))
+        .findFirst()
+        .orElseThrow(Exception::new);
+
+    assertEquals(6, copybookNode.getLevel());
+  }
+
 }
