@@ -65,7 +65,6 @@ public class CopybookServiceImpl implements CopybookService {
       new ConcurrentHashMap<>(8, 0.9f, 1);
 
   private final Cache<String, CopybookModel> copybookCache;
-  private final Set<String> processedCopybooks = new HashSet<>();
 
   @Inject
   public CopybookServiceImpl(
@@ -96,7 +95,6 @@ public class CopybookServiceImpl implements CopybookService {
     LOG.debug("Cache invalidated");
     copybooksForDownloading.clear();
     copybookCache.invalidateAll();
-    processedCopybooks.clear();
   }
 
   /**
@@ -122,11 +120,13 @@ public class CopybookServiceImpl implements CopybookService {
       boolean preprocess) {
     try {
       String cacheKey = makeCopybookCacheKay(copybookName, programDocumentUri);
-      CopybookModel copybookModel = copybookCache.get(cacheKey, () -> resolveSync(copybookName, documentUri, copybookConfig));
-      if (preprocess) {
-        copybookModel = cleanupCopybook(cacheKey, copybookModel);
-      }
-      return copybookModel;
+      return copybookCache.get(cacheKey, () -> {
+        CopybookModel copybookModel = resolveSync(copybookName, documentUri, copybookConfig);
+        if (preprocess) {
+          copybookModel = cleanupCopybook(copybookModel);
+        }
+        return copybookModel;
+      });
     } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
       return new CopybookModel(copybookName, null, null);
@@ -136,7 +136,7 @@ public class CopybookServiceImpl implements CopybookService {
   @Override
   public void store(CopybookModel copybookModel, String documentUri) {
     String cacheKay = makeCopybookCacheKay(copybookModel.getCopybookName(), documentUri);
-    copybookCache.put(cacheKay, copybookModel);
+    copybookCache.put(cacheKay, cleanupCopybook(copybookModel));
   }
 
   private CopybookModel resolveSync(
@@ -157,14 +157,9 @@ public class CopybookServiceImpl implements CopybookService {
                     .orElseGet(() -> registerForDownloading(copybookName, cobolFileName)));
   }
 
-  private CopybookModel cleanupCopybook(String cacheKey, CopybookModel dirtyCopybook) {
-    CopybookModel cleanCopybook = dirtyCopybook;
-    if (!processedCopybooks.contains(cacheKey)) {
-      String cleanText = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent()).getResult();
-      cleanCopybook = new CopybookModel(dirtyCopybook.getCopybookName(), dirtyCopybook.getUri(), cleanText);
-      processedCopybooks.add(cacheKey);
-    }
-    return cleanCopybook;
+  private CopybookModel cleanupCopybook(CopybookModel dirtyCopybook) {
+    String cleanText = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent()).getResult();
+    return new CopybookModel(dirtyCopybook.getCopybookName(), dirtyCopybook.getUri(), cleanText);
   }
 
   private Optional<CopybookModel> tryResolveCopybookFromWorkspace(
