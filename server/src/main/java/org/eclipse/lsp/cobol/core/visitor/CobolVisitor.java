@@ -252,6 +252,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       FileControlEntryContext fileControlEntryContext = fileControls.remove(fileName);
       fileControlClause = getIntervalText(fileControlEntryContext.fileControlClauses());
     }
+
     return addTreeNode(
         VariableDefinitionNode.builder()
             .level(LEVEL_FD_SD)
@@ -263,8 +264,21 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .fileDescriptor(getIntervalText(ctx.fileDescriptionEntryClauses()))
             .fileControlClause(fileControlClause)
             .isSortDescription(Objects.nonNull(ctx.fileDescriptionEntryClauses().SD()))
+            .global(isFeildDescriptionEntryGlobal(ctx))
             .build(),
         visitChildren(ctx));
+  }
+
+  private boolean isFeildDescriptionEntryGlobal(FileDescriptionEntryContext ctx) {
+    return !ctx.fileDescriptionEntryClauses().fileDescriptionEntryClause().isEmpty()
+            && Objects.nonNull(
+            ctx.fileDescriptionEntryClauses()
+                    .fileDescriptionEntryClause(0)
+                    .globalClause())
+            && !ctx.fileDescriptionEntryClauses()
+            .fileDescriptionEntryClause(0)
+            .globalClause()
+            .isEmpty();
   }
 
   /**
@@ -461,7 +475,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitRemarksParagraph(RemarksParagraphContext ctx) {
-    return addTreeNode(ctx, locality -> new RemarksNode(locality));
+    return addTreeNode(ctx, RemarksNode::new);
   }
 
   @Override
