@@ -66,7 +66,7 @@ abstract class ElementaryNode extends VariableWithLevelNode implements UsageClau
     this.picClause = picClause;
     this.usageFormat = usageFormat;
     this.effectiveDataType = setEffectiveDataType();
-    addProcessStep(this::processNode);
+    addProcessStep(this::processStandAloneNode);
   }
 
   private EffectiveDataType setEffectiveDataType() {
@@ -81,7 +81,7 @@ abstract class ElementaryNode extends VariableWithLevelNode implements UsageClau
    *
    * @return SyntaxError
    */
-  private List<SyntaxError> processNode() {
+  private List<SyntaxError> processStandAloneNode() {
     List<SyntaxError> errors = new ArrayList<>(validatePicClauseUsage());
     errors.addAll(validateCompatibleUsageClause());
     return errors;

@@ -59,7 +59,7 @@ class TestRenamesWithNonExistingName {
             "2",
             new Diagnostic(
                 null,
-                "A \"PICTURE\" clause was not found for elementary item VARNAME4",
+                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item VARNAME4",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "3",

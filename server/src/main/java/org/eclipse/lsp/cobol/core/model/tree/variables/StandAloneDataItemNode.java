@@ -36,7 +36,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class StandAloneDataItemNode extends VariableWithLevelNode {
+public class StandAloneDataItemNode extends ElementaryNode {
   private final String picClause;
   private final String value;
 
@@ -46,8 +46,21 @@ public class StandAloneDataItemNode extends VariableWithLevelNode {
       boolean global,
       String picClause,
       String value,
-      boolean redefines) {
-    super(location, LEVEL_77, name, redefines, VariableType.STAND_ALONE_DATA_ITEM, global);
+      boolean redefines,
+      UsageFormat usageFormat,
+      boolean isBlankWhenZeroPresent,
+      boolean isSignClausePresent) {
+    super(
+        location,
+        LEVEL_77,
+        name,
+        redefines,
+        VariableType.STAND_ALONE_DATA_ITEM,
+        global,
+        isBlankWhenZeroPresent,
+        isSignClausePresent,
+        picClause,
+        usageFormat);
     this.picClause = picClause;
     this.value = value;
     addProcessStep(this::processNode);
@@ -55,7 +68,7 @@ public class StandAloneDataItemNode extends VariableWithLevelNode {
 
   private List<SyntaxError> processNode() {
     List<SyntaxError> errors = new ArrayList<>();
-    if (picClause.isEmpty())
+    if (picClause.isEmpty() && usageFormat != UsageFormat.INDEX)
       errors.add(getError(MessageTemplate.of(EMPTY_STRUCTURE_MSG, getName())));
     return errors;
   }

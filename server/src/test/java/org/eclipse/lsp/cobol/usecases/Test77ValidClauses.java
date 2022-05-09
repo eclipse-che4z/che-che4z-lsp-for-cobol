@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2021 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -18,20 +18,19 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+/**
+ * This class checks that a 77-level variable PIC and usage INDEX do not produce a semantic error.
+ */
+public class Test77ValidClauses {
 
-/** This class checks that a 77-level variable without PIC specified produces a semantic error. */
-class Test77WithoutPICShowsError {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       77 {$*VARNAME|1}.\n"
+          + "       77 {$*VARNAME} USAGE INDEX.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$VARNAME}.";
 
@@ -40,35 +39,17 @@ class Test77WithoutPICShowsError {
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       77 {$*VARNAME|1} USAGE COMPUTATIONAL.\n"
+          + "       77 {$*VARNAME} PIC IS X(9).\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$VARNAME}.";
 
   @Test
-  void test() {
-    UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null,
-                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item VARNAME",
-                DiagnosticSeverity.Error,
-                ERROR.getText())));
+  void testPicClause() {
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
-  void testInCompatibleUsageForElementaryItem() {
-    UseCaseEngine.runTest(
-        TEXT2,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null,
-                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item VARNAME",
-                DiagnosticSeverity.Error,
-                ERROR.getText())));
+  void testUsageIndexClause() {
+    UseCaseEngine.runTest(TEXT2, ImmutableList.of(), ImmutableMap.of());
   }
 }
