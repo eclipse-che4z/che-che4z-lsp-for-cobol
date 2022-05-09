@@ -280,7 +280,7 @@ public class VariableDefinitionUtil {
               definitionNode.getLocality(),
               getName(definitionNode),
               definitionNode.isSortDescription() ? VariableType.SD : VariableType.FD,
-              false,
+              definitionNode.isGlobal(),
               definitionNode.getFileDescriptor(),
               definitionNode.getFileControlClause());
       createVariableNameNode(variable, definitionNode.getVariableName());
