@@ -14,6 +14,12 @@
 lexer grammar Db2SqlLexer;
 channels{COMMENTS}
 import TechnicalLexer;
+@lexer::members {
+   public Db2SqlLexer(CharStream input, boolean sqlFlag) {
+   		this(input);
+   		this.enableCommaSeparator = sqlFlag;
+   	}
+}
 
 // DB2 SQL Reserved Keywords
 

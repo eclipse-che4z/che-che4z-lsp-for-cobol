@@ -94,7 +94,7 @@ public class EmbeddedLanguagesListener extends CobolParserBaseListener {
 
   private CommonTokenStream applyDb2Lexer(ParserRuleContext context) {
     Db2SqlLexer lexer =
-        new Db2SqlLexer(CharStreams.fromString(VisitorHelper.getIntervalText(context)));
+        new Db2SqlLexer(CharStreams.fromString(VisitorHelper.getIntervalText(context)), true);
     lexer.removeErrorListeners();
 
     return new CommonTokenStream(lexer);
