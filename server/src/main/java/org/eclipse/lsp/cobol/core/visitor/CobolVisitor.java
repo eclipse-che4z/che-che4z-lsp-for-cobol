@@ -15,7 +15,6 @@
 
 package org.eclipse.lsp.cobol.core.visitor;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
@@ -79,7 +78,6 @@ import static org.eclipse.lsp.cobol.service.SubroutineService.IMPLICIT_SUBROUTIN
 public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
-  private final Multimap<String, Location> subroutineUsages = HashMultimap.create();
   private final NamedSubContext copybooks;
   private final CommonTokenStream tokenStream;
   private final Map<Token, Locality> positions;

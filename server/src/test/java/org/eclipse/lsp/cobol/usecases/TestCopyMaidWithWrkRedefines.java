@@ -16,9 +16,11 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,11 +45,12 @@ class TestCopyMaidWithWrkRedefines {
           + "             05 FILLER                 PIC X(37).";
 
   @Test
+  @Disabled("It's not clear if we should have locality of the variable definition before suffix substitution")
   void test() {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", COPYBOOK_CONTENT)),
-        ImmutableMap.of());
+            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, "WRK", COPYBOOK_CONTENT)),
+        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

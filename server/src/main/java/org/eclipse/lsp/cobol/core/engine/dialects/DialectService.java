@@ -19,11 +19,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoMaidProcessor;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.*;
@@ -43,7 +45,7 @@ public class DialectService {
     CobolDialect dialect = new IdmsDialect(copybookService, treeListener, messageService);
     dialectSuppliers.put(dialect.getName(), dialect);
 
-    dialect = new DaCoDialect(messageService);
+    dialect = new DaCoDialect(messageService, new DaCoMaidProcessor(copybookService, treeListener, messageService));
     dialectSuppliers.put(dialect.getName(), dialect);
 
   }

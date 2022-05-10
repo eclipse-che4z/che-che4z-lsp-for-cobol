@@ -10,8 +10,8 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((includeStatement | copyStatement | copyMaidStatement | replaceAreaStart | replaceOffStatement
-   | titleDirective | enterDirective | controlDirective | linkageSection | plusplusIncludeStatement | procedureDivision | workingStorageSection)+ .*?)* EOF
+   : .*? ((includeStatement | copyStatement | replaceAreaStart | replaceOffStatement | titleDirective | enterDirective
+   | controlDirective | linkageSection | plusplusIncludeStatement | procedureDivision | workingStorageSection)+ .*?)* EOF
    ;
 
 // procedure devision for resolving predefined labels
@@ -44,20 +44,11 @@ plusplusIncludeStatement
     : PLUSPLUSINCLUDE copySource (DOT_FS | SEMICOLON_FS)?
     ;
 
-// copy maid statement
-copyMaidStatement
-    : LEVEL_NUMBER? COPY MAID copySource qualifier? DOT_FS?
-    ;
-
 copySource
    : (literal | cobolWord) ((OF | IN) copyLibrary)?
    ;
 
 copyLibrary
-   : literal | cobolWord
-   ;
-
-qualifier
    : literal | cobolWord
    ;
 

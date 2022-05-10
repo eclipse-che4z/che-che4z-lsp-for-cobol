@@ -22,7 +22,6 @@ import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolParser;
@@ -41,7 +40,6 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
@@ -56,7 +54,6 @@ import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analys
 @Slf4j
 public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListener
     implements GrammarPreprocessorListener<ExtendedDocument> {
-  private static final String MAID_WRK_QUALIFIER = "WRK";
   private static final String FILLER_VARIABLE_NAME = "FILLER";
   private static final int DEFAULT_TOKEN_SHIFT = 2;
   private static final int TOKEN_SHIFT_WITH_LINEBREAK = 3;
@@ -180,20 +177,20 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void exitWorkingStorageSection(WorkingStorageSectionContext ctx) {
     analyzeCopybook(SPECIALREGISTER, ctx, ctx, DialectType.COBOL);
   }
-
-  @Override
-  public void enterCopyMaidStatement(CopyMaidStatementContext ctx) {
-    push();
-  }
-
-  @Override
-  public void exitCopyMaidStatement(CopyMaidStatementContext ctx) {
-    if (requiresEarlyReturn(ctx)) return;
-    final Optional<TerminalNode> levelNumber = ofNullable(ctx.LEVEL_NUMBER());
-    final CopySourceContext copySource = ctx.copySource();
-    if (levelNumber.isPresent()) analyzeCopybook(levelNumber.get(), ctx, copySource);
-    else analyzeCopybook(SKIPPING, ctx, copySource, DialectType.MAID);
-  }
+// TODO seporate into DaCo
+//  @Override
+//  public void enterCopyMaidStatement(CopyMaidStatementContext ctx) {
+//    push();
+//  }
+// TODO seporate into DaCo
+//  @Override
+//  public void exitCopyMaidStatement(CopyMaidStatementContext ctx) {
+//    if (requiresEarlyReturn(ctx)) return;
+//    final Optional<TerminalNode> levelNumber = ofNullable(ctx.LEVEL_NUMBER());
+//    final CopySourceContext copySource = ctx.copySource();
+//    if (levelNumber.isPresent()) analyzeCopybook(levelNumber.get(), ctx, copySource);
+//    else analyzeCopybook(SKIPPING, ctx, copySource, DialectType.MAID);
+//  }
 
   @Override
   public void enterPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
@@ -236,15 +233,15 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     }
     return false;
   }
-
-  private void analyzeCopybook(
-      TerminalNode levelNumber, CopyMaidStatementContext ctx, CopySourceContext copySource) {
-    final String qualifier = ofNullable(ctx.qualifier()).map(ParseTree::getText).orElse(null);
-    hierarchy.setModifier(
-        new CopyStatementModifier(
-            Integer.parseInt(levelNumber.getText()), qualifier, retrieveSuffix(qualifier, ctx)));
-    analyzeCopybook(DIALECT, ctx, copySource, DialectType.MAID);
-  }
+// TODO seporate into DaCo
+//  private void analyzeCopybook(
+//      TerminalNode levelNumber, CopyMaidStatementContext ctx, CopySourceContext copySource) {
+//    final String qualifier = ofNullable(ctx.qualifier()).map(ParseTree::getText).orElse(null);
+//    hierarchy.setModifier(
+//        new CopyStatementModifier(
+//            Integer.parseInt(levelNumber.getText()), qualifier, retrieveSuffix(qualifier, ctx)));
+//    analyzeCopybook(DIALECT, ctx, copySource, DialectType.MAID);
+//  }
 
   private void analyzeCopybook(
       AnalysisTypes type,
@@ -260,18 +257,18 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         .apply(nestedMappings)
         .accept(errors);
   }
-
-  private String retrieveSuffix(String qualifier, CopyMaidStatementContext ctx) {
-    if (!MAID_WRK_QUALIFIER.equalsIgnoreCase(qualifier)) {
-      return "";
-    }
-    String lastVariableName = retrieveLastVariableName();
-    if (variableCannotContainSuffix(lastVariableName)) {
-      reportCannotRetrieveSuffix(ctx);
-      return "";
-    }
-    return lastVariableName.substring(lastVariableName.length() - MAID_SUFFIX_LENGTH);
-  }
+// TODO seporate into DaCo
+//  private String retrieveSuffix(String qualifier, CopyMaidStatementContext ctx) {
+//    if (!MAID_WRK_QUALIFIER.equalsIgnoreCase(qualifier)) {
+//      return "";
+//    }
+//    String lastVariableName = retrieveLastVariableName();
+//    if (variableCannotContainSuffix(lastVariableName)) {
+//      reportCannotRetrieveSuffix(ctx);
+//      return "";
+//    }
+//    return lastVariableName.substring(lastVariableName.length() - MAID_SUFFIX_LENGTH);
+//  }
 
   private boolean variableCannotContainSuffix(String lastVariableName) {
     return lastVariableName == null
@@ -376,18 +373,18 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     errors.add(error);
     LOG.debug("Syntax error by reportInvalidArgument: {}", error.toString());
   }
-
-  private void reportCannotRetrieveSuffix(CopyMaidStatementContext ctx) {
-    SyntaxError error =
-        SyntaxError.syntaxError()
-            .severity(ERROR)
-            .suggestion(
-                messageService.getMessage("GrammarPreprocessorListener.cannotRetrieveMaidSuffix"))
-            .locality(retrieveLocality(ctx))
-            .build();
-    errors.add(error);
-    LOG.debug("Syntax error by reportCannotRetrieveSuffix: {}", error.toString());
-  }
+// TODO seporate into DaCo
+//  private void reportCannotRetrieveSuffix(CopyMaidStatementContext ctx) {
+//    SyntaxError error =
+//        SyntaxError.syntaxError()
+//            .severity(ERROR)
+//            .suggestion(
+//                messageService.getMessage("GrammarPreprocessorListener.cannotRetrieveMaidSuffix"))
+//            .locality(retrieveLocality(ctx))
+//            .build();
+//    errors.add(error);
+//    LOG.debug("Syntax error by reportCannotRetrieveSuffix: {}", error.toString());
+//  }
 
   private Locality retrieveLocality(ParserRuleContext ctx) {
     return LocalityUtils.buildLocality(ctx, documentUri, hierarchy.getCurrentCopybookId());

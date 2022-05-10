@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
@@ -61,13 +62,13 @@ class TestAdjustCopyMaidNumbers {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(new CobolText("BHTRGL-XBG", DialectType.MAID.name(), COPYBOOK_CONTENT)),
+        ImmutableList.of(new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
         ImmutableMap.of(
             "invalid",
             new Diagnostic(
                 null,
                 "Variable NOT-ADJUSTED is not defined",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

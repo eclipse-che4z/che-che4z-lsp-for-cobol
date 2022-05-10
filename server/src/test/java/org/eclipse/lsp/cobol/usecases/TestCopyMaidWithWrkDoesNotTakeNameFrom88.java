@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
@@ -30,7 +31,7 @@ class TestCopyMaidWithWrkDoesNotTakeNameFrom88 {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*PARENT}.\n"
-          + "            05 {$*CHILD} PIC X(2).\n"
+          + "            05 {$*CHILD-XLD} PIC X(2).\n"
           + "               88 {$*AB} VALUE \"AB\".\n"
           + "            05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
@@ -43,7 +44,7 @@ class TestCopyMaidWithWrkDoesNotTakeNameFrom88 {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", COPYBOOK_CONTENT)),
-        ImmutableMap.of());
+            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, "WRK", COPYBOOK_CONTENT)),
+        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

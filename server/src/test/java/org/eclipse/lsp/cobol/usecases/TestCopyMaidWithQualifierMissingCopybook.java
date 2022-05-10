@@ -66,6 +66,6 @@ class TestCopyMaidWithQualifierMissingCopybook {
                 null,
                 "Variable VAR1 is not defined",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }
