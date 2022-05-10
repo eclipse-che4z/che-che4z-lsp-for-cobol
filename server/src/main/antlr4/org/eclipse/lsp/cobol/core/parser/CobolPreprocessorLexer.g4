@@ -71,6 +71,9 @@ EMPTYPSEUDOTEXT : '====';
 PIPECHAR : '||';
 SELECT_ALL : '.*';
 
+// COBOL special separators
+SEMICOLONSEPARATOR2 : '; ' ;
+COMMASEPARATOR2 : ', ' ;
 
 mode PICTURECLAUSE;
 FINALCHARSTRING: CHARSTRING+ ->popMode;

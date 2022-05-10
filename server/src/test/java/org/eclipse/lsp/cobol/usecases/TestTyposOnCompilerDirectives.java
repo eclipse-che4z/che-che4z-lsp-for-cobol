@@ -59,7 +59,7 @@ class TestTyposOnCompilerDirectives {
           + "PGMNAME, QUA, QUALIFY, QUOTE, Q, RENT, RMODE, RULES, SEQ, SEQUENCE, SERV, SERVICE, SO, SOURCE, SPACE, "
           + "SQL, SQLC, SQLCCSID, SQLIMS, SSR, SSRANGE, STGOPT, SUPP, SUPPRESS, S, TERM, TERMINAL, TEST, THREAD, "
           + "TRUNC, TUNE, VBREF, VLR, VS, VSAMOPENFS, WD, WORD, XMLPARSE, XP, XREF, X, ZC, ZD, ZONECHECK, ZONEDATA, "
-          + "ZWB, ',', '}";
+          + "ZWB, ', ','}";
 
   @Test
   void testProcessWithoutNumbersWithTypo() {

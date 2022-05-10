@@ -23,12 +23,12 @@ procedureDivisionRules: ((dbs_allocate | dbs_alter | dbs_associate | dbs_call | 
           dbs_fetch | dbs_free | dbs_get | dbs_grant | dbs_hold | dbs_include | dbs_insert |
           dbs_label | dbs_lock | dbs_merge | dbs_open | dbs_prepare | dbs_refresh | dbs_release | dbs_rename |
           dbs_revoke | dbs_rollback | dbs_savepoint | dbs_select | dbs_set | dbs_signal | dbs_transfer | dbs_truncate |
-          dbs_update | dbs_values | dbs_whenever) SEMICOLON_FS?)+;
-rulesAllowedInDataDivision: ((dbs_declare_cursor | dbs_declare_table | dbs_include) SEMICOLON_FS?)+;
-rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca | dbs_include_sqlda) SEMICOLON_FS?)+;
+          dbs_update | dbs_values | dbs_whenever) dbs_semicolon_end?)+;
+rulesAllowedInDataDivision: ((dbs_declare_cursor | dbs_declare_table | dbs_include) dbs_semicolon_end?)+;
+rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca | dbs_include_sqlda) dbs_semicolon_end?)+;
 
 //used in working-storage section of cobol program
-dbs_declare_variable: DECLARE dbs_host_variable (dbs_comma_separator dbs_host_variable)* VARIABLE (CCSID (dbs_integer_constant | (EBCDIC|ASCII|UNICODE) (FOR (SBCS|MIXED|BIT) DATA)?))? SEMICOLON_FS?;
+dbs_declare_variable: DECLARE dbs_host_variable (dbs_comma_separator dbs_host_variable)* VARIABLE (CCSID (dbs_integer_constant | (EBCDIC|ASCII|UNICODE) (FOR (SBCS|MIXED|BIT) DATA)?))? dbs_semicolon_end?;
 
 
 /*ALLOCATE CURSOR */
@@ -367,7 +367,7 @@ dbs_create_index_table_def_body: (dbs_column_name | dbs_expression) (ASC | DESC 
 dbs_create_index_table_other_opt: xml_index_specification? (INCLUDE dbs_column_name LPARENCHAR (dbs_comma_separator dbs_column_name)* RPARENCHAR)? other_opt_part1 other_opt_part2 other_opt_part3;
 xml_index_specification: GENERATE (KEY | KEYS) USING XMLPATTERN xml_pattern_clause AS sql_data_type;
 xml_pattern_clause: prolog pattern_expression;
-prolog: (DECLARE NAMESPACE NCNAME  EQUALCHAR dbs_namespace_name SEMICOLON_FS | DECLARE DEFAULT ELEMENT NAMESPACE dbs_namespace_name SEMICOLON_FS)*;
+prolog: (DECLARE NAMESPACE NCNAME  EQUALCHAR dbs_namespace_name dbs_semicolon_end | DECLARE DEFAULT ELEMENT NAMESPACE dbs_namespace_name dbs_semicolon_end)*;
 pattern_expression: ( (SLASHCHAR | DOUBLESLASHCHAR)  )*;
 other_opt_part1: (NOT? CLUSTER | PARTITIONED | NOT? PADDED | using_specification | free_specification | gbpcache_specification | DEFINE yes_or_no |  COMPRESS yes_or_no | (INCLUDE | EXCLUDE) NULL KEYS)*;
 other_opt_part2: (PARTITION BY (RANGE)? LPARENCHAR (partition_using_specification (dbs_comma_separator  partition_using_specification)*)? RPARENCHAR)?;
@@ -499,7 +499,7 @@ sql_trigger_body: dbs_sql_control_statement | dbs_triggered_sql_statement_adv;
 dbs_create_trigger_basic: TRIGGER dbs_trigger_name (trigger_definition_basic | WRAPPED dbs_obfuscated_statement_text);
 trigger_definition_basic: trigger_activation_time trigger_event ON (dbs_table_name | dbs_view_name) referencing_opts?  trigger_granularity MODE DB2SQL ( NOT? SECURED)? triggered_action_basic;
 triggered_action_basic: (WHEN dbs_search_condition)? sql_trigger_body_basic;
-sql_trigger_body_basic:  (dbs_triggered_sql_statement_basic | BEGIN ATOMIC (dbs_triggered_sql_statement_basic SEMICOLON_FS)+ END);
+sql_trigger_body_basic:  (dbs_triggered_sql_statement_basic | BEGIN ATOMIC (dbs_triggered_sql_statement_basic dbs_semicolon_end)+ END);
 
 //CREATE TRUSTED CONTEXT
 dbs_create_trusted_context: TRUSTED CONTEXT dbs_context_name BASED UPON CONNECTION USING SYSTEM AUTHID dbs_authorization_name (NO DEFAULT ROLE |
@@ -1229,13 +1229,13 @@ dbs_control_statement: dbs_assignment_statement | dbs_call_control | dbs_case_st
 dbs_assignment_statement : SET (dbs_sql_parameter_name | dbs_sql_variable_name) EQUALCHAR (CURRENT SERVER | CURRENT PACKAGESET | CURRENT PACKAGE PATH | dbs_expression | NULL);
 dbs_procedure_argument_list : dbs_sql_variable_name| dbs_sql_parameter_name | dbs_expression| NULL;
 dbs_call_control : (dbs_key_label_name COLONCHAR)? CALL dbs_procedure_name (LPARENCHAR dbs_procedure_argument_list (dbs_comma_separator dbs_procedure_argument_list)*  RPARENCHAR)?;
-dbs_case_statement_pl_sql: (dbs_key_label_name COLONCHAR)? CASE (dbs_simple_when_clause_pl_sql | dbs_searched_when_clause_pl_sql) ELSE (dbs_sql_procedure_statement SEMICOLON_FS)+ END CASE;
-dbs_simple_when_clause_pl_sql: dbs_expressions (WHEN dbs_expressions THEN (dbs_sql_procedure_statement SEMICOLON_FS)+)+;
-dbs_searched_when_clause_pl_sql: (WHEN dbs_search_condition THEN (dbs_sql_procedure_statement SEMICOLON_FS)+)+;
+dbs_case_statement_pl_sql: (dbs_key_label_name COLONCHAR)? CASE (dbs_simple_when_clause_pl_sql | dbs_searched_when_clause_pl_sql) ELSE (dbs_sql_procedure_statement dbs_semicolon_end)+ END CASE;
+dbs_simple_when_clause_pl_sql: dbs_expressions (WHEN dbs_expressions THEN (dbs_sql_procedure_statement dbs_semicolon_end)+)+;
+dbs_searched_when_clause_pl_sql: (WHEN dbs_search_condition THEN (dbs_sql_procedure_statement dbs_semicolon_end)+)+;
 dbs_compund_statement: (dbs_key_label_name COLONCHAR)? BEGIN (NOT ATOMIC | ATOMIC)? ((dbs_sql_variable_declaration|dbs_sql_condition_declaration
-                        | dbs_return_code_declaration) SEMICOLON_FS)* (dbs_declare_statement SEMICOLON_FS)*
-                        (DECLARE dbs_declare_cursor SEMICOLON_FS)* (dbs_handler_declaration SEMICOLON_FS)*
-                        (dbs_sql_procedure_statement SEMICOLON_FS)* END dbs_key_label_name?; // check the labelname matches.
+                        | dbs_return_code_declaration) dbs_semicolon_end)* (dbs_declare_statement dbs_semicolon_end)*
+                        (DECLARE dbs_declare_cursor dbs_semicolon_end)* (dbs_handler_declaration dbs_semicolon_end)*
+                        (dbs_sql_procedure_statement dbs_semicolon_end)* END dbs_key_label_name?; // check the labelname matches.
 dbs_sql_variable_declaration: DECLARE dbs_sql_variable_name (dbs_comma_separator dbs_sql_variable_name)* (RESULT_SET_LOCATOR VARYING | dbs_insert_data_type (DEFAULT NULL | CONSTANT NULL | (DEFAULT | CONSTANT) dbs_constant)?) ;
 dbs_sql_condition_declaration: DECLARE dbs_sql_condition_name CONDITION FOR (SQLSTATE VALUE?)? dbs_string_constant;
 dbs_return_code_declaration: DECLARE (SQLSTATE (CHAR LPARENCHAR dbs_integer5 RPARENCHAR | CHARACTER LPARENCHAR dbs_integer5 RPARENCHAR) (DEFAULT dbs_string_constant)? | SQLCODE (INTEGER | INT) (DEFAULT dbs_integer_constant)?);
@@ -1243,21 +1243,21 @@ dbs_handler_declaration: DECLARE (CONTINUE | EXIT) HANDLER FOR (dbs_specific_con
 dbs_specific_condition_value: (SQLSTATE VALUE? dbs_string_constant | dbs_sql_condition_name) (dbs_comma_separator (SQLSTATE VALUE? dbs_string_constant | dbs_sql_condition_name))*;
 dbs_general_condition_value: (SQLEXCEPTION | SQLWARNING | NOT FOUND) (dbs_comma_separator  (SQLEXCEPTION | SQLWARNING | NOT FOUND))*;
 dbs_for_statement: (dbs_key_label_name COLONCHAR)? FOR (dbs_for_loop_name AS)? (dbs_cursor_name CURSOR (WITHOUT HOLD | WITH HOLD) FOR)?
-                    dbs_select_clause DO (dbs_sql_procedure_statement SEMICOLON_FS)+ END FOR  dbs_key_label_name; // check label name matches
+                    dbs_select_clause DO (dbs_sql_procedure_statement dbs_semicolon_end)+ END FOR  dbs_key_label_name; // check label name matches
 dbs_for_loop_name: dbs_generic_name;
 dbs_goto_statement: (dbs_key_label_name COLONCHAR)? GOTO dbs_key_label_name;
-dbs_if_else_conditional_statement: dbs_search_condition THEN (dbs_sql_procedure_statement SEMICOLON_FS)+;
-dbs_if_statement: (dbs_key_label_name COLONCHAR)? IF dbs_if_else_conditional_statement (ELSEIF dbs_if_else_conditional_statement )* (ELSE (dbs_sql_procedure_statement SEMICOLON_FS)+)? END IF;
+dbs_if_else_conditional_statement: dbs_search_condition THEN (dbs_sql_procedure_statement dbs_semicolon_end)+;
+dbs_if_statement: (dbs_key_label_name COLONCHAR)? IF dbs_if_else_conditional_statement (ELSEIF dbs_if_else_conditional_statement )* (ELSE (dbs_sql_procedure_statement dbs_semicolon_end)+)? END IF;
 dbs_iterate_statement: (dbs_key_label_name COLONCHAR)? ITERATE dbs_key_label_name;
 dbs_leave_statement: (dbs_key_label_name COLONCHAR)? LEAVE dbs_key_label_name;
-dbs_loop_statement:  (dbs_key_label_name COLONCHAR)? LOOP (dbs_sql_procedure_statement SEMICOLON_FS)+ END LOOP dbs_key_label_name?; // label name should match
-dbs_repeat_statement:  (dbs_key_label_name COLONCHAR)? REPEAT (dbs_sql_procedure_statement SEMICOLON_FS)+ UNTIL dbs_search_condition END REPEAT dbs_key_label_name?; // check that label name matches.
+dbs_loop_statement:  (dbs_key_label_name COLONCHAR)? LOOP (dbs_sql_procedure_statement dbs_semicolon_end)+ END LOOP dbs_key_label_name?; // label name should match
+dbs_repeat_statement:  (dbs_key_label_name COLONCHAR)? REPEAT (dbs_sql_procedure_statement dbs_semicolon_end)+ UNTIL dbs_search_condition END REPEAT dbs_key_label_name?; // check that label name matches.
 dbs_signal_arg1: (SQLSTATE VALUE? (dbs_sqlstate_string_constant | dbs_sql_variable_name | dbs_sql_parameter_name)| dbs_sql_condition_name);
 dbs_resignal_statement: (dbs_key_label_name COLONCHAR)? RESIGNAL (dbs_signal_arg1 dbs_signal_information? )?;
 dbs_signal_information:SET MESSAGE_TEXT EQUALCHAR dbs_diagnostic_string_expression | LPARENCHAR dbs_diagnostic_string_expression RPARENCHAR;
 dbs_return_statement: (dbs_key_label_name COLONCHAR)? RETURN (dbs_expressions | NULL | dbs_fullselect);
 dbs_signal_statement: (dbs_key_label_name COLONCHAR)?  SIGNAL dbs_signal_arg1 dbs_signal_information;
-dbs_while_statement: (dbs_key_label_name COLONCHAR)? WHILE dbs_search_condition DO (dbs_sql_procedure_statement SEMICOLON_FS)+ END WHILE dbs_key_label_name?;
+dbs_while_statement: (dbs_key_label_name COLONCHAR)? WHILE dbs_search_condition DO (dbs_sql_procedure_statement dbs_semicolon_end)+ END WHILE dbs_key_label_name?;
 /// End STATEMENTS ///
 
 ///SQL-routine-body: DB2 SQL PROCEDURE STATEMENT
@@ -1632,7 +1632,8 @@ dbs_view_name: dbs_hostname_identifier? T=dbs_sql_identifier {validateLength($T.
 dbs_volume_id: IDENTIFIER;
 dbs_pieceSize : IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");};
 dbs_sql_identifier: NONNUMERICLITERAL | IDENTIFIER | FILENAME | FILENAME (DOT_FS IDENTIFIER)* | DSNDB04 | TRANSACTION | RECORDS;
-dbs_comma_separator: (COMMASEPARATOR | COMMACHAR);
+dbs_comma_separator: (COMMASEPARATORDB2 | COMMACHAR);
+dbs_semicolon_end: SEMICOLON_FS | SEMICOLONSEPARATORSQL;
 
 dbs_integer0: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "0");};
 dbs_integer1: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "1");};

@@ -507,7 +507,7 @@ commitmentControlClause
    ;
 
 endClause
-    : (DOT_FS | SEMICOLON_FS)
+    : DOT_FS
     ;
 
 // --- data division --------------------------------------------------------------------
@@ -896,7 +896,7 @@ sentence
    ;
 
 conditionalStatementCall
-   : statement SEMICOLON_FS? | dialectStatement
+   : statement | dialectStatement
    ;
 
 statement
