@@ -31,9 +31,9 @@ public class LabelsContentProvider implements ContentProvider {
   @Override
   public String read(CopybookConfig copybookConfig, String uri) {
     StringBuilder sb = new StringBuilder();
-    for (String label : copybookConfig.getPredefinedLabels()) {
+    for (String paragraph : copybookConfig.getPredefinedParagraphs()) {
       sb.append(StringUtils.repeat(' ', 7));
-      sb.append(label);
+      sb.append(paragraph);
       sb.append(".\r\n");
     }
     return sb.toString();
