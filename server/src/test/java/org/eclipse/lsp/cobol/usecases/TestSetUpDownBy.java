@@ -90,7 +90,7 @@ class TestSetUpDownBy {
                     + "DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, GENERATE, GO, "
                     + "GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, PURGE, READ, READY, RECEIVE, "
                     + "RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT, START, STOP, STRING, SUBTRACT, "
-                    + "TERMINATE, UNSTRING, WRITE, XML, '.', ';'}",
+                    + "TERMINATE, UNSTRING, WRITE, XML, '.'}",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "4",

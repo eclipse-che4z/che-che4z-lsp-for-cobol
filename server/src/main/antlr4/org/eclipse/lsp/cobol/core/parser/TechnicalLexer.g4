@@ -18,10 +18,6 @@ channels{COMMENTS}
 // There should be only symbols, literal patterns, and fragments.
 // The purpose of this file is to allow similar parsing by the preprocessor and parser.
 // All the token declarations that are common to several lexers should be duplicated to the appropriate lexers.
-@lexer::members {
-   boolean enableCommaSeparator = false;
-}
-
 // symbols
 ASTERISKCHAR : '*';
 DOUBLEASTERISKCHAR : '**';
@@ -82,8 +78,6 @@ HEX_NUMBERS : HEXNUMBER;
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(COMMENTS);
 WS : [ \t\f]+ -> channel(HIDDEN);
-COMMASEPARATOR : ', ' {enableCommaSeparator}?;
-COMMASEPARATOR2 : ', '  {!enableCommaSeparator}? -> channel(HIDDEN);
 
 //SQL comments
 SQLLINECOMMENT

@@ -14,12 +14,6 @@
 lexer grammar Db2SqlLexer;
 channels{COMMENTS}
 import TechnicalLexer;
-@lexer::members {
-   public Db2SqlLexer(CharStream input, boolean sqlFlag) {
-   		this(input);
-   		this.enableCommaSeparator = sqlFlag;
-   	}
-}
 
 // DB2 SQL Reserved Keywords
 
@@ -802,6 +796,11 @@ YEAR : Y E A R;
 YEARS : Y E A R S;
 YES : Y E S;
 ZONE : Z O N E;
+
+
+// special separator tokens for embedded langauages
+SEMICOLONSEPARATORSQL : '; ' ;
+COMMASEPARATORDB2 : ', ' ;
 
 // Constructors symbols
 GRAPHIC_CONSTANT : GRAPHICUNICODE | GRAHICCHAR;

@@ -882,7 +882,7 @@ generalIdentifier
    ;
 
 functionCall
-   : FUNCTION functionName (LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR)* referenceModifier?
+   : FUNCTION functionName (LPARENCHAR argument (commaClause? argument)* RPARENCHAR)* referenceModifier?
    ;
 
 referenceModifier
@@ -908,7 +908,7 @@ qualifiedDataName
    ;
 
 tableCall
-   : LPARENCHAR (ALL | arithmeticExpression) (COMMACHAR? (ALL | arithmeticExpression))* RPARENCHAR
+   : LPARENCHAR (ALL | arithmeticExpression) (commaClause? (ALL | arithmeticExpression))* RPARENCHAR
    ;
 
 specialRegister
@@ -987,3 +987,7 @@ power
 basis
    : LPARENCHAR arithmeticExpression RPARENCHAR | literal | generalIdentifier
    ;
+
+commaClause
+    : COMMACHAR
+    | COMMASEPARATORCICS ;
