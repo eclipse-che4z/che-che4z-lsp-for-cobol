@@ -64,12 +64,12 @@ class PredefinedCopybookUtils {
    * Load and clean up all the predefined copybooks
    *
    * @param sqlBackend backend for the copybooks
-   * @param predefinedLabels is a list of user predefined labels
+   * @param predefinedParagraphs is a list of user predefined paragraphs
    * @return list of models for predefined copybooks
    */
-  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks, List<String> predefinedLabels) {
+  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks, List<String> predefinedParagraphs) {
     return PredefinedCopybooks.getNames().stream()
-        .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), sqlBackend, predefinedLabels))
+        .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), sqlBackend, predefinedParagraphs))
         .collect(Collectors.toList());
   }
 
@@ -81,13 +81,13 @@ class PredefinedCopybookUtils {
         .orElse(DialectType.COBOL.name());
   }
 
-  private CopybookModel retrieveModel(CopybookName copybookName, SQLBackend sqlBackend, List<String> predefinedLabels) {
+  private CopybookModel retrieveModel(CopybookName copybookName, SQLBackend sqlBackend, List<String> predefinedParagraphs) {
     final String uri = retrievePredefinedUri(copybookName.getDisplayName(), sqlBackend);
 
     PredefinedCopybooks.Copybook copybook = PredefinedCopybooks.forName(copybookName.getQualifiedName());
 
     String content = copybook.getContentType()
-        .equals(PredefinedCopybooks.CopybookContentType.FILE) ? readContentForImplicitCopybook(uri) : generateContent(predefinedLabels);
+        .equals(PredefinedCopybooks.CopybookContentType.FILE) ? readContentForImplicitCopybook(uri) : generateContent(predefinedParagraphs);
 
     final PreprocessedDocument cleanCopybook =
         AnnotatedDocumentCleaning.prepareDocument(
@@ -116,8 +116,8 @@ class PredefinedCopybookUtils {
     return content;
   }
 
-  private String generateContent(List<String> predefinedLabels) {
+  private String generateContent(List<String> predefinedParagraphs) {
     LabelsContentProvider provider = new LabelsContentProvider();
-    return provider.read(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, predefinedLabels), "");
+    return provider.read(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, predefinedParagraphs), "");
   }
 }

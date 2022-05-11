@@ -112,7 +112,7 @@ public class UseCaseUtils {
             });
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
-    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.getAnalysisConfig().getCopybookConfig().getPredefinedLabels())
+    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.getAnalysisConfig().getCopybookConfig().getPredefinedParagraphs())
         .forEach(copybookModel -> copybookService.store(copybookModel, useCase.fileName));
 
     useCase.getCopybooks().stream()
