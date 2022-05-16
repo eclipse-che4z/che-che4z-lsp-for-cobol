@@ -15,9 +15,8 @@
 parser grammar IdmsCopyParser;
 options {tokenVocab = IdmsCopyLexer;  superClass = MessageServiceParser;}
 
-dataDescriptionEntries
-   : dataDescriptionEntry*
-   ;
+startRule: .*? idmsCopybookRules* EOF;
+idmsCopybookRules: (dataDescriptionEntry | copyIdmsStatement | fileDescriptionEntry) .*?;
 
 dataDescriptionEntry
    : dataDescriptionEntryFormat1
@@ -46,6 +45,31 @@ dataDescriptionEntryFormat1Level77
       | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
       DOT_FS
     ;
+
+// -- copy section ----------------------------------
+
+copyIdmsStatement
+    : LEVEL_NUMBER? COPY IDMS copyIdmsOptions (DOT_FS | SEMICOLON_FS)?
+    ;
+
+copyIdmsOptions
+    : (RECORD copyIdmsSource versionClause? (REDEFINES cobolWord)?) |
+    (FILE copyIdmsSource versionClause?) |
+    ((MAP | MAP_CONTROL) copyIdmsSource) |
+    (MODULE? copyIdmsSource versionClause?)
+    ;
+
+copyIdmsSource
+    : copySource
+    ;
+
+copySource
+   : (literal | cobolWord | SUBSCHEMA_NAMES) ((OF | IN) copyLibrary)?
+   ;
+
+copyLibrary
+   : literal | cobolWord
+   ;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -372,7 +396,8 @@ dialectNodeFiller
     : ZERO_WIDTH_SPACE+
     ;
 
-///////////////// FILE ENTRY /////////////////////////////////
+
+// -- file section ----------------------------------
 
 fileDescriptionEntry
    : (fileDescriptionEntryClauses dataDescriptionEntry* | dialectNodeFiller)
@@ -485,3 +510,7 @@ linageLinesAtTop
 linageLinesAtBottom
    : LINES? AT? BOTTOM (dataName | integerLiteral)
    ;
+
+versionClause
+    : VERSION integerLiteral
+    ;

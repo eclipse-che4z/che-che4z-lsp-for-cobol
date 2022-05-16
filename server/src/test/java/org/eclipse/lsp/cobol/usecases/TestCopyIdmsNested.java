@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,20 +32,19 @@ public class TestCopyIdmsNested {
       + "        PROGRAM-ID. test1.\n"
       + "        DATA DIVISION.\n"
       + "       WORKING-STORAGE SECTION.\n"
-      + "             01 {$*NAME1}           PIC X(16).\n"
-      + "             01 COPY IDMS {~COPY1}.\n"
+      + "       01 {$*NAME1}.\n"
+      + "           03 COPY IDMS {~COPY1}.\n"
       + "       PROCEDURE DIVISION.\n";
 
-  private static final String COPY1 =        "            01  COPY IDMS {~NESTED-COPY}.\n";
-  private static final String NESTED_COPY =  "            01  {$*NESTED-COPY}.\n"
+  private static final String COPY1 =        "       01  COPY IDMS {~NESTED_COPY}.\n";
+  private static final String NESTED_COPY =  "       01  {$*NESTED_COPY}.\n"
       + "           03 {$*RANDOM-NAME}            PIC X(16).\n";
 
   @Test
   void testNestedIdmsCopybook() {
     UseCaseEngine.runTest(
-        TEXT, ImmutableList.of(
-            new CobolText("COPY1", IdmsDialect.NAME, COPY1),
-            new CobolText("NESTED_COPY", IdmsDialect.NAME, NESTED_COPY)),
+        TEXT, ImmutableList.of(new CobolText("COPY1", IdmsDialect.NAME, COPY1),
+            new CobolText("NESTED_COPY", IdmsDialect.NAME, null, NESTED_COPY, UseCaseUtils.toURI("COPY1"))),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 }

@@ -87,7 +87,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
                      MessageService messageService,
                      DialectProcessingContext context) {
     this.copybookService = copybookService;
-    this.idmsCopybookService = new IdmsCopybookService(treeListener, messageService);
+    this.idmsCopybookService = new IdmsCopybookService(copybookService, context.getCopybookConfig(), treeListener, messageService);
     this.copybookConfig = context.getCopybookConfig();
     this.programDocumentUri = context.getProgramDocumentUri();
 

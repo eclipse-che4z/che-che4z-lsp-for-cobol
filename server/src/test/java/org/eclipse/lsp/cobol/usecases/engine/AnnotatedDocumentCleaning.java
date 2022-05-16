@@ -119,11 +119,12 @@ class AnnotatedDocumentCleaning {
       TestData testData,
       List<String> explicitCopybooks,
       SQLBackend sqlBackend) {
-    return copybooks
-        .map(processCopybook(expectedDiagnostics, explicitCopybooks, sqlBackend))
-        .map(collectDataFromCopybooks(testData))
-        .map(it -> new CobolText(it.getCopybookName(), it.getDialectType(), it.getText()))
-        .collect(toList());
+    return copybooks.map(
+        cobolText -> {
+          TestData test = processCopybook(expectedDiagnostics, explicitCopybooks, sqlBackend).apply(cobolText);
+          test = collectDataFromCopybooks(testData).apply(test);
+          return new CobolText(test.getCopybookName(), test.getDialectType(), null, test.getText(), cobolText.getUri());
+        }).collect(toList());
   }
 
   private Function<CobolText, TestData> processCopybook(

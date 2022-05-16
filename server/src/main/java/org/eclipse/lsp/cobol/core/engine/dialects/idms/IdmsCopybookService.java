@@ -29,10 +29,10 @@ import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Class implements idms copybook processing
@@ -40,6 +40,8 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 class IdmsCopybookService {
 
+  private final CopybookService copybookService;
+  private final CopybookConfig copybookConfig;
   private final ParseTreeListener treeListener;
   private final MessageService messageService;
 
@@ -50,13 +52,10 @@ class IdmsCopybookService {
    * @return - a list of generated nodes
    */
   public List<Node> processCopybook(CopybookModel copybookModel, int parentLevel) {
-    List<Node> resultNodes = new LinkedList<>();
-    resultNodes.addAll(processNodes(copybookModel, IdmsCopyParser::fileDescriptionEntry, parentLevel));
-    resultNodes.addAll(processNodes(copybookModel, IdmsCopyParser::dataDescriptionEntries, parentLevel));
-    return resultNodes;
+    return processNodes(copybookModel, parentLevel);
   }
 
-  private List<Node> processNodes(CopybookModel copybookModel, Function<IdmsCopyParser, ParserRuleContext> parseFunc, int parentLevel) {
+  private List<Node> processNodes(CopybookModel copybookModel, int parentLevel) {
     if (copybookModel.getContent() == null) {
       return ImmutableList.of();
     }
@@ -73,9 +72,10 @@ class IdmsCopybookService {
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
     parser.addParseListener(treeListener);
 
-    IdmsCopybookVisitor visitor = new IdmsCopybookVisitor(copybookModel.getUri(), parentLevel);
+    IdmsCopybookVisitor visitor = new IdmsCopybookVisitor(copybookService, copybookConfig, treeListener, messageService,
+        copybookModel.getUri(), parentLevel);
 
-    ParserRuleContext node = parseFunc.apply(parser);
+    ParserRuleContext node = parser.startRule();
     return visitor.visit(node);
   }
 

@@ -20,7 +20,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.core.IdmsCopyParser;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormat;
@@ -77,17 +76,6 @@ class IdmsParserHelper {
                         .map(String::toUpperCase)
                         .orElse(null)))
         .collect(toList());
-  }
-
-  /**
-   * Get variable level from TerminalNode object
-   *
-   * @param terminalNode is a TerminalNode
-   * @return a level of defined variable
-   */
-  public int getLevel(TerminalNode terminalNode) {
-    String levelNumber = terminalNode.getText();
-    return Integer.parseInt(levelNumber);
   }
 
   /**

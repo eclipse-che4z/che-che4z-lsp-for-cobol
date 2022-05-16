@@ -19,12 +19,24 @@ import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.core.IdmsCopyParser;
 import org.eclipse.lsp.cobol.core.IdmsCopyParserBaseVisitor;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.*;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
+import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -45,16 +57,54 @@ import static org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsParserHelper.*
 @Slf4j
 @RequiredArgsConstructor
 class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
+  private final CopybookService copybookService;
+  private final CopybookConfig copybookConfig;
+  private final IdmsCopybookService idmsCopybookService;
   private final String uri;
   private final int parentLevel;
 
   private int firstCopybookLevel = 0;
 
+  IdmsCopybookVisitor(CopybookService copybookService,
+                      CopybookConfig copybookConfig,
+                      ParseTreeListener treeListener,
+                      MessageService messageService,
+                      String uri,
+                      int parentLevel) {
+    this.copybookService = copybookService;
+    this.copybookConfig = copybookConfig;
+    this.uri = uri;
+    this.parentLevel = parentLevel;
+    idmsCopybookService = new IdmsCopybookService(copybookService, copybookConfig, treeListener, messageService);
+  }
+
+  @Override
+  public List<Node> visitCopyIdmsStatement(IdmsCopyParser.CopyIdmsStatementContext ctx) {
+    IdmsCopyParser.CopyIdmsSourceContext optionsContext = ctx.copyIdmsOptions().copyIdmsSource();
+    String nameToken = optionsContext.getText().toUpperCase();
+    CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
+
+    CopybookModel copybookModel = copybookService.resolve(copybookName, uri, uri, copybookConfig, true);
+
+    Locality locality = buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), uri);
+    CopyNode node = new CopyNode(locality, copybookName.getDisplayName());
+    visitChildren(ctx).forEach(node::addChild);
+
+    Location location = new Location();
+    location.setUri(copybookModel.getUri());
+    location.setRange(new Range(new Position(0, 0), new Position(0, 0)));
+
+    node.setDefinition(new CopyDefinition(location, copybookModel.getUri()));
+
+    idmsCopybookService.processCopybook(copybookModel, calculateLevel(getLevel(ctx))).forEach(node::addChild);
+    return ImmutableList.of(node);
+  }
+
   @Override
   public List<Node> visitDataDescriptionEntryFormat1(IdmsCopyParser.DataDescriptionEntryFormat1Context ctx) {
     return addTreeNode(
         VariableDefinitionNode.builder()
-            .level(calculateLevel(getLevel(ctx.levelNumber().LEVEL_NUMBER())))
+            .level(calculateLevel(VisitorHelper.getLevel(ctx.levelNumber().LEVEL_NUMBER())))
             .levelLocality(getLevelLocality(ctx.levelNumber().LEVEL_NUMBER()))
             .statementLocality(retrieveRangeLocality(ctx))
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
@@ -179,6 +229,13 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
       return level - firstCopybookLevel + parentLevel;
     }
     return level;
+  }
+
+  private int getLevel(IdmsCopyParser.CopyIdmsStatementContext ctx) {
+    return Optional.ofNullable(ctx.LEVEL_NUMBER())
+        .map(ParseTree::getText)
+        .map(Integer::parseInt)
+        .orElse(0);
   }
 
   private List<Node> addTreeNode(Node node, List<Node> children) {
