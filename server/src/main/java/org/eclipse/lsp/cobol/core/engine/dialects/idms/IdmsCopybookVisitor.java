@@ -20,15 +20,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
+import org.eclipse.lsp.cobol.core.IdmsCopyParser;
+import org.eclipse.lsp.cobol.core.IdmsCopyParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.variables.OccursClause;
-import org.eclipse.lsp.cobol.core.model.tree.variables.ValueClause;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
-import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
+import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -40,22 +36,22 @@ import java.util.Optional;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
-import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
+import static org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsParserHelper.*;
 
 /**
- * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
- * abstract syntax tree built by {@link CobolParser} for IDMS copybooks.
+ * This extension of {@link IdmsCopyParserBaseVisitor} applies the semantic analysis based on the
+ * abstract syntax tree built by {@link IdmsCopyParser} for IDMS copybooks.
  */
 @Slf4j
 @RequiredArgsConstructor
-public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
+public class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
   private final String uri;
   private final int parentLevel;
 
   private int firstCopybookLevel = 0;
 
   @Override
-  public List<Node> visitDataDescriptionEntryFormat1(CobolParser.DataDescriptionEntryFormat1Context ctx) {
+  public List<Node> visitDataDescriptionEntryFormat1(IdmsCopyParser.DataDescriptionEntryFormat1Context ctx) {
     return addTreeNode(
         VariableDefinitionNode.builder()
             .level(calculateLevel(getLevel(ctx.levelNumber().LEVEL_NUMBER())))
@@ -69,7 +65,7 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
             .occursClauses(retrieveOccursValues(ctx.dataOccursClause()))
             .redefinesClauses(
                 ctx.dataRedefinesClause().stream()
-                    .map(CobolParser.DataRedefinesClauseContext::dataName)
+                    .map(IdmsCopyParser.DataRedefinesClauseContext::dataName)
                     .map(this::extractNameAndLocality)
                     .collect(toList()))
             .blankWhenZero(!ctx.dataBlankWhenZeroClause().isEmpty())
@@ -79,7 +75,7 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
   }
 
   @Override
-  public List<Node> visitDataDescriptionEntryFormat2(CobolParser.DataDescriptionEntryFormat2Context ctx) {
+  public List<Node> visitDataDescriptionEntryFormat2(IdmsCopyParser.DataDescriptionEntryFormat2Context ctx) {
     VariableDefinitionNode.Builder builder =
         VariableDefinitionNode.builder()
             .level(LEVEL_66)
@@ -87,12 +83,12 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
             .statementLocality(retrieveRangeLocality(ctx));
     ofNullable(ctx.dataRenamesClause())
-        .map(CobolParser.DataRenamesClauseContext::dataName)
+        .map(IdmsCopyParser.DataRenamesClauseContext::dataName)
         .map(this::extractNameAndLocality)
         .ifPresent(builder::renamesClause);
     ofNullable(ctx.dataRenamesClause())
-        .map(CobolParser.DataRenamesClauseContext::thruDataName)
-        .map(CobolParser.ThruDataNameContext::dataName)
+        .map(IdmsCopyParser.DataRenamesClauseContext::thruDataName)
+        .map(IdmsCopyParser.ThruDataNameContext::dataName)
         .map(this::extractNameAndLocality)
         .ifPresent(builder::renamesThruClause);
     return addTreeNode(builder.build(), visitChildren(ctx));
@@ -100,7 +96,7 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat1Level77(
-      CobolParser.DataDescriptionEntryFormat1Level77Context ctx) {
+      IdmsCopyParser.DataDescriptionEntryFormat1Level77Context ctx) {
     return addTreeNode(
         VariableDefinitionNode.builder()
             .level(LEVEL_77)
@@ -114,7 +110,7 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
             .occursClauses(retrieveOccursValues(ctx.dataOccursClause()))
             .redefinesClauses(
                 ctx.dataRedefinesClause().stream()
-                    .map(CobolParser.DataRedefinesClauseContext::dataName)
+                    .map(IdmsCopyParser.DataRedefinesClauseContext::dataName)
                     .map(this::extractNameAndLocality)
                     .collect(toList()))
             .blankWhenZero(!ctx.dataBlankWhenZeroClause().isEmpty())
@@ -124,9 +120,9 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
   }
 
   @Override
-  public List<Node> visitDataDescriptionEntryFormat3(CobolParser.DataDescriptionEntryFormat3Context ctx) {
+  public List<Node> visitDataDescriptionEntryFormat3(IdmsCopyParser.DataDescriptionEntryFormat3Context ctx) {
     return ofNullable(ctx.dataValueClause())
-        .map(CobolParser.DataValueClauseContext::valueIsToken)
+        .map(IdmsCopyParser.DataValueClauseContext::valueIsToken)
         .map(
             valueToken ->
                 addTreeNode(
@@ -143,7 +139,7 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
   }
 
   @Override
-  public List<Node> visitFileDescriptionEntry(CobolParser.FileDescriptionEntryContext ctx) {
+  public List<Node> visitFileDescriptionEntry(IdmsCopyParser.FileDescriptionEntryContext ctx) {
     if (ctx.fileDescriptionEntryClauses() == null || ctx.fileDescriptionEntryClauses().cobolWord() == null) {
       return ImmutableList.of();
     }
@@ -211,30 +207,30 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
         .build();
   }
 
-  private VariableNameAndLocality extractNameAndLocality(CobolParser.EntryNameContext context) {
+  private VariableNameAndLocality extractNameAndLocality(IdmsCopyParser.EntryNameContext context) {
     if (context == null || context.dataName() == null) return null;
     return extractNameAndLocality(context.dataName());
   }
 
-  private VariableNameAndLocality extractNameAndLocality(CobolParser.DataNameContext context) {
+  private VariableNameAndLocality extractNameAndLocality(IdmsCopyParser.DataNameContext context) {
     return extractNameAndLocality(context.cobolWord());
   }
 
-  private VariableNameAndLocality extractNameAndLocality(CobolParser.CobolWordContext context) {
+  private VariableNameAndLocality extractNameAndLocality(IdmsCopyParser.CobolWordContext context) {
     String name = getName(context);
     return new VariableNameAndLocality(name, buildNameRangeLocality(context, name, uri));
   }
 
-  private List<ValueClause> retrieveValues(List<CobolParser.DataValueClauseContext> clauses) {
+  private List<ValueClause> retrieveValues(List<IdmsCopyParser.DataValueClauseContext> clauses) {
     return clauses.stream().map(this::retrieveValue).collect(toList());
   }
 
-  private ValueClause retrieveValue(CobolParser.DataValueClauseContext context) {
+  private ValueClause retrieveValue(IdmsCopyParser.DataValueClauseContext context) {
     return new ValueClause(
         retrieveValueIntervals(context.dataValueClauseLiteral().dataValueInterval()), retrieveRangeLocality(context));
   }
 
-  private List<OccursClause> retrieveOccursValues(List<CobolParser.DataOccursClauseContext> contexts) {
+  private List<OccursClause> retrieveOccursValues(List<IdmsCopyParser.DataOccursClauseContext> contexts) {
     // TODO: Process OCCURS DEPENDING ON
     return contexts.stream()
         .map(this::toOccursClause)
@@ -243,16 +239,24 @@ public class IdmsCopybookVisitor extends CobolParserBaseVisitor<List<Node>>  {
         .collect(toList());
   }
 
-  private Optional<OccursClause> toOccursClause(CobolParser.DataOccursClauseContext ctx) {
-    return ofNullable(VisitorHelper.getInteger(ctx.integerLiteral()))
+  private Optional<OccursClause> toOccursClause(IdmsCopyParser.DataOccursClauseContext ctx) {
+    return ofNullable(getInteger(ctx.integerLiteral()))
         .map(
             intLit ->
                 new OccursClause(intLit, retrieveOccursToValue(ctx).orElse(null), retrieveIndexNames(ctx)));
   }
 
-  private List<VariableNameAndLocality> retrieveIndexNames(CobolParser.DataOccursClauseContext ctx) {
+  private Integer getInteger(IdmsCopyParser.IntegerLiteralContext context) {
+    return ofNullable(context)
+        .map(ParserRuleContext::getText)
+        .filter(it -> !it.isEmpty())
+        .map(Integer::parseInt)
+        .orElse(null);
+  }
+
+  private List<VariableNameAndLocality> retrieveIndexNames(IdmsCopyParser.DataOccursClauseContext ctx) {
     return ofNullable(ctx.indexName()).orElseGet(ImmutableList::of).stream()
-        .map(CobolParser.IndexNameContext::cobolWord)
+        .map(IdmsCopyParser.IndexNameContext::cobolWord)
         .map(this::extractNameAndLocality)
         .collect(toList());
   }

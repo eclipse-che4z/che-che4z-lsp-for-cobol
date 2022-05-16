@@ -20,9 +20,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.eclipse.lsp.cobol.core.CobolLexer;
-import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.core.IdmsParser;
+import org.eclipse.lsp.cobol.core.*;
 import org.eclipse.lsp.cobol.core.IdmsParser.CobolWordContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.DataNameContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.IdmsControlSectionContext;
@@ -40,7 +38,6 @@ import org.eclipse.lsp.cobol.core.IdmsParser.MapSectionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.QualifiedDataNameContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.SchemaSectionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.VariableUsageNameContext;
-import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
@@ -231,18 +228,18 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
         .orElse(0);
   }
 
-  private List<Node> processNodes(CopybookModel copybookModel, Function<CobolParser, ParserRuleContext> parseFunc, int parentLevel) {
+  private List<Node> processNodes(CopybookModel copybookModel, Function<IdmsCopyParser, ParserRuleContext> parseFunc, int parentLevel) {
     if (copybookModel.getContent() == null) {
       return ImmutableList.of();
     }
-    CobolLexer lexer = new CobolLexer(CharStreams.fromString(copybookModel.getContent()));
+    IdmsCopyLexer lexer = new IdmsCopyLexer(CharStreams.fromString(copybookModel.getContent()));
     lexer.removeErrorListeners();
 
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     ParserListener listener = new ParserListener();
     lexer.addErrorListener(listener);
 
-    CobolParser parser = getCobolParser(tokens);
+    IdmsCopyParser parser = getCobolParser(tokens);
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
@@ -256,14 +253,14 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   private List<Node> parseIdmsCopybook(CopybookModel copybookModel, int parentLevel) {
     List<Node> resultNodes = new LinkedList<>();
-    resultNodes.addAll(processNodes(copybookModel, CobolParser::fileDescriptionEntry, parentLevel));
-    resultNodes.addAll(processNodes(copybookModel, CobolParser::dataDescriptionEntries, parentLevel));
+    resultNodes.addAll(processNodes(copybookModel, IdmsCopyParser::fileDescriptionEntry, parentLevel));
+    resultNodes.addAll(processNodes(copybookModel, IdmsCopyParser::dataDescriptionEntries, parentLevel));
     return resultNodes;
   }
 
-  private CobolParser getCobolParser(CommonTokenStream tokens) {
+  private IdmsCopyParser getCobolParser(CommonTokenStream tokens) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    return new CobolParser(tokens);
+    return new IdmsCopyParser(tokens);
   }
 
   private List<Node> addTreeNode(Node node, List<Node> children) {
