@@ -40,7 +40,7 @@ import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILL
 
 /** Utility class for visitor and delegates classes with useful methods */
 @UtilityClass
-public class IdmsParserHelper {
+class IdmsParserHelper {
   /**
    * Extract picture texts
    *

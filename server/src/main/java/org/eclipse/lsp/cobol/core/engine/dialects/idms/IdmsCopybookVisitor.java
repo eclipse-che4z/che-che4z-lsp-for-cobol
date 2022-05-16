@@ -44,7 +44,7 @@ import static org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsParserHelper.*
  */
 @Slf4j
 @RequiredArgsConstructor
-public class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
+class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
   private final String uri;
   private final int parentLevel;
 
