@@ -761,11 +761,15 @@ dataRedefinesClause
    ;
 
 dataRenamesClause
-   : RENAMES dataName thruDataName?
+   : RENAMES qualifiedVariableDataName thruDataName?
    ;
 
 thruDataName
-   : (THROUGH | THRU) dataName
+   : (THROUGH | THRU) qualifiedVariableDataName
+   ;
+
+qualifiedVariableDataName
+   : (dataName (IN | OF))? dataName
    ;
 
 dataSignClause

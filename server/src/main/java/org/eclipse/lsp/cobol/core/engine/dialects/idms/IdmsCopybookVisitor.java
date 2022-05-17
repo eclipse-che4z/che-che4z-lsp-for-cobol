@@ -133,14 +133,18 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
             .statementLocality(retrieveRangeLocality(ctx));
     ofNullable(ctx.dataRenamesClause())
-        .map(IdmsCopyParser.DataRenamesClauseContext::dataName)
-        .map(this::extractNameAndLocality)
-        .ifPresent(builder::renamesClause);
+            .map(dataRenamesClauseContext -> dataRenamesClauseContext.qualifiedVariableDataName()
+                    .dataName()
+                    .stream()
+                    .map(IdmsCopyParser.DataNameContext.class::cast)
+                    .map(this::extractNameAndLocality).collect(toList()))
+            .ifPresent(builder::renamesClause);
     ofNullable(ctx.dataRenamesClause())
-        .map(IdmsCopyParser.DataRenamesClauseContext::thruDataName)
-        .map(IdmsCopyParser.ThruDataNameContext::dataName)
-        .map(this::extractNameAndLocality)
-        .ifPresent(builder::renamesThruClause);
+            .map(thruDataNameContext -> thruDataNameContext.qualifiedVariableDataName().dataName().stream()
+                    .map(IdmsCopyParser.DataNameContext.class::cast)
+                    .map(this::extractNameAndLocality)
+                    .collect(toList()))
+            .ifPresent(builder::renamesThruClause);
     return addTreeNode(builder.build(), visitChildren(ctx));
   }
 
