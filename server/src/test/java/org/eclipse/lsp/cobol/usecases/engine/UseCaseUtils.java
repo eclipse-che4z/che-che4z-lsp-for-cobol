@@ -36,6 +36,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static java.util.Collections.emptyList;
@@ -116,8 +117,11 @@ public class UseCaseUtils {
         .forEach(copybookModel -> copybookService.store(copybookModel, useCase.fileName));
 
     useCase.getCopybooks().stream()
-        .map(UseCaseUtils::toCopybookModel)
-        .forEach(copybookModel -> copybookService.store(copybookModel, useCase.fileName));
+        .forEach(cobolText -> {
+          CopybookModel copybookModel = UseCaseUtils.toCopybookModel(cobolText);
+          copybookService.store(copybookModel, Optional.ofNullable(cobolText.getUri())
+              .orElse(useCase.fileName));
+        });
 
     SubroutineService subroutines = injector.getInstance(SubroutineService.class);
     useCase.getSubroutines().forEach(name -> subroutines.store(name, "URI:" + name));

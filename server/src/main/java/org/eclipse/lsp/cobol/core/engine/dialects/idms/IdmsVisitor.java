@@ -15,14 +15,11 @@
 package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
 import com.google.common.collect.ImmutableList;
-import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.eclipse.lsp.cobol.core.CobolLexer;
-import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.core.IdmsParser;
+import org.eclipse.lsp.cobol.core.*;
 import org.eclipse.lsp.cobol.core.IdmsParser.CobolWordContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.DataNameContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.IdmsControlSectionContext;
@@ -40,7 +37,6 @@ import org.eclipse.lsp.cobol.core.IdmsParser.MapSectionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.QualifiedDataNameContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.SchemaSectionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.VariableUsageNameContext;
-import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
@@ -59,8 +55,6 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
-import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
-import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
@@ -69,7 +63,6 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -81,22 +74,20 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  *  This extension of {@link IdmsParserBaseVisitor} applies the semantic analysis based on the
  *  abstract syntax tree built by {@link IdmsParser}.
  */
-public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
+class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private static final String IF = "_IF_ ";
   private final CopybookService copybookService;
-  private final ParseTreeListener treeListener;
-  private final MessageService messageService;
+  private final IdmsCopybookService idmsCopybookService;
   private final CopybookConfig copybookConfig;
   private final String programDocumentUri;
   private final TextReplacement textReplacement;
 
-  public IdmsVisitor(CopybookService copybookService,
+  IdmsVisitor(CopybookService copybookService,
                      ParseTreeListener treeListener,
                      MessageService messageService,
                      DialectProcessingContext context) {
-    this.treeListener = treeListener;
     this.copybookService = copybookService;
-    this.messageService = messageService;
+    this.idmsCopybookService = new IdmsCopybookService(copybookService, context.getCopybookConfig(), treeListener, messageService);
     this.copybookConfig = context.getCopybookConfig();
     this.programDocumentUri = context.getProgramDocumentUri();
 
@@ -126,7 +117,7 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
     node.setDefinition(new CopyDefinition(location, copybookModel.getUri()));
 
-    parseIdmsCopybook(copybookModel, getLevel(ctx)).forEach(node::addChild);
+    idmsCopybookService.processCopybook(copybookModel, getLevel(ctx)).forEach(node::addChild);
     return ImmutableList.of(node);
   }
 
@@ -231,39 +222,9 @@ public class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
         .orElse(0);
   }
 
-  private List<Node> processNodes(CopybookModel copybookModel, Function<CobolParser, ParserRuleContext> parseFunc, int parentLevel) {
-    if (copybookModel.getContent() == null) {
-      return ImmutableList.of();
-    }
-    CobolLexer lexer = new CobolLexer(CharStreams.fromString(copybookModel.getContent()));
-    lexer.removeErrorListeners();
-
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    ParserListener listener = new ParserListener();
-    lexer.addErrorListener(listener);
-
-    CobolParser parser = getCobolParser(tokens);
-    parser.removeErrorListeners();
-    parser.addErrorListener(listener);
-    parser.setErrorHandler(new CobolErrorStrategy(messageService));
-    parser.addParseListener(treeListener);
-
-    IdmsCopybookVisitor visitor = new IdmsCopybookVisitor(copybookModel.getUri(), parentLevel);
-
-    ParserRuleContext node = parseFunc.apply(parser);
-    return visitor.visit(node);
-  }
-
-  private List<Node> parseIdmsCopybook(CopybookModel copybookModel, int parentLevel) {
-    List<Node> resultNodes = new LinkedList<>();
-    resultNodes.addAll(processNodes(copybookModel, CobolParser::fileDescriptionEntry, parentLevel));
-    resultNodes.addAll(processNodes(copybookModel, CobolParser::dataDescriptionEntries, parentLevel));
-    return resultNodes;
-  }
-
-  private CobolParser getCobolParser(CommonTokenStream tokens) {
+  private IdmsCopyParser getCobolParser(CommonTokenStream tokens) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    return new CobolParser(tokens);
+    return new IdmsCopyParser(tokens);
   }
 
   private List<Node> addTreeNode(Node node, List<Node> children) {

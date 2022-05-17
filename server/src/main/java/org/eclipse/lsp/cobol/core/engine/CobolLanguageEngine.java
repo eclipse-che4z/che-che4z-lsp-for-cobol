@@ -211,6 +211,7 @@ public class CobolLanguageEngine {
 
   private NamedSubContext applyDialectCopybooks(NamedSubContext copybooks, DialectOutcome dialectOutcome) {
     dialectOutcome.getDialectNodes().stream()
+        .flatMap(Node::getDepthFirstStream)
         .filter(n -> n.getNodeType().equals(NodeType.COPY))
         .map(CopyNode.class::cast)
         .forEach(n -> copybooks.define(n.getName(), n.getDefinition().getLocation()));

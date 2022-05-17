@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -298,7 +299,9 @@ public final class VariableDefinitionNode extends Node {
    * @return String
    */
   public String getFileDescriptor() {
-    return fileDescriptor.replaceAll(SPACES_AFTER_NEWLINE_REGEX, System.lineSeparator());
+    return Optional.ofNullable(fileDescriptor)
+        .map(f -> f.replaceAll(SPACES_AFTER_NEWLINE_REGEX, System.lineSeparator()))
+        .orElse("");
   }
 
   /**
@@ -306,7 +309,9 @@ public final class VariableDefinitionNode extends Node {
    * @return String
    */
   public String getFileControlClause() {
-    return fileControlClause.replaceAll(SPACES_AFTER_NEWLINE_REGEX, System.lineSeparator());
+    return Optional.ofNullable(fileControlClause)
+        .map(c -> c.replaceAll(SPACES_AFTER_NEWLINE_REGEX, System.lineSeparator()))
+        .orElse("");
   }
 
   /**
