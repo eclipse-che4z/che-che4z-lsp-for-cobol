@@ -31,4 +31,22 @@ public interface CobolLineReWriter {
    * @return the same amount of lines
    */
   List<CobolLine> processLines(List<CobolLine> lines);
+
+  /**
+   *  Checks if a string ends with Quote marks
+   * @param stringToCheck {@link String} parameter for test
+   * @return True is string ends with quotes and false otherwise
+   */
+  static boolean checkStringEndsWithQuoteMark(String stringToCheck) {
+    return stringToCheck.endsWith("\"") || stringToCheck.endsWith("'");
+  }
+
+  /**
+   * Checks if a string starts with Quote marks
+   * @param stringToCheck {@link String} parameter for test
+   * @return True is string starts with quotes and false otherwise
+   */
+  static boolean checkStringStartsWithQuoteMark(String stringToCheck) {
+    return stringToCheck.startsWith("\"") || stringToCheck.startsWith("'");
+  }
 }
