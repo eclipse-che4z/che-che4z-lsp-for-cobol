@@ -20,7 +20,6 @@ import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;

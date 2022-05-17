@@ -31,8 +31,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
+import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;

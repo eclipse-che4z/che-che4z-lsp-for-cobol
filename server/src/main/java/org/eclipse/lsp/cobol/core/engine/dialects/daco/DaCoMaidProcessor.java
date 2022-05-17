@@ -70,6 +70,13 @@ public class DaCoMaidProcessor {
   private final ParseTreeListener treeListener;
   private final MessageService messageService;
 
+  /**
+   * Process MAID copybooks in the source code
+   * @param input source code
+   * @param context dialect processing context
+   * @param errors a container to propagate errors from dialect processing
+   * @return processed text and dialect nodes
+   */
   public DialectOutcome process(String input, DialectProcessingContext context, List<SyntaxError> errors) {
     List<Node> copyMaidNodes = new ArrayList<>();
     DaCoMaidProcessingState state = DaCoMaidProcessingState.START;
@@ -131,8 +138,8 @@ public class DaCoMaidProcessor {
       int startChar = indent == null ? 0 : matcher.end("indent");
       int endChar = matcher.end(matcher.groupCount() - 1);
       int len = endChar - startChar;
-      matcher.appendReplacement(sb, (indent == null ? "" : indent) +
-              String.join("", Collections.nCopies(len, CobolDialect.FILLER)));
+      matcher.appendReplacement(sb, (indent == null ? "" : indent)
+              + String.join("", Collections.nCopies(len, CobolDialect.FILLER)));
       String level = matcher.group("level");
       String layoutId = matcher.group("layoutId");
       String layoutUsage = matcher.group("layoutUsage");

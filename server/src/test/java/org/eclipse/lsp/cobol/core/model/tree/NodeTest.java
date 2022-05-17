@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
-
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.junit.jupiter.api.Test;
 

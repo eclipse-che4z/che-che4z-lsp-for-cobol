@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
-import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

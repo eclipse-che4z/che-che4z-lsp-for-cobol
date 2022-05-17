@@ -22,9 +22,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
 import static java.util.Collections.singletonList;
+import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
+import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp4j.CodeActionKind.QuickFix;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 import static org.junit.jupiter.api.Assertions.assertEquals;

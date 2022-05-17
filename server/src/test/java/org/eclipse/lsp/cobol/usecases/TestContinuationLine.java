@@ -44,8 +44,29 @@ class TestContinuationLine {
           + "      -    asdfasdf\n"
           + "       .\n";
 
+  private static final String TEXT2 =
+      "       IDENTIFICATION DIVISION.                                         \n"
+          + "       PROGRAM-ID.                                                      \n"
+          + "           NC215A.                                                      \n"
+          + "       ENVIRONMENT DIVISION.                                            \n"
+          + "       CONFIGURATION SECTION.                                           \n"
+          + "       SOURCE-COMPUTER.                                                 \n"
+          + "           XXXXX082.                                                    \n"
+          + "       OBJECT-COMPUTER.                                                 \n"
+          + "           XXXXX083                                                     \n"
+          + "           PROGRAM COLLATING SEQUENCE IS THE-WILD-ONE.                  \n"
+          + "       SPECIAL-NAMES.                                                   \n"
+          + "           ALPHABET                                                     \n"
+          + "           THE-WILD-ONE IS \"A\" THRU \"H\" \"I\" ALSO \"J\", ALSO \"K\", ALSO    \n"
+          + "           \"L\" ALSO \"M\" ALSO \"N\" \"O\" THROUGH \"Z\" \"0\" THRU \"9\",          \n"
+          + "           ALPHABET                                                     \n"
+          + "           THE-BIG-OL-LITERAL-ALPHABET IS \"A+0B-1C*2D/3E=4Fl5G,6H;7I.8J\"\n"
+          + "      -    \"\"9K(L)M>N<O PQRSTUVWXYZ\".                                   \n"
+          + "      *                                                                 \n"
+          + "      *                                                                 ";
+
   @Test
-  void test() {
+  void testWhenContinuousLineStartsWithOneQuote_thenOneLiteralIsIdentified() {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(),
@@ -56,5 +77,10 @@ class TestContinuationLine {
                 "A continuation line cannot contain values in the Content Area A",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
+  }
+
+  @Test
+  void testWhenContinuousLineStartsWithTwoQuotes_thenTwoLiteralsAreIdentified() {
+    UseCaseEngine.runTest(TEXT2, ImmutableList.of(), ImmutableMap.of());
   }
 }

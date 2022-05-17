@@ -12,8 +12,8 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
- package org.eclipse.lsp.cobol.core.engine.dialects.daco;
-
+package org.eclipse.lsp.cobol.core.engine.dialects.daco;
+/** Representation of DaCo preprocessing state*/
 public enum DaCoMaidProcessingState {
   START,
   DATA_DIVISION,

@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -67,9 +68,14 @@ public class CobolLineWriterImpl implements CobolLineWriter {
    */
   private String removeStartingQuote(final CobolLine line) {
     String continuation = StringUtils.stripStart(line.getContentArea(), null);
-    if (continuation.startsWith("'") || continuation.startsWith("\""))
+    if (CobolLineReWriter.checkStringStartsWithQuoteMark(continuation)
+        && !isContinuedLineQuoted(line))
       continuation = continuation.substring(1);
     return continuation;
+  }
+
+  private boolean isContinuedLineQuoted(CobolLine line) {
+    return CobolLineReWriter.checkStringEndsWithQuoteMark(line.getPredecessor().getContentArea());
   }
 
   /**
