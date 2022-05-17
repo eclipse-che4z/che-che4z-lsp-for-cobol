@@ -150,7 +150,7 @@
                     "description": "Default list of USS paths to search for copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
                     "uniqueItems": true
                 },
-                "cobol-lsp.cpy-manager.maid.paths-local": {
+                "cobol-lsp.cpy-manager.daco.paths-local": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -158,7 +158,7 @@
                     "description": "Default list of relative local paths to search for MAID copybooks",
                     "uniqueItems": true
                 },
-                "cobol-lsp.cpy-manager.maid.paths-dsn": {
+                "cobol-lsp.cpy-manager.daco.paths-dsn": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -166,7 +166,7 @@
                     "description": "Default list of datasets to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
                     "uniqueItems": true
                 },
-                "cobol-lsp.cpy-manager.maid.paths-uss": {
+                "cobol-lsp.cpy-manager.daco.paths-uss": {
                     "type": "array",
                     "items": {
                         "type": "string"
