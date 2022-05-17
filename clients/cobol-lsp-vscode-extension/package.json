@@ -390,12 +390,12 @@
                     "description": "List of enabled dialects",
                     "uniqueItems": true
                 },
-                "cobol-lsp.predefined-labels": {
+                "cobol-lsp.predefined-paragraphs": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     },
-                    "description": "List of predefined labels",
+                    "description": "List of predefined paragraphs",
                     "uniqueItems": true
                 }
             }

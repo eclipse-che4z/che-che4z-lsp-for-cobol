@@ -41,7 +41,7 @@ public class TextReplacement {
    * @param prefix the prefix to inserting before the context
    */
   public void addReplacementContext(ParserRuleContext ctx, String prefix) {
-    addReplacementContext(ctx, prefix, "\u200B");
+    addReplacementContext(ctx, prefix, CobolDialect.FILLER);
   }
   /**
    * Add a context which will be replaced with spaces with specified prefix

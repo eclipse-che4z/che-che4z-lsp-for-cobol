@@ -832,3 +832,7 @@ YYYYMMDD : Y Y Y Y M M D D;
 ZERO : Z E R O;
 ZEROES : Z E R O E S;
 ZEROS : Z E R O S;
+
+// special separator tokens for embedded langauages
+SEMICOLONSEPARATORCICS : '; ' ;
+COMMASEPARATORCICS : ', ' ;

@@ -215,7 +215,7 @@ public class UseCaseEngine {
                     analysisConfig.getCopybookConfig().getCopybookProcessingMode())
                 .features(analysisConfig.getFeatures())
                 .dialects(analysisConfig.getDialects())
-                .predefinedLabels(analysisConfig.getCopybookConfig().getPredefinedLabels())
+                .predefinedParagraphs(analysisConfig.getCopybookConfig().getPredefinedParagraphs())
                 .build());
     assertResultEquals(actual, document.getTestData());
     return actual;

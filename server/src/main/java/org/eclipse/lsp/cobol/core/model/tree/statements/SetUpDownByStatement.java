@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /** This class implements the logic for SET UP/DOWN BY statement. */
@@ -76,8 +77,10 @@ public class SetUpDownByStatement extends StatementNode {
   }
 
   private boolean variableProducesError(QualifiedReferenceNode variable) {
-    return !variable.getVariableDefinitionNode()
-        .map(defNode -> defNode.getVariableType() == VariableType.ELEMENTARY_ITEM)
+    List<VariableType> allowedNodes = Arrays.asList(VariableType.ELEMENTARY_ITEM, VariableType.STAND_ALONE_DATA_ITEM);
+    return !variable
+        .getVariableDefinitionNode()
+        .map(defNode -> allowedNodes.contains(defNode.getVariableType()))
         .orElse(true); // to ignore not defined variables
   }
 }

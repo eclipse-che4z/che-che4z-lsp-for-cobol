@@ -16,6 +16,9 @@ lexer grammar CobolLexer;
 
 channels{COMMENTS, TECHNICAL}
 import TechnicalLexer;
+@lexer::members {
+   boolean enableCobolSpecialSeparators = true;
+}
 
 EJECT: E J E C T DOT_FS? -> channel(HIDDEN);
 SKIP1 : S K I P '1' DOT_FS? -> channel(HIDDEN);
@@ -87,7 +90,7 @@ BYTITLE : B Y T I T L E;
 CALL : C A L L;
 CANCEL : C A N C E L;
 CAPABLE : C A P A B L E;
-CBL : C B L {enableCommaSeparator = true;};
+CBL : C B L {enableCobolSpecialSeparators = false;};
 CCSVERSION : C C S V E R S I O N;
 CHAINING : C H A I N I N G;
 CHANGED : C H A N G E D;
@@ -294,7 +297,7 @@ HIGH_VALUES : H I G H MINUSCHAR V A L U E S;
 H_CHAR : H;
 IC : I C;
 ID : I D;
-IDENTIFICATION : I D E N T I F I C A T I O N {enableCommaSeparator = false;};
+IDENTIFICATION : I D E N T I F I C A T I O N {enableCobolSpecialSeparators = true;};
 IF : I F;
 IMPLICIT : I M P L I C I T;
 IN : I N;
@@ -601,7 +604,7 @@ PROCEDURE : P R O C E D U R E;
 PROCEDURES : P R O C E D U R E S;
 PROCEDURE_POINTER : P R O C E D U R E MINUSCHAR P O I N T E R;
 PROCEED : P R O C E E D;
-PROCESS : P R O C E S S {enableCommaSeparator = true;};
+PROCESS : P R O C E S S {enableCobolSpecialSeparators = false;};
 PROCESSING: P R O C E S S I N G;
 PROGRAM : P R O G R A M;
 PROGRAM_ID : P R O G R A M MINUSCHAR I D;
@@ -802,8 +805,14 @@ ZWB : Z W B;
 INTEGERLITERAL_WITH_K: INTEGERLITERAL ('K' | 'k');
 CURRENCY_SYMBOL : [\p{Sc}];
 
+// COBOL special separators
+SEMICOLONSEPARATOR2 : '; ' {enableCobolSpecialSeparators}? -> channel(HIDDEN);
+COMMASEPARATOR2 : ', '  {enableCobolSpecialSeparators}? -> channel(HIDDEN);
+COMMASEPARATOR : ', ' {!enableCobolSpecialSeparators}? ;
+
 mode PICTURECLAUSE;
 FINALCHARSTRING: CHARSTRING+ ->popMode;
+DOT_FS2 : '.' EOF? -> popMode;
 CHARSTRING: PICTURECHARSGROUP1+ PICTURECHARSGROUP2? LParIntegralRPar? '.'? (PICTURECHARSGROUP1|PICTURECHARSGROUP2)
 			PICTURECHARSGROUP1+ PICTURECHARSGROUP2? LParIntegralRPar?|
 			PICTURECHARSGROUP1* '.' PICTUREPeriodAcceptables+ LParIntegralRPar?|
@@ -817,6 +826,7 @@ PICTURECHARSGROUP1: PICTURECharAcceptedMultipleTime+;
 PICTURECHARSGROUP2: PICTURECharAcceptedOneTime+;
 PICTUREIS : IS;
 WS2 : [ \t\f]+ -> channel(HIDDEN);
+TEXT : ~('\n' | '\r');
 LParIntegralRPar: LPARENCHAR INTEGERLITERAL RPARENCHAR;
 fragment PICTUREPeriodAcceptables: ('0'|'9'|B|Z|CR|DB|ASTERISKCHAR|COMMACHAR|MINUSCHAR|PLUSCHAR|SLASHCHAR);
 fragment PICTURECharAcceptedMultipleTime: (A|G|N|P|X|DOLLARCHAR|PICTUREPeriodAcceptables);

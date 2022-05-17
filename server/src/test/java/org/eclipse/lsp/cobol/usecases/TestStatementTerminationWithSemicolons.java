@@ -37,7 +37,7 @@ class TestStatementTerminationWithSemicolons {
           + "          02 {$*PAGE-COUNT}        PIC 9(3).\n"
           + "          02 {$*ITENUM}           PIC X(7).\n"
           + "       procedure division.\n"
-          + "           CALL {%'spacing'} USING {$LINE-SPACING};\n"
+          + "           CALL {%'spacing'} USING {$LINE-SPACING}.\n"
           + "       {#*WRITE-REPORT-LINE}.\n"
           + "           IF {$NEW-PAGE}\n"
           + "              PERFORM {#WRITE-HEADER};\n"

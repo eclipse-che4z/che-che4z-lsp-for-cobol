@@ -41,9 +41,23 @@ class TestDaCoExecStatement {
                     // Negative tests
                     + "            EXEC 'SDSFERERE' USING {GBR4|1}. \r\n";
 
+    private static final String TEXT_MULTIPLE = "000100 IDENTIFICATION DIVISION.\n"
+        + "000200 PROGRAM-ID.    RAOMQP1M.                                           \n"
+        + "000300 ENVIRONMENT  DIVISION.\n"
+        + "000400 DATA   DIVISION.\n"
+        + "000500 WORKING-STORAGE SECTION.\n"
+        + "000550 01  {$*SUBSCHEMA-CTRL}.\n"
+        + "000560    03  FILLER PIC X(12)   VALUE SPACE.\n"
+        + "000570 01  {$*LDSHTI1M-XKB}.\n"
+        + "000580    03  FILLER PIC X(12)   VALUE SPACE.\n"
+        + "000600 PROCEDURE DIVISION.\n"
+        + "000700 {#*S794-000}.\n"
+        + "000800 D-B    EXEC 'BSSHTB1M'          USING {$SUBSCHEMA-CTRL}             \n"
+        + "000900 D-C    EXEC 'CSSHTI1M'          USING {$SUBSCHEMA-CTRL}             \n"
+        + "001000                                       {$LDSHTI1M-XKB}\n";
+
     @Test
     void test() {
-
         UseCaseEngine.runTest(
                 TEXT,
                 ImmutableList.of(),
@@ -56,5 +70,11 @@ class TestDaCoExecStatement {
                                 SourceInfoLevels.ERROR.getText())),
                 ImmutableList.of(),
                 DialectConfigs.getDaCoAnalysisConfig());
+    }
+
+    @Test
+    void testMultipleParameters() {
+        UseCaseEngine.runTest(TEXT_MULTIPLE, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(),
+            DialectConfigs.getDaCoAnalysisConfig());
     }
 }

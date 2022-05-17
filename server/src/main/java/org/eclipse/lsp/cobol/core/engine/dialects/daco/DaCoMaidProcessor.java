@@ -23,6 +23,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
+import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
@@ -58,6 +59,9 @@ import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 @RequiredArgsConstructor
 public class DaCoMaidProcessor {
   private static final String MAID_WRK_QUALIFIER = "WRK";
+  private static final String VARIABLE_LEVEL_66 = "66";
+  private static final String VARIABLE_LEVEL_77 = "77";
+  private static final String VARIABLE_LEVEL_88 = "88";
   private final Pattern procedureDivisionPattern = Pattern.compile("\\s*procedure\\s+division[\\w\\s]*\\.", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern dataDivisionPattern = Pattern.compile("\\s*data\\s+division\\s*\\.", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern dataDescriptionEntryPattern = Pattern.compile("^\\s*(?<lvl>\\d+)\\s+(?!copy maid)(?<entryName>[\\w]+(-\\w+)?)?.*\\..*$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
@@ -82,7 +86,10 @@ public class DaCoMaidProcessor {
         if (dataEntry.find()) {
           String name = dataEntry.group("entryName");
           String lvl = dataEntry.group("lvl");
-          if (name != null && !"66".equals(lvl) && !"77".equals(lvl) && !"88".equals(lvl)) {
+          if (name != null
+                  && !VARIABLE_LEVEL_66.equals(lvl)
+                  && !VARIABLE_LEVEL_77.equals(lvl)
+                  && !VARIABLE_LEVEL_88.equals(lvl)) {
             lastSuffix = extractSuffix(name);
           }
         }
@@ -124,7 +131,8 @@ public class DaCoMaidProcessor {
       int startChar = indent == null ? 0 : matcher.end("indent");
       int endChar = matcher.end(matcher.groupCount() - 1);
       int len = endChar - startChar;
-      matcher.appendReplacement(sb, (indent == null ? "" : indent) + String.join("", Collections.nCopies(len, "\u200B")));
+      matcher.appendReplacement(sb, (indent == null ? "" : indent) +
+              String.join("", Collections.nCopies(len, CobolDialect.FILLER)));
       String level = matcher.group("level");
       String layoutId = matcher.group("layoutId");
       String layoutUsage = matcher.group("layoutUsage");

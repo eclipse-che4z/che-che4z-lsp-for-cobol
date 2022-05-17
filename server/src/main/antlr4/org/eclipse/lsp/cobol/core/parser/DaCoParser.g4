@@ -372,7 +372,7 @@ debugFieldStatement
     ;
 
 execStatement
-    : EXEC literal (USING qualifiedDataName)?
+    : EXEC literal (USING qualifiedDataName+)?
     ;
 
 qualifiedDataName
