@@ -49,8 +49,8 @@ public final class VariableDefinitionNode extends Node {
   private final List<OccursClause> occursClauses;
   private final List<ValueClause> valueClauses;
   private final List<VariableNameAndLocality> redefinesClauses;
-  private final VariableNameAndLocality renamesClause;
-  private final VariableNameAndLocality renamesThruClause;
+  private final List<VariableNameAndLocality> renamesClause;
+  private final List<VariableNameAndLocality> renamesThruClause;
   private final String systemName;
   private final Locality levelLocality;
   private final boolean isBlankWhenZeroPresent;
@@ -71,8 +71,8 @@ public final class VariableDefinitionNode extends Node {
       List<ValueClause> valueClauses,
       List<UsageFormat> usageClauses,
       List<VariableNameAndLocality> redefinesClauses,
-      VariableNameAndLocality renamesClause,
-      VariableNameAndLocality renamesThruClause,
+      List<VariableNameAndLocality> renamesClause,
+      List<VariableNameAndLocality> renamesThruClause,
       String systemName,
       Locality levelLocality,
       boolean isBlankWhenZeroPresent,
@@ -334,8 +334,8 @@ public final class VariableDefinitionNode extends Node {
     List<ValueClause> valueClauses = ImmutableList.of();
     List<UsageFormat> usageClauses = ImmutableList.of();
     List<VariableNameAndLocality> redefinesClauses = ImmutableList.of();
-    VariableNameAndLocality renamesClause;
-    VariableNameAndLocality renamesThruClause;
+    List<VariableNameAndLocality> renamesClause;
+    List<VariableNameAndLocality> renamesThruClause;
     Locality statementLocality;
     String systemName;
     Locality levelLocality;

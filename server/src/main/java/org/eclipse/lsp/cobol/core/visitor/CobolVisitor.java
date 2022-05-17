@@ -66,8 +66,8 @@ import static org.eclipse.lsp.cobol.core.CobolParser.*;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
 import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.service.SubroutineService.IMPLICIT_SUBROUTINE_PATH;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
  * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
@@ -530,14 +530,19 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_66()))
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
             .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null));
-    ofNullable(ctx.dataRenamesClause())
-        .map(DataRenamesClauseContext::dataName)
-        .map(this::extractNameAndLocality)
-        .ifPresent(builder::renamesClause);
+     ofNullable(ctx.dataRenamesClause())
+            .map(dataRenamesClauseContext -> dataRenamesClauseContext.qualifiedVariableDataName()
+                    .dataName()
+                    .stream()
+                    .map(DataNameContext.class::cast)
+                    .map(this::extractNameAndLocality).collect(toList()))
+            .ifPresent(builder::renamesClause);
     ofNullable(ctx.dataRenamesClause())
         .map(DataRenamesClauseContext::thruDataName)
-        .map(ThruDataNameContext::dataName)
-        .map(this::extractNameAndLocality)
+        .map(thruDataNameContext -> thruDataNameContext.qualifiedVariableDataName().dataName().stream()
+                .map(DataNameContext.class::cast)
+                .map(this::extractNameAndLocality)
+                .collect(toList()))
         .ifPresent(builder::renamesThruClause);
     return addTreeNode(builder.build(), visitChildren(ctx));
   }

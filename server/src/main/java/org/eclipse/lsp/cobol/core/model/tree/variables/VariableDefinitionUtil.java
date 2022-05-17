@@ -270,8 +270,10 @@ public class VariableDefinitionUtil {
             definitionNode.hasRedefines(),
             global);
     createVariableNameNode(variable, definitionNode.getVariableName());
+    List<SyntaxError> errors = processRenamesBoundaries(variable, group, definitionNode);
+    if (errors.isEmpty()) variable.setVarGroupParent(group);
     return new ResultWithErrors<>(
-        variable, processRenamesBoundaries(variable, group, definitionNode));
+        variable, errors);
   }
 
   private ResultWithErrors<VariableNode> fdMatcher(VariableDefinitionNode definitionNode) {
@@ -507,20 +509,14 @@ public class VariableDefinitionUtil {
       RenameItemNode variable, GroupItemNode group, VariableDefinitionNode definitionNode) {
     if (group == null)
       return ImmutableList.of(variable.getError(MessageTemplate.of(NO_STRUCTURE_BEFORE_RENAME)));
-    List<VariableNode> nodesForRenaming =
-        group.getChildren().stream()
-            .flatMap(Node::getDepthFirstStream)
-            .filter(hasType(NodeType.VARIABLE))
-            .map(VariableNode.class::cast)
-            .collect(Collectors.toList());
     List<SyntaxError> errors = new ArrayList<>();
     Integer renamesIndex =
         processRenamesClauseAndGetIndex(
-                variable, definitionNode.getRenamesClause(), nodesForRenaming)
+                variable, definitionNode.getRenamesClause(), group)
             .unwrap(errors::addAll);
     Integer renamesThruIndex =
         processRenamesClauseAndGetIndex(
-                variable, definitionNode.getRenamesThruClause(), nodesForRenaming)
+                variable, definitionNode.getRenamesThruClause(), group)
             .unwrap(errors::addAll);
     if (renamesIndex != -1 && renamesThruIndex != -1 && renamesIndex >= renamesThruIndex)
       errors.add(variable.getError(MessageTemplate.of(INCORRECT_CHILDREN_ORDER)));
@@ -529,22 +525,53 @@ public class VariableDefinitionUtil {
 
   private ResultWithErrors<Integer> processRenamesClauseAndGetIndex(
       RenameItemNode variable,
-      VariableNameAndLocality renames,
-      List<VariableNode> nodesForRenaming) {
-    List<SyntaxError> errors = ImmutableList.of();
+      List<VariableNameAndLocality> renames,
+      GroupItemNode group) {
+    List<SyntaxError> errors = new ArrayList<>();
+    List<VariableNode> nodesForRenaming =
+            group.getChildren().stream()
+                    .flatMap(Node::getDepthFirstStream)
+                    .filter(hasType(NodeType.VARIABLE))
+                    .map(VariableNode.class::cast)
+                    .collect(Collectors.toList());
     if (renames == null) return new ResultWithErrors<>(-1, errors);
-    String renamesName = renames.getName();
+    String renamesName = renames.get(0).getName();
     int renamesIndex = Iterables.indexOf(nodesForRenaming, it -> renamesName.equals(it.getName()));
     if (renamesIndex != -1) {
       VariableUsageNode variableUsageNode =
-          new VariableUsageNode(renamesName, renames.getLocality());
+          new VariableUsageNode(renamesName, renames.get(0).getLocality());
       variable.addChild(variableUsageNode);
-      nodesForRenaming.get(renamesIndex).addUsage(variableUsageNode);
+      VariableNode variableDefNode = nodesForRenaming.get(renamesIndex);
+      variableDefNode.addUsage(variableUsageNode);
+      if (renames.size() > 1) {
+        VariableNode allowedQualifier = getAllowedQualifier(group, variableDefNode, renames.get(1));
+        if (Objects.nonNull(allowedQualifier)) {
+          processRenameClause(variable, renames.get(1), allowedQualifier);
+        } else {
+          errors.add(variable.getError(MessageTemplate.of(CHILD_TO_RENAME_NOT_FOUND, renames.get(1).getName())));
+        }
+      }
     } else
       errors =
           ImmutableList.of(
               variable.getError(MessageTemplate.of(CHILD_TO_RENAME_NOT_FOUND, renamesName)));
     return new ResultWithErrors<>(renamesIndex, errors);
+  }
+
+  private void processRenameClause(RenameItemNode variable, VariableNameAndLocality rename, VariableNode allowedQualifier) {
+    VariableUsageNode qualifiedVar = new VariableUsageNode(rename.getName(), rename.getLocality());
+    variable.addChild(qualifiedVar);
+    allowedQualifier.addUsage(qualifiedVar);
+  }
+
+  private static VariableNode getAllowedQualifier(GroupItemNode group, VariableNode childVar, VariableNameAndLocality variable) {
+    if (group.getName().equals(variable.getName())) return group;
+    VariableNode parentNode = childVar;
+    while (!parentNode.getName().equals(variable.getName())) {
+        parentNode = parentNode.getNearestParentByType(NodeType.VARIABLE).map(VariableNode.class::cast).orElse(null);
+        if (Objects.isNull(parentNode)) break;
+    }
+    return parentNode;
   }
 
   private VariableWithLevelNode getVariableForConditional(VariableDefinitionNode definitionNode) {
