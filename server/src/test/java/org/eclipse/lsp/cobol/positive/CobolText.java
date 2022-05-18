@@ -27,14 +27,12 @@ public class CobolText {
   String dialectType;
   String qualifier;
   String fullText;
-  String uri;
 
   public CobolText(String fileName, String fullText) {
     this.fileName = fileName;
     this.fullText = fullText;
     this.dialectType = DialectType.COBOL.name();
     this.qualifier = null;
-    this.uri = null;
   }
 
   public CobolText(String fileName, String dialectType, String fullText) {
@@ -42,15 +40,6 @@ public class CobolText {
     this.dialectType = dialectType;
     this.fullText = fullText;
     this.qualifier = null;
-    this.uri = null;
-  }
-
-  public CobolText(String fileName, String dialectType, String qualifier, String fullText) {
-    this.fileName = fileName;
-    this.dialectType = dialectType;
-    this.fullText = fullText;
-    this.qualifier = qualifier;
-    this.uri = null;
   }
 
   @Override

@@ -30,7 +30,7 @@ import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 @Slf4j
 @UtilityClass
 class ErrorHelper {
-  public SyntaxError reportMissingCopybooks(MessageService messageService, Locality locality, String copybookName) {
+  public SyntaxError missingCopybooks(MessageService messageService, Locality locality, String copybookName) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .locality(locality)
@@ -42,6 +42,21 @@ class ErrorHelper {
             .errorCode(MISSING_COPYBOOK)
             .build();
     LOG.debug("Syntax error by reportMissingCopybooks: {}", error.toString());
+    return error;
+  }
+
+  public SyntaxError circularDependency(MessageService messageService, Locality locality, String copybookName) {
+    SyntaxError error =
+        SyntaxError.syntaxError()
+            .locality(locality)
+            .suggestion(
+                messageService.getMessage(
+                    "IdmsCopybookVisitor.errorCircularDependency",
+                    copybookName))
+            .severity(ERROR)
+            .errorCode(MISSING_COPYBOOK)
+            .build();
+    LOG.debug("Syntax error by reportCircularDependency: {}", error.toString());
     return error;
   }
 }

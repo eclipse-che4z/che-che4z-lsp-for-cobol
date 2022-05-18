@@ -20,7 +20,10 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,11 +43,37 @@ public class TestCopyIdmsNested {
   private static final String NESTED_COPY =  "       01  {$*NESTED_COPY}.\n"
       + "           03 {$*RANDOM-NAME}            PIC X(16).\n";
 
+  private static final String TEXT_CIRCULAR = "        IDENTIFICATION DIVISION. \n"
+      + "        PROGRAM-ID. test1.\n"
+      + "        DATA DIVISION.\n"
+      + "       WORKING-STORAGE SECTION.\n"
+      + "       01 {$*NAME1}            PIC X(16).\n"
+      + "           03 COPY IDMS {~COPY1}.\n"
+      + "       PROCEDURE DIVISION.\n";
+
+  private static final String COPY_LOOP =  "       01  COPY IDMS {COPY1|1}.\n";
+
   @Test
   void testNestedIdmsCopybook() {
     UseCaseEngine.runTest(
         TEXT, ImmutableList.of(new CobolText("COPY1", IdmsDialect.NAME, COPY1),
-            new CobolText("NESTED_COPY", IdmsDialect.NAME, null, NESTED_COPY, UseCaseUtils.toURI("COPY1"))),
+            new CobolText("NESTED_COPY", IdmsDialect.NAME, null, NESTED_COPY)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
+
+  @Test
+  void testNestedIdmsCopybook_infiniteLoop() {
+    Diagnostic diagnosticCircular = new Diagnostic(
+        new Range(new Position(0, 21), new Position(0, 26)),
+        "COPY1: Copybook has circular dependency", DiagnosticSeverity.Error, "COBOL Language Support - E",
+        "MISSING_COPYBOOK"
+    );
+
+    UseCaseEngine.runTest(
+        TEXT_CIRCULAR, ImmutableList.of(
+            new CobolText("COPY1", IdmsDialect.NAME, null, COPY_LOOP)),
+        ImmutableMap.of("1", diagnosticCircular),
+        ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
+  }
+
 }

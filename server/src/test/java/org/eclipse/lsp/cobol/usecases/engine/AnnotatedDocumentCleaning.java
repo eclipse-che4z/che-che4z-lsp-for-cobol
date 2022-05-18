@@ -28,10 +28,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.usecase.UseCasePreprocessorLexer;
 import org.eclipse.usecase.UseCasePreprocessorParser;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -119,12 +116,11 @@ class AnnotatedDocumentCleaning {
       TestData testData,
       List<String> explicitCopybooks,
       SQLBackend sqlBackend) {
-    return copybooks.map(
-        cobolText -> {
-          TestData test = processCopybook(expectedDiagnostics, explicitCopybooks, sqlBackend).apply(cobolText);
-          test = collectDataFromCopybooks(testData).apply(test);
-          return new CobolText(test.getCopybookName(), test.getDialectType(), null, test.getText(), cobolText.getUri());
-        }).collect(toList());
+    return copybooks
+        .map(processCopybook(expectedDiagnostics, explicitCopybooks, sqlBackend))
+        .map(collectDataFromCopybooks(testData))
+        .map(test -> new CobolText(test.getCopybookName(), test.getDialectType(), null, test.getText()))
+        .collect(toList());
   }
 
   private Function<CobolText, TestData> processCopybook(
@@ -199,8 +195,11 @@ class AnnotatedDocumentCleaning {
   private <T> void mergeMaps(Map<String, List<T>> to, Map<String, List<T>> from) {
     from.forEach(
         (key, value) -> {
-          if (to.containsKey(key)) to.get(key).addAll(value);
-          else to.put(key, value);
+          if (to.containsKey(key)) {
+            List<T> list = new LinkedList<>(to.get(key));
+            list.addAll(value);
+            to.put(key, list);
+          } else to.put(key, value);
         });
   }
 }
