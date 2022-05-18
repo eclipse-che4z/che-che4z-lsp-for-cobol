@@ -15,7 +15,6 @@
 
 package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
-import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -26,12 +25,15 @@ import org.eclipse.lsp.cobol.core.IdmsCopyParser;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -51,14 +53,11 @@ class IdmsCopybookService {
    * @param parentLevel - copy statement parent level
    * @return - a list of generated nodes
    */
-  public List<Node> processCopybook(CopybookModel copybookModel, int parentLevel) {
+  public ResultWithErrors<List<Node>> processCopybook(CopybookModel copybookModel, int parentLevel) {
     return processNodes(copybookModel, parentLevel);
   }
 
-  private List<Node> processNodes(CopybookModel copybookModel, int parentLevel) {
-    if (copybookModel.getContent() == null) {
-      return ImmutableList.of();
-    }
+  private ResultWithErrors<List<Node>> processNodes(CopybookModel copybookModel, int parentLevel) {
     IdmsCopyLexer lexer = new IdmsCopyLexer(CharStreams.fromString(copybookModel.getContent()));
     lexer.removeErrorListeners();
 
@@ -76,7 +75,11 @@ class IdmsCopybookService {
         copybookModel.getUri(), parentLevel);
 
     ParserRuleContext node = parser.startRule();
-    return visitor.visit(node);
+    List<Node> nodes = visitor.visit(node);
+
+    List<SyntaxError> errors = new LinkedList<>(listener.getErrors());
+    errors.addAll(visitor.getErrors());
+    return new ResultWithErrors<>(nodes, errors);
   }
 
   private IdmsCopyParser getCobolParser(CommonTokenStream tokens) {

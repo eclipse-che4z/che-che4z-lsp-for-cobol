@@ -76,6 +76,7 @@ public final class IdmsDialect implements CobolDialect {
     IdmsVisitor visitor = new IdmsVisitor(copybookService, treeListener, messageService, context);
     List<Node> nodes = visitor.visitStartRule(parser.startRule());
     List<SyntaxError> errors = new ArrayList<>(listener.getErrors());
+    errors.addAll(visitor.getErrors());
     return new ResultWithErrors<>(new DialectOutcome(visitor.getResultedText(), nodes), errors);
   }
 }
