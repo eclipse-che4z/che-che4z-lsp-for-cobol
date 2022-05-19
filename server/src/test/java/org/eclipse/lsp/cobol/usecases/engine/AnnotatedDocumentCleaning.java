@@ -21,8 +21,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.service.SQLBackend;
+import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.usecase.UseCasePreprocessorLexer;
@@ -30,7 +30,6 @@ import org.eclipse.usecase.UseCasePreprocessorParser;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -75,8 +74,6 @@ class AnnotatedDocumentCleaning {
             DOCUMENT_URI,
             subroutineNames,
             expectedDiagnostics,
-            copybookNames,
-            sqlBackend,
             explicitCopybooks.stream()
                 .findFirst()
                 .map(CobolText::getDialectType)
@@ -87,9 +84,7 @@ class AnnotatedDocumentCleaning {
         processCopybooks(
             collectCopybooks(explicitCopybooks, sqlBackend, testData.getCopybookUsages()),
             expectedDiagnostics,
-            testData,
-            copybookNames,
-            sqlBackend),
+            testData),
         testData);
   }
 
@@ -116,33 +111,23 @@ class AnnotatedDocumentCleaning {
   private List<CobolText> processCopybooks(
       Stream<CobolText> copybooks,
       Map<String, Diagnostic> expectedDiagnostics,
-      TestData testData,
-      List<String> explicitCopybooks,
-      SQLBackend sqlBackend) {
+      TestData testData) {
     return copybooks.map(
         cobolText -> {
-          TestData test = processCopybook(expectedDiagnostics, explicitCopybooks, sqlBackend).apply(cobolText);
+          TestData test = processCopybook(expectedDiagnostics).apply(cobolText);
           test = collectDataFromCopybooks(testData).apply(test);
-          return new CobolText(test.getCopybookName(), test.getDialectType(), null, test.getText(), cobolText.getUri());
+          return new CobolText(test.getCopybookName(), test.getDialectType(), test.getText(), cobolText.getUri());
         }).collect(toList());
   }
 
-  private Function<CobolText, TestData> processCopybook(
-      Map<String, Diagnostic> expectedDiagnostics,
-      List<String> explicitCopybooks,
-      SQLBackend sqlBackend) {
-    return it -> {
-      String qualifier = Optional.ofNullable(it.getQualifier()).map(q -> "_" + q).orElse("");
-      return processDocument(
-          it.getFullText(),
-          it.getFileName() + qualifier,
-          toURI(it.getFileName() + qualifier),
-          ImmutableList.of(),
-          expectedDiagnostics,
-          explicitCopybooks,
-          sqlBackend,
-          it.getDialectType());
-    };
+  private Function<CobolText, TestData> processCopybook(Map<String, Diagnostic> expectedDiagnostics) {
+    return it -> processDocument(
+        it.getFullText(),
+        it.getFileName(),
+        toURI(it.getFileName()),
+        ImmutableList.of(),
+        expectedDiagnostics,
+        it.getDialectType());
   }
 
   private TestData processDocument(
@@ -151,8 +136,6 @@ class AnnotatedDocumentCleaning {
       String uri,
       List<String> subroutineNames,
       Map<String, Diagnostic> expectedDiagnostics,
-      List<String> explicitCopybooks,
-      SQLBackend sqlBackend,
       String dialectType) {
     int numberOfLines = text.split("\\R").length;
 

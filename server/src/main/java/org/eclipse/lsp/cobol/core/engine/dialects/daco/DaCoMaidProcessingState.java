@@ -12,12 +12,10 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
-
-/**
- * Represents supported dialect types, used for resolving copybooks for different dialects
- */
- // TODO: should we remove this enum?
-public enum DialectType {
-  COBOL
+package org.eclipse.lsp.cobol.core.engine.dialects.daco;
+/** Representation of DaCo preprocessing state*/
+public enum DaCoMaidProcessingState {
+  START,
+  DATA_DIVISION,
+  PROCEDURE_DIVISION
 }

@@ -33,22 +33,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-/** Process the text according to the DaCo rules */
+/**
+ * Process the text according to the DaCo rules
+ */
 @RequiredArgsConstructor
 public final class DaCoDialect implements CobolDialect {
   public static final String NAME = "DaCo";
   private final Pattern dcdbPattern = Pattern.compile("^[\\s\\d]{7}D-[BC]", Pattern.MULTILINE);
 
   private final MessageService messageService;
+  private final DaCoMaidProcessor maidProcessor;
 
   /**
    * Gets the name of the dialect
+   *
    * @return the name of the dialect
    */
   @Override
   public String getName() {
     return DaCoDialect.NAME;
   }
+
   /**
    * Processing the text according to the DaCo rules
    *
@@ -57,8 +62,11 @@ public final class DaCoDialect implements CobolDialect {
    */
   @Override
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    String text = dcdbPattern.matcher(context.getText()).replaceAll("          ");
-    DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(text));
+    List<SyntaxError> errors = new ArrayList<>();
+    DialectOutcome maidOutcome = maidProcessor.process(
+            dcdbPattern.matcher(context.getText()).replaceAll("          "),
+            context, errors);
+    DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(maidOutcome.getText()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     DaCoParser parser = new DaCoParser(tokens);
     DialectParserListener listener = new DialectParserListener(context.getProgramDocumentUri());
@@ -67,9 +75,10 @@ public final class DaCoDialect implements CobolDialect {
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
-    DaCoVisitor visitor = new DaCoVisitor(context.getProgramDocumentUri(), text);
+    DaCoVisitor visitor = new DaCoVisitor(context.getProgramDocumentUri(), maidOutcome.getText());
     List<Node> nodes = visitor.visitStartRule(parser.startRule());
-    List<SyntaxError> errors = new ArrayList<>(listener.getErrors());
+    nodes.addAll(maidOutcome.getDialectNodes());
+    errors.addAll(listener.getErrors());
     errors.addAll(visitor.getErrors());
     return new ResultWithErrors<>(new DialectOutcome(visitor.getResultedText(), nodes), errors);
   }

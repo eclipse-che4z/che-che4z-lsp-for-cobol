@@ -44,7 +44,7 @@ public class TestCopyIdmsNested {
   void testNestedIdmsCopybook() {
     UseCaseEngine.runTest(
         TEXT, ImmutableList.of(new CobolText("COPY1", IdmsDialect.NAME, COPY1),
-            new CobolText("NESTED_COPY", IdmsDialect.NAME, null, NESTED_COPY, UseCaseUtils.toURI("COPY1"))),
+            new CobolText("NESTED_COPY", IdmsDialect.NAME, NESTED_COPY, UseCaseUtils.toURI("COPY1"))),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 }

@@ -15,7 +15,10 @@
 
 package org.eclipse.lsp.cobol.service;
 
-import com.google.inject.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import org.eclipse.lsp.cobol.ClientServerTestModule;
 import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
