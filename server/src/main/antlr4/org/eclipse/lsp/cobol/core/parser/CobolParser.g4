@@ -215,7 +215,7 @@ remarksParagraph
 // - end of comment entry
 optionalParagraphTermination
    : ~(AUTHOR | CBL| DATE_COMPILED | DATE_WRITTEN | IDENTIFICATION | INSTALLATION
-   | DATA | END | ENVIRONMENT | ID | PROCEDURE | PROCESS | PROGRAM_ID | SECURITY | REMARKS)*?
+   | END | ENVIRONMENT | ID | PROCEDURE | PROCESS | PROGRAM_ID | SECURITY | REMARKS)*?
    ;
 
 // --- environment division --------------------------------------------------------------------
