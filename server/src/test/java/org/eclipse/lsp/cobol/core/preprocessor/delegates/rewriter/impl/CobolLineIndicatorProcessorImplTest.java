@@ -155,11 +155,11 @@ class CobolLineIndicatorProcessorImplTest {
         ProcessingConstants.WS + "           \"RANDOM TEXT   ",
         outcomeList.get(0).getIndicatorArea() + outcomeList.get(0).getContentArea());
     assertEquals(
-        ProcessingConstants.WS + "RANDOM TEXT   ",
-        outcomeList.get(1).getIndicatorArea() + outcomeList.get(1).getContentArea());
+            "        \"RANDOM TEXT   ",
+        outcomeList.get(1).getContentAreaB());
     assertEquals(
-        ProcessingConstants.WS + "\"CONTINUED LINE ENDS HERE\"",
-        outcomeList.get(2).getIndicatorArea() + outcomeList.get(2).getContentArea());
+            "        \"CONTINUED LINE ENDS HERE\"",
+        outcomeList.get(2).getContentAreaB());
   }
 
   /** Testing empty continuation line pre-formatting for Token analysis */

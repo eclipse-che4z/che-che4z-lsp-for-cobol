@@ -65,6 +65,25 @@ class TestContinuationLine {
           + "      *                                                                 \n"
           + "      *                                                                 ";
 
+  private static final String TEXT3 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01  {$*WRK-XN-160-1} PIC X(160) VALUE                                \n"
+          + "           \"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\n"
+          + "      -    \"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\n"
+          + "      -    \"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\n"
+          + "      -    \"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\n"
+          + "      -    \"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\n"
+          + "      -    \"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\".                                      \n"
+          + "       77 {$*DATA-T}              PICTURE X(20) VALUE          \"RANDOM TEXT \n"
+          + "      -                                                     \"RANDOM TEXT\n"
+          + "      -    \" CONTINUED LINE ENDS HERE\".\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           MOVE \"TEST\" to {$DATA-T}.\n"
+          + "           DISPLAY {$WRK-XN-160-1}.";
+
   @Test
   void testWhenContinuousLineStartsWithOneQuote_thenOneLiteralIsIdentified() {
     UseCaseEngine.runTest(
@@ -82,5 +101,11 @@ class TestContinuationLine {
   @Test
   void testWhenContinuousLineStartsWithTwoQuotes_thenTwoLiteralsAreIdentified() {
     UseCaseEngine.runTest(TEXT2, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void
+      testWhenContinuousLineStartsWithOneQuoteAndContinuedLineIsOpenLiteral_thenOneLiteralIdentified() {
+    UseCaseEngine.runTest(TEXT3, ImmutableList.of(), ImmutableMap.of());
   }
 }
