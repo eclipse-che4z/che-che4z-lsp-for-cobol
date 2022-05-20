@@ -38,6 +38,8 @@ class TestDaCoTableRowModifyStatement {
           + "             05 {$*DSAPRO-XL1}. \r\n"
           + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
           + "        PROCEDURE DIVISION. \r\n"
+          + "            ROW MODIFY {$TBLPRO-XL1}. \r\n"
+          + "            ROW MODIFY {$TBLPRO-XL1} ON {$DSAPRO-XL1}. \r\n"
           + "            ROW MODIFY {$TBLPRO-XL1} ON {$DSAPRO-XL1} WITH {$DSAPRO-XL1}. \r\n"
           + "            ROW MODIFY {$TBLPRO-XL1} ON 'ASDF' WITH {$DSAPRO-XL1}. \r\n"
           + "            ROW MODIFY {$TBFPRO-XL1} ON {$DSAPRO-XL1} WITH {$DSAPRO-XL1}. \r\n"
@@ -67,7 +69,7 @@ class TestDaCoTableRowModifyStatement {
                 "Variable GBR4 is not defined",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())),
-            ImmutableList.of(),
-            DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

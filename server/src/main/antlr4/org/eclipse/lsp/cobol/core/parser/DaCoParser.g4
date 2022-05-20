@@ -250,8 +250,8 @@ rowInsertStatement
 
 rowModifyStatement
     : MODIFY daco_table_name
-      ON (qualifiedDataName | literal)
-      WITH qualifiedDataName
+      (ON (qualifiedDataName | literal)
+      (WITH qualifiedDataName)?)?
     ;
 
 rowSortStatement
