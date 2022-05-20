@@ -21,8 +21,8 @@ import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** WRK qualifier should work even with copybooks with too short name. */
-class TestCopyMaidWithWrkShortName {
+/** WRK qualifier should work when specified in any case. */
+class TestCopyMaidWithWrkThreeCharsSuffix {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST.\n"
@@ -30,20 +30,19 @@ class TestCopyMaidWithWrkShortName {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "        01 {$*PARENT-XNT}.\n"
-          + "            05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.\n"
+          + "            05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} wrk.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           DISPLAY {$A}.";
+          + "           DISPLAY {$BHTRGL-XNT}.";
 
-  private static final String BHTRGL_XBG =
-      "            09 {$*A} PIC X.\n"
-          + "            09 PIC X.\n"
-          + "            09 FILLER PIC x.";
+  private static final String COPYBOOK_CONTENT =
+      "1           09 {$*BHTRGL-XXX`BHTRGL-XNT} PIC X.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(new CobolText("BHTRGL-XBG_WRK", DaCoDialect.NAME, BHTRGL_XBG)),
+        ImmutableList.of(
+            new CobolText("BHTRGL-XBG_WRK", DaCoDialect.NAME, COPYBOOK_CONTENT)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

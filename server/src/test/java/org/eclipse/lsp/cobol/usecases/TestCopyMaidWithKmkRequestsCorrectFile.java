@@ -43,7 +43,7 @@ class TestCopyMaidWithKmkRequestsCorrectFile {
           + "           DISPLAY {$BHTRGL-XB4} OF {$BHTTAB-XW7}.";
 
   private static final String COPYBOOK_CONTENT =
-      "1           09 {$*BHTRGL-XB4}.\n"
+            "1           09 {$*BHTRGL-XB4}.\n"
           + "2             11 {$*BHTRGLVLG-XB4}.\n"
           + "3               13 {$*FABLYN-XB4}.\n"
           + "4                 15 {$*FABLYNPOSEEN-XB4} PIC X.\n"

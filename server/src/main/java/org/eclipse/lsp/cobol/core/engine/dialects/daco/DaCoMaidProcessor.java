@@ -97,7 +97,7 @@ public class DaCoMaidProcessor {
                   && !VARIABLE_LEVEL_66.equals(lvl)
                   && !VARIABLE_LEVEL_77.equals(lvl)
                   && !VARIABLE_LEVEL_88.equals(lvl)) {
-            lastSuffix = extractSuffix(name);
+            lastSuffix = DaCoHelper.extractSuffix(name);
           }
         }
       } else if (dataDivisionPattern.matcher(line).find()) {
@@ -109,24 +109,6 @@ public class DaCoMaidProcessor {
 
 
     return new DialectOutcome(input, copyMaidNodes);
-  }
-
-  private String extractSuffix(String name) {
-    if (name.length() < 3) {
-      return null;
-    }
-    int l2 = name.length() - 2;
-    if (name.charAt(l2) == '-') {
-      return "";
-    }
-    if (name.length() < 5) {
-      return null;
-    }
-    int l4 = name.length() - 4;
-    if (name.charAt(l4) == '-') {
-      return name.substring(l2);
-    }
-    return null;
   }
 
   private String collectCopyMaid(String input, int lineNumber, List<Node> copyMaidNodes, String lastSuffix, DialectProcessingContext context, List<SyntaxError> errors) {
