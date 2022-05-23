@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
 import com.google.common.collect.ImmutableList;
+import lombok.Getter;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -44,8 +45,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
-import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
@@ -58,13 +58,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorString
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
@@ -81,13 +76,15 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private final CopybookConfig copybookConfig;
   private final String programDocumentUri;
   private final TextReplacement textReplacement;
+  @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
   IdmsVisitor(CopybookService copybookService,
                      ParseTreeListener treeListener,
                      MessageService messageService,
                      DialectProcessingContext context) {
     this.copybookService = copybookService;
-    this.idmsCopybookService = new IdmsCopybookService(copybookService, context.getCopybookConfig(), treeListener, messageService);
+    this.idmsCopybookService = new IdmsCopybookService(context.getProgramDocumentUri(), copybookService,
+        context.getCopybookConfig(), treeListener, messageService, new HashSet<>());
     this.copybookConfig = context.getCopybookConfig();
     this.programDocumentUri = context.getProgramDocumentUri();
 
@@ -107,18 +104,9 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     CopybookModel copybookModel = copybookService.resolve(copybookName, programDocumentUri, programDocumentUri, copybookConfig, true);
     textReplacement.addReplacementContext(ctx);
 
-    Locality locality = VisitorHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), programDocumentUri);
-    CopyNode node = new CopyNode(locality, copybookName.getDisplayName());
-    visitChildren(ctx).forEach(node::addChild);
-
-    Location location = new Location();
-    location.setUri(copybookModel.getUri());
-    location.setRange(new Range(new Position(0, 0), new Position(0, 0)));
-
-    node.setDefinition(new CopyDefinition(location, copybookModel.getUri()));
-
-    idmsCopybookService.processCopybook(copybookModel, getLevel(ctx)).forEach(node::addChild);
-    return ImmutableList.of(node);
+    Locality locality = IdmsParserHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), programDocumentUri);
+    return idmsCopybookService.processCopybook(copybookModel, getLevel(ctx), locality, copybookName)
+        .unwrap(errors::addAll);
   }
 
   @Override

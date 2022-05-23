@@ -26,20 +26,20 @@ public class CobolText {
   String fileName;
   String dialectType;
   String fullText;
-  String uri;
+  String url;
 
   public CobolText(String fileName, String fullText) {
     this.fileName = fileName;
     this.fullText = fullText;
     this.dialectType = DialectType.COBOL.name();
-    this.uri = null;
+    this.url = null;
   }
 
   public CobolText(String fileName, String dialectType, String fullText) {
     this.fileName = fileName;
     this.dialectType = dialectType;
     this.fullText = fullText;
-    this.uri = null;
+    this.url = null;
   }
 
   @Override

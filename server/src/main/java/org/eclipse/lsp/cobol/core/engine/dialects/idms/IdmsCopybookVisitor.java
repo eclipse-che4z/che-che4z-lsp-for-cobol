@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
 import com.google.common.collect.ImmutableList;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -27,8 +28,7 @@ import org.eclipse.lsp.cobol.core.IdmsCopyParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
-import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
@@ -36,14 +36,10 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorString
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
-import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -60,8 +56,11 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
   private final CopybookService copybookService;
   private final CopybookConfig copybookConfig;
   private final IdmsCopybookService idmsCopybookService;
-  private final String uri;
+  private final String programDocumentUri;
+  private final String documentUri;
   private final int parentLevel;
+  private final Set<CopybookName> processedCopybooks;
+  @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
   private int firstCopybookLevel = 0;
 
@@ -69,13 +68,18 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
                       CopybookConfig copybookConfig,
                       ParseTreeListener treeListener,
                       MessageService messageService,
-                      String uri,
-                      int parentLevel) {
+                      String programDocumentUri,
+                      String documentUri,
+                      int parentLevel,
+                      Set<CopybookName> processedCopybooks) {
     this.copybookService = copybookService;
     this.copybookConfig = copybookConfig;
-    this.uri = uri;
+    this.programDocumentUri = programDocumentUri;
+    this.documentUri = documentUri;
     this.parentLevel = parentLevel;
-    idmsCopybookService = new IdmsCopybookService(copybookService, copybookConfig, treeListener, messageService);
+    this.processedCopybooks = processedCopybooks;
+    idmsCopybookService = new IdmsCopybookService(programDocumentUri, copybookService,
+        copybookConfig, treeListener, messageService, processedCopybooks);
   }
 
   @Override
@@ -84,20 +88,11 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
     String nameToken = optionsContext.getText().toUpperCase();
     CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
 
-    CopybookModel copybookModel = copybookService.resolve(copybookName, uri, uri, copybookConfig, true);
+    CopybookModel copybookModel = copybookService.resolve(copybookName, programDocumentUri, documentUri, copybookConfig, true);
+    Locality locality = IdmsParserHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), documentUri);
 
-    Locality locality = buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), uri);
-    CopyNode node = new CopyNode(locality, copybookName.getDisplayName());
-    visitChildren(ctx).forEach(node::addChild);
-
-    Location location = new Location();
-    location.setUri(copybookModel.getUri());
-    location.setRange(new Range(new Position(0, 0), new Position(0, 0)));
-
-    node.setDefinition(new CopyDefinition(location, copybookModel.getUri()));
-
-    idmsCopybookService.processCopybook(copybookModel, calculateLevel(getLevel(ctx))).forEach(node::addChild);
-    return ImmutableList.of(node);
+    return idmsCopybookService.processCopybook(copybookModel, calculateLevel(getLevel(ctx)), locality, copybookName)
+        .unwrap(errors::addAll);
   }
 
   @Override
@@ -255,7 +250,7 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
         new Position(ctx.stop.getLine() - 1, ctx.stop.getCharPositionInLine()));
 
     return Locality.builder()
-        .uri(uri)
+        .uri(documentUri)
         .range(range)
         .build();
   }
@@ -279,7 +274,7 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
 
   private VariableNameAndLocality extractNameAndLocality(IdmsCopyParser.CobolWordContext context) {
     String name = getName(context);
-    return new VariableNameAndLocality(name, buildNameRangeLocality(context, name, uri));
+    return new VariableNameAndLocality(name, buildNameRangeLocality(context, name, documentUri));
   }
 
   private List<ValueClause> retrieveValues(List<IdmsCopyParser.DataValueClauseContext> clauses) {

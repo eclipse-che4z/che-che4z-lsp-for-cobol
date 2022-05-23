@@ -138,17 +138,11 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
       /*
        ... the continuation line might startPosition with a single quotation mark. This indicates,
        that the literal from the continued line stays open ...
+       Removing the leading quotation mark to keep the literal open is handled during serialization.
       */
-      if (CobolLineReWriter.checkStringStartsWithQuoteMark(trimmedContentArea)) {
-        /* so we are removing the leading quotation mark to keep the literal open. */
-        result =
-            CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-                WS, trimLeadingChar(trimmedContentArea), line);
-      } else {
         result =
             CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
                 WS, conditionalRightTrimmedContentArea, line);
-      }
     } else {
       /* As fallback trim leading whitespace. We also need to remove the starting quotes if exist */
       result =
