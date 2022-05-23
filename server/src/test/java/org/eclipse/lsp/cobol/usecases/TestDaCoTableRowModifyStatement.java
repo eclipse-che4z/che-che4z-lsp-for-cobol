@@ -40,6 +40,7 @@ class TestDaCoTableRowModifyStatement {
           + "        PROCEDURE DIVISION. \r\n"
           + "            ROW MODIFY {$TBLPRO-XL1}. \r\n"
           + "            ROW MODIFY {$TBLPRO-XL1} ON {$DSAPRO-XL1}. \r\n"
+          + "            ROW MODIFY {$TBLPRO-XL1} WITH {$DSAPRO-XL1}. \r\n"
           + "            ROW MODIFY {$TBLPRO-XL1} ON {$DSAPRO-XL1} WITH {$DSAPRO-XL1}. \r\n"
           + "            ROW MODIFY {$TBLPRO-XL1} ON 'ASDF' WITH {$DSAPRO-XL1}. \r\n"
           + "            ROW MODIFY {$TBFPRO-XL1} ON {$DSAPRO-XL1} WITH {$DSAPRO-XL1}. \r\n"
