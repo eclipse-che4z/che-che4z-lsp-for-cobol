@@ -16,7 +16,7 @@ startRule
 
 // procedure devision for resolving predefined labels
 procedureDivision
-   : PROCEDURE DIVISION DOT_FS
+   : PROCEDURE DIVISION .*? DOT_FS
    ;
 
 // linkage section for resolving predefined variables

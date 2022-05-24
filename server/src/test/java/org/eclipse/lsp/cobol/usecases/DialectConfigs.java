@@ -35,8 +35,12 @@ public class DialectConfigs {
 
   AnalysisConfig getDaCoAnalysisConfig() {
     return new AnalysisConfig(
-        new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
-        ImmutableList.of(),
-        ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME));
+            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
+            ImmutableList.of(),
+            ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME));
+  }
+
+  AnalysisConfig getDaCoAnalysisConfig(CopybookConfig copybookConfig) {
+    return new AnalysisConfig(copybookConfig, ImmutableList.of(), ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME));
   }
 }
