@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Getter
 @ToString(callSuper = true)
-public class IndexItemNode extends VariableNode {
+public class IndexItemNode extends VariableNode implements EffectiveData {
 
   protected IndexItemNode(Locality locality, String name, boolean global) {
     super(locality, name, VariableType.INDEX_ITEM, global);
@@ -42,5 +42,10 @@ public class IndexItemNode extends VariableNode {
   @Override
   protected String getVariableDisplayString() {
     return "INDEXED BY " + getName();
+  }
+
+  @Override
+  public EffectiveDataType getEffectiveDataType() {
+    return EffectiveDataType.INTEGER;
   }
 }
