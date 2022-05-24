@@ -2224,7 +2224,7 @@ fileName
    ;
 
 functionName
-   : INTEGER | LENGTH | RANDOM | SUM | WHEN_COMPILED | cobolWord
+   : INTEGER | LENGTH | RANDOM | SUM | MAX | WHEN_COMPILED | cobolWord
    ;
 
 indexName
