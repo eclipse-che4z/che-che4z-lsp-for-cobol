@@ -37,7 +37,6 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class StandAloneDataItemNode extends ElementaryNode {
-  private final String picClause;
   private final String value;
 
   public StandAloneDataItemNode(
@@ -61,7 +60,6 @@ public class StandAloneDataItemNode extends ElementaryNode {
         isSignClausePresent,
         picClause,
         usageFormat);
-    this.picClause = picClause;
     this.value = value;
     addProcessStep(this::processNode);
   }
