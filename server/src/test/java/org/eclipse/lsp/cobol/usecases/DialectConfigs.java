@@ -23,7 +23,7 @@ import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 
-/** IDMS related getter */
+/** IDMS and MAID related getter */
 @UtilityClass
 public class DialectConfigs {
   AnalysisConfig getIDMSAnalysisConfig() {

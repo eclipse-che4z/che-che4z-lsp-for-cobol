@@ -139,7 +139,7 @@ public class VariableDefinitionUtil {
             copybooks.add((CopyNode) c);
           }
         });
-
+    copybooks.sort(Comparator.comparingInt(c -> c.getLocality().getRange().getStart().getLine()));
     copybooks.forEach(copyNode -> {
       int copybookLine = copyNode.getLocality().getRange().getStart().getLine();
       String uri = copyNode.getLocality().getUri();
