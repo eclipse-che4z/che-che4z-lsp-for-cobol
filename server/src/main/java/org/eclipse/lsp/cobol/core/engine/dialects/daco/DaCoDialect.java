@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public final class DaCoDialect implements CobolDialect {
   public static final String NAME = "DaCo";
+  public static final String SPACES_A = "          ";
   private final Pattern dcdbPattern = Pattern.compile("^[\\s\\d]{7}D-[BC]", Pattern.MULTILINE);
 
   private final MessageService messageService;
@@ -64,7 +65,7 @@ public final class DaCoDialect implements CobolDialect {
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
     List<SyntaxError> errors = new ArrayList<>();
     DialectOutcome maidOutcome = maidProcessor.process(
-            dcdbPattern.matcher(context.getText()).replaceAll("          "),
+            dcdbPattern.matcher(context.getText()).replaceAll(SPACES_A),
             context, errors);
     DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(maidOutcome.getText()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);

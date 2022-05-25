@@ -34,6 +34,7 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
@@ -59,13 +60,10 @@ import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 @RequiredArgsConstructor
 public class DaCoMaidProcessor {
   private static final String MAID_WRK_QUALIFIER = "WRK";
-  private static final String VARIABLE_LEVEL_66 = "66";
-  private static final String VARIABLE_LEVEL_77 = "77";
-  private static final String VARIABLE_LEVEL_88 = "88";
   private final Pattern procedureDivisionPattern = Pattern.compile("\\s*procedure\\s+division[\\w\\s]*\\.", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern dataDivisionPattern = Pattern.compile("\\s*data\\s+division\\s*\\.", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern dataDescriptionEntryPattern = Pattern.compile("^\\s*(?<lvl>\\d+)\\s+(?!copy maid)(?<entryName>[\\w]+(-\\w+)?)?.*\\..*$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-  private final Pattern copyMaidPattern = Pattern.compile("^(?<indent>\\s*)(?<level>\\d{1,2})?\\s*COPY\\sMAID\\s(?<layoutId>[a-zA-Z0-9]*[-]?[a-zA-Z0-9]{0,3})\\s*(?<layoutUsage>[a-zA-Z]{3,6})?\\s*\\.?$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+  private final Pattern copyMaidPattern = Pattern.compile("^(?<indent>\\s*)(?<level>\\d{1,2})?\\s*COPY\\s+MAID\\s+(?<layoutId>[a-zA-Z0-9]*[-]?[a-zA-Z0-9]{0,3})\\s*(?<layoutUsage>[a-zA-Z]{3,6})?\\s*\\.?$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final CopybookService copybookService;
   private final ParseTreeListener treeListener;
   private final MessageService messageService;
@@ -92,11 +90,11 @@ public class DaCoMaidProcessor {
         Matcher dataEntry = dataDescriptionEntryPattern.matcher(line);
         if (dataEntry.find()) {
           String name = dataEntry.group("entryName");
-          String lvl = dataEntry.group("lvl");
+          int lvl = Integer.parseInt(dataEntry.group("lvl"));
           if (name != null
-                  && !VARIABLE_LEVEL_66.equals(lvl)
-                  && !VARIABLE_LEVEL_77.equals(lvl)
-                  && !VARIABLE_LEVEL_88.equals(lvl)) {
+                  && VariableDefinitionUtil.LEVEL_66 != lvl
+                  && VariableDefinitionUtil.LEVEL_77 != lvl
+                  && VariableDefinitionUtil.LEVEL_88 != lvl) {
             lastSuffix = DaCoHelper.extractSuffix(name);
           }
         }
@@ -152,8 +150,7 @@ public class DaCoMaidProcessor {
             context.getCopybookConfig(),
             true);
     if (copybookModel.getContent() != null) {
-      Location location = new Location(copybookModel.getUri(),
-              new Range(new Position(0, 0), new Position(0, 0)));
+      Location location = new Location(copybookModel.getUri(), new Range(new Position(), new Position()));
       CopyDefinition definition = new CopyDefinition(location, copybookModel.getUri());
       cbNode.setDefinition(definition);
       checkWrkSuffix(cbNode, layoutUsage, errors);

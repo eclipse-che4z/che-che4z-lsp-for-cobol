@@ -83,13 +83,21 @@ public class DaCoCopybookVisitor extends CobolParserBaseVisitor<List<Node>> {
                     .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_66()))
                     .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
                     .statementLocality(retrieveRangeLocality(ctx));
+
     ofNullable(ctx.dataRenamesClause())
-            .map(CobolParser.DataRenamesClauseContext::qualifiedVariableDataName)
-            .map(this::extractNameAndLocality);
+            .map(dataRenamesClauseContext -> dataRenamesClauseContext.qualifiedVariableDataName()
+                    .dataName()
+                    .stream()
+                    .map(CobolParser.DataNameContext.class::cast)
+                    .map(this::extractNameAndLocality).collect(toList()))
+            .ifPresent(builder::renamesClause);
+
     ofNullable(ctx.dataRenamesClause())
-            .map(CobolParser.DataRenamesClauseContext::thruDataName)
-            .map(CobolParser.ThruDataNameContext::qualifiedVariableDataName)
-            .map(this::extractNameAndLocality);
+            .map(thruDataNameContext -> thruDataNameContext.qualifiedVariableDataName().dataName().stream()
+                    .map(CobolParser.DataNameContext.class::cast)
+                    .map(this::extractNameAndLocality)
+                    .collect(toList()))
+            .ifPresent(builder::renamesThruClause);
     return addTreeNode(builder.build(), visitChildren(ctx));
   }
 
