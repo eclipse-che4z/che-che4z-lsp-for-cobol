@@ -28,7 +28,7 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /** This class implements the logic for SET UP/DOWN BY statement. */
@@ -91,13 +91,22 @@ public class SetUpDownByStatement extends StatementNode {
                 .filter(QualifiedReferenceNode.class::isInstance)
                 .map(QualifiedReferenceNode.class::cast));
 
-    if (Objects.nonNull(lastQualifiedElement) && lastQualifiedElement.getVariableDefinitionNode().isPresent()) {
-      VariableNode variableDefinitionNode = lastQualifiedElement.getVariableDefinitionNode().get();
-      if (variableDefinitionNode.getVariableType() != VariableType.TABLE_DATA_NAME && variableDefinitionNode instanceof EffectiveData)
-        return !ALLOWED_SENDING_FIELDS_TYPE.contains(((EffectiveData) variableDefinitionNode).getEffectiveDataType());
-      else return true;
+    if (lastQualifiedElement == null) {
+      return false;
     }
-    return false;
+
+    Optional<VariableNode> definitionNode = lastQualifiedElement.getVariableDefinitionNode();
+    if (!definitionNode.isPresent()) {
+      return false;
+    }
+    VariableNode variableDefinitionNode = definitionNode.get();
+    if (variableDefinitionNode.getVariableType() != VariableType.TABLE_DATA_NAME
+            && variableDefinitionNode instanceof EffectiveData) {
+      EffectiveDataType effectiveDataType = ((EffectiveData) variableDefinitionNode).getEffectiveDataType();
+      return !ALLOWED_SENDING_FIELDS_TYPE.contains(effectiveDataType);
+    } else {
+      return true;
+    }
   }
 
   private <T> T getLastElement(Stream<T> stream) {
