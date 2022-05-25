@@ -121,7 +121,7 @@ public class CopybookServiceImpl implements CopybookService {
     try {
       String cacheKey = makeCopybookCacheKay(copybookName, programDocumentUri);
       return copybookCache.get(cacheKey, () -> {
-        CopybookModel copybookModel = resolveSync(copybookName, documentUri, copybookConfig);
+        CopybookModel copybookModel = resolveSync(copybookName, programDocumentUri, copybookConfig);
         if (preprocess) {
           copybookModel = cleanupCopybook(copybookModel);
         }
@@ -141,20 +141,20 @@ public class CopybookServiceImpl implements CopybookService {
 
   private CopybookModel resolveSync(
       @NonNull CopybookName copybookName,
-      @NonNull String documentUri,
+      @NonNull String programUri,
       @NonNull CopybookConfig copybookConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    final String cobolFileName = files.getNameFromURI(documentUri);
+    final String mainProgramFileName = files.getNameFromURI(programUri);
     LOG.debug(
         "Trying to resolve copybook {} for {}, using config {}",
         copybookName,
-        documentUri,
+        programUri,
         copybookConfig);
-    return tryResolveCopybookFromWorkspace(copybookName, cobolFileName)
+    return tryResolveCopybookFromWorkspace(copybookName, mainProgramFileName)
         .orElseGet(
             () ->
                 tryResolvePredefinedCopybook(copybookName, copybookConfig)
-                    .orElseGet(() -> registerForDownloading(copybookName, cobolFileName)));
+                    .orElseGet(() -> registerForDownloading(copybookName, mainProgramFileName)));
   }
 
   private CopybookModel cleanupCopybook(CopybookModel dirtyCopybook) {
@@ -163,27 +163,27 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private Optional<CopybookModel> tryResolveCopybookFromWorkspace(
-      CopybookName copybookName, String cobolFileName) {
+      CopybookName copybookName, String mainProgramFileName) {
     LOG.debug(
         "Trying to resolve copybook copybook {} for {} from workspace",
         copybookName,
-        cobolFileName);
+        mainProgramFileName);
     final Optional<CopybookModel> copybookModel =
-        resolveCopybookFromWorkspace(copybookName, cobolFileName)
-            .map(uri -> loadCopybook(uri, copybookName, cobolFileName));
+        resolveCopybookFromWorkspace(copybookName, mainProgramFileName)
+            .map(uri -> loadCopybook(uri, copybookName, mainProgramFileName));
     LOG.debug("Copybook from workspace: {}", copybookModel);
     return copybookModel;
   }
 
   @SuppressWarnings("java:S2142")
   private Optional<String> resolveCopybookFromWorkspace(
-      CopybookName copybookName, String cobolFileName) {
+      CopybookName copybookName, String mainProgramFileName) {
     try {
       return SettingsService.getValueAsString(
           settingsService
               .getConfiguration(
                   COPYBOOK_RESOLVE.label,
-                  cobolFileName,
+                  mainProgramFileName,
                   copybookName.getQualifiedName(),
                   copybookName.getDialectType())
               .get());

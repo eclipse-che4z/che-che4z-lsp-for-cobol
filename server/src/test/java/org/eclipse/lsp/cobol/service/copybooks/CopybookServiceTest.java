@@ -356,7 +356,7 @@ class CopybookServiceTest {
     when(files.getContentByPath(parentPath)).thenReturn(PARENT_CONTENT);
     when(files.getContentByPath(parentPath)).thenReturn(PARENT_CONTENT);
 
-    when(settingsService.getConfiguration("copybook-resolve", PARENT_CPY_NAME, NESTED_CPY_NAME, DialectType.COBOL.name()))
+    when(settingsService.getConfiguration("copybook-resolve", "document", NESTED_CPY_NAME, DialectType.COBOL.name()))
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
 
     when(settingsService.getConfiguration("copybook-resolve", "document", PARENT_CPY_NAME, DialectType.COBOL.name()))
@@ -384,8 +384,9 @@ class CopybookServiceTest {
     verify(settingsService, times(1))
         .getConfigurations(
             asList(
-                "copybook-download.quiet.document.nested.COBOL",
-                "copybook-download.quiet.document.INVALID.COBOL"));
+                    "copybook-download.quiet.document.INVALID.COBOL",
+                    "copybook-download.quiet.document.nested.COBOL"
+                ));
   }
 
   /** Test the service will work correctly in case the middleware throw an error. */
