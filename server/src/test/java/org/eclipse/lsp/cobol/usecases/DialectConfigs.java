@@ -19,11 +19,11 @@ import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.SQLBackend;
 
-/** IDMS related getter */
+/** IDMS and MAID related getter */
 @UtilityClass
 public class DialectConfigs {
   AnalysisConfig getIDMSAnalysisConfig() {
@@ -35,8 +35,12 @@ public class DialectConfigs {
 
   AnalysisConfig getDaCoAnalysisConfig() {
     return new AnalysisConfig(
-        new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
-        ImmutableList.of(),
-        ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME));
+            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
+            ImmutableList.of(),
+            ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME));
+  }
+
+  AnalysisConfig getDaCoAnalysisConfig(CopybookConfig copybookConfig) {
+    return new AnalysisConfig(copybookConfig, ImmutableList.of(), ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME));
   }
 }

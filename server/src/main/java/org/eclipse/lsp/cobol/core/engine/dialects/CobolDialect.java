@@ -19,7 +19,7 @@ import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 
 /** A COBOL dialect */
 public interface CobolDialect {
-
+  String FILLER = "\u200B";
   /**
    * Gets the name of the dialect
    * @return the name of the dialect

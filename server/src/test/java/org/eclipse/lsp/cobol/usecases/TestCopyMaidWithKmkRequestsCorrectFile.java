@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ class TestCopyMaidWithKmkRequestsCorrectFile {
           + "           DISPLAY {$BHTRGL-XB4} OF {$BHTTAB-XW7}.";
 
   private static final String COPYBOOK_CONTENT =
-      "1           09 {$*BHTRGL-XB4}.\n"
+            "1           09 {$*BHTRGL-XB4}.\n"
           + "2             11 {$*BHTRGLVLG-XB4}.\n"
           + "3               13 {$*FABLYN-XB4}.\n"
           + "4                 15 {$*FABLYNPOSEEN-XB4} PIC X.\n"
@@ -55,7 +55,7 @@ class TestCopyMaidWithKmkRequestsCorrectFile {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "KMK", COPYBOOK_CONTENT)),
-        ImmutableMap.of());
+            new CobolText("BHTRGL-XBG_KMK", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

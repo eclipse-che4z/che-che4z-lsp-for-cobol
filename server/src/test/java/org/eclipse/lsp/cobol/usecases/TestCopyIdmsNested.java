@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Position;
@@ -57,7 +58,7 @@ public class TestCopyIdmsNested {
   void testNestedIdmsCopybook() {
     UseCaseEngine.runTest(
         TEXT, ImmutableList.of(new CobolText("COPY1", IdmsDialect.NAME, COPY1),
-            new CobolText("NESTED_COPY", IdmsDialect.NAME, null, NESTED_COPY)),
+            new CobolText("NESTED_COPY", IdmsDialect.NAME, NESTED_COPY, UseCaseUtils.toURI("COPY1"))),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
@@ -71,7 +72,7 @@ public class TestCopyIdmsNested {
 
     UseCaseEngine.runTest(
         TEXT_CIRCULAR, ImmutableList.of(
-            new CobolText("COPY1", IdmsDialect.NAME, null, COPY_LOOP)),
+            new CobolText("COPY1", IdmsDialect.NAME, COPY_LOOP)),
         ImmutableMap.of("1", diagnosticCircular),
         ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }

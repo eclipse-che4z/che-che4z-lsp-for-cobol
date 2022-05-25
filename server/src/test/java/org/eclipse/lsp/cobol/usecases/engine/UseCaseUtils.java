@@ -26,7 +26,9 @@ import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.*;
+import org.eclipse.lsp.cobol.service.SettingsService;
+import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -137,8 +139,7 @@ public class UseCaseUtils {
   public static CopybookModel toCopybookModel(CobolText cobolText) {
     return new CopybookModel(
         new CopybookName(
-            cobolText.getFileName()
-                + ofNullable(cobolText.getQualifier()).map(it -> "_" + it).orElse(""),
+            cobolText.getFileName(),
             cobolText.getDialectType()),
         toURI(cobolText.getFileName()),
         cobolText.getFullText());

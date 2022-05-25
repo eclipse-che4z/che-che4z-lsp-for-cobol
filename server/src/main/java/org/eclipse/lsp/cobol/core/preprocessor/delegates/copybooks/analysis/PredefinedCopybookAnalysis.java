@@ -50,7 +50,7 @@ class PredefinedCopybookAnalysis extends AbstractCopybookAnalysis {
   @Override
   protected CopybookName retrieveCopybookName(
       ParserRuleContext ctx, String dialect, CopybookHierarchy hierarchy) {
-    if ("PROCEDUREDIVISION.".equalsIgnoreCase(ctx.getText())) {
+    if (ctx.getText().toUpperCase().startsWith("PROCEDUREDIVISION")) {
       return new CopybookName(PLABEL.name(), dialect);
     }
     return new CopybookName(getPredefinedCopybookName(), dialect);

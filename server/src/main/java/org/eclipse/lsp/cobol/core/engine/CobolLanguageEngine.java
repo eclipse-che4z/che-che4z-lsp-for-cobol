@@ -214,6 +214,7 @@ public class CobolLanguageEngine {
         .flatMap(Node::getDepthFirstStream)
         .filter(n -> n.getNodeType().equals(NodeType.COPY))
         .map(CopyNode.class::cast)
+            .filter(n -> n.getDefinition() != null)
         .forEach(n -> copybooks.define(n.getName(), n.getDefinition().getLocation()));
     return copybooks;
   }

@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 /**
  * If user has user defined labels they should be resolved without errors
  */
-class TestUserDefinedLabels {
+class TestUserDefinedParagraphs {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST.\n"

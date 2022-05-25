@@ -21,9 +21,9 @@ import lombok.Singular;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.SQLBackend;
 
 import java.util.Collections;
 import java.util.List;

@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
@@ -36,10 +36,10 @@ class TestCopyMaidWithWrkRedefines {
           + "           05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.\n";
 
   private static final String COPYBOOK_CONTENT =
-      "       01  {$*MAIN-X^MAIN-XLO}.\n"
-          + "           03 {$*F90-X^F90-XLO}.\n"
-          + "             05 {$*SOME-X^SOME-XLO}            PIC X(4)    VALUE SPACE.\n"
-          + "           03 {$*F91-X^F91-XLO} REDEFINES {$F90-X^F90-XLO}.\n"
+      "       01  {$*MAIN-X`MAIN-XLO}.\n"
+          + "           03 {$*F90-X`F90-XLO}.\n"
+          + "             05 {$*SOME-X`SOME-XLO}            PIC X(4)    VALUE SPACE.\n"
+          + "           03 {$*F91-X`F91-XLO} REDEFINES {$F90-X`F90-XLO}.\n"
           + "             05 FILLER                 PIC X(37).";
 
   @Test
@@ -47,7 +47,7 @@ class TestCopyMaidWithWrkRedefines {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", COPYBOOK_CONTENT)),
-        ImmutableMap.of());
+            new CobolText("BHTRGL-XBG_WRK", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }
