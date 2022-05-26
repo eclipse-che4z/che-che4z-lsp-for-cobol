@@ -54,6 +54,7 @@
         <revision>1.0.0-SNAPSHOT</revision>
         <slf4j.api.version>1.7.25</slf4j.api.version>
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
+        <filesToTestPath>${project.basedir}${file.separator}..${file.separator}Cobol85PositiveTestsSuite</filesToTestPath>
     </properties>
     <dependencies>
         <dependency>
