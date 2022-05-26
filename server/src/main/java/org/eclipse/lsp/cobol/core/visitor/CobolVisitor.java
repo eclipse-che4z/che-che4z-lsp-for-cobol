@@ -312,6 +312,20 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitProcedureDeclarative(CobolParser.ProcedureDeclarativeContext ctx) {
+    String name = ctx.getStart().getText().toUpperCase();
+    return getLocality(ctx.getStart())
+            .map(
+                    def ->
+                            addTreeNode(
+                                    ctx,
+                                    locality ->
+                                            new DeclarativeProcedureSection(locality, name, getIntervalText(ctx), def)))
+            .orElseGet(() -> visitChildren(ctx));
+  }
+
+
+  @Override
   public List<Node> visitEndProgramStatement(EndProgramStatementContext ctx) {
     areaAWarning(ctx.getStart());
     return ofNullable(ctx.programName())
