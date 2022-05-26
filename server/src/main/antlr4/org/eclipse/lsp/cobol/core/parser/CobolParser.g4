@@ -1279,7 +1279,7 @@ exhibitOperand
 // exit statement
 
 exitStatement
-   : EXIT PROGRAM?
+   : EXIT (PROGRAM | SECTION | PARAGRAPH)?
    ;
 
 // generate statement
@@ -1527,7 +1527,7 @@ performStatement
    ;
 
 performInlineStatement
-   : performType? conditionalStatementCall*? END_PERFORM
+   : performType? conditionalStatementCall*? (EXIT PERFORM CYCLE?)? END_PERFORM
    ;
 
 performProcedureStatement
