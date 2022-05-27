@@ -236,7 +236,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitReplaceLiteral(ReplaceLiteralContext ctx) {
-    hierarchy.addCopyReplacing(replacingService.retrieveTokenReplacingPattern(read()));
+    if (ctx.replaceable().pseudoReplaceable() != null) {
+      replacingService
+              .retrievePseudoTextReplacingPattern(read(), retrieveLocality(ctx.replaceable().pseudoReplaceable()))
+              .processIfNoErrorsFound(hierarchy::addCopyReplacing, errors::addAll);
+    } else {
+      hierarchy.addCopyReplacing(replacingService.retrieveTokenReplacingPattern(read()));
+    }
     pop();
   }
 
