@@ -136,7 +136,7 @@ public class CopybookServiceImpl implements CopybookService {
   @Override
   public void store(CopybookModel copybookModel, String documentUri) {
     String cacheKay = makeCopybookCacheKay(copybookModel.getCopybookName(), documentUri);
-    copybookCache.put(cacheKay, cleanupCopybook(copybookModel));
+    copybookCache.put(cacheKay, copybookModel);
   }
 
   private CopybookModel resolveSync(
