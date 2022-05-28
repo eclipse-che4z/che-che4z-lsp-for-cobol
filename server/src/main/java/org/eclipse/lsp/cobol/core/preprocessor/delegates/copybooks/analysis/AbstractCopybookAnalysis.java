@@ -29,7 +29,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -62,17 +61,14 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
       "Syntax error by checkCopybookName: {}";
 
   private final TextPreprocessor preprocessor;
-  private final CopybookService copybookService;
   private final MessageService messageService;
   private final int maxCopybookNameLength;
 
   AbstractCopybookAnalysis(
       TextPreprocessor preprocessor,
-      CopybookService copybookService,
       MessageService messageService,
       int maxCopybookNameLength) {
     this.preprocessor = preprocessor;
-    this.copybookService = copybookService;
     this.messageService = messageService;
     this.maxCopybookNameLength = maxCopybookNameLength;
   }
@@ -89,7 +85,7 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
       CopybookMetaData metaData =
           validateMetaData(
                   CopybookMetaData.builder()
-                      .copybookName(retrieveCopybookName(copySource, dialectType.name(), hierarchy))
+                      .copybookName(retrieveCopybookName(copySource, dialectType.name()))
                       .context(context)
                       .documentUri(documentUri)
                       .copybookId(randomUUID().toString())
@@ -220,13 +216,9 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
       return emptyModel(
           copybookMetaData.getCopybookName(), hierarchy.mapCopybooks(this::reportRecursiveCopybook));
 
-    CopybookModel copybook =
-        copybookService.resolve(
-            copybookMetaData.getCopybookName(),
-                hierarchy.getRootDocumentUri().orElse(copybookMetaData.getDocumentUri()),
-                copybookMetaData.getDocumentUri(),
-                copybookMetaData.getConfig(),
-            false);
+    CopybookModel copybook = getCopybookModel(copybookMetaData.getCopybookName(),
+        hierarchy.getRootDocumentUri().orElse(copybookMetaData.getDocumentUri()),
+        copybookMetaData.getDocumentUri(), copybookMetaData.getConfig());
 
     if (copybook.getContent() == null) {
       return emptyModel(
@@ -236,9 +228,14 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
     return new ResultWithErrors<>(copybook, ImmutableList.of());
   }
 
+  protected abstract CopybookModel getCopybookModel(CopybookName copybookName,
+                                                    String programDocumentUri,
+                                                    String documentUri,
+                                                    CopybookConfig copybookConfig);
+
   @SuppressWarnings("unused")
   protected CopybookName retrieveCopybookName(
-      ParserRuleContext ctx, String dialect, CopybookHierarchy hierarchy) {
+      ParserRuleContext ctx, String dialect) {
     return new CopybookName(
         PreprocessorStringUtils.trimQuotes(ctx.getText().toUpperCase()), dialect);
   }
