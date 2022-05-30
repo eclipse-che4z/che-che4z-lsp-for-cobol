@@ -123,7 +123,7 @@ closingPseudoTextDelimiter
    ;
 
 replaceable
-   : literal | cobolWord | charDataLine | functionCall
+   : literal | cobolWord | charDataLine | functionCall | pseudoReplaceable
    ;
 
 functionCall
@@ -139,11 +139,11 @@ argument
    ;
 
 replacement
-   : literal | cobolWord | charDataLine | functionCall
+   : (literal | cobolWord | charDataLine)+ | functionCall | pseudoReplacement
    ;
 
 charDataLine
-   : (FILENAME | DOT_FS | LPARENCHAR | RPARENCHAR)+
+   : (FILENAME | LPARENCHAR | RPARENCHAR | IN)+
    ;
 
 cobolWord
