@@ -16,11 +16,13 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
 
 import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 class CobolAnalysis extends AbstractCopybookAnalysis {
   private static final int MAX_COPYBOOK_NAME_LENGTH_DATASET = 8;
 
+  private final CopybookService copybookService;
   private final ReplacingService replacingService;
 
   CobolAnalysis(
@@ -42,8 +45,22 @@ class CobolAnalysis extends AbstractCopybookAnalysis {
       CopybookService copybookService,
       MessageService messageService,
       ReplacingService replacingService) {
-    super(preprocessor, copybookService, messageService, MAX_COPYBOOK_NAME_LENGTH_DATASET);
+    super(preprocessor, messageService, MAX_COPYBOOK_NAME_LENGTH_DATASET);
+    this.copybookService = copybookService;
     this.replacingService = replacingService;
+  }
+
+  @Override
+  protected CopybookModel getCopybookModel(CopybookName copybookName,
+                                           String programDocumentUri,
+                                           String documentUri,
+                                           CopybookConfig copybookConfig) {
+    return copybookService.resolve(
+        copybookName,
+        programDocumentUri,
+        documentUri,
+        copybookConfig,
+        false);
   }
 
   @Override

@@ -15,15 +15,12 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
@@ -34,14 +31,13 @@ import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.service.SettingsService;
 import org.eclipse.lsp.cobol.service.copybooks.providers.ContentProvider;
-import org.eclipse.lsp.cobol.service.copybooks.providers.ContentProviderFactory;
+import org.eclipse.lsp.cobol.service.copybooks.providers.FileContentProvider;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
@@ -58,33 +54,24 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 public class CopybookServiceImpl implements CopybookService {
   private final SettingsService settingsService;
   private final FileSystemService files;
-  private final ContentProviderFactory contentProviderFactory;
   public final TextPreprocessor preprocessor;
 
   private final Map<String, Set<CopybookName>> copybooksForDownloading =
       new ConcurrentHashMap<>(8, 0.9f, 1);
 
-  private final Cache<String, CopybookModel> copybookCache;
+  private final CopybookCache copybookCache;
 
   @Inject
   public CopybookServiceImpl(
       DataBusBroker dataBus,
       SettingsService settingsService,
       FileSystemService files,
-      ContentProviderFactory contentProviderFactory,
       TextPreprocessor preprocessor,
-      @Named("CACHE-MAX-SIZE") int cacheSize,
-      @Named("CACHE-DURATION") int duration,
-      @Named("CACHE-TIME-UNIT") String timeUnitName) {
+      CopybookCache copybookCache) {
     this.settingsService = settingsService;
     this.files = files;
-    this.contentProviderFactory = contentProviderFactory;
     this.preprocessor = preprocessor;
-    copybookCache =
-        CacheBuilder.newBuilder()
-            .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName))
-            .maximumSize(cacheSize)
-            .build();
+    this.copybookCache = copybookCache;
     dataBus.subscribe(this);
   }
 
@@ -119,8 +106,7 @@ public class CopybookServiceImpl implements CopybookService {
       @NonNull CopybookConfig copybookConfig,
       boolean preprocess) {
     try {
-      String cacheKey = makeCopybookCacheKay(copybookName, programDocumentUri);
-      return copybookCache.get(cacheKey, () -> {
+      return copybookCache.get(copybookName, programDocumentUri, () -> {
         CopybookModel copybookModel = resolveSync(copybookName, programDocumentUri, copybookConfig);
         if (preprocess) {
           copybookModel = cleanupCopybook(copybookModel);
@@ -135,8 +121,7 @@ public class CopybookServiceImpl implements CopybookService {
 
   @Override
   public void store(CopybookModel copybookModel, String documentUri) {
-    String cacheKay = makeCopybookCacheKay(copybookModel.getCopybookName(), documentUri);
-    copybookCache.put(cacheKay, cleanupCopybook(copybookModel));
+    copybookCache.store(cleanupCopybook(copybookModel), documentUri);
   }
 
   private CopybookModel resolveSync(
@@ -155,6 +140,29 @@ public class CopybookServiceImpl implements CopybookService {
             () ->
                 tryResolvePredefinedCopybook(copybookName, copybookConfig)
                     .orElseGet(() -> registerForDownloading(copybookName, mainProgramFileName)));
+  }
+
+  /**
+   * Retrieve optional {@link CopybookModel} of the {@link PredefinedCopybooks} for the given name
+   * if it is predefined.
+   *
+   * @param copybookName - the name of copybook to check
+   * @param copybookConfig - configuration for copybook resolution
+   * @return optional model of a predefined copybook if it exists
+   */
+  private Optional<CopybookModel> tryResolvePredefinedCopybook(
+      CopybookName copybookName, CopybookConfig copybookConfig) {
+    LOG.debug(
+        "Trying to resolve predefined copybook {}, using config {}", copybookName, copybookConfig);
+    final Optional<CopybookModel> copybookModel =
+        Optional.ofNullable(PredefinedCopybooks.forName(copybookName.getQualifiedName()))
+            .map(it -> {
+              String uri = it.uriForBackend(copybookConfig.getSqlBackend());
+              ContentProvider contentProvider = new FileContentProvider(files);
+              return new CopybookModel(copybookName, PREF_IMPLICIT + uri, contentProvider.read(copybookConfig, uri));
+            });
+    LOG.debug("Predefined copybook: {}", copybookModel);
+    return copybookModel;
   }
 
   private CopybookModel cleanupCopybook(CopybookModel dirtyCopybook) {
@@ -194,29 +202,6 @@ public class CopybookServiceImpl implements CopybookService {
       LOG.warn("An exception thrown while resolving a copybook from the workspace", e);
       return Optional.empty();
     }
-  }
-
-  /**
-   * Retrieve optional {@link CopybookModel} of the {@link PredefinedCopybooks} for the given name
-   * if it is predefined.
-   *
-   * @param copybookName - the name of copybook to check
-   * @param copybookConfig - configuration for copybook resolution
-   * @return optional model of a predefined copybook if it exists
-   */
-  private Optional<CopybookModel> tryResolvePredefinedCopybook(
-      CopybookName copybookName, CopybookConfig copybookConfig) {
-    LOG.debug(
-        "Trying to resolve predefined copybook {}, using config {}", copybookName, copybookConfig);
-    final Optional<CopybookModel> copybookModel =
-        Optional.ofNullable(PredefinedCopybooks.forName(copybookName.getQualifiedName()))
-            .map(it -> {
-              String uri = it.uriForBackend(copybookConfig.getSqlBackend());
-              ContentProvider contentProvider = contentProviderFactory.getInstanceFor(it.getContentType());
-              return new CopybookModel(copybookName, PREF_IMPLICIT + uri, contentProvider.read(copybookConfig, uri));
-            });
-    LOG.debug("Predefined copybook: {}", copybookModel);
-    return copybookModel;
   }
 
   private CopybookModel registerForDownloading(CopybookName copybookName, String cobolFileName) {
@@ -283,9 +268,5 @@ public class CopybookServiceImpl implements CopybookService {
 
   private String getUserInteractionType(CopybookProcessingMode copybookProcessingMode) {
     return copybookProcessingMode.userInteraction ? VERBOSE.label : QUIET.label;
-  }
-
-  private static String makeCopybookCacheKay(CopybookName copybookName, String documentUri) {
-    return String.format("%s#%s#%s", copybookName.getQualifiedName(), copybookName.getDialectType(), documentUri);
   }
 }

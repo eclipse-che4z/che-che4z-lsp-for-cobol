@@ -23,8 +23,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.Copy
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.service.SettingsService;
-import org.eclipse.lsp.cobol.service.copybooks.providers.ContentProviderFactory;
-import org.eclipse.lsp.cobol.service.copybooks.providers.FileContentProvider;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,7 +70,6 @@ class CopybookServiceTest {
   private final DataBusBroker broker = mock(DataBusBroker.class);
   private final SettingsService settingsService = mock(SettingsService.class);
   private final FileSystemService files = mock(FileSystemService.class);
-  private final ContentProviderFactory contentProviderFactory = mock(ContentProviderFactory.class);
   private final TextPreprocessor preprocessor = mock(TextPreprocessor.class);
   private final Path cpyPath = mock(Path.class);
   private final Path parentPath = mock(Path.class);
@@ -94,7 +91,6 @@ class CopybookServiceTest {
     when(files.getContentByPath(cpyPath)).thenReturn(CONTENT);
     when(files.fileExists(cpyPath)).thenReturn(true);
     when(files.fileExists(parentPath)).thenReturn(true);
-    when(contentProviderFactory.getInstanceFor(PredefinedCopybooks.CopybookContentType.FILE)).thenReturn(new FileContentProvider(files));
 
     cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of());
   }
@@ -459,6 +455,6 @@ class CopybookServiceTest {
   }
 
   private CopybookServiceImpl createCopybookService() {
-    return new CopybookServiceImpl(broker, settingsService, files, contentProviderFactory, preprocessor, 3, 3, "HOURS");
+    return new CopybookServiceImpl(broker, settingsService, files, preprocessor, new CopybookCache(3, 3, "HOURS"));
   }
 }
