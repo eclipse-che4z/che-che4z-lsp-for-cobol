@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -38,7 +37,6 @@ import org.eclipse.lsp.cobol.core.IdmsParser.MapSectionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.QualifiedDataNameContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.SchemaSectionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.VariableUsageNameContext;
-import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
@@ -208,11 +206,6 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
         .map(ParseTree::getText)
         .map(Integer::parseInt)
         .orElse(0);
-  }
-
-  private IdmsCopyParser getCobolParser(CommonTokenStream tokens) {
-    ThreadInterruptionUtil.checkThreadInterrupted();
-    return new IdmsCopyParser(tokens);
   }
 
   private List<Node> addTreeNode(Node node, List<Node> children) {

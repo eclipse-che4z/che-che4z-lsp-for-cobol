@@ -20,10 +20,9 @@ import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookCache;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.Copybook.DFHEIBLC;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.Copybook.SPECIALREGISTERS;
-
+import org.eclipse.lsp.cobol.service.copybooks.providers.ContentProviderFactory;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -41,26 +40,22 @@ public class CopybookAnalysisFactory {
   public CopybookAnalysisFactory(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
+      ContentProviderFactory contentProviderFactory,
       MessageService messageService,
-      ReplacingService replacingService) {
+      ReplacingService replacingService,
+      CopybookCache copybookCache) {
     analysisInstances.put(
         AnalysisTypes.COBOL,
         new CobolAnalysis(preprocessor, copybookService, messageService, replacingService));
     analysisInstances.put(
-        AnalysisTypes.DIALECT,
-        new DialectCopybookAnalysis(preprocessor, copybookService, messageService));
-    analysisInstances.put(
         AnalysisTypes.SKIPPING,
-        new SkippingAnalysis(preprocessor, copybookService, messageService));
+        new SkippingAnalysis(preprocessor, messageService));
     analysisInstances.put(
         AnalysisTypes.PANVALET,
         new PanvaletAnalysis(preprocessor, copybookService, messageService));
     analysisInstances.put(
         AnalysisTypes.PREDEFINED,
-        new PredefinedCopybookAnalysis(preprocessor, copybookService, messageService, DFHEIBLC.name()));
-    analysisInstances.put(
-        AnalysisTypes.SPECIALREGISTER,
-        new PredefinedCopybookAnalysis(preprocessor, copybookService, messageService, SPECIALREGISTERS.name()));
+        new PredefinedCopybookAnalysis(preprocessor, contentProviderFactory, messageService, copybookCache));
   }
 
   /**
@@ -76,10 +71,8 @@ public class CopybookAnalysisFactory {
   /** An enumeration of all the supported copybook analysis implementations */
   public enum AnalysisTypes {
     COBOL,
-    DIALECT,
     SKIPPING,
     PANVALET,
     PREDEFINED,
-    SPECIALREGISTER
   }
 }

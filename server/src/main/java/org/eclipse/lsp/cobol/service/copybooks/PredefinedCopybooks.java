@@ -15,13 +15,11 @@
 
 package org.eclipse.lsp.cobol.service.copybooks;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.service.SQLBackend;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.Copybook.*;
@@ -33,18 +31,6 @@ public class PredefinedCopybooks {
   public static final String PREF_IMPLICIT = "implicit://";
   @SuppressWarnings("java:S1075")
   public static final String IMPLICIT_PATH = "/implicitCopybooks/";
-  private static final Map<String, Copybook> PREDEFINED_COPYBOOKS =
-      ImmutableMap.of(
-          "SQLCA",
-          SQLCA,
-          "SQLDA",
-          SQLDA,
-          "DFHEIBLC",
-          DFHEIBLC,
-          "PLABEL",
-          PLABEL,
-          "SPECIALREGISTERS",
-          SPECIALREGISTERS);
 
   /**
    * Get a predefined copybook instance for a given name or null
@@ -53,7 +39,8 @@ public class PredefinedCopybooks {
    * @return Copybook for this name or null
    */
   public Copybook forName(String name) {
-    return PREDEFINED_COPYBOOKS.get(name);
+    return Arrays.stream(values()).filter(c ->  c.name().equals(name))
+        .findFirst().orElse(null);
   }
 
   /**
