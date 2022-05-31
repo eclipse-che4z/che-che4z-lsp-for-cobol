@@ -15,6 +15,8 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.core.model.CopybookModel;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
@@ -23,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.eclipse.lsp.cobol.core.Constants.COBOL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -41,8 +44,9 @@ public class LabelsContentProviderTest {
   void testCreatesParagraphsFromLabelNames() {
     CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED,
         SQLBackend.DB2_SERVER, ImmutableList.of("LABEL1", "LABEL2"));
-    String content = contentProvider.read(copybookConfig, "uri");
-    assertEquals(content, "       LABEL1.\r\n       LABEL2.\r\n");
+    CopybookName copybookName = new CopybookName("name", COBOL);
+    CopybookModel model = contentProvider.read(copybookConfig, copybookName, "uri", "uri").get();
+    assertEquals(model.getContent(), "       LABEL1.\r\n       LABEL2.\r\n");
   }
 
 }

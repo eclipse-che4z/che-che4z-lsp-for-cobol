@@ -62,26 +62,20 @@ public class PredefinedCopybooks {
     return uri.startsWith(IMPLICIT_PATH);
   }
 
-  /** Enumeration of predefined copybook content types */
-  public enum CopybookContentType {
-    FILE,
-    GENERATED
-  }
-
   /** Enumeration of predefined copybooks */
   public enum Copybook {
     SQLCA {
       @Override
-      public String uriForBackend(SQLBackend backend) {
+      public String nameForBackend(SQLBackend backend) {
         return backend == SQLBackend.DATACOM_SERVER
-            ? IMPLICIT_PATH + "SQLCA_DATACOM.cpy"
-            : IMPLICIT_PATH + "SQLCA_DB2.cpy";
+            ? "SQLCA_DATACOM"
+            : "SQLCA_DB2";
       }
     },
     SQLDA {
       @Override
-      public String uriForBackend(SQLBackend backend) {
-        return IMPLICIT_PATH + "SQLDA.cpy";
+      public String nameForBackend(SQLBackend backend) {
+        return "SQLDA";
       }
     };
 
@@ -91,6 +85,6 @@ public class PredefinedCopybooks {
      * @param backend SQL backend for the program
      * @return uri of the predefined copybook
      */
-    public abstract String uriForBackend(SQLBackend backend);
+    public abstract String nameForBackend(SQLBackend backend);
   }
 }

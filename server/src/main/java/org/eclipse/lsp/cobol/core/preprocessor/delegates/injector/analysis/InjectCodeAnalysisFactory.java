@@ -20,9 +20,6 @@ import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory;
-import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -39,22 +36,17 @@ public class InjectCodeAnalysisFactory {
   @Inject
   public InjectCodeAnalysisFactory(
       TextPreprocessor preprocessor,
-      CopybookService copybookService,
-      ContentProviderFactory contentProviderFactory,
       MessageService messageService,
       ReplacingService replacingService) {
     analysisInstances.put(
         AnalysisTypes.COPYBOOK,
-        new CopybookAnalysis(preprocessor, copybookService, messageService, replacingService));
+        new CopybookAnalysis(preprocessor, messageService, replacingService));
     analysisInstances.put(
         AnalysisTypes.PANVALET,
-        new PanvaletAnalysis(preprocessor, copybookService, messageService));
+        new PanvaletAnalysis(preprocessor, messageService));
     analysisInstances.put(
         AnalysisTypes.IMPLICIT,
-        new InjectCodeImplicitAnalysis(preprocessor, contentProviderFactory.getInstanceFor(PredefinedCopybooks.CopybookContentType.FILE), messageService));
-    analysisInstances.put(
-        AnalysisTypes.GENERATED,
-        new InjectCodeImplicitAnalysis(preprocessor, contentProviderFactory.getInstanceFor(PredefinedCopybooks.CopybookContentType.GENERATED), messageService));
+        new InjectCodeImplicitAnalysis(preprocessor, messageService));
   }
 
   /**
@@ -71,7 +63,6 @@ public class InjectCodeAnalysisFactory {
   public enum AnalysisTypes {
     COPYBOOK,
     PANVALET,
-    IMPLICIT,
-    GENERATED
+    IMPLICIT
   }
 }

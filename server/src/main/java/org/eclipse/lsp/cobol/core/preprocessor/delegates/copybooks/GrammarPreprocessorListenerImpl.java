@@ -29,7 +29,7 @@ import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectDescriptor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
@@ -42,6 +42,7 @@ import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
+import static org.eclipse.lsp.cobol.core.Constants.COBOL;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 
 /**
@@ -160,17 +161,17 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitLinkageSection(LinkageSectionContext ctx) {
-    analyzeCopybook(injectService.getInjectors(ctx), ctx, ctx);
+    injectCode(injectService.getInjectors(ctx), ctx, ctx);
   }
 
   @Override
   public void exitProcedureDivision(ProcedureDivisionContext ctx) {
-    analyzeCopybook(injectService.getInjectors(ctx), ctx, ctx);
+    injectCode(injectService.getInjectors(ctx), ctx, ctx);
   }
 
   @Override
   public void exitWorkingStorageSection(WorkingStorageSectionContext ctx) {
-    analyzeCopybook(injectService.getInjectors(ctx), ctx, ctx);
+    injectCode(injectService.getInjectors(ctx), ctx, ctx);
   }
 
   @Override
@@ -181,7 +182,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    analyzeCopybook(injectService.getInjectors(ctx), ctx, ctx.copySource());
+    injectCode(injectService.getInjectors(ctx), ctx, ctx.copySource());
   }
 
   @Override
@@ -192,7 +193,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    analyzeCopybook(injectService.getInjectors(ctx), ctx, ctx.copySource());
+    injectCode(injectService.getInjectors(ctx), ctx, ctx.copySource());
   }
 
   @Override
@@ -203,7 +204,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    analyzeCopybook(injectService.getInjectors(ctx), ctx, ctx.copySource());
+    injectCode(injectService.getInjectors(ctx), ctx, ctx.copySource());
   }
 
   private boolean requiresEarlyReturn(ParserRuleContext context) {
@@ -215,12 +216,14 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     return false;
   }
 
-  private void analyzeCopybook(
+  private void injectCode(
       List<InjectDescriptor> descriptors,
       ParserRuleContext context,
       ParserRuleContext copyContext) {
     descriptors.forEach(c -> c.getInjectCodeAnalysis()
-        .injectCode(new CopybookName(c.getInjectedSourceName(), DialectType.COBOL.name()),
+        .injectCode(
+            c.getContentProvider(),
+            new CopybookName(c.getInjectedSourceName(), COBOL),
             context, copyContext, copybookConfig, documentUri)
         .apply(hierarchy)
         .apply(this)

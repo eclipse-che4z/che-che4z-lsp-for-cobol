@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.service.copybooks;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 
 import lombok.NonNull;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 
 /**
  * Provide API definition to search for copybooks files. The service also caches copybook to reduce

@@ -21,11 +21,14 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysis;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysisFactory;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 
 import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysisFactory.AnalysisTypes.*;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory.InjectCodeContentType.*;
 
 /**
  * Contains injectors that needs to be applied to different cobol program sections
@@ -33,10 +36,12 @@ import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysi
 @Singleton
 public class InjectService {
   private final InjectCodeAnalysisFactory analysisFactory;
+  private final ContentProviderFactory contentProviderFactory;
 
   @Inject
-  public InjectService(InjectCodeAnalysisFactory analysisFactory) {
+  public InjectService(InjectCodeAnalysisFactory analysisFactory, ContentProviderFactory contentProviderFactory) {
     this.analysisFactory = analysisFactory;
+    this.contentProviderFactory = contentProviderFactory;
   }
 
   /**
@@ -47,7 +52,8 @@ public class InjectService {
   @SuppressWarnings("unused")
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.LinkageSectionContext ctx) {
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
-    return ImmutableList.of(new InjectDescriptor("DFHEIBLC", analysis));
+    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(FILE);
+    return ImmutableList.of(new InjectDescriptor("DFHEIBLC", analysis, contentProvider));
   }
 
   /**
@@ -57,8 +63,9 @@ public class InjectService {
    */
   @SuppressWarnings("unused")
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.ProcedureDivisionContext ctx) {
-    InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(GENERATED);
-    return ImmutableList.of(new InjectDescriptor("PLABEL", analysis));
+    InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
+    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(GENERATED);
+    return ImmutableList.of(new InjectDescriptor("PLABEL", analysis, contentProvider));
   }
 
   /**
@@ -69,7 +76,8 @@ public class InjectService {
   @SuppressWarnings("unused")
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.WorkingStorageSectionContext ctx) {
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
-    return ImmutableList.of(new InjectDescriptor("SPECIALREGISTERS", analysis));
+    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(FILE);
+    return ImmutableList.of(new InjectDescriptor("SPECIALREGISTERS", analysis, contentProvider));
   }
 
   /**
@@ -79,7 +87,8 @@ public class InjectService {
    */
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.PlusplusIncludeStatementContext ctx) {
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(PANVALET);
-    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis));
+    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
+    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, contentProvider));
   }
 
   /**
@@ -89,7 +98,8 @@ public class InjectService {
    */
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.CopyStatementContext ctx) {
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(COPYBOOK);
-    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis));
+    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
+    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, contentProvider));
   }
 
   /**
@@ -99,7 +109,8 @@ public class InjectService {
    */
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.IncludeStatementContext ctx) {
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(COPYBOOK);
-    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis));
+    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
+    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, contentProvider));
   }
 
   private String retrieveCopybookName(ParserRuleContext ctx) {

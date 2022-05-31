@@ -16,7 +16,6 @@
 package org.eclipse.lsp.cobol.core.model;
 
 import lombok.Value;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.CopybookName;
 
 /**
  * This value class represents a resolved copybook. It consists of the copybook name, its URI using

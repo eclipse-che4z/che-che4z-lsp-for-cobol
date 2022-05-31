@@ -26,14 +26,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.service.SettingsService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.FileContentProvider;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,6 +42,7 @@ import java.util.concurrent.ExecutionException;
 
 import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.IMPLICIT_PATH;
 import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
@@ -154,13 +156,22 @@ public class CopybookServiceImpl implements CopybookService {
       CopybookName copybookName, CopybookConfig copybookConfig) {
     LOG.debug(
         "Trying to resolve predefined copybook {}, using config {}", copybookName, copybookConfig);
-    final Optional<CopybookModel> copybookModel =
-        Optional.ofNullable(PredefinedCopybooks.forName(copybookName.getQualifiedName()))
-            .map(it -> {
-              String uri = it.uriForBackend(copybookConfig.getSqlBackend());
-              ContentProvider contentProvider = new FileContentProvider(files);
-              return new CopybookModel(copybookName, PREF_IMPLICIT + uri, contentProvider.read(copybookConfig, uri));
-            });
+
+    Optional<CopybookModel> copybookModel = Optional.ofNullable(PredefinedCopybooks.forName(copybookName.getQualifiedName()))
+        .map(c -> {
+          String name = c.nameForBackend(copybookConfig.getSqlBackend());
+          String uri = IMPLICIT_PATH + name + ".cpy";
+          InputStream inputStream = CopybookServiceImpl.class.getResourceAsStream(uri);
+          String content = null;
+          try {
+            content =
+                files.readFromInputStream(inputStream, StandardCharsets.UTF_8);
+          } catch (IOException e) {
+            LOG.error("Implicit copybook is not loaded. ", e);
+          }
+          return new CopybookModel(copybookName, PREF_IMPLICIT + uri, content);
+        });
+
     LOG.debug("Predefined copybook: {}", copybookModel);
     return copybookModel;
   }

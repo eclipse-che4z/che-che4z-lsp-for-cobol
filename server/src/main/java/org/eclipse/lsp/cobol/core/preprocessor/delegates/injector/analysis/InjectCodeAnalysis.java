@@ -16,6 +16,8 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 /** This interface defines a common API for all the implementation of the copybook analysis logic */
@@ -23,6 +25,7 @@ public interface InjectCodeAnalysis {
   /**
    * Inject cobol code to the specified place
    *
+   * @param contentProvider the provider that reads an injected code source for injection
    * @param injectedSourceName the name of the injected object
    * @param context the context of the statement
    * @param copySource the context of the copybook name
@@ -31,6 +34,7 @@ public interface InjectCodeAnalysis {
    * @return the functions that should be applied to the preprocessor
    */
   PreprocessorFunctor injectCode(
+      ContentProvider contentProvider,
       CopybookName injectedSourceName,
       ParserRuleContext context,
       ParserRuleContext copySource,
