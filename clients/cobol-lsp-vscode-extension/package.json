@@ -43,6 +43,48 @@
     "icon": "resources/logo.png",
     "main": "./out/extension.js",
     "contributes": {
+        "problemMatchers": [
+            {
+                "name": "zowecc",
+                "owner": "Cobol LS",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}"
+                ],
+                "pattern": [
+                    {
+                        "regexp": "^FILENAME:@(.*)@(.*)$",
+                        "file": 1
+                    },
+                    {
+                        "regexp": "^\\s*(\\d+)\\s+IGY[A-Z]{2}\\d{4}-([A-Z])\\s+(.*)$",
+                        "line": 1,
+                        "severity": 2,
+                        "message": 3,
+                        "loop": true
+                    }
+                ]
+            }
+        ],
+        "taskDefinitions": [
+            {
+                "type": "cobolCompile",
+                "required": [
+                    "compileJclDataSet",
+                    "cobolDatatSet"
+                ],
+                "properties": {
+                    "compileJclDataSet": {
+                        "type": "string",
+                        "description": "The JCL dataset to compile a cobol program"
+                    },
+                    "cobolDatatSet": {
+                        "type": "string",
+                        "description": "The COBOL dataset where the program would be uploaded before compiling it."
+                    }
+                }
+            }
+        ],
         "commands": [
             {
                 "command": "cobol-lsp.cpy-manager.redownload",

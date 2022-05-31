@@ -20,17 +20,19 @@ import { C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID } from "./constants";
 import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
+import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab } from "./commands/SmartTabCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { Middleware } from "./services/Middleware";
 import { TelemetryService } from "./services/reporter/TelemetryService";
 import { createFileWithGivenPath } from "./services/Settings";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
-import { CommentAction, commentCommand } from "./commands/CommentCommand";
+import { CompileTaskProvider } from "./task/CompileTaskProvider";
 
 let copyBooksDownloader: CopybookDownloadService;
 let middleware: Middleware;
 let languageClientService: LanguageClientService;
+let compileTaskProvider: vscode.Disposable | undefined;
 
 function initialize() {
     // We need lazy initialization to be able to mock this for unit testing
@@ -58,6 +60,14 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE) }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
+
+
+    //create a task provider
+    const workspaceRoot = (vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0))
+        ? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
+    if (workspaceRoot) {
+        compileTaskProvider = vscode.tasks.registerTaskProvider(CompileTaskProvider.taskSource, new CompileTaskProvider());
+    }
 
     // create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
@@ -92,5 +102,6 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
+    if(compileTaskProvider) compileTaskProvider.dispose();
     return Promise.resolve(languageClientService.stop());
 }
