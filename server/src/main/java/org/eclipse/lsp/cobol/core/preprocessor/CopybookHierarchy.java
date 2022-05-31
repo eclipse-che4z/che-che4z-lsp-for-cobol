@@ -21,7 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.CopybookName;
 
 import java.util.*;
 import java.util.function.BiFunction;

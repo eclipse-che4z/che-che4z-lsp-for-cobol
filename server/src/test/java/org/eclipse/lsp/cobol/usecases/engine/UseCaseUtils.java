@@ -21,7 +21,7 @@ import com.google.inject.Injector;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.CopybookName;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;

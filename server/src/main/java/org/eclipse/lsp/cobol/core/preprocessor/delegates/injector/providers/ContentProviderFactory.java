@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysis;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysis;
 import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
@@ -42,7 +42,7 @@ public class ContentProviderFactory {
    * Get an instance of {@link ContentProvider} bound to the provided {@link PredefinedCopybooks.CopybookContentType}
    *
    * @param contentType the type of the required instance
-   * @return a specific extension of the {@link CopybookAnalysis}
+   * @return a specific extension of the {@link InjectCodeAnalysis}
    */
   public ContentProvider getInstanceFor(PredefinedCopybooks.CopybookContentType contentType) {
     return instances.get(contentType);

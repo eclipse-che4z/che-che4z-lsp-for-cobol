@@ -19,23 +19,23 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysis;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysis;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysisFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 
 import java.util.List;
 
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory.AnalysisTypes.*;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysisFactory.AnalysisTypes.*;
 
 /**
  * Contains injectors that needs to be applied to different cobol program sections
  */
 @Singleton
 public class InjectService {
-  private final CopybookAnalysisFactory analysisFactory;
+  private final InjectCodeAnalysisFactory analysisFactory;
 
   @Inject
-  public InjectService(CopybookAnalysisFactory analysisFactory) {
+  public InjectService(InjectCodeAnalysisFactory analysisFactory) {
     this.analysisFactory = analysisFactory;
   }
 
@@ -46,7 +46,7 @@ public class InjectService {
    */
   @SuppressWarnings("unused")
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.LinkageSectionContext ctx) {
-    CopybookAnalysis analysis = analysisFactory.getInstanceFor(PREDEFINED);
+    InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
     return ImmutableList.of(new InjectDescriptor("DFHEIBLC", analysis));
   }
 
@@ -57,7 +57,7 @@ public class InjectService {
    */
   @SuppressWarnings("unused")
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.ProcedureDivisionContext ctx) {
-    CopybookAnalysis analysis = analysisFactory.getInstanceFor(GENERATED);
+    InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(GENERATED);
     return ImmutableList.of(new InjectDescriptor("PLABEL", analysis));
   }
 
@@ -68,7 +68,7 @@ public class InjectService {
    */
   @SuppressWarnings("unused")
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.WorkingStorageSectionContext ctx) {
-    CopybookAnalysis analysis = analysisFactory.getInstanceFor(PREDEFINED);
+    InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
     return ImmutableList.of(new InjectDescriptor("SPECIALREGISTERS", analysis));
   }
 
@@ -78,7 +78,7 @@ public class InjectService {
    * @return list of injectors
    */
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.PlusplusIncludeStatementContext ctx) {
-    CopybookAnalysis analysis = analysisFactory.getInstanceFor(PANVALET);
+    InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(PANVALET);
     return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis));
   }
 
@@ -88,7 +88,7 @@ public class InjectService {
    * @return list of injectors
    */
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.CopyStatementContext ctx) {
-    CopybookAnalysis analysis = analysisFactory.getInstanceFor(COBOL);
+    InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(COPYBOOK);
     return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis));
   }
 
@@ -98,7 +98,7 @@ public class InjectService {
    * @return list of injectors
    */
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.IncludeStatementContext ctx) {
-    CopybookAnalysis analysis = analysisFactory.getInstanceFor(COBOL);
+    InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(COPYBOOK);
     return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis));
   }
 

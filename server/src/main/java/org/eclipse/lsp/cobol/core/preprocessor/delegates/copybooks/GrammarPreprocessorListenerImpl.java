@@ -29,7 +29,7 @@ import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectDescriptor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
@@ -219,8 +219,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       List<InjectDescriptor> descriptors,
       ParserRuleContext context,
       ParserRuleContext copyContext) {
-    descriptors.forEach(c -> c.getCopybookAnalysis()
-        .handleCopybook(new CopybookName(c.getInjectedSourceName(), DialectType.COBOL.name()),
+    descriptors.forEach(c -> c.getInjectCodeAnalysis()
+        .injectCode(new CopybookName(c.getInjectedSourceName(), DialectType.COBOL.name()),
             context, copyContext, copybookConfig, documentUri)
         .apply(hierarchy)
         .apply(this)

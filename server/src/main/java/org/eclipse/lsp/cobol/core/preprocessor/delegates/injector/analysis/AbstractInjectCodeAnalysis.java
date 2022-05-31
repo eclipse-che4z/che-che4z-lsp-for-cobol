@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -51,7 +51,7 @@ import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.*;
  * behavior overriding the methods.
  */
 @Slf4j
-abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
+abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
   protected static final int MAX_COPYBOOK_NAME_LENGTH_DEFAULT = Integer.MAX_VALUE;
   private static final String HYPHEN = "-";
   private static final String UNDERSCORE = "_";
@@ -62,7 +62,7 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
   private final MessageService messageService;
   private final int maxCopybookNameLength;
 
-  AbstractCopybookAnalysis(
+  AbstractInjectCodeAnalysis(
       TextPreprocessor preprocessor,
       MessageService messageService,
       int maxCopybookNameLength) {
@@ -72,8 +72,8 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
   }
 
   @Override
-  public PreprocessorFunctor handleCopybook(
-      CopybookName copybookName,
+  public PreprocessorFunctor injectCode(
+      CopybookName injectedSourceName,
       ParserRuleContext context,
       ParserRuleContext copySource,
       CopybookConfig config,
@@ -83,7 +83,7 @@ abstract class AbstractCopybookAnalysis implements CopybookAnalysis {
       CopybookMetaData metaData =
           validateMetaData(
                   CopybookMetaData.builder()
-                      .copybookName(copybookName)
+                      .copybookName(injectedSourceName)
                       .context(context)
                       .documentUri(documentUri)
                       .copybookId(randomUUID().toString())

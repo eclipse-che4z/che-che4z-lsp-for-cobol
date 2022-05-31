@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;

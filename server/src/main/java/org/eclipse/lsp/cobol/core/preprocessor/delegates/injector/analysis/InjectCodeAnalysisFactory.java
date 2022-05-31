@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -28,51 +28,50 @@ import java.util.EnumMap;
 import java.util.Map;
 
 /**
- * This factory builds and returns on demand instances of the {@link CopybookAnalysis} depending on
+ * This factory builds and returns on demand instances of the {@link InjectCodeAnalysis} depending on
  * their {@link AnalysisTypes}
  */
 @Singleton
-public class CopybookAnalysisFactory {
-  private final Map<AnalysisTypes, AbstractCopybookAnalysis> analysisInstances =
+public class InjectCodeAnalysisFactory {
+  private final Map<AnalysisTypes, InjectCodeAnalysis> analysisInstances =
       new EnumMap<>(AnalysisTypes.class);
 
   @Inject
-  public CopybookAnalysisFactory(
+  public InjectCodeAnalysisFactory(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
       ContentProviderFactory contentProviderFactory,
       MessageService messageService,
       ReplacingService replacingService) {
     analysisInstances.put(
-        AnalysisTypes.COBOL,
-        new CobolAnalysis(preprocessor, copybookService, messageService, replacingService));
+        AnalysisTypes.COPYBOOK,
+        new CopybookAnalysis(preprocessor, copybookService, messageService, replacingService));
     analysisInstances.put(
         AnalysisTypes.PANVALET,
         new PanvaletAnalysis(preprocessor, copybookService, messageService));
     analysisInstances.put(
-        AnalysisTypes.PREDEFINED,
-        new PredefinedCopybookAnalysis(preprocessor, contentProviderFactory.getInstanceFor(PredefinedCopybooks.CopybookContentType.FILE), messageService));
+        AnalysisTypes.IMPLICIT,
+        new InjectCodeImplicitAnalysis(preprocessor, contentProviderFactory.getInstanceFor(PredefinedCopybooks.CopybookContentType.FILE), messageService));
     analysisInstances.put(
         AnalysisTypes.GENERATED,
-        new PredefinedCopybookAnalysis(preprocessor, contentProviderFactory.getInstanceFor(PredefinedCopybooks.CopybookContentType.GENERATED), messageService));
+        new InjectCodeImplicitAnalysis(preprocessor, contentProviderFactory.getInstanceFor(PredefinedCopybooks.CopybookContentType.GENERATED), messageService));
   }
 
   /**
-   * Get an instance of {@link CopybookAnalysis} bound to the provided {@link AnalysisTypes}
+   * Get an instance of {@link InjectCodeAnalysis} bound to the provided {@link AnalysisTypes}
    *
    * @param type the type of the required instance
-   * @return a specific extension of the {@link CopybookAnalysis}
+   * @return a specific extension of the {@link InjectCodeAnalysis}
    */
-  public CopybookAnalysis getInstanceFor(AnalysisTypes type) {
+  public InjectCodeAnalysis getInstanceFor(AnalysisTypes type) {
     return analysisInstances.get(type);
   }
 
   /** An enumeration of all the supported copybook analysis implementations */
   public enum AnalysisTypes {
-    COBOL,
-    SKIPPING,
+    COPYBOOK,
     PANVALET,
-    PREDEFINED,
+    IMPLICIT,
     GENERATED
   }
 }

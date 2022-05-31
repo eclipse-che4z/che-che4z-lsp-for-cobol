@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -33,14 +33,14 @@ import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.IMPLIC
 import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
- * This implementation of the {@link AbstractCopybookAnalysis} resolves the DFHEIBLC and SPECIALREGISTERS copybook
+ * This implementation of the {@link AbstractInjectCodeAnalysis} resolves the DFHEIBLC and SPECIALREGISTERS copybook
  * under the LINKAGE and WORKING_STORAGE SECTION respectively.
  */
 @Slf4j
-class PredefinedCopybookAnalysis extends AbstractCopybookAnalysis {
+class InjectCodeImplicitAnalysis extends AbstractInjectCodeAnalysis {
   private final ContentProvider contentProvider;
 
-  PredefinedCopybookAnalysis(
+  InjectCodeImplicitAnalysis(
       TextPreprocessor preprocessor,
       ContentProvider contentProvider,
       MessageService messageService) {

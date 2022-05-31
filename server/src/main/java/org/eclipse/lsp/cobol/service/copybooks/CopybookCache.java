@@ -20,7 +20,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.CopybookName;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;

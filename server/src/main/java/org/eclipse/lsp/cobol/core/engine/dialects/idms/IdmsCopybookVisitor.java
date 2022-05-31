@@ -31,7 +31,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.*;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
