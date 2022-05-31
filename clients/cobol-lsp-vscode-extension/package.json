@@ -43,6 +43,130 @@
     "icon": "resources/logo.png",
     "main": "./out/extension.js",
     "contributes": {
+        "problemMatchers": [
+            {
+                "name": "enterprise-cobol",
+                "owner": "Cobol LS",
+                "fileLocation": [
+                    "absolute"
+                ],
+                "pattern": [
+                    {
+                        "regexp": "(.*):(.*?):(\\d+)\\s-(\\d+)\\s-\\s(.*?):\\s(.*)",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "endColumn": 4,
+                        "severity": 5,
+                        "message": 6,
+                        "loop": true
+                    }
+                ],
+                "source": "enterprise cobol compiler"
+            }
+        ],
+        "taskDefinitions": [
+            {
+                "type": "cobolCompileJob",
+                "required": [
+                    "jobCard",
+                    "presentation",
+                    "unit",
+                    "listingFile",
+                    "listFiles",
+                    "stepSummary",
+                    "combineSummaryNListing",
+                    "printFile"
+                ],
+                "properties": {
+                    "jobCard": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "JOB card of the the submitted job."
+                    },
+                    "steplib": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "COBOL compiler (IGYCRCTL) load library concatenation."
+                    },
+                    "syslib": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Copybooks library concatenation."
+                    },
+                    "presentation": {
+                        "type": "object",
+                        "default": {
+                            "revealProblems": "onProblem"
+                        }
+                    },
+                    "compilerOptions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Invocation parameters for the compiler.",
+                        "default": []
+                    },
+                    "unit": {
+                        "type": "string",
+                        "default": "SYSDA",
+                        "description": "Dataset allocation UNIT for compiler work datasets."
+                    },
+                    "listingFile": {
+                        "type": "object",
+                        "properties": {
+                            "stepname": {
+                                "type": "string"
+                            },
+                            "ddname": {
+                                "type": "string"
+                            },
+                            "procstep": {
+                                "type": "string"
+                            },
+                            "spoolid": {
+                                "type": "number"
+                            }
+                        },
+                        "default": {
+                            "ddname": "SYSPRINT"
+                        }
+                    },
+                    "listFiles": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Lists the JCL output "
+                    },
+                    "stepSummary": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Lists the step summary"
+                    },
+                    "combineSummaryNListing": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Combines listing and job summary"
+                    },
+                    "printFile" : {
+                        "type":"array",
+                        "items": {
+                            "type":"number"
+                        },
+                        "description": "Spool id for the file to print",
+                        "default":[]
+                    }
+                }
+            }
+        ],
         "commands": [
             {
                 "command": "cobol-lsp.cpy-manager.fetch-copybook",
