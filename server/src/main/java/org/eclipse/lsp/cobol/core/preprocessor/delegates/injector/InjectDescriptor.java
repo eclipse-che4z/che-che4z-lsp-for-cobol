@@ -22,6 +22,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.Copy
  */
 @Value
 public class InjectDescriptor {
-  String copybookName;
+  String injectedSourceName;
   CopybookAnalysis copybookAnalysis;
 }

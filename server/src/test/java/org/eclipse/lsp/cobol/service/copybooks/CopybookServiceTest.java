@@ -63,7 +63,6 @@ class CopybookServiceTest {
   private static final String CONTENT = "content";
   private static final String SQLCA = "SQLCA";
   private static final String SQLDA = "SQLDA";
-  private static final String DFHEIBLC = "DFHEIBLC";
   private static final String DOCUMENT_2_URI = "file:///c%3A/workspace/document2.cbl";
   private static final String DOCUMENT_3_URI = "implicit:///implicitCopybooks/SQLCA_DB2.cpy";
 
@@ -316,25 +315,6 @@ class CopybookServiceTest {
     assertEquals(
         copybookService.resolve(copybookName, DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DATACOM_SERVER, ImmutableList.of()), false),
         copybookService.resolve(copybookName, DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of()), false));
-  }
-
-  /**
-   * Test if implicit copybook SQLCA for DB2 is resolved. For simplicity, we consider content is
-   * null. Full use case test is in TestSqlIncludeStatementForImplicitlyDefinedCpy
-   */
-  @Test
-  void testDfheiblkIsResolved() {
-    CopybookName copybookName = new CopybookName(DFHEIBLC, DialectType.COBOL.name());
-    CopybookServiceImpl copybookService = createCopybookService();
-    verify(broker).subscribe(copybookService);
-
-    when(files.getNameFromURI(DOCUMENT_3_URI)).thenReturn("document2");
-    when(settingsService.getConfiguration("copybook-resolve", "document2", DFHEIBLC, DialectType.COBOL.name()))
-        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
-    CopybookModel cpy = copybookService.resolve(copybookName, DOCUMENT_3_URI, DOCUMENT_3_URI, cpyConfig, false);
-
-    assertEquals(
-        new CopybookModel(copybookName, "implicit:///implicitCopybooks/DFHEIBLC.cpy", null), cpy);
   }
 
   /**

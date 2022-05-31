@@ -20,9 +20,9 @@ import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookCache;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory;
+import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -42,8 +42,7 @@ public class CopybookAnalysisFactory {
       CopybookService copybookService,
       ContentProviderFactory contentProviderFactory,
       MessageService messageService,
-      ReplacingService replacingService,
-      CopybookCache copybookCache) {
+      ReplacingService replacingService) {
     analysisInstances.put(
         AnalysisTypes.COBOL,
         new CobolAnalysis(preprocessor, copybookService, messageService, replacingService));
@@ -52,7 +51,10 @@ public class CopybookAnalysisFactory {
         new PanvaletAnalysis(preprocessor, copybookService, messageService));
     analysisInstances.put(
         AnalysisTypes.PREDEFINED,
-        new PredefinedCopybookAnalysis(preprocessor, contentProviderFactory, messageService, copybookCache));
+        new PredefinedCopybookAnalysis(preprocessor, contentProviderFactory.getInstanceFor(PredefinedCopybooks.CopybookContentType.FILE), messageService));
+    analysisInstances.put(
+        AnalysisTypes.GENERATED,
+        new PredefinedCopybookAnalysis(preprocessor, contentProviderFactory.getInstanceFor(PredefinedCopybooks.CopybookContentType.GENERATED), messageService));
   }
 
   /**
@@ -71,5 +73,6 @@ public class CopybookAnalysisFactory {
     SKIPPING,
     PANVALET,
     PREDEFINED,
+    GENERATED
   }
 }

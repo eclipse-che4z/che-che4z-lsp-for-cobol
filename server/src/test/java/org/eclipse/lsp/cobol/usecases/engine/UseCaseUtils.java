@@ -34,6 +34,7 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
+import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 
@@ -96,8 +97,6 @@ public class UseCaseUtils {
         .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
 
     CobolLanguageClient languageClient = mock(CobolLanguageClient.class);
-    FileSystemService mockFileSystemService = mock(FileSystemService.class);
-    when(mockFileSystemService.getNameFromURI(any())).thenReturn("");
     Injector injector =
         Guice.createInjector(
             new EngineModule(),
@@ -107,14 +106,14 @@ public class UseCaseUtils {
               protected void configure() {
                 bind(CopybookService.class).to(CopybookServiceImpl.class);
                 bind(SettingsService.class).toInstance(mockSettingsService);
-                bind(FileSystemService.class).toInstance(mockFileSystemService);
+                bind(FileSystemService.class).toInstance(new WorkspaceFileService());
                 bind(CobolLanguageClient.class).toInstance(languageClient);
                 bind(SubroutineService.class).to(SubroutineServiceImpl.class);
               }
             });
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
-    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.getAnalysisConfig().getCopybookConfig().getPredefinedParagraphs())
+    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks())
         .forEach(copybookModel -> copybookService.store(copybookModel, useCase.fileName));
 
     useCase.getCopybooks().stream()

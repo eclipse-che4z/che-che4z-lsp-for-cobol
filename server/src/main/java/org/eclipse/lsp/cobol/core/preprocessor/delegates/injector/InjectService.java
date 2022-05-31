@@ -26,7 +26,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorString
 import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory.AnalysisTypes.*;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.Copybook.*;
 
 /**
  * Contains injectors that needs to be applied to different cobol program sections
@@ -48,7 +47,7 @@ public class InjectService {
   @SuppressWarnings("unused")
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.LinkageSectionContext ctx) {
     CopybookAnalysis analysis = analysisFactory.getInstanceFor(PREDEFINED);
-    return ImmutableList.of(new InjectDescriptor(DFHEIBLC.name(), analysis));
+    return ImmutableList.of(new InjectDescriptor("DFHEIBLC", analysis));
   }
 
   /**
@@ -58,8 +57,8 @@ public class InjectService {
    */
   @SuppressWarnings("unused")
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.ProcedureDivisionContext ctx) {
-    CopybookAnalysis analysis = analysisFactory.getInstanceFor(PREDEFINED);
-    return ImmutableList.of(new InjectDescriptor(PLABEL.name(), analysis));
+    CopybookAnalysis analysis = analysisFactory.getInstanceFor(GENERATED);
+    return ImmutableList.of(new InjectDescriptor("PLABEL", analysis));
   }
 
   /**
@@ -70,7 +69,7 @@ public class InjectService {
   @SuppressWarnings("unused")
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.WorkingStorageSectionContext ctx) {
     CopybookAnalysis analysis = analysisFactory.getInstanceFor(PREDEFINED);
-    return ImmutableList.of(new InjectDescriptor(SPECIALREGISTERS.name(), analysis));
+    return ImmutableList.of(new InjectDescriptor("SPECIALREGISTERS", analysis));
   }
 
   /**
