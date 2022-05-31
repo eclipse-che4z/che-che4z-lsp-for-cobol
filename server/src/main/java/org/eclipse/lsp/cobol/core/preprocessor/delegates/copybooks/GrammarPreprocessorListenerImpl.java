@@ -29,7 +29,9 @@ import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectDescriptor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
@@ -41,8 +43,6 @@ import java.util.function.Consumer;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory.AnalysisTypes;
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory.AnalysisTypes.*;
 
 /**
  * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
@@ -65,8 +65,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private final CopybookConfig copybookConfig;
   private final ReplacingService replacingService;
   private final MessageService messageService;
-  private final CopybookAnalysisFactory analysisFactory;
   private final CopybookHierarchy hierarchy;
+  private final InjectService injectService;
 
   @Inject
   GrammarPreprocessorListenerImpl(
@@ -76,13 +76,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       @Assisted CopybookHierarchy hierarchy,
       ReplacingService replacingService,
       MessageService messageService,
-      CopybookAnalysisFactory analysisFactory) {
+      InjectService injectService) {
     this.documentUri = documentUri;
     this.tokens = tokens;
     this.copybookConfig = copybookConfig;
     this.replacingService = replacingService;
     this.messageService = messageService;
-    this.analysisFactory = analysisFactory;
+    this.injectService = injectService;
     this.hierarchy = hierarchy;
     textAccumulator.push(new StringBuilder());
   }
@@ -160,17 +160,17 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitLinkageSection(LinkageSectionContext ctx) {
-    analyzeCopybook(PREDEFINED, ctx, ctx);
+    analyzeCopybook(injectService.getInjectors(ctx), ctx, ctx);
   }
 
   @Override
   public void exitProcedureDivision(ProcedureDivisionContext ctx) {
-    analyzeCopybook(PREDEFINED, ctx, ctx);
+    analyzeCopybook(injectService.getInjectors(ctx), ctx, ctx);
   }
 
   @Override
   public void exitWorkingStorageSection(WorkingStorageSectionContext ctx) {
-    analyzeCopybook(SPECIALREGISTER, ctx, ctx);
+    analyzeCopybook(injectService.getInjectors(ctx), ctx, ctx);
   }
 
   @Override
@@ -181,7 +181,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    analyzeCopybook(PANVALET, ctx, ctx.copySource());
+    analyzeCopybook(injectService.getInjectors(ctx), ctx, ctx.copySource());
   }
 
   @Override
@@ -192,7 +192,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    analyzeCopybook(COBOL, ctx, ctx.copySource());
+    analyzeCopybook(injectService.getInjectors(ctx), ctx, ctx.copySource());
   }
 
   @Override
@@ -203,7 +203,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    analyzeCopybook(COBOL, ctx, ctx.copySource());
+    analyzeCopybook(injectService.getInjectors(ctx), ctx, ctx.copySource());
   }
 
   private boolean requiresEarlyReturn(ParserRuleContext context) {
@@ -216,17 +216,17 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private void analyzeCopybook(
-      AnalysisTypes type,
+      List<InjectDescriptor> descriptors,
       ParserRuleContext context,
       ParserRuleContext copyContext) {
-    analysisFactory
-        .getInstanceFor(type)
-        .handleCopybook(context, copyContext, copybookConfig, documentUri, DialectType.COBOL)
+    descriptors.forEach(c -> c.getCopybookAnalysis()
+        .handleCopybook(new CopybookName(c.getCopybookName(), DialectType.COBOL.name()),
+            context, copyContext, copybookConfig, documentUri)
         .apply(hierarchy)
         .apply(this)
         .apply(copybooks)
         .apply(nestedMappings)
-        .accept(errors);
+        .accept(errors));
   }
 
   @Override
