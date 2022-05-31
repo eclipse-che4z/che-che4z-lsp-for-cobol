@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.core.model;
 
 import lombok.Value;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.CopybookName;
 
 /**
  * This value class describes a usage of a copybook inside a COPY statement. Here, name is a copybook

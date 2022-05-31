@@ -31,7 +31,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPrepro
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacePreprocessorFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingServiceImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysisFactory;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysisFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
@@ -60,7 +60,7 @@ public class EngineModule extends AbstractModule {
     bind(GrammarPreprocessor.class).to(GrammarPreprocessorImpl.class);
     install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));
     install(new FactoryModuleBuilder().build(ReplacePreprocessorFactory.class));
-    bind(CopybookAnalysisFactory.class);
+    bind(InjectCodeAnalysisFactory.class);
     bind(ReplacingService.class).to(ReplacingServiceImpl.class);
     bind(CobolLineReader.class).to(CobolLineReaderImpl.class);
     bind(CobolLineWriter.class).to(CobolLineWriterImpl.class);

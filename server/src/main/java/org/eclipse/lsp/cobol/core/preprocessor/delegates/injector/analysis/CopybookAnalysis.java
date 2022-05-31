@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
@@ -31,16 +31,16 @@ import java.util.List;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 
 /**
- * This implementation of the {@link AbstractCopybookAnalysis} provides logic for plain COBOL logic
+ * This implementation of the {@link AbstractInjectCodeAnalysis} provides logic for plain COBOL logic
  * applying replacing if presents.
  */
-class CobolAnalysis extends AbstractCopybookAnalysis {
+class CopybookAnalysis extends AbstractInjectCodeAnalysis {
   private static final int MAX_COPYBOOK_NAME_LENGTH_DATASET = 8;
 
   private final CopybookService copybookService;
   private final ReplacingService replacingService;
 
-  CobolAnalysis(
+  CopybookAnalysis(
       TextPreprocessor preprocessor,
       CopybookService copybookService,
       MessageService messageService,

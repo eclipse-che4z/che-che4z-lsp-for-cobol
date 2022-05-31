@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector;
 
 import lombok.Value;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookAnalysis;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysis;
 
 /**
  * Contains necessary information for injecting the copybook to a cobol document
@@ -23,5 +23,5 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.Copy
 @Value
 public class InjectDescriptor {
   String injectedSourceName;
-  CopybookAnalysis copybookAnalysis;
+  InjectCodeAnalysis injectCodeAnalysis;
 }

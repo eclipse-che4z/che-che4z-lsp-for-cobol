@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
@@ -22,10 +22,10 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 /**
- * This implementation of the {@link AbstractCopybookAnalysis} provides the logic and the default
+ * This implementation of the {@link AbstractInjectCodeAnalysis} provides the logic and the default
  * parameters for the PANVALET library copybooks resolving
  */
-class PanvaletAnalysis extends AbstractCopybookAnalysis {
+class PanvaletAnalysis extends AbstractInjectCodeAnalysis {
   private static final int MAX_COPYBOOK_NAME_LENGTH_PANVALET = 10;
   private final CopybookService copybookService;
 
