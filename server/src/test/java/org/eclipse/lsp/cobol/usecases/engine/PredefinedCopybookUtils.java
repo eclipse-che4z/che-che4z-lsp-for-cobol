@@ -24,11 +24,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.SQLBackend;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.LabelsContentProvider;
 import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
 
 import java.io.IOException;
@@ -64,12 +61,11 @@ class PredefinedCopybookUtils {
    * Load and clean up all the predefined copybooks
    *
    * @param sqlBackend backend for the copybooks
-   * @param predefinedParagraphs is a list of user predefined paragraphs
    * @return list of models for predefined copybooks
    */
-  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks, List<String> predefinedParagraphs) {
+  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks) {
     return PredefinedCopybooks.getNames().stream()
-        .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), sqlBackend, predefinedParagraphs))
+        .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), sqlBackend))
         .collect(Collectors.toList());
   }
 
@@ -81,13 +77,10 @@ class PredefinedCopybookUtils {
         .orElse(DialectType.COBOL.name());
   }
 
-  private CopybookModel retrieveModel(CopybookName copybookName, SQLBackend sqlBackend, List<String> predefinedParagraphs) {
+  private CopybookModel retrieveModel(CopybookName copybookName, SQLBackend sqlBackend) {
     final String uri = retrievePredefinedUri(copybookName.getDisplayName(), sqlBackend);
 
-    PredefinedCopybooks.Copybook copybook = PredefinedCopybooks.forName(copybookName.getQualifiedName());
-
-    String content = copybook.getContentType()
-        .equals(PredefinedCopybooks.CopybookContentType.FILE) ? readContentForImplicitCopybook(uri) : generateContent(predefinedParagraphs);
+    String content = readContentForImplicitCopybook(uri);
 
     final PreprocessedDocument cleanCopybook =
         AnnotatedDocumentCleaning.prepareDocument(
@@ -114,10 +107,5 @@ class PredefinedCopybookUtils {
       LOG.error("Implicit copybook is not loaded. ", e);
     }
     return content;
-  }
-
-  private String generateContent(List<String> predefinedParagraphs) {
-    LabelsContentProvider provider = new LabelsContentProvider();
-    return provider.read(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, predefinedParagraphs), "");
   }
 }

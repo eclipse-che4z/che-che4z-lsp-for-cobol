@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
 import java.io.IOException;
@@ -43,13 +42,13 @@ public class FileContentProvider implements ContentProvider {
    */
   @Override
   public String read(CopybookConfig copybookConfig, String resourcePath) {
-    InputStream inputStream = CopybookServiceImpl.class.getResourceAsStream(resourcePath);
+    InputStream inputStream = FileContentProvider.class.getResourceAsStream(resourcePath);
     String content = null;
     try {
       content =
           files.readFromInputStream(inputStream, StandardCharsets.UTF_8);
     } catch (IOException e) {
-      LOG.error("Implicit copybook is not loaded. ", e);
+      LOG.error("Implicit copybook " + resourcePath + " is not loaded. ", e);
     }
     return content;
   }

@@ -83,29 +83,6 @@ public class PredefinedCopybooks {
       public String uriForBackend(SQLBackend backend) {
         return IMPLICIT_PATH + "SQLDA.cpy";
       }
-    },
-    DFHEIBLC {
-      @Override
-      public String uriForBackend(SQLBackend backend) {
-        return IMPLICIT_PATH + "DFHEIBLC.cpy";
-      }
-    },
-    PLABEL {
-      @Override
-      public String uriForBackend(SQLBackend backend) {
-        return IMPLICIT_PATH + "PLABEL.cpy";
-      }
-
-      @Override
-      public CopybookContentType getContentType() {
-        return CopybookContentType.GENERATED;
-      }
-    },
-    SPECIALREGISTERS {
-      @Override
-      public String uriForBackend(SQLBackend backend) {
-        return IMPLICIT_PATH + "SPECIALREGISTERS.cpy";
-      }
     };
 
     /**
@@ -115,14 +92,5 @@ public class PredefinedCopybooks {
      * @return uri of the predefined copybook
      */
     public abstract String uriForBackend(SQLBackend backend);
-
-    /**
-     * Get predefined copybook's content type
-     *
-     * @return predefined copybook content type
-     */
-    public CopybookContentType getContentType() {
-      return CopybookContentType.FILE;
-    }
   }
 }

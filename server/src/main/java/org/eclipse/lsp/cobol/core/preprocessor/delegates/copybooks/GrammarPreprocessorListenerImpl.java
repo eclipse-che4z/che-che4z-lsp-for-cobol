@@ -220,7 +220,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       ParserRuleContext context,
       ParserRuleContext copyContext) {
     descriptors.forEach(c -> c.getCopybookAnalysis()
-        .handleCopybook(new CopybookName(c.getCopybookName(), DialectType.COBOL.name()),
+        .handleCopybook(new CopybookName(c.getInjectedSourceName(), DialectType.COBOL.name()),
             context, copyContext, copybookConfig, documentUri)
         .apply(hierarchy)
         .apply(this)
