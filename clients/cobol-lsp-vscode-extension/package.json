@@ -43,6 +43,77 @@
     "icon": "resources/logo.png",
     "main": "./out/extension.js",
     "contributes": {
+        "problemMatchers": [
+            {
+                "name": "zowecc",
+                "owner": "Cobol LS",
+                "fileLocation": [
+                    "absolute"
+                ],
+                "pattern": [
+                    {
+                        "regexp": "(.*):(.*?):(\\d+)\\s-(\\d+)\\s-\\s(.*?):\\s(.*)",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "endColumn": 4,
+                        "severity": 5,
+                        "message": 6,
+                        "loop": true
+                    }
+                ],
+                "source": "Cobol compiler"
+            }
+        ],
+        "taskDefinitions": [
+            {
+                "type": "cobolCompile",
+                "required": [
+                    "jobCard",
+                    "steplib",
+                    "presentation",
+                    "saveSysprint",
+                    "sysPrintLocation"
+                ],
+                "properties": {
+                    "jobCard": {
+                        "type": "string",
+                        "description": "Relative path from workspace specifying the file containing the JOB card."
+                    },
+                    "steplib": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Dataset name where COBOL compiler (IGYCRCTL) resides."
+                    },
+                    "syslib": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Copybooks library concatenation."
+                    },
+                    "presentation": {
+                        "type": "object",
+                        "default": {
+                            "revealProblems": "onProblem"
+                        }
+                    },
+                    "saveSysprint": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Do you want to save SYSPRINT?"
+                    },
+                    "sysPrintLocation": {
+                        "type": "string",
+                        "description": "Specifies the location to store SYSPRINT file. If empty, it defaults to <WORKSPACE_LOC>/SYSPRINT/<JOBID>",
+                        "default": ""
+                    }
+                }
+            }
+        ],
         "commands": [
             {
                 "command": "cobol-lsp.cpy-manager.redownload",
@@ -85,7 +156,9 @@
                     ".cpy",
                     ".copy"
                 ],
-                "filenamePatterns": ["**/*copybook*/**"],
+                "filenamePatterns": [
+                    "**/*copybook*/**"
+                ],
                 "configuration": "./syntaxes/lang-config.json"
             }
         ],

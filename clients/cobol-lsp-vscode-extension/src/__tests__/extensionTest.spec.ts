@@ -27,6 +27,16 @@ jest.mock("../commands/FetchCopybookCommand");
 jest.mock("../commands/OpenSettingsCommand");
 jest.mock("../services/LanguageClientService");
 jest.mock("../services/copybook/CopybookDownloadService");
+jest.mock("../task/CompileTaskProvider", () => {
+    return {
+        CompileTaskProvider: jest.fn().mockImplementation(() => {
+            return {
+                provideTasks: jest.fn(),
+                resolveTask :  jest.fn(),
+            };
+        }),
+    };
+});
 
 jest.mock("../services/Settings", () => ({
     createFileWithGivenPath: jest.fn(),
@@ -41,6 +51,9 @@ jest.mock("vscode", () => ({
     },
     languages: {
         registerCodeActionsProvider: jest.fn(),
+    },
+    tasks: {
+        registerTaskProvider: jest.fn(),
     },
     window: {
         showErrorMessage: jest.fn().mockReturnValue("test"),
