@@ -30,8 +30,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.Copy
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.service.SettingsService;
-import org.eclipse.lsp.cobol.service.copybooks.providers.ContentProvider;
-import org.eclipse.lsp.cobol.service.copybooks.providers.FileContentProvider;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.FileContentProvider;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
 import java.nio.file.Path;

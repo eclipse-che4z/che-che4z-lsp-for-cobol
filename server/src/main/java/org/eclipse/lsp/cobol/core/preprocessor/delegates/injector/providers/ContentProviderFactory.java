@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service.copybooks.providers;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

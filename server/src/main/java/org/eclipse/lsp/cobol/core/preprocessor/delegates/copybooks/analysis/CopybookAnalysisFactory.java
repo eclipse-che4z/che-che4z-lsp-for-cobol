@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookCache;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
-import org.eclipse.lsp.cobol.service.copybooks.providers.ContentProviderFactory;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -47,9 +47,6 @@ public class CopybookAnalysisFactory {
     analysisInstances.put(
         AnalysisTypes.COBOL,
         new CobolAnalysis(preprocessor, copybookService, messageService, replacingService));
-    analysisInstances.put(
-        AnalysisTypes.SKIPPING,
-        new SkippingAnalysis(preprocessor, messageService));
     analysisInstances.put(
         AnalysisTypes.PANVALET,
         new PanvaletAnalysis(preprocessor, copybookService, messageService));

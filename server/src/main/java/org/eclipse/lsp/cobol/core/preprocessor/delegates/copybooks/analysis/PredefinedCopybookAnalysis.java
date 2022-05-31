@@ -27,8 +27,8 @@ import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookCache;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
-import org.eclipse.lsp.cobol.service.copybooks.providers.ContentProvider;
-import org.eclipse.lsp.cobol.service.copybooks.providers.ContentProviderFactory;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
