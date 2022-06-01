@@ -12,12 +12,11 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+package org.eclipse.lsp.cobol.core;
 
 /**
- * Represents supported dialect types, used for resolving copybooks for different dialects
+ * Contains constants
  */
- // TODO: should we remove this enum?
-public enum DialectType {
-  COBOL
+public class Constants {
+  public static final String COBOL = "COBOL";
 }

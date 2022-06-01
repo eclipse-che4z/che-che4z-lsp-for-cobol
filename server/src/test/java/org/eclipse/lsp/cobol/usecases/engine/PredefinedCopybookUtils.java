@@ -20,8 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
@@ -36,6 +35,8 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.eclipse.lsp.cobol.core.Constants.COBOL;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.IMPLICIT_PATH;
 import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /** This util class allows retrieving and processing the predefined copybooks for syntax analysis */
@@ -54,7 +55,7 @@ class PredefinedCopybookUtils {
         new CobolText(
             name,
             readContentForImplicitCopybook(
-                PredefinedCopybooks.forName(name).uriForBackend(sqlBackend)));
+                retrievePredefinedUri(name, sqlBackend)));
   }
 
   /**
@@ -74,7 +75,7 @@ class PredefinedCopybookUtils {
         .filter(c -> c.getFileName().equals(name))
         .findFirst()
         .map(CobolText::getDialectType)
-        .orElse(DialectType.COBOL.name());
+        .orElse(COBOL);
   }
 
   private CopybookModel retrieveModel(CopybookName copybookName, SQLBackend sqlBackend) {
@@ -93,7 +94,7 @@ class PredefinedCopybookUtils {
   }
 
   private String retrievePredefinedUri(String name, SQLBackend sqlBackend) {
-    return PredefinedCopybooks.forName(name).uriForBackend(sqlBackend);
+    return IMPLICIT_PATH + PredefinedCopybooks.forName(name).nameForBackend(sqlBackend) + ".cpy";
   }
 
   private String readContentForImplicitCopybook(String resourcePath) {

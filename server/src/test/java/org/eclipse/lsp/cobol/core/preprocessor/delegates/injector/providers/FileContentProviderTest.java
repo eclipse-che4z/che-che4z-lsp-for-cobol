@@ -15,6 +15,8 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.core.model.CopybookModel;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
@@ -26,9 +28,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.eclipse.lsp.cobol.core.Constants.COBOL;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -50,14 +53,14 @@ public class FileContentProviderTest {
   @Test
   void testReadReturnsContent() throws IOException {
     when(files.readFromInputStream(any(), any())).thenReturn("content");
-    String content = contentProvider.read(copybookConfig, "copybook");
-    assertEquals(content, "content");
+    Optional<CopybookModel> model = contentProvider.read(copybookConfig, new CopybookName("copybook", COBOL), "uri", "uri");
+    assertEquals(model.get().getContent(), "content");
   }
 
   @Test
   void testReadFailed() throws IOException {
     when(files.readFromInputStream(any(), any())).thenThrow(IOException.class);
-    String content = contentProvider.read(copybookConfig, "copybook");
-    assertNull(content);
+    Optional<CopybookModel> model = contentProvider.read(copybookConfig, new CopybookName("copybook", COBOL), "uri", "uri");
+    assertFalse(model.isPresent());
   }
 }

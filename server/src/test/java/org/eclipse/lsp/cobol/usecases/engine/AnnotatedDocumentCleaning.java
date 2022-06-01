@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableList;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
@@ -35,6 +34,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.CharStreams.fromString;
+import static org.eclipse.lsp.cobol.core.Constants.COBOL;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.toURI;
 
@@ -69,7 +69,7 @@ class AnnotatedDocumentCleaning {
             explicitCopybooks.stream()
                 .findFirst()
                 .map(CobolText::getDialectType)
-                .orElse(DialectType.COBOL.name()));
+                .orElse(COBOL));
 
     return new PreprocessedDocument(
         testData.getText(),

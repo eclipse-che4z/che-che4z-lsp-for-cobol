@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
-import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,21 +31,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ContentProviderFactoryTest {
   private ContentProviderFactory factory;
   @Mock private FileSystemService files;
+  @Mock private CopybookService copybookService;
 
   @BeforeEach
   void setupMocks() {
-    factory = new ContentProviderFactory(files);
+    factory = new ContentProviderFactory(files, copybookService);
   }
 
   @Test
   void testFileContentProvider() {
-    ContentProvider contentProvider = factory.getInstanceFor(PredefinedCopybooks.CopybookContentType.FILE);
+    ContentProvider contentProvider = factory.getInstanceFor(ContentProviderFactory.InjectCodeContentType.FILE);
     assertTrue(contentProvider instanceof FileContentProvider);
   }
 
   @Test
   void testLabelsContentProvider() {
-    ContentProvider contentProvider = factory.getInstanceFor(PredefinedCopybooks.CopybookContentType.GENERATED);
+    ContentProvider contentProvider = factory.getInstanceFor(ContentProviderFactory.InjectCodeContentType.GENERATED);
     assertTrue(contentProvider instanceof LabelsContentProvider);
   }
 }

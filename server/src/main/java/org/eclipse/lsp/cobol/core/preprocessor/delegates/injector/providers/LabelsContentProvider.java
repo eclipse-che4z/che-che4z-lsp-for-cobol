@@ -15,7 +15,14 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.core.model.CopybookModel;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+
+import java.util.Optional;
+
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.IMPLICIT_PATH;
+import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
  * Generates predefined copybook content provider that generates content for a copybook
@@ -23,19 +30,24 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 public class LabelsContentProvider implements ContentProvider {
 
   /**
-   * Generate predefined copybook's content
+   * Read injected code content
    * @param copybookConfig is a copybook config
-   * @param uri for predefined copybook
-   * @return a copybook content
+   * @param copybookName for injected code name
+   * @param programDocumentUri for program document uri
+   * @param documentUri for current document uri
+   * @return an optional copybook model
    */
   @Override
-  public String read(CopybookConfig copybookConfig, String uri) {
+  public Optional<CopybookModel> read(CopybookConfig copybookConfig, CopybookName copybookName,
+                                      String programDocumentUri, String documentUri) {
     StringBuilder sb = new StringBuilder();
     for (String paragraph : copybookConfig.getPredefinedParagraphs()) {
       sb.append(StringUtils.repeat(' ', 7));
       sb.append(paragraph);
       sb.append(".\r\n");
     }
-    return sb.toString();
+
+    String uri = PREF_IMPLICIT + IMPLICIT_PATH + copybookName.getQualifiedName() + ".cpy";
+    return Optional.of(new CopybookModel(copybookName, uri, sb.toString()));
   }
 }

@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
+package org.eclipse.lsp.cobol.core.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Value;

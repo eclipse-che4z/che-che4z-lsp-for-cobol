@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
@@ -73,6 +74,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
 
   @Override
   public PreprocessorFunctor injectCode(
+      ContentProvider contentProvider,
       CopybookName injectedSourceName,
       ParserRuleContext context,
       ParserRuleContext copySource,
@@ -98,7 +100,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
               .unwrap(errors::addAll);
 
       ExtendedDocument copybookDocument =
-          buildExtendedDocumentForCopybook(metaData).apply(hierarchy).unwrap(errors::addAll);
+          buildExtendedDocumentForCopybook(contentProvider, metaData).apply(hierarchy).unwrap(errors::addAll);
       return stack -> {
         writeText(metaData, copybookDocument).accept(stack);
         return subContext -> {
@@ -166,10 +168,10 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
   }
 
   private Function<CopybookHierarchy, ResultWithErrors<ExtendedDocument>>
-      buildExtendedDocumentForCopybook(CopybookMetaData metaData) {
+      buildExtendedDocumentForCopybook(ContentProvider contentProvider, CopybookMetaData metaData) {
     List<SyntaxError> errors = new ArrayList<>();
     return hierarchy -> {
-      CopybookModel model = getCopyBookContent(metaData, hierarchy).unwrap(errors::addAll);
+      CopybookModel model = getCopyBookContent(contentProvider, metaData, hierarchy).unwrap(errors::addAll);
       return processCopybook(
               metaData,
               hierarchy,
@@ -206,6 +208,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
   }
 
   protected ResultWithErrors<CopybookModel> getCopyBookContent(
+      ContentProvider contentProvider,
       CopybookMetaData copybookMetaData, CopybookHierarchy hierarchy) {
     if (copybookMetaData.getCopybookName().getDisplayName().isEmpty())
       return emptyModel(copybookMetaData.getCopybookName(), ImmutableList.of());
@@ -214,22 +217,16 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
       return emptyModel(
           copybookMetaData.getCopybookName(), hierarchy.mapCopybooks(this::reportRecursiveCopybook));
 
-    CopybookModel copybook = getCopybookModel(copybookMetaData.getCopybookName(),
-        hierarchy.getRootDocumentUri().orElse(copybookMetaData.getDocumentUri()),
-        copybookMetaData.getDocumentUri(), copybookMetaData.getConfig());
+    new CopybookModel(copybookMetaData.getCopybookName(), null, null);
 
-    if (copybook.getContent() == null) {
-      return emptyModel(
-          copybookMetaData.getCopybookName(), ImmutableList.of(reportMissingCopybooks(copybookMetaData)));
-    }
+    String programDocumentUri = hierarchy.getRootDocumentUri().orElse(copybookMetaData.getDocumentUri());
 
-    return new ResultWithErrors<>(copybook, ImmutableList.of());
+    return contentProvider
+        .read(copybookMetaData.getConfig(), copybookMetaData.getCopybookName(), programDocumentUri, copybookMetaData.getDocumentUri())
+        .map(copybook -> new ResultWithErrors<>(copybook, ImmutableList.of()))
+        .orElse(emptyModel(
+            copybookMetaData.getCopybookName(), ImmutableList.of(reportMissingCopybooks(copybookMetaData))));
   }
-
-  protected abstract CopybookModel getCopybookModel(CopybookName copybookName,
-                                                    String programDocumentUri,
-                                                    String documentUri,
-                                                    CopybookConfig copybookConfig);
 
   protected Consumer<PreprocessorStack> beforeWriting() {
     return PreprocessorStack::pop;
