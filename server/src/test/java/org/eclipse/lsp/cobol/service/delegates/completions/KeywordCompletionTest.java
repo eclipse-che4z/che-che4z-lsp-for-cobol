@@ -41,9 +41,7 @@ class KeywordCompletionTest {
           + "com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsacce.htm)\r\n\r\n"
           + "© Copyright IBM Corporation 1994, 2019.\r\n\r\n"
           + "U.S. Government Users Restricted Rights - "
-          + "Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.\r\n\r\n***\r\n\r\n"
-          + "[IDMS] The ACCEPT statement transfers database, transaction, or task-related information to a specified "
-          + "location in program variable storage.";
+          + "Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.";
   private static final String LABEL = "ACCEPT";
 
   private KeywordCompletion completion = new KeywordCompletion(new Keywords());
