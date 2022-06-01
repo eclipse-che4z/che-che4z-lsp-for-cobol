@@ -24,11 +24,11 @@ import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -251,7 +251,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
       if (!(metaData.getCopybookName() == null
           || isEmpty(metaData.getCopybookName().getQualifiedName())
           || isEmpty(uri)
-          || isPredefined(uri)))
+          || ImplicitCodeUtils.isImplicit(uri)))
         copybooks.define(
             metaData.getCopybookName().getQualifiedName(),
             new Location(uri, new Range(new Position(0, 0), new Position(0, 0))));
@@ -324,10 +324,6 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
             .build();
     LOG.debug(logMessage, error.toString());
     return error;
-  }
-
-  private boolean isPredefined(String uri) {
-    return PredefinedCopybooks.isCopybookPredefined(uri);
   }
 
   private SyntaxError reportRecursiveCopybook(CopybookUsage usage) {

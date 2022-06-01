@@ -43,6 +43,7 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode.Builder;
 import org.eclipse.lsp.cobol.core.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
@@ -65,8 +66,6 @@ import static org.eclipse.lsp.cobol.core.CobolParser.*;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
 import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
-import static org.eclipse.lsp.cobol.service.SubroutineService.IMPLICIT_SUBROUTINE_PATH;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
  * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
@@ -751,7 +750,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                           .orElseGet(
                               () ->
                                   new Location(
-                                      PREF_IMPLICIT + IMPLICIT_SUBROUTINE_PATH, new Range())),
+                                      ImplicitCodeUtils.createSubroutineLocation(), new Range())),
                       subroutineName));
               SubroutineNameNode usage = new SubroutineNameNode(locality, subroutineName);
               SubroutineDefinition foundDefinition = subroutineDefinitionMap.get(subroutineName);

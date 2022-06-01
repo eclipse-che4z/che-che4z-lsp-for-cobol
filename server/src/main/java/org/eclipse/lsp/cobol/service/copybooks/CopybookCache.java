@@ -22,6 +22,7 @@ import com.google.inject.name.Named;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
 
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 public class CopybookCache {
 
   private final Cache<String, CopybookModel> cache;
+  private static final String COBOL = "COBOL";
 
   @Inject
   public CopybookCache(
@@ -75,7 +77,8 @@ public class CopybookCache {
   }
 
   private static String makeCopybookCacheKay(CopybookName copybookName, String documentUri) {
-    return String.format("%s#%s#%s", copybookName.getQualifiedName(), copybookName.getDialectType(), documentUri);
+    return String.format("%s#%s#%s", copybookName.getQualifiedName(), Optional.ofNullable(copybookName.getDialectType())
+        .orElse(COBOL), documentUri);
   }
 
 }

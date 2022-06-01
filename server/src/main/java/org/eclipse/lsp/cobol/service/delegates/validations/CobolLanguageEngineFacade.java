@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -39,7 +40,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
  * This class is a facade that maps the result of the syntax and semantic analysis to a model
@@ -99,7 +99,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
                     .map(CopyNode::getDefinitions)
                     .flatMap(Collection::stream)
                     .map(Location::getUri)
-                    .filter(it -> !it.startsWith(PREF_IMPLICIT))
+                    .filter(it -> !ImplicitCodeUtils.isImplicit(it))
                     .collect(toList()),
                 uri))
         .rootNode(rootNode)

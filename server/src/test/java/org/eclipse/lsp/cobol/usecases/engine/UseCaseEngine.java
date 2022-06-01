@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.core.model.tree.Context;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
@@ -46,7 +47,6 @@ import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.*;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.analyze;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -265,7 +265,7 @@ public class UseCaseEngine {
   private Map<String, List<Location>> extractVariableDefinitions(AnalysisResult result) {
     return extractVariables(
         result,
-        it -> !it.getLocality().getUri().startsWith(PREF_IMPLICIT),
+        it -> !ImplicitCodeUtils.isImplicit(it.getLocality().getUri()),
         Context::getDefinitions);
   }
 
@@ -299,7 +299,7 @@ public class UseCaseEngine {
         Context::getDefinitions,
         context ->
             !(context.getDefinitions().isEmpty()
-                || context.getDefinitions().get(0).getUri().startsWith(PREF_IMPLICIT)));
+                || ImplicitCodeUtils.isImplicit(context.getDefinitions().get(0).getUri())));
   }
 
   private Map<String, List<Location>> extractUsages(AnalysisResult result, NodeType nodeType) {

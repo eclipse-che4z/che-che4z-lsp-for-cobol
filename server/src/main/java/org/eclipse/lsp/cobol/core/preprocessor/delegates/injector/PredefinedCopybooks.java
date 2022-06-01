@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.service.copybooks;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector;
 
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.service.SQLBackend;
@@ -22,15 +22,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.Copybook.*;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.PredefinedCopybooks.Copybook.*;
 
 /** This util class encapsulates the logic of resolving the predefined variable names. */
 @UtilityClass
 public class PredefinedCopybooks {
-  /** Prefix for uri of the predefined copybooks */
-  public static final String PREF_IMPLICIT = "implicit://";
-  @SuppressWarnings("java:S1075")
-  public static final String IMPLICIT_PATH = "/implicitCopybooks/";
 
   /**
    * Get a predefined copybook instance for a given name or null
@@ -50,16 +46,6 @@ public class PredefinedCopybooks {
    */
   public List<String> getNames() {
     return Arrays.stream(values()).map(Enum::name).collect(Collectors.toList());
-  }
-
-  /**
-   * Check if this copybook is predefined
-   *
-   * @param uri uri of the copybook
-   * @return true if the copybook is predefined
-   */
-  public boolean isCopybookPredefined(String uri) {
-    return uri.startsWith(IMPLICIT_PATH);
   }
 
   /** Enumeration of predefined copybooks */

@@ -30,7 +30,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.util.Optional;
 
-import static org.eclipse.lsp.cobol.core.Constants.COBOL;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -53,14 +52,14 @@ public class FileContentProviderTest {
   @Test
   void testReadReturnsContent() throws IOException {
     when(files.readFromInputStream(any(), any())).thenReturn("content");
-    Optional<CopybookModel> model = contentProvider.read(copybookConfig, new CopybookName("copybook", COBOL), "uri", "uri");
+    Optional<CopybookModel> model = contentProvider.read(copybookConfig, new CopybookName("copybook"), "uri", "uri");
     assertEquals(model.get().getContent(), "content");
   }
 
   @Test
   void testReadFailed() throws IOException {
     when(files.readFromInputStream(any(), any())).thenThrow(IOException.class);
-    Optional<CopybookModel> model = contentProvider.read(copybookConfig, new CopybookName("copybook", COBOL), "uri", "uri");
+    Optional<CopybookModel> model = contentProvider.read(copybookConfig, new CopybookName("copybook"), "uri", "uri");
     assertFalse(model.isPresent());
   }
 }

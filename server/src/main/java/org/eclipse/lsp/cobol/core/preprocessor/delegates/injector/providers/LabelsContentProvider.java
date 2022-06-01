@@ -17,12 +17,10 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 import java.util.Optional;
-
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.IMPLICIT_PATH;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
  * Generates predefined copybook content provider that generates content for a copybook
@@ -47,7 +45,6 @@ public class LabelsContentProvider implements ContentProvider {
       sb.append(".\r\n");
     }
 
-    String uri = PREF_IMPLICIT + IMPLICIT_PATH + copybookName.getQualifiedName() + ".cpy";
-    return Optional.of(new CopybookModel(copybookName, uri, sb.toString()));
+    return Optional.of(new CopybookModel(copybookName, ImplicitCodeUtils.createFullUrl(copybookName.getQualifiedName()), sb.toString()));
   }
 }

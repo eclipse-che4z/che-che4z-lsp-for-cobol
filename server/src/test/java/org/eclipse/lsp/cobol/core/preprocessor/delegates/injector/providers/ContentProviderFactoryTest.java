@@ -40,13 +40,13 @@ public class ContentProviderFactoryTest {
 
   @Test
   void testFileContentProvider() {
-    ContentProvider contentProvider = factory.getInstanceFor(ContentProviderFactory.InjectCodeContentType.FILE);
+    ContentProvider contentProvider = factory.getInstanceFor(ContentProviderFactory.InjectContentType.FILE);
     assertTrue(contentProvider instanceof FileContentProvider);
   }
 
   @Test
   void testLabelsContentProvider() {
-    ContentProvider contentProvider = factory.getInstanceFor(ContentProviderFactory.InjectCodeContentType.GENERATED);
+    ContentProvider contentProvider = factory.getInstanceFor(ContentProviderFactory.InjectContentType.GENERATED);
     assertTrue(contentProvider instanceof LabelsContentProvider);
   }
 }

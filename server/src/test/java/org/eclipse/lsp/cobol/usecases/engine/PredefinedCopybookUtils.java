@@ -21,28 +21,22 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.SQLBackend;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
-import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static org.eclipse.lsp.cobol.core.Constants.COBOL;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.IMPLICIT_PATH;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /** This util class allows retrieving and processing the predefined copybooks for syntax analysis */
 @Slf4j
 @UtilityClass
 class PredefinedCopybookUtils {
+
+  private final WorkspaceFileService files = new WorkspaceFileService();
   /**
    * Retrieve the predefined copybook content using the given name and the sqlBackend and convert it
    * to the CobolText
@@ -54,8 +48,7 @@ class PredefinedCopybookUtils {
     return name ->
         new CobolText(
             name,
-            readContentForImplicitCopybook(
-                retrievePredefinedUri(name, sqlBackend)));
+            ImplicitCodeUtils.readImplicitCode(files, retrieveRealName(name, sqlBackend)));
   }
 
   /**
@@ -75,13 +68,13 @@ class PredefinedCopybookUtils {
         .filter(c -> c.getFileName().equals(name))
         .findFirst()
         .map(CobolText::getDialectType)
-        .orElse(COBOL);
+        .orElse(null);
   }
 
   private CopybookModel retrieveModel(CopybookName copybookName, SQLBackend sqlBackend) {
-    final String uri = retrievePredefinedUri(copybookName.getDisplayName(), sqlBackend);
+    final String name = retrieveRealName(copybookName.getDisplayName(), sqlBackend);
 
-    String content = readContentForImplicitCopybook(uri);
+    String content = ImplicitCodeUtils.readImplicitCode(files, name);
 
     final PreprocessedDocument cleanCopybook =
         AnnotatedDocumentCleaning.prepareDocument(
@@ -90,23 +83,10 @@ class PredefinedCopybookUtils {
             ImmutableList.of(),
             ImmutableMap.of(),
             sqlBackend);
-    return new CopybookModel(copybookName, PREF_IMPLICIT + uri, cleanCopybook.getText());
+    return new CopybookModel(copybookName, ImplicitCodeUtils.createFullUrl(name), cleanCopybook.getText());
   }
 
-  private String retrievePredefinedUri(String name, SQLBackend sqlBackend) {
-    return IMPLICIT_PATH + PredefinedCopybooks.forName(name).nameForBackend(sqlBackend) + ".cpy";
-  }
-
-  private String readContentForImplicitCopybook(String resourcePath) {
-    InputStream inputStream = CopybookServiceImpl.class.getResourceAsStream(resourcePath);
-    String content = null;
-    try {
-      content =
-          new WorkspaceFileService()
-              .readFromInputStream(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      LOG.error("Implicit copybook is not loaded. ", e);
-    }
-    return content;
+  private String retrieveRealName(String name, SQLBackend sqlBackend) {
+    return PredefinedCopybooks.forName(name).nameForBackend(sqlBackend);
   }
 }
