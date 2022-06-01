@@ -52,6 +52,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -443,6 +444,17 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("getting hover", uri)));
   }
 
+  @Override
+  public CompletableFuture<List<FoldingRange>> foldingRange(FoldingRangeRequestParams params) {
+    String uri = params.getTextDocument().getUri();
+    if (outlineMap.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
+    return outlineMap
+        .get(uri)
+        .thenApply(this::getFoldingRangeFromDocumentSymbol)
+        .whenComplete(
+            reportExceptionIfThrown(createDescriptiveErrorMessage("getting folding", uri)));
+  }
+
   private void registerDocument(String uri, CobolDocumentModel document) {
     docs.put(uri, document);
   }
@@ -453,5 +465,18 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   private BiConsumer<Object, Throwable> reportExceptionIfThrown(String message) {
     return (res, ex) -> ofNullable(ex).ifPresent(it -> LOG.error(message, it));
+  }
+
+  private List<FoldingRange> getFoldingRangeFromDocumentSymbol(
+      List<DocumentSymbol> documentSymbols) {
+    List<FoldingRange> foldingRanges = new ArrayList<>();
+    for (DocumentSymbol documentSymbol : documentSymbols) {
+      foldingRanges.add(
+          new FoldingRange(
+              documentSymbol.getSelectionRange().getStart().getLine(),
+              documentSymbol.getSelectionRange().getEnd().getLine()));
+      foldingRanges.addAll(getFoldingRangeFromDocumentSymbol(documentSymbol.getChildren()));
+    }
+    return foldingRanges;
   }
 }

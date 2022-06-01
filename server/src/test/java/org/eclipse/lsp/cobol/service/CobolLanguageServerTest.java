@@ -153,6 +153,7 @@ class CobolLanguageServerTest {
     assertTrue(capabilities.getDocumentHighlightProvider());
     assertTrue(capabilities.getCodeActionProvider());
     assertTrue(capabilities.getDocumentSymbolProvider());
+    assertTrue(capabilities.getFoldingRangeProvider().getLeft());
     assertEquals(
         stream(values()).map(ErrorCode::name).collect(toList()),
         capabilities.getExecuteCommandProvider().getCommands());
@@ -169,7 +170,6 @@ class CobolLanguageServerTest {
     assertNull(capabilities.getDocumentLinkProvider());
     assertNull(capabilities.getExperimental());
     assertNull(capabilities.getSignatureHelpProvider());
-    assertNull(capabilities.getFoldingRangeProvider());
     assertNull(capabilities.getImplementationProvider());
   }
 }
