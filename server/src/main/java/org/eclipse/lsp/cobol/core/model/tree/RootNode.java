@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp4j.Location;
@@ -31,8 +32,6 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.ROOT;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.IMPLICIT_PATH;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
  * The class represents the root. All trees must start with one root node. This class also creates
@@ -79,7 +78,7 @@ public class RootNode extends Node {
     copyDefinitionMap.putIfAbsent(
         copyNode.getName(),
         new CopyDefinition(
-            new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), copyNode.getName()));
+            new Location(ImplicitCodeUtils.createLocation(), new Range()), copyNode.getName()));
     CopyDefinition foundDefinition = copyDefinitionMap.get(copyNode.getName());
     foundDefinition.addUsages(copyNode);
     copyNode.setDefinition(foundDefinition);

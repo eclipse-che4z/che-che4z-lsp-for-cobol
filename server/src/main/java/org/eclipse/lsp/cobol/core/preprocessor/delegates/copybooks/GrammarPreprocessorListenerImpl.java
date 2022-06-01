@@ -42,7 +42,6 @@ import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
-import static org.eclipse.lsp.cobol.core.Constants.COBOL;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 
 /**
@@ -223,7 +222,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     descriptors.forEach(c -> c.getInjectCodeAnalysis()
         .injectCode(
             c.getContentProvider(),
-            new CopybookName(c.getInjectedSourceName(), COBOL),
+            new CopybookName(c.getInjectedSourceName()),
             context, copyContext, copybookConfig, documentUri)
         .apply(hierarchy)
         .apply(this)

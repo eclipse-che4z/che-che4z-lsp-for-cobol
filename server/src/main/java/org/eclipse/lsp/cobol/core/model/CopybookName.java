@@ -31,6 +31,12 @@ public class CopybookName {
   String dialectType;
   String qualifiedName;
 
+  public CopybookName(String displayName) {
+    this.displayName = displayName;
+    this.dialectType = null;
+    this.qualifiedName = displayName;
+  }
+
   public CopybookName(String displayName, String dialectType) {
     this.displayName = displayName;
     this.dialectType = dialectType;

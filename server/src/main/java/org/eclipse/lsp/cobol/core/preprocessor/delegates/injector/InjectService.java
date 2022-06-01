@@ -28,7 +28,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorString
 import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysisFactory.AnalysisTypes.*;
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory.InjectCodeContentType.*;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory.InjectContentType.*;
 
 /**
  * Contains injectors that needs to be applied to different cobol program sections

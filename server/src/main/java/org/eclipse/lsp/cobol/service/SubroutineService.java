@@ -23,8 +23,6 @@ import java.util.Optional;
  */
 public interface SubroutineService {
 
-  /** ** Prefix for defining undefined subroutines */
-  String IMPLICIT_SUBROUTINE_PATH = "/implicitSubroutine/";
   /**
    * Retrieve and return subroutine URI by its name.
    *

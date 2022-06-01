@@ -27,14 +27,13 @@ import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.service.SettingsService;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,8 +41,6 @@ import java.util.concurrent.ExecutionException;
 
 import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.IMPLICIT_PATH;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
 /**
@@ -57,6 +54,7 @@ public class CopybookServiceImpl implements CopybookService {
   private final SettingsService settingsService;
   private final FileSystemService files;
   public final TextPreprocessor preprocessor;
+  private static final String COBOL = "COBOL";
 
   private final Map<String, Set<CopybookName>> copybooksForDownloading =
       new ConcurrentHashMap<>(8, 0.9f, 1);
@@ -160,16 +158,8 @@ public class CopybookServiceImpl implements CopybookService {
     Optional<CopybookModel> copybookModel = Optional.ofNullable(PredefinedCopybooks.forName(copybookName.getQualifiedName()))
         .map(c -> {
           String name = c.nameForBackend(copybookConfig.getSqlBackend());
-          String uri = IMPLICIT_PATH + name + ".cpy";
-          InputStream inputStream = CopybookServiceImpl.class.getResourceAsStream(uri);
-          String content = null;
-          try {
-            content =
-                files.readFromInputStream(inputStream, StandardCharsets.UTF_8);
-          } catch (IOException e) {
-            LOG.error("Implicit copybook is not loaded. ", e);
-          }
-          return new CopybookModel(copybookName, PREF_IMPLICIT + uri, content);
+          String content = ImplicitCodeUtils.readImplicitCode(files, name);
+          return new CopybookModel(copybookName, ImplicitCodeUtils.createFullUrl(name), content);
         });
 
     LOG.debug("Predefined copybook: {}", copybookModel);
@@ -204,7 +194,7 @@ public class CopybookServiceImpl implements CopybookService {
                   COPYBOOK_RESOLVE.label,
                   mainProgramFileName,
                   copybookName.getQualifiedName(),
-                  copybookName.getDialectType())
+                  Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL))
               .get());
     } catch (InterruptedException e) {
       // rethrowing the InterruptedException to interrupt the parent thread.
@@ -263,7 +253,7 @@ public class CopybookServiceImpl implements CopybookService {
                           getUserInteractionType(event.getCopybookProcessingMode()),
                           document,
                           copybook.getQualifiedName(),
-                          copybook.getDialectType()))
+                          Optional.ofNullable(copybook.getDialectType()).orElse(COBOL)))
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
       if (!copybooksToDownload.isEmpty()) {

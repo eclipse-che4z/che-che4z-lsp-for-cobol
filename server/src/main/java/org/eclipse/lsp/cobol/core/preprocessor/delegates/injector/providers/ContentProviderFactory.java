@@ -30,29 +30,29 @@ import java.util.Map;
 public class ContentProviderFactory {
 
   /** Enumeration of predefined copybook content types */
-  public enum InjectCodeContentType {
+  public enum InjectContentType {
     FILE,
     GENERATED,
     RESOLVE_COPYBOOK
   }
 
-  private final Map<InjectCodeContentType, ContentProvider> instances;
+  private final Map<InjectContentType, ContentProvider> instances;
 
   @Inject
   public ContentProviderFactory(FileSystemService files, CopybookService copybookService) {
     this.instances = new HashMap<>();
-    instances.put(InjectCodeContentType.FILE, new FileContentProvider(files));
-    instances.put(InjectCodeContentType.GENERATED, new LabelsContentProvider());
-    instances.put(InjectCodeContentType.RESOLVE_COPYBOOK, new CopybookContentProvider(copybookService));
+    instances.put(InjectContentType.FILE, new FileContentProvider(files));
+    instances.put(InjectContentType.GENERATED, new LabelsContentProvider());
+    instances.put(InjectContentType.RESOLVE_COPYBOOK, new CopybookContentProvider(copybookService));
   }
 
   /**
-   * Get an instance of {@link ContentProvider} bound to the provided {@link InjectCodeContentType}
+   * Get an instance of {@link ContentProvider} bound to the provided {@link InjectContentType}
    *
    * @param contentType the type of the required instance
    * @return a specific extension of the {@link InjectCodeAnalysis}
    */
-  public ContentProvider getInstanceFor(InjectCodeContentType contentType) {
+  public ContentProvider getInstanceFor(InjectContentType contentType) {
     return instances.get(contentType);
   }
 }
