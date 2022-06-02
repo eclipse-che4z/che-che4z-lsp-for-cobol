@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
  * This unit tests check the {@link InjectService} class functionality
  */
 @ExtendWith(MockitoExtension.class)
-public class InjectServiceTest {
+class InjectServiceTest {
 
   @Mock private InjectCodeAnalysisFactory analysisFactory;
   @Mock private ContentProviderFactory contentProviderFactory;

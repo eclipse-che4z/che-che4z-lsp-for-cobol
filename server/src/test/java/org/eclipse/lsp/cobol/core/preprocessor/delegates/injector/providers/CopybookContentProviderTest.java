@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
  * This unit tests check the {@link CopybookContentProvider} class functionality
  */
 @ExtendWith(MockitoExtension.class)
-public class CopybookContentProviderTest {
+class CopybookContentProviderTest {
   @Mock private CopybookService copybookService;
   private CopybookConfig copybookConfig;
   private CopybookContentProvider contentProvider;
