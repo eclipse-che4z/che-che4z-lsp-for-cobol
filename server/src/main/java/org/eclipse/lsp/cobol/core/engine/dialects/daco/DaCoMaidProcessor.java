@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.engine.dialects.daco;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
@@ -106,7 +107,7 @@ public class DaCoMaidProcessor {
     input = String.join("\n", lines);
 
 
-    return new DialectOutcome(input, copyMaidNodes);
+    return new DialectOutcome(input, copyMaidNodes, ImmutableMultimap.of());
   }
 
   private String collectCopyMaid(String input, int lineNumber, List<Node> copyMaidNodes, String lastSuffix, DialectProcessingContext context, List<SyntaxError> errors) {
