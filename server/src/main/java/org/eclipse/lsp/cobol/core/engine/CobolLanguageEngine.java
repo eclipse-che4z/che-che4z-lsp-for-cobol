@@ -36,6 +36,7 @@ import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
@@ -74,6 +75,7 @@ public class CobolLanguageEngine {
   private final SubroutineService subroutineService;
   private final CachingConfigurationService cachingConfigurationService;
   private final DialectService dialectService;
+  private final InjectService injectService;
   private static final int PROCESS_CALLS_THRESHOLD = 10;
 
   @Inject
@@ -83,13 +85,15 @@ public class CobolLanguageEngine {
       ParseTreeListener treeListener,
       SubroutineService subroutineService,
       CachingConfigurationService cachingConfigurationService,
-      DialectService dialectService) {
+      DialectService dialectService,
+      InjectService injectService) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.treeListener = treeListener;
     this.subroutineService = subroutineService;
     this.cachingConfigurationService = cachingConfigurationService;
     this.dialectService = dialectService;
+    this.injectService = injectService;
   }
 
   /**
@@ -123,6 +127,7 @@ public class CobolLanguageEngine {
     timingBuilder.getDialectsTimer().stop();
 
     timingBuilder.getPreprocessorTimer().start();
+    injectService.setImplicitCode(dialectOutcome.getImplicitCode());
     ExtendedDocument extendedDocument =
         preprocessor
             .processCleanCode(

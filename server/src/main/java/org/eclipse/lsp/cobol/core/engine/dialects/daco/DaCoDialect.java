@@ -81,6 +81,6 @@ public final class DaCoDialect implements CobolDialect {
     nodes.addAll(maidOutcome.getDialectNodes());
     errors.addAll(listener.getErrors());
     errors.addAll(visitor.getErrors());
-    return new ResultWithErrors<>(new DialectOutcome(visitor.getResultedText(), nodes), errors);
+    return new ResultWithErrors<>(new DialectOutcome(visitor.getResultedText(), nodes, maidOutcome.getImplicitCode()), errors);
   }
 }
