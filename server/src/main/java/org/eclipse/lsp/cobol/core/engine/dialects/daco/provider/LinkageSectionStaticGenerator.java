@@ -11,41 +11,23 @@
  * DAF Trucks NV – implementation of DaCo COBOL statements
  * and DAF development standards
  */
-package org.eclipse.lsp.cobol.core.engine.dialects.daco;
+package org.eclipse.lsp.cobol.core.engine.dialects.daco.provider;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
- * Creates DaCo implicit code for future injection
+ * Generates static code for LINKAGE SECTION
  */
-public class DaCoImplicitCodeProvider {
+@UtilityClass
+class LinkageSectionStaticGenerator {
 
   /**
-   * Returns DaCo implicit code for future injection
-   * @return multimap object where the key is a section name and a value is a code to inject
+   * Generates static code for LINKAGE SECTION
+   * @return a generated code pair where the key is a name and a value is a code
    */
-  public Multimap<String, Pair<String, String>> getImplicitCode() {
-    Multimap<String, Pair<String, String>> implicitCode = LinkedListMultimap.create();
-    implicitCode.put("WORKING-STORAGE", getWorkingStorageImplicitCode());
-    implicitCode.put("LINKAGE", getLinkageSectionImplicitCode());
-    return implicitCode;
-  }
-
-  private Pair<String, String> getWorkingStorageImplicitCode() {
-    String content = "      *----------------------------------------------------------------*\n"
-        + "      * Belongs at the end of WORKING-STORAGE SECTION\n"
-        + "      *----------------------------------------------------------------*\n"
-        + "*DACO: 01 LDDCII1M-XII.\n"
-        + "*DACO:   03 OPDATOINI-XII PIC X(3) VALUE SPACE.\n"
-        + "*DACO:   03 LAYADRINI-BII POINTER.";
-
-    return new ImmutablePair<>("DACO-LDDCII1M", content);
-  }
-
-  private Pair<String, String> getLinkageSectionImplicitCode() {
+  public Pair<String, String> generate() {
     String content = "      *----------------------------------------------------------------*\n"
         + "      * Belongs at the end of LINKAGE SECTION\n"
         + "      *----------------------------------------------------------------*\n"
@@ -65,5 +47,4 @@ public class DaCoImplicitCodeProvider {
 
     return new ImmutablePair<>("DACO-KMKIDMdXII", content);
   }
-
 }

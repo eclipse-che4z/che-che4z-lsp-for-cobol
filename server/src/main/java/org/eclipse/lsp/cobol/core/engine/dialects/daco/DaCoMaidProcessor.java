@@ -106,7 +106,6 @@ public class DaCoMaidProcessor {
     }
     input = String.join("\n", lines);
 
-
     return new DialectOutcome(input, copyMaidNodes, ImmutableMultimap.of());
   }
 
