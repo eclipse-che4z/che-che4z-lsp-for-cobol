@@ -42,8 +42,8 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 
 - COBOL keywords, variables, paragraphs and sections
 - IDMS DML keywords
-- CICS and DB2 SQL keywords
-- Datacom COBOL and SQL keywords
+- CICS keywords
+- DB2 and Datacom SQL keywords
 - Code Snippets
 - Copybook variable and paragraph names
 - Names of copybooks that are used in the program
@@ -124,7 +124,7 @@ COBOL Language Support supports the following copybook types:
 
 - IBM COBOL Copybooks, called with the `COPY` statement.
 - IDMS dialect copybooks, called with the `COPY IDMS` statement. For more information, see the [IDMS documentation](https://techdocs.broadcom.com/idms)
-- Datacom copybooks, called with the `COPY` statement. Datacom copybooks must be extracted to a mainframe data set or local folder for use in COBOL Language Support. For more information, see the [Datacom documentation](https://techdocs.broadcom.com/datacom).
+- Datacom COBOL copybooks, called with the `COPY` statement. Datacom copybooks must be extracted to a mainframe data set or local folder for use in COBOL Language Support. For more information, see the [Datacom documentation](https://techdocs.broadcom.com/datacom).
 
 ### Storing Copybooks Locally
 
