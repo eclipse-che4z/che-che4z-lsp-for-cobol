@@ -12,8 +12,9 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.dialects.daco;
+package org.eclipse.lsp.cobol.core.engine.dialects.daco.provider;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /** This tests the logic of {@link DaCoImplicitCodeProvider} */
 class DaCoImplicitCodeProviderTest {
   @Test
-  void test() {
+  void testEmptyCobolListing() {
     DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider();
-    assertEquals(2, provider.getImplicitCode().size());
+    assertEquals(2, provider.getImplicitCode(ImmutableList.of()).size());
   }
 }
