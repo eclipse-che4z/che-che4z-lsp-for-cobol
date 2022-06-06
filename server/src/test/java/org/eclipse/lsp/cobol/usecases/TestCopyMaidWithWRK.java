@@ -38,7 +38,7 @@ class TestCopyMaidWithWRK {
           + "             05 {$*TABMAX-PW7} PIC S9(4) VALUE ZERO COMP-3.\n"
           + "             05 {$*BHTTAB-XW7}.\n"
           + "               07 {$*BHTREG-XW8} OCCURS 50.\n"
-          + "                 09 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.\n"
+          + "                 09 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG_WRK} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-XW8} OF {$BHTTAB-XW7}.";
 

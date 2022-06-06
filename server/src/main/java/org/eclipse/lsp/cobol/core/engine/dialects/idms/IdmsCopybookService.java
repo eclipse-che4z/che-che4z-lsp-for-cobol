@@ -81,7 +81,7 @@ class IdmsCopybookService {
 
     processedCopybooks.add(copybookName);
 
-    CopyNode node = new CopyNode(locality, copybookName.getDisplayName());
+    CopyNode node = new CopyNode(locality, copybookName.getDisplayName(), IdmsDialect.NAME);
 
     Location location = new Location();
     location.setUri(copybookModel.getUri());

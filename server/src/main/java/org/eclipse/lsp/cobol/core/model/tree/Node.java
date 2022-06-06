@@ -35,6 +35,7 @@ import java.util.stream.Stream;
 public abstract class Node {
   protected Locality locality;
   private final NodeType nodeType;
+  private final String dialect;
 
   @EqualsAndHashCode.Exclude private final List<Node> children = new ArrayList<>();
   @EqualsAndHashCode.Exclude @ToString.Exclude @Setter private Node parent;
@@ -42,9 +43,16 @@ public abstract class Node {
   @EqualsAndHashCode.Exclude
   private Optional<Supplier<List<SyntaxError>>> nextProcessingStep = Optional.empty();
 
+  protected Node(Locality location, NodeType nodeType, String dialect) {
+    this.locality = location;
+    this.nodeType = nodeType;
+    this.dialect = dialect;
+  }
+
   protected Node(Locality location, NodeType nodeType) {
     this.locality = location;
     this.nodeType = nodeType;
+    this.dialect = null;
   }
 
   /**

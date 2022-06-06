@@ -27,7 +27,7 @@ public class DaCoCopyNode extends CopyNode {
   String suffix;
 
   public DaCoCopyNode(Locality locality, String layoutId, String layoutUsage, String suffix) {
-    super(locality, layoutId);
+    super(locality, layoutId, DaCoDialect.NAME);
     this.layoutUsage = layoutUsage;
     this.suffix = suffix;
   }

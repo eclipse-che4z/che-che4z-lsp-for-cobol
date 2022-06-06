@@ -19,7 +19,7 @@ import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -33,5 +33,5 @@ public interface PreprocessorFunctor
         Function<
             PreprocessorStack,
             Function<
-                NamedSubContext,
+                    CopybooksRepository,
                 Function<Map<String, DocumentMapping>, Consumer<List<SyntaxError>>>>>> {}

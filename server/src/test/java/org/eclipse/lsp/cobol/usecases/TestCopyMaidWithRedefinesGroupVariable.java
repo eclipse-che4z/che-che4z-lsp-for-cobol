@@ -33,7 +33,7 @@ class TestCopyMaidWithRedefinesGroupVariable {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*ROOT-SSS}.\n"
-          + "       02  COPY MAID {~CB`CB_WRK} WRK.\n"
+          + "       02  COPY MAID {~CB!DaCo`CB_WRK} WRK.\n"
           + "           04 {$*D} REDEFINES {$B-SSS}.\n";
 
   private static final String COPYBOOK_CONTENT =

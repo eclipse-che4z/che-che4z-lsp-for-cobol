@@ -32,7 +32,7 @@ class TestCopyMaidWithWrkDoesNotTakeNameFrom88 {
           + "       01 {$*PARENT}.\n"
           + "            05 {$*CHILD-XLD} PIC X(2).\n"
           + "               88 {$*AB} VALUE \"AB\".\n"
-          + "            05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.\n"
+          + "            05 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG_WRK} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-XLD}.";
 

@@ -118,12 +118,16 @@ identifier
    ;
 
 cpyIdentifier
-   : cpyName replacement?
+   : cpyName cpyDialect? replacement?
    ;
 
 cpyName
    : IDENTIFIER | COPYBOOKNAME | QUOTED_COPYBOOKNAME | STRINGLITERAL | NUMBERLITERAL | LINKAGE | SECTION
    | LINKAGE
+   ;
+
+cpyDialect
+   : COPYBOOKDIALECT identifier
    ;
 
 LINKAGE : L I N K A G E;
@@ -143,6 +147,7 @@ SUBROUTINEUSAGE : START '%';
 DIAGNOSTICSTART : '|';
 ORIGINAL_SIZE_REPLACEMENT_START : '`';
 FINAL_SIZE_REPLACEMENT_START : '^';
+COPYBOOKDIALECT: '!';
 MULTITOKENSTART : START '_';
 MULTITOKENSTOP : '_' STOP;
 DOT : '.';

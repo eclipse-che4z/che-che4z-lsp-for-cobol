@@ -28,7 +28,7 @@ class TestCopyMaidStatement {
           + "          PROGRAM-ID. PARTEST.\n"
           + "          DATA DIVISION.\n"
           + "          WORKING-STORAGE SECTION.\n"
-          + "          01 COPY MAID {~NAME}.\n"
+          + "          01 COPY MAID {~NAME!DaCo}.\n"
           + "          PROCEDURE DIVISION.\n"
           + "              DISPLAY {$ABC}.";
 

@@ -29,7 +29,7 @@ class TestCopyMaidIsNotResolvedInProcedureDivision {
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 COPY MAID {~PMOREC}.\n"
+          + "       01 COPY MAID {~PMOREC!DaCo}.\n"
           + "       Procedure Division.\n"
           + "           COPY MAID PMOREC.\n"
           + "           DISPLAY {$DEF}.";

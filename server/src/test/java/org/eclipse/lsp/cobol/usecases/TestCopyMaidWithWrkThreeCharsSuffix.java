@@ -30,7 +30,7 @@ class TestCopyMaidWithWrkThreeCharsSuffix {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "        01 {$*PARENT-XNT}.\n"
-          + "            05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} wrk.\n"
+          + "            05 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG_WRK} wrk.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-XNT}.";
 

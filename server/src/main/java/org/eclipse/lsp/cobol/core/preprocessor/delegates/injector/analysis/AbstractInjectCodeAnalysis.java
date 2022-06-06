@@ -27,7 +27,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorS
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -159,7 +159,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
         .andThen(afterWriting(metaData.getContext()));
   }
 
-  protected Consumer<NamedSubContext> storeCopyStatementSemantics(
+  protected Consumer<CopybooksRepository> storeCopyStatementSemantics(
       CopybookMetaData metaData, ExtendedDocument copybookDocument) {
     return addCopybookUsage(metaData)
         .andThen(addCopybookDefinition(metaData, copybookDocument.getUri()))
@@ -236,17 +236,19 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
     return it -> it.accumulateTokenShift(context);
   }
 
-  private Consumer<NamedSubContext> collectCopybookStatement(CopybookMetaData metaData) {
-    return it -> it.addStatement(metaData.getCopybookId(), metaData.getContextLocality());
+  private Consumer<CopybooksRepository> collectCopybookStatement(CopybookMetaData metaData) {
+    return it -> it.addStatement(metaData.getCopybookId(), metaData.getCopybookName().getDialectType(), metaData.getContextLocality());
   }
 
-  protected Consumer<NamedSubContext> addCopybookUsage(CopybookMetaData metaData) {
+  protected Consumer<CopybooksRepository> addCopybookUsage(CopybookMetaData metaData) {
     return copybooks ->
         copybooks.addUsage(
-            metaData.getCopybookName().getQualifiedName(), metaData.getNameLocality().toLocation());
+            metaData.getCopybookName().getQualifiedName(),
+                metaData.getCopybookName().getDialectType(),
+                metaData.getNameLocality().toLocation());
   }
 
-  protected Consumer<NamedSubContext> addCopybookDefinition(CopybookMetaData metaData, String uri) {
+  protected Consumer<CopybooksRepository> addCopybookDefinition(CopybookMetaData metaData, String uri) {
     return copybooks -> {
       if (!(metaData.getCopybookName() == null
           || isEmpty(metaData.getCopybookName().getQualifiedName())
@@ -254,11 +256,11 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
           || ImplicitCodeUtils.isImplicit(uri)))
         copybooks.define(
             metaData.getCopybookName().getQualifiedName(),
-            new Location(uri, new Range(new Position(0, 0), new Position(0, 0))));
+                metaData.getCopybookName().getDialectType(), new Location(uri, new Range(new Position(0, 0), new Position(0, 0))));
     };
   }
 
-  protected Consumer<NamedSubContext> addNestedCopybook(ExtendedDocument copybookDocument) {
+  protected Consumer<CopybooksRepository> addNestedCopybook(ExtendedDocument copybookDocument) {
     return copybooks -> copybooks.merge(copybookDocument.getCopybooks());
   }
 

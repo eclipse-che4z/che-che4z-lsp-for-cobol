@@ -21,7 +21,7 @@ import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
 import java.util.function.Consumer;
 
@@ -39,7 +39,7 @@ class InjectCodeImplicitAnalysis extends AbstractInjectCodeAnalysis {
   }
 
   @Override
-  protected Consumer<NamedSubContext> storeCopyStatementSemantics(
+  protected Consumer<CopybooksRepository> storeCopyStatementSemantics(
       CopybookMetaData metaData, ExtendedDocument copybookDocument) {
     return it -> {};
   }

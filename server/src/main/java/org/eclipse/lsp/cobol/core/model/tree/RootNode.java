@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
@@ -42,16 +42,16 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.ROOT;
 public class RootNode extends Node {
   private final Map<String, CopyDefinition> copyDefinitionMap = new HashMap<>();
 
-  public RootNode(Locality locality, NamedSubContext copybook) {
+  public RootNode(Locality locality, CopybooksRepository copybooks) {
     super(locality, ROOT);
     addProcessStep(this::waitForVariableStructure);
-    createCopyBookDefinitionNode(copybook.getDefinitions());
+    createCopyBookDefinitionNode(copybooks.getDefinitions());
   }
 
   private void createCopyBookDefinitionNode(Multimap<String, Location> definition) {
     for (Map.Entry<String, Location> copybook : definition.entries()) {
       copyDefinitionMap.put(
-          copybook.getKey(), new CopyDefinition(copybook.getValue(), copybook.getKey()));
+              copybook.getKey(), new CopyDefinition(copybook.getValue(), copybook.getKey()));
     }
   }
 
@@ -64,22 +64,23 @@ public class RootNode extends Node {
     List<Node> nodes = getChildren().stream().filter(hasType(NodeType.COPY)).collect(toList());
     nodes.forEach(this::removeChild);
     nodes.forEach(
-        it ->
-            RangeUtils.findNodeByPosition(
-                    this, it.getLocality().getUri(), it.getLocality().getRange().getStart())
-                .orElse(this)
-                .addChild(it));
+            it ->
+                    RangeUtils.findNodeByPosition(
+                                    this, it.getLocality().getUri(), it.getLocality().getRange().getStart())
+                            .orElse(this)
+                            .addChild(it));
 
     getDepthFirstStream().filter(hasType(NodeType.COPY)).map(CopyNode.class::cast).forEach(this::registerCopyUsage);
     return ImmutableList.of();
   }
 
   private void registerCopyUsage(CopyNode copyNode) {
+    String copyBookId = copyNode.getDialect() == null ? copyNode.getName() : copyNode.getName() + '!' + copyNode.getDialect();
     copyDefinitionMap.putIfAbsent(
-        copyNode.getName(),
-        new CopyDefinition(
-            new Location(ImplicitCodeUtils.createLocation(), new Range()), copyNode.getName()));
-    CopyDefinition foundDefinition = copyDefinitionMap.get(copyNode.getName());
+            copyBookId,
+            new CopyDefinition(
+                    new Location(ImplicitCodeUtils.createLocation(), new Range()), copyNode.getName()));
+    CopyDefinition foundDefinition = copyDefinitionMap.get(copyBookId);
     foundDefinition.addUsages(copyNode);
     copyNode.setDefinition(foundDefinition);
   }

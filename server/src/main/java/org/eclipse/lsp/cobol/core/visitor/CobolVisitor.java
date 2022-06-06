@@ -46,7 +46,7 @@ import org.eclipse.lsp.cobol.core.model.variables.SectionType;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
@@ -77,7 +77,7 @@ import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
 public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
-  private final NamedSubContext copybooks;
+  private final CopybooksRepository copybooks;
   private final CommonTokenStream tokenStream;
   private final Map<Token, Locality> positions;
   private final Map<Token, EmbeddedCode> embeddedCodeParts;
@@ -90,7 +90,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final CachingConfigurationService cachingConfigurationService;
 
   public CobolVisitor(
-      @NonNull NamedSubContext copybooks,
+      @NonNull CopybooksRepository copybooks,
       @NonNull CommonTokenStream tokenStream,
       @NonNull Map<Token, Locality> positions,
       @NonNull AnalysisConfig analysisConfig,

@@ -26,7 +26,7 @@ import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
@@ -98,7 +98,7 @@ class CobolLanguageEngineTest {
         new ExtendedDocument(
             "",
             TEXT,
-            new NamedSubContext(),
+            new CopybooksRepository(),
             ImmutableMap.of(
                 URI,
                 new DocumentMapping(
@@ -172,7 +172,7 @@ class CobolLanguageEngineTest {
                     .range(new Range(new Position(0, 7), new Position(0, 31)))
                     .token("IDENTIFICATION")
                     .build(),
-                new NamedSubContext()),
+                new CopybooksRepository()),
             ImmutableList.of(error, eofError));
 
     ResultWithErrors<Node> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));

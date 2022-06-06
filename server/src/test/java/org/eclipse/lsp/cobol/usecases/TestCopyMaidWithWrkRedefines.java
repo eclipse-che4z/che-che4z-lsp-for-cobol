@@ -33,7 +33,7 @@ class TestCopyMaidWithWrkRedefines {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "        01 {$*PARENT-XLO}.\n"
-          + "           05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.\n";
+          + "           05 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG_WRK} WRK.\n";
 
   private static final String COPYBOOK_CONTENT =
       "       01  {$*MAIN-X`MAIN-XLO}.\n"
