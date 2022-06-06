@@ -14,9 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects.daco;
 
+import com.google.common.collect.Multimap;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.DaCoLexer;
 import org.eclipse.lsp.cobol.core.DaCoParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
@@ -83,8 +85,11 @@ public final class DaCoDialect implements CobolDialect {
     errors.addAll(listener.getErrors());
     errors.addAll(visitor.getErrors());
 
+    String text = visitor.getResultedText();
     DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider();
-    DialectOutcome result = new DialectOutcome(visitor.getResultedText(), nodes, provider.getImplicitCode(nodes));
+    Multimap<String, Pair<String, String>> implicitCode = provider.getImplicitCode(text, nodes);
+
+    DialectOutcome result = new DialectOutcome(text, nodes, implicitCode);
     return new ResultWithErrors<>(result, errors);
   }
 }

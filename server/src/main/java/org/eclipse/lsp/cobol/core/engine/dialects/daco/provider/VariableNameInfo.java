@@ -14,16 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects.daco.provider;
 
-import com.google.common.collect.ImmutableList;
-import org.junit.jupiter.api.Test;
+import lombok.Value;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/** This tests the logic of {@link DaCoImplicitCodeProvider} */
-class DaCoImplicitCodeProviderTest {
-  @Test
-  void testEmptyCobolListing() {
-    DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider();
-    assertEquals(2, provider.getImplicitCode("", ImmutableList.of()).size());
-  }
+/**
+ * Holds variable table name and a suffix
+ */
+@Value
+class VariableNameInfo {
+  String name;
+  String suffix;
 }

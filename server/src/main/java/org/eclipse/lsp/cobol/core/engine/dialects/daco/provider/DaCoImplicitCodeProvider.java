@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2022 DAF Trucks NV.
+ * Copyright (c) 2022 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +9,8 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- * DAF Trucks NV – implementation of DaCo COBOL statements
- * and DAF development standards
+ *    Broadcom, Inc. - initial API and implementation
+ *
  */
 package org.eclipse.lsp.cobol.core.engine.dialects.daco.provider;
 
@@ -30,15 +31,16 @@ public class DaCoImplicitCodeProvider {
 
   /**
    * Returns DaCo implicit code depend on COBOL text for future injection
+   * @param input source code
    * @param nodes is generated nodes with DaCo dialect processor
    * @return multimap object where the key is a section name and a value is a code to inject
    */
-  public Multimap<String, Pair<String, String>> getImplicitCode(List<Node> nodes) {
+  public Multimap<String, Pair<String, String>> getImplicitCode(String input, List<Node> nodes) {
     Multimap<String, Pair<String, String>> implicitCode = LinkedListMultimap.create();
     implicitCode.put(WORKING_STORAGE, WorkingSectionStaticGenerator.generate());
-    WorkingSectionDynamicGenerator.generate(nodes).ifPresent(code -> implicitCode.put(WORKING_STORAGE, code));
-
+    implicitCode.putAll(WORKING_STORAGE, WorkingSectionDynamicGenerator.generate(input, nodes));
     implicitCode.put(LINKAGE, LinkageSectionStaticGenerator.generate());
+
     return implicitCode;
   }
 }
