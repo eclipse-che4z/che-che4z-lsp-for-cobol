@@ -48,7 +48,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/** This utility class provides methods to run use cases with COBOL code examples. */
+/**
+ * This utility class provides methods to run use cases with COBOL code examples.
+ */
 @Slf4j
 @UtilityClass
 public class UseCaseUtils {
@@ -56,6 +58,24 @@ public class UseCaseUtils {
 
   private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.c4z/.copybooks/";
   private static final String CPY_URI_SUFFIX = ".cpy";
+
+  /**
+   * Construct the file URI from provided file name
+   *
+   * @param name the copybook name without extension
+   * @param dialect the copybook dialect name
+   * @return the URI
+   */
+  public static String toURI(String name, String dialect) {
+    StringBuilder sb = new StringBuilder(CPY_URI_PREFIX);
+    if (dialect != null) {
+      sb.append(dialect);
+      sb.append("/");
+    }
+    sb.append(name);
+    sb.append(CPY_URI_SUFFIX);
+    return sb.toString();
+  }
 
   /**
    * Construct the file URI from provided file name
@@ -116,7 +136,7 @@ public class UseCaseUtils {
     PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks())
         .forEach(copybookModel -> copybookService.store(copybookModel, useCase.fileName));
 
-    useCase.getCopybooks().stream()
+    useCase.getCopybooks()
         .forEach(cobolText -> {
           CopybookModel copybookModel = UseCaseUtils.toCopybookModel(cobolText);
           copybookService.store(copybookModel, useCase.fileName);
@@ -140,7 +160,7 @@ public class UseCaseUtils {
         new CopybookName(
             cobolText.getFileName(),
             cobolText.getDialectType()),
-        toURI(cobolText.getFileName()),
+        toURI(cobolText.getFileName(), cobolText.getDialectType()),
         cobolText.getFullText());
   }
 }

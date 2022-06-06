@@ -39,8 +39,8 @@ class TestCopyMaidWithQualifierHasCorrectDefinition {
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 COPY MAID {~BHTRGL`BHTRGL_ABC} ABC.\n"
-          + "       01 COPY MAID {~BHTRGL}.\n"
+          + "       01 COPY MAID {~BHTRGL!DaCo`BHTRGL_ABC} ABC.\n"
+          + "       01 COPY MAID {~BHTRGL!DaCo`BHTRGL}.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL1}."
           + "           DISPLAY {$BHTRGL2}.";
@@ -65,6 +65,6 @@ class TestCopyMaidWithQualifierHasCorrectDefinition {
             .map(CopyDefinition::getLocation)
             .map(Location::getUri)
             .collect(toList()),
-        containsInAnyOrder(UseCaseUtils.toURI("BHTRGL"), UseCaseUtils.toURI("BHTRGL_ABC")));
+        containsInAnyOrder(UseCaseUtils.toURI("BHTRGL", "DaCo"), UseCaseUtils.toURI("BHTRGL_ABC", "DaCo")));
   }
 }

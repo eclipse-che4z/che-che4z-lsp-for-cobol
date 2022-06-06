@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.core.model.tree.Context;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
@@ -32,10 +33,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
@@ -289,7 +287,7 @@ public class UseCaseEngine {
         .flatMap(Collection::stream)
         .filter(it -> !FILLER_NAME.equals(it.getName()))
         .filter(predicate)
-        .collect(toMap(extractor));
+        .collect(toMap(extractor, PROGRAM));
   }
 
   private Map<String, List<Location>> extractDefinitions(AnalysisResult result, NodeType nodeType) {
@@ -317,13 +315,19 @@ public class UseCaseEngine {
         .filter(hasType(nodeType))
         .map(Context.class::cast)
         .filter(predicate)
-        .collect(toMap(extractor));
+        .collect(toMap(extractor, nodeType));
   }
 
   private Collector<Context, ?, Map<String, List<Location>>> toMap(
-      Function<Context, List<Location>> extractor) {
+          Function<Context, List<Location>> extractor, NodeType nodeType) {
     return Collectors.toMap(
-        Context::getName,
+        ctx -> {
+          if (nodeType != COPY) {
+            return ctx.getName().toUpperCase();
+          }
+          String dialect = ((CopyNode) ctx).getDialect();
+          return (dialect == null ? ctx.getName() : ctx.getName() + '!' + dialect).toUpperCase();
+        },
         extractor,
         (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).distinct().collect(toList()));
   }

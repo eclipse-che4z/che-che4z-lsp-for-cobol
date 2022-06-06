@@ -52,35 +52,35 @@ class TestIdmsCopy {
           + "        01 {$*EMPLOYEE} PIC X(10).\n";
 
   private static final String COPY_IDMS_FILE =
-      "        FILE SECTION.\n" + "            COPY IDMS FILE {~FL002} VERSION 1.\n";
+      "        FILE SECTION.\n" + "            COPY IDMS FILE {~FL002!IDMS} VERSION 1.\n";
 
   private static final String COPY_IDMS_WS1 =
       "       WORKING-STORAGE SECTION.\n"
-          + "             01 COPY IDMS {~EMPLOYEE} VERSION 03.\n"
+          + "             01 COPY IDMS {~EMPLOYEE!IDMS} VERSION 03.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           MOVE 'MYNAME' TO {$EMPNAME}.";
 
   private static final String COPY_IDMS_WS2 =
       "        WORKING-STORAGE SECTION.\n"
-          + "             COPY IDMS {~SUBSCHEMA-RECORDS}\n"
+          + "             COPY IDMS {~SUBSCHEMA-RECORDS!IDMS}\n"
           + "       PROCEDURE DIVISION.\n"
           + "           MOVE 'JAVA' TO {$SKILL-NAME-0455}.";
 
   private static final String COPY_IDMS_WS3 =
       "        WORKING-STORAGE SECTION.\n"
-          + "             COPY IDMS MAP {~ABCMAP}.\n"
+          + "             COPY IDMS MAP {~ABCMAP!IDMS}.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           MOVE 'ABC' TO {$MRB-ABCMAP-ID}.\n";
 
   private static final String COPY_IDMS_WS4 =
       "        WORKING-STORAGE SECTION.\n"
-          + "             COPY IDMS {~MAPS}. \n"
+          + "             COPY IDMS {~MAPS!IDMS}. \n"
           + "       PROCEDURE DIVISION.\n"
           + "           MOVE 'ABC' TO {$MRB-ABCMAP-ID}.\n";
 
   private static final String COPY_IDMS_WS5 =
       "        WORKING-STORAGE SECTION.\n"
-          + "             COPY IDMS MAP-CONTROL {~ABCMAP}.\n"
+          + "             COPY IDMS MAP-CONTROL {~ABCMAP!IDMS}.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           MOVE 'ABC' TO {$MRB-ABCMAP-ID}.\n";
 
@@ -89,11 +89,11 @@ class TestIdmsCopy {
           + "        PROGRAM-ID. test1.\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
-          + "             01 COPY IDMS {~SUBSCHEMA-NAMES}.\n";
+          + "             01 COPY IDMS {~SUBSCHEMA-NAMES!IDMS}.\n";
 
   private static final String COPY_IDMS_LEVELS =
       "       WORKING-STORAGE SECTION.\n"
-          + "         01 COPY IDMS {~EMPLOYEE} VERSION 03.\n";
+          + "         01 COPY IDMS {~EMPLOYEE!IDMS} VERSION 03.\n";
 
   private static final String CB_NAME1 = "EMPLOYEE";
   private static final String CB1 = "          01 {$*EMPNAME}    PIC X(8).\n";

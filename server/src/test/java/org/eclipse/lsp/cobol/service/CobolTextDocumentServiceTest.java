@@ -25,7 +25,7 @@ import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
@@ -477,10 +477,10 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testAnalysisFinishedNotification() {
     AnalysisResult analysisResult =
         AnalysisResult.builder()
-            .rootNode(new RootNode(Locality.builder().build(), new NamedSubContext()))
+            .rootNode(new RootNode(Locality.builder().build(), new CopybooksRepository()))
             .build();
 
-    RootNode rootNode = new RootNode(Locality.builder().build(), new NamedSubContext());
+    RootNode rootNode = new RootNode(Locality.builder().build(), new CopybooksRepository());
     analysisResult.getRootNode().addChild(rootNode);
     CopyNode parent = new CopyNode(Locality.builder().uri(DOCUMENT_URI).build(), "PARENT");
     CopyNode nested = new CopyNode(Locality.builder().uri(PARENT_CPY_URI).build(), "NESTED");

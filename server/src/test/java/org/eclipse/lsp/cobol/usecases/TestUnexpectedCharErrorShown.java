@@ -26,13 +26,13 @@ import org.junit.jupiter.api.Test;
 class TestUnexpectedCharErrorShown {
 
   private static final String TEXT =
-      "        IDENTIFICATION DIVISION{!|typo}.\r\n"
+      "        IDENTIFICATION DIVISION{?|typo}.\r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
           + "        END PROGRAM test1.";
 
-  private static final String MESSAGE = "Extraneous input '!' expected '.'";
+  private static final String MESSAGE = "Extraneous input '?' expected '.'";
 
   @Test
   void test() {

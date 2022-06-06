@@ -19,7 +19,7 @@ import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Diagnostic;
 
 import java.util.HashMap;
@@ -34,5 +34,5 @@ import java.util.Map;
 @Builder(toBuilder = true)
 public class AnalysisResult {
   @Builder.Default Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
-  @Builder.Default Node rootNode = new RootNode(Locality.builder().build(), new NamedSubContext());
+  @Builder.Default Node rootNode = new RootNode(Locality.builder().build(), new CopybooksRepository());
 }

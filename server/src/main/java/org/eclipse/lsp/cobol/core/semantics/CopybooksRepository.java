@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2022 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -29,7 +29,7 @@ import java.util.Map;
  * stores their definitions and variables.
  */
 @Value
-public class NamedSubContext {
+public class CopybooksRepository {
   Multimap<String, Location> definitions = HashMultimap.create();
   Multimap<String, Location> usages = HashMultimap.create();
   Map<String, Locality> definitionStatements = new HashMap<>();
@@ -37,41 +37,45 @@ public class NamedSubContext {
   /**
    * Add defined language element to the context
    *
-   * @param name name of the element
+   * @param name     name of the element
+   * @param dialect  the copybook dialect
    * @param location location of the used element
    */
-  public void define(String name, Location location) {
-    definitions.put(name, location);
+  public void define(String name, String dialect, Location location) {
+    definitions.put(toId(name, dialect), location);
   }
 
   /**
    * Add the position of a language element usage
    *
-   * @param name name of the element
+   * @param name     name of the element
+   * @param dialect  the copybook dialect
    * @param location location of the used element
    */
-  public void addUsage(String name, Location location) {
-    usages.put(name, location);
+  public void addUsage(String name, String dialect, Location location) {
+    usages.put(toId(name, dialect), location);
   }
 
   /**
    * Add the definition statement of an element
    *
-   * @param id the id of the element
+   * @param name     the of copybook
+   * @param dialect  the copybook dialect
    * @param location the location of the definition statements
    */
-  public void addStatement(String id, Locality location) {
-    definitionStatements.put(id, location);
+  public void addStatement(String name, String dialect, Locality location) {
+    definitionStatements.put(toId(name, dialect), location);
   }
 
   /**
    * Check if the context contains a language element with the provided name already defined
    *
-   * @param name a language element name to check
+   * @param name    a language element name to check
+   * @param dialect the copybook dialectÒ
    * @return true if the element already defined
    */
-  public boolean contains(String name) {
-    return definitions.containsKey(name);
+  public boolean contains(String name, String dialect) {
+    return definitions.containsKey(toId(name, dialect));
   }
 
   /**
@@ -79,9 +83,13 @@ public class NamedSubContext {
    *
    * @param subContext a subContext that should be merged into this one
    */
-  public void merge(NamedSubContext subContext) {
+  public void merge(CopybooksRepository subContext) {
     definitions.putAll(subContext.getDefinitions());
     usages.putAll(subContext.getUsages());
     definitionStatements.putAll(subContext.getDefinitionStatements());
+  }
+
+  private static String toId(String name, String dialect) {
+    return dialect == null ? name : String.format("%s!%s", name, dialect);
   }
 }

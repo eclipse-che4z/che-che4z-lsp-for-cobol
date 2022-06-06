@@ -37,10 +37,10 @@ public class TestCopyIdmsNested {
       + "        DATA DIVISION.\n"
       + "       WORKING-STORAGE SECTION.\n"
       + "       01 {$*NAME1}.\n"
-      + "           03 COPY IDMS {~COPY1}.\n"
+      + "           03 COPY IDMS {~COPY1!IDMS}.\n"
       + "       PROCEDURE DIVISION.\n";
 
-  private static final String COPY1 =        "       01  COPY IDMS {~NESTED_COPY}.\n";
+  private static final String COPY1 =        "       01  COPY IDMS {~NESTED_COPY!IDMS}.\n";
   private static final String NESTED_COPY =  "       01  {$*NESTED_COPY}.\n"
       + "           03 {$*RANDOM-NAME}            PIC X(16).\n";
 
@@ -49,10 +49,10 @@ public class TestCopyIdmsNested {
       + "        DATA DIVISION.\n"
       + "       WORKING-STORAGE SECTION.\n"
       + "       01 {$*NAME1}            PIC X(16).\n"
-      + "           03 COPY IDMS {~COPY1}.\n"
+      + "           03 COPY IDMS {~COPY1!IDMS}.\n"
       + "       PROCEDURE DIVISION.\n";
 
-  private static final String COPY_LOOP =  "       01  COPY IDMS {COPY1|1}.\n";
+  private static final String COPY_LOOP =  "       01  COPY IDMS {COPY1!IDMS|1}.\n";
 
   @Test
   void testNestedIdmsCopybook() {

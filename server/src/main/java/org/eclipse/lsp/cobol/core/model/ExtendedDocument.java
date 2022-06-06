@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.core.model;
 
 import lombok.Value;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
 import java.util.Map;
 
@@ -27,6 +27,6 @@ import java.util.Map;
 public class ExtendedDocument {
   String uri;
   String text;
-  NamedSubContext copybooks;
+  CopybooksRepository copybooks;
   Map<String, DocumentMapping> documentMapping;
 }

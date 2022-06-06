@@ -40,7 +40,7 @@ class TestAdjustCopyMaidNumbers {
           + "023200       05 {$*TABMAX-PW7}             PIC S9(4)   VALUE ZERO  COMP-3.\n"
           + "023300       05 {$*BHTTAB-XW7}.\n"
           + "023400         07 {$*BHTREG-XW8}                       OCCURS 50.\n"
-          + "023500           09 COPY MAID {~BHTRGL-XBG}.\n"
+          + "023500           09 COPY MAID {~BHTRGL-XBG!DaCo}.\n"
           + "             05 {$*NOT-ADJUSTED} PIC X.\n"
           + "        Procedure Division.\n"
           + "           display {$FABLYNPOSEEN-X} OF {$FABLYN-X}.\n"

@@ -34,7 +34,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectDescript
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 import java.util.*;
@@ -56,7 +56,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   private final List<SyntaxError> errors = new ArrayList<>();
   private final Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
-  private final NamedSubContext copybooks = new NamedSubContext();
+  private final CopybooksRepository copybooks = new CopybooksRepository();
   private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
   private final Map<Integer, Integer> shifts = new HashMap<>();
 

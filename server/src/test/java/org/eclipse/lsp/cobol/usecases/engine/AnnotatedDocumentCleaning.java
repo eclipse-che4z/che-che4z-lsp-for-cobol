@@ -114,7 +114,7 @@ class AnnotatedDocumentCleaning {
     return it -> processDocument(
         it.getFullText(),
         it.getFileName(),
-        toURI(it.getFileName()),
+        toURI(it.getFileName(), it.getDialectType()),
         ImmutableList.of(),
         expectedDiagnostics,
         it.getDialectType());

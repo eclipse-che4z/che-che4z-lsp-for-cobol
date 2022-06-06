@@ -39,7 +39,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.EmbeddedLanguagesListener;
@@ -214,13 +214,13 @@ public class CobolLanguageEngine {
         rootNode, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
-  private NamedSubContext applyDialectCopybooks(NamedSubContext copybooks, DialectOutcome dialectOutcome) {
+  private CopybooksRepository applyDialectCopybooks(CopybooksRepository copybooks, DialectOutcome dialectOutcome) {
     dialectOutcome.getDialectNodes().stream()
         .flatMap(Node::getDepthFirstStream)
         .filter(n -> n.getNodeType().equals(NodeType.COPY))
         .map(CopyNode.class::cast)
             .filter(n -> n.getDefinition() != null)
-        .forEach(n -> copybooks.define(n.getName(), n.getDefinition().getLocation()));
+        .forEach(n -> copybooks.define(n.getName(), n.getDialect(), n.getDefinition().getLocation()));
     return copybooks;
   }
 

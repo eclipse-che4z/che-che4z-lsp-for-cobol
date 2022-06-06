@@ -33,7 +33,7 @@ class TestCopyMaidDoesNotShowMissingCopybookOnStatementWithoutNumber {
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 COPY MAID {~PMOREC|1}.\n"
+          + "       01 COPY MAID {~PMOREC!DaCo|1}.\n"
           + "       Procedure Division.\n"
           + "           COPY MAID PMOREC.\n";
 

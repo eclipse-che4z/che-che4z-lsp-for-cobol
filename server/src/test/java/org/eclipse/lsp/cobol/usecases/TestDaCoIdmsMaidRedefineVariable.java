@@ -31,8 +31,8 @@ public class TestDaCoIdmsMaidRedefineVariable {
           + "       PROGRAM-ID. PROGNM.\n"
           + "       DATA   DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01  COPY IDMS {~IDMSCB}.\n"
-          + "       01  COPY MAID {~MAIDCB}.\n"
+          + "       01  COPY IDMS {~IDMSCB!IDMS}.\n"
+          + "       01  COPY MAID {~MAIDCB!DaCo}.\n"
           + "           03 {$*A} REDEFINES {$B}.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXIT.";

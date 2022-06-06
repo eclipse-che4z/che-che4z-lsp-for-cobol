@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.*;
@@ -59,10 +59,10 @@ class ElementOccurrencesTest {
             .uri(URI)
             .range(new Range(new Position(1, 1), new Position(5, 1)))
             .build();
-    NamedSubContext copyBook = new NamedSubContext();
+    CopybooksRepository copyBook = new CopybooksRepository();
     copyBook.addUsage(
-        ELEMENT_NAME, new Location(URI, new Range(new Position(3, 0), new Position(3, 5))));
-    copyBook.define(ELEMENT_NAME, definition);
+        ELEMENT_NAME, null, new Location(URI, new Range(new Position(3, 0), new Position(3, 5))));
+    copyBook.define(ELEMENT_NAME, null, definition);
     VariableNode variableNodeInOneFile =
         createDefinitionNode(ELEMENT_NAME, definition.getUri(), definition.getRange());
     VariableUsageNode variableUsageNodeInOneFile =
@@ -162,7 +162,7 @@ class ElementOccurrencesTest {
     VariableNode definitionNode =
         createDefinitionNode(ELEMENT_NAME, URI, new Range(new Position(1, 2), new Position(2, 5)));
     Location definition = definitionNode.getLocality().toLocation();
-    NamedSubContext copyBook = new NamedSubContext();
+    CopybooksRepository copyBook = new CopybooksRepository();
     VariableUsageNode usageNode =
         createUsageNode(definitionNode, URI, new Range(new Position(3, 0), new Position(3, 5)));
     Location usage = usageNode.getLocality().toLocation();
@@ -196,7 +196,7 @@ class ElementOccurrencesTest {
 
   @Test
   void findHighlights() {
-    NamedSubContext copybook = new NamedSubContext();
+    CopybooksRepository copybook = new CopybooksRepository();
     Range definitionRange = new Range(new Position(1, 2), new Position(2, 5));
     VariableNode definitionNode = createDefinitionNode(ELEMENT_NAME, URI, definitionRange);
     Range usageRange = new Range(new Position(3, 0), new Position(3, 5));
