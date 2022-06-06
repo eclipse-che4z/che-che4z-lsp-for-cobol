@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2022 DAF Trucks NV.
+ * Copyright (c) 2022 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +9,8 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- * DAF Trucks NV – implementation of DaCo COBOL statements
- * and DAF development standards
+ *    Broadcom, Inc. - initial API and implementation
+ *
  */
 package org.eclipse.lsp.cobol.usecases;
 
@@ -56,6 +57,16 @@ class TestDaCoImplicitCode {
       + "             05 {$*ROWKNM-XIA}                         OCCURS 15.\n"
       + "               07 {$*SPETPS-XIA}           PIC X.\n";
 
+  private static final String TEXT_DYN =
+      "        IDENTIFICATION DIVISION. \n"
+          + "        PROGRAM-ID. test1. \n"
+          + "        DATA DIVISION. \n"
+          + "        WORKING-STORAGE SECTION. \n"
+          + "       01  {$*AREA-XAA}.\n"
+          + "           03 {$*TBLNAM-XAA} PIC X(6).\n"
+          + "        PROCEDURE DIVISION. \n"
+          + "               MOVE 6 to {$RUSNAM-BAA}.\n";
+
   @Test
   void testImplicitWorkingStorageCode() {
     UseCaseEngine.runTest(
@@ -77,6 +88,14 @@ class TestDaCoImplicitCode {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(new CobolText("PMOREC", DaCoDialect.NAME, COPY)),
+        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+  }
+
+  @Test
+  void testImplicitWorkingStorageCode_Dynamic() {
+    UseCaseEngine.runTest(
+        TEXT_DYN,
+        ImmutableList.of(),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 

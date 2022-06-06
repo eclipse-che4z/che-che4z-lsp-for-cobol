@@ -21,7 +21,7 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,30 +30,30 @@ import static org.junit.jupiter.api.Assertions.*;
 class WorkingSectionDynamicGeneratorTest {
   @Test
   void testEmptyNodes_returnsEmptyCode() {
-    assertFalse(WorkingSectionDynamicGenerator.generate(ImmutableList.of()).isPresent());
+    assertEquals(0, WorkingSectionDynamicGenerator.generate("", ImmutableList.of()).size());
   }
 
   @Test
   void testVariablesNotMatches_returnsEmptyCode() {
-    assertFalse(WorkingSectionDynamicGenerator.generate(ImmutableList.of(setupNodeMock("NODE"))).isPresent());
+    assertEquals(0, WorkingSectionDynamicGenerator.generate("", ImmutableList.of(setupNodeMock("NODE"))).size());
   }
 
   @Test
   void testTBFVariable_returnsGeneratedCode() {
-    Optional<Pair<String, String>> result = WorkingSectionDynamicGenerator
-        .generate(ImmutableList.of(setupNodeMock("TBFABC-XLK")));
+    List<Pair<String, String>> result = WorkingSectionDynamicGenerator
+        .generate("", ImmutableList.of(setupNodeMock("TBFABC-XLK")));
 
-    assertTrue(result.isPresent());
-    assertEquals(12, result.get().getValue().indexOf("RCUABC-BLK"));
+    assertEquals(1, result.size());
+    assertEquals(12, result.get(0).getValue().indexOf("RCUABC-BLK"));
   }
 
   @Test
   void testTBLVariable_returnsGeneratedCode() {
-    Optional<Pair<String, String>> result = WorkingSectionDynamicGenerator
-        .generate(ImmutableList.of(setupNodeMock("TBLAAA-XOO")));
+    List<Pair<String, String>> result = WorkingSectionDynamicGenerator
+        .generate("", ImmutableList.of(setupNodeMock("TBLAAA-XOO")));
 
-    assertTrue(result.isPresent());
-    assertEquals(12, result.get().getValue().indexOf("RCUAAA-BOO"));
+    assertEquals(1, result.size());
+    assertEquals(12, result.get(0).getValue().indexOf("RCUAAA-BOO"));
   }
 
   private Node setupNodeMock(String name) {
