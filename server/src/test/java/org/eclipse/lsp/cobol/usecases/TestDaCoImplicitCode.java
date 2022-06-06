@@ -46,7 +46,7 @@ class TestDaCoImplicitCode {
           + "        PROGRAM-ID. test1. \r\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
-          + "        01  COPY MAID {~PMOREC}.\r\n"
+          + "        01  COPY MAID {~PMOREC!DaCo}.\r\n"
           + "        PROCEDURE DIVISION. \r\n"
           + "               MOVE 6 to {$OPDATOINI-XII}.\r\n"
           + "               MOVE 6 to {$RMXKNM-BIA}.\r\n";

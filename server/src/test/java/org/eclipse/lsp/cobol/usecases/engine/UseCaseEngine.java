@@ -322,7 +322,7 @@ public class UseCaseEngine {
           Function<Context, List<Location>> extractor, NodeType nodeType) {
     return Collectors.toMap(
         ctx -> {
-          if(nodeType != COPY) {
+          if (nodeType != COPY) {
             return ctx.getName().toUpperCase();
           }
           String dialect = ((CopyNode) ctx).getDialect();

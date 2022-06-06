@@ -87,7 +87,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     contexts.push(new StringBuilder());
     diagnostics.put(documentUri, new ArrayList<>());
     ofNullable(documentName)
-            .map( name -> name + (dialectType == null ? "" : "!" + dialectType))
+            .map(name -> name + (dialectType == null ? "" : "!" + dialectType))
             .ifPresent(defineCopybook(documentUri));
   }
 
