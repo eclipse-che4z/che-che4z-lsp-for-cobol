@@ -15,9 +15,13 @@
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoMaidProcessor;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
@@ -46,7 +50,6 @@ public class DialectService {
 
     dialect = new DaCoDialect(messageService, new DaCoMaidProcessor(copybookService, treeListener, messageService));
     dialectSuppliers.put(dialect.getName(), dialect);
-
   }
 
   /**
@@ -60,7 +63,7 @@ public class DialectService {
     return dialects.stream()
         .map(this::getDialectByName)
         .reduce(
-            ResultWithErrors.of(new DialectOutcome(context.getText(), ImmutableList.of())),
+            ResultWithErrors.of(new DialectOutcome(context.getText(), ImmutableList.of(), ImmutableMultimap.of())),
             (previousResult, dialect) -> processDialect(previousResult, dialect, context),
             DialectService::mergeResults
         );
@@ -74,6 +77,8 @@ public class DialectService {
                                                                  CobolDialect dialect,
                                                                  DialectProcessingContext context) {
     List<Node> nodes = new ArrayList<>(previousResult.getResult().getDialectNodes());
+    Multimap<String, Pair<String, String>> implicitCode = LinkedListMultimap.create(previousResult.getResult().getImplicitCode());
+
     List<SyntaxError> errors = new ArrayList<>(previousResult.getErrors());
 
     DialectOutcome result = dialect.processText(context.toBuilder()
@@ -81,7 +86,8 @@ public class DialectService {
             .build())
         .unwrap(errors::addAll);
     nodes.addAll(result.getDialectNodes());
-    return new ResultWithErrors<>(new DialectOutcome(result.getText(), nodes), errors);
+    implicitCode.putAll(result.getImplicitCode());
+    return new ResultWithErrors<>(new DialectOutcome(result.getText(), nodes, implicitCode), errors);
   }
 
   private static ResultWithErrors<DialectOutcome> mergeResults(ResultWithErrors<DialectOutcome> result1,

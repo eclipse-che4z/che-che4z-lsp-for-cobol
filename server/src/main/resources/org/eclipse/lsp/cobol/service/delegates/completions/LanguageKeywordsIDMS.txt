@@ -1,0 +1,56 @@
+# Copyright (c) 2022 Broadcom.
+# The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+#
+# This program and the accompanying materials are made
+# available under the terms of the Eclipse Public License 2.0
+# which is available at https://www.eclipse.org/legal/epl-2.0/
+# SPDX-License-Identifier: EPL-2.0
+# Contributors:
+#   Broadcom, Inc. - initial API and implementation
+
+ABEND=The ABEND statement abnormally terminates the issuing task and optionally writes a task dump to the log file.
+ACCEPT=The ACCEPT statement transfers data or system date-related information into the data area referenced by the specified identifier.<br>[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsacce.htm)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.<br>***<br>[IDMS] The ACCEPT statement transfers database, transaction, or task-related information to a specified location in program variable storage.
+ATTACH=The ATTACH statement initiates a new task within the CA IDMS system.
+BIND=The BIND statement establishes processing initiation, subschema record addressability, communication with a database procedure, or a connection with a CA IDMS system.
+CHANGE=The CHANGE PRIORITY statement changes the dispatching priority of the issuing task.
+CHECK=The CHECK TERMINAL statement delays task processing until a previously issued I/O request has completed.
+COMMIT=The COMMIT statement makes permanent changes that were made to the database through an individual run unit or through all database sessions that are associated with a task.
+CONNECT=The CONNECT statement establishes a record occurrence as a member of a set occurrence.
+COPY=The COPY statement is a library statement that places prewritten text in a COBOL compilation unit.<br>[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlcdscop.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.<br>***<br>[IDMS] The COPY IDMS statement copies data descriptions for records and files, program source, and module source from the data dictionary.
+DC=The DC RETURN statement returns control to a program at the next higher level within a task.
+DELETE=The DELETE statement is an extended source library statement. It removes COBOL statements from a source program that was included by a BASIS statement.<br>[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlcdsdel.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.<br>***<br>[IDMS] The DELETE QUEUE statement deletes all or part of a queue.<br>The DELETE SCRATCH statement deletes one or all scratch records.<br>The DELETE TABLE releases use of a table in the program pool.
+DEQUEUE=The DEQUEUE statement releases resources that were acquired by the issuing task with an ENQUEUE request.
+DISCONNECT=The DISCONNECT statement cancels the current membership of a record occurrence in a set occurrence.
+END=The END keyword has several functions.<br>[Search IBM documentation](https://www.ibm.com/support/knowledgecenter/SS6SG3_6.2.0/welcome.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.<br>***<br>[IDMS] The END LINE statement terminates the current line I/O session.<br>The END TRANSACTION STATISTICS statement defines the end of a transaction.
+ENDPAGE=The ENDPAGE statement terminates a map paging session, clears the scratch record for the session, and clears the map paging options for the completed session.
+ENQUEUE=The ENQUEUE statement acquires or tests the availability of resources such as storage areas, common routines, queues, and processor time.
+ERASE=The ERASE statement deletes a record from the database and specifies how the erase affects member occurrences.
+FIND=The FIND statement locates a record occurrence in the database.
+FINISH=The FINISH statement commits database changes that were made through an individual run unit or through all database sessions that are associated with a task.
+FREE=The FREE STORAGE statement releases all or part of a variable storage area.
+GET=The GET statement transfers the contents of a specified record occurrence from the record buffer to program variable storage, retrieves queue or scratch records, acquires DC system pool storage, or retrieves the time and date from the operating system.
+IDMS=
+IDMS-RECORDS=
+IDMS-STATISTICS=
+IDMS-CONTROL=The IDMS-CONTROL SECTION establishes the operating mode, debug sequencing, and variable storage allocation.
+IF=The IF statement tests for the presence of member record occurrences in a set and determines the membership status of a record occurrence in a specified set.
+KEEP=The KEEP CURRENT and KEEP LONGTERM statements place share, exclusive, or long-term locks on database record occurrences.
+LOAD=The LOAD TABLE statement loads a table, module, or program into the program pool and provides access to it through a COBOL LINKAGE SECTION entry.
+MAP=The MAP SECTION statements are used to specify that mapping mode terminal I/O is being used, define the program maps, and specify the size of map field lists.<br>***<br>The MAP IN, MAP OUT and MAP OUTIN statements requests a transfer of data from the terminal to program variable storage, from program variable storage to the terminal, or from program variable storage to the terminal and, upon an operator signal, back to variable storage.
+MODIFY=The MODIFY statement replaces element values of the specified record occurrence with new element values that are defined in program variable storage.<br>The MODIFY MAP statement requests modifications of mapping options for a map.
+OBTAIN=The OBTAIN statement locates a record occurrence in the database and moves its associated data to the record buffers.
+POST=The POST statement alters an event control block (ECB) by posting it to indicate completion of an event upon which another task is waiting, or by clearing it to an unposted status.
+PUT=The PUT QUEUE statement stores queue records into the data dictionary.<br>The PUT SCRATCH statement stores scratch records into the data dictionary.
+READ=For sequential access, the READ statement makes the next logical record from a file available to the object program. For random access, the READ statement makes a specified record from a direct-access file available to the object program.<br>[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsread.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.<br>***<br>[IDMS] The READ statement transfers data from a terminal to program variable storage.
+READY=The READY statement prepares a database area for access by DML functions and specifies the usage mode of the area.
+ROLLBACK=The ROLLBACK statement rolls back uncommitted changes that were made to the database through an individual run unit or through all database sessions that are associated with a task.
+RETURN=The RETURN statement transfers records from the final phase of a sorting or merging operation to an OUTPUT PROCEDURE.<br>[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsretu.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.<br>***<br>[IDMS] The RETURN statement retrieves the database key for an indexed record without retrieving the record itself.
+SCHEMA=SCHEMA SECTION is included in the DATA DIVISION to identify the subschema view to be used by the program.
+SEND=The SEND MESSAGE statement sends a message to another terminal or user, or to a group of terminals or users.
+SET=The SET statement is used to perform various operations.<br>[Read more](https://www.ibm.com/support/knowledgecenter/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsset.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.<br>***<br> [IDMS] The SET ABEND EXIT statement establishes or cancels linkage to an abend routine to which CA IDMS passes control when the issuing task terminates abnormally.<br>The SET TIMER statement defines an event that occurs after a specified time interval or that cancels the effect of a previous SET TIMER request.
+SNAP=The SNAP statement requests a memory snap of task areas, system areas, or specified locations in memory.
+STARTPAGE=The STARTPAGE statement initiates a map paging session.
+STORE=The STORE statement adds a new record to the database.
+TRANSFER=The TRANSFER CONTROL statement passes control to another program, specifying whether or not to receive control back.
+WAIT=The WAIT statement relinquishes control to the CA IDMS system while awaiting completion of an event.
+WRITE=The WRITE statement releases a logical record to an output or input/output file.<br>[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlpswrit.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.<br>***<br>[IDMS] The WRITE statement transfers data from a specified location in program variable storage to a destination such as a journal, terminal, or printer.

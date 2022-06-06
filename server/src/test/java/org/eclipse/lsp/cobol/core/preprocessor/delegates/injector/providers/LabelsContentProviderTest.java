@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * This unit tests check the {@link LabelsContentProvider} class functionality
  */
 @ExtendWith(MockitoExtension.class)
-public class LabelsContentProviderTest {
+class LabelsContentProviderTest {
   private LabelsContentProvider contentProvider;
 
   @BeforeEach

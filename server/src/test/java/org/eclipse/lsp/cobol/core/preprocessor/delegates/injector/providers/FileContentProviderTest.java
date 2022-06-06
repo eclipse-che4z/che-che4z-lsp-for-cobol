@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
  * This unit tests check the {@link FileContentProvider} class functionality
  */
 @ExtendWith(MockitoExtension.class)
-public class FileContentProviderTest {
+class FileContentProviderTest {
   private FileContentProvider contentProvider;
   private CopybookConfig copybookConfig;
   @Mock private FileSystemService files;

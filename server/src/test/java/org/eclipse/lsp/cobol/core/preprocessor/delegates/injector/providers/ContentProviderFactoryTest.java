@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * This unit tests check the {@link ContentProviderFactory} class functionality
  */
 @ExtendWith(MockitoExtension.class)
-public class ContentProviderFactoryTest {
+class ContentProviderFactoryTest {
   private ContentProviderFactory factory;
   @Mock private FileSystemService files;
   @Mock private CopybookService copybookService;
@@ -49,4 +49,11 @@ public class ContentProviderFactoryTest {
     ContentProvider contentProvider = factory.getInstanceFor(ContentProviderFactory.InjectContentType.GENERATED);
     assertTrue(contentProvider instanceof LabelsContentProvider);
   }
+
+  @Test
+  void testCopybookContentProvider() {
+    ContentProvider contentProvider = factory.getInstanceFor(ContentProviderFactory.InjectContentType.RESOLVE_COPYBOOK);
+    assertTrue(contentProvider instanceof CopybookContentProvider);
+  }
+
 }

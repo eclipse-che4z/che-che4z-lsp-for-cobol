@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
 import java.io.IOException;
@@ -88,9 +87,8 @@ public class ImplicitCodeUtils {
    */
   public String readImplicitCode(FileSystemService files, String name) {
     String uri = createPath(name);
-    InputStream inputStream = CopybookServiceImpl.class.getResourceAsStream(uri);
     String content = null;
-    try {
+    try (InputStream inputStream = ImplicitCodeUtils.class.getResourceAsStream(uri)) {
       content =
           files.readFromInputStream(inputStream, StandardCharsets.UTF_8);
     } catch (IOException e) {

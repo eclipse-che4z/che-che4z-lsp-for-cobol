@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectParserListener;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.provider.DaCoImplicitCodeProvider;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -81,6 +82,9 @@ public final class DaCoDialect implements CobolDialect {
     nodes.addAll(maidOutcome.getDialectNodes());
     errors.addAll(listener.getErrors());
     errors.addAll(visitor.getErrors());
-    return new ResultWithErrors<>(new DialectOutcome(visitor.getResultedText(), nodes), errors);
+
+    DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider();
+    DialectOutcome result = new DialectOutcome(visitor.getResultedText(), nodes, provider.getImplicitCode(nodes));
+    return new ResultWithErrors<>(result, errors);
   }
 }

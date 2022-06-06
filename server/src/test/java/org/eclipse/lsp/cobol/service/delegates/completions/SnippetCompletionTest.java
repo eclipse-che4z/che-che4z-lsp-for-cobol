@@ -15,7 +15,9 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.service.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.SettingsService;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
@@ -28,20 +30,23 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 /** Test to check SnippetCompletion */
 class SnippetCompletionTest {
   private static final String INSERT_TEXT = "WRITE ${1:item}";
   private static final String DOCUMENTATION_TEXT = "WRITE item";
   private static final String LABEL = "WRITE";
-
+  private CachingConfigurationService cachingConfigurationService =
+      mock(CachingConfigurationService.class);
+  private SettingsService settingsService = mock(SettingsService.class);
   private final SnippetCompletion completion = new SnippetCompletion(new Snippets());
 
   @Test
   void testCompletionEmptyResult() {
     assertThat(
-            new SnippetCompletion(new Snippets()).getCompletionItems(
-            "Wr", new CobolDocumentModel("", AnalysisResult.builder().build())),
+        new SnippetCompletion(new Snippets())
+            .getCompletionItems("Wr", new CobolDocumentModel("", AnalysisResult.builder().build())),
         is(createExpected()));
   }
 
