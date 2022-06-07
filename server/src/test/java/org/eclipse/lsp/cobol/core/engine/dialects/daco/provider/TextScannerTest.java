@@ -49,6 +49,14 @@ class TextScannerTest {
   }
 
   @Test
+  void testTBF_numericSuffix() {
+    List<VariableNameInfo> infoList = TextScanner.scan(PROGRAM + "053800             11 TBFNAM-XW4.");
+    assertEquals(1, infoList.size());
+    assertEquals("NAM", infoList.get(0).getName());
+    assertEquals("W4", infoList.get(0).getSuffix());
+  }
+
+  @Test
   void testCommented() {
     List<VariableNameInfo> infoList = TextScanner.scan(PROGRAM + "      * TBLmmm-Xii");
     assertEquals(0, infoList.size());

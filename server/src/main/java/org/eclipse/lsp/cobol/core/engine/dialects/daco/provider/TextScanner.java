@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 class TextScanner {
   private final Pattern workingStoragePattern = Pattern.compile("\\s*working-storage\\s+section[\\w\\s]*\\.", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern procedureDivisionPattern = Pattern.compile("\\s*procedure\\s+division[\\w\\s]*\\.", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-  private final Pattern variableDefinitionPattern = Pattern.compile("^\\s*\\d*\\s*(?!\\*)(TBF|TBL)(?<name>[a-zA-Z][a-zA-Z][a-zA-Z])-X(?<suffix>[a-zA-Z][a-zA-Z])", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+  private final Pattern variableDefinitionPattern = Pattern.compile("^\\s*\\d*\\s*(?!\\*)(TBF|TBL)(?<name>[a-zA-Z]..)-X(?<suffix>[a-zA-Z].)", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
   /**
    * Scans source code for variable definitions with defined name's pattern
