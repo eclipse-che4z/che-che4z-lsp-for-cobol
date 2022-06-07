@@ -54,6 +54,15 @@ public class ProgramNode extends Node {
     return programName;
   }
 
+  /**
+   * Search for a block reference in a paragraph and then in a section map
+   * @param name the name of the block
+   * @return the block reference or null if not found
+   */
+  public CodeBlockReference getCodeBlockReference(String name) {
+    return paragraphMap.computeIfAbsent(name, sectionMap::get);
+  }
+
   public void setProgramName(String programName) {
     this.programName = programName;
   }
