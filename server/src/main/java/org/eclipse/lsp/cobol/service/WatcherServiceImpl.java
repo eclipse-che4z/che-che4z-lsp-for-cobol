@@ -51,6 +51,7 @@ public class WatcherServiceImpl implements WatcherService {
   private static final String WATCH_CONFIGURATION = "workspace/didChangeConfiguration";
   private static final String CONFIGURATION_CHANGE_ID = "configurationChange";
   private static final String PREDEFINED_FOLDER_WATCHER = "copybooksWatcher";
+  public static final String FILE_BASENAME_VARIABLE = "${fileBasenameNoExtension}";
 
   private final List<String> folderWatchers = new ArrayList<>();
 
@@ -117,7 +118,7 @@ public class WatcherServiceImpl implements WatcherService {
   }
 
   private String createFileWatcher(String folder) {
-    return "**/" + folder + "/**/*";
+    return "**/" + folder.replace(FILE_BASENAME_VARIABLE, "**") + "/**/*";
   }
 
   private String createFolderWatcher(String folder) {
