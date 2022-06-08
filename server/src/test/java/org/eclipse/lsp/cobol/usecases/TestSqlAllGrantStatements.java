@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -53,7 +53,9 @@ class TestSqlAllGrantStatements {
           + "           EXEC SQL\n";
 
   private static final String GRANT_ON_COLLECTION =
-      TEXT + "            GRANT CREATE IN COLLECTION DSN8CC91 TO ROLE ROLE1;\n" + "           END-EXEC.";
+      TEXT
+          + "            GRANT CREATE IN COLLECTION DSN8CC91 TO ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_COLLECTION2 =
       TEXT
@@ -90,10 +92,14 @@ class TestSqlAllGrantStatements {
           + "           END-EXEC.";
 
   private static final String GRANT_ON_FUNCTION =
-      TEXT + "            GRANT EXECUTE ON FUNCTION CALC_SALARY TO JONES;\n" + "           END-EXEC.";
+      TEXT
+          + "            GRANT EXECUTE ON FUNCTION CALC_SALARY TO JONES;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_SPECIFIC_FUNCTION =
-      TEXT + "            GRANT EXECUTE ON PROCEDURE VACATION_ACCR TO PUBLIC;\n" + "           END-EXEC.";
+      TEXT
+          + "            GRANT EXECUTE ON PROCEDURE VACATION_ACCR TO PUBLIC;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_PROCEDURE =
       TEXT
@@ -105,16 +111,22 @@ class TestSqlAllGrantStatements {
       TEXT + "            GRANT COPY ON PACKAGE DSN8CC61.* TO LEWIS;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_PACKAGE2 =
-      TEXT + "            GRANT ALL ON PACKAGE CLCT1.PKG1, CLCT2.PKG2 TO JONES;\n" + "           END-EXEC.";
+      TEXT
+          + "            GRANT ALL ON PACKAGE CLCT1.PKG1, CLCT2.PKG2 TO JONES;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_PACKAGE3 =
-      TEXT + "            GRANT EXECUTE ON PACKAGE DSN9CC13.* TO ROLE ROLE1;\n" + "           END-EXEC.";
+      TEXT
+          + "            GRANT EXECUTE ON PACKAGE DSN9CC13.* TO ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_PLAN =
       TEXT + "            GRANT BIND ON PLAN DSN8IP12 TO JONES;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_PLAN2 =
-      TEXT + "            GRANT BIND,EXECUTE ON PLAN DSN8CP12 TO PUBLIC;\n" + "           END-EXEC.";
+      TEXT
+          + "            GRANT BIND,EXECUTE ON PLAN DSN8CP12 TO PUBLIC;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_PLAN3 =
       TEXT
@@ -141,7 +153,9 @@ class TestSqlAllGrantStatements {
           + "           END-EXEC.";
 
   private static final String GRANT_ON_SCHEMA4 =
-      TEXT + "            GRANT ALTERIN ON SCHEMA EMPLOYEE TO ROLE ROLE1;\n" + "           END-EXEC.";
+      TEXT
+          + "            GRANT ALTERIN ON SCHEMA EMPLOYEE TO ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_SEQUENCE =
       TEXT
@@ -151,7 +165,9 @@ class TestSqlAllGrantStatements {
           + "           END-EXEC.";
 
   private static final String GRANT_ON_SEQUENCE2 =
-      TEXT + "            GRANT USAGE ON SEQUENCE ORDER_SEQ TO ROLE ROLE1;\n" + "           END-EXEC.";
+      TEXT
+          + "            GRANT USAGE ON SEQUENCE ORDER_SEQ TO ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_SYS_PRIVILGES =
       TEXT + "            GRANT DISPLAY\n" + "            TO LUTZ;\n" + "           END-EXEC.";
@@ -170,7 +186,10 @@ class TestSqlAllGrantStatements {
       TEXT + "            GRANT ARCHIVE TO ROLE ROLE1;\n" + "           END-EXEC.";
 
   private static final String GRANT_SYS_PRIVILGES5 =
-      TEXT + "            GRANT CREATE_SECURE_OBJECT \n" + "            TO STEVE;\n" + "           END-EXEC.";
+      TEXT
+          + "            GRANT CREATE_SECURE_OBJECT \n"
+          + "            TO STEVE;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_SYS_PRIVILGES6 =
       TEXT

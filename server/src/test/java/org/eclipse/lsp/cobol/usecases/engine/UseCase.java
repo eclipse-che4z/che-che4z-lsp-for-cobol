@@ -21,9 +21,9 @@ import lombok.Singular;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.service.SQLBackend;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.SQLBackend;
 
 import java.util.Collections;
 import java.util.List;
@@ -49,7 +49,7 @@ public class UseCase {
   /** Analysis dialects */
   @Builder.Default List<String> dialects = Collections.emptyList();
   /** User predefined labels */
-  @Builder.Default List<String> predefinedLabels = Collections.emptyList();
+  @Builder.Default List<String> predefinedParagraphs = Collections.emptyList();
   /**
    * Get the {@link AnalysisConfig} using the specified processing mode and the {@link SQLBackend}
    * see {@link CopybookConfig}
@@ -58,6 +58,6 @@ public class UseCase {
    */
   public AnalysisConfig getAnalysisConfig() {
     return new AnalysisConfig(
-        new CopybookConfig(copybookProcessingMode, sqlBackend, predefinedLabels), features, dialects);
+        new CopybookConfig(copybookProcessingMode, sqlBackend, predefinedParagraphs), features, dialects);
   }
 }

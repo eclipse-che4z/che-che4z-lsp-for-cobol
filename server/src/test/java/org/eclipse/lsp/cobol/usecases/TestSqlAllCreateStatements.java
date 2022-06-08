@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -93,7 +93,10 @@ class TestSqlAllCreateStatements {
           + "           END-EXEC.";
 
   private static final String CREATE_DB2 =
-      TEXT + "           CREATE DATABASE DSN8TEMP\n" + "           CCSID ASCII;\n" + "           END-EXEC.";
+      TEXT
+          + "           CREATE DATABASE DSN8TEMP\n"
+          + "           CCSID ASCII;\n"
+          + "           END-EXEC.";
 
   // CREATE FUNCTION (compiled SQL scalar)
   private static final String CREATE_FUNCTION_COMPILED =
@@ -945,10 +948,14 @@ class TestSqlAllCreateStatements {
 
   // CREATE TYPE array
   private static final String CREATE_TYPE_ARRAY =
-      TEXT + "            CREATE TYPE PHONENUMBERS AS DECIMAL(10,0) ARRAY[50];\n" + "           END-EXEC.";
+      TEXT
+          + "            CREATE TYPE PHONENUMBERS AS DECIMAL(10,0) ARRAY[50];\n"
+          + "           END-EXEC.";
 
   private static final String CREATE_TYPE_ARRAY2 =
-      TEXT + "            CREATE TYPE GENERIC.NUMBERS AS DECFLOAT(34) ARRAY[];\n" + "           END-EXEC.";
+      TEXT
+          + "            CREATE TYPE GENERIC.NUMBERS AS DECFLOAT(34) ARRAY[];\n"
+          + "           END-EXEC.";
 
   private static final String CREATE_TYPE_ARRAY3 =
       TEXT
@@ -962,7 +969,9 @@ class TestSqlAllCreateStatements {
           + "           END-EXEC.";
 
   private static final String CREATE_TYPE_ARRAY5 =
-      TEXT + "            CREATE TYPE PRODUCTS AS VARCHAR(40) ARRAY[INTEGER];\n" + "           END-EXEC.";
+      TEXT
+          + "            CREATE TYPE PRODUCTS AS VARCHAR(40) ARRAY[INTEGER];\n"
+          + "           END-EXEC.";
 
   // CREATE TYPE distinct
   private static final String CREATE_TYPE_DISTINCT =

@@ -69,8 +69,7 @@ public class CodeBlockUsageNode extends Node implements Context {
       Function<CodeBlockReference, List<Location>> retriveLocations) {
     return getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
-        .map(ProgramNode::getParagraphMap)
-        .map(it -> it.get(getName()))
+        .map(p -> p.getCodeBlockReference(getName()))
         .map(retriveLocations)
         .orElse(ImmutableList.of());
   }

@@ -15,11 +15,11 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
@@ -63,9 +63,15 @@ class TestMisspelledKeywordWarningInCorrectPosition {
                 SourceInfoLevels.WARNING.getText()),
             "area",
             new Diagnostic(
-                null, "The following token must start in Area A: DISPLA", Warning, SourceInfoLevels.WARNING.getText()),
+                null,
+                "The following token must start in Area A: DISPLA",
+                Warning,
+                SourceInfoLevels.WARNING.getText()),
             "hello",
             new Diagnostic(
-                null, "Syntax error on '\"hello\"' expected SECTION", Error, SourceInfoLevels.ERROR.getText())));
+                null,
+                "Syntax error on '\"hello\"' expected SECTION",
+                Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

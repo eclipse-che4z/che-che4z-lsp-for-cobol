@@ -10,13 +10,13 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((includeStatement | copyStatement | copyMaidStatement | replaceAreaStart | replaceOffStatement
-   | titleDirective | enterDirective | controlDirective | linkageSection | plusplusIncludeStatement | procedureDivision | workingStorageSection)+ .*?)* EOF
+   : .*? ((includeStatement | copyStatement | replaceAreaStart | replaceOffStatement | titleDirective | enterDirective
+   | controlDirective | linkageSection | plusplusIncludeStatement | procedureDivision | workingStorageSection)+ .*?)* EOF
    ;
 
 // procedure devision for resolving predefined labels
 procedureDivision
-   : PROCEDURE DIVISION DOT_FS
+   : PROCEDURE DIVISION .*? DOT_FS
    ;
 
 // linkage section for resolving predefined variables
@@ -44,20 +44,11 @@ plusplusIncludeStatement
     : PLUSPLUSINCLUDE copySource (DOT_FS | SEMICOLON_FS)?
     ;
 
-// copy maid statement
-copyMaidStatement
-    : LEVEL_NUMBER? COPY MAID copySource qualifier? DOT_FS?
-    ;
-
 copySource
    : (literal | cobolWord) ((OF | IN) copyLibrary)?
    ;
 
 copyLibrary
-   : literal | cobolWord
-   ;
-
-qualifier
    : literal | cobolWord
    ;
 
@@ -132,7 +123,7 @@ closingPseudoTextDelimiter
    ;
 
 replaceable
-   : literal | cobolWord | charDataLine | functionCall
+   : literal | cobolWord | charDataLine | functionCall | pseudoReplaceable
    ;
 
 functionCall
@@ -148,11 +139,11 @@ argument
    ;
 
 replacement
-   : literal | cobolWord | charDataLine | functionCall
+   : (literal | cobolWord | charDataLine)+ | functionCall | pseudoReplacement
    ;
 
 charDataLine
-   : (FILENAME | DOT_FS | LPARENCHAR | RPARENCHAR)+
+   : (FILENAME | LPARENCHAR | RPARENCHAR | IN)+
    ;
 
 cobolWord

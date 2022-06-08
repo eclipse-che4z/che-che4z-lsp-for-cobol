@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.service.delegates.formations;
 
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.TextEdit;
 import org.junit.jupiter.api.Test;
 

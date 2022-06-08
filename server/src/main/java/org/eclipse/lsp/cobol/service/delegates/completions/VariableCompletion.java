@@ -19,6 +19,7 @@ import com.google.inject.Singleton;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
 
@@ -30,7 +31,6 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.CONSTANTS;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.VARIABLES;
 import static org.eclipse.lsp4j.CompletionItemKind.Constant;
@@ -71,7 +71,7 @@ public class VariableCompletion implements Completion {
     item.setLabel(name);
     item.setInsertText(name);
     item.setDocumentation(it.getFullVariableDescription());
-    if (it.getLocality().getUri().startsWith(PREF_IMPLICIT)) {
+    if (ImplicitCodeUtils.isImplicit(it.getLocality().getUri())) {
       item.setSortText(CONSTANTS.prefix + name);
       item.setKind(Constant);
     } else {

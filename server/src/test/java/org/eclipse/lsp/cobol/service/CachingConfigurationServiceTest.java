@@ -58,7 +58,7 @@ class CachingConfigurationServiceTest {
     JsonArray dialectSettings = new JsonArray();
     dialectSettings.add("Dialect");
 
-    JsonArray predefinedLabels = new JsonArray();
+    JsonArray predefinedParagraphs = new JsonArray();
     JsonArray subroutines = new JsonArray();
 
     List<Object> clientConfig =
@@ -66,7 +66,7 @@ class CachingConfigurationServiceTest {
             new JsonPrimitive("DATACOM_SERVER"),
             featuresArray,
             dialectSettings,
-            predefinedLabels,
+            predefinedParagraphs,
             subroutines);
 
     when(settingsService.getConfigurations(
@@ -74,7 +74,7 @@ class CachingConfigurationServiceTest {
                 TARGET_SQL_BACKEND.label,
                 ANALYSIS_FEATURES.label,
                 DIALECTS.label,
-                PREDEFINED_LABELS.label,
+                PREDEFINED_PARAGRAPHS.label,
                 SUBROUTINE_LOCAL_PATHS.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
 
@@ -109,7 +109,7 @@ class CachingConfigurationServiceTest {
                 TARGET_SQL_BACKEND.label,
                 ANALYSIS_FEATURES.label,
                 DIALECTS.label,
-                PREDEFINED_LABELS.label,
+                PREDEFINED_PARAGRAPHS.label,
                 SUBROUTINE_LOCAL_PATHS.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
 

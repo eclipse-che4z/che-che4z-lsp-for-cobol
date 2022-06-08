@@ -15,8 +15,8 @@
 
 package org.eclipse.lsp.cobol.service.delegates.formations;
 
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.TextEdit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

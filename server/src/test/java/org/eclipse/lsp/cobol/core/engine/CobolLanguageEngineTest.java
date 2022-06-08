@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.engine;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
@@ -26,13 +27,14 @@ import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -41,8 +43,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
+import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
@@ -66,11 +68,13 @@ class CobolLanguageEngineTest {
     CobolErrorStrategy cobolErrorStrategy = new CobolErrorStrategy();
     ParseTreeListener treeListener = mock(ParseTreeListener.class);
     DialectService dialectService = mock(DialectService.class);
+    InjectService injectService = mock(InjectService.class);
     cobolErrorStrategy.setMessageService(mockMessageService);
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
-            preprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null, dialectService);
+            preprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
+            dialectService, injectService);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()
@@ -98,7 +102,7 @@ class CobolLanguageEngineTest {
         new ExtendedDocument(
             "",
             TEXT,
-            new NamedSubContext(),
+            new CopybooksRepository(),
             ImmutableMap.of(
                 URI,
                 new DocumentMapping(
@@ -138,7 +142,7 @@ class CobolLanguageEngineTest {
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of());
 
     when(dialectService.process(anyList(), any()))
-        .thenReturn(new ResultWithErrors<>(new DialectOutcome(TEXT, ImmutableList.of()), ImmutableList.of()));
+        .thenReturn(new ResultWithErrors<>(new DialectOutcome(TEXT, ImmutableList.of(), ImmutableMultimap.of()), ImmutableList.of()));
     when(preprocessor.cleanUpCode(URI, TEXT))
         .thenReturn(new ResultWithErrors<>(TEXT, ImmutableList.of()));
     when(preprocessor.processCleanCode(
@@ -172,7 +176,7 @@ class CobolLanguageEngineTest {
                     .range(new Range(new Position(0, 7), new Position(0, 31)))
                     .token("IDENTIFICATION")
                     .build(),
-                new NamedSubContext()),
+                new CopybooksRepository()),
             ImmutableList.of(error, eofError));
 
     ResultWithErrors<Node> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));

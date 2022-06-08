@@ -14,18 +14,16 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * This test checks that the copybook name with quotes processed successfully
- */
+/** This test checks that the copybook name with quotes processed successfully */
 class TestCopybookNameWithQuotes {
   private static final String TEXT =
-          "        IDENTIFICATION DIVISION.\n"
+      "        IDENTIFICATION DIVISION.\n"
           + "          PROGRAM-ID. PARTEST.\n"
           + "          DATA DIVISION.\n"
           + "          WORKING-STORAGE SECTION.\n"
@@ -34,17 +32,21 @@ class TestCopybookNameWithQuotes {
   private static final String QUITES_LOWERCASE = "            COPY {~'cpbtest'}.\n";
   private static final String DOUBLE_QUITES = "            COPY {~\"CPBTEST\"}.\n";
 
-  private static final String COPYBOOK =
-      "         {#*PROGA}.";
+  private static final String COPYBOOK = "         {#*PROGA}.";
 
   @Test
   void assertCopybookWithQuotesProcessing() {
-    UseCaseEngine.runTest(TEXT + QUITES_LOWERCASE, ImmutableList.of(new CobolText("CPBTEST", COPYBOOK)), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        TEXT + QUITES_LOWERCASE,
+        ImmutableList.of(new CobolText("CPBTEST", COPYBOOK)),
+        ImmutableMap.of());
   }
 
   @Test
   void assertCopybookWithDoubleQuotesProcessing() {
-    UseCaseEngine.runTest(TEXT + DOUBLE_QUITES, ImmutableList.of(new CobolText("CPBTEST", COPYBOOK)), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        TEXT + DOUBLE_QUITES,
+        ImmutableList.of(new CobolText("CPBTEST", COPYBOOK)),
+        ImmutableMap.of());
   }
-
 }

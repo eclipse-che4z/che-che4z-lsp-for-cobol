@@ -21,8 +21,11 @@ import com.google.gson.JsonPrimitive;
 import org.awaitility.Awaitility;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
-import org.eclipse.lsp.cobol.core.model.tree.*;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.core.model.tree.RootNode;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
@@ -43,13 +46,10 @@ import org.mockito.internal.stubbing.answers.AnswersWithDelay;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.function.BiConsumer;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.*;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.IMPLICIT_PATH;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -70,7 +70,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
       "file:///c%3A/workspace/incorrect_document.cbl";
 
   private CobolTextDocumentService service;
-  private final Map<String, CopyDefinition> copyDefinitionMap = new HashMap<>();
 
   @BeforeEach
   void setupService() {
@@ -207,6 +206,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    * may re-run analysis of the open documents if it receives a notification.
    */
   @Test
+
   void observerCallback() {
     Map<String, List<Diagnostic>> diagnosticsNoErrors = emptyMap();
     Map<String, List<Diagnostic>> diagnosticsWithErrors = createDefaultDiagnostics();
@@ -477,26 +477,26 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testAnalysisFinishedNotification() {
     AnalysisResult analysisResult =
         AnalysisResult.builder()
-            .rootNode(new RootNode(Locality.builder().build(), new NamedSubContext()))
+            .rootNode(new RootNode(Locality.builder().build(), new CopybooksRepository()))
             .build();
 
-    RootNode rootNode = new RootNode(Locality.builder().build(), new NamedSubContext());
+    RootNode rootNode = new RootNode(Locality.builder().build(), new CopybooksRepository());
     analysisResult.getRootNode().addChild(rootNode);
     CopyNode parent = new CopyNode(Locality.builder().uri(DOCUMENT_URI).build(), "PARENT");
     CopyNode nested = new CopyNode(Locality.builder().uri(PARENT_CPY_URI).build(), "NESTED");
     CopyNode nested2 =
         new CopyNode(Locality.builder().uri(NESTED_CPY_URI).build(), "NESTED_CPY_URI");
     CopyDefinition parentDefinition =
-        new CopyDefinition(new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), "PARENT");
+        new CopyDefinition(new Location(ImplicitCodeUtils.createLocation(), new Range()), "PARENT");
     parentDefinition.addUsages(parent);
     parent.setDefinition(parentDefinition);
     CopyDefinition nestedDefinition =
-        new CopyDefinition(new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), "NESTED");
+        new CopyDefinition(new Location(ImplicitCodeUtils.createLocation(), new Range()), "NESTED");
     nestedDefinition.addUsages(nested);
     nested.setDefinition(nestedDefinition);
     CopyDefinition nested2Definition =
         new CopyDefinition(
-            new Location(PREF_IMPLICIT + IMPLICIT_PATH, new Range()), "NESTED_CPY_URI");
+            new Location(ImplicitCodeUtils.createLocation(), new Range()), "NESTED_CPY_URI");
     nested2Definition.addUsages(nested2);
     nested2.setDefinition(nested2Definition);
     rootNode.addChild(parent);
@@ -586,54 +586,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
             any(CobolDocumentModel.class),
             any(TextDocumentPositionParams.class),
             any(ReferenceContext.class));
-  }
-
-  @Test
-  void testFoldingCodeWhenAnalysisIsNotStarted() {
-    service = getMockedTextDocumentServiceUsingSeparateThread();
-    TextDocumentIdentifier testFoldingCode = new TextDocumentIdentifier(DOCUMENT_URI);
-    CompletableFuture<List<FoldingRange>> listCompletableFuture =
-        service.foldingRange(new FoldingRangeRequestParams(testFoldingCode));
-    @SuppressWarnings("unchecked") BiConsumer<? super List<FoldingRange>, ? super Throwable> consumer = mock(BiConsumer.class);
-    listCompletableFuture.whenComplete(consumer);
-    assertTrue(listCompletableFuture.isDone());
-    verify(consumer).accept(Collections.emptyList(), null);
-  }
-
-  @Test
-  void testFoldingCodeWhenAnalysisIsStarted() throws ExecutionException, InterruptedException {
-    service = getMockedTextDocumentServiceUsingSeparateThread();
-    TextDocumentIdentifier testFoldingCode = new TextDocumentIdentifier(DOCUMENT_URI);
-    int startLine = 1;
-    int endLine = 3;
-
-    AnalysisResult analysisResult =
-        AnalysisResult.builder()
-            .rootNode(new RootNode(Locality.builder().build(), new NamedSubContext()))
-            .build();
-
-    Node programNode =
-        new ProgramNode(
-            Locality.builder()
-                .uri(DOCUMENT_URI)
-                .range(new Range(new Position(startLine, 0), new Position(endLine, 0)))
-                .build());
-    analysisResult.getRootNode().addChild(programNode);
-
-    when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
-    when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(analysisResult);
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
-
-    CompletableFuture<List<FoldingRange>> listCompletableFuture =
-        service.foldingRange(new FoldingRangeRequestParams(testFoldingCode));
-    listCompletableFuture.get();
-    @SuppressWarnings("unchecked") BiConsumer<? super List<FoldingRange>, ? super Throwable> consumer = mock(BiConsumer.class);
-    listCompletableFuture.whenComplete(consumer);
-    assertTrue(listCompletableFuture.isDone());
-    verify(consumer).accept(Collections.singletonList(new FoldingRange(startLine, endLine)), null);
   }
 
   private void openDocument(TextDocumentService service) {

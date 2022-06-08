@@ -165,8 +165,7 @@ class TestMarginAB {
 
   @Test
   void checkCorrectProgramID() {
-    AnalysisResult result =
-        UseCaseUtils.analyze(UseCase.builder().text(TEXT_PROGRAM_ID).build());
+    AnalysisResult result = UseCaseUtils.analyze(UseCase.builder().text(TEXT_PROGRAM_ID).build());
 
     assertEquals(1, result.getDiagnostics().size());
     assertEquals(
@@ -176,8 +175,7 @@ class TestMarginAB {
 
   @Test
   void checkDeclaratives() {
-    AnalysisResult result =
-        UseCaseUtils.analyze(UseCase.builder().text(TEXT_DECLARATIVES).build());
+    AnalysisResult result = UseCaseUtils.analyze(UseCase.builder().text(TEXT_DECLARATIVES).build());
 
     assertEquals(3, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
     assertEquals(

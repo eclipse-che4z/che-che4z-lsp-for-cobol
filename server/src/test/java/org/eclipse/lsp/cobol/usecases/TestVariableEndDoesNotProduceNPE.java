@@ -42,7 +42,7 @@ class TestVariableEndDoesNotProduceNPE {
             "1",
             new Diagnostic(
                 null,
-                "A \"PICTURE\" clause was not found for elementary item FILLER",
+                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item FILLER",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText()),
             "2",

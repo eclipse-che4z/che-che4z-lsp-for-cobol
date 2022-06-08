@@ -23,9 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
-/**
- * This test checks that redefined variable can not contain VALUE clause
- */
+/** This test checks that redefined variable can not contain VALUE clause */
 class TestVariableRedefineValue {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -49,5 +47,5 @@ class TestVariableRedefineValue {
                 "The redefining item cannot contain a VALUE clause: WS-DATA-B",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
-   }
+  }
 }

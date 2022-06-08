@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
@@ -33,7 +33,7 @@ class TestCopyMaidWithWrkShowsErrorAfterFiller {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "        01 FILLER.\n"
-          + "            {_05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.|1_}\n"
+          + "            05 COPY MAID {_{~BHTRGL-XBG!DaCo`BHTRGL-XBG_WRK}|1_} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-X}.";
 
@@ -44,13 +44,13 @@ class TestCopyMaidWithWrkShowsErrorAfterFiller {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", COPYBOOK_CONTENT)),
+            new CobolText("BHTRGL-XBG_WRK", DaCoDialect.NAME, COPYBOOK_CONTENT)),
         ImmutableMap.of(
             "1",
             new Diagnostic(
                 null,
                 "Cannot retrieve suffix for WRK usage",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

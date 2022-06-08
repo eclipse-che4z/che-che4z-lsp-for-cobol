@@ -14,10 +14,10 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,8 @@ class TestIndicatorAreaError {
   private static final String TEXT = "qwerty{u|1}{iop|2}";
 
   private static final String MESSAGE_1 = "Unexpected indicator area content";
-  private static final String MESSAGE_2 = "Syntax error on 'iop' expected {CBL, ID, IDENTIFICATION, PROCESS}";
+  private static final String MESSAGE_2 =
+      "Syntax error on 'iop' expected {CBL, ID, IDENTIFICATION, PROCESS}";
 
   @Test
   void test() {
@@ -37,8 +38,10 @@ class TestIndicatorAreaError {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
-            new Diagnostic(null, MESSAGE_1, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText()),
+            new Diagnostic(
+                null, MESSAGE_1, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText()),
             "2",
-            new Diagnostic(null, MESSAGE_2, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
+            new Diagnostic(
+                null, MESSAGE_2, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
   }
 }

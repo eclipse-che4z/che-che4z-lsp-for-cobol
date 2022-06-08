@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service.delegates.references;
 import lombok.NonNull;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.tree.Context;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.*;
@@ -31,7 +32,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils.findNodeByPosition;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
  * This occurrences provider resolves the requests for the semantic elements based on its positions.
@@ -92,7 +92,7 @@ public class ElementOccurrences implements Occurrences {
   }
 
   private static Predicate<Location> uriNotImplicit() {
-    return i -> !i.getUri().startsWith(PREF_IMPLICIT);
+    return i -> !ImplicitCodeUtils.isImplicit(i.getUri());
   }
 
   @Value

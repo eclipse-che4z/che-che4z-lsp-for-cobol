@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.FigurativeConstants;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
@@ -89,6 +90,8 @@ public class QualifiedReferenceNode extends Node {
     if (foundDefinitions.size() == 1)
       return ImmutableList.of();
     String dataName = variableUsageNodes.get(0).getName();
+    if (FigurativeConstants.FIGURATIVE_CONSTANTS.stream()
+            .anyMatch(e -> dataName.toUpperCase().equals(e))) return ImmutableList.of();
     SyntaxError error = SyntaxError.syntaxError()
         .severity(ErrorSeverity.ERROR)
         .locality(getLocality())

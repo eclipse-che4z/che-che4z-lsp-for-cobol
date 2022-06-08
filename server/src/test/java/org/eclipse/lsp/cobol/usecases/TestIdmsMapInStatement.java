@@ -50,7 +50,8 @@ class TestIdmsMapInStatement {
       DEFS + "           MAP IN USING {$EMPMAP} IO HEADER MODIFIED.\n";
 
   private static final String TST3 =
-      DEFS + "           MAP IN USING {$EMPMAP} NOIO DATASTREAM FROM {$MFLD} \n           LENGTH {$MFLD-LEN}.\n";
+      DEFS
+          + "           MAP IN USING {$EMPMAP} NOIO DATASTREAM FROM {$MFLD} \n           LENGTH {$MFLD-LEN}.\n";
 
   private static final String TST4 =
       DEFS + "           MAP IN USING {$EMPMAP} NOIO DATASTREAM FROM {$MFLD} LENGTH 20.\n";
@@ -87,6 +88,11 @@ class TestIdmsMapInStatement {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms map in tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfig());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

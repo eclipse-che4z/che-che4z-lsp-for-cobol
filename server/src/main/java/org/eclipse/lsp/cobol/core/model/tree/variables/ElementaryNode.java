@@ -37,7 +37,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.EffectiveDataType.
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @SuppressWarnings("squid:S107")
-abstract class ElementaryNode extends VariableWithLevelNode implements UsageClause {
+public abstract class ElementaryNode extends VariableWithLevelNode implements UsageClause, EffectiveData {
   private static final String SEMANTICS_NO_PIC_CLAUSE = "semantics.noPicClause";
   private static final String SEMANTIC_IMPROPER_USE_BLANK_WHEN_ZERO_AND_SIGN_CLAUSE =
       "semantics.improperUseBlankWhenZeroAndSignClause";
@@ -66,7 +66,7 @@ abstract class ElementaryNode extends VariableWithLevelNode implements UsageClau
     this.picClause = picClause;
     this.usageFormat = usageFormat;
     this.effectiveDataType = setEffectiveDataType();
-    addProcessStep(this::processNode);
+    addProcessStep(this::processStandAloneNode);
   }
 
   private EffectiveDataType setEffectiveDataType() {
@@ -81,7 +81,7 @@ abstract class ElementaryNode extends VariableWithLevelNode implements UsageClau
    *
    * @return SyntaxError
    */
-  private List<SyntaxError> processNode() {
+  private List<SyntaxError> processStandAloneNode() {
     List<SyntaxError> errors = new ArrayList<>(validatePicClauseUsage());
     errors.addAll(validateCompatibleUsageClause());
     return errors;

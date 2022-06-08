@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -49,7 +49,8 @@ class TestSqlDropStatement {
 
   private static final String DROP6 = TEXT + "            DROP TYPE DOCUMENT END-EXEC.\n";
 
-  private static final String DROP7 = TEXT + "            DROP FUNCTION CHEM.ATOMIC_WEIGHT END-EXEC.\n";
+  private static final String DROP7 =
+      TEXT + "            DROP FUNCTION CHEM.ATOMIC_WEIGHT END-EXEC.\n";
 
   private static final String DROP8 =
       TEXT + "            DROP FUNCTION CENTER(INTEGER, FLOAT) END-EXEC.\n";
@@ -57,7 +58,8 @@ class TestSqlDropStatement {
   private static final String DROP9 =
       TEXT + "            DROP SPECIFIC FUNCTION JOHNSON.FOCUS97 END-EXEC.\n";
 
-  private static final String DROP10 = TEXT + "            DROP PROCEDURE BIOLOGY.OSMOSIS END-EXEC.\n";
+  private static final String DROP10 =
+      TEXT + "            DROP PROCEDURE BIOLOGY.OSMOSIS END-EXEC.\n";
 
   private static final String DROP11 = TEXT + "            DROP TRIGGER BONUS END-EXEC.\n";
 

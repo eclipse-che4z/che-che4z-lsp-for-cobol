@@ -21,6 +21,8 @@ import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.model.ErrorCode;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
+import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
+import org.eclipse.lsp.cobol.service.delegates.completions.Snippets;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -71,6 +73,8 @@ class CobolLanguageServerTest {
     LocaleStore localeStore = mock(LocaleStore.class);
     ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
+    Keywords keywords = mock(Keywords.class);
+    Snippets snippets = mock(Snippets.class);
 
     JsonArray arr = new JsonArray();
     String path = "foo/bar";
@@ -96,7 +100,9 @@ class CobolLanguageServerTest {
             customExecutor,
             stateService,
             configurationService,
-            copybookNameService);
+            copybookNameService,
+            keywords,
+            snippets);
 
     server.initialized(new InitializedParams());
 
@@ -118,7 +124,7 @@ class CobolLanguageServerTest {
   void initialize() {
     CobolLanguageServer server =
         new CobolLanguageServer(
-            null, null, null, null, null, customExecutor, stateService, null, null);
+            null, null, null, null, null, customExecutor, stateService, null, null, null, null);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
@@ -138,7 +144,17 @@ class CobolLanguageServerTest {
     TextDocumentService textDocumentService = mock(CobolTextDocumentService.class);
     CobolLanguageServer server =
         new CobolLanguageServer(
-            textDocumentService, null, null, null, null, customExecutor, stateService, null, null);
+            textDocumentService,
+            null,
+            null,
+            null,
+            null,
+            customExecutor,
+            stateService,
+            null,
+            null,
+            null,
+            null);
     assertEquals(1, stateService.getExitCode());
     server.shutdown();
     assertEquals(0, stateService.getExitCode());

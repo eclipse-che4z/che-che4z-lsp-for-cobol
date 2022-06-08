@@ -18,8 +18,7 @@ import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
-
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -31,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /** Test {@link Node} */
 class NodeTest {
   private static final Locality LOCALITY = Locality.builder().build();
-  private static final NamedSubContext COPYBOOK = new NamedSubContext();
+  private static final CopybooksRepository COPYBOOK = new CopybooksRepository();
 
   @Test
   void getDepthFirstStream() {

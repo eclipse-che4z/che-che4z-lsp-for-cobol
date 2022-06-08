@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
+import com.google.common.collect.ImmutableMultimap;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -76,6 +77,7 @@ public final class IdmsDialect implements CobolDialect {
     IdmsVisitor visitor = new IdmsVisitor(copybookService, treeListener, messageService, context);
     List<Node> nodes = visitor.visitStartRule(parser.startRule());
     List<SyntaxError> errors = new ArrayList<>(listener.getErrors());
-    return new ResultWithErrors<>(new DialectOutcome(visitor.getResultedText(), nodes), errors);
+    errors.addAll(visitor.getErrors());
+    return new ResultWithErrors<>(new DialectOutcome(visitor.getResultedText(), nodes, ImmutableMultimap.of()), errors);
   }
 }

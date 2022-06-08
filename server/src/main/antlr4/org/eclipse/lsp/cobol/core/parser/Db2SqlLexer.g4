@@ -797,6 +797,11 @@ YEARS : Y E A R S;
 YES : Y E S;
 ZONE : Z O N E;
 
+
+// special separator tokens for embedded langauages
+SEMICOLONSEPARATORSQL : '; ' ;
+COMMASEPARATORDB2 : ', ' ;
+
 // Constructors symbols
 GRAPHIC_CONSTANT : GRAPHICUNICODE | GRAHICCHAR;
 DOUBLESLASHCHAR : '//';

@@ -25,7 +25,7 @@ endProgramStatement
 
 // compiler options
 compilerOptions
-   : (PROCESS | CBL) (COMMACHAR? compilerOption)+
+   : (PROCESS | CBL) (commaSeparator? compilerOption)+
    ;
 
 // https://www.ibm.com/docs/en/cobol-zos/6.3?topic=program-compiler-options
@@ -42,14 +42,14 @@ compilerOption
    | CICS (LPARENCHAR literal RPARENCHAR)? | NOCICS
    | (CODEPAGE | CP) LPARENCHAR integerLiteral RPARENCHAR
    | COMPILE | C_CHAR | (NOCOMPILE | NOC) (LPARENCHAR (S_CHAR | E_CHAR | W_CHAR) RPARENCHAR)?
-   | (COPYLOC | CPLC) LPARENCHAR ((SYSLIB | dataName) COMMACHAR)? (DSN | PATH) LPARENCHAR (literal | dataSetName) RPARENCHAR RPARENCHAR
+   | (COPYLOC | CPLC) LPARENCHAR ((SYSLIB | dataName) commaSeparator)? (DSN | PATH) LPARENCHAR (literal | dataSetName) RPARENCHAR RPARENCHAR
    | NOCOPYLOC | NOCPLC
    | (COPYRIGHT | CPYR) LPARENCHAR literal RPARENCHAR | NOCOPYRIGHT | NOCPYR
    | (CURRENCY | CURR) LPARENCHAR CURRENCY_SYMBOL RPARENCHAR | NOCURRENCY | NOCURR
    | DATA LPARENCHAR integerLiteral RPARENCHAR
    | DBCS | NODBCS
    | DECK | D_CHAR | NODECK | NOD
-   | (DEFINE | DEF) LPARENCHAR dataName ((COMMACHAR | EQUALCHAR) dataName)? RPARENCHAR | NODEFINE | NODEF
+   | (DEFINE | DEF) LPARENCHAR dataName ((commaSeparator | EQUALCHAR) dataName)? RPARENCHAR | NODEFINE | NODEF
    | DIAGTRUNC | DTR | NODIAGTRUNC | NODTR
    | (DISPSIGN | DS) LPARENCHAR (COMPAT | SEP | C_CHAR | S_CHAR) RPARENCHAR
    | DLL | NODLL
@@ -57,22 +57,22 @@ compilerOption
    | DYNAM | DYN | NODYNAM | NODYN
    | (EXIT | EX) LPARENCHAR (
         ((INEXIT | INX | LIBEXIT | LIBX | PRTEXIT | PRTX | ADEXIT | ADX | MSGEXIT | MSGX)
-            LPARENCHAR dataName (COMMACHAR dataName)? RPARENCHAR)
+            LPARENCHAR dataName (commaSeparator dataName)? RPARENCHAR)
         | (NOINEXIT | NOINX | NOLIBEXIT | NOLIBX | NOPRTEXIT | NOPRTX | NOADEXIT | NOADX | NOMSGEXIT | NOMSGX)
       )* RPARENCHAR
    | NOEXIT | NOEX
    | EXPORTALL | EXP | NOEXPORTALL | NOEXP
    | FASTSRT | FSRT | NOFASTSRT | NOFSRT
-   | (FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (COMMACHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR
+   | (FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (commaSeparator (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR
    | NOFLAG | NOF
-   | FLAGSTD LPARENCHAR (M_CHAR | I_CHAR | H_CHAR) (D_CHAR | N_CHAR | S_CHAR | DN | DS | ND | NS | SD | SN)? (COMMACHAR O_CHAR)? RPARENCHAR
+   | FLAGSTD LPARENCHAR (M_CHAR | I_CHAR | H_CHAR) (D_CHAR | N_CHAR | S_CHAR | DN | DS | ND | NS | SD | SN)? (commaSeparator O_CHAR)? RPARENCHAR
    | NOFLAGSTD
    | HGPR LPARENCHAR (PRESERVE | NOPRESERVE) RPARENCHAR
    | (INITCHECK | IC) (LPARENCHAR (LAX | STRICT)? RPARENCHAR)? | NOINITCHECK | NOIC
    | INITIAL | NOINITIAL
    | INLINE | INL | NOINLINE | NOINL
    | INTDATE LPARENCHAR (ANSI | LILIAN) RPARENCHAR
-   | (INVDATA | INVD) (LPARENCHAR invdataSuboptions (COMMACHAR invdataSuboptions)* RPARENCHAR)? | NOINVDATA | NOINVD
+   | (INVDATA | INVD) (LPARENCHAR invdataSuboptions (commaSeparator invdataSuboptions)* RPARENCHAR)? | NOINVDATA | NOINVD
    | (LANGUAGE | LANG) LPARENCHAR (ENGLISH | EN | JAPANESE | JA | JP | UENGLISH | UE) RPARENCHAR
    | (LINECOUNT | LC) LPARENCHAR integerLiteral RPARENCHAR
    | LIST | NOLIST
@@ -83,19 +83,19 @@ compilerOption
    | NAME (LPARENCHAR (ALIAS | NOALIAS) RPARENCHAR)? | NONAME
    | (NSYMBOL | NS) LPARENCHAR (NATIONAL | NAT | DBCS) RPARENCHAR
    | NUMBER | NUM | NONUMBER | NONUM
-   | (NUMCHECK | NC) (LPARENCHAR numcheckSuboptions (COMMACHAR numcheckSuboptions)* RPARENCHAR)? | NONUMCHECK | NONC
+   | (NUMCHECK | NC) (LPARENCHAR numcheckSuboptions (commaSeparator numcheckSuboptions)* RPARENCHAR)? | NONUMCHECK | NONC
    | NUMPROC LPARENCHAR (NOPFD | PFD) RPARENCHAR
    | OBJECT | OBJ | NOOBJECT | NOOBJ
    | OFFSET | OFF | NOOFFSET | NOOFF
    | OPTFILE
    | (OPTIMIZE | OPT) (LPARENCHAR integerLiteral RPARENCHAR)
    | (OUTDD | OUT) LPARENCHAR dataSetName RPARENCHAR
-   | (PARMCHECK | PC) (LPARENCHAR (MSG | ABD) (COMMACHAR integerLiteral)? RPARENCHAR)? | NOPARMCHECK | NOPC
+   | (PARMCHECK | PC) (LPARENCHAR (MSG | ABD) (commaSeparator integerLiteral)? RPARENCHAR)? | NOPARMCHECK | NOPC
    | (PGMNAME | PGMN) LPARENCHAR (CO | COMPAT | LM | LONGMIXED | LONGUPPER | LU | M_CHAR | MIXED | U_CHAR | UPPER) RPARENCHAR
    | (QUALIFY | QUA) LPARENCHAR (COMPAT | C_CHAR | EXTEND | E_CHAR) RPARENCHAR
    | RENT | NORENT
    | RMODE LPARENCHAR (ANY | AUTO | integerLiteral) RPARENCHAR
-   | RULES LPARENCHAR rulesSuboptions (COMMACHAR rulesSuboptions)* RPARENCHAR | NORULES
+   | RULES LPARENCHAR rulesSuboptions (commaSeparator rulesSuboptions)* RPARENCHAR | NORULES
    | SEQUENCE | SEQ | NOSEQUENCE | NOSEQ
    | (SERVICE | SERV) LPARENCHAR literal RPARENCHAR | NOSERVICE | NOSERV
    | (SOURCE | S_CHAR) (LPARENCHAR (HEX | DEC) RPARENCHAR)? | NOSOURCE | NOS
@@ -103,11 +103,11 @@ compilerOption
    | SQL (LPARENCHAR literal RPARENCHAR)? | NOSQL
    | SQLCCSID | SQLC | NOSQLCCSID | NOSQLC
    | SQLIMS (LPARENCHAR literal RPARENCHAR)? | NOSQLIMS
-   | (SSRANGE | SSR) LPARENCHAR (ssrangeSuboptions (COMMACHAR ssrangeSuboptions)*)? RPARENCHAR | (NOSSRANGE | NOSSR)
+   | (SSRANGE | SSR) LPARENCHAR (ssrangeSuboptions (commaSeparator ssrangeSuboptions)*)? RPARENCHAR | (NOSSRANGE | NOSSR)
    | STGOPT | SO | NOSTGOPT | NOSO
    | SUPPRESS | SUPP | NOSUPPRESS | NOSUPP
    | TERMINAL | TERM | NOTERMINAL | NOTERM
-   | (TEST | NOTEST) (LPARENCHAR (testSuboptions (COMMACHAR testSuboptions)*)? RPARENCHAR)?
+   | (TEST | NOTEST) (LPARENCHAR (testSuboptions (commaSeparator testSuboptions)*)? RPARENCHAR)?
    | THREAD | NOTHREAD
    | TRUNC LPARENCHAR (BIN | OPT | STD) RPARENCHAR
    | TUNE LPARENCHAR integerLiteral RPARENCHAR
@@ -122,12 +122,14 @@ compilerOption
    | ZWB | NOZWB
    ;
 
+commaSeparator: COMMACHAR | COMMASEPARATOR;
+
 invdataSuboptions
    : CLEANSIGN | CS | NOCLEANSIGN | NOCS | FORCENUMCMP | FNC | NOFORCENUMCMP | NOFNC
    ;
 
 numcheckSuboptions
-   : ZON (LPARENCHAR numcheckZonSuboptions (COMMACHAR numcheckZonSuboptions)* RPARENCHAR)? | NOZON
+   : ZON (LPARENCHAR numcheckZonSuboptions (commaSeparator numcheckZonSuboptions)* RPARENCHAR)? | NOZON
    | PAC | NOPAC
    | BIN (LPARENCHAR (TRUNCBIN | NOTRUNCBIN) RPARENCHAR)? | NOBIN
    | MSG | ABD
@@ -213,7 +215,7 @@ remarksParagraph
 // - end of comment entry
 optionalParagraphTermination
    : ~(AUTHOR | CBL| DATE_COMPILED | DATE_WRITTEN | IDENTIFICATION | INSTALLATION
-   | DATA | END | ENVIRONMENT | ID | PROCEDURE | PROCESS | PROGRAM_ID | SECURITY | REMARKS)*?
+   | END | ENVIRONMENT | ID | PROCEDURE | PROCESS | PROGRAM_ID | SECURITY | REMARKS)*?
    ;
 
 // --- environment division --------------------------------------------------------------------
@@ -223,7 +225,7 @@ environmentDivision
    ;
 
 environmentDivisionBody
-   : configurationSection | inputOutputSection | dialectSection
+   : configurationSection | inputOutputSection | dialectSection | dacoControlSection
    ;
 
 // -- configuration section ----------------------------------
@@ -411,7 +413,7 @@ fileControlClause
    ;
 
 assignClause
-   : ASSIGN TO? (DISK | DISPLAY | KEYBOARD | PORT | PRINTER | READER | REMOTE | TAPE | VIRTUAL | (DYNAMIC | EXTERNAL | VARYING)? assignmentName | literal)
+   : ASSIGN TO? (DISK | DISPLAY | KEYBOARD | PORT | PRINTER | READER | REMOTE | TAPE | VIRTUAL | (DYNAMIC | EXTERNAL | VARYING)? assignmentName | literal)+
    ;
 
 reserveClause
@@ -505,7 +507,7 @@ commitmentControlClause
    ;
 
 endClause
-    : (DOT_FS | SEMICOLON_FS)
+    : DOT_FS
     ;
 
 // --- data division --------------------------------------------------------------------
@@ -759,11 +761,15 @@ dataRedefinesClause
    ;
 
 dataRenamesClause
-   : RENAMES dataName thruDataName?
+   : RENAMES qualifiedVariableDataName thruDataName?
    ;
 
 thruDataName
-   : (THROUGH | THRU) dataName
+   : (THROUGH | THRU) qualifiedVariableDataName
+   ;
+
+qualifiedVariableDataName
+   : (dataName (IN | OF))? dataName
    ;
 
 dataSignClause
@@ -894,7 +900,7 @@ sentence
    ;
 
 conditionalStatementCall
-   : (statement SEMICOLON_FS?) | dialectStatement
+   : statement | dialectStatement
    ;
 
 statement
@@ -910,6 +916,14 @@ statement
 dialectStatement
    : dialectNodeFiller | dialectIfStatment
    ;
+
+// DAF DaCo Statements
+
+dacoControlSection
+    : DACO_CONTROL SECTION
+    ;
+
+// End of DaCo Statements
 
 // accept statement
 
@@ -1265,7 +1279,7 @@ exhibitOperand
 // exit statement
 
 exitStatement
-   : EXIT PROGRAM?
+   : EXIT (PROGRAM | SECTION | PARAGRAPH)?
    ;
 
 // generate statement
@@ -1513,7 +1527,7 @@ performStatement
    ;
 
 performInlineStatement
-   : performType? conditionalStatementCall*? END_PERFORM
+   : performType? conditionalStatementCall*? (EXIT PERFORM CYCLE?)? END_PERFORM
    ;
 
 performProcedureStatement
@@ -2210,7 +2224,7 @@ fileName
    ;
 
 functionName
-   : INTEGER | LENGTH | RANDOM | SUM | WHEN_COMPILED | cobolWord
+   : INTEGER | LENGTH | RANDOM | SUM | MAX | WHEN_COMPILED | cobolWord
    ;
 
 indexName

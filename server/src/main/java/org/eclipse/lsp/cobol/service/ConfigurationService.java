@@ -52,14 +52,14 @@ public interface ConfigurationService {
     SQLBackend sqlBackend;
     List<EmbeddedCodeNode.Language> features;
     List<String> dialects;
-    List<String> predefinedLabels;
+    List<String> predefinedParagraphs;
     List<String> subroutines;
 
     public ConfigurationEntity() {
       sqlBackend = SQLBackend.DB2_SERVER;
       features = ImmutableList.of();
       dialects = ImmutableList.of();
-      predefinedLabels = ImmutableList.of();
+      predefinedParagraphs = ImmutableList.of();
       subroutines = ImmutableList.of();
     }
   }

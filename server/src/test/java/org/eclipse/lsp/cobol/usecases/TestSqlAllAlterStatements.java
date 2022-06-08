@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -72,7 +72,9 @@ class TestSqlAllAlterStatements {
           + "             INTEGER) RETURNS NULL ON NULL INPUT END-EXEC.";
   // ALTER FUNCTION (compiled SQL scalar)
   private static final String ALTER_FUNCTION_COMPILED =
-      TEXT + "            EXEC SQL ALTER FUNCTION MY_UDF1 DETERMINISTIC \n" + "            END-EXEC.";
+      TEXT
+          + "            EXEC SQL ALTER FUNCTION MY_UDF1 DETERMINISTIC \n"
+          + "            END-EXEC.";
   private static final String ALTER_FUNCTION_COMPILED2 =
       TEXT
           + "            EXEC SQL ALTER FUNCTION REVERSE\n"
@@ -166,7 +168,10 @@ class TestSqlAllAlterStatements {
           + "            END-EXEC.";
 
   private static final String ALTER_INDEX3 =
-      TEXT + "            EXEC SQL ALTER INDEX X1\n" + "            NOT PADDED;\n" + "            END-EXEC.";
+      TEXT
+          + "            EXEC SQL ALTER INDEX X1\n"
+          + "            NOT PADDED;\n"
+          + "            END-EXEC.";
 
   private static final String ALTER_INDEX4 =
       TEXT
@@ -252,8 +257,8 @@ class TestSqlAllAlterStatements {
           + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
           + "            ACTIVATE VERSION V3;\n"
           + "            END-EXEC.";
-      // ALTER PROCEDURE UPDATE_SALARY_1
-      //      ACTIVATE VERSION V3;
+  // ALTER PROCEDURE UPDATE_SALARY_1
+  //      ACTIVATE VERSION V3;
 
   private static final String ALTER_PROCEDURE_SQL_NATIVE5 =
       TEXT
@@ -264,7 +269,10 @@ class TestSqlAllAlterStatements {
 
   // ALTER SEQUENCE
   private static final String ALTER_SEQUENCE =
-      TEXT + "            EXEC SQL\n" + "            ALTER SEQUENCE org_seq RESTART;\n" + "            END-EXEC.";
+      TEXT
+          + "            EXEC SQL\n"
+          + "            ALTER SEQUENCE org_seq RESTART;\n"
+          + "            END-EXEC.";
 
   // ALTER STOGROUP
   private static final String ALTER_STOGROUP =
@@ -457,7 +465,10 @@ class TestSqlAllAlterStatements {
 
   // ALTER VIEW
   private static final String ALTER_VIEW =
-      TEXT + "            EXEC SQL\n" + "             ALTER VIEW MYVIEW REGENERATE;;\n" + "            END-EXEC.";
+      TEXT
+          + "            EXEC SQL\n"
+          + "             ALTER VIEW MYVIEW REGENERATE;;\n"
+          + "            END-EXEC.";
 
   private static final String ALTER_VIEW2 =
       TEXT

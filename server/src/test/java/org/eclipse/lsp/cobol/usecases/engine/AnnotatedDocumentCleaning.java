@@ -19,19 +19,15 @@ import com.google.common.collect.ImmutableList;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.service.SQLBackend;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.PredefinedCopybooks;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.usecase.UseCasePreprocessorLexer;
 import org.eclipse.usecase.UseCasePreprocessorParser;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -62,12 +58,6 @@ class AnnotatedDocumentCleaning {
       List<String> subroutineNames,
       Map<String, Diagnostic> expectedDiagnostics,
       SQLBackend sqlBackend) {
-    List<String> copybookNames =
-        explicitCopybooks.stream()
-            .map(CobolText::getCopybookName)
-            .map(cbName -> String.format("%s#%s#%s",
-                    cbName.getQualifiedName(), cbName.getDialectType(), DOCUMENT_URI))
-            .collect(toList());
     TestData testData =
         processDocument(
             text,
@@ -75,21 +65,17 @@ class AnnotatedDocumentCleaning {
             DOCUMENT_URI,
             subroutineNames,
             expectedDiagnostics,
-            copybookNames,
-            sqlBackend,
             explicitCopybooks.stream()
                 .findFirst()
                 .map(CobolText::getDialectType)
-                .orElse(DialectType.COBOL.name()));
+                .orElse(null));
 
     return new PreprocessedDocument(
         testData.getText(),
         processCopybooks(
             collectCopybooks(explicitCopybooks, sqlBackend, testData.getCopybookUsages()),
             expectedDiagnostics,
-            testData,
-            copybookNames,
-            sqlBackend),
+            testData),
         testData);
   }
 
@@ -116,32 +102,22 @@ class AnnotatedDocumentCleaning {
   private List<CobolText> processCopybooks(
       Stream<CobolText> copybooks,
       Map<String, Diagnostic> expectedDiagnostics,
-      TestData testData,
-      List<String> explicitCopybooks,
-      SQLBackend sqlBackend) {
+      TestData testData) {
     return copybooks
-        .map(processCopybook(expectedDiagnostics, explicitCopybooks, sqlBackend))
+        .map(processCopybook(expectedDiagnostics))
         .map(collectDataFromCopybooks(testData))
-        .map(it -> new CobolText(it.getCopybookName(), it.getDialectType(), it.getText()))
+        .map(test -> new CobolText(test.getCopybookName(), test.getDialectType(), test.getText()))
         .collect(toList());
   }
 
-  private Function<CobolText, TestData> processCopybook(
-      Map<String, Diagnostic> expectedDiagnostics,
-      List<String> explicitCopybooks,
-      SQLBackend sqlBackend) {
-    return it -> {
-      String qualifier = Optional.ofNullable(it.getQualifier()).map(q -> "_" + q).orElse("");
-      return processDocument(
-          it.getFullText(),
-          it.getFileName() + qualifier,
-          toURI(it.getFileName() + qualifier),
-          ImmutableList.of(),
-          expectedDiagnostics,
-          explicitCopybooks,
-          sqlBackend,
-          it.getDialectType());
-    };
+  private Function<CobolText, TestData> processCopybook(Map<String, Diagnostic> expectedDiagnostics) {
+    return it -> processDocument(
+        it.getFullText(),
+        it.getFileName(),
+        toURI(it.getFileName(), it.getDialectType()),
+        ImmutableList.of(),
+        expectedDiagnostics,
+        it.getDialectType());
   }
 
   private TestData processDocument(
@@ -150,8 +126,6 @@ class AnnotatedDocumentCleaning {
       String uri,
       List<String> subroutineNames,
       Map<String, Diagnostic> expectedDiagnostics,
-      List<String> explicitCopybooks,
-      SQLBackend sqlBackend,
       String dialectType) {
     int numberOfLines = text.split("\\R").length;
 
@@ -198,8 +172,11 @@ class AnnotatedDocumentCleaning {
   private <T> void mergeMaps(Map<String, List<T>> to, Map<String, List<T>> from) {
     from.forEach(
         (key, value) -> {
-          if (to.containsKey(key)) to.get(key).addAll(value);
-          else to.put(key, value);
+          if (to.containsKey(key)) {
+            List<T> list = new LinkedList<>(to.get(key));
+            list.addAll(value);
+            to.put(key, list);
+          } else to.put(key, value);
         });
   }
 }

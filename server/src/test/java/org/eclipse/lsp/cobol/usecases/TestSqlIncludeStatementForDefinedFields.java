@@ -21,9 +21,7 @@ import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * This test checks sql include statement for explicitly defined SQLCA/SQLDA.
- */
+/** This test checks sql include statement for explicitly defined SQLCA/SQLDA. */
 class TestSqlIncludeStatementForDefinedFields {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"

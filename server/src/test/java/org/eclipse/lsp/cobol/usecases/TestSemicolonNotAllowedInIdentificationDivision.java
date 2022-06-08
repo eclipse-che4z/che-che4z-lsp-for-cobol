@@ -26,8 +26,8 @@ import org.junit.jupiter.api.Test;
 /** This test checks that the semicolons are not allowed outside the PROCEDURE DIVISION. */
 class TestSemicolonNotAllowedInIdentificationDivision {
   private static final String TEXT =
-      "       IDENTIFICATION DIVISION{;|1}\n"
-          + "       PROGRAM-ID. TEST1.\n"
+      "       IDENTIFICATION DIVISION;\n"
+          + "       {PROGRAM-ID|1}. {TEST1|2}.\n"
           + "       DATA DIVISION.\n"
           + "       working-storage section.\n"
           + "       01 {$*LINE-SPACING} PIC 9.\n"
@@ -43,7 +43,13 @@ class TestSemicolonNotAllowedInIdentificationDivision {
             "1",
             new Diagnostic(
                 null,
-                "Syntax error on ';' expected '.'",
+                "Extraneous input 'PROGRAM-ID' expected '.'",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "2",
+            new Diagnostic(
+                null,
+                "Syntax error on 'TEST1' expected PROGRAM-ID",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

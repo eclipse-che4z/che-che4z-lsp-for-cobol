@@ -15,10 +15,10 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +54,7 @@ class TestMissingCopybookNotInVariableList {
             "nopic",
             new Diagnostic(
                 null,
-                "A \"PICTURE\" clause was not found for elementary item PARENT",
+                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item PARENT",
                 Error,
                 SourceInfoLevels.ERROR.getText())));
   }

@@ -37,56 +37,41 @@ class TestProcessCbl {
           + "       Program-id. DEMO.";
 
   private static final String PREFIX = "PROCESS ";
-  private static final String SUFFIX = "\n       Identification Division.\n       Program-id. DEMO.";
-
-  @Test
-  void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-  }
+  private static final String SUFFIX =
+      "\n       Identification Division.\n       Program-id. DEMO.";
 
   private static Stream<String> getOptions() {
     return Stream.of(
         "NOADATA",
         "ADATA",
-
         "ADV",
         "NOADV",
-
         "AFP(NOVOLATILE)",
         "AFP(VOLATILE)",
-
         "QUOTE",
         "APOST",
         "Q",
-
         "ARCH(8)",
         "ARCH(10)",
         "ARCH(13)",
-
         "ARITH(COMPAT)",
         "ARITH(EXTEND)",
         "AR(C)",
         "AR(E)",
-
         "NOAWO",
         "AWO",
-
         "NOBLOCK0",
         "BLOCK0",
-
         "BUFSIZE(4096)",
         "BUFSIZE(256)",
         "BUFSIZE(10000)",
         "BUFSIZE(128K)",
         "BUF(256)",
-
         "NOCICS",
         "CICS",
         "CICS(\"string1\")",
-
         "CODEPAGE(1140)",
         "CP(37)",
-
         "NOCOMPILE(S)",
         "NOCOMPILE(E)",
         "NOCOMPILE(W)",
@@ -94,63 +79,50 @@ class TestProcessCbl {
         "NOCOMPILE",
         "C",
         "NOC",
-
         "NOCOPYLOC",
         "COPYLOC(MYLIB,DSN(USERID.COBOL.COPYLIB1))",
         "COPYLOC(MYLIB,PATH('/home/userid/copylib1'))",
         "CPLC(DSN(USER.COBOL))",
         "COPYLOC(SYSLIB,PATH('/tmp'))",
         "NOCPLC",
-
         "NOCOPYRIGHT",
         "COPYRIGHT('copyright string')",
         "NOCPYR",
-
         "NOCURRENCY",
         "CURRENCY($)",
         "CURR(€)",
         "NOCURR",
-
         "DATA(31)",
         "DATA(24)",
-
         "DBCS",
         "NODBCS",
-
         "NODECK",
         "DECK",
         "D",
         "NOD",
-
         "NODEFINE",
         "DEFINE(foo)",
         "DEFINE(foo=bar)",
         "DEF(foo,bar)",
         "NODEF",
-
         "NODIAGTRUNC",
         "DIAGTRUNC",
         "DTR",
         "NODTR",
-
         "DISPSIGN(COMPAT)",
         "DISPSIGN(SEP)",
         "DS(C)",
         "DS(S)",
-
         "DLL",
         "NODLL",
-
         "DUMP",
         "NODUMP",
         "DU",
         "NODU",
-
         "NODYNAM",
         "DYNAM",
         "DYN",
         "NODYN",
-
         "NOEXIT",
         "EXIT()",
         "EXIT(INEXIT(mod1))",
@@ -166,51 +138,41 @@ class TestProcessCbl {
         "EXIT(MSGEXIT(str1,mod1) NOMSGEXIT)",
         "EX(MSGX(mod2) NOMSGX)",
         "NOEX",
-
         "NOEXPORTALL",
         "EXPORTALL",
         "EXP",
         "NOEXP",
-
         "NOFASTSRT",
         "FASTSRT",
         "FSRT",
         "NOFSRT",
-
         "FLAG(I,I)",
         "NOFLAG",
         "FLAG(W)",
         "F(E)",
         "F(S,U)",
         "NOF",
-
         "NOFLAGSTD",
         "FLAGSTD(M)",
         "FLAGSTD(I D)",
         "FLAGSTD(H NS, O)",
         "FLAGSTD(M SD)",
-
         "HGPR(PRESERVE)",
         "HGPR(NOPRESERVE)",
-
         "NOINITCHECK",
         "INITCHECK",
         "INITCHECK()",
         "INITCHECK(LAX)",
         "IC(STRICT)",
         "NOIC",
-
         "NOINITIAL",
         "INITIAL",
-
         "INLINE",
         "NOINLINE",
         "INL",
         "NOINL",
-
         "INTDATE(ANSI)",
         "INTDATE(LILIAN)",
-
         "INVDATA",
         "INVDATA(NOFORCENUMCMP,CLEANSIGN)",
         "INVDATA(NOCLEANSIGN)",
@@ -219,7 +181,6 @@ class TestProcessCbl {
         "INVD(FNC,NOFNC)",
         "NOINVDATA",
         "NOINVD",
-
         "LANGUAGE(ENGLISH)",
         "LANG(EN)",
         "LANGUAGE(JAPANESE)",
@@ -227,27 +188,21 @@ class TestProcessCbl {
         "LANG(JP)",
         "LANGUAGE(UENGLISH)",
         "LANG(UE)",
-
         "LINECOUNT(60)",
         "LC(10)",
         "LC(0)",
         "LC(255)",
-
         "NOLIST",
         "LIST",
-
         "LP(32)",
         "LP(64)",
-
         "NOMAP",
         "MAP",
         "MAP(HEX)",
         "MAP(DEC)",
-
         "MAXPCF(100000)",
         "MAXPCF(0)",
         "MAXPCF(999999)",
-
         "NOMDECK",
         "MDECK",
         "MDECK(COMPILE)",
@@ -256,21 +211,17 @@ class TestProcessCbl {
         "MD(C)",
         "MD(NOC)",
         "NOMD",
-
         "NONAME",
         "NAME",
         "NAME(NOALIAS)",
         "NAME(ALIAS)",
-
         "NSYMBOL(NATIONAL)",
         "NSYMBOL(DBCS)",
         "NS(NAT)",
-
         "NONUMBER",
         "NUMBER",
         "NUM",
         "NONUM",
-
         "NUMCHECK",
         "NONUMCHECK",
         "NC",
@@ -289,29 +240,22 @@ class TestProcessCbl {
         "NUMCHECK(NOBIN)",
         "NUMCHECK(MSG, ABD)",
         "NUMCHECK(ZON(ALPHNUM,STRICT),PAC,BIN(TRUNCBIN),MSG)",
-
         "NUMPROC(NOPFD)",
         "NUMPROC(PFD)",
-
         "OBJECT",
         "NOOBJECT",
         "OBJ",
         "NOOBJ",
-
         "NOOFFSET",
         "OFFSET",
         "OFF",
         "NOOFF",
-
         "OPTFILE",
-
         "OPTIMIZE(0)",
         "OPT(1)",
         "OPT(2)",
-
         "OUTDD(SYSOUT)",
         "OUT(SOME.DD.NAME)",
-
         "NOPARMCHECK",
         "PARMCHECK",
         // in case (MSG,100) without space between ',' and '1' `,100` will be a NUMERICLITERAL
@@ -319,7 +263,6 @@ class TestProcessCbl {
         "PC(ABD)",
         "PC(MSG, 5000)",
         "NOPC",
-
         "PGMNAME(COMPAT)",
         "PGMN(CO)",
         "PGMNAME(LONGMIXED)",
@@ -330,19 +273,15 @@ class TestProcessCbl {
         "PGMN(UPPER)",
         "PGMN(LU)",
         "PGMN(U)",
-
         "QUALIFY(COMPAT)",
         "QUALIFY(EXTEND)",
         "QUA(C)",
         "QUA(E)",
-
         "RENT",
         "NORENT",
-
         "RMODE(AUTO)",
         "RMODE(24)",
         "RMODE(ANY)",
-
         "NORULES",
         "RULES(ENDPERIOD, ENDP)",
         "RULES(NOENDPERIOD)",
@@ -359,62 +298,50 @@ class TestProcessCbl {
         "RULES(NOUNREFSOURCE, NOUNRS)",
         "RULES(LAXREDEF, LXRDF)",
         "RULES(NOLAXREDEF)",
-
         "SEQUENCE",
         "NOSEQUENCE",
         "SEQ",
         "NOSEQ",
-
         "NOSERVICE",
         "SERVICE('service string')",
         "NOSERV",
-
         "SOURCE",
         "SOURCE(DEC)",
         "SOURCE(HEX)",
         "NOSOURCE",
         "S",
         "NOS",
-
         "SPACE(1)",
         "SPACE(2)",
         "SPACE(3)",
-
         "NOSQL",
         "SQL",
         "SQL(\"DB2-suboption-string\")",
-
         "SQLCCSID",
         "NOSQLCCSID",
         "SQLC",
         "NOSQLC",
-
         "NOSQLIMS",
         "SQLIMS",
         "SQLIMS(\"IMS-suboption-string\")",
-
         "NOSSRANGE",
         "SSRANGE()",
         "SSRANGE(ZLEN)",
         "SSRANGE(NOZLEN,ABD)",
         "SSR(MSG)",
         "NOSSR",
-
         "NOSTGOPT",
         "STGOPT",
         "SO",
         "NOSO",
-
         "SUPPRESS",
         "NOSUPPRESS",
         "SUPP",
         "NOSUPP",
-
         "NOTERMINAL",
         "TERMINAL",
         "TERM",
         "NOTERM",
-
         "NOTEST",
         "TEST",
         "TEST()",
@@ -424,62 +351,54 @@ class TestProcessCbl {
         "TEST(SEPARATE, SEPARATE(DSNAME), SEPARATE(NODSNAME))",
         "TEST(SOURCE, NOSOURCE)",
         "TEST(NOSO, SO, NOSEP, SEP)",
-
         "NOTHREAD",
         "THREAD",
-
         "TRUNC(STD)",
         "TRUNC(OPT)",
         "TRUNC(BIN)",
-
         "TUNE(8)",
         "TUNE(11)",
         "TUNE(13)",
-
         "NOVBREF",
         "VBREF",
-
         "VLR(STANDARD)",
         "VLR(COMPAT)",
         "VLR(C)",
         "VLR(S)",
-
         "VSAMOPENFS(COMPAT)",
         "VSAMOPENFS(SUCC)",
         "VS(C)",
         "VS(S)",
-
         "NOWORD",
         "WORD(ABCD)",
         "WD(1234)",
         "NOWD",
-
         "XMLPARSE(XMLSS)",
         "XMLPARSE(COMPAT)",
         "XP(X)",
         "XP(C)",
-
         "XREF",
         "XREF(FULL)",
         "XREF(SHORT)",
         "X",
         "NOXREF",
         "NOX",
-
         "NOZONECHECK",
         "ZONECHECK(MSG)",
         "ZONECHECK(ABD)",
         "ZC(ABD)",
         "NOZC",
-
         "ZONEDATA(PFD)",
         "ZONEDATA(NOPFD)",
         "ZONEDATA(MIG)",
         "ZD(PFD)",
-
         "ZWB",
-        "NOZWB"
-    );
+        "NOZWB");
+  }
+
+  @Test
+  void test() {
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 
   @ParameterizedTest
@@ -490,23 +409,29 @@ class TestProcessCbl {
 
   @Test
   void negativeCaseForCurrency() {
-    UseCaseEngine.runTest(PREFIX + "CURR({foo|1})" + SUFFIX, ImmutableList.of(), ImmutableMap.of(
-        "1",
-        new Diagnostic(null,
-            "Syntax error on 'foo' expected 'Currency symbol'",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText())
-    ));
+    UseCaseEngine.runTest(
+        PREFIX + "CURR({foo|1})" + SUFFIX,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Syntax error on 'foo' expected 'Currency symbol'",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 
   @Test
   void negativeCaseForBuff() {
-    UseCaseEngine.runTest(PREFIX + "BUFSIZE({256Kb|1})" + SUFFIX, ImmutableList.of(), ImmutableMap.of(
-        "1",
-        new Diagnostic(null,
-            "Syntax error on '256Kb' expected {'01-49', '66', '77', '88', INTEGERLITERAL}",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText())
-    ));
+    UseCaseEngine.runTest(
+        PREFIX + "BUFSIZE({256Kb|1})" + SUFFIX,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Syntax error on '256Kb' expected {'01-49', '66', '77', '88', INTEGERLITERAL}",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

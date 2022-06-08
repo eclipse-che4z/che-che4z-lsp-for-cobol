@@ -23,9 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
-/**
- * This test checks that redefined variable should immediately follow
- */
+/** This test checks that redefined variable should immediately follow */
 class TestVariableRedefineAsap {
   private static final String REDEFINES_SHOULD_FOLLOW =
       "       IDENTIFICATION DIVISION.\n"

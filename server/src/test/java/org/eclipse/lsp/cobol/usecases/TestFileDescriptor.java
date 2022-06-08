@@ -157,6 +157,33 @@ class TestFileDescriptor {
           + "           RECORDING MODE IS F\n"
           + "           BLOCK CONTAINS 0 RECORDS.";
 
+  private static final String MULTIPLE_ASSIGNMENTS_NAME_TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.  calc2.\n"
+          + "004500 ENVIRONMENT DIVISION.                                            IX1014.2\n"
+          + "004600 CONFIGURATION SECTION.                                           IX1014.2\n"
+          + "004700 SOURCE-COMPUTER.                                                 IX1014.2\n"
+          + "004800     XXXXX082.                                                    IX1014.2\n"
+          + "004900 OBJECT-COMPUTER.                                                 IX1014.2\n"
+          + "005000     XXXXX083.                                                    IX1014.2\n"
+          + "005100 INPUT-OUTPUT SECTION.                                            IX1014.2\n"
+          + "005200 FILE-CONTROL.                                                    IX1014.2\n"
+          + "006000     SELECT   {$IX-FS1} ASSIGN TO                                    IX1014.2\n"
+          + "006100     XXXXP024                                                     IX1014.2\n"
+          + "006200     XXXXP044                                                     IX1014.2\n"
+          + "006300     ORGANIZATION IS INDEXED                                      IX1014.2\n"
+          + "006400     RECORD KEY IS {$IX-FS1-KEY}                                     IX1014.2\n"
+          + "006500     ACCESS MODE IS SEQUENTIAL.                                   IX1014.2\n"
+          + "006600 DATA DIVISION.                                                   IX1014.2\n"
+          + "006700 FILE SECTION.                                                    IX1014.2\n"
+          + "008700 FD  {$*IX-FS1}                                                       IX1014.2\n"
+          + "008800     LABEL RECORD IS STANDARD                                     IX1014.2\n"
+          + "008900     DATA RECORD IS IX-FS1R1-F-G-240                              IX1014.2\n"
+          + "009000     BLOCK CONTAINS 1 RECORDS                                     IX1014.2\n"
+          + "009100     RECORD CONTAINS 240 CHARACTERS.                              IX1014.2\n"
+          + "009200 01  {$*IX-FS1R1-F-G-240}.                                            IX1014.2\n"
+          + "009600     05 {$*IX-FS1-KEY}  PIC X(29).                                    IX1014.2";
+
   @Test
   void test() {
     AnalysisResult analysisResult =
@@ -237,5 +264,11 @@ class TestFileDescriptor {
                 "File INFILE is already in the FILE-CONTROL paragraph",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
+  }
+
+  @Test
+  // Ref - https://www.ibm.com/docs/en/cobol-zos/6.3?topic=section-file-control-paragraph
+  void whenMultipleAssignmentNameProvided_thenShowNoError() {
+    UseCaseEngine.runTest(MULTIPLE_ASSIGNMENTS_NAME_TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 }

@@ -40,7 +40,7 @@ copyIdmsSource
     ;
 
 copySource
-   : (literal | cobolWord) ((OF | IN) copyLibrary)?
+   : (literal | cobolWord | SUBSCHEMA_NAMES) ((OF | IN) copyLibrary)?
    ;
 
 copyLibrary

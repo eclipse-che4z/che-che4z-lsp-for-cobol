@@ -15,11 +15,11 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
@@ -54,17 +54,26 @@ class TestCopybookWithIndirectRecursiveDependencyIsDetected {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(new CobolText(INNER_COPY_NAME, INNER_COPY), new CobolText(INDIRECT_NAME, INDIRECT)),
+        ImmutableList.of(
+            new CobolText(INNER_COPY_NAME, INNER_COPY), new CobolText(INDIRECT_NAME, INDIRECT)),
         ImmutableMap.of(
             "1",
-            new Diagnostic(null, MESSAGE_RECURSION + INDIRECT_NAME, Error, SourceInfoLevels.ERROR.getText()),
+            new Diagnostic(
+                null, MESSAGE_RECURSION + INDIRECT_NAME, Error, SourceInfoLevels.ERROR.getText()),
             "2",
-            new Diagnostic(null, MESSAGE_RECURSION + INNER_COPY_NAME, Error, SourceInfoLevels.ERROR.getText()),
+            new Diagnostic(
+                null, MESSAGE_RECURSION + INNER_COPY_NAME, Error, SourceInfoLevels.ERROR.getText()),
             "3",
             new Diagnostic(
-                null, MESSAGE_LONG_DECLARATION + INDIRECT_NAME, Information, SourceInfoLevels.INFO.getText()),
+                null,
+                MESSAGE_LONG_DECLARATION + INDIRECT_NAME,
+                Information,
+                SourceInfoLevels.INFO.getText()),
             "4",
             new Diagnostic(
-                null, MESSAGE_LONG_DECLARATION + INNER_COPY_NAME, Information, SourceInfoLevels.INFO.getText())));
+                null,
+                MESSAGE_LONG_DECLARATION + INNER_COPY_NAME,
+                Information,
+                SourceInfoLevels.INFO.getText())));
   }
 }

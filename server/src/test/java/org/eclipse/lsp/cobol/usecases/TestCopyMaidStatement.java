@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class TestCopyMaidStatement {
           + "          PROGRAM-ID. PARTEST.\n"
           + "          DATA DIVISION.\n"
           + "          WORKING-STORAGE SECTION.\n"
-          + "          01 COPY MAID {~NAME}.\n"
+          + "          01 COPY MAID {~NAME!DaCo}.\n"
           + "          PROCEDURE DIVISION.\n"
           + "              DISPLAY {$ABC}.";
 
@@ -37,6 +37,8 @@ class TestCopyMaidStatement {
   @Test
   void test() {
     UseCaseEngine.runTest(
-        TEXT, ImmutableList.of(new CobolText("NAME", DialectType.MAID.name(), COPYBOOK)), ImmutableMap.of());
+        TEXT,
+        ImmutableList.of(new CobolText("NAME", DaCoDialect.NAME, COPYBOOK)),
+        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }
