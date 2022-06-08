@@ -23,7 +23,8 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test that unknown variable definition error is shown to the user in case the engine can't recognize definition type
+ * Test that unknown variable definition error is shown to the user in case the engine can't
+ * recognize definition type
  */
 class TestUnknownVariableDefinition {
   private static final String TEXT =
@@ -50,7 +51,6 @@ class TestUnknownVariableDefinition {
                 null,
                 "Unexpected end of file",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())
-        ));
+                SourceInfoLevels.ERROR.getText())));
   }
 }

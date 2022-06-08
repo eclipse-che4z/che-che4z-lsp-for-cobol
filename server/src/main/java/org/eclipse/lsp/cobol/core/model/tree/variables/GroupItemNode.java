@@ -72,6 +72,7 @@ public class GroupItemNode extends VariableWithLevelNode implements UsageClause 
   private List<SyntaxError> processNode() {
     List<SyntaxError> errors = new ArrayList<>();
     if (getUsageFormat() == UsageFormat.UNDEFINED
+        && !this.isRedefines()
         && getChildren().stream().noneMatch(hasType(NodeType.VARIABLE)))
       errors.add(getError(MessageTemplate.of(EMPTY_STRUCTURE_MSG, getName())));
     return errors;

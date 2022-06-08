@@ -15,8 +15,14 @@
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+
+import java.util.Optional;
 
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_66;
 
@@ -29,12 +35,25 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class RenameItemNode extends VariableWithLevelNode {
-  public RenameItemNode(Locality location, String name, boolean redefines, boolean global) {
+
+  @EqualsAndHashCode.Exclude @ToString.Exclude @Getter @Setter private GroupItemNode varGroupParent;
+
+  public RenameItemNode(
+      Locality location, String name, boolean redefines, boolean global) {
     super(location, LEVEL_66, name, redefines, VariableType.RENAME_ITEM, global);
   }
 
   @Override
   protected String getVariableDisplayString() {
     return getFormattedSuffix() + ".";
+  }
+
+  @Override
+  public Optional<Node> getNearestParentByType(NodeType type) {
+    if (type == NodeType.VARIABLE)
+      return Optional.ofNullable(varGroupParent)
+          .flatMap(
+              it -> (it.getNodeType() == type) ? Optional.of(it) : it.getNearestParentByType(type));
+    else return super.getNearestParentByType(type);
   }
 }

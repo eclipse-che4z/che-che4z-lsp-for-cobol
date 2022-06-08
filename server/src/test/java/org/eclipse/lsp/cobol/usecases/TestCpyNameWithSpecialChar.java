@@ -25,8 +25,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This test proves that special chars (@,#,$) in copybook name recognized correctly, and the error
- * appears because of the missing copybook.
- * Copybook name with underscore is not allowed.
+ * appears because of the missing copybook. Copybook name with underscore is not allowed.
  */
 class TestCpyNameWithSpecialChar {
 
@@ -41,7 +40,6 @@ class TestCpyNameWithSpecialChar {
       BASE + "        COPY {~@SPE#-$|1}.\r\n" + "        PROCEDURE DIVISION.\r\n";
   private static final String TEXT_CONTAINS_UNDERSCORE =
       BASE + "        COPY {~@SPE#_$|1|2}.\r\n" + "        PROCEDURE DIVISION.\r\n";
-
 
   private static final String MESSAGE = "@SPE#-$: Copybook not found";
   private static final String MESSAGE_1 = "@SPE#_$: Copybook not found";
@@ -68,14 +66,14 @@ class TestCpyNameWithSpecialChar {
             "1",
                 new Diagnostic(
                     null,
-                        MESSAGE_1,
+                    MESSAGE_1,
                     DiagnosticSeverity.Error,
                     SourceInfoLevels.ERROR.getText(),
                     CODE),
             "2",
                 new Diagnostic(
                     null,
-                        MESSAGE_2,
+                    MESSAGE_2,
                     DiagnosticSeverity.Error,
                     SourceInfoLevels.ERROR.getText(),
                     null)));

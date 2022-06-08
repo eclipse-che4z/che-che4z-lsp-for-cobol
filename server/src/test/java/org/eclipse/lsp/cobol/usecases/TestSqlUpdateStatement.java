@@ -129,16 +129,7 @@ class TestSqlUpdateStatement {
 
   private static Stream<String> textsToTest() {
     return Stream.of(
-        UPDATE,
-        UPDATE2,
-        UPDATE3,
-        UPDATE4,
-        UPDATE5,
-        UPDATE6,
-        UPDATE7,
-        UPDATE8,
-        UPDATE9,
-        UPDATE10);
+        UPDATE, UPDATE2, UPDATE3, UPDATE4, UPDATE5, UPDATE6, UPDATE7, UPDATE8, UPDATE9, UPDATE10);
   }
 
   @ParameterizedTest

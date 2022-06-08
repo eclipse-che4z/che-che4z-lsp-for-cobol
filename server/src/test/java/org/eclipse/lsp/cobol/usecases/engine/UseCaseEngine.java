@@ -19,9 +19,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.core.model.tree.Context;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
@@ -31,10 +33,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
@@ -46,7 +45,6 @@ import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.*;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
-import static org.eclipse.lsp.cobol.service.copybooks.PredefinedCopybooks.PREF_IMPLICIT;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.analyze;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -108,6 +106,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @UtilityClass
 public class UseCaseEngine {
+  private final Comparator<Position> positionComparator =
+      comparing(Position::getLine).thenComparing(Position::getCharacter);
+  private final Comparator<Range> rangeComparator =
+      comparing(Range::getStart, positionComparator)
+          .thenComparing(Range::getEnd, positionComparator);
+  private final Comparator<Diagnostic> diagnosticComparator =
+      comparing(Diagnostic::getRange, rangeComparator).thenComparing(Diagnostic::getMessage);
+
   /**
    * Check if the language engine applies required syntax and semantic checks. All the semantic
    * elements in the given text, as well as syntax errors, should be wrapped with according tags.
@@ -207,7 +213,7 @@ public class UseCaseEngine {
                     analysisConfig.getCopybookConfig().getCopybookProcessingMode())
                 .features(analysisConfig.getFeatures())
                 .dialects(analysisConfig.getDialects())
-                .predefinedLabels(analysisConfig.getCopybookConfig().getPredefinedLabels())
+                .predefinedParagraphs(analysisConfig.getCopybookConfig().getPredefinedParagraphs())
                 .build());
     assertResultEquals(actual, document.getTestData());
     return actual;
@@ -257,7 +263,7 @@ public class UseCaseEngine {
   private Map<String, List<Location>> extractVariableDefinitions(AnalysisResult result) {
     return extractVariables(
         result,
-        it -> !it.getLocality().getUri().startsWith(PREF_IMPLICIT),
+        it -> !ImplicitCodeUtils.isImplicit(it.getLocality().getUri()),
         Context::getDefinitions);
   }
 
@@ -281,7 +287,7 @@ public class UseCaseEngine {
         .flatMap(Collection::stream)
         .filter(it -> !FILLER_NAME.equals(it.getName()))
         .filter(predicate)
-        .collect(toMap(extractor));
+        .collect(toMap(extractor, PROGRAM));
   }
 
   private Map<String, List<Location>> extractDefinitions(AnalysisResult result, NodeType nodeType) {
@@ -291,7 +297,7 @@ public class UseCaseEngine {
         Context::getDefinitions,
         context ->
             !(context.getDefinitions().isEmpty()
-                || context.getDefinitions().get(0).getUri().startsWith(PREF_IMPLICIT)));
+                || ImplicitCodeUtils.isImplicit(context.getDefinitions().get(0).getUri())));
   }
 
   private Map<String, List<Location>> extractUsages(AnalysisResult result, NodeType nodeType) {
@@ -309,13 +315,19 @@ public class UseCaseEngine {
         .filter(hasType(nodeType))
         .map(Context.class::cast)
         .filter(predicate)
-        .collect(toMap(extractor));
+        .collect(toMap(extractor, nodeType));
   }
 
   private Collector<Context, ?, Map<String, List<Location>>> toMap(
-      Function<Context, List<Location>> extractor) {
+          Function<Context, List<Location>> extractor, NodeType nodeType) {
     return Collectors.toMap(
-        Context::getName,
+        ctx -> {
+          if (nodeType != COPY) {
+            return ctx.getName().toUpperCase();
+          }
+          String dialect = ((CopyNode) ctx).getDialect();
+          return (dialect == null ? ctx.getName() : ctx.getName() + '!' + dialect).toUpperCase();
+        },
         extractor,
         (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).distinct().collect(toList()));
   }
@@ -332,16 +344,6 @@ public class UseCaseEngine {
           expectedDiagnostic, actualDiagnostic, "Different diagnostics for: " + documentUri);
     }
   }
-
-  private final Comparator<Position> positionComparator =
-      comparing(Position::getLine).thenComparing(Position::getCharacter);
-
-  private final Comparator<Range> rangeComparator =
-      comparing(Range::getStart, positionComparator)
-          .thenComparing(Range::getEnd, positionComparator);
-
-  private final Comparator<Diagnostic> diagnosticComparator =
-      comparing(Diagnostic::getRange, rangeComparator).thenComparing(Diagnostic::getMessage);
 
   private void assertResult(
       String message, Map<String, List<Location>> expected, Map<String, List<Location>> actual) {

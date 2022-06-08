@@ -16,13 +16,14 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.junit.jupiter.api.Test;
 
@@ -38,8 +39,8 @@ class TestCopyMaidWithQualifierHasCorrectDefinition {
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 COPY MAID {~BHTRGL`BHTRGL_ABC} ABC.\n"
-          + "       01 COPY MAID {~BHTRGL}.\n"
+          + "       01 COPY MAID {~BHTRGL!DaCo`BHTRGL_ABC} ABC.\n"
+          + "       01 COPY MAID {~BHTRGL!DaCo`BHTRGL}.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL1}."
           + "           DISPLAY {$BHTRGL2}.";
@@ -49,13 +50,13 @@ class TestCopyMaidWithQualifierHasCorrectDefinition {
 
   @Test
   void test() {
+    ImmutableList<CobolText> copybooks = ImmutableList.of(
+            new CobolText("BHTRGL", DaCoDialect.NAME, BHTRGL),
+            new CobolText("BHTRGL_ABC", DaCoDialect.NAME, BHTRGL_ABC));
+    ImmutableMap<String, Diagnostic> diagnostics = ImmutableMap.of();
     assertThat(
-        UseCaseEngine.runTest(
-                TEXT,
-                ImmutableList.of(
-                    new CobolText("BHTRGL", DialectType.MAID.name(), BHTRGL),
-                    new CobolText("BHTRGL", DialectType.MAID.name(), "ABC", BHTRGL_ABC)),
-                ImmutableMap.of())
+        UseCaseEngine.runTest(TEXT, copybooks, diagnostics, ImmutableList.of(),
+                        DialectConfigs.getDaCoAnalysisConfig())
             .getRootNode()
             .getDepthFirstStream()
             .filter(it -> it.getNodeType() == NodeType.COPY)
@@ -64,6 +65,6 @@ class TestCopyMaidWithQualifierHasCorrectDefinition {
             .map(CopyDefinition::getLocation)
             .map(Location::getUri)
             .collect(toList()),
-        containsInAnyOrder(UseCaseUtils.toURI("BHTRGL"), UseCaseUtils.toURI("BHTRGL_ABC")));
+        containsInAnyOrder(UseCaseUtils.toURI("BHTRGL", "DaCo"), UseCaseUtils.toURI("BHTRGL_ABC", "DaCo")));
   }
 }

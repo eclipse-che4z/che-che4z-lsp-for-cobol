@@ -55,7 +55,7 @@ public class CachingConfigurationService implements ConfigurationService {
                     TARGET_SQL_BACKEND.label,
                     ANALYSIS_FEATURES.label,
                     DIALECTS.label,
-                    PREDEFINED_LABELS.label,
+                    PREDEFINED_PARAGRAPHS.label,
                     SUBROUTINE_LOCAL_PATHS.label))
             .thenApply(this::parseConfig);
   }
@@ -99,7 +99,7 @@ public class CachingConfigurationService implements ConfigurationService {
         parseSQLBackend(clientConfig.subList(0, 1)),
         parseFeatures((JsonElement) clientConfig.get(1)),
         parseDialects((JsonArray) clientConfig.get(2)),
-        parsePredefinedLabels((JsonElement) clientConfig.get(3)),
+        parsePredefinedParagraphs((JsonElement) clientConfig.get(3)),
         parseSubroutineFolder((JsonElement) clientConfig.get(4)));
   }
 
@@ -123,7 +123,7 @@ public class CachingConfigurationService implements ConfigurationService {
     return Arrays.asList(EmbeddedCodeNode.Language.values());
   }
 
-  private List<String> parsePredefinedLabels(JsonElement labels) {
+  private List<String> parsePredefinedParagraphs(JsonElement labels) {
     if (labels.isJsonArray()) {
       return Streams.stream((JsonArray) labels).map(JsonElement::getAsString).collect(toList());
     }

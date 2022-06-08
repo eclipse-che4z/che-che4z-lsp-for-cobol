@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.core.messages;
 
-import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonPrimitive;
+import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

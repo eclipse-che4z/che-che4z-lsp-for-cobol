@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -92,7 +92,9 @@ class TestSqlAllRevokeStatements {
           + "           END-EXEC.";
 
   private static final String REVOKE_ON_FUNCTION =
-      TEXT + "            REVOKE EXECUTE ON FUNCTION CALC_SALARY FROM JONES;\n" + "           END-EXEC.";
+      TEXT
+          + "            REVOKE EXECUTE ON FUNCTION CALC_SALARY FROM JONES;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_PROCEDURE =
       TEXT
@@ -103,22 +105,30 @@ class TestSqlAllRevokeStatements {
       TEXT + "            REVOKE COPY ON PACKAGE DSN8CC61.* FROM LEWIS;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_PACKAGE2 =
-      TEXT + "            REVOKE EXECUTE ON PACKAGE DSN9CC13.* FROM ROLE ROLE1;\n" + "           END-EXEC.";
+      TEXT
+          + "            REVOKE EXECUTE ON PACKAGE DSN9CC13.* FROM ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_PLAN =
       TEXT + "            REVOKE BIND ON PLAN DSN8IP12 FROM JONES;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_PLAN2 =
-      TEXT + "            REVOKE BIND,EXECUTE ON PLAN DSN8CP12 FROM PUBLIC;\n" + "           END-EXEC.";
+      TEXT
+          + "            REVOKE BIND,EXECUTE ON PLAN DSN8CP12 FROM PUBLIC;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_PLAN3 =
-      TEXT + "            REVOKE EXECUTE ON PLAN DSN8CP12 FROM ADAMSON,BROWN;\n" + "           END-EXEC.";
+      TEXT
+          + "            REVOKE EXECUTE ON PLAN DSN8CP12 FROM ADAMSON,BROWN;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_PLAN4 =
       TEXT + "            REVOKE BIND ON PLAN DSN91PLN FROM ROLE ROLE1;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_SCHEMA =
-      TEXT + "            REVOKE CREATEIN ON SCHEMA T_SCORES FROM JONES;\n" + "           END-EXEC.";
+      TEXT
+          + "            REVOKE CREATEIN ON SCHEMA T_SCORES FROM JONES;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_SCHEMA2 =
       TEXT + "            REVOKE CREATEIN ON SCHEMA VAC FROM PUBLIC;\n" + "           END-EXEC.";
@@ -133,7 +143,9 @@ class TestSqlAllRevokeStatements {
           + "           END-EXEC.";
 
   private static final String REVOKE_ON_SCHEMA5 =
-      TEXT + "            REVOKE ALTERIN ON SCHEMA EMPLOYEE FROM ROLE ROLE1;\n" + "           END-EXEC.";
+      TEXT
+          + "            REVOKE ALTERIN ON SCHEMA EMPLOYEE FROM ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_SEQUENCE =
       TEXT
@@ -162,7 +174,10 @@ class TestSqlAllRevokeStatements {
       TEXT + "            REVOKE TRACE\n" + "            FROM PUBLIC;\n" + "           END-EXEC.";
 
   private static final String REVOKE_SYS_PRIVILGES4 =
-      TEXT + "            REVOKE ARCHIVE\n" + "             FROM ROLE ROLE1;\n" + "           END-EXEC.";
+      TEXT
+          + "            REVOKE ARCHIVE\n"
+          + "             FROM ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_SYS_PRIVILGES5 =
       TEXT
@@ -185,13 +200,19 @@ class TestSqlAllRevokeStatements {
           + "           END-EXEC.";
 
   private static final String REVOKE_ON_TABLE =
-      TEXT + "            REVOKE SELECT ON TABLE DSN8C10.EMP FROM PULASKI;\n" + "           END-EXEC.";
+      TEXT
+          + "            REVOKE SELECT ON TABLE DSN8C10.EMP FROM PULASKI;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_TABLE2 =
-      TEXT + "            REVOKE UPDATE ON TABLE DSN8C10.EMP FROM PUBLIC;\n" + "           END-EXEC.";
+      TEXT
+          + "            REVOKE UPDATE ON TABLE DSN8C10.EMP FROM PUBLIC;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_TABLE3 =
-      TEXT + "            REVOKE ALL ON TABLE DSN8C10.EMP FROM KWAN,THOMPSON;\n" + "           END-EXEC.";
+      TEXT
+          + "            REVOKE ALL ON TABLE DSN8C10.EMP FROM KWAN,THOMPSON;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_TABLE4 =
       TEXT

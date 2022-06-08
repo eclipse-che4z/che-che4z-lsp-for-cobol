@@ -35,7 +35,7 @@ class TestCopyMaidWithQualifierMissingCopybook {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*MRB|1}.\n"
-          + "           03 COPY MAID {~ABCDEFG123`ABCDEFG123_ABC|2} ABC.\n"
+          + "           03 COPY MAID {~ABCDEFG123!DaCo`ABCDEFG123_ABC|2} ABC.\n"
           + "       01  {$*QWE} PIC 9.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {VAR1|3}.\n"
@@ -51,7 +51,7 @@ class TestCopyMaidWithQualifierMissingCopybook {
             "1",
             new Diagnostic(
                 null,
-                "A \"PICTURE\" clause was not found for elementary item MRB",
+                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item MRB",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText()),
             "2",
@@ -66,6 +66,6 @@ class TestCopyMaidWithQualifierMissingCopybook {
                 null,
                 "Variable VAR1 is not defined",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

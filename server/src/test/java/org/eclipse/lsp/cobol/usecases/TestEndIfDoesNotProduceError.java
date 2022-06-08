@@ -43,11 +43,12 @@ class TestEndIfDoesNotProduceError {
             "1",
             new Diagnostic(
                 null,
-                "Extraneous input 'END' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, COMPUTE, CONTINUE,"
-                    + " DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, GENERATE, "
-                    + "GO, GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, PURGE, "
-                    + "READ, READY, RECEIVE, RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT, "
-                    + "START, STOP, STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, '.', ';'}",
+                "Extraneous input 'END' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, COMPUTE, CONTINUE, "
+                    + "DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, "
+                    + "GENERATE, GO, GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, "
+                    + "PERFORM, PURGE, READ, READY, RECEIVE, RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, "
+                    + "SERVICE, SET, SORT, START, STOP, STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, "
+                    + "'.'}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText()),
             "2",

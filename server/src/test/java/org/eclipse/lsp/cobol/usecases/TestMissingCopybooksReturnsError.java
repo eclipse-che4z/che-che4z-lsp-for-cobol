@@ -15,10 +15,10 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
@@ -43,6 +43,10 @@ class TestMissingCopybooksReturnsError {
         ImmutableMap.of(
             "missing",
             new Diagnostic(
-                null, "MISSCPY: Copybook not found", Error, SourceInfoLevels.ERROR.getText(), "MISSING_COPYBOOK")));
+                null,
+                "MISSCPY: Copybook not found",
+                Error,
+                SourceInfoLevels.ERROR.getText(),
+                "MISSING_COPYBOOK")));
   }
 }

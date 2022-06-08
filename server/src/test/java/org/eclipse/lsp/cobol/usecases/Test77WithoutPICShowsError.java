@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
@@ -35,6 +35,15 @@ class Test77WithoutPICShowsError {
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$VARNAME}.";
 
+  private static final String TEXT2 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       77 {$*VARNAME|1} USAGE COMPUTATIONAL.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$VARNAME}.";
+
   @Test
   void test() {
     UseCaseEngine.runTest(
@@ -44,7 +53,21 @@ class Test77WithoutPICShowsError {
             "1",
             new Diagnostic(
                 null,
-                "A \"PICTURE\" clause was not found for elementary item VARNAME",
+                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item VARNAME",
+                DiagnosticSeverity.Error,
+                ERROR.getText())));
+  }
+
+  @Test
+  void testInCompatibleUsageForElementaryItem() {
+    UseCaseEngine.runTest(
+        TEXT2,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item VARNAME",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
   }

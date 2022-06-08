@@ -19,9 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * This test checks that redefined item can not be redefined
- */
+/** This test checks that redefined item can not be redefined */
 class TestVariableRedefineRedefined {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -37,5 +35,5 @@ class TestVariableRedefineRedefined {
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-   }
+  }
 }

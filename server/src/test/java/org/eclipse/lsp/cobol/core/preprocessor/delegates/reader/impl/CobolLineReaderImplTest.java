@@ -14,11 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.impl;
 
+import com.google.common.collect.Lists;
 import org.eclipse.lsp.cobol.core.AbstractCobolLinePreprocessorTest;
+import org.eclipse.lsp.cobol.core.model.CobolLine;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.CobolLine;
-import com.google.common.collect.Lists;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;

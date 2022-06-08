@@ -21,8 +21,8 @@ import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test with two COPY REPLACING statements.
- * Show how to generate two variable definitions from one copybook.
+ * Test with two COPY REPLACING statements. Show how to generate two variable definitions from one
+ * copybook.
  */
 class TestReplacingSameCopybookTwice {
   private static final String TEXT =
@@ -40,7 +40,8 @@ class TestReplacingSameCopybookTwice {
 
   @Test
   void testIt() {
-    UseCaseEngine.runTest(TEXT,
+    UseCaseEngine.runTest(
+        TEXT,
         ImmutableList.of(new CobolText("BOOK1", BOOK1), new CobolText("BOOK2", BOOK2)),
         ImmutableMap.of());
   }

@@ -23,9 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
-/**
- * This test checks that redefined variable has the same level as original
- */
+/** This test checks that redefined variable has the same level as original */
 class TestVariableRedefineLevel {
   private static final String TEXT_HIGHEST_LEVEL =
       "       IDENTIFICATION DIVISION.\n"
@@ -48,7 +46,6 @@ class TestVariableRedefineLevel {
           + "             {04} {$*WS-DATA-RED} REDEFINES {$WS-DATA} PIC X(20).\n"
           + "       PROCEDURE DIVISION.\n";
 
-
   @Test
   void testHighest() {
     UseCaseEngine.runTest(
@@ -61,14 +58,10 @@ class TestVariableRedefineLevel {
                 "The redefining and redefined items must have the same level: WS-DATA-A",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
-   }
+  }
 
   @Test
   void testLevel5() {
-    UseCaseEngine.runTest(
-        TEXT_LEVEL_5,
-        ImmutableList.of(),
-        ImmutableMap.of());
+    UseCaseEngine.runTest(TEXT_LEVEL_5, ImmutableList.of(), ImmutableMap.of());
   }
-
 }

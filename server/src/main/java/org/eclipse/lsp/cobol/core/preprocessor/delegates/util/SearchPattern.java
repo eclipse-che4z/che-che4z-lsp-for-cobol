@@ -30,13 +30,13 @@ public enum SearchPattern {
   STARTS_WITH {
     @Override
     public String apply(String trim) {
-      return WORD_BOUNDARY + escapeSpecialCharacters(trim);
+      return WORD_BOUNDARY + adjustSpaces(escapeSpecialCharacters(trim));
     }
   },
   ENDS_WITH {
     @Override
     public String apply(String trim) {
-      return escapeSpecialCharacters(trim) + WORD_BOUNDARY;
+      return adjustSpaces(escapeSpecialCharacters(trim)) + WORD_BOUNDARY;
     }
   },
   EXACT {
@@ -44,7 +44,7 @@ public enum SearchPattern {
     public String apply(String trim) {
       trim = getActualWordToReplace(trim);
       if (isQuotedString(trim)) return Pattern.quote(trim);
-      return SEPARATOR_REGEX_PREFIX + escapeSpecialCharacters(trim) + SEPARATOR_REGEX_SUFFIX;
+      return SEPARATOR_REGEX_PREFIX + adjustSpaces(escapeSpecialCharacters(trim)) + SEPARATOR_REGEX_SUFFIX;
     }
 
     private String getActualWordToReplace(String trim) {
@@ -54,6 +54,10 @@ public enum SearchPattern {
       return trim;
     }
   };
+
+  private static String adjustSpaces(String escapeSpecialCharacters) {
+    return String.join("\\s*", escapeSpecialCharacters.split("[\\r\\n]*\\s"));
+  }
 
   private static boolean isQuotedString(String text) {
     return text.length() > 2

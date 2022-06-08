@@ -88,9 +88,9 @@ class TestSetUpDownBy {
                 null,
                 "Extraneous input 'IND3' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, COMPUTE, CONTINUE, "
                     + "DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, GENERATE, GO, "
-                    + "GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, PURGE, READ, "
-                    + "READY, RECEIVE, RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT, START, STOP, "
-                    + "STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, '.', ';'}",
+                    + "GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, PURGE, READ, READY, RECEIVE, "
+                    + "RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT, START, STOP, STRING, SUBTRACT, "
+                    + "TERMINATE, UNSTRING, WRITE, XML, '.'}",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "4",
@@ -98,8 +98,11 @@ class TestSetUpDownBy {
                 null, "Variable IND4 is not defined", DiagnosticSeverity.Error, ERROR.getText()),
             "5",
             new Diagnostic(
-                null, "The following token must start in Area A: IND3", DiagnosticSeverity.Warning, WARNING.getText())),
+                null,
+                "The following token must start in Area A: IND3",
+                DiagnosticSeverity.Warning,
+                WARNING.getText())),
         ImmutableList.of(),
-        IdmsBase.getAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

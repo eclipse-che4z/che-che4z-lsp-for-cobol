@@ -15,10 +15,10 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
@@ -63,7 +63,7 @@ class TestCompilerDirectivesNotCauseErrors {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 
-  //Ref: https://www.ibm.com/support/knowledgecenter/SS6SG3_6.3.0/lr/ref/rlcdscbl.html
+  // Ref: https://www.ibm.com/support/knowledgecenter/SS6SG3_6.3.0/lr/ref/rlcdscbl.html
   @Test
   void test_error_on_wrongSequenceNo() {
     UseCaseEngine.runTest(

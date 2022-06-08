@@ -21,17 +21,20 @@ import com.google.inject.Injector;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.analysis.CopybookName;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.*;
+import org.eclipse.lsp.cobol.service.SettingsService;
+import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
+import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 
@@ -45,7 +48,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/** This utility class provides methods to run use cases with COBOL code examples. */
+/**
+ * This utility class provides methods to run use cases with COBOL code examples.
+ */
 @Slf4j
 @UtilityClass
 public class UseCaseUtils {
@@ -53,6 +58,24 @@ public class UseCaseUtils {
 
   private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.c4z/.copybooks/";
   private static final String CPY_URI_SUFFIX = ".cpy";
+
+  /**
+   * Construct the file URI from provided file name
+   *
+   * @param name the copybook name without extension
+   * @param dialect the copybook dialect name
+   * @return the URI
+   */
+  public static String toURI(String name, String dialect) {
+    StringBuilder sb = new StringBuilder(CPY_URI_PREFIX);
+    if (dialect != null) {
+      sb.append(dialect);
+      sb.append("/");
+    }
+    sb.append(name);
+    sb.append(CPY_URI_SUFFIX);
+    return sb.toString();
+  }
 
   /**
    * Construct the file URI from provided file name
@@ -94,8 +117,6 @@ public class UseCaseUtils {
         .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
 
     CobolLanguageClient languageClient = mock(CobolLanguageClient.class);
-    FileSystemService mockFileSystemService = mock(FileSystemService.class);
-    when(mockFileSystemService.getNameFromURI(any())).thenReturn("");
     Injector injector =
         Guice.createInjector(
             new EngineModule(),
@@ -105,19 +126,21 @@ public class UseCaseUtils {
               protected void configure() {
                 bind(CopybookService.class).to(CopybookServiceImpl.class);
                 bind(SettingsService.class).toInstance(mockSettingsService);
-                bind(FileSystemService.class).toInstance(mockFileSystemService);
+                bind(FileSystemService.class).toInstance(new WorkspaceFileService());
                 bind(CobolLanguageClient.class).toInstance(languageClient);
                 bind(SubroutineService.class).to(SubroutineServiceImpl.class);
               }
             });
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
-    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.getAnalysisConfig().getCopybookConfig().getPredefinedLabels())
+    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks())
         .forEach(copybookModel -> copybookService.store(copybookModel, useCase.fileName));
 
-    useCase.getCopybooks().stream()
-        .map(UseCaseUtils::toCopybookModel)
-        .forEach(copybookModel -> copybookService.store(copybookModel, useCase.fileName));
+    useCase.getCopybooks()
+        .forEach(cobolText -> {
+          CopybookModel copybookModel = UseCaseUtils.toCopybookModel(cobolText);
+          copybookService.store(copybookModel, useCase.fileName);
+        });
 
     SubroutineService subroutines = injector.getInstance(SubroutineService.class);
     useCase.getSubroutines().forEach(name -> subroutines.store(name, "URI:" + name));
@@ -135,10 +158,9 @@ public class UseCaseUtils {
   public static CopybookModel toCopybookModel(CobolText cobolText) {
     return new CopybookModel(
         new CopybookName(
-            cobolText.getFileName()
-                + ofNullable(cobolText.getQualifier()).map(it -> "_" + it).orElse(""),
+            cobolText.getFileName(),
             cobolText.getDialectType()),
-        toURI(cobolText.getFileName()),
+        toURI(cobolText.getFileName(), cobolText.getDialectType()),
         cobolText.getFullText());
   }
 }

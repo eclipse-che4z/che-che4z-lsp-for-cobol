@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
@@ -73,23 +73,28 @@ class TestDuplicatedStatementInDefinitionProduceErrors {
 
   @Test
   void testDuplicatedPicProducesError() {
-    UseCaseEngine.runTest(BOILERPLATE + DUPLICATED_PIC, ImmutableList.of(), ImmutableMap.of("1", DIAGNOSTIC_PIC));
+    UseCaseEngine.runTest(
+        BOILERPLATE + DUPLICATED_PIC, ImmutableList.of(), ImmutableMap.of("1", DIAGNOSTIC_PIC));
   }
 
   @Test
   void testDuplicatedValueProducesError() {
-    UseCaseEngine.runTest(BOILERPLATE + DUPLICATED_VALUE, ImmutableList.of(), ImmutableMap.of("1", DIAGNOSTIC_VALUE));
+    UseCaseEngine.runTest(
+        BOILERPLATE + DUPLICATED_VALUE, ImmutableList.of(), ImmutableMap.of("1", DIAGNOSTIC_VALUE));
   }
 
   @Test
   void testDuplicatedUsageProducesError() {
-    UseCaseEngine.runTest(BOILERPLATE + DUPLICATED_USAGE, ImmutableList.of(), ImmutableMap.of("1", DIAGNOSTIC_USAGE));
+    UseCaseEngine.runTest(
+        BOILERPLATE + DUPLICATED_USAGE, ImmutableList.of(), ImmutableMap.of("1", DIAGNOSTIC_USAGE));
   }
 
   @Test
   void testDuplicatedOccursProducesError() {
     UseCaseEngine.runTest(
-        BOILERPLATE + DUPLICATED_OCCURS, ImmutableList.of(), ImmutableMap.of("1", DIAGNOSTIC_OCCURS));
+        BOILERPLATE + DUPLICATED_OCCURS,
+        ImmutableList.of(),
+        ImmutableMap.of("1", DIAGNOSTIC_OCCURS));
   }
 
   @Test
@@ -103,6 +108,8 @@ class TestDuplicatedStatementInDefinitionProduceErrors {
   @Test
   void testDuplicatedStatementsWithoutTheUsageTokenProduceCorrectError() {
     UseCaseEngine.runTest(
-        BOILERPLATE + DUPLICATED_USAGE_WITHOUT_TOKEN, ImmutableList.of(), ImmutableMap.of("1", DIAGNOSTIC_USAGE));
+        BOILERPLATE + DUPLICATED_USAGE_WITHOUT_TOKEN,
+        ImmutableList.of(),
+        ImmutableMap.of("1", DIAGNOSTIC_USAGE));
   }
 }

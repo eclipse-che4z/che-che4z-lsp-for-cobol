@@ -18,7 +18,6 @@ channels{COMMENTS}
 // There should be only symbols, literal patterns, and fragments.
 // The purpose of this file is to allow similar parsing by the preprocessor and parser.
 // All the token declarations that are common to several lexers should be duplicated to the appropriate lexers.
-
 // symbols
 ASTERISKCHAR : '*';
 DOUBLEASTERISKCHAR : '**';

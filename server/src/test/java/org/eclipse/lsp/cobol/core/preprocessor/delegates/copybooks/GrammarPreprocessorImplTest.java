@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -31,8 +31,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
+import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -74,8 +74,8 @@ class GrammarPreprocessorImplTest {
 
     List<SyntaxError> errors = emptyList();
 
-    NamedSubContext copybooks = new NamedSubContext();
-    copybooks.addUsage(CPYNAME, CPYNAME_POS.toLocation());
+    CopybooksRepository copybooks = new CopybooksRepository();
+    copybooks.addUsage(CPYNAME, null, CPYNAME_POS.toLocation());
     DocumentMapping mainMapping =
         new DocumentMapping(ImmutableList.of(CPYNAME_POS, COPY_POS), ImmutableMap.of(0, 2));
     DocumentMapping cpyMapping =

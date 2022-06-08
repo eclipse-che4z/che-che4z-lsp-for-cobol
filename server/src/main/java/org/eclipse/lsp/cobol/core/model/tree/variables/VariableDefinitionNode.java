@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,8 +49,8 @@ public final class VariableDefinitionNode extends Node {
   private final List<OccursClause> occursClauses;
   private final List<ValueClause> valueClauses;
   private final List<VariableNameAndLocality> redefinesClauses;
-  private final VariableNameAndLocality renamesClause;
-  private final VariableNameAndLocality renamesThruClause;
+  private final List<VariableNameAndLocality> renamesClause;
+  private final List<VariableNameAndLocality> renamesThruClause;
   private final String systemName;
   private final Locality levelLocality;
   private final boolean isBlankWhenZeroPresent;
@@ -70,8 +71,8 @@ public final class VariableDefinitionNode extends Node {
       List<ValueClause> valueClauses,
       List<UsageFormat> usageClauses,
       List<VariableNameAndLocality> redefinesClauses,
-      VariableNameAndLocality renamesClause,
-      VariableNameAndLocality renamesThruClause,
+      List<VariableNameAndLocality> renamesClause,
+      List<VariableNameAndLocality> renamesThruClause,
       String systemName,
       Locality levelLocality,
       boolean isBlankWhenZeroPresent,
@@ -298,7 +299,9 @@ public final class VariableDefinitionNode extends Node {
    * @return String
    */
   public String getFileDescriptor() {
-    return fileDescriptor.replaceAll(SPACES_AFTER_NEWLINE_REGEX, System.lineSeparator());
+    return Optional.ofNullable(fileDescriptor)
+        .map(f -> f.replaceAll(SPACES_AFTER_NEWLINE_REGEX, System.lineSeparator()))
+        .orElse("");
   }
 
   /**
@@ -306,7 +309,9 @@ public final class VariableDefinitionNode extends Node {
    * @return String
    */
   public String getFileControlClause() {
-    return fileControlClause.replaceAll(SPACES_AFTER_NEWLINE_REGEX, System.lineSeparator());
+    return Optional.ofNullable(fileControlClause)
+        .map(c -> c.replaceAll(SPACES_AFTER_NEWLINE_REGEX, System.lineSeparator()))
+        .orElse("");
   }
 
   /**
@@ -329,8 +334,8 @@ public final class VariableDefinitionNode extends Node {
     List<ValueClause> valueClauses = ImmutableList.of();
     List<UsageFormat> usageClauses = ImmutableList.of();
     List<VariableNameAndLocality> redefinesClauses = ImmutableList.of();
-    VariableNameAndLocality renamesClause;
-    VariableNameAndLocality renamesThruClause;
+    List<VariableNameAndLocality> renamesClause;
+    List<VariableNameAndLocality> renamesThruClause;
     Locality statementLocality;
     String systemName;
     Locality levelLocality;

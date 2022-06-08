@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
-/** Typing a variable definition with OCCURS TO clause should not produce any exceptions*/
+/** Typing a variable definition with OCCURS TO clause should not produce any exceptions */
 class TestOccursToDoesNotProduceExceptions {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"

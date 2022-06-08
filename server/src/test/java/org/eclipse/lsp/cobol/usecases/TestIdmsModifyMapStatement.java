@@ -95,6 +95,11 @@ class TestIdmsModifyMapStatement {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - idms modify map in tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), IdmsBase.getAnalysisConfig());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

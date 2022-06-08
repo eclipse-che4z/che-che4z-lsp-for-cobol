@@ -20,7 +20,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
-import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 
@@ -28,7 +28,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 class MockCompletionModel {
   static final AnalysisResult RESULT =
       AnalysisResult.builder()
-          .rootNode(new RootNode(Locality.builder().build(), new NamedSubContext()))
+          .rootNode(new RootNode(Locality.builder().build(), new CopybooksRepository()))
           .build();
   static final CobolDocumentModel MODEL = new CobolDocumentModel("some text", RESULT);
 
@@ -56,7 +56,7 @@ class MockCompletionModel {
               programNode.registerSectionNameNode(nameNode);
             });
 
-    RootNode rootNode = new RootNode(Locality.builder().build(), new NamedSubContext());
+    RootNode rootNode = new RootNode(Locality.builder().build(), new CopybooksRepository());
     RESULT.getRootNode().addChild(rootNode);
     ImmutableList.of("cpyU1", "CpyU2", "Not-cpyU")
               .forEach(

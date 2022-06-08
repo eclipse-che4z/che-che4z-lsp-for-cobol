@@ -111,7 +111,7 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
        ... the continuation line by specification has to startPosition with two consecutive
        quotation marks.
       */
-      if (checkStringStartsWithQuoteMark(trimmedContentArea)) {
+      if (CobolLineReWriter.checkStringStartsWithQuoteMark(trimmedContentArea)) {
         /*
          We have to remove the first quotation mark of the continuation line, the 1 quotation mark
          from the continued line and the 2 quotations marks from the continuation line become 2
@@ -138,17 +138,11 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
       /*
        ... the continuation line might startPosition with a single quotation mark. This indicates,
        that the literal from the continued line stays open ...
+       Removing the leading quotation mark to keep the literal open is handled during serialization.
       */
-      if (checkStringStartsWithQuoteMark(trimmedContentArea)) {
-        /* so we are removing the leading quotation mark to keep the literal open. */
-        result =
-            CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-                WS, trimLeadingChar(trimmedContentArea), line);
-      } else {
         result =
             CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
                 WS, conditionalRightTrimmedContentArea, line);
-      }
     } else {
       /* As fallback trim leading whitespace. We also need to remove the starting quotes if exist */
       result =
@@ -177,16 +171,9 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
 
   private boolean checkContentAreaEndsWithQuoteMark(CobolLine line) {
     return line.getPredecessor() != null
-        && (checkStringEndsWithQuoteMark(line.getPredecessor().getContentArea()));
+        && (CobolLineReWriter.checkStringEndsWithQuoteMark(line.getPredecessor().getContentArea()));
   }
 
-  private boolean checkStringEndsWithQuoteMark(String stringToCheck) {
-    return stringToCheck.endsWith("\"") || stringToCheck.endsWith("'");
-  }
-
-  private boolean checkStringStartsWithQuoteMark(String stringToCheck) {
-    return stringToCheck.startsWith("\"") || stringToCheck.startsWith("'");
-  }
 
   private String removeStringLiterals(final String contentArea) {
     return contentArea

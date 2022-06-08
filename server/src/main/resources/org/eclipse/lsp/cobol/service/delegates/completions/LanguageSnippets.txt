@@ -9,7 +9,11 @@
 #
 # Contributors:
 #   Broadcom, Inc. - initial API and implementation
+
 ACCEPT\u0020id=ACCEPT\u0020${1:id}
+accept\u0020id=ACCEPT\u0020${1:id}
+add\u0020=add\u0020${1:a}\u0020to\u0020${2:b}\u0020giving\u0020${2:c}
+ADD\U0020=ADD\U0020${1:A}\U0020TO\U0020${2:B}\U0020GIVING\U0020${2:C}
 ADD\u0020CORRESPONDING=ADD\u0020CORR\u0020${1:id}\u0020TO\u0020${2:id}
 ADD\u0020id\u0020TO\u0020id=ADD\u0020${1:id|lit}\u0020TO\u0020${2:id}
 ADDRESS\u0020OF=ADDRESS\u0020OF\u0020${1:id}

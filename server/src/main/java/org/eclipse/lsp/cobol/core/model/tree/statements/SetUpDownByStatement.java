@@ -24,11 +24,12 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.LiteralNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableType;
+import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /** This class implements the logic for SET UP/DOWN BY statement. */
 @EqualsAndHashCode(callSuper = true)
@@ -39,11 +40,12 @@ public class SetUpDownByStatement extends StatementNode {
   protected static final String INVALID_SENDING_FIELD_TEMPLATE = "statements.invalidSendingField";
   private static final List<VariableType> RECEIVING_FIELD_TYPES =
       ImmutableList.of(VariableType.INDEX_ITEM);
-  private static final MessageTemplate[] SENDING_FIELD_TYPES =
-      {
-        MessageTemplate.of("variables.elementaryWithType", MessageTemplate.of("variables.integer")),
-        MessageTemplate.of("variables.nonzeroInteger")
-      };
+  private static final List<EffectiveDataType> ALLOWED_SENDING_FIELDS_TYPE =
+      ImmutableList.of(EffectiveDataType.INTEGER, EffectiveDataType.REAL);
+  private static final MessageTemplate[] SENDING_FIELD_TYPES = {
+    MessageTemplate.of("variables.elementaryWithType", MessageTemplate.of("variables.integer")),
+    MessageTemplate.of("variables.nonzeroInteger")
+  };
   List<Node> receivingFields;
   Node sendingField;
 
@@ -56,10 +58,14 @@ public class SetUpDownByStatement extends StatementNode {
   @NonNull
   @Override
   public List<SyntaxError> validate() {
-    List<SyntaxError> errors = new ArrayList<>();
-    errors.addAll(validateVariableType(receivingFields, RECEIVING_FIELD_TYPES, INVALID_RECEIVING_FIELD_TEMPLATE));
+    List<SyntaxError> errors =
+        new ArrayList<>(
+            validateVariableType(
+                receivingFields, RECEIVING_FIELD_TYPES, INVALID_RECEIVING_FIELD_TEMPLATE));
     if (checkSendingFieldProducesError())
-      errors.add(createError(sendingField.getLocality(), INVALID_SENDING_FIELD_TEMPLATE, SENDING_FIELD_TYPES));
+      errors.add(
+          createError(
+              sendingField.getLocality(), INVALID_SENDING_FIELD_TEMPLATE, SENDING_FIELD_TYPES));
     return errors;
   }
 
@@ -76,8 +82,34 @@ public class SetUpDownByStatement extends StatementNode {
   }
 
   private boolean variableProducesError(QualifiedReferenceNode variable) {
-    return !variable.getVariableDefinitionNode()
-        .map(defNode -> defNode.getVariableType() == VariableType.ELEMENTARY_ITEM)
-        .orElse(true); // to ignore not defined variables
+    Node lastNode = getLastElement(variable.getDepthFirstStream());
+    if (lastNode instanceof LiteralNode) return false;
+
+    QualifiedReferenceNode lastQualifiedElement = getLastElement(
+            variable
+                .getDepthFirstStream()
+                .filter(QualifiedReferenceNode.class::isInstance)
+                .map(QualifiedReferenceNode.class::cast));
+
+    if (lastQualifiedElement == null) {
+      return false;
+    }
+
+    Optional<VariableNode> definitionNode = lastQualifiedElement.getVariableDefinitionNode();
+    if (!definitionNode.isPresent()) {
+      return false;
+    }
+    VariableNode variableDefinitionNode = definitionNode.get();
+    if (variableDefinitionNode.getVariableType() != VariableType.TABLE_DATA_NAME
+            && variableDefinitionNode instanceof EffectiveData) {
+      EffectiveDataType effectiveDataType = ((EffectiveData) variableDefinitionNode).getEffectiveDataType();
+      return !ALLOWED_SENDING_FIELDS_TYPE.contains(effectiveDataType);
+    } else {
+      return true;
+    }
+  }
+
+  private <T> T getLastElement(Stream<T> stream) {
+    return stream.reduce((first, second) -> second).orElse(null);
   }
 }

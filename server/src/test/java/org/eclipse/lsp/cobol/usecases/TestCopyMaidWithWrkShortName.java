@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.DialectType;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
@@ -29,13 +29,13 @@ class TestCopyMaidWithWrkShortName {
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "        01 {$*PARENT}.\n"
-          + "            05 COPY MAID {~BHTRGL-XBG`BHTRGL-XBG_WRK} WRK.\n"
+          + "        01 {$*PARENT-XNT}.\n"
+          + "            05 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG_WRK} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           DISPLAY {$ANT}.";
+          + "           DISPLAY {$A}.";
 
   private static final String BHTRGL_XBG =
-      "            09 {$*A^ANT} PIC X.\n"
+      "            09 {$*A} PIC X.\n"
           + "            09 PIC X.\n"
           + "            09 FILLER PIC x.";
 
@@ -43,8 +43,7 @@ class TestCopyMaidWithWrkShortName {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DialectType.MAID.name(), "WRK", BHTRGL_XBG)),
-        ImmutableMap.of());
+        ImmutableList.of(new CobolText("BHTRGL-XBG_WRK", DaCoDialect.NAME, BHTRGL_XBG)),
+        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

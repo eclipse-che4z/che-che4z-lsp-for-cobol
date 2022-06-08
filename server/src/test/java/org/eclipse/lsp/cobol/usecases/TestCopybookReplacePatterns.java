@@ -82,16 +82,16 @@ class TestCopybookReplacePatterns {
           + "      -    00000000000000000000000== .\r\n";
 
   private static final String TEXT8 =
-          BASE
-                  + "5      COPY {~REPL8} REPLACING =='XXX_ID$'== BY ==ACC_ID==.\n"
-                  + "8      PROCEDURE DIVISION.\n"
-                  + "9          MOVE 0 TO {$ACC_ID}.";
+      BASE
+          + "5      COPY {~REPL8} REPLACING =='XXX_ID$'== BY ==ACC_ID==.\n"
+          + "8      PROCEDURE DIVISION.\n"
+          + "9          MOVE 0 TO {$ACC_ID}.";
 
   private static final String TEXT9 =
-          BASE
-                  + "5      COPY {~REPL9} REPLACING =='XXX'_ID== BY ==ACC_ID==.\n"
-                  + "8      PROCEDURE DIVISION.\n"
-                  + "9          MOVE 0 TO {$ACC_ID}.";
+      BASE
+          + "5      COPY {~REPL9} REPLACING =='XXX'_ID== BY ==ACC_ID==.\n"
+          + "8      PROCEDURE DIVISION.\n"
+          + "9          MOVE 0 TO {$ACC_ID}.";
 
   private static final String REPL = "0      01 {$*TAG_ID}        PIC 9.\n";
   private static final String REPL_NAME = "REPL";
@@ -180,12 +180,12 @@ class TestCopybookReplacePatterns {
   @Test
   void testQuotedTextAreReplaced() {
     UseCaseEngine.runTest(
-            TEXT8, ImmutableList.of(new CobolText(REPL8_NAME, REPL8)), ImmutableMap.of());
+        TEXT8, ImmutableList.of(new CobolText(REPL8_NAME, REPL8)), ImmutableMap.of());
   }
 
   @Test
   void testPartialQuotedTextAreReplaced() {
     UseCaseEngine.runTest(
-            TEXT9, ImmutableList.of(new CobolText(REPL9_NAME, REPL9)), ImmutableMap.of());
+        TEXT9, ImmutableList.of(new CobolText(REPL9_NAME, REPL9)), ImmutableMap.of());
   }
 }

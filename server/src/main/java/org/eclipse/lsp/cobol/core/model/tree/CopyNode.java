@@ -37,6 +37,11 @@ public class CopyNode extends Node implements Context {
     this.name = copyBookName;
   }
 
+  public CopyNode(Locality locality, String copyBookName, String dialect) {
+    super(locality, NodeType.COPY, dialect);
+    this.name = copyBookName;
+  }
+
   @Override
   public List<Location> getDefinitions() {
     return Optional.ofNullable(definition).map(CopyDefinition::getDefinitions).orElse(ImmutableList.of());
@@ -47,5 +52,10 @@ public class CopyNode extends Node implements Context {
     return Optional.ofNullable(definition)
         .map(CopyDefinition::getUsages)
         .orElseGet(ImmutableList::of);
-    }
+  }
+
+  @Override
+  public String getDialect() {
+    return super.getDialect();
+  }
 }
