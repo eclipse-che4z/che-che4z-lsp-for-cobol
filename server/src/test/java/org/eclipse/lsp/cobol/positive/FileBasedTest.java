@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp4j.Diagnostic;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -47,6 +48,10 @@ public abstract class FileBasedTest extends ConfigurableTest {
   protected static List<CobolText> getCopybooks() {
     return TEXT_REGISTRY.getCopybooks();
   }
+
+    protected static Map<ReportSection, List<SysprintSnap>> getDataNameRefs(String filename) {
+        return TEXT_REGISTRY.getSnaps(filename);
+    }
 
   /**
    * Check that there were no errors found.

@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.positive;
 import org.eclipse.lsp.cobol.service.mocks.CopybooksMock;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CobolTextRegistry extends CopybooksMock {
   /** @return all the Cobol files for positive tests */
@@ -24,4 +25,12 @@ public interface CobolTextRegistry extends CopybooksMock {
 
   /** @return all the Cobol files for negative tests */
   List<CobolText> getNegatives();
+
+  /**
+   * Gives a map of positive filename mapped to a snap object.
+   *
+   * @param filename filename
+   * @return Map of positive filename mapped to a snap objects.
+   */
+  Map<ReportSection, List<SysprintSnap>> getSnaps(String filename);
 }

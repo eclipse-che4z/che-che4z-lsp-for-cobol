@@ -26,9 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /** Registry for Cobol source code files. */
 @Slf4j
@@ -36,8 +34,10 @@ public class FolderTextRegistry implements CobolTextRegistry {
   private static final String POSITIVE_ENTRY = "positive";
   private static final String NEGATIVE_ENTRY = "negative";
   private static final String COPYBOOK_ENTRY = "copybooks";
+  private static final String SNAPS_ENTRY = "SYSPRINT85";
 
   private final ListMultimap<String, CobolText> texts = ArrayListMultimap.create();
+  private final Map<String, Map<ReportSection, List<SysprintSnap>>> snaps = new HashMap<>();
 
   @SneakyThrows
   public FolderTextRegistry(String pathToTestResources) {
@@ -69,6 +69,7 @@ public class FolderTextRegistry implements CobolTextRegistry {
         Optional.ofNullable(path.getParent()).map(Path::getFileName).map(Path::toString).orElse("");
 
     if (!isSupportedFolder(folder)) {
+      processSysprintSnaps(path, name, folder);
       return;
     }
 
@@ -78,6 +79,26 @@ public class FolderTextRegistry implements CobolTextRegistry {
     } catch (IOException e) {
       LOG.warn("Unable to load file: {}, skipped", path);
     }
+  }
+
+  private void processSysprintSnaps(Path path, String name, String folder) {
+    if (folder.equals(SNAPS_ENTRY)) {
+      try {
+        processSnapFiles(name, FileUtils.readFileToString(path.toFile(), StandardCharsets.UTF_8));
+      } catch (IOException e) {
+        LOG.warn("Unable to load snap file: {}, skipped", path);
+      }
+    }
+  }
+
+  private void processSnapFiles(String name, String readFileToString) {
+    Map<ReportSection, List<SysprintSnap>> variableReferenceReport = new SysprintSnapProcessService(readFileToString).getVariableReferenceReport();
+    snaps.put(name, variableReferenceReport);
+  }
+
+  @Override
+  public Map<ReportSection, List<SysprintSnap>> getSnaps(String filename) {
+    return snaps.getOrDefault(filename, Collections.emptyMap());
   }
 
   private String cleanup(String name) {
