@@ -16,28 +16,28 @@ package org.eclipse.lsp.cobol.core.engine.dialects.daco.provider;
 
 import lombok.experimental.UtilityClass;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Scans source code for variable definitions with defined name's pattern
+ * Scans for already defined variables
  */
 @UtilityClass
-class TextScanner {
+class DefinedVariablesScanner {
   private final Pattern workingStoragePattern = Pattern.compile("\\s*working-storage\\s+section[\\w\\s]*\\.", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern procedureDivisionPattern = Pattern.compile("\\s*procedure\\s+division[\\w\\s]*", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-  private final Pattern variableDefinitionPattern = Pattern.compile("^\\s*\\d*\\s*(?!\\*)(TBF|TBL)(?<name>[a-zA-Z]..)-X(?<suffix>[a-zA-Z].)", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+  private final Pattern variableDefinitionPattern = Pattern.compile("^\\s*\\d*\\s*(?!\\*)(?<name>([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z]..)-([BX])([a-zA-Z].))", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
   /**
-   * Scans source code for variable definitions with defined name's pattern
+   * Scans source code for variable definitions with defined names
    * @param input source code
    * @return a list of variable name info
    */
-  public List<VariableNameInfo> scan(String input) {
+  public Set<String> scan(String input) {
     String[] lines = input.split("\n");
-    List<VariableNameInfo> result = new LinkedList<>();
+    Set<String> result = new HashSet<>();
 
     boolean scanStarted = false;
     for (String line : lines) {
@@ -47,9 +47,7 @@ class TextScanner {
         if (line.length() > 6) {
           Matcher matcher = variableDefinitionPattern.matcher(line.substring(6));
           if (matcher.find()) {
-            String name = matcher.group("name");
-            String suffix = matcher.group("suffix");
-            result.add(new VariableNameInfo(name, suffix));
+            result.add(matcher.group("name"));
           }
         }
         if (procedureDivisionPattern.matcher(line).find()) break;

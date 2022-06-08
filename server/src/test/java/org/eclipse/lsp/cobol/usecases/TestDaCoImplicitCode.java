@@ -67,6 +67,17 @@ class TestDaCoImplicitCode {
           + "        PROCEDURE DIVISION. \n"
           + "               MOVE 6 to {$RUSNAM-BAA}.\n";
 
+  private static final String TEXT_DYN_DUPLICATE =
+      "        IDENTIFICATION DIVISION. \n"
+          + "        PROGRAM-ID. test1. \n"
+          + "        DATA DIVISION. \n"
+          + "        WORKING-STORAGE SECTION. \n"
+          + "       01  {$*AREA-XAA}.\n"
+          + "           03 {$*TBLNAM-XAA} PIC X(6).\n"
+          + "             05 {$*RUSNAM-BAA} PIC X(6).\n"
+          + "        PROCEDURE DIVISION. \n"
+          + "               MOVE 6 to {$RUSNAM-BAA}.\n";
+
   @Test
   void testImplicitWorkingStorageCode() {
     UseCaseEngine.runTest(
@@ -95,6 +106,14 @@ class TestDaCoImplicitCode {
   void testImplicitWorkingStorageCode_Dynamic() {
     UseCaseEngine.runTest(
         TEXT_DYN,
+        ImmutableList.of(),
+        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+  }
+
+  @Test
+  void testImplicitWorkingStorageCode_DynamicWithDuplicates() {
+    UseCaseEngine.runTest(
+        TEXT_DYN_DUPLICATE,
         ImmutableList.of(),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }

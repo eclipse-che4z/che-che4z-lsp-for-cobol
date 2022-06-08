@@ -18,9 +18,11 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -29,11 +31,21 @@ import java.util.stream.Collectors;
 @UtilityClass
 class WorkingSectionDynamicGenerator {
 
-  private static final String TEMPLATE = "        01  RCU{mmm}-B{ii}       PIC S9(8)  VALUE ZERO COMP.\n"
-      + "        01   TBO{mmm}-X{ii}       PIC X      VALUE LOW-VALUE.\n"
-      + "        01   RMX{mmm}-B{ii}       PIC S9(8)  VALUE 300  COMP.\n"
-      + "        01   RMP{mmm}-B{ii}       PIC S9(4)  VALUE ZERO COMP.\n"
-      + "        01   RUS{mmm}-B{ii}       PIC S9(8)  VALUE ZERO  COMP.\n";
+  private static final String[] NAMES_TEMPLATES = {
+      "RCU{mmm}-B{ii}",
+      "TBO{mmm}-X{ii}",
+      "RMX{mmm}-B{ii}",
+      "RMP{mmm}-B{ii}",
+      "RUS{mmm}-B{ii}"
+  };
+
+  private static final String[] CODE_TEMPLATES = {
+      "        01   %s       PIC S9(8)  VALUE ZERO COMP.\n",
+      "        01   %s       PIC X      VALUE LOW-VALUE.\n",
+      "        01   %s       PIC S9(8)  VALUE 300  COMP.\n",
+      "        01   %s       PIC S9(4)  VALUE ZERO COMP.\n",
+      "        01   %s       PIC S9(8)  VALUE ZERO  COMP.\n"
+  };
 
   /**
    * Generates code for WORKING STORAGE SECTION
@@ -45,14 +57,44 @@ class WorkingSectionDynamicGenerator {
     List<VariableNameInfo> result = new LinkedList<>(TreeScanner.scan(nodes));
     result.addAll(TextScanner.scan(input));
 
+    Set<String> defined = getAlreadyDefinedVariables(input, nodes);
     return result.stream().distinct()
-        .map(WorkingSectionDynamicGenerator::generateTableVariables)
+        .map(info -> WorkingSectionDynamicGenerator.generateTableVariables(info, defined))
+        .filter(Objects::nonNull)
         .collect(Collectors.toList());
   }
 
-  private Pair<String, String> generateTableVariables(VariableNameInfo tableInfo) {
-    String code = TEMPLATE.replace("{mmm}", tableInfo.getName());
-    code =  code.replace("{ii}", tableInfo.getSuffix());
+  private Set<String> getAlreadyDefinedVariables(String input, List<Node> nodes) {
+    Set<String> alreadyDefined = new HashSet<>();
+    nodes.forEach(n -> alreadyDefined.addAll(n.getDepthFirstStream()
+        .filter(v -> v.getNodeType() == NodeType.VARIABLE_DEFINITION)
+        .map(VariableDefinitionNode.class::cast)
+        .map(VariableDefinitionNode::getVariableName)
+        .filter(Objects::nonNull)
+        .map(VariableNameAndLocality::getName)
+        .collect(Collectors.toList())));
+
+    alreadyDefined.addAll(DefinedVariablesScanner.scan(input));
+    return alreadyDefined;
+  }
+
+  private Pair<String, String> generateTableVariables(VariableNameInfo tableInfo, Set<String> alreadyDefined) {
+    StringBuilder codeBuilder = new StringBuilder();
+    for (int i = 0; i < NAMES_TEMPLATES.length; i++) {
+      String name = applyTemplate(NAMES_TEMPLATES[i], tableInfo);
+      if (!alreadyDefined.contains(name)) {
+        codeBuilder.append(String.format(CODE_TEMPLATES[i], name));
+      }
+    }
+    String code = codeBuilder.toString();
+    if (code.isEmpty()) {
+      return null;
+    }
     return new ImmutablePair<>("DaCo-TBX", code);
+  }
+
+  private String applyTemplate(String nameTemplate, VariableNameInfo tableInfo) {
+    String name = nameTemplate.replace("{mmm}", tableInfo.getName());
+    return  name.replace("{ii}", tableInfo.getSuffix());
   }
 }
