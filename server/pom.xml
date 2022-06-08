@@ -55,6 +55,7 @@
         <slf4j.api.version>1.7.25</slf4j.api.version>
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
         <filesToTestPath>${project.basedir}${file.separator}..${file.separator}Cobol85PositiveTestsSuite</filesToTestPath>
+        <listingSnap>${project.basedir}${file.separator}..${file.separator}Cobol85PositiveTestsSuite${file.separator}SYSPRINT85${file.separator}snapshot${file.separator}listingSnap.json</listingSnap>
     </properties>
     <dependencies>
         <dependency>
@@ -285,6 +286,11 @@
                             <name>filesToTestPath</name>
                             <!--suppress UnresolvedMavenProperty -->
                             <value>${filesToTestPath}</value>
+                        </property>
+                        <property>
+                            <name>listingSnap</name>
+                            <!--suppress UnresolvedMavenProperty -->
+                            <value>${listingSnap}</value>
                         </property>
                     </systemProperties>
                     <!--suppress UnresolvedMavenProperty -->
