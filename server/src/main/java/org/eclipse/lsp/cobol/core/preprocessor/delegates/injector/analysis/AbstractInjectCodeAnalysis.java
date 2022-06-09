@@ -118,7 +118,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
     List<SyntaxError> errors = new ArrayList<>();
     final String copybookName = metaData.getCopybookName().getDisplayName();
     final Locality locality = metaData.getNameLocality();
-    if (copybookName.length() > maxCopybookNameLength) {
+    if (copybookName.length() > maxCopybookNameLength && !ImplicitCodeUtils.isImplicit(locality.getUri())) {
       errors.add(
           addCopybookError(
               copybookName,
@@ -221,11 +221,16 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
 
     String programDocumentUri = hierarchy.getRootDocumentUri().orElse(copybookMetaData.getDocumentUri());
 
-    return contentProvider
+    CopybookModel copybookModel = contentProvider
         .read(copybookMetaData.getConfig(), copybookMetaData.getCopybookName(), programDocumentUri, copybookMetaData.getDocumentUri())
-        .map(copybook -> new ResultWithErrors<>(copybook, ImmutableList.of()))
-        .orElse(emptyModel(
-            copybookMetaData.getCopybookName(), ImmutableList.of(reportMissingCopybooks(copybookMetaData))));
+        .orElse(null);
+
+    if (copybookModel != null) {
+      return new ResultWithErrors<>(copybookModel, ImmutableList.of());
+    }
+
+    return emptyModel(
+            copybookMetaData.getCopybookName(), ImmutableList.of(reportMissingCopybooks(copybookMetaData)));
   }
 
   protected Consumer<PreprocessorStack> beforeWriting() {

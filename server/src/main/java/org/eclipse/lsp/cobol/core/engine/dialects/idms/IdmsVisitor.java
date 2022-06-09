@@ -74,6 +74,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private final CopybookConfig copybookConfig;
   private final String programDocumentUri;
   private final TextReplacement textReplacement;
+  @Getter private final IdmsRecordsDescriptor recordsDescriptor = new IdmsRecordsDescriptor();
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
   IdmsVisitor(CopybookService copybookService,
@@ -158,6 +159,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitMapSection(MapSectionContext ctx) {
+    recordsDescriptor.setMapSectionExists(true);
     return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.MAP));
   }
 
@@ -186,6 +188,18 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitSchemaSection(SchemaSectionContext ctx) {
     return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.SCHEMA));
+  }
+
+  @Override
+  public List<Node> visitIdmsRecordLocationParagraph(IdmsParser.IdmsRecordLocationParagraphContext ctx) {
+    if (ctx.withinClause() != null) {
+      if (ctx.withinClause().withinEntry() != null && ctx.withinClause().withinEntry().children.size() > 1) {
+        recordsDescriptor.setRecordsWithinPlacement(ctx.withinClause().withinEntry().getChild(1).getText().toUpperCase());
+      } else if ("MANUAL".equalsIgnoreCase(ctx.withinClause().getText())) {
+        recordsDescriptor.setRecordsManualExists(true);
+      }
+    }
+    return visitChildren(ctx);
   }
 
   @Override

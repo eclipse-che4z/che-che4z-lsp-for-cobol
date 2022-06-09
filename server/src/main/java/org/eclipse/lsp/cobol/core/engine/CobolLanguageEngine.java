@@ -306,7 +306,7 @@ public class CobolLanguageEngine {
   }
 
   private Predicate<SyntaxError> shouldRaise() {
-    return err -> err.getLocality().getCopybookId() != null;
+    return err -> (err.getLocality() != null && err.getLocality().getCopybookId() != null);
   }
 
   private SyntaxError constructErrorMessage(SyntaxError syntaxError) {
