@@ -27,6 +27,7 @@ import org.eclipse.lsp4j.MarkupContent;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.SNIPPETS;
@@ -37,7 +38,7 @@ import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrde
  */
 @Singleton
 public class SnippetCompletion implements Completion {
-  private final CompletionStorage snippets;
+  private final CompletionStorage<SnippetsModel> snippets;
 
   @Inject
   SnippetCompletion(@Named("Snippets") CompletionStorage snippets) {
@@ -49,17 +50,21 @@ public class SnippetCompletion implements Completion {
       @NonNull String token, @Nullable CobolDocumentModel document) {
     return snippets.getLabels().stream()
         .filter(DocumentationUtils.startsWithIgnoreCase(token))
+        .collect(Collectors.toList())
+        .stream()
+        .map(snippets::getSnippet)
         .map(this::toSnippetCompletions)
         .collect(toList());
   }
 
-  private CompletionItem toSnippetCompletions(String name) {
-    CompletionItem item = new CompletionItem(name);
-    item.setLabel(name);
-    item.setInsertText(snippets.getInformationFor(item.getLabel()));
-    item.setDocumentation(retrieveDocumentation(name));
+  private CompletionItem toSnippetCompletions(SnippetsModel snippet) {
+    CompletionItem item = new CompletionItem(snippet.getPrefix());
+    item.setLabel(snippet.getPrefix());
+    item.setInsertText(String.join(" ", snippet.getBody()));
     item.setInsertTextFormat(InsertTextFormat.Snippet);
-    item.setSortText(SNIPPETS.prefix + name);
+    item.setDocumentation(retrieveDocumentation(snippet.getDescription()));
+    item.setDetail(snippet.getDescription());
+    item.setSortText(SNIPPETS.prefix + snippet.getPrefix());
     item.setKind(CompletionItemKind.Snippet);
     return item;
   }
@@ -67,8 +72,6 @@ public class SnippetCompletion implements Completion {
   @NonNull
   private MarkupContent retrieveDocumentation(String label) {
     return DocumentationUtils.wrapWithMarkup(
-        Optional.ofNullable(snippets.getInformationFor(label))
-            .map(string -> string.replaceAll("[${\\d:}]", ""))
-            .orElse(""));
+        Optional.ofNullable(label).map(string -> string.replaceAll("[${\\d:}]", "")).orElse(""));
   }
 }

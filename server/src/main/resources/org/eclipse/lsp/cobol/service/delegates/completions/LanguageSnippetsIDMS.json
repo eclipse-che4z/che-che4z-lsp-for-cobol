@@ -1,0 +1,105 @@
+{
+  "IDMS-CONTROL SECTION": {
+    "prefix": "IDMS-CONTROL-SECTION",
+    "body": [
+      "IDMS-CONTROL SECTION.",
+      "PROTOCOL. MODE IS ${1:operating-mode}."
+    ],
+    "description": "[IDMS] idms-control section",
+    "scope": "cobol"
+  },
+  "SCHEMA SECTION": {
+    "prefix": "SCHEMA-SECTION [IDMS]",
+    "body": [
+      "SCHEMA SECTION.",
+      "DB ${1:subschema-name} WITHIN ${2:schema-name}."
+    ],
+    "description": "schema section",
+    "scope": "cobol"
+  },
+  "MAP SECTION": {
+    "prefix": "MAP-SECTION [IDMS]",
+    "body": [
+      "MAP SECTION.",
+      "MAX FIELD LIST IS ${1:field-list-size}.",
+      "MAP ${2:map-name}."
+    ],
+    "description": "map section",
+    "scope": "cobol"
+  },
+  "COPY IDMS": {
+    "prefix": "COPY-IDMS",
+    "body": [
+      "COPY IDMS ${1:idms-entity}."
+    ],
+    "description": "copy idms",
+    "scope": "cobol"
+  },
+  "COPY IDMS FILE": {
+    "prefix": "COPY-IDMS-FILE",
+    "body": [
+      "COPY IDMS FILE ${1:file-name}."
+    ],
+    "description": "copy idms file",
+    "scope": "cobol"
+  },
+  "COPY IDMS RECORD": {
+    "prefix": "COPY-IDMS-RECORD",
+    "body": [
+      "COPY IDMS RECORD ${1:record-name}."
+    ],
+    "description": "copy idms record",
+    "scope": "cobol"
+  },
+  "COPY IDMS MAP": {
+    "prefix": "COPY-IDMS-MAP",
+    "body": [
+      "COPY IDMS MAP ${1:map-name}."
+    ],
+    "description": "copy idms map",
+    "scope": "cobol"
+  },
+  "COPY IDMS MAP-CONTROL": {
+    "prefix": "COPY-MAP-CONTROL [IDMS]",
+    "body": [
+      "COPY IDMS MAP-CONTROL ${1:map-name}."
+    ],
+    "description": "copy idms map control",
+    "scope": "cobol"
+  },
+  "COPY IDMS MODULE": {
+    "prefix": "COPY-IDMS-MODULE",
+    "body": [
+      "COPY IDMS MODULE ${1:module-name}."
+    ],
+    "description": "copy idms module",
+    "scope": "cobol"
+  },
+  "shell-idms": {
+    "prefix": "shell-idms",
+    "body": [
+      "       IDENTIFICATION DIVISION.",
+      "       PROGRAM-ID. ${1:${1:${TM_FILENAME/(.*)\\..+$/$1/}}}.",
+      "       ENVIRONMENT DIVISION.",
+      "       IDMS-CONTROL SECTION.",
+      "       PROTOCOL. MODE IS ${2:operating-mode}.",
+      "       DATA DIVISION.",
+      "       FILE SECTION.",
+      "       SCHEMA SECTION.",
+      "       DB ${3:subschema-name} WITHIN ${4:schema-name}.",
+      "       MAP SECTION.",
+      "       MAX FIELD LIST IS ${5:field-list-size}.",
+      "       MAP ${6:map-name}.",
+      "       WORKING-STORAGE SECTION.",
+      "       COPY IDMS ${7:idms-entity}.",
+      "       LINKAGE SECTION.",
+      "       PROCEDURE DIVISION.",
+      "        main-processing SECTION.",
+      "         mainline-paragraph.",
+      "             $0",
+      "             STOP RUN."
+    ],
+    "description": "Template Program",
+    "scope": "cobol"
+  }
+}

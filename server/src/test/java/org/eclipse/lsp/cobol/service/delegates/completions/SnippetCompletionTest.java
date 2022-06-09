@@ -73,6 +73,7 @@ class SnippetCompletionTest {
     item.setInsertText(INSERT_TEXT);
     item.setInsertTextFormat(InsertTextFormat.Snippet);
     item.setDocumentation(doc);
+    item.setDetail(DOCUMENTATION_TEXT);
     item.setKind(CompletionItemKind.Snippet);
     item.setSortText("6" + DOCUMENTATION_TEXT);
     return item;

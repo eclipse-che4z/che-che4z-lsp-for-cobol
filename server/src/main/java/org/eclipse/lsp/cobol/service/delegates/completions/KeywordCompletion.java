@@ -31,7 +31,7 @@ import static org.eclipse.lsp4j.CompletionItemKind.Keyword;
 /** This completion provider resolves keywords and documentation for them as static content */
 @Singleton
 public class KeywordCompletion implements Completion {
-  private CompletionStorage keywords;
+  private CompletionStorage<String> keywords;
 
   @Inject
   KeywordCompletion(@Named("Keywords") CompletionStorage keywords) {
