@@ -17,10 +17,7 @@ package org.eclipse.lsp.cobol.service.delegates.validations;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
-import org.eclipse.lsp.cobol.core.model.ErrorCode;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
@@ -29,10 +26,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Location;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 import static java.util.Collections.emptyList;
@@ -126,6 +120,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private static Map<String, List<Diagnostic>> convertErrors(List<SyntaxError> errors) {
     return errors.stream()
+        .filter(e -> Objects.nonNull(e.getLocality()))
         .collect(groupingBy(err -> err.getLocality().getUri(), mapping(toDiagnostic(), toList())));
   }
 
