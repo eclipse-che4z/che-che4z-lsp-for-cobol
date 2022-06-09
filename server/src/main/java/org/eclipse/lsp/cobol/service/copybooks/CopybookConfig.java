@@ -27,5 +27,5 @@ import java.util.List;
 public class CopybookConfig {
   CopybookProcessingMode copybookProcessingMode;
   SQLBackend sqlBackend;
-  List<String> predefinedParagraphs;
+  List<String> predefinedSections;
 }

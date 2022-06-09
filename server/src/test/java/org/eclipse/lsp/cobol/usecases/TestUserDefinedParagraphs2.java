@@ -34,7 +34,7 @@ public class TestUserDefinedParagraphs2 {
                   + "       01  {$*LINK-PRM0}.\n"
                   + "           05  {$*PARM}                               PIC X(8).\n"
                   + "       PROCEDURE DIVISION USING {$LINK-PRM0}.\n"
-                  + "           PERFORM {#USERLABEL}.";
+                  + "           PERFORM {@USERLABEL}.";
 
   @Test
   void test() {

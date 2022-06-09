@@ -47,7 +47,7 @@ class ContentProviderFactoryTest {
   @Test
   void testLabelsContentProvider() {
     ContentProvider contentProvider = factory.getInstanceFor(ContentProviderFactory.InjectContentType.GENERATED);
-    assertTrue(contentProvider instanceof LabelsContentProvider);
+    assertTrue(contentProvider instanceof SectionsContentProvider);
   }
 
   @Test

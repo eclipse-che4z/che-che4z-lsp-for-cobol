@@ -28,15 +28,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * This unit tests check the {@link LabelsContentProvider} class functionality
+ * This unit tests check the {@link SectionsContentProvider} class functionality
  */
 @ExtendWith(MockitoExtension.class)
-class LabelsContentProviderTest {
-  private LabelsContentProvider contentProvider;
+class SectionsContentProviderTest {
+  private SectionsContentProvider contentProvider;
 
   @BeforeEach
   void setupMocks() {
-    contentProvider = new LabelsContentProvider();
+    contentProvider = new SectionsContentProvider();
   }
 
   @Test
@@ -45,7 +45,7 @@ class LabelsContentProviderTest {
         SQLBackend.DB2_SERVER, ImmutableList.of("LABEL1", "LABEL2"));
     CopybookName copybookName = new CopybookName("name");
     CopybookModel model = contentProvider.read(copybookConfig, copybookName, "uri", "uri").get();
-    assertEquals(model.getContent(), "       LABEL1.\r\n       LABEL2.\r\n");
+    assertEquals(model.getContent(), "       LABEL1 SECTION.\r\n       LABEL2 SECTION.\r\n");
   }
 
 }

@@ -23,9 +23,9 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import java.util.Optional;
 
 /**
- * Generates predefined copybook content provider that generates content for a copybook
+ * Generates predefined section content provider that generates content for a copybook
  */
-public class LabelsContentProvider implements ContentProvider {
+public class SectionsContentProvider implements ContentProvider {
 
   /**
    * Read injected code content
@@ -39,10 +39,10 @@ public class LabelsContentProvider implements ContentProvider {
   public Optional<CopybookModel> read(CopybookConfig copybookConfig, CopybookName copybookName,
                                       String programDocumentUri, String documentUri) {
     StringBuilder sb = new StringBuilder();
-    for (String paragraph : copybookConfig.getPredefinedParagraphs()) {
+    for (String sections : copybookConfig.getPredefinedSections()) {
       sb.append(StringUtils.repeat(' ', 7));
-      sb.append(paragraph);
-      sb.append(".\r\n");
+      sb.append(sections);
+      sb.append(" SECTION.\r\n");
     }
 
     return Optional.of(new CopybookModel(copybookName, ImplicitCodeUtils.createFullUrl(copybookName.getQualifiedName()), sb.toString()));

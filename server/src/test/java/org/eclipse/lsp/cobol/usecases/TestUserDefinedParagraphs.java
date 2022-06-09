@@ -34,7 +34,7 @@ class TestUserDefinedParagraphs {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           GO TO {#USERLABEL}.";
+          + "           GO TO {@USERLABEL}.";
 
   @Test
   void test() {

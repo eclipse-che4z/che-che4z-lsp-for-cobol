@@ -33,7 +33,7 @@ public enum SettingsParametersEnum {
   TARGET_SQL_BACKEND("target-sql-backend"),
   ANALYSIS_FEATURES("analysis.features"),
   DIALECTS("dialects"),
-  PREDEFINED_PARAGRAPHS("predefined-paragraphs");
+  PREDEFINED_SECTIONS("predefined-sections");
 
   public final String label;
 

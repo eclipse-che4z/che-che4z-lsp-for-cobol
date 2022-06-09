@@ -20,6 +20,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -31,6 +32,7 @@ import org.eclipse.lsp4j.Location;
 
 import java.util.*;
 
+import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 
 /** This class represents program context in COBOL. */
@@ -164,6 +166,23 @@ public class ProgramNode extends Node {
    */
   public Optional<SyntaxError> registerSectionNameNode(SectionNameNode node) {
     updateMap(sectionMap, node.getName(), node.locality.toLocation());
+    return Optional.empty();
+  }
+
+  /**
+   * Check if we have this section node defined already
+   * @param node new section node
+   * @param messageService message formatter
+   * @return an error if any
+   */
+  public Optional<SyntaxError> verifySectionNodeDuplication(SectionNameNode node, MessageService messageService) {
+    if (sectionMap.containsKey(node.getName())) {
+      return Optional.of(SyntaxError.syntaxError()
+             .suggestion(messageService.getMessage("semantics.duplicated", node.getName()))
+             .severity(ERROR)
+             .locality(node.getLocality())
+             .build());
+    }
     return Optional.empty();
   }
 
