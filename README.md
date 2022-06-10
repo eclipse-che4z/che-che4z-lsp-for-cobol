@@ -31,7 +31,7 @@ This extension is not compatible with other extensions that provide COBOL suppor
 
 The COBOL Language Support extension only supports IBM Enterprise COBOL. Other versions of COBOL are not supported.
 
-### Integration with Zowe Explorer
+## Integration with Zowe Explorer
 
 Integrating COBOL Language Support with Zowe Explorer lets you:
 
