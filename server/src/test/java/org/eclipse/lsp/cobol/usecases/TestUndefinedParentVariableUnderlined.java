@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -62,7 +63,6 @@ class TestUndefinedParentVariableUnderlined {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
-            new Diagnostic(
-                null, "Variable MAMA is not defined", DiagnosticSeverity.Error, ERROR.getText())));
+            new Diagnostic(new Range(), "Variable MAMA is not defined", DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

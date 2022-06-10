@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This test checks that the compiler directives that contain typos processed as usual lines */
@@ -69,7 +70,7 @@ class TestTyposOnCompilerDirectives {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Syntax error on 'DATA' expected {CBL, ID, IDENTIFICATION, PROCESS}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
@@ -83,7 +84,7 @@ class TestTyposOnCompilerDirectives {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Syntax error on 'PROESS' expected {CBL, ID, IDENTIFICATION, PROCESS}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
@@ -97,7 +98,7 @@ class TestTyposOnCompilerDirectives {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 DATA_ERROR_MESSAGE,
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
@@ -111,7 +112,7 @@ class TestTyposOnCompilerDirectives {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 DATA_ERROR_MESSAGE,
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));

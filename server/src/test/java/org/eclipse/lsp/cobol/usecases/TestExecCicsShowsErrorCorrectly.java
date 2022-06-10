@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.collect.ImmutableMap.of;
@@ -40,7 +41,7 @@ class TestExecCicsShowsErrorCorrectly {
         of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Syntax error on 'XCTL123' expected {ABEND, ADD, ADDRESS, ALLOCATE, ASKTIME, ASSIGN, BIF, "
                     + "BUILD, CANCEL, CHANGE, CHECK, CONNECT, CONSISTENT, CONVERSE, CONVERTTIME, DATASET, DEFINE, "
                     + "DELAY, DELETE, DELETEQ, DEQ, DOCUMENT, DUMP, ENDBR, ENDBROWSE, ENQ, ENTER, EXTRACT, FILE, "

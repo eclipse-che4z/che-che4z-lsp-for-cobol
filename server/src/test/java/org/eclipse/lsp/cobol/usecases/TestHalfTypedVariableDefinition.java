@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** Test that not completely typed variable definition doesn't produce an exception. */
@@ -39,7 +40,7 @@ class TestHalfTypedVariableDefinition {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Extraneous input '(' expected {BINARY, BLANK, COMP, COMPUTATIONAL, "
                     + "COMPUTATIONAL-1, COMPUTATIONAL-2, COMPUTATIONAL-3, COMPUTATIONAL-4, COMPUTATIONAL-5, COMP-1, COMP-2, "
                     + "COMP-3, COMP-4, COMP-5, DISPLAY, DISPLAY-1, DYNAMIC, EXTERNAL, FUNCTION-POINTER, GLOBAL, GROUP-USAGE, "
@@ -50,13 +51,13 @@ class TestHalfTypedVariableDefinition {
                 SourceInfoLevels.ERROR.getText()),
             "2",
             new Diagnostic(
-                null,
+                new Range(),
                 "No data definition entry found for rename",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText()),
             "3",
             new Diagnostic(
-                null,
+                new Range(),
                 "Unexpected end of file",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));

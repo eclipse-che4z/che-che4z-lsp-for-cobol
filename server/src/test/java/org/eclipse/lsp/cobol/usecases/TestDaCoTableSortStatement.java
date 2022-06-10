@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** Tests the DaCo ROW Add statement */
@@ -48,7 +49,7 @@ class TestDaCoTableSortStatement {
         ImmutableMap.of(
             "unsupported",
             new Diagnostic(
-                null,
+                new Range(),
                 "The code block is deprecated and not supported",
                 DiagnosticSeverity.Warning,
                 SourceInfoLevels.WARNING.getText())),

@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -52,7 +53,7 @@ class TestParametrised {
         ImmutableMap.of(
             "eof",
             new Diagnostic(
-                null,
+                new Range(),
                 "Unexpected end of file",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));

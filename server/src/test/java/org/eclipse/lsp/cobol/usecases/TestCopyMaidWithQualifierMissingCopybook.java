@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -50,20 +51,20 @@ class TestCopyMaidWithQualifierMissingCopybook {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item MRB",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText()),
             "2",
             new Diagnostic(
-                null,
+                new Range(),
                 "ABCDEFG123_ABC: Copybook not found",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText(),
                 "MISSING_COPYBOOK"),
             "3",
             new Diagnostic(
-                null,
+                new Range(),
                 "Variable VAR1 is not defined",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());

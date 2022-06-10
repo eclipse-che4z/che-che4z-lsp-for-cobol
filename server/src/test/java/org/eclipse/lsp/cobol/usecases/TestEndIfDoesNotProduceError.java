@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** Typing END-IF should not produce any exceptions */
@@ -42,7 +43,7 @@ class TestEndIfDoesNotProduceError {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Extraneous input 'END' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, COMPUTE, CONTINUE, "
                     + "DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, "
                     + "GENERATE, GO, GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, "
@@ -53,13 +54,13 @@ class TestEndIfDoesNotProduceError {
                 SourceInfoLevels.ERROR.getText()),
             "2",
             new Diagnostic(
-                null,
+                new Range(),
                 "The following token must start in Area A: END",
                 DiagnosticSeverity.Warning,
                 SourceInfoLevels.WARNING.getText()),
             "3",
             new Diagnostic(
-                null,
+                new Range(),
                 "Unexpected end of file",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));

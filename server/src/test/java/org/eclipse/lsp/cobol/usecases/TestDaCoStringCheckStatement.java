@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -52,19 +53,19 @@ class TestDaCoStringCheckStatement {
                 ImmutableMap.of(
                         "1",
                         new Diagnostic(
-                                null,
+                                new Range(),
                                 "Variable GBR4 is not defined",
                                 DiagnosticSeverity.Error,
                                 SourceInfoLevels.ERROR.getText()),
                         "2",
                         new Diagnostic(
-                                null,
+                                new Range(),
                                 "Syntax error on '.' expected {ALL, DFHRESP, DFHVALUE, FALSE, HIGH-VALUE, HIGH-VALUES, LOW-VALUE, LOW-VALUES, NULL, NULLS, QUOTES, SPACE, SPACES, TRUE, ZERO, ZEROES, ZEROS, '01-49', '66', '77', '88', INTEGERLITERAL, NUMERICLITERAL, NONNUMERICLITERAL, IDENTIFIER, FINALCHARSTRING}",
                                 DiagnosticSeverity.Error,
                                 SourceInfoLevels.ERROR.getText()),
                         "3",
                         new Diagnostic(
-                                null,
+                                new Range(),
                                 "Max length limit of 55 bytes allowed for email.",
                                 DiagnosticSeverity.Error,
                                 SourceInfoLevels.ERROR.getText())),
