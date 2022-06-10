@@ -92,7 +92,7 @@ The dialects setting lets you include specific language analysis in your COBOL f
 
 ### SQL Backend Server
 
-Set the SQL backend server as either DB2 or Datacom to ensure you use the correct version of the `SQLCA` and `SQLDA` copybooks. To set the SQL backend server, go to **VS Code Settings** > **User** > **Extensions** > **COBOL Language Support** > **Cobol-lsp: Target-sql-backend**. The default setting is DB2.
+Set the SQL backend server as either DB2 or Datacom to ensure you use the correct version of the implicit `SQLCA` and `SQLDA` copybooks. To set the SQL backend server, go to **VS Code Settings** > **User** > **Extensions** > **COBOL Language Support** > **Cobol-lsp: Target-sql-backend**. The default setting is DB2.
 
 ## Subroutine Support
 
