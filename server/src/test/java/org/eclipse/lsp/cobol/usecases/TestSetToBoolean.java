@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.collect.ImmutableMap.of;
@@ -50,7 +51,7 @@ class TestSetToBoolean {
         of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Invalid receiving field type. Expected: Condition name",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));

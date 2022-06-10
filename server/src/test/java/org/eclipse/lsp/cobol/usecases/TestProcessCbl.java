@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -415,7 +416,7 @@ class TestProcessCbl {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Syntax error on 'foo' expected 'Currency symbol'",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
@@ -429,7 +430,7 @@ class TestProcessCbl {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Syntax error on '256Kb' expected {'01-49', '66', '77', '88', INTEGERLITERAL}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));

@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This class test the *CONTROL (*CBL) compiler directives. */
@@ -57,19 +58,19 @@ class TestControlCompilerDirective {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "No arguments found for *CONTROL",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText()),
             "2",
             new Diagnostic(
-                null,
+                new Range(),
                 "Syntax error on 'MAP1' expected PROGRAM-ID",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText()),
             "3",
             new Diagnostic(
-                null,
+                new Range(),
                 "No arguments found for *CBL",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
@@ -83,7 +84,7 @@ class TestControlCompilerDirective {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Compiler directives cannot be continued on another line",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));

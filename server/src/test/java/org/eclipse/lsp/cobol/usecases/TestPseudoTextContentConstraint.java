@@ -94,7 +94,7 @@ class TestPseudoTextContentConstraint {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "COPY string is not allowed in pseudo text",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
@@ -108,7 +108,7 @@ class TestPseudoTextContentConstraint {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Compiler directives cannot be continued on another line",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));

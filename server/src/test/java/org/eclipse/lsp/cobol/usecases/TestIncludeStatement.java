@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This test checks that ++INCLUDE statement is parsed correctly */
@@ -51,7 +52,7 @@ class TestIncludeStatement {
         ImmutableMap.of(
             "NameLengthError",
             new Diagnostic(
-                null,
+                new Range(),
                 "Copybook declaration has more than 10 characters for: NAME123456789",
                 DiagnosticSeverity.Information,
                 SourceInfoLevels.INFO.getText())));

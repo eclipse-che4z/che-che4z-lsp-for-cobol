@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** Tests the DaCo GET ITEM statement */
@@ -62,7 +63,7 @@ class TestDaCoGetItemStatement {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Variable DSR443-RW1 is not defined",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())),

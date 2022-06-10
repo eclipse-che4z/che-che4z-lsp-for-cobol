@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This class checks that there are no errors shown for compiler directives on several lines */
@@ -72,7 +73,7 @@ class TestCompilerDirectivesNotCauseErrors {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "The first character of the sequence number must be numeric.",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));

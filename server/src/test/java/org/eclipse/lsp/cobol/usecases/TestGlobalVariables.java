@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
@@ -94,7 +95,7 @@ class TestGlobalVariables {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null, "Variable FOO is not defined", DiagnosticSeverity.Error, ERROR.getText())));
+                new Range(), "Variable FOO is not defined", DiagnosticSeverity.Error, ERROR.getText())));
   }
 
   @Test
@@ -110,7 +111,7 @@ class TestGlobalVariables {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Global variable must have a unique name",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
@@ -124,7 +125,7 @@ class TestGlobalVariables {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "GLOBAL can only be used on level 01",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
