@@ -22,9 +22,6 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 ## Prerequisites
 
 - Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
-- To enable automatic copybook retrieval from the mainframe, the following are required:
-    - [Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=Zowe.vscode-extension-for-zowe) version 1.15.0 or higher.
-    - A Zowe Explorer `zosmf` or `zftp` profile with credentials and a connection URL defined.
     
 ## Compatibility
 
@@ -33,6 +30,15 @@ The COBOL Language Support extension is supported on Visual Studio Code and Gith
 This extension is not compatible with other extensions that provide COBOL support except [COBOL Control Flow](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.ccf). We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
 
 The COBOL Language Support extension only supports IBM Enterprise COBOL. Other versions of COBOL are not supported.
+
+### Integration with Zowe Explorer
+
+Integrating COBOL Language Support with Zowe Explorer lets you:
+
+- Load your data sets containing COBOL code directly from the data set tree.
+- Enable automatic copybook retrieval from the mainframe.
+
+To enable these features, install the [Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=Zowe.vscode-extension-for-zowe) extension and configure a Zowe Explorer `zosmf` or `zftp` profile with credentials and a connection URL.
 
 ## Features
 COBOL Language Support provides the following COBOL syntax awareness features:
