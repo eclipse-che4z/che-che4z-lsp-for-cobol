@@ -90,6 +90,10 @@ The dialects setting lets you include specific language analysis in your COBOL f
 
 **Note:** If you disable the setting, your IDMS bits of code are highlighted as errors.
 
+### SQL Backend Server
+
+Set the SQL backend server as either DB2 or Datacom to ensure you use the correct version of the `SQLCA` and `SQLDA` copybooks. To set the SQL backend server, go to **VS Code Settings** > **User** > **Extensions** > **COBOL Language Support** > **Cobol-lsp: Target-sql-backend**. The default setting is DB2.
+
 ## Subroutine Support
 
 The COBOL Language Support extension supports subroutines specified in CALL statements if the called program is stored in a local folder in your workspace. The Go To Definition and Find All References functionalities, as well as autocomplete, are extended to work for names of subroutines. 
