@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 /**
  * If user has user defined paragraphs they should be resolved without errors
  */
-public class TestUserDefinedParagraphs2 {
+public class TestUserDefinedSections2 {
   private static final String TEXT =
           "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. UDPAR. \n"

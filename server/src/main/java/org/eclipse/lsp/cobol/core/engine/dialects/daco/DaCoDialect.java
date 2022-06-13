@@ -86,8 +86,8 @@ public final class DaCoDialect implements CobolDialect {
     errors.addAll(visitor.getErrors());
 
     String text = visitor.getResultedText();
-    DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider();
-    Multimap<String, Pair<String, String>> implicitCode = provider.getImplicitCode(text, nodes);
+    DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider(maidProcessor.getSections());
+    Multimap<String, Pair<String, String>> implicitCode = provider.getImplicitCode(text, nodes, context.getCopybookConfig());
 
     DialectOutcome result = new DialectOutcome(text, nodes, implicitCode);
     return new ResultWithErrors<>(result, errors);

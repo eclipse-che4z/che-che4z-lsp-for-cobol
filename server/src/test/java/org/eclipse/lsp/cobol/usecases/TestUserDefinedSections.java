@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 /**
  * If user has user defined labels they should be resolved without errors
  */
-class TestUserDefinedParagraphs {
+class TestUserDefinedSections {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST.\n"
@@ -39,7 +39,7 @@ class TestUserDefinedParagraphs {
   @Test
   void test() {
     CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of("USERLABEL"));
-    AnalysisConfig analysisConfig = new AnalysisConfig(copybookConfig, ImmutableList.of(), ImmutableList.of());
+    AnalysisConfig analysisConfig = new AnalysisConfig(copybookConfig, ImmutableList.of(), ImmutableList.of("DaCo", "IDMS"));
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
   }
 }

@@ -42,7 +42,6 @@ public class ContentProviderFactory {
   public ContentProviderFactory(FileSystemService files, CopybookService copybookService) {
     this.instances = new HashMap<>();
     instances.put(InjectContentType.FILE, new FileContentProvider(files));
-    instances.put(InjectContentType.GENERATED, new SectionsContentProvider());
     instances.put(InjectContentType.RESOLVE_COPYBOOK, new CopybookContentProvider(copybookService));
   }
 

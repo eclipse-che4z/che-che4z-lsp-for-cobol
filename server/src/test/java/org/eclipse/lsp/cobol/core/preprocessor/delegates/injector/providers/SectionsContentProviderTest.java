@@ -15,12 +15,8 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
 import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
-import org.eclipse.lsp.cobol.service.SQLBackend;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
-import org.junit.jupiter.api.BeforeEach;
+import com.google.common.collect.ImmutableSet;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.provider.SectionsGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,24 +24,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * This unit tests check the {@link SectionsContentProvider} class functionality
+ * This unit tests check the {@link SectionsGenerator} class functionality
  */
 @ExtendWith(MockitoExtension.class)
 class SectionsContentProviderTest {
-  private SectionsContentProvider contentProvider;
-
-  @BeforeEach
-  void setupMocks() {
-    contentProvider = new SectionsContentProvider();
-  }
-
   @Test
-  void testCreatesParagraphsFromLabelNames() {
-    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED,
-        SQLBackend.DB2_SERVER, ImmutableList.of("LABEL1", "LABEL2"));
-    CopybookName copybookName = new CopybookName("name");
-    CopybookModel model = contentProvider.read(copybookConfig, copybookName, "uri", "uri").get();
-    assertEquals(model.getContent(), "       LABEL1 SECTION.\r\n       LABEL2 SECTION.\r\n");
+  void testCreatesSectionsFromProvidedNames() {
+    String result = SectionsGenerator.generate(ImmutableList.of("LABEL1", "LABEL2", "LABEL_EX"), ImmutableSet.of("LABEL_EX")).getRight();
+    assertEquals("       LABEL1 SECTION.\r\n       LABEL2 SECTION.\r\n", result);
   }
 
 }

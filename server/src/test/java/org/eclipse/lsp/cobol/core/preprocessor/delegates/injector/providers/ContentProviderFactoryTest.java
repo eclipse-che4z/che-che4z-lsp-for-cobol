@@ -45,12 +45,6 @@ class ContentProviderFactoryTest {
   }
 
   @Test
-  void testLabelsContentProvider() {
-    ContentProvider contentProvider = factory.getInstanceFor(ContentProviderFactory.InjectContentType.GENERATED);
-    assertTrue(contentProvider instanceof SectionsContentProvider);
-  }
-
-  @Test
   void testCopybookContentProvider() {
     ContentProvider contentProvider = factory.getInstanceFor(ContentProviderFactory.InjectContentType.RESOLVE_COPYBOOK);
     assertTrue(contentProvider instanceof CopybookContentProvider);
