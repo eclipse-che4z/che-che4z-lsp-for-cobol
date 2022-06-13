@@ -28,6 +28,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.usecase.UseCasePreprocessorBaseListener;
 
 import java.util.*;
@@ -500,11 +501,11 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                     .add(
                             new Diagnostic(
                                     // honour the range provided by tester.
-                                    Objects.nonNull(it.getRange()) ? it.getRange() : range,
+                                    Objects.nonNull(it.getRange().getStart()) ? it.getRange() : range,
                                     it.getMessage(),
                                     it.getSeverity(),
                                     it.getSource(),
-                                    it.getCode()));
+                                    Optional.ofNullable(it.getCode()).map(Either::getLeft).orElse(null)));
     };
   }
 

@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
@@ -55,6 +56,6 @@ class TestIdentificationDivisionInCopybookWithError {
         TEXT,
         ImmutableList.of(new CobolText(IDDIV_NAME, IDDIV), new CobolText(STRUCT1_NAME, STRUCT1)),
         ImmutableMap.of(
-            "1", new Diagnostic(null, MESSAGE, Error, SourceInfoLevels.ERROR.getText())));
+            "1", new Diagnostic(new Range(), MESSAGE, Error, SourceInfoLevels.ERROR.getText())));
   }
 }

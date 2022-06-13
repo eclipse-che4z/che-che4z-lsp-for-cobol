@@ -160,13 +160,13 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Override
   @SuppressWarnings("cast")
-  public CompletableFuture<List<? extends Location>> definition(
-      TextDocumentPositionParams position) {
-    String uri = position.getTextDocument().getUri();
+  public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> definition(
+      DefinitionParams params) {
+    String uri = params.getTextDocument().getUri();
     return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
             disposableLSPStateService,
-            (Supplier<List<? extends Location>>)
-                () -> occurrences.findDefinitions(docs.get(uri), position),
+            (Supplier<Either<List<? extends Location>, List<? extends LocationLink>>>)
+                () -> Either.forLeft(occurrences.findDefinitions(docs.get(uri), params)),
             executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("definitions resolving", uri)));
@@ -187,13 +187,12 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Override
   @SuppressWarnings("cast")
-  public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
-      TextDocumentPositionParams position) {
-    String uri = position.getTextDocument().getUri();
+  public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(DocumentHighlightParams params) {
+    String uri = params.getTextDocument().getUri();
     return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
             disposableLSPStateService,
             (Supplier<List<? extends DocumentHighlight>>)
-                () -> occurrences.findHighlights(docs.get(uri), position),
+                () -> occurrences.findHighlights(docs.get(uri), params),
             executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("document highlighting", uri)));
@@ -432,10 +431,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   }
 
   @Override
-  public CompletableFuture<Hover> hover(TextDocumentPositionParams position) {
-    String uri = position.getTextDocument().getUri();
+  public CompletableFuture<Hover> hover(HoverParams params) {
+    String uri = params.getTextDocument().getUri();
     return CompletableFuture.supplyAsync(
-            () -> hoverProvider.getHover(docs.get(uri), position),
+            () -> hoverProvider.getHover(docs.get(uri), params),
             executors.getThreadPoolExecutor())
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("getting hover", uri)));
   }

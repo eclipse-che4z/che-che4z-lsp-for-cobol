@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** WRK qualifier should show an error if the previous variable doesn't have a name specified. */
@@ -48,7 +49,7 @@ class TestCopyMaidWithWrkShowsErrorAfterVariableWithoutName {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Cannot retrieve suffix for WRK usage",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());

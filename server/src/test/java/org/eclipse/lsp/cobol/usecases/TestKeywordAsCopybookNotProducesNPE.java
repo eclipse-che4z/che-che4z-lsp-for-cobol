@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
@@ -71,13 +72,13 @@ class TestKeywordAsCopybookNotProducesNPE {
         ImmutableMap.of(
             "long1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Copybook declaration has more than 8 characters for: IDENTIFICATION",
                 Information,
                 "COBOL Language Support - I"),
             "long2",
             new Diagnostic(
-                null,
+                new Range(),
                 "Copybook declaration has more than 8 characters for: NUMERICLITERAL",
                 Information,
                 "COBOL Language Support - I")));

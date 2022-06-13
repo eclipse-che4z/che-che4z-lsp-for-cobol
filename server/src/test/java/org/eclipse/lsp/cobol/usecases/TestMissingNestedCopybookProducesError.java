@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
@@ -52,7 +53,7 @@ class TestMissingNestedCopybookProducesError {
         ImmutableMap.of(
             "missing",
             new Diagnostic(
-                null,
+                new Range(),
                 "CPYNAME: Copybook not found",
                 Error,
                 SourceInfoLevels.ERROR.getText(),

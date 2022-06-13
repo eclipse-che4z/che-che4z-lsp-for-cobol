@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
@@ -57,42 +58,42 @@ class TestErrorsInDifferentFiles {
             .put(
                 "invalid",
                 new Diagnostic(
-                    null,
+                    new Range(),
                     "Variable CHILD1 is not defined",
                     Error,
                     SourceInfoLevels.ERROR.getText()))
             .put(
                 "pic",
                 new Diagnostic(
-                    null,
+                    new Range(),
                     "Syntax error on 'PIC' expected SECTION",
                     Error,
                     SourceInfoLevels.ERROR.getText()))
             .put(
                 "child1",
                 new Diagnostic(
-                    null,
+                    new Range(),
                     "Syntax error on 'CHILD1' expected SECTION",
                     Error,
                     SourceInfoLevels.ERROR.getText()))
             .put(
                 "is",
                 new Diagnostic(
-                    null,
+                    new Range(),
                     "Syntax error on 'IS' expected SECTION",
                     Error,
                     SourceInfoLevels.ERROR.getText()))
             .put(
                 "areaA1",
                 new Diagnostic(
-                    null,
+                    new Range(),
                     "The following token must start in Area A: 03",
                     Warning,
                     SourceInfoLevels.WARNING.getText()))
             .put(
                 "areaA2",
                 new Diagnostic(
-                    null,
+                    new Range(),
                     "The following token must start in Area A: CHILD1",
                     Warning,
                     SourceInfoLevels.WARNING.getText()))

@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -46,10 +47,8 @@ class TestSyntaxError {
         ImmutableList.of(),
         ImmutableMap.of(
             "typo",
-            new Diagnostic(
-                null, DIVISION, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText()),
+            new Diagnostic(new Range(), DIVISION, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText()),
             "name",
-            new Diagnostic(
-                null, NAME, DiagnosticSeverity.Warning, SourceInfoLevels.WARNING.getText())));
+            new Diagnostic(new Range(), NAME, DiagnosticSeverity.Warning, SourceInfoLevels.WARNING.getText())));
   }
 }

@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This test checks if CICS statements coded in Area B */
@@ -46,7 +47,7 @@ class TestExecCicsStatementMustCodedInAreaB {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "The following token must start in Area B: SEND",
                 DiagnosticSeverity.Warning,
                 SourceInfoLevels.WARNING.getText())));

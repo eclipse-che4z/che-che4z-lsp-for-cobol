@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This test checks that level 66 variable can be used with qualified names. */
@@ -75,7 +76,7 @@ public class TestQualifiedNameUsageForLevel66 {
   void test3() {
     UseCaseEngine.runTest(TEXT3, ImmutableList.of(), ImmutableMap.of("1",
             new Diagnostic(
-                    null, "The data entry with the name TOM not found", DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
+                    new Range(), "The data entry with the name TOM not found", DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
   }
 
 

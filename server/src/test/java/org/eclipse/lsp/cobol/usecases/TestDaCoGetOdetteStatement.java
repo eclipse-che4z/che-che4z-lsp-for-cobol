@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** Tests the DaCo GET ODETTE statement */
@@ -48,7 +49,7 @@ class TestDaCoGetOdetteStatement {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Variable DET002-XW1 is not defined",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())),

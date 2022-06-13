@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -66,25 +67,25 @@ class TestDaCoWriteTransaction {
                 ImmutableMap.of(
                         "1",
                         new Diagnostic(
-                                null,
+                                new Range(),
                                 "Only alphanumerics are allowed for task name",
                                 DiagnosticSeverity.Error,
                                 SourceInfoLevels.ERROR.getText()),
                         "2",
                         new Diagnostic(
-                                null,
+                                new Range(),
                                 "Exact length of task name must be 4 bytes",
                                 DiagnosticSeverity.Error,
                                 SourceInfoLevels.ERROR.getText()),
                         "3",
                         new Diagnostic(
-                                null,
+                                new Range(),
                                 "Allowed range is 4 to 2048",
                                 DiagnosticSeverity.Error,
                                 SourceInfoLevels.ERROR.getText()),
                         "4",
                         new Diagnostic(
-                                null,
+                                new Range(),
                                 "Max length limit of 19 bytes allowed for dbu.",
                                 DiagnosticSeverity.Error,
                                 SourceInfoLevels.ERROR.getText())),
