@@ -17,11 +17,23 @@ package org.eclipse.lsp.cobol.positive;
 import org.eclipse.lsp.cobol.service.mocks.CopybooksMock;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CobolTextRegistry extends CopybooksMock {
+  String PATH_TO_LISTING_SNAP = "listingSnap";
+  String DEFAULT_LISTING_PATH =
+      "..\\Cobol85PositiveTestsSuite\\SYSPRINT85\\snapshot\\listingSnap.json";
   /** @return all the Cobol files for positive tests */
   List<CobolText> getPositives();
 
   /** @return all the Cobol files for negative tests */
   List<CobolText> getNegatives();
+
+  /**
+   * Gives a map of positive filename mapped to a snap object.
+   *
+   * @param filename filename
+   * @return Map of positive filename mapped to a snap objects.
+   */
+  Map<ReportSection, List<SysprintSnap>> getSnapForFile(String filename);
 }
