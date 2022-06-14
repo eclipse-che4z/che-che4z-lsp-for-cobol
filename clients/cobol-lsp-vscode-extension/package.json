@@ -390,12 +390,21 @@
                     "description": "List of enabled dialects",
                     "uniqueItems": true
                 },
-                "cobol-lsp.predefined-paragraphs": {
+                "cobol-lsp.predefined-sections": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     },
-                    "description": "List of predefined paragraphs",
+                    "description": "List of predefined sections",
+                    "default": [
+                        "S930",
+                        "S940",
+                        "S950",
+                        "S990",
+                        "S991",
+                        "S997",
+                        "S999"
+                    ],
                     "uniqueItems": true
                 }
             }

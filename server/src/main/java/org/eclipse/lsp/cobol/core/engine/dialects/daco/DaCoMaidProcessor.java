@@ -44,10 +44,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,12 +59,15 @@ import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 public class DaCoMaidProcessor {
   private static final String MAID_WRK_QUALIFIER = "WRK";
   private final Pattern procedureDivisionPattern = Pattern.compile("\\s*procedure\\s+division[\\w\\s]*", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+  private final Pattern sectionPattern = Pattern.compile("^\\s*(?<name>\\w*)\\s+SECTION\\s*\\.\\s*$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern dataDivisionPattern = Pattern.compile("\\s*data\\s+division\\s*\\.", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern dataDescriptionEntryPattern = Pattern.compile("^\\s*(?<lvl>\\d+)\\s+(?!copy maid)(?<entryName>[\\w]+(-\\w+)?)?.*\\..*$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern copyMaidPattern = Pattern.compile("^(?<indent>\\s*)(?<level>\\d{1,2})?\\s*COPY\\s+MAID\\s+(?<layoutId>[a-zA-Z0-9]*[-]?[a-zA-Z0-9]{0,3})\\s*(?<layoutUsage>[a-zA-Z]{3,6})?\\s*\\.?$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final CopybookService copybookService;
   private final ParseTreeListener treeListener;
   private final MessageService messageService;
+
+  private final Set<String> sections = new HashSet<>();
 
   /**
    * Process MAID copybooks in the source code
@@ -82,6 +82,7 @@ public class DaCoMaidProcessor {
 
     String[] lines = input.split("\n");
     String lastSuffix = null;
+    sections.clear();
     for (int i = 0; i < lines.length; i++) {
       String line = lines[i];
       if (procedureDivisionPattern.matcher(line).find()) {
@@ -101,6 +102,12 @@ public class DaCoMaidProcessor {
         }
       } else if (dataDivisionPattern.matcher(line).find()) {
         state = DaCoMaidProcessingState.DATA_DIVISION;
+      }
+      if (state == DaCoMaidProcessingState.PROCEDURE_DIVISION) {
+        Matcher sectionMatcher = sectionPattern.matcher(line);
+        if (sectionMatcher.find()) {
+          sections.add(sectionMatcher.group("name"));
+        }
       }
       lines[i] = collectCopyMaid(line, i, copyMaidNodes, lastSuffix, context, errors);
     }
@@ -208,5 +215,9 @@ public class DaCoMaidProcessor {
       return layoutId;
     }
     return String.format("%s_%s", layoutId.toUpperCase(Locale.ROOT), layoutUsage.toUpperCase(Locale.ROOT));
+  }
+
+  public Set<String> getSections() {
+    return sections;
   }
 }

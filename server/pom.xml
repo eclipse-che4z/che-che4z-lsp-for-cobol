@@ -348,7 +348,7 @@
                 <version>${maven.antlr4.plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>build UseCasePreprocessorr</id>
+                        <id>build UseCasePreprocessor</id>
                         <phase>generate-test-sources</phase>
                         <goals>
                             <goal>antlr4</goal>

@@ -79,18 +79,6 @@ class InjectServiceTest {
   }
 
   @Test
-  void testProcedureDivisionPickUpDialectInjectors_true() {
-    CobolPreprocessor.ProcedureDivisionContext context = mock(CobolPreprocessor.ProcedureDivisionContext.class);
-    setupContext(context, "2");
-
-    List<InjectDescriptor> descriptorList = injectService.getInjectors(context);
-
-    assertEquals(2, descriptorList.size());
-    assertEquals("name2", descriptorList.get(0).getInjectedSourceName());
-    assertEquals("PLABEL", descriptorList.get(1).getInjectedSourceName());
-  }
-
-  @Test
   void testProcedureDivisionPickUpDialectInjectors_false() {
     CobolPreprocessor.LinkageSectionContext context = mock(CobolPreprocessor.LinkageSectionContext.class);
     setupContext(context, "unknown");
@@ -156,9 +144,9 @@ class InjectServiceTest {
     assertEquals("COPYBOOK3", descriptorList.get(0).getInjectedSourceName());
   }
 
-  void setupContext(ParserRuleContext context, String section) {
+  void setupContext(ParserRuleContext context, String text) {
     Token token = mock(Token.class);
-    when(token.getText()).thenReturn(section);
+    when(token.getText()).thenReturn(text);
     when(context.getStart()).thenReturn(token);
   }
 

@@ -15,6 +15,8 @@
 package org.eclipse.lsp.cobol.core.engine.dialects.daco.provider;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DaCoImplicitCodeProviderTest {
   @Test
   void testEmptyCobolListing() {
-    DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider();
-    assertEquals(2, provider.getImplicitCode("", ImmutableList.of()).size());
+    CopybookConfig copybookConfig = new CopybookConfig(null, null, ImmutableList.of("S1", "S2"));
+    DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider(ImmutableSet.of("SE"));
+    assertEquals(3, provider.getImplicitCode("", ImmutableList.of(), copybookConfig).size());
   }
 }
