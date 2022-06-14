@@ -179,7 +179,7 @@ class WorkspaceServiceTest {
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
-    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
+    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams());
 
     verify(watchingService).addWatchers(watcherCaptor.capture());
     verify(watchingService).removeWatchers(emptyList());
@@ -234,7 +234,7 @@ class WorkspaceServiceTest {
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
-    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
+    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams());
 
     verify(watchingService).addWatchers(emptyList());
     verify(watchingService).removeWatchers(emptyList());
@@ -329,7 +329,7 @@ class WorkspaceServiceTest {
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
-    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
+    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams());
 
     verify(watchingService).addWatchers(emptyList());
     verify(watchingService).removeWatchers(emptyList());

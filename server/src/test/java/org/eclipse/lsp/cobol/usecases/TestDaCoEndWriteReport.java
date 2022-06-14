@@ -18,6 +18,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -50,21 +51,21 @@ class TestDaCoEndWriteReport {
         diagnosticMap.put(
                 "1",
                 new Diagnostic(
-                        null,
+                        new Range(),
                         "Only alphanumerics are allowed for report name",
                         DiagnosticSeverity.Error,
                         SourceInfoLevels.ERROR.getText()));
         diagnosticMap.put(
                 "2",
                 new Diagnostic(
-                        null,
+                        new Range(),
                         "Exact length of report name must be 5 bytes",
                         DiagnosticSeverity.Error,
                         SourceInfoLevels.ERROR.getText()));
         diagnosticMap.put(
                 "3",
                 new Diagnostic(
-                        null,
+                        new Range(),
                         "String must starts with R or T values",
                         DiagnosticSeverity.Error,
                         SourceInfoLevels.ERROR.getText()));

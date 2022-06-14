@@ -43,7 +43,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.internal.stubbing.answers.AnswersWithDelay;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -293,7 +296,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   @Test
   void testCodeActionsEndpoint() {
     CodeActionParams params =
-        new CodeActionParams(new TextDocumentIdentifier(DOCUMENT_URI), null, null);
+        new CodeActionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Range(), new CodeActionContext());
     List<Either<Command, CodeAction>> expected = emptyList();
     when(actions.collect(params)).thenReturn(expected);
     try {
@@ -457,8 +460,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
     Position testHoverPosition = new Position(0, 2);
     TextDocumentIdentifier testTextDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
-    TextDocumentPositionParams testHoverPositionParams =
-        new TextDocumentPositionParams(testTextDocumentIdentifier, testHoverPosition);
+    HoverParams testHoverPositionParams = new HoverParams(testTextDocumentIdentifier, testHoverPosition);
 
     Awaitility.await()
         .until(
@@ -552,10 +554,8 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
             new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
     service.getFutureMap().get(DOCUMENT_URI).get();
     service
-        .definition(
-            new TextDocumentPositionParams(
-                new TextDocumentIdentifier(DOCUMENT_URI), new Position()))
-        .get();
+        .definition(new DefinitionParams(
+                new TextDocumentIdentifier(DOCUMENT_URI), new Position())).get();
     verify(occurrences)
         .findDefinitions(any(CobolDocumentModel.class), any(TextDocumentPositionParams.class));
   }

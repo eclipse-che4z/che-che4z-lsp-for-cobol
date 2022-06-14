@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
@@ -56,6 +57,6 @@ class TestReplacingForSeveralTokensInOneLine {
         DOCUMENT,
         ImmutableList.of(new CobolText(REPL_NAME, REPL)),
         ImmutableMap.of(
-            "invalid", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
+            "invalid", new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

@@ -163,12 +163,12 @@ class CobolLanguageServerTest {
   private void checkOnlySupportedCapabilitiesAreSet(ServerCapabilities capabilities) {
     assertEquals(TextDocumentSyncKind.Full, capabilities.getTextDocumentSync().getLeft());
     assertTrue(capabilities.getWorkspace().getWorkspaceFolders().getSupported());
-    assertTrue(capabilities.getDefinitionProvider());
-    assertTrue(capabilities.getReferencesProvider());
-    assertTrue(capabilities.getDocumentFormattingProvider());
-    assertTrue(capabilities.getDocumentHighlightProvider());
-    assertTrue(capabilities.getCodeActionProvider());
-    assertTrue(capabilities.getDocumentSymbolProvider());
+    assertTrue(capabilities.getDefinitionProvider().getLeft());
+    assertTrue(capabilities.getReferencesProvider().getLeft());
+    assertTrue(capabilities.getDocumentFormattingProvider().getLeft());
+    assertTrue(capabilities.getDocumentHighlightProvider().getLeft());
+    assertTrue(capabilities.getCodeActionProvider().getLeft());
+    assertTrue(capabilities.getDocumentSymbolProvider().getLeft());
     assertTrue(capabilities.getFoldingRangeProvider().getLeft());
     assertEquals(
         stream(values()).map(ErrorCode::name).collect(toList()),
@@ -177,7 +177,7 @@ class CobolLanguageServerTest {
     assertFalse(capabilities.getCompletionProvider().getResolveProvider());
     assertNull(capabilities.getWorkspace().getWorkspaceFolders().getChangeNotifications());
     assertNull(capabilities.getDocumentRangeFormattingProvider());
-    assertTrue(capabilities.getHoverProvider());
+    assertTrue(capabilities.getHoverProvider().getLeft());
     assertNull(capabilities.getRenameProvider());
     assertNull(capabilities.getWorkspaceSymbolProvider());
     assertNull(capabilities.getCodeLensProvider());

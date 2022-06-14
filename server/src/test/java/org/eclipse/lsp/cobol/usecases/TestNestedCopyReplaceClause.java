@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -67,13 +68,13 @@ class TestNestedCopyReplaceClause {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "More than one nested copy replace statement for copybook declaration of: STRUCT1",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText()),
             "2",
             new Diagnostic(
-                null,
+                new Range(),
                 "More than one nested copy replace statement for copybook declaration of: STRUCT1",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));

@@ -37,6 +37,7 @@
       "accept ${1:variable}",
       "$0"
     ],
+    "description": "Accept variable",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "ACCEPT": {
@@ -45,6 +46,7 @@
       "ACCEPT ${1:variable}",
       "$0"
     ],
+    "description": "Accept variable",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "accept from": {
@@ -104,7 +106,7 @@
     "body": [
       "AFTER ${1:item} FROM ${2:item}"
     ],
-    "description": "AFTER ${1:item} FROM ${2:item}",
+    "description": "AFTER item FROM 2:item",
     "scope": "cobol"
   },
   "ALL BY": {
@@ -120,7 +122,7 @@
     "body": [
       "ALLOCATE ${1:arithExp|dataName}"
     ],
-    "description": "TBD",
+    "description": "ALLOCATE item",
     "scope": "cobol"
   },
   "ALSO": {
@@ -128,7 +130,7 @@
     "body": [
       "ALSO ${1:id|lit|exp|TRUE|FALSE}"
     ],
-    "description": "TBD",
+    "description": "ALSO id|dlit|exp|TRUE|FALSE}",
     "scope": "cobol"
   },
   "ALTER TO": {
@@ -136,7 +138,7 @@
     "body": [
       "ALTER ${1:procName-1} TO ${2:procName-2}"
     ],
-    "description": "TBD",
+    "description": "ALTER TO",
     "scope": "cobol"
   },
   "ASCENDING": {
@@ -144,7 +146,7 @@
     "body": [
       "ASCENDING ${1:item}"
     ],
-    "description": "TBD",
+    "description": "ASCENDING item",
     "scope": "cobol"
   },
   "BEFORE": {
@@ -152,7 +154,7 @@
     "body": [
       "BEFORE ${1:id|lit}"
     ],
-    "description": "TBD",
+    "description": "BEFORE literal",
     "scope": "cobol"
   },
   "BY": {
@@ -160,7 +162,7 @@
     "body": [
       "BY ${1:item}"
     ],
-    "description": "TBD",
+    "description": "BY item",
     "scope": "cobol"
   },
   "BY UNTIL": {
@@ -168,7 +170,7 @@
     "body": [
       "BY ${1:item} UNTIL ${2:condition}"
     ],
-    "description": "TBD",
+    "description": "BY item UNTIL condition",
     "scope": "cobol"
   },
   "CHARACTERS BY": {
@@ -176,7 +178,7 @@
     "body": [
       "CHARACTERS BY ${1:id|lit}"
     ],
-    "description": "TBD",
+    "description": "CHARACTERS BY literal",
     "scope": "cobol"
   },
   "CALL": {
@@ -211,7 +213,7 @@
     "body": [
       "CLOSE $(1:fileName}"
     ],
-    "description": "TBD",
+    "description": "CLOSE fileName",
     "scope": "cobol"
   },
   "COMPUTE EQUAL": {
@@ -219,7 +221,7 @@
     "body": [
       "COMPUTE ${1:id} EQUAL ${2:arithExp}"
     ],
-    "description": "TBD",
+    "description": "COMPUTE id EQUAL arithExp",
     "scope": "cobol"
   },
   "CONTENT": {
@@ -227,7 +229,7 @@
     "body": [
       "CONTENT ${1:id}"
     ],
-    "description": "TBD",
+    "description": "CONTENT id",
     "scope": "cobol"
   },
   "CONVERTING": {
@@ -235,7 +237,7 @@
     "body": [
       "CONVERTING ${1:item}"
     ],
-    "description": "TBD",
+    "description": "CONVERTING item",
     "scope": "cobol"
   },
   "CORR": {
@@ -243,7 +245,7 @@
     "body": [
       "CORR ${1:id}"
     ],
-    "description": "TBD",
+    "description": "CORR id",
     "scope": "cobol"
   },
   "COUNT IN": {
@@ -251,7 +253,7 @@
     "body": [
       "COUNT IN ${1:id}"
     ],
-    "description": "TBD",
+    "description": "COUNT IN id",
     "scope": "cobol"
   },
   "copy": {
@@ -292,7 +294,7 @@
     "body": [
       "DATE ${1:yyyymmdd}"
     ],
-    "description": "TBD",
+    "description": "DATE yyyymmdd",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "DAY": {
@@ -300,7 +302,7 @@
     "body": [
       "DAY ${1:yyyyddd}"
     ],
-    "description": "TBD",
+    "description": "DAY yyyyddd",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "DELETE": {
@@ -308,7 +310,7 @@
     "body": [
       "DELETE ${1:fileName}"
     ],
-    "description": "TBD",
+    "description": "DELETE fileName",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "DELIMITED BY": {
@@ -316,7 +318,7 @@
     "body": [
       "DELIMITED BY ${1:item}"
     ],
-    "description": "TBD",
+    "description": "DELIMITED BY item",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "DELIMITER": {
@@ -324,7 +326,7 @@
     "body": [
       "DELIMITER ${1:item}"
     ],
-    "description": "TBD",
+    "description": "DELIMITED BY",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "DESCENDING": {
@@ -332,7 +334,7 @@
     "body": [
       "DESCENDING ${1:item}"
     ],
-    "description": "TBD",
+    "description": "DESCENDING item",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "divide": {
@@ -356,7 +358,7 @@
     "body": [
       "DIVIDE ${1:id|lit} BY ${2:id|lit} GIVING ${3:id}"
     ],
-    "description": "TBD",
+    "description": "DIVIDE BY GIVING",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "DIVIDE INTO": {
@@ -364,7 +366,7 @@
     "body": [
       "DIVIDE ${1:id|lit} INTO ${2:id}"
     ],
-    "description": "TBD",
+    "description": "DIVIDE INTO",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "DIVIDE INTO GIVING": {
@@ -372,7 +374,7 @@
     "body": [
       "DIVIDE ${1:id|lit} INTO ${2:id|lit} GIVING ${3:id}"
     ],
-    "description": "TBD",
+    "description": "DIVIDE INTO GIVING",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "DIVIDE INTO GIVING REMAINDER": {
@@ -380,7 +382,7 @@
     "body": [
       "DIVIDE INTO GIVING REMAINDER=DIVIDE ${1:id|lit} INTO ${2:id|lit} GIVING ${3:id} REMAINDER ${4:id4}"
     ],
-    "description": "TBD",
+    "description": "DIVIDE INTO GIVING REMAINDER=DIVIDE ${1:id|lit} INTO ${2:id|lit} GIVING ${3:id} REMAINDER ${4:id4}",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "display": {
@@ -404,7 +406,7 @@
     "body": [
       "DOWN BY ${1:item}"
     ],
-    "description": "TBD",
+    "description": "DOWN BY item",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "environment division": {
@@ -474,7 +476,7 @@
     "body": [
       "EXTEND ${1:fileName}"
     ],
-    "description": "EXTEND",
+    "description": "EXTEND fileName",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "EXCEPTION": {
@@ -482,7 +484,7 @@
     "body": [
       "EXCEPTION ${1:impStat}"
     ],
-    "description": "EXCEPTION",
+    "description": "EXCEPTION impStat",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "exit program": {
@@ -598,7 +600,7 @@
     "body": [
       "FIRST ${1:id|lit} BY ${2:id|lit}"
     ],
-    "description": "TBD Cobol, idms ",
+    "description": "FIRST ${1:id|lit} BY ${2:id|lit}",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "FOR": {
@@ -606,7 +608,7 @@
     "body": [
       "FOR ${1:item}"
     ],
-    "description": "TBD Cobol, cics , daco, idms",
+    "description": "FOR ${1:item}",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "FROM": {
@@ -614,7 +616,7 @@
     "body": [
       "FROM ${1:item}"
     ],
-    "description": "TBD Cobol, cics, Daco , idmscopy",
+    "description": "FROM ${1:item}",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "FREE": {
@@ -622,7 +624,7 @@
     "body": [
       "FREE ${1:dataName}"
     ],
-    "description": "TBD Daco, cics ",
+    "description": "FREE ${1:dataName}",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "function-acos": {
@@ -1963,7 +1965,7 @@
     "body": [
       "GENERATE ${1:id}"
     ],
-    "description": "TBD Daco , cobol",
+    "description": "GENERATE ${1:id}",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "GIVING": {
@@ -1973,7 +1975,7 @@
     "body": [
       "GIVING ${1:item}"
     ],
-    "description": "TBD cobol",
+    "description": "GIVING ${1:item}",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "GO DEPENDING": {
@@ -1983,7 +1985,7 @@
     "body": [
       "GO ${1:procName} DEPENDING ${2:id}"
     ],
-    "description": "TBD cobol",
+    "description": "GO ${1:procName} DEPENDING ${2:id}",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "I-O": {
@@ -1993,7 +1995,7 @@
     "body": [
       "I-O ${1:fileName}"
     ],
-    "description": "TBD cobol",
+    "description": "I-O ${1:fileName}",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "INPUT": {
@@ -2003,7 +2005,7 @@
     "body": [
       "INPUT ${1:fileName}"
     ],
-    "description": "TBD Daco",
+    "description": "INPUT ${1:fileName}",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "INPUT PROCEDURE": {
@@ -2013,7 +2015,7 @@
     "body": [
       "INPUT PROCEDURE ${1:procName}"
     ],
-    "description": "TBD cobol",
+    "description": "INPUT PROCEDURE",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "INSPECT CONVERTING": {
@@ -2033,17 +2035,16 @@
     "body": [
       "INSPECT ${1:id}"
     ],
-    "description": "TBD Cobol",
+    "description": "INSPECT ${1:id}",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "INSPECT REPLACING": {
     "prefix":
-      "INSPECT REPLACING"
-    ,
+      "INSPECT REPLACING",
     "body": [
       "INSPECT ${1:id} REPLACING ${2:snip}"
     ],
-    "description": "TBD Cobol",
+    "description": "INSPECT REPLACING",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
 
@@ -2271,7 +2272,7 @@
     "body": [
       "MERGE ${1:fileName} ${2:snipASC|DESC} ${3:dataName}"
     ],
-    "description": "MERGE fileName Daco Cobol",
+    "description": "MERGE fileName",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "MERGE USING": {
@@ -2569,7 +2570,7 @@
     "body": [
       "READ ${1:fileName}"
     ],
-    "description": "READ Daco cobol *",
+    "description": "READ fileName",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "RELEASE": {
@@ -2577,7 +2578,7 @@
     "body": [
       "RELEASE ${1:recordName}"
     ],
-    "description": "RELEASE recordName Daco Cobol *",
+    "description": "RELEASE recordName",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "REPLACING": {
@@ -2585,7 +2586,7 @@
     "body": [
       "RELEASE ${1:item}"
     ],
-    "description": "REPLACING item Daco Cobol *",
+    "description": "REPLACING item ",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "RETURN": {
@@ -2593,7 +2594,7 @@
     "body": [
       "RETURN ${1:fileName}"
     ],
-    "description": "REPLACING fileName Daco Cobol *",
+    "description": "REPLACING fileName",
     "scope": "cobol,acucobol,opencobol,gnucobol"
   },
   "RETURNING": {

@@ -19,29 +19,15 @@ import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.eclipse.lsp.cobol.core.*;
-import org.eclipse.lsp.cobol.core.IdmsParser.CobolWordContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.DataNameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsControlSectionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsIfConditionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsIfStatementContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsSectionsContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsStatementsContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.CopyIdmsStatementContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_db_entity_nameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_map_nameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_map_name_definitionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_procedure_nameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.MapClauseContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.MapSectionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.QualifiedDataNameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.SchemaSectionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.VariableUsageNameContext;
+import org.eclipse.lsp.cobol.core.IdmsParser;
+import org.eclipse.lsp.cobol.core.IdmsParser.*;
+import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -51,7 +37,6 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
@@ -74,6 +59,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private final CopybookConfig copybookConfig;
   private final String programDocumentUri;
   private final TextReplacement textReplacement;
+  @Getter private final IdmsRecordsDescriptor recordsDescriptor = new IdmsRecordsDescriptor();
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
   IdmsVisitor(CopybookService copybookService,
@@ -158,6 +144,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitMapSection(MapSectionContext ctx) {
+    recordsDescriptor.setMapSectionExists(true);
     return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.MAP));
   }
 
@@ -186,6 +173,18 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitSchemaSection(SchemaSectionContext ctx) {
     return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.SCHEMA));
+  }
+
+  @Override
+  public List<Node> visitIdmsRecordLocationParagraph(IdmsParser.IdmsRecordLocationParagraphContext ctx) {
+    if (ctx.withinClause() != null) {
+      if (ctx.withinClause().withinEntry() != null && ctx.withinClause().withinEntry().children.size() > 1) {
+        recordsDescriptor.setRecordsWithinPlacement(ctx.withinClause().withinEntry().getChild(1).getText().toUpperCase());
+      } else if ("MANUAL".equalsIgnoreCase(ctx.withinClause().getText())) {
+        recordsDescriptor.setRecordsManualExists(true);
+      }
+    }
+    return visitChildren(ctx);
   }
 
   @Override

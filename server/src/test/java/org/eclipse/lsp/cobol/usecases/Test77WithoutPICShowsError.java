@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
@@ -52,7 +53,7 @@ class Test77WithoutPICShowsError {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item VARNAME",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
@@ -66,7 +67,7 @@ class Test77WithoutPICShowsError {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item VARNAME",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));

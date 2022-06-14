@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
@@ -45,28 +46,28 @@ class TestDuplicatedStatementInDefinitionProduceErrors {
 
   private static final Diagnostic DIAGNOSTIC_PIC =
       new Diagnostic(
-          null,
+          new Range(),
           "A duplicate PICTURE clause was found in a data description entry",
           DiagnosticSeverity.Error,
           ERROR.getText());
 
   private static final Diagnostic DIAGNOSTIC_VALUE =
       new Diagnostic(
-          null,
+          new Range(),
           "A duplicate VALUE clause was found in a data description entry",
           DiagnosticSeverity.Error,
           ERROR.getText());
 
   private static final Diagnostic DIAGNOSTIC_USAGE =
       new Diagnostic(
-          null,
+          new Range(),
           "A duplicate USAGE clause was found in a data description entry",
           DiagnosticSeverity.Error,
           ERROR.getText());
 
   private static final Diagnostic DIAGNOSTIC_OCCURS =
       new Diagnostic(
-          null,
+          new Range(),
           "A duplicate OCCURS clause was found in a data description entry",
           DiagnosticSeverity.Error,
           ERROR.getText());

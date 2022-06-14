@@ -218,7 +218,7 @@ class TestFileDescriptor {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "No FILE-CONTROL entry found for INFILE",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
@@ -232,7 +232,7 @@ class TestFileDescriptor {
         ImmutableMap.of(
             "2",
             new Diagnostic(
-                null,
+                new Range(),
                 "Variable INFILE is not defined",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
@@ -246,7 +246,7 @@ class TestFileDescriptor {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Variable INFILE is not defined",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
@@ -260,7 +260,7 @@ class TestFileDescriptor {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "File INFILE is already in the FILE-CONTROL paragraph",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));

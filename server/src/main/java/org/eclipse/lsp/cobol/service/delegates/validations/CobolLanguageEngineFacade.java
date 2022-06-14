@@ -29,10 +29,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Location;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 import static java.util.Collections.emptyList;
@@ -126,6 +123,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private static Map<String, List<Diagnostic>> convertErrors(List<SyntaxError> errors) {
     return errors.stream()
+        .filter(e -> Objects.nonNull(e.getLocality()))
         .collect(groupingBy(err -> err.getLocality().getUri(), mapping(toDiagnostic(), toList())));
   }
 

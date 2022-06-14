@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This test checks that unexpected text in ID DIVISION is flagged */
@@ -44,7 +45,7 @@ class TestUnexpectedTextInIdentificationDivision {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Syntax error on 'DISPLAY' expected {AUTHOR, CBL, DATA, DATE-COMPILED, DATE-WRITTEN, "
                     + "END, ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, PROCESS, SECURITY}",
                 DiagnosticSeverity.Error,

@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This test checks if the parser recognizes an unexpected symbol and shows it as an error. */
@@ -42,7 +43,6 @@ class TestUnexpectedCharErrorShown {
         ImmutableList.of(),
         ImmutableMap.of(
             "typo",
-            new Diagnostic(
-                null, MESSAGE, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
+            new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
   }
 }

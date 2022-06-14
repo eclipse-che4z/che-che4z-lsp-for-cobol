@@ -53,7 +53,7 @@ public class TestDuplicatedVariableDefinition {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Duplicated definition for VARNAME",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));

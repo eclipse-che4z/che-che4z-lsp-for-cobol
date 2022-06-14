@@ -19,14 +19,11 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp4j.CompletionItem;
-import org.eclipse.lsp4j.CompletionItemKind;
-import org.eclipse.lsp4j.InsertTextFormat;
-import org.eclipse.lsp4j.MarkupContent;
+import org.eclipse.lsp4j.*;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -39,6 +36,8 @@ import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrde
 @Singleton
 public class SnippetCompletion implements Completion {
   private final CompletionStorage<SnippetsModel> snippets;
+  private final static String BACKTICK = "```";
+  private final static String LANGUAG_ID = "COBOL";
 
   @Inject
   SnippetCompletion(@Named("Snippets") CompletionStorage snippets) {
@@ -60,9 +59,10 @@ public class SnippetCompletion implements Completion {
   private CompletionItem toSnippetCompletions(SnippetsModel snippet) {
     CompletionItem item = new CompletionItem(snippet.getPrefix());
     item.setLabel(snippet.getPrefix());
-    item.setInsertText(String.join(" ", snippet.getBody()));
+    item.setInsertText(String.join("\n", snippet.getBody()));
+    item.setInsertTextMode(InsertTextMode.AdjustIndentation);
     item.setInsertTextFormat(InsertTextFormat.Snippet);
-    item.setDocumentation(retrieveDocumentation(snippet.getDescription()));
+    item.setDocumentation(retrieveDocumentation(snippet.getBody()));
     item.setDetail(snippet.getDescription());
     item.setSortText(SNIPPETS.prefix + snippet.getPrefix());
     item.setKind(CompletionItemKind.Snippet);
@@ -70,8 +70,9 @@ public class SnippetCompletion implements Completion {
   }
 
   @NonNull
-  private MarkupContent retrieveDocumentation(String label) {
-    return DocumentationUtils.wrapWithMarkup(
-        Optional.ofNullable(label).map(string -> string.replaceAll("[${\\d:}]", "")).orElse(""));
+  private MarkupContent retrieveDocumentation(String[] label) {
+
+    return DocumentationUtils.wrapWithMarkup(BACKTICK+LANGUAG_ID+"\n"+
+        Arrays.stream(label).map(string -> string.replaceAll("[${\\d:}]", "")).collect(Collectors.joining("\n"))+"\n"+BACKTICK);
   }
 }

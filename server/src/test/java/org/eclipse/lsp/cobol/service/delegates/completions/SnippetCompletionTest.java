@@ -15,14 +15,9 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.service.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.SettingsService;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp4j.CompletionItem;
-import org.eclipse.lsp4j.CompletionItemKind;
-import org.eclipse.lsp4j.InsertTextFormat;
-import org.eclipse.lsp4j.MarkupContent;
+import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -30,16 +25,13 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 /** Test to check SnippetCompletion */
 class SnippetCompletionTest {
   private static final String INSERT_TEXT = "WRITE ${1:item}";
   private static final String DOCUMENTATION_TEXT = "WRITE item";
   private static final String LABEL = "WRITE";
-  private CachingConfigurationService cachingConfigurationService =
-      mock(CachingConfigurationService.class);
-  private SettingsService settingsService = mock(SettingsService.class);
+
   private final SnippetCompletion completion = new SnippetCompletion(new Snippets());
 
   @Test
@@ -66,7 +58,7 @@ class SnippetCompletionTest {
 
   private CompletionItem createItem() {
     MarkupContent doc = new MarkupContent();
-    doc.setValue(DOCUMENTATION_TEXT);
+    doc.setValue("```COBOL\n" + DOCUMENTATION_TEXT + "\n```");
     doc.setKind("markdown");
     CompletionItem item = new CompletionItem(LABEL);
     item.setLabel(DOCUMENTATION_TEXT);
@@ -75,6 +67,7 @@ class SnippetCompletionTest {
     item.setDocumentation(doc);
     item.setDetail(DOCUMENTATION_TEXT);
     item.setKind(CompletionItemKind.Snippet);
+    item.setInsertTextMode(InsertTextMode.AdjustIndentation);
     item.setSortText("6" + DOCUMENTATION_TEXT);
     return item;
   }

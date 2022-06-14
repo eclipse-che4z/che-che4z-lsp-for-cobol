@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -54,7 +55,7 @@ class TestCpyNameWithSpecialChar {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null, MESSAGE, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText(), CODE)));
+                new Range(), MESSAGE, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText(), CODE)));
   }
 
   @Test
@@ -65,14 +66,14 @@ class TestCpyNameWithSpecialChar {
         ImmutableMap.of(
             "1",
                 new Diagnostic(
-                    null,
+                    new Range(),
                     MESSAGE_1,
                     DiagnosticSeverity.Error,
                     SourceInfoLevels.ERROR.getText(),
                     CODE),
             "2",
                 new Diagnostic(
-                    null,
+                    new Range(),
                     MESSAGE_2,
                     DiagnosticSeverity.Error,
                     SourceInfoLevels.ERROR.getText(),

@@ -15,13 +15,14 @@
 
 package org.eclipse.lsp.cobol.service;
 
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.Synchronized;
+import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +81,7 @@ public class WatcherServiceImpl implements WatcherService {
                 PREDEFINED_FOLDER_WATCHER,
                 WATCH_FILES,
                 new DidChangeWatchedFilesRegistrationOptions(
-                    singletonList(new FileSystemWatcher(COPYBOOKS_FOLDER_GLOB, WATCH_ALL_KIND))))));
+                    singletonList(new FileSystemWatcher(Either.forLeft(COPYBOOKS_FOLDER_GLOB), WATCH_ALL_KIND))))));
   }
 
   @Override
@@ -117,12 +118,12 @@ public class WatcherServiceImpl implements WatcherService {
     }
   }
 
-  private String createFileWatcher(String folder) {
-    return "**/" + folder.replace(FILE_BASENAME_VARIABLE, "**") + "/**/*";
+  private Either<String, RelativePattern> createFileWatcher(String folder) {
+    return Either.forLeft("**/" + folder.replace(FILE_BASENAME_VARIABLE, "**") + "/**/*");
   }
 
-  private String createFolderWatcher(String folder) {
-    return "**/" + folder;
+  private Either<String, RelativePattern> createFolderWatcher(String folder) {
+    return Either.forLeft("**/" + folder.replace(FILE_BASENAME_VARIABLE, "**"));
   }
 
   private void register(List<Registration> registrations) {

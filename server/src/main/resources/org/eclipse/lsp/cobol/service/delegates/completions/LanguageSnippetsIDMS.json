@@ -12,9 +12,9 @@
     "prefix": "SCHEMA-SECTION [IDMS]",
     "body": [
       "SCHEMA SECTION.",
-      "DB ${1:subschema-name} WITHIN ${2:schema-name}."
+      "DB ${1:subSchema} WITHIN ${2:schema-name}."
     ],
-    "description": "schema section",
+    "description": "Schema Section",
     "scope": "cobol"
   },
   "MAP SECTION": {
