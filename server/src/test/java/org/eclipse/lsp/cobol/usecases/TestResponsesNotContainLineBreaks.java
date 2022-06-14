@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -52,7 +53,7 @@ class TestResponsesNotContainLineBreaks {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Extraneous input '>' expected {ALL, DFHRESP, DFHVALUE, FALSE, "
                     + "FUNCTION, HIGH-VALUE, HIGH-VALUES, LENGTH, LINAGE-COUNTER, "
                     + "LOW-VALUE, LOW-VALUES, NOT, NULL, NULLS, QUOTES, "

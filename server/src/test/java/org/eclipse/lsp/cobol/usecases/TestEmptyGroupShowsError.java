@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -46,7 +47,7 @@ class TestEmptyGroupShowsError {
         ImmutableMap.of(
             "nopic",
             new Diagnostic(
-                null,
+                new Range(),
                 "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item PARENT",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));

@@ -39,7 +39,7 @@
         <junit.platform.version>1.6.0</junit.platform.version>
         <logback.classic.version>1.2.3</logback.classic.version>
         <lombok.version>1.18.22</lombok.version>
-        <lsp4j.version>0.5.0</lsp4j.version>
+        <lsp4j.version>0.14.0</lsp4j.version>
         <maven.antlr4.plugin.version>4.7</maven.antlr4.plugin.version>
         <maven.assembly.plugin.version>3.2.0</maven.assembly.plugin.version>
         <maven.cobertura.plugin.version>2.7</maven.cobertura.plugin.version>
@@ -55,6 +55,7 @@
         <slf4j.api.version>1.7.25</slf4j.api.version>
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
         <filesToTestPath>${project.basedir}${file.separator}..${file.separator}Cobol85PositiveTestsSuite</filesToTestPath>
+        <listingSnap>${project.basedir}${file.separator}..${file.separator}Cobol85PositiveTestsSuite${file.separator}SYSPRINT85${file.separator}snapshot${file.separator}listingSnap.json</listingSnap>
     </properties>
     <dependencies>
         <dependency>
@@ -286,6 +287,11 @@
                             <!--suppress UnresolvedMavenProperty -->
                             <value>${filesToTestPath}</value>
                         </property>
+                        <property>
+                            <name>listingSnap</name>
+                            <!--suppress UnresolvedMavenProperty -->
+                            <value>${listingSnap}</value>
+                        </property>
                     </systemProperties>
                     <!--suppress UnresolvedMavenProperty -->
                     <argLine>${argLine} -Xmx2048m -Djava.awt.headless=true</argLine>
@@ -348,7 +354,7 @@
                 <version>${maven.antlr4.plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>build UseCasePreprocessorr</id>
+                        <id>build UseCasePreprocessor</id>
                         <phase>generate-test-sources</phase>
                         <goals>
                             <goal>antlr4</goal>

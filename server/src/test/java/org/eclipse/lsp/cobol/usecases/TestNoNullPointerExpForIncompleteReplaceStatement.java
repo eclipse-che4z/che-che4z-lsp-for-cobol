@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
@@ -52,7 +53,7 @@ class TestNoNullPointerExpForIncompleteReplaceStatement {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Syntax error on 'copy' expected {CBL, END, EXEC, FD, FILE, ID, IDENTIFICATION, LINKAGE, "
                     + "LOCAL-STORAGE, PROCEDURE, PROCESS, SD, WORKING-STORAGE, '01-49', '66', '77', '88'}",
                 DiagnosticSeverity.Error,
@@ -67,7 +68,7 @@ class TestNoNullPointerExpForIncompleteReplaceStatement {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Syntax error on 'copy' expected {CBL, END, EXEC, FD, FILE, ID, IDENTIFICATION, "
                     + "LINKAGE, LOCAL-STORAGE, PROCEDURE, PROCESS, SD, WORKING-STORAGE, "
                     + "'01-49', '66', '77', '88'}",

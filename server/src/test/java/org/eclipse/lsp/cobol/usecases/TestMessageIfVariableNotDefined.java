@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
@@ -48,6 +49,6 @@ class TestMessageIfVariableNotDefined {
         ImmutableList.of(),
         ImmutableMap.of(
             "notDefined",
-            new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
+            new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

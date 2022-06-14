@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -90,31 +91,31 @@ class TestDaCoWriteReportWithName {
                 ImmutableMap.of(
                         "1",
                         new Diagnostic(
-                                null,
+                                new Range(),
                                 "Only alphanumerics are allowed for report name",
                                 DiagnosticSeverity.Error,
                                 SourceInfoLevels.ERROR.getText()),
                         "2",
                         new Diagnostic(
-                                null,
+                                new Range(),
                                 "Exact length of report name must be 5 bytes",
                                 DiagnosticSeverity.Error,
                                 SourceInfoLevels.ERROR.getText()),
                         "3",
                         new Diagnostic(
-                                null,
+                                new Range(),
                                 "Allowed range is 80 to 200",
                                 DiagnosticSeverity.Error,
                                 SourceInfoLevels.ERROR.getText()),
                         "4",
                         new Diagnostic(
-                                null,
+                                new Range(),
                                 "Variable ASD is not defined",
                                 DiagnosticSeverity.Error,
                                 SourceInfoLevels.ERROR.getText()),
                         "5",
                         new Diagnostic(
-                                null,
+                                new Range(),
                                 "String must starts with R or T values",
                                 DiagnosticSeverity.Error,
                                 SourceInfoLevels.ERROR.getText())),

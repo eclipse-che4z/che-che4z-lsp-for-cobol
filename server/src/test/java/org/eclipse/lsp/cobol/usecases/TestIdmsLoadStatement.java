@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -74,19 +75,19 @@ class TestIdmsLoadStatement {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Max length limit of 8 bytes allowed for table name.",
                 Error,
                 SourceInfoLevels.ERROR.getText()),
             "2",
             new Diagnostic(
-                null,
+                new Range(),
                 "Max length limit of 8 bytes allowed for node name.",
                 Error,
                 SourceInfoLevels.ERROR.getText()),
             "3",
             new Diagnostic(
-                null,
+                new Range(),
                 "Max length limit of 8 bytes allowed for dictionary name.",
                 Error,
                 SourceInfoLevels.ERROR.getText())),

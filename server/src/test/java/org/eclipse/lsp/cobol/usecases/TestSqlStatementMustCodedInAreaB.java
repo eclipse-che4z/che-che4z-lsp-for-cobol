@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This test checks if SQL statements coded in Area B */
@@ -44,13 +45,13 @@ class TestSqlStatementMustCodedInAreaB {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "The following token must start in Area B: SELECT",
                 DiagnosticSeverity.Warning,
                 SourceInfoLevels.WARNING.getText()),
             "2",
             new Diagnostic(
-                null,
+                new Range(),
                 "The following token must start in Area B: WHERE",
                 DiagnosticSeverity.Warning,
                 SourceInfoLevels.WARNING.getText())));

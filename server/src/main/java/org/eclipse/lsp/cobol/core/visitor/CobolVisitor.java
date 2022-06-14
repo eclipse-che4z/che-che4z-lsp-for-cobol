@@ -207,7 +207,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitProgramUnit(ProgramUnitContext ctx) {
     fileControls = new HashMap<>();
-    return addTreeNode(ctx, ProgramNode::new);
+    return addTreeNode(ctx, locality -> new ProgramNode(locality));
   }
 
   @Override
@@ -393,7 +393,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitSectionName(SectionNameContext ctx) {
-    return addTreeNode(ctx, locality -> new SectionNameNode(locality, ctx.getText()));
+    return addTreeNode(ctx, locality -> new SectionNameNode(locality, ctx.getText(), messageService));
   }
 
   @Override

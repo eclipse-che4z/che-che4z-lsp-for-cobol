@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This use case checks the error shown if there is an unexpected symbol in the indicator area. */
@@ -39,9 +40,9 @@ class TestIndicatorAreaError {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null, MESSAGE_1, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText()),
+                new Range(), MESSAGE_1, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText()),
             "2",
             new Diagnostic(
-                null, MESSAGE_2, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
+                new Range(), MESSAGE_2, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
   }
 }

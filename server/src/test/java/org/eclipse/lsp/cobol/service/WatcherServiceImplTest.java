@@ -124,11 +124,11 @@ class WatcherServiceImplTest {
             .getWatchers();
     assertEquals(2, watchers.size());
     FileSystemWatcher fileWatcher = watchers.get(0);
-    assertEquals("**/" + glob + "/**/*", fileWatcher.getGlobPattern());
+    assertEquals("**/" + glob + "/**/*", fileWatcher.getGlobPattern().getLeft());
     assertEquals(7, fileWatcher.getKind().intValue());
 
     FileSystemWatcher folderWatcher = watchers.get(1);
-    assertEquals("**/" + glob, folderWatcher.getGlobPattern());
+    assertEquals("**/" + glob, folderWatcher.getGlobPattern().getLeft());
     assertEquals(7, folderWatcher.getKind().intValue());
   }
 
@@ -143,7 +143,7 @@ class WatcherServiceImplTest {
             .getWatchers();
 
     FileSystemWatcher watcher = watchers.get(0);
-    assertEquals("**/.copybooks/**/*", watcher.getGlobPattern());
+    assertEquals("**/.copybooks/**/*", watcher.getGlobPattern().getLeft());
     assertEquals(7, watcher.getKind().intValue());
   }
 }

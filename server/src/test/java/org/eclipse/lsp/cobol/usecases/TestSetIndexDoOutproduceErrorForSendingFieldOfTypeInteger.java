@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This test checks that level 77 variable can be used for setting field. */
@@ -54,7 +55,7 @@ public class TestSetIndexDoOutproduceErrorForSendingFieldOfTypeInteger {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Invalid sending field type. Expected: Elementary integer data item, Non-zero integer",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));

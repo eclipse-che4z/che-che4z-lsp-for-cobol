@@ -1,0 +1,8748 @@
+Index: Cobol85PositiveTestsSuite/SYSPRINT85/snapshot/listingSnap.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Cobol85PositiveTestsSuite/SYSPRINT85/snapshot/listingSnap.json b/Cobol85PositiveTestsSuite/SYSPRINT85/snapshot/listingSnap.json
+--- a/Cobol85PositiveTestsSuite/SYSPRINT85/snapshot/listingSnap.json	(revision 64334f4c38e7c3459b1043d658dae39c91ffa72d)
++++ b/Cobol85PositiveTestsSuite/SYSPRINT85/snapshot/listingSnap.json	(date 1654872155209)
+@@ -2966,26 +2966,20 @@
+         "dataName": "ADD-CORR-1",
+         "definedLineNo": 108,
+         "references": [
+-          531,
+-          541
++          531
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-1",
+         "definedLineNo": 119,
+         "references": [
+-          541,
+-          571,
+-          596,
+-          637
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-1",
+         "definedLineNo": 132,
+         "references": [
+-          560,
+-          571
++          560
+         ]
+       },
+       {
+@@ -2993,234 +2987,180 @@
+         "definedLineNo": 149,
+         "references": [
+           589,
+-          596,
+-          634,
+-          637
++          634
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-2",
+         "definedLineNo": 107,
+         "references": [
+-          532,
+-          541
++          532
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-2",
+         "definedLineNo": 120,
+-        "references": [
+-          541,
+-          571,
+-          596,
+-          637
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-2",
+         "definedLineNo": 133,
+         "references": [
+-          561,
+-          571
++          561
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-2",
+         "definedLineNo": 148,
+         "references": [
+-          590,
+-          596,
+-          637
++          590
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-3",
+         "definedLineNo": 111,
+         "references": [
+-          533,
+-          541
++          533
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-3",
+         "definedLineNo": 121,
+-        "references": [
+-          541,
+-          571,
+-          596,
+-          637
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-3",
+         "definedLineNo": 136,
+         "references": [
+-          562,
+-          571
++          562
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-3",
+         "definedLineNo": 147,
+         "references": [
+-          591,
+-          596,
+-          637
++          591
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-4",
+         "definedLineNo": 110,
+         "references": [
+-          534,
+-          541
++          534
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-4",
+         "definedLineNo": 122,
+-        "references": [
+-          541,
+-          571,
+-          596,
+-          637
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-4",
+         "definedLineNo": 135,
+         "references": [
+-          563,
+-          571
++          563
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-4",
+         "definedLineNo": 146,
+         "references": [
+-          592,
+-          596,
+-          637
++          592
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-5",
+         "definedLineNo": 113,
+         "references": [
+-          535,
+-          541
++          535
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-5",
+         "definedLineNo": 123,
+-        "references": [
+-          541,
+-          571
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-5",
+         "definedLineNo": 134,
+         "references": [
+-          564,
+-          571
++          564
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-6",
+         "definedLineNo": 112,
+         "references": [
+-          536,
+-          541
++          536
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-6",
+         "definedLineNo": 124,
+-        "references": [
+-          541,
+-          571
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-6",
+         "definedLineNo": 137,
+         "references": [
+-          565,
+-          571
++          565
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-7",
+         "definedLineNo": 115,
+         "references": [
+-          537,
+-          541
++          537
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-7",
+         "definedLineNo": 125,
+-        "references": [
+-          541,
+-          571
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-7",
+         "definedLineNo": 138,
+         "references": [
+-          566,
+-          571
++          566
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-8",
+         "definedLineNo": 114,
+         "references": [
+-          538,
+-          541
++          538
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-8",
+         "definedLineNo": 126,
+-        "references": [
+-          541,
+-          571
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-8",
+         "definedLineNo": 139,
+         "references": [
+-          567,
+-          571
++          567
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-9",
+         "definedLineNo": 116,
+         "references": [
+-          539,
+-          541
++          539
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-9",
+         "definedLineNo": 127,
+-        "references": [
+-          541,
+-          571
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-9",
+         "definedLineNo": 140,
+         "references": [
+-          568,
+-          571
++          568
+         ]
+       },
+       {
+@@ -4356,29 +4296,17 @@
+         "definedLineNo": 151,
+         "references": [
+           655,
+-          662,
+           1131,
+-          1139,
+           1213,
+-          1224,
+           1298,
+-          1307,
+           1380,
+-          1389,
+           1464,
+-          1473,
+           1550,
+-          1558,
+           1665,
+-          1672,
+           1779,
+-          1786,
+           1893,
+-          1900,
+           1989,
+-          1996,
+-          2106,
+-          2113
++          2106
+         ]
+       },
+       {
+@@ -4386,51 +4314,39 @@
+         "definedLineNo": 155,
+         "references": [
+           658,
+-          662,
+           679,
+           687,
+           1134,
+-          1139,
+           1158,
+           1166,
+           1216,
+-          1224,
+           1243,
+           1251,
+           1301,
+-          1307,
+           1325,
+           1333,
+           1383,
+-          1389,
+           1409,
+           1417,
+           1467,
+-          1473,
+           1493,
+           1501,
+           1553,
+-          1558,
+           1568,
+           1576,
+           1668,
+-          1672,
+           1682,
+           1690,
+           1782,
+-          1786,
+           1796,
+           1804,
+           1896,
+-          1900,
+           1912,
+           1920,
+           1992,
+-          1996,
+           2009,
+           2017,
+           2109,
+-          2113,
+           2125,
+           2133
+         ]
+@@ -4440,29 +4356,17 @@
+         "definedLineNo": 152,
+         "references": [
+           656,
+-          662,
+           1132,
+-          1139,
+           1214,
+-          1224,
+           1299,
+-          1307,
+           1381,
+-          1389,
+           1465,
+-          1473,
+           1551,
+-          1558,
+           1666,
+-          1672,
+           1780,
+-          1786,
+           1894,
+-          1900,
+           1990,
+-          1996,
+-          2107,
+-          2113
++          2107
+         ]
+       },
+       {
+@@ -4470,51 +4374,39 @@
+         "definedLineNo": 156,
+         "references": [
+           659,
+-          662,
+           697,
+           706,
+           1135,
+-          1139,
+           1176,
+           1184,
+           1217,
+-          1224,
+           1261,
+           1269,
+           1302,
+-          1307,
+           1343,
+           1351,
+           1384,
+-          1389,
+           1427,
+           1435,
+           1468,
+-          1473,
+           1511,
+           1519,
+           1554,
+-          1558,
+           1586,
+           1594,
+           1669,
+-          1672,
+           1700,
+           1708,
+           1783,
+-          1786,
+           1814,
+           1822,
+           1897,
+-          1900,
+           1930,
+           1938,
+           1993,
+-          1996,
+           2027,
+           2035,
+           2110,
+-          2113,
+           2143,
+           2151
+         ]
+@@ -4524,29 +4416,17 @@
+         "definedLineNo": 153,
+         "references": [
+           657,
+-          662,
+           1133,
+-          1139,
+           1215,
+-          1224,
+           1300,
+-          1307,
+           1382,
+-          1389,
+           1466,
+-          1473,
+           1552,
+-          1558,
+           1667,
+-          1672,
+           1781,
+-          1786,
+           1895,
+-          1900,
+           1991,
+-          1996,
+-          2108,
+-          2113
++          2108
+         ]
+       },
+       {
+@@ -4554,51 +4434,39 @@
+         "definedLineNo": 157,
+         "references": [
+           660,
+-          662,
+           715,
+           724,
+           1136,
+-          1139,
+           1194,
+           1202,
+           1218,
+-          1224,
+           1279,
+           1287,
+           1303,
+-          1307,
+           1361,
+           1369,
+           1385,
+-          1389,
+           1445,
+           1453,
+           1469,
+-          1473,
+           1529,
+           1537,
+           1555,
+-          1558,
+           1604,
+           1612,
+           1670,
+-          1672,
+           1718,
+           1726,
+           1784,
+-          1786,
+           1832,
+           1840,
+           1898,
+-          1900,
+           1948,
+           1956,
+           1994,
+-          1996,
+           2045,
+           2053,
+           2111,
+-          2113,
+           2161,
+           2169
+         ]
+@@ -5029,8 +4897,7 @@
+         "dataName": "RECORD1",
+         "definedLineNo": 39,
+         "references": [
+-          1099,
+-          1109
++          1099
+         ]
+       },
+       {
+@@ -5038,7 +4905,6 @@
+         "definedLineNo": 45,
+         "references": [
+           1104,
+-          1109,
+           1110
+         ]
+       },
+@@ -5064,8 +4930,7 @@
+         "dataName": "RECORD3",
+         "definedLineNo": 43,
+         "references": [
+-          1102,
+-          1109
++          1102
+         ]
+       },
+       {
+@@ -5073,7 +4938,6 @@
+         "definedLineNo": 49,
+         "references": [
+           1107,
+-          1109,
+           1113
+         ]
+       },
+@@ -5467,23 +5331,16 @@
+         "definedLineNo": 179,
+         "references": [
+           733,
+-          741,
+           758,
+-          768,
+-          858,
+-          868,
+-          909
++          858
+         ]
+       },
+       {
+         "dataName": "XYZ-1",
+         "definedLineNo": 186,
+         "references": [
+-          741,
+-          768,
+           769,
+-          778,
+-          868
++          778
+         ]
+       },
+       {
+@@ -5495,19 +5352,15 @@
+         "dataName": "XYZ-1",
+         "definedLineNo": 207,
+         "references": [
+-          909,
+           910,
+           918,
+           963,
+-          972,
+           973,
+           982,
+           1025,
+-          1034,
+           1035,
+           1044,
+-          1071,
+-          1079
++          1071
+         ]
+       },
+       {
+@@ -5520,11 +5373,8 @@
+         "definedLineNo": 222,
+         "references": [
+           966,
+-          972,
+           1028,
+-          1034,
+-          1074,
+-          1079
++          1074
+         ]
+       },
+       {
+@@ -5539,13 +5389,10 @@
+           946,
+           954,
+           965,
+-          972,
+           1009,
+           1018,
+           1027,
+-          1034,
+-          1073,
+-          1079
++          1073
+         ]
+       },
+       {
+@@ -5558,11 +5405,8 @@
+         "definedLineNo": 224,
+         "references": [
+           968,
+-          972,
+           1030,
+-          1034,
+-          1076,
+-          1079
++          1076
+         ]
+       },
+       {
+@@ -5618,23 +5462,16 @@
+         "definedLineNo": 180,
+         "references": [
+           734,
+-          741,
+           759,
+-          768,
+-          859,
+-          868,
+-          909
++          859
+         ]
+       },
+       {
+         "dataName": "XYZ-2",
+         "definedLineNo": 187,
+         "references": [
+-          741,
+-          768,
+           787,
+-          796,
+-          868
++          796
+         ]
+       },
+       {
+@@ -5646,17 +5483,13 @@
+         "dataName": "XYZ-2",
+         "definedLineNo": 208,
+         "references": [
+-          909,
+           964,
+-          972,
+           991,
+           1000,
+           1026,
+-          1034,
+           1053,
+           1061,
+-          1072,
+-          1079
++          1072
+         ]
+       },
+       {
+@@ -5669,11 +5502,8 @@
+         "definedLineNo": 225,
+         "references": [
+           967,
+-          972,
+           1029,
+-          1034,
+-          1075,
+-          1079
++          1075
+         ]
+       },
+       {
+@@ -5681,22 +5511,16 @@
+         "definedLineNo": 181,
+         "references": [
+           735,
+-          741,
+           760,
+-          768,
+-          860,
+-          868
++          860
+         ]
+       },
+       {
+         "dataName": "XYZ-3",
+         "definedLineNo": 188,
+         "references": [
+-          741,
+-          768,
+           805,
+-          814,
+-          868
++          814
+         ]
+       },
+       {
+@@ -5709,24 +5533,18 @@
+         "definedLineNo": 182,
+         "references": [
+           736,
+-          741,
+           761,
+-          768,
+-          861,
+-          868
++          861
+         ]
+       },
+       {
+         "dataName": "XYZ-4",
+         "definedLineNo": 189,
+         "references": [
+-          741,
+           742,
+           751,
+-          768,
+           823,
+-          832,
+-          868
++          832
+         ]
+       },
+       {
+@@ -5739,22 +5557,16 @@
+         "definedLineNo": 183,
+         "references": [
+           737,
+-          741,
+           762,
+-          768,
+-          862,
+-          868
++          862
+         ]
+       },
+       {
+         "dataName": "XYZ-5",
+         "definedLineNo": 190,
+         "references": [
+-          741,
+-          768,
+           841,
+-          849,
+-          868
++          849
+         ]
+       },
+       {
+@@ -5767,21 +5579,14 @@
+         "definedLineNo": 184,
+         "references": [
+           738,
+-          741,
+           763,
+-          768,
+-          863,
+-          868
++          863
+         ]
+       },
+       {
+         "dataName": "XYZ-6",
+         "definedLineNo": 191,
+-        "references": [
+-          741,
+-          768,
+-          868
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-6",
+@@ -56134,13 +55939,6 @@
+         ]
+       },
+       {
+-        "dataName": "PRG-COLL-SEQ",
+-        "definedLineNo": 17,
+-        "references": [
+-          15
+-        ]
+-      },
+-      {
+         "dataName": "PRINT-FILE",
+         "definedLineNo": 25,
+         "references": [
+@@ -94752,746 +94550,8 @@
+   },
+   "SM1064.2.cbl": {
+     "PROCEDURES": [
+-      {
+-        "dataName": "BAIL-OUT",
+-        "definedLineNo": 289,
+-        "references": [
+-          206
+-        ]
+-      },
+-      {
+-        "dataName": "BAIL-OUT-EX",
+-        "definedLineNo": 297,
+-        "references": [
+-          206,
+-          291
+-        ]
+-      },
+-      {
+-        "dataName": "BAIL-OUT-WRITE",
+-        "definedLineNo": 292,
+-        "references": [
+-          290
+-        ]
+-      },
+-      {
+-        "dataName": "BLANK-LINE-PRINT",
+-        "definedLineNo": 272,
+-        "references": [
+-          305
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-EXIT",
+-        "definedLineNo": 311,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CCVS-999999",
+-        "definedLineNo": 312,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CCVS1",
+-        "definedLineNo": 181,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CCVS1-EXIT",
+-        "definedLineNo": 298,
+-        "references": [
+-          187
+-        ]
+-      },
+-      {
+-        "dataName": "CLOSE-FILES",
+-        "definedLineNo": 188,
+-        "references": [
+-          313
+-        ]
+-      },
+-      {
+-        "dataName": "COLUMN-NAMES-ROUTINE",
+-        "definedLineNo": 216,
+-        "references": [
+-          186
+-        ]
+-      },
+-      {
+-        "dataName": "DE-LETE",
+-        "definedLineNo": 197,
+-        "references": []
+-      },
+-      {
+-        "dataName": "END-ROUTINE",
+-        "definedLineNo": 220,
+-        "references": [
+-          189
+-        ]
+-      },
+-      {
+-        "dataName": "END-ROUTINE-1",
+-        "definedLineNo": 224,
+-        "references": []
+-      },
+-      {
+-        "dataName": "END-ROUTINE-12",
+-        "definedLineNo": 233,
+-        "references": []
+-      },
+-      {
+-        "dataName": "END-ROUTINE-13",
+-        "definedLineNo": 241,
+-        "references": [
+-          189
+-        ]
+-      },
+-      {
+-        "dataName": "END-RTN-EXIT",
+-        "definedLineNo": 222,
+-        "references": []
+-      },
+-      {
+-        "dataName": "FAIL",
+-        "definedLineNo": 196,
+-        "references": []
+-      },
+-      {
+-        "dataName": "FAIL-ROUTINE",
+-        "definedLineNo": 274,
+-        "references": [
+-          205
+-        ]
+-      },
+-      {
+-        "dataName": "FAIL-ROUTINE-EX",
+-        "definedLineNo": 288,
+-        "references": [
+-          205,
+-          282
+-        ]
+-      },
+-      {
+-        "dataName": "FAIL-ROUTINE-WRITE",
+-        "definedLineNo": 283,
+-        "references": [
+-          276,
+-          277
+-        ]
+-      },
+-      {
+-        "dataName": "HEAD-ROUTINE",
+-        "definedLineNo": 211,
+-        "references": [
+-          186
+-        ]
+-      },
+-      {
+-        "dataName": "INSPT",
+-        "definedLineNo": 194,
+-        "references": [
+-          310
+-        ]
+-      },
+-      {
+-        "dataName": "LB106A-INIT",
+-        "definedLineNo": 300,
+-        "references": []
+-      },
+-      {
+-        "dataName": "LB106A-001",
+-        "definedLineNo": 301,
+-        "references": []
+-      },
+-      {
+-        "dataName": "OPEN-FILES",
+-        "definedLineNo": 182,
+-        "references": []
+-      },
+-      {
+-        "dataName": "PASS",
+-        "definedLineNo": 195,
+-        "references": []
+-      },
+-      {
+-        "dataName": "PRINT-DETAIL",
+-        "definedLineNo": 199,
+-        "references": []
+-      },
+-      {
+-        "dataName": "TERMINATE-CALL",
+-        "definedLineNo": 192,
+-        "references": []
+-      },
+-      {
+-        "dataName": "TERMINATE-CCVS",
+-        "definedLineNo": 190,
+-        "references": []
+-      },
+-      {
+-        "dataName": "WRITE-LINE",
+-        "definedLineNo": 253,
+-        "references": [
+-          203,
+-          204,
+-          212,
+-          213,
+-          214,
+-          215,
+-          217,
+-          218,
+-          219,
+-          221,
+-          223,
+-          232,
+-          240,
+-          246,
+-          251,
+-          252,
+-          280,
+-          284,
+-          286,
+-          295,
+-          304,
+-          309
+-        ]
+-      },
+-      {
+-        "dataName": "WRT-LN",
+-        "definedLineNo": 269,
+-        "references": [
+-          259,
+-          260,
+-          261,
+-          262,
+-          263,
+-          264,
+-          265,
+-          268,
+-          273
+-        ]
+-      }
+     ],
+     "DATA_NAMES": [
+-      {
+-        "dataName": "ANSI-REFERENCE",
+-        "definedLineNo": 101,
+-        "references": [
+-          278,
+-          285,
+-          294
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-C-1",
+-        "definedLineNo": 80,
+-        "references": [
+-          217,
+-          263
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-C-2",
+-        "definedLineNo": 85,
+-        "references": [
+-          218,
+-          264
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-1",
+-        "definedLineNo": 135,
+-        "references": [
+-          223
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-2",
+-        "definedLineNo": 140,
+-        "references": [
+-          232,
+-          239,
+-          246,
+-          251
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-2-2",
+-        "definedLineNo": 143,
+-        "references": [
+-          231
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-3",
+-        "definedLineNo": 148,
+-        "references": [
+-          252
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-4",
+-        "definedLineNo": 157,
+-        "references": [
+-          231
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-4-1",
+-        "definedLineNo": 158,
+-        "references": [
+-          229
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-4-2",
+-        "definedLineNo": 160,
+-        "references": [
+-          230
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-H-1",
+-        "definedLineNo": 102,
+-        "references": [
+-          212,
+-          259
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-H-2A",
+-        "definedLineNo": 107,
+-        "references": [
+-          213,
+-          260
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-H-2B",
+-        "definedLineNo": 116,
+-        "references": [
+-          214,
+-          261
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-H-3",
+-        "definedLineNo": 128,
+-        "references": [
+-          215,
+-          262
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-PGM-ID",
+-        "definedLineNo": 178,
+-        "references": [
+-          184,
+-          184
+-        ]
+-      },
+-      {
+-        "dataName": "CM-18V0",
+-        "definedLineNo": 62,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COMPUTED-A",
+-        "definedLineNo": 56,
+-        "references": [
+-          57,
+-          59,
+-          60,
+-          61,
+-          62,
+-          290,
+-          293
+-        ]
+-      },
+-      {
+-        "dataName": "COMPUTED-N",
+-        "definedLineNo": 57,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COMPUTED-X",
+-        "definedLineNo": 55,
+-        "references": [
+-          207,
+-          275
+-        ]
+-      },
+-      {
+-        "dataName": "COMPUTED-0V18",
+-        "definedLineNo": 59,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COMPUTED-14V4",
+-        "definedLineNo": 61,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COMPUTED-18V0",
+-        "definedLineNo": 63,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COMPUTED-4V14",
+-        "definedLineNo": 60,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COR-ANSI-REFERENCE",
+-        "definedLineNo": 79,
+-        "references": [
+-          285,
+-          287
+-        ]
+-      },
+-      {
+-        "dataName": "CORRECT-A",
+-        "definedLineNo": 70,
+-        "references": [
+-          71,
+-          72,
+-          73,
+-          74,
+-          75,
+-          291,
+-          293
+-        ]
+-      },
+-      {
+-        "dataName": "CORRECT-N",
+-        "definedLineNo": 71,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CORRECT-X",
+-        "definedLineNo": 69,
+-        "references": [
+-          208,
+-          277
+-        ]
+-      },
+-      {
+-        "dataName": "CORRECT-0V18",
+-        "definedLineNo": 72,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CORRECT-14V4",
+-        "definedLineNo": 74,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CORRECT-18V0",
+-        "definedLineNo": 76,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CORRECT-4V14",
+-        "definedLineNo": 73,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CR-18V0",
+-        "definedLineNo": 75,
+-        "references": []
+-      },
+-      {
+-        "dataName": "DELETE-COUNTER",
+-        "definedLineNo": 93,
+-        "references": [
+-          197,
+-          226,
+-          242,
+-          244
+-        ]
+-      },
+-      {
+-        "dataName": "DOTVALUE",
+-        "definedLineNo": 48,
+-        "references": [
+-          202
+-        ]
+-      },
+-      {
+-        "dataName": "DUMMY-HOLD",
+-        "definedLineNo": 99,
+-        "references": [
+-          256,
+-          266
+-        ]
+-      },
+-      {
+-        "dataName": "DUMMY-RECORD",
+-        "definedLineNo": 37,
+-        "references": [
+-          212,
+-          213,
+-          214,
+-          215,
+-          217,
+-          218,
+-          219,
+-          221,
+-          223,
+-          232,
+-          239,
+-          246,
+-          251,
+-          252,
+-          256,
+-          257,
+-          258,
+-          259,
+-          260,
+-          261,
+-          262,
+-          263,
+-          264,
+-          265,
+-          266,
+-          270,
+-          271,
+-          280,
+-          295
+-        ]
+-      },
+-      {
+-        "dataName": "ENDER-DESC",
+-        "definedLineNo": 146,
+-        "references": [
+-          234,
+-          245,
+-          250
+-        ]
+-      },
+-      {
+-        "dataName": "ERROR-COUNTER",
+-        "definedLineNo": 94,
+-        "references": [
+-          196,
+-          225,
+-          235,
+-          238
+-        ]
+-      },
+-      {
+-        "dataName": "ERROR-HOLD",
+-        "definedLineNo": 98,
+-        "references": [
+-          225,
+-          226,
+-          226,
+-          227,
+-          230
+-        ]
+-      },
+-      {
+-        "dataName": "ERROR-TOTAL",
+-        "definedLineNo": 144,
+-        "references": [
+-          236,
+-          238,
+-          243,
+-          244,
+-          248,
+-          249
+-        ]
+-      },
+-      {
+-        "dataName": "FEATURE",
+-        "definedLineNo": 41,
+-        "references": []
+-      },
+-      {
+-        "dataName": "HYPHEN-LINE",
+-        "definedLineNo": 172,
+-        "references": [
+-          219,
+-          221,
+-          265
+-        ]
+-      },
+-      {
+-        "dataName": "ID-AGAIN",
+-        "definedLineNo": 138,
+-        "references": [
+-          184
+-        ]
+-      },
+-      {
+-        "dataName": "INF-ANSI-REFERENCE",
+-        "definedLineNo": 171,
+-        "references": [
+-          278,
+-          281,
+-          294,
+-          296
+-        ]
+-      },
+-      {
+-        "dataName": "INFO-TEXT",
+-        "definedLineNo": 166,
+-        "references": [
+-          279
+-        ]
+-      },
+-      {
+-        "dataName": "INSPECT-COUNTER",
+-        "definedLineNo": 95,
+-        "references": [
+-          194,
+-          225,
+-          247,
+-          249
+-        ]
+-      },
+-      {
+-        "dataName": "P-OR-F",
+-        "definedLineNo": 43,
+-        "references": [
+-          194,
+-          195,
+-          196,
+-          197,
+-          204,
+-          207
+-        ]
+-      },
+-      {
+-        "dataName": "PAR-NAME",
+-        "definedLineNo": 45,
+-        "references": [
+-          209
+-        ]
+-      },
+-      {
+-        "dataName": "PARDOT-X",
+-        "definedLineNo": 47,
+-        "references": [
+-          201
+-        ]
+-      },
+-      {
+-        "dataName": "PASS-COUNTER",
+-        "definedLineNo": 96,
+-        "references": [
+-          195,
+-          227,
+-          229
+-        ]
+-      },
+-      {
+-        "dataName": "PRINT-FILE",
+-        "definedLineNo": 35,
+-        "references": [
+-          31,
+-          183,
+-          189
+-        ]
+-      },
+-      {
+-        "dataName": "PRINT-REC",
+-        "definedLineNo": 36,
+-        "references": [
+-          203,
+-          284,
+-          286,
+-          303,
+-          308
+-        ]
+-      },
+-      {
+-        "dataName": "RE-MARK",
+-        "definedLineNo": 50,
+-        "references": [
+-          198,
+-          210
+-        ]
+-      },
+-      {
+-        "dataName": "REC-CT",
+-        "definedLineNo": 92,
+-        "references": [
+-          200,
+-          202,
+-          209
+-        ]
+-      },
+-      {
+-        "dataName": "REC-SKL-SUB",
+-        "definedLineNo": 91,
+-        "references": []
+-      },
+-      {
+-        "dataName": "RECORD-COUNT",
+-        "definedLineNo": 100,
+-        "references": [
+-          254,
+-          255,
+-          267
+-        ]
+-      },
+-      {
+-        "dataName": "TEST-COMPUTED",
+-        "definedLineNo": 51,
+-        "references": [
+-          284
+-        ]
+-      },
+-      {
+-        "dataName": "TEST-CORRECT",
+-        "definedLineNo": 66,
+-        "references": [
+-          286
+-        ]
+-      },
+-      {
+-        "dataName": "TEST-ID",
+-        "definedLineNo": 119,
+-        "references": [
+-          184
+-        ]
+-      },
+-      {
+-        "dataName": "TEST-RESULTS",
+-        "definedLineNo": 39,
+-        "references": [
+-          185,
+-          203
+-        ]
+-      },
+-      {
+-        "dataName": "TOTAL-ERROR",
+-        "definedLineNo": 97,
+-        "references": []
+-      },
+-      {
+-        "dataName": "XXCOMPUTED",
+-        "definedLineNo": 168,
+-        "references": [
+-          293
+-        ]
+-      },
+-      {
+-        "dataName": "XXCORRECT",
+-        "definedLineNo": 170,
+-        "references": [
+-          293
+-        ]
+-      },
+-      {
+-        "dataName": "XXINFO",
+-        "definedLineNo": 163,
+-        "references": [
+-          280,
+-          295
+-        ]
+-      }
+     ],
+     "PROGRAMS": [
+       {
+@@ -291921,13 +290981,6 @@
+         ]
+       },
+       {
+-        "dataName": "PRG-COLL-SEQ",
+-        "definedLineNo": 18,
+-        "references": [
+-          16
+-        ]
+-      },
+-      {
+         "dataName": "PRINT-FILE",
+         "definedLineNo": 26,
+         "references": [
+@@ -472261,7 +471314,7 @@
+         "dataName": "RE-MARK",
+         "definedLineNo": 88,
+         "references": [
+-          231,
++          230,
+           262
+         ]
+       },
+@@ -582991,7 +582044,7 @@
+           1206,
+           1277,
+           1845,
+-          1944,
++          1943,
+           1946
+         ]
+       },
+@@ -586173,16 +585226,6 @@
+         "referencesLocation": []
+       },
+       {
+-        "dataName": "COMPUTE-1",
+-        "definedLineNo": 92,
+-        "references": [
+-          1042,
+-          1043,
+-          1044,
+-          1048
+-        ]
+-      },
+-      {
+         "dataName": "COMPUTE-1A",
+         "definedLineNo": 93,
+         "references": [
+@@ -652596,13 +651639,6 @@
+         ]
+       },
+       {
+-        "dataName": "N-A-T-I-V-E",
+-        "definedLineNo": 35,
+-        "references": [
+-          27
+-        ]
+-      },
+-      {
+         "dataName": "P-OR-F",
+         "definedLineNo": 87,
+         "references": [
+@@ -652722,13 +651758,8 @@
+           229,
+           247
+         ]
+-      },
++      }, 
+       {
+-        "dataName": "THE-ONE-CHARACTER-ALPHABET",
+-        "definedLineNo": 41,
+-        "references": []
+-      },
+-      {
+         "dataName": "TOTAL-ERROR",
+         "definedLineNo": 141,
+         "references": []
+@@ -675564,7 +674595,7 @@
+         "dataName": "FALL-THROUGH-TEST",
+         "definedLineNo": 383,
+         "references": [
+-          225
++          224
+         ]
+       },
+       {
+@@ -677901,27 +676932,6 @@
+         ]
+       },
+       {
+-        "dataName": "DEBUG-CONTENTS",
+-        "definedLineNo": 0,
+-        "references": [
+-          222
+-        ]
+-      },
+-      {
+-        "dataName": "DEBUG-LINE",
+-        "definedLineNo": 0,
+-        "references": [
+-          220
+-        ]
+-      },
+-      {
+-        "dataName": "DEBUG-NAME",
+-        "definedLineNo": 0,
+-        "references": [
+-          221
+-        ]
+-      },
+-      {
+         "dataName": "DELETE-CNT",
+         "definedLineNo": 143,
+         "references": [
+@@ -710540,13 +709550,6 @@
+         "referencesLocation": []
+       },
+       {
+-        "dataName": "FOR-INX-START-TEST",
+-        "definedLineNo": 118,
+-        "references": [
+-          115
+-        ]
+-      },
+-      {
+         "dataName": "HYPHEN-LINE",
+         "definedLineNo": 685,
+         "references": [
+@@ -728111,13 +727114,6 @@
+         ]
+       },
+       {
+-        "dataName": "PRG-COLL-SEQ",
+-        "definedLineNo": 18,
+-        "references": [
+-          16
+-        ]
+-      },
+-      {
+         "dataName": "PRINT-FILE",
+         "definedLineNo": 26,
+         "references": [
+@@ -784927,13 +783923,6 @@
+         ]
+       },
+       {
+-        "dataName": "PRG-COLL-SEQ",
+-        "definedLineNo": 18,
+-        "references": [
+-          16
+-        ]
+-      },
+-      {
+         "dataName": "PRINT-FILE",
+         "definedLineNo": 26,
+         "references": [
+@@ -804631,13 +803620,13 @@
+           308,
+           472,
+           473,
+-          475,
++          474,
+           476,
+           477,
+-          479,
++          478,
+           480,
+           481,
+-          483,
++          482,
+           484,
+           485,
+           510,
+@@ -927035,21 +926024,12 @@
+       {
+         "dataName": "QUAL-SECTION-1",
+         "definedLineNo": 550,
+-        "references": [
+-          555,
+-          604,
+-          661,
+-          665,
+-          673
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "QUAL-SECTION-2",
+         "definedLineNo": 654,
+-        "references": [
+-          580,
+-          631
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "TERMINATE-CALL",
+@@ -932000,7 +930980,6 @@
+         "dataName": "GRP-MOVE-CORR-1",
+         "definedLineNo": 128,
+         "references": [
+-          1047
+         ],
+         "definitionLocation": {
+           "start": {
+@@ -932369,14 +931348,12 @@
+         "dataName": "MOVE-CORR-E1",
+         "definedLineNo": 149,
+         "references": [
+-          1068
+         ]
+       },
+       {
+         "dataName": "MOVE-CORR-E1",
+         "definedLineNo": 161,
+         "references": [
+-          1068
+         ]
+       },
+       {
+@@ -932393,14 +931370,12 @@
+         "dataName": "MOVE-CORR-E3",
+         "definedLineNo": 153,
+         "references": [
+-          1068
+         ]
+       },
+       {
+         "dataName": "MOVE-CORR-E3",
+         "definedLineNo": 165,
+         "references": [
+-          1068
+         ]
+       },
+       {
+@@ -932457,71 +931432,53 @@
+         "dataName": "MOVE-CORR-G5",
+         "definedLineNo": 155,
+         "references": [
+-          1068
+         ]
+       },
+       {
+         "dataName": "MOVE-CORR-G5",
+         "definedLineNo": 167,
+         "references": [
+-          1068
+         ]
+       },
+       {
+         "dataName": "MOVE-CORR-1",
+         "definedLineNo": 132,
+-        "references": [
+-          1047
+-        ]
++        "references": [ ]
+       },
+       {
+         "dataName": "MOVE-CORR-1",
+         "definedLineNo": 139,
+-        "references": [
+-          1047
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "MOVE-CORR-2",
+         "definedLineNo": 131,
+-        "references": [
+-          1047
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "MOVE-CORR-2",
+         "definedLineNo": 140,
+-        "references": [
+-          1047
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "MOVE-CORR-3",
+         "definedLineNo": 130,
+-        "references": [
+-          1047
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "MOVE-CORR-3",
+         "definedLineNo": 141,
+-        "references": [
+-          1047
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "MOVE-CORR-4",
+         "definedLineNo": 134,
+-        "references": [
+-          1047
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "MOVE-CORR-4",
+         "definedLineNo": 142,
+-        "references": [
+-          1047
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "MOVE-CORR-5",
+@@ -932553,15 +931510,12 @@
+       {
+         "dataName": "MOVE56",
+         "definedLineNo": 86,
+-        "references": [
+-          1087
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "MOVE56",
+         "definedLineNo": 91,
+         "references": [
+-          1087,
+           1107
+         ]
+       },
+@@ -932578,15 +931532,12 @@
+       {
+         "dataName": "MOVE58",
+         "definedLineNo": 88,
+-        "references": [
+-          1087
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "MOVE58",
+         "definedLineNo": 93,
+         "references": [
+-          1087,
+           1107
+         ]
+       },
+@@ -932599,7 +931550,6 @@
+         "dataName": "MOVE60",
+         "definedLineNo": 90,
+         "references": [
+-          1087,
+           1089,
+           1097,
+           1107,
+@@ -933272,16 +932222,13 @@
+         "definedLineNo": 182,
+         "references": [
+           877,
+-          886,
+-          973,
+-          979
++          973
+         ]
+       },
+       {
+         "dataName": "XYZ-1",
+         "definedLineNo": 189,
+         "references": [
+-          886,
+           904,
+           913
+         ]
+@@ -933290,17 +932237,14 @@
+         "dataName": "XYZ-1",
+         "definedLineNo": 201,
+         "references": [
+-          979,
+           983,
+-          992,
+-          1020
++          992
+         ]
+       },
+       {
+         "dataName": "XYZ-1",
+         "definedLineNo": 210,
+         "references": [
+-          1020,
+           1022
+         ]
+       },
+@@ -933386,16 +932330,13 @@
+         "definedLineNo": 183,
+         "references": [
+           878,
+-          886,
+-          974,
+-          979
++          974
+         ]
+       },
+       {
+         "dataName": "XYZ-2",
+         "definedLineNo": 190,
+         "references": [
+-          886,
+           887,
+           896
+         ]
+@@ -933403,16 +932344,12 @@
+       {
+         "dataName": "XYZ-2",
+         "definedLineNo": 200,
+-        "references": [
+-          979,
+-          1020
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-2",
+         "definedLineNo": 211,
+         "references": [
+-          1020,
+           1025
+         ]
+       },
+@@ -933431,16 +932368,13 @@
+         "definedLineNo": 184,
+         "references": [
+           879,
+-          886,
+-          975,
+-          979
++          975
+         ]
+       },
+       {
+         "dataName": "XYZ-3",
+         "definedLineNo": 191,
+         "references": [
+-          886,
+           921,
+           929
+         ]
+@@ -933449,7 +932383,6 @@
+         "dataName": "XYZ-3",
+         "definedLineNo": 197,
+         "references": [
+-          979,
+           1000,
+           1009
+         ]
+@@ -933459,18 +932392,15 @@
+         "definedLineNo": 185,
+         "references": [
+           880,
+-          886,
+           938,
+           949,
+-          976,
+-          979
++          976
+         ]
+       },
+       {
+         "dataName": "XYZ-4",
+         "definedLineNo": 192,
+         "references": [
+-          886,
+           938,
+           948
+         ]
+@@ -933478,25 +932408,20 @@
+       {
+         "dataName": "XYZ-4",
+         "definedLineNo": 196,
+-        "references": [
+-          979
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-5",
+         "definedLineNo": 186,
+         "references": [
+           881,
+-          886,
+-          977,
+-          979
++          977
+         ]
+       },
+       {
+         "dataName": "XYZ-5",
+         "definedLineNo": 193,
+         "references": [
+-          886,
+           956,
+           964
+         ]
+@@ -933504,33 +932429,25 @@
+       {
+         "dataName": "XYZ-5",
+         "definedLineNo": 199,
+-        "references": [
+-          979
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-6",
+         "definedLineNo": 187,
+         "references": [
+           882,
+-          886,
+-          978,
+-          979
++          978
+         ]
+       },
+       {
+         "dataName": "XYZ-6",
+         "definedLineNo": 194,
+-        "references": [
+-          886
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-6",
+         "definedLineNo": 198,
+-        "references": [
+-          979
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-6",
+@@ -970515,19 +969432,19 @@
+           897,
+           903,
+           912,
+-          923,
++          922,
+           932,
+-          944,
++          943,
+           953,
+-          967,
++          966,
+           973,
+           982,
+-          996,
++          995,
+           1002,
+           1011,
+-          1020,
++          1019,
+           1029,
+-          1041
++          1040
+         ]
+       },
+       {
+@@ -971791,18 +970708,6 @@
+         "referencesLocation": []
+       },
+       {
+-        "dataName": "COLLATING-SEQ-1",
+-        "definedLineNo": 59,
+-        "references": [
+-          56
+-        ]
+-      },
+-      {
+-        "dataName": "COLLATING-SEQ-2",
+-        "definedLineNo": 64,
+-        "references": []
+-      },
+-      {
+         "dataName": "COMPUTED-A",
+         "definedLineNo": 100,
+         "references": [
+@@ -974937,13 +973842,6 @@
+         "referencesLocation": []
+       },
+       {
+-        "dataName": "DEBUG-NAME",
+-        "definedLineNo": 0,
+-        "references": [
+-          516
+-        ]
+-      },
+-      {
+         "dataName": "DELETE-CNT",
+         "definedLineNo": 439,
+         "references": [
+@@ -974994,7 +973892,7 @@
+           608,
+           612,
+           613,
+-          1216,
++          1215,
+           1234,
+           1237,
+           1239
+@@ -989271,8 +988169,7 @@
+         "dataName": "RECORD1",
+         "definedLineNo": 40,
+         "references": [
+-          324,
+-          399
++          324
+         ]
+       },
+       {
+@@ -989282,22 +988179,18 @@
+           329,
+           346,
+           376,
+-          399,
+           400
+         ]
+       },
+       {
+         "dataName": "RECORD1",
+         "definedLineNo": 52,
+-        "references": [
+-          429
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "RECORD1",
+         "definedLineNo": 58,
+         "references": [
+-          429,
+           430
+         ]
+       },
+@@ -989349,8 +988242,7 @@
+         "dataName": "RECORD3",
+         "definedLineNo": 44,
+         "references": [
+-          327,
+-          399
++          327
+         ]
+       },
+       {
+@@ -989360,22 +988252,18 @@
+           332,
+           347,
+           377,
+-          399,
+           403
+         ]
+       },
+       {
+         "dataName": "RECORD3",
+         "definedLineNo": 56,
+-        "references": [
+-          429
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "RECORD3",
+         "definedLineNo": 62,
+         "references": [
+-          429,
+           433
+         ]
+       },
+@@ -1061904,3547 +1060792,8 @@
+   },
+   "SM1074.2.cbl": {
+     "PROCEDURES": [
+-      {
+-        "dataName": "BAIL-OUT",
+-        "definedLineNo": 283,
+-        "references": [
+-          205
+-        ]
+-      },
+-      {
+-        "dataName": "BAIL-OUT-EX",
+-        "definedLineNo": 291,
+-        "references": [
+-          205,
+-          285
+-        ]
+-      },
+-      {
+-        "dataName": "BAIL-OUT-WRITE",
+-        "definedLineNo": 286,
+-        "references": [
+-          284
+-        ]
+-      },
+-      {
+-        "dataName": "BLANK-LINE-PRINT",
+-        "definedLineNo": 267,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CCVS-EXIT",
+-        "definedLineNo": 1902,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CCVS-999999",
+-        "definedLineNo": 1903,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CCVS1",
+-        "definedLineNo": 180,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CCVS1-EXIT",
+-        "definedLineNo": 292,
+-        "references": [
+-          186
+-        ]
+-      },
+-      {
+-        "dataName": "CLOSE-FILES",
+-        "definedLineNo": 187,
+-        "references": [
+-          1904
+-        ]
+-      },
+-      {
+-        "dataName": "COLUMN-NAMES-ROUTINE",
+-        "definedLineNo": 215,
+-        "references": [
+-          185
+-        ]
+-      },
+-      {
+-        "dataName": "COPY-TEST-1",
+-        "definedLineNo": 303,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-10",
+-        "definedLineNo": 374,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-100",
+-        "definedLineNo": 1094,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-101",
+-        "definedLineNo": 1102,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-102",
+-        "definedLineNo": 1110,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-103",
+-        "definedLineNo": 1118,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-104",
+-        "definedLineNo": 1126,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-105",
+-        "definedLineNo": 1134,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-106",
+-        "definedLineNo": 1142,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-107",
+-        "definedLineNo": 1150,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-108",
+-        "definedLineNo": 1158,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-109",
+-        "definedLineNo": 1166,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-11",
+-        "definedLineNo": 382,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-110",
+-        "definedLineNo": 1174,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-111",
+-        "definedLineNo": 1182,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-112",
+-        "definedLineNo": 1190,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-113",
+-        "definedLineNo": 1198,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-114",
+-        "definedLineNo": 1206,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-115",
+-        "definedLineNo": 1214,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-116",
+-        "definedLineNo": 1222,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-117",
+-        "definedLineNo": 1230,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-118",
+-        "definedLineNo": 1238,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-119",
+-        "definedLineNo": 1246,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-12",
+-        "definedLineNo": 390,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-120",
+-        "definedLineNo": 1254,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-121",
+-        "definedLineNo": 1262,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-122",
+-        "definedLineNo": 1270,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-123",
+-        "definedLineNo": 1278,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-124",
+-        "definedLineNo": 1286,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-125",
+-        "definedLineNo": 1294,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-126",
+-        "definedLineNo": 1302,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-127",
+-        "definedLineNo": 1310,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-128",
+-        "definedLineNo": 1318,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-129",
+-        "definedLineNo": 1326,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-13",
+-        "definedLineNo": 398,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-130",
+-        "definedLineNo": 1334,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-131",
+-        "definedLineNo": 1342,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-132",
+-        "definedLineNo": 1350,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-133",
+-        "definedLineNo": 1358,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-134",
+-        "definedLineNo": 1366,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-135",
+-        "definedLineNo": 1374,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-136",
+-        "definedLineNo": 1382,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-137",
+-        "definedLineNo": 1390,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-138",
+-        "definedLineNo": 1398,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-139",
+-        "definedLineNo": 1406,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-14",
+-        "definedLineNo": 406,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-140",
+-        "definedLineNo": 1414,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-141",
+-        "definedLineNo": 1422,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-142",
+-        "definedLineNo": 1430,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-143",
+-        "definedLineNo": 1438,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-144",
+-        "definedLineNo": 1446,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-145",
+-        "definedLineNo": 1454,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-146",
+-        "definedLineNo": 1462,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-147",
+-        "definedLineNo": 1470,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-148",
+-        "definedLineNo": 1478,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-149",
+-        "definedLineNo": 1486,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-15",
+-        "definedLineNo": 414,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-150",
+-        "definedLineNo": 1494,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-151",
+-        "definedLineNo": 1502,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-152",
+-        "definedLineNo": 1510,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-153",
+-        "definedLineNo": 1518,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-154",
+-        "definedLineNo": 1526,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-155",
+-        "definedLineNo": 1534,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-156",
+-        "definedLineNo": 1542,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-157",
+-        "definedLineNo": 1550,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-158",
+-        "definedLineNo": 1558,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-159",
+-        "definedLineNo": 1566,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-16",
+-        "definedLineNo": 422,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-160",
+-        "definedLineNo": 1574,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-161",
+-        "definedLineNo": 1582,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-162",
+-        "definedLineNo": 1590,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-163",
+-        "definedLineNo": 1598,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-164",
+-        "definedLineNo": 1606,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-165",
+-        "definedLineNo": 1614,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-166",
+-        "definedLineNo": 1622,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-167",
+-        "definedLineNo": 1630,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-168",
+-        "definedLineNo": 1638,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-169",
+-        "definedLineNo": 1646,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-17",
+-        "definedLineNo": 430,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-170",
+-        "definedLineNo": 1654,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-171",
+-        "definedLineNo": 1662,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-172",
+-        "definedLineNo": 1670,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-173",
+-        "definedLineNo": 1678,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-174",
+-        "definedLineNo": 1686,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-175",
+-        "definedLineNo": 1694,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-176",
+-        "definedLineNo": 1702,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-177",
+-        "definedLineNo": 1710,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-178",
+-        "definedLineNo": 1718,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-179",
+-        "definedLineNo": 1726,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-18",
+-        "definedLineNo": 438,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-180",
+-        "definedLineNo": 1734,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-181",
+-        "definedLineNo": 1742,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-182",
+-        "definedLineNo": 1750,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-183",
+-        "definedLineNo": 1758,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-184",
+-        "definedLineNo": 1766,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-185",
+-        "definedLineNo": 1774,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-186",
+-        "definedLineNo": 1782,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-187",
+-        "definedLineNo": 1790,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-188",
+-        "definedLineNo": 1798,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-189",
+-        "definedLineNo": 1806,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-19",
+-        "definedLineNo": 446,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-190",
+-        "definedLineNo": 1814,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-191",
+-        "definedLineNo": 1822,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-192",
+-        "definedLineNo": 1830,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-193",
+-        "definedLineNo": 1838,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-194",
+-        "definedLineNo": 1846,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-195",
+-        "definedLineNo": 1854,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-196",
+-        "definedLineNo": 1862,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-197",
+-        "definedLineNo": 1870,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-198",
+-        "definedLineNo": 1878,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-199",
+-        "definedLineNo": 1886,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-2",
+-        "definedLineNo": 311,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-2I",
+-        "definedLineNo": 470,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-20",
+-        "definedLineNo": 454,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-200",
+-        "definedLineNo": 1894,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-21",
+-        "definedLineNo": 462,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-23",
+-        "definedLineNo": 478,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-24",
+-        "definedLineNo": 486,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-25",
+-        "definedLineNo": 494,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-26",
+-        "definedLineNo": 502,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-27",
+-        "definedLineNo": 510,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-28",
+-        "definedLineNo": 518,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-29",
+-        "definedLineNo": 526,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-3",
+-        "definedLineNo": 319,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-30",
+-        "definedLineNo": 534,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-31",
+-        "definedLineNo": 542,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-32",
+-        "definedLineNo": 550,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-33",
+-        "definedLineNo": 558,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-34",
+-        "definedLineNo": 566,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-35",
+-        "definedLineNo": 574,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-36",
+-        "definedLineNo": 582,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-37",
+-        "definedLineNo": 590,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-38",
+-        "definedLineNo": 598,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-39",
+-        "definedLineNo": 606,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-4",
+-        "definedLineNo": 327,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-40",
+-        "definedLineNo": 614,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-41",
+-        "definedLineNo": 622,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-42",
+-        "definedLineNo": 630,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-43",
+-        "definedLineNo": 638,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-44",
+-        "definedLineNo": 646,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-45",
+-        "definedLineNo": 654,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-46",
+-        "definedLineNo": 662,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-47",
+-        "definedLineNo": 670,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-48",
+-        "definedLineNo": 678,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-49",
+-        "definedLineNo": 686,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-5",
+-        "definedLineNo": 335,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-50",
+-        "definedLineNo": 694,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-51",
+-        "definedLineNo": 702,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-52",
+-        "definedLineNo": 710,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-53",
+-        "definedLineNo": 718,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-54",
+-        "definedLineNo": 726,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-55",
+-        "definedLineNo": 734,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-56",
+-        "definedLineNo": 742,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-57",
+-        "definedLineNo": 750,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-58",
+-        "definedLineNo": 758,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-59",
+-        "definedLineNo": 766,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-6",
+-        "definedLineNo": 343,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-60",
+-        "definedLineNo": 774,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-61",
+-        "definedLineNo": 782,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-62",
+-        "definedLineNo": 790,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-63",
+-        "definedLineNo": 798,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-64",
+-        "definedLineNo": 806,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-65",
+-        "definedLineNo": 814,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-66",
+-        "definedLineNo": 822,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-67",
+-        "definedLineNo": 830,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-68",
+-        "definedLineNo": 838,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-69",
+-        "definedLineNo": 846,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-7",
+-        "definedLineNo": 351,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-70",
+-        "definedLineNo": 854,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-71",
+-        "definedLineNo": 862,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-72",
+-        "definedLineNo": 870,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-73",
+-        "definedLineNo": 878,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-74",
+-        "definedLineNo": 886,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-75",
+-        "definedLineNo": 894,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-76",
+-        "definedLineNo": 902,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-77",
+-        "definedLineNo": 910,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-78",
+-        "definedLineNo": 918,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-79",
+-        "definedLineNo": 926,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-8",
+-        "definedLineNo": 359,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-80",
+-        "definedLineNo": 934,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-81",
+-        "definedLineNo": 942,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-82",
+-        "definedLineNo": 950,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-83",
+-        "definedLineNo": 958,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-84",
+-        "definedLineNo": 966,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-85",
+-        "definedLineNo": 974,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-86",
+-        "definedLineNo": 982,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-87",
+-        "definedLineNo": 990,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-88",
+-        "definedLineNo": 998,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-89",
+-        "definedLineNo": 1006,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-9",
+-        "definedLineNo": 366,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-90",
+-        "definedLineNo": 1014,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-91",
+-        "definedLineNo": 1022,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-92",
+-        "definedLineNo": 1030,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-93",
+-        "definedLineNo": 1038,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-94",
+-        "definedLineNo": 1046,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-95",
+-        "definedLineNo": 1054,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-96",
+-        "definedLineNo": 1062,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-97",
+-        "definedLineNo": 1070,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-98",
+-        "definedLineNo": 1078,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COPY-TEST-99",
+-        "definedLineNo": 1086,
+-        "references": []
+-      },
+-      {
+-        "dataName": "DE-LETE",
+-        "definedLineNo": 196,
+-        "references": []
+-      },
+-      {
+-        "dataName": "END-ROUTINE",
+-        "definedLineNo": 219,
+-        "references": [
+-          188
+-        ]
+-      },
+-      {
+-        "dataName": "END-ROUTINE-1",
+-        "definedLineNo": 223,
+-        "references": []
+-      },
+-      {
+-        "dataName": "END-ROUTINE-12",
+-        "definedLineNo": 232,
+-        "references": []
+-      },
+-      {
+-        "dataName": "END-ROUTINE-13",
+-        "definedLineNo": 240,
+-        "references": [
+-          188
+-        ]
+-      },
+-      {
+-        "dataName": "END-RTN-EXIT",
+-        "definedLineNo": 221,
+-        "references": []
+-      },
+-      {
+-        "dataName": "FAIL",
+-        "definedLineNo": 195,
+-        "references": []
+-      },
+-      {
+-        "dataName": "FAIL-ROUTINE",
+-        "definedLineNo": 269,
+-        "references": [
+-          204
+-        ]
+-      },
+-      {
+-        "dataName": "FAIL-ROUTINE-EX",
+-        "definedLineNo": 282,
+-        "references": [
+-          204,
+-          276
+-        ]
+-      },
+-      {
+-        "dataName": "FAIL-ROUTINE-WRITE",
+-        "definedLineNo": 277,
+-        "references": [
+-          270,
+-          271
+-        ]
+-      },
+-      {
+-        "dataName": "HEAD-ROUTINE",
+-        "definedLineNo": 210,
+-        "references": [
+-          185
+-        ]
+-      },
+-      {
+-        "dataName": "INSPT",
+-        "definedLineNo": 193,
+-        "references": []
+-      },
+-      {
+-        "dataName": "OPEN-FILES",
+-        "definedLineNo": 181,
+-        "references": []
+-      },
+-      {
+-        "dataName": "PASS",
+-        "definedLineNo": 194,
+-        "references": [
+-          306,
+-          314,
+-          322,
+-          330,
+-          338,
+-          346,
+-          354,
+-          361,
+-          369,
+-          377,
+-          385,
+-          393,
+-          401,
+-          409,
+-          417,
+-          425,
+-          433,
+-          441,
+-          449,
+-          457,
+-          465,
+-          473,
+-          481,
+-          489,
+-          497,
+-          505,
+-          513,
+-          521,
+-          529,
+-          537,
+-          545,
+-          553,
+-          561,
+-          569,
+-          577,
+-          585,
+-          593,
+-          601,
+-          609,
+-          617,
+-          625,
+-          633,
+-          641,
+-          649,
+-          657,
+-          665,
+-          673,
+-          681,
+-          689,
+-          697,
+-          705,
+-          713,
+-          721,
+-          729,
+-          737,
+-          745,
+-          753,
+-          761,
+-          769,
+-          777,
+-          785,
+-          793,
+-          801,
+-          809,
+-          817,
+-          825,
+-          833,
+-          841,
+-          849,
+-          857,
+-          865,
+-          873,
+-          881,
+-          889,
+-          897,
+-          905,
+-          913,
+-          923,
+-          929,
+-          937,
+-          945,
+-          953,
+-          961,
+-          969,
+-          977,
+-          985,
+-          993,
+-          1001,
+-          1009,
+-          1017,
+-          1025,
+-          1033,
+-          1041,
+-          1049,
+-          1057,
+-          1065,
+-          1073,
+-          1081,
+-          1089,
+-          1097,
+-          1105,
+-          1113,
+-          1121,
+-          1129,
+-          1137,
+-          1145,
+-          1153,
+-          1161,
+-          1169,
+-          1177,
+-          1185,
+-          1193,
+-          1201,
+-          1209,
+-          1217,
+-          1225,
+-          1233,
+-          1241,
+-          1249,
+-          1257,
+-          1265,
+-          1273,
+-          1281,
+-          1289,
+-          1297,
+-          1305,
+-          1313,
+-          1321,
+-          1329,
+-          1337,
+-          1345,
+-          1353,
+-          1361,
+-          1369,
+-          1377,
+-          1385,
+-          1393,
+-          1401,
+-          1409,
+-          1417,
+-          1425,
+-          1433,
+-          1441,
+-          1449,
+-          1457,
+-          1465,
+-          1473,
+-          1481,
+-          1489,
+-          1497,
+-          1505,
+-          1513,
+-          1521,
+-          1529,
+-          1537,
+-          1545,
+-          1553,
+-          1561,
+-          1569,
+-          1577,
+-          1585,
+-          1593,
+-          1601,
+-          1609,
+-          1617,
+-          1625,
+-          1633,
+-          1641,
+-          1649,
+-          1657,
+-          1665,
+-          1673,
+-          1681,
+-          1689,
+-          1697,
+-          1705,
+-          1713,
+-          1721,
+-          1729,
+-          1737,
+-          1745,
+-          1753,
+-          1761,
+-          1769,
+-          1777,
+-          1785,
+-          1793,
+-          1801,
+-          1809,
+-          1817,
+-          1825,
+-          1833,
+-          1841,
+-          1849,
+-          1857,
+-          1865,
+-          1873,
+-          1881,
+-          1889,
+-          1897
+-        ]
+-      },
+-      {
+-        "dataName": "PRINT-DETAIL",
+-        "definedLineNo": 198,
+-        "references": [
+-          310,
+-          318,
+-          326,
+-          334,
+-          342,
+-          350,
+-          358,
+-          365,
+-          373,
+-          381,
+-          389,
+-          397,
+-          405,
+-          413,
+-          421,
+-          429,
+-          437,
+-          445,
+-          453,
+-          461,
+-          469,
+-          477,
+-          485,
+-          493,
+-          501,
+-          509,
+-          517,
+-          525,
+-          533,
+-          541,
+-          549,
+-          557,
+-          565,
+-          573,
+-          581,
+-          589,
+-          597,
+-          605,
+-          613,
+-          621,
+-          629,
+-          637,
+-          645,
+-          653,
+-          661,
+-          669,
+-          677,
+-          685,
+-          693,
+-          701,
+-          709,
+-          717,
+-          725,
+-          733,
+-          741,
+-          749,
+-          757,
+-          765,
+-          773,
+-          781,
+-          789,
+-          797,
+-          805,
+-          813,
+-          821,
+-          829,
+-          837,
+-          845,
+-          853,
+-          861,
+-          869,
+-          877,
+-          885,
+-          893,
+-          901,
+-          909,
+-          917,
+-          925,
+-          933,
+-          941,
+-          949,
+-          957,
+-          965,
+-          973,
+-          981,
+-          989,
+-          997,
+-          1005,
+-          1013,
+-          1021,
+-          1029,
+-          1037,
+-          1045,
+-          1053,
+-          1061,
+-          1069,
+-          1077,
+-          1085,
+-          1093,
+-          1101,
+-          1109,
+-          1117,
+-          1125,
+-          1133,
+-          1141,
+-          1149,
+-          1157,
+-          1165,
+-          1173,
+-          1181,
+-          1189,
+-          1197,
+-          1205,
+-          1213,
+-          1221,
+-          1229,
+-          1237,
+-          1245,
+-          1253,
+-          1261,
+-          1269,
+-          1277,
+-          1285,
+-          1293,
+-          1301,
+-          1309,
+-          1317,
+-          1325,
+-          1333,
+-          1341,
+-          1349,
+-          1357,
+-          1365,
+-          1373,
+-          1381,
+-          1389,
+-          1397,
+-          1405,
+-          1413,
+-          1421,
+-          1429,
+-          1437,
+-          1445,
+-          1453,
+-          1461,
+-          1469,
+-          1477,
+-          1485,
+-          1493,
+-          1501,
+-          1509,
+-          1517,
+-          1525,
+-          1533,
+-          1541,
+-          1549,
+-          1557,
+-          1565,
+-          1573,
+-          1581,
+-          1589,
+-          1597,
+-          1605,
+-          1613,
+-          1621,
+-          1629,
+-          1637,
+-          1645,
+-          1653,
+-          1661,
+-          1669,
+-          1677,
+-          1685,
+-          1693,
+-          1701,
+-          1709,
+-          1717,
+-          1725,
+-          1733,
+-          1741,
+-          1749,
+-          1757,
+-          1765,
+-          1773,
+-          1781,
+-          1789,
+-          1797,
+-          1805,
+-          1813,
+-          1821,
+-          1829,
+-          1837,
+-          1845,
+-          1853,
+-          1861,
+-          1869,
+-          1877,
+-          1885,
+-          1893,
+-          1901
+-        ]
+-      },
+-      {
+-        "dataName": "TERMINATE-CALL",
+-        "definedLineNo": 191,
+-        "references": []
+-      },
+-      {
+-        "dataName": "TERMINATE-CCVS",
+-        "definedLineNo": 189,
+-        "references": []
+-      },
+-      {
+-        "dataName": "WARNING-MSG",
+-        "definedLineNo": 294,
+-        "references": []
+-      },
+-      {
+-        "dataName": "WRITE-LINE",
+-        "definedLineNo": 252,
+-        "references": [
+-          202,
+-          203,
+-          211,
+-          212,
+-          213,
+-          214,
+-          216,
+-          217,
+-          218,
+-          220,
+-          222,
+-          231,
+-          239,
+-          245,
+-          250,
+-          251,
+-          274,
+-          278,
+-          280,
+-          289,
+-          297
+-        ]
+-      },
+-      {
+-        "dataName": "WRT-LN",
+-        "definedLineNo": 264,
+-        "references": [
+-          258,
+-          259,
+-          260,
+-          263,
+-          268
+-        ]
+-      }
+     ],
+-    "DATA_NAMES": [
+-      {
+-        "dataName": "ANSI-REFERENCE",
+-        "definedLineNo": 100,
+-        "references": [
+-          272,
+-          279,
+-          288
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 99,
+-            "character": 7
+-          },
+-          "end": {
+-            "line": 99,
+-            "character": 67
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 271,
+-              "character": 18
+-            },
+-            "end": {
+-              "line": 271,
+-              "character": 32
+-            }
+-          },
+-          {
+-            "start": {
+-              "line": 278,
+-              "character": 18
+-            },
+-            "end": {
+-              "line": 278,
+-              "character": 32
+-            }
+-          },
+-          {
+-            "start": {
+-              "line": 287,
+-              "character": 18
+-            },
+-            "end": {
+-              "line": 287,
+-              "character": 32
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-C-1",
+-        "definedLineNo": 79,
+-        "references": [
+-          216,
+-          258
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 78,
+-            "character": 7
+-          },
+-          "end": {
+-            "line": 82,
+-            "character": 66
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 215,
+-              "character": 16
+-            },
+-            "end": {
+-              "line": 215,
+-              "character": 24
+-            }
+-          },
+-          {
+-            "start": {
+-              "line": 257,
+-              "character": 20
+-            },
+-            "end": {
+-              "line": 257,
+-              "character": 28
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-C-2",
+-        "definedLineNo": 84,
+-        "references": [
+-          217,
+-          259
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 83,
+-            "character": 7
+-          },
+-          "end": {
+-            "line": 88,
+-            "character": 66
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 216,
+-              "character": 16
+-            },
+-            "end": {
+-              "line": 216,
+-              "character": 24
+-            }
+-          },
+-          {
+-            "start": {
+-              "line": 258,
+-              "character": 20
+-            },
+-            "end": {
+-              "line": 258,
+-              "character": 28
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-1",
+-        "definedLineNo": 134,
+-        "references": [
+-          222
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 133,
+-            "character": 7
+-          },
+-          "end": {
+-            "line": 137,
+-            "character": 67
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 221,
+-              "character": 16
+-            },
+-            "end": {
+-              "line": 221,
+-              "character": 24
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-2",
+-        "definedLineNo": 139,
+-        "references": [
+-          231,
+-          238,
+-          245,
+-          250
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 138,
+-            "character": 7
+-          },
+-          "end": {
+-            "line": 145,
+-            "character": 39
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 230,
+-              "character": 17
+-            },
+-            "end": {
+-              "line": 230,
+-              "character": 25
+-            }
+-          },
+-          {
+-            "start": {
+-              "line": 237,
+-              "character": 20
+-            },
+-            "end": {
+-              "line": 237,
+-              "character": 28
+-            }
+-          },
+-          {
+-            "start": {
+-              "line": 244,
+-              "character": 16
+-            },
+-            "end": {
+-              "line": 244,
+-              "character": 24
+-            }
+-          },
+-          {
+-            "start": {
+-              "line": 249,
+-              "character": 17
+-            },
+-            "end": {
+-              "line": 249,
+-              "character": 25
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-2-2",
+-        "definedLineNo": 142,
+-        "references": [
+-          230
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 141,
+-            "character": 11
+-          },
+-          "end": {
+-            "line": 145,
+-            "character": 39
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 229,
+-              "character": 29
+-            },
+-            "end": {
+-              "line": 229,
+-              "character": 39
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-3",
+-        "definedLineNo": 147,
+-        "references": [
+-          251
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 146,
+-            "character": 7
+-          },
+-          "end": {
+-            "line": 154,
+-            "character": 37
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 250,
+-              "character": 16
+-            },
+-            "end": {
+-              "line": 250,
+-              "character": 24
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-4",
+-        "definedLineNo": 156,
+-        "references": [
+-          230
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 155,
+-            "character": 7
+-          },
+-          "end": {
+-            "line": 160,
+-            "character": 49
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 229,
+-              "character": 17
+-            },
+-            "end": {
+-              "line": 229,
+-              "character": 25
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-4-1",
+-        "definedLineNo": 157,
+-        "references": [
+-          228
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 156,
+-            "character": 11
+-          },
+-          "end": {
+-            "line": 156,
+-            "character": 66
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 227,
+-              "character": 33
+-            },
+-            "end": {
+-              "line": 227,
+-              "character": 43
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-4-2",
+-        "definedLineNo": 159,
+-        "references": [
+-          229
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 158,
+-            "character": 11
+-          },
+-          "end": {
+-            "line": 158,
+-            "character": 66
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 228,
+-              "character": 31
+-            },
+-            "end": {
+-              "line": 228,
+-              "character": 41
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-H-1",
+-        "definedLineNo": 101,
+-        "references": [
+-          211
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 100,
+-            "character": 7
+-          },
+-          "end": {
+-            "line": 104,
+-            "character": 67
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 210,
+-              "character": 16
+-            },
+-            "end": {
+-              "line": 210,
+-              "character": 24
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-H-2A",
+-        "definedLineNo": 106,
+-        "references": [
+-          212
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 105,
+-            "character": 7
+-          },
+-          "end": {
+-            "line": 112,
+-            "character": 66
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 211,
+-              "character": 16
+-            },
+-            "end": {
+-              "line": 211,
+-              "character": 25
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-H-2B",
+-        "definedLineNo": 115,
+-        "references": [
+-          213
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 114,
+-            "character": 7
+-          },
+-          "end": {
+-            "line": 125,
+-            "character": 72
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 212,
+-              "character": 16
+-            },
+-            "end": {
+-              "line": 212,
+-              "character": 25
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-H-3",
+-        "definedLineNo": 127,
+-        "references": [
+-          214
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 126,
+-            "character": 7
+-          },
+-          "end": {
+-            "line": 132,
+-            "character": 40
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 213,
+-              "character": 16
+-            },
+-            "end": {
+-              "line": 213,
+-              "character": 24
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-PGM-ID",
+-        "definedLineNo": 177,
+-        "references": [
+-          183,
+-          183
+-        ],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 176,
+-            "character": 7
+-          },
+-          "end": {
+-            "line": 177,
+-            "character": 20
+-          }
+-        },
+-        "referencesLocation": [
+-          {
+-            "start": {
+-              "line": 182,
+-              "character": 16
+-            },
+-            "end": {
+-              "line": 182,
+-              "character": 27
+-            }
+-          },
+-          {
+-            "start": {
+-              "line": 182,
+-              "character": 45
+-            },
+-            "end": {
+-              "line": 182,
+-              "character": 56
+-            }
+-          }
+-        ]
+-      },
+-      {
+-        "dataName": "CM-18V0",
+-        "definedLineNo": 61,
+-        "references": [],
+-        "definitionLocation": {
+-          "start": {
+-            "line": 60,
+-            "character": 11
+-          },
+-          "end": {
+-            "line": 62,
+-            "character": 57
+-          }
+-        },
+-        "referencesLocation": []
+-      },
+-      {
+-        "dataName": "COMPUTED-A",
+-        "definedLineNo": 55,
+-        "references": [
+-          56,
+-          58,
+-          59,
+-          60,
+-          61,
+-          284,
+-          287,
+-          307,
+-          315,
+-          323,
+-          331,
+-          339,
+-          347,
+-          355,
+-          362,
+-          370,
+-          378,
+-          386,
+-          394,
+-          402,
+-          410,
+-          418,
+-          426,
+-          434,
+-          442,
+-          450,
+-          458,
+-          466,
+-          474,
+-          482,
+-          490,
+-          498,
+-          506,
+-          514,
+-          522,
+-          530,
+-          538,
+-          546,
+-          554,
+-          562,
+-          570,
+-          578,
+-          586,
+-          594,
+-          602,
+-          610,
+-          618,
+-          626,
+-          634,
+-          642,
+-          650,
+-          658,
+-          666,
+-          674,
+-          682,
+-          690,
+-          698,
+-          706,
+-          714,
+-          722,
+-          730,
+-          738,
+-          746,
+-          754,
+-          762,
+-          770,
+-          778,
+-          786,
+-          794,
+-          802,
+-          810,
+-          818,
+-          826,
+-          834,
+-          842,
+-          850,
+-          858,
+-          866,
+-          874,
+-          882,
+-          890,
+-          898,
+-          906,
+-          914,
+-          921,
+-          930,
+-          938,
+-          946,
+-          954,
+-          962,
+-          970,
+-          978,
+-          986,
+-          994,
+-          1002,
+-          1010,
+-          1018,
+-          1026,
+-          1034,
+-          1042,
+-          1050,
+-          1058,
+-          1066,
+-          1074,
+-          1082,
+-          1090,
+-          1098,
+-          1106,
+-          1114,
+-          1122,
+-          1130,
+-          1138,
+-          1146,
+-          1154,
+-          1162,
+-          1170,
+-          1178,
+-          1186,
+-          1194,
+-          1202,
+-          1210,
+-          1218,
+-          1226,
+-          1234,
+-          1242,
+-          1250,
+-          1258,
+-          1266,
+-          1274,
+-          1282,
+-          1290,
+-          1298,
+-          1306,
+-          1314,
+-          1322,
+-          1330,
+-          1338,
+-          1346,
+-          1354,
+-          1362,
+-          1370,
+-          1378,
+-          1386,
+-          1394,
+-          1402,
+-          1410,
+-          1418,
+-          1426,
+-          1434,
+-          1442,
+-          1450,
+-          1458,
+-          1466,
+-          1474,
+-          1482,
+-          1490,
+-          1498,
+-          1506,
+-          1514,
+-          1522,
+-          1530,
+-          1538,
+-          1546,
+-          1554,
+-          1562,
+-          1570,
+-          1578,
+-          1586,
+-          1594,
+-          1602,
+-          1610,
+-          1618,
+-          1626,
+-          1634,
+-          1642,
+-          1650,
+-          1658,
+-          1666,
+-          1674,
+-          1682,
+-          1690,
+-          1698,
+-          1706,
+-          1714,
+-          1722,
+-          1730,
+-          1738,
+-          1746,
+-          1754,
+-          1762,
+-          1770,
+-          1778,
+-          1786,
+-          1794,
+-          1802,
+-          1810,
+-          1818,
+-          1826,
+-          1834,
+-          1842,
+-          1850,
+-          1858,
+-          1866,
+-          1874,
+-          1882,
+-          1890,
+-          1898
+-        ]
+-      },
+-      {
+-        "dataName": "COMPUTED-N",
+-        "definedLineNo": 56,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COMPUTED-X",
+-        "definedLineNo": 54,
+-        "references": [
+-          206,
+-          270
+-        ]
+-      },
+-      {
+-        "dataName": "COMPUTED-0V18",
+-        "definedLineNo": 58,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COMPUTED-14V4",
+-        "definedLineNo": 60,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COMPUTED-18V0",
+-        "definedLineNo": 62,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COMPUTED-4V14",
+-        "definedLineNo": 59,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COR-ANSI-REFERENCE",
+-        "definedLineNo": 78,
+-        "references": [
+-          279,
+-          281
+-        ]
+-      },
+-      {
+-        "dataName": "CORRECT-A",
+-        "definedLineNo": 69,
+-        "references": [
+-          70,
+-          71,
+-          72,
+-          73,
+-          74,
+-          285,
+-          287,
+-          308,
+-          316,
+-          324,
+-          332,
+-          340,
+-          348,
+-          356,
+-          363,
+-          371,
+-          379,
+-          387,
+-          395,
+-          403,
+-          411,
+-          419,
+-          427,
+-          435,
+-          443,
+-          451,
+-          459,
+-          467,
+-          475,
+-          483,
+-          491,
+-          499,
+-          507,
+-          515,
+-          523,
+-          531,
+-          539,
+-          547,
+-          555,
+-          563,
+-          571,
+-          579,
+-          587,
+-          595,
+-          603,
+-          611,
+-          619,
+-          627,
+-          635,
+-          643,
+-          651,
+-          659,
+-          667,
+-          675,
+-          683,
+-          691,
+-          699,
+-          707,
+-          715,
+-          723,
+-          731,
+-          739,
+-          747,
+-          755,
+-          763,
+-          771,
+-          779,
+-          787,
+-          795,
+-          803,
+-          811,
+-          819,
+-          827,
+-          835,
+-          843,
+-          851,
+-          859,
+-          867,
+-          875,
+-          883,
+-          891,
+-          899,
+-          907,
+-          915,
+-          922,
+-          931,
+-          939,
+-          947,
+-          955,
+-          963,
+-          971,
+-          979,
+-          987,
+-          995,
+-          1003,
+-          1011,
+-          1019,
+-          1027,
+-          1035,
+-          1043,
+-          1051,
+-          1059,
+-          1067,
+-          1075,
+-          1083,
+-          1091,
+-          1099,
+-          1107,
+-          1115,
+-          1123,
+-          1131,
+-          1139,
+-          1147,
+-          1155,
+-          1163,
+-          1171,
+-          1179,
+-          1187,
+-          1195,
+-          1203,
+-          1211,
+-          1219,
+-          1227,
+-          1235,
+-          1243,
+-          1251,
+-          1259,
+-          1267,
+-          1275,
+-          1283,
+-          1291,
+-          1299,
+-          1307,
+-          1315,
+-          1323,
+-          1331,
+-          1339,
+-          1347,
+-          1355,
+-          1363,
+-          1371,
+-          1379,
+-          1387,
+-          1395,
+-          1403,
+-          1411,
+-          1419,
+-          1427,
+-          1435,
+-          1443,
+-          1451,
+-          1459,
+-          1467,
+-          1475,
+-          1483,
+-          1491,
+-          1499,
+-          1507,
+-          1515,
+-          1523,
+-          1531,
+-          1539,
+-          1547,
+-          1555,
+-          1563,
+-          1571,
+-          1579,
+-          1587,
+-          1595,
+-          1603,
+-          1611,
+-          1619,
+-          1627,
+-          1635,
+-          1643,
+-          1651,
+-          1659,
+-          1667,
+-          1675,
+-          1683,
+-          1691,
+-          1699,
+-          1707,
+-          1715,
+-          1723,
+-          1731,
+-          1739,
+-          1747,
+-          1755,
+-          1763,
+-          1771,
+-          1779,
+-          1787,
+-          1795,
+-          1803,
+-          1811,
+-          1819,
+-          1827,
+-          1835,
+-          1843,
+-          1851,
+-          1859,
+-          1867,
+-          1875,
+-          1883,
+-          1891,
+-          1899
+-        ]
+-      },
+-      {
+-        "dataName": "CORRECT-N",
+-        "definedLineNo": 70,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CORRECT-X",
+-        "definedLineNo": 68,
+-        "references": [
+-          207,
+-          271
+-        ]
+-      },
+-      {
+-        "dataName": "CORRECT-0V18",
+-        "definedLineNo": 71,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CORRECT-14V4",
+-        "definedLineNo": 73,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CORRECT-18V0",
+-        "definedLineNo": 75,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CORRECT-4V14",
+-        "definedLineNo": 72,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CR-18V0",
+-        "definedLineNo": 74,
+-        "references": []
+-      },
+-      {
+-        "dataName": "DELETE-COUNTER",
+-        "definedLineNo": 92,
+-        "references": [
+-          196,
+-          225,
+-          241,
+-          243
+-        ]
+-      },
+-      {
+-        "dataName": "DOTVALUE",
+-        "definedLineNo": 47,
+-        "references": [
+-          201
+-        ]
+-      },
+-      {
+-        "dataName": "DUMMY-HOLD",
+-        "definedLineNo": 98,
+-        "references": [
+-          255,
+-          261
+-        ]
+-      },
+-      {
+-        "dataName": "DUMMY-RECORD",
+-        "definedLineNo": 36,
+-        "references": [
+-          211,
+-          212,
+-          213,
+-          214,
+-          216,
+-          217,
+-          218,
+-          220,
+-          222,
+-          231,
+-          238,
+-          245,
+-          250,
+-          251,
+-          255,
+-          256,
+-          257,
+-          258,
+-          259,
+-          260,
+-          261,
+-          265,
+-          266,
+-          274,
+-          289
+-        ]
+-      },
+-      {
+-        "dataName": "ENDER-DESC",
+-        "definedLineNo": 145,
+-        "references": [
+-          233,
+-          244,
+-          249
+-        ]
+-      },
+-      {
+-        "dataName": "ERROR-COUNTER",
+-        "definedLineNo": 93,
+-        "references": [
+-          195,
+-          224,
+-          234,
+-          237
+-        ]
+-      },
+-      {
+-        "dataName": "ERROR-HOLD",
+-        "definedLineNo": 97,
+-        "references": [
+-          224,
+-          225,
+-          225,
+-          226,
+-          229
+-        ]
+-      },
+-      {
+-        "dataName": "ERROR-TOTAL",
+-        "definedLineNo": 143,
+-        "references": [
+-          235,
+-          237,
+-          242,
+-          243,
+-          247,
+-          248
+-        ]
+-      },
+-      {
+-        "dataName": "FEATURE",
+-        "definedLineNo": 40,
+-        "references": [
+-          304,
+-          312,
+-          320,
+-          328,
+-          336,
+-          344,
+-          352,
+-          367,
+-          375,
+-          383,
+-          391,
+-          399,
+-          407,
+-          415,
+-          423,
+-          431,
+-          439,
+-          447,
+-          455,
+-          463,
+-          471,
+-          479,
+-          487,
+-          495,
+-          503,
+-          511,
+-          519,
+-          527,
+-          535,
+-          543,
+-          551,
+-          559,
+-          567,
+-          575,
+-          583,
+-          591,
+-          599,
+-          607,
+-          615,
+-          623,
+-          631,
+-          639,
+-          647,
+-          655,
+-          663,
+-          671,
+-          679,
+-          687,
+-          695,
+-          703,
+-          711,
+-          719,
+-          727,
+-          735,
+-          743,
+-          751,
+-          759,
+-          767,
+-          775,
+-          783,
+-          791,
+-          799,
+-          807,
+-          815,
+-          823,
+-          831,
+-          839,
+-          847,
+-          855,
+-          863,
+-          871,
+-          879,
+-          887,
+-          895,
+-          903,
+-          911,
+-          919,
+-          927,
+-          935,
+-          943,
+-          951,
+-          959,
+-          967,
+-          975,
+-          983,
+-          991,
+-          999,
+-          1007,
+-          1015,
+-          1023,
+-          1031,
+-          1039,
+-          1047,
+-          1055,
+-          1063,
+-          1071,
+-          1079,
+-          1087,
+-          1095,
+-          1103,
+-          1111,
+-          1119,
+-          1127,
+-          1135,
+-          1143,
+-          1151,
+-          1159,
+-          1167,
+-          1175,
+-          1183,
+-          1191,
+-          1199,
+-          1207,
+-          1215,
+-          1223,
+-          1231,
+-          1239,
+-          1247,
+-          1255,
+-          1263,
+-          1271,
+-          1279,
+-          1287,
+-          1295,
+-          1303,
+-          1311,
+-          1319,
+-          1327,
+-          1335,
+-          1343,
+-          1351,
+-          1359,
+-          1367,
+-          1375,
+-          1383,
+-          1391,
+-          1399,
+-          1407,
+-          1415,
+-          1423,
+-          1431,
+-          1439,
+-          1447,
+-          1455,
+-          1463,
+-          1471,
+-          1479,
+-          1487,
+-          1495,
+-          1503,
+-          1511,
+-          1519,
+-          1527,
+-          1535,
+-          1543,
+-          1551,
+-          1559,
+-          1567,
+-          1575,
+-          1583,
+-          1591,
+-          1599,
+-          1607,
+-          1615,
+-          1623,
+-          1631,
+-          1639,
+-          1647,
+-          1655,
+-          1663,
+-          1671,
+-          1679,
+-          1687,
+-          1695,
+-          1703,
+-          1711,
+-          1719,
+-          1727,
+-          1735,
+-          1743,
+-          1751,
+-          1759,
+-          1767,
+-          1775,
+-          1783,
+-          1791,
+-          1799,
+-          1807,
+-          1815,
+-          1823,
+-          1831,
+-          1839,
+-          1847,
+-          1855,
+-          1863,
+-          1871,
+-          1879,
+-          1887,
+-          1895
+-        ]
+-      },
+-      {
+-        "dataName": "HYPHEN-LINE",
+-        "definedLineNo": 171,
+-        "references": [
+-          218,
+-          220,
+-          260
+-        ]
+-      },
+-      {
+-        "dataName": "ID-AGAIN",
+-        "definedLineNo": 137,
+-        "references": [
+-          183
+-        ]
+-      },
+-      {
+-        "dataName": "INF-ANSI-REFERENCE",
+-        "definedLineNo": 170,
+-        "references": [
+-          272,
+-          275,
+-          288,
+-          290
+-        ]
+-      },
+-      {
+-        "dataName": "INFO-TEXT",
+-        "definedLineNo": 165,
+-        "references": [
+-          273
+-        ]
+-      },
+-      {
+-        "dataName": "INSPECT-COUNTER",
+-        "definedLineNo": 94,
+-        "references": [
+-          193,
+-          224,
+-          246,
+-          248
+-        ]
+-      },
+-      {
+-        "dataName": "P-OR-F",
+-        "definedLineNo": 42,
+-        "references": [
+-          193,
+-          194,
+-          195,
+-          196,
+-          203,
+-          206
+-        ]
+-      },
+-      {
+-        "dataName": "PAR-NAME",
+-        "definedLineNo": 44,
+-        "references": [
+-          208,
+-          305,
+-          313,
+-          321,
+-          329,
+-          337,
+-          345,
+-          353,
+-          360,
+-          368,
+-          376,
+-          384,
+-          392,
+-          400,
+-          408,
+-          416,
+-          424,
+-          432,
+-          440,
+-          448,
+-          456,
+-          464,
+-          472,
+-          480,
+-          488,
+-          496,
+-          504,
+-          512,
+-          520,
+-          528,
+-          536,
+-          544,
+-          552,
+-          560,
+-          568,
+-          576,
+-          584,
+-          592,
+-          600,
+-          608,
+-          616,
+-          624,
+-          632,
+-          640,
+-          648,
+-          656,
+-          664,
+-          672,
+-          680,
+-          688,
+-          696,
+-          704,
+-          712,
+-          720,
+-          728,
+-          736,
+-          744,
+-          752,
+-          760,
+-          768,
+-          776,
+-          784,
+-          792,
+-          800,
+-          808,
+-          816,
+-          824,
+-          832,
+-          840,
+-          848,
+-          856,
+-          864,
+-          872,
+-          880,
+-          888,
+-          896,
+-          904,
+-          912,
+-          920,
+-          928,
+-          936,
+-          944,
+-          952,
+-          960,
+-          968,
+-          976,
+-          984,
+-          992,
+-          1000,
+-          1008,
+-          1016,
+-          1024,
+-          1032,
+-          1040,
+-          1048,
+-          1056,
+-          1064,
+-          1072,
+-          1080,
+-          1088,
+-          1096,
+-          1104,
+-          1112,
+-          1120,
+-          1128,
+-          1136,
+-          1144,
+-          1152,
+-          1160,
+-          1168,
+-          1176,
+-          1184,
+-          1192,
+-          1200,
+-          1208,
+-          1216,
+-          1224,
+-          1232,
+-          1240,
+-          1248,
+-          1256,
+-          1264,
+-          1272,
+-          1280,
+-          1288,
+-          1296,
+-          1304,
+-          1312,
+-          1320,
+-          1328,
+-          1336,
+-          1344,
+-          1352,
+-          1360,
+-          1368,
+-          1376,
+-          1384,
+-          1392,
+-          1400,
+-          1408,
+-          1416,
+-          1424,
+-          1432,
+-          1440,
+-          1448,
+-          1456,
+-          1464,
+-          1472,
+-          1480,
+-          1488,
+-          1496,
+-          1504,
+-          1512,
+-          1520,
+-          1528,
+-          1536,
+-          1544,
+-          1552,
+-          1560,
+-          1568,
+-          1576,
+-          1584,
+-          1592,
+-          1600,
+-          1608,
+-          1616,
+-          1624,
+-          1632,
+-          1640,
+-          1648,
+-          1656,
+-          1664,
+-          1672,
+-          1680,
+-          1688,
+-          1696,
+-          1704,
+-          1712,
+-          1720,
+-          1728,
+-          1736,
+-          1744,
+-          1752,
+-          1760,
+-          1768,
+-          1776,
+-          1784,
+-          1792,
+-          1800,
+-          1808,
+-          1816,
+-          1824,
+-          1832,
+-          1840,
+-          1848,
+-          1856,
+-          1864,
+-          1872,
+-          1880,
+-          1888,
+-          1896
+-        ]
+-      },
+-      {
+-        "dataName": "PARDOT-X",
+-        "definedLineNo": 46,
+-        "references": [
+-          200
+-        ]
+-      },
+-      {
+-        "dataName": "PASS-COUNTER",
+-        "definedLineNo": 95,
+-        "references": [
+-          194,
+-          226,
+-          228
+-        ]
+-      },
+-      {
+-        "dataName": "PRINT-FILE",
+-        "definedLineNo": 34,
+-        "references": [
+-          30,
+-          182,
+-          188
+-        ]
+-      },
+-      {
+-        "dataName": "PRINT-REC",
+-        "definedLineNo": 35,
+-        "references": [
+-          202,
+-          278,
+-          280,
+-          296
+-        ]
+-      },
+-      {
+-        "dataName": "RE-MARK",
+-        "definedLineNo": 49,
+-        "references": [
+-          197,
+-          209,
+-          309,
+-          317,
+-          325,
+-          333,
+-          341,
+-          349,
+-          357,
+-          364,
+-          372,
+-          380,
+-          388,
+-          396,
+-          404,
+-          412,
+-          420,
+-          428,
+-          436,
+-          444,
+-          452,
+-          460,
+-          468,
+-          476,
+-          484,
+-          492,
+-          500,
+-          508,
+-          516,
+-          524,
+-          532,
+-          540,
+-          548,
+-          556,
+-          564,
+-          572,
+-          580,
+-          588,
+-          596,
+-          604,
+-          612,
+-          620,
+-          628,
+-          636,
+-          644,
+-          652,
+-          660,
+-          668,
+-          676,
+-          684,
+-          692,
+-          700,
+-          708,
+-          716,
+-          724,
+-          732,
+-          740,
+-          748,
+-          756,
+-          764,
+-          772,
+-          780,
+-          788,
+-          796,
+-          804,
+-          812,
+-          820,
+-          828,
+-          836,
+-          844,
+-          852,
+-          860,
+-          868,
+-          876,
+-          884,
+-          892,
+-          900,
+-          908,
+-          916,
+-          924,
+-          932,
+-          940,
+-          948,
+-          956,
+-          964,
+-          972,
+-          980,
+-          988,
+-          996,
+-          1004,
+-          1012,
+-          1020,
+-          1028,
+-          1036,
+-          1044,
+-          1052,
+-          1060,
+-          1068,
+-          1076,
+-          1084,
+-          1092,
+-          1100,
+-          1108,
+-          1116,
+-          1124,
+-          1132,
+-          1140,
+-          1148,
+-          1156,
+-          1164,
+-          1172,
+-          1180,
+-          1188,
+-          1196,
+-          1204,
+-          1212,
+-          1220,
+-          1228,
+-          1236,
+-          1244,
+-          1252,
+-          1260,
+-          1268,
+-          1276,
+-          1284,
+-          1292,
+-          1300,
+-          1308,
+-          1316,
+-          1324,
+-          1332,
+-          1340,
+-          1348,
+-          1356,
+-          1364,
+-          1372,
+-          1380,
+-          1388,
+-          1396,
+-          1404,
+-          1412,
+-          1420,
+-          1428,
+-          1436,
+-          1444,
+-          1452,
+-          1460,
+-          1468,
+-          1476,
+-          1484,
+-          1492,
+-          1500,
+-          1508,
+-          1516,
+-          1524,
+-          1532,
+-          1540,
+-          1548,
+-          1556,
+-          1564,
+-          1572,
+-          1580,
+-          1588,
+-          1596,
+-          1604,
+-          1612,
+-          1620,
+-          1628,
+-          1636,
+-          1644,
+-          1652,
+-          1660,
+-          1668,
+-          1676,
+-          1684,
+-          1692,
+-          1700,
+-          1708,
+-          1716,
+-          1724,
+-          1732,
+-          1740,
+-          1748,
+-          1756,
+-          1764,
+-          1772,
+-          1780,
+-          1788,
+-          1796,
+-          1804,
+-          1812,
+-          1820,
+-          1828,
+-          1836,
+-          1844,
+-          1852,
+-          1860,
+-          1868,
+-          1876,
+-          1884,
+-          1892,
+-          1900
+-        ]
+-      },
+-      {
+-        "dataName": "REC-CT",
+-        "definedLineNo": 91,
+-        "references": [
+-          199,
+-          201,
+-          208
+-        ]
+-      },
+-      {
+-        "dataName": "REC-SKL-SUB",
+-        "definedLineNo": 90,
+-        "references": []
+-      },
+-      {
+-        "dataName": "RECORD-COUNT",
+-        "definedLineNo": 99,
+-        "references": [
+-          253,
+-          254,
+-          262
+-        ]
+-      },
+-      {
+-        "dataName": "TEST-COMPUTED",
+-        "definedLineNo": 50,
+-        "references": [
+-          278
+-        ]
+-      },
+-      {
+-        "dataName": "TEST-CORRECT",
+-        "definedLineNo": 65,
+-        "references": [
+-          280
+-        ]
+-      },
+-      {
+-        "dataName": "TEST-ID",
+-        "definedLineNo": 118,
+-        "references": [
+-          183
+-        ]
+-      },
+-      {
+-        "dataName": "TEST-RESULTS",
+-        "definedLineNo": 38,
+-        "references": [
+-          184,
+-          202
+-        ]
+-      },
+-      {
+-        "dataName": "TOTAL-ERROR",
+-        "definedLineNo": 96,
+-        "references": []
+-      },
+-      {
+-        "dataName": "XXCOMPUTED",
+-        "definedLineNo": 167,
+-        "references": [
+-          287
+-        ]
+-      },
+-      {
+-        "dataName": "XXCORRECT",
+-        "definedLineNo": 169,
+-        "references": [
+-          287
+-        ]
+-      },
+-      {
+-        "dataName": "XXINFO",
+-        "definedLineNo": 162,
+-        "references": [
+-          274,
+-          289
+-        ]
+-      }
+-    ],
++    "DATA_NAMES": [],
+     "PROGRAMS": [
+       {
+         "dataName": "SM107A",
+@@ -1109321,9 +1104670,7 @@
+         "references": [
+           575,
+           587,
+-          973,
+           1208,
+-          1595,
+           1824,
+           1826,
+           2258,
+@@ -1109336,9 +1104683,7 @@
+         "references": [
+           600,
+           612,
+-          973,
+           1233,
+-          1595,
+           1849,
+           1851,
+           2283,
+@@ -1109351,9 +1104696,7 @@
+         "references": [
+           625,
+           636,
+-          973,
+           1258,
+-          1595,
+           1874,
+           2308
+         ]
+@@ -1109364,9 +1104707,7 @@
+         "references": [
+           650,
+           662,
+-          973,
+           1283,
+-          1595,
+           1897,
+           2331
+         ]
+@@ -1109377,9 +1104718,7 @@
+         "references": [
+           675,
+           687,
+-          973,
+           1308,
+-          1595,
+           1920,
+           1922,
+           2354,
+@@ -1109392,9 +1104731,7 @@
+         "references": [
+           700,
+           712,
+-          973,
+           1332,
+-          1595,
+           1945,
+           1947,
+           2379,
+@@ -1109407,9 +1104744,7 @@
+         "references": [
+           725,
+           736,
+-          973,
+           1356,
+-          1595,
+           1970,
+           2404
+         ]
+@@ -1109420,9 +1104755,7 @@
+         "references": [
+           750,
+           761,
+-          973,
+           1380,
+-          1595,
+           1993,
+           2427
+         ]
+@@ -1109433,10 +1104766,8 @@
+         "references": [
+           775,
+           777,
+-          973,
+           1404,
+           1406,
+-          1595,
+           2016,
+           2450
+         ]
+@@ -1109447,9 +1104778,7 @@
+         "references": [
+           800,
+           802,
+-          973,
+           1430,
+-          1595,
+           2039,
+           2473
+         ]
+@@ -1109460,9 +1104789,7 @@
+         "references": [
+           825,
+           827,
+-          973,
+           1454,
+-          1595,
+           2062,
+           2064,
+           2496,
+@@ -1109475,9 +1104802,7 @@
+         "references": [
+           850,
+           852,
+-          973,
+           1478,
+-          1595,
+           2087,
+           2089,
+           2521,
+@@ -1109490,9 +1104815,7 @@
+         "references": [
+           875,
+           877,
+-          973,
+           1502,
+-          1595,
+           2112,
+           2546
+         ]
+@@ -1109503,9 +1104826,7 @@
+         "references": [
+           900,
+           902,
+-          973,
+           1526,
+-          1595,
+           2135,
+           2569
+         ]
+@@ -1109516,9 +1104837,7 @@
+         "references": [
+           925,
+           927,
+-          973,
+           1550,
+-          1595,
+           2158,
+           2160,
+           2592,
+@@ -1109531,9 +1104850,7 @@
+         "references": [
+           950,
+           952,
+-          973,
+           1574,
+-          1595,
+           2183,
+           2185,
+           2617,
+@@ -1109543,8 +1104860,7 @@
+       {
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 98,
+-        "references": [
+-          973,
++        "references": [ 
+           975,
+           986,
+           1210
+@@ -1109554,7 +1104870,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 100,
+         "references": [
+-          973,
+           998,
+           1008,
+           1235
+@@ -1109564,7 +1104879,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 103,
+         "references": [
+-          973,
+           1020,
+           1031,
+           1260
+@@ -1109574,7 +1104888,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 105,
+         "references": [
+-          973,
+           1043,
+           1054,
+           1285
+@@ -1109584,7 +1104897,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 109,
+         "references": [
+-          973,
+           1066,
+           1077,
+           1310
+@@ -1109594,7 +1104906,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 111,
+         "references": [
+-          973,
+           1089,
+           1100,
+           1334
+@@ -1109604,7 +1104915,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 114,
+         "references": [
+-          973,
+           1112,
+           1123,
+           1358
+@@ -1109614,7 +1104924,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 116,
+         "references": [
+-          973,
+           1135,
+           1146,
+           1382
+@@ -1109623,15 +1104932,12 @@
+       {
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 121,
+-        "references": [
+-          973
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 123,
+         "references": [
+-          973,
+           1428
+         ]
+       },
+@@ -1109639,7 +1104945,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 126,
+         "references": [
+-          973,
+           1452
+         ]
+       },
+@@ -1109647,7 +1104952,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 128,
+         "references": [
+-          973,
+           1476
+         ]
+       },
+@@ -1109655,7 +1104959,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 132,
+         "references": [
+-          973,
+           1500
+         ]
+       },
+@@ -1109663,7 +1104966,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 134,
+         "references": [
+-          973,
+           1524
+         ]
+       },
+@@ -1109671,7 +1104973,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 137,
+         "references": [
+-          973,
+           1548
+         ]
+       },
+@@ -1109679,7 +1104980,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 139,
+         "references": [
+-          973,
+           1572
+         ]
+       },
+@@ -1109687,7 +1104987,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 146,
+         "references": [
+-          1595,
+           1597,
+           1608
+         ]
+@@ -1109696,7 +1104995,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 148,
+         "references": [
+-          1595,
+           1619,
+           1630
+         ]
+@@ -1109705,7 +1105003,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 151,
+         "references": [
+-          1595,
+           1641,
+           1652
+         ]
+@@ -1109714,7 +1105011,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 153,
+         "references": [
+-          1595,
+           1663,
+           1674
+         ]
+@@ -1109723,7 +1105019,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 157,
+         "references": [
+-          1595,
+           1685,
+           1696
+         ]
+@@ -1109732,7 +1105027,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 159,
+         "references": [
+-          1595,
+           1707,
+           1718
+         ]
+@@ -1109741,7 +1105035,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 162,
+         "references": [
+-          1595,
+           1729,
+           1740
+         ]
+@@ -1109750,7 +1105043,6 @@
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 164,
+         "references": [
+-          1595,
+           1751,
+           1762
+         ]
+@@ -1109758,58 +1105050,42 @@
+       {
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 169,
+-        "references": [
+-          1595
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 171,
+-        "references": [
+-          1595
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 174,
+-        "references": [
+-          1595
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 176,
+-        "references": [
+-          1595
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 180,
+-        "references": [
+-          1595
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 182,
+-        "references": [
+-          1595
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 185,
+-        "references": [
+-          1595
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "TBL-ITEM-1",
+         "definedLineNo": 187,
+-        "references": [
+-          1595
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "TEST-COMPUTED",
+@@ -1111985,15 +1107261,12 @@
+         "dataName": "AL",
+         "definedLineNo": 48,
+         "references": [
+-          470,
+-          697
+         ]
+       },
+       {
+         "dataName": "AL",
+         "definedLineNo": 66,
+         "references": [
+-          470,
+           538,
+           547
+         ]
+@@ -1112003,7 +1107276,6 @@
+         "definedLineNo": 92,
+         "references": [
+           95,
+-          697,
+           766,
+           775
+         ]
+@@ -1112101,9 +1107373,7 @@
+       {
+         "dataName": "BOB",
+         "definedLineNo": 50,
+-        "references": [
+-          941
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "BOB",
+@@ -1112133,9 +1107403,7 @@
+       {
+         "dataName": "BOB",
+         "definedLineNo": 135,
+-        "references": [
+-          941
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "BOBBY",
+@@ -1112586,18 +1107854,12 @@
+       {
+         "dataName": "DICK",
+         "definedLineNo": 43,
+-        "references": [
+-          400,
+-          697,
+-          803,
+-          873
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "DICK",
+         "definedLineNo": 56,
+         "references": [
+-          400,
+           421,
+           430
+         ]
+@@ -1112630,7 +1107892,6 @@
+         "dataName": "DICK",
+         "definedLineNo": 86,
+         "references": [
+-          697,
+           718,
+           727
+         ]
+@@ -1112639,7 +1107900,6 @@
+         "dataName": "DICK",
+         "definedLineNo": 102,
+         "references": [
+-          803,
+           824,
+           833
+         ]
+@@ -1112647,9 +1107907,7 @@
+       {
+         "dataName": "DICK",
+         "definedLineNo": 125,
+-        "references": [
+-          873
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "DICKY",
+@@ -1112768,10 +1108026,7 @@
+       {
+         "dataName": "HARRY",
+         "definedLineNo": 45,
+-        "references": [
+-          643,
+-          873
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "HARRY",
+@@ -1112801,7 +1108056,6 @@
+         "dataName": "HARRY",
+         "definedLineNo": 80,
+         "references": [
+-          643,
+           679,
+           688
+         ]
+@@ -1112825,9 +1108079,7 @@
+       {
+         "dataName": "HARRY",
+         "definedLineNo": 129,
+-        "references": [
+-          873
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "HARRY-A",
+@@ -1112889,18 +1108141,12 @@
+       {
+         "dataName": "JOE",
+         "definedLineNo": 47,
+-        "references": [
+-          400,
+-          697,
+-          803,
+-          873
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "JOE",
+         "definedLineNo": 60,
+         "references": [
+-          400,
+           453,
+           462
+         ]
+@@ -1112917,7 +1108163,6 @@
+         "dataName": "JOE",
+         "definedLineNo": 91,
+         "references": [
+-          697,
+           750,
+           759
+         ]
+@@ -1112927,7 +1108172,6 @@
+         "definedLineNo": 108,
+         "references": [
+           109,
+-          803,
+           856,
+           865
+         ]
+@@ -1112935,9 +1108179,7 @@
+       {
+         "dataName": "JOE",
+         "definedLineNo": 127,
+-        "references": [
+-          873
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "JOEY",
+@@ -1113114,18 +1108356,12 @@
+       {
+         "dataName": "TOM",
+         "definedLineNo": 42,
+-        "references": [
+-          400,
+-          643,
+-          697,
+-          873
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "TOM",
+         "definedLineNo": 55,
+         "references": [
+-          400,
+           405,
+           414
+         ]
+@@ -1113150,7 +1108386,6 @@
+         "dataName": "TOM",
+         "definedLineNo": 77,
+         "references": [
+-          643,
+           647,
+           656
+         ]
+@@ -1113159,7 +1108394,6 @@
+         "dataName": "TOM",
+         "definedLineNo": 85,
+         "references": [
+-          697,
+           702,
+           711
+         ]
+@@ -1113172,9 +1108406,7 @@
+       {
+         "dataName": "TOM",
+         "definedLineNo": 124,
+-        "references": [
+-          873
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "TOMMY",
+@@ -1113236,1310 +1108468,8 @@
+     ]
+   },
+   "NC2054.2.cbl": {
+-    "PROCEDURES": [
+-      {
+-        "dataName": "BAIL-OUT",
+-        "definedLineNo": 383,
+-        "references": [
+-          305
+-        ]
+-      },
+-      {
+-        "dataName": "BAIL-OUT-EX",
+-        "definedLineNo": 391,
+-        "references": [
+-          305,
+-          385
+-        ]
+-      },
+-      {
+-        "dataName": "BAIL-OUT-WRITE",
+-        "definedLineNo": 386,
+-        "references": [
+-          384
+-        ]
+-      },
+-      {
+-        "dataName": "BLANK-LINE-PRINT",
+-        "definedLineNo": 367,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CCVS-EXIT",
+-        "definedLineNo": 798,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CCVS-999999",
+-        "definedLineNo": 799,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CCVS1",
+-        "definedLineNo": 280,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CCVS1-EXIT",
+-        "definedLineNo": 392,
+-        "references": [
+-          286
+-        ]
+-      },
+-      {
+-        "dataName": "CLOSE-FILES",
+-        "definedLineNo": 287,
+-        "references": [
+-          800
+-        ]
+-      },
+-      {
+-        "dataName": "COLUMN-NAMES-ROUTINE",
+-        "definedLineNo": 315,
+-        "references": [
+-          285
+-        ]
+-      },
+-      {
+-        "dataName": "CON-DELETE-GF-1",
+-        "definedLineNo": 412,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-DELETE-GF-10",
+-        "definedLineNo": 789,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-DELETE-GF-2",
+-        "definedLineNo": 438,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-DELETE-GF-3",
+-        "definedLineNo": 556,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-DELETE-GF-4",
+-        "definedLineNo": 589,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-DELETE-GF-5",
+-        "definedLineNo": 615,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-DELETE-GF-6",
+-        "definedLineNo": 635,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-DELETE-GF-7",
+-        "definedLineNo": 660,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-DELETE-GF-8",
+-        "definedLineNo": 678,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-DELETE-GF-9",
+-        "definedLineNo": 768,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-FAIL-GF-1",
+-        "definedLineNo": 415,
+-        "references": [
+-          411
+-        ]
+-      },
+-      {
+-        "dataName": "CON-FAIL-GF-10",
+-        "definedLineNo": 792,
+-        "references": [
+-          788
+-        ]
+-      },
+-      {
+-        "dataName": "CON-FAIL-GF-2",
+-        "definedLineNo": 441,
+-        "references": [
+-          437
+-        ]
+-      },
+-      {
+-        "dataName": "CON-FAIL-GF-3",
+-        "definedLineNo": 563,
+-        "references": [
+-          554
+-        ]
+-      },
+-      {
+-        "dataName": "CON-FAIL-GF-4",
+-        "definedLineNo": 592,
+-        "references": [
+-          588
+-        ]
+-      },
+-      {
+-        "dataName": "CON-FAIL-GF-5",
+-        "definedLineNo": 618,
+-        "references": [
+-          614
+-        ]
+-      },
+-      {
+-        "dataName": "CON-FAIL-GF-6",
+-        "definedLineNo": 638,
+-        "references": [
+-          630,
+-          634
+-        ]
+-      },
+-      {
+-        "dataName": "CON-FAIL-GF-7",
+-        "definedLineNo": 663,
+-        "references": [
+-          659
+-        ]
+-      },
+-      {
+-        "dataName": "CON-FAIL-GF-8",
+-        "definedLineNo": 681,
+-        "references": [
+-          677
+-        ]
+-      },
+-      {
+-        "dataName": "CON-FAIL-GF-9",
+-        "definedLineNo": 771,
+-        "references": [
+-          767
+-        ]
+-      },
+-      {
+-        "dataName": "CON-INIT-GF",
+-        "definedLineNo": 395,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-INIT-GF-1",
+-        "definedLineNo": 399,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-INIT-GF-10",
+-        "definedLineNo": 778,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-INIT-GF-2",
+-        "definedLineNo": 422,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-INIT-GF-3",
+-        "definedLineNo": 450,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-INIT-GF-4",
+-        "definedLineNo": 568,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-INIT-GF-5",
+-        "definedLineNo": 600,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-INIT-GF-7",
+-        "definedLineNo": 648,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-INIT-GF-8",
+-        "definedLineNo": 669,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-INIT-GF-9",
+-        "definedLineNo": 688,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-TEST-GF-1",
+-        "definedLineNo": 402,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-TEST-GF-10-1",
+-        "definedLineNo": 783,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-TEST-GF-2",
+-        "definedLineNo": 425,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-TEST-GF-3",
+-        "definedLineNo": 453,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-TEST-GF-4",
+-        "definedLineNo": 574,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-TEST-GF-5",
+-        "definedLineNo": 606,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-TEST-GF-6",
+-        "definedLineNo": 625,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-TEST-GF-6-1",
+-        "definedLineNo": 633,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-TEST-GF-7",
+-        "definedLineNo": 654,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-TEST-GF-8",
+-        "definedLineNo": 673,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-TEST-GF-9",
+-        "definedLineNo": 692,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CON-WRITE-GF-1",
+-        "definedLineNo": 419,
+-        "references": [
+-          410,
+-          414
+-        ]
+-      },
+-      {
+-        "dataName": "CON-WRITE-GF-10",
+-        "definedLineNo": 796,
+-        "references": [
+-          787,
+-          791
+-        ]
+-      },
+-      {
+-        "dataName": "CON-WRITE-GF-2",
+-        "definedLineNo": 445,
+-        "references": [
+-          436,
+-          440
+-        ]
+-      },
+-      {
+-        "dataName": "CON-WRITE-GF-3",
+-        "definedLineNo": 565,
+-        "references": [
+-          555,
+-          558
+-        ]
+-      },
+-      {
+-        "dataName": "CON-WRITE-GF-4",
+-        "definedLineNo": 597,
+-        "references": [
+-          587,
+-          591
+-        ]
+-      },
+-      {
+-        "dataName": "CON-WRITE-GF-5",
+-        "definedLineNo": 622,
+-        "references": [
+-          613,
+-          617
+-        ]
+-      },
+-      {
+-        "dataName": "CON-WRITE-GF-6",
+-        "definedLineNo": 641,
+-        "references": [
+-          631,
+-          637
+-        ]
+-      },
+-      {
+-        "dataName": "CON-WRITE-GF-7",
+-        "definedLineNo": 667,
+-        "references": [
+-          658,
+-          662
+-        ]
+-      },
+-      {
+-        "dataName": "CON-WRITE-GF-8",
+-        "definedLineNo": 685,
+-        "references": [
+-          676,
+-          680
+-        ]
+-      },
+-      {
+-        "dataName": "CON-WRITE-GF-9",
+-        "definedLineNo": 775,
+-        "references": [
+-          766,
+-          770
+-        ]
+-      },
+-      {
+-        "dataName": "DE-LETE",
+-        "definedLineNo": 296,
+-        "references": [
+-          413,
+-          439,
+-          557,
+-          590,
+-          616,
+-          636,
+-          661,
+-          679,
+-          769,
+-          790
+-        ]
+-      },
+-      {
+-        "dataName": "END-ROUTINE",
+-        "definedLineNo": 319,
+-        "references": [
+-          288
+-        ]
+-      },
+-      {
+-        "dataName": "END-ROUTINE-1",
+-        "definedLineNo": 323,
+-        "references": []
+-      },
+-      {
+-        "dataName": "END-ROUTINE-12",
+-        "definedLineNo": 332,
+-        "references": []
+-      },
+-      {
+-        "dataName": "END-ROUTINE-13",
+-        "definedLineNo": 340,
+-        "references": [
+-          288
+-        ]
+-      },
+-      {
+-        "dataName": "END-RTN-EXIT",
+-        "definedLineNo": 321,
+-        "references": []
+-      },
+-      {
+-        "dataName": "FAIL",
+-        "definedLineNo": 295,
+-        "references": [
+-          416,
+-          442,
+-          564,
+-          593,
+-          619,
+-          639,
+-          664,
+-          682,
+-          772,
+-          793
+-        ]
+-      },
+-      {
+-        "dataName": "FAIL-ROUTINE",
+-        "definedLineNo": 369,
+-        "references": [
+-          304
+-        ]
+-      },
+-      {
+-        "dataName": "FAIL-ROUTINE-EX",
+-        "definedLineNo": 382,
+-        "references": [
+-          304,
+-          376
+-        ]
+-      },
+-      {
+-        "dataName": "FAIL-ROUTINE-WRITE",
+-        "definedLineNo": 377,
+-        "references": [
+-          370,
+-          371
+-        ]
+-      },
+-      {
+-        "dataName": "HEAD-ROUTINE",
+-        "definedLineNo": 310,
+-        "references": [
+-          285
+-        ]
+-      },
+-      {
+-        "dataName": "INSPT",
+-        "definedLineNo": 293,
+-        "references": []
+-      },
+-      {
+-        "dataName": "OPEN-FILES",
+-        "definedLineNo": 281,
+-        "references": []
+-      },
+-      {
+-        "dataName": "PASS",
+-        "definedLineNo": 294,
+-        "references": [
+-          409,
+-          435,
+-          551,
+-          585,
+-          613,
+-          628,
+-          657,
+-          676,
+-          765,
+-          786
+-        ]
+-      },
+-      {
+-        "dataName": "PRINT-DETAIL",
+-        "definedLineNo": 298,
+-        "references": [
+-          398,
+-          420,
+-          446,
+-          566,
+-          598,
+-          623,
+-          642,
+-          668,
+-          686,
+-          776,
+-          797
+-        ]
+-      },
+-      {
+-        "dataName": "SECT-NC205A-001",
+-        "definedLineNo": 394,
+-        "references": []
+-      },
+-      {
+-        "dataName": "TERMINATE-CALL",
+-        "definedLineNo": 291,
+-        "references": []
+-      },
+-      {
+-        "dataName": "TERMINATE-CCVS",
+-        "definedLineNo": 289,
+-        "references": []
+-      },
+-      {
+-        "dataName": "WRITE-LINE",
+-        "definedLineNo": 352,
+-        "references": [
+-          302,
+-          303,
+-          311,
+-          312,
+-          313,
+-          314,
+-          316,
+-          317,
+-          318,
+-          320,
+-          322,
+-          331,
+-          339,
+-          345,
+-          350,
+-          351,
+-          374,
+-          378,
+-          380,
+-          389
+-        ]
+-      },
+-      {
+-        "dataName": "WRT-LN",
+-        "definedLineNo": 364,
+-        "references": [
+-          358,
+-          359,
+-          360,
+-          363,
+-          368
+-        ]
+-      }
+-    ],
+-    "DATA_NAMES": [
+-      {
+-        "dataName": "ANSI-REFERENCE",
+-        "definedLineNo": 200,
+-        "references": [
+-          372,
+-          379,
+-          388,
+-          397,
+-          780
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-C-1",
+-        "definedLineNo": 179,
+-        "references": [
+-          316,
+-          358
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-C-2",
+-        "definedLineNo": 184,
+-        "references": [
+-          317,
+-          359
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-1",
+-        "definedLineNo": 234,
+-        "references": [
+-          322
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-2",
+-        "definedLineNo": 239,
+-        "references": [
+-          331,
+-          338,
+-          345,
+-          350
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-2-2",
+-        "definedLineNo": 242,
+-        "references": [
+-          330
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-3",
+-        "definedLineNo": 247,
+-        "references": [
+-          351
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-4",
+-        "definedLineNo": 256,
+-        "references": [
+-          330
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-4-1",
+-        "definedLineNo": 257,
+-        "references": [
+-          328
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-E-4-2",
+-        "definedLineNo": 259,
+-        "references": [
+-          329
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-H-1",
+-        "definedLineNo": 201,
+-        "references": [
+-          311
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-H-2A",
+-        "definedLineNo": 206,
+-        "references": [
+-          312
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-H-2B",
+-        "definedLineNo": 215,
+-        "references": [
+-          313
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-H-3",
+-        "definedLineNo": 227,
+-        "references": [
+-          314
+-        ]
+-      },
+-      {
+-        "dataName": "CCVS-PGM-ID",
+-        "definedLineNo": 277,
+-        "references": [
+-          283,
+-          283
+-        ]
+-      },
+-      {
+-        "dataName": "CM-18V0",
+-        "definedLineNo": 161,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COMPUTED-A",
+-        "definedLineNo": 155,
+-        "references": [
+-          156,
+-          158,
+-          159,
+-          160,
+-          161,
+-          384,
+-          387,
+-          620,
+-          665,
+-          683
+-        ]
+-      },
+-      {
+-        "dataName": "COMPUTED-N",
+-        "definedLineNo": 156,
+-        "references": [
+-          417,
+-          443,
+-          594,
+-          794
+-        ]
+-      },
+-      {
+-        "dataName": "COMPUTED-X",
+-        "definedLineNo": 154,
+-        "references": [
+-          306,
+-          370
+-        ]
+-      },
+-      {
+-        "dataName": "COMPUTED-0V18",
+-        "definedLineNo": 158,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COMPUTED-14V4",
+-        "definedLineNo": 160,
+-        "references": []
+-      },
+-      {
+-        "dataName": "COMPUTED-18V0",
+-        "definedLineNo": 162,
+-        "references": [
+-          773
+-        ]
+-      },
+-      {
+-        "dataName": "COMPUTED-4V14",
+-        "definedLineNo": 159,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CONT-A",
+-        "definedLineNo": 45,
+-        "references": [
+-          655
+-        ]
+-      },
+-      {
+-        "dataName": "CONT-B",
+-        "definedLineNo": 50,
+-        "references": [
+-          407,
+-          408,
+-          417,
+-          433,
+-          434,
+-          443,
+-          454,
+-          464
+-        ]
+-      },
+-      {
+-        "dataName": "CONT-C",
+-        "definedLineNo": 51,
+-        "references": [
+-          455,
+-          465,
+-          573,
+-          578,
+-          605,
+-          610,
+-          612,
+-          620
+-        ]
+-      },
+-      {
+-        "dataName": "CONT-D",
+-        "definedLineNo": 52,
+-        "references": [
+-          456,
+-          546,
+-          546,
+-          571,
+-          580,
+-          594,
+-          603,
+-          607,
+-          608
+-        ]
+-      },
+-      {
+-        "dataName": "CONT-E",
+-        "definedLineNo": 53,
+-        "references": [
+-          457,
+-          460,
+-          572,
+-          577
+-        ]
+-      },
+-      {
+-        "dataName": "CONT-F",
+-        "definedLineNo": 54,
+-        "references": [
+-          458,
+-          547,
+-          604,
+-          609
+-        ]
+-      },
+-      {
+-        "dataName": "CONT-GRP",
+-        "definedLineNo": 131,
+-        "references": [
+-          655
+-        ]
+-      },
+-      {
+-        "dataName": "CONT-88",
+-        "definedLineNo": 55,
+-        "references": [
+-          459
+-        ]
+-      },
+-      {
+-        "dataName": "COR-ANSI-REFERENCE",
+-        "definedLineNo": 178,
+-        "references": [
+-          379,
+-          381
+-        ]
+-      },
+-      {
+-        "dataName": "CORRECT-A",
+-        "definedLineNo": 169,
+-        "references": [
+-          170,
+-          171,
+-          172,
+-          173,
+-          174,
+-          385,
+-          387,
+-          621,
+-          666,
+-          684
+-        ]
+-      },
+-      {
+-        "dataName": "CORRECT-N",
+-        "definedLineNo": 170,
+-        "references": [
+-          418,
+-          444,
+-          595,
+-          795
+-        ]
+-      },
+-      {
+-        "dataName": "CORRECT-X",
+-        "definedLineNo": 168,
+-        "references": [
+-          307,
+-          371
+-        ]
+-      },
+-      {
+-        "dataName": "CORRECT-0V18",
+-        "definedLineNo": 171,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CORRECT-14V4",
+-        "definedLineNo": 173,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CORRECT-18V0",
+-        "definedLineNo": 175,
+-        "references": [
+-          774
+-        ]
+-      },
+-      {
+-        "dataName": "CORRECT-4V14",
+-        "definedLineNo": 172,
+-        "references": []
+-      },
+-      {
+-        "dataName": "CR-18V0",
+-        "definedLineNo": 174,
+-        "references": []
+-      },
+-      {
+-        "dataName": "DELETE-COUNTER",
+-        "definedLineNo": 192,
+-        "references": [
+-          296,
+-          325,
+-          341,
+-          343
+-        ]
+-      },
+-      {
+-        "dataName": "DOTVALUE",
+-        "definedLineNo": 147,
+-        "references": [
+-          301
+-        ]
+-      },
+-      {
+-        "dataName": "DUMMY-HOLD",
+-        "definedLineNo": 198,
+-        "references": [
+-          355,
+-          361
+-        ]
+-      },
+-      {
+-        "dataName": "DUMMY-RECORD",
+-        "definedLineNo": 38,
+-        "references": [
+-          311,
+-          312,
+-          313,
+-          314,
+-          316,
+-          317,
+-          318,
+-          320,
+-          322,
+-          331,
+-          338,
+-          345,
+-          350,
+-          351,
+-          355,
+-          356,
+-          357,
+-          358,
+-          359,
+-          360,
+-          361,
+-          365,
+-          366,
+-          374,
+-          389
+-        ]
+-      },
+-      {
+-        "dataName": "ENDER-DESC",
+-        "definedLineNo": 245,
+-        "references": [
+-          333,
+-          344,
+-          349
+-        ]
+-      },
+-      {
+-        "dataName": "ERROR-COUNTER",
+-        "definedLineNo": 193,
+-        "references": [
+-          295,
+-          324,
+-          334,
+-          337
+-        ]
+-      },
+-      {
+-        "dataName": "ERROR-HOLD",
+-        "definedLineNo": 197,
+-        "references": [
+-          324,
+-          325,
+-          325,
+-          326,
+-          329
+-        ]
+-      },
+-      {
+-        "dataName": "ERROR-TOTAL",
+-        "definedLineNo": 243,
+-        "references": [
+-          335,
+-          337,
+-          342,
+-          343,
+-          347,
+-          348
+-        ]
+-      },
+-      {
+-        "dataName": "FEATURE",
+-        "definedLineNo": 140,
+-        "references": [
+-          396,
+-          401,
+-          424,
+-          451,
+-          569,
+-          601,
+-          627,
+-          649,
+-          670,
+-          781
+-        ]
+-      },
+-      {
+-        "dataName": "GREATERZERO",
+-        "definedLineNo": 56,
+-        "references": [
+-          463
+-        ]
+-      },
+-      {
+-        "dataName": "HYPHEN-LINE",
+-        "definedLineNo": 271,
+-        "references": [
+-          318,
+-          320,
+-          360
+-        ]
+-      },
+-      {
+-        "dataName": "ID-AGAIN",
+-        "definedLineNo": 237,
+-        "references": [
+-          283
+-        ]
+-      },
+-      {
+-        "dataName": "INF-ANSI-REFERENCE",
+-        "definedLineNo": 270,
+-        "references": [
+-          372,
+-          375,
+-          388,
+-          390
+-        ]
+-      },
+-      {
+-        "dataName": "INFO-TEXT",
+-        "definedLineNo": 265,
+-        "references": [
+-          373
+-        ]
+-      },
+-      {
+-        "dataName": "INSPECT-COUNTER",
+-        "definedLineNo": 194,
+-        "references": [
+-          293,
+-          324,
+-          346,
+-          348
+-        ]
+-      },
+-      {
+-        "dataName": "LEVEL-02",
+-        "definedLineNo": 133,
+-        "references": []
+-      },
+-      {
+-        "dataName": "LEVEL-03",
+-        "definedLineNo": 134,
+-        "references": []
+-      },
+-      {
+-        "dataName": "LEVEL-04",
+-        "definedLineNo": 136,
+-        "references": [
+-          656,
+-          665
+-        ]
+-      },
+-      {
+-        "dataName": "NEGATIVEZERO",
+-        "definedLineNo": 57,
+-        "references": [
+-          549
+-        ]
+-      },
+-      {
+-        "dataName": "P-OR-F",
+-        "definedLineNo": 142,
+-        "references": [
+-          293,
+-          294,
+-          295,
+-          296,
+-          303,
+-          306,
+-          630
+-        ]
+-      },
+-      {
+-        "dataName": "PAR-NAME",
+-        "definedLineNo": 144,
+-        "references": [
+-          308,
+-          400,
+-          423,
+-          452,
+-          570,
+-          602,
+-          626,
+-          650,
+-          671,
+-          689,
+-          782
+-        ]
+-      },
+-      {
+-        "dataName": "PARDOT-X",
+-        "definedLineNo": 146,
+-        "references": [
+-          300
+-        ]
+-      },
+-      {
+-        "dataName": "PASS-COUNTER",
+-        "definedLineNo": 195,
+-        "references": [
+-          294,
+-          326,
+-          328
+-        ]
+-      },
+-      {
+-        "dataName": "PRINT-FILE",
+-        "definedLineNo": 36,
+-        "references": [
+-          32,
+-          282,
+-          288
+-        ]
+-      },
+-      {
+-        "dataName": "PRINT-REC",
+-        "definedLineNo": 37,
+-        "references": [
+-          302,
+-          378,
+-          380
+-        ]
+-      },
+-      {
+-        "dataName": "PROCEDUREDIVISION",
+-        "definedLineNo": 43,
+-        "references": []
+-      },
+-      {
+-        "dataName": "RE-MARK",
+-        "definedLineNo": 149,
+-        "references": [
+-          297,
+-          309,
+-          596,
+-          640
+-        ]
+-      },
+-      {
+-        "dataName": "REC-CT",
+-        "definedLineNo": 191,
+-        "references": [
+-          299,
+-          301,
+-          308
+-        ]
+-      },
+-      {
+-        "dataName": "REC-SKL-SUB",
+-        "definedLineNo": 190,
+-        "references": []
+-      },
+-      {
+-        "dataName": "RECORD-COUNT",
+-        "definedLineNo": 199,
+-        "references": [
+-          353,
+-          354,
+-          362
+-        ]
+-      },
+-      {
+-        "dataName": "SPACING-RECEIVE",
+-        "definedLineNo": 67,
+-        "references": [
+-          691,
+-          693,
+-          773
+-        ]
+-      },
+-      {
+-        "dataName": "SPACING-SEND",
+-        "definedLineNo": 66,
+-        "references": [
+-          690,
+-          691
+-        ]
+-      },
+-      {
+-        "dataName": "SPACING-01",
+-        "definedLineNo": 129,
+-        "references": [
+-          674
+-        ]
+-      },
+-      {
+-        "dataName": "SPACING-02",
+-        "definedLineNo": 129,
+-        "references": []
+-      },
+-      {
+-        "dataName": "SPACING-03",
+-        "definedLineNo": 129,
+-        "references": []
+-      },
+-      {
+-        "dataName": "SPACING-2",
+-        "definedLineNo": 130,
+-        "references": []
+-      },
+-      {
+-        "dataName": "SPACING-3",
+-        "definedLineNo": 130,
+-        "references": []
+-      },
+-      {
+-        "dataName": "SPACING-4",
+-        "definedLineNo": 130,
+-        "references": [
+-          675,
+-          683
+-        ]
+-      },
+-      {
+-        "dataName": "SPACING-77",
+-        "definedLineNo": 60,
+-        "references": [
+-          672,
+-          674
+-        ]
+-      },
+-      {
+-        "dataName": "TEST-COMPUTED",
+-        "definedLineNo": 150,
+-        "references": [
+-          378
+-        ]
+-      },
+-      {
+-        "dataName": "TEST-CORRECT",
+-        "definedLineNo": 165,
+-        "references": [
+-          380
+-        ]
+-      },
+-      {
+-        "dataName": "TEST-ID",
+-        "definedLineNo": 218,
+-        "references": [
+-          283
+-        ]
+-      },
+-      {
+-        "dataName": "TEST-RESULTS",
+-        "definedLineNo": 138,
+-        "references": [
+-          284,
+-          302
+-        ]
+-      },
+-      {
+-        "dataName": "TOTAL-ERROR",
+-        "definedLineNo": 196,
+-        "references": []
+-      },
+-      {
+-        "dataName": "WS-TEST-12-DATA",
+-        "definedLineNo": 40,
+-        "references": [
+-          784,
+-          785,
+-          794
+-        ]
+-      },
+-      {
+-        "dataName": "XXCOMPUTED",
+-        "definedLineNo": 267,
+-        "references": [
+-          387
+-        ]
+-      },
+-      {
+-        "dataName": "XXCORRECT",
+-        "definedLineNo": 269,
+-        "references": [
+-          387
+-        ]
+-      },
+-      {
+-        "dataName": "XXINFO",
+-        "definedLineNo": 262,
+-        "references": [
+-          374,
+-          389
+-        ]
+-      }
+-    ],
++    "PROCEDURES": [],
++    "DATA_NAMES": [],
+     "PROGRAMS": [
+       {
+         "dataName": "NC205A",
+@@ -1152386,13 +1146316,6 @@
+         ]
+       },
+       {
+-        "dataName": "PRG-COLL-SEQ",
+-        "definedLineNo": 18,
+-        "references": [
+-          16
+-        ]
+-      },
+-      {
+         "dataName": "PRINT-FILE",
+         "definedLineNo": 26,
+         "references": [
+@@ -1295964,23 +1289887,19 @@
+         "dataName": "ADD-CORR-1",
+         "definedLineNo": 109,
+         "references": [
+-          545,
+-          556
++          545
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-1",
+         "definedLineNo": 120,
+         "references": [
+-          556,
+-          576
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-1",
+         "definedLineNo": 133,
+         "references": [
+-          576
+         ]
+       },
+       {
+@@ -1295992,24 +1289911,18 @@
+         "dataName": "ADD-CORR-2",
+         "definedLineNo": 108,
+         "references": [
+-          546,
+-          556
++          546
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-2",
+         "definedLineNo": 121,
+-        "references": [
+-          556,
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-2",
+         "definedLineNo": 134,
+-        "references": [
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-2",
+@@ -1296020,24 +1289933,18 @@
+         "dataName": "ADD-CORR-3",
+         "definedLineNo": 112,
+         "references": [
+-          547,
+-          556
++          547
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-3",
+         "definedLineNo": 122,
+-        "references": [
+-          556,
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-3",
+         "definedLineNo": 137,
+-        "references": [
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-3",
+@@ -1296048,24 +1289955,18 @@
+         "dataName": "ADD-CORR-4",
+         "definedLineNo": 111,
+         "references": [
+-          548,
+-          556
++          548
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-4",
+         "definedLineNo": 123,
+-        "references": [
+-          556,
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-4",
+         "definedLineNo": 136,
+-        "references": [
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-4",
+@@ -1296076,116 +1289977,86 @@
+         "dataName": "ADD-CORR-5",
+         "definedLineNo": 114,
+         "references": [
+-          549,
+-          556
++          549
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-5",
+         "definedLineNo": 124,
+-        "references": [
+-          556,
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-5",
+         "definedLineNo": 135,
+-        "references": [
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-6",
+         "definedLineNo": 113,
+         "references": [
+-          550,
+-          556
++          550
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-6",
+         "definedLineNo": 125,
+-        "references": [
+-          556,
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-6",
+         "definedLineNo": 138,
+-        "references": [
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-7",
+         "definedLineNo": 116,
+         "references": [
+-          551,
+-          556
++          551
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-7",
+         "definedLineNo": 126,
+-        "references": [
+-          556,
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-7",
+         "definedLineNo": 139,
+-        "references": [
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-8",
+         "definedLineNo": 115,
+         "references": [
+-          552,
+-          556
++          552
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-8",
+         "definedLineNo": 127,
+-        "references": [
+-          556,
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-8",
+         "definedLineNo": 140,
+-        "references": [
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-9",
+         "definedLineNo": 117,
+         "references": [
+-          553,
+-          556
++          553
+         ]
+       },
+       {
+         "dataName": "ADD-CORR-9",
+         "definedLineNo": 128,
+-        "references": [
+-          556,
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-CORR-9",
+         "definedLineNo": 141,
+-        "references": [
+-          576
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "ADD-1",
+@@ -1297481,8 +1291352,7 @@
+         "dataName": "RECORD1",
+         "definedLineNo": 40,
+         "references": [
+-          529,
+-          759
++          529
+         ]
+       },
+       {
+@@ -1297490,7 +1291360,6 @@
+         "definedLineNo": 46,
+         "references": [
+           534,
+-          759,
+           761
+         ]
+       },
+@@ -1297516,8 +1291385,7 @@
+         "dataName": "RECORD3",
+         "definedLineNo": 44,
+         "references": [
+-          532,
+-          759
++          532
+         ]
+       },
+       {
+@@ -1297525,7 +1291393,6 @@
+         "definedLineNo": 50,
+         "references": [
+           537,
+-          759,
+           764
+         ]
+       },
+@@ -1297613,29 +1291480,17 @@
+         "definedLineNo": 172,
+         "references": [
+           592,
+-          602,
+           783,
+-          790,
+           880,
+-          887,
+           976,
+-          983,
+           1073,
+-          1080,
+           1171,
+-          1178,
+           1268,
+-          1275,
+           1386,
+-          1393,
+           1502,
+-          1509,
+           1622,
+-          1629,
+           1743,
+-          1750,
+-          1859,
+-          1866
++          1859
+         ]
+       },
+       {
+@@ -1297643,51 +1291498,39 @@
+         "definedLineNo": 176,
+         "references": [
+           595,
+-          602,
+           621,
+           630,
+           786,
+-          790,
+           818,
+           826,
+           883,
+-          887,
+           915,
+           923,
+           979,
+-          983,
+           1011,
+           1019,
+           1076,
+-          1080,
+           1110,
+           1118,
+           1174,
+-          1178,
+           1208,
+           1216,
+           1271,
+-          1275,
+           1305,
+           1313,
+           1389,
+-          1393,
+           1420,
+           1428,
+           1505,
+-          1509,
+           1541,
+           1549,
+           1625,
+-          1629,
+           1661,
+           1669,
+           1746,
+-          1750,
+           1782,
+           1787,
+           1862,
+-          1866,
+           1898,
+           1906
+         ]
+@@ -1297697,29 +1291540,17 @@
+         "definedLineNo": 173,
+         "references": [
+           593,
+-          602,
+           784,
+-          790,
+           881,
+-          887,
+           977,
+-          983,
+           1074,
+-          1080,
+           1172,
+-          1178,
+           1269,
+-          1275,
+           1387,
+-          1393,
+           1503,
+-          1509,
+           1623,
+-          1629,
+           1744,
+-          1750,
+-          1860,
+-          1866
++          1860
+         ]
+       },
+       {
+@@ -1297727,51 +1291558,39 @@
+         "definedLineNo": 177,
+         "references": [
+           596,
+-          602,
+           640,
+           649,
+           787,
+-          790,
+           838,
+           846,
+           884,
+-          887,
+           935,
+           943,
+           980,
+-          983,
+           1031,
+           1039,
+           1077,
+-          1080,
+           1130,
+           1138,
+           1175,
+-          1178,
+           1228,
+           1236,
+           1272,
+-          1275,
+           1325,
+           1333,
+           1390,
+-          1393,
+           1440,
+           1448,
+           1506,
+-          1509,
+           1561,
+           1569,
+           1626,
+-          1629,
+           1681,
+           1689,
+           1747,
+-          1750,
+           1799,
+           1807,
+           1863,
+-          1866,
+           1918,
+           1926
+         ]
+@@ -1297781,29 +1291600,17 @@
+         "definedLineNo": 174,
+         "references": [
+           594,
+-          602,
+           785,
+-          790,
+           882,
+-          887,
+           978,
+-          983,
+           1075,
+-          1080,
+           1173,
+-          1178,
+           1270,
+-          1275,
+           1388,
+-          1393,
+           1504,
+-          1509,
+           1624,
+-          1629,
+           1745,
+-          1750,
+-          1861,
+-          1866
++          1861
+         ]
+       },
+       {
+@@ -1297811,51 +1291618,39 @@
+         "definedLineNo": 178,
+         "references": [
+           597,
+-          602,
+           659,
+           668,
+           788,
+-          790,
+           858,
+           866,
+           885,
+-          887,
+           955,
+           963,
+           981,
+-          983,
+           1051,
+           1059,
+           1078,
+-          1080,
+           1150,
+           1158,
+           1176,
+-          1178,
+           1248,
+           1253,
+           1273,
+-          1275,
+           1345,
+           1353,
+           1391,
+-          1393,
+           1460,
+           1468,
+           1507,
+-          1509,
+           1581,
+           1589,
+           1627,
+-          1629,
+           1701,
+           1709,
+           1748,
+-          1750,
+           1819,
+           1827,
+           1864,
+-          1866,
+           1938,
+           1946
+         ]
+@@ -1297867,7 +1291662,6 @@
+           595,
+           596,
+           597,
+-          602,
+           621,
+           630,
+           640,
+@@ -1297877,7 +1291671,6 @@
+           786,
+           787,
+           788,
+-          790,
+           818,
+           826,
+           838,
+@@ -1297887,7 +1291680,6 @@
+           883,
+           884,
+           885,
+-          887,
+           915,
+           923,
+           935,
+@@ -1297897,7 +1291689,6 @@
+           979,
+           980,
+           981,
+-          983,
+           1011,
+           1019,
+           1031,
+@@ -1297907,7 +1291698,6 @@
+           1076,
+           1077,
+           1078,
+-          1080,
+           1110,
+           1118,
+           1130,
+@@ -1297917,7 +1291707,6 @@
+           1174,
+           1175,
+           1176,
+-          1178,
+           1208,
+           1216,
+           1228,
+@@ -1297927,7 +1291716,6 @@
+           1271,
+           1272,
+           1273,
+-          1275,
+           1305,
+           1313,
+           1325,
+@@ -1297937,7 +1291725,6 @@
+           1389,
+           1390,
+           1391,
+-          1393,
+           1420,
+           1428,
+           1440,
+@@ -1297947,7 +1291734,6 @@
+           1505,
+           1506,
+           1507,
+-          1509,
+           1541,
+           1549,
+           1561,
+@@ -1297957,7 +1291743,6 @@
+           1625,
+           1626,
+           1627,
+-          1629,
+           1661,
+           1669,
+           1681,
+@@ -1297967,7 +1291752,6 @@
+           1746,
+           1747,
+           1748,
+-          1750,
+           1782,
+           1787,
+           1799,
+@@ -1297977,7 +1291761,6 @@
+           1862,
+           1863,
+           1864,
+-          1866,
+           1898,
+           1906,
+           1918,
+@@ -1298322,40 +1292105,27 @@
+       {
+         "dataName": "XYZ-1",
+         "definedLineNo": 180,
+-        "references": [
+-          699,
+-          718,
+-          738
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-1",
+         "definedLineNo": 187,
+-        "references": [
+-          679
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-1",
+         "definedLineNo": 199,
+-        "references": [
+-          679
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-1",
+         "definedLineNo": 208,
+-        "references": [
+-          738
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-1",
+         "definedLineNo": 219,
+-        "references": [
+-          699,
+-          718
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-1",
+@@ -1298430,40 +1292200,27 @@
+       {
+         "dataName": "XYZ-2",
+         "definedLineNo": 181,
+-        "references": [
+-          699,
+-          718,
+-          738
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-2",
+         "definedLineNo": 188,
+-        "references": [
+-          679
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-2",
+         "definedLineNo": 198,
+-        "references": [
+-          679
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-2",
+         "definedLineNo": 209,
+-        "references": [
+-          738
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-2",
+         "definedLineNo": 220,
+-        "references": [
+-          699,
+-          718
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-2",
+@@ -1298478,16 +1292235,12 @@
+       {
+         "dataName": "XYZ-3",
+         "definedLineNo": 189,
+-        "references": [
+-          679
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-3",
+         "definedLineNo": 195,
+-        "references": [
+-          679
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-4",
+@@ -1298497,16 +1292250,12 @@
+       {
+         "dataName": "XYZ-4",
+         "definedLineNo": 190,
+-        "references": [
+-          679
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-4",
+         "definedLineNo": 194,
+-        "references": [
+-          679
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-5",
+@@ -1298516,16 +1292265,12 @@
+       {
+         "dataName": "XYZ-5",
+         "definedLineNo": 191,
+-        "references": [
+-          679
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-5",
+         "definedLineNo": 197,
+-        "references": [
+-          679
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-6",
+@@ -1298535,16 +1292280,12 @@
+       {
+         "dataName": "XYZ-6",
+         "definedLineNo": 192,
+-        "references": [
+-          679
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-6",
+         "definedLineNo": 196,
+-        "references": [
+-          679
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "XYZ-6",
+@@ -1333862,22 +1327603,12 @@
+       {
+         "dataName": "QUAL-SECTION-1",
+         "definedLineNo": 871,
+-        "references": [
+-          873,
+-          876,
+-          892,
+-          920
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "QUAL-SECTION-2",
+         "definedLineNo": 910,
+-        "references": [
+-          874,
+-          891,
+-          894,
+-          915
+-        ]
++        "references": []
+       },
+       {
+         "dataName": "SECT-OBNC2M-001",
+@@ -1468586,13 +1462317,6 @@
+         ]
+       },
+       {
+-        "dataName": "FOR-INX-START-TEST",
+-        "definedLineNo": 182,
+-        "references": [
+-          179
+-        ]
+-      },
+-      {
+         "dataName": "FS1-ALTKEY1-1-10",
+         "definedLineNo": 272,
+         "references": []
+@@ -1476873,13 +1470597,6 @@
+         ]
+       },
+       {
+-        "dataName": "FOR-INX-START-TEST",
+-        "definedLineNo": 184,
+-        "references": [
+-          181
+-        ]
+-      },
+-      {
+         "dataName": "FS1-ALTKEY1-1-10",
+         "definedLineNo": 274,
+         "references": []
+@@ -1482421,12 +1476138,12 @@
+         "references": [
+           344,
+           356,
+-          468,
++          467,
+           490,
+           515,
+           537,
+-          562,
+-          584
++          561,
++          583
+         ]
+       },
+       {
+@@ -1484876,27 +1478593,6 @@
+         ]
+       },
+       {
+-        "dataName": "DEBUG-CONTENTS",
+-        "definedLineNo": 0,
+-        "references": [
+-          293
+-        ]
+-      },
+-      {
+-        "dataName": "DEBUG-LINE",
+-        "definedLineNo": 0,
+-        "references": [
+-          291
+-        ]
+-      },
+-      {
+-        "dataName": "DEBUG-NAME",
+-        "definedLineNo": 0,
+-        "references": [
+-          292
+-        ]
+-      },
+-      {
+         "dataName": "DELETE-CNT",
+         "definedLineNo": 214,
+         "references": [
+@@ -1945010,13 +1938706,6 @@
+         ]
+       },
+       {
+-        "dataName": "PRG-COLL-SEQ",
+-        "definedLineNo": 17,
+-        "references": [
+-          15
+-        ]
+-      },
+-      {
+         "dataName": "PRINT-FILE",
+         "definedLineNo": 25,
+         "references": [
+@@ -1974765,19 +1968454,7 @@
+         "references": [
+           217,
+           235,
+-          475
+-        ]
+-      },
+-      {
+-        "dataName": "THE-BIG-OL-LITERAL-ALPHABET",
+-        "definedLineNo": 45,
+-        "references": []
+-      },
+-      {
+-        "dataName": "THE-WILD-ONE",
+-        "definedLineNo": 34,
+-        "references": [
+-          31
++          474
+         ]
+       },
+       {
+@@ -2000229,7 +1993906,7 @@
+         "dataName": "FALL-THROUGH-TEST",
+         "definedLineNo": 405,
+         "references": [
+-          231
++          230
+         ]
+       },
+       {
+@@ -2002827,27 +1996504,6 @@
+         ]
+       },
+       {
+-        "dataName": "DEBUG-CONTENTS",
+-        "definedLineNo": 0,
+-        "references": [
+-          228
+-        ]
+-      },
+-      {
+-        "dataName": "DEBUG-LINE",
+-        "definedLineNo": 0,
+-        "references": [
+-          226
+-        ]
+-      },
+-      {
+-        "dataName": "DEBUG-NAME",
+-        "definedLineNo": 0,
+-        "references": [
+-          227
+-        ]
+-      },
+-      {
+         "dataName": "DELETE-CNT",
+         "definedLineNo": 149,
+         "references": [

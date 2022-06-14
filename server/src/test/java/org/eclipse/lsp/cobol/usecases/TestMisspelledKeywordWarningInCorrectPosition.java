@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
@@ -57,19 +58,19 @@ class TestMisspelledKeywordWarningInCorrectPosition {
         ImmutableMap.of(
             "misspelled",
             new Diagnostic(
-                null,
+                new Range(),
                 "A misspelled word, maybe you want to put DISPLAY",
                 Warning,
                 SourceInfoLevels.WARNING.getText()),
             "area",
             new Diagnostic(
-                null,
+                new Range(),
                 "The following token must start in Area A: DISPLA",
                 Warning,
                 SourceInfoLevels.WARNING.getText()),
             "hello",
             new Diagnostic(
-                null,
+                new Range(),
                 "Syntax error on '\"hello\"' expected SECTION",
                 Error,
                 SourceInfoLevels.ERROR.getText())));

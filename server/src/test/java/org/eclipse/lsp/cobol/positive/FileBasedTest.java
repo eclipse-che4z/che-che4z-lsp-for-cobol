@@ -16,10 +16,21 @@
 package org.eclipse.lsp.cobol.positive;
 
 import org.eclipse.lsp.cobol.ConfigurableTest;
+import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
+import static java.lang.System.getProperty;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.positive.FolderTextRegistry.DEFAULT_LISTING_PATH;
+import static org.eclipse.lsp.cobol.positive.FolderTextRegistry.PATH_TO_LISTING_SNAP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -46,6 +57,10 @@ public abstract class FileBasedTest extends ConfigurableTest {
    */
   protected static List<CobolText> getCopybooks() {
     return TEXT_REGISTRY.getCopybooks();
+  }
+
+  protected static Map<ReportSection, List<SysprintSnap>> getDataNameRefs(String filename) {
+    return TEXT_REGISTRY.getSnapForFile(filename);
   }
 
   /**
@@ -76,4 +91,24 @@ public abstract class FileBasedTest extends ConfigurableTest {
         });
     return result.toString();
   }
+
+  void updateSnaps() {
+    String listingSnap = ofNullable(getProperty(PATH_TO_LISTING_SNAP)).orElse(DEFAULT_LISTING_PATH);
+    String updateFlag = ofNullable(getProperty("UpdateSnapListing")).orElse("false");
+    if (Files.exists(Paths.get(listingSnap)) && !updateFlag.equals("false")) {
+      FolderTextRegistry textRegistry = (FolderTextRegistry) TEXT_REGISTRY;
+      textRegistry.createListingSnap(textRegistry.getSnaps());
+    }
+  }
+
+     void assertNoError(String fileName, AnalysisResult analyze) {
+        List<Diagnostic> diagnostic = ofNullable(analyze.getDiagnostics().get(fileName))
+                .map(
+                        diagnostics ->
+                                diagnostics.stream()
+                                        .filter(it -> it.getSeverity() == DiagnosticSeverity.Error)
+                                        .collect(toList()))
+                .orElse(emptyList());
+        assertNoSyntaxErrorsFound(diagnostic, fileName);
+    }
 }

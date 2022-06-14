@@ -55,7 +55,7 @@ public class CachingConfigurationService implements ConfigurationService {
                     TARGET_SQL_BACKEND.label,
                     ANALYSIS_FEATURES.label,
                     DIALECTS.label,
-                    PREDEFINED_PARAGRAPHS.label,
+                    PREDEFINED_SECTIONS.label,
                     SUBROUTINE_LOCAL_PATHS.label))
             .thenApply(this::parseConfig);
   }

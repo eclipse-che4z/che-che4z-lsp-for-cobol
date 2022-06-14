@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This use case checks that there is no NullPointerException thrown if END-PERFORM missing. */
@@ -43,7 +44,7 @@ class TestPerformWithoutEndNotCauseNPE {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Extraneous input '.' expected END-PERFORM",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));

@@ -76,12 +76,7 @@ public class InjectService {
    */
   @SuppressWarnings("unused")
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.ProcedureDivisionContext ctx) {
-    List<InjectDescriptor> descriptors = new LinkedList<>(getDialectDescriptors(retrieveSectionName(ctx)));
-
-    InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
-    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(GENERATED);
-    descriptors.add(new InjectDescriptor("PLABEL", analysis, contentProvider));
-    return descriptors;
+    return getDialectDescriptors(retrieveSectionName(ctx));
   }
 
   /**

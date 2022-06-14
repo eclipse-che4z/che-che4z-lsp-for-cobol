@@ -97,14 +97,15 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     assertEquals(0, stateService.getExitCode());
 
     CodeActionParams params =
-        new CodeActionParams(new TextDocumentIdentifier(DOCUMENT_URI), null, null);
+        new CodeActionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Range(), new CodeActionContext());
     CompletionParams completionParams =
         new CompletionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Position(0, 8));
 
     Position position = new Position(0, 2);
     TextDocumentIdentifier testTextDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
-    TextDocumentPositionParams positionParams =
-        new TextDocumentPositionParams(testTextDocumentIdentifier, position);
+    DocumentHighlightParams documentHighlightParams =
+            new DocumentHighlightParams(testTextDocumentIdentifier, position);
+    DefinitionParams definitionParams = new DefinitionParams(testTextDocumentIdentifier, position);
     ReferenceParams referenceParams = mock(ReferenceParams.class);
     // params.getTextDocument().getUri()
     TextDocumentIdentifier mockTextIdentifier = mock(TextDocumentIdentifier.class);
@@ -115,10 +116,10 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     when(mockFormattingParam.getTextDocument()).thenReturn(mockTextIdentifier);
 
     assertEquals(SHUTDOWN_RESPONSE, service.codeAction(params).get()); // NOSONAR
-    assertEquals(SHUTDOWN_RESPONSE, service.definition(positionParams).get()); // NOSONAR
+    assertEquals(SHUTDOWN_RESPONSE, service.definition(definitionParams).get()); // NOSONAR
     assertEquals(SHUTDOWN_RESPONSE, service.completion(completionParams).get()); // NOSONAR
     assertEquals(SHUTDOWN_RESPONSE, service.references(referenceParams).get()); // NOSONAR
-    assertEquals(SHUTDOWN_RESPONSE, service.documentHighlight(positionParams).get()); // NOSONAR
+    assertEquals(SHUTDOWN_RESPONSE, service.documentHighlight(documentHighlightParams).get()); // NOSONAR
     assertEquals(SHUTDOWN_RESPONSE, service.formatting(mockFormattingParam).get()); // NOSONAR
 
     List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();

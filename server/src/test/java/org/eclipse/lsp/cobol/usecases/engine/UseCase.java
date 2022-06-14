@@ -49,7 +49,7 @@ public class UseCase {
   /** Analysis dialects */
   @Builder.Default List<String> dialects = Collections.emptyList();
   /** User predefined labels */
-  @Builder.Default List<String> predefinedParagraphs = Collections.emptyList();
+  @Builder.Default List<String> predefinedSections = Collections.emptyList();
   /**
    * Get the {@link AnalysisConfig} using the specified processing mode and the {@link SQLBackend}
    * see {@link CopybookConfig}
@@ -58,6 +58,6 @@ public class UseCase {
    */
   public AnalysisConfig getAnalysisConfig() {
     return new AnalysisConfig(
-        new CopybookConfig(copybookProcessingMode, sqlBackend, predefinedParagraphs), features, dialects);
+        new CopybookConfig(copybookProcessingMode, sqlBackend, predefinedSections), features, dialects);
   }
 }

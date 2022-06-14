@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
@@ -73,19 +74,19 @@ class TestSetUpDownBy {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Invalid receiving field type. Expected: Index name",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "2",
             new Diagnostic(
-                null,
+                new Range(),
                 "Invalid sending field type. Expected: Elementary integer data item, Non-zero integer",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "3",
             new Diagnostic(
-                null,
+                new Range(),
                 "Extraneous input 'IND3' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, COMPUTE, CONTINUE, "
                     + "DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, GENERATE, GO, "
                     + "GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, PURGE, READ, READY, RECEIVE, "
@@ -95,10 +96,10 @@ class TestSetUpDownBy {
                 ERROR.getText()),
             "4",
             new Diagnostic(
-                null, "Variable IND4 is not defined", DiagnosticSeverity.Error, ERROR.getText()),
+                new Range(), "Variable IND4 is not defined", DiagnosticSeverity.Error, ERROR.getText()),
             "5",
             new Diagnostic(
-                null,
+                new Range(),
                 "The following token must start in Area A: IND3",
                 DiagnosticSeverity.Warning,
                 WARNING.getText())),

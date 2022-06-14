@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
@@ -48,31 +49,31 @@ class Test77WithMultiplePicShowsError {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "A duplicate PICTURE clause was found in a data description entry",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "2",
             new Diagnostic(
-                null,
+                new Range(),
                 "A duplicate VALUE clause was found in a data description entry",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "3",
             new Diagnostic(
-                null,
+                new Range(),
                 "A duplicate OCCURS clause was found in a data description entry",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "4",
             new Diagnostic(
-                null,
+                new Range(),
                 "A duplicate USAGE clause was found in a data description entry",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "5",
             new Diagnostic(
-                null,
+                new Range(),
                 "PICTURE clause incompatible with usage POINTER",
                 DiagnosticSeverity.Warning,
                 WARNING.getText())));

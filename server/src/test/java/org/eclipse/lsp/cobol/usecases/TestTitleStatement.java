@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -61,7 +62,7 @@ class TestTitleStatement {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "Syntax error on 'TITLE' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, "
                     + "LINKAGE, LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE}",
                 DiagnosticSeverity.Error,

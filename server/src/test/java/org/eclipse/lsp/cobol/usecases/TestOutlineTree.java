@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp.cobol.usecases.engine.UseCase;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -323,6 +324,6 @@ class TestOutlineTree {
   }
 
   private DocumentSymbol node(String name, NodeType nodeType, List<DocumentSymbol> nested) {
-    return new DocumentSymbol(name, nodeType.getSymbolKind(), null, null, "", nested);
+    return new DocumentSymbol(name, nodeType.getSymbolKind(), new Range(), new Range(), "", nested);
   }
 }

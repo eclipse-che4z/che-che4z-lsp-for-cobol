@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
@@ -52,25 +53,25 @@ class TestRenamesWithNonExistingName {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null,
+                new Range(),
                 "The data entry with the name NOT-EXISTS1 not found",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "2",
             new Diagnostic(
-                null,
+                new Range(),
                 "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item VARNAME4",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "3",
             new Diagnostic(
-                null,
+                new Range(),
                 "The data entry with the name NOT-EXISTS2 not found",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "4",
             new Diagnostic(
-                null,
+                new Range(),
                 "Variable VARNAME5 is not defined",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
