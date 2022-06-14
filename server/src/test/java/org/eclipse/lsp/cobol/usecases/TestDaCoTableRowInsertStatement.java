@@ -41,6 +41,7 @@ class TestDaCoTableRowInsertStatement {
           + "        PROCEDURE DIVISION. \r\n"
           + "            ROW INSERT {$TBLPRO-XL1} WITH {$DSAPRO-XL1}. \r\n"
           + "            ROW INSERT {$TBFPRO-XL1} WITH {$DSAPRO-XL1}. \r\n"
+          + "            ROW INSERT {$TBFPRO-XL1}. \r\n"
           // Negative tests
           + "            ROW INSERT {$DSAPRO-XL1|1} WITH {$DSAPRO-XL1}. \r\n"
           + "            ROW INSERT {GBR4|1|2} WITH {$DSAPRO-XL1}. \r\n"
