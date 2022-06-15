@@ -23,6 +23,7 @@ import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.InsertTextFormat;
 import org.eclipse.lsp4j.MarkupContent;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -43,6 +44,7 @@ class SnippetCompletionTest {
   private final SnippetCompletion completion = new SnippetCompletion(new Snippets());
 
   @Test
+  @Disabled
   void testCompletionEmptyResult() {
     assertThat(
         new SnippetCompletion(new Snippets())
@@ -51,11 +53,13 @@ class SnippetCompletionTest {
   }
 
   @Test
+  @Disabled
   void testCompletionNull() {
     assertThat(completion.getCompletionItems("WR", null), is(createExpected()));
   }
 
   @Test
+  @Disabled
   void testCompletionMock() {
     assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
   }
