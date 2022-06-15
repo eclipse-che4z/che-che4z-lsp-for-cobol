@@ -201,7 +201,7 @@ public class VisitorHelper {
                                         start.toBuilder()
                                             .range(
                                                 new Range(
-                                                    start.getRange().getStart(),
+                                                    start.getRange().getEnd(),
                                                     stop.getRange().getEnd()))
                                             .build())));
   }
