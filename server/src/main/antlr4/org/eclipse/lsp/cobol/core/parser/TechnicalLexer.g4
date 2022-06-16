@@ -27,6 +27,7 @@ COMMENTTAG : '*>';
 DOLLARCHAR : '$';
 DOUBLEQUOTE : '"';
 DOUBLEEQUALCHAR : '==';
+DOUBLEMORETHANCHAR : '>>';
 
 // period full stopPosition
 DOT_FS : '.' EOF?;
@@ -78,6 +79,7 @@ HEX_NUMBERS : HEXNUMBER;
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(COMMENTS);
 WS : [ \t\f]+ -> channel(HIDDEN);
+COMPILERLINE : DOUBLEMORETHANCHAR ~('\n' | '\r')* -> channel(HIDDEN);
 
 //SQL comments
 SQLLINECOMMENT

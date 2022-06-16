@@ -245,7 +245,7 @@ rowAddStatement
 
 rowInsertStatement
     : INSERT daco_table_name
-      WITH qualifiedDataName
+      (WITH qualifiedDataName)?
     ;
 
 rowModifyStatement

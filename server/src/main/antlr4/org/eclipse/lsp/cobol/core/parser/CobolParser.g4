@@ -1241,15 +1241,15 @@ execSqlStatementInProcedureDivision
    ;
 
 execSqlStatementInWorkingStorage
-   : execSqlStatement DOT_FS
+   : execSqlStatement DOT_FS?
    ;
 
 execSqlStatementInWorkingStorageAndLinkageSection
-   : execSqlStatement DOT_FS
+   : execSqlStatement DOT_FS?
    ;
 
 execSqlStatementInDataDivision
-   : execSqlStatement DOT_FS
+   : execSqlStatement DOT_FS?
    ;
 
 execSqlStatement
