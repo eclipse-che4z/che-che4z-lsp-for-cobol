@@ -18,6 +18,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.eclipse.lsp.cobol.positive.SysprintSnapProcessService.getPatternForCuttingReport;
+
 /** Enum representing different sections in a SYSPRINT file. */
 public enum ReportSection {
   DATA_NAMES {
@@ -44,7 +46,7 @@ public enum ReportSection {
       return this.extractReportBasedOnCuttingPattern(
           getPatternForCuttingReport(
               "Defined   Cross-reference of programs     References",
-              "LineID  Message code  Message text"));
+              "LineID  Message code  Message text|End of compilation"));
     }
   };
 
@@ -59,10 +61,5 @@ public enum ReportSection {
       }
       return builder.toString();
     };
-  }
-
-  private static Pattern getPatternForCuttingReport(String start, String end) {
-    return Pattern.compile(
-        String.format("(%s).*?(%s)", Pattern.quote(start), Pattern.quote(end)), Pattern.DOTALL);
   }
 }

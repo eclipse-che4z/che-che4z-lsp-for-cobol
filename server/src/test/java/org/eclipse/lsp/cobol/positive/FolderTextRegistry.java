@@ -16,9 +16,6 @@ package org.eclipse.lsp.cobol.positive;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -26,15 +23,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.System.getProperty;
@@ -46,11 +39,10 @@ public class FolderTextRegistry implements CobolTextRegistry {
   private static final String POSITIVE_ENTRY = "positive";
   private static final String NEGATIVE_ENTRY = "negative";
   private static final String COPYBOOK_ENTRY = "copybooks";
-  private static final String SNAPS_ENTRY = "SYSPRINT85";
-  private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+  private static final String SNAPS_ENTRY = "compileListing";
 
   private final ListMultimap<String, CobolText> texts = ArrayListMultimap.create();
-  @Getter private Map<String, Map<ReportSection, List<SysprintSnap>>> snaps = new HashMap<>();
+  @Getter private Map<String, TreeMap<ReportSection, List<SysprintSnap>>> snaps = new HashMap<>();
 
   @SneakyThrows
   public FolderTextRegistry(String pathToTestResources) {
@@ -73,11 +65,39 @@ public class FolderTextRegistry implements CobolTextRegistry {
   }
 
   private void collectFilesToTest(String folderPath) throws IOException {
-    String updateListingFlag = ofNullable(getProperty("UpdateSnapListing")).orElse("false");
+    String updateListingFlag = getUpdateListingFlag();
     Files.walk(Paths.get(folderPath)).filter(Files::isRegularFile).forEach(this::processFile);
     if (!Files.exists(Paths.get(getListingFileLocation())) || !updateListingFlag.equals("false"))
       createListingSnap(snaps);
     else snaps = readFromSnap();
+  }
+
+  private String getUpdateListingFlag() {
+    return ofNullable(getProperty("UpdateSnapListing")).orElse("false");
+  }
+
+  /**
+   * Creates a snap of test file names mapped to the compiler listing object.
+   *
+   * @param snaps Map of test file names mapped to the compiler listing object
+   */
+  void createListingSnap(Map<String, TreeMap<ReportSection, List<SysprintSnap>>> snaps) {
+    StringBuilder sb = new StringBuilder();
+    String snapLocation = getListingFileLocation();
+    snaps.forEach((key1, value1) -> {
+      value1.forEach((key, value) -> {
+        sb.append(String.format("%s\n", key));
+        sb.append(String.format("%s\n", value.stream().map(SysprintSnap::toString).collect(Collectors.joining(System.lineSeparator()))));
+        sb.append(System.lineSeparator());
+      });
+      try {
+        Files.write(Paths.get(snapLocation, key1), sb.toString().getBytes(StandardCharsets.UTF_8));
+      } catch (IOException e) {
+        LOG.error("error creating snapshot for " + key1, e);
+      } finally {
+        sb.setLength(0);
+      }
+    });
   }
 
   private void processFile(Path path) {
@@ -86,7 +106,6 @@ public class FolderTextRegistry implements CobolTextRegistry {
         ofNullable(path.getParent()).map(Path::getFileName).map(Path::toString).orElse("");
 
     if (!isSupportedFolder(folder)) {
-      if (!Files.exists(Paths.get(getListingFileLocation())))
         processSysprintSnaps(path, name, folder);
       return;
     }
@@ -102,7 +121,7 @@ public class FolderTextRegistry implements CobolTextRegistry {
   }
 
   private void processSysprintSnaps(Path path, String name, String folder) {
-    if (folder.equals(SNAPS_ENTRY)) {
+    if (folder.equals(SNAPS_ENTRY) && !getUpdateListingFlag().equals("false")) {
       try {
         processSnapFiles(name, FileUtils.readFileToString(path.toFile(), StandardCharsets.UTF_8));
       } catch (IOException e) {
@@ -114,51 +133,27 @@ public class FolderTextRegistry implements CobolTextRegistry {
   private void processSnapFiles(String name, String readFileToString) {
     Map<ReportSection, List<SysprintSnap>> variableReferenceReport =
         new SysprintSnapProcessService(readFileToString).getVariableReferenceReport();
-    snaps.put(name, variableReferenceReport);
+    snaps.put(name, new TreeMap<>(variableReferenceReport));
   }
 
-  private Map<String, Map<ReportSection, List<SysprintSnap>>> readFromSnap() {
+  @SneakyThrows
+  private Map<String, TreeMap<ReportSection, List<SysprintSnap>>> readFromSnap() {
     String snapLocation = getListingFileLocation();
-    Object o = null;
-    try {
-      Type typeOfHashMap = new TypeToken<Map<String, Map<ReportSection, List<SysprintSnap>>>>() { }.getType();
-      String str = Files.lines(Paths.get(snapLocation)).collect(Collectors.joining(System.lineSeparator()));
-      o = GSON.fromJson(str, typeOfHashMap);
-    } catch (IOException e) {
-      LOG.error("Error while reading the Listing Snap for positive tests");
-    }
-    @SuppressWarnings("unchecked")
-    Map<String, Map<ReportSection, List<SysprintSnap>>> result = (Map<String, Map<ReportSection, List<SysprintSnap>>>) o;
-    return result;
+    return SnapshotReader.read(snapLocation);
   }
 
   private String getListingFileLocation() {
     return ofNullable(getProperty(PATH_TO_LISTING_SNAP)).orElse(DEFAULT_LISTING_PATH);
   }
 
-  /**
-   * Creates a snap of test file names mapped to the compiler listing object.
-   *
-   * @param dataNameRefs Map of test file names mapped to the compiler listing object
-   */
-  public void createListingSnap(Map<String, Map<ReportSection, List<SysprintSnap>>> dataNameRefs) {
-    String snapLocation = getListingFileLocation();
-    String json = GSON.toJson(dataNameRefs);
-    try {
-      if (Files.exists(Paths.get(snapLocation))) Files.delete(Paths.get(snapLocation));
-      Files.write(Files.createFile(Paths.get(snapLocation)), json.getBytes(StandardCharsets.UTF_8));
-    } catch (IOException e) {
-      LOG.error("Error occurred while creating listing snapshot");
-    }
-  }
 
   /**
    * Gives cross-reference object from listing corresponding to a test file.
    * @param filename filename
    * @return cross-reference object
    */
-  public Map<ReportSection, List<SysprintSnap>> getSnapForFile(String filename) {
-    return snaps.getOrDefault(filename, Collections.emptyMap());
+  public TreeMap<ReportSection, List<SysprintSnap>> getSnapForFile(String filename) {
+    return snaps.getOrDefault(filename, new TreeMap<>(Collections.emptyMap()));
   }
 
   private String cleanup(String name) {
