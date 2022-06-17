@@ -476,15 +476,15 @@
                         </executions>
                         <configuration>
                             <mainClass>org.eclipse.lsp.cobol.LangServerBootstrap</mainClass>
-                            <buildArgs>
-                                <buildArg>-H:+StaticExecutableWithDynamicLibC</buildArg>
-                                <buildArg>-H:+ReportExceptionStackTraces</buildArg>
-                                <buildArg>--allow-incomplete-classpath</buildArg>
-                                <buildArg>--allow-incomplete-classpath</buildArg>
-                                <buildArg>--report-unsupported-elements-at-runtime</buildArg>
-                                <buildArg>--verbose</buildArg>
-                                <buildArg>--no-fallback</buildArg>
-                            </buildArgs>
+<!--                            <buildArgs>-->
+<!--                                <buildArg>-H:+StaticExecutableWithDynamicLibC</buildArg>-->
+<!--                                <buildArg>-H:+ReportExceptionStackTraces</buildArg>-->
+<!--                                <buildArg>&#45;&#45;allow-incomplete-classpath</buildArg>-->
+<!--                                <buildArg>&#45;&#45;allow-incomplete-classpath</buildArg>-->
+<!--                                <buildArg>&#45;&#45;report-unsupported-elements-at-runtime</buildArg>-->
+<!--                                <buildArg>&#45;&#45;verbose</buildArg>-->
+<!--                                <buildArg>&#45;&#45;no-fallback</buildArg>-->
+<!--                            </buildArgs>-->
                         </configuration>
                     </plugin>
                 </plugins>
