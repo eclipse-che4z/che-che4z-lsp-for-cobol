@@ -13,20 +13,20 @@
  */
 
 import * as fs from "fs";
-import * as net from "net";
+import * as os from "os";
 import * as vscode from "vscode";
 import {
     ConfigurationParams,
     ConfigurationRequest,
+    Executable,
     LanguageClient,
     LanguageClientOptions,
-    StreamInfo,
 } from "vscode-languageclient";
 import {ConfigurationWorkspaceMiddleware} from "vscode-languageclient/lib/configuration";
+import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
 import {LANGUAGE_ID} from "../constants";
 import {JavaCheck} from "./JavaCheck";
 import {Middleware} from "./Middleware";
-import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
 import { SettingsService } from "./Settings";
 
 export class LanguageClientService {
@@ -36,7 +36,7 @@ export class LanguageClientService {
 
     constructor(private middleware: Middleware) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
-        this.jarPath = `${ext.extensionPath}/server/server.jar`;
+        this.jarPath = `${ext.extensionPath}/server/server.exe`;
     }
 
     public async checkPrerequisites(): Promise<void> {
@@ -106,26 +106,45 @@ export class LanguageClientService {
     }
 
     private createServerOptions(jarPath: string) {
-        const port = SettingsService.getLspPort();
-        if (port) {
-            // Connect to language server via socket
-            const connectionInfo = {
-                host: "localhost",
-                port,
-            };
-            return () => {
-                const socket = net.connect(connectionInfo);
-                const result: StreamInfo = {
-                    reader: socket,
-                    writer: socket,
-                };
-                return Promise.resolve(result);
-            };
-        }
-        return {
-            args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
-            command: "java",
-            options: {stdio: "pipe", detached: false},
+        const executable: Executable = {
+            args: ["pipeEnabled"],
+            command: "",
+            options: { stdio: "pipe", detached: false },
         };
+        switch (os.type()) {
+            case "Windows_NT":
+                executable.command = jarPath;
+                break;
+            case "Darwin":
+                executable.command = jarPath;
+                break;
+            case "Linux":
+                executable.command = jarPath;
+                break;
+            default:
+                break;
+        }
+        return executable;
+        // const port = SettingsService.getLspPort();
+        // if (port) {
+        //     // Connect to language server via socket
+        //     const connectionInfo = {
+        //         host: "localhost",
+        //         port,
+        //     };
+        //     return () => {
+        //         const socket = net.connect(connectionInfo);
+        //         const result: StreamInfo = {
+        //             reader: socket,
+        //             writer: socket,
+        //         };
+        //         return Promise.resolve(result);
+        //     };
+        // }
+        // return {
+        //     args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
+        //     command: "java",
+        //     options: {stdio: "pipe", detached: false},
+        // };
     }
 }

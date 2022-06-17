@@ -1,0 +1,14 @@
+[
+  {
+    "interfaces":["org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory"]}
+  ,
+  {
+    "interfaces":["org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacePreprocessorFactory"]}
+  ,
+  {
+    "interfaces":["org.eclipse.lsp.cobol.jrpc.CobolLanguageClient","org.eclipse.lsp4j.jsonrpc.Endpoint"]}
+  ,
+  {
+    "interfaces":["org.eclipse.lsp.cobol.service.delegates.communications.Communications","com.google.inject.internal.CircularDependencyProxy"]}
+  
+]
