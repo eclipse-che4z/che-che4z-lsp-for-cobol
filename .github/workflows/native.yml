@@ -51,6 +51,11 @@ jobs:
       - name: Build with Maven
         working-directory: server
         run: mvn -e -B -Pnative -DskipTests clean package
+      - name: Run UPX
+        uses: svenstaro/upx-action@v2
+        with:
+          file: server/target/server
+          args: '-7'
       - name: Upload artifacts
         run: mkdir staging && cp server/target/server staging/server-mac-amd64
       - uses: actions/upload-artifact@v2
@@ -76,6 +81,12 @@ jobs:
       - name: Build with Maven
         working-directory: server
         run: mvn -e -B -Pnative -DskipTests clean package
+      - name: Run UPX
+        uses: crazy-max/ghaction-upx@v1.3.3
+        with:
+          version: latest
+          file: server/target/server
+          args: '-7'
       - name: Upload artifacts
         run: mkdir staging && cp server/target/server staging/server
       - uses: actions/upload-artifact@v2
