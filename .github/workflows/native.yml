@@ -1,0 +1,106 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Native Build
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  buildOnWindows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1.5.0
+      - uses: microsoft/setup-msbuild@v1
+      - uses: ayltai/setup-graalvm@v1
+        with:
+          java-version: 11
+          graalvm-version: 22.0.0.2
+          native-image: true
+      - name: Build with Maven
+        working-directory: server
+        run: mvn -e -B -Pnative -DskipTests clean package
+        shell: powershell
+      - name: Run UPX
+        uses: crazy-max/ghaction-upx@v1.3.3
+        with:
+          version: latest
+          file: server/target/server.exe
+          args: '-7'
+      - uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: warn
+          name: package-win
+          path: |
+            server/target/*.exe
+            server/target/*.dll
+            server/target/*.txt
+      - uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: warn
+          name: logs
+          path: server/target/*.log
+
+  buildOnMac:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ayltai/setup-graalvm@v1
+        with:
+          java-version: 11
+          graalvm-version: 22.0.0.2
+          native-image: true
+      - name: Build with Maven
+        working-directory: server
+        run: mvn -e -B -Pnative -DskipTests clean package
+      - name: Run UPX
+        uses: svenstaro/upx-action@v2
+        with:
+          file: server/target/server
+          args: '-7'
+      - name: Upload artifacts
+        run: mkdir staging && cp server/target/server staging/server-mac-amd64
+      - uses: actions/upload-artifact@v2
+        with:
+          name: package-macos
+          path: staging
+      - uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: warn
+          name: logs
+          path: server/target/*.log
+
+  buildOnLinux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ayltai/setup-graalvm@v1
+        with:
+          java-version: 11
+          graalvm-version: 22.0.0.2
+          native-image: true
+      - name: Build with Maven
+        working-directory: server
+        run: mvn -e -B -Pnative -DskipTests clean package
+      - name: Run UPX
+        uses: crazy-max/ghaction-upx@v1.3.3
+        with:
+          version: latest
+          file: server/target/server
+          args: '-7'
+      - name: Upload artifacts
+        run: mkdir staging && cp server/target/server staging/server
+      - uses: actions/upload-artifact@v2
+        with:
+          name: package-linux
+          path: staging
+      - uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: warn
+          name: logs
+          path: server/target/*.log
