@@ -265,10 +265,6 @@
   "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"java.util.Collections$EmptyList",
-  "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
   "name":"java.util.PropertyPermission"
 },
 {
@@ -801,34 +797,14 @@
   "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.eclipse.lsp4j.Command",
-  "allDeclaredFields":true,
-  "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
   "name":"org.eclipse.lsp4j.CompletionCapabilities",
   "allDeclaredFields":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.eclipse.lsp4j.CompletionContext",
-  "allDeclaredFields":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.lsp4j.CompletionItem",
-  "allDeclaredFields":true,
-  "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
   "name":"org.eclipse.lsp4j.CompletionItemCapabilities",
   "allDeclaredFields":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.lsp4j.CompletionItemDefaults",
-  "allDeclaredFields":true,
-  "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"org.eclipse.lsp4j.CompletionItemInsertTextModeSupportCapabilities",
@@ -843,11 +819,6 @@
   "name":"org.eclipse.lsp4j.CompletionItemKindCapabilities",
   "allDeclaredFields":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.lsp4j.CompletionItemLabelDetails",
-  "allDeclaredFields":true,
-  "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"org.eclipse.lsp4j.CompletionItemOptions",
@@ -869,11 +840,6 @@
   "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.eclipse.lsp4j.CompletionList",
-  "allDeclaredFields":true,
-  "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
   "name":"org.eclipse.lsp4j.CompletionListCapabilities",
   "allDeclaredFields":true,
   "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
@@ -882,15 +848,6 @@
   "name":"org.eclipse.lsp4j.CompletionOptions",
   "allDeclaredFields":true,
   "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.lsp4j.CompletionParams",
-  "allDeclaredFields":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.lsp4j.CompletionTriggerKind",
-  "fields":[{"name":"value"}]
 },
 {
   "name":"org.eclipse.lsp4j.ConfigurationItem",
@@ -921,11 +878,6 @@
   "name":"org.eclipse.lsp4j.DefinitionOptions",
   "allDeclaredFields":true,
   "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.lsp4j.DefinitionParams",
-  "allDeclaredFields":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"org.eclipse.lsp4j.Diagnostic",
@@ -981,11 +933,6 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.eclipse.lsp4j.DidChangeTextDocumentParams",
-  "allDeclaredFields":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
   "name":"org.eclipse.lsp4j.DidChangeWatchedFilesCapabilities",
   "allDeclaredFields":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
@@ -1006,11 +953,6 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.eclipse.lsp4j.DidSaveTextDocumentParams",
-  "allDeclaredFields":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
   "name":"org.eclipse.lsp4j.DocumentFilter",
   "allDeclaredFields":true,
   "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
@@ -1021,18 +963,9 @@
   "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.eclipse.lsp4j.DocumentHighlight",
-  "allDeclaredFields":true,
-  "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
   "name":"org.eclipse.lsp4j.DocumentHighlightCapabilities",
   "allDeclaredFields":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.lsp4j.DocumentHighlightKind",
-  "fields":[{"name":"value"}]
 },
 {
   "name":"org.eclipse.lsp4j.DocumentHighlightOptions",
@@ -1244,20 +1177,6 @@
   "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.eclipse.lsp4j.InsertReplaceEdit",
-  "allDeclaredFields":true,
-  "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.lsp4j.InsertReplaceRange",
-  "allDeclaredFields":true,
-  "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.lsp4j.InsertTextFormat",
-  "fields":[{"name":"value"}]
-},
-{
   "name":"org.eclipse.lsp4j.InsertTextMode",
   "fields":[{"name":"value"}]
 },
@@ -1283,11 +1202,6 @@
 },
 {
   "name":"org.eclipse.lsp4j.MarkedString",
-  "allDeclaredFields":true,
-  "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.lsp4j.MarkupContent",
   "allDeclaredFields":true,
   "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
 },
@@ -1508,11 +1422,6 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.eclipse.lsp4j.TextDocumentContentChangeEvent",
-  "allDeclaredFields":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
   "name":"org.eclipse.lsp4j.TextDocumentIdentifier",
   "allDeclaredFields":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
@@ -1540,11 +1449,6 @@
 },
 {
   "name":"org.eclipse.lsp4j.TextDocumentSyncOptions",
-  "allDeclaredFields":true,
-  "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.lsp4j.TextEdit",
   "allDeclaredFields":true,
   "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
 },
@@ -1632,14 +1536,6 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.eclipse.lsp4j.adapters.CompletionItemDefaultsEditRangeTypeAdapter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.lsp4j.adapters.CompletionItemTextEditTypeAdapter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
   "name":"org.eclipse.lsp4j.adapters.DocumentSymbolResponseAdapter",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
@@ -1661,10 +1557,6 @@
 },
 {
   "name":"org.eclipse.lsp4j.adapters.SemanticTokensFullDeltaResponseAdapter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.lsp4j.adapters.VersionedTextDocumentIdentifierTypeAdapter$Factory",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
@@ -1706,12 +1598,8 @@
   "queryAllDeclaredMethods":true,
   "methods":[
     {"name":"codeAction","parameterTypes":["org.eclipse.lsp4j.CodeActionParams"] }, 
-    {"name":"completion","parameterTypes":["org.eclipse.lsp4j.CompletionParams"] }, 
-    {"name":"definition","parameterTypes":["org.eclipse.lsp4j.DefinitionParams"] }, 
-    {"name":"didChange","parameterTypes":["org.eclipse.lsp4j.DidChangeTextDocumentParams"] }, 
     {"name":"didClose","parameterTypes":["org.eclipse.lsp4j.DidCloseTextDocumentParams"] }, 
     {"name":"didOpen","parameterTypes":["org.eclipse.lsp4j.DidOpenTextDocumentParams"] }, 
-    {"name":"didSave","parameterTypes":["org.eclipse.lsp4j.DidSaveTextDocumentParams"] }, 
     {"name":"documentHighlight","parameterTypes":["org.eclipse.lsp4j.DocumentHighlightParams"] }, 
     {"name":"documentSymbol","parameterTypes":["org.eclipse.lsp4j.DocumentSymbolParams"] }, 
     {"name":"foldingRange","parameterTypes":["org.eclipse.lsp4j.FoldingRangeRequestParams"] }, 
