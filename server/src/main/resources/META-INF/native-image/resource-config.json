@@ -8,6 +8,15 @@
       "pattern":"\\QimplicitCopybooks/SPECIALREGISTERS.cpy\\E"
     }, 
     {
+      "pattern":"\\QimplicitCopybooks/SQLCA_DB2.cpy\\E"
+    },
+    {
+      "pattern":"\\QimplicitCopybooks/SQLCA_DATACOM.cpy\\E"
+    },
+    {
+      "pattern":"\\QimplicitCopybooks/SQLDA.cpy\\E"
+    },
+    {
       "pattern":"\\Qlogback.xml\\E"
     }, 
     {
