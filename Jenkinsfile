@@ -130,7 +130,7 @@ pipeline {
                                 withMaven {
                                     sh 'mvn -version'
                                     sh 'mvn clean verify --no-transfer-progress'
-                                    sh 'cp target/server.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
+                                    sh 'cp engine/target/server.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
                                 }
                             }
                         }
