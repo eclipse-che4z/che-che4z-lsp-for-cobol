@@ -69,14 +69,14 @@ export async function activate(context: vscode.ExtensionContext) {
             { scheme: "file", language: LANGUAGE_ID },
             new CopybooksCodeActionProvider()));
 
-    try {
-        await languageClientService.checkPrerequisites();
-    } catch (err) {
-        vscode.window.showErrorMessage(err.toString());
-        TelemetryService.registerExceptionEvent("RuntimeException", err.toString(), ["bootstrap", "experiment-tag"], "Client has wrong Java version installed");
+    // try {
+    //     await languageClientService.checkPrerequisites();
+    // } catch (err) {
+    //     vscode.window.showErrorMessage(err.toString());
+    //     TelemetryService.registerExceptionEvent("RuntimeException", err.toString(), ["bootstrap", "experiment-tag"], "Client has wrong Java version installed");
 
-        return;
-    }
+    //     return;
+    // }
 
     // Custom client handlers
     languageClientService.addRequestHandler("cobol/resolveSubroutine", resolveSubroutineURI);

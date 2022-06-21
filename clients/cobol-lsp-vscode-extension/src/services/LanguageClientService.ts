@@ -14,13 +14,16 @@
 
 import * as fs from "fs";
 import * as os from "os";
+import * as net from "net";
 import * as vscode from "vscode";
+import * as cp from "child_process";
 import {
     ConfigurationParams,
     ConfigurationRequest,
     Executable,
     LanguageClient,
     LanguageClientOptions,
+    StreamInfo,
 } from "vscode-languageclient";
 import {ConfigurationWorkspaceMiddleware} from "vscode-languageclient/lib/configuration";
 import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
@@ -36,7 +39,8 @@ export class LanguageClientService {
 
     constructor(private middleware: Middleware) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
-        this.jarPath = `${ext.extensionPath}/server/server.exe`;
+        // this.jarPath = `${ext.extensionPath}/server/server.jar`;
+        this.jarPath =  this.initializeExecutables(`${ext.extensionPath}/server`);
     }
 
     public async checkPrerequisites(): Promise<void> {
@@ -113,13 +117,16 @@ export class LanguageClientService {
         };
         switch (os.type()) {
             case "Windows_NT":
-                executable.command = jarPath;
+                executable.options.cwd=`${jarPath}`;
+                executable.command = `server.exe`;
                 break;
             case "Darwin":
-                executable.command = jarPath;
+                executable.options.cwd=`${jarPath}`;
+                executable.command = `./server-mac-amd64`;
                 break;
             case "Linux":
-                executable.command = jarPath;
+                executable.options.cwd=`${jarPath}`;
+                executable.command = `./server`;
                 break;
             default:
                 break;
@@ -142,9 +149,37 @@ export class LanguageClientService {
         //     };
         // }
         // return {
-        //     args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
+        //     args: ["-Dline.slseparator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
         //     command: "java",
         //     options: {stdio: "pipe", detached: false},
         // };
+    }
+
+    private initializeExecutables(serverPath: String) {
+        let executablePath;
+        switch (os.type()) {
+            case "Windows_NT":
+                executablePath = `${serverPath}/package-win`;
+                break;
+            case "Darwin":
+                executablePath = `${serverPath}/package-macos`;
+                this.giveExecutePermission(executablePath);
+                break;
+            case "Linux":
+                executablePath = `${serverPath}/package-linux`;
+                this.giveExecutePermission(executablePath);
+                break;
+            default:
+                break;
+        }
+        return executablePath;
+    }
+
+    private giveExecutePermission(executablePath) {
+        cp.exec(`cd ${executablePath}; chmod 755 *`, (err, stdout, stderr) => {
+            if (err) {
+                vscode.window.showInformationMessage(`couldn't initialize executable as ${executablePath}. Please change the permission to execution mode`)
+            }
+        });
     }
 }
