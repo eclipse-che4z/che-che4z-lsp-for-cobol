@@ -273,6 +273,7 @@ public class CobolLanguageEngine {
   private List<SyntaxError> finalizeErrors(
       @NonNull List<SyntaxError> errors, @NonNull Map<Token, Locality> mapping) {
     return errors.stream()
+        .filter(c -> c.getOffendedToken() != null)
         .map(convertError(mapping))
         .filter(it -> it.getLocality() != null)
         .collect(toList());
