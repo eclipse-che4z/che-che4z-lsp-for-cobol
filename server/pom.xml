@@ -482,7 +482,7 @@
                                 <buildArg>--report-unsupported-elements-at-runtime</buildArg>
                                 <buildArg>--verbose</buildArg>
                                 <buildArg>--no-fallback</buildArg>
-                                <buildArg>-J-Xmx4g</buildArg>
+<!--                                <buildArg>-J-Xmx4g</buildArg>-->
                             </buildArgs>
                         </configuration>
                     </plugin>
