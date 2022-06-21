@@ -25,9 +25,9 @@ import java.util.List;
 /** This class is a provider for Cobol Snippets */
 @Singleton
 public class Snippets extends CompletionStorage {
-  private static final String SNIPPETS_FILE_PATH = "LanguageSnippets.txt";
-  private static final String SNIPPETS_IDMS_FILE_PATH = "LanguageSnippetsIDMS.txt";
-  private static final String SNIPPETS_DACO_FILE_PATH = "LanguageSnippetsDaCo.txt";
+  private static final String SNIPPETS_FILE_PATH = "LanguageSnippets.json";
+  private static final String SNIPPETS_IDMS_FILE_PATH = "LanguageSnippetsIDMS.json";
+  private static final String SNIPPETS_DACO_FILE_PATH = "LanguageSnippetsDaCo.json";
 
   @Override
   protected InputStream getInputStream(List<String> dialectList) {
