@@ -14,6 +14,10 @@
   "name":"jdk.internal.loader.ClassLoaders$PlatformClassLoader"
 },
 {
+  "name":"org.eclipse.lsp.cobol.LangServerBootstrap",
+  "methods":[{"name":"main","parameterTypes":["java.lang.String[]"] }]
+},
+{
   "name":"org.graalvm.jniutils.JNIExceptionWrapperEntryPoints",
   "methods":[{"name":"getClassName","parameterTypes":["java.lang.Class"] }]
 }

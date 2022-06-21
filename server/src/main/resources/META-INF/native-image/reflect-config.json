@@ -1390,9 +1390,19 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
+  "name":"org.eclipse.lsp4j.ReferenceContext",
+  "allDeclaredFields":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
   "name":"org.eclipse.lsp4j.ReferenceOptions",
   "allDeclaredFields":true,
   "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.eclipse.lsp4j.ReferenceParams",
+  "allDeclaredFields":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"org.eclipse.lsp4j.ReferencesCapabilities",
@@ -1797,7 +1807,8 @@
     {"name":"documentHighlight","parameterTypes":["org.eclipse.lsp4j.DocumentHighlightParams"] }, 
     {"name":"documentSymbol","parameterTypes":["org.eclipse.lsp4j.DocumentSymbolParams"] }, 
     {"name":"foldingRange","parameterTypes":["org.eclipse.lsp4j.FoldingRangeRequestParams"] }, 
-    {"name":"hover","parameterTypes":["org.eclipse.lsp4j.HoverParams"] }
+    {"name":"hover","parameterTypes":["org.eclipse.lsp4j.HoverParams"] }, 
+    {"name":"references","parameterTypes":["org.eclipse.lsp4j.ReferenceParams"] }
   ]
 },
 {
