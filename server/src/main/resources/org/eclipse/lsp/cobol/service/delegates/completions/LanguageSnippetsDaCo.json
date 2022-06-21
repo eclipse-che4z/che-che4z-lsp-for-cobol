@@ -1,94 +1,617 @@
-READ\u0020TRANSACTION=READ\u0020TRANSACTION\u0020${1:task-name}.
-WRITE\u0020TRANSACTION\u0020STATEMENT=WRITE\u0020TRANSACTION\u0020${1:task-name}\u0020LENGTH\u0020${2:nn}\u0020TO\u0020${3:dbu}.
-WRITE\u0020TRANSACTION\u0020INPUT=WRITE\u0020TRANSACTION\u0020INPUT\u0020LENGTH\u0020${2:nn}\u0020TO\u0020${3:dbu}.
-WRITE\u0020REPORT=WRITE\u0020REPORT\u0020${1:report-name}\u0020FROM\u0020${2:layout}\u0020TO\u0020{3:layout2}\u0020LENGTH\u0020{4:length}.
-WRITE\u0020REPORT\u0020ENDRPT=WRITE\u0020REPORT\u0020${1:report-name}\u0020ENDRPT.
-WRITE\u0020REPORT\u0020AFTER=WRITE\u0020REPORT\u0020${1:report-name}\u0020FROM\u0020${2:layout}\u0020TO\u0020{3:layout2}\u0020LENGTH\u0020{4:length}\u0020AFTER\u0020{3:id}.
-WRITE\u0020REPORT\u0020AFTER\u0020PAGE=WRITE\u0020REPORT\u0020${1:report-name}\u0020FROM\u0020${2:layout}\u0020TO\u0020{3:layout2}\u0020LENGTH\u0020{4:length}\u0020AFTER\u0020PAGE.
-WRITE\u0020REPORT\u0020AFTER\u0020LINES=WRITE\u0020REPORT\u0020${1:report-name}\u0020FROM\u0020${2:layout}\u0020TO\u0020{3:layout2}\u0020LENGTH\u0020{4:length}\u0020AFTER\u0020${5:nn}\u0020LINES.
-WRITE\u0020REPORT\u0020AUTO=WRITE\u0020REPORT\u0020AUTO\u0020${1:layout}\u0020END\u0020${2:layout2}.
-OPEN\u0020PACKET=OPEN\u0020PACKET\u0020${1:task-name}\u0020FOR\u0020${2:receiver-packet}\u0020SORT\u0020${3:s}\u0020VERSION\u0020${4:v}.
-GET\u0020ENTITY\u0020DESCRIPTION=GET\u0020ENTITY\u0020${1:kls}\u0020${2:att}\u0020DESCRIPTION\u0020${3:tal}.
-GET\u0020ENTITY=GET\u0020ENTITY\u0020${1:kls}\u0020${2:att}\u0020${3:rol}.
-GET\u0020USER=GET\u0020USER\u0020${1:kls}\u0020${2:att}.
-GET\u0020ITEM\u0020ANY=GET\u0020ITEM\u0020ANY\u0020${1:geg}\u0020${2:wrd}\u0020${3:tal}.
-GET\u0020ITEM\u0020SEQ=GET\u0020ITEM\u0020SEQ\u0020${1:geg}\u0020${2:tal}.
-GET\u0020ITEM\u0020GRS=GET\u0020ITEM\u0020GRS\u0020${1:geg}\u0020${2:tak}\u0020${3:tal}.
-GET\u0020TASK=GET\u0020TASK\u0020${1:task}.
-GET\u0020ODETTE=GET\u0020ODETTE\u0020${1:odt}.
-GET\u0020JOB=GET\u0020JOB\u0020${1:jobName}.
-GET\u0020NETWORK=GET\u0020NETWORK\u0020${1:networkName}.
-SHOW\u0020INFO=SHOW\u0020INFO\u0020${1:message-code}\u0020${2:parameter1}\u0020${3:parameter2}\u0020${4:parameter3}.
-SHOW\u0020WARNING=SHOW\u0020WARNING\u0020${1:message-code}\u0020${2:parameter1}\u0020${3:parameter2}\u0020${4:parameter3}.
-SHOW\u0020ERROR=SHOW\u0020ERROR\u0020${1:message-code}\u0020${2:parameter1}\u0020${3:parameter2}\u0020${4:parameter3}.
-SHOW\u0020STD\u0020INFO=SHOW\u0020STD\u0020INFO\u0020${1:message-code}\u0020${2:parameter1}\u0020${3:parameter2}\u0020${4:parameter3}.
-SHOW\u0020STD\u0020INFO=SHOW\u0020STD\u0020ERROR\u0020${1:message-code}\u0020${2:parameter1}\u0020${3:parameter2}\u0020${4:parameter3}.
-SHOW\u0020STD\u0020WARNING=SHOW\u0020STD\u0020WARNING\u0020${1:message-code}\u0020${2:parameter1}\u0020${3:parameter2}\u0020${4:parameter3}.
-RETURN\u0020INFO=RETURN\u0020INFO\u0020${1:message}.
-RETURN\u0020ERROR=RETURN\u0020ERROR\u0020${1:message}.
-RETURN\u0020WARNING=RETURN\u0020WARNING\u0020${1:message}.
-SHOW\u0020RESULT=SHOW\u0020RESULT\u0020${1:task-code}.
-SHOW\u0020MESSAGE=SHOW\u0020MESSAGE\u0020${1:language-code}.
-ROW\u0020START=ROW\u0020START\u0020${1:TBL|TBFnam}.
-ROW\u0020SAVE=ROW\u0020SAVE\u0020${1:TBLnam}\u0020IN\u0020${2:value}.
-ROW\u0020RESTORE=ROW\u0020RESTORE\u0020${1:TBLnam}\u0020FROM\u0020${2:value}.
-ROW\u0020BUFFER=ROW\u0020BUFFER\u0020${1:TBLnam}\u0020IS\u0020YES.
-ROW\u0020GET=ROW\u0020GET\u0020${1:TBL|TBFnam}\u0020ON\u0020${2:value/dataname-1}\u0020TO\u0020${3:dataname-2}.
-ROW\u0020NEXT=ROW\u0020NEXT\u0020${1:TBL|TBFnam}\u0020TO\u0020${2:dataname}.
-ROW\u0020PRIOR=ROW\u0020PRIOR\u0020${1:TBL|TBFnam}\u0020TO\u0020${2:dataname}.
-ROW\u0020ANY=ROW\u0020ANY\u0020${1:TBL|TBFnam}\u0020USING\u0020${2:dataname}.
-ROW\u0020MATCH=ROW\u0020MATCH\u0020${1:TBL|TBFnam}\u0020USING\u0020${2:dataname}.
-ROW\u0020DELETE=ROW\u0020DELETE\u0020${1:TBL|TBFnam}.
-ROW\u0020ADD=ROW\u0020ADD\u0020${1:TBL|TBFnam}\u0020WITH\u0020${2:dataname}.
-ROW\u0020INSERT=ROW\u0020INSERT\u0020${1:TBL|TBFnam}\u0020WITH\u0020${2:dataname}.
-ROW\u0020MODIFY=ROW\u0020MODIFY\u0020${1:TBL|TBFnam}\u0020ON\u0020${2:value|dataname-1}\u0020WITH\u0020${3:dataname-2}.
-ROW\u0020SORT\u0020ASC=ROW\u0020SORT\u0020${1:TBL|TBFnam}\u0020ASC\u0020ON\u0020${2:tablerow-dataname}.
-ROW\u0020SORT\u0020DES=ROW\u0020SORT\u0020${1:TBL|TBFnam}\u0020DES\u0020ON\u0020${2:tablerow-dataname}.
-ROW\u0020SINGLE=ROW\u0020SINGLE\u0020${1:TBL|TBFnam}\u0020ON\u0020${2:tablerow-dataname}.
-ROW\u0020DUPLICATE=ROW\u0020DUPLICATE\u0020${1:TBL|TBFnam}\u0020ON\u0020${2:tablerow-dataname}.
-ROW\u0020INVERT=ROW\u0020INVERT\u0020${1:TBL|TBFnam}.
-GET\u0020TABLE\u0020ANY=GET\u0020TABLE\u0020ANY\u0020${1:tttt}.
-GET\u0020TABLE\u0020SEQ=GET\u0020TABLE\u0020SEQ\u0020${1:tttt}.
-GET\u0020FILE=GET\u0020FILE\u0020${1:DD-name}\u0020INTO\u0020${2:dsn-name}\u0020VOLSER\u0020INTO\u0020${3:buffer}.
-SORT\u0020TABLE\u0020ASCENDING=SORT\u0020TABLE\u0020${1:entry-1}\u0020TO\u0020${2:entry-2}\u0020LENGTH\u0020${3:nn}\u0020ASCENDING.
-SORT\u0020TABLE\u0020DESCENDING=SORT\u0020TABLE\u0020${1:entry-1}\u0020TO\u0020${2:entry-2}\u0020LENGTH\u0020${3:nn}\u0020DESCENDING.
-OPEN\u0020FILE=OPEN\u0020FILE\u0020${1:bbbb}\u0020MAX\u0020LENGTH\u0020${2:nn}.
-OPEN\u0020FILE\u0020LAYOUT=OPEN\u0020FILE\u0020${1:bbbb}\u0020MAX\u0020LENGTH\u0020LAYOUT.
-READ\u0020FILE=READ\u0020FILE\u0020${1:bbbb}\u0020MAX\u0020LENGTH\u0020${2:nn}.
-READ\u0020FILE\u0020LAYOUT=READ\u0020FILE\u0020${1:bbbb}\u0020MAX\u0020LENGTH\u0020LAYOUT.
-WRITE\u0020FILE=WRITE\u0020FILE\u0020${1:bbbb}\u0020LENGTH\u0020${2:nn}.
-CLOSE\u0020FILE\u0020INPUT=CLOSE\u0020FILE\u0020INPUT\u0020${1:bbbb}.
-CLOSE\u0020FILE\u0020INPUT\u0020ALL=CLOSE\u0020FILE\u0020INPUT\u0020ALL.
-CLOSE\u0020FILE\u0020OUTPUT=CLOSE\u0020FILE\u0020OUTPUT\u0020${1:bbbb}.
-CLOSE\u0020FILE\u0020OUTPUT\u0020ALL=CLOSE\u0020FILE\u0020OUTPUT\u0020ALL.
-STRING\u0020FIND=STRING\u0020FIND\u0020${1:uts-Xli}\u0020${2:value/dataname}.
-STRING\u0020GET=STRING\u0020GET\u0020${1:uts-Xli}.
-STRING\u0020NEXT=STRING\u0020NEXT\u0020${1:uts-Xli}\u0020DELIMITER\u0020${2:value/dataname}.
-STRING\u0020MATCH=STRING\u0020MATCH\u0020${1:string1}\u0020${2:string2}\u0020${3:length}.
-STRING\u0020CHECK=STRING\u0020CHECK\u0020${1:uts-Xli}\u0020${2:string}.
-STRING\u0020ADD=STRING\u0020ADD\u0020${1:uts-Xli}\u0020${2:value1/dataname1}\u0020LENGTH\u0020${3:value2/dataname2}.
-STRING\u0020INSERT=STRING\u0020INSERT\u0020${1:uts-Xli}\u0020${2:value1/dataname1}\u0020LENGTH\u0020${3:value2/dataname2}.
-STRING\u0020FILL=STRING\u0020FILL\u0020${1:uts-Xli}\u0020${2:value1/dataname1}\u0020LENGTH\u0020${3:value2/dataname2}.
-STRING\u0020REPLACE=STRING\u0020REPLACE\u0020ALL\u0020${1:uts-Xli}\u0020${2:value1/dataname1}\u0020BY\u0020${3:value2/dataname2}.
-STRING\u0020DELETE=STRING\u0020DELETE\u0020ALL\u0020${1:uts-Xli}\u0020${2:value/dataname}\u0020LENGTH\u0020${3:value2/dataname2}.
-DACO-CONTROL=DACO-CONTROL\u0020SECTION.<br>
-DEBUG=DEBUG\u0020${1:field}\u0020LENGTH\u0020${2:len1}\u0020COLS\u0020${3:num}\u0020TABLE\u0020${4:len2}\u0020NO-POS\u0020${5|\u0020HEX,\u0020DISPLAY,\u0020BOTH|}.
-DEBUG\u0020STATS=DEBUG\u0020STATS\u0020${1:text}.
-EXEC=EXEC\u0020${1:text}\u0020USING\u0020${2:variable}.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+{
+  "READ TRANSACTION": {
+    "prefix": "READ TRANSACTION",
+    "body": [
+      "READ TRANSACTION ${1:task-name}."
+    ],
+    "description": "Read Transaction Statement",
+    "scope": "cobol"
+  },
+  "WRITE TRANSACTION": {
+    "prefix": "WRITE TRANSACTION",
+    "body": [
+      "WRITE TRANSACTION ${1:task-name} LENGTH ${2:nn} TO ${3:dbu}."
+    ],
+    "description": "Write Transaction Statement",
+    "scope": "cobol"
+  },
+  "WRITE TRANSACTION INPUT": {
+    "prefix": "WRITE TRANSACTION INPUT",
+    "body": [
+      "WRITE TRANSACTION INPUT LENGTH ${2:nn} TO ${3:dbu}."
+    ],
+    "description": "Write Transaction INPUT Statement",
+    "scope": "cobol"
+  },
+  "WRITE REPORT": {
+    "prefix": "WRITE REPORT",
+    "body": [
+      "WRITE REPORT ${1:report-name} FROM ${2:layout} TO {3:layout2} LENGTH {4:length}."
+    ],
+    "description": "Write Report Statement",
+    "scope": "cobol"
+  },
+  "WRITE REPORT ENDRPT": {
+    "prefix": "WRITE REPORT ENDRPT",
+    "body": [
+      "WRITE REPORT ${1:report-name} ENDRPT."
+    ],
+    "description": "Write Report Auto Statement",
+    "scope": "cobol"
+  },
+  "WRITE REPORT AFTER": {
+    "prefix": "WRITE REPORT AFTER",
+    "body": [
+      "WRITE REPORT ${1:report-name} FROM ${2:layout} TO {3:layout2} LENGTH {4:length} AFTER {3:id}."
+    ],
+    "description": "Write Report Statement",
+    "scope": "cobol"
+  },
+  "WRITE REPORT AFTER PAGE": {
+    "prefix": "WRITE REPORT AFTER PAGE",
+    "body": [
+      "WRITE REPORT ${1:report-name} FROM ${2:layout} TO {3:layout2} LENGTH {4:length} AFTER PAGE."
+    ],
+    "description": "Write Report Statement",
+    "scope": "cobol"
+  },
+  "WRITE REPORT AFTER LINES": {
+    "prefix": "WRITE REPORT AFTER LINES",
+    "body": [
+      "WRITE REPORT ${1:report-name} FROM ${2:layout} TO {3:layout2} LENGTH {4:length} AFTER ${5:nn} LINES."
+    ],
+    "description": "Write Report Statement",
+    "scope": "cobol"
+  },
+  "WRITE REPORT AUTO": {
+    "prefix": "WRITE REPORT AUTO",
+    "body": [
+      "WRITE REPORT AUTO ${1:layout} END ${2:layout2}."
+    ],
+    "description": "Write Report Auto Statement",
+    "scope": "cobol"
+  },
+  "OPEN PACKET": {
+    "prefix": "OPEN PACKET",
+    "body": [
+      "OPEN PACKET ${1:task-name} FOR ${2:receiver-packet} SORT ${3:s} VERSION ${4:v}."
+    ],
+    "description": "Open Packet Statement",
+    "scope": "cobol"
+  },
+  "GET ENTITY": {
+    "prefix": "GET ENTITY",
+    "body": [
+      "GET ENTITY ${1:kls} ${2:att} ${3:rol}."
+    ],
+    "description": "GET Entity Statement",
+    "scope": "cobol"
+  },
+  "GET ENTITY DESCRIPTION": {
+    "prefix": "GET ENTITY DESCRIPTION",
+    "body": [
+      "GET ENTITY ${1:kls} ${2:att} DESCRIPTION ${3:tal}."
+    ],
+    "description": "GET Entity DESCRIPTION Statement",
+    "scope": "cobol"
+  },
+  "GET USER": {
+    "prefix": "GET USER",
+    "body": [
+      "GET USER ${1:kls} ${2:att}."
+    ],
+    "description": "GET USER Statement",
+    "scope": "cobol"
+  },
+  "GET ITEM ANY": {
+    "prefix": "GET ITEM ANY",
+    "body": [
+      "GET ITEM ANY ${1:geg} ${2:wrd} ${3:tal}."
+    ],
+    "description": "GET ITEM ANY",
+    "scope": "cobol"
+  },
+  "GET ITEM SEQ": {
+    "prefix": "GET ITEM SEQ",
+    "body": [
+      "GET ITEM SEQ ${1:geg} ${2:tal}."
+    ],
+    "description": "GET ITEM SEQ",
+    "scope": "cobol"
+  },
+  "GET ITEM GRS": {
+    "prefix": "GET ITEM GRS",
+    "body": [
+      "GET ITEM GRS ${1:geg} ${2:tak} ${3:tal}."
+    ],
+    "description": "GET ITEM GRS",
+    "scope": "cobol"
+  },
+  "GET TASK": {
+    "prefix": "GET TASK",
+    "body": [
+      "GET TASK ${1:task}."
+    ],
+    "description": "GET TASK",
+    "scope": "cobol"
+  },
+  "GET ODETTE": {
+    "prefix": "GET ODETTE",
+    "body": [
+      "GET ODETTE ${1:odt}."
+    ],
+    "description": "GET ODETTE",
+    "scope": "cobol"
+  },
+  "GET JOB": {
+    "prefix": "GET JOB",
+    "body": [
+      "GET JOB ${1:jobName}."
+    ],
+    "description": "GET JOB",
+    "scope": "cobol"
+  },
+  "GET NETWORK": {
+    "prefix": "GET NETWORK",
+    "body": [
+      "GET NETWORK ${1:networkName}."
+    ],
+    "description": "GET NETWORK",
+    "scope": "cobol"
+  },
+  "SHOW TASK INFO MESSAGE": {
+    "prefix": "SHOW INFO",
+    "body": [
+      "SHOW INFO ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
+    ],
+    "description": "SHOW INFO message",
+    "scope": "cobol"
+  },
+  "SHOW TASK WARNING MESSAGE": {
+    "prefix": "SHOW WARNING",
+    "body": [
+      "SHOW WARNING ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
+    ],
+    "description": "SHOW WARNING message",
+    "scope": "cobol"
+  },
+  "SHOW TASK ERROR MESSAGE": {
+    "prefix": "SHOW ERROR",
+    "body": [
+      "SHOW ERROR ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
+    ],
+    "description": "SHOW ERROR message",
+    "scope": "cobol"
+  },
+  "SHOW GENERAL INFO MESSAGE": {
+    "prefix": "SHOW STD INFO",
+    "body": [
+      "SHOW STD INFO ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
+    ],
+    "description": "SHOW STD INFO message",
+    "scope": "cobol"
+  },
+  "SHOW GENERAL WARNING MESSAGE": {
+    "prefix": "SHOW STD WARNING",
+    "body": [
+      "SHOW STD WARNING ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
+    ],
+    "description": "SHOW STD WARNING message",
+    "scope": "cobol"
+  },
+  "SHOW GENERAL ERROR MESSAGE": {
+    "prefix": "SHOW STD ERROR",
+    "body": [
+      "SHOW STD ERROR ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
+    ],
+    "description": "SHOW STD ERROR message",
+    "scope": "cobol"
+  },
+  "RETURN INFO STATUS": {
+    "prefix": "RETURN INFO",
+    "body": [
+      "RETURN INFO ${1:message}."
+    ],
+    "description": "RETURN INFO message",
+    "scope": "cobol"
+  },
+  "RETURN WARNING STATUS": {
+    "prefix": "RETURN WARNING",
+    "body": [
+      "RETURN WARNING ${1:message}."
+    ],
+    "description": "RETURN WARNING message",
+    "scope": "cobol"
+  },
+  "RETURN ERROR STATUS": {
+    "prefix": "RETURN ERROR",
+    "body": [
+      "RETURN ERROR ${1:message}."
+    ],
+    "description": "RETURN ERROR message",
+    "scope": "cobol"
+  },
+  "SHOW RESULT": {
+    "prefix": "SHOW RESULT",
+    "body": [
+      "SHOW RESULT ${1:task-code}."
+    ],
+    "description": "SHOW RESULT",
+    "scope": "cobol"
+  },
+  "SHOW LAST ERROR MESSAGE": {
+    "prefix": "SHOW MESSAGE",
+    "body": [
+      "SHOW MESSAGE ${1:language-code}."
+    ],
+    "description": "SHOW Last Error Message",
+    "scope": "cobol"
+  },
+  "TABLE ROW START": {
+    "prefix": "ROW START",
+    "body": [
+      "ROW START ${1:TBL|TBFnam}."
+    ],
+    "description": "Set the line-currency (RCU) to \nzero in order to process the table \nsequentially from the beginning. \nAfter this command is given, \nthe ROW NEXT command can be used \nto move the currency 1 line forward.\n",
+    "scope": "cobol"
+  },
+  "TABLE ROW SAVE": {
+    "prefix": "ROW SAVE",
+    "body": [
+      "ROW SAVE ${1:TBLnam} IN ${2:value}."
+    ],
+    "description": "Place the content of \nTable Buffer-1 in Table Buffer-<value>, \nwhere <value> is 2, 3 or 4. \nThe three Table Buffers (2, 3 and 4) \ncan be used in the program logic.\n",
+    "scope": "cobol"
+  },
+  "TABLE ROW RESTORE": {
+    "prefix": "ROW RESTORE",
+    "body": [
+      "ROW RESTORE ${1:TBLnam} FROM ${2:value}."
+    ],
+    "description": "Restore the content of Table \nBuffer-<value> to \nTable Buffer-1 and put the line \nid of Table Buffer-value in RCU, \nwhere <value> is 2, 3 or 4.\n",
+    "scope": "cobol"
+  },
+  "TABLE ROW BUFFER": {
+    "prefix": "ROW BUFFER",
+    "body": [
+      "ROW BUFFER ${1:TBLnam} IS YES."
+    ],
+    "description": "ROW BUFFER",
+    "scope": "cobol"
+  },
+  "TABLE ROW GET": {
+    "prefix": "ROW GET",
+    "body": [
+      "ROW GET ${1:TBL|TBFnam} ON ${2:value/dataname-1} TO ${3:dataname-2}."
+    ],
+    "description": "ROW GET",
+    "scope": "cobol"
+  },
+  "TABLE ROW NEXT": {
+    "prefix": "ROW NEXT",
+    "body": [
+      "ROW NEXT ${1:TBL|TBFnam} TO ${2:dataname}."
+    ],
+    "description": "ROW NEXT",
+    "scope": "cobol"
+  },
+  "TABLE ROW PRIOR": {
+    "prefix": "ROW PRIOR",
+    "body": [
+      "ROW PRIOR ${1:TBL|TBFnam} TO ${2:dataname}."
+    ],
+    "description": "ROW PRIOR",
+    "scope": "cobol"
+  },
+  "TABLE ROW ANY": {
+    "prefix": "ROW ANY",
+    "body": [
+      "ROW ANY ${1:TBL|TBFnam} USING ${2:dataname}."
+    ],
+    "description": "ROW ANY",
+    "scope": "cobol"
+  },
+  "TABLE ROW MATCH": {
+    "prefix": "ROW MATCH",
+    "body": [
+      "ROW MATCH ${1:TBL|TBFnam} USING ${2:dataname}."
+    ],
+    "description": "ROW MATCH",
+    "scope": "cobol"
+  },
+  "TABLE ROW DELETE": {
+    "prefix": "ROW DELETE",
+    "body": [
+      "ROW DELETE ${1:TBL|TBFnam}."
+    ],
+    "description": "ROW DELETE",
+    "scope": "cobol"
+  },
+  "TABLE ROW ADD": {
+    "prefix": "ROW ADD",
+    "body": [
+      "ROW ADD ${1:TBL|TBFnam} WITH ${2:dataname}."
+    ],
+    "description": "ROW ADD",
+    "scope": "cobol"
+  },
+  "TABLE ROW INSERT": {
+    "prefix": "ROW INSERT",
+    "body": [
+      "ROW INSERT ${1:TBL|TBFnam} WITH ${2:dataname}."
+    ],
+    "description": "ROW INSERT",
+    "scope": "cobol"
+  },
+  "TABLE ROW MODIFY": {
+    "prefix": "ROW MODIFY",
+    "body": [
+      "ROW MODIFY ${1:TBL|TBFnam} ON ${2:value|dataname-1} WITH ${3:dataname-2}."
+    ],
+    "description": "ROW MODIFY",
+    "scope": "cobol"
+  },
+  "TABLE ROW SORT ASC": {
+    "prefix": "ROW SORT ASC",
+    "body": [
+      "ROW SORT ${1:TBL|TBFnam} ASC ON ${2:tablerow-dataname}."
+    ],
+    "description": "ROW SORT ASC",
+    "scope": "cobol"
+  },
+  "TABLE ROW SORT DES": {
+    "prefix": "ROW SORT DES",
+    "body": [
+      "ROW SORT ${1:TBL|TBFnam} DES ON ${2:tablerow-dataname}."
+    ],
+    "description": "ROW SORT DES",
+    "scope": "cobol"
+  },
+  "TABLE ROW SINGLE": {
+    "prefix": "ROW SINGLE",
+    "body": [
+      "ROW SINGLE ${1:TBL|TBFnam} ON ${2:tablerow-dataname}."
+    ],
+    "description": "ROW SINGLE",
+    "scope": "cobol"
+  },
+  "TABLE ROW DUPLICATE": {
+    "prefix": "ROW DUPLICATE",
+    "body": [
+      "ROW DUPLICATE ${1:TBL|TBFnam} ON ${2:tablerow-dataname}."
+    ],
+    "description": "ROW DUPLICATE",
+    "scope": "cobol"
+  },
+  "TABLE ROW INVERT": {
+    "prefix": "ROW INVERT",
+    "body": [
+      "ROW INVERT ${1:TBL|TBFnam}."
+    ],
+    "description": "ROW INVERT",
+    "scope": "cobol"
+  },
+  "TABLE GET ANY": {
+    "prefix": "GET TABLE ANY",
+    "body": [
+      "GET TABLE ANY ${1:tttt}."
+    ],
+    "description": "GET TABLE ANY",
+    "scope": "cobol"
+  },
+  "TABLE GET SEQ": {
+    "prefix": "GET TABLE SEQ",
+    "body": [
+      "GET TABLE SEQ ${1:tttt}."
+    ],
+    "description": "GET TABLE SEQ",
+    "scope": "cobol"
+  },
+  "TABLE SORT ASCENDING": {
+    "prefix": "SORT TABLE ASCENDING",
+    "body": [
+      "SORT TABLE ${1:entry-1} TO ${2:entry-2} LENGTH ${3:nn} ASCENDING."
+    ],
+    "description": "SORT TABLE ASCENDING",
+    "scope": "cobol"
+  },
+  "TABLE SORT DESCENDING": {
+    "prefix": "SORT TABLE DESCENDING",
+    "body": [
+      "SORT TABLE ${1:entry-1} TO ${2:entry-2} LENGTH ${3:nn} DESCENDING."
+    ],
+    "description": "SORT TABLE DESCENDING",
+    "scope": "cobol"
+  },
+  "OPEN FILE": {
+    "prefix": "OPEN FILE",
+    "body": [
+      "OPEN FILE ${1:bbbb} MAX LENGTH ${2:nn}."
+    ],
+    "description": "OPEN FILE",
+    "scope": "cobol"
+  },
+  "OPEN FILE LAYOUT": {
+    "prefix": "OPEN FILE LAYOUT",
+    "body": [
+      "OPEN FILE ${1:bbbb} MAX LENGTH LAYOUT."
+    ],
+    "description": "OPEN FILE LAYOUT",
+    "scope": "cobol"
+  },
+  "READ FILE": {
+    "prefix": "READ FILE",
+    "body": [
+      "READ FILE ${1:bbbb} MAX LENGTH ${2:nn}."
+    ],
+    "description": "READ FILE",
+    "scope": "cobol"
+  },
+  "READ FILE LAYOUT": {
+    "prefix": "READ FILE LAYOUT",
+    "body": [
+      "READ FILE ${1:bbbb} MAX LENGTH LAYOUT."
+    ],
+    "description": "READ FILE LAYOUT",
+    "scope": "cobol"
+  },
+  "WRITE FILE": {
+    "prefix": "WRITE FILE",
+    "body": [
+      "WRITE FILE ${1:bbbb} LENGTH ${2:nn}."
+    ],
+    "description": "WRITE FILE",
+    "scope": "cobol"
+  },
+  "CLOSE FILE INPUT": {
+    "prefix": "CLOSE FILE INPUT",
+    "body": [
+      "CLOSE FILE INPUT ${1:bbbb}."
+    ],
+    "description": "CLOSE FILE INPUT",
+    "scope": "cobol"
+  },
+  "CLOSE FILE INPUT ALL": {
+    "prefix": "CLOSE FILE INPUT ALL",
+    "body": [
+      "CLOSE FILE INPUT ALL."
+    ],
+    "description": "CLOSE FILE INPUT ALL",
+    "scope": "cobol"
+  },
+  "CLOSE FILE OUTPUT": {
+    "prefix": "CLOSE FILE OUTPUT",
+    "body": [
+      "CLOSE FILE OUTPUT ${1:bbbb}."
+    ],
+    "description": "CLOSE FILE OUTPUT",
+    "scope": "cobol"
+  },
+  "CLOSE FILE OUTPUT ALL": {
+    "prefix": "CLOSE FILE OUTPUT ALL",
+    "body": [
+      "CLOSE FILE OUTPUT ALL."
+    ],
+    "description": "CLOSE FILE OUTPUT ALL",
+    "scope": "cobol"
+  },
+  "GET FILE": {
+    "prefix": "GET FILE",
+    "body": [
+      "GET FILE ${1:DD-name} INTO ${2:dsn-name} VOLSER INTO ${3:buffer}."
+    ],
+    "description": "GET FILE",
+    "scope": "cobol"
+  },
+  "STRING FIND": {
+    "prefix": "STRING FIND",
+    "body": [
+      "STRING FIND ${1:uts-Xli} ${2:value/dataname}."
+    ],
+    "description": "STRING FIND",
+    "scope": "cobol"
+  },
+  "STRING GET": {
+    "prefix": "STRING GET",
+    "body": [
+      "STRING GET ${1:uts-Xli}."
+    ],
+    "description": "STRING GET",
+    "scope": "cobol"
+  },
+  "STRING NEXT": {
+    "prefix": "STRING NEXT",
+    "body": [
+      "STRING NEXT ${1:uts-Xli} DELIMITER ${2:value/dataname}."
+    ],
+    "description": "STRING NEXT",
+    "scope": "cobol"
+  },
+  "STRING MATCH": {
+    "prefix": "STRING MATCH",
+    "body": [
+      "STRING MATCH ${1:string1} ${2:string2} ${3:length}."
+    ],
+    "description": "STRING MATCH",
+    "scope": "cobol"
+  },
+  "STRING CHECK": {
+    "prefix": "STRING CHECK",
+    "body": [
+      "STRING CHECK ${1:uts-Xli} ${2:string}."
+    ],
+    "description": "STRING CHECK",
+    "scope": "cobol"
+  },
+  "STRING ADD": {
+    "prefix": "STRING ADD",
+    "body": [
+      "STRING ADD ${1:uts-Xli} ${2:value1/dataname1} LENGTH ${3:value2/dataname2}."
+    ],
+    "description": "STRING ADD",
+    "scope": "cobol"
+  },
+  "STRING INSERT": {
+    "prefix": "STRING INSERT",
+    "body": [
+      "STRING INSERT ${1:uts-Xli} ${2:value1/dataname1} LENGTH ${3:value2/dataname2}."
+    ],
+    "description": "STRING INSERT",
+    "scope": "cobol"
+  },
+  "STRING FILL": {
+    "prefix": "STRING FILL",
+    "body": [
+      "STRING FILL ${1:uts-Xli} ${2:value1/dataname1} LENGTH ${3:value2/dataname2}."
+    ],
+    "description": "STRING FILL",
+    "scope": "cobol"
+  },
+  "STRING REPLACE": {
+    "prefix": "STRING REPLACE",
+    "body": [
+      "STRING REPLACE ALL ${1:uts-Xli} ${2:value1/dataname1} BY ${3:value2/dataname2}."
+    ],
+    "description": "STRING REPLACE",
+    "scope": "cobol"
+  },
+  "STRING DELETE": {
+    "prefix": "STRING DELETE",
+    "body": [
+      "STRING DELETE ALL ${1:uts-Xli} ${2:value/dataname} LENGTH ${3:value2/dataname2}."
+    ],
+    "description": "STRING DELETE",
+    "scope": "cobol"
+  },
+  "DACO-CONTROL SECTION": {
+    "prefix": "DACO-CONTROL",
+    "body": [
+      "DACO-CONTROL SECTION.",
+      "$0"
+    ]
+  },
+  "DEBUG": {
+    "prefix": "DEBUG",
+    "body": [
+      "DEBUG ${1:field} LENGTH ${2:len1} COLS ${3:num} TABLE ${4:len2} NO-POS ${5| HEX, DISPLAY, BOTH|}."
+    ],
+    "description": "DEBUG ",
+    "scope": "cobol"
+  },
+  "DEBUG STATS": {
+    "prefix": "DEBUG STATS",
+    "body": [
+      "DEBUG STATS ${1:text}."
+    ],
+    "description": "DEBUG STATS",
+    "scope": "cobol"
+  },
+  "EXEC [DaCo]": {
+    "prefix": "EXEC ",
+    "body": [
+      "EXEC ${1:text} USING ${2:variable}."
+    ],
+    "description": "EXEC",
+    "scope": "cobol"
+  }
+}
