@@ -1806,7 +1806,8 @@
     {"name":"didSave","parameterTypes":["org.eclipse.lsp4j.DidSaveTextDocumentParams"] }, 
     {"name":"documentHighlight","parameterTypes":["org.eclipse.lsp4j.DocumentHighlightParams"] }, 
     {"name":"documentSymbol","parameterTypes":["org.eclipse.lsp4j.DocumentSymbolParams"] }, 
-    {"name":"foldingRange","parameterTypes":["org.eclipse.lsp4j.FoldingRangeRequestParams"] }, 
+    {"name":"foldingRange","parameterTypes":["org.eclipse.lsp4j.FoldingRangeRequestParams"] },
+    {"name":"formatting","parameterTypes":["org.eclipse.lsp4j.DocumentFormattingParams"] },
     {"name":"hover","parameterTypes":["org.eclipse.lsp4j.HoverParams"] }, 
     {"name":"references","parameterTypes":["org.eclipse.lsp4j.ReferenceParams"] }
   ]
