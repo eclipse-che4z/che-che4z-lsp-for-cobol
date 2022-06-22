@@ -102,7 +102,7 @@ local.properties
 .tern-project
 
 # ANTLR plugin
-/server/gen
+/server/engine/gen
 
 # TeXlipse plugin
 .texlipse
