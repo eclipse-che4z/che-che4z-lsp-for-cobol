@@ -109,10 +109,6 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    env:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-      FORCE_COLOR: 1
     needs: [buildOnLinux, buildOnMac, buildOnWindows]
     steps:
     - uses: actions/checkout@v2
@@ -134,14 +130,18 @@ jobs:
     - name: coverage
       run: npm run coverage
       working-directory: clients/cobol-lsp-vscode-extension
+    - name: see ls 
+      working-directory: clients/cobol-lsp-vscode-extension
+      run: ls -ltra
+    - name: see ls ..
+      working-directory: clients/cobol-lsp-vscode-extension
+      run: ls -ltra ..
+    - name: see ls ../..
+      working-directory: clients/cobol-lsp-vscode-extension
+      run: ls -ltra ../..
     - name: configure server
       working-directory: clients/cobol-lsp-vscode-extension
-      run: |
-       pwd
-       ls -ltra ..
-       ls -lrta ../..
-       cp -r ../../staging/. ./server/
-       cp ../../jar/. ./server
+      run: "cp -r ../../staging/. ./server/"
     - name: coverage
       run: npm run package
     - uses: actions/upload-artifact@v3
