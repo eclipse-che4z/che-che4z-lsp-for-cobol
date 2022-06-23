@@ -131,7 +131,7 @@ jobs:
     - name: configure server
       working-directory: clients/cobol-lsp-vscode-extension
       run: |
-       copy staging ./server
+       cp staging/* ./server
     - name: coverage
       run: npm run package
     - uses: actions/upload-artifact@v3
