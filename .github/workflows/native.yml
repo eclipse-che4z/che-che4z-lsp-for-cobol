@@ -122,6 +122,7 @@ jobs:
       - name: Earthly version
         run: earthly --version
       - name: Run build
+        working-directory: che-che4z-lsp-for-cobol
         run: earthly --ci -a +build/*.vsix
       - uses: actions/upload-artifact@v3
         with:

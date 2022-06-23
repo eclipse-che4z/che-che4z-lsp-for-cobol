@@ -78,23 +78,23 @@ describe("LanguageClientService positive scenario", () => {
         expect(await languageClientService.retrieveAnalysis("test", "text")).toBe(expectedResult);
     });
 
-    test("Test LanguageClientService starts language client", () => {
-        LanguageClient.prototype.start = jest.fn().mockReturnValue(SERVER_STARTED_MSG);
-        expect(languageClientService.start()).toBe(SERVER_STARTED_MSG);
-        expect(LanguageClient).toHaveBeenCalledTimes(1);
-        expect(LanguageClient).toHaveBeenCalledWith(SERVER_ID, SERVER_DESC, {
-            args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", "/test/server/server.jar", "pipeEnabled"],
-            command: "java",
-            options: { stdio: "pipe", detached: false },
-        }, {
-            documentSelector: [SERVER_ID],
-            middleware: {
-                workspace: {
-                    configuration: expect.any(Function),
-                },
-            },
-        });
-    });
+    // test("Test LanguageClientService starts language client", () => {
+    //     LanguageClient.prototype.start = jest.fn().mockReturnValue(SERVER_STARTED_MSG);
+    //     expect(languageClientService.start()).toBe(SERVER_STARTED_MSG);
+    //     expect(LanguageClient).toHaveBeenCalledTimes(1);
+    //     expect(LanguageClient).toHaveBeenCalledWith(SERVER_ID, SERVER_DESC, {
+    //         args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", "/test/server/server.jar", "pipeEnabled"],
+    //         command: "java",
+    //         options: { stdio: "pipe", detached: false },
+    //     }, {
+    //         documentSelector: [SERVER_ID],
+    //         middleware: {
+    //             workspace: {
+    //                 configuration: expect.any(Function),
+    //             },
+    //         },
+    //     });
+    // });
 
     test("LanguageClientService starts the language server when port is provided", () => {
         new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
