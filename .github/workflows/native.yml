@@ -97,6 +97,10 @@ jobs:
         with:
           name: package-linux
           path: staging
+      - uses: action/upload-artifact@v2
+        with:
+          name: jar
+          path: server/target/server.jar
       - uses: actions/upload-artifact@v2
         with:
           if-no-files-found: warn
@@ -115,7 +119,9 @@ jobs:
     - name: Retrieve native images
       uses: actions/download-artifact@v2
       with:
-        path: staging        
+        path: |
+          staging
+          jar
     - uses: actions/setup-node@v3
       with:
         node-version: 14
@@ -131,7 +137,8 @@ jobs:
     - name: configure server
       working-directory: clients/cobol-lsp-vscode-extension
       run: |
-       cp ../../staging/* ./server
+       cp -r ../../staging/* ./server
+       cp ../../jar ./server
     - name: coverage
       run: npm run package
     - uses: actions/upload-artifact@v3
