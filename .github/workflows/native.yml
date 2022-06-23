@@ -120,7 +120,7 @@ jobs:
       with:
         node-version: 14
     - name: build client
-    - run: npm ci --ignore-scripts
+      run: npm ci --ignore-scripts
       working-directory: clients/cobol-lsp-vscode-extension
     - name: postinstall
       run: npm run postinstall
