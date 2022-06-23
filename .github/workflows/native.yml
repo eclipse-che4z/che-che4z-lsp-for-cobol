@@ -29,7 +29,7 @@ jobs:
         working-directory: server
         run: mvn -e -B -Pnative -DskipTests clean package
         shell: powershell
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: package-win
@@ -37,7 +37,7 @@ jobs:
             server/target/*.exe
             server/target/*.dll
             server/target/*.txt
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: logs
@@ -63,11 +63,11 @@ jobs:
           args: '-7'
       - name: Upload artifacts
         run: mkdir staging && cp server/target/server staging/server-mac-amd64
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: package-macos
           path: staging
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: logs
@@ -93,14 +93,14 @@ jobs:
           args: '-7'
       - name: Upload artifacts
         run: mkdir staging && cp server/target/server staging/server
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: package-linux
           path: staging
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: server/target/server.jar
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: logs
@@ -112,7 +112,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Retrieve native images
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         path: staging
     - uses: actions/setup-node@v3
