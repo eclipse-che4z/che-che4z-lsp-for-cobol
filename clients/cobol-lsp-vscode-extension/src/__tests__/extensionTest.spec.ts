@@ -94,20 +94,24 @@ describe("Check plugin extension for cobol starts successfully.", () => {
     });
 });
 
-// describe("Check plugin extension for cobol fails.", () => {
-//     beforeEach(() => {
-//         (LanguageClientService as any).mockImplementation(() => {
-//             return {
-//                 checkPrerequisites: () => {
-//                     throw new Error("The error");
-//                 },
-//             };
-//         });
-//     });
+describe("Check plugin extension for cobol fails.", () => {
+    beforeEach(() => {
+        (LanguageClientService as any).mockImplementation(() => {
+            return {
+                checkPrerequisites: () => {
+                    throw new Error("The error");
+                },
+                enableNativeBuild: jest.fn(),
+                addRequestHandler: jest.fn(),
+                retrieveAnalysis: jest.fn(),
+                start: jest.fn(),
+            };
+        });
+    });
 
-//     test("start fails.", async () => {
-//         await activate(context);
-//         expect(TelemetryService.registerEvent).toHaveBeenCalledWith("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
-//         expect(vscode.window.showErrorMessage).toBeCalledTimes(1);
-//     });
-// });
+    test("start fails.", async () => {
+        await activate(context);
+        expect(TelemetryService.registerEvent).toHaveBeenCalledWith("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
+        expect(vscode.window.showErrorMessage).toBeCalledTimes(1);
+    });
+});
