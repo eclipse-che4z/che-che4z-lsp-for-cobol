@@ -115,9 +115,11 @@ jobs:
     - name: Retrieve native images
       uses: actions/download-artifact@v2
       with:
-        path: |
-          staging
-          jar
+        path: staging
+    - name: Retrieve native images
+      uses: actions/download-artifact@v2
+      with:
+        path: jar
     - uses: actions/setup-node@v3
       with:
         node-version: 14
@@ -141,7 +143,9 @@ jobs:
       run: ls -ltra ../..
     - name: configure server
       working-directory: clients/cobol-lsp-vscode-extension
-      run: "cp -r ../../staging/. ./server/"
+      run: |
+        "cp -r ../../staging/. ./server/"
+        "cp ../../jar/. ./server"
     - name: coverage
       run: npm run package
     - uses: actions/upload-artifact@v3
