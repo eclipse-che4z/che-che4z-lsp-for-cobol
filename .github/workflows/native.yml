@@ -134,6 +134,12 @@ jobs:
     - name: coverage
       run: npm run coverage
       working-directory: clients/cobol-lsp-vscode-extension
+    - name: check folder str
+      run: |
+        ls -ltra
+        pwd
+        ls ..
+        ls ../..
     - name: configure server
       working-directory: clients/cobol-lsp-vscode-extension
       run: |
