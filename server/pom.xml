@@ -491,11 +491,11 @@
         </profile>
         <profile>
             <id>linux-native</id>
-            <activation>
-                <os>
-                    <family>linux</family>
-                </os>
-            </activation>
+<!--            <activation>-->
+<!--                <os>-->
+<!--                    <family>linux</family>-->
+<!--                </os>-->
+<!--            </activation>-->
             <build>
                 <plugins>
                     <plugin>

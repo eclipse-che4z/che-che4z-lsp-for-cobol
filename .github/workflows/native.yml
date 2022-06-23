@@ -75,10 +75,6 @@ jobs:
 
   buildOnLinux:
     runs-on: ubuntu-latest
-    env:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-      FORCE_COLOR: 1
     steps:
       - uses: actions/checkout@v2
       - uses: ayltai/setup-graalvm@v1
@@ -106,26 +102,41 @@ jobs:
           if-no-files-found: warn
           name: logs
           path: server/target/*.log
-      - name: Put back the git branch into git (Earthly uses it for tagging)
-        run: |
-          branch=""
-          if [ -n "$GITHUB_HEAD_REF" ]; then
-            branch="$GITHUB_HEAD_REF"
-          else
-            branch="${GITHUB_REF##*/}"
-          fi
-          git checkout -b "$branch" || true
-      - name: Docker Login
-        run: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
-      - name: Download latest earthly
-        run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.6.12/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
-      - name: Earthly version
-        run: earthly --version
-      - name : get location
-        run: ls -lrta
-      - name: Run build
-        run: earthly --ci -a +build/*.vsix
-      - uses: actions/upload-artifact@v3
+
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      FORCE_COLOR: 1
+    needs: [buildOnLinux, buildOnMac, buildOnWindows]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Retrieve native images
+      uses: actions/download-artifact@v2
+      with:
+        path: staging        
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 14
+    - name: build client
+    - run: npm ci --ignore-scripts
+      working-directory: clients/cobol-lsp-vscode-extension
+    - name: postinstall
+      run: npm run postinstall
+     working-directory: clients/cobol-lsp-vscode-extension
+    - name: coverage
+      run: npm run coverage
+      working-directory: clients/cobol-lsp-vscode-extension
+    - name: configure server
+      working-directory: clients/cobol-lsp-vscode-extension
+      run: |
+       copy staging ./server
+    - name: coverage
+      run: npm run package
+    - uses: actions/upload-artifact@v2
         with:
-          name: vsix-package
-          path: '*.vsix'
+          name: extension
+          path: ./*.vsix
+       
+
