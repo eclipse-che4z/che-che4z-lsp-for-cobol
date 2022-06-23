@@ -9,7 +9,7 @@
 
 # COBOL Language Support
 
-COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using the Zowe Explorer extension to automatically retrieve copybooks used in your programs and store them in your workspace. 
+COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using the Zowe Explorer extension to automatically retrieve copybooks used in your programs and store them in your workspace. COBOL Language Support also supports COBOL programs which interact with IDMS, Datacom, CICS, and DB2 SQL.
 
 COBOL Language Support recognizes files with the extensions `.cob`, `.cbl` and `.cobol` as COBOL files, and `.cpy` and `.copy` as COBOL copybooks.
 
@@ -22,9 +22,6 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 ## Prerequisites
 
 - Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
-- To enable automatic copybook retrieval from the mainframe, the following are required:
-    - [Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=Zowe.vscode-extension-for-zowe) version 1.15.0 or higher.
-    - A Zowe Explorer `zosmf` or `zftp` profile with credentials and a connection URL defined.
     
 ## Compatibility
 
@@ -34,6 +31,15 @@ This extension is not compatible with other extensions that provide COBOL suppor
 
 The COBOL Language Support extension only supports IBM Enterprise COBOL. Other versions of COBOL are not supported.
 
+## Integration with Zowe Explorer
+
+Integrating COBOL Language Support with Zowe Explorer lets you:
+
+- Load your data sets containing COBOL code directly from the data set tree.
+- Enable automatic copybook retrieval from the mainframe.
+
+To enable these features, install the [Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=Zowe.vscode-extension-for-zowe) extension and configure a Zowe Explorer `zosmf` or `zftp` profile with credentials and a connection URL.
+
 ## Features
 COBOL Language Support provides the following COBOL syntax awareness features:
 
@@ -42,7 +48,8 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 
 - COBOL keywords, variables, paragraphs and sections
 - IDMS DML keywords
-- CICS and DB2 SQL keywords
+- CICS keywords
+- DB2 and Datacom SQL keywords
 - Code Snippets
 - Copybook variable and paragraph names
 - Names of copybooks that are used in the program
@@ -55,7 +62,7 @@ The autocomplete feature is only available in the main COBOL file, not in copybo
 ### Syntax and Semantic Check for Code
 This feature checks for mistakes and errors in COBOL code. The syntax check feature reviews the whole content of the code and suggests fixes, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
 
-This feature is also enabled for CICS and DB2 SQL keywords and variables.
+This feature is also enabled for IDMS, Datacom, CICS, and DB2 SQL keywords and variables.
 
 ![Syntax check](/docs/images/CLSErrorHighlighting.gif)
 			
@@ -89,6 +96,10 @@ The dialects setting lets you include specific language analysis in your COBOL f
 
 **Note:** If you disable the setting, your IDMS bits of code are highlighted as errors.
 
+### SQL Backend Server
+
+Set the SQL backend server as either DB2 or Datacom to ensure you use the correct version of the implicit `SQLCA` and `SQLDA` copybooks. To set the SQL backend server, go to **VS Code Settings** > **User** > **Extensions** > **COBOL Language Support** > **Cobol-lsp: Target-sql-backend**. The default setting is DB2.
+
 ## Subroutine Support
 
 The COBOL Language Support extension supports subroutines specified in CALL statements if the called program is stored in a local folder in your workspace. The Go To Definition and Find All References functionalities, as well as autocomplete, are extended to work for names of subroutines. 
@@ -113,11 +124,17 @@ The COBOL Language Support extension supports copybooks used in your source code
 
 You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
 
-COBOL Language Support also supports copybooks for the IDMS dialect, called with the `COPY IDMS` statement. For more information, see the [IDMS documentation](https://techdocs.broadcom.com/us/en/ca-mainframe-software/database-management/ca-idms/19-0.html).
-
 Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
 
 Configuring copybook support on COBOL Language Support also enables copybook support features of the [COBOL Control Flow](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.ccf) extension.
+
+### Supported Copybook Types
+
+COBOL Language Support supports the following copybook types:
+
+- IBM COBOL Copybooks, called with the `COPY` statement.
+- IDMS dialect copybooks, called with the `COPY IDMS` statement. For more information, see the [IDMS documentation](https://techdocs.broadcom.com/idms)
+- Datacom COBOL copybooks, called with the `COPY` statement. Datacom copybooks must be extracted to a mainframe data set or local folder for use in COBOL Language Support. For more information, see the [Datacom documentation](https://techdocs.broadcom.com/datacom).
 
 ### Storing Copybooks Locally
 
@@ -128,7 +145,7 @@ You can store your copybooks locally in folders in your workspace and specify th
 1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
 2. Switch from **User** to **Workspace**.
 3. Specify the paths of the folders containing copybooks:
-   - Under **Cpy-manager: Paths-local** for standard IBM Enterprise COBOL.
+   - Under **Cpy-manager: Paths-local** for standard IBM Enterprise COBOL and Datacom.
    - Under **Cpy-manager: Paths-local: Idms** for the IDMS dialect.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**. 
    - The folders are searched in the order they are listed. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
