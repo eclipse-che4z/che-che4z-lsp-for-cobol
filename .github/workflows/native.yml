@@ -138,9 +138,10 @@ jobs:
       working-directory: clients/cobol-lsp-vscode-extension
       run: |
        pwd
-       ls -ltra
-       cp -r ../../staging/* ./server/
-       cp ../../jar/* ./server
+       ls -ltra ..
+       ls -lrta ../..
+       cp -r ../../staging/. ./server/
+       cp ../../jar/. ./server
     - name: coverage
       run: npm run package
     - uses: actions/upload-artifact@v3
