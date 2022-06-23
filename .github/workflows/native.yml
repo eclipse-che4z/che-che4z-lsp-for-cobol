@@ -99,7 +99,6 @@ jobs:
           path: staging
       - uses: actions/upload-artifact@v2
         with:
-          name: jar
           path: server/target/server.jar
       - uses: actions/upload-artifact@v2
         with:
@@ -116,10 +115,6 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         path: staging
-    - name: Retrieve native images
-      uses: actions/download-artifact@v2
-      with:
-        path: jar
     - uses: actions/setup-node@v3
       with:
         node-version: 14
