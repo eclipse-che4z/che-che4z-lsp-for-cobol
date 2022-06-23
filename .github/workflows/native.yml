@@ -144,7 +144,8 @@ jobs:
     - name: configure server
       working-directory: clients/cobol-lsp-vscode-extension
       run: "cp -R ../../staging/. ./server/"
-    - name: coverage
+    - name: generate vsix
+      working-directory: clients/cobol-lsp-vscode-extension
       run: npm run package
     - uses: actions/upload-artifact@v3
       with:
