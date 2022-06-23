@@ -141,7 +141,9 @@ jobs:
       run: "cp -R ../../staging/. ./server/"
     - name: generate vsix
       working-directory: clients/cobol-lsp-vscode-extension
-      run: npm run package
+      run: |
+        npm run package
+        cp *.vsix ../../.
     - uses: actions/upload-artifact@v3
       with:
         name: vsix-package
