@@ -143,9 +143,7 @@ jobs:
       run: ls -ltra ../..
     - name: configure server
       working-directory: clients/cobol-lsp-vscode-extension
-      run: |
-        "cp -r ../../staging/. ./server/"
-        "cp ../../jar/. ./server"
+      run: "cp -R ../../staging/. ./server/"
     - name: coverage
       run: npm run package
     - uses: actions/upload-artifact@v3
