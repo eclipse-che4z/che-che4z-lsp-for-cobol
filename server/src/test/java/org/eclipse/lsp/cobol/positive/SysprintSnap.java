@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.lsp4j.Range;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Objects representing a cross-reference in a SYSPRINT file.
@@ -46,5 +47,31 @@ public class SysprintSnap {
     this.dataName = dataName;
     this.definedLineNo = definedLineNo;
     this.references = references;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    if (this.definitionLocation != null) {
+      sb.append(getFormattedRange(definitionLocation));
+    } else {
+      sb.append(definedLineNo);
+    }
+    sb.append("\t");
+    sb.append(dataName);
+    sb.append("\t");
+    if (referencesLocation != null) {
+      sb.append(
+          referencesLocation.stream().map(this::getFormattedRange).collect(Collectors.joining(",")));
+    } else {
+      sb.append(references.stream().map(Object::toString).collect(Collectors.joining(",")));
+    }
+    return sb.toString();
+  }
+
+  private String getFormattedRange(Range range) {
+    return String.format(
+        "%d:%d-%d:%d",
+        range.getStart().getLine(), range.getStart().getCharacter(), range.getEnd().getLine(), range.getEnd().getCharacter());
   }
 }

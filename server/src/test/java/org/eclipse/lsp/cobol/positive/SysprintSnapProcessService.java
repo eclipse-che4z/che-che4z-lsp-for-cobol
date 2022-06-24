@@ -31,9 +31,9 @@ public class SysprintSnapProcessService {
   private final Map<String, String> renamedReferences;
   private static final String CROSS_REFERENCE_REPORT_START =
       "Defined   Cross-reference of data names   References";
-  private static final String CROSS_REFERENCE_REPORT_END = "LineID  Message code  Message text";
+  private static final String CROSS_REFERENCE_REPORT_END = "LineID  Message code  Message text|End of compilation";
 
-  private static Pattern getPatternForCuttingReport(String start, String end) {
+  static Pattern getPatternForCuttingReport(String start, String end) {
     return Pattern.compile(String.format("(%s).*?(%s)", start, end), Pattern.DOTALL);
   }
 
