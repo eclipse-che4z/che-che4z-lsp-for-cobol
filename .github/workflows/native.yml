@@ -99,6 +99,7 @@ jobs:
           path: staging
       - uses: actions/upload-artifact@v3
         with:
+          name: jar
           path: server/target/server.jar
       - uses: actions/upload-artifact@v3
         with:
@@ -127,15 +128,6 @@ jobs:
     - name: coverage
       run: npm run coverage
       working-directory: clients/cobol-lsp-vscode-extension
-    - name: see ls 
-      working-directory: clients/cobol-lsp-vscode-extension
-      run: ls -ltra
-    - name: see ls ..
-      working-directory: clients/cobol-lsp-vscode-extension
-      run: ls -ltra ..
-    - name: see ls ../..
-      working-directory: clients/cobol-lsp-vscode-extension
-      run: ls -ltra ../..
     - name: configure server
       working-directory: clients/cobol-lsp-vscode-extension
       run: "cp -R ../../staging/. ./server/"
