@@ -45,8 +45,8 @@ describe("Checks Java installation", () => {
     let map: any;
     let checkFn: any;
     let stderrFn: any;
-    const expectedErrMsgSupportedJavaVersion = "Minimum expected Java version is 8";
-    const expectedErrMsgJavaVersionNotFound = "Java 8 is not found";
+    const expectedErrMsgSupportedJavaVersion = "Minimum expected Java version is 8. Switching to native builds";
+    const expectedErrMsgJavaVersionNotFound = "Java 8 is not found. Switching to native builds";
 
     beforeEach(() => {
         javaCheck = new JavaCheck();
@@ -114,6 +114,6 @@ describe("Checks Java installation", () => {
         const promise = javaCheck.isJavaInstalled();
         map.close(23);
 
-        await expect(promise).rejects.toEqual("An error occurred when checking if Java was installed");
+        await expect(promise).rejects.toEqual("An error occurred when checking if Java was installed. Switching to native builds");
     });
 });

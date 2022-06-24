@@ -33,14 +33,20 @@ import {Middleware} from "./Middleware";
 import { SettingsService } from "./Settings";
 
 export class LanguageClientService {
-    private readonly jarPath: string;
+    private jarPath: string;
     private languageClient: LanguageClient;
     private handlers: {(languageClient: LanguageClient): void}[] = [];
+    private isNativeBuildEnabled: boolean = false;
 
     constructor(private middleware: Middleware) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
-        this.jarPath = `${ext.extensionPath}/server/server.jar`;
-        // this.jarPath =  this.initializeExecutables(`${ext.extensionPath}/server`);
+        this.jarPath = `${ext.extensionPath}/server/jar/server.jar`;
+    }
+
+    public enableNativeBuild() {
+        const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
+        this.isNativeBuildEnabled = true;
+        this.jarPath = this.initializeExecutables(`${ext.extensionPath}/server`);
     }
 
     public async checkPrerequisites(): Promise<void> {
@@ -110,28 +116,9 @@ export class LanguageClientService {
     }
 
     private createServerOptions(jarPath: string) {
-        // const executable: Executable = {
-        //     args: ["pipeEnabled"],
-        //     command: "",
-        //     options: { stdio: "pipe", detached: false },
-        // };
-        // switch (os.type()) {
-        //     case "Windows_NT":
-        //         executable.options.cwd=`${jarPath}`;
-        //         executable.command = `server.exe`;
-        //         break;
-        //     case "Darwin":
-        //         executable.options.cwd=`${jarPath}`;
-        //         executable.command = `./server-mac-amd64`;
-        //         break;
-        //     case "Linux":
-        //         executable.options.cwd=`${jarPath}`;
-        //         executable.command = `./server`;
-        //         break;
-        //     default:
-        //         break;
-        // }
-        // return executable;
+        if(this.isNativeBuildEnabled) {
+            return nativeServer(jarPath);
+        }
         const port = SettingsService.getLspPort();
         if (port) {
             // Connect to language server via socket
@@ -149,7 +136,7 @@ export class LanguageClientService {
             };
         }
         return {
-            args: ["-Dline.slseparator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
+            args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
             command: "java",
             options: {stdio: "pipe", detached: false},
         };
@@ -183,3 +170,28 @@ export class LanguageClientService {
         });
     }
 }
+function nativeServer(jarPath: string) {
+    const executable: Executable = {
+            args: ["pipeEnabled"],
+            command: "",
+            options: { stdio: "pipe", detached: false },
+        };
+        switch (os.type()) {
+            case "Windows_NT":
+                executable.options.cwd=`${jarPath}`;
+                executable.command = `server.exe`;
+                break;
+            case "Darwin":
+                executable.options.cwd=`${jarPath}`;
+                executable.command = `./server-mac-amd64`;
+                break;
+            case "Linux":
+                executable.options.cwd=`${jarPath}`;
+                executable.command = `./server`;
+                break;
+            default:
+                break;
+        }
+        return executable;
+}
+

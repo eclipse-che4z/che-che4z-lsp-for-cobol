@@ -31,16 +31,16 @@ export class JavaCheck {
             });
             ls.on("error", (code: any) => {
                 if ("Error: spawn java ENOENT" === code.toString()) {
-                    reject("Java 8 is not found");
+                    reject("Java 8 is not found. Switching to native builds");
                 }
                 reject(code);
             });
             ls.on("close", (code: number) => {
                 if (code !== 0) {
-                    reject("An error occurred when checking if Java was installed");
+                    reject("An error occurred when checking if Java was installed. Switching to native builds");
                 }
                 if (!resolved) {
-                    reject("Minimum expected Java version is 8");
+                    reject("Minimum expected Java version is 8. Switching to native builds");
                 }
             });
         });
