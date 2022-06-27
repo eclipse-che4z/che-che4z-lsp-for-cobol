@@ -18,10 +18,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.model.CobolLine;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
@@ -62,14 +59,14 @@ public class TextPreprocessorImpl implements TextPreprocessor {
   }
 
   @Override
-  public ResultWithErrors<String> cleanUpCode(String documentUri, String cobolCode) {
+  public ResultWithErrors<ExtendedDocumentHierarchy> cleanUpCode(String documentUri, String cobolCode) {
     List<SyntaxError> errors = new ArrayList<>();
     List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
     List<CobolLine> transformedLines = transformLines(documentUri, lines).unwrap(errors::addAll);
     List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
 
     String code = writer.serialize(rewrittenLines);
-    return new ResultWithErrors<>(code, errors);
+    return new ResultWithErrors<>(ExtendedDocumentHierarchy.of(code, documentUri), errors);
   }
 
   @NonNull

@@ -181,7 +181,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
                       hierarchy,
                       preprocessor
                           .cleanUpCode(model.getUri(), model.getContent())
-                          .unwrap(errors::addAll))
+                          .unwrap(errors::addAll).calculateExtendedText())
                   .unwrap(errors::addAll))
           .accumulateErrors(errors);
     };

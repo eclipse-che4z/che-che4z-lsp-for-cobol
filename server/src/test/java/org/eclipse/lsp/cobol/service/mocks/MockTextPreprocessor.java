@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service.mocks;
 import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocumentHierarchy;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
@@ -27,8 +28,8 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
  */
 public class MockTextPreprocessor implements TextPreprocessor {
   @Override
-  public ResultWithErrors<String> cleanUpCode(String documentUri, String cobolCode) {
-    return new ResultWithErrors<>(cobolCode, ImmutableList.of());
+  public ResultWithErrors<ExtendedDocumentHierarchy> cleanUpCode(String documentUri, String cobolCode) {
+    return new ResultWithErrors<>(ExtendedDocumentHierarchy.of(cobolCode, documentUri), ImmutableList.of());
   }
 
   @Override

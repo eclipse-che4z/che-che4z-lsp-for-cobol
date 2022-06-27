@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.preprocessor;
 
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocumentHierarchy;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
@@ -33,7 +34,7 @@ public interface TextPreprocessor {
    * @return modified code wrapped object and list of syntax error that might send back to the
    *     client
    */
-  ResultWithErrors<String> cleanUpCode(String documentUri, String cobolCode);
+  ResultWithErrors<ExtendedDocumentHierarchy> cleanUpCode(String documentUri, String cobolCode);
 
   /**
    * Process the given source code by removing all the unnecessary tokens and building in the nested

@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor;
 
 import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocumentHierarchy;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
@@ -36,27 +37,31 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /** This test checks multiple comment entries are parsed and cleaned up correctly */
-class TestCommentLines {
+class TestLinesConcatenation {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
   private static final String TEXT =
-      "      * Copyright (c) 2021 Broadcom.\n"
-          + "      * The term Broadcom  refers to Broadcom Inc. and/or its subsidiaries.\n"
-          + "000010 IDENTIFICATION DIVISION.                                         qweasdzx\n"
-          + "000020*    Comment line                                                 qweasdzx\n"
-          + "\n"
-          + "000022*> Floating comment                                               qweasdzx\n"
-          + "000025 *> 25 Floating comment  w/o space      qweasdzx\n"
-          + "000030 PROGRAM-ID. comments.    *> Floating comment\n";
+      "000100 IDENTIFICATION DIVISION.                                         NC2054.2\n"
+          + "000200 PROGRAM-ID.                                                      NC2054.2\n"
+          + "000300     NC205A.                                                      NC2054.2\n"
+          + "003800 DATA DIVISION.                                                   NC2054.2\n"
+          + "004300 WORKING-STORAGE SECTION.                                         NC2054.2\n"
+          + "005400 77  CONT-B                       PICTURE S9(5)V9(5) VALUE ZERO.  NC2054.2\n"
+          + "028300 PROCEDURE DIVISION.                                              NC2054.2\n"
+          + "040700     MOVE     4                                                   NC2054.2\n"
+          + "040800-             5                                                   NC2054.2\n"
+          + "040900-             6                                                   NC2054.2\n"
+          + "041000-             7                                                   NC2054.2\n"
+          + "041100-             8 TO CONT-B.                                        NC2054.2";
 
   private static final String EXPECTED =
-      "       \n"
-          + "       \n"
-          + "       IDENTIFICATION DIVISION.\n"
-          + "       \n"
-          + "       \n"
-          + "       \n"
-          + "       \n"
-          + "       PROGRAM-ID. comments.    ";
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.\n"
+          + "           NC205A.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       77  CONT-B                       PICTURE S9(5)V9(5) VALUE ZERO.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           MOVE     45678 TO CONT-B.";
 
   @Test
   void test() {
@@ -68,12 +73,9 @@ class TestCommentLines {
     CobolLinesTransformation transformation = new ContinuationLineTransformation(messageService);
     CobolLineReWriter indicatorProcessor = new CobolLineIndicatorProcessorImpl();
 
-    TextPreprocessor textPreprocessor =
-        new TextPreprocessorImpl(
-            grammarPreprocessor, reader, writer, transformation, indicatorProcessor);
-    String actual =
-        textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll).calculateExtendedText();
-    assertEquals(EXPECTED, actual);
+    TextPreprocessor textPreprocessor = new TextPreprocessorImpl(grammarPreprocessor, reader, writer, transformation, indicatorProcessor);
+    ExtendedDocumentHierarchy extendedDocumentHierarchy = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
+    assertEquals(EXPECTED, extendedDocumentHierarchy.calculateExtendedText());
     assertTrue(accumulatedErrors.isEmpty());
   }
 }

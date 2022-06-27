@@ -55,12 +55,18 @@ public class ExtendedDocumentHierarchy {
     }
     for (int i = lineNumber; i < lines.length; i++) {
       sb.append(lines[i]);
-      sb.append("\n");
+      if(i < lines.length -1) {
+        sb.append("\n");
+      }
     }
     return sb.toString();
   }
 
   public void replace(CopyNode copyNode, ExtendedDocumentHierarchy extendedDocumentHierarchy) {
     replacements.put(copyNode.getLocality(), extendedDocumentHierarchy);
+  }
+
+  public static ExtendedDocumentHierarchy of(String text, String uri) {
+    return new ExtendedDocumentHierarchy(text, uri);
   }
 }

@@ -144,7 +144,7 @@ class CobolLanguageEngineTest {
     when(dialectService.process(anyList(), any()))
         .thenReturn(new ResultWithErrors<>(new DialectOutcome(TEXT, ImmutableList.of(), ImmutableMultimap.of()), ImmutableList.of()));
     when(preprocessor.cleanUpCode(URI, TEXT))
-        .thenReturn(new ResultWithErrors<>(TEXT, ImmutableList.of()));
+        .thenReturn(new ResultWithErrors<>(ExtendedDocumentHierarchy.of(TEXT, URI), ImmutableList.of()));
     when(preprocessor.processCleanCode(
             eq(URI), eq(TEXT), eq(cpyConfig), any(CopybookHierarchy.class)))
         .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));

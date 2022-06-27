@@ -167,7 +167,7 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private CopybookModel cleanupCopybook(CopybookModel dirtyCopybook) {
-    String cleanText = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent()).getResult();
+    String cleanText = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent()).getResult().calculateExtendedText();
     return new CopybookModel(dirtyCopybook.getCopybookName(), dirtyCopybook.getUri(), cleanText);
   }
 

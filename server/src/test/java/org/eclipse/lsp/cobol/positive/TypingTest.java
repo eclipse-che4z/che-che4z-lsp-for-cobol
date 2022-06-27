@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.positive;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocumentHierarchy;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
@@ -74,10 +75,10 @@ class TypingTest extends FileBasedTest {
         new ContinuationLineTransformation(null),
         new CobolLineIndicatorProcessorImpl()
     );
-    ResultWithErrors<String> cleanTextResult = preprocessor.cleanUpCode(cobolText.getFileName(), cobolText.getFullText());
+    ResultWithErrors<ExtendedDocumentHierarchy> cleanTextResult = preprocessor.cleanUpCode(cobolText.getFileName(), cobolText.getFullText());
     for (SyntaxError error: cleanTextResult.getErrors())
       LOG.error(error.toString());
-    return cleanTextResult.getResult();
+    return cleanTextResult.getResult().calculateExtendedText();
   }
 
   private void analyze(String name, String fullText) {
