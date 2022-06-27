@@ -71,7 +71,7 @@ public final class DaCoDialect implements CobolDialect {
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
     List<SyntaxError> errors = new ArrayList<>();
     DialectOutcome maidOutcome = maidProcessor.process(
-            dcdbPattern.matcher(context.getText()).replaceAll(SPACES_A),
+            dcdbPattern.matcher(context.getExtendedDocumentHierarchy().calculateExtendedText()).replaceAll(SPACES_A),
             context, errors);
     DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(maidOutcome.getText()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);

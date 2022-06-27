@@ -87,7 +87,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     this.copybookConfig = context.getCopybookConfig();
     this.programDocumentUri = context.getProgramDocumentUri();
 
-    textReplacement = new TextReplacement(context.getText());
+    textReplacement = new TextReplacement(context.getExtendedDocumentHierarchy().calculateExtendedText());
   }
 
   public String getResultedText() {

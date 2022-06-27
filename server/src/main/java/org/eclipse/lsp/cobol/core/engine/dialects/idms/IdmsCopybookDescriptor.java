@@ -29,12 +29,12 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 @Data
 public class IdmsCopybookDescriptor {
   String name;
-  Locality locality;
+  Locality usage;
 
   public static IdmsCopybookDescriptor from(IdmsParser.CopyIdmsStatementContext ctx, String programDocumentUri) {
     IdmsCopybookDescriptor result = new IdmsCopybookDescriptor();
     result.name = getName(ctx);
-    result.locality = Locality.builder()
+    result.usage = Locality.builder()
             .uri(programDocumentUri)
             .range(DialectUtils.constructRange(ctx))
             .build();

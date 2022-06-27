@@ -30,7 +30,7 @@ public class ExtendedDocumentHierarchy {
   private final String text;
   private final String uri;
   private final Map<Locality, ExtendedDocumentHierarchy> replacements = new HashMap<>();
-  private final List<CopyNode> copyNode = new ArrayList<>();
+  private final List<CopyNode> copyNodes = new ArrayList<>();
 
   public String calculateExtendedText() {
     StringBuilder sb = new StringBuilder();
@@ -63,6 +63,7 @@ public class ExtendedDocumentHierarchy {
   }
 
   public void replace(CopyNode copyNode, ExtendedDocumentHierarchy extendedDocumentHierarchy) {
+    copyNodes.add(copyNode);
     replacements.put(copyNode.getLocality(), extendedDocumentHierarchy);
   }
 

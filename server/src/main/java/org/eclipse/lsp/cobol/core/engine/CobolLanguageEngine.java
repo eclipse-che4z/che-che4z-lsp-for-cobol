@@ -121,7 +121,6 @@ public class CobolLanguageEngine {
     DialectProcessingContext dialectProcessingContext =
         DialectProcessingContext.builder()
             .programDocumentUri(documentUri)
-            .text(cleanText.calculateExtendedText())
             .extendedDocumentHierarchy(cleanText)
             .copybookConfig(analysisConfig.getCopybookConfig())
             .build();

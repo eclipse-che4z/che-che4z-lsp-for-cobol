@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-/** This test checks multiple comment entries are parsed and cleaned up correctly */
+/** This test checks line concatenation */
 class TestLinesConcatenation {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
   private static final String TEXT =
@@ -77,5 +77,6 @@ class TestLinesConcatenation {
     ExtendedDocumentHierarchy extendedDocumentHierarchy = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
     assertEquals(EXPECTED, extendedDocumentHierarchy.calculateExtendedText());
     assertTrue(accumulatedErrors.isEmpty());
+    assertEquals(1, extendedDocumentHierarchy.getReplacements().size());
   }
 }

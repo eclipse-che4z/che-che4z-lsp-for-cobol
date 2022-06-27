@@ -26,10 +26,13 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectParserListener;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -68,8 +71,7 @@ public final class IdmsDialect implements CobolDialect {
     List<IdmsCopybookDescriptor> cbs =
         new CopybookInlineVisitor(extendedDocumentHierarchy)
             .visitStartRule(
-                parseIdms(
-                    extendedDocumentHierarchy.calculateExtendedText(), "", errors));
+                parseIdms(extendedDocumentHierarchy.calculateExtendedText(), "", errors));
     cbs.forEach(
         cb -> {
           CopybookModel copybookModel =
@@ -79,11 +81,16 @@ public final class IdmsDialect implements CobolDialect {
                   extendedDocumentHierarchy.getUri(), // FIX me for nested case
                   context.getCopybookConfig(),
                   true);
-          extendedDocumentHierarchy
-              .replace(
-                  new CopyNode(cb.getLocality(), cb.getName(), IdmsDialect.NAME),
-                  new ExtendedDocumentHierarchy(
-                      copybookModel.getContent(), copybookModel.getUri()));
+          CopyNode copyNode = new CopyNode(cb.getUsage(), cb.getName(), IdmsDialect.NAME);
+
+          Location cbLocation = new Location();
+          cbLocation.setRange(new Range());
+          cbLocation.setUri(copybookModel.getUri());
+          CopyDefinition copyDefinition = new CopyDefinition(cbLocation, cb.getName());
+          copyNode.setDefinition(copyDefinition);
+          extendedDocumentHierarchy.replace(
+              copyNode,
+              new ExtendedDocumentHierarchy(copybookModel.getContent(), copybookModel.getUri()));
         });
   }
 
@@ -97,9 +104,10 @@ public final class IdmsDialect implements CobolDialect {
     IdmsVisitor visitor = new IdmsVisitor(copybookService, treeListener, messageService, context);
     List<SyntaxError> errors = new ArrayList<>();
     IdmsParser.StartRuleContext startRuleContext =
-        parseIdms(context.getText(), context.getProgramDocumentUri(), errors);
-    List<Node> nodes = new ArrayList<>(context.getExtendedDocumentHierarchy().getCopyNode());
+        parseIdms(context.getExtendedDocumentHierarchy().calculateExtendedText(), context.getProgramDocumentUri(), errors);
+    List<Node> nodes = new ArrayList<>();
     nodes.addAll(visitor.visitStartRule(startRuleContext));
+    nodes.addAll(context.getExtendedDocumentHierarchy().getCopyNodes());
     errors.addAll(visitor.getErrors());
 
     return new ResultWithErrors<>(

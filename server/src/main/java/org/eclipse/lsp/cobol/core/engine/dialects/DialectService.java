@@ -106,10 +106,7 @@ public class DialectService {
 
     List<SyntaxError> errors = new ArrayList<>(previousResult.getErrors());
 
-    DialectOutcome result = dialect.processText(context.toBuilder()
-                    .text(previousResult.getResult().getText())
-                    .build())
-            .unwrap(errors::addAll);
+    DialectOutcome result = dialect.processText(context).unwrap(errors::addAll);
     nodes.addAll(result.getDialectNodes());
     implicitCode.putAll(result.getImplicitCode());
     return new ResultWithErrors<>(new DialectOutcome(result.getText(), nodes, implicitCode), errors);
