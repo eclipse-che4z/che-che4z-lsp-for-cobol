@@ -16,6 +16,8 @@ package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import lombok.Builder;
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocumentHierarchy;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 /**
@@ -26,5 +28,6 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 public class DialectProcessingContext {
   String programDocumentUri;
   String text;
+  ExtendedDocumentHierarchy extendedDocumentHierarchy;
   CopybookConfig copybookConfig;
 }

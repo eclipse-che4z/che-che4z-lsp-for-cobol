@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects.daco;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
@@ -26,6 +27,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectParserListener;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.provider.DaCoImplicitCodeProvider;
+import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -34,6 +36,7 @@ import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -91,5 +94,10 @@ public final class DaCoDialect implements CobolDialect {
 
     DialectOutcome result = new DialectOutcome(text, nodes, implicitCode);
     return new ResultWithErrors<>(result, errors);
+  }
+
+  @Override
+  public Set<String> runBefore() {
+    return ImmutableSet.of(IdmsDialect.NAME);
   }
 }

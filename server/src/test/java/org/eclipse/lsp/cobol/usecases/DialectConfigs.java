@@ -26,18 +26,18 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 /** IDMS and MAID related getter */
 @UtilityClass
 public class DialectConfigs {
-  AnalysisConfig getIDMSAnalysisConfig() {
+  public AnalysisConfig getIDMSAnalysisConfig() {
     return new AnalysisConfig(
         new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
         ImmutableList.of(),
         ImmutableList.of(IdmsDialect.NAME));
   }
 
-  AnalysisConfig getDaCoAnalysisConfig() {
+  public AnalysisConfig getDaCoAnalysisConfig() {
     return new AnalysisConfig(
             new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(),
-            ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME));
+            ImmutableList.of(DaCoDialect.NAME));
   }
 
   AnalysisConfig getDaCoAnalysisConfig(CopybookConfig copybookConfig) {

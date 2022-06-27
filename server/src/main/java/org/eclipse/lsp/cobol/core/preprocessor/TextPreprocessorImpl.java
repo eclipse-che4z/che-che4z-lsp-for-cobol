@@ -87,8 +87,7 @@ public class TextPreprocessorImpl implements TextPreprocessor {
     return reader.processLines(documentURI, cobolCode);
   }
 
-  private ResultWithErrors<List<CobolLine>> transformLines(
-      String documentURI, List<CobolLine> lines) {
+  private ResultWithErrors<List<CobolLine>> transformLines(String documentURI, List<CobolLine> lines) {
     return transformation.transformLines(documentURI, lines);
   }
 

@@ -115,15 +115,22 @@ public class CobolLanguageEngine {
 
     timingBuilder.getDialectsTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
-    String cleanText = preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
+    String cleanText =
+        preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
 
-    DialectOutcome dialectOutcome = dialectService
-        .process(analysisConfig.getDialects(), DialectProcessingContext.builder()
+    DialectProcessingContext dialectProcessingContext =
+        DialectProcessingContext.builder()
             .programDocumentUri(documentUri)
             .text(cleanText)
+            .extendedDocumentHierarchy(new ExtendedDocumentHierarchy(cleanText, documentUri))
             .copybookConfig(analysisConfig.getCopybookConfig())
-            .build())
-        .unwrap(accumulatedErrors::addAll);
+            .build();
+
+    DialectOutcome dialectOutcome =
+        dialectService
+            .process(analysisConfig.getDialects(), dialectProcessingContext)
+            .unwrap(accumulatedErrors::addAll);
+
     timingBuilder.getDialectsTimer().stop();
 
     timingBuilder.getPreprocessorTimer().start();
@@ -175,8 +182,7 @@ public class CobolLanguageEngine {
             messageService,
             subroutineService,
             dialectOutcome.getDialectNodes(),
-            cachingConfigurationService
-        );
+            cachingConfigurationService);
     List<Node> syntaxTree = visitor.visit(tree);
     accumulatedErrors.addAll(visitor.getErrors());
     timingBuilder.getVisitorTimer().stop();
@@ -214,13 +220,15 @@ public class CobolLanguageEngine {
         rootNode, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
-  private CopybooksRepository applyDialectCopybooks(CopybooksRepository copybooks, DialectOutcome dialectOutcome) {
+  private CopybooksRepository applyDialectCopybooks(
+      CopybooksRepository copybooks, DialectOutcome dialectOutcome) {
     dialectOutcome.getDialectNodes().stream()
         .flatMap(Node::getDepthFirstStream)
         .filter(n -> n.getNodeType().equals(NodeType.COPY))
         .map(CopyNode.class::cast)
-            .filter(n -> n.getDefinition() != null)
-        .forEach(n -> copybooks.define(n.getName(), n.getDialect(), n.getDefinition().getLocation()));
+        .filter(n -> n.getDefinition() != null)
+        .forEach(
+            n -> copybooks.define(n.getName(), n.getDialect(), n.getDefinition().getLocation()));
     return copybooks;
   }
 

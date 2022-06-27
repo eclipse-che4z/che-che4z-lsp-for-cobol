@@ -26,6 +26,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoMaidProcessor;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocumentHierarchy;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -33,7 +34,9 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.*;
 
-/** Dialect utility class */
+/**
+ * Dialect utility class
+ */
 @Singleton
 public class DialectService {
   private static final CobolDialect EMPTY_DIALECT = () -> "COBOL";
@@ -56,17 +59,39 @@ public class DialectService {
    * Process the source file text with dialects
    *
    * @param dialects the list of enabled dialects
-   * @param context is a DialectProcessingContext class with all needed data for dialect processing
+   * @param context  is a DialectProcessingContext class with all needed data for dialect processing
    * @return dialects outcome
    */
   public ResultWithErrors<DialectOutcome> process(List<String> dialects, DialectProcessingContext context) {
-    return dialects.stream()
-        .map(this::getDialectByName)
-        .reduce(
-            ResultWithErrors.of(new DialectOutcome(context.getText(), ImmutableList.of(), ImmutableMultimap.of())),
-            (previousResult, dialect) -> processDialect(previousResult, dialect, context),
-            DialectService::mergeResults
-        );
+    LinkedList<CobolDialect> orderedDialects = new LinkedList<>();
+    LinkedList<String> dialectsQueue = new LinkedList<>(dialects);
+    while (!dialectsQueue.isEmpty()) {
+      CobolDialect dialect = getDialectByName(dialectsQueue.pop());
+      if (dialect.runBefore().isEmpty()) {
+        orderedDialects.add(dialect);
+      } else {
+        int pos = orderedDialects.size();
+        for (String name : dialect.runBefore()) {
+          CobolDialect d = getDialectByName(name);
+          int index = orderedDialects.indexOf(d);
+          if (index >= 0) {
+            pos = index;
+          } else {
+            dialectsQueue.add(d.getName());
+          }
+        }
+        orderedDialects.add(pos, dialect);
+      }
+    };
+    for (CobolDialect orderedDialect : orderedDialects) {
+      orderedDialect.extend(context);
+    }
+    ResultWithErrors<DialectOutcome> acc = ResultWithErrors
+            .of(new DialectOutcome(context.getExtendedDocumentHierarchy().calculateExtendedText(), ImmutableList.of(), ImmutableMultimap.of()));
+    for (CobolDialect orderedDialect : orderedDialects) {
+      acc = processDialect(acc, orderedDialect, context);
+    }
+    return acc;
   }
 
   private CobolDialect getDialectByName(String dialectName) {
@@ -82,9 +107,9 @@ public class DialectService {
     List<SyntaxError> errors = new ArrayList<>(previousResult.getErrors());
 
     DialectOutcome result = dialect.processText(context.toBuilder()
-            .text(previousResult.getResult().getText())
-            .build())
-        .unwrap(errors::addAll);
+                    .text(previousResult.getResult().getText())
+                    .build())
+            .unwrap(errors::addAll);
     nodes.addAll(result.getDialectNodes());
     implicitCode.putAll(result.getImplicitCode());
     return new ResultWithErrors<>(new DialectOutcome(result.getText(), nodes, implicitCode), errors);

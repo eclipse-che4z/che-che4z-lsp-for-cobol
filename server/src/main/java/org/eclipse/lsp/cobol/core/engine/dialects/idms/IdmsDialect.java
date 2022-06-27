@@ -25,13 +25,14 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectParserListener;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /** Process the text according to the IDMS rules */
@@ -41,9 +42,10 @@ public final class IdmsDialect implements CobolDialect {
   private final ParseTreeListener treeListener;
   private final MessageService messageService;
 
-  public IdmsDialect(CopybookService copybookService,
-                     ParseTreeListener treeListener,
-                     MessageService messageService) {
+  public IdmsDialect(
+      CopybookService copybookService,
+      ParseTreeListener treeListener,
+      MessageService messageService) {
     this.copybookService = copybookService;
     this.treeListener = treeListener;
     this.messageService = messageService;
@@ -51,11 +53,38 @@ public final class IdmsDialect implements CobolDialect {
 
   /**
    * Gets the name of the dialect
+   *
    * @return the name of the dialect
    */
   @Override
   public String getName() {
     return NAME;
+  }
+
+  @Override
+  public void extend(DialectProcessingContext context) {
+    List<SyntaxError> errors = new LinkedList<>();
+    ExtendedDocumentHierarchy extendedDocumentHierarchy = context.getExtendedDocumentHierarchy();
+    List<IdmsCopybookDescriptor> cbs =
+        new CopybookInlineVisitor(extendedDocumentHierarchy)
+            .visitStartRule(
+                parseIdms(
+                    extendedDocumentHierarchy.calculateExtendedText(), "", errors));
+    cbs.forEach(
+        cb -> {
+          CopybookModel copybookModel =
+              copybookService.resolve(
+                  new CopybookName(cb.getName(), IdmsDialect.NAME),
+                  extendedDocumentHierarchy.getUri(),
+                  extendedDocumentHierarchy.getUri(), // FIX me for nested case
+                  context.getCopybookConfig(),
+                  true);
+          extendedDocumentHierarchy
+              .replace(
+                  new CopyNode(cb.getLocality(), cb.getName(), IdmsDialect.NAME),
+                  new ExtendedDocumentHierarchy(
+                      copybookModel.getContent(), copybookModel.getUri()));
+        });
   }
 
   /**
@@ -65,21 +94,32 @@ public final class IdmsDialect implements CobolDialect {
    * @return the dialect processing result
    */
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    IdmsLexer lexer = new IdmsLexer(CharStreams.fromString(context.getText()));
+    IdmsVisitor visitor = new IdmsVisitor(copybookService, treeListener, messageService, context);
+    List<SyntaxError> errors = new ArrayList<>();
+    IdmsParser.StartRuleContext startRuleContext =
+        parseIdms(context.getText(), context.getProgramDocumentUri(), errors);
+    List<Node> nodes = new ArrayList<>(context.getExtendedDocumentHierarchy().getCopyNode());
+    nodes.addAll(visitor.visitStartRule(startRuleContext));
+    errors.addAll(visitor.getErrors());
+
+    return new ResultWithErrors<>(
+        new DialectOutcome(visitor.getResultedText(), nodes, ImmutableMultimap.of()), errors);
+  }
+
+  private IdmsParser.StartRuleContext parseIdms(
+      String text, String programDocumentUri, List<SyntaxError> errors) {
+    IdmsLexer lexer = new IdmsLexer(CharStreams.fromString(text));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     IdmsParser parser = new IdmsParser(tokens);
-    DialectParserListener listener = new DialectParserListener(context.getProgramDocumentUri());
+    DialectParserListener listener = new DialectParserListener(programDocumentUri);
     lexer.removeErrorListeners();
     lexer.addErrorListener(listener);
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
 
-    IdmsVisitor visitor = new IdmsVisitor(copybookService, treeListener, messageService, context);
-    List<Node> nodes = visitor.visitStartRule(parser.startRule());
-    List<SyntaxError> errors = new ArrayList<>(listener.getErrors());
-    errors.addAll(visitor.getErrors());
-
-    return new ResultWithErrors<>(new DialectOutcome(visitor.getResultedText(), nodes, ImmutableMultimap.of()), errors);
+    IdmsParser.StartRuleContext result = parser.startRule();
+    errors.addAll(listener.getErrors());
+    return result;
   }
 }

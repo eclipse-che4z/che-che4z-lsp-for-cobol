@@ -28,5 +28,6 @@ public class ExtendedDocument {
   String uri;
   String text;
   CopybooksRepository copybooks;
+  // URI -> DocumentMapping
   Map<String, DocumentMapping> documentMapping;
 }
