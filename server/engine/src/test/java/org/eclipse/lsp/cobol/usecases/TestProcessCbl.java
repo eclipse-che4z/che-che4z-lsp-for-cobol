@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -419,7 +419,7 @@ class TestProcessCbl {
                 new Range(),
                 "Syntax error on 'foo' expected 'Currency symbol'",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                ErrorStage.SYNTAX.getText())));
   }
 
   @Test
@@ -433,6 +433,6 @@ class TestProcessCbl {
                 new Range(),
                 "Syntax error on '256Kb' expected {'01-49', '66', '77', '88', INTEGERLITERAL}",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                ErrorStage.SYNTAX.getText())));
   }
 }

@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -46,12 +46,12 @@ class TestSemicolonNotAllowedInIdentificationDivision {
                 new Range(),
                 "Extraneous input 'PROGRAM-ID' expected '.'",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorStage.SYNTAX.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "Syntax error on 'TEST1' expected PROGRAM-ID",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                ErrorStage.SYNTAX.getText())));
   }
 }

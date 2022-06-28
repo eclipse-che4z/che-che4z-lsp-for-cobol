@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 
 /** Test no Null pointer exceptions are thrown for incomplete copy replace statements */
 class TestNoNullPointerExpForIncompleteReplaceStatement {
@@ -57,7 +57,7 @@ class TestNoNullPointerExpForIncompleteReplaceStatement {
                 "Syntax error on 'copy' expected {CBL, END, EXEC, FD, FILE, ID, IDENTIFICATION, LINKAGE, "
                     + "LOCAL-STORAGE, PROCEDURE, PROCESS, SD, WORKING-STORAGE, '01-49', '66', '77', '88'}",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 
   @Test
@@ -73,6 +73,6 @@ class TestNoNullPointerExpForIncompleteReplaceStatement {
                     + "LINKAGE, LOCAL-STORAGE, PROCEDURE, PROCESS, SD, WORKING-STORAGE, "
                     + "'01-49', '66', '77', '88'}",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 }

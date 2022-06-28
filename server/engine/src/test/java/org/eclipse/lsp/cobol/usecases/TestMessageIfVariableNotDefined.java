@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 
 /**
  * This test asserts syntax error on not defined variable. CHILD1 on line 6 is used, but not
@@ -49,6 +49,6 @@ class TestMessageIfVariableNotDefined {
         ImmutableList.of(),
         ImmutableMap.of(
             "notDefined",
-            new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
+            new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error,  ErrorStage.SYNTAX.getText())));
   }
 }

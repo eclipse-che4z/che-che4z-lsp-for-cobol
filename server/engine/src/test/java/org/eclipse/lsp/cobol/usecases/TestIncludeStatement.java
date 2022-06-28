@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -41,6 +41,7 @@ class TestIncludeStatement {
   private static final String COPYBOOK1 = "         01 {$*ABC1} PIC 9.";
   private static final String COPYBOOK2 = "         01 {$*ABC2} PIC 9.";
 
+//to check
   @Test
   void test() {
     UseCaseEngine.runTest(
@@ -55,6 +56,6 @@ class TestIncludeStatement {
                 new Range(),
                 "Copybook declaration has more than 10 characters for: NAME123456789",
                 DiagnosticSeverity.Information,
-                SourceInfoLevels.INFO.getText())));
+                ErrorStage.DIALECT.getText())));
   }
 }

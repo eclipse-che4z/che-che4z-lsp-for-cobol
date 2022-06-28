@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -49,7 +49,6 @@ class TestControlCompilerDirective {
   void testNoErrorOnControlCompilerDirective() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
-
   @Test
   void testErrorOnWrongArgumentToControlDirective() {
     UseCaseEngine.runTest(
@@ -61,19 +60,16 @@ class TestControlCompilerDirective {
                 new Range(),
                 "No arguments found for *CONTROL",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorStage.PREPROCESSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "Syntax error on 'MAP1' expected PROGRAM-ID",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorStage.SYNTAX.getText()),
             "3",
             new Diagnostic(
-                new Range(),
-                "No arguments found for *CBL",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                new Range(), "No arguments found for *CBL", DiagnosticSeverity.Error, ErrorStage.PREPROCESSING.getText())));
   }
 
   @Test
@@ -87,6 +83,6 @@ class TestControlCompilerDirective {
                 new Range(),
                 "Compiler directives cannot be continued on another line",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                ErrorStage.PREPROCESSING.getText())));
   }
 }

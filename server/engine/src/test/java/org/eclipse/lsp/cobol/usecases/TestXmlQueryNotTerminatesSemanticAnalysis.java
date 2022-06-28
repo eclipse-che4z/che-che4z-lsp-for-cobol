@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Disabled;
 
 import java.util.List;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 
 /**
  * This test checks that an XML Query that has gaps in concatenation and variable calls with '$'
@@ -78,6 +78,6 @@ class TestXmlQueryNotTerminatesSemanticAnalysis {
             new Range(new Position(19, 21), new Position(19, 29)),
             "Invalid definition for: VARNAME1",
             DiagnosticSeverity.Error,
-            ERROR.getText()));
+             ErrorStage.SYNTAX.getText()));
   }
 }

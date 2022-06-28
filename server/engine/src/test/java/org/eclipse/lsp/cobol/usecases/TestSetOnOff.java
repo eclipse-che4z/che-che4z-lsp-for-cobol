@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 
 /** This test checks that only mnemonic names expected in the SET TO ON/OFF statement */
 class TestSetOnOff {
@@ -58,9 +58,9 @@ class TestSetOnOff {
                 new Range(),
                 "Invalid receiving field type. Expected: Mnemonic name",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
+                 ErrorStage.SYNTAX.getText()),
             "2",
             new Diagnostic(
-                new Range(), "Variable ABCDE is not defined", DiagnosticSeverity.Error, ERROR.getText())));
+                new Range(), "Variable ABCDE is not defined", DiagnosticSeverity.Error,  ErrorStage.SYNTAX.getText())));
   }
 }

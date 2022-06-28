@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 
 /** This test checks that 66-level variable cannot be renamed by another 66 one */
 class Test66RenamingReturnError {
@@ -53,6 +53,6 @@ class Test66RenamingReturnError {
                 new Range(),
                 "No data definition entry found for rename",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 }

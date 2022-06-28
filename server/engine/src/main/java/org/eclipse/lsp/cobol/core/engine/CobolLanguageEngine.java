@@ -210,6 +210,7 @@ public class CobolLanguageEngine {
           timing.getLateErrorProcessingTime());
     }
 
+
     return new ResultWithErrors<>(
         rootNode, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
@@ -284,7 +285,7 @@ public class CobolLanguageEngine {
     return err ->
         err.toBuilder()
             .locality(LocalityUtils.findPreviousVisibleLocality(err.getOffendedToken(), mapping))
-            .suggestion(messageService.getMessage(err.getSuggestion()))
+            .suggestion(messageService.getMessage(err.getSuggestion())).errorStage(ErrorStage.SYNTAX)
             .build();
   }
 
@@ -300,7 +301,8 @@ public class CobolLanguageEngine {
   private List<SyntaxError> raiseError(SyntaxError error, Map<String, Locality> copyStatements) {
     return Stream.of(error)
         .filter(shouldRaise())
-        .map(err -> err.toBuilder().locality(copyStatements.get(err.getLocality().getCopybookId())))
+        .map(err -> err.toBuilder().locality(copyStatements.get(err.getLocality().getCopybookId()))
+                .errorStage(ErrorStage.COPYBOOK))
         .map(SyntaxError.SyntaxErrorBuilder::build)
         .flatMap(err -> Stream.concat(raiseError(err, copyStatements).stream(), Stream.of(err)))
         .collect(toList());

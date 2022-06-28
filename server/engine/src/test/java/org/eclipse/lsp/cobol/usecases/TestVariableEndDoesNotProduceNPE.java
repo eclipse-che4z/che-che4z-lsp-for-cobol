@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -45,7 +45,7 @@ class TestVariableEndDoesNotProduceNPE {
                 new Range(),
                 "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item FILLER",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorStage.SYNTAX.getText()),
             "2",
             new Diagnostic(
                 new Range(),
@@ -56,18 +56,18 @@ class TestVariableEndDoesNotProduceNPE {
                     + "POINTER, POINTER-32, PROCEDURE-POINTER, REDEFINES, SIGN, SYNC, SYNCHRONIZED, TRAILING, USAGE, "
                     + "UTF-8, VALUE, VALUES, '.', IDENTIFIER}",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorStage.SYNTAX.getText()),
             "3",
             new Diagnostic(
                 new Range(),
                 "The following token must start in Area A: END",
                 DiagnosticSeverity.Warning,
-                SourceInfoLevels.WARNING.getText()),
+                ErrorStage.SYNTAX.getText()),
             "4",
             new Diagnostic(
                 new Range(),
                 "Unexpected end of file",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                ErrorStage.SYNTAX.getText())));
   }
 }

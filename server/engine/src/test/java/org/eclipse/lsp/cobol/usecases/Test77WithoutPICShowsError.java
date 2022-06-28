@@ -17,13 +17,12 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /** This class checks that a 77-level variable without PIC specified produces a semantic error. */
 class Test77WithoutPICShowsError {
@@ -56,7 +55,7 @@ class Test77WithoutPICShowsError {
                 new Range(),
                 "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item VARNAME",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                ErrorStage.SYNTAX.getText())));
   }
 
   @Test
@@ -70,6 +69,6 @@ class Test77WithoutPICShowsError {
                 new Range(),
                 "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item VARNAME",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                ErrorStage.SYNTAX.getText())));
   }
 }

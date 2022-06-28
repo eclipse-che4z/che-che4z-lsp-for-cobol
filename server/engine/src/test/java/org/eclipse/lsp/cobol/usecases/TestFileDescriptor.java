@@ -28,7 +28,7 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -221,7 +221,7 @@ class TestFileDescriptor {
                 new Range(),
                 "No FILE-CONTROL entry found for INFILE",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 
   @Test
@@ -235,7 +235,7 @@ class TestFileDescriptor {
                 new Range(),
                 "Variable INFILE is not defined",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 
   @Test
@@ -249,7 +249,7 @@ class TestFileDescriptor {
                 new Range(),
                 "Variable INFILE is not defined",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 
   @Test
@@ -263,7 +263,7 @@ class TestFileDescriptor {
                 new Range(),
                 "File INFILE is already in the FILE-CONTROL paragraph",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 
   @Test

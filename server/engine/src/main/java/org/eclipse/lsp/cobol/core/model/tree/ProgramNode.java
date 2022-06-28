@@ -22,10 +22,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
+import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp4j.Location;
@@ -130,6 +127,7 @@ public class ProgramNode extends Node {
         ? Optional.empty()
         : Optional.of(
             SyntaxError.syntaxError()
+                .errorStage(ErrorStage.SYNTAX)
                 .messageTemplate(
                     MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
                 .severity(ErrorSeverity.ERROR)
@@ -177,7 +175,7 @@ public class ProgramNode extends Node {
    */
   public Optional<SyntaxError> verifySectionNodeDuplication(SectionNameNode node, MessageService messageService) {
     if (sectionMap.containsKey(node.getName())) {
-      return Optional.of(SyntaxError.syntaxError()
+      return Optional.of(SyntaxError.syntaxError().errorStage(ErrorStage.SYNTAX)
              .suggestion(messageService.getMessage("semantics.duplicated", node.getName()))
              .severity(ERROR)
              .locality(node.getLocality())

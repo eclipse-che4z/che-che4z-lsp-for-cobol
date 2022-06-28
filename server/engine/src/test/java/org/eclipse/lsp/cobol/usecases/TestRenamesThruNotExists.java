@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 
 /**
  * This test checks the semantic error that appears if the variable specified after THRU doesn't
@@ -53,6 +53,6 @@ class TestRenamesThruNotExists {
                 new Range(),
                 "The data entry with the name NOT-EXISTS not found",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 }

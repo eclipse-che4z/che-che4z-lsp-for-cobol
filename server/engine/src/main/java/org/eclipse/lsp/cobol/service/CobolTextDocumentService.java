@@ -389,7 +389,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     notifyAnalysisFinished(uri, extractCopybookUsages(result), copybookProcessingMode);
     communications.cancelProgressNotification(uri);
     communications.publishDiagnostics(result.getDiagnostics());
-    if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
+    if (result.getDiagnostics().isEmpty())
+      communications.notifyThatDocumentAnalysed(uri);
   }
 
   private void notifyAnalysisFinished(

@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 
 /** This test checks that a variable definition with PIC cannot contain nested elements */
 class TestElementWithPICNotAllowedAsGroup {
@@ -49,12 +49,12 @@ class TestElementWithPICNotAllowedAsGroup {
                 new Range(),
                 "CHILD1: Only 01, 66 and 77 level numbers are allowed at the highest level",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
+                 ErrorStage.SYNTAX.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "Variable CHILD1 is not defined",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 }

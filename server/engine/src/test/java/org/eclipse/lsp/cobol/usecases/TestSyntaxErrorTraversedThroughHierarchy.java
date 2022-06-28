@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
@@ -47,7 +47,7 @@ class TestSyntaxErrorTraversedThroughHierarchy {
   private static final String CONT = "       {_COPY {~REPL}.|1|2_}";
   private static final String CONT_NAME = "CONT";
 
-  private static final String REPL = "       {@*05} {@*TAG-ID|1} {PIC|2} 9.\n";
+  private static final String REPL = "       {@*05} {@*TAG-ID|3} {PIC|4} 9.\n";
   private static final String REPL_NAME = "REPL";
 
   @Test
@@ -61,14 +61,28 @@ class TestSyntaxErrorTraversedThroughHierarchy {
                 new Range(),
                 "Syntax error on 'TAG-ID' expected SECTION",
                 Error,
-                SourceInfoLevels.ERROR.getText(),
+                ErrorStage.COPYBOOK.getText(),
                 null),
             "2",
             new Diagnostic(
                 new Range(),
                 "Syntax error on 'PIC' expected SECTION",
                 Error,
-                SourceInfoLevels.ERROR.getText(),
+                ErrorStage.COPYBOOK.getText(),
+                null),
+            "3",
+            new Diagnostic(
+                new Range(),
+                "Syntax error on 'TAG-ID' expected SECTION",
+                Error,
+                ErrorStage.SYNTAX.getText(),
+                null),
+            "4",
+            new Diagnostic(
+                new Range(),
+                "Syntax error on 'PIC' expected SECTION",
+                Error,
+                ErrorStage.SYNTAX.getText(),
                 null)));
   }
 }

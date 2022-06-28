@@ -24,10 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.SearchPattern;
 
 import java.util.ArrayList;
@@ -117,6 +114,7 @@ public class ReplacingServiceImpl implements ReplacingService {
     return isInvalidLength
         ? Optional.of(
             SyntaxError.syntaxError()
+                    .errorStage(ErrorStage.EXTENDED_DOCUMENT)
                 .severity(ErrorSeverity.ERROR)
                 .locality(locality)
                 .suggestion(
@@ -131,6 +129,7 @@ public class ReplacingServiceImpl implements ReplacingService {
     return isInvalidWordPresent
         ? Optional.of(
             SyntaxError.syntaxError()
+                    .errorStage(ErrorStage.EXTENDED_DOCUMENT)
                 .severity(ErrorSeverity.ERROR)
                 .suggestion(messageService.getMessage("ReplacingServiceImpl.invalidWord"))
                 .locality(locality)

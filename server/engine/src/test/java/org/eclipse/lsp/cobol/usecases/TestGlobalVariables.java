@@ -22,7 +22,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 
 /** Test Global variables errors. */
 class TestGlobalVariables {
@@ -95,7 +95,7 @@ class TestGlobalVariables {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), "Variable FOO is not defined", DiagnosticSeverity.Error, ERROR.getText())));
+                new Range(), "Variable FOO is not defined", DiagnosticSeverity.Error,  ErrorStage.SYNTAX.getText())));
   }
 
   @Test
@@ -114,7 +114,7 @@ class TestGlobalVariables {
                 new Range(),
                 "Global variable must have a unique name",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 
   @Test
@@ -128,6 +128,6 @@ class TestGlobalVariables {
                 new Range(),
                 "GLOBAL can only be used on level 01",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 }

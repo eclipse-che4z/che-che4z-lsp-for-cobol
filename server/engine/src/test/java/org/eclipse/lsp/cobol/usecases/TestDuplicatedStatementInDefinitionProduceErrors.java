@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 
 /**
  * This test checks all the cases of the semantic check for duplicated statements in the variable
@@ -49,28 +49,28 @@ class TestDuplicatedStatementInDefinitionProduceErrors {
           new Range(),
           "A duplicate PICTURE clause was found in a data description entry",
           DiagnosticSeverity.Error,
-          ERROR.getText());
+           ErrorStage.SYNTAX.getText());
 
   private static final Diagnostic DIAGNOSTIC_VALUE =
       new Diagnostic(
           new Range(),
           "A duplicate VALUE clause was found in a data description entry",
           DiagnosticSeverity.Error,
-          ERROR.getText());
+           ErrorStage.SYNTAX.getText());
 
   private static final Diagnostic DIAGNOSTIC_USAGE =
       new Diagnostic(
           new Range(),
           "A duplicate USAGE clause was found in a data description entry",
           DiagnosticSeverity.Error,
-          ERROR.getText());
+           ErrorStage.SYNTAX.getText());
 
   private static final Diagnostic DIAGNOSTIC_OCCURS =
       new Diagnostic(
           new Range(),
           "A duplicate OCCURS clause was found in a data description entry",
           DiagnosticSeverity.Error,
-          ERROR.getText());
+           ErrorStage.SYNTAX.getText());
 
   @Test
   void testDuplicatedPicProducesError() {

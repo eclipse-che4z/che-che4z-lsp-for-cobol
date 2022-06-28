@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -57,24 +57,24 @@ class TestIncompatiblePicAndUsageClause {
                 new Range(),
                 MESSAGE_1 + "COMP_1",
                 DiagnosticSeverity.Warning,
-                SourceInfoLevels.WARNING.getText()),
+                ErrorStage.SYNTAX.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 MESSAGE_1 + "COMP_2",
                 DiagnosticSeverity.Warning,
-                SourceInfoLevels.WARNING.getText()),
+                ErrorStage.SYNTAX.getText()),
             "3",
             new Diagnostic(
-                new Range(), MESSAGE_2, DiagnosticSeverity.Warning, SourceInfoLevels.WARNING.getText()),
+                new Range(), MESSAGE_2, DiagnosticSeverity.Warning, ErrorStage.SYNTAX.getText()),
             "4",
             new Diagnostic(
-                new Range(), MESSAGE_3, DiagnosticSeverity.Warning, SourceInfoLevels.WARNING.getText()),
+                new Range(), MESSAGE_3, DiagnosticSeverity.Warning, ErrorStage.SYNTAX.getText()),
             "5",
             new Diagnostic(
                 new Range(),
                 MESSAGE_1 + "COMP_1",
                 DiagnosticSeverity.Warning,
-                SourceInfoLevels.WARNING.getText())));
+                ErrorStage.SYNTAX.getText())));
   }
 }

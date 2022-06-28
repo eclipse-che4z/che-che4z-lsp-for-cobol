@@ -20,10 +20,7 @@ import com.google.common.collect.Iterables;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
@@ -217,6 +214,7 @@ public class VariableDefinitionUtil {
         } else {
           SyntaxError error =
               SyntaxError.syntaxError()
+                  .errorStage(ErrorStage.SYNTAX)
                   .severity(SEVERITY)
                   .locality(definitionNode.getLocality())
                   .messageTemplate(MessageTemplate.of(UNKNOWN_VARIABLE_DEFINITION))
@@ -600,6 +598,7 @@ public class VariableDefinitionUtil {
     if (eligibleNodesForRedefine.isEmpty() || !allowedRedefinedNode.isPresent()) {
       errors.add(
           SyntaxError.syntaxError()
+              .errorStage(ErrorStage.SYNTAX)
               .severity(SEVERITY)
               .messageTemplate(MessageTemplate.of(REDEFINE_IMMEDIATELY_FOLLOW, redefinesName))
               .locality(redefinesLocality)
@@ -609,6 +608,7 @@ public class VariableDefinitionUtil {
       if (checkLevel77Mismatch(definitionNode, allowedRedefinedNode.get())) {
         errors.add(
             SyntaxError.syntaxError()
+                .errorStage(ErrorStage.SYNTAX)
                 .severity(SEVERITY)
                 .messageTemplate(MessageTemplate.of(LEVELS_MUST_MATCH, redefinesName))
                 .locality(definitionNode.getLevelLocality())
@@ -620,6 +620,7 @@ public class VariableDefinitionUtil {
       if (valueLocality != null)
         errors.add(
             SyntaxError.syntaxError()
+                .errorStage(ErrorStage.SYNTAX)
                 .locality(valueLocality)
                 .severity(SEVERITY)
                 .messageTemplate(

@@ -14,7 +14,7 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -54,21 +54,21 @@ class TestDaCoEndWriteReport {
                         new Range(),
                         "Only alphanumerics are allowed for report name",
                         DiagnosticSeverity.Error,
-                        SourceInfoLevels.ERROR.getText()));
+                        ErrorStage.DIALECT.getText()));
         diagnosticMap.put(
                 "2",
                 new Diagnostic(
                         new Range(),
                         "Exact length of report name must be 5 bytes",
                         DiagnosticSeverity.Error,
-                        SourceInfoLevels.ERROR.getText()));
+                        ErrorStage.DIALECT.getText()));
         diagnosticMap.put(
                 "3",
                 new Diagnostic(
                         new Range(),
                         "String must starts with R or T values",
                         DiagnosticSeverity.Error,
-                        SourceInfoLevels.ERROR.getText()));
+                        ErrorStage.DIALECT.getText()));
 
         UseCaseEngine.runTest(
                 TEXT, ImmutableList.of(), diagnosticMap, ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());

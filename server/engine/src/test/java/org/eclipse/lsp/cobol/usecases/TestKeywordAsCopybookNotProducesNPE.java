@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
@@ -75,12 +76,12 @@ class TestKeywordAsCopybookNotProducesNPE {
                 new Range(),
                 "Copybook declaration has more than 8 characters for: IDENTIFICATION",
                 Information,
-                "COBOL Language Support - I"),
+                ErrorStage.DIALECT.getText()),
             "long2",
             new Diagnostic(
                 new Range(),
                 "Copybook declaration has more than 8 characters for: NUMERICLITERAL",
                 Information,
-                "COBOL Language Support - I")));
+                ErrorStage.DIALECT.getText())));
   }
 }

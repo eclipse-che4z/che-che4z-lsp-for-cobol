@@ -15,7 +15,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -94,31 +94,31 @@ class TestDaCoWriteReportWithName {
                                 new Range(),
                                 "Only alphanumerics are allowed for report name",
                                 DiagnosticSeverity.Error,
-                                SourceInfoLevels.ERROR.getText()),
+                                ErrorStage.DIALECT.getText()),
                         "2",
                         new Diagnostic(
                                 new Range(),
                                 "Exact length of report name must be 5 bytes",
                                 DiagnosticSeverity.Error,
-                                SourceInfoLevels.ERROR.getText()),
+                                ErrorStage.DIALECT.getText()),
                         "3",
                         new Diagnostic(
                                 new Range(),
                                 "Allowed range is 80 to 200",
                                 DiagnosticSeverity.Error,
-                                SourceInfoLevels.ERROR.getText()),
+                                ErrorStage.DIALECT.getText()),
                         "4",
                         new Diagnostic(
                                 new Range(),
                                 "Variable ASD is not defined",
                                 DiagnosticSeverity.Error,
-                                SourceInfoLevels.ERROR.getText()),
+                                ErrorStage.SYNTAX.getText()),
                         "5",
                         new Diagnostic(
                                 new Range(),
                                 "String must starts with R or T values",
                                 DiagnosticSeverity.Error,
-                                SourceInfoLevels.ERROR.getText())),
+                                ErrorStage.DIALECT.getText())),
                 ImmutableList.of(),
                 DialectConfigs.getDaCoAnalysisConfig());
     }

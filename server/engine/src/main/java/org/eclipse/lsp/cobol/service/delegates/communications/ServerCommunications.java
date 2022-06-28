@@ -29,6 +29,7 @@ import org.eclipse.lsp4j.PublishDiagnosticsParams;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -99,8 +100,7 @@ public class ServerCommunications implements Communications {
             logMessage(
                 Info,
                 messageService.getMessage(
-                    "Communications.noSyntaxError",
-                    files.getNameFromURI(files.decodeURI(uri)))));
+                    "Communications.noSyntaxError", files.getNameFromURI(files.decodeURI(uri)))));
   }
 
   /**
@@ -121,6 +121,27 @@ public class ServerCommunications implements Communications {
    * @param diagnostics map of URIs and errors populated by the language engine
    */
   public void publishDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
+
+    diagnostics.forEach(
+        (uri, diagnostic) -> {
+          diagnostic.stream().filter(getDesiredErrors());
+          getClient()
+              .publishDiagnostics(
+                  new PublishDiagnosticsParams(files.decodeURI(uri), clean(diagnostic)));
+        });
+  }
+
+  private Predicate<Diagnostic> getDesiredErrors() {
+    return err -> err.getSource().equalsIgnoreCase("SYNTAX");
+  }
+
+  /**
+   * This method raise a diagnostic message to the client with syntax error retrieved by the COBOL
+   * LSP server for related files.
+   *
+   * @param diagnostics map of URIs and errors populated by the language engine
+   */
+  public void publishDiagnosticsPredicate(Map<String, List<Diagnostic>> diagnostics) {
     diagnostics.forEach(
         (uri, diagnostic) ->
             getClient()

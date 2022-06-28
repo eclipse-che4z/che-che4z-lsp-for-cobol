@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
@@ -43,7 +43,7 @@ class TestIdentificationDivisionInCopybookWithError {
           + "8          GOBACK. ";
 
   private static final String STRUCT1 = "           03  {$*CHILD1}         PIC 9   VALUE IS '0'.\n";
-  private static final String IDDIV = "       IDENTIFICATION {DIVISIONs|1}.";
+  private static final String IDDIV = "       IDENTIFICATION {DIVISIONs|2}.";
 
   private static final String IDDIV_NAME = "IDDIV";
   private static final String STRUCT1_NAME = "STRUCT1";
@@ -56,6 +56,9 @@ class TestIdentificationDivisionInCopybookWithError {
         TEXT,
         ImmutableList.of(new CobolText(IDDIV_NAME, IDDIV), new CobolText(STRUCT1_NAME, STRUCT1)),
         ImmutableMap.of(
-            "1", new Diagnostic(new Range(), MESSAGE, Error, SourceInfoLevels.ERROR.getText())));
+            "1",
+            new Diagnostic(new Range(), MESSAGE, Error, ErrorStage.COPYBOOK.getText()),
+            "2",
+            new Diagnostic(new Range(), MESSAGE, Error, ErrorStage.SYNTAX.getText())));
   }
 }

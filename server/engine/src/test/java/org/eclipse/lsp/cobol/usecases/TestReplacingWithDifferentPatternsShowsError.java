@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -189,9 +189,9 @@ class TestReplacingWithDifferentPatternsShowsError {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null, MESSAGE, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText()),
+                null, MESSAGE, DiagnosticSeverity.Error, ErrorStage.SYNTAX.getText()),
             "2",
             new Diagnostic(
-                null, MESSAGE2, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
+                null, MESSAGE2, DiagnosticSeverity.Error, ErrorStage.SYNTAX.getText())));
   }
 }

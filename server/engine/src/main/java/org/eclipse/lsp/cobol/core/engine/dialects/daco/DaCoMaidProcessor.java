@@ -28,15 +28,11 @@ import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
@@ -164,7 +160,7 @@ public class DaCoMaidProcessor {
       parseCopybookContent(copybookModel, startingLevel, MAID_WRK_QUALIFIER.equalsIgnoreCase(layoutUsage) ? cbNode.getParentSuffix() : null)
               .forEach(cbNode::addChild);
     } else {
-      SyntaxError error = SyntaxError.syntaxError()
+      SyntaxError error = SyntaxError.syntaxError().errorStage(ErrorStage.DIALECT)
               .locality(cbNode.getLocality())
               .suggestion(messageService.getMessage("GrammarPreprocessorListener.errorSuggestion", copybookName.getQualifiedName()))
               .severity(ERROR)
@@ -180,6 +176,7 @@ public class DaCoMaidProcessor {
     if (MAID_WRK_QUALIFIER.equalsIgnoreCase(layoutUsage) && node.getParentSuffix() == null) {
       SyntaxError error =
               SyntaxError.syntaxError()
+                      .errorStage(ErrorStage.DIALECT)
                       .severity(ErrorSeverity.ERROR)
                       .suggestion(
                               messageService.getMessage("GrammarPreprocessorListener.cannotRetrieveMaidSuffix"))

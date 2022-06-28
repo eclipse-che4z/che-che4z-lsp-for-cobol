@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 
 /** This test checks that redefined variable has the same group */
 class TestVariableRedefineSameGroup {
@@ -132,7 +132,7 @@ class TestVariableRedefineSameGroup {
                 new Range(),
                 "REDEFINES line must immediately follow redefined item: WS-DATE1",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 
   @Test
@@ -159,13 +159,13 @@ class TestVariableRedefineSameGroup {
                 new Range(),
                 "TEMPORARY-EMPLOYEE: Only 01, 66 and 77 level numbers are allowed at the highest level",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
+                 ErrorStage.SYNTAX.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "REDEFINES line must immediately follow redefined item: REGULAR-EMPLOYEE",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 
   @Test

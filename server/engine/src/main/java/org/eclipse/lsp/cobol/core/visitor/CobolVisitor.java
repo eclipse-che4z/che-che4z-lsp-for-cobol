@@ -31,10 +31,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToOnOffStatement;
@@ -269,11 +266,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private boolean isFeildDescriptionEntryGlobal(FileDescriptionEntryContext ctx) {
     return !ctx.fileDescriptionEntryClauses().fileDescriptionEntryClause().isEmpty()
-            && Objects.nonNull(
-            ctx.fileDescriptionEntryClauses()
-                    .fileDescriptionEntryClause(0)
-                    .globalClause())
-            && !ctx.fileDescriptionEntryClauses()
+        && Objects.nonNull(
+            ctx.fileDescriptionEntryClauses().fileDescriptionEntryClause(0).globalClause())
+        && !ctx.fileDescriptionEntryClauses()
             .fileDescriptionEntryClause(0)
             .globalClause()
             .isEmpty();
@@ -314,15 +309,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitProcedureDeclarative(CobolParser.ProcedureDeclarativeContext ctx) {
     String name = ctx.getStart().getText().toUpperCase();
     return getLocality(ctx.getStart())
-            .map(
-                    def ->
-                            addTreeNode(
-                                    ctx,
-                                    locality ->
-                                            new DeclarativeProcedureSection(locality, name, getIntervalText(ctx), def)))
-            .orElseGet(() -> visitChildren(ctx));
+        .map(
+            def ->
+                addTreeNode(
+                    ctx,
+                    locality ->
+                        new DeclarativeProcedureSection(locality, name, getIntervalText(ctx), def)))
+        .orElseGet(() -> visitChildren(ctx));
   }
-
 
   @Override
   public List<Node> visitEndProgramStatement(EndProgramStatementContext ctx) {
@@ -363,6 +357,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
               if (fileControls.containsKey(filename.toUpperCase())) {
                 SyntaxError error =
                     SyntaxError.syntaxError()
+                        .errorStage(ErrorStage.SYNTAX)
                         .suggestion(
                             messageService.getMessage("CobolVisitor.duplicateFileName", filename))
                         .severity(ErrorSeverity.ERROR)
@@ -393,7 +388,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitSectionName(SectionNameContext ctx) {
-    return addTreeNode(ctx, locality -> new SectionNameNode(locality, ctx.getText(), messageService));
+    return addTreeNode(
+        ctx, locality -> new SectionNameNode(locality, ctx.getText(), messageService));
   }
 
   @Override
@@ -541,19 +537,22 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_66()))
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
             .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null));
-     ofNullable(ctx.dataRenamesClause())
-            .map(dataRenamesClauseContext -> dataRenamesClauseContext.qualifiedVariableDataName()
-                    .dataName()
-                    .stream()
+    ofNullable(ctx.dataRenamesClause())
+        .map(
+            dataRenamesClauseContext ->
+                dataRenamesClauseContext.qualifiedVariableDataName().dataName().stream()
                     .map(DataNameContext.class::cast)
-                    .map(this::extractNameAndLocality).collect(toList()))
-            .ifPresent(builder::renamesClause);
+                    .map(this::extractNameAndLocality)
+                    .collect(toList()))
+        .ifPresent(builder::renamesClause);
     ofNullable(ctx.dataRenamesClause())
         .map(DataRenamesClauseContext::thruDataName)
-        .map(thruDataNameContext -> thruDataNameContext.qualifiedVariableDataName().dataName().stream()
-                .map(DataNameContext.class::cast)
-                .map(this::extractNameAndLocality)
-                .collect(toList()))
+        .map(
+            thruDataNameContext ->
+                thruDataNameContext.qualifiedVariableDataName().dataName().stream()
+                    .map(DataNameContext.class::cast)
+                    .map(this::extractNameAndLocality)
+                    .collect(toList()))
         .ifPresent(builder::renamesThruClause);
     return addTreeNode(builder.build(), visitChildren(ctx));
   }
@@ -784,6 +783,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorStage(ErrorStage.SYNTAX)
             .locality(locality)
             .suggestion(message + wrongToken)
             .severity(ErrorSeverity.WARNING)
@@ -802,6 +802,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private void reportSubroutineNotDefined(String name, Locality locality) {
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorStage(ErrorStage.SYNTAX)
             .suggestion(messageService.getMessage("CobolVisitor.subroutineNotFound", name))
             .severity(ErrorSeverity.INFO)
             .locality(getIntervalPosition(locality, locality))
@@ -824,6 +825,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     if (locality == null) return;
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorStage(ErrorStage.SYNTAX)
             .suggestion(messageService.getMessage("CobolVisitor.misspelledWord", suggestion))
             .severity(ErrorSeverity.WARNING)
             .locality(locality)
@@ -955,7 +957,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return ofNullable(VisitorHelper.getInteger(ctx.integerLiteral()))
         .map(
             intLit ->
-                new OccursClause(intLit, retrieveOccursToValue(ctx).orElse(null), retrieveIndexNames(ctx)));
+                new OccursClause(
+                    intLit, retrieveOccursToValue(ctx).orElse(null), retrieveIndexNames(ctx)));
   }
 
   private List<VariableNameAndLocality> retrieveIndexNames(DataOccursClauseContext ctx) {

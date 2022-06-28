@@ -100,6 +100,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
       CobolLine cobolLine, String uri, int lineNumber) {
     if (isCompilerDirectiveStatement(cobolLine)) {
       return SyntaxError.syntaxError()
+          .errorStage(ErrorStage.PREPROCESSING)
           .severity(ERROR)
           .locality(
               Locality.builder()
@@ -131,7 +132,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   // topic - Continuation of alphanumeric and national literals
   private boolean isPseudoDelimiterContinued(CobolLine line, String predecessorContentArea) {
     return StringUtils.stripEnd(StringUtils.normalizeSpace(predecessorContentArea), ",;")
-        .endsWith(PSEUDO_TEXT_DELIMITER)
+            .endsWith(PSEUDO_TEXT_DELIMITER)
         && StringUtils.normalizeSpace(line.getContentArea()).startsWith(PSEUDO_TEXT_DELIMITER);
   }
 
@@ -163,8 +164,10 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
    */
   private SyntaxError checkContentAreaAWithContinuationLine(
       CobolLine cobolLine, String uri, int lineNumber) {
-    if (cobolLine.getType() == CobolLineTypeEnum.CONTINUATION && !StringUtils.isBlank(cobolLine.getContentAreaA())) {
-      return registerContinuationLineError(uri, lineNumber, countLeadingSpaces(cobolLine.getContentAreaA()));
+    if (cobolLine.getType() == CobolLineTypeEnum.CONTINUATION
+        && !StringUtils.isBlank(cobolLine.getContentAreaA())) {
+      return registerContinuationLineError(
+          uri, lineNumber, countLeadingSpaces(cobolLine.getContentAreaA()));
     }
     return null;
   }
@@ -173,10 +176,8 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private int countLeadingSpaces(String line) {
     int spaces = 0;
     for (char c : line.toCharArray())
-      if (c == ' ')
-        spaces++;
-      else
-        break;
+      if (c == ' ') spaces++;
+      else break;
     return spaces;
   }
 
@@ -245,7 +246,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private SyntaxError registerStringClosingError(
       String uri, int lineNumber, int cobolLineTrimmedLength) {
     SyntaxError error =
-        SyntaxError.syntaxError()
+        SyntaxError.syntaxError().errorStage(ErrorStage.PREPROCESSING)
             .locality(
                 Locality.builder()
                     .uri(uri)
@@ -268,15 +269,14 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private SyntaxError registerContinuationLineError(String uri, int lineNumber, int countingSpace) {
     int startPosition = ProcessingConstants.INDICATOR_AREA + countingSpace;
     SyntaxError error =
-        SyntaxError.syntaxError()
+        SyntaxError.syntaxError().errorStage(ErrorStage.PREPROCESSING)
             .locality(
                 Locality.builder()
                     .uri(uri)
                     .range(
                         new Range(
                             new Position(lineNumber, startPosition),
-                            new Position(
-                                lineNumber, ProcessingConstants.START_INDEX_AREA_B)))
+                            new Position(lineNumber, ProcessingConstants.START_INDEX_AREA_B)))
                     .recognizer(ContinuationLineTransformation.class)
                     .build())
             .suggestion(

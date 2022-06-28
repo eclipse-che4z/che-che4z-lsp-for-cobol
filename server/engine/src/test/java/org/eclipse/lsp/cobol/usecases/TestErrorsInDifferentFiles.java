@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
@@ -40,12 +40,12 @@ class TestErrorsInDifferentFiles {
           + "3      Working-Storage Section.\n"
           + "4      Procedure Division.\n"
           + "5      {#*000-Main-Logic}.\n"
-          + "6      {_COPY {~ASDASD}.|areaA1|areaA2|child1|pic_} \n"
+          + "6      {_COPY {~ASDASD}.|child1|areaA1|areaA2|pic_} \n"
           + "7          DISPLAY {CHILD1|invalid}.\n"
           + "8      End program ProgramId.";
 
   private static final String ASDASD =
-      "           {@*03|areaA1}  {@*CHILD1|child1|areaA2}         {PIC|pic} 9   VALUE IS '0'.";
+      "           {@*03|areaA11}  {@*CHILD1|child11|areaA22}         {PIC|pic1} 9   VALUE IS '0'.";
 
   private static final String ASDASD_NAME = "ASDASD";
 
@@ -61,42 +61,60 @@ class TestErrorsInDifferentFiles {
                     new Range(),
                     "Variable CHILD1 is not defined",
                     Error,
-                    SourceInfoLevels.ERROR.getText()))
+                    ErrorStage.SYNTAX.getText()))
             .put(
                 "pic",
                 new Diagnostic(
                     new Range(),
                     "Syntax error on 'PIC' expected SECTION",
                     Error,
-                    SourceInfoLevels.ERROR.getText()))
+                    ErrorStage.COPYBOOK.getText())).put(
+                "pic1",
+                new Diagnostic(
+                    new Range(),
+                    "Syntax error on 'PIC' expected SECTION",
+                    Error,
+                    ErrorStage.SYNTAX.getText()))
             .put(
                 "child1",
                 new Diagnostic(
                     new Range(),
                     "Syntax error on 'CHILD1' expected SECTION",
                     Error,
-                    SourceInfoLevels.ERROR.getText()))
-            .put(
-                "is",
+                    ErrorStage.COPYBOOK.getText())).put(
+                "child11",
                 new Diagnostic(
                     new Range(),
-                    "Syntax error on 'IS' expected SECTION",
+                    "Syntax error on 'CHILD1' expected SECTION",
                     Error,
-                    SourceInfoLevels.ERROR.getText()))
+                    ErrorStage.SYNTAX.getText()))
             .put(
                 "areaA1",
                 new Diagnostic(
                     new Range(),
                     "The following token must start in Area A: 03",
                     Warning,
-                    SourceInfoLevels.WARNING.getText()))
+                    ErrorStage.COPYBOOK.getText())) .put(
+                "areaA11",
+                new Diagnostic(
+                    new Range(),
+                    "The following token must start in Area A: 03",
+                    Warning,
+                    ErrorStage.SYNTAX.getText()))
             .put(
                 "areaA2",
                 new Diagnostic(
                     new Range(),
                     "The following token must start in Area A: CHILD1",
                     Warning,
-                    SourceInfoLevels.WARNING.getText()))
+                    ErrorStage.COPYBOOK.getText()))
+                .put(
+                "areaA22",
+                new Diagnostic(
+                    new Range(),
+                    "The following token must start in Area A: CHILD1",
+                    Warning,
+                    ErrorStage.SYNTAX.getText()))
             .build());
   }
 }

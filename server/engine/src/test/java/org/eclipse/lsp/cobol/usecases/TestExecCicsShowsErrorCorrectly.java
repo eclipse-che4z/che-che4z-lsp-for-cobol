@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.collect.ImmutableMap.of;
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 
 /** The errors inside CICS should be shown in the expected position */
 class TestExecCicsShowsErrorCorrectly {
@@ -54,6 +54,6 @@ class TestExecCicsShowsErrorCorrectly {
                     + "SYNCPOINT, SYSID, TASK, TEST, TRANSFORM, UNCOMMITTED, UNLOCK, UPDATE, VERIFY, WAIT, "
                     + "WAITCICS, WEB, WRITE, WRITEQ, WSACONTEXT, WSAEPR, XCTL, XRBA}",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorStage.SYNTAX.getText())));
   }
 }

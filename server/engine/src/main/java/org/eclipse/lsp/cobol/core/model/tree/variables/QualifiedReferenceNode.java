@@ -20,6 +20,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.FigurativeConstants;
@@ -92,7 +93,7 @@ public class QualifiedReferenceNode extends Node {
     String dataName = variableUsageNodes.get(0).getName();
     if (FigurativeConstants.FIGURATIVE_CONSTANTS.stream()
             .anyMatch(e -> dataName.toUpperCase().equals(e))) return ImmutableList.of();
-    SyntaxError error = SyntaxError.syntaxError()
+    SyntaxError error = SyntaxError.syntaxError().errorStage(ErrorStage.SYNTAX)
         .severity(ErrorSeverity.ERROR)
         .locality(getLocality())
         .messageTemplate(MessageTemplate.of(

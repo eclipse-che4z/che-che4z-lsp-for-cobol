@@ -17,14 +17,13 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /**
  * This test checks that semantic errors that appear in a copybook exposed in the COBOL document on
@@ -41,7 +40,7 @@ class TestSemanticErrorsFromCopybooksShownInDocument {
           + "           {_COPY {~MOVE}.|1_}\n"
           + "           GOBACK.";
 
-  private static final String MOVE = "             MOVE 0 to {SMTH|1}.";
+  private static final String MOVE = "             MOVE 0 to {SMTH|2}.";
   private static final String MOVE_NAME = "MOVE";
 
   @Test
@@ -52,6 +51,15 @@ class TestSemanticErrorsFromCopybooksShownInDocument {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), "Variable SMTH is not defined", DiagnosticSeverity.Error, ERROR.getText())));
+                new Range(),
+                "Variable SMTH is not defined",
+                DiagnosticSeverity.Error,
+                ErrorStage.COPYBOOK.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Variable SMTH is not defined",
+                DiagnosticSeverity.Error,
+                ErrorStage.SYNTAX.getText())));
   }
 }

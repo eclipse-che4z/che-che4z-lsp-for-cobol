@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.DISABLED;
 import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 
 /**
  * This test checks that the undefined parent variable underlined while variable call hierarchy
@@ -63,6 +63,6 @@ class TestUndefinedParentVariableUnderlined {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
-            new Diagnostic(new Range(), "Variable MAMA is not defined", DiagnosticSeverity.Error, ERROR.getText())));
+            new Diagnostic(new Range(), "Variable MAMA is not defined", DiagnosticSeverity.Error,  ErrorStage.SYNTAX.getText())));
   }
 }

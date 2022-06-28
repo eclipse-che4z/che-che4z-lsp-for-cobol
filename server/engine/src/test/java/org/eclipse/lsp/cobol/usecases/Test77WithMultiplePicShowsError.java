@@ -17,14 +17,12 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.WARNING;
 
 /**
  * This test checks the "duplicated clause" errors for the different types of clauses in a variable
@@ -52,30 +50,30 @@ class Test77WithMultiplePicShowsError {
                 new Range(),
                 "A duplicate PICTURE clause was found in a data description entry",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
+                ErrorStage.SYNTAX.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "A duplicate VALUE clause was found in a data description entry",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
+                ErrorStage.SYNTAX.getText()),
             "3",
             new Diagnostic(
                 new Range(),
                 "A duplicate OCCURS clause was found in a data description entry",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
+                ErrorStage.SYNTAX.getText()),
             "4",
             new Diagnostic(
                 new Range(),
                 "A duplicate USAGE clause was found in a data description entry",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
+                ErrorStage.SYNTAX.getText()),
             "5",
             new Diagnostic(
                 new Range(),
                 "PICTURE clause incompatible with usage POINTER",
                 DiagnosticSeverity.Warning,
-                WARNING.getText())));
+                ErrorStage.SYNTAX.getText())));
   }
 }

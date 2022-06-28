@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.semantics;
 
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import com.google.common.collect.HashMultimap;
@@ -153,6 +154,7 @@ public class GroupContext {
                     .map(
                         locality ->
                             SyntaxError.syntaxError()
+                                .errorStage(ErrorStage.SYNTAX)
                                 .suggestion(
                                     messageService.getMessage(
                                         "CobolVisitor.paragraphNotDefined", name))

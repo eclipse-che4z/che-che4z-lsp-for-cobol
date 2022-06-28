@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
+import org.eclipse.lsp.cobol.core.model.ErrorStage;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
@@ -64,11 +65,13 @@ public class TestCopyIdmsNested {
 
   @Test
   void testNestedIdmsCopybook_infiniteLoop() {
-    Diagnostic diagnosticCircular = new Diagnostic(
-        new Range(new Position(0, 21), new Position(0, 26)),
-        "COPY1: Copybook has circular dependency", DiagnosticSeverity.Error, "COBOL Language Support - E",
-        "MISSING_COPYBOOK"
-    );
+    Diagnostic diagnosticCircular =
+        new Diagnostic(
+            new Range(new Position(0, 21), new Position(0, 26)),
+            "COPY1: Copybook has circular dependency",
+            DiagnosticSeverity.Error,
+            ErrorStage.DIALECT.getText(),
+            "MISSING_COPYBOOK");
 
     UseCaseEngine.runTest(
         TEXT_CIRCULAR, ImmutableList.of(

@@ -37,4 +37,5 @@ public class SyntaxError {
   String suggestion;
   ErrorSeverity severity;
   ErrorCode errorCode;
+  ErrorStage errorStage;
 }
