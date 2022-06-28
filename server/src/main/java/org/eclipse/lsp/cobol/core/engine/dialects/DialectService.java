@@ -26,7 +26,6 @@ import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoMaidProcessor;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocumentHierarchy;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -87,7 +86,7 @@ public class DialectService {
       orderedDialect.extend(context);
     }
     ResultWithErrors<DialectOutcome> acc = ResultWithErrors
-            .of(new DialectOutcome(context.getExtendedDocumentHierarchy().calculateExtendedText(), ImmutableList.of(), ImmutableMultimap.of()));
+            .of(new DialectOutcome(context.getTextTransformations().calculateExtendedText(), ImmutableList.of(), ImmutableMultimap.of()));
     for (CobolDialect orderedDialect : orderedDialects) {
       acc = processDialect(acc, orderedDialect, context);
     }

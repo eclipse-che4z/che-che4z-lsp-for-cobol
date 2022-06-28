@@ -115,13 +115,13 @@ public class CobolLanguageEngine {
 
     timingBuilder.getDialectsTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
-    ExtendedDocumentHierarchy cleanText =
+    TextTransformations cleanText =
         preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
 
     DialectProcessingContext dialectProcessingContext =
         DialectProcessingContext.builder()
             .programDocumentUri(documentUri)
-            .extendedDocumentHierarchy(cleanText)
+            .textTransformations(cleanText)
             .copybookConfig(analysisConfig.getCopybookConfig())
             .build();
 

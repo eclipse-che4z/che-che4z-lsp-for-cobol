@@ -3,23 +3,23 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.IdmsParser;
 import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocumentHierarchy;
+import org.eclipse.lsp.cobol.core.model.TextTransformations;
 
 import java.util.ArrayList;
 import java.util.List;
 
 class CopybookInlineVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescriptor>> {
-  private final ExtendedDocumentHierarchy extendedDocumentHierarchy;
+  private final TextTransformations textTransformations;
 
-  public CopybookInlineVisitor(ExtendedDocumentHierarchy extendedDocumentHierarchy) {
-    this.extendedDocumentHierarchy = extendedDocumentHierarchy;
+  public CopybookInlineVisitor(TextTransformations textTransformations) {
+    this.textTransformations = textTransformations;
   }
 
   @Override
   public List<IdmsCopybookDescriptor> visitCopyIdmsStatement(
           IdmsParser.CopyIdmsStatementContext ctx) {
     return ImmutableList.of(
-            IdmsCopybookDescriptor.from(ctx, extendedDocumentHierarchy.getUri()));
+            IdmsCopybookDescriptor.from(ctx, textTransformations.getUri()));
   }
 
   @Override

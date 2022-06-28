@@ -42,7 +42,7 @@ class TestCopyMaidWithQualifierHasCorrectDefinition {
           + "       01 COPY MAID {~BHTRGL!DaCo`BHTRGL_ABC} ABC.\n"
           + "       01 COPY MAID {~BHTRGL!DaCo`BHTRGL}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           DISPLAY {$BHTRGL1}."
+          + "           DISPLAY {$BHTRGL1}.\n"
           + "           DISPLAY {$BHTRGL2}.";
 
   private static final String BHTRGL = "1        01 {$*BHTRGL1} PIC X.\n";

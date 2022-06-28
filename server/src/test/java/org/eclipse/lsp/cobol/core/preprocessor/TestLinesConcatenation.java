@@ -16,7 +16,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor;
 
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocumentHierarchy;
+import org.eclipse.lsp.cobol.core.model.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
@@ -74,9 +74,9 @@ class TestLinesConcatenation {
     CobolLineReWriter indicatorProcessor = new CobolLineIndicatorProcessorImpl();
 
     TextPreprocessor textPreprocessor = new TextPreprocessorImpl(grammarPreprocessor, reader, writer, transformation, indicatorProcessor);
-    ExtendedDocumentHierarchy extendedDocumentHierarchy = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
-    assertEquals(EXPECTED, extendedDocumentHierarchy.calculateExtendedText());
+    TextTransformations textTransformations = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
+    assertEquals(EXPECTED, textTransformations.calculateExtendedText());
     assertTrue(accumulatedErrors.isEmpty());
-    assertEquals(1, extendedDocumentHierarchy.getReplacements().size());
+    assertEquals(1, textTransformations.getReplacements().size());
   }
 }

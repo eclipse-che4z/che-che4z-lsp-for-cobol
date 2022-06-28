@@ -67,18 +67,18 @@ public final class IdmsDialect implements CobolDialect {
   @Override
   public void extend(DialectProcessingContext context) {
     List<SyntaxError> errors = new LinkedList<>();
-    ExtendedDocumentHierarchy extendedDocumentHierarchy = context.getExtendedDocumentHierarchy();
+    TextTransformations textTransformations = context.getTextTransformations();
     List<IdmsCopybookDescriptor> cbs =
-        new CopybookInlineVisitor(extendedDocumentHierarchy)
+        new CopybookInlineVisitor(textTransformations)
             .visitStartRule(
-                parseIdms(extendedDocumentHierarchy.calculateExtendedText(), "", errors));
+                parseIdms(textTransformations.calculateExtendedText(), "", errors));
     cbs.forEach(
         cb -> {
           CopybookModel copybookModel =
               copybookService.resolve(
                   new CopybookName(cb.getName(), IdmsDialect.NAME),
-                  extendedDocumentHierarchy.getUri(),
-                  extendedDocumentHierarchy.getUri(), // FIX me for nested case
+                  textTransformations.getUri(),
+                  textTransformations.getUri(), // FIX me for nested case
                   context.getCopybookConfig(),
                   true);
           CopyNode copyNode = new CopyNode(cb.getUsage(), cb.getName(), IdmsDialect.NAME);
@@ -88,9 +88,9 @@ public final class IdmsDialect implements CobolDialect {
           cbLocation.setUri(copybookModel.getUri());
           CopyDefinition copyDefinition = new CopyDefinition(cbLocation, cb.getName());
           copyNode.setDefinition(copyDefinition);
-          extendedDocumentHierarchy.replace(
+          textTransformations.extend(
               copyNode,
-              new ExtendedDocumentHierarchy(copybookModel.getContent(), copybookModel.getUri()));
+              new TextTransformations(copybookModel.getContent(), copybookModel.getUri()));
         });
   }
 
@@ -104,10 +104,10 @@ public final class IdmsDialect implements CobolDialect {
     IdmsVisitor visitor = new IdmsVisitor(copybookService, treeListener, messageService, context);
     List<SyntaxError> errors = new ArrayList<>();
     IdmsParser.StartRuleContext startRuleContext =
-        parseIdms(context.getExtendedDocumentHierarchy().calculateExtendedText(), context.getProgramDocumentUri(), errors);
+        parseIdms(context.getTextTransformations().calculateExtendedText(), context.getProgramDocumentUri(), errors);
     List<Node> nodes = new ArrayList<>();
     nodes.addAll(visitor.visitStartRule(startRuleContext));
-    nodes.addAll(context.getExtendedDocumentHierarchy().getCopyNodes());
+    nodes.addAll(context.getTextTransformations().getCopyNodes());
     errors.addAll(visitor.getErrors());
 
     return new ResultWithErrors<>(

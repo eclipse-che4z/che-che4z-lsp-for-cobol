@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.engine.dialects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocumentHierarchy;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 
 import java.util.Set;
@@ -38,7 +37,7 @@ public interface CobolDialect {
    * @return the dialect processing result
    */
   default ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    return new ResultWithErrors<>(new DialectOutcome(context.getExtendedDocumentHierarchy().calculateExtendedText(),
+    return new ResultWithErrors<>(new DialectOutcome(context.getTextTransformations().calculateExtendedText(),
             ImmutableList.of(), ImmutableMultimap.of()), ImmutableList.of());
   }
 

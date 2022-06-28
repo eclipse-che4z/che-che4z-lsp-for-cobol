@@ -59,14 +59,14 @@ public class TextPreprocessorImpl implements TextPreprocessor {
   }
 
   @Override
-  public ResultWithErrors<ExtendedDocumentHierarchy> cleanUpCode(String documentUri, String cobolCode) {
+  public ResultWithErrors<TextTransformations> cleanUpCode(String documentUri, String cobolCode) {
     List<SyntaxError> errors = new ArrayList<>();
     List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
     List<CobolLine> transformedLines = transformLines(documentUri, lines).unwrap(errors::addAll);
     List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
 
     String code = writer.serialize(rewrittenLines);
-    return new ResultWithErrors<>(ExtendedDocumentHierarchy.of(code, documentUri), errors);
+    return new ResultWithErrors<>(TextTransformations.of(code, documentUri), errors);
   }
 
   @NonNull

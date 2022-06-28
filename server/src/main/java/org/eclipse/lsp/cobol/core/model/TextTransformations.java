@@ -26,10 +26,11 @@ import java.util.*;
  */
 @Data
 @RequiredArgsConstructor
-public class ExtendedDocumentHierarchy {
+public class TextTransformations {
   private final String text;
   private final String uri;
-  private final Map<Locality, ExtendedDocumentHierarchy> replacements = new HashMap<>();
+  private final Map<Locality, TextTransformations> extensions = new HashMap<>();
+  private final Map<Locality, String> replacements = new HashMap<>();
   private final List<CopyNode> copyNodes = new ArrayList<>();
 
   public String calculateExtendedText() {
@@ -45,7 +46,7 @@ public class ExtendedDocumentHierarchy {
         sb.append("\n");
       } else if (currentLocality.getRange().getStart().getLine() == lineNumber) {
         sb.append(lines[lineNumber], 0, currentLocality.getRange().getStart().getCharacter());
-        sb.append(replacements.get(currentLocality).calculateExtendedText());
+        sb.append(extensions.get(currentLocality).calculateExtendedText());
         lineNumber = currentLocality.getRange().getEnd().getLine();
         sb.append(lines[lineNumber].substring(currentLocality.getRange().getEnd().getCharacter()));
         sb.append("\n");
@@ -62,12 +63,15 @@ public class ExtendedDocumentHierarchy {
     return sb.toString();
   }
 
-  public void replace(CopyNode copyNode, ExtendedDocumentHierarchy extendedDocumentHierarchy) {
+  public void extend(CopyNode copyNode, TextTransformations textTransformations) {
     copyNodes.add(copyNode);
-    replacements.put(copyNode.getLocality(), extendedDocumentHierarchy);
+    extensions.put(copyNode.getLocality(), textTransformations);
+  }
+  public void replace(Locality locality, String newText) {
+    replacements.put(locality, newText);
   }
 
-  public static ExtendedDocumentHierarchy of(String text, String uri) {
-    return new ExtendedDocumentHierarchy(text, uri);
+  public static TextTransformations of(String text, String uri) {
+    return new TextTransformations(text, uri);
   }
 }
