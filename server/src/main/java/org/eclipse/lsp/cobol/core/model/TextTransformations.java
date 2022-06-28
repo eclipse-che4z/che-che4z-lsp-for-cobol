@@ -33,6 +33,10 @@ public class TextTransformations {
   private final Map<Locality, String> replacements = new HashMap<>();
   private final List<CopyNode> copyNodes = new ArrayList<>();
 
+  /**
+   * Apply all transformations and form resulting text
+   * @return text with all transformations
+   */
   public String calculateExtendedText() {
     StringBuilder sb = new StringBuilder();
     LinkedList<Locality> localities = new LinkedList<>(replacements.keySet());
@@ -56,21 +60,38 @@ public class TextTransformations {
     }
     for (int i = lineNumber; i < lines.length; i++) {
       sb.append(lines[i]);
-      if(i < lines.length -1) {
+      if (i < lines.length - 1) {
         sb.append("\n");
       }
     }
     return sb.toString();
   }
 
+  /**
+   * Replace copy statement with result of copybook substitution
+   * @param copyNode node representation of copybook
+   * @param textTransformations Copybook's transformations
+   */
   public void extend(CopyNode copyNode, TextTransformations textTransformations) {
     copyNodes.add(copyNode);
     extensions.put(copyNode.getLocality(), textTransformations);
   }
+
+  /**
+   * Substitute location of original document with a new content.
+   * @param locality location
+   * @param newText new content
+   */
   public void replace(Locality locality, String newText) {
     replacements.put(locality, newText);
   }
 
+  /**
+   * Static constructor for transformations
+   * @param text original text
+   * @param uri uri of the document
+   * @return an empty transformations object
+   */
   public static TextTransformations of(String text, String uri) {
     return new TextTransformations(text, uri);
   }

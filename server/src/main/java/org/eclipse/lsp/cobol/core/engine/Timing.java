@@ -16,8 +16,6 @@ package org.eclipse.lsp.cobol.core.engine;
 
 import lombok.Value;
 
-import java.util.function.Function;
-
 /**
  * The collection of timing data.
  */

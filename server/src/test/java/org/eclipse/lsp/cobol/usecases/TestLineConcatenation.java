@@ -39,7 +39,7 @@ public class TestLineConcatenation {
           + "041100-             8 TO {$CONT-B}.                                        NC2054.2";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 }

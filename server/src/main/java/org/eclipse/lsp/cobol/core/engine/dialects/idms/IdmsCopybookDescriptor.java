@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2022 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ *
+ */
 package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
 import lombok.Data;
@@ -26,11 +40,20 @@ import org.eclipse.lsp.cobol.core.model.Locality;
  *    ;
  */
 
+/**
+ * Description of IDMS copybook
+ */
 @Data
 public class IdmsCopybookDescriptor {
   String name;
   Locality usage;
 
+  /**
+   * Factory method for copybook description object
+   * @param ctx IDMS copybook rule context
+   * @param programDocumentUri uri of file
+   * @return copybook descriptor
+   */
   public static IdmsCopybookDescriptor from(IdmsParser.CopyIdmsStatementContext ctx, String programDocumentUri) {
     IdmsCopybookDescriptor result = new IdmsCopybookDescriptor();
     result.name = getName(ctx);

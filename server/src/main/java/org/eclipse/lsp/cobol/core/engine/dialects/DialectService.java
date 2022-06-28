@@ -81,7 +81,7 @@ public class DialectService {
         }
         orderedDialects.add(pos, dialect);
       }
-    };
+    }
     for (CobolDialect orderedDialect : orderedDialects) {
       orderedDialect.extend(context);
     }
