@@ -23,7 +23,7 @@
   "WRITE REPORT": {
     "prefix": "WRITE REPORT",
     "body": [
-      "WRITE REPORT ${1:report-name} FROM ${2:layout} TO {3:layout2} LENGTH {4:length}."
+      "WRITE REPORT ${1:report-name} FROM ${2:layout} TO ${3:layout2} LENGTH ${4:length}."
     ],
     "description": "Write Report Statement"
   },
@@ -37,21 +37,21 @@
   "WRITE REPORT AFTER": {
     "prefix": "WRITE REPORT AFTER",
     "body": [
-      "WRITE REPORT ${1:report-name} FROM ${2:layout} TO {3:layout2} LENGTH {4:length} AFTER {3:id}."
+      "WRITE REPORT ${1:report-name} FROM ${2:layout} TO ${3:layout2} LENGTH ${4:length} AFTER ${3:id}."
     ],
     "description": "Write Report Statement"
   },
   "WRITE REPORT AFTER PAGE": {
     "prefix": "WRITE REPORT AFTER PAGE",
     "body": [
-      "WRITE REPORT ${1:report-name} FROM ${2:layout} TO {3:layout2} LENGTH {4:length} AFTER PAGE."
+      "WRITE REPORT ${1:report-name} FROM ${2:layout} TO ${3:layout2} LENGTH ${4:length} AFTER PAGE."
     ],
     "description": "Write Report Statement"
   },
   "WRITE REPORT AFTER LINES": {
     "prefix": "WRITE REPORT AFTER LINES",
     "body": [
-      "WRITE REPORT ${1:report-name} FROM ${2:layout} TO {3:layout2} LENGTH {4:length} AFTER ${5:nn} LINES."
+      "WRITE REPORT ${1:report-name} FROM ${2:layout} TO ${3:layout2} LENGTH ${4:length} AFTER ${5:nn} LINES."
     ],
     "description": "Write Report Statement"
   },
