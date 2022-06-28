@@ -145,15 +145,15 @@ public class DaCoMaidProcessor {
 
   private CopyNode createMaidCopybookNode(DialectProcessingContext context, int startingLevel, String layoutId, String layoutUsage, String lastSuffix, Range range, List<SyntaxError> errors) {
     Locality locality = Locality.builder()
-            .uri(context.getProgramDocumentUri())
+            .uri(context.getTextTransformations().getUri())
             .range(range)
             .build();
     DaCoCopyNode cbNode = new DaCoCopyNode(locality, makeCopybookFileName(layoutId, layoutUsage), layoutUsage, lastSuffix);
 
     CopybookName copybookName = new CopybookName(makeCopybookFileName(layoutId, layoutUsage), DaCoDialect.NAME);
     CopybookModel copybookModel = copybookService.resolve(copybookName,
-            context.getProgramDocumentUri(),
-            context.getProgramDocumentUri(),
+            context.getTextTransformations().getUri(),
+            context.getTextTransformations().getUri(),
             context.getCopybookConfig(),
             true);
     if (copybookModel.getContent() != null) {

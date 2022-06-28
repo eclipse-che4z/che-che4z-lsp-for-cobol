@@ -120,7 +120,6 @@ public class CobolLanguageEngine {
 
     DialectProcessingContext dialectProcessingContext =
         DialectProcessingContext.builder()
-            .programDocumentUri(documentUri)
             .textTransformations(cleanText)
             .copybookConfig(analysisConfig.getCopybookConfig())
             .build();

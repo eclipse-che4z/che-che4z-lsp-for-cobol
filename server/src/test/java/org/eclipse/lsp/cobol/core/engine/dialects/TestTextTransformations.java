@@ -26,18 +26,37 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Text Transformation tests
  */
 public class TestTextTransformations {
+    private final static String text = "0: abcd\n1: TEST\n";
+
     @Test
     void replace() {
-        String text = ""
-                + "1: abcd\n"
-                + "2: TEST\n";
         TextTransformations tt = new TextTransformations(text, "https://example.com/text1.txt");
-
         tt.replace(Locality.builder()
                 .range(new Range(
-                        new Position(2, 4),
-                        new Position(2, 8)))
+                        new Position(1, 3),
+                        new Position(1, 7)))
                 .build(), "1234");
-        assertEquals("1: abcd\n2: 1234\n", tt.calculateExtendedText());
+        assertEquals("0: abcd\n1: 1234\n", tt.calculateExtendedText());
+    }
+
+    @Test
+    void replaceMultiline() {
+        TextTransformations tt = new TextTransformations(text, "https://example.com/text1.txt");
+        tt.replace(Locality.builder()
+                .range(new Range(
+                        new Position(0, 3),
+                        new Position(1, 7)))
+                .build(), "hi");
+        assertEquals("0: hi\n", tt.calculateExtendedText());
+    }
+    @Test
+    void replaceExtend() {
+        TextTransformations tt = new TextTransformations(text, "https://example.com/text1.txt");
+        tt.replace(Locality.builder()
+                .range(new Range(
+                        new Position(0, 3),
+                        new Position(1, 7)))
+                .build(), "Hello, World!\n123\ntest11");
+        assertEquals("0: Hello, World!\n123\ntest11\n", tt.calculateExtendedText());
     }
 }

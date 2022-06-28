@@ -39,7 +39,8 @@ public class TextTransformations {
    */
   public String calculateExtendedText() {
     StringBuilder sb = new StringBuilder();
-    LinkedList<Locality> localities = new LinkedList<>(replacements.keySet());
+    LinkedList<Locality> localities = new LinkedList<>(extensions.keySet());
+    localities.addAll(replacements.keySet());
     localities.sort(Comparator.comparingInt(e -> e.getRange().getStart().getLine()));
     String[] lines = text.split("\r?\n");
     int lineNumber = 0;
@@ -50,7 +51,10 @@ public class TextTransformations {
         sb.append("\n");
       } else if (currentLocality.getRange().getStart().getLine() == lineNumber) {
         sb.append(lines[lineNumber], 0, currentLocality.getRange().getStart().getCharacter());
-        sb.append(extensions.get(currentLocality).calculateExtendedText());
+        String replace = extensions.containsKey(currentLocality)
+                ? extensions.get(currentLocality).calculateExtendedText()
+                : replacements.get(currentLocality);
+        sb.append(replace);
         lineNumber = currentLocality.getRange().getEnd().getLine();
         sb.append(lines[lineNumber].substring(currentLocality.getRange().getEnd().getCharacter()));
         sb.append("\n");

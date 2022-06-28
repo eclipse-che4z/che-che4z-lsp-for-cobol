@@ -76,13 +76,13 @@ public final class DaCoDialect implements CobolDialect {
     DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(maidOutcome.getText()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     DaCoParser parser = new DaCoParser(tokens);
-    DialectParserListener listener = new DialectParserListener(context.getProgramDocumentUri());
+    DialectParserListener listener = new DialectParserListener(context.getTextTransformations().getUri());
     lexer.removeErrorListeners();
     lexer.addErrorListener(listener);
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
-    DaCoVisitor visitor = new DaCoVisitor(context.getProgramDocumentUri(), maidOutcome.getText());
+    DaCoVisitor visitor = new DaCoVisitor(context.getTextTransformations().getUri(), maidOutcome.getText());
     List<Node> nodes = visitor.visitStartRule(parser.startRule());
     nodes.addAll(maidOutcome.getDialectNodes());
     errors.addAll(listener.getErrors());

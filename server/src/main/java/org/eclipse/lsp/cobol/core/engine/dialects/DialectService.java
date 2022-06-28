@@ -62,6 +62,19 @@ public class DialectService {
    * @return dialects outcome
    */
   public ResultWithErrors<DialectOutcome> process(List<String> dialects, DialectProcessingContext context) {
+    LinkedList<CobolDialect> orderedDialects = sortDialects(dialects);
+    for (CobolDialect orderedDialect : orderedDialects) {
+      orderedDialect.extend(context);
+    }
+    String extendedText = context.getTextTransformations().calculateExtendedText();
+    ResultWithErrors<DialectOutcome> acc = ResultWithErrors.of(new DialectOutcome(extendedText, ImmutableList.of(), ImmutableMultimap.of()));
+    for (CobolDialect orderedDialect : orderedDialects) {
+      acc = processDialect(acc, orderedDialect, context);
+    }
+    return acc;
+  }
+
+  private LinkedList<CobolDialect> sortDialects(List<String> dialects) {
     LinkedList<CobolDialect> orderedDialects = new LinkedList<>();
     LinkedList<String> dialectsQueue = new LinkedList<>(dialects);
     while (!dialectsQueue.isEmpty()) {
@@ -82,15 +95,7 @@ public class DialectService {
         orderedDialects.add(pos, dialect);
       }
     }
-    for (CobolDialect orderedDialect : orderedDialects) {
-      orderedDialect.extend(context);
-    }
-    ResultWithErrors<DialectOutcome> acc = ResultWithErrors
-            .of(new DialectOutcome(context.getTextTransformations().calculateExtendedText(), ImmutableList.of(), ImmutableMultimap.of()));
-    for (CobolDialect orderedDialect : orderedDialects) {
-      acc = processDialect(acc, orderedDialect, context);
-    }
-    return acc;
+    return orderedDialects;
   }
 
   private CobolDialect getDialectByName(String dialectName) {
