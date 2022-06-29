@@ -148,7 +148,7 @@ getOdetteOrJobOrNetworkStatement
     ;
 
 messageHandlingStatement
-    : showDMLMessageStatement | returnStatusStatement
+    : showDMLMessageStatement | returnStatusStatement | returnStatusAsFieldStatement
     ;
 
 showDMLMessageStatement
@@ -175,7 +175,11 @@ showErrorMessageStatement
 returnStatusStatement
     : RETURN daco_message_types
       ({validateExactLength(_input.LT(1).getText(), "message code", 3);} integerLiteral)
-      (qualifiedDataName | NONNUMERICLITERAL)?
+      (qualifiedDataName | NONNUMERICLITERAL)? qualifiedDataName? qualifiedDataName?
+    ;
+
+returnStatusAsFieldStatement
+    : RETURN FIELD daco_field_name
     ;
 
 tableRowRetrievalStatement
@@ -530,4 +534,11 @@ daco_string_command
 
 daco_string_identifier
     : qualifiedDataName | literal | SPACE
+    ;
+
+daco_field_name
+    :{validateLength(_input.LT(1).getText(), "field name", 12);
+      validateAlphaNumericPattern(_input.LT(1).getText(), "field name");
+     }
+        (cobolWord | integerLiteral)
     ;

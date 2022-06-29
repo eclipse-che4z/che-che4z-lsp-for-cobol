@@ -63,6 +63,7 @@ ENTITY : E N T I T Y;
 ERROR : E R R O R;
 EXEC : E X E C;
 FALSE : F A L S E;
+FIELD : F I E L D;
 FILE : F I L E;
 FILL : F I L L;
 FIND : F I N D;
