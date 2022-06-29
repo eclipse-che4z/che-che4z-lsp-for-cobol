@@ -46,6 +46,10 @@ class TestDaCoReturnStatusStatement {
                     + "            RETURN INFO 002 {$DET001-XW1}. \r\n"
                     + "            RETURN WARNING 002 {$DET001-XW1}. \r\n"
                     + "            RETURN ERROR 002 {$DET001-XW1}. \r\n"
+                    + "            RETURN ERROR 002 {$DET001-XW1} {$DET001-XW1}. \r\n"
+                    + "            RETURN ERROR 002 {$DET001-XW1} {$DET001-XW1} {$DET001-XW1}. \r\n"
+                    + "            RETURN ERROR 002 'MODULE' {$DET001-XW1}. \r\n"
+                    + "            RETURN ERROR 002 'MODULE' {$DET001-XW1} {$DET001-XW1}. \r\n"
                     // Negative tests
                     + "            RETURN INFO {00|2}. \r\n"
                     + "            RETURN WARNING {00|2}. \r\n"
