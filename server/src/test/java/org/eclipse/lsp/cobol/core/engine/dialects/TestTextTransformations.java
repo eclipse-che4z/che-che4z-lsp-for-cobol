@@ -26,11 +26,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Text Transformation tests
  */
 public class TestTextTransformations {
-    private final static String text = "0: abcd\n1: TEST\n";
+    private static final String TEXT = "0: abcd\n1: TEST\n";
 
     @Test
     void replace() {
-        TextTransformations tt = new TextTransformations(text, "https://example.com/text1.txt");
+        TextTransformations tt = new TextTransformations(TEXT, "https://example.com/text1.txt");
         tt.replace(Locality.builder()
                 .range(new Range(
                         new Position(1, 3),
@@ -41,7 +41,7 @@ public class TestTextTransformations {
 
     @Test
     void replaceMultiline() {
-        TextTransformations tt = new TextTransformations(text, "https://example.com/text1.txt");
+        TextTransformations tt = new TextTransformations(TEXT, "https://example.com/text1.txt");
         tt.replace(Locality.builder()
                 .range(new Range(
                         new Position(0, 3),
@@ -51,7 +51,7 @@ public class TestTextTransformations {
     }
     @Test
     void replaceExtend() {
-        TextTransformations tt = new TextTransformations(text, "https://example.com/text1.txt");
+        TextTransformations tt = new TextTransformations(TEXT, "https://example.com/text1.txt");
         tt.replace(Locality.builder()
                 .range(new Range(
                         new Position(0, 3),
