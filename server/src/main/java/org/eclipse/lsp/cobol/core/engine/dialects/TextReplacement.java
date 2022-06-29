@@ -15,17 +15,21 @@
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.eclipse.lsp.cobol.core.engine.TextTransformations;
+import org.eclipse.lsp4j.Range;
 
 /**
  * The class for replacing entire ParserRuleContext's with spaces.
  */
 public class TextReplacement {
   private final String text;
+  private TextTransformations textTransformations;
   private int textIndexPointer = 0;
   private final StringBuilder resultingText = new StringBuilder();
 
-  public TextReplacement(String text) {
-    this.text = text;
+  public TextReplacement(TextTransformations textTransformations) {
+    this.text = textTransformations.calculateExtendedText();
+    this.textTransformations = textTransformations;
   }
 
   /**
@@ -50,12 +54,14 @@ public class TextReplacement {
    * @param replacement the replacement string
    */
   public void addReplacementContext(ParserRuleContext ctx, String prefix, String replacement) {
+    String newText = prefix + text
+            .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
+            .replaceAll("[^ \n]", replacement);
+    Range range = DialectUtils.constructRange(ctx);
+    textTransformations.replace(range, newText);
     resultingText
         .append(text, textIndexPointer, ctx.start.getStartIndex())
-        .append(prefix)
-        .append(text
-            .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
-            .replaceAll("[^ \n]", replacement));
+        .append(newText);
     textIndexPointer = ctx.stop.getStopIndex() + 1;
   }
 

@@ -20,6 +20,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.IdmsLexer;
 import org.eclipse.lsp.cobol.core.IdmsParser;
+import org.eclipse.lsp.cobol.core.engine.TextTransformations;
 import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectParserListener;
@@ -111,7 +112,7 @@ public final class IdmsDialect implements CobolDialect {
     errors.addAll(visitor.getErrors());
 
     return new ResultWithErrors<>(
-        new DialectOutcome(visitor.getResultedText(), nodes, ImmutableMultimap.of()), errors);
+        new DialectOutcome(context.getTextTransformations(), nodes, ImmutableMultimap.of()), errors);
   }
 
   private IdmsParser.StartRuleContext parseIdms(

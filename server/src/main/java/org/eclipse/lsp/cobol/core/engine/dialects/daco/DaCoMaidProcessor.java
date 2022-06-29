@@ -28,15 +28,11 @@ import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
@@ -71,16 +67,15 @@ public class DaCoMaidProcessor {
 
   /**
    * Process MAID copybooks in the source code
-   * @param input source code
    * @param context dialect processing context
    * @param errors a container to propagate errors from dialect processing
    * @return processed text and dialect nodes
    */
-  public DialectOutcome process(String input, DialectProcessingContext context, List<SyntaxError> errors) {
+  public DialectOutcome process(DialectProcessingContext context, List<SyntaxError> errors) {
     List<Node> copyMaidNodes = new ArrayList<>();
     DaCoMaidProcessingState state = DaCoMaidProcessingState.START;
 
-    String[] lines = input.split("\n");
+    String[] lines = context.getTextTransformations().getText().split("\n");
     String lastSuffix = null;
     sections.clear();
     for (int i = 0; i < lines.length; i++) {
@@ -109,24 +104,24 @@ public class DaCoMaidProcessor {
           sections.add(sectionMatcher.group("name"));
         }
       }
-      lines[i] = collectCopyMaid(line, i, copyMaidNodes, lastSuffix, context, errors);
+      collectCopyMaid(line, i, copyMaidNodes, lastSuffix, context, errors);
     }
-    input = String.join("\n", lines);
 
-    return new DialectOutcome(input, copyMaidNodes, ImmutableMultimap.of());
+    return new DialectOutcome(context.getTextTransformations(), copyMaidNodes, ImmutableMultimap.of());
   }
 
-  private String collectCopyMaid(String input, int lineNumber, List<Node> copyMaidNodes, String lastSuffix, DialectProcessingContext context, List<SyntaxError> errors) {
+  private void collectCopyMaid(String input, int lineNumber, List<Node> copyMaidNodes, String lastSuffix, DialectProcessingContext context, List<SyntaxError> errors) {
     Matcher matcher = copyMaidPattern.matcher(input);
 
     if (matcher.find()) {
-      StringBuffer sb = new StringBuffer();
       String indent = matcher.group("indent");
       int startChar = indent == null ? 0 : matcher.end("indent");
       int endChar = matcher.end(matcher.groupCount() - 1);
       int len = endChar - startChar;
-      matcher.appendReplacement(sb, (indent == null ? "" : indent)
-              + String.join("", Collections.nCopies(len, CobolDialect.FILLER)));
+      String newString = String.join("", Collections.nCopies(len, CobolDialect.FILLER));
+      context.getTextTransformations().replace(new Range(
+              new Position(lineNumber, startChar),
+              new Position(lineNumber, endChar + 1)), newString);
       String level = matcher.group("level");
       String layoutId = matcher.group("layoutId");
       String layoutUsage = matcher.group("layoutUsage");
@@ -136,10 +131,7 @@ public class DaCoMaidProcessor {
                 createMaidCopybookNode(context, Integer.parseInt(level), layoutId, layoutUsage, lastSuffix, range, errors)
         );
       }
-      matcher.appendTail(sb);
-      return sb.toString();
     }
-    return input;
   }
 
 

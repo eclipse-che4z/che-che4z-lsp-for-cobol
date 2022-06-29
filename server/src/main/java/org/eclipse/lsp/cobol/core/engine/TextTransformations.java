@@ -12,11 +12,12 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model;
+package org.eclipse.lsp.cobol.core.engine;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
+import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 
@@ -29,8 +30,8 @@ import java.util.*;
 public class TextTransformations {
   private final String text;
   private final String uri;
-  private final Map<Locality, TextTransformations> extensions = new HashMap<>();
-  private final Map<Locality, String> replacements = new HashMap<>();
+  private final Map<Range, TextTransformations> extensions = new HashMap<>();
+  private final Map<Range, String> replacements = new HashMap<>();
   private final List<CopyNode> copyNodes = new ArrayList<>();
 
   /**
@@ -39,26 +40,26 @@ public class TextTransformations {
    */
   public String calculateExtendedText() {
     StringBuilder sb = new StringBuilder();
-    LinkedList<Locality> localities = new LinkedList<>(extensions.keySet());
-    localities.addAll(replacements.keySet());
-    localities.sort(Comparator.comparingInt(e -> e.getRange().getStart().getLine()));
+    LinkedList<Range> ranges = new LinkedList<>(extensions.keySet());
+    ranges.addAll(replacements.keySet());
+    ranges.sort(Comparator.comparingInt(e -> e.getStart().getLine()));
     String[] lines = text.split("\r?\n");
     int lineNumber = 0;
-    Locality currentLocality = localities.isEmpty() ? null : localities.removeFirst();
-    while (currentLocality != null && lineNumber < lines.length) {
-      if (currentLocality.getRange().getStart().getLine() > lineNumber) {
+    Range currentRange = ranges.isEmpty() ? null : ranges.removeFirst();
+    while (currentRange != null && lineNumber < lines.length) {
+      if (currentRange.getStart().getLine() > lineNumber) {
         sb.append(lines[lineNumber]);
         sb.append("\n");
-      } else if (currentLocality.getRange().getStart().getLine() == lineNumber) {
-        sb.append(lines[lineNumber], 0, currentLocality.getRange().getStart().getCharacter());
-        String replace = extensions.containsKey(currentLocality)
-                ? extensions.get(currentLocality).calculateExtendedText()
-                : replacements.get(currentLocality);
+      } else if (currentRange.getStart().getLine() == lineNumber) {
+        sb.append(lines[lineNumber], 0, currentRange.getStart().getCharacter());
+        String replace = extensions.containsKey(currentRange)
+                ? extensions.get(currentRange).calculateExtendedText()
+                : replacements.get(currentRange);
         sb.append(replace);
-        lineNumber = currentLocality.getRange().getEnd().getLine();
-        sb.append(lines[lineNumber].substring(currentLocality.getRange().getEnd().getCharacter()));
+        lineNumber = currentRange.getEnd().getLine();
+        sb.append(lines[lineNumber].substring(currentRange.getEnd().getCharacter()));
         sb.append("\n");
-        currentLocality = localities.isEmpty() ? null : localities.removeFirst();
+        currentRange = ranges.isEmpty() ? null : ranges.removeFirst();
       }
       lineNumber++;
     }
@@ -78,16 +79,16 @@ public class TextTransformations {
    */
   public void extend(CopyNode copyNode, TextTransformations textTransformations) {
     copyNodes.add(copyNode);
-    extensions.put(copyNode.getLocality(), textTransformations);
+    extensions.put(copyNode.getLocality().getRange(), textTransformations);
   }
 
   /**
    * Substitute location of original document with a new content.
-   * @param locality location
+   * @param range location
    * @param newText new content
    */
-  public void replace(Locality locality, String newText) {
-    replacements.put(locality, newText);
+  public void replace(Range range, String newText) {
+    replacements.put(range, newText);
   }
 
   /**

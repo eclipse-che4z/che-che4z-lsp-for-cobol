@@ -137,7 +137,7 @@ public class CobolLanguageEngine {
         preprocessor
             .processCleanCode(
                 documentUri,
-                dialectOutcome.getText(),
+                dialectOutcome.getTransformations().calculateExtendedText(),
                 analysisConfig.getCopybookConfig(),
                 new CopybookHierarchy())
             .unwrap(accumulatedErrors::addAll);

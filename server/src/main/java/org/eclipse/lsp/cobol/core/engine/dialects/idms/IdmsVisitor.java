@@ -37,13 +37,12 @@ import org.eclipse.lsp.cobol.core.IdmsParser.MapSectionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.QualifiedDataNameContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.SchemaSectionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.VariableUsageNameContext;
+import org.eclipse.lsp.cobol.core.engine.TextTransformations;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
@@ -51,7 +50,6 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
@@ -74,6 +72,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private final CopybookConfig copybookConfig;
   private final String programDocumentUri;
   private final TextReplacement textReplacement;
+  private final TextTransformations textTransformations;
   @Getter private final IdmsRecordsDescriptor recordsDescriptor = new IdmsRecordsDescriptor();
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
@@ -86,12 +85,9 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
         context.getCopybookConfig(), treeListener, messageService, new HashSet<>());
     this.copybookConfig = context.getCopybookConfig();
     this.programDocumentUri = context.getTextTransformations().getUri();
+    this.textTransformations = context.getTextTransformations();
 
-    textReplacement = new TextReplacement(context.getTextTransformations().calculateExtendedText());
-  }
-
-  public String getResultedText() {
-    return textReplacement.getResultingText();
+    textReplacement = new TextReplacement(context.getTextTransformations());
   }
 
   @Override

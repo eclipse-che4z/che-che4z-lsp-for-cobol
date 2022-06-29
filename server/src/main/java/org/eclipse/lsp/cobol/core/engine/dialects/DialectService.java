@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.engine.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
@@ -66,7 +67,7 @@ public class DialectService {
     for (CobolDialect orderedDialect : orderedDialects) {
       orderedDialect.extend(context);
     }
-    String extendedText = context.getTextTransformations().calculateExtendedText();
+    TextTransformations extendedText = context.getTextTransformations();
     ResultWithErrors<DialectOutcome> acc = ResultWithErrors.of(new DialectOutcome(extendedText, ImmutableList.of(), ImmutableMultimap.of()));
     for (CobolDialect orderedDialect : orderedDialects) {
       acc = processDialect(acc, orderedDialect, context);
@@ -113,7 +114,7 @@ public class DialectService {
     DialectOutcome result = dialect.processText(context).unwrap(errors::addAll);
     nodes.addAll(result.getDialectNodes());
     implicitCode.putAll(result.getImplicitCode());
-    return new ResultWithErrors<>(new DialectOutcome(result.getText(), nodes, implicitCode), errors);
+    return new ResultWithErrors<>(new DialectOutcome(result.getTransformations(), nodes, implicitCode), errors);
   }
 
   private static ResultWithErrors<DialectOutcome> mergeResults(ResultWithErrors<DialectOutcome> result1,

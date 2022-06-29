@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import lombok.Builder;
 import lombok.Value;
-import org.eclipse.lsp.cobol.core.model.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.TextTransformations;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 /**

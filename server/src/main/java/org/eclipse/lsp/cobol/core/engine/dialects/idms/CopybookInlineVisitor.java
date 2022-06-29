@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.IdmsParser;
 import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.model.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.TextTransformations;
 
 import java.util.ArrayList;
 import java.util.List;

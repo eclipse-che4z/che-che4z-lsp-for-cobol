@@ -26,6 +26,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.engine.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.SortTableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
@@ -46,9 +47,9 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
   private final String uri;
   private final TextReplacement textReplacement;
 
-  public DaCoVisitor(String uri, String text) {
-    this.uri = uri;
-    textReplacement = new TextReplacement(text);
+  public DaCoVisitor(TextTransformations textTransformations) {
+    this.uri = textTransformations.getUri();
+    textReplacement = new TextReplacement(textTransformations);
   }
 
   public String getResultedText() {

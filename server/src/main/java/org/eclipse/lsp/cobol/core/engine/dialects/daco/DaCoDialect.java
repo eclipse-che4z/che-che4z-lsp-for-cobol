@@ -22,10 +22,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.DaCoLexer;
 import org.eclipse.lsp.cobol.core.DaCoParser;
-import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectParserListener;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.dialects.*;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.provider.DaCoImplicitCodeProvider;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
@@ -33,10 +31,13 @@ import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -70,10 +71,9 @@ public final class DaCoDialect implements CobolDialect {
   @Override
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
     List<SyntaxError> errors = new ArrayList<>();
-    DialectOutcome maidOutcome = maidProcessor.process(
-            dcdbPattern.matcher(context.getTextTransformations().calculateExtendedText()).replaceAll(SPACES_A),
-            context, errors);
-    DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(maidOutcome.getText()));
+    removeDcDb(context.getTextTransformations());
+    DialectOutcome maidOutcome = maidProcessor.process(context, errors);
+    DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(maidOutcome.getTransformations().calculateExtendedText()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     DaCoParser parser = new DaCoParser(tokens);
     DialectParserListener listener = new DialectParserListener(context.getTextTransformations().getUri());
@@ -82,7 +82,7 @@ public final class DaCoDialect implements CobolDialect {
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
-    DaCoVisitor visitor = new DaCoVisitor(context.getTextTransformations().getUri(), maidOutcome.getText());
+    DaCoVisitor visitor = new DaCoVisitor(context.getTextTransformations());
     List<Node> nodes = visitor.visitStartRule(parser.startRule());
     nodes.addAll(maidOutcome.getDialectNodes());
     errors.addAll(listener.getErrors());
@@ -92,8 +92,18 @@ public final class DaCoDialect implements CobolDialect {
     DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider(maidProcessor.getSections());
     Multimap<String, Pair<String, String>> implicitCode = provider.getImplicitCode(text, nodes, context.getCopybookConfig());
 
-    DialectOutcome result = new DialectOutcome(text, nodes, implicitCode);
+    DialectOutcome result = new DialectOutcome(context.getTextTransformations(), nodes, implicitCode);
     return new ResultWithErrors<>(result, errors);
+  }
+
+  private void removeDcDb(TextTransformations tt) {
+    Matcher matcher = dcdbPattern.matcher(tt.getText());
+    while (matcher.find()) {
+      Position start = DialectUtils.findPosition(tt.getText(), matcher.start());
+      Position end = DialectUtils.findPosition(tt.getText(), matcher.end());
+      tt.replace(new Range(start, end),
+              new String(new char[matcher.end() - matcher.start()]).replace('\0', ' '));
+    }
   }
 
   @Override
