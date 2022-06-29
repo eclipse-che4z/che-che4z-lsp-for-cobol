@@ -71,11 +71,14 @@
         ],
         "languages": [
             {
-                "id": "COBOL",
+                "id": "cobol",
                 "extensions": [
                     ".cbl",
                     ".cob",
                     ".cobol"
+                ],
+                "aliases": [
+                    "COBOL"
                 ],
                 "configuration": "./syntaxes/lang-config.json"
             },
