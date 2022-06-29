@@ -20,6 +20,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
+import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.service.SettingsService;
 
 import java.io.BufferedReader;
@@ -28,7 +29,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -46,57 +46,51 @@ public class Snippets extends CompletionStorage<SnippetsModel> {
   }
 
   @Override
-  protected Map<String, SnippetsModel> getInputStream(List<String> dialectList) {
+  protected Map<String, SnippetsModel> getDataMap(String dialectType) {
     Gson gson = new Gson();
-    Reader reader;
-    Map<String, SnippetsModel> cobolSnippets = new HashMap<>();
-    Map<String, SnippetsModel> idmsSnippets;
-    try {
-      reader = getReader(SNIPPETS_FILE_PATH);
-      cobolSnippets = getCobolSnippets(gson, reader);
-      reader.close();
 
-      if (!dialectList.isEmpty()) {
-        idmsSnippets = getMergedSnippetsModelMap(SNIPPETS_IDMS_FILE_PATH, cobolSnippets);
-        if (dialectList.size() == 2
-            || (dialectList.size() == 1 && dialectList.contains(DaCoDialect.NAME))) {
-          return getMergedSnippetsModelMap(SNIPPETS_DACO_FILE_PATH, idmsSnippets);
-        } else return idmsSnippets;
-      } else return cobolSnippets;
+    Map<String, SnippetsModel> snippetsModelMap = new HashMap<>();
+    try (Reader reader = createReader(SNIPPETS_FILE_PATH)) {
+      Map<String, SnippetsModel> cobolSnippets = getCobolSnippets(gson, reader);
+      if (dialectType.equalsIgnoreCase(DaCoDialect.NAME)) {
+        Map<String, SnippetsModel> idmsSnippets = getMergedSnippetsModelMap(SNIPPETS_IDMS_FILE_PATH, cobolSnippets);
+        snippetsModelMap = getMergedSnippetsModelMap(SNIPPETS_DACO_FILE_PATH, idmsSnippets);
+      } else if (dialectType.equalsIgnoreCase(IdmsDialect.NAME))
+        snippetsModelMap = getMergedSnippetsModelMap(SNIPPETS_IDMS_FILE_PATH, cobolSnippets);
+      else
+        snippetsModelMap = cobolSnippets;
     } catch (IOException e) {
       LOG.error(" Error reading snippets file {}", e.getMessage());
     }
-
-    return cobolSnippets;
+    return snippetsModelMap;
   }
 
-  private Map<String, SnippetsModel> getMergedSnippetsModelMap(
-      String snippetFileName, Map<String, SnippetsModel> mergeMap) throws IOException {
+  private Map<String, SnippetsModel> getMergedSnippetsModelMap(String snippetFileName, Map<String, SnippetsModel> mergeMap) {
     Gson gson = new Gson();
-    Reader reader = getReader(snippetFileName);
-    Map<String, SnippetsModel> snippets = getCobolSnippets(gson, reader);
-    Map<String, SnippetsModel> finalSnippets = new HashMap<>(mergeMap);
-
-    snippets.forEach(
-        (key, value) ->
-            finalSnippets.merge(
-                key,
+    Map<String, SnippetsModel> mergedSnippets = new HashMap<>(mergeMap);
+    try (Reader reader = createReader(snippetFileName)) {
+      Map<String, SnippetsModel> snippets = getCobolSnippets(gson, reader);
+      snippets.forEach(
+              (key, value) ->
+                  mergedSnippets.merge(key,
                 value,
-                (v1, v2) ->
-                    new SnippetsModel(
-                        v1.getKey(),
-                        v2.getPrefix(),
-                        v2.getBody(),
-                        v2.getDescription())));
-    reader.close();
-    return finalSnippets;
+                              (v1, v2) ->
+                                      new SnippetsModel(
+                                              v1.getKey(),
+                                              v2.getPrefix(),
+                                              v2.getBody(),
+                                              v2.getDescription())));
+    } catch (IOException e) {
+      LOG.error("Error reading snippets file {}", e.getMessage());
+    }
+    return mergedSnippets;
   }
 
-  private BufferedReader getReader(String resourceFile) {
+  private BufferedReader createReader(String resourceFile) {
     return new BufferedReader(
-        new InputStreamReader(
-            Objects.requireNonNull(Snippets.class.getResourceAsStream(resourceFile)),
-            StandardCharsets.UTF_8));
+            new InputStreamReader(
+                    Objects.requireNonNull(Snippets.class.getResourceAsStream(resourceFile)),
+                    StandardCharsets.UTF_8));
   }
 
   private Map<String, SnippetsModel> getCobolSnippets(Gson gson, Reader reader) {

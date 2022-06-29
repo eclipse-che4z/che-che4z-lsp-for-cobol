@@ -18,6 +18,8 @@ import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
+import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.service.SettingsService;
 
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ public abstract class CompletionStorage<T> {
   private Map<String, T> storage;
   private List<String> dialectList = new ArrayList<>();
   private SettingsService settingsService;
+  private String dialectType = "COBOL";
 
   CompletionStorage(SettingsService settingsService) {
     this.settingsService = settingsService;
@@ -52,7 +55,7 @@ public abstract class CompletionStorage<T> {
     this.settingsService.getConfiguration(DIALECTS.label).thenAccept(this::setDialects);
   }
 
-  protected abstract Map<String, T> getInputStream(List<String> dialectList);
+  protected abstract Map<String, T> getDataMap(String dialectType);
 
   /**
    * Return a full set of the registered keywords
@@ -69,6 +72,7 @@ public abstract class CompletionStorage<T> {
    *
    * @param label - Keyword to find a description
    * @return description
+   *
    */
   String getInformationFor(String label) {
     return (String) storage.get(label);
@@ -92,12 +96,14 @@ public abstract class CompletionStorage<T> {
   private void setDialects(List<Object> dialectObject) {
     JsonArray jsonObj = (JsonArray) dialectObject.get(0);
     this.dialectList = Streams.stream(jsonObj).map(JsonElement::getAsString).collect(toList());
+    if (!dialectList.isEmpty())
+      this.dialectType = dialectList.contains(DaCoDialect.NAME) ? DaCoDialect.NAME : IdmsDialect.NAME;
     resetStorage();
   }
 
   private void resetStorage() {
     Map<String, T> dataMap;
-    dataMap = getInputStream(this.dialectList);
+    dataMap = getDataMap(this.dialectType);
     fillInStorage(dataMap);
     LOG.info("The properties file has been loaded successfully");
   }
