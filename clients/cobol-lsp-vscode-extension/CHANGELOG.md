@@ -4,12 +4,12 @@ Changelog:
 
 ## [1.0.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.1...1.0.2) (2022-06-29)
 
-### Documentation
-- Updates to README([85543b4](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/85543b4b4aee89953c1db841abe76473b42e7d5b))
+#### Changed
+- Readme update
 
 ## [1.0.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.0...1.0.1) (2022-04-05)
 
-### Fixed
+#### Fixed
 * Provide default features list when no features are set in settings
 
 ## [1.0.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.21.0...1.0.0) (2022-03-31)
