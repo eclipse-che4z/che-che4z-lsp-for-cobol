@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.engine;
 
 import lombok.var;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -49,7 +48,7 @@ class MappingServiceTest {
         .build(), "copybook");
 
     textTransformations.extend(copyNode, TextTransformations.of(COPYBOOK, "copybook"));
-    textTransformations.replace(copyNode.getLocality(), "");
+    textTransformations.replace(copyNode.getLocality().getRange(), "");
 
     var mapping = MappingService.buildLocalityMap(textTransformations);
     assertEquals(textTransformations.calculateExtendedText(), "");

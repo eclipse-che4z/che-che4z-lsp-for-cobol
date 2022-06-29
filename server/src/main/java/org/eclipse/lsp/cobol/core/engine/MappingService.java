@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.engine;
 
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.TextTransformations;
 
 import java.util.HashMap;
 import java.util.Map;
