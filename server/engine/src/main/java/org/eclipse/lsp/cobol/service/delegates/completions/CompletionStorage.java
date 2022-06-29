@@ -17,13 +17,15 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
+import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.service.SettingsService;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -34,12 +36,14 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.DIALECT
  * elements as strings and documentation for them if provided.
  */
 @Slf4j
-public abstract class CompletionStorage {
-  private Map<String, String> storage = new HashMap<>();
+public abstract class CompletionStorage<T> {
+  private Map<String, T> storage;
   private List<String> dialectList = new ArrayList<>();
-  @Inject private SettingsService settingsService;
+  private SettingsService settingsService;
+  private String dialectType = "COBOL";
 
-  CompletionStorage() {
+  CompletionStorage(SettingsService settingsService) {
+    this.settingsService = settingsService;
     resetStorage();
   }
 
@@ -48,10 +52,10 @@ public abstract class CompletionStorage {
    * settings
    */
   public void updateStorage() {
-    settingsService.getConfiguration(DIALECTS.label).thenAccept(this::getDialects);
+    this.settingsService.getConfiguration(DIALECTS.label).thenAccept(this::setDialects);
   }
 
-  protected abstract InputStream getInputStream(List<String> dialectList);
+  protected abstract Map<String, T> getDataMap(String dialectType);
 
   /**
    * Return a full set of the registered keywords
@@ -59,6 +63,7 @@ public abstract class CompletionStorage {
    * @return A set of keywords
    */
   Set<String> getLabels() {
+    resetStorage();
     return storage.keySet();
   }
 
@@ -67,43 +72,39 @@ public abstract class CompletionStorage {
    *
    * @param label - Keyword to find a description
    * @return description
+   *
    */
   String getInformationFor(String label) {
-    return storage.get(label);
+    return (String) storage.get(label);
   }
 
-  private void fillInStorage(Properties props) {
-    this.storage =
-        props.entrySet().stream()
-            .collect(
-                Collectors.toMap(
-                    entry -> entry.getKey().toString(),
-                    entry -> processDescription(entry.getValue().toString())));
-  }
   /**
-   * Replace line break tags with actual line breaks
+   * Return a snippet for given label or null not found
    *
-   * @param desc - raw description retrieved from storage
-   * @return the description properly split in lines
+   * @param label - Keyword to find a description
+   * @return description
    */
-  private String processDescription(String desc) {
-    return desc.replace("<br>", "\r\n\r\n");
+  SnippetsModel getSnippet(String label) {
+    return (SnippetsModel) storage.get(label);
   }
 
-  private void getDialects(List<Object> dialectObject) {
+  private void fillInStorage(Map<String, T> props) {
+    this.storage =
+            props.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+  }
+
+  private void setDialects(List<Object> dialectObject) {
     JsonArray jsonObj = (JsonArray) dialectObject.get(0);
     this.dialectList = Streams.stream(jsonObj).map(JsonElement::getAsString).collect(toList());
+    if (!dialectList.isEmpty())
+      this.dialectType = dialectList.contains(DaCoDialect.NAME) ? DaCoDialect.NAME : IdmsDialect.NAME;
     resetStorage();
   }
 
   private void resetStorage() {
-    Properties props = new Properties();
-    try (InputStream propertiesStream = getInputStream(dialectList)) {
-      props.load(propertiesStream);
-    } catch (IOException e) {
-      LOG.error(e.getMessage());
-    }
-    fillInStorage(props);
+    Map<String, T> dataMap;
+    dataMap = getDataMap(this.dialectType);
+    fillInStorage(dataMap);
     LOG.info("The properties file has been loaded successfully");
   }
 }

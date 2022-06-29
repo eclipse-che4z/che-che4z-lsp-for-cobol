@@ -31,7 +31,7 @@ import static org.eclipse.lsp4j.CompletionItemKind.Keyword;
 /** This completion provider resolves keywords and documentation for them as static content */
 @Singleton
 public class KeywordCompletion implements Completion {
-  private CompletionStorage keywords;
+  private CompletionStorage<String> keywords;
 
   @Inject
   KeywordCompletion(@Named("Keywords") CompletionStorage keywords) {
@@ -40,11 +40,11 @@ public class KeywordCompletion implements Completion {
 
   @Override
   public @NonNull Collection<CompletionItem> getCompletionItems(
-      @NonNull String token, @Nullable CobolDocumentModel document) {
+          @NonNull String token, @Nullable CobolDocumentModel document) {
     return keywords.getLabels().stream()
-        .filter(DocumentationUtils.startsWithIgnoreCase(token))
-        .map(this::toKeywordCompletion)
-        .collect(toList());
+            .filter(DocumentationUtils.startsWithIgnoreCase(token))
+            .map(this::toKeywordCompletion)
+            .collect(toList());
   }
 
   private CompletionItem toKeywordCompletion(String name) {

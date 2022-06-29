@@ -1,0 +1,1781 @@
+{
+  "ADD": {
+    "prefix": "ADD",
+    "body": [
+      "ADD ${1:a} TO ${2:c} GIVING ${3:C}"
+    ],
+    "description": "ADD a TO b GIVING c"
+  },
+  "ADD Id TO Id": {
+    "prefix": "ADD id TO id",
+    "body": [
+      "ADD ${1:id|LIT} TO ${2:id}"
+    ],
+    "description": "ADD literal TO id"
+  },
+  "ADD CORRESPONDING": {
+    "prefix": "ADD CORRESPONDING",
+    "body": [
+      "ADD CORR ${1:id} TO ${2:id}"
+    ],
+    "description": "ADD CORRESPONDING is used to add the corresponding variables or fiels in two identical group variables"
+  },
+  "ACCEPT": {
+    "prefix": "ACCEPT variable",
+    "body": [
+      "ACCEPT ${1:variable}",
+      "$0"
+    ],
+    "description": "ACCEPT variable"
+  },
+  "ACCEPT FROM": {
+    "prefix": "ACCEPT",
+    "body": [
+      "ACCEPT ${1:variable} ${2|FROM DATE,FROM DAY,FROM DAY-OF-WEEK,TIME|}",
+      "$0"
+    ],
+    "description": "ACCEPT FROM DATE/DAY/WEEK/TIME"
+  },
+  "ACCEPT id": {
+    "prefix": "ACCEPT id",
+    "body": [
+      "ACCEPT ${1:id}",
+      "$0"
+    ],
+    "description": "ACCEPT id"
+  },
+  "ADDRESS OF": {
+    "prefix": "ADDRESS OF",
+    "body": [
+      "ADDRESS OF ${1:id}"
+    ],
+    "description": "The ADDRESS OF special register references the address of a data item in the linkage section, the local-storage section, or the working-storage section."
+  },
+  "AFTER FROM": {
+    "prefix": "AFTER FROM",
+    "body": [
+      "AFTER ${1:item} FROM ${2:item}"
+    ],
+    "description": "AFTER FROM"
+  },
+  "AFTER id": {
+    "prefix": "AFTER id",
+    "body": [
+      "AFTER ${1:item}"
+    ],
+    "description": "AFTER id"
+  },
+  "ALL BY": {
+    "prefix": "ALL id BY id",
+    "body": [
+      "ALL ${1:id|lit} BY ${2:id|lit}"
+    ],
+    "description": "ALL id BY id"
+  },
+  "ALLOCATE": {
+    "prefix": "ALLOCATE item",
+    "body": [
+      "ALLOCATE ${1:arithExp|dataName}"
+    ],
+    "description": "ALLOCATE item"
+  },
+  "ALSO": {
+    "prefix": "ALSO item",
+    "body": [
+      "ALSO ${1:id|lit|exp|TRUE|FALSE}"
+    ],
+    "description": "ALSO id|dlit|exp|TRUE|FALSE}"
+  },
+  "ALTER TO": {
+    "prefix": "ALTER TO",
+    "body": [
+      "ALTER ${1:procName-1} TO ${2:procName-2}"
+    ],
+    "description": "ALTER TO"
+  },
+  "ASCENDING": {
+    "prefix": "ASCENDING",
+    "body": [
+      "ASCENDING ${1:item}"
+    ],
+    "description": "ASCENDING item"
+  },
+  "BEFORE": {
+    "prefix": "BEFORE",
+    "body": [
+      "BEFORE ${1:id|lit}"
+    ],
+    "description": "BEFORE literal"
+  },
+  "BY": {
+    "prefix": "BY",
+    "body": [
+      "BY ${1:item}"
+    ],
+    "description": "BY Item"
+  },
+  "BY UNTIL": {
+    "prefix": "BY UNTIL",
+    "body": [
+      "BY ${1:item} UNTIL ${2:condition}"
+    ],
+    "description": "BY item UNTIL condition"
+  },
+  "CHARACTERS BY": {
+    "prefix": "CHARACTERS BY",
+    "body": [
+      "CHARACTERS BY ${1:id|lit}"
+    ],
+    "description": "CHARACTERS BY literal"
+  },
+  "CALL": {
+    "prefix": "CALL",
+    "body": [
+      "CALL \"$1\" USING",
+      "    BY ${2|value,reference,content|} ${3:identifer}",
+      "    RETURNING ${4:return-code}",
+      "END-CALL",
+      "$0"
+    ],
+    "description": "CALL literal"
+  },
+  "CANCEL": {
+    "prefix": "CANCEL",
+    "body": [
+      "CANCEL ${1:id|lit}",
+      "$0"
+    ],
+    "description": "CANCEL literal"
+  },
+  "CLOSE": {
+    "prefix": "CLOSE",
+    "body": [
+      "CLOSE $(1:fileName}"
+    ],
+    "description": "CLOSE filename"
+  },
+  "COMPUTE EQUAL": {
+    "prefix": "COMPUTE EQUAL",
+    "body": [
+      "COMPUTE ${1:id} EQUAL ${2:arithExp}"
+    ],
+    "description": "COMPUTE id EQUAL arithexp"
+  },
+  "CONTENT": {
+    "prefix": "CONTENT",
+    "body": [
+      "CONTENT ${1:id}"
+    ],
+    "description": "CONTENT id"
+  },
+  "CONVERTING": {
+    "prefix": "CONVERTING",
+    "body": [
+      "CONVERTING ${1:item}"
+    ],
+    "description": "CONVERTING item"
+  },
+  "CORR": {
+    "prefix": "CORR",
+    "body": [
+      "CORR ${1:id}"
+    ],
+    "description": "CORR id"
+  },
+  "COUNT IN": {
+    "prefix": "COUNT IN",
+    "body": [
+      "COUNT IN ${1:id}"
+    ],
+    "description": "COUNT IN id"
+  },
+  "COPY": {
+    "prefix": "COPY",
+    "body": [
+      "COPY \"${1:SUBPROG.CPY}\"",
+      "    REPLACING ==${2:()}== BY ==${3:lnk-}==."
+    ],
+    "description": "COPY REPLACING"
+  },
+  "DATA DIVISION": {
+    "prefix": "DATA DIVISION",
+    "body": [
+      "DATA DIVISION.",
+      "$0"
+    ],
+    "description": " DATA DIVISION"
+  },
+  "DATE": {
+    "prefix": "DATE",
+    "body": [
+      "DATE ${1:yyyymmdd}"
+    ],
+    "description": "DATE yyyymmdd"
+  },
+  "DAY": {
+    "prefix": "DAY",
+    "body": [
+      "DAY ${1:yyyyddd}"
+    ],
+    "description": "DAY yyyyddd"
+  },
+  "DELETE": {
+    "prefix": "DELETE fileName",
+    "body": [
+      "DELETE ${1:fileName}"
+    ],
+    "description": "DELETE fileName"
+  },
+  "DELIMITED BY": {
+    "prefix": "DELIMITED BY",
+    "body": [
+      "DELIMITED BY ${1:item}"
+    ],
+    "description": "DELIMITED BY item"
+  },
+  "DELIMITER": {
+    "prefix": "DELIMITER",
+    "body": [
+      "DELIMITER ${1:item}"
+    ],
+    "description": "DELIMITED BY"
+  },
+  "DESCENDING": {
+    "prefix": "DESCENDING item",
+    "body": [
+      "DESCENDING ${1:item}"
+    ],
+    "description": "DESCENDING item"
+  },
+  "DIVIDE": {
+    "prefix": "DIVIDE",
+    "body": [
+      "DIVIDE ${1:a} BY ${2:b} GIVING ${3:c} ${4:REMAINDER ${5:d}}"
+    ],
+    "description": "DIVIDE a BY b GIVING [REMAINDER}"
+  },
+  "DIVIDE BY GIVING": {
+    "prefix": "DIVIDE BY GIVING",
+    "body": [
+      "DIVIDE ${1:id|lit} BY ${2:id|lit} GIVING ${3:id}"
+    ],
+    "description": "DIVIDE BY GIVING"
+  },
+  "DIVIDE INTO": {
+    "prefix": "DIVIDE INTO",
+    "body": [
+      "DIVIDE ${1:id|lit} INTO ${2:id}"
+    ],
+    "description": "DIVIDE INTO"
+  },
+  "DIVIDE INTO GIVING": {
+    "prefix": "DIVIDE INTO GIVING",
+    "body": [
+      "DIVIDE ${1:id|lit} INTO ${2:id|lit} GIVING ${3:id}"
+    ],
+    "description": "DIVIDE INTO GIVING"
+  },
+  "DIVIDE INTO GIVING REMAINDER": {
+    "prefix": "DIVIDE INTO GIVING REMAINDER",
+    "body": [
+      "DIVIDE INTO GIVING REMAINDER=DIVIDE ${1:id|lit} INTO ${2:id|lit} GIVING ${3:id} REMAINDER ${4:id4}"
+    ],
+    "description": "DIVIDE INTO GIVING REMAINDER"
+  },
+  "DISPLAY": {
+    "prefix": "DISPLAY",
+    "body": [
+      "DISPLAY ${1:id|lit}"
+    ],
+    "description": "DISPLAY literal"
+  },
+  "DOWN BY": {
+    "prefix": "DOWN BY",
+    "body": [
+      "DOWN BY ${1:item}"
+    ],
+    "description": "DOWN BY item"
+  },
+  "ENVIRONMENT DIVISION": {
+    "prefix": "ENVIRONMENT DIVISION",
+    "body": [
+      "ENVIRONMENT DIVISION.",
+      "$0"
+    ],
+    "description": "ENVIRONMENT DIVISION"
+  },
+  "ENTRY": {
+    "prefix": "ENTRY",
+    "body": [
+      "$1-EP SECTON.",
+      "ENTRY \"$1\".",
+      "    $0\t",
+      "    GOBACK.",
+      ""
+    ],
+    "description": "ENTRY statement"
+  },
+  "ENCODING": {
+    "prefix": "ENCODING item",
+    "body": [
+      "ENCODING ${1:item}"
+    ],
+    "description": "ENCODING item"
+  },
+  "END-OF-PAGE": {
+    "prefix": "END-OF-PAGE",
+    "body": [
+      "END-OF-PAGE ${1:item}"
+    ],
+    "description": "END-OF-PAGE item"
+  },
+  "EQUAL": {
+    "prefix": "EQUAL",
+    "body": [
+      "EQUAL ${1:item} ${2:item}"
+    ],
+    "description": "EQUAL two items"
+  },
+  "EXTEND": {
+    "prefix": "EXTEND",
+    "body": [
+      "EXTEND ${1:fileName}"
+    ],
+    "description": "EXTEND fileName"
+  },
+  "EXCEPTION": {
+    "prefix": "EXCEPTION",
+    "body": [
+      "EXCEPTION ${1:impStat}"
+    ],
+    "description": "EXCEPTION impStat"
+  },
+  "EXIT PROGRAM": {
+    "prefix": "EXIT",
+    "body": [
+      "EXIT PROGRAM RETURNING ${1:item}"
+    ],
+    "description": "EXIT PROGRAM"
+  },
+  "EXEC SQL": {
+    "prefix": "EXEC SQL",
+    "body": [
+      "EXEC SQL ${1:SQL-STATEMENT} END-EXEC."
+    ],
+    "description": "EXEC SQL STATEMENT"
+  },
+  "EXEC SQL INCLUDE": {
+    "prefix": "EXEC SQL INCLUDE",
+    "body": [
+      "EXEC SQL INCLUDE ${1:SQLSTATEMENT.CPY} END-EXEC."
+    ],
+    "description": "EXEC SQL INCLUDE"
+  },
+  "EXEC CICS": {
+    "prefix": "EXEC CICS",
+    "body": [
+      "EXEC CICS ${1:cics-statement} END-EXEC."
+    ],
+    "description": "EXEC CICS STATEMENT"
+  },
+  "EVALUATE": {
+    "prefix": "EVALUATE ",
+    "body": [
+      "EVALUATE $1",
+      "    WHEN $2",
+      "       $0",
+      "    WHEN OTHER",
+      "       CONTINUE",
+      "END-EVALUATE",
+      ""
+    ],
+    "description": "EVALUATE"
+  },
+  "FILE": {
+    "prefix": "FILE",
+    "body": [
+      "FILE ${1:item}"
+    ],
+    "description": "FILE item"
+  },
+  "FIRST": {
+    "prefix": "FIRST",
+    "body": [
+      "FIRST ${1:id|lit} BY ${2:id|lit}"
+    ],
+    "description": "FIRST id|literal BY id|literal"
+  },
+  "FOR": {
+    "prefix": "FOR",
+    "body": [
+      "FOR ${1:item}"
+    ],
+    "description": "FOR item"
+  },
+  "FROM": {
+    "prefix": "FROM",
+    "body": [
+      "FROM ${1:item}"
+    ],
+    "description": "FROM item"
+  },
+  "FREE": {
+    "prefix": "FREE",
+    "body": [
+      "FREE ${1:dataName}"
+    ],
+    "description": "FREE dataName"
+  },
+  "FUNCTION BIT-OF": {
+    "prefix": "FUNCTION BIT-OF",
+    "body": [
+      "FUNCTION BIT-OF(${1:integer})$0"
+    ],
+    "description": "FUNCTION TO CONVERT THE ARGUMENT TO BITS"
+  },
+  "FUNCTION BIT-TO-CHAR": {
+    "prefix":
+    "FUNCTION BIT-TO-CHAR"
+  ,
+    "body": [
+      "FUNCTION BIT-TO-CHAR(${1:integer})$0"
+    ],
+    "description": "FUNCTION TO CONVERT BITS TO CHARACTER"
+  },
+  "FUNCTION CHAR": {
+    "prefix":
+    "FUNCTION CHAR"
+  ,
+    "body": [
+      "FUNCTION CHAR(${1:integer})$0"
+    ],
+    "description": "FUNCTION CHARACTER IN THE ORDINAL POSITION SPECIFIED BY INTEGER, FROM THE CURRENT ALPHANUMERIC COLLATING SEQUENCE"
+  },
+  "FUNCTION COS": {
+    "prefix":
+    "FUNCTION COS"
+  ,
+    "body": [
+      "FUNCTION COS(${1:angle})$0"
+    ],
+    "description": "FUNCTION TRIGONOMETRIC COSINE OF ANGLE"
+  },
+  "FUNCTION CURRENCY-SYMBOL": {
+    "prefix":
+    "FUNCTION CURRENCY-SYMBOL"
+  ,
+    "body": [
+      "FUNCTION CURRENCY-SYMBOL()$0"
+    ],
+    "description": "FUNCTION CURRENCY-SYMBOL CHARACTER CURRENTLY IN EFFECT FOR THE LOCALE UNDER WHICH THE PROGRAM IS RUNNING"
+  },
+  "FUNCTION CURRENT-DATE": {
+    "prefix":
+    "FUNCTION CURRENT-DATE"
+  ,
+    "body": [
+      "FUNCTION CURRENT-DATE(${1:date-and-time-format})$0"
+    ],
+    "description": "FUNCTION CURRENT DATE AND TIME AS 21-CHARACTER VALUE"
+  },
+  "FUNCTION DATE-OF-INTEGER": {
+    "prefix":
+    "FUNCTION DATE-OF-INTEGER"
+  ,
+    "body": [
+      "FUNCTION DATE-OF-integer(${1:integer})$0"
+    ],
+    "description": "FUNCTION TO CONVERT THE INTEGER DATE TO STANDARD DATE FORMAT"
+  },
+  "FUNCTION DAY-OF-INTEGER": {
+    "prefix":
+    "FUNCTION DAY-OF-INTEGER"
+  ,
+    "body": [
+      "FUNCTION DAY-OF-INTEGER(${1:integer})$0"
+    ],
+    "description": "FUNCTION TO CONVERT THE INTEGER DATE TO NUMBER OF DAYS IN THE GREGORIAN CALENDAR"
+  },
+  "FUNCTION DAY-TO-YYYYDDD": {
+    "prefix":
+    "FUNCTION DAY-TO-YYYYDDD"
+  ,
+    "body": [
+      "FUNCTION DATE--TO-YYYYDDD(${1:integer},${2:integer})$0"
+    ],
+    "description": "FUNCTION TO CONVERT A DATE WITH A 2 DIGIT YEAR TO A 4 DIGIT YEAR"
+  },
+  "FUNCTION DISPLAY-OF": {
+    "prefix":
+    "FUNCTION DISPLAY-OF"
+  ,
+    "body": [
+      "FUNCTION DISPLAY-OF(${1:string},${2:integer})$0"
+    ],
+    "description": "FUNCTION TO CONVERT AN ALPHANUMERIC STRING USING A CODEPAGE"
+  },
+  "FUNCTION EXP": {
+    "prefix":
+    "FUNCTION EXP"
+  ,
+    "body": [
+      "FUNCTION EXP(${1:integer})$0"
+    ],
+    "description": "FUNCTION TO RETURN E RAISED TO THE POWER OF THE ARGUMENT"
+  },
+  "FUNCTION ABS": {
+    "prefix":
+    "FUNCTION ABS"
+  ,
+    "body": [
+      "FUNCTION ABS(${1:number})$0"
+    ],
+    "description": "FUNCTION ABSOLUTE VALUE OF NUMBER"
+  },
+  "FUNCTION ACOS": {
+    "prefix":
+    "FUNCTION ACOS"
+  ,
+    "body": [
+      "FUNCTION ACOS(${1:COSINE})$0"
+    ],
+    "description": "FUNCTION TRIGONOMETRIC ARC-COSINE, OR INVERSE COSINE, OF COSINE"
+  },
+  "FUNCTION ANNUITY": {
+    "prefix":
+    "FUNCTION ANNUITY"
+  ,
+    "body": [
+      "FUNCTION ANNUITY(${1:INTEREST-RATE},${2:number-of-periods})$0"
+    ],
+    "description": "FUNCTION ANNUITY"
+  },
+  "FUNCTION ASIN": {
+    "prefix":
+    "FUNCTION ASIN"
+  ,
+    "body": [
+      "FUNCTION ASIN(${1:sine})$0"
+    ],
+    "description": "FUNCTION TRIGONOMETRIC ARC-SINE, OR INVERSE SINE, OF SINE"
+  },
+  "FUNCTION ATAN": {
+    "prefix":
+    "FUNCTION ATAN"
+  ,
+    "body": [
+      "FUNCTION ATAN(${1:tangent})$0"
+    ],
+    "description": "FUNCTION TRIGONOMETRIC ARC-TANGENT, OR INVERSE TANGENT, OF TANGENT"
+  },
+  "FUNCTION BOOLEAN-OF-INTEGER": {
+    "prefix":
+    "FUNCTION BOOLEAN-OF-INTEGER"
+  ,
+    "body": [
+      "FUNCTION BOOLEAN-OF-INTEGER(${1:integer},${2:LENGTH})$0"
+    ],
+    "description": "FUNCTION BOOLEAN ITEM OF USAGE BIT REPRESENTING THE BINARY VALUE OF INTEGER; WITH THE GIVEN LENGTH"
+  },
+  "FUNCTION BYTE-LENGTH": {
+    "prefix":
+    "FUNCTION BYTE-LENGTH"
+  ,
+    "body": [
+      "FUNCTION BYTE-LENGTH(${1:integer})$0"
+    ],
+    "description": "FUNCTION BYTE-LENGTH (IN BYTES) OF ITEM"
+  },
+  "FUNCTION DATE-TO-YYYYMMDD": {
+    "prefix":
+    "FUNCTION DATE-TO-YYYYMMDD"
+  ,
+    "body": [
+      "FUNCTION DATE--TO-YYYYMMDD(${1:integer},${2:integer})$0"
+    ],
+    "description": "FUNCTION TO CONVERT A DATE WITH A 2 DIGIT YEAR TO A 4 DIGIT YEAR"
+  },
+  "FUNCTION EXP10": {
+    "prefix":
+    "FUNCTION EXP10"
+  ,
+    "body": [
+      "FUNCTION EXP10(${1:integer})$0"
+    ],
+    "description": "FUNCTION TO RETURN 10 RAISED TO THE POWER OF THE ARGUMENT"
+  },
+  "FUNCTION FACTORIAL": {
+    "prefix":
+    "FUNCTION FACTORIAL"
+  ,
+    "body": [
+      "FUNCTION FACTORIAL(${1:integer})$0"
+    ],
+    "description": "FUNCTION TO RETURN THE FACTORIAL OF THE ARGUMENT"
+  },
+  "FUNCTION HEX-OF": {
+    "prefix":
+    "FUNCTION HEX-OF"
+  ,
+    "body": [
+      "FUNCTION HEX-OF(${1:variable})$0"
+    ],
+    "description": "FUNCTION TO RETURN HEXADECIMAL REPRESENTATION OF THE ARGUMENT"
+  },
+  "FUNCTION HEX-TO-CHAR": {
+    "prefix":
+    "FUNCTION HEX-TO-CHAR"
+  ,
+    "body": [
+      "FUNCTION HEX-TO-CHAR(${1:variable})$0"
+    ],
+    "description": "FUNCTION TO RETURN A CHARACTER STRING THAT IS A HEXADECIMAL REPRESENTATION OF THE ARGUMENT"
+  },
+  "FUNCTION INTEGER": {
+    "prefix":
+    "FUNCTION INTEGER"
+  ,
+    "body": [
+      "FUNCTION INTEGER(${1:number})$0"
+    ],
+    "description": "GREATEST INTEGER VALUE THAT IS LESS THAN OR EQUAL TO NUMBER"
+  },
+  "FUNCTION INTEGER-OF-DATE": {
+    "prefix":
+    "FUNCTION INTEGER-OF-DATE"
+  ,
+    "body": [
+      "FUNCTION INTEGER-OF-DATE(${1:yyyymmdd})$0"
+    ],
+    "description": "CONVERTS YYYYMMDD TO AN INTERNAL INTEGER-DATE"
+  },
+  "FUNCTION INTEGER-OF-DAY": {
+    "prefix":
+    "FUNCTION INTEGER-OF-DAY"
+  ,
+    "body": [
+      "FUNCTION INTEGER-OF-DAY(${1:yyyymmdd})$0"
+    ],
+    "description": "CONVERTS YYYYMMDD TO AN INTERNAL INTEGER-DAY"
+  },
+  "FUNCTION INTEGER-PART": {
+    "prefix":
+    "FUNCTION INTEGER-PART"
+  ,
+    "body": [
+      "FUNCTION INTEGER-PART(${1:number})$0"
+    ],
+    "description": "PORTION OF NUMBER THAT OCCURS TO THE LEFT OF THE DECIMAL POINT"
+  },
+  "FUNCTION LENGTH": {
+    "prefix":
+    "FUNCTION LENGTH"
+  ,
+    "body": [
+      "FUNCTION LENGTH(${1:item})$0"
+    ],
+    "description": "RETURNS THE LENGTH (IN CHARACTER POSITIONS) OF THE SPECIFIED ITEM"
+  },
+  "FUNCTION LOG": {
+    "prefix":
+    "FUNCTION LOG"
+  ,
+    "body": [
+      "FUNCTION LOG(${1:number})$0"
+    ],
+    "description": "FORMAT BASE E LOGARITHM OF NUMBER"
+  },
+  "FUNCTION LOG10": {
+    "prefix":
+    "FUNCTION LOG10"
+  ,
+    "body": [
+      "FUNCTION LOG10(${1:number})$0"
+    ],
+    "description": "FORMAT BASE 10 LOGARITHM OF NUMBER"
+  },
+  "FUNCTION LOWERCASE": {
+    "prefix":
+    "FUNCTION LOWERCASE"
+  ,
+    "body": [
+      "FUNCTION LOWERCASE(${1:string})$0"
+    ],
+    "description": "CHARACTER STRING THAT CONTAINS STRING WITH ANY UPPERCASE LETTERS REPLACED BY THEIR CORRESPONDING LOWERCASE LETTERS"
+  },
+  "FUNCTION MAX": {
+    "prefix":
+    "FUNCTION MAX"
+  ,
+    "body": [
+      "FUNCTION MAX(${1:number},${2:...})$0"
+    ],
+    "description": "ALPHANUMERIC/INDEX/INTEGER/NATIONAL/NUMERIC MAXIMUM VALUE FROM THE SPECIFIED LIST OF NUMBERS"
+  },
+  "FUNCTION MEAN": {
+    "prefix":
+    "FUNCTION MEAN"
+  ,
+    "body": [
+      "FUNCTION MEAN(${1:number},${2:...})$0"
+    ],
+    "description": "STATISTICAL MEAN VALUE OF THE SPECIFIED LIST OF NUMBERS"
+  },
+  "FUNCTION MEDIAN": {
+    "prefix":
+    "FUNCTION MEDIAN"
+  ,
+    "body": [
+      "FUNCTION MEDIAN(${1:number},${2:...})$0"
+    ],
+    "description": "STATISTICAL MEDIAN VALUE OF THE SPECIFIED LIST OF NUMBERS"
+  },
+  "FUNCTION MIDRANGE": {
+    "prefix":
+    "FUNCTION MIDRANGE"
+  ,
+    "body": [
+      "FUNCTION MIDRANGE(${1:number},${2:...})$0"
+    ],
+    "description": "STATISTICAL MIDRANGE VALUE OF THE SPECIFIED LIST OF NUMBERS"
+  },
+  "FUNCTION MIN": {
+    "prefix":
+    "FUNCTION MIN"
+  ,
+    "body": [
+      "FUNCTION MIN(${1:number},${2:...})$0"
+    ],
+    "description": "STATISTICAL MIN VALUE OF THE SPECIFIED LIST OF NUMBERS"
+  },
+  "FUNCTION MOD": {
+    "prefix":
+    "FUNCTION MOD"
+  ,
+    "body": [
+      "FUNCTION MOD(${1:value},${2:modulus})$0"
+    ],
+    "description": "REMAINDER FROM THE DIVISION OF VALUE BY MODULUS"
+  },
+  "FUNCTION NATIONAL-OF": {
+    "prefix":
+    "FUNCTION NATIONAL-OF"
+  ,
+    "body": [
+      "FUNCTION NATIONAL-OF(${1:alphanumeric-string},${2:replacement-char})$0"
+    ],
+    "description": "CONVERT ALPHANUMERIC-STRING TO THE NATIONAL CODED CHARACTER SET REPRESENTATION"
+  },
+  "FUNCTION NUMVAL": {
+    "prefix":
+    "FUNCTION NUMVAL"
+  ,
+    "body": [
+      "FUNCTION NUMVAL(${1:string})$0"
+    ],
+    "description": "CORRESPONDING NUMERIC VALUE FOR STRING"
+  },
+  "FUNCTION NUMVAL-C": {
+    "prefix":
+    "FUNCTION NUMVAL-C"
+  ,
+    "body": [
+      "FUNCTION NUMVAL-C(${1:string},${2:currency-symbol}${3:,anycase})$0"
+    ],
+    "description": "CORRESPONDING NUMERIC VALUE FOR STRING, CASE-SENSITIVE IF ANYCASE NOT GIVEN"
+  },
+  "FUNCTION NUMVAL-F": {
+    "prefix":
+    "FUNCTION NUMVAL-F"
+  ,
+    "body": [
+      "FUNCTION NUMVAL-F(${1:string})$0"
+    ],
+    "description": "CORRESPONDING NUMERIC VALUE FOR FLOATING-POINT-STRING"
+  },
+  "FUNCTION ORD": {
+    "prefix":
+    "FUNCTION ORD"
+  ,
+    "body": [
+      "FUNCTION ORD(${1:char},${2:...})$0"
+    ],
+    "description": "ORDINAL POSITION IN THE PROGRAM CHARACTER SET CORRESPONDING TO CHAR"
+  },
+  "FUNCTION ORD-MAX": {
+    "prefix":
+    "FUNCTION ORD-MAX"
+  ,
+    "body": [
+      "FUNCTION ORD-MAX(${1:char},${2:...})$0"
+    ],
+    "description": "MAX. ORDINAL POSITION IN THE PROGRAM CHARACTER SET CORRESPONDING TO LIST OF CHARS"
+  },
+  "FUNCTION ORD-MIN": {
+    "prefix":
+    "FUNCTION ORD-MIN"
+  ,
+    "body": [
+      "FUNCTION ORD-MIN(${1:char},${2:...})$0"
+    ],
+    "description": "MIN. ORDINAL POSITION IN THE PROGRAM CHARACTER SET CORRESPONDING TO LIST OF CHARS"
+  },
+  "FUNCTION PI": {
+    "prefix":
+    "FUNCTION PI"
+  ,
+    "body": [
+      "FUNCTION PI()$0"
+    ],
+    "description": "PI"
+  },
+  "FUNCTION PRESENT-VALUE": {
+    "prefix":
+    "FUNCTION PRESENT-VALUE"
+  ,
+    "body": [
+      "FUNCTION PRESENT-VALUE(${1:discount-rate},${2:amount},${3:...})$0"
+    ],
+    "description": "APPROXIMATION OF THE PRESENT VALUE OF A SERIES OF FUTURE PERIOD-END AMOUNT"
+  },
+  "FUNCTION RANDOM": {
+    "prefix":
+    "FUNCTION RANDOM"
+  ,
+    "body": [
+      "FUNCTION RANDOM(${1:seed})$0"
+    ],
+    "description": "PSEUDO-RANDOM NUMBER 0> <1 FROM A RECTANGULAR DISTRIBUTION WITH OPTIONAL SEED"
+  },
+  "FUNCTION RANGE": {
+    "prefix":
+    "FUNCTION RANGE"
+  ,
+    "body": [
+      "FUNCTION RANGE(${1:argument},${2:...})$0"
+    ],
+    "description": "VALUE OF THE MAXIMUM ARGUMENT MINUS THE VALUE OF THE MINIMUM ARGUMENT"
+  },
+  "FUNCTION REM": {
+    "prefix":
+    "FUNCTION REM"
+  ,
+    "body": [
+      "FUNCTION REM(${1:number},${2:divisor})$0"
+    ],
+    "description": "REMAINDER OF NUMBER DIVIDED BY DIVISOR"
+  },
+  "FUNCTION REVERSE": {
+    "prefix":
+    "FUNCTION REVERSE"
+  ,
+    "body": [
+      "FUNCTION REVERSE(${1:string})$0"
+    ],
+    "description": "REVERSE REPRESENTATION WITH SAME LENGTH OF STRING"
+  },
+  "FUNCTION SIGN": {
+    "prefix":
+    "FUNCTION SIGN"
+  ,
+    "body": [
+      "FUNCTION SIGN(${1:number})$0"
+    ],
+    "description": "SIGN REPRESENTATION OF NUMBER AS -1, 0, 1"
+  },
+  "FUNCTION SIN": {
+    "prefix":
+    "FUNCTION SIN"
+  ,
+    "body": [
+      "FUNCTION SIN(${1:angle})$0"
+    ],
+    "description": "TRIGONOMETRIC SINE OF THE SPECIFIED ANGLE"
+  },
+  "FUNCTION STANDARD-DEVIATION": {
+    "prefix":
+    "FUNCTION STANDARD-DEVIATION"
+  ,
+    "body": [
+      "FUNCTION STANDARD-DEVIATION(${1:integer})$0"
+    ],
+    "description": "FUNCTION TO RETURN THE STANDARD DEVIATION OF ITS ARGUMENTS"
+  },
+  "FUNCTION SQRT": {
+    "prefix":
+    "FUNCTION SQRT"
+  ,
+    "body": [
+      "FUNCTION SQRT(${1:number})$0"
+    ],
+    "description": "APROXIMATION OF THE SQUARE ROOT OF NUMBER"
+  },
+  "FUNCTION SUM": {
+    "prefix":
+    "FUNCTION SUM"
+  ,
+    "body": [
+      "FUNCTION SUM(${1:integer})$0"
+    ],
+    "description": "FUNCTION TO RETURN THE SUM OF ITS ARGUMENTS"
+  },
+  "FUNCTION TAN": {
+    "prefix":
+    "FUNCTION TAN"
+  ,
+    "body": [
+      "FUNCTION TAN(${1:angle})$0"
+    ],
+    "description": "TRIGONOMETRIC TANGENT OF THE SPECIFIED ANGLE"
+  },
+  "FUNCTION TEST-NUMVAL": {
+    "prefix":
+    "FUNCTION TEST-NUMVAL"
+  ,
+    "body": [
+      "FUNCTION TEST-NUMVAL(${1:integer})$0"
+    ],
+    "description": "FUNCTION TO VERIFY THE CONTENTS OF THE ARGUMENT"
+  },
+  "FUNCTION TEST-NUMVAL-F": {
+    "prefix":
+    "FUNCTION TEST-NUMVAL-F"
+  ,
+    "body": [
+      "FUNCTION TEST-NUMVAL-F(${1:integer})$0"
+    ],
+    "description": "FUNCTION TO VERIFY THE CONTENTS OF THE ARGUMENT"
+  },
+  "FUNCTION TRIM": {
+    "prefix":
+    "FUNCTION TRIM"
+  ,
+    "body": [
+      "FUNCTION TRIM(${1:variable})$0"
+    ],
+    "description": "FUNCTION TO TRIM LEADING AND OR TRAILING SPACES OF THE ARGUMENT"
+  },
+  "FUNCTION ULENGTH": {
+    "prefix":
+    "FUNCTION ULENGTH"
+  ,
+    "body": [
+      "FUNCTION ULENGTH(${1:variable})$0"
+    ],
+    "description": "FUNCTION TO RETURN THE NUMBER OF UTF8 OR UTF16 CHARACTERS OF THE ARGUMENT"
+  },
+  "FUNCTION UPOS": {
+    "prefix":
+    "FUNCTION UPOS"
+  ,
+    "body": [
+      "FUNCTION UPOS(${1:string},${2:integer})$0"
+    ],
+    "description": "FUNCTION TO RETURN AN INTEGER VALUE EQUAL TO THE POSITION OF THE NTH ITEM IN THE PASSED UTF8 OR UTF16 ARGUMENT"
+  },
+  "FUNCTION UPPER-CASE": {
+    "prefix":
+    "FUNCTION UPPER-CASE"
+  ,
+    "body": [
+      "FUNCTION UPPER-CASE(${1:variable})$0"
+    ],
+    "description": "FUNCTION TO RETURN THE ARGUMENT IN UPPER CASE"
+  },
+  "FUNCTION USUBSTR": {
+    "prefix":
+    "FUNCTION USUBSTR"
+  ,
+    "body": [
+      "FUNCTION USUBSTR(${1:variable},${2:integer},$(3:integer)$0"
+    ],
+    "description": "FUNCTION TO RETURN SUBSTRING OF THE CHARACTER DATA PASSED THAT CONTAINS UTF8 OR UTF16 DATA"
+  },
+  "FUNCTION USUPPLEMENTARY": {
+    "prefix":
+    "FUNCTION USUPPLEMENTARY"
+  ,
+    "body": [
+      "FUNCTION USUPPLEMENTARY(${1:variable})$0"
+    ],
+    "description": "FUNCTION TO RETURN AN INTEGER VALUE EQUATING TO THE INDEX OF THE FIRST UNICODE CHARACTER OF THE ARGUMENT"
+  },
+  "FUNCTION UVALID": {
+    "prefix":
+    "FUNCTION UVALID"
+  ,
+    "body": [
+      "FUNCTION UVALID(${1:variable})$0"
+    ],
+    "description": "FUNCTION TO RETURN AN INTEGER VALUE EQUATING TO THE INDEX OF THE FIRST INVALID UNICODE CHARACTER OF THE ARGUMENT"
+  },
+  "FUNCTION UWIDTH": {
+    "prefix":
+    "FUNCTION UWIDTH"
+  ,
+    "body": [
+      "FUNCTION UWIDTH(${1:STRING},${2:integer})$0"
+    ],
+    "description": "FUNCTION TO RETURN AN INTEGER VALUE EQUAL TO THE WIDTH IN BYTES OF THE NTH ITEM IN THE PASSED UTF8 OR UTF16 ARGUMENT"
+  },
+  "FUNCTION VARIANCE": {
+    "prefix":
+    "FUNCTION VARIANCE"
+  ,
+    "body": [
+      "FUNCTION VARIANCE(${1:number},${2:...})$0"
+    ],
+    "description": "STATISTICAL VARIANCE OF THE SPECIFIED LIST OF NUMBER ARGUMENT"
+  },
+  "FUNCTION YEAR-TO-YYYY": {
+    "prefix":
+    "FUNCTION YEAR-TO-YYYY"
+  ,
+    "body": [
+      "FUNCTION YEAR-TO-YYYY(${1:YY},${2:[YY-CUTOFF, DEFAULT: 50},${3:YY-EXECUTION-TIME, DEFAULT: NOW})$0"
+    ],
+    "description": "CONVERT YY TO YYYY WITH OPTIONAL YY-CUTOFF TO DELINEATE CENTURIES"
+  },
+  "GENERATE": {
+    "prefix":
+    "GENERATE"
+  ,
+    "body": [
+      "GENERATE ${1:id}"
+    ],
+    "description": "GENERATE id"
+  },
+  "GIVING": {
+    "prefix":
+    "GIVING"
+  ,
+    "body": [
+      "GIVING ${1:item}"
+    ],
+    "description": "GIVING item"
+  },
+  "GO DEPENDING": {
+    "prefix":
+    "GO DEPENDING"
+  ,
+    "body": [
+      "GO ${1:procName} DEPENDING ${2:id}"
+    ],
+    "description": "GO procName DEPENDING id"
+  },
+  "I-O": {
+    "prefix":
+    "I-O"
+  ,
+    "body": [
+      "I-O ${1:fileName}"
+    ],
+    "description": "I-O fileName"
+  },
+  "INPUT": {
+    "prefix":
+    "INPUT"
+  ,
+    "body": [
+      "INPUT ${1:fileName}"
+    ],
+    "description": "INPUT fileName"
+  },
+  "INPUT PROCEDURE": {
+    "prefix":
+    "INPUT PROCEDURE"
+  ,
+    "body": [
+      "INPUT PROCEDURE ${1:procName}"
+    ],
+    "description": "INPUT PROCEDURE"
+  },
+  "INSPECT CONVERTING": {
+    "prefix":
+    "INSPECT ID CONVERTING"
+  ,
+    "body": [
+      "INPUT PROCEDURE ${1:procName}"
+    ],
+    "description": "INSPECT CONVERTING"
+  },
+  "INSPECT": {
+    "prefix":
+    "INSPECT"
+  ,
+    "body": [
+      "INSPECT ${1:id}"
+    ],
+    "description": "INSPECT id"
+  },
+  "INSPECT REPLACING": {
+    "prefix":
+    "INSPECT REPLACING",
+    "body": [
+      "INSPECT ${1:id} REPLACING ${2:SNIP}"
+    ],
+    "description": "INSPECT REPLACING"
+  },
+
+  "IDENTIFICATION DIVISION": {
+    "prefix": "IDENTIFICATION-DIVISION",
+    "body": [
+      "IDENTIFICATION DIVISION.",
+      "$0"
+    ],
+    "description": "IDENTIFICATION-DIVISION" 
+  },
+  "IF": {
+    "prefix": "IF",
+    "body": [
+      "IF ${1:CONDITION}",
+      "   $0",
+      "END-IF"
+    ],
+    "description": "IF"
+  },
+  "IF ELSE": {
+    "prefix": "IF",
+    "body": [
+      "IF ${1:CONDITION}",
+      "   $0",
+      "ELSE",
+      "   ",
+      "END-IF"
+    ],
+    "description": "IF ELSE"
+  },
+  "INTO": {
+    "prefix": "INTO",
+    "body": [
+      "INTO ${1:item}"
+    ],
+    "description": "INSPECT CONVERTING"
+  },
+  "INSPECT TALLYING": {
+    "prefix": "INSPECT",
+    "body": [
+      "MOVE 0 TO ${2:COUNTER}",
+      "INSPECT ${1:SOURCE} TALLYING ${2:COUNTER} FOR ${3|ALL SPACES,ALL $4,CHARACTERS|}"
+    ],
+    "description": "INSPECT A TALLYING COUNTER FOR ..."
+  },
+  "INVALID": {
+    "prefix": "INVALID",
+    "body": [
+      "INVALID ${1:impStat}"
+    ],
+    "description": "INVALID"
+  },
+  "INVOKE": {
+    "prefix": "INVOKE",
+    "body": [
+      "INVOKE ${1:id|CLASS|SELF|SUPER} ${2:LIT|ID|NEW}"
+    ],
+    "description": "INVOKE"
+  },
+  "JSON GENERATE FROM": {
+    "prefix": "JSON GENERATE FROM",
+    "body": [
+      "JSON GENERATE ${1:id} FROM ${2:id}"
+    ],
+    "description": "JSON GENERATE FROM"
+  },
+  "JSON PARSE INTO": {
+    "prefix": "JSON PARSE INTO",
+    "body": [
+      "JSON PARSE ${1:id} INTO ${2:id}"
+    ],
+    "description": "JSON PARSE INTO"
+  },
+  "KEY IS": {
+    "prefix": "KEY IS",
+    "body": [
+      "KEY IS ${1:item}"
+    ],
+    "description": "KEY IS"
+  },
+  "LEADING BY": {
+    "prefix": "LEADING BY",
+    "body": [
+      "LEADING ${1:id|LIT} BY ${2:id|LIT}"
+    ],
+    "description": "LEADING BY"
+  },
+  "LEADING": {
+    "prefix": "LEADING",
+    "body": [
+      "LEADING ${1:id|LIT}"
+    ],
+    "description": "LEADING"
+  },
+  "LENGTH OF": {
+    "prefix": "LENGTH OF",
+    "body": [
+      "LENGTH OF ${1:id}"
+    ],
+    "description": "LENGTH OF"
+  },
+  "LOC": {
+    "prefix": "LOC",
+    "body": [
+      "LOC ${1:integer}"
+    ],
+    "description": "LOC"
+  },
+  "LINKAGE SECTION ": {
+    "prefix": "LINKAGE SECTION",
+    "body": [
+      "LINKAGE SECTION.",
+      "$0"
+    ],
+    "description": "LINKAGE SECTION."    
+  },
+  "LOCAL-STORAGE SECTION": {
+    "prefix": "LOCAL-STORAGE",
+    "body": [
+      "LOCAL-STORAGE SECTION.",
+      "$0"
+    ],
+    "description": "LOCAL-STORAGE SECTION"
+  },
+  "MAIN METHOD-ID": {
+    "prefix": "MAIN",
+    "body": [
+      "*>> <SUMMARY>METHOD MAIN</SUMMARY>",
+      "METHOD-ID MAIN PUBLIC STATIC.",
+      "PROCEDURE DIVISION USING",
+      "           BY VALUE ARGS AS STRING OCCURS ANY.",
+      "    $0",
+      "END METHOD.",
+      ""
+    ],
+    "description": "METHOD-ID (MAIN)"
+  },
+  "METHOD-ID": {
+    "prefix": "METHOD-ID",
+    "body": [
+      "*>> <SUMMARY>METHOD $1</SUMMARY>",
+      "METHOD-ID $1.",
+      "PROCEDURE DIVISION.",
+      "    $0",
+      "END METHOD.",
+      ""
+    ],
+    "description": "METHOD-ID"
+  },
+  "MERGE": {
+    "prefix": "MERGE",
+    "body": [
+      "MERGE ${1:fileName} ${2:snipasc|DESC} ${3:dataname}"
+    ],
+    "description": "MERGE FILENAME"
+  },
+  "MERGE USING": {
+    "prefix": "MERGE USING",
+    "body": [
+      "MERGE ${1:fileName} ${2:snipasc|DESC} ${3:dataname} USING ${4:fileName} ${5:fileName}"
+    ],
+    "description": "MERGE USING"
+  },
+  "MERGE CORR": {
+    "prefix": "MERGE CORR",
+    "body": ["MOVE CORR ${1:id}"],
+    "description": "MERGE USING"
+  },
+  "MOVE CORR": {
+    "prefix": "MOVE CORR",
+    "body": ["MOVE CORR ${1:id}"],
+    "description": "MOVE CORR"
+  },
+  "MOVE CORR TO": {
+    "prefix": "MOVE CORR TO",
+    "body": ["MOVE CORR ${1:id} TO ${2:id}"],
+    "description": "MOVE CORR"
+  },
+  "MOVE": {
+    "prefix": "MOVE",
+    "body": ["MOVE ${1:id|LIT}"],
+    "description": "MOVE"
+  },
+  "MOVE TO": {
+    "prefix": "MOVE TO",
+    "body": ["MOVE ${1:id|LIT} TO ${2:id}"],
+    "description": "MOVE"
+  },
+  "MULTIPLY": {
+    "prefix": "MULTIPLY",
+    "body": [
+      "MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C}"
+    ],
+    "description": "MULTIPLY A BY Y GIVING Z"
+  },
+  "MULTIPLY BY": {
+    "prefix": "MULTIPLY BY",
+    "body": [
+      "MULTIPLY ${1:id|LIT} BY ${2:id}"
+    ],
+    "description": "MULTIPLY"
+  },
+  "MULTIPLY BY GIVING": {
+    "prefix": "MULTIPLY BY GIVING",
+    "body": [
+      "MULTIPLY ${1:id|LIT} BY ${2:id|LIT} GIVING ${3:id}"
+    ],
+    "description": "MULTIPLY BY GIVING"
+  },
+  "NAME IS": {
+    "prefix": "NAME IS",
+    "body": [
+      "NAME ${1:id} IS ${2:LIT}"
+    ],
+    "description": "NAME ID IS LIT"
+  },
+  "NAMESPACE": {
+    "prefix": "NAMESPACE",
+    "body": [
+      "NAME ${1:id} IS ${2:LIT}"
+    ],
+    "description": "NAMESPACE ITEM *"
+  },
+  "NAMESPACE-prefix": {
+    "prefix": "NAMESPACE-prefix",
+    "body": [
+      "NAMESPACE ${1:item}"
+    ],
+    "description": "NAMESPACE-prefix ITEM"
+  },
+  "NOT INVALID": {
+    "prefix": "NAMESPACE-prefix",
+    "body": [
+      "NOT INVALID ${1:impStat}"
+    ],
+    "description": "NOT INVALID ITEM"
+  },
+  "OPEN EXTEND": {
+    "prefix": "OPEN EXTEND",
+    "body": [
+      "OPEN EXTEND ${1:fileName}"
+    ],
+    "description": "OPEN EXTEND FILENAME"
+  },
+  "OPEN I-O": {
+    "prefix": "OPEN I-O",
+    "body": [
+      "OPEN I-O ${1:fileName}"
+    ],
+    "description": "OPEN I-O FILENAME"
+  },
+  "OPEN INPUT": {
+    "prefix": "OPEN INPUT",
+    "body": [
+      "OPEN INPUT ${1:fileName}"
+    ],
+    "description": "OPEN INPUT FILENAME"
+  },
+  "OPEN OUTPUT": {
+    "prefix": "OPEN OUTPUT",
+    "body": [
+      "OPEN OUTPUT ${1:fileName}"
+    ],
+    "description": "OPEN OUTPUT FILENAME"
+  },
+  "OUTPUT": {
+    "prefix": "OUTPUT",
+    "body": [
+      "OUTPUT ${1:fileName}"
+    ],
+    "description": "OUTPUT FILENAME"
+  },
+  "OVERFLOW": {
+    "prefix": "OVERFLOW",
+    "body": [
+      "OVERFLOW ${1:impStat}"
+    ],
+    "description": "OVERFLOW IMPSTAT"
+  },
+  "OUTPUT PROCEDURE": {
+    "prefix": "OUTPUT PROCEDURE",
+    "body": [
+      "OUTPUT PROCEDURE ${1:procName}"
+    ],
+    "description": "OUTPUT PROCEDURE FILENAME"
+  },
+  "PARSE": {
+    "prefix": "PARSE",
+    "body": [
+      "PARSE ${1:item}"
+    ],
+    "description": "PARSE ITEM"
+  },
+  "PERFORM": {
+    "prefix": "PERFORM",
+    "body": [
+      "PERFORM ${1:PARAGRAPH-NAME} ${2:VALUE-1} TIMES"
+    ],
+    "description": "PERFORM PARAGRAPH X TIMES"
+  },
+  "PERFORM TIMES": {
+    "prefix": "PERFORM TIMES",
+    "body": [
+      "PERFORM ${1:procName} ${2:id|int} TIMES"
+    ],
+    "description": "PERFORM TIMES PROCEDURE NAME X TIMES"
+  },
+  "PERFORM-END-PERFORM": {
+    "prefix": "PERFORM",
+    "body": [
+      "PERFORM ${1}",
+      "\t${2}",
+      "END-PERFORM",
+      "${0}"
+    ],
+    "description": "PERFORM .. END-PERFORM"
+  },
+  "PERFORM VARYING": {
+    "prefix": "PERFORM",
+    "body": [
+      "PERFORM ${1:paragraph-name} VARYING ${2:field-1}",
+      " FROM ${3:value-1} BY ${4:value-2}",
+      " UNTIL ${5:condition}",
+      "$0"
+    ],
+    "description": "INLINE PERFORM VARYING"
+  },
+  "POINTER": {
+    "prefix": "POINTER",
+    "body": [
+      "POINTER ${1:item}"
+    ],
+    "description": "POINTER item"
+  },
+  "PROCEDURE DIVISION": {
+    "prefix": "PROCEDURE-DIVISION",
+    "body": [
+      "PROCEDURE DIVISION.",
+      "$0"
+    ],
+    "description": "PROCEDURE DIVISION"
+
+  },
+  "PROGRAM-ID": {
+    "prefix": "PROGRAM-ID.",
+    "body": [
+      "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}}.",
+      "$0"
+    ],
+    "description": "PROGRAM-ID"
+
+  },
+  "PROPERTY": {
+    "prefix": "PROPERTY",
+    "body": [
+      "01 ${2:_PROP} ${3:BINARY-LONG} PRIVATE.",
+      "METHOD-ID. GET PROPERTY #${1:PROP}.",
+      "PROCEDURE DIVISION RETURNING RET AS ${3:BINARY-LONG}.",
+      "    SET RET TO ${2:_PROP}",
+      "END METHOD.",
+      "METHOD-ID. SET PROPERTY #${1:PROP}.",
+      "PROCEDURE DIVISION USING BY VALUE VAL AS ${3:BINARY-LONG}.",
+      "    SET ${2:_PROP} TO 0",
+      "END METHOD.",
+      ""
+    ],
+    "description": "SET/GET PROPERTY"
+  },
+  "READ": {
+    "prefix": "READ",
+    "body": [
+      "READ ${1:fileName}"
+    ],
+    "description": "READ FILENAME"
+  },
+  "RELEASE": {
+    "prefix": "RELEASE",
+    "body": [
+      "RELEASE ${1:recordName}"
+    ],
+    "description": "RELEASE recordName"
+  },
+  "REPLACING": {
+    "prefix": "REPLACING",
+    "body": [
+      "RELEASE ${1:item}"
+    ],
+    "description": "REPLACING item "
+  },
+  "RETURN": {
+    "prefix": "RETURN",
+    "body": [
+      "RETURN ${1:fileName}"
+    ],
+    "description": "REPLACING fileName"
+  },
+  "RETURNING": {
+    "prefix": "RETURNING",
+    "body": [
+      "RETURNING ${1:dataname}"
+    ],
+    "description": "RETURNING dataname"
+  },
+  "REWRITE": {
+    "prefix": "REWRITE",
+    "body": [
+      "REWRITE ${1:recordName}"
+    ],
+    "description": "REWRITE recordName"
+  },
+  "SEARCH ALL WHEN": {
+    "prefix": "SEARCH ALL WHEN",
+    "body": [
+      "SEARCH ALL ${1:item} WHEN ${2:item1} EQUAL ${3:item3} ${4:item4}"
+    ],
+    "description": "SEARCH ALL item1 WHEN item2 EQUAL item3 item4 "
+  },
+  "SEARCH WHEN": {
+    "prefix": "SEARCH WHEN",
+    "body": [
+      "SEARCH ${1:item} WHEN ${2:condition} ${3:item}"
+    ],
+    "description": "SEARCH WHEN condition item"
+  },
+  "SEQUENCE": {
+    "prefix": "SEQUENCE",
+    "body": [
+      "SEQUENCE ${1:item}"
+    ],
+    "description": "SEQUENCE"
+  },
+  "SET": {
+    "prefix": "SET",
+    "body": [
+      "SET ${1:item}"
+    ],
+    "description": "SET"
+  },
+  "SORT": {
+    "prefix": "SORT",
+    "body": [
+      "SORT ${1:fileName} ${2:snipordering} ${3:snip} ${4:snip}"
+    ],
+    "description": "SORT"
+  },
+  "START": {
+    "prefix": "START",
+    "body": [
+      "START ${1:fileName}"
+    ],
+    "description": "START"
+  },
+  "SUPPRESS": {
+    "prefix": "SUPPRESS",
+    "body": [
+      "SUPPRESS ${1:id}"
+    ],
+    "description": "SUPPRESS"
+  },
+
+  "STOP": {
+    "prefix": "STOP",
+    "body": [
+      "STOP ${1:RUN|LITERAL}"
+    ],
+    "description": "STOP"
+  },
+  "SIZE ERROR": {
+    "prefix": "SIZE ERROR",
+    "body": [
+      "SIZE ERROR ${1:impStat}"
+    ],
+    "description": "SIZE ERROR"
+  },
+  "SHELL": {
+    "prefix": "SHELL",
+    "body": [
+      "       IDENTIFICATION DIVISION.",
+      "       PROGRAM-ID. ${1:${1:${TM_FILENAME/(.*)\\..+$/$1/}}}.",
+      "       ENVIRONMENT DIVISION.",
+      "       CONFIGURATION SECTION.",
+      "       SPECIAL-NAMES.",
+      "       INPUT-OUTPUT SECTION.",
+      "       FILE-CONTROL.",
+      "       DATA DIVISION.",
+      "        FILE SECTION.",
+      "        WORKING-STORAGE SECTION.",
+      "        LINKAGE SECTION.",
+      "       PROCEDURE DIVISION.",
+      "        MAIN-PROCESSING SECTION.",
+      "         MAINLINE-PARAGRAPH.",
+      "             $0",
+      "             STOP RUN."
+    ],
+    "description": "TEMPLATE PROGRAM"
+  },
+  "SUBTRACT": {
+    "prefix": "SUBTRACT",
+    "body": [
+      "SUBTRACT ${1:A} FROM ${2:B} GIVING ${3:C}"
+    ],
+    "description": "SUBTRACT A FROM B GIVING C"
+  },
+  "STRING": {
+    "prefix": "STRING",
+    "body": [
+      "STRING ${1:item1} DELIMITED BY SIZE",
+      "       ${2:item2} DELIMITED BY SIZE",
+      "       INTO ${3:RESULT}",
+      "END-STRING",
+      "$0"
+    ],
+    "description": "STRING DELIMITED BY SIZE"
+  },
+  "TALLYING": {
+    "prefix": "TALLYING",
+    "body": [
+      "TALLYING ${1:item}"
+    ],
+    "description": "TALLYING item"
+  },
+  "THROUGH": {
+    "prefix": "THROUGH",
+    "body": [
+      "THROUGH ${1:item}"
+    ],
+    "description": "THROUGH item"
+  },
+  "THRU": {
+    "prefix": "THRU",
+    "body": [
+      "THRU ${1:item}"
+    ],
+    "description": "THRU item"
+  },
+  "TO": {
+    "prefix": "TO",
+    "body": [
+      "TO ${1:item}"
+    ],
+    "description": "TO item"
+  },
+  "TO ITEM1 ITEM2": {
+    "prefix": "TO ITEM1 ITEM2",
+    "body": [
+      "TO ${1:item} ${2:item}"
+    ],
+    "description": "TO item1 item2"
+  },
+  "TYPE": {
+    "prefix": "TYPE ITEM1 ITEM2",
+    "body": [
+      "TYPE ${1:item} ${2:SNIP}"
+    ],
+    "description": "TYPE item1 item2"
+  },
+  "UNSTRING": {
+    "prefix": "UNSTRING ITEM",
+    "body": [
+      "UNSTRING ${1:item}"
+    ],
+    "description": "UNSTRING item"
+  },
+  "UNTIL": {
+    "prefix": "UNTIL",
+    "body": [
+      "UNTIL ${1:item}"
+    ],
+    "description": "UNTIL item"
+  },
+  "UP BY": {
+    "prefix": "UP BY",
+    "body": [
+      "UP BY ${1:item}"
+    ],
+    "description": "UP BY item1"
+  },
+  "UPON": {
+    "prefix": "UPON",
+    "body": [
+      "UPON ${1:mnemName|envName}"
+    ],
+    "description": "UPON mnemName|envName"
+  },
+  "USING": {
+    "prefix": "USING",
+    "body": [
+      "USING ${1:fileName} ${2:fileName}"
+    ],
+    "description": "USING fileName"
+  },
+  "USING VALUE": {
+    "prefix": "USING",
+    "body": [
+      "USING VALUE ${1:id}"
+    ],
+    "description": "USING VALUE"
+  },
+  "VALIDATING": {
+    "prefix": "VALIDATING",
+    "body": [
+      "VALIDATING ${1:item}"
+    ],
+    "description": "VALIDATING item"
+  },
+  "VALUE": {
+    "prefix": "VALUE",
+    "body": [
+      "VALUE ${1:id}"
+    ],
+    "description": "VALUE ID"
+  },
+  "VARYING FROM": {
+    "prefix": "VARYING FROM",
+    "body": [
+      "VARYING ${1:item} FROM ${2:item} ${3:snipByUntil}"
+    ],
+    "description": "VARYING FROM"
+  },
+  "WHEN": {
+    "prefix": "WHEN",
+    "body": [
+      "WHEN ${1:snipPhrase} ${2:impStat}"
+    ],
+    "description": "WHEN item"
+  },
+  "WHEN OTHER": {
+    "prefix": "WHEN OTHER",
+    "body": [
+      "WHEN OTHER ${1:impStat}"
+    ],
+    "description": "WHEN OTHER"
+  },
+  "WRITE item": {
+    "prefix": "WRITE item",
+    "body": [
+      "WRITE ${1:item}"
+    ],
+    "description": "WRITE item"
+  },
+  "XML GENERATE": {
+    "prefix": "XML GENERATE",
+    "body": [
+      "XML GENERATE ${1:item}"
+    ],
+    "description": "XML GENERATE item"
+  },
+  "XML PARSE": {
+    "prefix": "XML PARSE",
+    "body": [
+      "XML PARSE ${1:item}"
+    ],
+    "description": "XML PARSE item"
+  },
+  "WORKING-STORAGE SECTION": {
+    "prefix": "WORKING-STORAGE SECTION",
+    "body": [
+      "WORKING-STORAGE SECTION.",
+      "$0"
+    ],
+    "description": "WORKING-STORAGE SECTION"
+
+  }
+}
