@@ -15,6 +15,8 @@
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import org.eclipse.lsp.cobol.core.engine.TextTransformations;
+import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
@@ -69,5 +71,26 @@ public class TestTextTransformations {
                         new Position(0, 7)),
                 "4321");
         assertEquals("0: 4321\n1: 123\n", tt.calculateExtendedText());
+    }
+
+    @Test
+    void mixed() {
+        TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
+        Range range = new Range(
+                new Position(1, 3),
+                new Position(1, 7));
+        CopyNode copyNode = new CopyNode(Locality.builder().range(range).build(), "BOOM");
+        tt.extend(copyNode, TextTransformations.of("123\n", ""));
+        tt.replace(new Range(
+                        new Position(0, 3),
+                        new Position(0, 7)),
+                "4321");
+        assertEquals("0: 4321\n1: 123\n\n", tt.calculateExtendedText());
+
+    }
+    @Test
+    void eol() {
+        TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
+        assertEquals(TEST, tt.calculateExtendedText());
     }
 }

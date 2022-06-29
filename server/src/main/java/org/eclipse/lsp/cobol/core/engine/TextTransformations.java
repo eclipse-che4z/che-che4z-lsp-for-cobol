@@ -43,13 +43,12 @@ public class TextTransformations {
     LinkedList<Range> ranges = new LinkedList<>(extensions.keySet());
     ranges.addAll(replacements.keySet());
     ranges.sort(Comparator.comparingInt(e -> e.getStart().getLine()));
-    String[] lines = text.split("\r?\n");
+    String[] lines = text.split("(?<=\\r?\\n)");
     int lineNumber = 0;
     Range currentRange = ranges.isEmpty() ? null : ranges.removeFirst();
     while (currentRange != null && lineNumber < lines.length) {
       if (currentRange.getStart().getLine() > lineNumber) {
         sb.append(lines[lineNumber]);
-        sb.append("\n");
       } else if (currentRange.getStart().getLine() == lineNumber) {
         sb.append(lines[lineNumber], 0, currentRange.getStart().getCharacter());
         String replace = extensions.containsKey(currentRange)
@@ -58,16 +57,12 @@ public class TextTransformations {
         sb.append(replace);
         lineNumber = currentRange.getEnd().getLine();
         sb.append(lines[lineNumber].substring(currentRange.getEnd().getCharacter()));
-        sb.append("\n");
         currentRange = ranges.isEmpty() ? null : ranges.removeFirst();
       }
       lineNumber++;
     }
     for (int i = lineNumber; i < lines.length; i++) {
       sb.append(lines[i]);
-      if (i < lines.length - 1) {
-        sb.append("\n");
-      }
     }
     return sb.toString();
   }

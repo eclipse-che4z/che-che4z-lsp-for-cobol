@@ -18,6 +18,7 @@ import lombok.Data;
 import org.eclipse.lsp.cobol.core.IdmsParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp4j.Range;
 
 /*
  * copyIdmsOptions
@@ -57,9 +58,10 @@ public class IdmsCopybookDescriptor {
   public static IdmsCopybookDescriptor from(IdmsParser.CopyIdmsStatementContext ctx, String programDocumentUri) {
     IdmsCopybookDescriptor result = new IdmsCopybookDescriptor();
     result.name = getName(ctx);
+    Range range = DialectUtils.constructRange(ctx);
     result.usage = Locality.builder()
             .uri(programDocumentUri)
-            .range(DialectUtils.constructRange(ctx))
+            .range(range)
             .build();
     return result;
   }
@@ -72,6 +74,10 @@ public class IdmsCopybookDescriptor {
 
     if (copySourceContext.cobolWord() != null) {
       return copySourceContext.cobolWord().getText();
+    }
+
+    if (copySourceContext.SUBSCHEMA_NAMES() != null) {
+      return copySourceContext.SUBSCHEMA_NAMES().getText();
     }
     return null;
   }

@@ -116,12 +116,12 @@ public class DaCoMaidProcessor {
     if (matcher.find()) {
       String indent = matcher.group("indent");
       int startChar = indent == null ? 0 : matcher.end("indent");
-      int endChar = matcher.end(matcher.groupCount() - 1);
+      int endChar = matcher.end();
       int len = endChar - startChar;
       String newString = String.join("", Collections.nCopies(len, CobolDialect.FILLER));
       context.getTextTransformations().replace(new Range(
               new Position(lineNumber, startChar),
-              new Position(lineNumber, endChar + 1)), newString);
+              new Position(lineNumber, endChar)), newString);
       String level = matcher.group("level");
       String layoutId = matcher.group("layoutId");
       String layoutUsage = matcher.group("layoutUsage");
