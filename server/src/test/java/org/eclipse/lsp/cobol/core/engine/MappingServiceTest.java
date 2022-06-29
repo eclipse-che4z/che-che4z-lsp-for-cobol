@@ -34,10 +34,12 @@ class MappingServiceTest {
           + "           88  OPEN-OK  VALUE '00'.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           COPY TEST.\n"
-          + "           DISPLAY {$MYFILE-STATUS}.";
+          + "           DISPLAY MYFILE-STATUS.";
 
   private static final String COPYBOOK = "COPYBOOK TEXT\n"
-      + "           NEXT LINE\n";
+      + "           NEXT LINE 1\n"
+      + "           NEXT LINE 2\n"
+      + "           NEXT LINE 3\n";
 
   @Test
   void test() {
@@ -48,10 +50,27 @@ class MappingServiceTest {
         .build(), "copybook");
 
     textTransformations.extend(copyNode, TextTransformations.of(COPYBOOK, "copybook"));
-    textTransformations.replace(copyNode.getLocality().getRange(), "");
 
     var mapping = MappingService.buildLocalityMap(textTransformations);
-    assertEquals(textTransformations.calculateExtendedText(), "");
+    assertEquals(3, mapping.size());
+
+    assertEquals(0, mapping.get(0).getKey().getStart().getLine());
+    assertEquals(6, mapping.get(0).getKey().getEnd().getLine());
+    assertEquals(0, mapping.get(0).getValue().getRange().getStart().getLine());
+    assertEquals(6, mapping.get(0).getValue().getRange().getEnd().getLine());
+    assertEquals("original", mapping.get(0).getValue().getUri());
+
+    assertEquals(7, mapping.get(1).getKey().getStart().getLine());
+    assertEquals(10, mapping.get(1).getKey().getEnd().getLine());
+    assertEquals(0, mapping.get(1).getValue().getRange().getStart().getLine());
+    assertEquals(3, mapping.get(1).getValue().getRange().getEnd().getLine());
+    assertEquals("copybook", mapping.get(1).getValue().getUri());
+
+    assertEquals(11, mapping.get(2).getKey().getStart().getLine());
+    assertEquals(11, mapping.get(2).getKey().getEnd().getLine());
+    assertEquals(8, mapping.get(2).getValue().getRange().getStart().getLine());
+    assertEquals(8, mapping.get(2).getValue().getRange().getEnd().getLine());
+    assertEquals("original", mapping.get(2).getValue().getUri());
   }
 
 }
