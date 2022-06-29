@@ -4,6 +4,9 @@ Changelog:
 
 ## [1.0.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.1...1.0.2) (2022-06-29)
 
+#### Fixed
+- Telemetry fix
+
 #### Changed
 - Readme update
 
