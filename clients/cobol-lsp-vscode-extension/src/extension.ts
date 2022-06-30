@@ -77,9 +77,8 @@ export async function activate(context: vscode.ExtensionContext) {
         await languageClientService.checkPrerequisites();
     } catch (err) {
         vscode.window.showErrorMessage(err.toString());
-        TelemetryService.registerExceptionEvent("RuntimeException", err.toString(), ["bootstrap", "experiment-tag"], "Client has wrong Java version installed");
-
-        return;
+        languageClientService.enableNativeBuild();
+        TelemetryService.registerExceptionEvent("RuntimeException", err.toString(), ["bootstrap", "experiment-tag"], "Client has wrong Java version installed. Native builds activated.");
     }
 
     // Custom client handlers

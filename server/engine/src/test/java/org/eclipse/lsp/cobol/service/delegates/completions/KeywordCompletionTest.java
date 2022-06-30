@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.SettingsService;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
@@ -28,6 +29,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 /**
  * This test {@link KeywordCompletion} asserts that filtration and preparing the keyword completion
@@ -35,23 +37,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class KeywordCompletionTest {
   private static final String DOCUMENTATION_TEXT =
-      "The ACCEPT statement transfers data or system date-related information into the "
-          + "data area referenced by the specified identifier.\r\n\r\n"
-          + "[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/"
-          + "com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsacce.htm)\r\n\r\n"
-          + "© Copyright IBM Corporation 1994, 2019.\r\n\r\n"
-          + "U.S. Government Users Restricted Rights - "
-          + "Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.";
+          "The ACCEPT statement transfers data or system date-related information into the "
+                  + "data area referenced by the specified identifier.\r\n\r\n"
+                  + "[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/"
+                  + "com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsacce.htm)\r\n\r\n"
+                  + "© Copyright IBM Corporation 1994, 2019.\r\n\r\n"
+                  + "U.S. Government Users Restricted Rights - "
+                  + "Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.";
   private static final String LABEL = "ACCEPT";
 
-  private KeywordCompletion completion = new KeywordCompletion(new Keywords());
+  private KeywordCompletion completion = new KeywordCompletion(new Keywords(mock(SettingsService.class)));
+
 
   @Test
   void testCompletionEmptyResult() {
     assertThat(
-        completion.getCompletionItems(
-            "accep", new CobolDocumentModel("", AnalysisResult.builder().build())),
-        is(createExpected()));
+            completion.getCompletionItems(
+                    "accep", new CobolDocumentModel("", AnalysisResult.builder().build())),
+            is(createExpected()));
   }
 
   @Test
@@ -62,7 +65,7 @@ class KeywordCompletionTest {
   @Test
   void testCompletionMock() {
     assertEquals(
-        createExpected(), completion.getCompletionItems("ACCEP", MockCompletionModel.MODEL));
+            createExpected(), completion.getCompletionItems("ACCEP", MockCompletionModel.MODEL));
   }
 
   private List<CompletionItem> createExpected() {
