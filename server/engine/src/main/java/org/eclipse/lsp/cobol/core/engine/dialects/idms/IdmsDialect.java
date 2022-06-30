@@ -33,6 +33,7 @@ import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
@@ -85,7 +86,7 @@ public final class IdmsDialect implements CobolDialect {
           CopyNode copyNode = new CopyNode(cb.getUsage(), cb.getName(), IdmsDialect.NAME);
 
           Location cbLocation = new Location();
-          cbLocation.setRange(new Range());
+          cbLocation.setRange(new Range(new Position(0, 0), new Position(0, 0)));
           cbLocation.setUri(copybookModel.getUri());
           CopyDefinition copyDefinition = new CopyDefinition(cbLocation, cb.getName());
           copyNode.setDefinition(copyDefinition);

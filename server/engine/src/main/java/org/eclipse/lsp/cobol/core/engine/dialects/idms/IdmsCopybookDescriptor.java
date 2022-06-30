@@ -58,7 +58,7 @@ public class IdmsCopybookDescriptor {
   public static IdmsCopybookDescriptor from(IdmsParser.CopyIdmsStatementContext ctx, String programDocumentUri) {
     IdmsCopybookDescriptor result = new IdmsCopybookDescriptor();
     result.name = getName(ctx);
-    Range range = DialectUtils.constructRange(ctx);
+    Range range = DialectUtils.constructRange(ctx.copyIdmsOptions());
     result.usage = Locality.builder()
             .uri(programDocumentUri)
             .range(range)
