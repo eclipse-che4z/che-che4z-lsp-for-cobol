@@ -48,6 +48,7 @@ import org.eclipse.lsp4j.Range;
 public class IdmsCopybookDescriptor {
   String name;
   Locality usage;
+  Locality statement;
 
   /**
    * Factory method for copybook description object
@@ -58,11 +59,16 @@ public class IdmsCopybookDescriptor {
   public static IdmsCopybookDescriptor from(IdmsParser.CopyIdmsStatementContext ctx, String programDocumentUri) {
     IdmsCopybookDescriptor result = new IdmsCopybookDescriptor();
     result.name = getName(ctx);
-    Range range = DialectUtils.constructRange(ctx.copyIdmsOptions());
+    Range range = DialectUtils.constructRange(ctx.copyIdmsOptions().copyIdmsSource());
     result.usage = Locality.builder()
             .uri(programDocumentUri)
             .range(range)
             .build();
+    result.statement =  Locality.builder()
+        .uri(programDocumentUri)
+        .range(DialectUtils.constructRange(ctx))
+        .build();
+
     return result;
   }
 

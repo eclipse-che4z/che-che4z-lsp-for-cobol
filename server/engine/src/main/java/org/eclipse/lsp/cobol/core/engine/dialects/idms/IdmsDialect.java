@@ -83,7 +83,7 @@ public final class IdmsDialect implements CobolDialect {
                   textTransformations.getUri(), // FIX me for nested case
                   context.getCopybookConfig(),
                   true);
-          CopyNode copyNode = new CopyNode(cb.getUsage(), cb.getName(), IdmsDialect.NAME);
+          CopyNode copyNode = new CopyNode(cb.getStatement(), cb.getName(), IdmsDialect.NAME);
 
           Location cbLocation = new Location();
           cbLocation.setRange(new Range(new Position(0, 0), new Position(0, 0)));
@@ -93,6 +93,7 @@ public final class IdmsDialect implements CobolDialect {
           textTransformations.extend(
               copyNode,
               new TextTransformations(copybookModel.getContent(), copybookModel.getUri()));
+          copyNode.setLocality(cb.getUsage());
         });
   }
 
