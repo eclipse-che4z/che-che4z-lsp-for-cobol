@@ -101,6 +101,10 @@ describe("Check plugin extension for cobol fails.", () => {
                 checkPrerequisites: () => {
                     throw new Error("The error");
                 },
+                enableNativeBuild: jest.fn(),
+                addRequestHandler: jest.fn(),
+                retrieveAnalysis: jest.fn(),
+                start: jest.fn(),
             };
         });
     });
