@@ -125,9 +125,21 @@ jobs:
       - name: coverage
         run: npm run coverage
         working-directory: clients/cobol-lsp-vscode-extension
-      - name: configure server
+      - name: configure server jar
         working-directory: clients/cobol-lsp-vscode-extension
-        run: "cp -R ../../staging/. ./server/"
+        run: "cp -R ../../staging/jar/* ./server/jar"
+      - name: configure windows executable
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          cp ../../staging/package-win/engine.build_artifacts.txt ./server/package-win
+          cp ../../staging/package-win/engine.exe ./server/package-win
+          cp ../../staging/package-win/sunmscapi.dll ./server/package-win
+      - name: configure mac executable
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: "cp ../../staging/package-macos/server-mac-amd64 ./server/package-macos"
+      - name: configure linux executable
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: "cp ../../staging/package-linux/server ./server/package-linux"
       - name: generate vsix
         working-directory: clients/cobol-lsp-vscode-extension
         run: |

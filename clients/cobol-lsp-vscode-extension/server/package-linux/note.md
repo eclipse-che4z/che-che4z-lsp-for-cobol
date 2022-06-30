@@ -1,5 +1,5 @@
 <!---
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2022 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its  * subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -14,10 +14,10 @@
 -->
 
 # COBOL LSP server running information
-Put in this folder the COBOL LSP server jar with this name
+Put in this folder the COBOL LSP linux native build for server
 
 ```
-server.jar
+server
 ```
 In Linux environment be sure that the server folder have read/write permission, in case simply run the command
 
