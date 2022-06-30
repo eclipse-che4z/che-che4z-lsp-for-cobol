@@ -70,7 +70,6 @@
                 "type": "cobolCompile",
                 "required": [
                     "jobCard",
-                    "steplib",
                     "presentation",
                     "saveSysprint",
                     "sysPrintLocation"

@@ -12,11 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
 import * as fs from "fs-extra";
+import * as path from "path";
 import * as vscode from "vscode";
 import { CustomBuildTaskTerminal } from "../../task/CustomBuildTaskTerminal";
-import * as path from "path";
 
 const jobCard: string = "jobCard";
 let taskTerminal: CustomBuildTaskTerminal;
@@ -42,35 +41,39 @@ afterEach(() => jest.clearAllMocks());
 
 describe("CustomBuildTaskTerminal Test", () => {
     beforeEach(() => {
-        (ZoweVsCodeExtension.getZoweExplorerApi as any) = (_requiredVersion?: string) => {
-            return {
-                getExplorerExtenderApi: jest.fn().mockReturnValue({
-                    getProfilesCache: jest.fn().mockReturnValue({
-                        loadNamedProfile: jest.fn().mockReturnValue("testProfile"),
-                    }),
-                }),
-                getJesApi: jest.fn().mockReturnValue({
-                    getJob: jest.fn().mockReturnValue({
-                        retcode: "000",
-                    }),
-                    getSpoolContentById: jest.fn().mockReturnValue("0LineID  Message code  Message text\n" +
-                        "\n" +
-                        "     91  IGYGR1216-I   A \"RECORDING MODE\" of \"F\" was assumed for file \"PRINT-FILE\".\n" +
-                        "\n" +
-                        "     93  IGYGR1174-S   \"XXXXX084\" was not defined as a data-name.  \"XXXXX084\" was discarded.\n" +
-                        "\n" +
-                        "   1151  IGYPA3086-W   \"PERFORM\" start-of-range \"PROC-213-PFM-G-15\" follows the \"PERFORM\" end-of-range \"PROC-217-PFM-B-15\".  The\n" +
-                        "                       \"PERFORM\" end-of-range may be unreachable.  The statement was processed as written."),
-                    getSpoolFiles: jest.fn().mockReturnValue([{
-                        ddname: "SYSPRINT",
-                        id: "spoolID",
-                    }]),
-                    submitJcl: jest.fn().mockReturnValue({
-                        jobid: "jobid",
-                        jobname: "jobname",
-                    }),
-                }),
-            };
+        (vscode.extensions as any) = {
+            getExtension: jest.fn().mockReturnValue(
+                {
+                    exports: {
+                        getExplorerExtenderApi: jest.fn().mockReturnValue({
+                            getProfilesCache: jest.fn().mockReturnValue({
+                                loadNamedProfile: jest.fn().mockReturnValue("testProfile"),
+                            }),
+                        }),
+                        getJesApi: jest.fn().mockReturnValue({
+                            getJob: jest.fn().mockReturnValue({
+                                retcode: "000",
+                            }),
+                            getSpoolContentById: jest.fn().mockReturnValue("0LineID  Message code  Message text\n" +
+                                "\n" +
+                                "     91  IGYGR1216-I   A \"RECORDING MODE\" of \"F\" was assumed for file \"PRINT-FILE\".\n" +
+                                "\n" +
+                                "     93  IGYGR1174-S   \"XXXXX084\" was not defined as a data-name.  \"XXXXX084\" was discarded.\n" +
+                                "\n" +
+                                "   1151  IGYPA3086-W   \"PERFORM\" start-of-range \"PROC-213-PFM-G-15\" follows the \"PERFORM\" end-of-range \"PROC-217-PFM-B-15\".  The\n" +
+                                "                       \"PERFORM\" end-of-range may be unreachable.  The statement was processed as written."),
+                            getSpoolFiles: jest.fn().mockReturnValue([{
+                                ddname: "SYSPRINT",
+                                id: "spoolID",
+                            }]),
+                            submitJcl: jest.fn().mockReturnValue({
+                                jobid: "jobid",
+                                jobname: "jobname",
+                            }),
+                        }),
+                    },
+                },
+            ),
         };
 
         taskTerminal = new CustomBuildTaskTerminal({ fileName: "filename" } as any, {
@@ -89,12 +92,21 @@ describe("CustomBuildTaskTerminal Test", () => {
     });
 
     it("returns with error when ZE is not installed", async () => {
-        ZoweVsCodeExtension.getZoweExplorerApi = (_requiredVersion?: string) => {
-            return undefined;
+        (vscode.extensions as any) = {
+            getExtension : jest.fn().mockReturnValue(undefined),
         };
 
         await (taskTerminal as any).doCompile().catch(e => {
             expect(e).toEqual("Please install zowe Explorer");
+        });
+    });
+
+    it("returns with error when ZE profile is not found", async () => {
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue(""),
+        });
+        await (taskTerminal as any).doCompile().catch(e => {
+            expect(e).toEqual("Please specify zowe profile for copybook download for the task to run.");
         });
     });
 
@@ -103,11 +115,14 @@ describe("CustomBuildTaskTerminal Test", () => {
             type: "testTask",
         });
         await (incompleteTask as any).doCompile().catch(e => {
-            expect(e).toEqual("jobCard and steplib are mandatory. customize task and provide these attributed in task.json");
+            expect(e).toEqual("jobCard is mandatory. customize task and provide these attributed in task.json");
         });
     });
 
     it("checks compile works when all data is provided", async () => {
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue("testProfile"),
+        });
         (taskTerminal as any).CompileCobolDocument = jest.fn().mockResolvedValue("TEST");
         await expect((taskTerminal as any).doCompile()).resolves.not.toThrowError();
     });
@@ -135,7 +150,7 @@ describe("CustomBuildTaskTerminal Test", () => {
         (task as any).closeEmitter = {
             fire: closeEvent,
         };
-        await (task as any).CompileCobolDocument(ZoweVsCodeExtension.getZoweExplorerApi(), loadedProfile);
+        await (task as any).CompileCobolDocument(vscode.extensions.getExtension("Zowe.vscode-extension-for-zowe")?.exports, loadedProfile);
         expect(writterEvent).toBeCalledTimes(6);
     });
 

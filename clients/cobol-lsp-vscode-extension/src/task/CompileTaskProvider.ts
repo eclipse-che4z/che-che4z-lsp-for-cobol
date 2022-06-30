@@ -16,6 +16,7 @@ import * as vscode from "vscode";
 import {taskType} from "../extension";
 import { CustomBuildTaskTerminal } from "./CustomBuildTaskTerminal";
 
+const TASK_DETAIL = "compile with IBM Enterprise COBOL for z/OS";
 export class CompileTaskProvider implements vscode.TaskProvider {
     public static taskSource = "cobol";
     public static problemMatcher = "$zowecc";
@@ -24,8 +25,7 @@ export class CompileTaskProvider implements vscode.TaskProvider {
 
     public resolveTask(_task: vscode.Task, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.Task> {
         const jobCard = _task.definition.jobCard;
-        const steplib = _task.definition.steplib;
-        if (jobCard && steplib) {
+        if (jobCard) {
             // resolveTask requires that the same definition object be used.
             const definition = _task.definition as any;
             const documentText = vscode.window.activeTextEditor.document;
@@ -59,7 +59,7 @@ export class CompileTaskProvider implements vscode.TaskProvider {
             CompileTaskProvider.taskSource,
             new vscode.CustomExecution(async () => new CustomBuildTaskTerminal(documentText, definition)),
             CompileTaskProvider.problemMatcher);
-        task.detail = "compile with IBM Enterprise cobol compiler on z/OS";
+        task.detail = TASK_DETAIL;
         result.push(task);
         return result;
     }
