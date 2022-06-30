@@ -17,11 +17,14 @@ package org.eclipse.lsp.cobol.core.engine;
 import lombok.var;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /** Test class for {@link MappingService} **/
 class MappingServiceTest {
@@ -36,22 +39,16 @@ class MappingServiceTest {
           + "           COPY TEST.\n"
           + "           DISPLAY MYFILE-STATUS.";
 
-  private static final String COPYBOOK = "COPYBOOK TEXT\n"
+  private static final String COPYBOOK = "           COPYBOOK TEXT\n"
       + "           NEXT LINE 1\n"
       + "           NEXT LINE 2\n"
       + "           NEXT LINE 3\n";
 
   @Test
-  void test() {
-    TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
+  void testMapping() {
+    var service = prepareService();
+    var mapping = service.getLocalityMap();
 
-    CopyNode copyNode = new CopyNode(Locality.builder()
-        .range(new Range(new Position(7, 11), new Position(7, 21)))
-        .build(), "copybook");
-
-    textTransformations.extend(copyNode, TextTransformations.of(COPYBOOK, "copybook"));
-
-    var mapping = MappingService.buildLocalityMap(textTransformations);
     assertEquals(3, mapping.size());
 
     assertEquals(0, mapping.get(0).getKey().getStart().getLine());
@@ -71,6 +68,67 @@ class MappingServiceTest {
     assertEquals(8, mapping.get(2).getValue().getRange().getStart().getLine());
     assertEquals(8, mapping.get(2).getValue().getRange().getEnd().getLine());
     assertEquals("original", mapping.get(2).getValue().getUri());
+  }
+
+  @Test
+  void testLocationBeforeCopybook() {
+    var service = prepareService();
+    Optional<Location> location = service.getOriginalLocation(new Range(new Position(2, 10), new Position(5, 15)));
+
+    assertTrue(location.isPresent());
+    assertEquals("original", location.get().getUri());
+    assertEquals(2, location.get().getRange().getStart().getLine());
+    assertEquals(10, location.get().getRange().getStart().getCharacter());
+    assertEquals(5, location.get().getRange().getEnd().getLine());
+    assertEquals(15, location.get().getRange().getEnd().getCharacter());
+  }
+
+  @Test
+  void testLocationInCopybook() {
+    var service = prepareService();
+    Optional<Location> location = service.getOriginalLocation(new Range(new Position(8, 10), new Position(9, 15)));
+
+    assertTrue(location.isPresent());
+    assertEquals("copybook", location.get().getUri());
+    assertEquals(1, location.get().getRange().getStart().getLine());
+    assertEquals(10, location.get().getRange().getStart().getCharacter());
+    assertEquals(2, location.get().getRange().getEnd().getLine());
+    assertEquals(15, location.get().getRange().getEnd().getCharacter());
+  }
+
+  @Test
+  void testLocationAfterCopybook() {
+    var service = prepareService();
+    Optional<Location> location = service.getOriginalLocation(new Range(new Position(11, 10), new Position(11, 15)));
+
+    assertTrue(location.isPresent());
+    assertEquals("original", location.get().getUri());
+    assertEquals(8, location.get().getRange().getStart().getLine());
+    assertEquals(10, location.get().getRange().getStart().getCharacter());
+    assertEquals(8, location.get().getRange().getEnd().getLine());
+    assertEquals(15, location.get().getRange().getEnd().getCharacter());
+  }
+
+  @Test
+  void testLocationOutOfCode() {
+    var service = prepareService();
+    Optional<Location> location = service.getOriginalLocation(new Range(new Position(12, 10), new Position(12, 15)));
+    assertFalse(location.isPresent());
+
+    location = service.getOriginalLocation(new Range(new Position(-1, 10), new Position(-1, 15)));
+    assertFalse(location.isPresent());
+  }
+
+  private MappingService prepareService() {
+    TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
+
+    CopyNode copyNode = new CopyNode(Locality.builder()
+        .range(new Range(new Position(7, 11), new Position(7, 21)))
+        .build(), "copybook");
+
+    textTransformations.extend(copyNode, TextTransformations.of(COPYBOOK, "copybook"));
+
+    return new MappingService(textTransformations);
   }
 
 }

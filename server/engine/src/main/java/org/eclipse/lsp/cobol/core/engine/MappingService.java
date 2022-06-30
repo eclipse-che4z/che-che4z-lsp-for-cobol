@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine;
 
-import lombok.experimental.UtilityClass;
+import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -25,15 +25,95 @@ import java.util.*;
 /**
  * Provides mapping functionality for extended document
  */
-@UtilityClass
 public class MappingService {
+
+  @Getter
+  private final ArrayList<Pair<Range, Location>> localityMap;
+
+  public MappingService(TextTransformations textTransformations) {
+    localityMap = new ArrayList<>(buildLocalityMap(textTransformations));
+  }
+
+  /**
+   * Returns a original location with document's uri
+   * @param range is a range from extendes source
+   * @return a Location object
+   */
+  public Optional<Location> getOriginalLocation(Range range) {
+    return Optional.ofNullable(findRangeAndLocation(range.getStart().getLine(), 0, localityMap.size() - 1))
+        .map(rangeAndLocation -> {
+          int lineShift = range.getStart().getLine() - rangeAndLocation.getKey().getStart().getLine();
+
+          int originalLine = rangeAndLocation.getValue().getRange().getStart().getLine() + lineShift;
+          int originalCharacter = range.getStart().getCharacter();
+          Position startPos = new Position(originalLine, originalCharacter);
+
+          originalLine = originalLine + range.getEnd().getLine() - range.getStart().getLine();
+          originalCharacter = range.getEnd().getCharacter();
+          Position endPos = new Position(originalLine, originalCharacter);
+
+          Range newRange = new Range(startPos, endPos);
+          return new Location(rangeAndLocation.getValue().getUri(), newRange);
+        });
+  }
+
+  private Pair<Range, Location> findRangeAndLocation(int line, int start, int end) {
+    Pair<Range, Location> startRange = localityMap.get(start);
+    Pair<Range, Location> endRange = localityMap.get(end);
+
+    if (start == end) {
+      if (inRange(line, startRange.getKey()) == 0) {
+        return startRange;
+      }
+      return null;
+    }
+
+    int inRange = inRange(line, startRange.getKey());
+    if (inRange == -1) {
+      return null;
+    }
+
+    if (inRange == 0) {
+      return startRange;
+    }
+
+    inRange = inRange(line, endRange.getKey());
+    if (inRange == 1) {
+      return null;
+    }
+
+    if (inRange == 0) {
+      return endRange;
+    }
+
+    int middleIndex = (start + end) / 2;
+    inRange = inRange(line, localityMap.get(middleIndex).getKey());
+    if (inRange == 0) {
+      return localityMap.get(middleIndex);
+    }
+
+    if (inRange == -1) {
+      return findRangeAndLocation(line, start, middleIndex);
+    }
+    return findRangeAndLocation(line, middleIndex, end);
+  }
+
+  private int inRange(int line, Range range) {
+    if (line < range.getStart().getLine()) {
+      return -1;
+    }
+    if (line > range.getEnd().getLine()) {
+      return 1;
+    }
+    return 0;
+  }
 
   /**
    * Builds an extended document token locality to original source locality map
    * @param textTransformations is a text transformations object
    * @return a map
    */
-  public List<Pair<Range, Location>> buildLocalityMap(TextTransformations textTransformations) {
+  private List<Pair<Range, Location>> buildLocalityMap(TextTransformations textTransformations) {
     List<Pair<Range, Location>> result = new LinkedList<>();
     LinkedList<Range> ranges = new LinkedList<>(textTransformations.getExtensions().keySet());
     ranges.sort(Comparator.comparingInt(e -> e.getStart().getLine()));
@@ -54,6 +134,7 @@ public class MappingService {
         int size = end.getLine() - start.getLine() + 1;
 
         start.setLine(extendedDocumentLine);
+        start.setCharacter(range.getStart().getCharacter());
         end.setLine(extendedDocumentLine + size - 1);
         pair.getKey().setStart(start);
         pair.getKey().setEnd(end);
