@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 
 /** Typing a variable definition with OCCURS TO clause should not produce any exceptions */
 class TestOccursToDoesNotProduceExceptions {
@@ -42,6 +42,6 @@ class TestOccursToDoesNotProduceExceptions {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), "Unexpected end of file", DiagnosticSeverity.Error, ERROR.getText())));
+                new Range(), "Unexpected end of file", DiagnosticSeverity.Error,  ErrorSource.PARSING.getText())));
   }
 }

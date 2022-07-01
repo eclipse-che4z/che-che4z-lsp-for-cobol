@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
@@ -78,19 +78,19 @@ class TestIdmsLoadStatement {
                 new Range(),
                 "Max length limit of 8 bytes allowed for table name.",
                 Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorSource.DIALECT.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "Max length limit of 8 bytes allowed for node name.",
                 Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorSource.DIALECT.getText()),
             "3",
             new Diagnostic(
                 new Range(),
                 "Max length limit of 8 bytes allowed for dictionary name.",
                 Error,
-                SourceInfoLevels.ERROR.getText())),
+                ErrorSource.DIALECT.getText())),
         ImmutableList.of(),
         DialectConfigs.getIDMSAnalysisConfig());
   }

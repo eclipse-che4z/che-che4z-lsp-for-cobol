@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 
 /** Test deprecated COMMUNICATION SECTION produces error */
 class TestSyntaxErrorOnCommunicationSection {
@@ -46,6 +46,6 @@ class TestSyntaxErrorOnCommunicationSection {
                 "Syntax error on 'COMMUNICATION' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, "
                     + "LINKAGE, LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE}",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorSource.PARSING.getText())));
   }
 }

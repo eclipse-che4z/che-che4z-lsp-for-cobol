@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -43,6 +43,6 @@ class TestUnexpectedCharErrorShown {
         ImmutableList.of(),
         ImmutableMap.of(
             "typo",
-            new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
+            new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())));
   }
 }

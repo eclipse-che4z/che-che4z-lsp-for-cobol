@@ -15,7 +15,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -54,7 +54,7 @@ class TestDaCoFileCloseStatement {
                 new Range(),
                 "Exact length of file reference must be 4 bytes",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())),
+                ErrorSource.DIALECT.getText())),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());
   }

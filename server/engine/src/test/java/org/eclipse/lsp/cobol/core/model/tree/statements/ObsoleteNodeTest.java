@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree.statements;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.RemarksNode;
@@ -39,6 +40,7 @@ class ObsoleteNodeTest {
         rootNode.process(),
             ImmutableList.of(
                     SyntaxError.syntaxError()
+                            .errorSource(ErrorSource.PARSING)
                             .severity(ErrorSeverity.WARNING)
                             .locality(locality)
                             .messageTemplate(MessageTemplate.of("cobolParser.ObsoleteCode"))
