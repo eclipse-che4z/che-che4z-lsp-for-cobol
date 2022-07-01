@@ -42,7 +42,7 @@ class MappingServiceTest {
   private static final String COPYBOOK = "           COPYBOOK TEXT\n"
       + "           NEXT LINE 1\n"
       + "           NEXT LINE 2\n"
-      + "           NEXT LINE 3\n";
+      + "           NEXT LINE 3";
 
   @Test
   void testMapping() {
