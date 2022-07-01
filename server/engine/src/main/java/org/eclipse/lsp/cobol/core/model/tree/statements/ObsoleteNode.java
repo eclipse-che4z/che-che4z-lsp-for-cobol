@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -41,6 +42,7 @@ public abstract class ObsoleteNode extends Node {
   private List<SyntaxError> throwObsoleteNodeWarning() {
     return ImmutableList.of(
         SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
             .severity(ErrorSeverity.WARNING)
             .locality(getLocality())
             .messageTemplate(MessageTemplate.of("cobolParser.ObsoleteCode"))

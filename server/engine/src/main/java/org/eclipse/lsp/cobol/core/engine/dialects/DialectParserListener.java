@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp4j.Position;
@@ -34,8 +35,7 @@ import java.util.List;
 public class DialectParserListener extends BaseErrorListener {
   private final String uri;
 
-  @Getter
-  private final List<SyntaxError> errors = new ArrayList<>();
+  @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
   public DialectParserListener(String uri) {
     this.uri = uri;
@@ -52,14 +52,19 @@ public class DialectParserListener extends BaseErrorListener {
     int errorLine = line - 1;
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorSource(ErrorSource.DIALECT)
             .offendedToken((CommonToken) offendingSymbol)
             .suggestion(msg)
-            .locality(Locality.builder()
-                .uri(uri)
-                .range(new Range(
-                    new Position(errorLine, charPositionInLine),
-                    new Position(errorLine, charPositionInLine + getOffendingSymbolSize(offendingSymbol))))
-                .build())
+            .locality(
+                Locality.builder()
+                    .uri(uri)
+                    .range(
+                        new Range(
+                            new Position(errorLine, charPositionInLine),
+                            new Position(
+                                errorLine,
+                                charPositionInLine + getOffendingSymbolSize(offendingSymbol))))
+                    .build())
             .severity(ErrorSeverity.ERROR)
             .build();
     LOG.debug("Syntax error by DialectParserListener " + error.toString());
