@@ -146,7 +146,7 @@ public class MappingService {
     String[] originalLines = textTransformations.getText().split("\r?\n");
     int size = originalLines.length - originalDocumentLine;
 
-    Pair<Range, Location> last = Pair.of(new Range(new Position(extendedDocumentLine, 0), new Position(extendedDocumentLine + size - 1, 0)),
+    Pair<Range, Location> last = Pair.of(new Range(new Position(extendedDocumentLine, 0), new Position(extendedDocumentLine + size, 0)),
         new Location(textTransformations.getUri(), new Range(new Position(originalDocumentLine, 0), new Position(originalDocumentLine + size - 1, 0))));
     result.add(last);
     return result;

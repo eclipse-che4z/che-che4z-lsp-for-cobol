@@ -166,7 +166,7 @@ public class CobolLanguageEngine {
 
     timingBuilder.getMappingTimer().start();
     Map<Token, Locality> positionMapping =
-        getPositionMapping(documentUri, extendedDocument, tokens, embeddedCodeParts);
+        getPositionMapping(documentUri, extendedDocument, tokens, embeddedCodeParts, new MappingService(dialectOutcome.getTransformations()));
     timingBuilder.getMappingTimer().stop();
 
     timingBuilder.getVisitorTimer().start();
@@ -260,10 +260,25 @@ public class CobolLanguageEngine {
       String documentUri,
       ExtendedDocument extendedDocument,
       CommonTokenStream tokens,
-      Map<Token, EmbeddedCode> embeddedCodeParts) {
+      Map<Token, EmbeddedCode> embeddedCodeParts,
+      MappingService mappingService) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    return LocalityMappingUtils.createPositionMapping(
+    Map<Token, Locality> mapping = LocalityMappingUtils.createPositionMapping(
         tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri, embeddedCodeParts);
+    return updateMapping(documentUri, mapping, mappingService);
+  }
+
+  private Map<Token, Locality> updateMapping(String documentUri, Map<Token, Locality> mapping, MappingService mappingService) {
+    mapping.forEach((k, v) -> {
+      if (v.getUri().equals(documentUri)) {
+        mappingService.getOriginalLocation(v.getRange()).ifPresent(l -> {
+          v.getRange().setStart(l.getRange().getStart());
+          v.getRange().setEnd(l.getRange().getEnd());
+          v.setUri(l.getUri());
+        });
+      }
+    });
+    return mapping;
   }
 
   private void analyzeEmbeddedCode(List<Node> syntaxTree, Map<Token, Locality> mapping) {
