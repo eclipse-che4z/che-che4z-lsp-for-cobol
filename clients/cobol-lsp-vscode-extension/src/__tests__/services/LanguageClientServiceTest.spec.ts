@@ -40,8 +40,8 @@ const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService
 const middleware: Middleware = new Middleware(copyBooksDownloader);
 let languageClientService: LanguageClientService;
 
-const SERVER_DESC = "LSP extension for COBOL language";
-const SERVER_ID = "COBOL";
+const SERVER_DESC = "LSP extension for cobol language";
+const SERVER_ID = "cobol";
 
 beforeEach(() => {
     jest.clearAllMocks();
@@ -103,13 +103,13 @@ describe("LanguageClientService positive scenario", () => {
         expect(languageClientService.start()).toBe(SERVER_STARTED_MSG);
         expect(LanguageClient).toHaveBeenLastCalledWith(SERVER_ID, SERVER_DESC,
             expect.any(Function), {
-            documentSelector: [SERVER_ID],
-            middleware: {
-                workspace: {
-                    configuration: expect.any(Function),
+                documentSelector: [SERVER_ID],
+                middleware: {
+                    workspace: {
+                        configuration: expect.any(Function),
+                    },
                 },
-            },
-        });
+            });
     });
 
     test("Test LanguageClientService fire a stop() command on LanguageClient", async () => {

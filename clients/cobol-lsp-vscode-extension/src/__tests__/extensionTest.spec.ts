@@ -83,7 +83,7 @@ describe("Check plugin extension for cobol starts successfully.", () => {
         expect(createFileWithGivenPath).toHaveBeenCalledTimes(1);
 
         expect(vscode.languages.registerCodeActionsProvider)
-            .toBeCalledWith({ scheme: "file", language: "COBOL" }, expect.any(CopybooksCodeActionProvider));
+            .toBeCalledWith({ scheme: "file", language: "cobol" }, expect.any(CopybooksCodeActionProvider));
 
     });
 
