@@ -58,13 +58,13 @@ class MappingServiceTest {
     assertEquals("original", mapping.get(0).getValue().getUri());
 
     assertEquals(7, mapping.get(1).getKey().getStart().getLine());
-    assertEquals(10, mapping.get(1).getKey().getEnd().getLine());
+    assertEquals(11, mapping.get(1).getKey().getEnd().getLine());
     assertEquals(0, mapping.get(1).getValue().getRange().getStart().getLine());
-    assertEquals(3, mapping.get(1).getValue().getRange().getEnd().getLine());
+    assertEquals(4, mapping.get(1).getValue().getRange().getEnd().getLine());
     assertEquals("copybook", mapping.get(1).getValue().getUri());
 
-    assertEquals(11, mapping.get(2).getKey().getStart().getLine());
-    assertEquals(11, mapping.get(2).getKey().getEnd().getLine());
+    assertEquals(12, mapping.get(2).getKey().getStart().getLine());
+    assertEquals(12, mapping.get(2).getKey().getEnd().getLine());
     assertEquals(8, mapping.get(2).getValue().getRange().getStart().getLine());
     assertEquals(8, mapping.get(2).getValue().getRange().getEnd().getLine());
     assertEquals("original", mapping.get(2).getValue().getUri());
@@ -99,7 +99,7 @@ class MappingServiceTest {
   @Test
   void testLocationAfterCopybook() {
     var service = prepareService();
-    Optional<Location> location = service.getOriginalLocation(new Range(new Position(11, 10), new Position(11, 15)));
+    Optional<Location> location = service.getOriginalLocation(new Range(new Position(12, 10), new Position(12, 15)));
 
     assertTrue(location.isPresent());
     assertEquals("original", location.get().getUri());
@@ -112,7 +112,7 @@ class MappingServiceTest {
   @Test
   void testLocationOutOfCode() {
     var service = prepareService();
-    Optional<Location> location = service.getOriginalLocation(new Range(new Position(12, 10), new Position(12, 15)));
+    Optional<Location> location = service.getOriginalLocation(new Range(new Position(13, 10), new Position(13, 15)));
     assertFalse(location.isPresent());
 
     location = service.getOriginalLocation(new Range(new Position(-1, 10), new Position(-1, 15)));

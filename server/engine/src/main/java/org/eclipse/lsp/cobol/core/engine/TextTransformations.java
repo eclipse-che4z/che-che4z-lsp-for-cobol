@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.engine;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.*;
@@ -52,7 +53,7 @@ public class TextTransformations {
       } else if (currentRange.getStart().getLine() == lineNumber) {
         sb.append(lines[lineNumber], 0, currentRange.getStart().getCharacter());
         String replace = extensions.containsKey(currentRange)
-                ? "\n" + extensions.get(currentRange).calculateExtendedText()
+                ? extensions.get(currentRange).calculateExtendedText()
                 : replacements.get(currentRange);
         sb.append(replace);
         lineNumber = currentRange.getEnd().getLine();
@@ -75,6 +76,8 @@ public class TextTransformations {
   public void extend(CopyNode copyNode, TextTransformations textTransformations) {
     copyNodes.add(copyNode);
     Range range = copyNode.getLocality().getRange();
+    range = new Range(new Position(range.getStart().getLine(), 0),
+        new Position(range.getEnd().getLine(), range.getEnd().getCharacter()));
     extensions.put(range, textTransformations);
   }
 
