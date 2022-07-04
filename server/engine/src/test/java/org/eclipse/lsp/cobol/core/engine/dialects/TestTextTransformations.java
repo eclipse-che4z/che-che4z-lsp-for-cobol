@@ -85,7 +85,7 @@ public class TestTextTransformations {
                         new Position(0, 3),
                         new Position(0, 7)),
                 "4321");
-        assertEquals("0: 4321\n1: 123\n\n", tt.calculateExtendedText());
+        assertEquals("0: 4321\n1: \n123\n\n", tt.calculateExtendedText());
 
     }
     @Test

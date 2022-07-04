@@ -52,7 +52,7 @@ public class TextTransformations {
       } else if (currentRange.getStart().getLine() == lineNumber) {
         sb.append(lines[lineNumber], 0, currentRange.getStart().getCharacter());
         String replace = extensions.containsKey(currentRange)
-                ? extensions.get(currentRange).calculateExtendedText()
+                ? "\n" + extensions.get(currentRange).calculateExtendedText()
                 : replacements.get(currentRange);
         sb.append(replace);
         lineNumber = currentRange.getEnd().getLine();

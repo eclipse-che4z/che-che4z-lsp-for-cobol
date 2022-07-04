@@ -34,11 +34,11 @@ class TestIdmsCopyWithCobol {
           + "        WORKING-STORAGE SECTION.\n"
           + "        01 {$*EMPLOYEE} PIC X(10).\n"
           + "        PROCEDURE DIVISION.\n"
-          + "        COPY IDMS {~CB!IDMS}.\n"
-          + "        COPY IDMS {~CB!IDMS}.\n"
-          + "        DISPLAY \"HELLO\".\n";
+          + "            COPY IDMS {~CB!IDMS}.\n"
+          + "            COPY IDMS {~CB!IDMS}.\n"
+          + "            DISPLAY \"HELLO\".\n";
 
-  private static final String TEXT_IDMS_COPYBOOK = "DISPLAY {$EMPLOYEE}.";
+  private static final String TEXT_IDMS_COPYBOOK = "            DISPLAY {$EMPLOYEE}.";
 
   @Test
   void test() {
