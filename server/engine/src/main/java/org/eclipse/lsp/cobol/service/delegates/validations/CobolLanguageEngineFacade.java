@@ -131,7 +131,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
       diagnostic.setSource(err.getErrorSource().getText());
       diagnostic.setMessage(err.getSuggestion());
       diagnostic.setRange(err.getLocality().getRange());
-      diagnostic.setCode(ofNullable(err.getErrorCode()).map(ErrorCode::name).orElse(null));
+      diagnostic.setCode(ofNullable(err.getErrorCode()).map(ErrorCode::getLabel).orElse(null));
       return diagnostic;
     };
   }
