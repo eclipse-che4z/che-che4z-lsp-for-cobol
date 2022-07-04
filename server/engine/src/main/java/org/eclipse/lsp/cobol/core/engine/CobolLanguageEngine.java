@@ -122,6 +122,7 @@ public class CobolLanguageEngine {
         DialectProcessingContext.builder()
             .textTransformations(cleanText)
             .copybookConfig(analysisConfig.getCopybookConfig())
+            .programDocumentUri(documentUri)
             .build();
 
     DialectOutcome dialectOutcome =

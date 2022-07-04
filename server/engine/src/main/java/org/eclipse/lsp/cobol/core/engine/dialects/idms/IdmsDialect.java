@@ -31,6 +31,7 @@ import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -70,6 +71,12 @@ public final class IdmsDialect implements CobolDialect {
   public void extend(DialectProcessingContext context) {
     List<SyntaxError> errors = new LinkedList<>();
     TextTransformations textTransformations = context.getTextTransformations();
+    processTextTransformation(textTransformations, errors, context.getCopybookConfig(), context.getProgramDocumentUri());
+  }
+
+  private void processTextTransformation(TextTransformations textTransformations,
+                                         List<SyntaxError> errors,
+                                         CopybookConfig copybookConfig, String programDocumentUri) {
     List<IdmsCopybookDescriptor> cbs =
         new CopybookInlineVisitor(textTransformations)
             .visitStartRule(
@@ -79,9 +86,9 @@ public final class IdmsDialect implements CobolDialect {
           CopybookModel copybookModel =
               copybookService.resolve(
                   new CopybookName(cb.getName(), IdmsDialect.NAME),
+                  programDocumentUri,
                   textTransformations.getUri(),
-                  textTransformations.getUri(), // FIX me for nested case
-                  context.getCopybookConfig(),
+                  copybookConfig,
                   true);
           CopyNode copyNode = new CopyNode(cb.getStatement(), cb.getName(), IdmsDialect.NAME);
 
@@ -90,12 +97,15 @@ public final class IdmsDialect implements CobolDialect {
           cbLocation.setUri(copybookModel.getUri());
           CopyDefinition copyDefinition = new CopyDefinition(cbLocation, cb.getName());
           copyNode.setDefinition(copyDefinition);
-          textTransformations.extend(
-              copyNode,
-              new TextTransformations(copybookModel.getContent(), copybookModel.getUri()));
+
+          TextTransformations copyTransform = new TextTransformations(copybookModel.getContent(), copybookModel.getUri());
+          processTextTransformation(copyTransform, errors, copybookConfig, programDocumentUri);
+
+          textTransformations.extend(copyNode, copyTransform);
           copyNode.setLocality(cb.getUsage());
         });
   }
+
 
   /**
    * Processing the text according to the IDMS rules
@@ -110,7 +120,7 @@ public final class IdmsDialect implements CobolDialect {
         parseIdms(context.getTextTransformations().calculateExtendedText(), context.getTextTransformations().getUri(), errors);
     List<Node> nodes = new ArrayList<>();
     nodes.addAll(visitor.visitStartRule(startRuleContext));
-    nodes.addAll(context.getTextTransformations().getCopyNodes());
+    nodes.addAll(context.getTextTransformations().calculateCopyNodes());
     errors.addAll(visitor.getErrors());
 
     return new ResultWithErrors<>(

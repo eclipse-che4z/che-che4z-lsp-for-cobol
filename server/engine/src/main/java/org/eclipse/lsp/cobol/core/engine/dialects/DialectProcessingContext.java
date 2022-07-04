@@ -27,4 +27,5 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 public class DialectProcessingContext {
   TextTransformations textTransformations;
   CopybookConfig copybookConfig;
+  String programDocumentUri;
 }

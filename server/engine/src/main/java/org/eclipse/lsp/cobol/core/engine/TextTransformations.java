@@ -99,4 +99,15 @@ public class TextTransformations {
   public static TextTransformations of(String text, String uri) {
     return new TextTransformations(text, uri);
   }
+
+  /**
+   * Calculates a list of all copy nodes include nested
+   * @return a list of all copy nodes
+   */
+  public List<CopyNode> calculateCopyNodes() {
+    List<CopyNode> result = new LinkedList<>();
+    extensions.values().forEach(v -> result.addAll(v.calculateCopyNodes()));
+    result.addAll(copyNodes);
+    return result;
+  }
 }
