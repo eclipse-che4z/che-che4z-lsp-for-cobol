@@ -114,7 +114,7 @@ class SnippetCompletionTest {
         SnippetCompletion completion = new SnippetCompletion(snippets);
         assertEquals(222, snippets.getDataMap("COBOL").size());
         assertEquals(232, snippets.getDataMap(IdmsDialect.NAME).size());
-        assertEquals(309, snippets.getDataMap(DaCoDialect.NAME).size());
+        assertEquals(310, snippets.getDataMap(DaCoDialect.NAME).size());
     }
 
     @Test
