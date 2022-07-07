@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -83,7 +83,7 @@ class TestPseudoTextContentConstraint {
                 new Range(new Position(4, 27), new Position(4, 469)),
                 "Max 322 chars allowed for each individual word in pseudo text",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                ErrorSource.EXTENDED_DOCUMENT.getText())));
   }
 
   @Test
@@ -97,7 +97,7 @@ class TestPseudoTextContentConstraint {
                 new Range(),
                 "COPY string is not allowed in pseudo text",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                ErrorSource.EXTENDED_DOCUMENT.getText())));
   }
 
   @Test
@@ -111,7 +111,7 @@ class TestPseudoTextContentConstraint {
                 new Range(),
                 "Compiler directives cannot be continued on another line",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                ErrorSource.PREPROCESSING.getText())));
   }
 
   @Test

@@ -22,7 +22,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 
 /** This test checks that redefined variable has the same level as original */
 class TestVariableRedefineLevel {
@@ -58,7 +58,7 @@ class TestVariableRedefineLevel {
                 new Range(),
                 "The redefining and redefined items must have the same level: WS-DATA-A",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorSource.PARSING.getText())));
   }
 
   @Test

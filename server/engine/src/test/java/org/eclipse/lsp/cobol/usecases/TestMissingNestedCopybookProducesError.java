@@ -17,8 +17,9 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.model.ErrorCode;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
@@ -42,7 +43,7 @@ class TestMissingNestedCopybookProducesError {
           + "9          GOBACK. ";
 
   private static final String REPL =
-      "         05 {$*:TAG:-ID^ABC-ID} PIC 9.\n" + "       COPY {~CPYNAME|missing}.";
+      "         05 {$*:TAG:-ID^ABC-ID} PIC 9.\n" + "       COPY {~CPYNAME|missingCpy}.";
   private static final String REPL_NAME = "REPL";
 
   @Test
@@ -56,7 +57,14 @@ class TestMissingNestedCopybookProducesError {
                 new Range(),
                 "CPYNAME: Copybook not found",
                 Error,
-                SourceInfoLevels.ERROR.getText(),
-                "MISSING_COPYBOOK")));
+                ErrorSource.COPYBOOK.getText(),
+                ErrorCode.MISSING_COPYBOOK.getLabel()),
+            "missingCpy",
+            new Diagnostic(
+                new Range(),
+                "CPYNAME: Copybook not found",
+                Error,
+                ErrorSource.COPYBOOK.getText(),
+                ErrorCode.MISSING_COPYBOOK.getLabel())));
   }
 }

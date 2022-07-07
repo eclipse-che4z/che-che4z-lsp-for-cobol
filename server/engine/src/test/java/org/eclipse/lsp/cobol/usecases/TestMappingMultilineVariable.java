@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
@@ -51,13 +52,13 @@ class TestMappingMultilineVariable {
                 new Range(),
                 "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item SPACING-RECEIVE",
                 Error,
-                "COBOL Language Support - E"),
+                    ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "Syntax error on 'PICTUREQ' expected {BINARY, BLANK, COMP, COMPUTATIONAL, COMPUTATIONAL-1, COMPUTATIONAL-2, COMPUTATIONAL-3, COMPUTATIONAL-4, COMPUTATIONAL-5, COMP-1, COMP-2, COMP-3, COMP-4, COMP-5, DISPLAY, DISPLAY-1, DYNAMIC, EXTERNAL, FUNCTION-POINTER, GLOBAL, GROUP-USAGE, INDEX, IS, JUST, JUSTIFIED, LEADING, NATIONAL, OBJECT, OCCURS, PACKED-DECIMAL, PIC, PICTURE, POINTER, POINTER-32, PROCEDURE-POINTER, REDEFINES, SIGN, SYNC, SYNCHRONIZED, TRAILING, USAGE, UTF-8, VALUE, VALUES, VOLATILE, '.'}",
                 Error,
-                "COBOL Language Support - E")
+                    ErrorSource.PARSING.getText())
         ),
         ImmutableList.of(),
         AnalysisConfig.defaultConfig(CopybookProcessingMode.DISABLED));

@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 
@@ -33,6 +34,7 @@ class ErrorHelper {
   public SyntaxError missingCopybooks(MessageService messageService, Locality locality, String copybookName) {
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorSource(ErrorSource.DIALECT)
             .locality(locality)
             .suggestion(
                 messageService.getMessage(
@@ -48,6 +50,7 @@ class ErrorHelper {
   public SyntaxError circularDependency(MessageService messageService, Locality locality, String copybookName) {
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorSource(ErrorSource.DIALECT)
             .locality(locality)
             .suggestion(
                 messageService.getMessage(

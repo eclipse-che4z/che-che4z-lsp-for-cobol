@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.visitor;
 
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,7 @@ public class ParserListener extends BaseErrorListener {
 
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
             .offendedToken((CommonToken) offendingSymbol)
             .suggestion(msg)
             .severity(ErrorSeverity.ERROR)

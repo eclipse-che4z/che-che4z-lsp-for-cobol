@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
@@ -52,7 +52,7 @@ class TestCopybookWithIndirectRecursiveDependencyIsDetected {
       "Copybook declaration has more than 8 characters for: ";
 
   @Test
-  void test() {
+  void testInnerCopy() {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
@@ -60,21 +60,21 @@ class TestCopybookWithIndirectRecursiveDependencyIsDetected {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), MESSAGE_RECURSION + INDIRECT_NAME, Error, SourceInfoLevels.ERROR.getText()),
+                new Range(), MESSAGE_RECURSION + INDIRECT_NAME, Error, ErrorSource.COPYBOOK.getText()),
             "2",
             new Diagnostic(
-                new Range(), MESSAGE_RECURSION + INNER_COPY_NAME, Error, SourceInfoLevels.ERROR.getText()),
+                new Range(), MESSAGE_RECURSION + INNER_COPY_NAME, Error, ErrorSource.COPYBOOK.getText()),
             "3",
             new Diagnostic(
                 new Range(),
                 MESSAGE_LONG_DECLARATION + INDIRECT_NAME,
                 Information,
-                SourceInfoLevels.INFO.getText()),
+                ErrorSource.COPYBOOK.getText()),
             "4",
             new Diagnostic(
                 new Range(),
                 MESSAGE_LONG_DECLARATION + INNER_COPY_NAME,
                 Information,
-                SourceInfoLevels.INFO.getText())));
+                ErrorSource.COPYBOOK.getText())));
   }
 }

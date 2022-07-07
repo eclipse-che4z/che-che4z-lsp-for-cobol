@@ -15,21 +15,20 @@
 
 package org.eclipse.lsp.cobol.service.delegates.actions;
 
+import lombok.NonNull;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-import lombok.NonNull;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp4j.CodeActionKind.QuickFix;
 
 /**
@@ -45,7 +44,7 @@ public class FindCopybookCommand implements CodeActionProvider {
       @NonNull CodeActionParams params) {
     return params.getContext().getDiagnostics().stream()
         .filter(it -> it.getCode() != null)
-        .filter(it -> MISSING_COPYBOOK.equals(valueOf(it.getCode().getLeft())))
+        .filter(it -> MISSING_COPYBOOK.getLabel().equalsIgnoreCase(it.getCode().getLeft()))
         .map(toCodeAction(params))
         .map(Either::<Command, CodeAction>forRight)
         .collect(toList());
@@ -66,7 +65,7 @@ public class FindCopybookCommand implements CodeActionProvider {
   private Command createCommand(@NonNull CodeActionParams params, @NonNull Diagnostic it) {
     return new Command(
         TITLE,
-        MISSING_COPYBOOK.name(),
+        MISSING_COPYBOOK.getLabel(),
         asList(retrieveCopybookName(it), params.getTextDocument().getUri()));
   }
 
