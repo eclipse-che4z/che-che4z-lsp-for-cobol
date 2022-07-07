@@ -45,10 +45,6 @@
     "contributes": {
         "commands": [
             {
-                "command": "cobol-lsp.cpy-manager.redownload",
-                "title": "Redownload all copybooks"
-            },
-            {
                 "command": "cobol-lsp.cpy-manager.fetch-copybook",
                 "title": "Fetch copybook"
             },
