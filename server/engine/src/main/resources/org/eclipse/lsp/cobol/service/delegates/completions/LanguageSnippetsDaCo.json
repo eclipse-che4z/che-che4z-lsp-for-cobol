@@ -184,23 +184,30 @@
   "RETURN INFO STATUS": {
     "prefix": "RETURN INFO",
     "body": [
-      "RETURN INFO ${1:message}."
+      "RETURN INFO ${1:message-code} ${2:message} ${3:data-variable1} ${4:data-variable2}."
     ],
     "description": "RETURN INFO message"
   },
   "RETURN WARNING STATUS": {
     "prefix": "RETURN WARNING",
     "body": [
-      "RETURN WARNING ${1:message}."
+      "RETURN WARNING ${1:message-code} ${2:message} ${3:data-variable1} ${4:data-variable2}."
     ],
     "description": "RETURN WARNING message"
   },
   "RETURN ERROR STATUS": {
     "prefix": "RETURN ERROR",
     "body": [
-      "RETURN ERROR ${1:message}."
+      "RETURN ERROR ${1:message-code} ${2:message} ${3:data-variable1} ${4:data-variable2}."
     ],
     "description": "RETURN ERROR message"
+  },
+  "RETURN FIELD" : {
+    "prefix": "RETURN FIELD",
+    "body": [
+      "RETURN FIELD ${1:field-name}"
+    ],
+    "description": "RETURN FIELD field-name"
   },
   "SHOW RESULT": {
     "prefix": "SHOW RESULT",
