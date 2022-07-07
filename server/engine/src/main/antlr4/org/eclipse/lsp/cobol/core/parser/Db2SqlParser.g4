@@ -1466,6 +1466,7 @@ dbs_collection_name: T=dbs_sql_identifier {validateLength($T.text, "collection n
 dbs_generic_name
     : ADDRESS | AVG | COUNT | COMMENT | FILENAME | GROUP | HOUR | HOURS | ID | IN | IDENTIFIER | LOCATION | LOCATOR
     | MAX | MIN | MONTH | NAME | NONNUMERICLITERAL | YEAR | DATE | DAY | SERVER | SQLCODE | TRANSACTION | TYPE | V1
+    | TIMESTAMP
     ;
 dbs_column_name: (dbs_generic_name DOT_FS)? T=dbs_generic_name {validateLength($T.text, "column name", 30);};
 dbs_constant : (dbs_string_constant | dbs_integer_constant | DATELITERAL);
