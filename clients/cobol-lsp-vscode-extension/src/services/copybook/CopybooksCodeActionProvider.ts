@@ -38,12 +38,13 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
     }
 
     private shouldHaveCodeAction(context: vscode.CodeActionContext): boolean {
+        var missingCopyBook = "MISSING_COPYBOOK";
         if (!context.diagnostics || context.diagnostics.length < 1) {
             return false;
         }
 
         for (const d of context.diagnostics) {
-            if (d.code === "MISSING_COPYBOOK") {
+            if (d.code === missingCopyBook) {
                 return true;
             }
         }

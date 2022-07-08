@@ -24,7 +24,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum ErrorCode {
   /** This copybook does not present in the copybook folder */
-  MISSING_COPYBOOK("missing copybook");
+  MISSING_COPYBOOK("MISSING_COPYBOOK");
 
   private String label;
 
