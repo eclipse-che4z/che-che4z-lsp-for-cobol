@@ -17,8 +17,10 @@ jobs:
     - name: Build with Maven
       working-directory: server
       run: mvn package -DskipTests --no-transfer-progress
+    - name: create executable location in extension
+      run: mkdir clients/cobol-lsp-vscode-extension/server/jar
     - name: Copy jar into extension
-      run: cp server/target/server.jar clients/cobol-lsp-vscode-extension/server
+      run: cp server/target/server.jar clients/cobol-lsp-vscode-extension/server/jar
     - name: Set up Node 16
       uses: actions/setup-node@v1
       with:

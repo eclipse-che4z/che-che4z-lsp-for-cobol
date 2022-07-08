@@ -49,3 +49,6 @@ node_modules/imurmurhash
 node_modules/isstream
 node_modules/concat-map
 node_modules/pend
+node_modules/forever-agent
+node_modules/mustache
+node_modules/moment

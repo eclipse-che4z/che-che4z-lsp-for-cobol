@@ -1,0 +1,95 @@
+{
+  "IDMS-CONTROL SECTION": {
+    "prefix": "IDMS-CONTROL SECTION",
+    "body": [
+      "IDMS-CONTROL SECTION.",
+      "PROTOCOL. MODE IS ${1:operating-mode}."
+    ],
+    "description": "[IDMS] IDMS-CONTROL SECTION"
+  },
+  "SCHEMA SECTION": {
+    "prefix": "SCHEMA SECTION",
+    "body": [
+      "SCHEMA SECTION.",
+      "DB ${1:subSchema} WITHIN ${2:schema-name}."
+    ],
+    "description": "[IDMS] SCHEMA SECTION"
+  },
+  "MAP SECTION": {
+    "prefix": "MAP SECTION",
+    "body": [
+      "MAP SECTION.",
+      "MAX FIELD LIST IS ${1:field-list-size}.",
+      "MAP ${2:map-name}."
+    ],
+    "description": "[IDMS] MAP SECTION"
+  },
+  "COPY IDMS": {
+    "prefix": "COPY IDMS",
+    "body": [
+      "COPY IDMS ${1:idms-entity}."
+    ],
+    "description": "[IDMS] COPY IDMS"
+  },
+  "COPY IDMS FILE": {
+    "prefix": "COPY IDMS FILE",
+    "body": [
+      "COPY IDMS FILE ${1:file-name}."
+    ],
+    "description": "[IDMS] COPY IDMS FILE"
+  },
+  "COPY IDMS RECORD": {
+    "prefix": "COPY IDMS RECORD",
+    "body": [
+      "COPY IDMS RECORD ${1:record-name}."
+    ],
+    "description": "[IDMS] COPY IDMS RECORD"
+  },
+  "COPY IDMS MAP": {
+    "prefix": "COPY IDMS MAP",
+    "body": [
+      "COPY IDMS MAP ${1:map-name}."
+    ],
+    "description": "[IDMS] COPY IDMS MAP"
+  },
+  "COPY IDMS MAP-CONTROL": {
+    "prefix": "COPY IDMS MAP-CONTROL",
+    "body": [
+      "COPY IDMS MAP-CONTROL ${1:map-name}."
+    ],
+    "description": "[IDMS] COPY IDMS MAP CONTROL"
+  },
+  "COPY IDMS MODULE": {
+    "prefix": "COPY IDMS MODULE",
+    "body": [
+      "COPY IDMS MODULE ${1:module-name}."
+    ],
+    "description": "[IDMS] COPY IDMS MODULE"
+  },
+  "SHELL IDMS": {
+    "prefix": "SHELL IDMS",
+    "body": [
+      "       IDENTIFICATION DIVISION.",
+      "       PROGRAM-ID. ${1:${1:${TM_FILENAME/(.*)\\..+$/$1/}}}.",
+      "       ENVIRONMENT DIVISION.",
+      "        IDMS-CONTROL SECTION.",
+      "        PROTOCOL. MODE IS {$2:operating-mode}.",
+      "       DATA DIVISION.",
+      "        FILE SECTION.",
+      "        SCHEMA SECTION.",
+      "         DB ${3:subschema-name} WITHIN ${4:schema-name}.",
+      "        MAP SECTION.",
+      "         MAX FIELD LIST IS ${5:field-list-size}.",
+      "         MAP ${6:map-name}.",
+      "        WORKING-STORAGE SECTION.",
+      "         COPY IDMS ${7:idms-entity}.",
+      "        LINKAGE SECTION.",
+      "       PROCEDURE DIVISION.",
+      "        main-processing SECTION.",
+      "         mainline-paragraph.",
+      "             $0",
+      "             STOP RUN."
+    ],
+    "description": "[IDMS] Template Program"
+  }
+}

@@ -8,7 +8,7 @@
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
-        "vscode": "^1.56.0"
+        "vscode": "^1.55.0"
     },
     "repository": {
         "type": "git",
@@ -85,6 +85,7 @@
                     ".cpy",
                     ".copy"
                 ],
+                "filenamePatterns": ["**/*copybook*/**"],
                 "configuration": "./syntaxes/lang-config.json"
             }
         ],
@@ -147,6 +148,30 @@
                         "type": "string"
                     },
                     "description": "Default list of USS paths to search for copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+                    "uniqueItems": true
+                },
+                "cobol-lsp.cpy-manager.daco.paths-local": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of relative local paths to search for MAID copybooks",
+                    "uniqueItems": true
+                },
+                "cobol-lsp.cpy-manager.daco.paths-dsn": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of datasets to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+                    "uniqueItems": true
+                },
+                "cobol-lsp.cpy-manager.daco.paths-uss": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of USS paths to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
                     "uniqueItems": true
                 },
                 "cobol-lsp.cpy-manager.idms.paths-local": {
@@ -358,16 +383,43 @@
                     "items": {
                         "type": "string",
                         "enum": [
+                            "DaCo",
                             "IDMS"
                         ]
                     },
                     "description": "List of enabled dialects",
+                    "uniqueItems": true
+                },
+                "cobol-lsp.predefined-sections": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of predefined sections",
+                    "default": [
+                        "S930",
+                        "S940",
+                        "S950",
+                        "S990",
+                        "S991",
+                        "S997",
+                        "S999"
+                    ],
                     "uniqueItems": true
                 }
             }
         },
         "configurationDefaults": {
             "[COBOL]": {
+                "editor.renderIndentGuides": false,
+                "editor.rulers": [
+                    7,
+                    11,
+                    72,
+                    80
+                ]
+            },
+            "[COBOL Copybook]": {
                 "editor.renderIndentGuides": false,
                 "editor.rulers": [
                     7,
@@ -424,7 +476,7 @@
     "devDependencies": {
         "@types/jest": "^27.0.0",
         "@types/node": "^12.6.2",
-        "@types/vscode": "^1.56.0",
+        "@types/vscode": "^1.55.0",
         "jest": "^27.0.0",
         "jest-sonar-reporter": "^2.0.0",
         "patch-package": "^6.4.7",

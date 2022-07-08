@@ -12,36 +12,46 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import * as cp from "child_process";
 import * as fs from "fs";
 import * as net from "net";
+import * as os from "os";
 import * as vscode from "vscode";
 import {
     ConfigurationParams,
     ConfigurationRequest,
+    Executable,
     LanguageClient,
     LanguageClientOptions,
     StreamInfo,
 } from "vscode-languageclient";
 import {ConfigurationWorkspaceMiddleware} from "vscode-languageclient/lib/configuration";
+import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
 import {LANGUAGE_ID} from "../constants";
 import {JavaCheck} from "./JavaCheck";
 import {Middleware} from "./Middleware";
-import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
 import { SettingsService } from "./Settings";
 
 export class LanguageClientService {
-    private readonly jarPath: string;
+    private executablePath: string;
     private languageClient: LanguageClient;
-    private handlers: {(languageClient: LanguageClient): void}[] = [];
+    private handlers: Array<(languageClient: LanguageClient) => void> = [];
+    private isNativeBuildEnabled: boolean = false;
 
     constructor(private middleware: Middleware) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
-        this.jarPath = `${ext.extensionPath}/server/server.jar`;
+        this.executablePath = `${ext.extensionPath}/server/jar/server.jar`;
+    }
+
+    public enableNativeBuild() {
+        const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
+        this.isNativeBuildEnabled = true;
+        this.executablePath = this.initializeExecutables(`${ext.extensionPath}/server`);
     }
 
     public async checkPrerequisites(): Promise<void> {
         await new JavaCheck().isJavaInstalled();
-        if (!SettingsService.getLspPort() && !fs.existsSync(this.jarPath)) {
+        if (!SettingsService.getLspPort() && !fs.existsSync(this.executablePath)) {
             throw new Error("LSP server for " + LANGUAGE_ID + " not found");
         }
     }
@@ -65,16 +75,16 @@ export class LanguageClientService {
         return this.getLanguageClient().start();
     }
 
-    private initHandlers() {
-        const languageClient = this.getLanguageClient();
-        for (let handler of this.handlers) {
-            languageClient.onReady().then(() => handler(languageClient));
-        }
-    }
-
     public stop(): Thenable<void> {
         if (this.languageClient) {
             return Promise.resolve(this.getLanguageClient().stop());
+        }
+    }
+
+    private initHandlers() {
+        const languageClient = this.getLanguageClient();
+        for (const handler of this.handlers) {
+            languageClient.onReady().then(() => handler(languageClient));
         }
     }
 
@@ -82,7 +92,7 @@ export class LanguageClientService {
         if (!this.languageClient) {
             this.languageClient = new LanguageClient(LANGUAGE_ID,
                 "LSP extension for " + LANGUAGE_ID + " language",
-                this.createServerOptions(this.jarPath),
+                this.createServerOptions(this.executablePath),
                 this.createClientOptions());
         }
         return this.languageClient;
@@ -106,6 +116,9 @@ export class LanguageClientService {
     }
 
     private createServerOptions(jarPath: string) {
+        if (this.isNativeBuildEnabled) {
+            return nativeServer(jarPath);
+        }
         const port = SettingsService.getLspPort();
         if (port) {
             // Connect to language server via socket
@@ -128,4 +141,57 @@ export class LanguageClientService {
             options: {stdio: "pipe", detached: false},
         };
     }
+
+    private initializeExecutables(serverPath: String) {
+        let executablePath;
+        switch (os.type()) {
+            case "Windows_NT":
+                executablePath = `${serverPath}/package-win`;
+                break;
+            case "Darwin":
+                executablePath = `${serverPath}/package-macos`;
+                this.giveExecutePermission(executablePath);
+                break;
+            case "Linux":
+                executablePath = `${serverPath}/package-linux`;
+                this.giveExecutePermission(executablePath);
+                break;
+            default:
+                break;
+        }
+        return executablePath;
+    }
+
+    private giveExecutePermission(executablePath) {
+        cp.exec(`cd ${executablePath}; chmod 755 *`, (err, stdout, stderr) => {
+            if (err) {
+                vscode.window.showInformationMessage(`couldn't initialize executable as ${executablePath}. Please change the permission to execution mode`);
+            }
+        });
+    }
 }
+export function nativeServer(jarPath: string) {
+    const executable: Executable = {
+            args: ["pipeEnabled"],
+            command: "",
+            options: { stdio: "pipe", detached: false },
+        };
+    switch (os.type()) {
+            case "Windows_NT":
+                executable.options.cwd = `${jarPath}`;
+                executable.command = `engine.exe`;
+                break;
+            case "Darwin":
+                executable.options.cwd = `${jarPath}`;
+                executable.command = `./server-mac-amd64`;
+                break;
+            case "Linux":
+                executable.options.cwd = `${jarPath}`;
+                executable.command = `./server`;
+                break;
+            default:
+                break;
+        }
+    return executable;
+}
+
