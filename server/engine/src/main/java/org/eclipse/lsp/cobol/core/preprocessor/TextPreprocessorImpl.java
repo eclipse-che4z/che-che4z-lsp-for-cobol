@@ -66,8 +66,8 @@ public class TextPreprocessorImpl implements TextPreprocessor {
     List<CobolLine> transformedLines = transformLines(documentUri, lines).unwrap(errors::addAll);
     List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
 
-    String code = writer.serialize(rewrittenLines);
-    return new ResultWithErrors<>(TextTransformations.of(code, documentUri), errors);
+    TextTransformations code = writer.serialize(rewrittenLines, documentUri);
+    return new ResultWithErrors<>(code, errors);
   }
 
   @NonNull

@@ -54,7 +54,7 @@ class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
   void test() {
     ResultWithErrors<List<CobolLine>> result = super.processText(TEXT_TO_TEST);
     CobolLineWriter writer = new CobolLineWriterImpl();
-    assertEquals(EXPECTED, writer.serialize(result.getResult()));
+    assertEquals(EXPECTED, writer.serialize(result.getResult(), "").calculateExtendedText());
     assertEquals(0, result.getErrors().size());
   }
 }

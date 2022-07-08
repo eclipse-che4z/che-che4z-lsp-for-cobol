@@ -15,52 +15,77 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.core.engine.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.Map;
 
 /** This class serializes a list of COBOL lines into a String */
 public class CobolLineWriterImpl implements CobolLineWriter {
 
   @Override
-  public String serialize(final List<CobolLine> lines) {
+  public TextTransformations serialize(final List<CobolLine> lines, String documentUri) {
     final StringBuilder sb = new StringBuilder();
-    int counter = 0;
+    final Map<Range, String> acc = new HashMap<>();
+    StringBuilder clSb = new StringBuilder();
+    Position start = null;
 
     for (final CobolLine line : lines) {
       final boolean isContinuationLine = CobolLineTypeEnum.CONTINUATION.equals(line.getType());
 
       if (!isContinuationLine) {
-        if (line.getNumber() > 0) {
-          sb.append(ProcessingConstants.NEWLINE);
+        if (start != null) {
+          Position stop = new Position(line.getNumber() - 1, sb.length() - sb.lastIndexOf("\n") - 1);
+          Range range = new Range(start, stop);
+          acc.put(range, clSb.toString());
+          clSb = new StringBuilder();
+          start = null;
         }
-        counter = 0;
-
-        if (line.getType() != CobolLineTypeEnum.PREPROCESSED) {
-          sb.append(ProcessingConstants.BLANK_SEQUENCE_AREA);
-        }
-        sb.append(line.getIndicatorArea());
-        sb.append(line.getContentArea());
+        process(sb, line);
       }
 
       /*
-       * check if there is any continuation line and try to concatenate all of them
+       * check if there is any continuation line and try to concatenate all result them
        * without error message to be on a wrong paragraph by adding a newline for each
-       * concatenated line at the end of concatenated string
+       * concatenated line at the end result concatenated string
        */
       if (isContinuationLine) {
-        ++counter;
-        sb.append(removeStartingQuote(line));
-        removeIntermediateLinebreaks(sb, counter);
-        appendNewLinesAtEnd(sb, counter);
+        if (start == null) {
+          int col = sb.length() - sb.toString().lastIndexOf("\n") - 1;
+          start = new Position(line.getNumber() - 1, col);
+        }
+        process(sb, line);
+        clSb.append(removeStartingQuote(line));
       }
     }
 
-    return sb.toString();
+    TextTransformations result = TextTransformations.of(sb.toString(), documentUri);
+    acc.forEach(result::replace);
+    if (start != null) {
+      CobolLine lastLine = lines.get(lines.size() - 1);
+      Position stop = new Position(lastLine.getNumber(), sb.length() - sb.lastIndexOf("\n") - 1);
+      Range range = new Range(start, stop);
+      result.replace(range, clSb.toString());
+    }
+    return result;
+  }
+
+  private void process(StringBuilder sb, CobolLine line) {
+    if (line.getNumber() > 0) {
+      sb.append(ProcessingConstants.NEWLINE);
+    }
+    if (line.getType() != CobolLineTypeEnum.PREPROCESSED) {
+      sb.append(ProcessingConstants.BLANK_SEQUENCE_AREA);
+    }
+    sb.append(line.getIndicatorArea());
+    sb.append(line.getContentArea());
   }
 
   /**
@@ -76,24 +101,5 @@ public class CobolLineWriterImpl implements CobolLineWriter {
 
   private boolean isContinuedLineQuoted(CobolLine line) {
     return CobolLineReWriter.checkStringEndsWithQuoteMark(line.getPredecessor().getContentArea());
-  }
-
-  /**
-   * Delete the newlines which are between lines for multiple continuation lines and append to the
-   */
-  private void removeIntermediateLinebreaks(final StringBuilder sb, int counter) {
-    if (counter > 1)
-      IntStream.range(0, counter - 1)
-          .forEach(
-              i ->
-                  sb.delete(
-                      sb.lastIndexOf(ProcessingConstants.NEWLINE),
-                      sb.lastIndexOf(ProcessingConstants.NEWLINE)
-                          + ProcessingConstants.NEWLINE.length()));
-  }
-
-  /** Append the number of newlines at the end of concatenated string */
-  private void appendNewLinesAtEnd(StringBuilder sb, int counter) {
-    IntStream.range(0, counter).forEach(i -> sb.append(ProcessingConstants.NEWLINE));
   }
 }
