@@ -37,7 +37,6 @@
     ],
     "activationEvents": [
         "onLanguage:COBOL",
-        "onLanguage:COBOL Copybook",
         "workspaceContains:/.c4z"
     ],
     "icon": "resources/logo.png",
@@ -75,13 +74,7 @@
                 "extensions": [
                     ".cbl",
                     ".cob",
-                    ".cobol"
-                ],
-                "configuration": "./syntaxes/lang-config.json"
-            },
-            {
-                "id": "COBOL Copybook",
-                "extensions": [
+                    ".cobol",
                     ".cpy",
                     ".copy"
                 ],
@@ -98,24 +91,11 @@
                     "meta.embedded.block.sql": "sql",
                     "meta.embedded.block.html": "html"
                 }
-            },
-            {
-                "language": "COBOL Copybook",
-                "scopeName": "source.cobol",
-                "path": "./syntaxes/COBOL.tmLanguage.json",
-                "embeddedLanguages": {
-                    "meta.embedded.block.sql": "sql",
-                    "meta.embedded.block.html": "html"
-                }
             }
         ],
         "snippets": [
             {
                 "language": "COBOL",
-                "path": "./snippets.json"
-            },
-            {
-                "language": "COBOL Copybook",
                 "path": "./snippets.json"
             }
         ],
@@ -196,6 +176,15 @@
                         "type": "string"
                     },
                     "description": "Default list of USS paths to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+                    "uniqueItems": true
+                },
+                "cobol-lsp.cpy-manager.copybook-extensions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [".CPY", ".COPY", ".cpy", ".copy"],
+                    "description": "List of copybook extensions",
                     "uniqueItems": true
                 },
                 "cobol-lsp.cpy-manager.copybook-file-encoding": {
@@ -411,15 +400,6 @@
         },
         "configurationDefaults": {
             "[COBOL]": {
-                "editor.renderIndentGuides": false,
-                "editor.rulers": [
-                    7,
-                    11,
-                    72,
-                    80
-                ]
-            },
-            "[COBOL Copybook]": {
                 "editor.renderIndentGuides": false,
                 "editor.rulers": [
                     7,
