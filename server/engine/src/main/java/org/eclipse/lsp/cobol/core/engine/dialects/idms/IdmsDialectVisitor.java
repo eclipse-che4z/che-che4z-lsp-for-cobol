@@ -25,10 +25,10 @@ import java.util.List;
 /**
  * Visitor to collect all IDMS copybooks
  */
-class CopybookInlineVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescriptor>> {
+class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescriptor>> {
   private final TextTransformations textTransformations;
 
-  CopybookInlineVisitor(TextTransformations textTransformations) {
+  IdmsDialectVisitor(TextTransformations textTransformations) {
     this.textTransformations = textTransformations;
   }
 

@@ -778,7 +778,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     List<Node> result = new ArrayList<>(aggregate.size() + nextResult.size());
     result.addAll(aggregate);
     result.addAll(nextResult);
-    return result;
+    return result.stream().distinct().collect(toList());
   }
 
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {

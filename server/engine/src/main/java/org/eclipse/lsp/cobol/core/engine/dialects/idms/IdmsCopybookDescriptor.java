@@ -15,9 +15,12 @@
 package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
 import lombok.Data;
+import org.antlr.v4.runtime.Token;
+import org.eclipse.lsp.cobol.core.IdmsCopyParser;
 import org.eclipse.lsp.cobol.core.IdmsParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 /*
@@ -49,6 +52,37 @@ public class IdmsCopybookDescriptor {
   String name;
   Locality usage;
   Locality statement;
+  Range levelRange;
+  int level;
+
+  /**
+   * Factory method for copybook description object
+   * @param ctx IDMS copybook rule context
+   * @param programDocumentUri uri of file
+   * @return copybook descriptor
+   */
+  public static IdmsCopybookDescriptor from(IdmsCopyParser.CopyIdmsStatementContext ctx, String programDocumentUri) {
+    IdmsCopybookDescriptor result = new IdmsCopybookDescriptor();
+    result.name = getName(ctx);
+    Range range = DialectUtils.constructRange(ctx.copyIdmsOptions().copyIdmsSource());
+
+    if (ctx.LEVEL_NUMBER() != null && ctx.LEVEL_NUMBER().getSymbol() != null) {
+      result.levelRange = extractLevelRange(ctx.LEVEL_NUMBER().getSymbol());
+      result.level = extractLevel(ctx.LEVEL_NUMBER().getSymbol());
+    }
+
+    result.usage = Locality.builder()
+            .uri(programDocumentUri)
+            .range(range)
+            .build();
+
+    result.statement = Locality.builder()
+        .uri(programDocumentUri)
+        .range(DialectUtils.constructRange(ctx))
+        .build();
+
+    return result;
+  }
 
   /**
    * Factory method for copybook description object
@@ -60,16 +94,50 @@ public class IdmsCopybookDescriptor {
     IdmsCopybookDescriptor result = new IdmsCopybookDescriptor();
     result.name = getName(ctx);
     Range range = DialectUtils.constructRange(ctx.copyIdmsOptions().copyIdmsSource());
+
+    if (ctx.LEVEL_NUMBER() != null && ctx.LEVEL_NUMBER().getSymbol() != null) {
+      result.levelRange = extractLevelRange(ctx.LEVEL_NUMBER().getSymbol());
+      result.level = extractLevel(ctx.LEVEL_NUMBER().getSymbol());
+    }
+
     result.usage = Locality.builder()
-            .uri(programDocumentUri)
-            .range(range)
-            .build();
-    result.statement =  Locality.builder()
+        .uri(programDocumentUri)
+        .range(range)
+        .build();
+
+    result.statement = Locality.builder()
         .uri(programDocumentUri)
         .range(DialectUtils.constructRange(ctx))
         .build();
 
     return result;
+  }
+
+  private static int extractLevel(Token token) {
+    return Integer.parseInt(token.getText());
+  }
+
+  private static Range extractLevelRange(Token token) {
+    Range range = new Range();
+    range.setStart(new Position(token.getLine() - 1, token.getCharPositionInLine()));
+    range.setEnd(new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getText().length() - 1));
+    return range;
+  }
+
+  private static String getName(IdmsCopyParser.CopyIdmsStatementContext ctx) {
+    IdmsCopyParser.CopySourceContext copySourceContext = ctx.copyIdmsOptions().copyIdmsSource().copySource();
+    if (copySourceContext.literal() != null) {
+      return copySourceContext.literal().getText();
+    }
+
+    if (copySourceContext.cobolWord() != null) {
+      return copySourceContext.cobolWord().getText();
+    }
+
+    if (copySourceContext.SUBSCHEMA_NAMES() != null) {
+      return copySourceContext.SUBSCHEMA_NAMES().getText();
+    }
+    return null;
   }
 
   private static String getName(IdmsParser.CopyIdmsStatementContext ctx) {
@@ -87,4 +155,5 @@ public class IdmsCopybookDescriptor {
     }
     return null;
   }
+
 }
