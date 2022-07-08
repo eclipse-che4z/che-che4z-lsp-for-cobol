@@ -82,29 +82,6 @@ public final class IdmsDialect implements CobolDialect {
     cbs.forEach(cb -> insertIdmsCopybook(textTransformations, errors, cb, context.getProgramDocumentUri(), context.getCopybookConfig()));
   }
 
-  private void processTextTransformation(TextTransformations textTransformations,
-                                         List<SyntaxError> errors,
-                                         CopybookConfig copybookConfig, String programDocumentUri,
-                                         int copybookLevel) {
-    IdmsCopyVisitor copyVisitor = new IdmsCopyVisitor(textTransformations);
-    IdmsCopyParser.StartRuleContext context = parseCopyIdms(textTransformations.calculateExtendedText(), programDocumentUri, errors);
-
-    List<IdmsCopybookDescriptor> cbs = copyVisitor.visitStartRule(context);
-    int firstLevel = copyVisitor.getVariableLevels().stream().findFirst().map(Pair::getRight).orElse(0);
-    copyVisitor.getVariableLevels().forEach(p -> {
-      if (copybookLevel > 0 && p.getRight() != null) {
-        textTransformations.replace(p.getLeft(), String.format("%02d", calculateLevel(copybookLevel, firstLevel, p.getRight())));
-      }
-    });
-
-    cbs.forEach(cb -> insertIdmsCopybook(textTransformations, errors, cb, programDocumentUri, copybookConfig));
-  }
-
-  private int calculateLevel(int copybookLevel, int firstLevel, int level) {
-    int delta = copybookLevel - firstLevel;
-    return level + delta;
-  }
-
   private void insertIdmsCopybook(TextTransformations textTransformations, List<SyntaxError> errors,
                                   IdmsCopybookDescriptor cb, String programDocumentUri,
                                   CopybookConfig copybookConfig) {
@@ -128,6 +105,34 @@ public final class IdmsDialect implements CobolDialect {
 
     textTransformations.extend(copyNode, copyTransform);
     copyNode.setLocality(cb.getUsage());
+  }
+
+  private void processTextTransformation(TextTransformations textTransformations,
+                                         List<SyntaxError> errors,
+                                         CopybookConfig copybookConfig, String programDocumentUri,
+                                         int copybookLevel) {
+    IdmsCopyVisitor copyVisitor = new IdmsCopyVisitor(textTransformations);
+    IdmsCopyParser.StartRuleContext context = parseCopyIdms(textTransformations.calculateExtendedText(), programDocumentUri, errors);
+
+    List<IdmsCopybookDescriptor> cbs = copyVisitor.visitStartRule(context);
+    int firstLevel = copyVisitor.getVariableLevels().stream().findFirst().map(Pair::getRight).orElse(0);
+    copyVisitor.getVariableLevels().forEach(p -> {
+      if (copybookLevel > 0 && p.getRight() != null) {
+        textTransformations.replace(p.getLeft(), String.format("%02d", calculateLevel(copybookLevel, firstLevel, p.getRight())));
+      }
+    });
+
+    cbs.forEach(cb -> {
+      if (copybookLevel > 0) {
+        cb.level = copybookLevel;
+      }
+      insertIdmsCopybook(textTransformations, errors, cb, programDocumentUri, copybookConfig);
+    });
+  }
+
+  private int calculateLevel(int copybookLevel, int firstLevel, int level) {
+    int delta = copybookLevel - firstLevel;
+    return level + delta;
   }
 
   /**

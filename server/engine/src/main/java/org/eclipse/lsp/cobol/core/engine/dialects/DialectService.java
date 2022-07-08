@@ -117,9 +117,4 @@ public class DialectService {
     return new ResultWithErrors<>(new DialectOutcome(result.getTransformations(), nodes, implicitCode), errors);
   }
 
-  private static ResultWithErrors<DialectOutcome> mergeResults(ResultWithErrors<DialectOutcome> result1,
-                                                               ResultWithErrors<DialectOutcome> result2) {
-    throw new ConcurrentModificationException("The reduction must be done sequentially");
-  }
-
 }

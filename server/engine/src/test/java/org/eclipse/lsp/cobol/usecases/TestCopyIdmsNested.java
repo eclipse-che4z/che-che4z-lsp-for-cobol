@@ -52,7 +52,7 @@ public class TestCopyIdmsNested {
       + "           03 COPY IDMS {~COPY1!IDMS}.\n"
       + "       PROCEDURE DIVISION.\n";
 
-  private static final String COPY_LOOP =  "       01  COPY IDMS {COPY1!IDMS|1}.\n";
+  private static final String COPY_LOOP =  "       01  COPY IDMS COPY1.\n";
 
   @Test
   void testNestedIdmsCopybook() {
