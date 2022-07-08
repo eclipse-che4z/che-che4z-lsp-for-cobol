@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWri
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class CobolLineWriterImpl implements CobolLineWriter {
     final Map<Range, String> acc = new HashMap<>();
     StringBuilder clSb = new StringBuilder();
     Position start = null;
-
+    lines.sort(Comparator.comparingInt(CobolLine::getNumber));
     for (final CobolLine line : lines) {
       final boolean isContinuationLine = CobolLineTypeEnum.CONTINUATION.equals(line.getType());
 
@@ -58,8 +59,9 @@ public class CobolLineWriterImpl implements CobolLineWriter {
        */
       if (isContinuationLine) {
         if (start == null) {
-          int col = sb.length() - sb.toString().lastIndexOf("\n") - 1;
-          start = new Position(line.getNumber() - 1, col);
+          CobolLine predecessor = line.getPredecessor();
+          int col = lineString(predecessor).length();
+          start = new Position(predecessor.getNumber(), col);
         }
         process(sb, line);
         clSb.append(removeStartingQuote(line));
@@ -81,11 +83,17 @@ public class CobolLineWriterImpl implements CobolLineWriter {
     if (line.getNumber() > 0) {
       sb.append(ProcessingConstants.NEWLINE);
     }
+    sb.append(lineString(line));
+  }
+
+  private String lineString(CobolLine line) {
+    StringBuilder sb = new StringBuilder();
     if (line.getType() != CobolLineTypeEnum.PREPROCESSED) {
       sb.append(ProcessingConstants.BLANK_SEQUENCE_AREA);
     }
     sb.append(line.getIndicatorArea());
     sb.append(line.getContentArea());
+    return sb.toString();
   }
 
   /**

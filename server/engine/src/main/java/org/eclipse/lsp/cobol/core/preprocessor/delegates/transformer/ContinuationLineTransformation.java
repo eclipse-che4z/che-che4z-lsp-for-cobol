@@ -136,22 +136,25 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   }
 
   private void adjustBlankOrCommentLines(CobolLine cobolLine) {
-    if (Objects.nonNull(cobolLine.getPredecessor())) {
-      while (isBlankLine(cobolLine.getPredecessor())
-          || cobolLine.getPredecessor().getType() == CobolLineTypeEnum.COMMENT) {
-        CobolLine blankOrCommentLine = cobolLine.getPredecessor();
-        cobolLine.setPredecessor(cobolLine.getPredecessor().getPredecessor());
-        blankOrCommentLine.setSuccessor(cobolLine.getSuccessor());
-        cobolLine.setSuccessor(blankOrCommentLine);
-      }
-      cobolLine.getPredecessor().setSuccessor(cobolLine);
+    if (!Objects.nonNull(cobolLine.getPredecessor())) {
+      return;
     }
+
+    while (isBlankLine(cobolLine.getPredecessor()) || isCommentLine(cobolLine.getPredecessor())) {
+      CobolLine blankOrCommentLine = cobolLine.getPredecessor();
+      cobolLine.setPredecessor(cobolLine.getPredecessor().getPredecessor());
+      blankOrCommentLine.setSuccessor(cobolLine.getSuccessor());
+      cobolLine.setSuccessor(blankOrCommentLine);
+    }
+    cobolLine.getPredecessor().setSuccessor(cobolLine);
   }
 
   private boolean isBlankLine(CobolLine cobolLine) {
     return BLANK_LINE_PATTERN.matcher(cobolLine.toString()).matches();
   }
-
+  private boolean isCommentLine(CobolLine cobolLine) {
+    return cobolLine.getType() == CobolLineTypeEnum.COMMENT;
+  }
   /**
    * Method that check if the rule for fixed format is respected: when there is a continuation line
    * the content area A (7-11) should be blank.
@@ -186,7 +189,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
    */
   private SyntaxError checkIfStringClosedCorrectly(
       CobolLine previousCobolLine, String uri, int lineNumber, CobolLine currentCobolLine) {
-    if (isBlankLine(currentCobolLine) || currentCobolLine.getType() == CobolLineTypeEnum.COMMENT)
+    if (isBlankLine(currentCobolLine) || isCommentLine(currentCobolLine))
       return null;
     if (checkIfLineHasUnclosedString(previousCobolLine)
         && !CobolLineTypeEnum.CONTINUATION.equals(currentCobolLine.getType())) {
@@ -199,9 +202,9 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
 
   /** Check with a good pattern if there is an unclosed string */
   private boolean checkIfLineHasUnclosedString(CobolLine cobolLine) {
-    if (cobolLine == null) return false;
-    if (CobolLineTypeEnum.COMMENT.equals(cobolLine.getType()))
-      return false; // Do not process comment lines
+    if (cobolLine == null || isCommentLine(cobolLine))  {
+      return false;
+    }
 
     String cobolLineToCheck = cobolLine.getContentAreaA() + cobolLine.getContentAreaB();
     String startChar = findQuoteOpeningChar(cobolLineToCheck);
