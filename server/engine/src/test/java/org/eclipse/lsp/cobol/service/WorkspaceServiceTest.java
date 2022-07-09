@@ -90,7 +90,7 @@ class WorkspaceServiceTest {
     CompletableFuture<Object> result =
         service.executeCommand(
             new ExecuteCommandParams(
-                MISSING_COPYBOOK.name(),
+                MISSING_COPYBOOK.getLabel(),
                 ImmutableList.of(
                     new JsonPrimitive(copybookName),
                     new JsonPrimitive(UseCaseUtils.DOCUMENT_URI))));
