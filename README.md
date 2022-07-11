@@ -22,7 +22,7 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 ## Prerequisites
 
 - Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
-    
+
 ## Compatibility
 
 The COBOL Language Support extension is supported on Visual Studio Code and Github Codespaces.
@@ -58,17 +58,17 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 The autocomplete feature is only available in the main COBOL file, not in copybooks.
 
 ![Autocomplete](/docs/images/CLSAutocorrect.gif)
-		
+
 ### Syntax and Semantic Check for Code
 This feature checks for mistakes and errors in COBOL code. The syntax check feature reviews the whole content of the code and suggests fixes, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
 
 This feature is also enabled for IDMS, Datacom, CICS, and DB2 SQL keywords and variables.
 
 ![Syntax check](/docs/images/CLSErrorHighlighting.gif)
-			
+
 ### Syntax Highlighting
 The extension enables syntax highlighting for COBOL code.
-	
+
 ### Syntax Coloring
 Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, paragraphs and sections.
 
@@ -102,25 +102,25 @@ Set the SQL backend server as either DB2 or Datacom to ensure you use the correc
 
 ## Subroutine Support
 
-The COBOL Language Support extension supports subroutines specified in CALL statements if the called program is stored in a local folder in your workspace. The Go To Definition and Find All References functionalities, as well as autocomplete, are extended to work for names of subroutines. 
+The COBOL Language Support extension supports subroutines specified in CALL statements if the called program is stored in a local folder in your workspace. The Go To Definition and Find All References functionalities, as well as autocomplete, are extended to work for names of subroutines.
 
 To enable subroutine support, specify the paths of folders containing subroutine files in your workspace extension settings.
 
 **Follow these steps:**
 
-1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
+1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings.
 2. Switch from **User** to **Workspace**.
 3. Under **Subroutine-manager: Paths-local**, specify the paths of the folders containing subroutines.
-   - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**. 
+   - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
    - The folders are searched in the order they are listed. If two folders contain a subroutine with the same file name, the one from the folder higher on the list is used.
 4. Open a program or project.  
    Subroutine support features are now enabled.
-   
-If you specify your subroutine folders using absolute paths or paths containing `../` or `./`, the subroutine folders are not watched for changes. You might need to resolve names of recently added files in your code manually. 
+
+If you specify your subroutine folders using absolute paths or paths containing `../` or `./`, the subroutine folders are not watched for changes. You might need to resolve names of recently added files in your code manually.
 
 ## Copybook Support
 
-The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace. 
+The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace.
 
 You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
 
@@ -142,28 +142,28 @@ You can store your copybooks locally in folders in your workspace and specify th
 
 **Follow these steps:**
 
-1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
+1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings.
 2. Switch from **User** to **Workspace**.
 3. Specify the paths of the folders containing copybooks:
    - Under **Cpy-manager: Paths-local** for standard IBM Enterprise COBOL and Datacom.
    - Under **Cpy-manager: Paths-local: Idms** for the IDMS dialect.
-   - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**. 
+   - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
    - The folders are searched in the order they are listed. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
 4. Open a program or project.  
    Copybook support features are now enabled.
-   
-If you specify your copybook folders using absolute paths or paths containing `../` or `./`, the copybook folders are not watched for changes. You might need to resolve names of recently added copybooks in your code manually. 
+
+If you specify your copybook folders using absolute paths or paths containing `../` or `./`, the copybook folders are not watched for changes. You might need to resolve names of recently added copybooks in your code manually.
 
 To resolve copybook names manually, hover over the copybook name with the error underline, select **Quick Fix...** and **Resolve copybook**.
 
 ### Retrieving Copybooks from the Mainframe
 
-You can also set up automatic copybook retrieval from the mainframe to download copybooks from mainframe data sets to your workspace. 
+You can also set up automatic copybook retrieval from the mainframe to download copybooks from mainframe data sets to your workspace.
 
 **Follow these steps:**
 
 1. Ensure that you have a [Zowe Explorer profile](https://docs.zowe.org/stable/user-guide/ze-profiles/) configured, with credentials and a connection URL defined.
-2. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
+2. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings.
 3. Switch from **User** to **Workspace**.
 4. Under **Cpy-manager: Paths-dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
 5. Under **Profile**, enter the name of your Zowe Explorer profile.
@@ -202,8 +202,8 @@ The Find All References and Go To Definition functionalities are extended to wor
 
 #### Other
 
-* Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.  
-* Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code. 
+* Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.
+* Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code.
 * Functionality to skip variable levels when called, reducing call time.
 
 ## Troubleshooting
