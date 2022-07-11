@@ -80,9 +80,9 @@ class CobolLanguageServerTest {
     String path = "foo/bar";
     arr.add(new JsonPrimitive(path));
 
+    when(settingsService.getTextConfiguration(anyString())).thenCallRealMethod();
     when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.toStrings(any())).thenCallRealMethod();
     when(localeStore.notifyLocaleStore()).thenReturn(System.out::println);
     when(settingsService.getConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList(arr)));

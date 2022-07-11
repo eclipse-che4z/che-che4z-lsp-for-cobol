@@ -51,6 +51,15 @@ public class SettingsServiceImpl implements SettingsService {
     return getConfigurations(singletonList(Joiner.on(".").join(param)));
   }
 
+  @Override
+  public CompletableFuture<List<String>> getTextConfiguration(@NonNull String... section) {
+    return getConfiguration(section).thenApply(objects -> objects.stream()
+            .map(obj -> (JsonArray) obj)
+            .flatMap(Streams::stream)
+            .map(JsonElement::getAsString)
+            .collect(toList()));
+  }
+
   @NonNull
   @Override
   public CompletableFuture<List<Object>> getConfigurations(@NonNull List<String> sections) {
@@ -62,16 +71,6 @@ public class SettingsServiceImpl implements SettingsService {
                     .map(section -> LSP_PREFIX.label + "." + section)
                     .map(SettingsServiceImpl::buildConfigurationItem)
                     .collect(toList())));
-  }
-
-  @NonNull
-  @Override
-  public List<String> toStrings(@NonNull List<Object> objects) {
-    return objects.stream()
-        .map(obj -> (JsonArray) obj)
-        .flatMap(Streams::stream)
-        .map(JsonElement::getAsString)
-        .collect(toList());
   }
 
   @NonNull

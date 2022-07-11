@@ -175,7 +175,6 @@ class WorkspaceServiceTest {
         .thenReturn(completedFuture(singletonList("LOCALE")));
     when(settingsService.getConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(singletonList("INFO")));
-    when(settingsService.toStrings(any())).thenCallRealMethod();
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
@@ -230,7 +229,6 @@ class WorkspaceServiceTest {
         .thenReturn(completedFuture(singletonList("LOCALE")));
     when(settingsService.getConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(singletonList("INFO")));
-    when(settingsService.toStrings(any())).thenCallRealMethod();
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 

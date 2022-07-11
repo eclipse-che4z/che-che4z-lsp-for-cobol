@@ -48,9 +48,8 @@ class CopybookNameServiceTest {
   private static final String WORKSPACE_PROGRAM_URI = "file:///c%3A/workspace";
 
   private final List<WorkspaceFolder> workspace = new ArrayList<>();
-  private final List<Object> copyNames = new ArrayList<>();
+  private final List<String> copyNames = new ArrayList<>();
   private final List<String> resolvedCopyNames = new ArrayList<>();
-
   private final WorkspaceFolder folder = new WorkspaceFolder(WORKSPACE_PROGRAM_URI);
   private final SettingsService settingsService = mock(SettingsService.class);
   private final FileSystemService files = mock(FileSystemService.class);
@@ -70,9 +69,8 @@ class CopybookNameServiceTest {
             });
     when(provider.get()).thenReturn(client);
     when(client.workspaceFolders()).thenReturn(CompletableFuture.completedFuture(workspace));
-    when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
+    when(settingsService.getTextConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(CompletableFuture.completedFuture(copyNames));
-    when(settingsService.toStrings(copyNames)).thenReturn(resolvedCopyNames);
   }
   /** Test a main positive scenario when the copybook local path exists in the settings. */
   @Test

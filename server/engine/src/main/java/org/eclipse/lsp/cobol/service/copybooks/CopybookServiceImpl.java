@@ -188,14 +188,12 @@ public class CopybookServiceImpl implements CopybookService {
   private Optional<String> resolveCopybookFromWorkspace(
       CopybookName copybookName, String mainProgramFileName) {
     try {
-      return SettingsService.getValueAsString(
-          settingsService
-              .getConfiguration(
+      return settingsService
+              .getTextConfiguration(
                   COPYBOOK_RESOLVE.label,
                   mainProgramFileName,
                   copybookName.getQualifiedName(),
-                  Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL))
-              .get());
+                  Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL)).get().stream().findAny();
     } catch (InterruptedException e) {
       // rethrowing the InterruptedException to interrupt the parent thread.
       throw new UncheckedExecutionException(e);

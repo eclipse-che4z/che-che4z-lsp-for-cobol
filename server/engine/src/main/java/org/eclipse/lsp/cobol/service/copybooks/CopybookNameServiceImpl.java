@@ -64,14 +64,14 @@ public class CopybookNameServiceImpl implements CopybookNameService {
         .get()
         .workspaceFolders()
         .thenAcceptBoth(
-            settingsService.getConfiguration(CPY_LOCAL_PATHS.label), this::resolveNames);
+            settingsService.getTextConfiguration(CPY_LOCAL_PATHS.label), this::resolveNames);
   }
 
   private void resolveNames(
-      List<WorkspaceFolder> workspaceFolderList, List<Object> copybookListFromSettings) {
+      List<WorkspaceFolder> workspaceFolderList, List<String> copybookListFromSettings) {
     listOfCopybookNames =
         unmodifiableList(
-            settingsService.toStrings(copybookListFromSettings).stream()
+            copybookListFromSettings.stream()
                 .map(fileName -> collectFiles(workspaceFolderList, fileName))
                 .flatMap(List::stream)
                 .collect(Collectors.toList()));

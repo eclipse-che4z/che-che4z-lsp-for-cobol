@@ -36,6 +36,15 @@ public interface SettingsService {
   CompletableFuture<List<Object>> getConfiguration(String... section);
 
   /**
+   * Fetch the required text configuration section from the client. Note that Scope URI is null. The
+   * {@link SettingsParametersEnum#LSP_PREFIX LSP prefix} will be added to specified section.
+   *
+   * @param section the required section.
+   * @return a list of string of one configuration object.
+   */
+  CompletableFuture<List<String>> getTextConfiguration(String... section);
+
+  /**
    * Fetch the required configuration sections from the client. Note that Scope URI is null. The
    * {@link SettingsParametersEnum#LSP_PREFIX LSP prefix} will be added to each specified section.
    *
@@ -43,14 +52,6 @@ public interface SettingsService {
    * @return a list of configuration objects.
    */
   CompletableFuture<List<Object>> getConfigurations(List<String> sections);
-
-  /**
-   * Convert JSON objects in configuration response to strings.
-   *
-   * @param objects - content of the client settings response
-   * @return objects converted to strings
-   */
-  List<String> toStrings(List<Object> objects);
 
   /**
    * Get config data as optional string

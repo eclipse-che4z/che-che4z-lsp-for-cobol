@@ -32,6 +32,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 
@@ -202,12 +203,15 @@ public class CobolLanguageServer implements LanguageServer {
   }
 
   private void addLocalFilesWatcher() {
-    settingsService
-        .getConfiguration(CPY_LOCAL_PATHS.label)
-        .thenAccept(it -> watchingService.addWatchers(settingsService.toStrings(it)));
-    settingsService
-        .getConfiguration(SUBROUTINE_LOCAL_PATHS.label)
-        .thenAccept(it -> watchingService.addWatchers(settingsService.toStrings(it)));
+    CompletableFuture<List<String>> copyBookLocalPaths = settingsService.getTextConfiguration(CPY_LOCAL_PATHS.label);
+    CompletableFuture<List<String>> subroutineLocalPaths = settingsService.getTextConfiguration(SUBROUTINE_LOCAL_PATHS.label);
+//    CompletableFuture<List<String>> copyBookExtensions = settingsService.getTextConfiguration(CPY_EXTENSIONS.label);
+ //TODO finish copyBookExtension config
+    CompletableFuture.allOf(copyBookLocalPaths, subroutineLocalPaths).thenAccept(aVoid -> {
+        watchingService.addWatchers(copyBookLocalPaths.join());
+        watchingService.addWatchers(subroutineLocalPaths.join());
+    }).join();
+
   }
 
   @NonNull
