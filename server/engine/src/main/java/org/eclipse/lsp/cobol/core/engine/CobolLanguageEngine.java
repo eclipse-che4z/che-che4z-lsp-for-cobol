@@ -144,6 +144,12 @@ public class CobolLanguageEngine {
             .unwrap(accumulatedErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
 
+    // Update copybook usages with proper positions
+    MappingService mappingService = new MappingService(dialectOutcome.getTransformations());
+    extendedDocument.getCopybooks().getUsages()
+        .forEach((k, v) -> mappingService.getOriginalLocation(v.getRange())
+            .ifPresent(l -> v.setRange(l.getRange())));
+
     timingBuilder.getParserTimer().start();
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(extendedDocument.getText()));
     lexer.removeErrorListeners();
@@ -167,7 +173,7 @@ public class CobolLanguageEngine {
 
     timingBuilder.getMappingTimer().start();
     Map<Token, Locality> positionMapping =
-        getPositionMapping(documentUri, extendedDocument, tokens, embeddedCodeParts, new MappingService(dialectOutcome.getTransformations()));
+        getPositionMapping(documentUri, extendedDocument, tokens, embeddedCodeParts, mappingService);
     timingBuilder.getMappingTimer().stop();
 
     timingBuilder.getVisitorTimer().start();

@@ -42,7 +42,6 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
