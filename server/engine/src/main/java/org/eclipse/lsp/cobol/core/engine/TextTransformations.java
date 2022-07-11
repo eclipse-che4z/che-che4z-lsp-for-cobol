@@ -23,8 +23,8 @@ import org.eclipse.lsp4j.Range;
 import java.util.*;
 
 /**
- * This value class represents the extended document hierarchy.
- * It's possible to construct extended source based on this data.
+ * This value class represents the extended document hierarchy. It's possible to construct extended
+ * source based on this data.
  */
 @Data
 @RequiredArgsConstructor
@@ -37,6 +37,7 @@ public class TextTransformations {
 
   /**
    * Apply all transformations and form resulting text
+   *
    * @return text with all transformations
    */
   public String calculateExtendedText() {
@@ -46,43 +47,63 @@ public class TextTransformations {
     ranges.sort(Comparator.comparingInt(e -> e.getStart().getLine()));
     String[] lines = text.split("(?<=\\r?\\n)");
     int lineNumber = 0;
+    int linePos = 0;
     Range currentRange = ranges.isEmpty() ? null : ranges.removeFirst();
+    Range prevRange = null;
     while (currentRange != null && lineNumber < lines.length) {
       if (currentRange.getStart().getLine() > lineNumber) {
-        sb.append(lines[lineNumber]);
+        if(prevRange != null && prevRange.getEnd().getLine() == lineNumber) {
+          sb.append(lines[lineNumber], prevRange.getEnd().getCharacter(), lines[lineNumber].length());
+        } else {
+          sb.append(lines[lineNumber]);
+        }
+        lineNumber++;
       } else if (currentRange.getStart().getLine() == lineNumber) {
-        sb.append(lines[lineNumber], 0, currentRange.getStart().getCharacter());
-        String replace = extensions.containsKey(currentRange)
+        if (prevRange != null && prevRange.getEnd().getLine() == lineNumber) {
+          linePos = prevRange.getEnd().getCharacter();
+        } else {
+          linePos = 0;
+        }
+        sb.append(lines[lineNumber], linePos, currentRange.getStart().getCharacter());
+        String replace =
+            extensions.containsKey(currentRange)
                 ? extensions.get(currentRange).calculateExtendedText()
                 : replacements.get(currentRange);
         sb.append(replace);
         lineNumber = currentRange.getEnd().getLine();
-        sb.append(lines[lineNumber].substring(currentRange.getEnd().getCharacter()));
+        prevRange = currentRange;
         currentRange = ranges.isEmpty() ? null : ranges.removeFirst();
       }
-      lineNumber++;
     }
     for (int i = lineNumber; i < lines.length; i++) {
-      sb.append(lines[i]);
+      if(prevRange != null && prevRange.getEnd().getLine() == i) {
+        sb.append(lines[i], prevRange.getEnd().getCharacter(), lines[i].length());
+      } else {
+        sb.append(lines[i]);
+      }
     }
     return sb.toString();
   }
 
   /**
    * Replace copy statement with result of copybook substitution
+   *
    * @param copyNode node representation of copybook
    * @param textTransformations Copybook's transformations
    */
   public void extend(CopyNode copyNode, TextTransformations textTransformations) {
     copyNodes.add(copyNode);
     Range range = copyNode.getLocality().getRange();
-    range = new Range(new Position(range.getStart().getLine(), 0),
-        new Position(range.getEnd().getLine(), range.getEnd().getCharacter()));
+    range =
+        new Range(
+            new Position(range.getStart().getLine(), 0),
+            new Position(range.getEnd().getLine(), range.getEnd().getCharacter()));
     extensions.put(range, textTransformations);
   }
 
   /**
    * Substitute location of original document with a new content.
+   *
    * @param range location
    * @param newText new content
    */
@@ -92,6 +113,7 @@ public class TextTransformations {
 
   /**
    * Static constructor for transformations
+   *
    * @param text original text
    * @param uri uri of the document
    * @return an empty transformations object

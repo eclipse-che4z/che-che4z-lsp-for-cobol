@@ -48,7 +48,20 @@ public class TestTextTransformations {
                 "hi");
         assertEquals("0: hi\n", tt.calculateExtendedText());
     }
+    @Test
 
+    void replaceMultiline2() {
+        TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
+        tt.replace(new Range(
+                        new Position(0, 0),
+                        new Position(0, 2)),
+                "hi");
+        tt.replace(new Range(
+                        new Position(0, 3),
+                        new Position(1, 7)),
+                "hi");
+        assertEquals("hi hi\n", tt.calculateExtendedText());
+    }
     @Test
     void replaceExtend() {
         TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
