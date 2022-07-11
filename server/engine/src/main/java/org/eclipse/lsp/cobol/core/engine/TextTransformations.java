@@ -52,7 +52,7 @@ public class TextTransformations {
     Range prevRange = null;
     while (currentRange != null && lineNumber < lines.length) {
       if (currentRange.getStart().getLine() > lineNumber) {
-        if(prevRange != null && prevRange.getEnd().getLine() == lineNumber) {
+        if (prevRange != null && prevRange.getEnd().getLine() == lineNumber) {
           sb.append(lines[lineNumber], prevRange.getEnd().getCharacter(), lines[lineNumber].length());
         } else {
           sb.append(lines[lineNumber]);
@@ -76,7 +76,7 @@ public class TextTransformations {
       }
     }
     for (int i = lineNumber; i < lines.length; i++) {
-      if(prevRange != null && prevRange.getEnd().getLine() == i) {
+      if (prevRange != null && prevRange.getEnd().getLine() == i) {
         sb.append(lines[i], prevRange.getEnd().getCharacter(), lines[i].length());
       } else {
         sb.append(lines[i]);
