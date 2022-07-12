@@ -17,6 +17,9 @@ package org.eclipse.lsp.cobol.service.copybooks;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.SettingsService;
@@ -28,6 +31,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.unmodifiableList;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
 
 /**
@@ -37,6 +41,7 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOC
 @Slf4j
 @Singleton
 public class CopybookNameServiceImpl implements CopybookNameService {
+
   private final FileSystemService files;
   private final Provider<CobolLanguageClient> clientProvider;
   private final SettingsService settingsService;
@@ -60,24 +65,35 @@ public class CopybookNameServiceImpl implements CopybookNameService {
 
   @Override
   public void collectLocalCopybookNames() {
-    clientProvider
-        .get()
-        .workspaceFolders()
-        .thenAcceptBoth(
-            settingsService.getTextConfiguration(CPY_LOCAL_PATHS.label), this::resolveNames);
+
+    CompletableFuture<List<WorkspaceFolder>> copybookWorkspaces = clientProvider.get()
+        .workspaceFolders();
+    CompletableFuture<List<String>> copybookLocalFolders = settingsService.getTextConfiguration(
+        CPY_LOCAL_PATHS.label);
+    CompletableFuture<List<String>> copybooksExtensions = settingsService.getTextConfiguration(
+        CPY_EXTENSIONS.label);
+
+    CompletableFuture.allOf(copybookWorkspaces, copybookLocalFolders, copybooksExtensions).join();
+
+    resolveNames(copybookWorkspaces.join(), copybookLocalFolders.join(),
+        new HashSet<>(copybooksExtensions.join()));
   }
 
   private void resolveNames(
-      List<WorkspaceFolder> workspaceFolderList, List<String> copybookListFromSettings) {
+      List<WorkspaceFolder> workspaceFolderList, List<String> copybookFolders,
+      Set<String> copybookExtensions) {
     listOfCopybookNames =
         unmodifiableList(
-            copybookListFromSettings.stream()
-                .map(fileName -> collectFiles(workspaceFolderList, fileName))
+            copybookFolders.stream()
+                .map(copybookFolder -> listExistedFiles(workspaceFolderList, copybookFolder))
                 .flatMap(List::stream)
+                .map(nameAndExtension -> nameAndExtension.split("\\."))
+                .filter(nameAndExtension -> copybookExtensions.contains(nameAndExtension[1]))
+                .map(nameAndExtension -> nameAndExtension[0])
                 .collect(Collectors.toList()));
   }
 
-  private List<String> collectFiles(List<WorkspaceFolder> workspace, String fileName) {
+  private List<String> listExistedFiles(List<WorkspaceFolder> workspace, String fileName) {
     return workspace.stream()
         .map(
             path ->
@@ -87,7 +103,6 @@ public class CopybookNameServiceImpl implements CopybookNameService {
         .filter(files::fileExists)
         .map(files::listFilesInDirectory)
         .flatMap(List::stream)
-        .map(name -> name.split("\\.")[0])
         .collect(Collectors.toList());
   }
 }
