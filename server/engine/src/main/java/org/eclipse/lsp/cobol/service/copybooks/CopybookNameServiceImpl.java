@@ -73,10 +73,11 @@ public class CopybookNameServiceImpl implements CopybookNameService {
     CompletableFuture<List<String>> copybooksExtensions = settingsService.getTextConfiguration(
         CPY_EXTENSIONS.label);
 
-    CompletableFuture.allOf(copybookWorkspaces, copybookLocalFolders, copybooksExtensions).join();
+    CompletableFuture.allOf(copybookWorkspaces, copybookLocalFolders, copybooksExtensions).thenAccept(
+        (aVoid) -> resolveNames(copybookWorkspaces.join(), copybookLocalFolders.join(),
+            new HashSet<>(copybooksExtensions.join()))
+    );
 
-    resolveNames(copybookWorkspaces.join(), copybookLocalFolders.join(),
-        new HashSet<>(copybooksExtensions.join()));
   }
 
   private void resolveNames(
@@ -89,7 +90,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
                 .flatMap(List::stream)
                 .map(nameAndExtension -> nameAndExtension.split("\\."))
                 .filter(nameAndExtension -> copybookExtensions.contains(nameAndExtension[1]))
-                .map(nameAndExtension -> nameAndExtension[0])
+                .map(nameAndExtension -> String.join(".", nameAndExtension))
                 .collect(Collectors.toList()));
   }
 

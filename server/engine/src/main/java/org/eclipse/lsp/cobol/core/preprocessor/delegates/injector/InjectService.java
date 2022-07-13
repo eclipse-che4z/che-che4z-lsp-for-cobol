@@ -65,7 +65,7 @@ public class InjectService {
 
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
     ContentProvider contentProvider = contentProviderFactory.getInstanceFor(FILE);
-    descriptors.add(new InjectDescriptor("DFHEIBLC", analysis, contentProvider));
+    descriptors.add(new InjectDescriptor("DFHEIBLC.cpy", analysis, contentProvider));
     return descriptors;
   }
 
@@ -90,7 +90,7 @@ public class InjectService {
 
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
     ContentProvider contentProvider = contentProviderFactory.getInstanceFor(FILE);
-    descriptors.add((new InjectDescriptor("SPECIALREGISTERS", analysis, contentProvider)));
+    descriptors.add((new InjectDescriptor("SPECIALREGISTERS.cpy", analysis, contentProvider)));
     return descriptors;
   }
 

@@ -32,12 +32,8 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
@@ -206,21 +202,12 @@ public class CobolLanguageServer implements LanguageServer {
   }
 
   private void addLocalFilesWatcher() {
-    CompletableFuture<List<String>> copyBookLocalPaths = settingsService.getTextConfiguration(
-        CPY_LOCAL_PATHS.label);
-    CompletableFuture<List<String>> subroutineLocalPaths = settingsService.getTextConfiguration(
-        SUBROUTINE_LOCAL_PATHS.label);
-    CompletableFuture<List<String>> copyBookExtensions = settingsService.getTextConfiguration(
-        CPY_EXTENSIONS.label);
-    CompletableFuture.allOf(copyBookLocalPaths, subroutineLocalPaths, copyBookExtensions).join();
-    List<String> pathsToWatch = Stream.of(
-            copyBookLocalPaths,
-            subroutineLocalPaths,
-            copyBookExtensions
-        ).map(CompletableFuture::join)
-        .flatMap(Collection::stream)
-        .collect(Collectors.toList());
-    watchingService.addWatchers(pathsToWatch);
+    settingsService
+        .getTextConfiguration(CPY_LOCAL_PATHS.label)
+        .thenAccept(watchingService::addWatchers);
+    settingsService
+        .getTextConfiguration(SUBROUTINE_LOCAL_PATHS.label)
+        .thenAccept(watchingService::addWatchers);
   }
 
   @NonNull
