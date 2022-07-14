@@ -568,7 +568,7 @@ recordContainsClauseFormat1
    ;
 
 recordContainsClauseFormat2
-   : IS? VARYING IN? SIZE? (FROM? integerLiteral recordContainsTo? CHARACTERS?)? (DEPENDING ON? qualifiedDataName)?
+   : IS? VARYING IN? SIZE? ((FROM? integerLiteral)? recordContainsTo? CHARACTERS?)? (DEPENDING ON? qualifiedDataName)?
    ;
 
 recordContainsClauseFormat3
