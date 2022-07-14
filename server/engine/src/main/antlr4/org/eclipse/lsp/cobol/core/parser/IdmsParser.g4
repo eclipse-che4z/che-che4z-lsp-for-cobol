@@ -168,10 +168,14 @@ idmsOnClause
     : ON generalIdentifier
     ;
 
+nextSentence
+    : (NEXT SENTENCE) DOT_FS?
+    ;
+
 // abend code statement
 
 abendCodeStatement
-    : ABEND CODE (literal | generalIdentifier) abendCodeDumpClause? abendCodeExitClause?
+    : ABEND CODE (literal | generalIdentifier) ((idmsOnClause nextSentence)? | abendCodeDumpClause? abendCodeExitClause?)
     ;
 
 abendCodeDumpClause
@@ -647,7 +651,7 @@ idmsDmlFromClause
     ;
 
 idmsDmlLengthClause
-   : ((TO generalIdentifier) | (LENGTH (generalIdentifier | integerLiteral)))
+   : ((TO generalIdentifier (idmsOnClause nextSentence)?) | (LENGTH (generalIdentifier | integerLiteral)))
    ;
 
 idmsWaitNowaitClause
