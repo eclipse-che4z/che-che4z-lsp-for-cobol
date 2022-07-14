@@ -21,6 +21,7 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Provides mapping functionality for extended document
@@ -28,10 +29,13 @@ import java.util.*;
 public class MappingService {
 
   @Getter
-  private final ArrayList<Pair<Range, Location>> localityMap;
+  private ArrayList<Pair<Range, Location>> localityMap;
 
   public MappingService(TextTransformations textTransformations) {
     localityMap = new ArrayList<>(buildLocalityMap(textTransformations));
+    if (textTransformations.getReplacements().size() > 0) {
+      localityMap = applyReplacements(textTransformations.getReplacements(), textTransformations.getUri());
+    }
   }
 
   /**
@@ -40,7 +44,8 @@ public class MappingService {
    * @return a Location object
    */
   public Optional<Location> getOriginalLocation(Range range) {
-    return Optional.ofNullable(findRangeAndLocation(range.getStart().getLine(), 0, localityMap.size() - 1))
+    return /*Optional.ofNullable(findRangeAndLocation(range.getStart().getLine(), 0, localityMap.size() - 1))*/
+        findRangeAndLocation(range)
         .map(rangeAndLocation -> {
           int lineShift = range.getStart().getLine() - rangeAndLocation.getKey().getStart().getLine();
 
@@ -57,55 +62,8 @@ public class MappingService {
         });
   }
 
-  private Pair<Range, Location> findRangeAndLocation(int line, int start, int end) {
-    Pair<Range, Location> startRange = localityMap.get(start);
-    Pair<Range, Location> endRange = localityMap.get(end);
-
-    if (start == end) {
-      if (inRange(line, startRange.getKey()) == 0) {
-        return startRange;
-      }
-      return null;
-    }
-
-    int inRange = inRange(line, startRange.getKey());
-    if (inRange == -1) {
-      return null;
-    }
-
-    if (inRange == 0) {
-      return startRange;
-    }
-
-    inRange = inRange(line, endRange.getKey());
-    if (inRange == 1) {
-      return null;
-    }
-
-    if (inRange == 0) {
-      return endRange;
-    }
-
-    int middleIndex = (start + end) / 2;
-    inRange = inRange(line, localityMap.get(middleIndex).getKey());
-    if (inRange == 0) {
-      return localityMap.get(middleIndex);
-    }
-
-    if (inRange == -1) {
-      return findRangeAndLocation(line, start, middleIndex);
-    }
-    return findRangeAndLocation(line, middleIndex, end);
-  }
-
-  private int inRange(int line, Range range) {
-    if (line < range.getStart().getLine()) {
-      return -1;
-    }
-    if (line > range.getEnd().getLine()) {
-      return 1;
-    }
-    return 0;
+  private Optional<Pair<Range, Location>> findRangeAndLocation(Range range) {
+    return localityMap.stream().filter(p -> MappingHelper.rangeIn(range, p.getKey())).findFirst();
   }
 
   /**
@@ -146,20 +104,62 @@ public class MappingService {
     String[] originalLines = textTransformations.getText().split("\r?\n");
     int size = originalLines.length - originalDocumentLine + (textTransformations.getText().endsWith("\n") ? 1 : 0);
 
-    Pair<Range, Location> last = Pair.of(new Range(new Position(extendedDocumentLine, 0), new Position(extendedDocumentLine + size - 1, 0)),
-        new Location(textTransformations.getUri(), new Range(new Position(originalDocumentLine, 0), new Position(originalDocumentLine + size - 1, 0))));
+    Pair<Range, Location> last = Pair.of(new Range(new Position(extendedDocumentLine, 0), new Position(extendedDocumentLine + size - 1, 80)),
+        new Location(textTransformations.getUri(), new Range(new Position(originalDocumentLine, 0), new Position(originalDocumentLine + size - 1, 80))));
     result.add(last);
+
     return result;
+  }
+
+  private ArrayList<Pair<Range, Location>> applyReplacements(Map<Range, String> replacements, String documentUri) {
+    LinkedList<Range> ranges = new LinkedList<>(replacements.keySet());
+    ranges.sort(Comparator.comparingInt(e -> e.getStart().getLine()));
+
+    for (Range range : ranges) {
+      if (MappingHelper.size(range) <= 1) {
+        continue;
+      }
+
+      List<Pair<Range, Location>> iterationMap = new LinkedList<>(localityMap);
+      for (Pair<Range, Location> pair : iterationMap) {
+        if (MappingHelper.rangeIn(range, pair.getValue().getRange())) {
+
+          List<Location> newLocations = MappingHelper.split(range, pair.getValue().getRange())
+              .stream().map(r -> new Location(pair.getValue().getUri(), r)).collect(Collectors.toList());
+
+          int lineShift = range.getStart().getLine() - pair.getValue().getRange().getStart().getLine();
+          int charShift = range.getStart().getCharacter() - pair.getValue().getRange().getStart().getCharacter();
+
+          Position startPosition = new Position(pair.getKey().getStart().getLine()
+              + lineShift, pair.getKey().getStart().getCharacter() + charShift + 1);
+
+          Position endPosition = new Position(pair.getKey().getStart().getLine()
+              + lineShift + MappingHelper.size(range) - 1,
+              pair.getKey().getStart().getCharacter() + charShift + MappingHelper.charSize(range));
+
+          Range extendedRange = new Range(startPosition, endPosition);
+
+          List<Range> newRanges = MappingHelper.concat(extendedRange, pair.getLeft());
+          if (newLocations.size() == newRanges.size()) {
+            for (int i = 0; i < newLocations.size(); i++) {
+              localityMap.add(Pair.of(newRanges.get(i), newLocations.get(i)));
+            }
+          }
+          localityMap.remove(pair);
+        }
+      }
+    }
+    return localityMap;
   }
 
   private Pair<Range, Location> buildRange(String uri, int originalDocumentLine, int extendedDocumentLine, Range originalRange, Range extendedRange) {
     Position posStart = new Position(originalDocumentLine, 0);
-    Position posEnd = new Position(originalRange.getEnd().getLine() - 1, 0);
+    Position posEnd = new Position(originalRange.getEnd().getLine() - 1, 80);
     Range newOriginalRange = new Range(posStart, posEnd);
 
     posStart = new Position(extendedDocumentLine, 0);
     extendedDocumentLine += originalRange.getEnd().getLine() - originalDocumentLine - 1;
-    posEnd = new Position(extendedDocumentLine, 0/*originalRange.getStart().getCharacter() + extendedRange.getEnd().getCharacter()*/);
+    posEnd = new Position(extendedDocumentLine, 80/*originalRange.getStart().getCharacter() + extendedRange.getEnd().getCharacter()*/);
     Range newExtendedRange = new Range(posStart, posEnd);
     return Pair.of(newExtendedRange, new Location(uri, newOriginalRange));
   }
