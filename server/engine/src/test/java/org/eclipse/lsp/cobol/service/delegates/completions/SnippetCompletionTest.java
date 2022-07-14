@@ -68,114 +68,186 @@ class SnippetCompletionTest {
         assertThat(completion.getCompletionItems("WR", null), is(createExpected()));
     }
 
-    @Test
-    void testCompletionMock() {
+  @Test
+  void testGetStreamDataMap() {
+    Snippets snippets = new Snippets(settingsService);
+    SnippetCompletion completion = new SnippetCompletion(snippets);
+    assertEquals(222, snippets.getDataMap("COBOL").size());
+    assertEquals(232, snippets.getDataMap(IdmsDialect.NAME).size());
+    assertEquals(310, snippets.getDataMap(DaCoDialect.NAME).size());
+  }
 
-        Snippets snippets = new Snippets(settingsService);
-        SnippetCompletion completion = new SnippetCompletion(snippets);
+  @Test
+  void testCompletionMock() {
 
-        when(settingsService.getConfiguration(DIALECTS.label))
-                .thenReturn(supplyAsync(() -> ImmutableList.of()));
+    Snippets snippets = new Snippets(settingsService);
+    SnippetCompletion completion = new SnippetCompletion(snippets);
 
-        snippets.updateStorage();
+    when(settingsService.getConfiguration(DIALECTS.label))
+        .thenReturn(supplyAsync(() -> ImmutableList.of(new JsonArray())));
 
-        assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
-        assertEquals(0, completion.getCompletionItems("IDMS", MockCompletionModel.MODEL).size());
-        assertEquals(3, completion.getCompletionItems("EXEC ", MockCompletionModel.MODEL).size());
-        assertEquals(
-                ImmutableList.of(), completion.getCompletionItems("GET JOB", MockCompletionModel.MODEL));
-    }
+    snippets.updateStorage();
 
-    @Test
-    void testCompletionIDMSMock() {
+    assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
+    assertEquals(0, completion.getCompletionItems("IDMS", MockCompletionModel.MODEL).size());
+    assertEquals(3, completion.getCompletionItems("EXEC ", MockCompletionModel.MODEL).size());
+    assertEquals(
+        ImmutableList.of(), completion.getCompletionItems("GET JOB", MockCompletionModel.MODEL));
+  }
 
-        Snippets snippets = new Snippets(settingsService);
-        SnippetCompletion completion = new SnippetCompletion(snippets);
+  @Test
+  void testCompletionIDMSMock() {
 
-        JsonArray dialectSettings = new JsonArray();
-        dialectSettings.add(IdmsDialect.NAME);
-        List<Object> clientConfig = Arrays.asList(dialectSettings);
-        when(settingsService.getConfiguration(DIALECTS.label))
-                .thenReturn(supplyAsync(() -> clientConfig));
-        snippets.updateStorage();
+    Snippets snippets = new Snippets(settingsService);
+    SnippetCompletion completion = new SnippetCompletion(snippets);
 
-        assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
-        assertEquals(1, completion.getCompletionItems("WRITE", MockCompletionModel.MODEL).size());
-        assertEquals(
-                0, completion.getCompletionItems("WRITE TRANSACTION", MockCompletionModel.MODEL).size());
-        assertEquals(
-                ImmutableList.of(createIDMSItem()),
-                completion.getCompletionItems("IDMS", MockCompletionModel.MODEL));
-    }
+    JsonArray dialectSettings = new JsonArray();
+    dialectSettings.add(IdmsDialect.NAME);
+    List<Object> clientConfig = Arrays.asList(dialectSettings);
+    when(settingsService.getConfiguration(DIALECTS.label))
+        .thenReturn(supplyAsync(() -> clientConfig));
+    snippets.updateStorage();
 
-    @Test
-    void testGetStreamDataMap() {
-        Snippets snippets = new Snippets(settingsService);
-        SnippetCompletion completion = new SnippetCompletion(snippets);
-        assertEquals(222, snippets.getDataMap("COBOL").size());
-        assertEquals(232, snippets.getDataMap(IdmsDialect.NAME).size());
-        assertEquals(310, snippets.getDataMap(DaCoDialect.NAME).size());
-    }
+    assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
+    assertEquals(1, completion.getCompletionItems("WRITE", MockCompletionModel.MODEL).size());
+    assertEquals(
+        0, completion.getCompletionItems("WRITE TRANSACTION", MockCompletionModel.MODEL).size());
+    assertEquals(
+        ImmutableList.of(createIDMSItem()),
+        completion.getCompletionItems("IDMS", MockCompletionModel.MODEL));
+  }
 
-    @Test
-    void testCompletionDaCoMock() {
+  @Test
+  void testCompletionDaCoMock() {
 
-        Snippets snippets = new Snippets(settingsService);
-        SnippetCompletion completion = new SnippetCompletion(snippets);
+    Snippets snippets = new Snippets(settingsService);
+    SnippetCompletion completion = new SnippetCompletion(snippets);
 
-        JsonArray dialectSettings = new JsonArray();
-        dialectSettings.add(DaCoDialect.NAME);
-        List<Object> clientConfig = Arrays.asList(dialectSettings);
-        when(settingsService.getConfiguration(DIALECTS.label))
-                .thenReturn(supplyAsync(() -> clientConfig));
-        snippets.updateStorage();
-        assertEquals(
-                ImmutableList.of(createIDMSItem()),
-                completion.getCompletionItems("IDMS", MockCompletionModel.MODEL));
-        assertEquals(4, completion.getCompletionItems("EXEC", MockCompletionModel.MODEL).size());
-        assertEquals(11, completion.getCompletionItems("GET", MockCompletionModel.MODEL).size());
-        assertEquals(1, completion.getCompletionItems("GET JOB", MockCompletionModel.MODEL).size());
-    }
+    JsonArray dialectSettings = new JsonArray();
+    dialectSettings.add(DaCoDialect.NAME);
+    List<Object> clientConfig = Arrays.asList(dialectSettings);
+    when(settingsService.getConfiguration(DIALECTS.label))
+            .thenReturn(supplyAsync(() -> clientConfig));
+    snippets.updateStorage();
+    System.out.println("Dialect list :" +  dialectSettings.get(0));
+    assertEquals(
+            ImmutableList.of(createIDMSItem()),
+            completion.getCompletionItems("IDMS", MockCompletionModel.MODEL));
+    assertEquals(11, completion.getCompletionItems("GET", MockCompletionModel.MODEL).size());
+    assertEquals(1, completion.getCompletionItems("GET JOB", MockCompletionModel.MODEL).size());
+  }
 
-    private List<CompletionItem> createExpected() {
-        return ImmutableList.of(createItem());
-    }
+  @Test
+  void testCompletionFirstIDMSThenResetToEmptySettings() {
 
-    private CompletionItem createItem() {
-        MarkupContent doc = new MarkupContent();
-        doc.setValue("```COBOL\n" + DOCUMENTATION_TEXT + "\n```");
-        doc.setKind("markdown");
-        CompletionItem item = new CompletionItem(LABEL);
-        item.setLabel(DOCUMENTATION_TEXT);
-        labelDetails.setDetail(KEY);
-        labelDetails.setDescription(DOCUMENTATION_TEXT);
-        item.setLabelDetails(labelDetails);
-        item.setInsertText(INSERT_TEXT);
-        item.setInsertTextFormat(InsertTextFormat.Snippet);
-        item.setDocumentation(doc);
-        item.setDetail(DOCUMENTATION_TEXT);
-        item.setKind(CompletionItemKind.Snippet);
-        item.setInsertTextMode(InsertTextMode.AdjustIndentation);
-        item.setSortText("6" + DOCUMENTATION_TEXT);
-        return item;
-    }
+    Snippets snippets = new Snippets(settingsService);
+    SnippetCompletion completion = new SnippetCompletion(snippets);
 
-    private CompletionItem createIDMSItem() {
-        MarkupContent doc = new MarkupContent();
-        doc.setValue("```COBOL\n" + IDMS_DOCUMENTATION_TEXT + "\n```");
-        doc.setKind("markdown");
-        CompletionItem item = new CompletionItem(IDMS_LABEL);
-        item.setLabel(IDMS_LABEL);
-        labelDetails.setDetail(IDMS_LABEL);
-        labelDetails.setDescription(IDMS_DESCRIPTION);
-        item.setLabelDetails(labelDetails);
-        item.setInsertText(IDMS_INSERT_TEXT);
-        item.setInsertTextFormat(InsertTextFormat.Snippet);
-        item.setDocumentation(doc);
-        item.setDetail(IDMS_DESCRIPTION);
-        item.setKind(CompletionItemKind.Snippet);
-        item.setInsertTextMode(InsertTextMode.AdjustIndentation);
-        item.setSortText("6" + IDMS_LABEL);
-        return item;
-    }
+    /* IDMS is selected in the Settings.json */
+    JsonArray dialectSettings = new JsonArray();
+    dialectSettings.add(IdmsDialect.NAME);
+    List<Object> clientConfig = Arrays.asList(dialectSettings);
+    when(settingsService.getConfiguration(DIALECTS.label))
+        .thenReturn(supplyAsync(() -> clientConfig));
+    snippets.updateStorage();
+
+    assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
+    assertEquals(1, completion.getCompletionItems("WRITE", MockCompletionModel.MODEL).size());
+    assertEquals(
+        0, completion.getCompletionItems("WRITE TRANSACTION", MockCompletionModel.MODEL).size());
+    assertEquals(
+        ImmutableList.of(createIDMSItem()),
+        completion.getCompletionItems("IDMS", MockCompletionModel.MODEL));
+
+    /* No dialect type is set in Settings.json */
+    JsonArray cobolSettings = new JsonArray();
+    List<Object> cobolConfig = Arrays.asList(cobolSettings);
+
+    when(settingsService.getConfiguration(DIALECTS.label))
+        .thenReturn(supplyAsync(() -> cobolConfig));
+    snippets.updateStorage();
+
+    assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
+    assertEquals(0, completion.getCompletionItems("IDMS", MockCompletionModel.MODEL).size());
+    assertEquals(3, completion.getCompletionItems("EXEC ", MockCompletionModel.MODEL).size());
+    assertEquals(
+        ImmutableList.of(), completion.getCompletionItems("GET JOB", MockCompletionModel.MODEL));
+  }
+
+  @Test
+  void testCompletionFirstDacoThenResetToEmptySettings() {
+
+    Snippets snippets = new Snippets(settingsService);
+    SnippetCompletion completion = new SnippetCompletion(snippets);
+
+    /* Daco is selected in the Settings.json */
+    JsonArray dialectSettings = new JsonArray();
+    dialectSettings.add(IdmsDialect.NAME);
+    List<Object> clientConfig = Arrays.asList(dialectSettings);
+
+    when(settingsService.getConfiguration(DIALECTS.label))
+        .thenReturn(supplyAsync(() -> clientConfig));
+    snippets.updateStorage();
+
+    assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
+    assertEquals(1, completion.getCompletionItems("WRITE", MockCompletionModel.MODEL).size());
+    assertEquals(
+        0, completion.getCompletionItems("WRITE TRANSACTION", MockCompletionModel.MODEL).size());
+    assertEquals(
+        ImmutableList.of(createIDMSItem()),
+        completion.getCompletionItems("IDMS", MockCompletionModel.MODEL));
+
+    /* No dialect type is set in Settings.json */
+    when(settingsService.getConfiguration(DIALECTS.label))
+        .thenReturn(supplyAsync(() -> ImmutableList.of(new JsonArray())));
+    snippets.updateStorage();
+
+    assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
+    assertEquals(0, completion.getCompletionItems("IDMS", MockCompletionModel.MODEL).size());
+    assertEquals(3, completion.getCompletionItems("EXEC ", MockCompletionModel.MODEL).size());
+    assertEquals(
+        ImmutableList.of(), completion.getCompletionItems("GET JOB", MockCompletionModel.MODEL));
+  }
+
+  private List<CompletionItem> createExpected() {
+    return ImmutableList.of(createItem());
+  }
+
+  private CompletionItem createItem() {
+    MarkupContent doc = new MarkupContent();
+    doc.setValue("```COBOL\n" + DOCUMENTATION_TEXT + "\n```");
+    doc.setKind("markdown");
+    CompletionItem item = new CompletionItem(LABEL);
+    item.setLabel(DOCUMENTATION_TEXT);
+    labelDetails.setDetail(KEY);
+    labelDetails.setDescription(DOCUMENTATION_TEXT);
+    item.setLabelDetails(labelDetails);
+    item.setInsertText(INSERT_TEXT);
+    item.setInsertTextFormat(InsertTextFormat.Snippet);
+    item.setDocumentation(doc);
+    item.setDetail(DOCUMENTATION_TEXT);
+    item.setKind(CompletionItemKind.Snippet);
+    item.setInsertTextMode(InsertTextMode.AdjustIndentation);
+    item.setSortText("6" + DOCUMENTATION_TEXT);
+    return item;
+  }
+
+  private CompletionItem createIDMSItem() {
+    MarkupContent doc = new MarkupContent();
+    doc.setValue("```COBOL\n" + IDMS_DOCUMENTATION_TEXT + "\n```");
+    doc.setKind("markdown");
+    CompletionItem item = new CompletionItem(IDMS_LABEL);
+    item.setLabel(IDMS_LABEL);
+    labelDetails.setDetail(IDMS_LABEL);
+    labelDetails.setDescription(IDMS_DESCRIPTION);
+    item.setLabelDetails(labelDetails);
+    item.setInsertText(IDMS_INSERT_TEXT);
+    item.setInsertTextFormat(InsertTextFormat.Snippet);
+    item.setDocumentation(doc);
+    item.setDetail(IDMS_DESCRIPTION);
+    item.setKind(CompletionItemKind.Snippet);
+    item.setInsertTextMode(InsertTextMode.AdjustIndentation);
+    item.setSortText("6" + IDMS_LABEL);
+    return item;
+  }
 }

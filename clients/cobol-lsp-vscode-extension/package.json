@@ -85,7 +85,9 @@
                     ".cpy",
                     ".copy"
                 ],
-                "filenamePatterns": ["**/*copybook*/**"],
+                "filenamePatterns": [
+                    "**/*copybook*/**"
+                ],
                 "configuration": "./syntaxes/lang-config.json"
             }
         ],
@@ -107,16 +109,6 @@
                     "meta.embedded.block.sql": "sql",
                     "meta.embedded.block.html": "html"
                 }
-            }
-        ],
-        "snippets": [
-            {
-                "language": "COBOL",
-                "path": "./snippets.json"
-            },
-            {
-                "language": "COBOL Copybook",
-                "path": "./snippets.json"
             }
         ],
         "configuration": {
