@@ -165,12 +165,10 @@ class WorkspaceServiceTest {
                 keywords, snippets);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
-    JsonArray arr = new JsonArray();
     String path = "foo/bar";
-    arr.add(new JsonPrimitive(path));
 
-    when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.getTextConfiguration(CPY_LOCAL_PATHS.label))
+        .thenReturn(completedFuture(singletonList(path)));
     when(settingsService.getConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
     when(settingsService.getConfiguration(LOGGING_LEVEL.label))
@@ -219,12 +217,10 @@ class WorkspaceServiceTest {
             copybookNameService,
                 keywords, snippets);
 
-    JsonArray arr = new JsonArray();
     String path = "foo/bar";
-    arr.add(new JsonPrimitive(path));
 
-    when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.getTextConfiguration(CPY_LOCAL_PATHS.label))
+        .thenReturn(completedFuture(singletonList(path)));
     when(settingsService.getConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
     when(settingsService.getConfiguration(LOGGING_LEVEL.label))
@@ -272,7 +268,7 @@ class WorkspaceServiceTest {
     String path = "foo/bar";
     arr.add(new JsonPrimitive(path));
 
-    when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
+    when(settingsService.getTextConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(emptyList()));
     when(settingsService.getConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
@@ -318,7 +314,7 @@ class WorkspaceServiceTest {
             stateService,
             copybookNameService, keywords, snippets);
 
-    when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
+    when(settingsService.getTextConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(emptyList()));
     when(settingsService.getConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));

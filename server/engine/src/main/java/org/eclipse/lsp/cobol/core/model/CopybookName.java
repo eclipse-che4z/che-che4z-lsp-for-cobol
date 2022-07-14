@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Value;
 
 /**
@@ -26,20 +27,34 @@ import lombok.Value;
  */
 @Value
 @AllArgsConstructor
+@Builder
 public class CopybookName {
   String displayName;
   String dialectType;
-  String qualifiedName;
+  String extension;
+  private static String defaultExtension = "cpy";
+  public String getQualifiedName() {
+    return displayName;
+  }
+
+  /**
+   * Gets the name with extension
+   *
+   * @return the name with extension
+   */
+  public String nameWithExtension() {
+    return String.join(".", displayName, extension);
+  }
 
   public CopybookName(String displayName) {
     this.displayName = displayName;
+    this.extension = defaultExtension;
     this.dialectType = null;
-    this.qualifiedName = displayName;
   }
 
   public CopybookName(String displayName, String dialectType) {
     this.displayName = displayName;
     this.dialectType = dialectType;
-    this.qualifiedName = displayName;
+    this.extension = defaultExtension;
   }
 }

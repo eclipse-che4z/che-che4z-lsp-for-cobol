@@ -18,9 +18,11 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.SettingsService;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
@@ -45,7 +47,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   private final FileSystemService files;
   private final Provider<CobolLanguageClient> clientProvider;
   private final SettingsService settingsService;
-  private List<String> listOfCopybookNames;
+  private List<CopybookName> listOfCopybookNames;
 
   @Inject
   public CopybookNameServiceImpl(
@@ -59,8 +61,15 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   }
 
   @Override
-  public List<String> getNames() {
+  public List<CopybookName> getNames() {
     return listOfCopybookNames;
+  }
+
+  @Override
+  public Optional<CopybookName> findByName(String displayName) {
+    return listOfCopybookNames.stream()
+        .filter(copybookName -> displayName.toLowerCase().equals(copybookName.getDisplayName()))
+        .findAny();
   }
 
   @Override
@@ -89,8 +98,12 @@ public class CopybookNameServiceImpl implements CopybookNameService {
                 .map(copybookFolder -> listExistedFiles(workspaceFolderList, copybookFolder))
                 .flatMap(List::stream)
                 .map(nameAndExtension -> nameAndExtension.split("\\."))
-                .filter(nameAndExtension -> copybookExtensions.contains(nameAndExtension[1]))
-                .map(nameAndExtension -> String.join(".", nameAndExtension))
+                .map(nameAndExtension -> CopybookName
+                    .builder()
+                    .displayName(nameAndExtension[0])
+                    .extension(nameAndExtension[1])
+                    .build())
+                .filter(copybookName -> copybookExtensions.contains(copybookName.getExtension()))
                 .collect(Collectors.toList()));
   }
 

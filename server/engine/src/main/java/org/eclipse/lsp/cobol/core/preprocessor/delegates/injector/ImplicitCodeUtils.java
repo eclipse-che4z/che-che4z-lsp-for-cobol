@@ -63,30 +63,30 @@ public class ImplicitCodeUtils {
 
   /**
    * Creates the path to implicit code
-   * @param path is a path of the implicit code
+   * @param name is a name of the implicit code
    * @return the path
    */
-  public String createPath(String path) {
-    return IMPLICIT_PATH + path;
+  public String createPath(String name) {
+    return IMPLICIT_PATH + name + ".cpy";
   }
 
   /**
    * Creates full url for implicit code
-   * @param path is a path of the implicit code
+   * @param name is a name of the implicit code
    * @return the full url
    */
-  public String createFullUrl(String path) {
-    return PREF_IMPLICIT + createPath(path);
+  public String createFullUrl(String name) {
+    return PREF_IMPLICIT + createPath(name);
   }
 
   /**
    * Reads implicit content
    * @param files is a file system service
-   * @param path us a path of the implicit code
+   * @param name us a name of the implicit code
    * @return the content as a string
    */
-  public String readImplicitCode(FileSystemService files, String path) {
-    String uri = createPath(path);
+  public String readImplicitCode(FileSystemService files, String name) {
+    String uri = createPath(name);
     String content = null;
     try (InputStream inputStream = ImplicitCodeUtils.class.getResourceAsStream(uri)) {
       content =

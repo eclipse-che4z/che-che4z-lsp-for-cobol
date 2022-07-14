@@ -51,6 +51,7 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 @Singleton
 @SuppressWarnings("UnstableApiUsage")
 public class CopybookServiceImpl implements CopybookService {
+
   private final SettingsService settingsService;
   private final FileSystemService files;
   public final TextPreprocessor preprocessor;
@@ -88,15 +89,16 @@ public class CopybookServiceImpl implements CopybookService {
    * Retrieve and return the copybook by its name. Copybook may be cached to limit interactions with
    * the file system.
    *
-   * <p>Resolving works in synchronous way. Resolutions with different copybook names will not block
+   * <p>Resolving works in synchronous way. Resolutions with different copybook names will not
+   * block
    * each other.
    *
-   * @param copybookName - the name of the copybook to be retrieved
+   * @param copybookName       - the name of the copybook to be retrieved
    * @param programDocumentUri - the currently processing program document
-   * @param documentUri - the currently processing document that contains the copy statement
-   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql
-   *     server
-   * @param preprocess - indicates if copybook needs to be preprocessed after resolving
+   * @param documentUri        - the currently processing document that contains the copy statement
+   * @param copybookConfig     - contains config info like: copybook processing mode, target backend
+   *                           sql server
+   * @param preprocess         - indicates if copybook needs to be preprocessed after resolving
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   public CopybookModel resolve(
@@ -146,7 +148,7 @@ public class CopybookServiceImpl implements CopybookService {
    * Retrieve optional {@link CopybookModel} of the {@link PredefinedCopybooks} for the given name
    * if it is predefined.
    *
-   * @param copybookName - the name of copybook to check
+   * @param copybookName   - the name of copybook to check
    * @param copybookConfig - configuration for copybook resolution
    * @return optional model of a predefined copybook if it exists
    */
@@ -155,7 +157,8 @@ public class CopybookServiceImpl implements CopybookService {
     LOG.debug(
         "Trying to resolve predefined copybook {}, using config {}", copybookName, copybookConfig);
 
-    Optional<CopybookModel> copybookModel = Optional.ofNullable(PredefinedCopybooks.forName(copybookName.getQualifiedName()))
+    Optional<CopybookModel> copybookModel = Optional.ofNullable(
+            PredefinedCopybooks.forName(copybookName.getQualifiedName()))
         .map(c -> {
           String name = c.nameForBackend(copybookConfig.getSqlBackend());
           String content = ImplicitCodeUtils.readImplicitCode(files, name);
@@ -167,7 +170,8 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private CopybookModel cleanupCopybook(CopybookModel dirtyCopybook) {
-    String cleanText = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent()).getResult();
+    String cleanText = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent())
+        .getResult();
     return new CopybookModel(dirtyCopybook.getCopybookName(), dirtyCopybook.getUri(), cleanText);
   }
 
@@ -188,12 +192,13 @@ public class CopybookServiceImpl implements CopybookService {
   private Optional<String> resolveCopybookFromWorkspace(
       CopybookName copybookName, String mainProgramFileName) {
     try {
-      return settingsService
-              .getTextConfiguration(
-                  COPYBOOK_RESOLVE.label,
-                  mainProgramFileName,
-                  copybookName.getQualifiedName(),
-                  Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL)).get().stream().findAny();
+      return SettingsService.getValueAsString(
+          settingsService.getConfiguration(
+              COPYBOOK_RESOLVE.label,
+              mainProgramFileName,
+              copybookName.getQualifiedName(),
+              Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL)).get()
+      );
     } catch (InterruptedException e) {
       // rethrowing the InterruptedException to interrupt the parent thread.
       throw new UncheckedExecutionException(e);
