@@ -23,87 +23,78 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Text Transformation tests
- */
+/** Text Transformation tests */
 public class TestTextTransformations {
-    private static final String TEST = "0: abcd\n1: TEST\n";
+  private static final String TEST = "0: abcd\n1: TEST\n";
 
-    @Test
-    void replace() {
-        TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
-        tt.replace(new Range(
-                        new Position(1, 3),
-                        new Position(1, 7)),
-                "1234");
-        assertEquals("0: abcd\n1: 1234\n", tt.calculateExtendedText());
-    }
+  @Test
+  void replace() {
+    TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
+    tt.replace(new Range(new Position(1, 3), new Position(1, 7)), "1234");
+    assertEquals("0: abcd\n1: 1234\n", tt.calculateExtendedText());
+  }
 
-    @Test
-    void replaceMultiline() {
-        TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
-        tt.replace(new Range(
-                        new Position(0, 3),
-                        new Position(1, 7)),
-                "hi");
-        assertEquals("0: hi\n", tt.calculateExtendedText());
-    }
-    @Test
+  @Test
+  void replaceMultiline() {
+    TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
+    tt.replace(new Range(new Position(0, 3), new Position(1, 7)), "hi");
+    assertEquals("0: hi\n", tt.calculateExtendedText());
+  }
 
-    void replaceMultiline2() {
-        TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
-        tt.replace(new Range(
-                        new Position(0, 0),
-                        new Position(0, 2)),
-                "hi");
-        tt.replace(new Range(
-                        new Position(0, 3),
-                        new Position(1, 7)),
-                "hi");
-        assertEquals("hi hi\n", tt.calculateExtendedText());
-    }
-    @Test
-    void replaceExtend() {
-        TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
-        tt.replace(new Range(
-                        new Position(0, 3),
-                        new Position(1, 7)),
-                "Hello, World!\n123\ntest11");
-        assertEquals("0: Hello, World!\n123\ntest11\n", tt.calculateExtendedText());
-    }
+  @Test
+  void replaceMultiline2() {
+    TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
+    tt.replace(new Range(new Position(0, 0), new Position(0, 2)), "hi");
+    tt.replace(new Range(new Position(0, 3), new Position(1, 7)), "hi");
+    assertEquals("hi hi\n", tt.calculateExtendedText());
+  }
 
-    @Test
-    void replaces() {
-        TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
-        tt.replace(new Range(
-                        new Position(1, 3),
-                        new Position(1, 7)),
-                "123");
-        tt.replace(new Range(
-                        new Position(0, 3),
-                        new Position(0, 7)),
-                "4321");
-        assertEquals("0: 4321\n1: 123\n", tt.calculateExtendedText());
-    }
+  @Test
+  void replaceExtend() {
+    TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
+    tt.replace(new Range(new Position(0, 3), new Position(1, 7)), "Hello, World!\n123\ntest11");
+    assertEquals("0: Hello, World!\n123\ntest11\n", tt.calculateExtendedText());
+  }
 
-    @Test
-    void mixed() {
-        TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
-        Range range = new Range(
-                new Position(1, 3),
-                new Position(1, 7));
-        CopyNode copyNode = new CopyNode(Locality.builder().range(range).build(), "BOOM");
-        tt.extend(copyNode, TextTransformations.of("123\n", ""));
-        tt.replace(new Range(
-                        new Position(0, 3),
-                        new Position(0, 7)),
-                "4321");
-        assertEquals("0: 4321\n1: \n123\n\n", tt.calculateExtendedText());
+  @Test
+  void replaces() {
+    TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
+    tt.replace(new Range(new Position(1, 3), new Position(1, 7)), "123");
+    tt.replace(new Range(new Position(0, 3), new Position(0, 7)), "4321");
+    assertEquals("0: 4321\n1: 123\n", tt.calculateExtendedText());
+  }
 
-    }
-    @Test
-    void eol() {
-        TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
-        assertEquals(TEST, tt.calculateExtendedText());
-    }
+  @Test
+  void mixed() {
+    TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
+    Range range = new Range(new Position(1, 3), new Position(1, 7));
+    CopyNode copyNode = new CopyNode(Locality.builder().range(range).build(), "BOOM");
+    tt.extend(copyNode, TextTransformations.of("123\n", ""));
+    tt.replace(new Range(new Position(0, 3), new Position(0, 7)), "4321");
+    assertEquals("0: 4321\n1: \n123\n\n", tt.calculateExtendedText());
+  }
+
+  @Test
+  void eol() {
+    TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
+    assertEquals(TEST, tt.calculateExtendedText());
+  }
+
+  @Test
+  void extRegionsTest() {
+    TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
+    Range range1 = new Range(new Position(0, 7), new Position(0, 7));
+    Range range2 = new Range(new Position(0, 0), new Position(0, 1));
+    Range range3 = new Range(new Position(1, 0), new Position(1, 3));
+    Range exRange1 = new Range(new Position(0, 8), new Position(0, 9));
+    Range exRange2 = new Range(new Position(0, 0), new Position(0, 2));
+    tt.replace(range1, "e");
+    tt.replace(range2, "00");
+    tt.replace(range3, "");
+    assertEquals("00: abcde\nTEST\n", tt.calculateExtendedText());
+    assertEquals(2, tt.getExtendedDocumentMap().size());
+    assertEquals(range1, tt.getExtendedDocumentMap().get(exRange1).getRange());
+    assertEquals(range2, tt.getExtendedDocumentMap().get(exRange2).getRange());
+
+  }
 }

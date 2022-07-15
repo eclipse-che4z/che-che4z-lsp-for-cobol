@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.engine;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -29,11 +30,14 @@ import java.util.*;
 @Data
 @RequiredArgsConstructor
 public class TextTransformations {
+  public static final String REGEX_KEEP_NEW_LINES = "(?<=\\r?\\n)";
   private final String text;
   private final String uri;
   private final Map<Range, TextTransformations> extensions = new HashMap<>();
   private final Map<Range, String> replacements = new HashMap<>();
   private final List<CopyNode> copyNodes = new ArrayList<>();
+
+  private final Map<Range, Location> extToOriginalMap = new HashMap<>();
 
   /**
    * Apply all transformations and form resulting text
@@ -41,11 +45,16 @@ public class TextTransformations {
    * @return text with all transformations
    */
   public String calculateExtendedText() {
-    StringBuilder sb = new StringBuilder();
+    extToOriginalMap.clear();
+    ExtendDocumentAccumulator eda = new ExtendDocumentAccumulator();
+
     LinkedList<Range> ranges = new LinkedList<>(extensions.keySet());
     ranges.addAll(replacements.keySet());
-    ranges.sort(Comparator.comparingInt(e -> e.getStart().getLine()));
-    String[] lines = text.split("(?<=\\r?\\n)");
+    ranges.sort(
+        Comparator.comparingInt((Range c) -> c.getStart().getLine())
+            .thenComparingInt(c -> c.getStart().getCharacter()));
+
+    String[] lines = text.split(REGEX_KEEP_NEW_LINES);
     int lineNumber = 0;
     int linePos = 0;
     Range currentRange = ranges.isEmpty() ? null : ranges.removeFirst();
@@ -53,9 +62,10 @@ public class TextTransformations {
     while (currentRange != null && lineNumber < lines.length) {
       if (currentRange.getStart().getLine() > lineNumber) {
         if (prevRange != null && prevRange.getEnd().getLine() == lineNumber) {
-          sb.append(lines[lineNumber], prevRange.getEnd().getCharacter(), lines[lineNumber].length());
+          eda.append(
+              lines[lineNumber], prevRange.getEnd().getCharacter(), lines[lineNumber].length());
         } else {
-          sb.append(lines[lineNumber]);
+          eda.append(lines[lineNumber]);
         }
         lineNumber++;
       } else if (currentRange.getStart().getLine() == lineNumber) {
@@ -64,12 +74,20 @@ public class TextTransformations {
         } else {
           linePos = 0;
         }
-        sb.append(lines[lineNumber], linePos, currentRange.getStart().getCharacter());
+        eda.append(lines[lineNumber], linePos, currentRange.getStart().getCharacter());
+        String uri =
+            extensions.containsKey(currentRange) ? extensions.get(currentRange).getUri() : getUri();
         String replace =
             extensions.containsKey(currentRange)
                 ? extensions.get(currentRange).calculateExtendedText()
                 : replacements.get(currentRange);
-        sb.append(replace);
+        Position start = eda.getPosition();
+        eda.append(replace);
+        Position end = eda.getPosition();
+        Range extRange = new Range(start, end);
+        if (!isRangeEmpty(extRange)) {
+          extToOriginalMap.put(extRange, new Location(uri, currentRange));
+        }
         lineNumber = currentRange.getEnd().getLine();
         prevRange = currentRange;
         currentRange = ranges.isEmpty() ? null : ranges.removeFirst();
@@ -77,12 +95,25 @@ public class TextTransformations {
     }
     for (int i = lineNumber; i < lines.length; i++) {
       if (prevRange != null && prevRange.getEnd().getLine() == i) {
-        sb.append(lines[i], prevRange.getEnd().getCharacter(), lines[i].length());
+        eda.append(lines[i], prevRange.getEnd().getCharacter(), lines[i].length());
       } else {
-        sb.append(lines[i]);
+        eda.append(lines[i]);
       }
     }
-    return sb.toString();
+    return eda.toString();
+  }
+
+  private boolean isRangeEmpty(Range range) {
+    return range.getStart().equals(range.getEnd());
+  }
+
+  /**
+   * Get a map of extended document. It will be populated after calculateExtendedText call
+   *
+   * @return a map of extended document.
+   */
+  public Map<Range, Location> getExtendedDocumentMap() {
+    return extToOriginalMap;
   }
 
   /**
@@ -124,6 +155,7 @@ public class TextTransformations {
 
   /**
    * Calculates a list of all copy nodes include nested
+   *
    * @return a list of all copy nodes
    */
   public List<CopyNode> calculateCopyNodes() {
@@ -131,5 +163,33 @@ public class TextTransformations {
     extensions.values().forEach(v -> result.addAll(v.calculateCopyNodes()));
     result.addAll(copyNodes);
     return result;
+  }
+
+  private static class ExtendDocumentAccumulator {
+    private final StringBuilder sb = new StringBuilder();
+    private int column = 0;
+    private int line = 0;
+
+    void append(String string) {
+      if (!string.isEmpty()) {
+        String[] strings = string.split(REGEX_KEEP_NEW_LINES);
+        line += strings.length - 1;
+        column += strings[strings.length - 1].length();
+      }
+      sb.append(string);
+    }
+
+    void append(String string, int start, int end) {
+      append(string.substring(start, end));
+    }
+
+    Position getPosition() {
+      return new Position(line, column);
+    }
+
+    @Override
+    public String toString() {
+      return sb.toString();
+    }
   }
 }
