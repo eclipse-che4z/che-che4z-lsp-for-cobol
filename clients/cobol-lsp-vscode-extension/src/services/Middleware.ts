@@ -18,8 +18,7 @@ import {CopybookDownloadService} from "./copybook/CopybookDownloadService";
 import {CopybookURI} from "./copybook/CopybookURI";
 import { InfoStorage } from "./copybook/InfoStorage";
 
-const PARAMS_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+)\.([^.]+)$/
-
+const PARAMS_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+\.[^.]+)\.([^.]+)$/
 export class Middleware {
     constructor(
         private copybookDownloader: CopybookDownloadService) {
