@@ -29,6 +29,11 @@ public interface CopybookNameService {
    */
   List<CopybookName> getNames();
 
+  /**
+   * Find a copybook in the open workspace that match displayName
+   * @param displayName an attribute to find by
+   * @return optional CopybookName
+   */
   Optional<CopybookName> findByName(String displayName);
 
   /** Resolves the paths defined in Settings.json for cobol-lsp.cpy-manager.paths-local */

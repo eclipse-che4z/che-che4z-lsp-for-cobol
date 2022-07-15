@@ -71,17 +71,6 @@ public class SettingsServiceImpl implements SettingsService {
                     .map(section -> LSP_PREFIX.label + "." + section)
                     .map(SettingsServiceImpl::buildConfigurationItem)
                     .collect(toList())));
-    //TODO remove
-//    ConfigurationItem item = new ConfigurationItem();
-//item.setSection(LSP_PREFIX.label + "." + "copybook-resolve.ert.cbl.xyz.COBOL");
-//
-//clientProvider
-//        .get()
-//        .configuration(
-//            new ConfigurationParams(
-//                new SingletonList(item)
-//            )
-//        ).get()
   }
 
   @NonNull
