@@ -39,6 +39,33 @@ class MappingServiceTest {
           + "           COPY TEST.\n"
           + "           DISPLAY MYFILE-STATUS.";
 
+  private static final String TEXT_SHRINK =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       COPY IDMS EXTEND.\n"
+          + "       \n"
+          + "       \n"
+          + "       \n"
+          + "       \n"
+          + "       77  MYFILE-STATUS  PIC  X(2)   VALUE SPACES.\n"
+          + "           88  OPEN-OK  VALUE '00'.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       \n"
+          + "       \n"
+          + "       \n"
+          + "       \n"
+          + "       \n"
+          + "       \n"
+          + "           DISPLAY MYFILE-STATUS.";
+
+  private static final String TEXT_REPLACEMENT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "         01 TEST REPLACEMENT\n"
+          + "            CONTINUE\n";
+
   private static final String COPYBOOK = "           COPYBOOK TEXT\n"
       + "           NEXT LINE 1\n"
       + "           NEXT LINE 2\n"
@@ -117,6 +144,67 @@ class MappingServiceTest {
 
     location = service.getOriginalLocation(new Range(new Position(-1, 10), new Position(-1, 15)));
     assertFalse(location.isPresent());
+  }
+
+  @Test
+  void testShrinkEmptyLines() {
+    TextTransformations textTransformations = TextTransformations.of(TEXT_SHRINK, "original");
+    Range range = new Range(new Position(5, 0), new Position(9, 0));
+    textTransformations.replace(range, "");
+
+    range = new Range(new Position(12, 0), new Position(17, 8));
+    textTransformations.replace(range, "");
+
+    MappingService mappingService = new MappingService(textTransformations);
+    Optional<Location> location = mappingService.getOriginalLocation(new Range(new Position(5, 5), new Position(5, 10)));
+    assertTrue(location.isPresent());
+
+    assertEquals(9, location.get().getRange().getStart().getLine());
+    assertEquals(location.get().getRange().getStart().getCharacter(), 5);
+
+    location = mappingService.getOriginalLocation(new Range(new Position(8, 5), new Position(8, 10)));
+    assertTrue(location.isPresent());
+
+    assertEquals(18, location.get().getRange().getStart().getLine());
+  }
+
+  @Test
+  void testExtendAndShrinkEmptyLines() {
+    TextTransformations textTransformations = TextTransformations.of(TEXT_SHRINK, "original");
+
+    CopyNode copyNode = new CopyNode(Locality.builder()
+        .range(new Range(new Position(4, 0), new Position(4, 24)))
+        .build(), "copybook");
+
+    textTransformations.extend(copyNode, new TextTransformations("COPYBOOK\nCOPYBOOK\n", "copybook"));
+
+    Range range = new Range(new Position(5, 0), new Position(8, 8));
+    textTransformations.replace(range, "");
+
+    MappingService mappingService = new MappingService(textTransformations);
+    Optional<Location> location = mappingService.getOriginalLocation(new Range(new Position(7, 5), new Position(7, 10)));
+    assertTrue(location.isPresent());
+
+    assertEquals(9, location.get().getRange().getStart().getLine());
+    assertEquals(location.get().getRange().getStart().getCharacter(), 5);
+  }
+
+  @Test
+  void testReplacementPositioning() {
+    TextTransformations textTransformations = TextTransformations.of(TEXT_REPLACEMENT, "original");
+    Range range = new Range(new Position(2, 17), new Position(3, 12));
+    textTransformations.replace(range, "");
+
+    MappingService mappingService = new MappingService(textTransformations);
+
+    Optional<Location> location = mappingService.getOriginalLocation(new Range(new Position(2, 12), new Position(2, 16)));
+    assertTrue(location.isPresent());
+    assertEquals(2, location.get().getRange().getStart().getLine());
+
+    location = mappingService.getOriginalLocation(new Range(new Position(2, 18), new Position(2, 20)));
+    assertTrue(location.isPresent());
+    assertEquals(3, location.get().getRange().getStart().getLine());
+    assertEquals(12, location.get().getRange().getStart().getCharacter());
   }
 
   private MappingService prepareService() {
