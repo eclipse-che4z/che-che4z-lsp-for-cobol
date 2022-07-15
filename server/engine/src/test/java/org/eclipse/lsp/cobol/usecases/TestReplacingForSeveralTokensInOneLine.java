@@ -24,7 +24,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 
 /**
  * This test verifies that the replacing statement changes the variable names following one by one,
@@ -46,7 +46,7 @@ class TestReplacingForSeveralTokensInOneLine {
           + "           GOBACK.";
 
   private static final String REPL =
-      "              MOVE 10 TO {_{:TAG:-CHILD^ABCDE-CHILD} OF {:TAG:-PARENT^ABCDE-PARENT}|invalid_}";
+      "              MOVE 10 TO {_{:TAG:-CHILD^ABCDE-CHILD} OF {:TAG:-PARENT^ABCDE-PARENT}|invalidS_}";
 
   private static final String REPL_NAME = "REPL";
   private static final String MESSAGE = "Variable ABCDE-CHILD is not defined";
@@ -57,6 +57,8 @@ class TestReplacingForSeveralTokensInOneLine {
         DOCUMENT,
         ImmutableList.of(new CobolText(REPL_NAME, REPL)),
         ImmutableMap.of(
-            "invalid", new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
+            "invalid", new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error,  ErrorSource.COPYBOOK.getText()),
+            "invalidS", new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error,  ErrorSource.PARSING.getText())
+                ));
   }
 }

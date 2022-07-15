@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2022 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -16,36 +16,30 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/** Typing EXEC SQL should not throw {@link StringIndexOutOfBoundsException} */
-class TestNoStringIndexOutOfBoundsOnExecSql {
-
+/** ABEND CODE with ON and NEXT SENTENCE should not cause errors during analysis */
+class TestAbendCodeOnNextSentence {
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
+          + "        01 {$*ERRORSAT}.\n"
+          + "            05 {$*SSC-ERRSTAT-SAVE} PIC X.\n"
+          + "            05 {$*ANY-STATUS} PIC X.\n"
           + "        PROCEDURE DIVISION.\n"
-          + "            EXEC SQL\n"
-          + "       {|1}\n";
+          + "            ABEND CODE {$SSC-ERRSTAT-SAVE} ON \n"
+          + "               {$ANY-STATUS} NEXT SENTENCE.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(),
-                "Unexpected end of file",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

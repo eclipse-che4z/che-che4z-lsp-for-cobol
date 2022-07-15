@@ -12,11 +12,11 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "fs";
-import * as os from "os";
-import * as net from "net";
-import * as vscode from "vscode";
 import * as cp from "child_process";
+import * as fs from "fs";
+import * as net from "net";
+import * as os from "os";
+import * as vscode from "vscode";
 import {
     ConfigurationParams,
     ConfigurationRequest,
@@ -35,7 +35,7 @@ import { SettingsService } from "./Settings";
 export class LanguageClientService {
     private executablePath: string;
     private languageClient: LanguageClient;
-    private handlers: {(languageClient: LanguageClient): void}[] = [];
+    private handlers: Array<(languageClient: LanguageClient) => void> = [];
     private isNativeBuildEnabled: boolean = false;
 
     constructor(private middleware: Middleware) {
@@ -75,16 +75,16 @@ export class LanguageClientService {
         return this.getLanguageClient().start();
     }
 
-    private initHandlers() {
-        const languageClient = this.getLanguageClient();
-        for (let handler of this.handlers) {
-            languageClient.onReady().then(() => handler(languageClient));
-        }
-    }
-
     public stop(): Thenable<void> {
         if (this.languageClient) {
             return Promise.resolve(this.getLanguageClient().stop());
+        }
+    }
+
+    private initHandlers() {
+        const languageClient = this.getLanguageClient();
+        for (const handler of this.handlers) {
+            languageClient.onReady().then(() => handler(languageClient));
         }
     }
 
@@ -116,7 +116,7 @@ export class LanguageClientService {
     }
 
     private createServerOptions(jarPath: string) {
-        if(this.isNativeBuildEnabled) {
+        if (this.isNativeBuildEnabled) {
             return nativeServer(jarPath);
         }
         const port = SettingsService.getLspPort();
@@ -165,33 +165,33 @@ export class LanguageClientService {
     private giveExecutePermission(executablePath) {
         cp.exec(`cd ${executablePath}; chmod 755 *`, (err, stdout, stderr) => {
             if (err) {
-                vscode.window.showInformationMessage(`couldn't initialize executable as ${executablePath}. Please change the permission to execution mode`)
+                vscode.window.showInformationMessage(`couldn't initialize executable as ${executablePath}. Please change the permission to execution mode`);
             }
         });
     }
 }
-function nativeServer(jarPath: string) {
+export function nativeServer(jarPath: string) {
     const executable: Executable = {
             args: ["pipeEnabled"],
             command: "",
             options: { stdio: "pipe", detached: false },
         };
-        switch (os.type()) {
+    switch (os.type()) {
             case "Windows_NT":
-                executable.options.cwd=`${jarPath}`;
+                executable.options.cwd = `${jarPath}`;
                 executable.command = `engine.exe`;
                 break;
             case "Darwin":
-                executable.options.cwd=`${jarPath}`;
+                executable.options.cwd = `${jarPath}`;
                 executable.command = `./server-mac-amd64`;
                 break;
             case "Linux":
-                executable.options.cwd=`${jarPath}`;
+                executable.options.cwd = `${jarPath}`;
                 executable.command = `./server`;
                 break;
             default:
                 break;
         }
-        return executable;
+    return executable;
 }
 

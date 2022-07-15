@@ -15,7 +15,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -69,25 +69,25 @@ class TestDaCoGetEntityStatement {
                 new Range(),
                 "Exact length of tal must be 2 bytes",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorSource.DIALECT.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "String length must be between 3 and 4",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorSource.DIALECT.getText()),
             "3",
             new Diagnostic(
                 new Range(),
                 "Only allowed value(s): OWNER, OWN, DESIGNER, AVG, ANALIST, ANA",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorSource.DIALECT.getText()),
             "4",
             new Diagnostic(
                 new Range(),
                 "Only allowed value(s): DOM",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())),
+                ErrorSource.DIALECT.getText())),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());
   }

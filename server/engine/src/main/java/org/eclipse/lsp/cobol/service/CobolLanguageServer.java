@@ -213,7 +213,7 @@ public class CobolLanguageServer implements LanguageServer {
   @NonNull
   private ExecuteCommandOptions collectExecuteCommandList() {
     return new ExecuteCommandOptions(
-        stream(ErrorCode.values()).map(ErrorCode::name).collect(toList()));
+        stream(ErrorCode.values()).map(ErrorCode::getLabel).collect(toList()));
   }
 
   /** Represents the JSON RPC response structure for shutdown command as per LSP specification */

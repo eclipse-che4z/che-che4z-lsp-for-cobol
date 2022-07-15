@@ -17,7 +17,8 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorCode;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
@@ -50,13 +51,13 @@ class TestMissingCopybookNotInVariableList {
                 new Range(),
                 "CPYNAME: Copybook not found",
                 Error,
-                SourceInfoLevels.ERROR.getText(),
-                "MISSING_COPYBOOK"),
+                ErrorSource.COPYBOOK.getText(),
+                ErrorCode.MISSING_COPYBOOK.getLabel()),
             "nopic",
             new Diagnostic(
                 new Range(),
                 "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item PARENT",
                 Error,
-                SourceInfoLevels.ERROR.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

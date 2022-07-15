@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 
 /**
  * This test checks that the RENAMES clause with the specified variable range using THRU includes
@@ -57,6 +57,6 @@ class TestRenamingIncludesOnlyRequiredVariable {
                 new Range(),
                 "Variable VARNAME5 is not defined",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorSource.PARSING.getText())));
   }
 }

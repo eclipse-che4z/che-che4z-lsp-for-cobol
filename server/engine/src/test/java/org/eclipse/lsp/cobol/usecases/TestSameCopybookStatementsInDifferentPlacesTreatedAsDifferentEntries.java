@@ -17,14 +17,13 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /**
  * Test several copy statements treated as different entries, so if one of them contains a syntax
@@ -37,7 +36,7 @@ class TestSameCopybookStatementsInDifferentPlacesTreatedAsDifferentEntries {
           + "       PROGRAM-ID. TESTREPL.\n"
           + "       COPY {~REPL}.\n"
           + "       {_COPY {~REPL}.|1_}\n";
-  private static final String REPL = "       {DATA|1} DIVISION.\n";
+  private static final String REPL = "       {DATA|2} DIVISION.\n";
   private static final String REPL_NAME = "REPL";
 
   @Test
@@ -52,7 +51,15 @@ class TestSameCopybookStatementsInDifferentPlacesTreatedAsDifferentEntries {
                 "Syntax error on 'DATA' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, "
                     + "LINKAGE, LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE}",
                 DiagnosticSeverity.Error,
-                ERROR.getText(),
+                ErrorSource.COPYBOOK.getText(),
+                null),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Syntax error on 'DATA' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, "
+                    + "LINKAGE, LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE}",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText(),
                 null)));
   }
 }

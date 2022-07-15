@@ -4,7 +4,7 @@
     "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
@@ -91,12 +91,6 @@
                     "meta.embedded.block.sql": "sql",
                     "meta.embedded.block.html": "html"
                 }
-            }
-        ],
-        "snippets": [
-            {
-                "language": "COBOL",
-                "path": "./snippets.json"
             }
         ],
         "configuration": {
@@ -450,7 +444,7 @@
     "dependencies": {
         "@zowe/zowe-explorer-api": "^1.17.0",
         "iconv-lite": "^0.6.3",
-        "@vscode/extension-telemetry": "0.6.2",
+        "vscode-extension-telemetry": "0.1.6",
         "vscode-languageclient": "5.2.1"
     },
     "devDependencies": {

@@ -137,6 +137,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (languageNameContext == null) {
       final SyntaxError error =
           SyntaxError.syntaxError()
+              .errorSource(ErrorSource.EXTENDED_DOCUMENT)
               .locality(retrieveLocality(ctx))
               .severity(ERROR)
               .suggestion(
@@ -318,6 +319,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private void reportInvalidArgument(ControlCblContext ctx) {
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PREPROCESSING)
             .severity(ERROR)
             .suggestion(
                 messageService.getMessage(

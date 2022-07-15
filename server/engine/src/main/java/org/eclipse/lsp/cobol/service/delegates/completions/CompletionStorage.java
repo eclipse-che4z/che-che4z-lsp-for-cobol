@@ -22,7 +22,6 @@ import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.service.SettingsService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,13 +36,15 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.DIALECT
  */
 @Slf4j
 public abstract class CompletionStorage<T> {
+  private static final String DEFAULT = "COBOL";
+  private String dialectType;
   private Map<String, T> storage;
-  private List<String> dialectList = new ArrayList<>();
   private SettingsService settingsService;
-  private String dialectType = "COBOL";
+
 
   CompletionStorage(SettingsService settingsService) {
     this.settingsService = settingsService;
+    this.dialectType = DEFAULT;
     resetStorage();
   }
 
@@ -52,7 +53,7 @@ public abstract class CompletionStorage<T> {
    * settings
    */
   public void updateStorage() {
-    this.settingsService.fetchConfiguration(DIALECTS.label).thenAccept(this::setDialects);
+    this.settingsService.getConfiguration(DIALECTS.label).thenAccept(this::getDialectArray);
   }
 
   protected abstract Map<String, T> getDataMap(String dialectType);
@@ -93,12 +94,21 @@ public abstract class CompletionStorage<T> {
             props.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  private void setDialects(List<Object> dialectObject) {
-    JsonArray jsonObj = (JsonArray) dialectObject.get(0);
-    this.dialectList = Streams.stream(jsonObj).map(JsonElement::getAsString).collect(toList());
-    if (!dialectList.isEmpty())
-      this.dialectType = dialectList.contains(DaCoDialect.NAME) ? DaCoDialect.NAME : IdmsDialect.NAME;
+  private void getDialectArray(List<Object> dialectObject) {
+    JsonArray dialectArray = (JsonArray) dialectObject.get(0);
+    this.dialectType = setDialect(dialectArray);
     resetStorage();
+  }
+
+  private String setDialect(JsonArray dialectList) {
+    if (dialectList.isEmpty()) return DEFAULT;
+
+    return Streams.stream(dialectList)
+            .map(JsonElement::getAsString)
+            .collect(toList())
+            .contains(DaCoDialect.NAME)
+        ? DaCoDialect.NAME
+        : IdmsDialect.NAME;
   }
 
   private void resetStorage() {

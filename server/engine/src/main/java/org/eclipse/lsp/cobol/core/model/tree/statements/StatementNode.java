@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -80,6 +81,7 @@ public abstract class StatementNode extends Node {
   protected SyntaxError createError(Locality locality, String message, MessageTemplate... types) {
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
             .locality(locality)
             .severity(ERROR)
             .messageTemplate(MessageTemplate.concatenatingArgs(message, ", ", types))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2022 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -18,17 +18,21 @@ package org.eclipse.lsp.cobol.core.model;
 import lombok.AllArgsConstructor;
 
 /**
- * This enum represents the error codes that are used to determine some special type of errors. See
- * the instance documentation for more details. This is specifiaclly used to trigger codeActions.
+ * This enum represents the source where error is generated during parsing and analysis.
  */
 @AllArgsConstructor
-public enum ErrorCode {
-  /** This copybook does not present in the copybook folder */
-  MISSING_COPYBOOK("missing copybook");
+public enum ErrorSource {
+  PARSING("(parsing)"),
+  PREPROCESSING("(preprocessing)"),
+  DIALECT("(dialect)"),
+  EXTENDED_DOCUMENT("(extended document)"),
+  COPYBOOK("(copybook)");
+
+  private static final String COBOL_LANG_SUPPORT_LABEL = "COBOL Language Support";
 
   private String label;
 
-  public String getLabel() {
-    return label;
+  public String getText() {
+    return COBOL_LANG_SUPPORT_LABEL + " " + label;
   }
 }
