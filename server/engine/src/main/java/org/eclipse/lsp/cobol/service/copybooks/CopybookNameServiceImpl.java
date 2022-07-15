@@ -77,9 +77,9 @@ public class CopybookNameServiceImpl implements CopybookNameService {
 
     CompletableFuture<List<WorkspaceFolder>> copybookWorkspaces = clientProvider.get()
         .workspaceFolders();
-    CompletableFuture<List<String>> copybookLocalFolders = settingsService.getTextConfiguration(
+    CompletableFuture<List<String>> copybookLocalFolders = settingsService.fetchTextConfiguration(
         CPY_LOCAL_PATHS.label);
-    CompletableFuture<List<String>> copybooksExtensions = settingsService.getTextConfiguration(
+    CompletableFuture<List<String>> copybooksExtensions = settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label);
 
     CompletableFuture.allOf(copybookWorkspaces, copybookLocalFolders, copybooksExtensions).thenAccept(

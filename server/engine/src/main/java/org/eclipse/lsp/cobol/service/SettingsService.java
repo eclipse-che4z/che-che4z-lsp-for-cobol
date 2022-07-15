@@ -33,7 +33,7 @@ public interface SettingsService {
    * @param section the required section.
    * @return a list of one configuration object.
    */
-  CompletableFuture<List<Object>> getConfiguration(String... section);
+  CompletableFuture<List<Object>> fetchConfiguration(String... section);
 
   /**
    * Fetch the required text configuration section from the client. Note that Scope URI is null. The
@@ -42,7 +42,7 @@ public interface SettingsService {
    * @param section the required section.
    * @return a list of string of one configuration object.
    */
-  CompletableFuture<List<String>> getTextConfiguration(String... section);
+  CompletableFuture<List<String>> fetchTextConfiguration(String... section);
 
   /**
    * Fetch the required configuration sections from the client. Note that Scope URI is null. The
@@ -51,7 +51,7 @@ public interface SettingsService {
    * @param sections the required sections.
    * @return a list of configuration objects.
    */
-  CompletableFuture<List<Object>> getConfigurations(List<String> sections);
+  CompletableFuture<List<Object>> fetchConfigurations(List<String> sections);
 
   /**
    * Get config data as optional string

@@ -69,7 +69,7 @@ class CachingConfigurationServiceTest {
             predefinedParagraphs,
             subroutines);
 
-    when(settingsService.getConfigurations(
+    when(settingsService.fetchConfigurations(
             Arrays.asList(
                 TARGET_SQL_BACKEND.label,
                 ANALYSIS_FEATURES.label,
@@ -104,7 +104,7 @@ class CachingConfigurationServiceTest {
             dialectSettings,
             new JsonNull(),
             subroutineSettings);
-    when(settingsService.getConfigurations(
+    when(settingsService.fetchConfigurations(
             Arrays.asList(
                 TARGET_SQL_BACKEND.label,
                 ANALYSIS_FEATURES.label,

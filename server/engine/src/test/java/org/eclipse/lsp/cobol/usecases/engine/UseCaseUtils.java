@@ -113,7 +113,7 @@ public class UseCaseUtils {
    */
   public static AnalysisResult analyze(UseCase useCase) {
     SettingsService mockSettingsService = mock(SettingsService.class);
-    when(mockSettingsService.getConfiguration(any()))
+    when(mockSettingsService.fetchConfiguration(any()))
         .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
 
     CobolLanguageClient languageClient = mock(CobolLanguageClient.class);

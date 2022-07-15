@@ -193,10 +193,11 @@ public class CopybookServiceImpl implements CopybookService {
       CopybookName copybookName, String mainProgramFileName) {
     try {
       return SettingsService.getValueAsString(
-          settingsService.getConfiguration(
+          settingsService.fetchConfiguration(
               COPYBOOK_RESOLVE.label,
               mainProgramFileName,
-              copybookName.nameWithExtension(),
+              copybookName.getDisplayName(),
+              copybookName.getExtension(),
               Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL)).get()
       );
     } catch (InterruptedException e) {
@@ -260,7 +261,7 @@ public class CopybookServiceImpl implements CopybookService {
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
       if (!copybooksToDownload.isEmpty()) {
-        settingsService.getConfigurations(copybooksToDownload);
+        settingsService.fetchConfigurations(copybooksToDownload);
       }
     }
   }

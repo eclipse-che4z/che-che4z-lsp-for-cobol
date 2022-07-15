@@ -74,7 +74,7 @@ class SnippetCompletionTest {
         Snippets snippets = new Snippets(settingsService);
         SnippetCompletion completion = new SnippetCompletion(snippets);
 
-        when(settingsService.getConfiguration(DIALECTS.label))
+        when(settingsService.fetchConfiguration(DIALECTS.label))
                 .thenReturn(supplyAsync(() -> ImmutableList.of()));
 
         snippets.updateStorage();
@@ -95,7 +95,7 @@ class SnippetCompletionTest {
         JsonArray dialectSettings = new JsonArray();
         dialectSettings.add(IdmsDialect.NAME);
         List<Object> clientConfig = Arrays.asList(dialectSettings);
-        when(settingsService.getConfiguration(DIALECTS.label))
+        when(settingsService.fetchConfiguration(DIALECTS.label))
                 .thenReturn(supplyAsync(() -> clientConfig));
         snippets.updateStorage();
 
@@ -126,7 +126,7 @@ class SnippetCompletionTest {
         JsonArray dialectSettings = new JsonArray();
         dialectSettings.add(DaCoDialect.NAME);
         List<Object> clientConfig = Arrays.asList(dialectSettings);
-        when(settingsService.getConfiguration(DIALECTS.label))
+        when(settingsService.fetchConfiguration(DIALECTS.label))
                 .thenReturn(supplyAsync(() -> clientConfig));
         snippets.updateStorage();
         assertEquals(

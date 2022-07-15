@@ -47,13 +47,13 @@ public class SettingsServiceImpl implements SettingsService {
 
   @NonNull
   @Override
-  public CompletableFuture<List<Object>> getConfiguration(@NonNull String... param) {
-    return getConfigurations(singletonList(Joiner.on(".").join(param)));
+  public CompletableFuture<List<Object>> fetchConfiguration(@NonNull String... param) {
+    return fetchConfigurations(singletonList(Joiner.on(".").join(param)));
   }
 
   @Override
-  public CompletableFuture<List<String>> getTextConfiguration(@NonNull String... section) {
-    return getConfiguration(section).thenApply(objects -> objects.stream()
+  public CompletableFuture<List<String>> fetchTextConfiguration(@NonNull String... section) {
+    return fetchConfiguration(section).thenApply(objects -> objects.stream()
             .map(obj -> (JsonArray) obj)
             .flatMap(Streams::stream)
             .map(JsonElement::getAsString)
@@ -62,7 +62,7 @@ public class SettingsServiceImpl implements SettingsService {
 
   @NonNull
   @Override
-  public CompletableFuture<List<Object>> getConfigurations(@NonNull List<String> sections) {
+  public CompletableFuture<List<Object>> fetchConfigurations(@NonNull List<String> sections) {
     return clientProvider
         .get()
         .configuration(

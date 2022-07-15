@@ -126,12 +126,12 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
     if (disposableLSPStateService.isServerShutdown()) return;
     settingsService
-        .getTextConfiguration(CPY_LOCAL_PATHS.label)
+        .fetchTextConfiguration(CPY_LOCAL_PATHS.label)
         .thenAccept(this::acceptSettingsChange);
 
-    settingsService.getConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
+    settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
     settingsService
-        .getConfiguration(LOGGING_LEVEL.label)
+        .fetchConfiguration(LOGGING_LEVEL.label)
         .thenAccept(LogLevelUtils.updateLogLevel());
     configurationService.updateConfigurationFromSettings();
     copybookNameService.collectLocalCopybookNames();

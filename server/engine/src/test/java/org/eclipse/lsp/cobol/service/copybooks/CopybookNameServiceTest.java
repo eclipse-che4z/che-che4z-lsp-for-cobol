@@ -75,7 +75,7 @@ class CopybookNameServiceTest {
             });
     when(provider.get()).thenReturn(client);
     when(client.workspaceFolders()).thenReturn(CompletableFuture.completedFuture(workspace));
-    when(settingsService.getTextConfiguration(CPY_LOCAL_PATHS.label))
+    when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(CompletableFuture.completedFuture(copyNames));
   }
 
@@ -122,7 +122,7 @@ class CopybookNameServiceTest {
     CopybookNameService copybookNameService =
         new CopybookNameServiceImpl(settingsService, files, provider);
 
-    when(settingsService.getTextConfiguration(
+    when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
 
     when(wrkPath.toUri()).thenReturn(URI.create(WORKSPACE_PROGRAM_URI));
@@ -152,7 +152,7 @@ class CopybookNameServiceTest {
     CopybookNameService copybookNameService =
         new CopybookNameServiceImpl(settingsService, files, provider);
 
-    when(settingsService.getTextConfiguration(
+    when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(Collections.singletonList("cpy")));
     when(files.decodeURI(VALID_CPY_URI)).thenReturn(null);
     when(files.getPathFromURI(VALID_CPY_URI)).thenReturn(null);

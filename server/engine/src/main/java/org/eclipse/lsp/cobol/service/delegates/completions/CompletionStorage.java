@@ -52,7 +52,7 @@ public abstract class CompletionStorage<T> {
    * settings
    */
   public void updateStorage() {
-    this.settingsService.getConfiguration(DIALECTS.label).thenAccept(this::setDialects);
+    this.settingsService.fetchConfiguration(DIALECTS.label).thenAccept(this::setDialects);
   }
 
   protected abstract Map<String, T> getDataMap(String dialectType);

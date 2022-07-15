@@ -167,11 +167,11 @@ class WorkspaceServiceTest {
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     String path = "foo/bar";
 
-    when(settingsService.getTextConfiguration(CPY_LOCAL_PATHS.label))
+    when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(path)));
-    when(settingsService.getConfiguration(LOCALE.label))
+    when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
-    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(singletonList("INFO")));
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
@@ -219,11 +219,11 @@ class WorkspaceServiceTest {
 
     String path = "foo/bar";
 
-    when(settingsService.getTextConfiguration(CPY_LOCAL_PATHS.label))
+    when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(path)));
-    when(settingsService.getConfiguration(LOCALE.label))
+    when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
-    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(singletonList("INFO")));
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
@@ -268,11 +268,11 @@ class WorkspaceServiceTest {
     String path = "foo/bar";
     arr.add(new JsonPrimitive(path));
 
-    when(settingsService.getTextConfiguration(CPY_LOCAL_PATHS.label))
+    when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(emptyList()));
-    when(settingsService.getConfiguration(LOCALE.label))
+    when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
-    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(singletonList("INFO")));
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
@@ -314,11 +314,11 @@ class WorkspaceServiceTest {
             stateService,
             copybookNameService, keywords, snippets);
 
-    when(settingsService.getTextConfiguration(CPY_LOCAL_PATHS.label))
+    when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(emptyList()));
-    when(settingsService.getConfiguration(LOCALE.label))
+    when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
-    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(singletonList("INFO")));
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});

@@ -50,7 +50,7 @@ public class CachingConfigurationService implements ConfigurationService {
   public void updateConfigurationFromSettings() {
     config =
         settingsService
-            .getConfigurations(
+            .fetchConfigurations(
                 Arrays.asList(
                     TARGET_SQL_BACKEND.label,
                     ANALYSIS_FEATURES.label,
