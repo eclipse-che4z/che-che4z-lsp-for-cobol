@@ -78,10 +78,23 @@ public class MappingHelper {
   public List<Range> split(Range split, Range range) {
     List<Range> result = takeFirstPart(split, range);
 
-    Position startPoint = new Position(split.getEnd().getLine(), split.getEnd().getCharacter() + 1);
-    Position endPoint = range.getEnd();
+    int line = split.getEnd().getLine();
+    int charPos = split.getEnd().getCharacter() + 1;
+    if (charPos >= 80) {
+      charPos = 0;
+      line += 1;
+    }
+    Position startPoint = new Position(line, charPos);
+    Position endPoint = new Position(line, 80);
     Range secondRange = new Range(startPoint, endPoint);
+    if (size(secondRange) > 0 || charSize(secondRange) > 0) {
+      result.add(secondRange);
+    }
 
+    startPoint = new Position(line + 1, 0);
+    endPoint = new Position(range.getEnd().getLine(), range.getEnd().getCharacter());
+
+    secondRange = new Range(startPoint, endPoint);
     if (size(secondRange) > 0 || charSize(secondRange) > 0) {
       result.add(secondRange);
     }
@@ -97,13 +110,21 @@ public class MappingHelper {
   public List<Range> concat(Range split, Range range) {
     List<Range> result = takeFirstPart(split, range);
 
-    Position startPoint = new Position(split.getEnd().getLine() - size(split) + 1, split.getEnd().getCharacter() - charSize(split));
-    Position endPoint = new Position(range.getEnd().getLine() - size(split) + 1, range.getEnd().getCharacter() - charSize(split));
+    Position startPoint = new Position(split.getStart().getLine(), split.getStart().getCharacter());
+    Position endPoint = new Position(split.getStart().getLine(), 80);
     Range secondRange = new Range(startPoint, endPoint);
+    if (size(secondRange) > 0 || charSize(secondRange) > 0) {
+      result.add(secondRange);
+    }
+
+    startPoint = new Position(split.getStart().getLine() + 1, 0);
+    endPoint = new Position(range.getEnd().getLine() - size(split) + 1, range.getEnd().getCharacter());
+    secondRange = new Range(startPoint, endPoint);
 
     if (size(secondRange) > 0 || charSize(secondRange) > 0) {
       result.add(secondRange);
     }
+
     return result;
   }
 
@@ -111,9 +132,20 @@ public class MappingHelper {
     if (!rangeIn(split, range)) {
       return ImmutableList.of(range);
     }
+    if (split.getStart().getLine() == range.getStart().getLine() && split.getStart().getCharacter() == range.getStart().getCharacter()) {
+      return new LinkedList<>();
+    }
     List<Range> result = new LinkedList<>();
     Position startPoint = range.getStart();
-    Position endPoint = new Position(split.getStart().getLine(), Math.max(split.getStart().getCharacter() - 1, 0));
+
+    int linePos = split.getStart().getLine();
+    int charPos = split.getStart().getCharacter() - 1;
+    if (charPos < 0) {
+      charPos = 80;
+      linePos -= 1;
+    }
+
+    Position endPoint = new Position(linePos, charPos);
     Range firstRange = new Range(startPoint, endPoint);
 
     if (size(firstRange) > 0 || charSize(firstRange) > 0) {

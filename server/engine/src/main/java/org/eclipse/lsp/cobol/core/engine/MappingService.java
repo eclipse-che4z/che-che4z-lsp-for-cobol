@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.core.engine;
 
 import lombok.Getter;
-import org.apache.commons.lang3.tuple.Pair;
+import lombok.Value;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -28,8 +28,27 @@ import java.util.stream.Collectors;
  */
 public class MappingService {
 
+  /**
+   * Mapping item object
+   */
+  @Value
+  public static class MappingItem {
+    Range extendedRange;
+    Location originalLocation;
+    CharShift charShift;
+  }
+
+  /**
+   * Chift object
+   */
+  @Value
+  public static class CharShift {
+    int lineNumber;
+    int charShift;
+  }
+
   @Getter
-  private ArrayList<Pair<Range, Location>> localityMap;
+  private ArrayList<MappingItem> localityMap;
 
   public MappingService(TextTransformations textTransformations) {
     localityMap = new ArrayList<>(buildLocalityMap(textTransformations));
@@ -44,27 +63,31 @@ public class MappingService {
    * @return a Location object
    */
   public Optional<Location> getOriginalLocation(Range range) {
-    return /*Optional.ofNullable(findRangeAndLocation(range.getStart().getLine(), 0, localityMap.size() - 1))*/
+    return
         findRangeAndLocation(range)
-        .map(rangeAndLocation -> {
-          int lineShift = range.getStart().getLine() - rangeAndLocation.getKey().getStart().getLine();
-          int charShift = 0; //rangeAndLocation.getKey().getStart().getCharacter() - rangeAndLocation.getValue().getRange().getStart().getCharacter();
+        .map(mappingItem -> {
+          int lineShift = range.getStart().getLine() - mappingItem.extendedRange.getStart().getLine();
+          int charShift = mappingItem.originalLocation.getRange().getStart().getCharacter() - mappingItem.extendedRange.getStart().getCharacter();
+          int originalLine = mappingItem.originalLocation.getRange().getStart().getLine() + lineShift;
 
-          int originalLine = rangeAndLocation.getValue().getRange().getStart().getLine() + lineShift;
-          int originalCharacter = range.getStart().getCharacter() - charShift;
+          int originalCharacter = range.getStart().getCharacter() + charShift;
           Position startPos = new Position(originalLine, originalCharacter);
 
           originalLine = originalLine + range.getEnd().getLine() - range.getStart().getLine();
-          originalCharacter = range.getEnd().getCharacter() - charShift;
+          originalCharacter = originalCharacter + range.getEnd().getCharacter() - range.getStart().getCharacter();
           Position endPos = new Position(originalLine, originalCharacter);
 
           Range newRange = new Range(startPos, endPos);
-          return new Location(rangeAndLocation.getValue().getUri(), newRange);
+//          if (newRange.getStart().getLine() == 12 && newRange.getStart().getCharacter() == 7) {
+//            originalCharacter += 1;
+//          }
+
+          return new Location(mappingItem.originalLocation.getUri(), newRange);
         });
   }
 
-  private Optional<Pair<Range, Location>> findRangeAndLocation(Range range) {
-    return localityMap.stream().filter(p -> MappingHelper.rangeIn(range, p.getKey())).findFirst();
+  private Optional<MappingItem> findRangeAndLocation(Range range) {
+    return localityMap.stream().filter(p -> MappingHelper.rangeIn(range, p.extendedRange)).findFirst();
   }
 
   /**
@@ -72,31 +95,31 @@ public class MappingService {
    * @param textTransformations is a text transformations object
    * @return a map
    */
-  private List<Pair<Range, Location>> buildLocalityMap(TextTransformations textTransformations) {
-    List<Pair<Range, Location>> result = new LinkedList<>();
+  private List<MappingItem> buildLocalityMap(TextTransformations textTransformations) {
+    List<MappingItem> result = new LinkedList<>();
     LinkedList<Range> ranges = new LinkedList<>(textTransformations.getExtensions().keySet());
     ranges.sort(Comparator.comparingInt(e -> e.getStart().getLine()));
     int originalDocumentLine = 0;
     int extendedDocumentLine = 0;
     for (Range range : ranges) {
-      List<Pair<Range, Location>> map = buildLocalityMap(textTransformations.getExtensions().get(range));
-      Pair<Range, Location> last = map.get(map.size() - 1);
+      List<MappingItem> map = buildLocalityMap(textTransformations.getExtensions().get(range));
+      MappingItem last = map.get(map.size() - 1);
 
-      result.add(buildRange(textTransformations.getUri(), originalDocumentLine, extendedDocumentLine, range, last.getKey()));
+      result.add(buildMappingItem(textTransformations.getUri(), originalDocumentLine, extendedDocumentLine, range, last.extendedRange));
 
       extendedDocumentLine += (range.getEnd().getLine() - originalDocumentLine);
       originalDocumentLine = range.getEnd().getLine() + 1;
 
-      for (Pair<Range, Location> pair : map) {
-        Position start = pair.getKey().getStart();
-        Position end = pair.getKey().getEnd();
+      for (MappingItem item : map) {
+        Position start = item.extendedRange.getStart();
+        Position end = item.extendedRange.getEnd();
         int size = end.getLine() - start.getLine() + 1;
 
         start.setLine(extendedDocumentLine);
         start.setCharacter(range.getStart().getCharacter());
         end.setLine(extendedDocumentLine + size - 1);
-        pair.getKey().setStart(start);
-        pair.getKey().setEnd(end);
+        item.extendedRange.setStart(start);
+        item.extendedRange.setEnd(end);
         extendedDocumentLine += size;
       }
       result.addAll(map);
@@ -105,14 +128,14 @@ public class MappingService {
     String[] originalLines = textTransformations.getText().split("\r?\n");
     int size = originalLines.length - originalDocumentLine + (textTransformations.getText().endsWith("\n") ? 1 : 0);
 
-    Pair<Range, Location> last = Pair.of(new Range(new Position(extendedDocumentLine, 0), new Position(extendedDocumentLine + size - 1, 80)),
-        new Location(textTransformations.getUri(), new Range(new Position(originalDocumentLine, 0), new Position(originalDocumentLine + size - 1, 80))));
+    MappingItem last = new MappingItem(new Range(new Position(extendedDocumentLine, 0), new Position(extendedDocumentLine + size - 1, 80)),
+        new Location(textTransformations.getUri(), new Range(new Position(originalDocumentLine, 0), new Position(originalDocumentLine + size - 1, 80))), null);
     result.add(last);
 
     return result;
   }
 
-  private ArrayList<Pair<Range, Location>> applyReplacements(Map<Range, String> replacements, String text) {
+  private ArrayList<MappingItem> applyReplacements(Map<Range, String> replacements, String text) {
     LinkedList<Range> ranges = new LinkedList<>(replacements.keySet());
     ranges.sort(Comparator.comparingInt(e -> e.getStart().getLine()));
 
@@ -122,41 +145,45 @@ public class MappingService {
       }
 
       String[] lines =  text.split("\\r?\\n");
-      List<Pair<Range, Location>> iterationMap = new LinkedList<>(localityMap);
-      for (Pair<Range, Location> pair : iterationMap) {
-        if (MappingHelper.rangeIn(range, pair.getValue().getRange())) {
+      List<MappingItem> iterationMap = new LinkedList<>(localityMap);
+      for (MappingItem item : iterationMap) {
+        if (MappingHelper.rangeIn(range, item.originalLocation.getRange())) {
 
-          //range = extendRangeIfNeeded(range, lines);
-          List<Location> newLocations = MappingHelper.split(range, pair.getValue().getRange())
-              .stream().map(r -> new Location(pair.getValue().getUri(), r)).collect(Collectors.toList());
+          range = extendRangeIfNeeded(range, lines);
+          List<Location> newLocations = MappingHelper.split(range, item.originalLocation.getRange())
+              .stream().map(r -> new Location(item.originalLocation.getUri(), r)).collect(Collectors.toList());
 
-          int lineShift = range.getStart().getLine() - pair.getValue().getRange().getStart().getLine();
-          int charShift = range.getStart().getCharacter() - pair.getValue().getRange().getStart().getCharacter();
+          int lineShift = range.getStart().getLine() - item.originalLocation.getRange().getStart().getLine();
+          int charShift = range.getStart().getCharacter() - item.originalLocation.getRange().getStart().getCharacter();
 
-          int charPos = pair.getKey().getStart().getCharacter() + charShift;
-          int linePos = pair.getKey().getStart().getLine() + lineShift;
+          int charPos = item.extendedRange.getStart().getCharacter() + charShift;
+          int linePos = item.extendedRange.getStart().getLine() + lineShift;
           if (charPos < 0) {
             charPos = 80;
             linePos -= 1;
           }
           Position startPosition = new Position(linePos, charPos);
 
-          Position endPosition = new Position(pair.getKey().getStart().getLine()
+          Position endPosition = new Position(item.extendedRange.getStart().getLine()
               + lineShift + MappingHelper.size(range) - 1,
-              pair.getKey().getStart().getCharacter() + charShift + MappingHelper.charSize(range));
+              item.extendedRange.getStart().getCharacter() + charShift + MappingHelper.charSize(range));
 
           Range extendedRange = new Range(startPosition, endPosition);
 
-          List<Range> newRanges = MappingHelper.concat(extendedRange, pair.getLeft());
+          List<Range> newRanges = MappingHelper.concat(extendedRange, item.extendedRange);
           if (newLocations.size() == newRanges.size()) {
             for (int i = 0; i < newLocations.size(); i++) {
               Range newRange = newRanges.get(i);
               if (MappingHelper.size(newRange) > 1 || MappingHelper.charSize(newRange) > 0) {
-                localityMap.add(Pair.of(newRange, newLocations.get(i)));
+                CharShift shift = null;
+                if (newRange.getStart().getCharacter() > 0) {
+                  shift = new CharShift(newRange.getStart().getLine(), MappingHelper.charSize(range));
+                }
+                localityMap.add(new MappingItem(newRange, newLocations.get(i), shift));
               }
             }
           }
-          localityMap.remove(pair);
+          localityMap.remove(item);
         }
       }
     }
@@ -166,12 +193,12 @@ public class MappingService {
   private Range extendRangeIfNeeded(Range range, String[] lines) {
     String line = lines[range.getEnd().getLine()];
     if (line.length() <= range.getEnd().getCharacter()) {
-      return new Range(range.getStart(), new Position(range.getEnd().getLine() + 1, 0));
+      return new Range(range.getStart(), new Position(range.getEnd().getLine(), 80));
     }
     return range;
   }
 
-  private Pair<Range, Location> buildRange(String uri, int originalDocumentLine, int extendedDocumentLine, Range originalRange, Range extendedRange) {
+  private MappingItem buildMappingItem(String uri, int originalDocumentLine, int extendedDocumentLine, Range originalRange, Range extendedRange) {
     Position posStart = new Position(originalDocumentLine, 0);
     Position posEnd = new Position(originalRange.getEnd().getLine() - 1, 80);
     Range newOriginalRange = new Range(posStart, posEnd);
@@ -180,7 +207,7 @@ public class MappingService {
     extendedDocumentLine += originalRange.getEnd().getLine() - originalDocumentLine - 1;
     posEnd = new Position(extendedDocumentLine, 80/*originalRange.getStart().getCharacter() + extendedRange.getEnd().getCharacter()*/);
     Range newExtendedRange = new Range(posStart, posEnd);
-    return Pair.of(newExtendedRange, new Location(uri, newOriginalRange));
+    return new MappingItem(newExtendedRange, new Location(uri, newOriginalRange), null);
   }
 
 }

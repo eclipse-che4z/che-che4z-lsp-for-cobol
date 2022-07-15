@@ -78,23 +78,23 @@ class MappingServiceTest {
 
     assertEquals(3, mapping.size());
 
-    assertEquals(0, mapping.get(0).getKey().getStart().getLine());
-    assertEquals(6, mapping.get(0).getKey().getEnd().getLine());
-    assertEquals(0, mapping.get(0).getValue().getRange().getStart().getLine());
-    assertEquals(6, mapping.get(0).getValue().getRange().getEnd().getLine());
-    assertEquals("original", mapping.get(0).getValue().getUri());
+    assertEquals(0, mapping.get(0).getExtendedRange().getStart().getLine());
+    assertEquals(6, mapping.get(0).getExtendedRange().getEnd().getLine());
+    assertEquals(0, mapping.get(0).getOriginalLocation().getRange().getStart().getLine());
+    assertEquals(6, mapping.get(0).getOriginalLocation().getRange().getEnd().getLine());
+    assertEquals("original", mapping.get(0).getOriginalLocation().getUri());
 
-    assertEquals(7, mapping.get(1).getKey().getStart().getLine());
-    assertEquals(11, mapping.get(1).getKey().getEnd().getLine());
-    assertEquals(0, mapping.get(1).getValue().getRange().getStart().getLine());
-    assertEquals(4, mapping.get(1).getValue().getRange().getEnd().getLine());
-    assertEquals("copybook", mapping.get(1).getValue().getUri());
+    assertEquals(7, mapping.get(1).getExtendedRange().getStart().getLine());
+    assertEquals(11, mapping.get(1).getExtendedRange().getEnd().getLine());
+    assertEquals(0, mapping.get(1).getOriginalLocation().getRange().getStart().getLine());
+    assertEquals(4, mapping.get(1).getOriginalLocation().getRange().getEnd().getLine());
+    assertEquals("copybook", mapping.get(1).getOriginalLocation().getUri());
 
-    assertEquals(12, mapping.get(2).getKey().getStart().getLine());
-    assertEquals(12, mapping.get(2).getKey().getEnd().getLine());
-    assertEquals(8, mapping.get(2).getValue().getRange().getStart().getLine());
-    assertEquals(8, mapping.get(2).getValue().getRange().getEnd().getLine());
-    assertEquals("original", mapping.get(2).getValue().getUri());
+    assertEquals(12, mapping.get(2).getExtendedRange().getStart().getLine());
+    assertEquals(12, mapping.get(2).getExtendedRange().getEnd().getLine());
+    assertEquals(8, mapping.get(2).getOriginalLocation().getRange().getStart().getLine());
+    assertEquals(8, mapping.get(2).getOriginalLocation().getRange().getEnd().getLine());
+    assertEquals("original", mapping.get(2).getOriginalLocation().getUri());
   }
 
   @Test
@@ -149,7 +149,7 @@ class MappingServiceTest {
   @Test
   void testShrinkEmptyLines() {
     TextTransformations textTransformations = TextTransformations.of(TEXT_SHRINK, "original");
-    Range range = new Range(new Position(5, 0), new Position(9, 0));
+    Range range = new Range(new Position(5, 0), new Position(8, 8));
     textTransformations.replace(range, "");
 
     range = new Range(new Position(12, 0), new Position(17, 8));
