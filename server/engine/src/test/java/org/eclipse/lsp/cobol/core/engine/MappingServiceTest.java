@@ -149,7 +149,7 @@ class MappingServiceTest {
   @Test
   void testShrinkEmptyLines() {
     TextTransformations textTransformations = TextTransformations.of(TEXT_SHRINK, "original");
-    Range range = new Range(new Position(5, 0), new Position(8, 8));
+    Range range = new Range(new Position(5, 0), new Position(9, 0));
     textTransformations.replace(range, "");
 
     range = new Range(new Position(12, 0), new Position(17, 8));
@@ -185,7 +185,6 @@ class MappingServiceTest {
     Optional<Location> location = mappingService.getOriginalLocation(new Range(new Position(7, 5), new Position(7, 10)));
     assertTrue(location.isPresent());
 
-    //assertEquals(3, mappingService.getLocalityMap().size());
     assertEquals(9, location.get().getRange().getStart().getLine());
     assertEquals(location.get().getRange().getStart().getCharacter(), 5);
   }
@@ -197,10 +196,15 @@ class MappingServiceTest {
     textTransformations.replace(range, "");
 
     MappingService mappingService = new MappingService(textTransformations);
+
     Optional<Location> location = mappingService.getOriginalLocation(new Range(new Position(2, 12), new Position(2, 16)));
     assertTrue(location.isPresent());
-
     assertEquals(2, location.get().getRange().getStart().getLine());
+
+    location = mappingService.getOriginalLocation(new Range(new Position(2, 18), new Position(2, 20)));
+    assertTrue(location.isPresent());
+    assertEquals(3, location.get().getRange().getStart().getLine());
+    assertEquals(12, location.get().getRange().getStart().getCharacter());
   }
 
   private MappingService prepareService() {

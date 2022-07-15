@@ -35,10 +35,20 @@ public class MappingHelper {
    * @return true if smallRange fits into bigRange
    */
   public boolean rangeIn(Range smallRange, Range bigRange) {
-    return (smallRange.getStart().getLine() >= bigRange.getStart().getLine()
-        && smallRange.getEnd().getLine() <= bigRange.getEnd().getLine()
-        && smallRange.getStart().getCharacter() >= bigRange.getStart().getCharacter()
-        && smallRange.getEnd().getCharacter() <= bigRange.getEnd().getCharacter());
+    if (smallRange.getStart().getLine() > bigRange.getStart().getLine()
+      && smallRange.getStart().getLine() < bigRange.getEnd().getLine()) {
+      return true;
+    }
+
+    if (smallRange.getStart().getLine() == bigRange.getStart().getLine()) {
+      return smallRange.getStart().getCharacter() >= bigRange.getStart().getCharacter();
+    }
+
+    if (smallRange.getStart().getLine() == bigRange.getEnd().getLine()) {
+      return smallRange.getStart().getCharacter() <= bigRange.getEnd().getCharacter();
+    }
+
+    return false;
   }
 
   /**
@@ -87,7 +97,7 @@ public class MappingHelper {
   public List<Range> concat(Range split, Range range) {
     List<Range> result = takeFirstPart(split, range);
 
-    Position startPoint = new Position(split.getEnd().getLine() - size(split) + 1, split.getEnd().getCharacter() + 1 - charSize(split));
+    Position startPoint = new Position(split.getEnd().getLine() - size(split) + 1, split.getEnd().getCharacter() - charSize(split));
     Position endPoint = new Position(range.getEnd().getLine() - size(split) + 1, range.getEnd().getCharacter() - charSize(split));
     Range secondRange = new Range(startPoint, endPoint);
 

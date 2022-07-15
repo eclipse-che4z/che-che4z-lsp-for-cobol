@@ -34,7 +34,7 @@ public class MappingService {
   public MappingService(TextTransformations textTransformations) {
     localityMap = new ArrayList<>(buildLocalityMap(textTransformations));
     if (textTransformations.getReplacements().size() > 0) {
-      localityMap = applyReplacements(textTransformations.getReplacements(), textTransformations.getUri());
+      localityMap = applyReplacements(textTransformations.getReplacements(), textTransformations.getText());
     }
   }
 
@@ -48,13 +48,14 @@ public class MappingService {
         findRangeAndLocation(range)
         .map(rangeAndLocation -> {
           int lineShift = range.getStart().getLine() - rangeAndLocation.getKey().getStart().getLine();
+          int charShift = 0; //rangeAndLocation.getKey().getStart().getCharacter() - rangeAndLocation.getValue().getRange().getStart().getCharacter();
 
           int originalLine = rangeAndLocation.getValue().getRange().getStart().getLine() + lineShift;
-          int originalCharacter = range.getStart().getCharacter();
+          int originalCharacter = range.getStart().getCharacter() - charShift;
           Position startPos = new Position(originalLine, originalCharacter);
 
           originalLine = originalLine + range.getEnd().getLine() - range.getStart().getLine();
-          originalCharacter = range.getEnd().getCharacter();
+          originalCharacter = range.getEnd().getCharacter() - charShift;
           Position endPos = new Position(originalLine, originalCharacter);
 
           Range newRange = new Range(startPos, endPos);
@@ -111,7 +112,7 @@ public class MappingService {
     return result;
   }
 
-  private ArrayList<Pair<Range, Location>> applyReplacements(Map<Range, String> replacements, String documentUri) {
+  private ArrayList<Pair<Range, Location>> applyReplacements(Map<Range, String> replacements, String text) {
     LinkedList<Range> ranges = new LinkedList<>(replacements.keySet());
     ranges.sort(Comparator.comparingInt(e -> e.getStart().getLine()));
 
@@ -120,18 +121,25 @@ public class MappingService {
         continue;
       }
 
+      String[] lines =  text.split("\\r?\\n");
       List<Pair<Range, Location>> iterationMap = new LinkedList<>(localityMap);
       for (Pair<Range, Location> pair : iterationMap) {
         if (MappingHelper.rangeIn(range, pair.getValue().getRange())) {
 
+          //range = extendRangeIfNeeded(range, lines);
           List<Location> newLocations = MappingHelper.split(range, pair.getValue().getRange())
               .stream().map(r -> new Location(pair.getValue().getUri(), r)).collect(Collectors.toList());
 
           int lineShift = range.getStart().getLine() - pair.getValue().getRange().getStart().getLine();
           int charShift = range.getStart().getCharacter() - pair.getValue().getRange().getStart().getCharacter();
 
-          Position startPosition = new Position(pair.getKey().getStart().getLine()
-              + lineShift, pair.getKey().getStart().getCharacter() + charShift + 1);
+          int charPos = pair.getKey().getStart().getCharacter() + charShift;
+          int linePos = pair.getKey().getStart().getLine() + lineShift;
+          if (charPos < 0) {
+            charPos = 80;
+            linePos -= 1;
+          }
+          Position startPosition = new Position(linePos, charPos);
 
           Position endPosition = new Position(pair.getKey().getStart().getLine()
               + lineShift + MappingHelper.size(range) - 1,
@@ -142,7 +150,10 @@ public class MappingService {
           List<Range> newRanges = MappingHelper.concat(extendedRange, pair.getLeft());
           if (newLocations.size() == newRanges.size()) {
             for (int i = 0; i < newLocations.size(); i++) {
-              localityMap.add(Pair.of(newRanges.get(i), newLocations.get(i)));
+              Range newRange = newRanges.get(i);
+              if (MappingHelper.size(newRange) > 1 || MappingHelper.charSize(newRange) > 0) {
+                localityMap.add(Pair.of(newRange, newLocations.get(i)));
+              }
             }
           }
           localityMap.remove(pair);
@@ -150,6 +161,14 @@ public class MappingService {
       }
     }
     return localityMap;
+  }
+
+  private Range extendRangeIfNeeded(Range range, String[] lines) {
+    String line = lines[range.getEnd().getLine()];
+    if (line.length() <= range.getEnd().getCharacter()) {
+      return new Range(range.getStart(), new Position(range.getEnd().getLine() + 1, 0));
+    }
+    return range;
   }
 
   private Pair<Range, Location> buildRange(String uri, int originalDocumentLine, int extendedDocumentLine, Range originalRange, Range extendedRange) {
