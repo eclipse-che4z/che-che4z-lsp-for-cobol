@@ -57,7 +57,12 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitDacoStatements(DacoStatementsContext ctx) {
-    textReplacement.addReplacementContext(ctx);
+    if (ctx.dfldRcu() == null) {
+      textReplacement.addReplacementContext(ctx);
+    } else {
+      textReplacement.addReplacementContext(ctx.dfldRcu().ON());
+      textReplacement.addReplacementContext(ctx.dfldRcu().RCU());
+    }
     return visitChildren(ctx);
   }
 

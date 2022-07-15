@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
  * The class for replacing entire ParserRuleContext's with spaces.
@@ -34,6 +35,18 @@ public class TextReplacement {
    */
   public void addReplacementContext(ParserRuleContext ctx) {
     addReplacementContext(ctx, "");
+  }
+  /**
+   * Add a context which will be replaced with spaces
+   * @param token the ANTLR token
+   */
+  public void addReplacementContext(TerminalNode token) {
+    resultingText
+            .append(text, textIndexPointer, token.getSymbol().getStartIndex())
+            .append(text
+                    .substring(token.getSymbol().getStartIndex(), token.getSymbol().getStopIndex() + 1)
+                    .replaceAll("[^ \n]", " "));
+    textIndexPointer = token.getSymbol().getStopIndex() + 1;
   }
   /**
    * Add a context which will be replaced with spaces with specified prefix
