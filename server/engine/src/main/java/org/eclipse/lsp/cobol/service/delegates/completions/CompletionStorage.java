@@ -53,7 +53,7 @@ public abstract class CompletionStorage<T> {
    * settings
    */
   public void updateStorage() {
-    this.settingsService.getConfiguration(DIALECTS.label).thenAccept(this::getDialectArray);
+    this.settingsService.fetchConfiguration(DIALECTS.label).thenAccept(this::updateDialects);
   }
 
   protected abstract Map<String, T> getDataMap(String dialectType);
@@ -94,7 +94,7 @@ public abstract class CompletionStorage<T> {
             props.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  private void getDialectArray(List<Object> dialectObject) {
+  private void updateDialects(List<Object> dialectObject) {
     JsonArray dialectArray = (JsonArray) dialectObject.get(0);
     this.dialectType = setDialect(dialectArray);
     resetStorage();

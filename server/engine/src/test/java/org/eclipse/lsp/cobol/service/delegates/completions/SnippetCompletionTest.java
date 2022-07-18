@@ -83,7 +83,7 @@ class SnippetCompletionTest {
     Snippets snippets = new Snippets(settingsService);
     SnippetCompletion completion = new SnippetCompletion(snippets);
 
-    when(settingsService.getConfiguration(DIALECTS.label))
+    when(settingsService.fetchConfiguration(DIALECTS.label))
         .thenReturn(supplyAsync(() -> ImmutableList.of(new JsonArray())));
 
     snippets.updateStorage();
@@ -104,7 +104,7 @@ class SnippetCompletionTest {
     JsonArray dialectSettings = new JsonArray();
     dialectSettings.add(IdmsDialect.NAME);
     List<Object> clientConfig = Arrays.asList(dialectSettings);
-    when(settingsService.getConfiguration(DIALECTS.label))
+    when(settingsService.fetchConfiguration(DIALECTS.label))
         .thenReturn(supplyAsync(() -> clientConfig));
     snippets.updateStorage();
 
@@ -163,7 +163,7 @@ class SnippetCompletionTest {
     JsonArray cobolSettings = new JsonArray();
     List<Object> cobolConfig = Arrays.asList(cobolSettings);
 
-    when(settingsService.getConfiguration(DIALECTS.label))
+    when(settingsService.fetchConfiguration(DIALECTS.label))
         .thenReturn(supplyAsync(() -> cobolConfig));
     snippets.updateStorage();
 
@@ -185,7 +185,7 @@ class SnippetCompletionTest {
     dialectSettings.add(IdmsDialect.NAME);
     List<Object> clientConfig = Arrays.asList(dialectSettings);
 
-    when(settingsService.getConfiguration(DIALECTS.label))
+    when(settingsService.fetchConfiguration(DIALECTS.label))
         .thenReturn(supplyAsync(() -> clientConfig));
     snippets.updateStorage();
 
@@ -198,7 +198,7 @@ class SnippetCompletionTest {
         completion.getCompletionItems("IDMS", MockCompletionModel.MODEL));
 
     /* No dialect type is set in Settings.json */
-    when(settingsService.getConfiguration(DIALECTS.label))
+    when(settingsService.fetchConfiguration(DIALECTS.label))
         .thenReturn(supplyAsync(() -> ImmutableList.of(new JsonArray())));
     snippets.updateStorage();
 
