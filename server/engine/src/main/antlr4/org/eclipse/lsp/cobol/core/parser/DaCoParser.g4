@@ -21,6 +21,7 @@ dacoRules: dacoStatements .*?;
 dacoStatements
     : readTransactionStatement
     | writeTransactionStatement
+    | dfldRcu
     | writeReportStatement
     | openPacketStatement
     | getMetaInfoStatement
@@ -42,6 +43,9 @@ writeTransactionStatement
     : WRITE TRANSACTION (daco_task_name | INPUT)
         (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 4, 2048);} integerLiteral | qualifiedDataName))?
         (TO ({validateLength(_input.LT(1).getText(), "dbu", 19);} (qualifiedDataName | integerLiteral)))?
+    ;
+dfldRcu
+    : DFLD IDENTIFIER ON RCU
     ;
 
 writeReportStatement

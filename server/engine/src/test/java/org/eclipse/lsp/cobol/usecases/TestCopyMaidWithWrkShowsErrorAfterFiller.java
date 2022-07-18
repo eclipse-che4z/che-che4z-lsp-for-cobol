@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -52,6 +52,6 @@ class TestCopyMaidWithWrkShowsErrorAfterFiller {
                 new Range(),
                 "Cannot retrieve suffix for WRK usage",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+                ErrorSource.DIALECT.getText())), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

@@ -31,10 +31,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToOnOffStatement;
@@ -363,6 +360,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
               if (fileControls.containsKey(filename.toUpperCase())) {
                 SyntaxError error =
                     SyntaxError.syntaxError()
+                        .errorSource(ErrorSource.PARSING)
                         .suggestion(
                             messageService.getMessage("CobolVisitor.duplicateFileName", filename))
                         .severity(ErrorSeverity.ERROR)
@@ -784,6 +782,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
             .locality(locality)
             .suggestion(message + wrongToken)
             .severity(ErrorSeverity.WARNING)
@@ -802,6 +801,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private void reportSubroutineNotDefined(String name, Locality locality) {
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
             .suggestion(messageService.getMessage("CobolVisitor.subroutineNotFound", name))
             .severity(ErrorSeverity.INFO)
             .locality(getIntervalPosition(locality, locality))
@@ -824,6 +824,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     if (locality == null) return;
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
             .suggestion(messageService.getMessage("CobolVisitor.misspelledWord", suggestion))
             .severity(ErrorSeverity.WARNING)
             .locality(locality)

@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -48,18 +48,18 @@ class TestHalfTypedVariableDefinition {
                     + "POINTER-32, PROCEDURE-POINTER, REDEFINES, SIGN, SYNC, SYNCHRONIZED, TRAILING, USAGE, UTF-8, VALUE, "
                     + "VALUES, VOLATILE, '.'}",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "No data definition entry found for rename",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorSource.PARSING.getText()),
             "3",
             new Diagnostic(
                 new Range(),
                 "Unexpected end of file",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

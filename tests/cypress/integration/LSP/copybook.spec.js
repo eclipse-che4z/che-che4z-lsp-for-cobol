@@ -74,7 +74,7 @@ context('This is a Copybook spec', () => {
           expect(lineNumber).to.be.equal(19);
           cy.getLineByNumber(lineNumber).find('span').eq(-1).click().realHover({ position: 'center' });
         });
-      cy.get(IDE.hoverOverContent).contains('BOOK3: Copybook not foundCOBOL Language Support - E(MISSING_COPYBOOK)');
+      cy.get(IDE.hoverOverContent).contains('BOOK3: Copybook not foundCOBOL Language Support');
     });
   });
 
@@ -317,7 +317,7 @@ context('This is a Copybook spec', () => {
       cy.getCurrentLineErrors({ expectedLine: 40 })
         .eq(0)
         .getHoverErrorMessage()
-        .contains('ABC: Copybook not foundCOBOL Language Support - E(MISSING_COPYBOOK)');
+        .contains('ABC: Copybook not foundCOBOL Language Support (copybook)(missing copybook)');
       cy.getCurrentLine().type('{end}{enter}Mov');
       cy.getCurrentLineErrors({ expectedLine: 41, errorType: 'warning' })
         .eq(0)
