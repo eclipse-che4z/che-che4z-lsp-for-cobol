@@ -17,9 +17,12 @@ package org.eclipse.lsp.cobol.core.engine.dialects;
 import org.eclipse.lsp.cobol.core.engine.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -67,11 +70,12 @@ public class TestTextTransformations {
   @Test
   void mixed() {
     TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
-    Range range = new Range(new Position(1, 3), new Position(1, 7));
+    // extend starts with 0
+    Range range = new Range(new Position(1, 0), new Position(1, 7));
     CopyNode copyNode = new CopyNode(Locality.builder().range(range).build(), "BOOM");
     tt.extend(copyNode, TextTransformations.of("123\n", ""));
     tt.replace(new Range(new Position(0, 3), new Position(0, 7)), "4321");
-    assertEquals("0: 4321\n1: \n123\n\n", tt.calculateExtendedText());
+    assertEquals("0: 4321\n123\n\n", tt.calculateExtendedText());
   }
 
   @Test
@@ -95,6 +99,23 @@ public class TestTextTransformations {
     assertEquals(2, tt.getExtendedDocumentMap().size());
     assertEquals(range1, tt.getExtendedDocumentMap().get(exRange1).getRange());
     assertEquals(range2, tt.getExtendedDocumentMap().get(exRange2).getRange());
+  }
 
+  @Test
+  void extRegionsTestRecursive() {
+    TextTransformations tt = new TextTransformations("Hi!\n" + TEST, "https://example.com/text1.txt");
+    Range range = new Range(new Position(1, 0), new Position(1, 7));
+    CopyNode copyNode = new CopyNode(Locality.builder().range(range).build(), "BOOM");
+    String boomUri = "BOOM.cpy";
+    TextTransformations boom = TextTransformations.of("Line 1\nLine 2\n", boomUri);
+    boom.replace(new Range(new Position(1, 2), new Position(1, 3)), "M");
+    tt.extend(copyNode, boom);
+    assertEquals("Hi!\nLine 1\nLiMe 2\n\n1: TEST\n", tt.calculateExtendedText());
+    Map<Range, Location> map = tt.getExtendedDocumentMap();
+    assertEquals(2, map.size());
+    Range extBoomRange = new Range(new Position(1, 0), new Position(3, 0));
+    Range extMRange = new Range(new Position(2, 2), new Position(2, 3));
+    assertEquals(range, map.get(extBoomRange).getRange());
+    assertEquals(boomUri, map.get(extMRange).getUri());
   }
 }

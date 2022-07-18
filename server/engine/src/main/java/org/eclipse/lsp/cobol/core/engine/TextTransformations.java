@@ -77,11 +77,15 @@ public class TextTransformations {
         eda.append(lines[lineNumber], linePos, currentRange.getStart().getCharacter());
         String uri =
             extensions.containsKey(currentRange) ? extensions.get(currentRange).getUri() : getUri();
-        String replace =
-            extensions.containsKey(currentRange)
-                ? extensions.get(currentRange).calculateExtendedText()
-                : replacements.get(currentRange);
+        String replace;
         Position start = eda.getPosition();
+        if (extensions.containsKey(currentRange)) {
+          TextTransformations textTransformations = extensions.get(currentRange);
+          replace = textTransformations.calculateExtendedText();
+          extToOriginalMap.putAll(shift(eda.getPosition(), textTransformations.getExtToOriginalMap()));
+        } else {
+          replace = replacements.get(currentRange);
+        }
         eda.append(replace);
         Position end = eda.getPosition();
         Range extRange = new Range(start, end);
@@ -101,6 +105,20 @@ public class TextTransformations {
       }
     }
     return eda.toString();
+  }
+
+  private Map<Range, Location> shift(Position extPos, Map<Range, Location> extToOriginalMap) {
+    Map<Range, Location> result = new HashMap<>();
+    extToOriginalMap.forEach(
+        (k, v) -> {
+          Range newKey =
+              new Range(
+                  new Position(
+                      k.getStart().getLine() + extPos.getLine(), k.getStart().getCharacter()),
+                  new Position(k.getEnd().getLine() + extPos.getLine(), k.getEnd().getCharacter()));
+          result.put(newKey, v);
+        });
+    return result;
   }
 
   private boolean isRangeEmpty(Range range) {
@@ -172,7 +190,7 @@ public class TextTransformations {
 
     void append(String string) {
       if (!string.isEmpty()) {
-        String[] strings = string.split(REGEX_KEEP_NEW_LINES);
+        String[] strings = string.split(REGEX_KEEP_NEW_LINES, -1);
         line += strings.length - 1;
         column += strings[strings.length - 1].length();
       }
