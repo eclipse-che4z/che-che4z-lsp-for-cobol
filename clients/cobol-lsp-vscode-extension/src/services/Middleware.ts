@@ -18,7 +18,10 @@ import {CopybookDownloadService} from "./copybook/CopybookDownloadService";
 import {CopybookURI} from "./copybook/CopybookURI";
 import { InfoStorage } from "./copybook/InfoStorage";
 
-const PARAMS_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+\.[^.]+)\.([^.]+)$/
+//TODO #1478 JSON format for client-server communication. Replace regexp parsing with JSON processing
+const PARAMS_WITHOUT_COPYBOOK_EXTENSION_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+)\.([^.]+)$/;
+const PARAMS_WITH_COPYBOOK_EXTENSION_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+\.[^.]+)\.([^.]+)$/;
+
 export class Middleware {
     constructor(
         private copybookDownloader: CopybookDownloadService) {
@@ -47,7 +50,9 @@ export class Middleware {
     }
 
     private static parseLine(line: string): RequestLine | undefined {
-        const match = PARAMS_REGEX.exec(line);
+        const match = line.split(".")[1] === "copybook-resolve" ?
+            PARAMS_WITH_COPYBOOK_EXTENSION_REGEX.exec(line) :
+            PARAMS_WITHOUT_COPYBOOK_EXTENSION_REGEX.exec(line);
         if (match !== null) {
             return new RequestLine(
                 match[1],

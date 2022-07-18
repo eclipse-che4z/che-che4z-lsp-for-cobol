@@ -78,7 +78,9 @@
                     ".cpy",
                     ".copy"
                 ],
-                "filenamePatterns": ["**/*copybook*/**"],
+                "filenamePatterns": [
+                    "**/*copybook*/**"
+                ],
                 "configuration": "./syntaxes/lang-config.json"
             }
         ],
@@ -177,7 +179,12 @@
                     "items": {
                         "type": "string"
                     },
-                    "default": [".CPY", ".COPY", ".cpy", ".copy"],
+                    "default": [
+                        ".CPY",
+                        ".COPY",
+                        ".cpy",
+                        ".copy"
+                    ],
                     "description": "List of copybook extensions",
                     "uniqueItems": true
                 },
@@ -445,7 +452,8 @@
         "@zowe/zowe-explorer-api": "^1.17.0",
         "iconv-lite": "^0.6.3",
         "vscode-extension-telemetry": "0.1.6",
-        "vscode-languageclient": "5.2.1"
+        "vscode-languageclient": "5.2.1",
+        "yarn": "^1.22.19"
     },
     "devDependencies": {
         "@types/jest": "^27.0.0",

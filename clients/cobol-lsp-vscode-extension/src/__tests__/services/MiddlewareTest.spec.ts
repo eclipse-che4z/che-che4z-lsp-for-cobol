@@ -40,14 +40,14 @@ describe("Copybook downloader", () => {
     });
 
     it("Handle copybook request", async () => {
-        const params = constructParams("cobol-lsp.copybook-resolve.cobFile.bookName.COBOL");
+        const params = constructParams("cobol-lsp.copybook-resolve.cobFile.bookName.cpy.COBOL");
         expect(await middleware.handleConfigurationRequest(params, null, null)).toEqual(["copybookUri"]);
-        expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName", "cobFile", "COBOL");
+        expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName.cpy", "cobFile", "COBOL");
     });
     it("Handle copybook request for name with dots", async () => {
-        const params = constructParams("cobol-lsp.copybook-resolve.USER.CLIST.COB.bookName.COBOL");
+        const params = constructParams("cobol-lsp.copybook-resolve.USER.CLIST.COB.bookName.cpy.COBOL");
         expect(await middleware.handleConfigurationRequest(params, null, null)).toEqual(["copybookUri"]);
-        expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName", "USER.CLIST.COB", "COBOL");
+        expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName.cpy", "USER.CLIST.COB", "COBOL");
     });
     it("Handle copybook download request", async () => {
         const params = {
@@ -76,11 +76,11 @@ describe("Copybook downloader", () => {
 const each = require("jest-each").default;
 describe("ParseLine() returns a RequestLine object or undefined in the following cases:", () => {
     each([
-        ["pref.comm.file.copyname.cpy.COBOL", new RequestLine("pref", "comm", "file", "copyname.cpy", "COBOL", true)],
-        ["pref.comm.file.with.dots.copyname.cpy.COBOL", new RequestLine("pref", "comm", "file.with.dots", "copyname.cpy", "COBOL", true)],
-        ["pref.comm.file.with.dots.copyname.cpy.DIALECT", new RequestLine("pref", "comm", "file.with.dots", "copyname.cpy", "DIALECT", true)],
-        ["pref.comm.quiet.file.copyname.cpy.COBOL", new RequestLine("pref", "comm", "file", "copyname.cpy", "COBOL", true)],
-        ["pref.comm.verbose.file.copyname.cpy.COBOL", new RequestLine("pref", "comm", "file", "copyname.cpy", "COBOL", false)],
+        ["pref.comm.file.copyname.COBOL", new RequestLine("pref", "comm", "file", "copyname", "COBOL", true)],
+        ["pref.comm.file.with.dots.copyname.COBOL", new RequestLine("pref", "comm", "file.with.dots", "copyname", "COBOL", true)],
+        ["pref.comm.file.with.dots.copyname.DIALECT", new RequestLine("pref", "comm", "file.with.dots", "copyname", "DIALECT", true)],
+        ["pref.comm.quiet.file.copyname.COBOL", new RequestLine("pref", "comm", "file", "copyname", "COBOL", true)],
+        ["pref.comm.verbose.file.copyname.COBOL", new RequestLine("pref", "comm", "file", "copyname", "COBOL", false)],
         ["pref.comm", undefined],
         ["", undefined],
     ]).it("when the input is '%s'", (line, expected) => {
