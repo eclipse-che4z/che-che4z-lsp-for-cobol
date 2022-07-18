@@ -68,6 +68,9 @@ public class MappingService {
         .map(mappingItem -> {
           int lineShift = range.getStart().getLine() - mappingItem.extendedRange.getStart().getLine();
           int charShift = mappingItem.originalLocation.getRange().getStart().getCharacter() - mappingItem.extendedRange.getStart().getCharacter();
+          if (charShift != 0) {
+            charShift -= 1;
+          }
 
           int originalLine = mappingItem.originalLocation.getRange().getStart().getLine() + lineShift;
           int originalCharacter = range.getStart().getCharacter() + charShift;
@@ -146,7 +149,7 @@ public class MappingService {
       for (MappingItem item : iterationMap) {
         if (MappingHelper.rangeIn(range, item.originalLocation.getRange())) {
 
-          range = extendRangeIfNeeded(range, lines);
+          range = extendRangeIfNeeded(range, lines, replacements.get(range));
           List<Location> newLocations = MappingHelper.split(range, item.originalLocation.getRange())
               .stream().map(r -> new Location(item.originalLocation.getUri(), r)).collect(Collectors.toList());
 
@@ -196,10 +199,15 @@ public class MappingService {
     return (lines.length != MappingHelper.size(range) || range.getEnd().getCharacter() != last.length());
   }
 
-  private Range extendRangeIfNeeded(Range range, String[] lines) {
+  private Range extendRangeIfNeeded(Range range, String[] lines, String text) {
     String line = lines[range.getEnd().getLine()];
-    if (line.length() <= range.getEnd().getCharacter()) {
+    String[] replaceLines = text.split("\\r?\\n");
+    if (line.length() <= range.getEnd().getCharacter() && text.length() == 0) {
       return new Range(range.getStart(), new Position(range.getEnd().getLine(), 80));
+    }
+    if (replaceLines.length > 0) {
+      return new Range(new Position(range.getStart().getLine(), range.getStart().getCharacter()),
+          new Position(range.getEnd().getLine(), range.getEnd().getCharacter() - replaceLines[replaceLines.length - 1].length()));
     }
     return range;
   }

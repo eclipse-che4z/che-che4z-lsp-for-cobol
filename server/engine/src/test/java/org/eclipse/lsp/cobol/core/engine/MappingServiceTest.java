@@ -64,7 +64,7 @@ class MappingServiceTest {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROCEDURE DIVISION.\n"
           + "         01 TEST REPLACEMENT\n"
-          + "            CONTINUE\n";
+          + "            CONT INUE\n";
 
   private static final String COPYBOOK = "           COPYBOOK TEXT\n"
       + "           NEXT LINE 1\n"
@@ -201,10 +201,11 @@ class MappingServiceTest {
     assertTrue(location.isPresent());
     assertEquals(2, location.get().getRange().getStart().getLine());
 
-    location = mappingService.getOriginalLocation(new Range(new Position(2, 18), new Position(2, 20)));
+    location = mappingService.getOriginalLocation(new Range(new Position(2, 17), new Position(2, 20)));
     assertTrue(location.isPresent());
     assertEquals(3, location.get().getRange().getStart().getLine());
     assertEquals(12, location.get().getRange().getStart().getCharacter());
+    assertEquals(15, location.get().getRange().getEnd().getCharacter());
   }
 
   private MappingService prepareService() {
