@@ -68,20 +68,16 @@ public class MappingService {
         .map(mappingItem -> {
           int lineShift = range.getStart().getLine() - mappingItem.extendedRange.getStart().getLine();
           int charShift = mappingItem.originalLocation.getRange().getStart().getCharacter() - mappingItem.extendedRange.getStart().getCharacter();
-          int originalLine = mappingItem.originalLocation.getRange().getStart().getLine() + lineShift;
 
+          int originalLine = mappingItem.originalLocation.getRange().getStart().getLine() + lineShift;
           int originalCharacter = range.getStart().getCharacter() + charShift;
           Position startPos = new Position(originalLine, originalCharacter);
 
           originalLine = originalLine + range.getEnd().getLine() - range.getStart().getLine();
-          originalCharacter = originalCharacter + range.getEnd().getCharacter() - range.getStart().getCharacter();
+          originalCharacter = originalCharacter + MappingHelper.charSize(range);
           Position endPos = new Position(originalLine, originalCharacter);
 
           Range newRange = new Range(startPos, endPos);
-//          if (newRange.getStart().getLine() == 12 && newRange.getStart().getCharacter() == 7) {
-//            originalCharacter += 1;
-//          }
-
           return new Location(mappingItem.originalLocation.getUri(), newRange);
         });
   }
@@ -136,7 +132,8 @@ public class MappingService {
   }
 
   private ArrayList<MappingItem> applyReplacements(Map<Range, String> replacements, String text) {
-    LinkedList<Range> ranges = new LinkedList<>(replacements.keySet());
+    List<Range> ranges = new LinkedList<>(replacements.keySet());
+    ranges = ranges.stream().filter(r -> affectsToMapping(r, replacements.get(r))).collect(Collectors.toList());
     ranges.sort(Comparator.comparingInt(e -> e.getStart().getLine()));
 
     for (Range range : ranges) {
@@ -188,6 +185,15 @@ public class MappingService {
       }
     }
     return localityMap;
+  }
+
+  private boolean affectsToMapping(Range range, String text) {
+    String[] lines = text.split("\\r?\n");
+    if (lines.length < 1) {
+      return false;
+    }
+    String last = lines[lines.length - 1];
+    return (lines.length != MappingHelper.size(range) || range.getEnd().getCharacter() != last.length());
   }
 
   private Range extendRangeIfNeeded(Range range, String[] lines) {
