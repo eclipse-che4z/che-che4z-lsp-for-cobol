@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonPrimitive;
+import java.util.Collections;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
@@ -78,10 +78,10 @@ class CopybookServiceTest {
 
   @BeforeEach
   void setupMocks() throws IOException {
-    when(settingsService.fetchConfiguration("copybook-resolve", "document", VALID_CPY_NAME, CPY_EXTENSION, "COBOL"))
-        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(VALID_CPY_URI))));
-    when(settingsService.fetchConfiguration("copybook-resolve", "document", INVALID_CPY_NAME, CPY_EXTENSION, "COBOL"))
-        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
+    when(settingsService.fetchTextConfiguration("copybook-resolve", "document", VALID_CPY_NAME, CPY_EXTENSION, "COBOL"))
+        .thenReturn(supplyAsync(() -> singletonList(VALID_CPY_URI)));
+    when(settingsService.fetchTextConfiguration("copybook-resolve", "document", INVALID_CPY_NAME, CPY_EXTENSION, "COBOL"))
+        .thenReturn(supplyAsync(Collections::emptyList));
 
     when(cpyPath.toUri()).thenReturn(URI.create(VALID_CPY_URI));
     when(parentPath.toUri()).thenReturn(URI.create(PARENT_CPY_URI));
@@ -194,7 +194,7 @@ class CopybookServiceTest {
   void testServiceRespondsIfClientSendsInvalidResult() {
     CopybookName copybookName = new CopybookName(VALID_CPY_NAME);
     CopybookService copybookService = createCopybookService();
-    when(settingsService.fetchConfiguration(any())).thenReturn(completedFuture(null));
+    when(settingsService.fetchTextConfiguration(any())).thenReturn(completedFuture(null));
     CopybookModel copybookModel = copybookService.resolve(copybookName, DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
 
     assertEquals(new CopybookModel(copybookName, null, null), copybookModel);
@@ -213,8 +213,8 @@ class CopybookServiceTest {
     verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(DOCUMENT_2_URI)).thenReturn("document2");
-    when(settingsService.fetchConfiguration("copybook-resolve", "document2", INVALID_2_CPY_NAME, CPY_EXTENSION, "COBOL"))
-        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
+    when(settingsService.fetchTextConfiguration("copybook-resolve", "document2", INVALID_2_CPY_NAME, CPY_EXTENSION, "COBOL"))
+        .thenReturn(supplyAsync(Collections::emptyList));
 
     // First document parsed
     CopybookModel invalidCpy = copybookService.resolve(new CopybookName(INVALID_CPY_NAME), DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
@@ -236,7 +236,7 @@ class CopybookServiceTest {
             .copybookProcessingMode(ENABLED)
             .build());
     verify(settingsService, times(1))
-        .fetchConfigurations(singletonList("copybook-download.quiet.document.INVALID.COBOL"));
+        .fetchTextConfigurations(singletonList("copybook-download.quiet.document.INVALID.COBOL"));
 
     // Others parsing done events for first document are not trigger settingsService
     copybookService.handleAnalysisFinishedEvent(
@@ -246,7 +246,7 @@ class CopybookServiceTest {
             .copybookProcessingMode(ENABLED)
             .build());
     verify(settingsService, times(1))
-        .fetchConfigurations(singletonList("copybook-download.quiet.document.INVALID.COBOL"));
+        .fetchTextConfigurations(singletonList("copybook-download.quiet.document.INVALID.COBOL"));
 
     // Second document parsing done
     copybookService.handleAnalysisFinishedEvent(
@@ -256,7 +256,7 @@ class CopybookServiceTest {
             .copybookProcessingMode(ENABLED)
             .build());
     verify(settingsService, times(1))
-        .fetchConfigurations(singletonList("copybook-download.quiet.document2.INVALID_2.COBOL"));
+        .fetchTextConfigurations(singletonList("copybook-download.quiet.document2.INVALID_2.COBOL"));
   }
 
   /** Tests copybook config nullity */
@@ -280,8 +280,8 @@ class CopybookServiceTest {
     verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(DOCUMENT_3_URI)).thenReturn("document2");
-    when(settingsService.fetchConfiguration("copybook-resolve", "document2", SQLCA, CPY_EXTENSION, "COBOL"))
-        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
+    when(settingsService.fetchTextConfiguration("copybook-resolve", "document2", SQLCA, CPY_EXTENSION, "COBOL"))
+        .thenReturn(supplyAsync(Collections::emptyList));
     CopybookModel cpy = copybookService.resolve(copybookName, DOCUMENT_3_URI, DOCUMENT_3_URI, cpyConfig, false);
 
     assertEquals(new CopybookModel(copybookName, DOCUMENT_3_URI, CONTENT), cpy);
@@ -295,8 +295,8 @@ class CopybookServiceTest {
     verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(DOCUMENT_URI)).thenReturn("document2");
-    when(settingsService.fetchConfiguration("copybook-resolve", "document2", SQLCA, CPY_EXTENSION, "COBOL"))
-        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
+    when(settingsService.fetchTextConfiguration("copybook-resolve", "document2", SQLCA, CPY_EXTENSION, "COBOL"))
+        .thenReturn(supplyAsync(Collections::emptyList));
     CopybookModel cpy =
         copybookService.resolve(copybookName, DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DATACOM_SERVER, ImmutableList.of()), false);
 
@@ -313,7 +313,7 @@ class CopybookServiceTest {
 
     when(files.getNameFromURI(DOCUMENT_URI)).thenReturn("document2");
     when(settingsService.fetchConfiguration("copybook-resolve", "document2", SQLDA, CPY_EXTENSION, "COBOL"))
-        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
+        .thenReturn(supplyAsync(Collections::emptyList));
 
     assertEquals(
         copybookService.resolve(copybookName, DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DATACOM_SERVER, ImmutableList.of()), false),
@@ -334,11 +334,11 @@ class CopybookServiceTest {
     when(files.getContentByPath(parentPath)).thenReturn(PARENT_CONTENT);
     when(files.getContentByPath(parentPath)).thenReturn(PARENT_CONTENT);
 
-    when(settingsService.fetchConfiguration("copybook-resolve", "document", NESTED_CPY_NAME, CPY_EXTENSION, "COBOL"))
-        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
+    when(settingsService.fetchTextConfiguration("copybook-resolve", "document", NESTED_CPY_NAME, CPY_EXTENSION, "COBOL"))
+        .thenReturn(supplyAsync(() -> singletonList("")));
 
-    when(settingsService.fetchConfiguration("copybook-resolve", "document", PARENT_CPY_NAME, CPY_EXTENSION, "COBOL"))
-        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(PARENT_CPY_URI))));
+    when(settingsService.fetchTextConfiguration("copybook-resolve", "document", PARENT_CPY_NAME, CPY_EXTENSION, "COBOL"))
+        .thenReturn(supplyAsync(() -> singletonList(PARENT_CPY_URI)));
 
     CopybookModel invalidCpy = copybookService.resolve(new CopybookName(INVALID_CPY_NAME), DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
     CopybookModel parentCpy = copybookService.resolve(new CopybookName(PARENT_CPY_NAME), DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
@@ -360,7 +360,7 @@ class CopybookServiceTest {
             .build());
 
     verify(settingsService, times(1))
-        .fetchConfigurations(
+        .fetchTextConfigurations(
             asList(
                     "copybook-download.quiet.document.INVALID.COBOL",
                     "copybook-download.quiet.document.nested.COBOL"
@@ -371,7 +371,7 @@ class CopybookServiceTest {
   @Test
   void testResolveGetsStubWhenConfigurationThrowAnError() {
     CopybookName copybookName = new CopybookName(VALID_CPY_NAME);
-    when(settingsService.fetchConfiguration("copybook-resolve", "document", VALID_CPY_NAME, CPY_EXTENSION, "COBOL"))
+    when(settingsService.fetchTextConfiguration("copybook-resolve", "document", VALID_CPY_NAME, CPY_EXTENSION, "COBOL"))
         .thenReturn(
             CompletableFuture.supplyAsync(
                 () -> {
@@ -386,7 +386,7 @@ class CopybookServiceTest {
   @Test
   void testThatMiddlewareThrowsRuntimeException() {
     CopybookName copybookName = new CopybookName(VALID_CPY_NAME);
-    when(settingsService.fetchConfiguration("copybook-resolve", "document", VALID_CPY_NAME, CPY_EXTENSION, "COBOL"))
+    when(settingsService.fetchTextConfiguration("copybook-resolve", "document", VALID_CPY_NAME, CPY_EXTENSION, "COBOL"))
         .thenThrow(new RuntimeException("Something is wrong"));
     CopybookService copybookService = createCopybookService();
     CopybookModel copybookModel = copybookService.resolve(copybookName, DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
@@ -398,15 +398,15 @@ class CopybookServiceTest {
   void testPredefinedCopybooksLoaded() {
     final String copybookName = PredefinedCopybooks.Copybook.SQLCA.name();
     CopybookService copybookService = createCopybookService();
-    when(settingsService.fetchConfiguration("copybook-resolve", "document", copybookName, CPY_EXTENSION, "COBOL"))
-        .thenReturn(supplyAsync(() -> ImmutableList.of(new JsonPrimitive(""))));
+    when(settingsService.fetchTextConfiguration("copybook-resolve", "document", copybookName, CPY_EXTENSION, "COBOL"))
+        .thenReturn(supplyAsync(Collections::emptyList));
     final CopybookModel model =
         copybookService.resolve(
             new CopybookName(copybookName), DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of()), false);
 
     assertEquals("implicit:///implicitCopybooks/SQLCA_DB2.cpy", model.getUri());
     verify(settingsService, times(1))
-        .fetchConfiguration("copybook-resolve", "document", copybookName, CPY_EXTENSION, "COBOL");
+        .fetchTextConfiguration("copybook-resolve", "document", copybookName, CPY_EXTENSION, "COBOL");
     verify(files, times(1)).getNameFromURI(DOCUMENT_URI);
   }
 
@@ -415,8 +415,8 @@ class CopybookServiceTest {
     final String copybookName = PredefinedCopybooks.Copybook.SQLCA.name();
     final String copybookUri = "file:///c%3A/workspace/.c4z/.copybooks/" + copybookName + ".cpy";
 
-    when(settingsService.fetchConfiguration("copybook-resolve", "document", copybookName, CPY_EXTENSION, "COBOL"))
-        .thenReturn(supplyAsync(() -> ImmutableList.of(new JsonPrimitive(copybookUri))));
+    when(settingsService.fetchTextConfiguration("copybook-resolve", "document", copybookName, CPY_EXTENSION, "COBOL"))
+        .thenReturn(supplyAsync(() -> ImmutableList.of(copybookUri)));
     when(files.getPathFromURI(copybookUri)).thenReturn(cpyPath);
     when(files.fileExists(cpyPath)).thenReturn(true);
     when(files.getContentByPath(cpyPath)).thenReturn("content");
@@ -431,7 +431,7 @@ class CopybookServiceTest {
     assertEquals(copybookUri, model.getUri());
     assertEquals("content", model.getContent());
     verify(settingsService, times(1))
-        .fetchConfiguration("copybook-resolve", "document", copybookName, CPY_EXTENSION, "COBOL");
+        .fetchTextConfiguration("copybook-resolve", "document", copybookName, CPY_EXTENSION, "COBOL");
 
     // Assert the copybook was not added to the download queue
     assertTrue(copybookService.getCopybooksForDownloading().isEmpty());

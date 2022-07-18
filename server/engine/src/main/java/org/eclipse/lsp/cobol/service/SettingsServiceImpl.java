@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import java.util.stream.Collectors;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Streams;
@@ -53,11 +54,16 @@ public class SettingsServiceImpl implements SettingsService {
 
   @Override
   public CompletableFuture<List<String>> fetchTextConfiguration(@NonNull String... section) {
-    return fetchConfiguration(section).thenApply(objects -> objects.stream()
-            .map(obj -> (JsonArray) obj)
-            .flatMap(Streams::stream)
-            .map(JsonElement::getAsString)
-            .collect(toList()));
+    return fetchTextConfigurations(singletonList(Joiner.on(".").join(section)));
+  }
+
+  @Override
+  public CompletableFuture<List<String>> fetchTextConfigurations(List<String> sections) {
+    return fetchConfigurations(sections).thenApply(objects -> objects.stream()
+        .map(obj -> (JsonArray) obj)
+        .flatMap(Streams::stream)
+        .map(JsonElement::getAsString)
+        .collect(Collectors.toList()));
   }
 
   @NonNull

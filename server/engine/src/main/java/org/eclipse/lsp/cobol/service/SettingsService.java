@@ -44,6 +44,17 @@ public interface SettingsService {
    */
   CompletableFuture<List<String>> fetchTextConfiguration(String... section);
 
+
+  /**
+   * Fetch the required configuration sections from the client. Note that Scope URI is null. The
+   * {@link SettingsParametersEnum#LSP_PREFIX LSP prefix} will be added to each specified section.
+   *
+   * @param sections the required sections.
+   * @return a list of string of configuration objects.
+   */
+  CompletableFuture<List<String>> fetchTextConfigurations(List<String> sections);
+
+
   /**
    * Fetch the required configuration sections from the client. Note that Scope URI is null. The
    * {@link SettingsParametersEnum#LSP_PREFIX LSP prefix} will be added to each specified section.
