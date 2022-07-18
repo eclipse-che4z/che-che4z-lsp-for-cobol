@@ -68,9 +68,6 @@ public class MappingService {
         .map(mappingItem -> {
           int lineShift = range.getStart().getLine() - mappingItem.extendedRange.getStart().getLine();
           int charShift = mappingItem.originalLocation.getRange().getStart().getCharacter() - mappingItem.extendedRange.getStart().getCharacter();
-          if (charShift != 0) {
-            charShift -= 1;
-          }
 
           int originalLine = mappingItem.originalLocation.getRange().getStart().getLine() + lineShift;
           int originalCharacter = range.getStart().getCharacter() + charShift;
@@ -207,7 +204,7 @@ public class MappingService {
     }
     if (replaceLines.length > 0) {
       return new Range(new Position(range.getStart().getLine(), range.getStart().getCharacter()),
-          new Position(range.getEnd().getLine(), range.getEnd().getCharacter() - replaceLines[replaceLines.length - 1].length()));
+          new Position(range.getEnd().getLine(), range.getEnd().getCharacter() - replaceLines[replaceLines.length - 1].length() - 1));
     }
     return range;
   }
