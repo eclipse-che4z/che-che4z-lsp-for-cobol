@@ -277,17 +277,18 @@ public class UseCaseEngine {
       Predicate<VariableNode> predicate,
       Function<Context, List<Location>> extractor) {
 
-    return result
-        .getRootNode()
-        .getDepthFirstStream()
-        .filter(hasType(PROGRAM))
-        .map(ProgramNode.class::cast)
-        .map(ProgramNode::getVariables)
-        .map(Multimap::values)
-        .flatMap(Collection::stream)
-        .filter(it -> !FILLER_NAME.equals(it.getName()))
-        .filter(predicate)
-        .collect(toMap(extractor, PROGRAM));
+    Map<String, List<Location>> map = result
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(hasType(PROGRAM))
+            .map(ProgramNode.class::cast)
+            .map(ProgramNode::getVariables)
+            .map(Multimap::values)
+            .flatMap(Collection::stream)
+            .filter(it -> !FILLER_NAME.equals(it.getName()))
+            .filter(predicate)
+            .collect(toMap(extractor, PROGRAM));
+    return map;
   }
 
   private Map<String, List<Location>> extractDefinitions(AnalysisResult result, NodeType nodeType) {

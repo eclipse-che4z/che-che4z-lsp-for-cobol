@@ -183,27 +183,25 @@ public class VisitorHelper {
   /**
    * Retrieve a locality from the given context with a range from the start to the end
    *
-   * @param context ParserRuleContext to extract locality
+   * @param ctx ParserRuleContext to extract locality
    * @param positions map of exact positions
    * @return locality which has a range from the start to the end of the rule
    */
-  Optional<Locality> retrieveRangeLocality(
-      ParserRuleContext context, Map<Token, Locality> positions) {
-    return ofNullable(context)
-        .flatMap(
-            ctx ->
-                ofNullable(positions.get(ctx.getStart()))
-                    .flatMap(
-                        start ->
-                            ofNullable(positions.get(ctx.getStop()))
-                                .map(
-                                    stop ->
-                                        start.toBuilder()
-                                            .range(
-                                                new Range(
-                                                    start.getRange().getStart(),
-                                                    stop.getRange().getEnd()))
-                                            .build())));
+  Optional<Locality> retrieveRangeLocality(ParserRuleContext ctx, Map<Token, Locality> positions) {
+    if (ctx == null) {
+      return Optional.empty();
+    }
+    Locality start = positions.get(ctx.getStart());
+    Locality stop = positions.get(ctx.getStop());
+    if (start == null || stop == null) {
+      return Optional.empty();
+    }
+    return Optional.of(
+            start.toBuilder().range(
+                    new Range(
+                            start.getRange().getStart(),
+                            stop.getRange().getEnd()
+                    )).build());
   }
 
   /**

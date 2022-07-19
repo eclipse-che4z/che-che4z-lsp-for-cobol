@@ -76,6 +76,7 @@ class MappingServiceTest {
       + "           NEXT LINE 1\n"
       + "           NEXT LINE 2\n"
       + "           NEXT LINE 3\n";
+  private static final String COPYBOOK2 = "!!!!\n";
 
   @Test
   void testMapping() {
@@ -127,6 +128,111 @@ class MappingServiceTest {
     assertEquals(10, location.get().getRange().getStart().getCharacter());
     assertEquals(2, location.get().getRange().getEnd().getLine());
     assertEquals(15, location.get().getRange().getEnd().getCharacter());
+  }
+
+  @Test
+  void testLocationInNestedCopybook() {
+    TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
+    CopyNode copyNode = new CopyNode(Locality.builder().range(new Range(new Position(7, 11), new Position(7, 21))).build(),
+            "copybook");
+    CopyNode copyNode2 = new CopyNode(Locality.builder().range(new Range(new Position(1, 0), new Position(1,22))).build(),
+            "copybook2");
+    TextTransformations copybookTT = TextTransformations.of(COPYBOOK, "copybook");
+    textTransformations.extend(copyNode, copybookTT);
+    copybookTT.extend(copyNode2, TextTransformations.of(COPYBOOK2, "copybook2"));
+
+    MappingService service = new MappingService(textTransformations);
+    Optional<Location> location = service.getOriginalLocation(
+            new Range(new Position(8, 0), new Position(8, 4)));
+
+    assertTrue(location.isPresent());
+    assertEquals("copybook2", location.get().getUri());
+    assertEquals(0, location.get().getRange().getStart().getLine());
+    assertEquals(0, location.get().getRange().getStart().getCharacter());
+    assertEquals(0, location.get().getRange().getEnd().getLine());
+    assertEquals(4, location.get().getRange().getEnd().getCharacter());
+
+    Optional<Location> location2 = service.getOriginalLocation(
+            new Range(new Position(6, 0), new Position(6, 2)));
+
+    assertTrue(location2.isPresent());
+    assertEquals("original", location2.get().getUri());
+    assertEquals(6, location2.get().getRange().getStart().getLine());
+    assertEquals(0, location2.get().getRange().getStart().getCharacter());
+    assertEquals(6, location2.get().getRange().getEnd().getLine());
+    assertEquals(2, location2.get().getRange().getEnd().getCharacter());
+
+    Optional<Location> location3 = service.getOriginalLocation(
+            new Range(new Position(7, 0), new Position(7, 2)));
+
+    assertTrue(location3.isPresent());
+    assertEquals("copybook", location3.get().getUri());
+    assertEquals(0, location3.get().getRange().getStart().getLine());
+    assertEquals(0, location3.get().getRange().getStart().getCharacter());
+    assertEquals(0, location3.get().getRange().getEnd().getLine());
+    assertEquals(2, location3.get().getRange().getEnd().getCharacter());
+
+    Optional<Location> location4 = service.getOriginalLocation(
+            new Range(new Position(10, 0), new Position(10, 2)));
+
+    assertTrue(location4.isPresent());
+    assertEquals("copybook", location4.get().getUri());
+    assertEquals(2, location4.get().getRange().getStart().getLine());
+    assertEquals(0, location4.get().getRange().getStart().getCharacter());
+    assertEquals(2, location4.get().getRange().getEnd().getLine());
+    assertEquals(2, location4.get().getRange().getEnd().getCharacter());
+  }
+  @Test
+  void testLocationInNestedCopybook2() {
+    TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
+    CopyNode copyNode = new CopyNode(Locality.builder().range(new Range(new Position(7, 11), new Position(7, 21))).build(),
+            "copybook");
+    CopyNode copyNode2 = new CopyNode(Locality.builder().range(new Range(new Position(0, 0), new Position(0,24))).build(),
+            "copybook2");
+    TextTransformations copybookTT = TextTransformations.of(COPYBOOK, "copybook");
+    textTransformations.extend(copyNode, copybookTT);
+    copybookTT.extend(copyNode2, TextTransformations.of(COPYBOOK2, "copybook2"));
+
+    MappingService service = new MappingService(textTransformations);
+    Optional<Location> location = service.getOriginalLocation(
+            new Range(new Position(7, 0), new Position(7, 4)));
+
+    assertTrue(location.isPresent());
+    assertEquals("copybook2", location.get().getUri());
+    assertEquals(0, location.get().getRange().getStart().getLine());
+    assertEquals(0, location.get().getRange().getStart().getCharacter());
+    assertEquals(0, location.get().getRange().getEnd().getLine());
+    assertEquals(4, location.get().getRange().getEnd().getCharacter());
+
+    Optional<Location> location2 = service.getOriginalLocation(
+            new Range(new Position(6, 0), new Position(6, 2)));
+
+    assertTrue(location2.isPresent());
+    assertEquals("original", location2.get().getUri());
+    assertEquals(6, location2.get().getRange().getStart().getLine());
+    assertEquals(0, location2.get().getRange().getStart().getCharacter());
+    assertEquals(6, location2.get().getRange().getEnd().getLine());
+    assertEquals(2, location2.get().getRange().getEnd().getCharacter());
+
+    Optional<Location> location3 = service.getOriginalLocation(
+            new Range(new Position(7, 0), new Position(7, 2)));
+
+    assertTrue(location3.isPresent());
+    assertEquals("copybook", location3.get().getUri());
+    assertEquals(0, location3.get().getRange().getStart().getLine());
+    assertEquals(0, location3.get().getRange().getStart().getCharacter());
+    assertEquals(0, location3.get().getRange().getEnd().getLine());
+    assertEquals(2, location3.get().getRange().getEnd().getCharacter());
+
+    Optional<Location> location4 = service.getOriginalLocation(
+            new Range(new Position(10, 0), new Position(10, 2)));
+
+    assertTrue(location4.isPresent());
+    assertEquals("copybook", location4.get().getUri());
+    assertEquals(2, location4.get().getRange().getStart().getLine());
+    assertEquals(0, location4.get().getRange().getStart().getCharacter());
+    assertEquals(2, location4.get().getRange().getEnd().getLine());
+    assertEquals(2, location4.get().getRange().getEnd().getCharacter());
   }
 
   @Test
