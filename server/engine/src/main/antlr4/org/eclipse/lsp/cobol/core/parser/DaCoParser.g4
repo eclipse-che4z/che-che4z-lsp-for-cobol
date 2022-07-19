@@ -239,7 +239,7 @@ rowMatchStatement
 tableRowUpdateStatement
     : ROW (rowDeleteStatement | rowAddStatement | rowInsertStatement |
       rowModifyStatement | rowSortStatement | rowSingleStatement |
-      rowDuplicateStatement | rowInvertStatement)
+      rowDuplicateStatement | rowInvertStatement | rowInitializaStatement)
     ;
 
 rowDeleteStatement
@@ -279,6 +279,10 @@ rowDuplicateStatement
 
 rowInvertStatement
     : INVERT daco_table_name
+    ;
+
+rowInitializaStatement
+    : INITIALIZE daco_table_name
     ;
 
 tableDMLStatement
