@@ -192,13 +192,14 @@ public class CopybookServiceImpl implements CopybookService {
   private Optional<String> resolveCopybookFromWorkspace(
       CopybookName copybookName, String mainProgramFileName) {
     try {
-      return settingsService.fetchTextConfiguration(
+      return SettingsService.getValueAsString(
+          settingsService.fetchConfiguration(
               COPYBOOK_RESOLVE.label,
               mainProgramFileName,
               copybookName.getDisplayName(),
               copybookName.getExtension(),
-              Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL)
-      ).get().stream().findAny();
+              Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL)).get()
+      );
     } catch (InterruptedException e) {
       // rethrowing the InterruptedException to interrupt the parent thread.
       throw new UncheckedExecutionException(e);
@@ -260,7 +261,7 @@ public class CopybookServiceImpl implements CopybookService {
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
       if (!copybooksToDownload.isEmpty()) {
-        settingsService.fetchTextConfigurations(copybooksToDownload);
+        settingsService.fetchConfigurations(copybooksToDownload);
       }
     }
   }

@@ -80,12 +80,13 @@ class CobolLanguageServerTest {
     String path = "foo/bar";
     arr.add(new JsonPrimitive(path));
 
-    when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(path)));
+    when(settingsService.fetchTextConfiguration(anyString())).thenCallRealMethod();
+    when(settingsService.fetchConfiguration(CPY_LOCAL_PATHS.label))
+        .thenReturn(completedFuture(singletonList(arr)));
     when(localeStore.notifyLocaleStore()).thenReturn(System.out::println);
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.fetchTextConfiguration(SUBROUTINE_LOCAL_PATHS.label))
+    when(settingsService.fetchConfiguration(SUBROUTINE_LOCAL_PATHS.label))
         .thenReturn(completedFuture(ImmutableList.of()));
     when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(ImmutableList.of("INFO")));
@@ -107,7 +108,7 @@ class CobolLanguageServerTest {
 
     verify(watchingService).watchConfigurationChange();
     verify(watchingService).watchPredefinedFolder();
-    verify(settingsService).fetchTextConfiguration(CPY_LOCAL_PATHS.label);
+    verify(settingsService).fetchConfiguration(CPY_LOCAL_PATHS.label);
     verify(settingsService).fetchConfiguration(LOCALE.label);
     verify(watchingService).addWatchers(singletonList(path));
     verify(localeStore).notifyLocaleStore();
