@@ -41,7 +41,10 @@ import java.util.concurrent.ExecutionException;
 
 import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK_DOWNLOAD;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK_RESOLVE;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.QUIET;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.VERBOSE;
 
 /**
  * This service processes copybook requests and returns content by its name. The service also caches
