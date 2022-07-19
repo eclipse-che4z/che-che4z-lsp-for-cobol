@@ -68,9 +68,6 @@ public class MappingService {
         .map(mappingItem -> {
           int lineShift = range.getStart().getLine() - mappingItem.extendedRange.getStart().getLine();
           int charShift = mappingItem.originalLocation.getRange().getStart().getCharacter() - mappingItem.extendedRange.getStart().getCharacter();
-          if (charShift != 0) {
-            charShift -= 1;
-          }
 
           int originalLine = mappingItem.originalLocation.getRange().getStart().getLine() + lineShift;
           int originalCharacter = range.getStart().getCharacter() + charShift;
@@ -200,16 +197,25 @@ public class MappingService {
   }
 
   private Range extendRangeIfNeeded(Range range, String[] lines, String text) {
-    String line = lines[range.getEnd().getLine()];
+    String firstLine = lines[range.getStart().getLine()];
+    String lastLine = lines[range.getEnd().getLine()];
     String[] replaceLines = text.split("\\r?\\n");
-    if (line.length() <= range.getEnd().getCharacter() && text.length() == 0) {
-      return new Range(range.getStart(), new Position(range.getEnd().getLine(), 80));
+
+    Position start = new Position(range.getStart().getLine(), range.getStart().getCharacter());
+    Position end = new Position(range.getEnd().getLine(), range.getEnd().getCharacter());
+
+    if (lastLine.length() <= range.getEnd().getCharacter() && text.length() == 0) {
+      end.setCharacter(80);
+    } else {
+      if (replaceLines.length > 0) {
+        end.setCharacter(range.getEnd().getCharacter() - replaceLines[replaceLines.length - 1].length() - 1);
+      }
     }
-    if (replaceLines.length > 0) {
-      return new Range(new Position(range.getStart().getLine(), range.getStart().getCharacter()),
-          new Position(range.getEnd().getLine(), range.getEnd().getCharacter() - replaceLines[replaceLines.length - 1].length()));
+    if (firstLine.length() <= start.getCharacter() && text.length() == 0) {
+      start.setLine(range.getStart().getLine() + 1);
+      start.setCharacter(0);
     }
-    return range;
+    return new Range(start, end);
   }
 
   private MappingItem buildMappingItem(String uri, int originalDocumentLine, int extendedDocumentLine, Range originalRange, Range extendedRange) {
