@@ -66,6 +66,12 @@ class MappingServiceTest {
           + "         01 TEST REPLACEMENT\n"
           + "            CONT INUE\n";
 
+  private static final String TEXT_REPLACEMENT_NEW_LINE =
+      "0123\n"
+          + "5\n"
+          + "\n"
+          + "6\n";
+
   private static final String COPYBOOK = "           COPYBOOK TEXT\n"
       + "           NEXT LINE 1\n"
       + "           NEXT LINE 2\n"
@@ -206,6 +212,20 @@ class MappingServiceTest {
     assertEquals(3, location.get().getRange().getStart().getLine());
     assertEquals(12, location.get().getRange().getStart().getCharacter());
     assertEquals(15, location.get().getRange().getEnd().getCharacter());
+  }
+
+  @Test
+  void testReplacementNewLinePositioning() {
+    TextTransformations textTransformations = TextTransformations.of(TEXT_REPLACEMENT_NEW_LINE, "original");
+    Range range = new Range(new Position(0, 4), new Position(1, 1));
+    textTransformations.replace(range, "");
+
+    MappingService mappingService = new MappingService(textTransformations);
+
+    Optional<Location> location = mappingService.getOriginalLocation(new Range(new Position(2, 0), new Position(2, 0)));
+    assertTrue(location.isPresent());
+    assertEquals(3, location.get().getRange().getStart().getLine());
+    assertEquals(0, location.get().getRange().getStart().getCharacter());
   }
 
   private MappingService prepareService() {

@@ -118,7 +118,7 @@ public class MappingHelper {
     }
 
     startPoint = new Position(split.getStart().getLine() + 1, 0);
-    endPoint = new Position(range.getEnd().getLine() - size(split) + 1, range.getEnd().getCharacter());
+    endPoint = new Position(range.getEnd().getLine() - size(split) + (split.getEnd().getCharacter() < 80 ? 1 : 0), range.getEnd().getCharacter());
     secondRange = new Range(startPoint, endPoint);
 
     if (size(secondRange) > 0 || charSize(secondRange) > 0) {

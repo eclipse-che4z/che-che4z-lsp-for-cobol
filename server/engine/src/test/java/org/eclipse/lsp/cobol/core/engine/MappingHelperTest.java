@@ -74,4 +74,52 @@ class MappingHelperTest {
     assertEquals(80, ranges.get(2).getEnd().getCharacter());
   }
 
+  @Test
+  void testSplitFullLineMiddle() {
+    Range bigRange = new Range(new Position(0, 0), new Position(10, 80));
+    Range splitter = new Range(new Position(5, 0), new Position(5, 80));
+    List<Range> ranges = MappingHelper.split(splitter, bigRange);
+
+    assertEquals(3, ranges.size());
+
+    assertEquals(0, ranges.get(0).getStart().getLine());
+    assertEquals(0, ranges.get(0).getStart().getCharacter());
+    assertEquals(4, ranges.get(0).getEnd().getLine());
+    assertEquals(80, ranges.get(0).getEnd().getCharacter());
+
+    assertEquals(6, ranges.get(1).getStart().getLine());
+    assertEquals(0, ranges.get(1).getStart().getCharacter());
+    assertEquals(6, ranges.get(1).getEnd().getLine());
+    assertEquals(80, ranges.get(1).getEnd().getCharacter());
+
+    assertEquals(7, ranges.get(2).getStart().getLine());
+    assertEquals(0, ranges.get(2).getStart().getCharacter());
+    assertEquals(10, ranges.get(2).getEnd().getLine());
+    assertEquals(80, ranges.get(2).getEnd().getCharacter());
+  }
+
+  @Test
+  void testConcatFullLineMiddle() {
+    Range bigRange = new Range(new Position(0, 0), new Position(10, 80));
+    Range splitter = new Range(new Position(5, 0), new Position(5, 80));
+    List<Range> ranges = MappingHelper.concat(splitter, bigRange);
+
+    assertEquals(3, ranges.size());
+
+    assertEquals(0, ranges.get(0).getStart().getLine());
+    assertEquals(0, ranges.get(0).getStart().getCharacter());
+    assertEquals(4, ranges.get(0).getEnd().getLine());
+    assertEquals(80, ranges.get(0).getEnd().getCharacter());
+
+    assertEquals(5, ranges.get(1).getStart().getLine());
+    assertEquals(0, ranges.get(1).getStart().getCharacter());
+    assertEquals(5, ranges.get(1).getEnd().getLine());
+    assertEquals(80, ranges.get(1).getEnd().getCharacter());
+
+    assertEquals(6, ranges.get(2).getStart().getLine());
+    assertEquals(0, ranges.get(2).getStart().getCharacter());
+    assertEquals(9, ranges.get(2).getEnd().getLine());
+    assertEquals(80, ranges.get(2).getEnd().getCharacter());
+  }
+
 }
