@@ -349,6 +349,13 @@
     ],
     "description": "[DaCo] ROW INVERT"
   },
+  "TABLE ROW INITIALIZE": {
+    "prefix": "ROW INITIALIZE",
+    "body": [
+      "ROW INITIALIZE ${1:TBL|TBFnam}."
+    ],
+    "description": "[DaCo] ROW INITIALIZE"
+  },
   "TABLE GET ANY": {
     "prefix": "GET TABLE ANY",
     "body": [
