@@ -56,6 +56,7 @@ import static org.mockito.Mockito.when;
 public class UseCaseUtils {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
 
+  public static final String COPYBOOK_URI = "file///c%3A/copybooks/copybook.cpy";
   private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.c4z/.copybooks/";
   private static final String CPY_URI_SUFFIX = ".cpy";
 
