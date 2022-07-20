@@ -11,7 +11,7 @@
 
 COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using the Zowe Explorer extension to automatically retrieve copybooks used in your programs and store them in your workspace. COBOL Language Support also supports COBOL programs which interact with IDMS, Datacom, CICS, and DB2 SQL.
 
-COBOL Language Support recognizes files with the extensions `.cob`, `.cbl` and `.cobol` as COBOL files, and `.cpy` and `.copy` as COBOL copybooks.
+COBOL Language Support recognizes files with the extensions `.cob`, `.cbl` and `.cobol` as COBOL files.
 
 > How can we improve COBOL Language Support? [Let us know on our Git repository](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues)
 
@@ -120,9 +120,9 @@ If you specify your subroutine folders using absolute paths or paths containing 
 
 ## Copybook Support
 
-The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace.
+The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If you have copybooks stored in mainframe data sets or USS directories, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace.
 
-You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
+To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a remote location, the one in the local folder is used.
 
 Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
 
@@ -149,7 +149,9 @@ You can store your copybooks locally in folders in your workspace and specify th
    - Under **Cpy-manager: Paths-local: Idms** for the IDMS dialect.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
    - The folders are searched in the order they are listed. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
-4. Open a program or project.  
+4. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
+5. (Optional) Under **Cpy-manager: Copybook-file-encoding**, specify the file encoding used in your copybooks.
+6. Open a program or project.  
    Copybook support features are now enabled.
 
 If you specify your copybook folders using absolute paths or paths containing `../` or `./`, the copybook folders are not watched for changes. You might need to resolve names of recently added copybooks in your code manually.
@@ -158,7 +160,7 @@ To resolve copybook names manually, hover over the copybook name with the error 
 
 ### Retrieving Copybooks from the Mainframe
 
-You can also set up automatic copybook retrieval from the mainframe to download copybooks from mainframe data sets to your workspace.
+You can also set up automatic copybook retrieval from the mainframe to download copybooks from mainframe data sets and USS directories to your workspace.
 
 **Follow these steps:**
 
@@ -166,8 +168,11 @@ You can also set up automatic copybook retrieval from the mainframe to download 
 2. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings.
 3. Switch from **User** to **Workspace**.
 4. Under **Cpy-manager: Paths-dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
-5. Under **Profile**, enter the name of your Zowe Explorer profile.
-6. Open a program or project.  
+5. Under **Cpy-manager: Paths-uss**, list absolute paths of directories on USS subsystems to search for copybooks. The directories are searched in the order they are listed, so if two directories contain a copybook with the same member name, the one from the directory higher on the list is downloaded.
+6. Under **Cpy-manager: Profiles**, enter the name of your Zowe Explorer profile.
+7. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
+8. (Optional) Under **Cpy-manager: Copybook-file-encoding**, specify the file encoding used in your copybooks.
+9. Open a program or project.  
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3.  
    Copybook support features are now enabled.
 
