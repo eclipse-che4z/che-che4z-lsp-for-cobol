@@ -135,7 +135,7 @@ class MappingServiceTest {
     TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
     CopyNode copyNode = new CopyNode(Locality.builder().range(new Range(new Position(7, 11), new Position(7, 21))).build(),
             "copybook");
-    CopyNode copyNode2 = new CopyNode(Locality.builder().range(new Range(new Position(1, 0), new Position(1,22))).build(),
+    CopyNode copyNode2 = new CopyNode(Locality.builder().range(new Range(new Position(1, 0), new Position(1, 22))).build(),
             "copybook2");
     TextTransformations copybookTT = TextTransformations.of(COPYBOOK, "copybook");
     textTransformations.extend(copyNode, copybookTT);
@@ -182,12 +182,13 @@ class MappingServiceTest {
     assertEquals(2, location4.get().getRange().getEnd().getLine());
     assertEquals(2, location4.get().getRange().getEnd().getCharacter());
   }
+
   @Test
   void testLocationInNestedCopybook2() {
     TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
     CopyNode copyNode = new CopyNode(Locality.builder().range(new Range(new Position(7, 11), new Position(7, 21))).build(),
             "copybook");
-    CopyNode copyNode2 = new CopyNode(Locality.builder().range(new Range(new Position(0, 0), new Position(0,24))).build(),
+    CopyNode copyNode2 = new CopyNode(Locality.builder().range(new Range(new Position(0, 0), new Position(0, 24))).build(),
             "copybook2");
     TextTransformations copybookTT = TextTransformations.of(COPYBOOK, "copybook");
     textTransformations.extend(copyNode, copybookTT);
@@ -218,7 +219,7 @@ class MappingServiceTest {
             new Range(new Position(7, 0), new Position(7, 2)));
 
     assertTrue(location3.isPresent());
-    assertEquals("copybook", location3.get().getUri());
+    assertEquals("copybook2", location3.get().getUri());
     assertEquals(0, location3.get().getRange().getStart().getLine());
     assertEquals(0, location3.get().getRange().getStart().getCharacter());
     assertEquals(0, location3.get().getRange().getEnd().getLine());

@@ -98,14 +98,16 @@ public class MappingService {
     int originalDocumentLine = 0;
     int extendedDocumentLine = 0;
     for (Range range : ranges) {
-      List<MappingItem> map = buildLocalityMap(textTransformations.getExtensions().get(range));
-      MappingItem last = map.get(map.size() - 1);
 
-      result.add(buildMappingItem(textTransformations.getUri(), originalDocumentLine, extendedDocumentLine, range, last.extendedRange));
+      MappingItem mappingItem = buildMappingItemForRange(textTransformations.getUri(), range, originalDocumentLine, extendedDocumentLine);
+      if (MappingHelper.size(mappingItem.extendedRange) > 0) {
+        result.add(mappingItem);
+      }
 
       extendedDocumentLine += (range.getEnd().getLine() - originalDocumentLine);
       originalDocumentLine = range.getEnd().getLine() + 1;
 
+      List<MappingItem> map = buildLocalityMap(textTransformations.getExtensions().get(range));
       for (MappingItem item : map) {
         Position start = item.extendedRange.getStart();
         Position end = item.extendedRange.getEnd();
@@ -129,6 +131,22 @@ public class MappingService {
     result.add(last);
 
     return result;
+  }
+
+  private MappingItem buildMappingItemForRange(String uri, Range range, int originalDocumentLine, int extendedDocumentLine) {
+    int size = range.getStart().getLine() - originalDocumentLine;
+    int charPos = range.getStart().getCharacter() - 1;
+    int originalEndLine = range.getStart().getLine();
+    int extendedEndLine = extendedDocumentLine + size;
+    if (charPos < 0) {
+      charPos = 80;
+      originalEndLine -= 1;
+      extendedEndLine -= 1;
+    }
+    Location originalLocation = new Location(uri, new Range(new Position(originalDocumentLine, 0), new Position(originalEndLine, charPos)));
+    Range extended = new Range(new Position(extendedDocumentLine, 0), new Position(extendedEndLine, charPos));
+
+    return new MappingItem(extended, originalLocation, null);
   }
 
   private ArrayList<MappingItem> applyReplacements(Map<Range, String> replacements, String text) {
@@ -217,17 +235,4 @@ public class MappingService {
     }
     return new Range(start, end);
   }
-
-  private MappingItem buildMappingItem(String uri, int originalDocumentLine, int extendedDocumentLine, Range originalRange, Range extendedRange) {
-    Position posStart = new Position(originalDocumentLine, 0);
-    Position posEnd = new Position(originalRange.getEnd().getLine() - 1, 80);
-    Range newOriginalRange = new Range(posStart, posEnd);
-
-    posStart = new Position(extendedDocumentLine, 0);
-    extendedDocumentLine += originalRange.getEnd().getLine() - originalDocumentLine - 1;
-    posEnd = new Position(extendedDocumentLine, 80/*originalRange.getStart().getCharacter() + extendedRange.getEnd().getCharacter()*/);
-    Range newExtendedRange = new Range(posStart, posEnd);
-    return new MappingItem(newExtendedRange, new Location(uri, newOriginalRange), null);
-  }
-
 }
