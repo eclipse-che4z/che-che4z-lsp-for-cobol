@@ -134,6 +134,8 @@ public class CobolLanguageEngine {
 
     timingBuilder.getPreprocessorTimer().start();
     injectService.setImplicitCode(dialectOutcome.getImplicitCode());
+
+    List<SyntaxError> preprocessorErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =
         preprocessor
             .processCleanCode(
@@ -141,7 +143,7 @@ public class CobolLanguageEngine {
                 dialectOutcome.getTransformations().calculateExtendedText(),
                 analysisConfig.getCopybookConfig(),
                 new CopybookHierarchy())
-            .unwrap(accumulatedErrors::addAll);
+            .unwrap(preprocessorErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
 
     // Update copybook usages with proper positions
@@ -149,6 +151,11 @@ public class CobolLanguageEngine {
     extendedDocument.getCopybooks().getUsages()
         .forEach((k, v) -> mappingService.getOriginalLocation(v.getRange())
             .ifPresent(l -> v.setRange(l.getRange())));
+
+    preprocessorErrors
+        .forEach(e -> mappingService.getOriginalLocation(e.getLocality().getRange())
+            .ifPresent(locality -> e.getLocality().setRange(locality.getRange())));
+    accumulatedErrors.addAll(preprocessorErrors);
 
     timingBuilder.getParserTimer().start();
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(extendedDocument.getText()));
