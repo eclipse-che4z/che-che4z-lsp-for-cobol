@@ -60,6 +60,7 @@ describe("LanguageClientService positive scenario", () => {
     });
 
     test("Test LanguageClientService switches native flag", async () => {
+        (languageClientService as any).initializeExecutables = jest.fn()
         fs.existsSync = jest.fn().mockReturnValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(9999);
         languageClientService.enableNativeBuild();
@@ -133,7 +134,7 @@ describe("LanguageClientService positive scenario", () => {
         spy.mockReturnValue("Windows_NT");
         const executableName = nativeServer("/test");
         expect(executableName.command).toBe("engine.exe");
-
+        (languageClientService as any).giveExecutePermission = jest.fn();
         const executableLocation = (languageClientService as any).initializeExecutables("/test");
         expect(executableLocation).toBe("/test/package-win");
     });
@@ -143,6 +144,7 @@ describe("LanguageClientService positive scenario", () => {
         spy.mockReturnValue("Linux");
         const executableName = nativeServer("/test");
         expect(executableName.command).toBe("./server");
+        (languageClientService as any).giveExecutePermission = jest.fn();
         const executableLocation = (languageClientService as any).initializeExecutables("/test");
         expect(executableLocation).toBe("/test/package-linux");
     });
@@ -152,6 +154,7 @@ describe("LanguageClientService positive scenario", () => {
         spy.mockReturnValue("Darwin");
         const executableName = nativeServer("/test");
         expect(executableName.command).toBe("./server-mac-amd64");
+        (languageClientService as any).giveExecutePermission = jest.fn();
         const executableLocation = (languageClientService as any).initializeExecutables("/test");
         expect(executableLocation).toBe("/test/package-macos");
     });
@@ -161,6 +164,7 @@ describe("LanguageClientService positive scenario", () => {
         spy.mockReturnValue("Android");
         const executableName = nativeServer("/test");
         expect(executableName.command).toBe("");
+        (languageClientService as any).giveExecutePermission = jest.fn();
         const executableLocation = (languageClientService as any).initializeExecutables("/test");
         expect(executableLocation).toBe(undefined);
     });
