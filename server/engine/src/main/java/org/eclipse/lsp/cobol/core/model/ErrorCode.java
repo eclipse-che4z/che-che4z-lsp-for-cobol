@@ -15,11 +15,20 @@
 
 package org.eclipse.lsp.cobol.core.model;
 
+import lombok.AllArgsConstructor;
+
 /**
  * This enum represents the error codes that are used to determine some special type of errors. See
- * the instance documentation for more details.
+ * the instance documentation for more details. This is specifiaclly used to trigger codeActions.
  */
+@AllArgsConstructor
 public enum ErrorCode {
   /** This copybook does not present in the copybook folder */
-  MISSING_COPYBOOK
+  MISSING_COPYBOOK("missing copybook");
+
+  private String label;
+
+  public String getLabel() {
+    return label;
+  }
 }

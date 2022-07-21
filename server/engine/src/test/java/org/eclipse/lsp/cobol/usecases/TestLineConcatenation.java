@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
@@ -77,8 +76,8 @@ public class TestLineConcatenation {
                 new Range(),
                 "KP001: Copybook not found",
                 Error,
-                SourceInfoLevels.ERROR.getText(),
-                "MISSING_COPYBOOK")));
+                "COBOL Language Support (copybook)",
+                "missing copybook")));
   }
 
 }

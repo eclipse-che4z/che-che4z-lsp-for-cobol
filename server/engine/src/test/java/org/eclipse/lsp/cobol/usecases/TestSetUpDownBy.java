@@ -23,8 +23,8 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.WARNING;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
+
 
 /**
  * This test checks that a variable used in SET UP/DOWN BY statement flagged when it is not allowed
@@ -77,13 +77,13 @@ class TestSetUpDownBy {
                 new Range(),
                 "Invalid receiving field type. Expected: Index name",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
+                 ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "Invalid sending field type. Expected: Elementary integer data item, Non-zero integer",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
+                 ErrorSource.PARSING.getText()),
             "3",
             new Diagnostic(
                 new Range(),
@@ -93,16 +93,16 @@ class TestSetUpDownBy {
                     + "RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT, START, STOP, STRING, SUBTRACT, "
                     + "TERMINATE, UNSTRING, WRITE, XML, '.'}",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
+                 ErrorSource.PARSING.getText()),
             "4",
             new Diagnostic(
-                new Range(), "Variable IND4 is not defined", DiagnosticSeverity.Error, ERROR.getText()),
+                new Range(), "Variable IND4 is not defined", DiagnosticSeverity.Error,  ErrorSource.PARSING.getText()),
             "5",
             new Diagnostic(
                 new Range(),
                 "The following token must start in Area A: IND3",
                 DiagnosticSeverity.Warning,
-                WARNING.getText())),
+                ErrorSource.PARSING.getText())),
         ImmutableList.of(),
         DialectConfigs.getIDMSAnalysisConfig());
   }

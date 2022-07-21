@@ -110,7 +110,14 @@ public class CachingConfigurationService implements ConfigurationService {
   }
 
   private List<String> parseDialects(JsonArray dialects) {
-    return Streams.stream(dialects).map(JsonElement::getAsString).collect(toList());
+    List<String> providedDialects = Streams.stream(dialects).map(JsonElement::getAsString).collect(toList());
+    setSystemDialects(providedDialects);
+    return providedDialects;
+  }
+
+  private void setSystemDialects(List<String> providedDialects) {
+    if (!providedDialects.contains(CICS_TRANSLATOR_DIALECT))
+      providedDialects.add(CICS_TRANSLATOR_DIALECT);
   }
 
   private List<EmbeddedCodeNode.Language> parseFeatures(JsonElement features) {

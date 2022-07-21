@@ -28,9 +28,9 @@ public class TestIdmsCopybookWithCobol {
           + "       PROGRAM-ID. MIN.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY \"MAIN\".\n"
-          + "           COPY IDMS IDMSCB.";
+          + "           COPY IDMS {~IDMSCB!IDMS}.";
 
-  private static final String IDMSCB = "    DISPLAY \"COPY\".\n";
+  private static final String IDMSCB = "           DISPLAY \"COPY\".\n";
 
   @Test
   void test() {

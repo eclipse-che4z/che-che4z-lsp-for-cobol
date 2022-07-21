@@ -17,13 +17,13 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
+// to review
 /** This test checks that READY TRACE outside the PROCEDURE DIVISION is not allowed */
 class TestErrorOnReadyTraceOutsideProcedureDivision {
   private static final String TEXT =
@@ -46,6 +46,6 @@ class TestErrorOnReadyTraceOutsideProcedureDivision {
                 "Syntax error on 'READY' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, LINKAGE, "
                     + "LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE, '01-49', '66', '77', '88'}",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

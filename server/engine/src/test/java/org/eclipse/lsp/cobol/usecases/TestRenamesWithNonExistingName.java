@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 
 /**
  * This test check the semantic error when the renamed structure does not contain the specified data
@@ -56,24 +56,24 @@ class TestRenamesWithNonExistingName {
                 new Range(),
                 "The data entry with the name NOT-EXISTS1 not found",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
+                 ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item VARNAME4",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
+                 ErrorSource.PARSING.getText()),
             "3",
             new Diagnostic(
                 new Range(),
                 "The data entry with the name NOT-EXISTS2 not found",
                 DiagnosticSeverity.Error,
-                ERROR.getText()),
+                 ErrorSource.PARSING.getText()),
             "4",
             new Diagnostic(
                 new Range(),
                 "Variable VARNAME5 is not defined",
                 DiagnosticSeverity.Error,
-                ERROR.getText())));
+                 ErrorSource.PARSING.getText())));
   }
 }

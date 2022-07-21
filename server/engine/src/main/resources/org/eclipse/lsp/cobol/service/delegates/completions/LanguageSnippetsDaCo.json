@@ -4,511 +4,525 @@
     "body": [
       "READ TRANSACTION ${1:task-name}."
     ],
-    "description": "Read Transaction Statement"
+    "description": "[DaCo] Read Transaction Statement"
   },
   "WRITE TRANSACTION": {
     "prefix": "WRITE TRANSACTION",
     "body": [
       "WRITE TRANSACTION ${1:task-name} LENGTH ${2:nn} TO ${3:dbu}."
     ],
-    "description": "Write Transaction Statement"
+    "description": "[DaCo] Write Transaction Statement"
   },
   "WRITE TRANSACTION INPUT": {
     "prefix": "WRITE TRANSACTION INPUT",
     "body": [
       "WRITE TRANSACTION INPUT LENGTH ${2:nn} TO ${3:dbu}."
     ],
-    "description": "Write Transaction INPUT Statement"
+    "description": "[DaCo] Write Transaction INPUT Statement"
   },
   "WRITE REPORT": {
     "prefix": "WRITE REPORT",
     "body": [
       "WRITE REPORT ${1:report-name} FROM ${2:layout} TO ${3:layout2} LENGTH ${4:length}."
     ],
-    "description": "Write Report Statement"
+    "description": "[DaCo] Write Report Statement"
   },
   "WRITE REPORT ENDRPT": {
     "prefix": "WRITE REPORT ENDRPT",
     "body": [
       "WRITE REPORT ${1:report-name} ENDRPT."
     ],
-    "description": "Write Report Auto Statement"
+    "description": "[DaCo] Write Report Auto Statement"
   },
   "WRITE REPORT AFTER": {
     "prefix": "WRITE REPORT AFTER",
     "body": [
       "WRITE REPORT ${1:report-name} FROM ${2:layout} TO ${3:layout2} LENGTH ${4:length} AFTER ${3:id}."
     ],
-    "description": "Write Report Statement"
+    "description": "[DaCo] Write Report Statement"
   },
   "WRITE REPORT AFTER PAGE": {
     "prefix": "WRITE REPORT AFTER PAGE",
     "body": [
       "WRITE REPORT ${1:report-name} FROM ${2:layout} TO ${3:layout2} LENGTH ${4:length} AFTER PAGE."
     ],
-    "description": "Write Report Statement"
+    "description": "[DaCo] Write Report Statement"
   },
   "WRITE REPORT AFTER LINES": {
     "prefix": "WRITE REPORT AFTER LINES",
     "body": [
       "WRITE REPORT ${1:report-name} FROM ${2:layout} TO ${3:layout2} LENGTH ${4:length} AFTER ${5:nn} LINES."
     ],
-    "description": "Write Report Statement"
+    "description": "[DaCo] Write Report Statement"
   },
   "WRITE REPORT AUTO": {
     "prefix": "WRITE REPORT AUTO",
     "body": [
       "WRITE REPORT AUTO ${1:layout} END ${2:layout2}."
     ],
-    "description": "Write Report Auto Statement"
+    "description": "[DaCo] Write Report Auto Statement"
   },
   "OPEN PACKET": {
     "prefix": "OPEN PACKET",
     "body": [
       "OPEN PACKET ${1:task-name} FOR ${2:receiver-packet} SORT ${3:s} VERSION ${4:v}."
     ],
-    "description": "Open Packet Statement"
+    "description": "[DaCo] Open Packet Statement"
   },
   "GET ENTITY": {
     "prefix": "GET ENTITY",
     "body": [
       "GET ENTITY ${1:kls} ${2:att} ${3:rol}."
     ],
-    "description": "GET Entity Statement"
+    "description": "[DaCo] GET Entity Statement"
   },
   "GET ENTITY DESCRIPTION": {
     "prefix": "GET ENTITY DESCRIPTION",
     "body": [
       "GET ENTITY ${1:kls} ${2:att} DESCRIPTION ${3:tal}."
     ],
-    "description": "GET Entity DESCRIPTION Statement"
+    "description": "[DaCo] GET Entity DESCRIPTION Statement"
   },
   "GET USER": {
     "prefix": "GET USER",
     "body": [
       "GET USER ${1:kls} ${2:att}."
     ],
-    "description": "GET USER Statement"
+    "description": "[DaCo] GET USER Statement"
   },
   "GET ITEM ANY": {
     "prefix": "GET ITEM ANY",
     "body": [
       "GET ITEM ANY ${1:geg} ${2:wrd} ${3:tal}."
     ],
-    "description": "GET ITEM ANY"
+    "description": "[DaCo] GET ITEM ANY"
   },
   "GET ITEM SEQ": {
     "prefix": "GET ITEM SEQ",
     "body": [
       "GET ITEM SEQ ${1:geg} ${2:tal}."
     ],
-    "description": "GET ITEM SEQ"
+    "description": "[DaCo] GET ITEM SEQ"
   },
   "GET ITEM GRS": {
     "prefix": "GET ITEM GRS",
     "body": [
       "GET ITEM GRS ${1:geg} ${2:tak} ${3:tal}."
     ],
-    "description": "GET ITEM GRS"
+    "description": "[DaCo] GET ITEM GRS"
   },
   "GET TASK": {
     "prefix": "GET TASK",
     "body": [
       "GET TASK ${1:task}."
     ],
-    "description": "GET TASK"
+    "description": "[DaCo] GET TASK"
   },
   "GET ODETTE": {
     "prefix": "GET ODETTE",
     "body": [
       "GET ODETTE ${1:odt}."
     ],
-    "description": "GET ODETTE"
+    "description": "[DaCo] GET ODETTE"
   },
   "GET JOB": {
     "prefix": "GET JOB",
     "body": [
       "GET JOB ${1:jobName}."
     ],
-    "description": "GET JOB"
+    "description": "[DaCo] GET JOB"
   },
   "GET NETWORK": {
     "prefix": "GET NETWORK",
     "body": [
       "GET NETWORK ${1:networkName}."
     ],
-    "description": "GET NETWORK"
+    "description": "[DaCo] GET NETWORK"
   },
   "SHOW TASK INFO MESSAGE": {
     "prefix": "SHOW INFO",
     "body": [
       "SHOW INFO ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
     ],
-    "description": "SHOW INFO message"
+    "description": "[DaCo] SHOW INFO message"
   },
   "SHOW TASK WARNING MESSAGE": {
     "prefix": "SHOW WARNING",
     "body": [
       "SHOW WARNING ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
     ],
-    "description": "SHOW WARNING message"
+    "description": "[DaCo] SHOW WARNING message"
   },
   "SHOW TASK ERROR MESSAGE": {
     "prefix": "SHOW ERROR",
     "body": [
       "SHOW ERROR ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
     ],
-    "description": "SHOW ERROR message"
+    "description": "[DaCo] SHOW ERROR message"
   },
   "SHOW GENERAL INFO MESSAGE": {
     "prefix": "SHOW STD INFO",
     "body": [
       "SHOW STD INFO ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
     ],
-    "description": "SHOW STD INFO message"
+    "description": "[DaCo] SHOW STD INFO message"
   },
   "SHOW GENERAL WARNING MESSAGE": {
     "prefix": "SHOW STD WARNING",
     "body": [
       "SHOW STD WARNING ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
     ],
-    "description": "SHOW STD WARNING message"
+    "description": "[DaCo] SHOW STD WARNING message"
   },
   "SHOW GENERAL ERROR MESSAGE": {
     "prefix": "SHOW STD ERROR",
     "body": [
       "SHOW STD ERROR ${1:message-code} ${2:parameter1} ${3:parameter2} ${4:parameter3}."
     ],
-    "description": "SHOW STD ERROR message"
+    "description": "[DaCo] SHOW STD ERROR message"
   },
   "RETURN INFO STATUS": {
     "prefix": "RETURN INFO",
     "body": [
-      "RETURN INFO ${1:message}."
+      "RETURN INFO ${1:message-code} ${2:message} ${3:data-variable1} ${4:data-variable2}."
     ],
-    "description": "RETURN INFO message"
+    "description": "[DaCo] RETURN INFO message"
   },
   "RETURN WARNING STATUS": {
     "prefix": "RETURN WARNING",
     "body": [
-      "RETURN WARNING ${1:message}."
+      "RETURN WARNING ${1:message-code} ${2:message} ${3:data-variable1} ${4:data-variable2}."
     ],
-    "description": "RETURN WARNING message"
+    "description": "[DaCo] RETURN WARNING message"
   },
   "RETURN ERROR STATUS": {
     "prefix": "RETURN ERROR",
     "body": [
-      "RETURN ERROR ${1:message}."
+      "RETURN ERROR ${1:message-code} ${2:message} ${3:data-variable1} ${4:data-variable2}."
     ],
-    "description": "RETURN ERROR message"
+    "description": "[DaCo] RETURN ERROR message"
+  },
+  "RETURN FIELD" : {
+    "prefix": "RETURN FIELD",
+    "body": [
+      "RETURN FIELD ${1:field-name}"
+    ],
+    "description": "[DaCo] RETURN FIELD field-name"
   },
   "SHOW RESULT": {
     "prefix": "SHOW RESULT",
     "body": [
       "SHOW RESULT ${1:task-code}."
     ],
-    "description": "SHOW RESULT"
+    "description": "[DaCo] SHOW RESULT"
   },
   "SHOW LAST ERROR MESSAGE": {
     "prefix": "SHOW MESSAGE",
     "body": [
       "SHOW MESSAGE ${1:language-code}."
     ],
-    "description": "SHOW Last Error Message"
+    "description": "[DaCo] SHOW Last Error Message"
   },
   "TABLE ROW START": {
     "prefix": "ROW START",
     "body": [
       "ROW START ${1:TBL|TBFnam}."
     ],
-    "description": "Set the line-currency (RCU) to \nzero in order to process the table \nsequentially from the beginning. \nAfter this command is given, \nthe ROW NEXT command can be used \nto move the currency 1 line forward.\n"
+    "description": "[DaCo] Set the line-currency (RCU) to \nzero in order to process the table \nsequentially from the beginning. \nAfter this command is given, \nthe ROW NEXT command can be used \nto move the currency 1 line forward.\n"
   },
   "TABLE ROW SAVE": {
     "prefix": "ROW SAVE",
     "body": [
       "ROW SAVE ${1:TBLnam} IN ${2:value}."
     ],
-    "description": "Place the content of \nTable Buffer-1 in Table Buffer-<value>, \nwhere <value> is 2, 3 or 4. \nThe three Table Buffers (2, 3 and 4) \ncan be used in the program logic.\n"
+    "description": "[DaCo] Place the content of \nTable Buffer-1 in Table Buffer-<value>, \nwhere <value> is 2, 3 or 4. \nThe three Table Buffers (2, 3 and 4) \ncan be used in the program logic.\n"
   },
   "TABLE ROW RESTORE": {
     "prefix": "ROW RESTORE",
     "body": [
       "ROW RESTORE ${1:TBLnam} FROM ${2:value}."
     ],
-    "description": "Restore the content of Table \nBuffer-<value> to \nTable Buffer-1 and put the line \nid of Table Buffer-value in RCU, \nwhere <value> is 2, 3 or 4.\n"
+    "description": "[DaCo] Restore the content of Table \nBuffer-<value> to \nTable Buffer-1 and put the line \nid of Table Buffer-value in RCU, \nwhere <value> is 2, 3 or 4.\n"
   },
   "TABLE ROW BUFFER": {
     "prefix": "ROW BUFFER",
     "body": [
       "ROW BUFFER ${1:TBLnam} IS YES."
     ],
-    "description": "ROW BUFFER"
+    "description": "[DaCo] ROW BUFFER"
   },
   "TABLE ROW GET": {
     "prefix": "ROW GET",
     "body": [
       "ROW GET ${1:TBL|TBFnam} ON ${2:value/dataname-1} TO ${3:dataname-2}."
     ],
-    "description": "ROW GET"
+    "description": "[DaCo] ROW GET"
   },
   "TABLE ROW NEXT": {
     "prefix": "ROW NEXT",
     "body": [
       "ROW NEXT ${1:TBL|TBFnam} TO ${2:dataname}."
     ],
-    "description": "ROW NEXT"
+    "description": "[DaCo] ROW NEXT"
   },
   "TABLE ROW PRIOR": {
     "prefix": "ROW PRIOR",
     "body": [
       "ROW PRIOR ${1:TBL|TBFnam} TO ${2:dataname}."
     ],
-    "description": "ROW PRIOR"
+    "description": "[DaCo] ROW PRIOR"
   },
   "TABLE ROW ANY": {
     "prefix": "ROW ANY",
     "body": [
       "ROW ANY ${1:TBL|TBFnam} USING ${2:dataname}."
     ],
-    "description": "ROW ANY"
+    "description": "[DaCo] ROW ANY"
   },
   "TABLE ROW MATCH": {
     "prefix": "ROW MATCH",
     "body": [
       "ROW MATCH ${1:TBL|TBFnam} USING ${2:dataname}."
     ],
-    "description": "ROW MATCH"
+    "description": "[DaCo] ROW MATCH"
   },
   "TABLE ROW DELETE": {
     "prefix": "ROW DELETE",
     "body": [
       "ROW DELETE ${1:TBL|TBFnam}."
     ],
-    "description": "ROW DELETE"
+    "description": "[DaCo] ROW DELETE"
   },
   "TABLE ROW ADD": {
     "prefix": "ROW ADD",
     "body": [
       "ROW ADD ${1:TBL|TBFnam} WITH ${2:dataname}."
     ],
-    "description": "ROW ADD"
+    "description": "[DaCo] ROW ADD"
   },
   "TABLE ROW INSERT": {
     "prefix": "ROW INSERT",
     "body": [
       "ROW INSERT ${1:TBL|TBFnam} WITH ${2:dataname}."
     ],
-    "description": "ROW INSERT"
+    "description": "[DaCo] ROW INSERT"
   },
   "TABLE ROW MODIFY": {
     "prefix": "ROW MODIFY",
     "body": [
       "ROW MODIFY ${1:TBL|TBFnam} ON ${2:value|dataname-1} WITH ${3:dataname-2}."
     ],
-    "description": "ROW MODIFY"
+    "description": "[DaCo] ROW MODIFY"
   },
   "TABLE ROW SORT ASC": {
     "prefix": "ROW SORT ASC",
     "body": [
       "ROW SORT ${1:TBL|TBFnam} ASC ON ${2:tablerow-dataname}."
     ],
-    "description": "ROW SORT ASC"
+    "description": "[DaCo] ROW SORT ASC"
   },
   "TABLE ROW SORT DES": {
     "prefix": "ROW SORT DES",
     "body": [
       "ROW SORT ${1:TBL|TBFnam} DES ON ${2:tablerow-dataname}."
     ],
-    "description": "ROW SORT DES"
+    "description": "[DaCo] ROW SORT DES"
   },
   "TABLE ROW SINGLE": {
     "prefix": "ROW SINGLE",
     "body": [
       "ROW SINGLE ${1:TBL|TBFnam} ON ${2:tablerow-dataname}."
     ],
-    "description": "ROW SINGLE"
+    "description": "[DaCo] ROW SINGLE"
   },
   "TABLE ROW DUPLICATE": {
     "prefix": "ROW DUPLICATE",
     "body": [
       "ROW DUPLICATE ${1:TBL|TBFnam} ON ${2:tablerow-dataname}."
     ],
-    "description": "ROW DUPLICATE"
+    "description": "[DaCo] ROW DUPLICATE"
   },
   "TABLE ROW INVERT": {
     "prefix": "ROW INVERT",
     "body": [
       "ROW INVERT ${1:TBL|TBFnam}."
     ],
-    "description": "ROW INVERT"
+    "description": "[DaCo] ROW INVERT"
+  },
+  "TABLE ROW INITIALIZE": {
+    "prefix": "ROW INITIALIZE",
+    "body": [
+      "ROW INITIALIZE ${1:TBL|TBFnam}."
+    ],
+    "description": "[DaCo] ROW INITIALIZE"
   },
   "TABLE GET ANY": {
     "prefix": "GET TABLE ANY",
     "body": [
       "GET TABLE ANY ${1:tttt}."
     ],
-    "description": "GET TABLE ANY"
+    "description": "[DaCo] GET TABLE ANY"
   },
   "TABLE GET SEQ": {
     "prefix": "GET TABLE SEQ",
     "body": [
       "GET TABLE SEQ ${1:tttt}."
     ],
-    "description": "GET TABLE SEQ"
+    "description": "[DaCo] GET TABLE SEQ"
   },
   "TABLE SORT ASCENDING": {
     "prefix": "SORT TABLE ASCENDING",
     "body": [
       "SORT TABLE ${1:entry-1} TO ${2:entry-2} LENGTH ${3:nn} ASCENDING."
     ],
-    "description": "SORT TABLE ASCENDING"
+    "description": "[DaCo] SORT TABLE ASCENDING"
   },
   "TABLE SORT DESCENDING": {
     "prefix": "SORT TABLE DESCENDING",
     "body": [
       "SORT TABLE ${1:entry-1} TO ${2:entry-2} LENGTH ${3:nn} DESCENDING."
     ],
-    "description": "SORT TABLE DESCENDING"
+    "description": "[DaCo] SORT TABLE DESCENDING"
   },
   "OPEN FILE": {
     "prefix": "OPEN FILE",
     "body": [
       "OPEN FILE ${1:bbbb} MAX LENGTH ${2:nn}."
     ],
-    "description": "OPEN FILE"
+    "description": "[DaCo] OPEN FILE"
   },
   "OPEN FILE LAYOUT": {
     "prefix": "OPEN FILE LAYOUT",
     "body": [
       "OPEN FILE ${1:bbbb} MAX LENGTH LAYOUT."
     ],
-    "description": "OPEN FILE LAYOUT"
+    "description": "[DaCo] OPEN FILE LAYOUT"
   },
   "READ FILE": {
     "prefix": "READ FILE",
     "body": [
       "READ FILE ${1:bbbb} MAX LENGTH ${2:nn}."
     ],
-    "description": "READ FILE"
+    "description": "[DaCo] READ FILE"
   },
   "READ FILE LAYOUT": {
     "prefix": "READ FILE LAYOUT",
     "body": [
       "READ FILE ${1:bbbb} MAX LENGTH LAYOUT."
     ],
-    "description": "READ FILE LAYOUT"
+    "description": "[DaCo] READ FILE LAYOUT"
   },
   "WRITE FILE": {
     "prefix": "WRITE FILE",
     "body": [
       "WRITE FILE ${1:bbbb} LENGTH ${2:nn}."
     ],
-    "description": "WRITE FILE"
+    "description": "[DaCo] WRITE FILE"
   },
   "CLOSE FILE INPUT": {
     "prefix": "CLOSE FILE INPUT",
     "body": [
       "CLOSE FILE INPUT ${1:bbbb}."
     ],
-    "description": "CLOSE FILE INPUT"
+    "description": "[DaCo] CLOSE FILE INPUT"
   },
   "CLOSE FILE INPUT ALL": {
     "prefix": "CLOSE FILE INPUT ALL",
     "body": [
       "CLOSE FILE INPUT ALL."
     ],
-    "description": "CLOSE FILE INPUT ALL"
+    "description": "[DaCo] CLOSE FILE INPUT ALL"
   },
   "CLOSE FILE OUTPUT": {
     "prefix": "CLOSE FILE OUTPUT",
     "body": [
       "CLOSE FILE OUTPUT ${1:bbbb}."
     ],
-    "description": "CLOSE FILE OUTPUT"
+    "description": "[DaCo] CLOSE FILE OUTPUT"
   },
   "CLOSE FILE OUTPUT ALL": {
     "prefix": "CLOSE FILE OUTPUT ALL",
     "body": [
       "CLOSE FILE OUTPUT ALL."
     ],
-    "description": "CLOSE FILE OUTPUT ALL"
+    "description": "[DaCo] CLOSE FILE OUTPUT ALL"
   },
   "GET FILE": {
     "prefix": "GET FILE",
     "body": [
       "GET FILE ${1:DD-name} INTO ${2:dsn-name} VOLSER INTO ${3:buffer}."
     ],
-    "description": "GET FILE"
+    "description": "[DaCo] GET FILE"
   },
   "STRING FIND": {
     "prefix": "STRING FIND",
     "body": [
       "STRING FIND ${1:uts-Xli} ${2:value/dataname}."
     ],
-    "description": "STRING FIND"
+    "description": "[DaCo] STRING FIND"
   },
   "STRING GET": {
     "prefix": "STRING GET",
     "body": [
       "STRING GET ${1:uts-Xli}."
     ],
-    "description": "STRING GET"
+    "description": "[DaCo] STRING GET"
   },
   "STRING NEXT": {
     "prefix": "STRING NEXT",
     "body": [
       "STRING NEXT ${1:uts-Xli} DELIMITER ${2:value/dataname}."
     ],
-    "description": "STRING NEXT"
+    "description": "[DaCo] STRING NEXT"
   },
   "STRING MATCH": {
     "prefix": "STRING MATCH",
     "body": [
       "STRING MATCH ${1:string1} ${2:string2} ${3:length}."
     ],
-    "description": "STRING MATCH"
+    "description": "[DaCo] STRING MATCH"
   },
   "STRING CHECK": {
     "prefix": "STRING CHECK",
     "body": [
       "STRING CHECK ${1:uts-Xli} ${2:string}."
     ],
-    "description": "STRING CHECK"
+    "description": "[DaCo] STRING CHECK"
   },
   "STRING ADD": {
     "prefix": "STRING ADD",
     "body": [
       "STRING ADD ${1:uts-Xli} ${2:value1/dataname1} LENGTH ${3:value2/dataname2}."
     ],
-    "description": "STRING ADD"
+    "description": "[DaCo] STRING ADD"
   },
   "STRING INSERT": {
     "prefix": "STRING INSERT",
     "body": [
       "STRING INSERT ${1:uts-Xli} ${2:value1/dataname1} LENGTH ${3:value2/dataname2}."
     ],
-    "description": "STRING INSERT"
+    "description": "[DaCo] STRING INSERT"
   },
   "STRING FILL": {
     "prefix": "STRING FILL",
     "body": [
       "STRING FILL ${1:uts-Xli} ${2:value1/dataname1} LENGTH ${3:value2/dataname2}."
     ],
-    "description": "STRING FILL"
+    "description": "[DaCo] STRING FILL"
   },
   "STRING REPLACE": {
     "prefix": "STRING REPLACE",
     "body": [
       "STRING REPLACE ALL ${1:uts-Xli} ${2:value1/dataname1} BY ${3:value2/dataname2}."
     ],
-    "description": "STRING REPLACE"
+    "description": "[DaCo] STRING REPLACE"
   },
   "STRING DELETE": {
     "prefix": "STRING DELETE",
     "body": [
       "STRING DELETE ALL ${1:uts-Xli} ${2:value/dataname} LENGTH ${3:value2/dataname2}."
     ],
-    "description": "STRING DELETE"
+    "description": "[DaCo] STRING DELETE"
   },
   "DACO-CONTROL SECTION": {
     "prefix": "DACO-CONTROL",
@@ -522,20 +536,20 @@
     "body": [
       "DEBUG ${1:field} LENGTH ${2:len1} COLS ${3:num} TABLE ${4:len2} NO-POS ${5| HEX, DISPLAY, BOTH|}."
     ],
-    "description": "DEBUG "
+    "description": "[DaCo] DEBUG "
   },
   "DEBUG STATS": {
     "prefix": "DEBUG STATS",
     "body": [
       "DEBUG STATS ${1:text}."
     ],
-    "description": "DEBUG STATS"
+    "description": "[DaCo] DEBUG STATS"
   },
   "EXEC [DaCo]": {
     "prefix": "EXEC ",
     "body": [
       "EXEC ${1:text} USING ${2:variable}."
     ],
-    "description": "EXEC"
+    "description": "[DaCo] EXEC"
   }
 }

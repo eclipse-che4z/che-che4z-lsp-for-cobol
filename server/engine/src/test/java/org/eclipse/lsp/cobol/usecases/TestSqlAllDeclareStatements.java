@@ -88,6 +88,7 @@ class TestSqlAllDeclareStatements {
           + "               BIRTHDATE DATE                ,\n"
           + "               SALARY    DECIMAL(9,2)        ,\n"
           + "               BONUS     DECIMAL(9,2)        ,\n"
+          + "               TIMESTAMP TIMESTAMP NOT NULL,\n"
           + "               COMM      DECIMAL(9,2)        );\n"
           + "             END-EXEC.";
 

@@ -45,7 +45,7 @@ public class AnalysisConfig {
     return new AnalysisConfig(
         new CopybookConfig(mode, SQLBackend.DB2_SERVER, ImmutableList.of()),
         Arrays.asList(EmbeddedCodeNode.Language.values()),
-        ImmutableList.of());
+        ImmutableList.of(ConfigurationService.CICS_TRANSLATOR_DIALECT));
   }
 
   /**
