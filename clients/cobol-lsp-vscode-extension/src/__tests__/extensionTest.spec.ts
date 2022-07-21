@@ -50,6 +50,9 @@ jest.mock("vscode", () => ({
         }),
         showErrorMessage: jest.fn().mockReturnValue("test"),
         showInformationMessage: jest.fn().mockImplementation((message: string) => Promise.resolve(message)),
+        createOutputChannel: jest.fn().mockReturnValue({
+            appendLine: jest.fn(),
+        }),
     },
     workspace: {
         getConfiguration: jest.fn().mockReturnValue({
@@ -122,6 +125,5 @@ describe("Check plugin extension for cobol fails.", () => {
     test("start fails.", async () => {
         await activate(context);
         expect(TelemetryService.registerEvent).toHaveBeenCalledWith("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
-        expect(vscode.window.showErrorMessage).toBeCalledTimes(1);
     });
 });

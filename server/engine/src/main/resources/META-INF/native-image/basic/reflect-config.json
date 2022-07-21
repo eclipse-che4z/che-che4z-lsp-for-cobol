@@ -345,7 +345,7 @@
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":["java.lang.String","org.antlr.v4.runtime.BufferedTokenStream","org.eclipse.lsp.cobol.service.copybooks.CopybookConfig","org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy","org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService","org.eclipse.lsp.cobol.core.messages.MessageService","org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService"] }]
+    "methods":[{"name":"<init>","parameterTypes":["java.lang.String","org.antlr.v4.runtime.BufferedTokenStream","org.eclipse.lsp.cobol.service.copybooks.CopybookConfig","org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy","org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService","org.eclipse.lsp.cobol.core.messages.MessageService","org.eclipse.lsp.cobol.service.copybooks.CopybookNameService","org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService"] }]
   },
   {
     "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacePreProcessorListener",
@@ -497,7 +497,7 @@
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
     "methods":[
-      {"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.delegates.communications.Communications","org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade","org.eclipse.lsp.cobol.service.delegates.formations.Formations","org.eclipse.lsp.cobol.service.delegates.completions.Completions","org.eclipse.lsp.cobol.service.delegates.references.Occurrences","org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker","org.eclipse.lsp.cobol.service.delegates.actions.CodeActions","org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor","org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider","org.eclipse.lsp.cobol.service.CFASTBuilder","org.eclipse.lsp.cobol.service.DisposableLSPStateService","org.eclipse.lsp.cobol.service.ConfigurationService"] },
+      {"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.delegates.communications.Communications","org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade","org.eclipse.lsp.cobol.service.delegates.formations.Formations","org.eclipse.lsp.cobol.service.delegates.completions.Completions","org.eclipse.lsp.cobol.service.delegates.references.Occurrences","org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker","org.eclipse.lsp.cobol.service.delegates.actions.CodeActions","org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor","org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider","org.eclipse.lsp.cobol.service.CFASTBuilder","org.eclipse.lsp.cobol.service.DisposableLSPStateService","org.eclipse.lsp.cobol.service.copybooks.CopybookNameService","org.eclipse.lsp.cobol.service.ConfigurationService"] },
       {"name":"onRunAnalysisEventCallback","parameterTypes":["org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent"] }
     ]
   },
@@ -506,7 +506,7 @@
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker","org.eclipse.lsp.cobol.service.SettingsService","org.eclipse.lsp.cobol.service.WatcherService","org.eclipse.lsp.cobol.service.copybooks.CopybookService","org.eclipse.lsp.cobol.core.messages.LocaleStore","org.eclipse.lsp.cobol.service.SubroutineService","org.eclipse.lsp.cobol.service.ConfigurationService","org.eclipse.lsp.cobol.service.DisposableLSPStateService","org.eclipse.lsp.cobol.service.copybooks.CopybookNameService","org.eclipse.lsp.cobol.service.delegates.completions.Keyword"] }]
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker","org.eclipse.lsp.cobol.service.SettingsService","org.eclipse.lsp.cobol.service.WatcherService","org.eclipse.lsp.cobol.service.copybooks.CopybookService","org.eclipse.lsp.cobol.core.messages.LocaleStore","org.eclipse.lsp.cobol.service.SubroutineService","org.eclipse.lsp.cobol.service.ConfigurationService","org.eclipse.lsp.cobol.service.DisposableLSPStateService","org.eclipse.lsp.cobol.service.copybooks.CopybookNameService","org.eclipse.lsp.cobol.service.delegates.completions.Keywords"] }]
   },
   {
     "name":"org.eclipse.lsp.cobol.service.SettingsServiceImpl",
@@ -616,7 +616,7 @@
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.SettingsService"] }]
   },
   {
     "name":"org.eclipse.lsp.cobol.service.delegates.completions.ParagraphCompletion",

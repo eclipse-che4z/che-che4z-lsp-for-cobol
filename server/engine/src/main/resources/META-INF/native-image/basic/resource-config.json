@@ -32,13 +32,13 @@
         "pattern":"\\Qorg/eclipse/lsp/cobol/service/delegates/completions/LanguageKeywordsIDMS.txt\\E"
       },
       {
-        "pattern":"\\Qorg/eclipse/lsp/cobol/service/delegates/completions/LanguageSnippets.txt\\E"
+        "pattern":"\\Qorg/eclipse/lsp/cobol/service/delegates/completions/LanguageSnippetsCobol.json\\E"
       },
       {
-        "pattern":"\\Qorg/eclipse/lsp/cobol/service/delegates/completions/LanguageSnippetsDaCo.txt\\E"
+        "pattern":"\\Qorg/eclipse/lsp/cobol/service/delegates/completions/LanguageSnippetsDaCo.json\\"
       },
       {
-        "pattern":"\\Qorg/eclipse/lsp/cobol/service/delegates/completions/LanguageSnippetsIDMS.txt\\E"
+        "pattern":"\\Qorg/eclipse/lsp/cobol/service/delegates/completions/LanguageSnippetsIDMS.json\\E"
       },
       {
         "pattern":"\\Qorg/slf4j/impl/StaticLoggerBinder.class\\E"

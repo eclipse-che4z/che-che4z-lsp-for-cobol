@@ -21,8 +21,10 @@ import { CopybookDownloadService } from "../../services/copybook/CopybookDownloa
 import { JavaCheck } from "../../services/JavaCheck";
 import { LanguageClientService, nativeServer } from "../../services/LanguageClientService";
 import { Middleware } from "../../services/Middleware";
+import {TelemetryService} from "../../services/reporter/TelemetryService";
 
 jest.mock("../../services/Middleware");
+jest.mock("../../services/reporter/TelemetryService");
 jest.mock("../../services/copybook/CopybookURI");
 jest.mock("vscode", () => ({
     extensions: {
@@ -32,6 +34,9 @@ jest.mock("vscode", () => ({
         getConfiguration: jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue(0),
         }),
+    },
+    window: {
+        createOutputChannel: jest.fn(),
     },
 }));
 jest.mock("vscode-languageclient", () => ({
@@ -54,7 +59,7 @@ const SERVER_STARTED_MSG = "server started";
 const SERVER_STOPPED_MSG = "server stopped";
 describe("LanguageClientService positive scenario", () => {
     beforeEach(() => {
-        languageClientService = new LanguageClientService(middleware);
+        languageClientService = new LanguageClientService(middleware, jest.fn() as any);
         new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(0);
         fs.existsSync = jest.fn().mockReturnValue(true);
@@ -65,6 +70,9 @@ describe("LanguageClientService positive scenario", () => {
         fs.existsSync = jest.fn().mockReturnValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(9999);
         languageClientService.enableNativeBuild();
+
+        expect(TelemetryService.registerEvent).toHaveBeenCalledWith("Native Build enabled", ["COBOL", "native build enabled", "settings"],
+            "Native build enabled");
         expect((languageClientService as any).isNativeBuildEnabled).toBeTruthy();
     });
 
@@ -104,6 +112,7 @@ describe("LanguageClientService positive scenario", () => {
                     configuration: expect.any(Function),
                 },
             },
+            outputChannel: expect.any(Function),
         });
     });
 
@@ -120,6 +129,7 @@ describe("LanguageClientService positive scenario", () => {
                     configuration: expect.any(Function),
                 },
             },
+            outputChannel: expect.any(Function),
         });
     });
 
@@ -178,7 +188,7 @@ describe("LanguageClientService negative scenario.", () => {
     test("LSP port not defined and jar path doesn't exists", async () => {
         fs.existsSync = jest.fn().mockReturnValue(false);
         try {
-            await new LanguageClientService(undefined).checkPrerequisites();
+            await new LanguageClientService(undefined, jest.fn() as any).checkPrerequisites();
         } catch (error) {
             expect(error.toString()).toBe("Error: LSP server for cobol not found");
         }

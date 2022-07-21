@@ -114,6 +114,6 @@ describe("Checks Java installation", () => {
         const promise = javaCheck.isJavaInstalled();
         map.close(23);
 
-        await expect(promise).rejects.toEqual("An error occurred when checking if Java was installed. Switching to native builds");
+        await expect(promise).rejects.toEqual("An error occurred when checking if Java was installed. Switching to native build.");
     });
 });
