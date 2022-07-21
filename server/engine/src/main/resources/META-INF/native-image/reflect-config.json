@@ -3,6 +3,9 @@
     "name":"[Ljava.lang.Object;"
   },
   {
+    "name":"[Ljava.lang.String;"
+  },
+  {
     "name":"ch.qos.logback.classic.encoder.PatternLayoutEncoder",
     "queryAllPublicMethods":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
@@ -613,7 +616,7 @@
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.SettingsService"] }]
   },
   {
     "name":"org.eclipse.lsp.cobol.service.delegates.completions.ParagraphCompletion",
@@ -641,7 +644,11 @@
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.SettingsService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.completions.SnippetsModel",
+    "allDeclaredFields":true
   },
   {
     "name":"org.eclipse.lsp.cobol.service.delegates.completions.SubroutineCompletion",
@@ -1056,6 +1063,11 @@
     "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
+    "name":"org.eclipse.lsp4j.DocumentFormattingParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
     "name":"org.eclipse.lsp4j.DocumentHighlight",
     "allDeclaredFields":true,
     "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
@@ -1206,6 +1218,10 @@
   {
     "name":"org.eclipse.lsp4j.FormattingCapabilities",
     "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FormattingOptions",
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
@@ -1824,6 +1840,7 @@
     "name":"sun.misc.Unsafe",
     "allDeclaredFields":true,
     "methods":[
+      {"name":"allocateInstance","parameterTypes":["java.lang.Class"] },
       {"name":"objectFieldOffset","parameterTypes":["java.lang.reflect.Field"] },
       {"name":"putBoolean","parameterTypes":["java.lang.Object","long","boolean"] }
     ],
