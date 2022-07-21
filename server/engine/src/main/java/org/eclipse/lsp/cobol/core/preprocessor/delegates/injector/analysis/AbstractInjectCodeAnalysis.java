@@ -283,6 +283,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
   private SyntaxError reportMissingCopybooks(CopybookMetaData metaData) {
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorSource(ErrorSource.COPYBOOK)
             .locality(metaData.getNameLocality())
             .suggestion(
                 messageService.getMessage(
@@ -307,7 +308,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
       String messageID,
       String logMessage) {
     SyntaxError error =
-        SyntaxError.syntaxError()
+        SyntaxError.syntaxError().errorSource(ErrorSource.COPYBOOK)
             .severity(info)
             .suggestion(messageService.getMessage(messageID, copybookName.getDisplayName()))
             .locality(locality)
@@ -324,7 +325,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
       String messageID,
       String logMessage) {
     SyntaxError error =
-        SyntaxError.syntaxError()
+        SyntaxError.syntaxError().errorSource(ErrorSource.COPYBOOK)
             .severity(info)
             .suggestion(messageService.getMessage(messageID, maxNameLength, copybookName))
             .locality(locality)

@@ -426,7 +426,7 @@ context('This is a LSP spec', () => {
     it(['smoke', 'CI'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
       cy.getCurrentLine().type('{selectall}shell').wait(500);
-      cy.get(Theia.suggestWidget).contains('shell').click();
+      cy.get(Theia.suggestWidget).contains('SHELL').click();
       cy.getLineByNumber(2).contains(`PROGRAM-ID. ${fileName}.`);
       cy.getLineByNumber(8).contains('DATA DIVISION.');
       cy.getLineByNumber(16).contains('STOP RUN.');
@@ -449,7 +449,7 @@ context('This is a LSP spec', () => {
         .getCurrentLineErrors({ expectedLine: 15 })
         .eq(0)
         .getHoverErrorMessage('ABC')
-        .contains('ABC: Copybook not found');
+        .contains('ABC: Copybook not foundCOBOL Language Support (copybook)(missing copybook)');
       cy.getCurrentLine().type('{end}{enter}');
       cy.getCurrentLine().type('FUNCTION-CO');
       cy.get(Theia.suggestWidget).contains('FUNCTION-COS');

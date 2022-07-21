@@ -165,7 +165,11 @@ idmsStmtsMandTermOn
     ;
 
 idmsOnClause
-    : ON generalIdentifier
+    : ON generalIdentifier nextSentence?
+    ;
+
+nextSentence
+    : (NEXT SENTENCE) DOT_FS?
     ;
 
 // abend code statement

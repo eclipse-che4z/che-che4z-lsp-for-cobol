@@ -319,7 +319,7 @@ public class CobolLanguageEngine {
     return err ->
         err.toBuilder()
             .locality(LocalityUtils.findPreviousVisibleLocality(err.getOffendedToken(), mapping))
-            .suggestion(messageService.getMessage(err.getSuggestion()))
+            .suggestion(messageService.getMessage(err.getSuggestion())).errorSource(ErrorSource.PARSING)
             .build();
   }
 
@@ -335,7 +335,8 @@ public class CobolLanguageEngine {
   private List<SyntaxError> raiseError(SyntaxError error, Map<String, Locality> copyStatements) {
     return Stream.of(error)
         .filter(shouldRaise())
-        .map(err -> err.toBuilder().locality(copyStatements.get(err.getLocality().getCopybookId())))
+        .map(err -> err.toBuilder().locality(copyStatements.get(err.getLocality().getCopybookId()))
+        .errorSource(ErrorSource.COPYBOOK))
         .map(SyntaxError.SyntaxErrorBuilder::build)
         .flatMap(err -> Stream.concat(raiseError(err, copyStatements).stream(), Stream.of(err)))
         .collect(toList());

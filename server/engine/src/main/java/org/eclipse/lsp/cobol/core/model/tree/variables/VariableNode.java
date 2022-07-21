@@ -20,6 +20,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Context;
@@ -84,6 +85,7 @@ public abstract class VariableNode extends Node implements Context {
    */
   public SyntaxError getError(MessageTemplate messageTemplate, ErrorSeverity severity) {
     return SyntaxError.syntaxError()
+        .errorSource(ErrorSource.PARSING)
         .severity(severity)
         .locality(getLocalityForError())
         .messageTemplate(messageTemplate)

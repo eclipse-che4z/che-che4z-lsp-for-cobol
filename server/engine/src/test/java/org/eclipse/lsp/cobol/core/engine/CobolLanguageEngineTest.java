@@ -83,12 +83,14 @@ class CobolLanguageEngineTest {
             .build();
     SyntaxError error =
         SyntaxError.syntaxError()
+                .errorSource(ErrorSource.PARSING)
             .locality(locality)
             .suggestion("suggestion")
             .severity(ERROR)
             .build();
     SyntaxError eofError =
         SyntaxError.syntaxError()
+                .errorSource(ErrorSource.PARSING)
             .locality(
                 Locality.builder()
                     .uri(URI)

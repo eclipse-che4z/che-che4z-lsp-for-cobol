@@ -22,7 +22,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 
 /** This test checks that variable can be used before its definition. */
 class TestVariableInFileControl {
@@ -50,6 +50,6 @@ class TestVariableInFileControl {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
-            new Diagnostic(new Range(), "Variable BAZ is not defined", DiagnosticSeverity.Error, ERROR.getText())));
+            new Diagnostic(new Range(), "Variable BAZ is not defined", DiagnosticSeverity.Error,  ErrorSource.PARSING.getText())));
   }
 }

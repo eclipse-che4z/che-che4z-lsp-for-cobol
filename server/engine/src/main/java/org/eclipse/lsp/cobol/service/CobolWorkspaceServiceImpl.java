@@ -109,7 +109,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
 
   private Runnable executeCopybookFix(@NonNull ExecuteCommandParams params) {
     return () -> {
-      if (MISSING_COPYBOOK.name().equals(params.getCommand())) {
+      if (MISSING_COPYBOOK.getLabel().equals(params.getCommand())) {
         rerunAnalysis(true);
       }
     };

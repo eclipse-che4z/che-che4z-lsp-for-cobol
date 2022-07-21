@@ -223,6 +223,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
       @NonNull String uri, @NonNull String message, int lineNumber, int start, int stop) {
     SyntaxError error =
         SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PREPROCESSING)
             .suggestion(message)
             .severity(ERROR)
             .locality(

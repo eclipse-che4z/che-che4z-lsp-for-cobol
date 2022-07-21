@@ -156,7 +156,7 @@ public class DaCoMaidProcessor {
       parseCopybookContent(copybookModel, startingLevel, MAID_WRK_QUALIFIER.equalsIgnoreCase(layoutUsage) ? cbNode.getParentSuffix() : null)
               .forEach(cbNode::addChild);
     } else {
-      SyntaxError error = SyntaxError.syntaxError()
+      SyntaxError error = SyntaxError.syntaxError().errorSource(ErrorSource.DIALECT)
               .locality(cbNode.getLocality())
               .suggestion(messageService.getMessage("GrammarPreprocessorListener.errorSuggestion", copybookName.getQualifiedName()))
               .severity(ERROR)
@@ -172,6 +172,7 @@ public class DaCoMaidProcessor {
     if (MAID_WRK_QUALIFIER.equalsIgnoreCase(layoutUsage) && node.getParentSuffix() == null) {
       SyntaxError error =
               SyntaxError.syntaxError()
+                      .errorSource(ErrorSource.DIALECT)
                       .severity(ErrorSeverity.ERROR)
                       .suggestion(
                               messageService.getMessage("GrammarPreprocessorListener.cannotRetrieveMaidSuffix"))
