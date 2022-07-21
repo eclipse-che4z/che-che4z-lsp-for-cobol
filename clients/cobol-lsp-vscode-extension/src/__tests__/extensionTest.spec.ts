@@ -42,10 +42,14 @@ jest.mock("vscode", () => ({
     },
     languages: {
         registerCodeActionsProvider: jest.fn(),
-        registerCompletionItemProvider: jest.fn()
+        registerCompletionItemProvider: jest.fn(),
     },
     window: {
+        setStatusBarMessage: jest.fn().mockImplementation(async (_text: string, _hideWhenDone: Thenable<any>) => {
+            return Promise.resolve(true);
+        }),
         showErrorMessage: jest.fn().mockReturnValue("test"),
+        showInformationMessage: jest.fn().mockImplementation((message: string) => Promise.resolve(message)),
     },
     workspace: {
         getConfiguration: jest.fn().mockReturnValue({
@@ -53,6 +57,7 @@ jest.mock("vscode", () => ({
         }),
         getWorkspaceFolder: jest.fn().mockReturnValue({ name: "workspaceFolder1" }),
         onDidChangeConfiguration: jest.fn().mockReturnValue("onDidChangeConfiguration"),
+        workspaceFolders: [{ uri: { fsPath: "ws-path" } } as any],
     },
 }));
 
@@ -76,7 +81,7 @@ describe("Check plugin extension for cobol starts successfully.", () => {
         await activate(context);
         expect(TelemetryService.registerEvent).toHaveBeenCalledWith("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
 
-        expect(vscode.commands.registerCommand).toBeCalledTimes(6);
+        expect(vscode.commands.registerCommand).toBeCalledTimes(7);
 
         expect(fetchCopybookCommand).toHaveBeenCalled();
         expect(gotoCopybookSettings).toHaveBeenCalled();

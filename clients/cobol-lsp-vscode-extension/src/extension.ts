@@ -19,7 +19,6 @@ import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import { C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID } from "./constants";
 import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
-
 import { initSmartTab } from "./commands/SmartTabCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { Middleware } from "./services/Middleware";
@@ -28,6 +27,7 @@ import { createFileWithGivenPath, SettingsService } from "./services/Settings";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 import { pickSnippet, SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
+import { clearCache } from "./commands/ClearCopybookCacheCommand";
 
 let copyBooksDownloader: CopybookDownloadService;
 let middleware: Middleware;
@@ -58,6 +58,9 @@ export async function activate(context: vscode.ExtensionContext) {
         () => {
         gotoCopybookSettings();
     }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.clear.downloaded.copybooks", () => { clearCache() }));
+
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE) }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
