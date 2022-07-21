@@ -228,6 +228,14 @@ public class PositiveTestUtility {
             .findFirst()
             .filter(VariableNode.class::isInstance)
             .map(VariableNode.class::cast);
+
+    List<Range> ranges = nodes.stream()
+        .filter(VariableNode.class::isInstance)
+        .map(VariableNode.class::cast)
+        .filter(node -> node.getName().equals(snap.getDataName()))
+        .map(node -> node.getLocality().getRange())
+        .collect(toList());
+
     Assertions.assertTrue(
         foundVariableNodeInLSP.isPresent(),
         "["
@@ -235,7 +243,7 @@ public class PositiveTestUtility {
             + "]:"
             + "Data name definition for "
             + snap.getDataName()
-            + " not found in LSP engine");
+            + " not found in LSP engine. Ranges: \r\n" + ranges);
 
     foundVariableNodeInLSP.ifPresent(
         node -> {
