@@ -32,6 +32,7 @@ import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
 import org.eclipse.lsp.cobol.jrpc.ExtendedApi;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
@@ -61,7 +62,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -96,7 +96,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final CFASTBuilder cfastBuilder;
   private final ConfigurationService configurationService;
   private DisposableLSPStateService disposableLSPStateService;
-  private final SettingsService settingsService;
+  private final CopybookNameService copybookNameService;
 
   @Inject
   @Builder
@@ -113,7 +113,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       HoverProvider hoverProvider,
       CFASTBuilder cfastBuilder,
       DisposableLSPStateService disposableLSPStateService,
-      SettingsService settingsService,
+      CopybookNameService copybookNameService,
       ConfigurationService configurationService) {
     this.communications = communications;
     this.engine = engine;
@@ -127,7 +127,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.cfastBuilder = cfastBuilder;
     this.disposableLSPStateService = disposableLSPStateService;
     this.configurationService = configurationService;
-    this.settingsService = settingsService;
+    this.copybookNameService = copybookNameService;
 
     dataBus.subscribe(this);
   }
@@ -236,12 +236,11 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     if (uri.startsWith(GIT_FS_URI)) {
       LOG.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
     }
-    isCopyBook(uri).thenAccept(isCopyBook -> {
-      if (isCopyBook) return;
-      String text = params.getTextDocument().getText();
-      communications.notifyThatLoadingInProgress(uri);
-      analyzeDocumentFirstTime(uri, text, false);
-    });
+    if (copybookNameService.isCopyBook(uri)) return;
+
+    String text = params.getTextDocument().getText();
+    communications.notifyThatLoadingInProgress(uri);
+    analyzeDocumentFirstTime(uri, text, false);
   }
 
   @Override
@@ -250,12 +249,11 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     String uri = params.getTextDocument().getUri();
     outlineMap.put(uri, new CompletableFuture<>());
     cfAstMap.put(uri, new CompletableFuture<>());
-    isCopyBook(uri).thenAccept(isCopyBook -> {
-      if (isCopyBook) return;
-      String text = params.getContentChanges().get(0).getText();
-      interruptAnalysis(uri);
-      analyzeChanges(uri, text);
-    });
+    if (copybookNameService.isCopyBook(uri)) return;
+
+    String text = params.getContentChanges().get(0).getText();
+    interruptAnalysis(uri);
+    analyzeChanges(uri, text);
   }
 
   @Override
@@ -391,11 +389,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                   }
                 });
     registerToFutureMap(uri, analyseSubmitFuture);
-  }
-
-  private CompletableFuture<Boolean> isCopyBook(String uri) {
-    return settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label)
-        .thenApply(localPaths -> localPaths.stream().anyMatch(uri::contains));
   }
 
   private void publishResult(

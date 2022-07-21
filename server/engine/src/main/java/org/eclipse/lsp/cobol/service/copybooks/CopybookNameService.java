@@ -30,6 +30,14 @@ public interface CopybookNameService {
   List<CopybookName> getNames();
 
   /**
+   * Check if URI belongs to copybooks
+   *
+   * @param uri an attribute to check
+   * @return true if URI belongs to known copybooks and list of folders c
+   */
+  boolean isCopyBook(String uri);
+
+  /**
    * Find a copybook in the open workspace that match displayName
    * @param displayName an attribute to find by
    * @return optional CopybookName

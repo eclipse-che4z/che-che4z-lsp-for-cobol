@@ -15,17 +15,15 @@
 
 package org.eclipse.lsp.cobol.service.mocks;
 
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.service.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.service.CobolLSPServerStateService;
 import org.eclipse.lsp.cobol.service.CobolTextDocumentService;
 import org.eclipse.lsp.cobol.service.ConfigurationService;
-import org.eclipse.lsp.cobol.service.SettingsService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
@@ -52,7 +50,7 @@ public class MockTextDocumentService {
   @Mock protected Formations formations;
   @Mock protected HoverProvider hoverProvider;
   @Mock protected ConfigurationService configurationService;
-  @Mock protected SettingsService settingsService;
+  @Mock protected CopybookNameService copybookNameService;
 
 
   /**
@@ -61,7 +59,7 @@ public class MockTextDocumentService {
    */
   protected CobolTextDocumentService getMockedTextDocumentServiceUsingSameThread() {
     return CobolTextDocumentService.builder()
-        .settingsService(settingsService)
+        .copybookNameService(copybookNameService)
         .communications(communications)
         .engine(engine)
         .dataBus(broker)
@@ -83,7 +81,7 @@ public class MockTextDocumentService {
    */
   protected CobolTextDocumentService getMockedTextDocumentServiceUsingSeparateThread() {
     return CobolTextDocumentService.builder()
-        .settingsService(settingsService)
+        .copybookNameService(copybookNameService)
         .communications(communications)
         .engine(engine)
         .dataBus(broker)
@@ -98,8 +96,8 @@ public class MockTextDocumentService {
         .build();
   }
 
-  protected void mockSettingServiceForCopybooks(List<String> copybooksFound) {
-    when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
-        .thenReturn(CompletableFuture.completedFuture(copybooksFound));
+  protected void mockSettingServiceForCopybooks(boolean answer) {
+    when(copybookNameService.isCopyBook(any()))
+        .thenReturn(answer);
   }
 }

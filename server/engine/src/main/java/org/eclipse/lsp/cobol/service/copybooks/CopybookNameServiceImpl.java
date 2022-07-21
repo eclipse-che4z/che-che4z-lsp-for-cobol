@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
@@ -48,6 +49,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   private final Provider<CobolLanguageClient> clientProvider;
   private final SettingsService settingsService;
   private List<CopybookName> listOfCopybookNames;
+  private List<String>  listOfCopybookFolders;
 
   @Inject
   public CopybookNameServiceImpl(
@@ -73,6 +75,18 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   }
 
   @Override
+  public boolean isCopyBook(String uri) {
+    String[] uriAsArray = uri.split("/");
+    String fileNameWithExtension = uriAsArray[uriAsArray.length - 1];
+    String fileName = fileNameWithExtension.split("\\.")[0];
+    return findByName(fileName).isPresent()
+        || Optional.ofNullable(listOfCopybookFolders)
+            .orElse(emptyList())
+            .stream()
+            .anyMatch(uri::contains);
+  }
+
+  @Override
   public void collectLocalCopybookNames() {
 
     CompletableFuture<List<WorkspaceFolder>> copybookWorkspaces = clientProvider.get()
@@ -92,6 +106,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   private void resolveNames(
       List<WorkspaceFolder> workspaceFolderList, List<String> copybookFolders,
       Set<String> copybookExtensions) {
+    listOfCopybookFolders = copybookFolders;
     listOfCopybookNames =
         unmodifiableList(
             copybookFolders.stream()
