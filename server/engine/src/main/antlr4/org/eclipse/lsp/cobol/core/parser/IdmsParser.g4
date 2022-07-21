@@ -165,7 +165,7 @@ idmsStmtsMandTermOn
     ;
 
 idmsOnClause
-    : ON generalIdentifier
+    : ON generalIdentifier nextSentence?
     ;
 
 nextSentence
@@ -175,7 +175,7 @@ nextSentence
 // abend code statement
 
 abendCodeStatement
-    : ABEND CODE (literal | generalIdentifier) ((idmsOnClause nextSentence)? | abendCodeDumpClause? abendCodeExitClause?)
+    : ABEND CODE (literal | generalIdentifier) abendCodeDumpClause? abendCodeExitClause?
     ;
 
 abendCodeDumpClause
@@ -651,7 +651,7 @@ idmsDmlFromClause
     ;
 
 idmsDmlLengthClause
-   : ((TO generalIdentifier (idmsOnClause nextSentence)?) | (LENGTH (generalIdentifier | integerLiteral)))
+   : ((TO generalIdentifier) | (LENGTH (generalIdentifier | integerLiteral)))
    ;
 
 idmsWaitNowaitClause
