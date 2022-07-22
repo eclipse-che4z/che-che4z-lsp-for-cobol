@@ -90,9 +90,7 @@ class IdmsCopyVisitor extends IdmsCopyParserBaseVisitor<List<IdmsCopybookDescrip
   public List<IdmsCopybookDescriptor> visitDataDescriptionEntryFormat3(IdmsCopyParser.DataDescriptionEntryFormat3Context ctx) {
     ofNullable(ctx.dataValueClause())
         .map(IdmsCopyParser.DataValueClauseContext::valueIsToken)
-        .map(
-            valueToken ->
-                variableLevels.add(Pair.of(getLevelLocality(ctx.LEVEL_NUMBER_88()).getRange(), LEVEL_88)));
+        .ifPresent(t -> variableLevels.add(Pair.of(getLevelLocality(ctx.LEVEL_NUMBER_88()).getRange(), LEVEL_88)));
     return visitChildren(ctx);
   }
 
