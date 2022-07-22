@@ -166,13 +166,13 @@ class TestIdmsCopy {
   @Test
   void testIdmsCopyWithComments() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS1, ImmutableList.of(new CobolText(CB_NAME1, IdmsDialect.NAME, COMMENTED_TEXT + CB1)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
+        TEXT + COPY_IDMS_WS1, ImmutableList.of(new CobolText(CB_NAME1, IdmsDialect.NAME, COMMENTED_TEXT + CB1, null, true)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test
   void testIdmsCopyCleanup() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS1, ImmutableList.of(new CobolText(CB_NAME1, IdmsDialect.NAME,  CB7)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
+        TEXT + COPY_IDMS_WS1, ImmutableList.of(new CobolText(CB_NAME1, IdmsDialect.NAME,  CB7, null, true)), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
   @Test

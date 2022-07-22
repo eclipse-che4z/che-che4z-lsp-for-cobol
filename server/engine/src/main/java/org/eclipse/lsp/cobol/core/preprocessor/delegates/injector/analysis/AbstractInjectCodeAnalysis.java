@@ -217,8 +217,6 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
       return emptyModel(
           copybookMetaData.getCopybookName(), hierarchy.mapCopybooks(this::reportRecursiveCopybook));
 
-    new CopybookModel(copybookMetaData.getCopybookName(), null, null);
-
     String programDocumentUri = hierarchy.getRootDocumentUri().orElse(copybookMetaData.getDocumentUri());
 
     CopybookModel copybookModel = contentProvider

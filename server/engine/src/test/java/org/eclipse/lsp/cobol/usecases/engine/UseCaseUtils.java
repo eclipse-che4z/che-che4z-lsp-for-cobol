@@ -143,10 +143,14 @@ public class UseCaseUtils {
 
     useCase.getCopybooks()
         .forEach(cobolText -> {
-          String cleanedText = preprocessor.cleanUpCode("uri", cobolText.getFullText())
-              .unwrap(l -> {}).calculateExtendedText();
 
-          cobolText = new CobolText(cobolText.getFileName(), cobolText.getDialectType(), cleanedText);
+          String copybookText = cobolText.getFullText();
+          if (cobolText.isPreprocess()) {
+            copybookText = preprocessor.cleanUpCode("uri", cobolText.getFullText())
+                .getResult().calculateExtendedText();
+          }
+
+          cobolText = new CobolText(cobolText.getFileName(), cobolText.getDialectType(), copybookText);
           CopybookModel copybookModel = UseCaseUtils.toCopybookModel(cobolText);
           copybookService.store(copybookModel, useCase.fileName);
         });
