@@ -97,7 +97,7 @@ public class MockTextDocumentService {
   }
 
   protected void mockSettingServiceForCopybooks(boolean answer) {
-    when(copybookNameService.isCopyBook(any()))
+    when(copybookNameService.isCopybook(any()))
         .thenReturn(answer);
   }
 }

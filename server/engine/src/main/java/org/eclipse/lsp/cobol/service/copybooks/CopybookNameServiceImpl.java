@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service.copybooks;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -68,18 +69,18 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   }
 
   @Override
-  public Optional<CopybookName> findByName(String displayName) {
+  public Optional<CopybookName> findFirstByName(String displayName) {
     return listOfCopybookNames.stream()
-        .filter(copybookName -> displayName.toLowerCase().equals(copybookName.getDisplayName()))
+        .filter(copybookName -> displayName.equalsIgnoreCase(copybookName.getDisplayName()))
         .findAny();
   }
 
   @Override
-  public boolean isCopyBook(String uri) {
+  public boolean isCopybook(String uri) {
     String[] uriAsArray = uri.split("/");
     String fileNameWithExtension = uriAsArray[uriAsArray.length - 1];
     String fileName = fileNameWithExtension.split("\\.")[0];
-    return findByName(fileName).isPresent()
+    return findFirstByName(fileName).isPresent()
         || Optional.ofNullable(listOfCopybookFolders)
             .orElse(emptyList())
             .stream()
@@ -98,14 +99,15 @@ public class CopybookNameServiceImpl implements CopybookNameService {
 
     CompletableFuture.allOf(copybookWorkspaces, copybookLocalFolders, copybooksExtensions).thenAccept(
         (aVoid) -> resolveNames(copybookWorkspaces.join(), copybookLocalFolders.join(),
-            new HashSet<>(copybooksExtensions.join()))
+            copybooksExtensions.join())
     );
 
   }
 
   private void resolveNames(
       List<WorkspaceFolder> workspaceFolderList, List<String> copybookFolders,
-      Set<String> copybookExtensions) {
+      List<String> copybookExtensions) {
+    Set<String> copybookExtensionsAsSet = new HashSet<>(copybookExtensions);
     listOfCopybookFolders = copybookFolders;
     listOfCopybookNames =
         unmodifiableList(
@@ -118,7 +120,8 @@ public class CopybookNameServiceImpl implements CopybookNameService {
                     .displayName(nameAndExtension[0])
                     .extension(nameAndExtension[1])
                     .build())
-                .filter(copybookName -> copybookExtensions.contains(copybookName.getExtension()))
+                .filter(copybookName -> copybookExtensionsAsSet.contains(copybookName.getExtension()))
+                .sorted(Comparator.comparingInt(o -> copybookExtensions.indexOf(o.getExtension())))
                 .collect(Collectors.toList()));
   }
 

@@ -17,7 +17,9 @@ package org.eclipse.lsp.cobol.service.copybooks;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Provider;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Stream;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.SettingsService;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
@@ -38,6 +40,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static edu.emory.mathcs.backport.java.util.Collections.emptyList;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -109,6 +112,44 @@ class CopybookNameServiceTest {
     );
   }
 
+  static Stream<Arguments> copybooksWithExtensionsOrderData() {
+    return Stream.of(
+        Arguments.of(
+            Arrays.asList("xyz", "copy", "COPY", "cpy", "CPY"),
+            Optional.of(CopybookName.builder().displayName("A").extension("copy").build())
+        ),
+        Arguments.of(
+            Arrays.asList("xyz", "CPY", "cpy", "COPY", "copy"),
+            Optional.of(CopybookName.builder().displayName("A").extension("CPY").build())
+        ),
+        Arguments.of(
+            Arrays.asList("xyz", "acd"),
+            Optional.empty()
+        )
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("copybooksWithExtensionsOrderData")
+  void testCopybooksWithExtensionsOrder(
+      List<String> extensionsInCofig,
+      Optional<CopybookName> copybookFound
+  ) {
+
+    validFoldersMock();
+    when(settingsService.fetchTextConfiguration(
+        CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
+    when(files.listFilesInDirectory(wrkPath)).thenReturn(emptyList());
+    when(files.listFilesInDirectory(cpyPath)).thenReturn(Arrays.asList("A.CPY", "A.COPY", "A.cpy", "A.copy"));
+
+    CopybookNameService copybookNameService =
+        new CopybookNameServiceImpl(settingsService, files, provider);
+    copybookNameService.collectLocalCopybookNames();
+
+    assertEquals(copybookFound, copybookNameService.findFirstByName("A"));
+
+  }
+
   /** Test scenarios when the copybook local path exists in the settings. */
   @ParameterizedTest
   @MethodSource("collectCopybookNamesData")
@@ -119,31 +160,16 @@ class CopybookNameServiceTest {
       List<String> extensionsInCofig,
       int expectedCopybookFound
   ) {
-    CopybookNameService copybookNameService =
-        new CopybookNameServiceImpl(settingsService, files, provider);
-
+    validFoldersMock();
     when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
-
-    when(wrkPath.toUri()).thenReturn(URI.create(WORKSPACE_PROGRAM_URI));
-    when(cpyPath.toUri()).thenReturn(URI.create(VALID_CPY_URI));
-
-    when(files.decodeURI(WORKSPACE_PROGRAM_URI)).thenReturn(WORKSPACE_PROGRAM_URI);
-    when(files.decodeURI(VALID_CPY_URI)).thenReturn(VALID_CPY_URI);
-
-    when(files.getPathFromURI(WORKSPACE_PROGRAM_URI)).thenReturn(wrkPath);
-    when(files.getPathFromURI(VALID_CPY_URI)).thenReturn(cpyPath);
-
-    when(wrkPath.resolve(WORKSPACE_PROGRAM_URI)).thenReturn(wrkPath);
-    when(wrkPath.resolve(VALID_CPY_URI)).thenReturn(cpyPath);
-
-    when(files.fileExists(wrkPath)).thenReturn(true);
-    when(files.fileExists(cpyPath)).thenReturn(true);
-
     when(files.listFilesInDirectory(wrkPath)).thenReturn(filesInWorkingDirectory);
     when(files.listFilesInDirectory(cpyPath)).thenReturn(filesInCopybookDirectory);
 
+    CopybookNameService copybookNameService =
+        new CopybookNameServiceImpl(settingsService, files, provider);
     copybookNameService.collectLocalCopybookNames();
+
     assertEquals(expectedCopybookFound, copybookNameService.getNames().size());
   }
 
@@ -160,5 +186,22 @@ class CopybookNameServiceTest {
 
     copybookNameService.collectLocalCopybookNames();
     assertEquals(0, copybookNameService.getNames().size());
+  }
+
+  private void validFoldersMock() {
+    when(wrkPath.toUri()).thenReturn(URI.create(WORKSPACE_PROGRAM_URI));
+    when(cpyPath.toUri()).thenReturn(URI.create(VALID_CPY_URI));
+
+    when(files.decodeURI(WORKSPACE_PROGRAM_URI)).thenReturn(WORKSPACE_PROGRAM_URI);
+    when(files.decodeURI(VALID_CPY_URI)).thenReturn(VALID_CPY_URI);
+
+    when(files.getPathFromURI(WORKSPACE_PROGRAM_URI)).thenReturn(wrkPath);
+    when(files.getPathFromURI(VALID_CPY_URI)).thenReturn(cpyPath);
+
+    when(wrkPath.resolve(WORKSPACE_PROGRAM_URI)).thenReturn(wrkPath);
+    when(wrkPath.resolve(VALID_CPY_URI)).thenReturn(cpyPath);
+
+    when(files.fileExists(wrkPath)).thenReturn(true);
+    when(files.fileExists(cpyPath)).thenReturn(true);
   }
 }

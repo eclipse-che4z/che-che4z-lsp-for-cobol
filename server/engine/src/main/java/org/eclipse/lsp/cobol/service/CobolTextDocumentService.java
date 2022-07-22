@@ -236,7 +236,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     if (uri.startsWith(GIT_FS_URI)) {
       LOG.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
     }
-    if (copybookNameService.isCopyBook(uri)) return;
+    if (copybookNameService.isCopybook(uri)) return;
 
     String text = params.getTextDocument().getText();
     communications.notifyThatLoadingInProgress(uri);
@@ -249,7 +249,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     String uri = params.getTextDocument().getUri();
     outlineMap.put(uri, new CompletableFuture<>());
     cfAstMap.put(uri, new CompletableFuture<>());
-    if (copybookNameService.isCopyBook(uri)) return;
+    if (copybookNameService.isCopybook(uri)) return;
 
     String text = params.getContentChanges().get(0).getText();
     interruptAnalysis(uri);

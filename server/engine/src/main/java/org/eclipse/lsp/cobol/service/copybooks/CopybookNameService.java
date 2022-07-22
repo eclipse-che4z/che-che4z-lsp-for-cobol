@@ -30,19 +30,22 @@ public interface CopybookNameService {
   List<CopybookName> getNames();
 
   /**
-   * Check if URI belongs to copybooks
+   * Check if URI belongs to copybooks (defined by extension list)
+   * and list of copybook folder (defined by copybook folder list)
    *
    * @param uri an attribute to check
-   * @return true if URI belongs to known copybooks and list of folders c
+   * @return true if URI belongs to known copybooks.
    */
-  boolean isCopyBook(String uri);
+  boolean isCopybook(String uri);
 
   /**
-   * Find a copybook in the open workspace that match displayName
+   * Find a first copybook in the list of copybookNames
+   * that ordered by SettingsParametersEnum.CPY_EXTENSIONS list from client config
+   * in the open workspace that match displayName
    * @param displayName an attribute to find by
    * @return optional CopybookName
    */
-  Optional<CopybookName> findByName(String displayName);
+  Optional<CopybookName> findFirstByName(String displayName);
 
   /** Resolves the paths defined in Settings.json for cobol-lsp.cpy-manager.paths-local */
   void collectLocalCopybookNames();
