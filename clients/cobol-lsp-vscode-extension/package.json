@@ -43,8 +43,7 @@
     "icon": "resources/logo.png",
     "main": "./out/extension.js",
     "contributes": {
-        "commands": [
-            {
+        "commands": [{
                 "command": "cobol-lsp.cpy-manager.fetch-copybook",
                 "title": "Fetch copybook"
             },
@@ -65,8 +64,7 @@
                 "title": "Remove COBOL Line Comment"
             }
         ],
-        "languages": [
-            {
+        "languages": [{
                 "id": "COBOL",
                 "extensions": [
                     ".cbl",
@@ -87,8 +85,7 @@
                 "configuration": "./syntaxes/lang-config.json"
             }
         ],
-        "grammars": [
-            {
+        "grammars": [{
                 "language": "COBOL",
                 "scopeName": "source.cobol",
                 "path": "./syntaxes/COBOL.tmLanguage.json",
@@ -417,8 +414,7 @@
                 ]
             }
         },
-        "keybindings": [
-            {
+        "keybindings": [{
                 "key": "tab",
                 "command": "cobol-lsp.smart-tab",
                 "when": "editorLangId == cobol && !inSnippetMode"
@@ -456,7 +452,7 @@
         "package": "vsce package"
     },
     "dependencies": {
-        "@zowe/zowe-explorer-api": "2.0.3",
+        "@zowe/zowe-explorer-api": "^1.17.0",
         "iconv-lite": "^0.6.3",
         "vscode-extension-telemetry": "0.1.6",
         "vscode-languageclient": "5.2.1"

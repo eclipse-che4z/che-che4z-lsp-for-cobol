@@ -33,7 +33,7 @@ vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
 
 // file utils
 function createFile(filename: string, folderPath: string): string {
-    fs.writeFileSync(path.join(folderPath, filename), "Some dummy content", err => {
+    (fs as any).writeFileSync(path.join(folderPath, filename), "Some dummy content", err => {
         if (err) {
             return null;
         }

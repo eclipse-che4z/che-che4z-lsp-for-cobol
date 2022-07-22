@@ -56,11 +56,11 @@ describe("LanguageClientService positive scenario", () => {
         languageClientService = new LanguageClientService(middleware);
         new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(0);
-        fs.existsSync = jest.fn().mockReturnValue(true);
+        (fs as any).existsSync = jest.fn().mockReturnValue(true);
     });
 
     test("Test LanguageClientService switches native flag", async () => {
-        fs.existsSync = jest.fn().mockReturnValue(true);
+        (fs as any).existsSync = jest.fn().mockReturnValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(9999);
         languageClientService.enableNativeBuild();
         expect((languageClientService as any).isNativeBuildEnabled).toBeTruthy();
@@ -68,7 +68,7 @@ describe("LanguageClientService positive scenario", () => {
 
     test("Test LanguageClientService checkPrerequisites passes", async () => {
         let message = false;
-        fs.existsSync = jest.fn().mockReturnValue(true);
+        (fs as any).existsSync = jest.fn().mockReturnValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(9999);
         try {
             await languageClientService.checkPrerequisites();
@@ -170,7 +170,7 @@ describe("LanguageClientService positive scenario", () => {
 describe("LanguageClientService negative scenario.", () => {
 
     test.skip("LSP port not defined and jar path doesn't exists", async () => {
-        fs.existsSync = jest.fn().mockReturnValue(false);
+        (fs as any).existsSync = jest.fn().mockReturnValue(false);
         try {
             await new LanguageClientService(undefined).checkPrerequisites();
         } catch (error) {
