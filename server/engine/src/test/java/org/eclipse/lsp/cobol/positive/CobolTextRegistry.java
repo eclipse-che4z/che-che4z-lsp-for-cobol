@@ -21,7 +21,7 @@ import java.util.Map;
 
 public interface CobolTextRegistry extends CopybooksMock {
   String PATH_TO_LISTING_SNAP = "listingSnap";
-  String DEFAULT_LISTING_PATH = "..\\..\\Cobol85PositiveTestsSuite\\compileListing\\snapshot";
+  String DEFAULT_LISTING_PATH = "../../Cobol85PositiveTestsSuite/compileListing/snapshot";
   /** @return all the Cobol files for positive tests */
   List<CobolText> getPositives();
 
