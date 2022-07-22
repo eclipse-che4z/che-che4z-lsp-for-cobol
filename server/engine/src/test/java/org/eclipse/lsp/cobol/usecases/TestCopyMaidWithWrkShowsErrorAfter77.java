@@ -48,7 +48,7 @@ class TestCopyMaidWithWrkShowsErrorAfter77 {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, "WRK", COPYBOOK_CONTENT)),
+            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT, "WRK", false)),
         ImmutableMap.of(
             "2",
             new Diagnostic(
