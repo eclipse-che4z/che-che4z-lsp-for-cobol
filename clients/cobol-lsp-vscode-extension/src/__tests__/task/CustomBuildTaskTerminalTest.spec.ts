@@ -12,29 +12,23 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "fs-extra";
-import * as path from "path";
+import * as os from "os";
 import * as vscode from "vscode";
+import { CobolCompileJobDefinition } from "../../task/CompileTaskProvider";
 import { CustomBuildTaskTerminal } from "../../task/CustomBuildTaskTerminal";
+import {CobolCompileJCLProvider} from "../../task/jcl/CobolCompileJCLProvider";
 
-const jobCard: string = "jobCard";
+const jobCard: string[] = ["jobCard"];
+const docText = { fileName: "filename", getText: jest.fn().mockReturnValue("DUMMY TEXT"), uri: { fsPath: "tmp-ws" } };
 let taskTerminal: CustomBuildTaskTerminal;
 const writterEvent = jest.fn();
 const closeEvent = jest.fn();
-let jobcardFilePath;
 beforeAll(() => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
         get: jest.fn().mockReturnValue("testProfile"),
     });
     const fsPath = ".";
     (vscode.workspace.workspaceFolders as any) = [{ uri: { fsPath } } as any];
-});
-
-afterAll(() => {
-    jest.clearAllMocks();
-    if (fs.existsSync(jobcardFilePath)) {
-        fs.remove(jobcardFilePath);
-    }
 });
 
 afterEach(() => jest.clearAllMocks());
@@ -76,9 +70,9 @@ describe("CustomBuildTaskTerminal Test", () => {
             ),
         };
 
-        taskTerminal = new CustomBuildTaskTerminal({ fileName: "filename" } as any, {
+        taskTerminal = new CustomBuildTaskTerminal(docText as any, {
             jobCard,
-            steplib: "steplib",
+            steplib: ["steplib"],
             type: "testTask",
         });
 
@@ -93,7 +87,7 @@ describe("CustomBuildTaskTerminal Test", () => {
 
     it("returns with error when ZE is not installed", async () => {
         (vscode.extensions as any) = {
-            getExtension : jest.fn().mockReturnValue(undefined),
+            getExtension: jest.fn().mockReturnValue(undefined),
         };
 
         await (taskTerminal as any).doCompile().catch(e => {
@@ -105,17 +99,24 @@ describe("CustomBuildTaskTerminal Test", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue(""),
         });
+        (vscode.commands as any) = {
+            executeCommand: jest.fn().mockReturnValue(undefined),
+        };
         await (taskTerminal as any).doCompile().catch(e => {
-            expect(e).toEqual("Please specify zowe profile for copybook download for the task to run.");
+            expect(e).toEqual("Please specify zowe profile for copybook download in settings.");
         });
     });
 
-    it("return with error when jobCard and steplib is not provided", async () => {
-        const incompleteTask = new CustomBuildTaskTerminal({ fileName: "filename" } as any, {
+    it("return with error when jobCard is not provided", async () => {
+        const incompleteTask = new CustomBuildTaskTerminal(docText as any, {
             type: "testTask",
+            jobCard: [],
+        });
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue("testProfile"),
         });
         await (incompleteTask as any).doCompile().catch(e => {
-            expect(e).toEqual("jobCard is mandatory. customize task and provide these attributed in task.json");
+            expect(e).toEqual("jobCard is missing. Update the task configuration in task.json .");
         });
     });
 
@@ -123,13 +124,13 @@ describe("CustomBuildTaskTerminal Test", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue("testProfile"),
         });
-        (taskTerminal as any).CompileCobolDocument = jest.fn().mockResolvedValue("TEST");
+        (taskTerminal as any).compileCobolDocument = jest.fn().mockReturnValue("TEST");
         await expect((taskTerminal as any).doCompile()).resolves.not.toThrowError();
     });
 
     it("checks proper flow of task", async () => {
-        const loadedProfile: any = {};
-        const task = new CustomBuildTaskTerminal({ fileName: "filename" } as any, {
+        const loadedProfile: any = { profile: { host: "testHost.company.com" } };
+        const task = new CustomBuildTaskTerminal(docText as any, {
             jobCard,
             steplib: ["steplib1", "steplib2"],
             syslib: ["syslib1", "syslib2"],
@@ -150,75 +151,210 @@ describe("CustomBuildTaskTerminal Test", () => {
         (task as any).closeEmitter = {
             fire: closeEvent,
         };
-        await (task as any).CompileCobolDocument(vscode.extensions.getExtension("Zowe.vscode-extension-for-zowe")?.exports, loadedProfile);
+        await (task as any).compileCobolDocument(vscode.extensions.getExtension("Zowe.vscode-extension-for-zowe")?.exports, loadedProfile);
         expect(writterEvent).toBeCalledTimes(6);
     });
 
     it("checks proper JCL is formed for compile job", async () => {
-        jobcardFilePath = path.resolve(vscode.workspace.workspaceFolders[0].uri.fsPath, jobCard);
-        await fs.writeFileSync(jobcardFilePath, "JOBCARD");
 
-        const expectedJCL = "JOBCARD\r\n" +
-            "//*\n" +
-            "//*  COBOL LIBRARIES\n" +
-            "//*\n" +
-            "//*\n" +
-            "//******************************************************************\n" +
-            "//*  COMP - COMPILE THE COBOL PROGRAM\n" +
-            "//******************************************************************\n" +
-            "//*\n" +
-            "//COMP     EXEC PGM=IGYCRCTL,REGION=0M\n" +
-            "//*  PARM=('LIST,APOST,NOSEQ,LIST,MAP,XREF,SOURCE,LP(64)')\n" +
-            "//*  PARM=('LIST,APOST,NOSEQ,LIST,MAP,XREF,SOURCE,DATA(24)')\r\n" +
-            "//STEPLIB  DD  DISP=SHR,DSN=steplib1\r\n" +
-            "//         DD  DISP=SHR,DSN=steplib2\r\n" +
-            "//SYSUT1   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT2   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT3   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT4   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT5   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT6   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT7   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT8   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT9   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT10  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT11  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT12  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT13  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT14  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSUT15  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSMDECK DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\n" +
-            "//SYSPRINT DD  SYSOUT=*\n" +
-            "//SYSLIN   DD  DSN=&&LOADSET,DISP=(MOD,PASS),\n" +
+        const expectedJCL = "jobCard\r\n" +
+            "//*\r\n" +
+            "//*  COBOL LIBRARIES\r\n" +
+            "//*\r\n" +
+            "//*\r\n" +
+            "//******************************************************************\r\n" +
+            "//*  COMP - COMPILE THE COBOL PROGRAM\r\n" +
+            "//******************************************************************\r\n" +
+            "//*\r\n" +
+            "//COMP     EXEC PGM=IGYCRCTL,REGION=0M\r\n" +
+            "//*\r\n" +
+            "//STEPLIB DD DISP=SHR,DSN=steplib1\r\n" +
+            "//         DD DISP=SHR,DSN=steplib2\r\n" +
+            "//SYSUT1   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT2   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT3   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT4   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT5   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT6   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT7   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT8   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT9   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT10  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT11  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT12  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT13  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT14  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT15  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSMDECK DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSPRINT DD  SYSOUT=*\r\n" +
+            "//SYSLIN   DD  DSN=&&LOADSET,DISP=(MOD,PASS),\r\n" +
             "//             UNIT=SYSDA,SPACE=(400,(2000,200))\r\n" +
-            "//SYSLIB  DD  DISP=SHR,DSN=syslib1\r\n" +
-            "//         DD  DISP=SHR,DSN=syslib2\r\n" +
-            "//SYSUDUMP DD  SYSOUT=*\n" +
-            "//SYSPUNCH DD  DUMMY\n" +
-            "//SYSIN    DD  * \r\n" +
-            "THIS IS A DUMMY COBOL PRGM.";
+            "//SYSLIB DD DISP=SHR,DSN=syslib1\r\n" +
+            "//         DD DISP=SHR,DSN=syslib2\r\n" +
+            "//SYSPUNCH DD  DUMMY\r\n" +
+            "//SYSIN    DD  * ";
 
-        const task = new CustomBuildTaskTerminal({fileName: "filename"} as any, {
+        const definition: CobolCompileJobDefinition = {
             jobCard,
             steplib: ["steplib1", "steplib2"],
             syslib: ["syslib1", "syslib2"],
             type: "testTask",
-        });
-        (task as any).storeSysPrint = jest.fn();
-        (task as any).documentText = {
-            getText: jest.fn().mockReturnValue("THIS IS A DUMMY COBOL PRGM."),
-            uri: {
-                fsPath: "documentUri",
-            },
-        };
-        (task as any).writeEmitter = {
-            fire: writterEvent,
-        };
+            unit: "SYSDA"
+        }
 
-        (task as any).closeEmitter = {
-            fire: closeEvent,
-        };
-        const JCL = (task as any).getCompileJobJCL();
+        const JCL = (CobolCompileJCLProvider as any).getCompileJobJCL(definition);
         expect(JCL).toEqual(expectedJCL);
     });
+
+    it("checks proper JCL is formed for compile job with custom unit", async () => {
+
+        const expectedJCL = "jobCard\r\n" +
+            "//*\r\n" +
+            "//*  COBOL LIBRARIES\r\n" +
+            "//*\r\n" +
+            "//*\r\n" +
+            "//******************************************************************\r\n" +
+            "//*  COMP - COMPILE THE COBOL PROGRAM\r\n" +
+            "//******************************************************************\r\n" +
+            "//*\r\n" +
+            "//COMP     EXEC PGM=IGYCRCTL,REGION=0M\r\n" +
+            "//*\r\n" +
+            "//STEPLIB DD DISP=SHR,DSN=steplib1\r\n" +
+            "//         DD DISP=SHR,DSN=steplib2\r\n" +
+            "//SYSUT1   DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT2   DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT3   DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT4   DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT5   DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT6   DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT7   DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT8   DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT9   DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT10  DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT11  DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT12  DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT13  DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT14  DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT15  DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSMDECK DD  UNIT=SYSDAYU8,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSPRINT DD  SYSOUT=*\r\n" +
+            "//SYSLIN   DD  DSN=&&LOADSET,DISP=(MOD,PASS),\r\n" +
+            "//             UNIT=SYSDAYU8,SPACE=(400,(2000,200))\r\n" +
+            "//SYSLIB DD DISP=SHR,DSN=syslib1\r\n" +
+            "//         DD DISP=SHR,DSN=syslib2\r\n" +
+            "//SYSPUNCH DD  DUMMY\r\n" +
+            "//SYSIN    DD  * ";
+
+        const definition: CobolCompileJobDefinition = {
+            jobCard,
+            steplib: ["steplib1", "steplib2"],
+            syslib: ["syslib1", "syslib2"],
+            type: "testTask",
+            unit: "SYSDAYU8"
+        }
+
+        const JCL = (CobolCompileJCLProvider as any).getCompileJobJCL(definition);
+        expect(JCL).toEqual(expectedJCL);
+    });
+
+    it("checks proper JCL is formed with compiler options", async () => {
+
+        const expectedJCL = "jobCard\r\n" +
+            "//*\r\n" +
+            "//*  COBOL LIBRARIES\r\n" +
+            "//*\r\n" +
+            "//*\r\n" +
+            "//******************************************************************\r\n" +
+            "//*  COMP - COMPILE THE COBOL PROGRAM\r\n" +
+            "//******************************************************************\r\n" +
+            "//*\r\n" +
+            "//COMP     EXEC PGM=IGYCRCTL,REGION=0M,\r\n" +
+            "// PARM=(LIST,APOST,NOSEQ,LIST,MAP,XREF,SOURCE,DATA(24),NODUMP,NODYNAM,X\r\n" +
+            "//             NOEXIT,NOEXPORTALL)\r\n" +
+            "//STEPLIB DD DISP=SHR,DSN=steplib1\r\n" +
+            "//         DD DISP=SHR,DSN=steplib2\r\n" +
+            "//SYSUT1   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT2   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT3   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT4   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT5   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT6   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT7   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT8   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT9   DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT10  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT11  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT12  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT13  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT14  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSUT15  DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSMDECK DD  UNIT=SYSDA,SPACE=(TRK,(10,10))\r\n" +
+            "//SYSPRINT DD  SYSOUT=*\r\n" +
+            "//SYSLIN   DD  DSN=&&LOADSET,DISP=(MOD,PASS),\r\n" +
+            "//             UNIT=SYSDA,SPACE=(400,(2000,200))\r\n" +
+            "//SYSLIB DD DISP=SHR,DSN=syslib1\r\n" +
+            "//         DD DISP=SHR,DSN=syslib2\r\n" +
+            "//SYSPUNCH DD  DUMMY\r\n" +
+            "//SYSIN    DD  * ";
+
+        const definition: CobolCompileJobDefinition = {
+            jobCard,
+            steplib: ["steplib1", "steplib2"],
+            syslib: ["syslib1", "syslib2"],
+            type: "testTask",
+            compilerOptions: ["LIST", "APOST", "NOSEQ", "LIST", "MAP", "XREF", "SOURCE", "DATA(24)", "NODUMP", "NODYNAM", "NOEXIT", "NOEXPORTALL"],
+            unit: "SYSDA",
+        };
+
+        const JCL = (CobolCompileJCLProvider as any).getCompileJobJCL(definition);
+        expect(JCL).toEqual(expectedJCL);
+    });
+
+    it("checks proper compiler options are generated", async () => {
+        const compileOptions = (CobolCompileJCLProvider as any).getCompilerOptions(["LIST"]);
+        expect(compileOptions).toBe("// PARM=(LIST)");
+    });
+
+    it("checks proper compiler options are generated for a bigger list", async () => {
+        const compilerOption = ["LIST"];
+        for (let i = 0; i < 33; i++) {
+            compilerOption.push("test1");
+        }
+        const compileOptions = (CobolCompileJCLProvider as any).getCompilerOptions(compilerOption);
+        expect(compileOptions).toBe("// PARM=(LIST,test1,test1,test1,test1,test1,test1,test1,test1,test1,tesX" + os.EOL +
+            "//             t1,test1,test1,test1,test1,test1,test1,test1,test1,test1,X" + os.EOL +
+            "//             test1,test1,test1,test1,test1,test1,test1,test1,test1,tesX" + os.EOL +
+            "//             t1,test1,test1,test1,test1)");
+    });
+
+    it("checks a syslib provided with more than 44 char throws exception", () => {
+        const task = new CustomBuildTaskTerminal(docText as any, {
+            jobCard,
+            steplib: ["steplib1", "steplib2", "123456789123456789123456789123456789123456789"],
+            syslib: ["syslib1", "syslib2"],
+            type: "testTask",
+        });
+        try {
+            (task as any).validateParams();
+        } catch (err) {
+            expect(err.message).toBe("Invalid params provided. Steplib and Syslib has must have a max length of 44." + os.EOL +
+                "Correct/modify 123456789123456789123456789123456789123456789.");
+        }
+    });
+
+    it("checks the jcl line generated with more than 71 chars throws error", () => {
+        try {
+            (CobolCompileJCLProvider as any).generateLibs("STEPLIB", ["qwertyuiopasdfghjklzxcvbnm1234567890qwertyuioplkjhgdf"]);
+        } catch (error) {
+            expect(error.message).toBe("Error while generating JCL line. Line: //STEPLIB DD DISP=SHR,DSN=qwertyuiopasdfghjklzxcvbnm1234567890qwertyuioplkjhgdf");
+        }
+    });
+
+    it("checks a libname with more than 8 chars throws error", () => {
+        try {
+            (CobolCompileJCLProvider as any).generateLibs("STEPLIB12", ["qwerty"]);
+        } catch (error) {
+            expect(error.message).toBe("libName can have maximum of 8 characters.");
+        }
+    })
 });

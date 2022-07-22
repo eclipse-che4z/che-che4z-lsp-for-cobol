@@ -15,26 +15,45 @@
 import { IProfileLoaded } from "@zowe/imperative";
 import { ZoweExplorerApi } from "@zowe/zowe-explorer-api";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import { SettingsService } from "../services/Settings";
-import { COMPILE_JCL_HEADER, COMPILE_JCL_MIDDLE, COMPILE_JCL_TAIL } from "./script/compile";
+import { CobolCompileJobDefinition } from "./CompileTaskProvider";
+import { CobolCompileJCLProvider } from "./jcl/CobolCompileJCLProvider";
 
 export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
     private ERROR_REGEX = "^\\s+([0-9]*)\\s+IGY[A-Z]{2}\\d{4}-([A-Z])\\s+(.*)$";
     private writeEmitter = new vscode.EventEmitter<string>();
-    onDidWrite: vscode.Event<string> = this.writeEmitter.event;
     private closeEmitter = new vscode.EventEmitter<number>();
+    onDidWrite: vscode.Event<string> = this.writeEmitter.event;
     onDidClose?: vscode.Event<number> = this.closeEmitter.event;
 
-    constructor(private documentText: vscode.TextDocument, private definition: vscode.TaskDefinition) {
+    constructor(private documentText: vscode.TextDocument, private definition: CobolCompileJobDefinition) {
     }
 
     public open(_initialDimensions: vscode.TerminalDimensions | undefined): void {
+        try {
+            this.validateParams();
+        } catch (error) {
+            this.handleError(error).catch(err => {
+                throw new Error(err);
+            });
+        }
         this.doCompile();
     }
 
     public close(): void {
+    }
+
+    private validateParams() {
+        const invalidSyslib = this.definition.syslib?.filter(str => str.length > 44);
+        const invalidSteplib = this.definition.steplib?.filter(str => str.length > 44);
+        if ((invalidSyslib ? invalidSyslib.length === 0 : true) && (invalidSteplib ? invalidSteplib.length === 0 : true)) {
+            return;
+        }
+        const invalidParams = (invalidSyslib ? invalidSyslib?.join(", ") : "") + (invalidSteplib ? invalidSteplib?.join(", ") : "");
+        throw new Error(`Invalid params provided. Steplib and Syslib has must have a max length of 44.${os.EOL}Correct/modify ${invalidParams}.`);
     }
 
     private async doCompile(): Promise<void> {
@@ -43,14 +62,18 @@ export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
         if (!zoweExplorerApi) {
             return this.handleError({ message: "Please install zowe Explorer" });
         }
-        if (!this.definition.jobCard) {
-            return this.handleError({ message: "jobCard is mandatory. customize task and provide these attributed in task.json" });
+        if (typeof this.definition?.jobCard === "undefined" || this.definition.jobCard.length === 0) {
+            return this.handleError({ message: "jobCard is missing. Update the task configuration in task.json ." });
         }
 
         try {
             const zoweProfile = SettingsService.getProfileName();
-            if(!zoweProfile)
-            return this.handleError({ message: "Please specify zowe profile for copybook download for the task to run." });
+            if (!zoweProfile) {
+              return this.handleError(
+                  { message: "Please specify zowe profile for copybook download in settings." }, () => {
+                    vscode.commands.executeCommand("workbench.action.openSettings", "cobol-lsp.cpy-manager.profiles");
+                  });
+            }
             loadedProfile = zoweExplorerApi
                 .getExplorerExtenderApi()
                 .getProfilesCache()
@@ -61,7 +84,7 @@ export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
 
         return new Promise<void>(async resolve => {
             try {
-                await this.CompileCobolDocument(zoweExplorerApi, loadedProfile);
+                await this.compileCobolDocument(zoweExplorerApi, loadedProfile);
                 this.closeEmitter.fire(0);
                 resolve();
             } catch (error) {
@@ -70,27 +93,26 @@ export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
         });
     }
 
-    private async CompileCobolDocument(zoweExplorerApi: ZoweExplorerApi.IApiRegisterClient, loadedProfile: IProfileLoaded) {
-        const jclToSubmit = this.getCompileJobJCL();
+    private async compileCobolDocument(zoweExplorerApi: ZoweExplorerApi.IApiRegisterClient, loadedProfile: IProfileLoaded) {
+        const jclToSubmit = CobolCompileJCLProvider.getCompileJobJCL(this.definition);
         const jesApi = zoweExplorerApi.getJesApi(loadedProfile);
-
-        this.writeEmitter.fire("Submitting JCL ...\r\n");
-        const submitJob = await jesApi.submitJcl(jclToSubmit);
-        this.writeEmitter.fire(`JOB submitted. JOBID: ${submitJob.jobid} ...\r\n`);
-        this.writeEmitter.fire(`Fetching result ...\r\n`);
+        this.writeEmitter.fire(`Submitting JCL ...${os.EOL}`);
+        const submitJob = await jesApi.submitJcl(`${jclToSubmit}\r\n${this.documentText.getText()}`);
+        this.writeEmitter.fire(`JOB submitted. JOBID: ${submitJob.jobid} ...${os.EOL}`);
+        this.writeEmitter.fire(`Fetching result ...${os.EOL}`);
         // TODO : Add a logic to not aggresively look for O/P
         let job = await jesApi.getJob(submitJob.jobid);
         do {
             job = await jesApi.getJob(submitJob.jobid);
         } while (!job.retcode);
 
-        this.writeEmitter.fire(`JOB completed, return code: ${job.retcode} ...\r\n`);
-        if(`${job.retcode}` !== "JCL ERROR") {
+        this.writeEmitter.fire(`JOB completed, return code: ${job.retcode} ...${os.EOL}`);
+        if (`${job.retcode}` !== "JCL ERROR") {
         const sysPrintSpool = (await jesApi.getSpoolFiles(submitJob.jobname, submitJob.jobid))
             .filter(file => file.ddname === "SYSPRINT");
         const sysPrintContent = await jesApi.getSpoolContentById(submitJob.jobname, submitJob.jobid, sysPrintSpool[0].id);
 
-        this.writeEmitter.fire("Analysing output...\r\n");
+        this.writeEmitter.fire(`Analysing output...${os.EOL}`);
 
         this.writeEmitter.fire(sysPrintContent.split("\n")
             .filter(str => str.match(this.ERROR_REGEX))
@@ -98,45 +120,29 @@ export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
                 const match = str.match(this.ERROR_REGEX);
                 return `\x1b[4m\x1b[33m${this.documentText.uri.fsPath}:${match[1]}:7\x1b[24m\x1b[39m -72 - ${match[2]}: ${match[3]}`;
             })
-            .join("\r\n"));
-            this.storeSysPrint(submitJob, sysPrintContent);
+            .join(os.EOL));
+        this.storeSysPrint(submitJob, sysPrintContent, loadedProfile.profile.host.split(".")[0]);
         }
     }
 
-    private storeSysPrint(submitJob: any, sysPrintContent: any) {
-        if (this.definition.saveSysprint) {
-            const fileLocation = this.definition.sysPrintLocation ? `${this.definition.sysPrintLocation}` : `${vscode.workspace.workspaceFolders[0].uri.fsPath}${path.sep}SYSPRINT`;
+    private storeSysPrint(submitJob: any, sysPrintContent: any, hostname: string) {
+        if (this.definition.saveListing) {
+            const defaultLocation = path.join(`${vscode.workspace.workspaceFolders[0].uri.fsPath}`, ".c4z", "listings", `${hostname}`);
+            const fileLocation = this.definition.listingLocation ? `${this.definition.listingLocation}` : defaultLocation;
             if (!fs.existsSync(fileLocation)) {
                 fs.mkdirSync(fileLocation, { recursive: true });
             }
             fs.writeFileSync(`${fileLocation}${path.sep}${submitJob.jobid}`, sysPrintContent);
-            this.writeEmitter.fire("\r\n");
-            this.writeEmitter.fire(`SYSPRINT at \x1b[4m\x1b[33m${fileLocation}${path.sep}${submitJob.jobid}\x1b[24m\x1b[39m\r\n`);
+            this.writeEmitter.fire(os.EOL);
+            this.writeEmitter.fire(`SYSPRINT at \x1b[4m\x1b[33m${fileLocation}${path.sep}${submitJob.jobid}\x1b[24m\x1b[39m${os.EOL}`);
         }
     }
 
-    private getCompileJobJCL() {
-        let jclToSubmit: string;
-        const jobCard = fs.readFileSync(path.resolve(vscode.workspace.workspaceFolders[0].uri.fsPath, this.definition.jobCard)).toString().trim();
-        const steplibs = this.definition.steplib && this.definition.steplib.length > 0 ? this.generateLibs("STEPLIB", this.definition.steplib) : "//*";
-        const syslibs = this.definition.syslib && this.definition.syslib.length > 0 ? this.generateLibs("SYSLIB", this.definition.syslib) : "//*";
-        jclToSubmit = `${jobCard}\r\n${COMPILE_JCL_HEADER}\r\n${steplibs}\r\n${COMPILE_JCL_MIDDLE}\r\n${syslibs}\r\n${COMPILE_JCL_TAIL}\r\n${this.documentText.getText()}`;
-        return jclToSubmit;
-    }
-
-    private generateLibs(libName: string, params: string[]) {
-        return params.map((str, i) => {
-            if (i === 0) {
-                return `//${libName}  DD  DISP=SHR,DSN=${str}`;
-            }
-            return `//         DD  DISP=SHR,DSN=${str}`;
-        }).join("\r\n");
-    }
-
-    private handleError(error: any) {
-        this.writeEmitter.fire(`encountered error ...\r\n`);
-        this.writeEmitter.fire(`${error.message}\r\n`);
+    private handleError(error: any, callback?: () => void) {
+        this.writeEmitter.fire(`\x1b[1m\x1b[31mencountered error ...${os.EOL}`);
+        this.writeEmitter.fire(`\x1b[31m${error.message}${os.EOL}`);
         this.closeEmitter.fire(0);
+        if (typeof callback !== "undefined") { callback(); }
         return Promise.reject(error.message);
     }
 }

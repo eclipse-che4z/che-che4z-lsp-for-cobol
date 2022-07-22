@@ -45,7 +45,7 @@
     "contributes": {
         "problemMatchers": [
             {
-                "name": "zowecc",
+                "name": "enterprise-cobol",
                 "owner": "Cobol LS",
                 "fileLocation": [
                     "absolute"
@@ -62,22 +62,27 @@
                         "loop": true
                     }
                 ],
-                "source": "Cobol compiler"
+                "source": "enterprise cobol compiler"
             }
         ],
         "taskDefinitions": [
             {
-                "type": "cobolCompile",
+                "type": "cobolCompileJob",
                 "required": [
                     "jobCard",
                     "presentation",
-                    "saveSysprint",
-                    "sysPrintLocation"
+                    "saveListing",
+                    "listingLocation",
+                    "unit"
                 ],
                 "properties": {
                     "jobCard": {
-                        "type": "string",
-                        "description": "Relative path from workspace specifying the file containing the JOB card."
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "JOB card of the the submitted job."
                     },
                     "steplib": {
                         "type": "array",
@@ -85,7 +90,7 @@
                             "type": "string"
                         },
                         "default": [],
-                        "description": "Dataset name where COBOL compiler (IGYCRCTL) resides."
+                        "description": "COBOL compiler (IGYCRCTL) load library concatenation."
                     },
                     "syslib": {
                         "type": "array",
@@ -100,15 +105,28 @@
                             "revealProblems": "onProblem"
                         }
                     },
-                    "saveSysprint": {
+                    "saveListing": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Do you want to save SYSPRINT?"
+                        "description": "Do you want to save compilation listing?"
                     },
-                    "sysPrintLocation": {
+                    "listingLocation": {
                         "type": "string",
-                        "description": "Specifies the location to store SYSPRINT file. If empty, it defaults to <WORKSPACE_LOC>/SYSPRINT/<JOBID>",
+                        "description": "Location where to store compilation listing. If empty, it defaults to ${workspaceFolder}/.c4z/listings/${hostname}/${jobid}.",
                         "default": ""
+                    },
+                    "compilerOptions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Invocation parameters for the compiler.",
+                        "default": []
+                    },
+                    "unit": {
+                        "type": "string",
+                        "default": "SYSDA",
+                        "description": "Dataset allocation UNIT for compiler work datasets."
                     }
                 }
             }

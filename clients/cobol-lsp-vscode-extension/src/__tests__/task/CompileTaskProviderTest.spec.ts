@@ -23,28 +23,11 @@ describe("CompileTaskProvider", () => {
         expect(mockCompileTask).toBeCalledTimes(1);
     });
 
-    it("resolve task is not triggred when jobcard and stepLib are not provided", () => {
-        const task = new CompileTaskProvider();
-        (task as any).getCompileTask = jest.fn();
-        const taskToResolve = {
-            definition: { type: "testTask" },
-            isBackground: false,
-            name: "testTaslResolve",
-            presentationOptions: {},
-            problemMatchers: [],
-            runOptions: {},
-            source: "",
-        };
-        const resolvedTask = task.resolveTask(taskToResolve,
-            { isCancellationRequested: false, onCancellationRequested: jest.fn() });
-        expect(resolvedTask).toBe(undefined);
-    });
-
     it("resolve task is triggred when jobcard and stepLib are provided", () => {
         const task = new CompileTaskProvider();
         (task as any).getCompileTask = jest.fn();
         const taskToResolve = {
-            definition: { type: "testTask", jobCard: "jobCard", steplib: "steplib" },
+            definition: { type: "testTask", jobCard: ["jobCard"], steplib: ["steplib"] },
             isBackground: false,
             name: "testTaslResolve",
             presentationOptions: {},

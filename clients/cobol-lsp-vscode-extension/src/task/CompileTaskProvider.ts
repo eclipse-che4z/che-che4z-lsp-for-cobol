@@ -19,43 +19,39 @@ import { CustomBuildTaskTerminal } from "./CustomBuildTaskTerminal";
 const TASK_DETAIL = "compile with IBM Enterprise COBOL for z/OS";
 export class CompileTaskProvider implements vscode.TaskProvider {
     public static taskSource = "cobol";
-    public static problemMatcher = "$zowecc";
+    public static problemMatcher = "$enterprise-cobol";
     public static taskProviderName = "compile";
-    private cobolCompileTasks?: Thenable<vscode.Task[]> = undefined;
+    private cobolCompileTasks?: Thenable<CobolCompileTask[]> = undefined;
 
-    public resolveTask(_task: vscode.Task, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.Task> {
-        const jobCard = _task.definition.jobCard;
-        if (jobCard) {
-            // resolveTask requires that the same definition object be used.
-            const definition = _task.definition as any;
-            const documentText = vscode.window.activeTextEditor.document;
-
-            return new vscode.Task(
-                definition,
-                vscode.TaskScope.Workspace,
-                CompileTaskProvider.taskProviderName,
-                CompileTaskProvider.taskSource,
-                new vscode.CustomExecution(async () => new CustomBuildTaskTerminal(documentText, definition)),
-                CompileTaskProvider.problemMatcher,
-            );
-        }
-        return undefined;
+    public resolveTask(task: CobolCompileTask, _token: vscode.CancellationToken): vscode.ProviderResult<CobolCompileTask> {
+        const definition: CobolCompileJobDefinition = task.definition;
+                // resolveTask requires that the same definition object be used.
+        const documentText = vscode.window.activeTextEditor.document;
+        return new CobolCompileTask(
+                    definition,
+                    vscode.TaskScope.Workspace,
+                    CompileTaskProvider.taskProviderName,
+                    CompileTaskProvider.taskSource,
+                    new vscode.CustomExecution(async () => new CustomBuildTaskTerminal(documentText, definition)),
+                    CompileTaskProvider.problemMatcher,
+                );
     }
 
-    public provideTasks(_token: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> {
+    public provideTasks(_token: vscode.CancellationToken): vscode.ProviderResult<CobolCompileTask[]> {
         if (!this.cobolCompileTasks) {
             this.cobolCompileTasks = this.getCompileTask();
         }
         return this.cobolCompileTasks;
     }
 
-    private async getCompileTask(): Promise<vscode.Task[]> {
-        const result: vscode.Task[] = [];
+    private async getCompileTask(): Promise<CobolCompileTask[]> {
+        const result: CobolCompileTask[] = [];
         const documentText = undefined;
-        const definition: vscode.TaskDefinition = {
+        const definition: CobolCompileJobDefinition = {
+            jobCard: [],
             type: taskType,
         };
-        const task = new vscode.Task(definition, vscode.TaskScope.Workspace, CompileTaskProvider.taskProviderName,
+        const task = new CobolCompileTask(definition, vscode.TaskScope.Workspace, CompileTaskProvider.taskProviderName,
             CompileTaskProvider.taskSource,
             new vscode.CustomExecution(async () => new CustomBuildTaskTerminal(documentText, definition)),
             CompileTaskProvider.problemMatcher);
@@ -63,5 +59,18 @@ export class CompileTaskProvider implements vscode.TaskProvider {
         result.push(task);
         return result;
     }
+}
 
+export interface CobolCompileJobDefinition extends vscode.TaskDefinition {
+    jobCard: string[];
+    steplib?: string[];
+    syslib?: string[];
+    saveListing?: boolean;
+    listingLocation?: string;
+    compilerOptions?: string[];
+    unit?: string;
+}
+
+export class CobolCompileTask extends vscode.Task {
+     public definition: CobolCompileJobDefinition;
 }

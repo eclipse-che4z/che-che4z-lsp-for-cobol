@@ -29,22 +29,18 @@ import { createFileWithGivenPath } from "./services/Settings";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 import { CompileTaskProvider } from "./task/CompileTaskProvider";
 
-let copyBooksDownloader: CopybookDownloadService;
-let middleware: Middleware;
-let languageClientService: LanguageClientService;
-let compileTaskProvider: vscode.Disposable | undefined;
-export const taskType = "cobolCompile";
+export const taskType = "cobolCompileJob";
 function initialize() {
     // We need lazy initialization to be able to mock this for unit testing
-    copyBooksDownloader = new CopybookDownloadService();
-    middleware = new Middleware(copyBooksDownloader);
-    languageClientService = new LanguageClientService(middleware);
-    // create a task provider
-    compileTaskProvider = vscode.tasks.registerTaskProvider(taskType, new CompileTaskProvider());
+    const copyBooksDownloader = new CopybookDownloadService();
+    const middleware = new Middleware(copyBooksDownloader);
+    const languageClientService = new LanguageClientService(middleware);
+
+    return {copyBooksDownloader, languageClientService};
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-    initialize();
+    const {copyBooksDownloader, languageClientService} = initialize();
     initSmartTab(context);
 
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
@@ -59,10 +55,12 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings", () => {
         gotoCopybookSettings();
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE) }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE); }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT); }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT); }));
 
+    // task provider
+    context.subscriptions.push(vscode.tasks.registerTaskProvider(taskType, new CompileTaskProvider()));
     // create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
@@ -92,9 +90,4 @@ export async function activate(context: vscode.ExtensionContext) {
             return languageClientService.retrieveAnalysis(uri, text);
         },
     };
-}
-
-export function deactivate() {
-    if (compileTaskProvider) { compileTaskProvider.dispose(); }
-    return Promise.resolve(languageClientService.stop());
 }
