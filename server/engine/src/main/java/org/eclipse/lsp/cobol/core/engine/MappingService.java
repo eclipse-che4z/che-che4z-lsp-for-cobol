@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
  * Provides mapping functionality for extended document
  */
 public class MappingService {
+  private static final int LINE_LEN = 80;
 
   /**
    * Mapping item object
@@ -126,8 +127,8 @@ public class MappingService {
     String[] originalLines = textTransformations.getText().split("\r?\n");
     int size = originalLines.length - originalDocumentLine + (textTransformations.getText().endsWith("\n") ? 1 : 0);
 
-    MappingItem last = new MappingItem(new Range(new Position(extendedDocumentLine, 0), new Position(extendedDocumentLine + size - 1, 80)),
-        new Location(textTransformations.getUri(), new Range(new Position(originalDocumentLine, 0), new Position(originalDocumentLine + size - 1, 80))), null);
+    MappingItem last = new MappingItem(new Range(new Position(extendedDocumentLine, 0), new Position(extendedDocumentLine + size - 1, LINE_LEN)),
+        new Location(textTransformations.getUri(), new Range(new Position(originalDocumentLine, 0), new Position(originalDocumentLine + size - 1, LINE_LEN))), null);
     result.add(last);
 
     return result;
@@ -139,7 +140,7 @@ public class MappingService {
     int originalEndLine = range.getStart().getLine();
     int extendedEndLine = extendedDocumentLine + size;
     if (charPos < 0) {
-      charPos = 80;
+      charPos = LINE_LEN;
       originalEndLine -= 1;
       extendedEndLine -= 1;
     }
@@ -174,7 +175,7 @@ public class MappingService {
           int charPos = item.extendedRange.getStart().getCharacter() + charShift;
           int linePos = item.extendedRange.getStart().getLine() + lineShift;
           if (charPos < 0) {
-            charPos = 80;
+            charPos = LINE_LEN;
             linePos -= 1;
           }
           Position startPosition = new Position(linePos, charPos);
@@ -223,7 +224,7 @@ public class MappingService {
     Position end = new Position(range.getEnd().getLine(), range.getEnd().getCharacter());
 
     if (lastLine.length() <= range.getEnd().getCharacter() && text.length() == 0) {
-      end.setCharacter(80);
+      end.setCharacter(LINE_LEN);
     } else {
       if (replaceLines.length > 0) {
         end.setCharacter(range.getEnd().getCharacter() - replaceLines[replaceLines.length - 1].length() - 1);
