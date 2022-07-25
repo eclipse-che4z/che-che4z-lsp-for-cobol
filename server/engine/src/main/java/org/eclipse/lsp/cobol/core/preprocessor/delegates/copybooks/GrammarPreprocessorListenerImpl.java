@@ -227,7 +227,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     descriptors.forEach(c -> c.getInjectCodeAnalysis()
         .injectCode(
             c.getContentProvider(),
-            copybookNameService.findFirstByName(c.getInjectedSourceName())
+            copybookNameService.findByName(c.getInjectedSourceName())
                 .orElse(new CopybookName(c.getInjectedSourceName())),
             context, copyContext, copybookConfig, documentUri)
         .apply(hierarchy)

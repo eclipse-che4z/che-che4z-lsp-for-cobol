@@ -39,13 +39,12 @@ public interface CopybookNameService {
   boolean isCopybook(String uri);
 
   /**
-   * Find a first copybook in the list of copybookNames
-   * that ordered by SettingsParametersEnum.CPY_EXTENSIONS list from client config
+   * Find copybook in the list of unique copybookNames
    * in the open workspace that match displayName
    * @param displayName an attribute to find by
    * @return optional CopybookName
    */
-  Optional<CopybookName> findFirstByName(String displayName);
+  Optional<CopybookName> findByName(String displayName);
 
   /** Resolves the paths defined in Settings.json for cobol-lsp.cpy-manager.paths-local */
   void collectLocalCopybookNames();

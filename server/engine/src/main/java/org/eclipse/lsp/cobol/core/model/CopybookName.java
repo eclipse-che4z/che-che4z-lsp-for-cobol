@@ -32,7 +32,6 @@ public class CopybookName {
   String displayName;
   String dialectType;
   String extension;
-  private static String defaultExtension = "cpy";
   public String getQualifiedName() {
     return displayName;
   }
@@ -48,13 +47,13 @@ public class CopybookName {
 
   public CopybookName(String displayName) {
     this.displayName = displayName;
-    this.extension = defaultExtension;
+    this.extension = null;
     this.dialectType = null;
   }
 
   public CopybookName(String displayName, String dialectType) {
     this.displayName = displayName;
     this.dialectType = dialectType;
-    this.extension = defaultExtension;
+    this.extension = null;
   }
 }

@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static edu.emory.mathcs.backport.java.util.Collections.emptyList;
+import static edu.emory.mathcs.backport.java.util.Collections.singletonList;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,7 +59,6 @@ class CopybookNameServiceTest {
 
   private final List<WorkspaceFolder> workspace = new ArrayList<>();
   private final List<String> copyNames = new ArrayList<>();
-  private final List<String> resolvedCopyNames = new ArrayList<>();
   private final WorkspaceFolder folder = new WorkspaceFolder(WORKSPACE_PROGRAM_URI);
   private final SettingsService settingsService = mock(SettingsService.class);
   private final FileSystemService files = mock(FileSystemService.class);
@@ -70,12 +70,7 @@ class CopybookNameServiceTest {
   @BeforeEach
   void setupMocks() {
     workspace.add(folder);
-    ImmutableList.of(VALID_CPY_URI, WORKSPACE_PROGRAM_URI)
-        .forEach(
-            it -> {
-              copyNames.add(it);
-              resolvedCopyNames.add(it);
-            });
+    copyNames.addAll(ImmutableList.of(VALID_CPY_URI, WORKSPACE_PROGRAM_URI));
     when(provider.get()).thenReturn(client);
     when(client.workspaceFolders()).thenReturn(CompletableFuture.completedFuture(workspace));
     when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
@@ -87,27 +82,32 @@ class CopybookNameServiceTest {
         Arguments.of(
             Collections.singletonList("VALIDNAME2.CPY"),
             Collections.singletonList("VALIDNAME.CPY"),
-            Arrays.asList("cpy", "CPY"),
+            Arrays.asList(".cpy", ".CPY"),
             2),
         Arguments.of(
             Collections.singletonList("VALIDNAME2.CPY"),
             Collections.singletonList("VALIDNAME.CPY"),
-            Collections.singletonList("cpy"),
+            Collections.singletonList(".cpy"),
             0), // lowercase extension, copybooks not found
         Arguments.of(
             Collections.emptyList(),
             Collections.emptyList(),
-            Arrays.asList("cpy", "CPY"),
+            Arrays.asList(".cpy", ".CPY"),
             0), // no folders with copybooks, nothing found
         Arguments.of(
             Collections.singletonList("VALIDNAME2.CPY"),
             Collections.singletonList("VALIDNAME.CPY"),
-            Arrays.asList("abc", "cde"),
+            Arrays.asList(".abc", ".cde"),
             0), // copybooks with extensions from config wasn't found.
         Arguments.of(
             Collections.singletonList("VALIDNAME2.abc"),
             Collections.singletonList("VALIDNAME.cde"),
-            Arrays.asList("abc", "cde"),
+            Arrays.asList(".abc", ".cde"),
+            2),
+        Arguments.of(
+            Collections.singletonList("VALIDNAME2"),
+            Collections.singletonList("VALIDNAME"),
+            singletonList(""),
             2)
     );
   }
@@ -115,16 +115,28 @@ class CopybookNameServiceTest {
   static Stream<Arguments> copybooksWithExtensionsOrderData() {
     return Stream.of(
         Arguments.of(
-            Arrays.asList("xyz", "copy", "COPY", "cpy", "CPY"),
+            Arrays.asList(".xyz", ".copy", ".COPY", ".cpy", ".CPY"),
             Optional.of(CopybookName.builder().displayName("A").extension("copy").build())
         ),
         Arguments.of(
-            Arrays.asList("xyz", "CPY", "cpy", "COPY", "copy"),
+            Arrays.asList(".xyz", ".CPY", ".cpy", ".COPY", ".copy"),
             Optional.of(CopybookName.builder().displayName("A").extension("CPY").build())
         ),
         Arguments.of(
-            Arrays.asList("xyz", "acd"),
+            Arrays.asList(".xyz", ".acd"),
             Optional.empty()
+        ),
+        Arguments.of(
+            Arrays.asList("", ".copy"),
+            Optional.of(CopybookName.builder().displayName("A").extension("").build())
+        ),
+        Arguments.of(
+            emptyList(),
+            Optional.empty()
+        ),
+        Arguments.of(
+            Arrays.asList(".COPY", ".copy"),
+            Optional.of(CopybookName.builder().displayName("A").extension("").build())
         )
     );
   }
@@ -132,21 +144,21 @@ class CopybookNameServiceTest {
   @ParameterizedTest
   @MethodSource("copybooksWithExtensionsOrderData")
   void testCopybooksWithExtensionsOrder(
-      List<String> extensionsInCofig,
+      List<String> extensionsInConfig,
       Optional<CopybookName> copybookFound
   ) {
 
     validFoldersMock();
     when(settingsService.fetchTextConfiguration(
-        CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
+        CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(extensionsInConfig));
     when(files.listFilesInDirectory(wrkPath)).thenReturn(emptyList());
-    when(files.listFilesInDirectory(cpyPath)).thenReturn(Arrays.asList("A.CPY", "A.COPY", "A.cpy", "A.copy"));
+    when(files.listFilesInDirectory(cpyPath)).thenReturn(Arrays.asList("A.CPY", "A.COPY", "A.cpy", "A.copy", "A"));
 
     CopybookNameService copybookNameService =
         new CopybookNameServiceImpl(settingsService, files, provider);
     copybookNameService.collectLocalCopybookNames();
 
-    assertEquals(copybookFound, copybookNameService.findFirstByName("A"));
+    assertEquals(copybookFound, copybookNameService.findByName("A"));
 
   }
 

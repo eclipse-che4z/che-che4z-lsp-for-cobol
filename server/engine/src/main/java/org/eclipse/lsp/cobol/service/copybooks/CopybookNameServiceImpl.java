@@ -14,14 +14,15 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
@@ -34,7 +35,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
 
@@ -69,7 +69,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   }
 
   @Override
-  public Optional<CopybookName> findFirstByName(String displayName) {
+  public Optional<CopybookName> findByName(String displayName) {
     return listOfCopybookNames.stream()
         .filter(copybookName -> displayName.equalsIgnoreCase(copybookName.getDisplayName()))
         .findAny();
@@ -80,7 +80,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
     String[] uriAsArray = uri.split("/");
     String fileNameWithExtension = uriAsArray[uriAsArray.length - 1];
     String fileName = fileNameWithExtension.split("\\.")[0];
-    return findFirstByName(fileName).isPresent()
+    return findByName(fileName).isPresent()
         || Optional.ofNullable(listOfCopybookFolders)
             .orElse(emptyList())
             .stream()
@@ -107,22 +107,32 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   private void resolveNames(
       List<WorkspaceFolder> workspaceFolderList, List<String> copybookFolders,
       List<String> copybookExtensions) {
-    Set<String> copybookExtensionsAsSet = new HashSet<>(copybookExtensions);
+    List<String> copybookExtensionsWithoutDot = copybookExtensions.stream()
+        .map(extension -> extension.replaceFirst("\\.", ""))
+        .collect(Collectors.toList());
+    Set<String> copybookExtensionsWithoutDotAsSet = new HashSet<>(copybookExtensionsWithoutDot);
     listOfCopybookFolders = copybookFolders;
-    listOfCopybookNames =
-        unmodifiableList(
-            copybookFolders.stream()
+    listOfCopybookNames = ImmutableList.copyOf(
+        copybookFolders.stream()
                 .map(copybookFolder -> listExistedFiles(workspaceFolderList, copybookFolder))
                 .flatMap(List::stream)
                 .map(nameAndExtension -> nameAndExtension.split("\\."))
                 .map(nameAndExtension -> CopybookName
                     .builder()
                     .displayName(nameAndExtension[0])
-                    .extension(nameAndExtension[1])
+                    .extension(nameAndExtension.length == 1 ? "" : nameAndExtension[1])
                     .build())
-                .filter(copybookName -> copybookExtensionsAsSet.contains(copybookName.getExtension()))
-                .sorted(Comparator.comparingInt(o -> copybookExtensions.indexOf(o.getExtension())))
-                .collect(Collectors.toList()));
+                .filter(copybookName -> copybookExtensionsWithoutDotAsSet.contains(
+                    copybookName.getExtension()))
+                .collect(Collectors.toMap(
+                    CopybookName::getDisplayName,
+                    Function.identity(),
+                    (existing, replacement) ->
+                        copybookExtensionsWithoutDot.indexOf(existing.getExtension())
+                            < copybookExtensionsWithoutDot.indexOf(replacement.getExtension())
+                            ? existing : replacement
+
+                )).values());
   }
 
   private List<String> listExistedFiles(List<WorkspaceFolder> workspace, String fileName) {

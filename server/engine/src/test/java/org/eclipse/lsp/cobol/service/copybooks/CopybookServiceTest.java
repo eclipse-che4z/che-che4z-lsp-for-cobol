@@ -56,6 +56,8 @@ class CopybookServiceTest {
   private static final String VALID_CPY_URI =
       "file:///c%3A/workspace/.c4z/.copybooks/VALIDNAME.CPY";
   private static final String CPY_EXTENSION = "cpy";
+  private static final String NO_EXTENSION = null;
+
   private static final String INVALID_CPY_NAME = "INVALID";
   private static final String INVALID_2_CPY_NAME = "INVALID_2";
   private static final String PARENT_CPY_NAME = "PARENT";
@@ -103,7 +105,7 @@ class CopybookServiceTest {
    */
   @Test
   void testRequestWhileCopybookAnalysisActiveProcessed() {
-    CopybookName copybookName = new CopybookName(VALID_CPY_NAME);
+    CopybookName copybookName = createCopybook(VALID_CPY_NAME);
     CopybookService copybookService = createCopybookService();
     CopybookModel copybookModel = copybookService.resolve(copybookName, DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
 
@@ -119,7 +121,7 @@ class CopybookServiceTest {
    */
   @Test
   void testResponseIfFileNotExists() {
-    CopybookName copybookName = new CopybookName(VALID_CPY_NAME);
+    CopybookName copybookName = createCopybook(VALID_CPY_NAME);
     CopybookService copybookService = createCopybookService();
     when(files.getPathFromURI(VALID_CPY_URI)).thenReturn(null);
     CopybookModel copybookModel = copybookService.resolve(copybookName, DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
@@ -150,7 +152,7 @@ class CopybookServiceTest {
    */
   @Test
   void testNoNewClientCallsOnDidChange() {
-    CopybookName copybookName = new CopybookName(VALID_CPY_NAME);
+    CopybookName copybookName = createCopybook(VALID_CPY_NAME);
     CopybookService copybookService = createCopybookService();
     CopybookModel copybookModelEnabled =
         copybookService.resolve(copybookName, DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
@@ -171,7 +173,7 @@ class CopybookServiceTest {
    */
   @Test
   void testCacheInvalidation() {
-    CopybookName copybookName = new CopybookName(VALID_CPY_NAME);
+    CopybookName copybookName = createCopybook(VALID_CPY_NAME);
     CopybookService copybookService = createCopybookService();
 
     CopybookModel copybookModel = copybookService.resolve(copybookName, DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
@@ -217,16 +219,16 @@ class CopybookServiceTest {
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
 
     // First document parsed
-    CopybookModel invalidCpy = copybookService.resolve(new CopybookName(INVALID_CPY_NAME), DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
-    CopybookModel validCpy = copybookService.resolve(new CopybookName(VALID_CPY_NAME), DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
+    CopybookModel invalidCpy = copybookService.resolve(createCopybook(INVALID_CPY_NAME), DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
+    CopybookModel validCpy = copybookService.resolve(createCopybook(VALID_CPY_NAME), DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
     // Second document parsed
     CopybookModel invalidCpy2 =
-        copybookService.resolve(new CopybookName(INVALID_2_CPY_NAME), DOCUMENT_2_URI, DOCUMENT_2_URI, cpyConfig, false);
+        copybookService.resolve(createCopybook(INVALID_2_CPY_NAME), DOCUMENT_2_URI, DOCUMENT_2_URI, cpyConfig, false);
 
     // Check that all copybook models are correct
-    assertEquals(new CopybookModel(new CopybookName(VALID_CPY_NAME), VALID_CPY_URI, CONTENT), validCpy);
-    assertEquals(new CopybookModel(new CopybookName(INVALID_CPY_NAME), null, null), invalidCpy);
-    assertEquals(new CopybookModel(new CopybookName(INVALID_2_CPY_NAME), null, null), invalidCpy2);
+    assertEquals(new CopybookModel(createCopybook(VALID_CPY_NAME), VALID_CPY_URI, CONTENT), validCpy);
+    assertEquals(new CopybookModel(createCopybook(INVALID_CPY_NAME), null, null), invalidCpy);
+    assertEquals(new CopybookModel(createCopybook(INVALID_2_CPY_NAME), null, null), invalidCpy2);
 
     // First document parsing done
     copybookService.handleAnalysisFinishedEvent(
@@ -280,7 +282,7 @@ class CopybookServiceTest {
     verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(DOCUMENT_3_URI)).thenReturn("document2");
-    when(settingsService.fetchConfiguration("copybook-resolve", "document2", SQLCA, CPY_EXTENSION, "COBOL"))
+    when(settingsService.fetchConfiguration("copybook-resolve", "document2", SQLCA, NO_EXTENSION, "COBOL"))
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
     CopybookModel cpy = copybookService.resolve(copybookName, DOCUMENT_3_URI, DOCUMENT_3_URI, cpyConfig, false);
 
@@ -295,7 +297,7 @@ class CopybookServiceTest {
     verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(DOCUMENT_URI)).thenReturn("document2");
-    when(settingsService.fetchConfiguration("copybook-resolve", "document2", SQLCA, CPY_EXTENSION, "COBOL"))
+    when(settingsService.fetchConfiguration("copybook-resolve", "document2", SQLCA, NO_EXTENSION, "COBOL"))
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
     CopybookModel cpy =
         copybookService.resolve(copybookName, DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DATACOM_SERVER, ImmutableList.of()), false);
@@ -340,15 +342,15 @@ class CopybookServiceTest {
     when(settingsService.fetchConfiguration("copybook-resolve", "document", PARENT_CPY_NAME, CPY_EXTENSION, "COBOL"))
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(PARENT_CPY_URI))));
 
-    CopybookModel invalidCpy = copybookService.resolve(new CopybookName(INVALID_CPY_NAME), DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
-    CopybookModel parentCpy = copybookService.resolve(new CopybookName(PARENT_CPY_NAME), DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
+    CopybookModel invalidCpy = copybookService.resolve(createCopybook(INVALID_CPY_NAME), DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
+    CopybookModel parentCpy = copybookService.resolve(createCopybook(PARENT_CPY_NAME), DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
     // Nested copybook declaration
-    CopybookModel nestedCpy = copybookService.resolve(new CopybookName(NESTED_CPY_NAME), DOCUMENT_URI, PARENT_CPY_URI, cpyConfig, false);
+    CopybookModel nestedCpy = copybookService.resolve(createCopybook(NESTED_CPY_NAME), DOCUMENT_URI, PARENT_CPY_URI, cpyConfig, false);
 
     // Check that all copybook models are correct
-    assertEquals(new CopybookModel(new CopybookName(INVALID_CPY_NAME), null, null), invalidCpy);
-    assertEquals(new CopybookModel(new CopybookName(PARENT_CPY_NAME), PARENT_CPY_URI, PARENT_CONTENT), parentCpy);
-    assertEquals(new CopybookModel(new CopybookName(NESTED_CPY_NAME), null, null), nestedCpy);
+    assertEquals(new CopybookModel(createCopybook(INVALID_CPY_NAME), null, null), invalidCpy);
+    assertEquals(new CopybookModel(createCopybook(PARENT_CPY_NAME), PARENT_CPY_URI, PARENT_CONTENT), parentCpy);
+    assertEquals(new CopybookModel(createCopybook(NESTED_CPY_NAME), null, null), nestedCpy);
 
     // Notify that analysis finished sending the document URI and copybook names that have nested
     // copybooks
@@ -398,7 +400,7 @@ class CopybookServiceTest {
   void testPredefinedCopybooksLoaded() {
     final String copybookName = PredefinedCopybooks.Copybook.SQLCA.name();
     CopybookService copybookService = createCopybookService();
-    when(settingsService.fetchConfiguration("copybook-resolve", "document", copybookName, CPY_EXTENSION, "COBOL"))
+    when(settingsService.fetchConfiguration("copybook-resolve", "document", copybookName, NO_EXTENSION, "COBOL"))
         .thenReturn(supplyAsync(() -> ImmutableList.of(new JsonPrimitive(""))));
     final CopybookModel model =
         copybookService.resolve(
@@ -406,7 +408,7 @@ class CopybookServiceTest {
 
     assertEquals("implicit:///implicitCopybooks/SQLCA_DB2.cpy", model.getUri());
     verify(settingsService, times(1))
-        .fetchConfiguration("copybook-resolve", "document", copybookName, CPY_EXTENSION, "COBOL");
+        .fetchConfiguration("copybook-resolve", "document", copybookName, NO_EXTENSION, "COBOL");
     verify(files, times(1)).getNameFromURI(DOCUMENT_URI);
   }
 
@@ -415,7 +417,7 @@ class CopybookServiceTest {
     final String copybookName = PredefinedCopybooks.Copybook.SQLCA.name();
     final String copybookUri = "file:///c%3A/workspace/.c4z/.copybooks/" + copybookName + ".cpy";
 
-    when(settingsService.fetchConfiguration("copybook-resolve", "document", copybookName, CPY_EXTENSION, "COBOL"))
+    when(settingsService.fetchConfiguration("copybook-resolve", "document", copybookName, NO_EXTENSION, "COBOL"))
         .thenReturn(supplyAsync(() -> ImmutableList.of(new JsonPrimitive(copybookUri))));
     when(files.getPathFromURI(copybookUri)).thenReturn(cpyPath);
     when(files.fileExists(cpyPath)).thenReturn(true);
@@ -431,7 +433,7 @@ class CopybookServiceTest {
     assertEquals(copybookUri, model.getUri());
     assertEquals("content", model.getContent());
     verify(settingsService, times(1))
-        .fetchConfiguration("copybook-resolve", "document", copybookName, CPY_EXTENSION, "COBOL");
+        .fetchConfiguration("copybook-resolve", "document", copybookName, NO_EXTENSION, "COBOL");
 
     // Assert the copybook was not added to the download queue
     assertTrue(copybookService.getCopybooksForDownloading().isEmpty());
@@ -439,5 +441,9 @@ class CopybookServiceTest {
 
   private CopybookServiceImpl createCopybookService() {
     return new CopybookServiceImpl(broker, settingsService, files, preprocessor, new CopybookCache(3, 3, "HOURS"));
+  }
+
+  private CopybookName createCopybook(String displayName) {
+    return CopybookName.builder().displayName(displayName).extension(CPY_EXTENSION).build();
   }
 }
