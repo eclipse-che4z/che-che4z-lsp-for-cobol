@@ -16,9 +16,11 @@
 	"compilerOptions": {
 		"types": [
 			"node",
-			"jest"
-		  ],	
+			"jest",
+            "mocha"
+		  ],
 		"target": "es6",
+        "skipLibCheck": true,
 		"lib": [
             "es6"
         ],
