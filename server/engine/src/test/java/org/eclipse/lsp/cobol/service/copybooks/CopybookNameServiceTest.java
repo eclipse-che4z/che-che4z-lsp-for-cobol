@@ -136,7 +136,7 @@ class CopybookNameServiceTest {
         ),
         Arguments.of(
             Arrays.asList(".COPY", ".copy"),
-            Optional.of(CopybookName.builder().displayName("A").extension("").build())
+            Optional.of(CopybookName.builder().displayName("A").extension("COPY").build())
         )
     );
   }
