@@ -163,14 +163,27 @@ pipeline {
                     }
                 }
 
-//                 stage('Client - Unit tests'){
+                stage('Client - Unit tests'){
+                  environment {
+                      npm_config_cache = "$env.WORKSPACE"
+                  }
+                  steps {
+                      container('node') {
+                          dir('clients/cobol-lsp-vscode-extension') {
+                            sh 'npm run coverage'
+                          }
+                      }
+                  }
+                }
+
+//                 stage('Client - API integration tests'){
 //                   environment {
 //                       npm_config_cache = "$env.WORKSPACE"
 //                   }
 //                   steps {
 //                       container('node') {
 //                           dir('clients/cobol-lsp-vscode-extension') {
-//                             sh 'npm run coverage'
+//                             sh 'npm run test:integration'
 //                           }
 //                       }
 //                   }
