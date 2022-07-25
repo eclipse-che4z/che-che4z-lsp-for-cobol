@@ -176,18 +176,18 @@ pipeline {
                   }
                 }
 
-                stage('Client - API integration tests'){
-                  environment {
-                      npm_config_cache = "$env.WORKSPACE"
-                  }
-                  steps {
-                      container('node') {
-                          dir('clients/cobol-lsp-vscode-extension') {
-                            sh 'npm run test:integration'
-                          }
-                      }
-                  }
-                }
+                // stage('Client - API integration tests'){
+                //   environment {
+                //       npm_config_cache = "$env.WORKSPACE"
+                //   }
+                //   steps {
+                //       container('node') {
+                //           dir('clients/cobol-lsp-vscode-extension') {
+                //             sh 'npm run test:integration'
+                //           }
+                //       }
+                //   }
+                // }
 
                 stage('SonarCloud analysis-Client') {
                     environment {
