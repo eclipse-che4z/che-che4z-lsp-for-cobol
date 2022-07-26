@@ -105,7 +105,7 @@ public final class IdmsDialect implements CobolDialect {
     copybookStack.push(copyNode.getName());
 
     Location cbLocation = new Location();
-    cbLocation.setRange(new Range(new Position(0, 0), new Position(0, 0)));
+    cbLocation.setRange(new Range(new Position(), new Position()));
     cbLocation.setUri(copybookModel.getUri());
     CopyDefinition copyDefinition = new CopyDefinition(cbLocation, cb.getName());
     copyNode.setDefinition(copyDefinition);

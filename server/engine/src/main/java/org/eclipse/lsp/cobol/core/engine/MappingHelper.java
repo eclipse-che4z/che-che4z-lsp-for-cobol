@@ -80,12 +80,12 @@ public class MappingHelper {
 
     int line = split.getEnd().getLine();
     int charPos = split.getEnd().getCharacter() + 1;
-    if (charPos >= 80) {
+    if (charPos >= MappingService.LINE_LEN) {
       charPos = 0;
       line += 1;
     }
     Position startPoint = new Position(line, charPos);
-    Position endPoint = new Position(line, 80);
+    Position endPoint = new Position(line, MappingService.LINE_LEN);
     Range secondRange = new Range(startPoint, endPoint);
     if (size(secondRange) > 0 || charSize(secondRange) > 0) {
       result.add(secondRange);

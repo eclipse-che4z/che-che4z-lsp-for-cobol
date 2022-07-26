@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * Provides mapping functionality for extended document
  */
 public class MappingService {
-  private static final int LINE_LEN = 80;
+  static final int LINE_LEN = 80;
 
   /**
    * Mapping item object
