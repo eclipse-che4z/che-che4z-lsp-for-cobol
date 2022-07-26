@@ -35,24 +35,25 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.*;
 
-/**
- * Dialect utility class
- */
+/** Dialect utility class */
 @Singleton
 public class DialectService {
   private static final CobolDialect EMPTY_DIALECT = () -> "COBOL";
   private final Map<String, CobolDialect> dialectSuppliers;
 
   @Inject
-  public DialectService(CopybookService copybookService,
-                        ParseTreeListener treeListener,
-                        MessageService messageService) {
+  public DialectService(
+      CopybookService copybookService,
+      ParseTreeListener treeListener,
+      MessageService messageService) {
     dialectSuppliers = new HashMap<>();
 
     CobolDialect dialect = new IdmsDialect(copybookService, treeListener, messageService);
     dialectSuppliers.put(dialect.getName(), dialect);
 
-    dialect = new DaCoDialect(messageService, new DaCoMaidProcessor(copybookService, treeListener, messageService));
+    dialect =
+        new DaCoDialect(
+            messageService, new DaCoMaidProcessor(copybookService, treeListener, messageService));
     dialectSuppliers.put(dialect.getName(), dialect);
 
     dialect = new CICSTranslatorDialect(messageService);
@@ -63,16 +64,19 @@ public class DialectService {
    * Process the source file text with dialects
    *
    * @param dialects the list of enabled dialects
-   * @param context  is a DialectProcessingContext class with all needed data for dialect processing
+   * @param context is a DialectProcessingContext class with all needed data for dialect processing
    * @return dialects outcome
    */
-  public ResultWithErrors<DialectOutcome> process(List<String> dialects, DialectProcessingContext context) {
+  public ResultWithErrors<DialectOutcome> process(
+      List<String> dialects, DialectProcessingContext context) {
     LinkedList<CobolDialect> orderedDialects = sortDialects(dialects);
     for (CobolDialect orderedDialect : orderedDialects) {
       orderedDialect.extend(context);
     }
     TextTransformations extendedText = context.getTextTransformations();
-    ResultWithErrors<DialectOutcome> acc = ResultWithErrors.of(new DialectOutcome(extendedText, ImmutableList.of(), ImmutableMultimap.of()));
+    ResultWithErrors<DialectOutcome> acc =
+        ResultWithErrors.of(
+            new DialectOutcome(extendedText, ImmutableList.of(), ImmutableMultimap.of()));
     for (CobolDialect orderedDialect : orderedDialects) {
       acc = processDialect(acc, orderedDialect, context);
     }
@@ -93,6 +97,9 @@ public class DialectService {
           if (index >= 0) {
             orderedDialects.add(index, dialect);
           } else {
+            if (!dialectsQueue.contains(d.getName())) {
+              dialectsQueue.add(d.getName());
+            }
             dialectsQueue.add(dialect.getName());
           }
         }
@@ -105,18 +112,20 @@ public class DialectService {
     return dialectSuppliers.getOrDefault(dialectName, EMPTY_DIALECT);
   }
 
-  private static ResultWithErrors<DialectOutcome> processDialect(ResultWithErrors<DialectOutcome> previousResult,
-                                                                 CobolDialect dialect,
-                                                                 DialectProcessingContext context) {
+  private static ResultWithErrors<DialectOutcome> processDialect(
+      ResultWithErrors<DialectOutcome> previousResult,
+      CobolDialect dialect,
+      DialectProcessingContext context) {
     List<Node> nodes = new ArrayList<>(previousResult.getResult().getDialectNodes());
-    Multimap<String, Pair<String, String>> implicitCode = LinkedListMultimap.create(previousResult.getResult().getImplicitCode());
+    Multimap<String, Pair<String, String>> implicitCode =
+        LinkedListMultimap.create(previousResult.getResult().getImplicitCode());
 
     List<SyntaxError> errors = new ArrayList<>(previousResult.getErrors());
 
     DialectOutcome result = dialect.processText(context).unwrap(errors::addAll);
     nodes.addAll(result.getDialectNodes());
     implicitCode.putAll(result.getImplicitCode());
-    return new ResultWithErrors<>(new DialectOutcome(result.getTransformations(), nodes, implicitCode), errors);
+    return new ResultWithErrors<>(
+        new DialectOutcome(result.getTransformations(), nodes, implicitCode), errors);
   }
-
 }
