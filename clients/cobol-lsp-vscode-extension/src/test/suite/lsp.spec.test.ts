@@ -101,6 +101,7 @@ suite('Integration Test Suite', () => {
     }).timeout(10000).slow(4000);
 
     test('TC152058 Autocomplete functionality with snippets navigation', async () => {
+
         const ACCEPTED_LINE_NUMBER = 40;
         await helper.insertString(editor, new vscode.Position(40, 0), "           A");
         await vscode.commands.executeCommand('editor.action.triggerSuggest', editor.document.uri);
@@ -114,6 +115,7 @@ suite('Integration Test Suite', () => {
         await helper.sleep(1000);
         const text = editor.document.getText();
         const acceptedLine = text.split('\n')[ACCEPTED_LINE_NUMBER];
+
         assert.ok(acceptedLine.includes("ADD 1 TO str"),
             "Checks auto complete functionality, also with navigation by snippets");
     }).timeout(10000).slow(4000);
