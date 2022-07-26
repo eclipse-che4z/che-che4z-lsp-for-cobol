@@ -87,17 +87,18 @@ public class DialectService {
       if (dialect.runBefore().isEmpty()) {
         orderedDialects.add(dialect);
       } else {
-        int pos = orderedDialects.size();
         for (String name : dialect.runBefore()) {
           CobolDialect d = getDialectByName(name);
           int index = orderedDialects.indexOf(d);
           if (index >= 0) {
-            pos = index;
+            orderedDialects.add(index, dialect);
           } else {
-            dialectsQueue.add(d.getName());
+            if (!dialectsQueue.contains(d.getName())) {
+              dialectsQueue.add(d.getName());
+            }
+            dialectsQueue.add(dialect.getName());
           }
         }
-        orderedDialects.add(pos, dialect);
       }
     }
     return orderedDialects;

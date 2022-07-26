@@ -54,7 +54,7 @@ public class TextTransformations {
         Comparator.comparingInt((Range c) -> c.getStart().getLine())
             .thenComparingInt(c -> c.getStart().getCharacter()));
 
-    String[] lines = text.split(REGEX_KEEP_NEW_LINES);
+    String[] lines = text.split(REGEX_KEEP_NEW_LINES, -1);
     int lineNumber = 0;
     int linePos = 0;
     Range currentRange = ranges.isEmpty() ? null : ranges.removeFirst();
