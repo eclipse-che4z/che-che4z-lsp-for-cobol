@@ -12,13 +12,13 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as os from "os";
 import { CobolCompileJobDefinition } from "../CompileTaskProvider";
+import { CRLF } from "../CustomBuildTaskTerminal";
 
 export class CobolCompileJCLProvider {
 
     public static getCompileJobJCL = (taskDefinition: CobolCompileJobDefinition) => {
-        const jobCard = taskDefinition.jobCard.join(os.EOL);
+        const jobCard = taskDefinition.jobCard.join(CRLF);
         const unit = taskDefinition.unit;
         const compilerOptions = CobolCompileJCLProvider.getCompilerOptions(taskDefinition.compilerOptions);
         const steplibs = taskDefinition.steplib && taskDefinition.steplib.length > 0 ? CobolCompileJCLProvider.generateLibs("STEPLIB", taskDefinition.steplib) : "//*";
@@ -80,13 +80,13 @@ ${syslibs}
             }
             CobolCompileJCLProvider.validateJclLineLength(jclLine);
             return jclLine;
-        }).join(os.EOL);
+        }).join(CRLF);
     }
 
     private static formatCompilerOptions = (options: string, allowedLength: number = 72): string => {
         if (options.length > allowedLength) {
             const intermittentOption = options.slice(0, allowedLength);
-            return intermittentOption + "X" + os.EOL +
+            return intermittentOption + "X" + CRLF +
                 CobolCompileJCLProvider.formatCompilerOptions("//             " + options.slice(allowedLength));
         } else {
             return options;

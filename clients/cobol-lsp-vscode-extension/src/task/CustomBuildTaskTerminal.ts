@@ -15,13 +15,13 @@
 import { IProfileLoaded } from "@zowe/imperative";
 import { ZoweExplorerApi } from "@zowe/zowe-explorer-api";
 import * as fs from "fs";
-import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import { SettingsService } from "../services/Settings";
 import { CobolCompileJobDefinition } from "./CompileTaskProvider";
 import { CobolCompileJCLProvider } from "./jcl/CobolCompileJCLProvider";
 
+export const CRLF = "\r\n";
 export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
     private ERROR_REGEX = "^\\s+([0-9]*)\\s+IGY[A-Z]{2}\\d{4}-([A-Z])\\s+(.*)$";
     private writeEmitter = new vscode.EventEmitter<string>();
@@ -53,7 +53,7 @@ export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
             return;
         }
         const invalidParams = (invalidSyslib ? invalidSyslib?.join(", ") : "") + (invalidSteplib ? invalidSteplib?.join(", ") : "");
-        throw new Error(`Invalid params provided. Steplib and Syslib has must have a max length of 44.${os.EOL}Correct/modify ${invalidParams}.`);
+        throw new Error(`Invalid params provided. Steplib and Syslib has must have a max length of 44.${CRLF}Correct/modify ${invalidParams}.`);
     }
 
     private async doCompile(): Promise<void> {
@@ -96,23 +96,23 @@ export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
     private async compileCobolDocument(zoweExplorerApi: ZoweExplorerApi.IApiRegisterClient, loadedProfile: IProfileLoaded) {
         const jclToSubmit = CobolCompileJCLProvider.getCompileJobJCL(this.definition);
         const jesApi = zoweExplorerApi.getJesApi(loadedProfile);
-        this.writeEmitter.fire(`Submitting JCL ...${os.EOL}`);
+        this.writeEmitter.fire(`Submitting JCL ...${CRLF}`);
         const submitJob = await jesApi.submitJcl(`${jclToSubmit}\r\n${this.documentText.getText()}`);
-        this.writeEmitter.fire(`JOB submitted. JOBID: ${submitJob.jobid} ...${os.EOL}`);
-        this.writeEmitter.fire(`Fetching result ...${os.EOL}`);
+        this.writeEmitter.fire(`JOB submitted. JOBID: ${submitJob.jobid} ...${CRLF}`);
+        this.writeEmitter.fire(`Fetching result ...${CRLF}`);
         // TODO : Add a logic to not aggresively look for O/P
         let job = await jesApi.getJob(submitJob.jobid);
         do {
             job = await jesApi.getJob(submitJob.jobid);
         } while (!job.retcode);
 
-        this.writeEmitter.fire(`JOB completed, return code: ${job.retcode} ...${os.EOL}`);
+        this.writeEmitter.fire(`JOB completed, return code: ${job.retcode} ...${CRLF}`);
         if (`${job.retcode}` !== "JCL ERROR") {
         const sysPrintSpool = (await jesApi.getSpoolFiles(submitJob.jobname, submitJob.jobid))
             .filter(file => file.ddname === "SYSPRINT");
         const sysPrintContent = await jesApi.getSpoolContentById(submitJob.jobname, submitJob.jobid, sysPrintSpool[0].id);
 
-        this.writeEmitter.fire(`Analysing output...${os.EOL}`);
+        this.writeEmitter.fire(`Analysing output...${CRLF}`);
 
         this.writeEmitter.fire(sysPrintContent.split("\n")
             .filter(str => str.match(this.ERROR_REGEX))
@@ -120,7 +120,7 @@ export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
                 const match = str.match(this.ERROR_REGEX);
                 return `\x1b[4m\x1b[33m${this.documentText.uri.fsPath}:${match[1]}:7\x1b[24m\x1b[39m -72 - ${match[2]}: ${match[3]}`;
             })
-            .join(os.EOL));
+            .join(CRLF));
         this.storeSysPrint(submitJob, sysPrintContent, loadedProfile.profile.host.split(".")[0]);
         }
     }
@@ -133,14 +133,14 @@ export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
                 fs.mkdirSync(fileLocation, { recursive: true });
             }
             fs.writeFileSync(`${fileLocation}${path.sep}${submitJob.jobid}`, sysPrintContent);
-            this.writeEmitter.fire(os.EOL);
-            this.writeEmitter.fire(`SYSPRINT at \x1b[4m\x1b[33m${fileLocation}${path.sep}${submitJob.jobid}\x1b[24m\x1b[39m${os.EOL}`);
+            this.writeEmitter.fire(CRLF);
+            this.writeEmitter.fire(`SYSPRINT at \x1b[4m\x1b[33m${fileLocation}${path.sep}${submitJob.jobid}\x1b[24m\x1b[39m${CRLF}`);
         }
     }
 
     private handleError(error: any, callback?: () => void) {
-        this.writeEmitter.fire(`\x1b[1m\x1b[31mencountered error ...${os.EOL}`);
-        this.writeEmitter.fire(`\x1b[31m${error.message}${os.EOL}`);
+        this.writeEmitter.fire(`\x1b[1m\x1b[31mencountered error ...${CRLF}`);
+        this.writeEmitter.fire(`\x1b[31m${error.message}${CRLF}`);
         this.closeEmitter.fire(0);
         if (typeof callback !== "undefined") { callback(); }
         return Promise.reject(error.message);
