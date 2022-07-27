@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.positive;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.eclipse.lsp.cobol.core.engine.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;

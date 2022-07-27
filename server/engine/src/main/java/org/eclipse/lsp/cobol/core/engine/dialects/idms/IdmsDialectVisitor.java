@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.IdmsParser;
 import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.engine.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,17 +26,17 @@ import java.util.List;
  * Visitor to collect all IDMS copybooks
  */
 class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescriptor>> {
-  private final TextTransformations textTransformations;
 
-  IdmsDialectVisitor(TextTransformations textTransformations) {
-    this.textTransformations = textTransformations;
+
+  private final DialectProcessingContext context;
+
+  IdmsDialectVisitor(DialectProcessingContext context) {
+    this.context = context;
   }
 
   @Override
-  public List<IdmsCopybookDescriptor> visitCopyIdmsStatement(
-          IdmsParser.CopyIdmsStatementContext ctx) {
-    return ImmutableList.of(
-            IdmsCopybookDescriptor.from(ctx, textTransformations.getUri()));
+  public List<IdmsCopybookDescriptor> visitCopyIdmsStatement(IdmsParser.CopyIdmsStatementContext ctx) {
+    return ImmutableList.of(IdmsCopybookDescriptor.from(ctx, context.getCurrentUri()));
   }
 
   @Override

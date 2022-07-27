@@ -17,52 +17,48 @@ package org.eclipse.lsp.cobol.core.engine.dialects.daco;
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.core.DaCoParser;
 import org.eclipse.lsp.cobol.core.DaCoParser.DacoStatementsContext;
 import org.eclipse.lsp.cobol.core.DaCoParser.QualifiedDataNameContext;
 import org.eclipse.lsp.cobol.core.DaCoParser.VariableUsageNameContext;
 import org.eclipse.lsp.cobol.core.DaCoParserBaseVisitor;
+import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
-import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.engine.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.SortTableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
+import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
 /**
- *  This extension of {@link DaCoParserBaseVisitor} applies the semantic analysis based on the
- *  abstract syntax tree built by {@link DaCoParser}.
+ * This extension of {@link DaCoParserBaseVisitor} applies the semantic analysis based on the
+ * abstract syntax tree built by {@link DaCoParser}.
  */
 @Slf4j
 public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
   private final List<SyntaxError> errors = new ArrayList<>();
-  private final String uri;
-  private final TextReplacement textReplacement;
+  DialectProcessingContext context;
 
-  public DaCoVisitor(TextTransformations textTransformations) {
-    this.uri = textTransformations.getUri();
-    textReplacement = new TextReplacement(textTransformations);
-  }
-
-  public String getResultedText() {
-    return textReplacement.getResultingText();
+  public DaCoVisitor(DialectProcessingContext context) {
+    this.context = context;
   }
 
   @Override
   public List<Node> visitDacoStatements(DacoStatementsContext ctx) {
     if (ctx.dfldRcu() == null) {
-      textReplacement.addReplacementContext(ctx);
+      addReplacementContext(ctx);
     } else {
-      textReplacement.addReplacementContext(ctx.dfldRcu().ON());
-      textReplacement.addReplacementContext(ctx.dfldRcu().RCU());
+      addReplacementContext(ctx.dfldRcu().ON());
+      addReplacementContext(ctx.dfldRcu().RCU());
     }
     return visitChildren(ctx);
   }
@@ -79,7 +75,8 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitVariableUsageName(VariableUsageNameContext ctx) {
-    return addTreeNode(ctx, locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality));
+    return addTreeNode(
+        ctx, locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality));
   }
 
   @Override
@@ -102,13 +99,25 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
   }
 
   private Locality constructLocality(ParserRuleContext ctx) {
-    return Locality.builder()
-        .uri(uri)
-        .range(DialectUtils.constructRange(ctx))
-        .build();
+    return Locality.builder().uri(context.getCurrentUri()).range(DialectUtils.constructRange(ctx)).build();
   }
 
   public List<SyntaxError> getErrors() {
     return errors;
+  }
+
+  private void addReplacementContext(TerminalNode token) {
+    String newText = context.extendedText()
+            .substring(token.getSymbol().getStartIndex(), token.getSymbol().getStopIndex() + 1)
+            .replaceAll("[^ \n]", " ");
+    Range range = DialectUtils.constructRange(token);
+    context.replace(range, newText);
+  }
+  private void addReplacementContext(ParserRuleContext ctx) {
+    String newText = context.extendedText()
+            .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
+            .replaceAll("[^ \n]", CobolDialect.FILLER);
+    Range range = DialectUtils.constructRange(ctx);
+    context.replace(range, newText);
   }
 }

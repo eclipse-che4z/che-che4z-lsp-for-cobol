@@ -54,7 +54,7 @@ public class CICSTranslatorDialect implements CobolDialect {
    */
   @Override
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    CICSTranslatorLexer lexer = new CICSTranslatorLexer(CharStreams.fromString(context.getTextTransformations().getText()));
+    CICSTranslatorLexer lexer = new CICSTranslatorLexer(CharStreams.fromString(context.extendedText()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     CICSTranslatorParser parser = new CICSTranslatorParser(tokens);
     DialectParserListener listener = new DialectParserListener(context.getProgramDocumentUri());
@@ -68,6 +68,6 @@ public class CICSTranslatorDialect implements CobolDialect {
     cicsTranslatorVisitor.visitStartRule(parser.startRule());
 
     List<SyntaxError> errors = new ArrayList<>(listener.getErrors());
-    return new ResultWithErrors<>(new DialectOutcome(cicsTranslatorVisitor.getResult(), Collections.emptyList(), ImmutableMultimap.of()), errors);
+    return new ResultWithErrors<>(new DialectOutcome(Collections.emptyList(), ImmutableMultimap.of(), context), errors);
   }
 }

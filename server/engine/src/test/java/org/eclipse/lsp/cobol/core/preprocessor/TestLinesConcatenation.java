@@ -16,7 +16,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor;
 
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.engine.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;

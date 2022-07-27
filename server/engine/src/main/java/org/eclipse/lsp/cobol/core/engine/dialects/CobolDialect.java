@@ -37,8 +37,8 @@ public interface CobolDialect {
    * @return the dialect processing result
    */
   default ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    return new ResultWithErrors<>(new DialectOutcome(context.getTextTransformations(),
-            ImmutableList.of(), ImmutableMultimap.of()), ImmutableList.of());
+    return new ResultWithErrors<>(new DialectOutcome(ImmutableList.of(), ImmutableMultimap.of(), context),
+            ImmutableList.of());
   }
 
   /**

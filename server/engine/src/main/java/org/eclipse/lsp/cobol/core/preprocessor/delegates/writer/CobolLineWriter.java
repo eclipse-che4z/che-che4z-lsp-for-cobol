@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer;
 
-import org.eclipse.lsp.cobol.core.engine.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
 
 import java.util.List;

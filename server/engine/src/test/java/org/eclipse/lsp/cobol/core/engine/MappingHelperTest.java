@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine;
 
+import org.eclipse.lsp.cobol.core.engine.mapping.MappingHelper;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;

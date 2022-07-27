@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.engine.dialects;
 import com.google.common.collect.Multimap;
 import lombok.Value;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.core.engine.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 
 import java.util.List;
@@ -27,7 +26,7 @@ import java.util.List;
  */
 @Value
 public class DialectOutcome {
-  TextTransformations transformations;
   List<Node> dialectNodes;
   Multimap<String, Pair<String, String>> implicitCode;
+  DialectProcessingContext context;
 }

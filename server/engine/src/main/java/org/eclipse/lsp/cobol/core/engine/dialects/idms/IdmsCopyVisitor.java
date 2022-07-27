@@ -20,7 +20,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.IdmsCopyParser;
 import org.eclipse.lsp.cobol.core.IdmsCopyParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.engine.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Position;

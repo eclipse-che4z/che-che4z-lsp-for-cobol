@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.*;
 import org.eclipse.lsp.cobol.core.IdmsParser.CobolWordContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.DataNameContext;
@@ -37,11 +36,9 @@ import org.eclipse.lsp.cobol.core.IdmsParser.MapSectionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.QualifiedDataNameContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.SchemaSectionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.VariableUsageNameContext;
-import org.eclipse.lsp.cobol.core.engine.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
-import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNode;
@@ -51,8 +48,6 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.*;
 import java.util.function.Function;
@@ -66,27 +61,15 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  */
 class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private static final String IF = "_IF_ ";
-  private final CopybookService copybookService;
-  private final IdmsCopybookService idmsCopybookService;
-  private final CopybookConfig copybookConfig;
   private final String programDocumentUri;
-  private final TextReplacement textReplacement;
-  private final TextTransformations textTransformations;
+  private final DialectProcessingContext context;
+
   @Getter private final IdmsRecordsDescriptor recordsDescriptor = new IdmsRecordsDescriptor();
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
-  IdmsVisitor(CopybookService copybookService,
-                     ParseTreeListener treeListener,
-                     MessageService messageService,
-                     DialectProcessingContext context) {
-    this.copybookService = copybookService;
-    this.idmsCopybookService = new IdmsCopybookService(context.getTextTransformations().getUri(), copybookService,
-        context.getCopybookConfig(), treeListener, messageService, new HashSet<>());
-    this.copybookConfig = context.getCopybookConfig();
-    this.programDocumentUri = context.getTextTransformations().getUri();
-    this.textTransformations = context.getTextTransformations();
-
-    textReplacement = new TextReplacement(context.getTextTransformations());
+  IdmsVisitor(DialectProcessingContext context) {
+    this.programDocumentUri = context.getCurrentUri();
+    this.context = context;
   }
 
 //  @Override
@@ -105,25 +88,25 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitIdmsStatements(IdmsStatementsContext ctx) {
-    textReplacement.addReplacementContext(ctx);
+    addReplacementContext(ctx, "");
     return visitChildren(ctx);
   }
 
   @Override
   public List<Node> visitIdmsSections(IdmsSectionsContext ctx) {
-    textReplacement.addReplacementContext(ctx);
+    addReplacementContext(ctx, "");
     return visitChildren(ctx);
   }
 
   @Override
   public List<Node> visitIdmsIfStatement(IdmsIfStatementContext ctx) {
-    textReplacement.addReplacementContext(ctx, IF);
+    addReplacementContext(ctx, IF);
     return visitChildren(ctx);
   }
 
   @Override
   public List<Node> visitIdmsIfCondition(IdmsIfConditionContext ctx) {
-    textReplacement.addReplacementContext(ctx);
+    addReplacementContext(ctx, "");
     return visitChildren(ctx);
   }
 
@@ -241,6 +224,13 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
         .uri(programDocumentUri)
         .range(DialectUtils.constructRange(ctx))
         .build();
+  }
+
+  private void addReplacementContext(ParserRuleContext ctx, String prefix) {
+    String newText = prefix + context.extendedText()
+            .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
+            .replaceAll("[^ \n]", CobolDialect.FILLER);
+    context.replace(DialectUtils.constructRange(ctx), newText);
   }
 
 }

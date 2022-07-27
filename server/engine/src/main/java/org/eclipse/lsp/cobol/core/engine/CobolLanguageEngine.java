@@ -28,6 +28,8 @@ import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.core.engine.mapping.MappingService;
+import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
@@ -123,6 +125,7 @@ public class CobolLanguageEngine {
             .textTransformations(cleanText)
             .copybookConfig(analysisConfig.getCopybookConfig())
             .programDocumentUri(documentUri)
+            .mappingService(new MappingService(cleanText))
             .build();
 
     DialectOutcome dialectOutcome =
@@ -140,21 +143,28 @@ public class CobolLanguageEngine {
         preprocessor
             .processCleanCode(
                 documentUri,
-                dialectOutcome.getTransformations().calculateExtendedText(),
+                dialectOutcome.getContext().extendedText(),
                 analysisConfig.getCopybookConfig(),
                 new CopybookHierarchy())
             .unwrap(preprocessorErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
 
     // Update copybook usages with proper positions
-    MappingService mappingService = new MappingService(dialectOutcome.getTransformations());
-    extendedDocument.getCopybooks().getUsages()
-        .forEach((k, v) -> mappingService.getOriginalLocation(v.getRange())
-            .ifPresent(l -> v.setRange(l.getRange())));
+    MappingService mappingService = dialectOutcome.getContext().getMappingService();
+    extendedDocument
+        .getCopybooks()
+        .getUsages()
+        .forEach(
+            (k, v) ->
+                mappingService
+                    .getOriginalLocation(v.getRange())
+                    .ifPresent(l -> v.setRange(l.getRange())));
 
-    preprocessorErrors
-        .forEach(e -> mappingService.getOriginalLocation(e.getLocality().getRange())
-            .ifPresent(locality -> e.getLocality().setRange(locality.getRange())));
+    preprocessorErrors.forEach(
+        e ->
+            mappingService
+                .getOriginalLocation(e.getLocality().getRange())
+                .ifPresent(locality -> e.getLocality().setRange(locality.getRange())));
     accumulatedErrors.addAll(preprocessorErrors);
 
     timingBuilder.getParserTimer().start();
@@ -180,7 +190,8 @@ public class CobolLanguageEngine {
 
     timingBuilder.getMappingTimer().start();
     Map<Token, Locality> positionMapping =
-        getPositionMapping(documentUri, extendedDocument, tokens, embeddedCodeParts, mappingService);
+        getPositionMapping(
+            documentUri, extendedDocument, tokens, embeddedCodeParts, mappingService);
     timingBuilder.getMappingTimer().stop();
 
     timingBuilder.getVisitorTimer().start();
@@ -277,21 +288,30 @@ public class CobolLanguageEngine {
       Map<Token, EmbeddedCode> embeddedCodeParts,
       MappingService mappingService) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    Map<Token, Locality> mapping = LocalityMappingUtils.createPositionMapping(
-        tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri, embeddedCodeParts);
+    Map<Token, Locality> mapping =
+        LocalityMappingUtils.createPositionMapping(
+            tokens.getTokens(),
+            extendedDocument.getDocumentMapping(),
+            documentUri,
+            embeddedCodeParts);
     return updateMapping(documentUri, mapping, mappingService);
   }
 
-  private Map<Token, Locality> updateMapping(String documentUri, Map<Token, Locality> mapping, MappingService mappingService) {
-    mapping.forEach((k, v) -> {
-      if (v.getUri().equals(documentUri)) {
-        mappingService.getOriginalLocation(v.getRange()).ifPresent(l -> {
-          v.getRange().setStart(l.getRange().getStart());
-          v.getRange().setEnd(l.getRange().getEnd());
-          v.setUri(l.getUri());
+  private Map<Token, Locality> updateMapping(
+      String documentUri, Map<Token, Locality> mapping, MappingService mappingService) {
+    mapping.forEach(
+        (k, v) -> {
+          if (v.getUri().equals(documentUri)) {
+            mappingService
+                .getOriginalLocation(v.getRange())
+                .ifPresent(
+                    l -> {
+                      v.getRange().setStart(l.getRange().getStart());
+                      v.getRange().setEnd(l.getRange().getEnd());
+                      v.setUri(l.getUri());
+                    });
+          }
         });
-      }
-    });
     return mapping;
   }
 
@@ -319,7 +339,8 @@ public class CobolLanguageEngine {
     return err ->
         err.toBuilder()
             .locality(LocalityUtils.findPreviousVisibleLocality(err.getOffendedToken(), mapping))
-            .suggestion(messageService.getMessage(err.getSuggestion())).errorSource(ErrorSource.PARSING)
+            .suggestion(messageService.getMessage(err.getSuggestion()))
+            .errorSource(ErrorSource.PARSING)
             .build();
   }
 
@@ -335,8 +356,11 @@ public class CobolLanguageEngine {
   private List<SyntaxError> raiseError(SyntaxError error, Map<String, Locality> copyStatements) {
     return Stream.of(error)
         .filter(shouldRaise())
-        .map(err -> err.toBuilder().locality(copyStatements.get(err.getLocality().getCopybookId()))
-        .errorSource(ErrorSource.COPYBOOK))
+        .map(
+            err ->
+                err.toBuilder()
+                    .locality(copyStatements.get(err.getLocality().getCopybookId()))
+                    .errorSource(ErrorSource.COPYBOOK))
         .map(SyntaxError.SyntaxErrorBuilder::build)
         .flatMap(err -> Stream.concat(raiseError(err, copyStatements).stream(), Stream.of(err)))
         .collect(toList());

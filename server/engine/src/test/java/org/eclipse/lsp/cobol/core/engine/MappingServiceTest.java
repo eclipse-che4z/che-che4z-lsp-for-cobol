@@ -15,6 +15,8 @@
 package org.eclipse.lsp.cobol.core.engine;
 
 import lombok.var;
+import org.eclipse.lsp.cobol.core.engine.mapping.MappingService;
+import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp4j.Location;

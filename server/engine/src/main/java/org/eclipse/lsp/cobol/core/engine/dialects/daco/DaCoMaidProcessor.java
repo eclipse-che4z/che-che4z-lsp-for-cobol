@@ -75,7 +75,7 @@ public class DaCoMaidProcessor {
     List<Node> copyMaidNodes = new ArrayList<>();
     DaCoMaidProcessingState state = DaCoMaidProcessingState.START;
 
-    String[] lines = context.getTextTransformations().getText().split("\n");
+    String[] lines = context.extendedText().split("\n", -1);
     String lastSuffix = null;
     sections.clear();
     for (int i = 0; i < lines.length; i++) {
@@ -107,7 +107,7 @@ public class DaCoMaidProcessor {
       collectCopyMaid(line, i, copyMaidNodes, lastSuffix, context, errors);
     }
 
-    return new DialectOutcome(context.getTextTransformations(), copyMaidNodes, ImmutableMultimap.of());
+    return new DialectOutcome(copyMaidNodes, ImmutableMultimap.of(), context);
   }
 
   private void collectCopyMaid(String input, int lineNumber, List<Node> copyMaidNodes, String lastSuffix, DialectProcessingContext context, List<SyntaxError> errors) {
@@ -119,7 +119,7 @@ public class DaCoMaidProcessor {
       int endChar = matcher.end();
       int len = endChar - startChar;
       String newString = String.join("", Collections.nCopies(len, CobolDialect.FILLER));
-      context.getTextTransformations().replace(new Range(
+      context.replace(new Range(
               new Position(lineNumber, startChar),
               new Position(lineNumber, endChar)), newString);
       String level = matcher.group("level");
@@ -137,15 +137,15 @@ public class DaCoMaidProcessor {
 
   private CopyNode createMaidCopybookNode(DialectProcessingContext context, int startingLevel, String layoutId, String layoutUsage, String lastSuffix, Range range, List<SyntaxError> errors) {
     Locality locality = Locality.builder()
-            .uri(context.getTextTransformations().getUri())
+            .uri(context.getCurrentUri())
             .range(range)
             .build();
     DaCoCopyNode cbNode = new DaCoCopyNode(locality, makeCopybookFileName(layoutId, layoutUsage), layoutUsage, lastSuffix);
 
     CopybookName copybookName = new CopybookName(makeCopybookFileName(layoutId, layoutUsage), DaCoDialect.NAME);
     CopybookModel copybookModel = copybookService.resolve(copybookName,
-            context.getTextTransformations().getUri(),
-            context.getTextTransformations().getUri(),
+            context.getCurrentUri(),
+            context.getCurrentUri(),
             context.getCopybookConfig(),
             true);
     if (copybookModel.getContent() != null) {

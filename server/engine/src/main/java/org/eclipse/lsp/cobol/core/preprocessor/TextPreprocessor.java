@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.core.preprocessor;
 
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
-import org.eclipse.lsp.cobol.core.engine.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
