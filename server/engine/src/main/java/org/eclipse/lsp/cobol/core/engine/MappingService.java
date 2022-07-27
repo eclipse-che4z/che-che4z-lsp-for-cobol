@@ -49,13 +49,10 @@ public class MappingService {
   }
 
   @Getter
-  private ArrayList<MappingItem> localityMap;
+  private final List<MappingItem> localityMap;
 
   public MappingService(TextTransformations textTransformations) {
     localityMap = new ArrayList<>(buildLocalityMap(textTransformations));
-    if (textTransformations.getReplacements().size() > 0) {
-      localityMap = applyReplacements(textTransformations.getReplacements(), textTransformations.getText());
-    }
   }
 
   /**
@@ -131,6 +128,10 @@ public class MappingService {
         new Location(textTransformations.getUri(), new Range(new Position(originalDocumentLine, 0), new Position(originalDocumentLine + size - 1, LINE_LEN))), null);
     result.add(last);
 
+    if (textTransformations.getReplacements().size() > 0) {
+      result = applyReplacements(result, textTransformations.getReplacements(), textTransformations.getText());
+    }
+
     return result;
   }
 
@@ -150,7 +151,8 @@ public class MappingService {
     return new MappingItem(extended, originalLocation, null);
   }
 
-  private ArrayList<MappingItem> applyReplacements(Map<Range, String> replacements, String text) {
+  private static List<MappingItem> applyReplacements(List<MappingItem> localityMap, Map<Range, String> replacements, String text) {
+    localityMap = new ArrayList<>(localityMap);
     List<Range> ranges = new LinkedList<>(replacements.keySet());
     ranges = ranges.stream().filter(r -> affectsToMapping(r, replacements.get(r))).collect(Collectors.toList());
     ranges.sort(Comparator.comparingInt(e -> e.getStart().getLine()));
@@ -206,7 +208,7 @@ public class MappingService {
     return localityMap;
   }
 
-  private boolean affectsToMapping(Range range, String text) {
+  private static boolean affectsToMapping(Range range, String text) {
     String[] lines = text.split("\\r?\n");
     if (lines.length < 1) {
       return false;
@@ -215,7 +217,7 @@ public class MappingService {
     return (lines.length != MappingHelper.size(range) || range.getEnd().getCharacter() != last.length());
   }
 
-  private Range extendRangeIfNeeded(Range range, String[] lines, String text) {
+  private static Range extendRangeIfNeeded(Range range, String[] lines, String text) {
     String firstLine = lines[range.getStart().getLine()];
     String lastLine = lines[range.getEnd().getLine()];
     String[] replaceLines = text.split("\\r?\\n");
