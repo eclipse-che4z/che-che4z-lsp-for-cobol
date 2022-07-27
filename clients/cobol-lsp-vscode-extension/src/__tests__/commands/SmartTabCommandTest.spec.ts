@@ -13,7 +13,6 @@
  */
 
 import * as vscode from "vscode";
-
 import {initSmartTab} from "../../commands/SmartTabCommand";
 
 const editor: any = {
@@ -30,6 +29,13 @@ const context: any = {
 };
 
 jest.mock("vscode", () => ({
+    window: {
+        activeTextEditor: {
+            options: {
+                tabSize: 4
+            }
+        }
+    },
     commands: {
         executeCommand: jest.fn().mockImplementation(),
         registerTextEditorCommand : jest.fn().mockImplementation((command, callback) => callback(editor, {}))

@@ -48,7 +48,5 @@ export const INSTALL_ZOWE = "Install Zowe Explorer";
 export enum PUNCH_CARD {
     SEQUENCE_AREA_END_POS = 6,
     INDICATOR_AREA = 7,
-    AREA_A_END_POS = 11,
-    AREA_B_END_POS = 72,
-    IDENTIFICATION_AREA_END_POS = 80,
+    AREA_A_END_POS = 11
 }

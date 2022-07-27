@@ -18,7 +18,6 @@ import { PUNCH_CARD } from "../constants";
 
 const SMART_TAB_COMMAND: string = "cobol-lsp.smart-tab";
 const SMART_OUTDENT_COMMAND: string = "cobol-lsp.smart-outdent";
-const TAB_SPACES: number = 4;
 
 /**
  * Class provides bind-to-command binding functionality
@@ -30,6 +29,7 @@ abstract class SmartCommandProvider {
      * @param cobolCommandName is a name for cobol extension command
      */
     public constructor(private context: vscode.ExtensionContext, private cobolCommandName: string) {
+        
     }
 
     /**
@@ -49,6 +49,19 @@ abstract class SmartCommandProvider {
      * @param args is a command arguments
      */
     public abstract execute(editor: vscode.TextEditor, edit: vscode.TextEditorEdit, args: any[]);
+
+    getTabSize(): number {
+        let tabSize = vscode.window.activeTextEditor?.options?.tabSize;
+        if (tabSize) {
+            tabSize = +tabSize;
+        } else {
+            tabSize = 4;
+        }
+        if (tabSize === 0) {
+            tabSize = 4;
+        }
+        return +tabSize;
+    }
 }
 
 class SmartTabCommandProvider extends SmartCommandProvider {
@@ -60,7 +73,7 @@ class SmartTabCommandProvider extends SmartCommandProvider {
             let column = findNextSolidPosition(editor, position);
             if (column === -1) {
                 column = position.character;
-                const nextPosition = getNextPosition(editor, column);  
+                const nextPosition = getNextPosition(editor, column, this.getTabSize());
                 const lineLen = getCurrentLine(editor, position.line).length;      
                 if (lineLen < nextPosition) {
                     const insertSize = nextPosition - lineLen;
@@ -68,7 +81,7 @@ class SmartTabCommandProvider extends SmartCommandProvider {
                 }                    
                 column = nextPosition;
             } else {
-                const nextPosition = getNextPosition(editor, column);
+                const nextPosition = getNextPosition(editor, column, this.getTabSize());
                 const insertSize = nextPosition - column;
                 edit.insert(position, ' '.repeat(insertSize));
                 column = nextPosition - insertSize;
@@ -92,12 +105,12 @@ class SmartOutdentCommandProvider extends SmartCommandProvider {
             if (charPosition === 0) {
                 return;
             }
-            let prevPosition = getPrevPosition(editor, charPosition);
+            let prevPosition = getPrevPosition(editor, charPosition, this.getTabSize());
             if (this.onlySpaces(getCurrentLine(editor, position.line), prevPosition, charPosition)) {
                 edit.delete(new vscode.Range(new vscode.Position(position.line, prevPosition), new vscode.Position(position.line, charPosition)));
             } else {
                 let prevSolidPosition = this.findPrevSolidPosition(editor, new vscode.Position(position.line, charPosition - 1));
-                let removeSize = Math.max(0, Math.min(charPosition - prevSolidPosition - 1, TAB_SPACES));
+                let removeSize = Math.max(0, Math.min(charPosition - prevSolidPosition - 1, this.getTabSize()));
                 edit.delete(new vscode.Range(new vscode.Position(position.line, charPosition - removeSize), new vscode.Position(position.line, charPosition)));
                 prevPosition = charPosition - removeSize;
             }
@@ -170,7 +183,6 @@ function findNextSolidPosition(editor: vscode.TextEditor, position: vscode.Posit
     return -1;
 }
 
-
 /**
  * Retrieve text line for the specified line number
  * @param editor is a vscode text editor
@@ -185,23 +197,25 @@ function getCurrentLine(editor: vscode.TextEditor, line: number): string {
 /**
  * Calculate next column predefined position
  * @param character is the current cursor position in the line
+ * @param tabSize is a number of spaces in tab
  * @return next column predefined position
  */
-function getNextPosition(editor: vscode.TextEditor, character: number): number {
+function getNextPosition(editor: vscode.TextEditor, character: number, tabSize: number): number {
     for (const item in PUNCH_CARD) {
         if (character < Number(item)) {
             return Number(item);
         }
     }
-    return character;
+    return character + tabSize;
 }
 
 /**
  * Calculate previous column predefined position
  * @param character is the current cursor position in the line
+ * @param tabSize is a number of spaces in tab
  * @return previous predefined position
  */
- function getPrevPosition(editor: vscode.TextEditor, character: number): number {
+ function getPrevPosition(editor: vscode.TextEditor, character: number, tabSize: number): number {
     let prev: number = 0;
     for (const item in PUNCH_CARD) {
         if (character <= Number(item)) {
@@ -209,5 +223,5 @@ function getNextPosition(editor: vscode.TextEditor, character: number): number {
         }
         prev = Number(item);
     }
-    return character;
+    return Math.max(character - tabSize, 0);
 }
