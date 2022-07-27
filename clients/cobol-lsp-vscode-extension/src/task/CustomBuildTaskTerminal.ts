@@ -28,6 +28,7 @@ export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
     private closeEmitter = new vscode.EventEmitter<number>();
     onDidWrite: vscode.Event<string> = this.writeEmitter.event;
     onDidClose?: vscode.Event<number> = this.closeEmitter.event;
+    private lastSysprintLoc: string;
 
     constructor(private documentText: vscode.TextDocument, private definition: CobolCompileJobDefinition) {
     }
@@ -86,6 +87,11 @@ export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
             try {
                 await this.compileCobolDocument(zoweExplorerApi, loadedProfile);
                 this.closeEmitter.fire(0);
+                const selection = await vscode.window.showInformationMessage("Compilation completed.", "Show Listing");
+                if (selection === "Show Listing") {
+                    await vscode.workspace.openTextDocument(vscode.Uri.file(this.lastSysprintLoc))
+                    .then(doc => vscode.window.showTextDocument(doc));
+                }
                 resolve();
             } catch (error) {
                 return this.handleError(error);
@@ -134,7 +140,9 @@ export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
             }
             fs.writeFileSync(`${fileLocation}${path.sep}${submitJob.jobid}`, sysPrintContent);
             this.writeEmitter.fire(CRLF);
+            this.writeEmitter.fire(CRLF);
             this.writeEmitter.fire(`SYSPRINT at \x1b[4m\x1b[33m${fileLocation}${path.sep}${submitJob.jobid}\x1b[24m\x1b[39m${CRLF}`);
+            this.lastSysprintLoc = `${fileLocation}${path.sep}${submitJob.jobid}`;
         }
     }
 

@@ -15,7 +15,7 @@
 import * as os from "os";
 import * as vscode from "vscode";
 import { CobolCompileJobDefinition } from "../../task/CompileTaskProvider";
-import { CustomBuildTaskTerminal } from "../../task/CustomBuildTaskTerminal";
+import { CRLF, CustomBuildTaskTerminal } from "../../task/CustomBuildTaskTerminal";
 import {CobolCompileJCLProvider} from "../../task/jcl/CobolCompileJCLProvider";
 
 const jobCard: string[] = ["jobCard"];
@@ -321,9 +321,9 @@ describe("CustomBuildTaskTerminal Test", () => {
             compilerOption.push("test1");
         }
         const compileOptions = (CobolCompileJCLProvider as any).getCompilerOptions(compilerOption);
-        expect(compileOptions).toBe("// PARM=(LIST,test1,test1,test1,test1,test1,test1,test1,test1,test1,tesX" + os.EOL +
-            "//             t1,test1,test1,test1,test1,test1,test1,test1,test1,test1,X" + os.EOL +
-            "//             test1,test1,test1,test1,test1,test1,test1,test1,test1,tesX" + os.EOL +
+        expect(compileOptions).toBe("// PARM=(LIST,test1,test1,test1,test1,test1,test1,test1,test1,test1,tesX" + CRLF +
+            "//             t1,test1,test1,test1,test1,test1,test1,test1,test1,test1,X" + CRLF +
+            "//             test1,test1,test1,test1,test1,test1,test1,test1,test1,tesX" + CRLF +
             "//             t1,test1,test1,test1,test1)");
     });
 
@@ -337,7 +337,7 @@ describe("CustomBuildTaskTerminal Test", () => {
         try {
             (task as any).validateParams();
         } catch (err) {
-            expect(err.message).toBe("Invalid params provided. Steplib and Syslib has must have a max length of 44." + os.EOL +
+            expect(err.message).toBe("Invalid params provided. Steplib and Syslib has must have a max length of 44." + CRLF +
                 "Correct/modify 123456789123456789123456789123456789123456789.");
         }
     });
