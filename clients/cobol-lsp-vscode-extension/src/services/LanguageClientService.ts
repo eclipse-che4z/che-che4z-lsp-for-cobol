@@ -32,6 +32,8 @@ import {JavaCheck} from "./JavaCheck";
 import {Middleware} from "./Middleware";
 import { SettingsService } from "./Settings";
 
+const extensionId = "BroadcomMFD.cobol-language-support";
+
 export class LanguageClientService {
     private executablePath: string;
     private languageClient: LanguageClient;
@@ -39,12 +41,12 @@ export class LanguageClientService {
     private isNativeBuildEnabled: boolean = false;
 
     constructor(private middleware: Middleware) {
-        const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
+        const ext = vscode.extensions.getExtension(extensionId);
         this.executablePath = `${ext.extensionPath}/server/jar/server.jar`;
     }
 
     public enableNativeBuild() {
-        const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
+        const ext = vscode.extensions.getExtension(extensionId);
         this.isNativeBuildEnabled = true;
         this.executablePath = this.initializeExecutables(`${ext.extensionPath}/server`);
     }
@@ -142,7 +144,7 @@ export class LanguageClientService {
         };
     }
 
-    private initializeExecutables(serverPath: String) {
+    private initializeExecutables(serverPath: string) {
         let executablePath;
         switch (os.type()) {
             case "Windows_NT":
@@ -163,7 +165,7 @@ export class LanguageClientService {
     }
 
     private giveExecutePermission(executablePath) {
-        cp.exec(`cd ${executablePath}; chmod 755 *`, (err, stdout, stderr) => {
+        cp.exec(`cd ${executablePath}; chmod 755 *`, (err, _stdout, _stderr) => {
             if (err) {
                 vscode.window.showInformationMessage(`couldn't initialize executable as ${executablePath}. Please change the permission to execution mode`);
             }
@@ -194,4 +196,3 @@ export function nativeServer(jarPath: string) {
         }
     return executable;
 }
-
