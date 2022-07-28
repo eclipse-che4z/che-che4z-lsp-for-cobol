@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
-import { C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID } from "./constants";
+import { C4Z_FOLDER, GITIGNORE_FILE, IS_NATIVE_BUILD, LANGUAGE_ID } from "./constants";
 import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
@@ -25,7 +25,7 @@ import { initSmartTab } from "./commands/SmartTabCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { Middleware } from "./services/Middleware";
 import { TelemetryService } from "./services/reporter/TelemetryService";
-import { createFileWithGivenPath } from "./services/Settings";
+import { createFileWithGivenPath, SettingsService } from "./services/Settings";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 import { CompileTaskProvider } from "./task/CompileTaskProvider";
 
@@ -48,11 +48,13 @@ export async function activate(context: vscode.ExtensionContext) {
     copyBooksDownloader.start();
 
     // Commands
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook",
+        (copybook, programName) => {
         fetchCopybookCommand(copybook, copyBooksDownloader, programName);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings", () => {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings",
+        () => {
         gotoCopybookSettings();
     }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE); }));
@@ -71,8 +73,24 @@ export async function activate(context: vscode.ExtensionContext) {
             { scheme: "file", language: LANGUAGE_ID },
             new CopybooksCodeActionProvider()));
 
+    vscode.workspace.onDidChangeConfiguration(async event => {
+        if (event.affectsConfiguration(IS_NATIVE_BUILD)) {
+            const selection = await vscode.window.showInformationMessage("Restart the vscode to enforce native build settings change", "Ok", "Later");
+            if (typeof selection === "undefined" || selection === "Later") {
+                return;
+            }
+            if (selection === "Ok") {
+                await vscode.commands.executeCommand("workbench.action.reloadWindow");
+            }
+        }
+    });
+
     try {
-        await languageClientService.checkPrerequisites();
+        if (SettingsService.isNativeBuildEnabled()) {
+            languageClientService.enableNativeBuild();
+        } else {
+            await languageClientService.checkPrerequisites();
+        }
     } catch (err) {
         vscode.window.showErrorMessage(err.toString());
         languageClientService.enableNativeBuild();

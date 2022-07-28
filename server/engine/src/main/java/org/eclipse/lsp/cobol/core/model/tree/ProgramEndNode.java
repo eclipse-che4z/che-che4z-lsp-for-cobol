@@ -19,6 +19,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 
@@ -48,6 +49,7 @@ public class ProgramEndNode extends Node {
                 LOG.debug("Syntax error: Program name is empty");
                 errors.add(
                     SyntaxError.syntaxError()
+                        .errorSource(ErrorSource.PARSING)
                         .locality(getLocality())
                         .severity(ErrorSeverity.WARNING)
                         .messageTemplate(MessageTemplate.of("CobolVisitor.progIDIssueMsg"))
@@ -59,6 +61,7 @@ public class ProgramEndNode extends Node {
                     programId);
                 errors.add(
                     SyntaxError.syntaxError()
+                        .errorSource(ErrorSource.PARSING)
                         .locality(getLocality())
                         .severity(ErrorSeverity.WARNING)
                         .messageTemplate(

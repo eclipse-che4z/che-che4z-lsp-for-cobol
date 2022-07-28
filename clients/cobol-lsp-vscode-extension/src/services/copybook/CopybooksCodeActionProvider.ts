@@ -43,7 +43,7 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
         }
 
         for (const d of context.diagnostics) {
-            if (d.code === "MISSING_COPYBOOK") {
+            if (d.code === "missing copybook") {
                 return true;
             }
         }

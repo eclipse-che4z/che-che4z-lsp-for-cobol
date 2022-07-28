@@ -33,7 +33,11 @@ public class DialectConfigs {
         ImmutableList.of(IdmsDialect.NAME));
   }
 
-  AnalysisConfig getDaCoAnalysisConfig() {
+  /**
+   * Provides DaCo dialect configuration
+   * @return DaCo dialect configuration
+   */
+  public AnalysisConfig getDaCoAnalysisConfig() {
     return new AnalysisConfig(
             new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(),

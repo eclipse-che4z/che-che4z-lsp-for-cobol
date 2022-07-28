@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
@@ -85,7 +85,7 @@ class TestIdmsReadyStatement {
                 new Range(),
                 "Max length limit of 16 bytes allowed for db entity name.",
                 Error,
-                SourceInfoLevels.ERROR.getText())),
+                ErrorSource.DIALECT.getText())),
         ImmutableList.of(),
         DialectConfigs.getIDMSAnalysisConfig());
   }

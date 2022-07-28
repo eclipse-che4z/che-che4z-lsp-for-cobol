@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -48,12 +48,12 @@ class TestSqlStatementMustCodedInAreaB {
                 new Range(),
                 "The following token must start in Area B: SELECT",
                 DiagnosticSeverity.Warning,
-                SourceInfoLevels.WARNING.getText()),
+                ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "The following token must start in Area B: WHERE",
                 DiagnosticSeverity.Warning,
-                SourceInfoLevels.WARNING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

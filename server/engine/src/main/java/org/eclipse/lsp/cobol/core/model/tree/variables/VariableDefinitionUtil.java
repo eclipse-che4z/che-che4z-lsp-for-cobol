@@ -20,10 +20,7 @@ import com.google.common.collect.Iterables;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
@@ -38,6 +35,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableType.*;
 
 /** The utility class is for converting VariableDefinitionNode into appropriate VariableNode. */
 @UtilityClass
@@ -173,9 +171,16 @@ public class VariableDefinitionUtil {
     List<Node> children = node.getChildren();
     if (children.isEmpty()) return;
     children.forEach(VariableDefinitionUtil::reshapeVariablesLocality);
-    if (node.getNodeType() == NodeType.VARIABLE)
-      ((VariableNode) node)
+    if (node.getNodeType() == NodeType.VARIABLE) {
+      VariableNode variableNode = (VariableNode) node;
+      if (isGroupedVariable(variableNode))
+      variableNode
           .extendLocality(children.get(children.size() - 1).getLocality().getRange().getEnd());
+    }
+  }
+
+  private boolean isGroupedVariable(VariableNode variableNode) {
+    return !ImmutableList.of(FD, SD).contains(variableNode.getVariableType());
   }
 
   private void registerVariablesInProgram(Node node) {
@@ -217,6 +222,7 @@ public class VariableDefinitionUtil {
         } else {
           SyntaxError error =
               SyntaxError.syntaxError()
+                  .errorSource(ErrorSource.PARSING)
                   .severity(SEVERITY)
                   .locality(definitionNode.getLocality())
                   .messageTemplate(MessageTemplate.of(UNKNOWN_VARIABLE_DEFINITION))
@@ -282,7 +288,7 @@ public class VariableDefinitionUtil {
           new FileDescriptionNode(
               definitionNode.getLocality(),
               getName(definitionNode),
-              definitionNode.isSortDescription() ? VariableType.SD : VariableType.FD,
+              definitionNode.isSortDescription() ? SD : FD,
               definitionNode.isGlobal(),
               definitionNode.getFileDescriptor(),
               definitionNode.getFileControlClause());
@@ -600,6 +606,7 @@ public class VariableDefinitionUtil {
     if (eligibleNodesForRedefine.isEmpty() || !allowedRedefinedNode.isPresent()) {
       errors.add(
           SyntaxError.syntaxError()
+              .errorSource(ErrorSource.PARSING)
               .severity(SEVERITY)
               .messageTemplate(MessageTemplate.of(REDEFINE_IMMEDIATELY_FOLLOW, redefinesName))
               .locality(redefinesLocality)
@@ -609,6 +616,7 @@ public class VariableDefinitionUtil {
       if (checkLevel77Mismatch(definitionNode, allowedRedefinedNode.get())) {
         errors.add(
             SyntaxError.syntaxError()
+                .errorSource(ErrorSource.PARSING)
                 .severity(SEVERITY)
                 .messageTemplate(MessageTemplate.of(LEVELS_MUST_MATCH, redefinesName))
                 .locality(definitionNode.getLevelLocality())
@@ -620,6 +628,7 @@ public class VariableDefinitionUtil {
       if (valueLocality != null)
         errors.add(
             SyntaxError.syntaxError()
+                .errorSource(ErrorSource.PARSING)
                 .locality(valueLocality)
                 .severity(SEVERITY)
                 .messageTemplate(

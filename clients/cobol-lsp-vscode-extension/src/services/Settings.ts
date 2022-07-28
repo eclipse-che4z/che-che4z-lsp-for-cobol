@@ -15,7 +15,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { PATHS_LOCAL_KEY, PATHS_USS, PATHS_ZOWE, SERVER_PORT, SETTINGS_CPY_SECTION, SETTINGS_SUBROUTINE_LOCAL_KEY } from "../constants";
+import { IS_NATIVE_BUILD, PATHS_LOCAL_KEY, PATHS_USS, PATHS_ZOWE, SERVER_PORT, SETTINGS_CPY_SECTION, SETTINGS_SUBROUTINE_LOCAL_KEY } from "../constants";
 
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
@@ -123,7 +123,7 @@ export class SettingsService {
      * @returns string
      */
     public static getCopybookFileEncoding() {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("copybook-file-encoding")
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("copybook-file-encoding");
     }
     private static getCopybookConfigValues(section: string, cobolFileName: string, dialectType: string) {
         const programFile = cobolFileName.replace(/\.[^/.]+$/, "");
@@ -136,4 +136,14 @@ export class SettingsService {
         const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(section);
         return SettingsService.evaluateVariable(pathList, "fileBasenameNoExtension", programFile);
     }
+
+   /**
+    * Checks if native build is enabled.
+    *
+    * @returns is native build enabled
+    */
+    public static isNativeBuildEnabled(): boolean {
+        return vscode.workspace.getConfiguration().get(IS_NATIVE_BUILD);
+    }
+
 }

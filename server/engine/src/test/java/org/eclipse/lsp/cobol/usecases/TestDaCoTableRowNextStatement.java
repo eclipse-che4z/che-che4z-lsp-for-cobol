@@ -15,7 +15,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -59,13 +59,13 @@ class TestDaCoTableRowNextStatement {
                 new Range(),
                 "String must starts with TBL or TBF values",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorSource.DIALECT.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "Variable GBR4 is not defined",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())),
+                ErrorSource.PARSING.getText())),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());
   }

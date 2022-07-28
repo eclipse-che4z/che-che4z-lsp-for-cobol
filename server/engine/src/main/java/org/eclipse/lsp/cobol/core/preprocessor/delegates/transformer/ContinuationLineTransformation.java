@@ -100,6 +100,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
       CobolLine cobolLine, String uri, int lineNumber) {
     if (isCompilerDirectiveStatement(cobolLine)) {
       return SyntaxError.syntaxError()
+          .errorSource(ErrorSource.PREPROCESSING)
           .severity(ERROR)
           .locality(
               Locality.builder()
@@ -245,7 +246,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private SyntaxError registerStringClosingError(
       String uri, int lineNumber, int cobolLineTrimmedLength) {
     SyntaxError error =
-        SyntaxError.syntaxError()
+        SyntaxError.syntaxError().errorSource(ErrorSource.PREPROCESSING)
             .locality(
                 Locality.builder()
                     .uri(uri)
@@ -268,7 +269,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private SyntaxError registerContinuationLineError(String uri, int lineNumber, int countingSpace) {
     int startPosition = ProcessingConstants.INDICATOR_AREA + countingSpace;
     SyntaxError error =
-        SyntaxError.syntaxError()
+        SyntaxError.syntaxError().errorSource(ErrorSource.PREPROCESSING)
             .locality(
                 Locality.builder()
                     .uri(uri)

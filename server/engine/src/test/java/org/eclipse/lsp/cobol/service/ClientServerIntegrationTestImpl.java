@@ -16,10 +16,10 @@ package org.eclipse.lsp.cobol.service;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -43,12 +43,12 @@ public class ClientServerIntegrationTestImpl implements LanguageEngineFacade {
                 new Range(),
                 "Recursive copybook declaration for: CPYBK1",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
+                ErrorSource.COPYBOOK.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "Recursive copybook declaration for: CPYBK2",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                ErrorSource.COPYBOOK.getText())));
   }
 }
