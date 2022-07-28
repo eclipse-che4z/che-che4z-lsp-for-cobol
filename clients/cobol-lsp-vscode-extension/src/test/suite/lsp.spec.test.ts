@@ -45,8 +45,9 @@ suite('Integration Test Suite', () => {
     }).timeout(10000).slow(4000);
 
     test('TC152049 Navigate through definitions', async () => {
-        await helper.sleep(500);
+        await helper.sleep(1000);
         const result: vscode.Location[] = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', editor.document.uri, new vscode.Position(28, 24));
+        await helper.sleep(2000);
         assert.ok(result.length == 1
             && result[0].uri.fsPath == editor.document.fileName
             && result[0].range.start.line == 31
@@ -55,7 +56,7 @@ suite('Integration Test Suite', () => {
 
     test('TC152080 Find all references from the word middle', async () => {
         const result: vscode.Location[] = await vscode.commands.executeCommand('vscode.executeReferenceProvider', editor.document.uri, new vscode.Position(20, 15));
-        await helper.sleep(1000);
+        await helper.sleep(2000);
         assert.ok(result.length == 3
             && result[0].uri.fsPath == editor.document.fileName
             && result[0].range.start.line == 20
@@ -66,6 +67,7 @@ suite('Integration Test Suite', () => {
     test('TC152080 Find all references from the word begin', async () => {
         await helper.sleep(1000);
         const result: vscode.Location[] = await vscode.commands.executeCommand('vscode.executeReferenceProvider', editor.document.uri, new vscode.Position(20, 10));
+        await helper.sleep(2000);
         assert.ok(result.length == 3
             && result[0].uri.fsPath == editor.document.fileName
             && result[0].range.start.line == 20
@@ -77,7 +79,7 @@ suite('Integration Test Suite', () => {
     test('TC152047/ TC152052/ TC152051/ TC152050/ TC152053 Error case - file has syntax errors and semantic errors are marked and have detailed hints', async () => {
         await helper.showDocument("USER2.cbl");
         editor = helper.get_editor("USER2.cbl");
-        await helper.sleep(1000);
+        await helper.sleep(2000);
         const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         assert.ok(diagnostics.length == 3
             && diagnostics[0].message == "There is an issue with PROGRAM-ID paragraph"
@@ -93,7 +95,7 @@ suite('Integration Test Suite', () => {
 
     test('TC152054 Auto format of right trailing spaces', async () => {
         await helper.insertString(editor, new vscode.Position(34, 57), "        ");
-        await helper.sleep(1000);
+        await helper.sleep(2000);
         const result: vscode.TextEdit[] = await vscode.commands.executeCommand('vscode.executeFormatDocumentProvider', editor.document.uri, { tabSize: 4, insertSpaces: true });
         assert.ok(helper.assertRangeIsEqual(result[0].range, new vscode.Range(new vscode.Position(34, 57), new vscode.Position(34, 65)))
             && result[0].newText == "",
@@ -103,14 +105,14 @@ suite('Integration Test Suite', () => {
     test('TC152058 Autocomplete functionality with snippets navigation', async () => {
         await helper.insertString(editor, new vscode.Position(40, 0), "           A");
         await vscode.commands.executeCommand('editor.action.triggerSuggest', editor.document.uri);
-        await helper.sleep(1000);
+        await helper.sleep(2000);
         await helper.executeCommandMultipleTimes('selectNextSuggestion', 6)
         await vscode.commands.executeCommand('acceptSelectedSuggestion');
         await editor.edit(edit => edit.replace(editor.selection, "1"));
-        await helper.sleep(1000);
+        await helper.sleep(2000);
         await vscode.commands.executeCommand("jumpToNextSnippetPlaceholder");
         await editor.edit(edit => edit.replace(editor.selection, "str"));
-        await helper.sleep(1000);
+        await helper.sleep(2000);
         const text = editor.document.getText();
         const acceptedLine = text.split('\n')[40];
         assert.ok(acceptedLine.includes("ADD 1 TO str"),
@@ -120,9 +122,9 @@ suite('Integration Test Suite', () => {
     test('TC288736 error message for 80chars limit', async () => {
         await helper.showDocument("TEST.CBL");
         editor = helper.get_editor("TEST.CBL");
-        await helper.sleep(500);
+        await helper.sleep(2000);
         await helper.insertString(editor, new vscode.Position(22, 7), "oi3Bd5kC1f3nMFp0IWg62ZZgWMxHPJnuLWm4DqplZDzMIX69C6vjeL24YbobdQnoQsDenL35omljznHd0l1fP");
-        await helper.sleep(500);
+        await helper.sleep(1000);
         const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         assert.ok(diagnostics.length == 4
             && diagnostics[0].message == "Source text cannot go past column 80"

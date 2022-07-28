@@ -17,6 +17,8 @@ import * as fs from "fs";
 import * as net from "net";
 import * as os from "os";
 import * as vscode from "vscode";
+import * as path from "path";
+
 import {
     ConfigurationParams,
     ConfigurationRequest,
@@ -40,7 +42,7 @@ export class LanguageClientService {
 
     constructor(private middleware: Middleware) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
-        this.executablePath = `${ext.extensionPath}/server/jar/server.jar`;
+        this.executablePath = path.join(ext.extensionPath, "server", "jar", "server.jar");
     }
 
     public enableNativeBuild() {
@@ -142,18 +144,18 @@ export class LanguageClientService {
         };
     }
 
-    private initializeExecutables(serverPath: String) {
+    private initializeExecutables(serverPath: string) {
         let executablePath;
         switch (os.type()) {
             case "Windows_NT":
-                executablePath = `${serverPath}/package-win`;
+                executablePath = path.join(serverPath, "package-win");
                 break;
             case "Darwin":
-                executablePath = `${serverPath}/package-macos`;
+                executablePath = path.join(serverPath, "package-macos");
                 this.giveExecutePermission(executablePath);
                 break;
             case "Linux":
-                executablePath = `${serverPath}/package-linux`;
+                executablePath = path.join(serverPath, "package-linux");
                 this.giveExecutePermission(executablePath);
                 break;
             default:

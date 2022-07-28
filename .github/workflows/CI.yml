@@ -105,9 +105,15 @@ jobs:
           path: server/target/*.log
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: [buildOnLinux, buildOnMac, buildOnWindows]
     steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11.0.13'
+          distribution: 'microsoft'
+      - run: java -version
       - uses: actions/checkout@v2
       - name: Retrieve native images
         uses: actions/download-artifact@v3
@@ -122,12 +128,28 @@ jobs:
       - name: postinstall
         run: npm run postinstall
         working-directory: clients/cobol-lsp-vscode-extension
+      - name: configure server jar
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: "cp -R ../../staging/jar/* ./server/jar"
+      - name: configure windows executable
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          cp ../../staging/package-win/engine.build_artifacts.txt ./server/package-win
+          cp ../../staging/package-win/engine.exe ./server/package-win
+          cp ../../staging/package-win/sunmscapi.dll ./server/package-win
+      - name: configure mac executable
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: "cp ../../staging/package-macos/server-mac-amd64 ./server/package-macos"
+      - name: configure linux executable
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: "cp ../../staging/package-linux/server ./server/package-linux"
       - name: coverage
         run: npm run coverage
         working-directory: clients/cobol-lsp-vscode-extension
-      - name: configure server
-        working-directory: clients/cobol-lsp-vscode-extension
-        run: "cp -R ../../staging/. ./server/"
+      - name: integration-test
+        uses: GabrielBB/xvfb-action@v1.0
+        with:
+          run: npm --prefix clients/cobol-lsp-vscode-extension run test:integration
       - name: generate vsix
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
