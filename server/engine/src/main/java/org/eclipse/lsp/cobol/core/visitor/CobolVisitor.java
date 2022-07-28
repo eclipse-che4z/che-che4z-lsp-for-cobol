@@ -129,10 +129,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private void addDialectsNode(Node rootNode) {
     for (Node dialectNode : dialectNodes) {
-      RangeUtils.findNodeByPosition(
+      Optional<Node> nodeByPosition = RangeUtils.findNodeByPosition(
               rootNode,
               dialectNode.getLocality().getUri(),
-              dialectNode.getLocality().getRange().getStart())
+              dialectNode.getLocality().getRange().getStart());
+
+      nodeByPosition
           .orElse(rootNode)
           .addChild(dialectNode);
     }

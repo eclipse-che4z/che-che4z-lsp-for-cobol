@@ -138,16 +138,16 @@ public class TextTransformations {
    * Replace copy statement with result of copybook substitution
    *
    * @param copyNode node representation of copybook
+   * @param range a range in the original document
    * @param textTransformations Copybook's transformations
    */
-  public void extend(CopyNode copyNode, TextTransformations textTransformations) {
+  public void extend(CopyNode copyNode, Range range, TextTransformations textTransformations) {
     copyNodes.add(copyNode);
-    Range range = copyNode.getLocality().getRange();
-    range =
+    Range extRange =
         new Range(
             new Position(range.getStart().getLine(), 0),
             new Position(range.getEnd().getLine(), range.getEnd().getCharacter()));
-    extensions.put(range, textTransformations);
+    extensions.put(extRange, textTransformations);
   }
 
   /**

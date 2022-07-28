@@ -17,19 +17,22 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 import com.google.common.collect.ImmutableMultimap;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.IdmsCopyLexer;
 import org.eclipse.lsp.cobol.core.IdmsCopyParser;
 import org.eclipse.lsp.cobol.core.IdmsLexer;
 import org.eclipse.lsp.cobol.core.IdmsParser;
-import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectParserListener;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.mapping.Mappable;
+import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.CopybookModel;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -49,15 +52,12 @@ import java.util.List;
 public final class IdmsDialect implements CobolDialect {
   public static final String NAME = "IDMS";
   private final CopybookService copybookService;
-  private final ParseTreeListener treeListener;
   private final MessageService messageService;
 
   public IdmsDialect(
       CopybookService copybookService,
-      ParseTreeListener treeListener,
       MessageService messageService) {
     this.copybookService = copybookService;
-    this.treeListener = treeListener;
     this.messageService = messageService;
   }
 
@@ -81,38 +81,44 @@ public final class IdmsDialect implements CobolDialect {
     IdmsParser.StartRuleContext ruleContext = parseIdms(context.extendedText(), "", errors);
 
     List<IdmsCopybookDescriptor> cbs = inlineVisitor.visitStartRule(ruleContext);
-    cbs.forEach(cb -> insertIdmsCopybook(context, errors, cb, context.getProgramDocumentUri(), context.getCopybookConfig(), copybookStack));
+    cbs.forEach(cb -> insertIdmsCopybook(context, errors, cb, context.getProgramDocumentUri(),
+            context.getCurrentUri(), context.getCopybookConfig(), copybookStack));
   }
 
-  private void insertIdmsCopybook(DialectProcessingContext context, List<SyntaxError> errors,
-                                  IdmsCopybookDescriptor cb, String programDocumentUri,
+  private void insertIdmsCopybook(Mappable map, List<SyntaxError> errors,
+                                  IdmsCopybookDescriptor cb, String programDocumentUri, String currentUri,
                                   CopybookConfig copybookConfig,
                                   Deque<String> copybookStack) {
     CopybookModel copybookModel =
         copybookService.resolve(
             new CopybookName(cb.getName(), IdmsDialect.NAME),
             programDocumentUri,
-            context.getCurrentUri(),
+            currentUri,
             copybookConfig,
             true);
     CopyNode copyNode = new CopyNode(cb.getStatement(), cb.getName(), IdmsDialect.NAME);
     if (recursiveCall(copybookStack, copyNode.getName())) {
-      context.replace(copyNode.getLocality().getRange(), "");
+      map.replace(copyNode.getLocality().getRange(), "");
       errors.add(ErrorHelper.circularDependency(messageService, cb.getUsage(), cb.getName()));
       return;
     }
     copybookStack.push(copyNode.getName());
 
-    Location cbLocation = new Location();
-    cbLocation.setRange(new Range(new Position(), new Position()));
-    cbLocation.setUri(copybookModel.getUri());
+    Location cbLocation = new Location(copybookModel.getUri(), new Range(new Position(), new Position()));
     CopyDefinition copyDefinition = new CopyDefinition(cbLocation, cb.getName());
     copyNode.setDefinition(copyDefinition);
 
     TextTransformations copyTransform = new TextTransformations(copybookModel.getContent(), copybookModel.getUri());
-    processTextTransformation(copyTransform, errors, copybookConfig, programDocumentUri, cb.level, copybookStack);
+    Mappable mappable = new Mappable() {
+      @Override
+      protected TextTransformations getTextTransformations() {
+        return copyTransform;
+      }
+    };
+    mappable.rebuildMapping();
+    processTextTransformation(mappable, errors, copybookConfig, programDocumentUri, cb.level, copybookStack);
 
-    context.extend(copyNode, copyTransform);
+    map.extend(copyNode, copyTransform);
     copyNode.setLocality(cb.getUsage());
     copybookStack.pop();
   }
@@ -121,18 +127,19 @@ public final class IdmsDialect implements CobolDialect {
     return copybookStack.contains(name);
   }
 
-  private void processTextTransformation(TextTransformations textTransformations,
+  private void processTextTransformation(Mappable map,
                                          List<SyntaxError> errors,
                                          CopybookConfig copybookConfig, String programDocumentUri,
                                          int copybookLevel, Deque<String> copybookStack) {
-    IdmsCopyVisitor copyVisitor = new IdmsCopyVisitor(textTransformations);
-    IdmsCopyParser.StartRuleContext context = parseCopyIdms(textTransformations.getText(), programDocumentUri, errors);
+    IdmsCopyVisitor copyVisitor = new IdmsCopyVisitor(map);
+    IdmsCopyParser.StartRuleContext context = parseCopyIdms(map.extendedText(), programDocumentUri, errors);
 
     List<IdmsCopybookDescriptor> cbs = copyVisitor.visitStartRule(context);
     int firstLevel = copyVisitor.getVariableLevels().stream().findFirst().map(Pair::getRight).orElse(0);
     copyVisitor.getVariableLevels().forEach(p -> {
       if (copybookLevel > 0 && p.getRight() != null) {
-        textTransformations.replace(p.getLeft(), String.format("%02d", calculateLevel(copybookLevel, firstLevel, p.getRight())));
+        // TODO: use mapping
+        map.replace(p.getLeft(), String.format("%02d", calculateLevel(copybookLevel, firstLevel, p.getRight())));
       }
     });
 
@@ -140,7 +147,8 @@ public final class IdmsDialect implements CobolDialect {
       if (copybookLevel > 0) {
         cb.level = copybookLevel;
       }
-      insertIdmsCopybook(textTransformations, errors, cb, programDocumentUri, copybookConfig, copybookStack);
+
+      insertIdmsCopybook(map, errors, cb, programDocumentUri, map.getCurrentUri(), copybookConfig, copybookStack);
     });
   }
 

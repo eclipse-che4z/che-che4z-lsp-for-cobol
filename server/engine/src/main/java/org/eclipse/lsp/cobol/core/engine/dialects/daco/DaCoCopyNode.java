@@ -32,10 +32,6 @@ public class DaCoCopyNode extends CopyNode {
     this.suffix = suffix;
   }
 
-  public String getLayoutId() {
-    return getName();
-  }
-
   public String getParentSuffix() {
     return suffix;
   }

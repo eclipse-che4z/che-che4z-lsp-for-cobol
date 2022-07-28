@@ -125,8 +125,8 @@ public class CobolLanguageEngine {
             .textTransformations(cleanText)
             .copybookConfig(analysisConfig.getCopybookConfig())
             .programDocumentUri(documentUri)
-            .mappingService(new MappingService(cleanText))
             .build();
+    dialectProcessingContext.rebuildMapping();
 
     DialectOutcome dialectOutcome =
         dialectService

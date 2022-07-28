@@ -48,7 +48,7 @@ public class DialectService {
                         MessageService messageService) {
     dialectSuppliers = new HashMap<>();
 
-    CobolDialect dialect = new IdmsDialect(copybookService, treeListener, messageService);
+    CobolDialect dialect = new IdmsDialect(copybookService, messageService);
     dialectSuppliers.put(dialect.getName(), dialect);
 
     dialect = new DaCoDialect(messageService, new DaCoMaidProcessor(copybookService, treeListener, messageService));
@@ -69,11 +69,13 @@ public class DialectService {
     LinkedList<CobolDialect> orderedDialects = sortDialects(dialects);
     for (CobolDialect orderedDialect : orderedDialects) {
       orderedDialect.extend(context);
+      context.rebuildMapping();
     }
     ResultWithErrors<DialectOutcome> acc = ResultWithErrors.of(
             new DialectOutcome(ImmutableList.of(), ImmutableMultimap.of(), context));
     for (CobolDialect orderedDialect : orderedDialects) {
       acc = processDialect(acc, orderedDialect, context);
+      context.rebuildMapping();
     }
     return acc;
   }

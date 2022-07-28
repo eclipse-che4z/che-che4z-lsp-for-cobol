@@ -127,6 +127,9 @@ public class DaCoMaidProcessor {
       String layoutUsage = matcher.group("layoutUsage");
       if (level != null) {
         Range range = new Range(new Position(lineNumber, matcher.start("layoutId")), new Position(lineNumber, matcher.end("layoutId")));
+        range = context.getMappingService().getOriginalLocation(range)
+                .orElseThrow(IllegalStateException::new)
+                .getRange();
         copyMaidNodes.add(
                 createMaidCopybookNode(context, Integer.parseInt(level), layoutId, layoutUsage, lastSuffix, range, errors)
         );

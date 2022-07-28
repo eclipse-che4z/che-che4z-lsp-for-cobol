@@ -140,8 +140,9 @@ class MappingServiceTest {
     CopyNode copyNode2 = new CopyNode(Locality.builder().range(new Range(new Position(1, 0), new Position(1, 22))).build(),
             "copybook2");
     TextTransformations copybookTT = TextTransformations.of(COPYBOOK, "copybook");
-    textTransformations.extend(copyNode, copybookTT);
-    copybookTT.extend(copyNode2, TextTransformations.of(COPYBOOK2, "copybook2"));
+    textTransformations.extend(copyNode, copyNode.getLocality().getRange(), copybookTT);
+    copybookTT.extend(copyNode2, copyNode2.getLocality().getRange(),
+            TextTransformations.of(COPYBOOK2, "copybook2"));
 
     MappingService service = new MappingService(textTransformations);
     Optional<Location> location = service.getOriginalLocation(
@@ -193,8 +194,8 @@ class MappingServiceTest {
     CopyNode copyNode2 = new CopyNode(Locality.builder().range(new Range(new Position(0, 0), new Position(0, 24))).build(),
             "copybook2");
     TextTransformations copybookTT = TextTransformations.of(COPYBOOK, "copybook");
-    textTransformations.extend(copyNode, copybookTT);
-    copybookTT.extend(copyNode2, TextTransformations.of(COPYBOOK2, "copybook2"));
+    textTransformations.extend(copyNode, copyNode.getLocality().getRange(), copybookTT);
+    copybookTT.extend(copyNode2, copyNode2.getLocality().getRange(), TextTransformations.of(COPYBOOK2, "copybook2"));
 
     MappingService service = new MappingService(textTransformations);
     Optional<Location> location = service.getOriginalLocation(
@@ -291,7 +292,7 @@ class MappingServiceTest {
         .range(new Range(new Position(4, 0), new Position(4, 24)))
         .build(), "copybook");
 
-    textTransformations.extend(copyNode, new TextTransformations("COPYBOOK\nCOPYBOOK\n", "copybook"));
+    textTransformations.extend(copyNode, copyNode.getLocality().getRange(), new TextTransformations("COPYBOOK\nCOPYBOOK\n", "copybook"));
 
     Range range = new Range(new Position(5, 0), new Position(8, 8));
     textTransformations.replace(range, "");
@@ -344,7 +345,7 @@ class MappingServiceTest {
         .range(new Range(new Position(7, 11), new Position(7, 21)))
         .build(), "copybook");
 
-    textTransformations.extend(copyNode, TextTransformations.of(COPYBOOK, "copybook"));
+    textTransformations.extend(copyNode, copyNode.getLocality().getRange(), TextTransformations.of(COPYBOOK, "copybook"));
 
     return new MappingService(textTransformations);
   }

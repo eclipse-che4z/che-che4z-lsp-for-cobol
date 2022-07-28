@@ -27,7 +27,8 @@ import org.junit.jupiter.api.Test;
  * IDMS and MAID copybooks should work together. There was an issue with redefine variable for this case.
  */
 public class TestDaCoIdmsMaidRedefineVariable {
-  private static final String TEXT = "       IDENTIFICATION DIVISION.\n"
+  private static final String TEXT =
+            "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. PROGNM.\n"
           + "       DATA   DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
