@@ -91,7 +91,7 @@ describe("CustomBuildTaskTerminal Test", () => {
         };
 
         await (taskTerminal as any).doCompile().catch(e => {
-            expect(e).toEqual("Please install zowe Explorer");
+            expect(e).toEqual("Please install Zowe Explorer");
         });
     });
 

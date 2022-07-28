@@ -61,7 +61,7 @@ export class CustomBuildTaskTerminal implements vscode.Pseudoterminal {
         const zoweExplorerApi: ZoweExplorerApi.IApiRegisterClient = vscode.extensions.getExtension("Zowe.vscode-extension-for-zowe")?.exports;
         let loadedProfile: IProfileLoaded;
         if (!zoweExplorerApi) {
-            return this.handleError({ message: "Please install zowe Explorer" });
+            return this.handleError({ message: "Please install Zowe Explorer" });
         }
         if (typeof this.definition?.jobCard === "undefined" || this.definition.jobCard.length === 0) {
             return this.handleError({ message: "jobCard is missing. Update the task configuration in task.json ." });
