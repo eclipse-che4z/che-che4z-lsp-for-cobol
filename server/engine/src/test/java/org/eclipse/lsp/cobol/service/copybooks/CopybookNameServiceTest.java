@@ -44,6 +44,7 @@ import static edu.emory.mathcs.backport.java.util.Collections.emptyList;
 import static edu.emory.mathcs.backport.java.util.Collections.singletonList;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.DIALECTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -145,10 +146,13 @@ class CopybookNameServiceTest {
   @MethodSource("copybooksWithExtensionsOrderData")
   void testCopybooksWithExtensionsOrder(
       List<String> extensionsInConfig,
+      List<String> dialectsInConfig,
       Optional<CopybookName> copybookFound
   ) {
 
     validFoldersMock();
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(CompletableFuture.completedFuture(dialectsInConfig));
     when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(extensionsInConfig));
     when(files.listFilesInDirectory(wrkPath)).thenReturn(emptyList());
@@ -173,6 +177,8 @@ class CopybookNameServiceTest {
       int expectedCopybookFound
   ) {
     validFoldersMock();
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(CompletableFuture.completedFuture(emptyList()));
     when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
     when(files.listFilesInDirectory(wrkPath)).thenReturn(filesInWorkingDirectory);
@@ -190,6 +196,8 @@ class CopybookNameServiceTest {
     CopybookNameService copybookNameService =
         new CopybookNameServiceImpl(settingsService, files, provider);
 
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(CompletableFuture.completedFuture(emptyList()));
     when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(Collections.singletonList("cpy")));
     when(files.decodeURI(VALID_CPY_URI)).thenReturn(null);

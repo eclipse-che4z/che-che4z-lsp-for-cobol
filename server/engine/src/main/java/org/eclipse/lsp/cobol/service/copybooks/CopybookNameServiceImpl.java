@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.DIALECTS;
 
 /**
  * This service processes all the copybook names present in the local directory. The service also
@@ -49,7 +51,8 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   private final FileSystemService files;
   private final Provider<CobolLanguageClient> clientProvider;
   private final SettingsService settingsService;
-  private List<CopybookName> listOfCopybookNames;
+  private Set<CopybookName> listOfCopybookNames;
+  private List<String> dialects;
   private List<String>  listOfCopybookFolders;
 
   @Inject
@@ -60,12 +63,12 @@ public class CopybookNameServiceImpl implements CopybookNameService {
     this.settingsService = settingsService;
     this.files = files;
     this.clientProvider = clientProvider;
-    this.listOfCopybookNames = new ArrayList<>();
+    this.listOfCopybookNames = new HashSet<>();
   }
 
   @Override
   public List<CopybookName> getNames() {
-    return listOfCopybookNames;
+    return ImmutableList.copyOf(listOfCopybookNames);
   }
 
   @Override
@@ -87,32 +90,51 @@ public class CopybookNameServiceImpl implements CopybookNameService {
             .anyMatch(uri::contains);
   }
 
+  private CompletableFuture<List<String>> copybookLocalFolders(List<String> dialects) {
+    List<CompletableFuture<List<String>>> copybookLocalFolders = new ArrayList<>();
+    copybookLocalFolders.add(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label));
+
+    dialects.forEach(dialect -> {
+      copybookLocalFolders.add(
+          settingsService.fetchTextConfiguration("cpy-manager." + dialect.toLowerCase() + ".paths-local"));
+    });
+
+    return CompletableFuture.allOf(copybookLocalFolders.toArray(new CompletableFuture<?>[0]))
+        .thenApply(v -> copybookLocalFolders.stream()
+            .map(CompletableFuture::join)
+            .flatMap(List::stream)
+            .collect(Collectors.toList())
+        );
+  }
+
   @Override
   public void collectLocalCopybookNames() {
-
     CompletableFuture<List<WorkspaceFolder>> copybookWorkspaces = clientProvider.get()
         .workspaceFolders();
-    CompletableFuture<List<String>> copybookLocalFolders = settingsService.fetchTextConfiguration(
-        CPY_LOCAL_PATHS.label);
     CompletableFuture<List<String>> copybooksExtensions = settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label);
-
-    CompletableFuture.allOf(copybookWorkspaces, copybookLocalFolders, copybooksExtensions).thenAccept(
-        (aVoid) -> resolveNames(copybookWorkspaces.join(), copybookLocalFolders.join(),
-            copybooksExtensions.join())
-    );
-
+    settingsService.fetchTextConfiguration(DIALECTS.label).thenAccept(dialects -> {
+      this.dialects = dialects;
+      CompletableFuture<List<String>> copybookLocalFolders = copybookLocalFolders(dialects);
+      CompletableFuture.allOf(copybookLocalFolders, copybookWorkspaces, copybooksExtensions)
+          .thenAccept(
+              (aVoid) -> resolveNames(
+                  copybookWorkspaces.join(),
+                  copybookLocalFolders.join(),
+                  copybooksExtensions.join()));
+    });
   }
 
   private void resolveNames(
-      List<WorkspaceFolder> workspaceFolderList, List<String> copybookFolders,
+      List<WorkspaceFolder> workspaceFolderList,
+      List<String> copybookFolders,
       List<String> copybookExtensions) {
     List<String> copybookExtensionsWithoutDot = copybookExtensions.stream()
         .map(extension -> extension.replaceFirst("\\.", ""))
         .collect(Collectors.toList());
     Set<String> copybookExtensionsWithoutDotAsSet = new HashSet<>(copybookExtensionsWithoutDot);
     listOfCopybookFolders = copybookFolders;
-    listOfCopybookNames = ImmutableList.copyOf(
+    listOfCopybookNames = ImmutableSet.copyOf(
         copybookFolders.stream()
                 .map(copybookFolder -> listExistedFiles(workspaceFolderList, copybookFolder))
                 .flatMap(List::stream)

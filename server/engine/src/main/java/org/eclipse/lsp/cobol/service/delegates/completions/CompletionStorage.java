@@ -14,9 +14,6 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import com.google.common.collect.Streams;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
@@ -27,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.DIALECTS;
 
 /**
@@ -53,7 +49,7 @@ public abstract class CompletionStorage<T> {
    * settings
    */
   public void updateStorage() {
-    this.settingsService.fetchConfiguration(DIALECTS.label).thenAccept(this::updateDialects);
+    this.settingsService.fetchTextConfiguration(DIALECTS.label).thenAccept(this::updateDialects);
   }
 
   protected abstract Map<String, T> getDataMap(String dialectType);
@@ -94,19 +90,14 @@ public abstract class CompletionStorage<T> {
             props.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  private void updateDialects(List<Object> dialectObject) {
-    JsonArray dialectArray = (JsonArray) dialectObject.get(0);
-    this.dialectType = setDialect(dialectArray);
+  private void updateDialects(List<String> dialects) {
+    this.dialectType = setDialect(dialects);
     resetStorage();
   }
 
-  private String setDialect(JsonArray dialectList) {
-    if (dialectList.isEmpty()) return DEFAULT;
-
-    return Streams.stream(dialectList)
-            .map(JsonElement::getAsString)
-            .collect(toList())
-            .contains(DaCoDialect.NAME)
+  private String setDialect(List<String> dialects) {
+    if (dialects.isEmpty()) return DEFAULT;
+    return dialects.contains(DaCoDialect.NAME)
         ? DaCoDialect.NAME
         : IdmsDialect.NAME;
   }

@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonArray;
+import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
@@ -24,10 +24,10 @@ import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.DIALECTS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -83,8 +83,8 @@ class SnippetCompletionTest {
     Snippets snippets = new Snippets(settingsService);
     SnippetCompletion completion = new SnippetCompletion(snippets);
 
-    when(settingsService.fetchConfiguration(DIALECTS.label))
-        .thenReturn(supplyAsync(() -> ImmutableList.of(new JsonArray())));
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(CompletableFuture.completedFuture(emptyList()));
 
     snippets.updateStorage();
 
@@ -101,11 +101,9 @@ class SnippetCompletionTest {
     Snippets snippets = new Snippets(settingsService);
     SnippetCompletion completion = new SnippetCompletion(snippets);
 
-    JsonArray dialectSettings = new JsonArray();
-    dialectSettings.add(IdmsDialect.NAME);
-    List<Object> clientConfig = Arrays.asList(dialectSettings);
-    when(settingsService.fetchConfiguration(DIALECTS.label))
-        .thenReturn(supplyAsync(() -> clientConfig));
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(CompletableFuture.completedFuture(singletonList(IdmsDialect.NAME)));
+
     snippets.updateStorage();
 
     assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
@@ -123,13 +121,10 @@ class SnippetCompletionTest {
     Snippets snippets = new Snippets(settingsService);
     SnippetCompletion completion = new SnippetCompletion(snippets);
 
-    JsonArray dialectSettings = new JsonArray();
-    dialectSettings.add(DaCoDialect.NAME);
-    List<Object> clientConfig = Arrays.asList(dialectSettings);
-    when(settingsService.fetchConfiguration(DIALECTS.label))
-            .thenReturn(supplyAsync(() -> clientConfig));
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(CompletableFuture.completedFuture(singletonList(DaCoDialect.NAME)));
     snippets.updateStorage();
-    System.out.println("Dialect list :" +  dialectSettings.get(0));
+
     assertEquals(
             ImmutableList.of(createIDMSItem()),
             completion.getCompletionItems("IDMS", MockCompletionModel.MODEL));
@@ -144,11 +139,8 @@ class SnippetCompletionTest {
     SnippetCompletion completion = new SnippetCompletion(snippets);
 
     /* IDMS is selected in the Settings.json */
-    JsonArray dialectSettings = new JsonArray();
-    dialectSettings.add(IdmsDialect.NAME);
-    List<Object> clientConfig = Arrays.asList(dialectSettings);
-    when(settingsService.fetchConfiguration(DIALECTS.label))
-        .thenReturn(supplyAsync(() -> clientConfig));
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(CompletableFuture.completedFuture(singletonList(IdmsDialect.NAME)));
     snippets.updateStorage();
 
     assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
@@ -160,11 +152,8 @@ class SnippetCompletionTest {
         completion.getCompletionItems("IDMS", MockCompletionModel.MODEL));
 
     /* No dialect type is set in Settings.json */
-    JsonArray cobolSettings = new JsonArray();
-    List<Object> cobolConfig = Arrays.asList(cobolSettings);
-
-    when(settingsService.fetchConfiguration(DIALECTS.label))
-        .thenReturn(supplyAsync(() -> cobolConfig));
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(CompletableFuture.completedFuture(emptyList()));
     snippets.updateStorage();
 
     assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
@@ -180,13 +169,8 @@ class SnippetCompletionTest {
     Snippets snippets = new Snippets(settingsService);
     SnippetCompletion completion = new SnippetCompletion(snippets);
 
-    /* Daco is selected in the Settings.json */
-    JsonArray dialectSettings = new JsonArray();
-    dialectSettings.add(IdmsDialect.NAME);
-    List<Object> clientConfig = Arrays.asList(dialectSettings);
-
-    when(settingsService.fetchConfiguration(DIALECTS.label))
-        .thenReturn(supplyAsync(() -> clientConfig));
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(CompletableFuture.completedFuture(singletonList(IdmsDialect.NAME)));
     snippets.updateStorage();
 
     assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
@@ -198,8 +182,8 @@ class SnippetCompletionTest {
         completion.getCompletionItems("IDMS", MockCompletionModel.MODEL));
 
     /* No dialect type is set in Settings.json */
-    when(settingsService.fetchConfiguration(DIALECTS.label))
-        .thenReturn(supplyAsync(() -> ImmutableList.of(new JsonArray())));
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(CompletableFuture.completedFuture(emptyList()));
     snippets.updateStorage();
 
     assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
