@@ -125,7 +125,7 @@ public class DaCoMaidProcessor {
               + String.join("", Collections.nCopies(len, CobolDialect.FILLER)));
       String level = matcher.group("level");
       String layoutId = matcher.group("layoutId");
-      String layoutUsage = matcher.group("layoutUsage");
+      String layoutUsage = level.equals("01") ? matcher.group("layoutUsage") : null;
       if (level != null) {
         Range range = new Range(new Position(lineNumber, matcher.start("layoutId")), new Position(lineNumber, matcher.end("layoutId")));
         copyMaidNodes.add(
