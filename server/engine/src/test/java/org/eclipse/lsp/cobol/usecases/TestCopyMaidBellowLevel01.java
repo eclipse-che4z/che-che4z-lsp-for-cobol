@@ -22,29 +22,40 @@ import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /**
- * Check that the copybook name in COPY MAID is concatenated with the qualifier before requesting
- * the copybook file, and is shown as is in the AST
+ * Check that the COPY MAID `usage` is ignored bellow level 01 before requesting
+ * the copybook file
  */
-class TestCopyMaidWithKmkRequestsCorrectFile {
+class TestCopyMaidBellowLevel01 {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "        01 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG_KMK} KMK.\n"
+          + "        01 {$*PARENT}."
+          + "           03 {$*AREA-XW7}.\n"
+          + "             05 FILLER PIC X(8) VALUE 'AREA-XW8'.\n"
+          + "             05 {$*TABMAX-PW7} PIC S9(4) VALUE ZERO COMP-3.\n"
+          + "             05 {$*BHTTAB-XW7}.\n"
+          + "               07 {$*BHTREG-XW8} OCCURS 50.\n"
+          + "                 09 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG} KMK.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           DISPLAY {$BHTORSKOD-XB4}.";
+          + "           DISPLAY {$BHTRGL-XB4} OF {$BHTTAB-XW7}.";
 
   private static final String COPYBOOK_CONTENT =
-      "1       13 {$*BHTORSKOD-XB4} PIC X(2).";
+            "1           09 {$*BHTRGL-XB4}.\n"
+          + "2             11 {$*BHTRGLVLG-XB4}.\n"
+          + "3               13 {$*FABLYN-XB4}.\n"
+          + "4                 15 {$*FABLYNPOSEEN-XB4} PIC X.\n"
+          + "5                 15 {$*LYNKOD-XB4} PIC X(2).\n"
+          + "6               13 {$*BHTORSKOD-XB4} PIC X(2).";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG_KMK", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

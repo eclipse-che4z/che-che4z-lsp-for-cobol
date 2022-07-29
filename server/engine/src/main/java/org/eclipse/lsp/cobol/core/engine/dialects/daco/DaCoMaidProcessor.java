@@ -58,7 +58,7 @@ public class DaCoMaidProcessor {
   private final Pattern sectionPattern = Pattern.compile("^\\s*(?<name>\\w*)\\s+SECTION\\s*\\.\\s*$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern dataDivisionPattern = Pattern.compile("\\s*data\\s+division\\s*\\.", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern dataDescriptionEntryPattern = Pattern.compile("^\\s*(?<lvl>\\d+)\\s+(?!copy maid)(?<entryName>[\\w]+(-\\w+)?)?.*\\..*$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-  private final Pattern copyMaidPattern = Pattern.compile("^(?<indent>\\s*)(?<level>\\d{1,2})?\\s*COPY\\s+MAID\\s+(?<layoutId>[a-zA-Z0-9]*[-]?[a-zA-Z0-9]{0,3})\\s*(?<layoutUsage>[a-zA-Z]{3,6})?\\s*\\.?$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+  private final Pattern copyMaidPattern = Pattern.compile("^(?<indent>\\s*)(?<level>\\d{1,2})?\\s*COPY\\s+MAID\\s+(?<layoutId>[a-zA-Z0-9]*[-]?[a-zA-Z0-9]{0,3})\\s*(?<layoutUsage>[a-zA-Z]{3,6})?\\s*(<dot>\\.)?$", Pattern.CASE_INSENSITIVE);
   private final CopybookService copybookService;
   private final ParseTreeListener treeListener;
   private final MessageService messageService;
@@ -116,20 +116,22 @@ public class DaCoMaidProcessor {
     Matcher matcher = copyMaidPattern.matcher(input);
 
     if (matcher.find()) {
+      String level = matcher.group("level");
+      String layoutId = matcher.group("layoutId");
+      String layoutUsage = matcher.group("layoutUsage");
+      String dot = matcher.group("dot");
       StringBuffer sb = new StringBuffer();
       String indent = matcher.group("indent");
       int startChar = indent == null ? 0 : matcher.end("indent");
-      int endChar = matcher.end(matcher.groupCount() - 1);
+      int endChar = matcher.end(dot != null ? "dot" : layoutUsage != null ? "layoutUsage" : "layoutId");
       int len = endChar - startChar;
       matcher.appendReplacement(sb, (indent == null ? "" : indent)
               + String.join("", Collections.nCopies(len, CobolDialect.FILLER)));
-      String level = matcher.group("level");
-      String layoutId = matcher.group("layoutId");
-      String layoutUsage = level.equals("01") ? matcher.group("layoutUsage") : null;
       if (level != null) {
+        String actualLayoutUsage = level.equals("01") ? layoutUsage : null;
         Range range = new Range(new Position(lineNumber, matcher.start("layoutId")), new Position(lineNumber, matcher.end("layoutId")));
         copyMaidNodes.add(
-                createMaidCopybookNode(context, Integer.parseInt(level), layoutId, layoutUsage, lastSuffix, range, errors)
+                createMaidCopybookNode(context, Integer.parseInt(level), layoutId, actualLayoutUsage, lastSuffix, range, errors)
         );
       }
       matcher.appendTail(sb);

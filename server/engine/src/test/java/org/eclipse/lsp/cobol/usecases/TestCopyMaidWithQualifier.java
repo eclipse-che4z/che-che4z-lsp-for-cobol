@@ -30,8 +30,8 @@ class TestCopyMaidWithQualifier {
           + "       PROGRAM-ID. SETINDEX.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01  {$*MRB}.\n"
-          + "           03 COPY MAID {~ABCDEFG123!DaCo`ABCDEFG123_ABC} ABC.\n"
+          + "       01  {$*MRB} PIC 9.\n"
+          + "       01  COPY MAID {~ABCDEFG123!DaCo`ABCDEFG123_ABC} ABC.\n"
           + "       01  {$*QWE} PIC 9.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$QWE}.\n"
@@ -39,13 +39,13 @@ class TestCopyMaidWithQualifier {
           + "           DISPLAY {$VAR1}.\n";
 
   private static final String COPYBOOK = "            03 {$*VAR1} PIC X(3) VALUE \"ABC\".";
-  private static final String COPYBOOK_NAME = "ABCDEFG123";
+  private static final String COPYBOOK_FILE_NAME = "ABCDEFG123_ABC";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(new CobolText(COPYBOOK_NAME + "_ABC", DaCoDialect.NAME, COPYBOOK)),
+        ImmutableList.of(new CobolText(COPYBOOK_FILE_NAME, DaCoDialect.NAME, COPYBOOK)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }
