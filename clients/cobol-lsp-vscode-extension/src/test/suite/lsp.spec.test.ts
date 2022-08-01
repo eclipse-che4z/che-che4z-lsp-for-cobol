@@ -100,23 +100,6 @@ suite('Integration Test Suite', () => {
             "Checks that auto format removed sight trailing spaces")
     }).timeout(10000).slow(4000);
 
-    test('TC152058 Autocomplete functionality with snippets navigation', async () => {
-        await helper.insertString(editor, new vscode.Position(40, 0), "           A");
-        await vscode.commands.executeCommand('editor.action.triggerSuggest', editor.document.uri);
-        await helper.sleep(1000);
-        await helper.executeCommandMultipleTimes('selectNextSuggestion', 6)
-        await vscode.commands.executeCommand('acceptSelectedSuggestion');
-        await editor.edit(edit => edit.replace(editor.selection, "1"));
-        await helper.sleep(1000);
-        await vscode.commands.executeCommand("jumpToNextSnippetPlaceholder");
-        await editor.edit(edit => edit.replace(editor.selection, "str"));
-        await helper.sleep(1000);
-        const text = editor.document.getText();
-        const acceptedLine = text.split('\n')[40];
-        assert.ok(acceptedLine.includes("ADD 1 TO str"),
-            "Checks auto complete functionality, also with navigation by snippets");
-    }).timeout(10000).slow(4000);
-
     test('TC288736 error message for 80chars limit', async () => {
         await helper.showDocument("TEST.CBL");
         editor = helper.get_editor("TEST.CBL");
@@ -130,5 +113,4 @@ suite('Integration Test Suite', () => {
             "Source text can not go past column 80")
 
     }).timeout(10000).slow(4000);
-
 })

@@ -400,11 +400,6 @@
                         "S999"
                     ],
                     "uniqueItems": true
-                },
-                "cobol-lsp.enableNativeBuild": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Enables the native build server instead of java server. Please restart the vscode window after making changes to this settings."
                 }
             }
         },

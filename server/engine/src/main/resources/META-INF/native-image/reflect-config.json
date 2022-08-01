@@ -485,7 +485,7 @@
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp4j.services.TextDocumentService","org.eclipse.lsp4j.services.WorkspaceService","org.eclipse.lsp.cobol.service.WatcherService","org.eclipse.lsp.cobol.service.SettingsService","org.eclipse.lsp.cobol.core.messages.LocaleStore","org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor","org.eclipse.lsp.cobol.service.DisposableLSPStateService","org.eclipse.lsp.cobol.service.ConfigurationService","org.eclipse.lsp.cobol.service.copybooks.CopybookNameService","org.eclipse.lsp.cobol.service.delegates.completions.Keywords","org.eclipse.lsp.cobol.service.delegates.completions.Snippets"] }]
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp4j.services.TextDocumentService","org.eclipse.lsp4j.services.WorkspaceService","org.eclipse.lsp.cobol.service.WatcherService","org.eclipse.lsp.cobol.service.SettingsService","org.eclipse.lsp.cobol.core.messages.LocaleStore","org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor","org.eclipse.lsp.cobol.service.DisposableLSPStateService","org.eclipse.lsp.cobol.service.ConfigurationService","org.eclipse.lsp.cobol.service.copybooks.CopybookNameService","org.eclipse.lsp.cobol.service.delegates.completions.Keywords"] }]
   },
   {
     "name":"org.eclipse.lsp.cobol.service.CobolLanguageServer$ShutdownResponse",
@@ -506,7 +506,7 @@
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker","org.eclipse.lsp.cobol.service.SettingsService","org.eclipse.lsp.cobol.service.WatcherService","org.eclipse.lsp.cobol.service.copybooks.CopybookService","org.eclipse.lsp.cobol.core.messages.LocaleStore","org.eclipse.lsp.cobol.service.SubroutineService","org.eclipse.lsp.cobol.service.ConfigurationService","org.eclipse.lsp.cobol.service.DisposableLSPStateService","org.eclipse.lsp.cobol.service.copybooks.CopybookNameService","org.eclipse.lsp.cobol.service.delegates.completions.Keywords","org.eclipse.lsp.cobol.service.delegates.completions.Snippets"] }]
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker","org.eclipse.lsp.cobol.service.SettingsService","org.eclipse.lsp.cobol.service.WatcherService","org.eclipse.lsp.cobol.service.copybooks.CopybookService","org.eclipse.lsp.cobol.core.messages.LocaleStore","org.eclipse.lsp.cobol.service.SubroutineService","org.eclipse.lsp.cobol.service.ConfigurationService","org.eclipse.lsp.cobol.service.DisposableLSPStateService","org.eclipse.lsp.cobol.service.copybooks.CopybookNameService","org.eclipse.lsp.cobol.service.delegates.completions.Keyword"] }]
   },
   {
     "name":"org.eclipse.lsp.cobol.service.SettingsServiceImpl",
@@ -616,7 +616,7 @@
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.SettingsService"] }]
+    "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
     "name":"org.eclipse.lsp.cobol.service.delegates.completions.ParagraphCompletion",
@@ -631,24 +631,6 @@
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
-  },
-  {
-    "name":"org.eclipse.lsp.cobol.service.delegates.completions.SnippetCompletion",
-    "allDeclaredFields":true,
-    "queryAllDeclaredMethods":true,
-    "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.delegates.completions.CompletionStorage"] }]
-  },
-  {
-    "name":"org.eclipse.lsp.cobol.service.delegates.completions.Snippets",
-    "allDeclaredFields":true,
-    "queryAllDeclaredMethods":true,
-    "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.SettingsService"] }]
-  },
-  {
-    "name":"org.eclipse.lsp.cobol.service.delegates.completions.SnippetsModel",
-    "allDeclaredFields":true
   },
   {
     "name":"org.eclipse.lsp.cobol.service.delegates.completions.SubroutineCompletion",

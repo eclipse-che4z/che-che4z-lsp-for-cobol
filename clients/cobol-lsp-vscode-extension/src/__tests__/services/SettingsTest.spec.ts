@@ -118,14 +118,5 @@ describe("SettingsService evaluate variables", () => {
         expect(tracking).toBeCalledWith("maid.paths-local")
     });
 
-    test("Get native build enable settings", () => {
-        const tracking = jest.fn();
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: tracking,
-        });
-        SettingsService.isNativeBuildEnabled();
-        expect(tracking).toBeCalledWith("cobol-lsp.enableNativeBuild");
-    });
-
 });
 

@@ -16,17 +16,18 @@ import * as vscode from "vscode";
 
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
-import { C4Z_FOLDER, GITIGNORE_FILE, IS_NATIVE_BUILD, LANGUAGE_ID } from "./constants";
+import { C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID } from "./constants";
 import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
-import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab } from "./commands/SmartTabCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { Middleware } from "./services/Middleware";
 import { TelemetryService } from "./services/reporter/TelemetryService";
 import { createFileWithGivenPath, SettingsService } from "./services/Settings";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
+import { SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
+import { CommentAction, commentCommand } from "./commands/CommentCommand";
 
 let copyBooksDownloader: CopybookDownloadService;
 let middleware: Middleware;
@@ -57,13 +58,9 @@ export async function activate(context: vscode.ExtensionContext) {
         () => {
         gotoCopybookSettings();
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle",
-        () => { commentCommand(CommentAction.TOGGLE); }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment",
-        () => { commentCommand(CommentAction.COMMENT); }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment",
-        () => { commentCommand(CommentAction.UNCOMMENT); }));
-
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
     // create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
@@ -73,25 +70,14 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerCodeActionsProvider(
             { scheme: "file", language: LANGUAGE_ID },
             new CopybooksCodeActionProvider()));
+    const completionProvider =  vscode.languages.registerCompletionItemProvider(
+                { scheme: "file", language: LANGUAGE_ID },
+                new SnippetCompletionProvider());
+    context.subscriptions.push(completionProvider);
 
-    vscode.workspace.onDidChangeConfiguration(async event => {
-        if (event.affectsConfiguration(IS_NATIVE_BUILD)) {
-            const selection = await vscode.window.showInformationMessage("Restart the vscode to enforce native build settings change", "Ok", "Later");
-            if (typeof selection === "undefined" || selection === "Later") {
-                return;
-            }
-            if (selection === "Ok") {
-                await vscode.commands.executeCommand("workbench.action.reloadWindow");
-            }
-        }
-    });
 
     try {
-        if (SettingsService.isNativeBuildEnabled()) {
-            languageClientService.enableNativeBuild();
-        } else {
-            await languageClientService.checkPrerequisites();
-        }
+        await languageClientService.checkPrerequisites();
     } catch (err) {
         vscode.window.showErrorMessage(err.toString());
         languageClientService.enableNativeBuild();
