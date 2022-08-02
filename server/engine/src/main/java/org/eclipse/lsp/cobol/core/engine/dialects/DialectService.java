@@ -69,13 +69,13 @@ public class DialectService {
     LinkedList<CobolDialect> orderedDialects = sortDialects(dialects);
     for (CobolDialect orderedDialect : orderedDialects) {
       orderedDialect.extend(context);
-      context.rebuildMapping();
+      context.commitTransformations();
     }
     ResultWithErrors<DialectOutcome> acc = ResultWithErrors.of(
             new DialectOutcome(ImmutableList.of(), ImmutableMultimap.of(), context));
     for (CobolDialect orderedDialect : orderedDialects) {
       acc = processDialect(acc, orderedDialect, context);
-      context.rebuildMapping();
+      context.commitTransformations();
     }
     return acc;
   }

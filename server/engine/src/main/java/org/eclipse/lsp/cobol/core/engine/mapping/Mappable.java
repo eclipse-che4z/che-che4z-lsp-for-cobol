@@ -19,12 +19,15 @@ import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 /** Represents mappable modifications on source code */
 public abstract class Mappable {
-  private MappingService mappingService;
+  private final LinkedList<MappingService> mappings = new LinkedList<>();
+
+  private final LinkedList<TextTransformations> transformations = new LinkedList<>();
 
   /**
    * Replace copy statement with result of copybook substitution
@@ -33,18 +36,22 @@ public abstract class Mappable {
    * @param copyTransform Copybook's transformations
    */
   public void extend(CopyNode copyNode, TextTransformations copyTransform) {
-    getTextTransformations().extend(copyNode, mapRange(copyNode.getLocality().getRange()), copyTransform);
+    topTransformations().extend(copyNode, copyNode.getLocality().getRange(), copyTransform);
   }
 
   /**
-   * Recalculate  mapping for current transformations
+   * Commit current accumulated transformations. Create a new text transformation level on top of
+   * current one.
    */
-  public void rebuildMapping() {
-    mappingService = new MappingService(getTextTransformations());
+  public void commitTransformations() {
+    mappings.push(new MappingService(topTransformations()));
+    transformations.push(
+        new TextTransformations(
+            topTransformations().calculateExtendedText(), topTransformations().getUri()));
   }
 
   public String getCurrentUri() {
-    return getTextTransformations().getUri();
+    return topTransformations().getUri();
   }
 
   /**
@@ -53,7 +60,9 @@ public abstract class Mappable {
    * @return a list of all copy nodes
    */
   public List<CopyNode> calculateCopyNodes() {
-    return getTextTransformations().calculateCopyNodes();
+    List<CopyNode> result = new ArrayList<>();
+    transformations.forEach(t -> result.addAll(t.calculateCopyNodes()));
+    return result;
   }
 
   /**
@@ -63,10 +72,8 @@ public abstract class Mappable {
    * @param replacement new content
    */
   public void replace(Range range, String replacement) {
-    getTextTransformations().replace(mapRange(range), replacement);
+    topTransformations().replace(mapLocation(range).getRange(), replacement);
   }
-
-  protected abstract TextTransformations getTextTransformations();
 
   /**
    * Apply all transformations and form resulting text
@@ -74,20 +81,42 @@ public abstract class Mappable {
    * @return text with all transformations
    */
   public String extendedText() {
-    return getTextTransformations().calculateExtendedText();
+    return topTransformations().calculateExtendedText();
   }
 
-  protected Range mapRange(Range range) {
-    Location originalLocation =
-        mappingService.getOriginalLocation(range).orElseThrow(IllegalArgumentException::new);
-    if (!Objects.equals(getTextTransformations().getUri(), originalLocation.getUri())) {
-      throw new IllegalArgumentException("Uri mismatch");
+  protected abstract TextTransformations getTextTransformations();
+
+  /**
+   * Map a range in an extended to its original location
+   *
+   * @param range in the extended documetn
+   * @return a location of original source
+   */
+  public Location mapLocation(Range range) {
+    Location extLocation = new Location();
+    extLocation.setRange(range);
+    extLocation.setUri(transformations.getLast().getUri());
+    LinkedList<MappingService> maps = new LinkedList<>(mappings);
+    return mapLocation(extLocation, maps);
+  }
+
+  private Location mapLocation(Location location, LinkedList<MappingService> maps) {
+    if (maps.isEmpty()) {
+      return location;
     }
-    return originalLocation.getRange();
+    MappingService mappingService = maps.pop();
+    Location originalLocation =
+        mappingService
+            .getOriginalLocation(location.getRange())
+            .orElseThrow(IllegalStateException::new);
+
+    return mapLocation(originalLocation, maps);
   }
 
-  // TODO probably it's possible to make this method private
-  public MappingService getMappingService() {
-    return mappingService;
+  private TextTransformations topTransformations() {
+    if (transformations.isEmpty()) {
+      transformations.push(getTextTransformations());
+    }
+    return transformations.peek();
   }
 }

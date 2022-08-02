@@ -28,7 +28,7 @@ import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.mapping.MappingService;
+import org.eclipse.lsp.cobol.core.engine.mapping.Mappable;
 import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
@@ -49,6 +49,7 @@ import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,7 +127,7 @@ public class CobolLanguageEngine {
             .copybookConfig(analysisConfig.getCopybookConfig())
             .programDocumentUri(documentUri)
             .build();
-    dialectProcessingContext.rebuildMapping();
+    dialectProcessingContext.commitTransformations();
 
     DialectOutcome dialectOutcome =
         dialectService
@@ -150,21 +151,20 @@ public class CobolLanguageEngine {
     timingBuilder.getPreprocessorTimer().stop();
 
     // Update copybook usages with proper positions
-    MappingService mappingService = dialectOutcome.getContext().getMappingService();
     extendedDocument
         .getCopybooks()
         .getUsages()
         .forEach(
-            (k, v) ->
-                mappingService
-                    .getOriginalLocation(v.getRange())
-                    .ifPresent(l -> v.setRange(l.getRange())));
+            (k, v) -> v.setRange(dialectOutcome.getContext().mapLocation(v.getRange()).getRange()));
 
     preprocessorErrors.forEach(
         e ->
-            mappingService
-                .getOriginalLocation(e.getLocality().getRange())
-                .ifPresent(locality -> e.getLocality().setRange(locality.getRange())));
+            e.getLocality()
+                .setRange(
+                    dialectOutcome
+                        .getContext()
+                        .mapLocation(e.getLocality().getRange())
+                        .getRange()));
     accumulatedErrors.addAll(preprocessorErrors);
 
     timingBuilder.getParserTimer().start();
@@ -191,7 +191,7 @@ public class CobolLanguageEngine {
     timingBuilder.getMappingTimer().start();
     Map<Token, Locality> positionMapping =
         getPositionMapping(
-            documentUri, extendedDocument, tokens, embeddedCodeParts, mappingService);
+            documentUri, extendedDocument, tokens, embeddedCodeParts, dialectProcessingContext);
     timingBuilder.getMappingTimer().stop();
 
     timingBuilder.getVisitorTimer().start();
@@ -286,7 +286,7 @@ public class CobolLanguageEngine {
       ExtendedDocument extendedDocument,
       CommonTokenStream tokens,
       Map<Token, EmbeddedCode> embeddedCodeParts,
-      MappingService mappingService) {
+      Mappable mappable) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     Map<Token, Locality> mapping =
         LocalityMappingUtils.createPositionMapping(
@@ -294,22 +294,19 @@ public class CobolLanguageEngine {
             extendedDocument.getDocumentMapping(),
             documentUri,
             embeddedCodeParts);
-    return updateMapping(documentUri, mapping, mappingService);
+    return updateMapping(documentUri, mapping, mappable);
   }
 
   private Map<Token, Locality> updateMapping(
-      String documentUri, Map<Token, Locality> mapping, MappingService mappingService) {
+      String documentUri, Map<Token, Locality> mapping, Mappable mappable) {
     mapping.forEach(
         (k, v) -> {
           if (v.getUri().equals(documentUri)) {
-            mappingService
-                .getOriginalLocation(v.getRange())
-                .ifPresent(
-                    l -> {
-                      v.getRange().setStart(l.getRange().getStart());
-                      v.getRange().setEnd(l.getRange().getEnd());
-                      v.setUri(l.getUri());
-                    });
+            Location l = mappable.mapLocation(v.getRange());
+
+            v.getRange().setStart(l.getRange().getStart());
+            v.getRange().setEnd(l.getRange().getEnd());
+            v.setUri(l.getUri());
           }
         });
     return mapping;

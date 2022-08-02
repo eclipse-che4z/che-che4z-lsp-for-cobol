@@ -115,7 +115,7 @@ public final class IdmsDialect implements CobolDialect {
         return copyTransform;
       }
     };
-    mappable.rebuildMapping();
+    mappable.commitTransformations();
     processTextTransformation(mappable, errors, copybookConfig, programDocumentUri, cb.level, copybookStack);
 
     map.extend(copyNode, copyTransform);

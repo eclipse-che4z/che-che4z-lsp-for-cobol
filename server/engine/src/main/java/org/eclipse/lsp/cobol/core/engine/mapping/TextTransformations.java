@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.engine.mapping;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
-import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -37,16 +36,13 @@ public class TextTransformations {
   private final Map<Range, String> replacements = new HashMap<>();
   private final List<CopyNode> copyNodes = new ArrayList<>();
 
-  private final Map<Range, Location> extToOriginalMap = new HashMap<>();
-
   /**
    * Apply all transformations and form resulting text
    *
    * @return text with all transformations
    */
   public String calculateExtendedText() {
-    extToOriginalMap.clear();
-    ExtendDocumentAccumulator eda = new ExtendDocumentAccumulator();
+    StringBuilder eda = new StringBuilder();
 
     LinkedList<Range> ranges = new LinkedList<>(extensions.keySet());
     ranges.addAll(replacements.keySet());
@@ -56,7 +52,7 @@ public class TextTransformations {
 
     String[] lines = text.split(REGEX_KEEP_NEW_LINES, -1);
     int lineNumber = 0;
-    int linePos = 0;
+    int linePos;
     Range currentRange = ranges.isEmpty() ? null : ranges.removeFirst();
     Range prevRange = null;
     while (currentRange != null && lineNumber < lines.length) {
@@ -75,23 +71,14 @@ public class TextTransformations {
           linePos = 0;
         }
         eda.append(lines[lineNumber], linePos, currentRange.getStart().getCharacter());
-        String uri =
-            extensions.containsKey(currentRange) ? extensions.get(currentRange).getUri() : getUri();
         String replace;
-        Position start = eda.getPosition();
         if (extensions.containsKey(currentRange)) {
-          TextTransformations textTransformations = extensions.get(currentRange);
-          replace = textTransformations.calculateExtendedText();
-          extToOriginalMap.putAll(shift(eda.getPosition(), textTransformations.getExtToOriginalMap()));
+          TextTransformations mappable = extensions.get(currentRange);
+          replace = mappable.calculateExtendedText();
         } else {
           replace = replacements.get(currentRange);
         }
         eda.append(replace);
-        Position end = eda.getPosition();
-        Range extRange = new Range(start, end);
-        if (!isRangeEmpty(extRange)) {
-          extToOriginalMap.put(extRange, new Location(uri, currentRange));
-        }
         lineNumber = currentRange.getEnd().getLine();
         prevRange = currentRange;
         currentRange = ranges.isEmpty() ? null : ranges.removeFirst();
@@ -107,47 +94,20 @@ public class TextTransformations {
     return eda.toString();
   }
 
-  private Map<Range, Location> shift(Position extPos, Map<Range, Location> extToOriginalMap) {
-    Map<Range, Location> result = new HashMap<>();
-    extToOriginalMap.forEach(
-        (k, v) -> {
-          Range newKey =
-              new Range(
-                  new Position(
-                      k.getStart().getLine() + extPos.getLine(), k.getStart().getCharacter()),
-                  new Position(k.getEnd().getLine() + extPos.getLine(), k.getEnd().getCharacter()));
-          result.put(newKey, v);
-        });
-    return result;
-  }
-
-  private boolean isRangeEmpty(Range range) {
-    return range.getStart().equals(range.getEnd());
-  }
-
-  /**
-   * Get a map of extended document. It will be populated after calculateExtendedText call
-   *
-   * @return a map of extended document.
-   */
-  public Map<Range, Location> getExtendedDocumentMap() {
-    return extToOriginalMap;
-  }
-
   /**
    * Replace copy statement with result of copybook substitution
    *
    * @param copyNode node representation of copybook
    * @param range a range in the original document
-   * @param textTransformations Copybook's transformations
+   * @param mappable Copybook's transformations
    */
-  public void extend(CopyNode copyNode, Range range, TextTransformations textTransformations) {
+  public void extend(CopyNode copyNode, Range range, TextTransformations mappable) {
     copyNodes.add(copyNode);
     Range extRange =
         new Range(
             new Position(range.getStart().getLine(), 0),
             new Position(range.getEnd().getLine(), range.getEnd().getCharacter()));
-    extensions.put(extRange, textTransformations);
+    extensions.put(extRange, mappable);
   }
 
   /**
@@ -181,33 +141,5 @@ public class TextTransformations {
     extensions.values().forEach(v -> result.addAll(v.calculateCopyNodes()));
     result.addAll(copyNodes);
     return result;
-  }
-
-  private static class ExtendDocumentAccumulator {
-    private final StringBuilder sb = new StringBuilder();
-    private int column = 0;
-    private int line = 0;
-
-    void append(String string) {
-      if (!string.isEmpty()) {
-        String[] strings = string.split(REGEX_KEEP_NEW_LINES, -1);
-        line += strings.length - 1;
-        column += strings[strings.length - 1].length();
-      }
-      sb.append(string);
-    }
-
-    void append(String string, int start, int end) {
-      append(string.substring(start, end));
-    }
-
-    Position getPosition() {
-      return new Position(line, column);
-    }
-
-    @Override
-    public String toString() {
-      return sb.toString();
-    }
   }
 }
