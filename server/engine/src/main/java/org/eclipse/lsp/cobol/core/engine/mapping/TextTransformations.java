@@ -99,15 +99,15 @@ public class TextTransformations {
    *
    * @param copyNode node representation of copybook
    * @param range a range in the original document
-   * @param mappable Copybook's transformations
+   * @param textTransformations Copybook's transformations
    */
-  public void extend(CopyNode copyNode, Range range, TextTransformations mappable) {
+  public void extend(CopyNode copyNode, Range range, TextTransformations textTransformations) {
     copyNodes.add(copyNode);
     Range extRange =
         new Range(
             new Position(range.getStart().getLine(), 0),
             new Position(range.getEnd().getLine(), range.getEnd().getCharacter()));
-    extensions.put(extRange, mappable);
+    extensions.put(extRange, textTransformations);
   }
 
   /**

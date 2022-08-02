@@ -115,9 +115,8 @@ public final class IdmsDialect implements CobolDialect {
         return copyTransform;
       }
     };
-    mappable.commitTransformations();
     processTextTransformation(mappable, errors, copybookConfig, programDocumentUri, cb.level, copybookStack);
-
+    mappable.commitTransformations();
     map.extend(copyNode, copyTransform);
     copyNode.setLocality(cb.getUsage());
     copybookStack.pop();
@@ -138,7 +137,6 @@ public final class IdmsDialect implements CobolDialect {
     int firstLevel = copyVisitor.getVariableLevels().stream().findFirst().map(Pair::getRight).orElse(0);
     copyVisitor.getVariableLevels().forEach(p -> {
       if (copybookLevel > 0 && p.getRight() != null) {
-        // TODO: use mapping
         map.replace(p.getLeft(), String.format("%02d", calculateLevel(copybookLevel, firstLevel, p.getRight())));
       }
     });

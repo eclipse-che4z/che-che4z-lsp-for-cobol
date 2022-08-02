@@ -22,6 +22,7 @@ import org.eclipse.lsp4j.Range;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /** Represents mappable modifications on source code */
 public abstract class Mappable {
@@ -101,7 +102,8 @@ public abstract class Mappable {
   }
 
   private Location mapLocation(Location location, LinkedList<MappingService> maps) {
-    if (maps.isEmpty()) {
+    if (maps.isEmpty() ||
+            !Objects.equals(location.getUri(), topTransformations().getUri())) {
       return location;
     }
     MappingService mappingService = maps.pop();
