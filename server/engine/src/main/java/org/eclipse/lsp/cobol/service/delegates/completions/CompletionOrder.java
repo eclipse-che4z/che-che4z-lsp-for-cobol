@@ -23,7 +23,6 @@ public enum CompletionOrder {
   COPYBOOKS,
   SUBROUTINES,
   CONSTANTS,
-  SNIPPETS,
   KEYWORDS;
   final String prefix = String.valueOf(this.ordinal());
 }

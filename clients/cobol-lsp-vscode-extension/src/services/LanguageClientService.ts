@@ -32,6 +32,7 @@ import {JavaCheck} from "./JavaCheck";
 import {Middleware} from "./Middleware";
 import { SettingsService } from "./Settings";
 
+
 export class LanguageClientService {
     private executablePath: string;
     private languageClient: LanguageClient;
@@ -142,7 +143,7 @@ export class LanguageClientService {
         };
     }
 
-    private initializeExecutables(serverPath: String) {
+    private initializeExecutables(serverPath: string) {
         let executablePath;
         switch (os.type()) {
             case "Windows_NT":
@@ -194,4 +195,3 @@ export function nativeServer(jarPath: string) {
         }
     return executable;
 }
-
