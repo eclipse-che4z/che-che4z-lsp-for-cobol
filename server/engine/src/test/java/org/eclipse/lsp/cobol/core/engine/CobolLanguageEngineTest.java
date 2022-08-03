@@ -148,7 +148,7 @@ class CobolLanguageEngineTest {
     DialectProcessingContext context = DialectProcessingContext.builder()
             .textTransformations(TextTransformations.of(TEXT, URI))
             .build();
-    context.commitTransformations();
+    context.getExtendedSource().commitTransformations();
     when(dialectService.process(anyList(), any()))
         .thenReturn(new ResultWithErrors<>(new DialectOutcome(ImmutableList.of(), ImmutableMultimap.of(), context), ImmutableList.of()));
     when(preprocessor.cleanUpCode(URI, TEXT))

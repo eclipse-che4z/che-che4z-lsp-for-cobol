@@ -71,10 +71,10 @@ public final class DaCoDialect implements CobolDialect {
     List<SyntaxError> errors = new ArrayList<>();
     removeDcDb(context);
     DialectOutcome maidOutcome = maidProcessor.process(context, errors);
-    DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(context.extendedText()));
+    DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(context.getExtendedSource().extendedText()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     DaCoParser parser = new DaCoParser(tokens);
-    DialectParserListener listener = new DialectParserListener(context.getCurrentUri());
+    DialectParserListener listener = new DialectParserListener(context.getExtendedSource().getCurrentUri());
     lexer.removeErrorListeners();
     lexer.addErrorListener(listener);
     parser.removeErrorListeners();
@@ -88,20 +88,20 @@ public final class DaCoDialect implements CobolDialect {
 
     DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider(maidProcessor.getSections());
     Multimap<String, Pair<String, String>> implicitCode =
-            provider.getImplicitCode(context.extendedText(), nodes, context.getCopybookConfig());
+            provider.getImplicitCode(context.getExtendedSource().extendedText(), nodes, context.getCopybookConfig());
 
     DialectOutcome result = new DialectOutcome(nodes, implicitCode, context);
     return new ResultWithErrors<>(result, errors);
   }
 
   private void removeDcDb(DialectProcessingContext ctx) {
-    String input = ctx.extendedText();
+    String input = ctx.getExtendedSource().extendedText();
     Matcher matcher = dcdbPattern.matcher(input);
     while (matcher.find()) {
       Position start = DialectUtils.findPosition(input, matcher.start());
       Position end = DialectUtils.findPosition(input, matcher.end());
       String replace = new String(new char[matcher.end() - matcher.start()]).replace('\0', ' ');
-      ctx.replace(new Range(start, end), replace);
+      ctx.getExtendedSource().replace(new Range(start, end), replace);
     }
   }
 

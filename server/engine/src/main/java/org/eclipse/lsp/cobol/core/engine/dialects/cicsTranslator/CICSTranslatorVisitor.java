@@ -43,11 +43,11 @@ public class CICSTranslatorVisitor extends CICSTranslatorParserBaseVisitor<List<
    */
   @Override
   public List<Node> visitCicsTranslatorStmt(CICSTranslatorParser.CicsTranslatorStmtContext ctx) {
-    String newText = "ADATA" + context.extendedText()
+    String newText = "ADATA" + context.getExtendedSource().extendedText()
             .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
             .replaceAll("[^ \n]", "");
     Range range = DialectUtils.constructRange(ctx);
-    context.replace(range, newText);
+    context.getExtendedSource().replace(range, newText);
     return visitChildren(ctx);
   }
 }

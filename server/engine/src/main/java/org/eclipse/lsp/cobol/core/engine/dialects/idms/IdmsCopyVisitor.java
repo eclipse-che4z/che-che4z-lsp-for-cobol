@@ -20,7 +20,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.IdmsCopyParser;
 import org.eclipse.lsp.cobol.core.IdmsCopyParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.engine.mapping.Mappable;
+import org.eclipse.lsp.cobol.core.engine.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Position;
@@ -37,19 +37,19 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  * Visitor to collect all IDMS copybooks
  */
 class IdmsCopyVisitor extends IdmsCopyParserBaseVisitor<List<IdmsCopybookDescriptor>> {
-  private final Mappable mappable;
+  private final DocumentMap documentMap;
   @Getter
   private final List<Pair<Range, Integer>> variableLevels = new LinkedList<>();
 
-  IdmsCopyVisitor(Mappable mappable) {
-    this.mappable = mappable;
+  IdmsCopyVisitor(DocumentMap documentMap) {
+    this.documentMap = documentMap;
   }
 
   @Override
   public List<IdmsCopybookDescriptor> visitCopyIdmsStatement(
           IdmsCopyParser.CopyIdmsStatementContext ctx) {
     return ImmutableList.of(
-            IdmsCopybookDescriptor.from(ctx, mappable.getCurrentUri()));
+            IdmsCopybookDescriptor.from(ctx, documentMap.getUri()));
   }
 
   @Override

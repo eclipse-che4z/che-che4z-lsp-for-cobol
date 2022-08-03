@@ -28,7 +28,7 @@ import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.mapping.Mappable;
+import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
@@ -126,8 +126,9 @@ public class CobolLanguageEngine {
             .textTransformations(cleanText)
             .copybookConfig(analysisConfig.getCopybookConfig())
             .programDocumentUri(documentUri)
+            .extendedSource(new ExtendedSource(cleanText))
             .build();
-    dialectProcessingContext.commitTransformations();
+    dialectProcessingContext.getExtendedSource().commitTransformations();
 
     DialectOutcome dialectOutcome =
         dialectService
@@ -144,7 +145,7 @@ public class CobolLanguageEngine {
         preprocessor
             .processCleanCode(
                 documentUri,
-                dialectOutcome.getContext().extendedText(),
+                dialectOutcome.getContext().getExtendedSource().extendedText(),
                 analysisConfig.getCopybookConfig(),
                 new CopybookHierarchy())
             .unwrap(preprocessorErrors::addAll);
@@ -155,7 +156,7 @@ public class CobolLanguageEngine {
         .getCopybooks()
         .getUsages()
         .forEach(
-            (k, v) -> v.setRange(dialectOutcome.getContext().mapLocation(v.getRange()).getRange()));
+            (k, v) -> v.setRange(dialectOutcome.getContext().getExtendedSource().mapLocation(v.getRange()).getRange()));
 
     preprocessorErrors.forEach(
         e ->
@@ -163,6 +164,7 @@ public class CobolLanguageEngine {
                 .setRange(
                     dialectOutcome
                         .getContext()
+                        .getExtendedSource()
                         .mapLocation(e.getLocality().getRange())
                         .getRange()));
     accumulatedErrors.addAll(preprocessorErrors);
@@ -191,7 +193,7 @@ public class CobolLanguageEngine {
     timingBuilder.getMappingTimer().start();
     Map<Token, Locality> positionMapping =
         getPositionMapping(
-            documentUri, extendedDocument, tokens, embeddedCodeParts, dialectProcessingContext);
+            documentUri, extendedDocument, tokens, embeddedCodeParts, dialectProcessingContext.getExtendedSource());
     timingBuilder.getMappingTimer().stop();
 
     timingBuilder.getVisitorTimer().start();
@@ -286,7 +288,7 @@ public class CobolLanguageEngine {
       ExtendedDocument extendedDocument,
       CommonTokenStream tokens,
       Map<Token, EmbeddedCode> embeddedCodeParts,
-      Mappable mappable) {
+      ExtendedSource extendedSource) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     Map<Token, Locality> mapping =
         LocalityMappingUtils.createPositionMapping(
@@ -294,15 +296,15 @@ public class CobolLanguageEngine {
             extendedDocument.getDocumentMapping(),
             documentUri,
             embeddedCodeParts);
-    return updateMapping(documentUri, mapping, mappable);
+    return updateMapping(documentUri, mapping, extendedSource);
   }
 
   private Map<Token, Locality> updateMapping(
-      String documentUri, Map<Token, Locality> mapping, Mappable mappable) {
+      String documentUri, Map<Token, Locality> mapping, ExtendedSource extendedSource) {
     mapping.forEach(
         (k, v) -> {
           if (v.getUri().equals(documentUri)) {
-            Location l = mappable.mapLocation(v.getRange());
+            Location l = extendedSource.mapLocation(v.getRange());
 
             v.getRange().setStart(l.getRange().getStart());
             v.getRange().setEnd(l.getRange().getEnd());

@@ -15,19 +15,19 @@
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import lombok.*;
-import org.eclipse.lsp.cobol.core.engine.mapping.Mappable;
+import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 /** Contains all needed data for dialect processing */
 @Value
-@EqualsAndHashCode(callSuper = true)
 @Builder(toBuilder = true)
-public class DialectProcessingContext extends Mappable {
+public class DialectProcessingContext {
   CopybookConfig copybookConfig;
   String programDocumentUri;
 
   @Getter(AccessLevel.PROTECTED)
   @Setter(AccessLevel.NONE)
   TextTransformations textTransformations;
+  ExtendedSource extendedSource;
 }

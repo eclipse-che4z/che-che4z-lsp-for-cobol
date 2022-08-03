@@ -68,23 +68,9 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
   IdmsVisitor(DialectProcessingContext context) {
-    this.programDocumentUri = context.getCurrentUri();
+    this.programDocumentUri = context.getExtendedSource().getCurrentUri();
     this.context = context;
   }
-
-//  @Override
-//  public List<Node> visitCopyIdmsStatement(CopyIdmsStatementContext ctx) {
-//    IdmsParser.CopyIdmsSourceContext optionsContext = ctx.copyIdmsOptions().copyIdmsSource();
-//    String nameToken = optionsContext.getText().toUpperCase();
-//    CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
-//
-//    CopybookModel copybookModel = copybookService.resolve(copybookName, programDocumentUri, programDocumentUri, copybookConfig, true);
-//    textReplacement.addReplacementContext(ctx);
-//
-//    Locality locality = IdmsParserHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), programDocumentUri);
-//    return idmsCopybookService.processCopybook(copybookModel, getLevel(ctx), locality, copybookName)
-//        .unwrap(errors::addAll);
-//  }
 
   @Override
   public List<Node> visitIdmsStatements(IdmsStatementsContext ctx) {
@@ -227,10 +213,10 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   }
 
   private void addReplacementContext(ParserRuleContext ctx, String prefix) {
-    String newText = prefix + context.extendedText()
+    String newText = prefix + context.getExtendedSource().extendedText()
             .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
             .replaceAll("[^ \n]", CobolDialect.FILLER);
-    context.replace(DialectUtils.constructRange(ctx), newText);
+    context.getExtendedSource().replace(DialectUtils.constructRange(ctx), newText);
   }
 
 }

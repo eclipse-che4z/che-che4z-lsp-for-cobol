@@ -75,7 +75,7 @@ public class DaCoMaidProcessor {
     List<Node> copyMaidNodes = new ArrayList<>();
     DaCoMaidProcessingState state = DaCoMaidProcessingState.START;
 
-    String[] lines = context.extendedText().split("\n", -1);
+    String[] lines = context.getExtendedSource().extendedText().split("\n", -1);
     String lastSuffix = null;
     sections.clear();
     for (int i = 0; i < lines.length; i++) {
@@ -119,7 +119,7 @@ public class DaCoMaidProcessor {
       int endChar = matcher.end();
       int len = endChar - startChar;
       String newString = String.join("", Collections.nCopies(len, CobolDialect.FILLER));
-      context.replace(new Range(
+      context.getExtendedSource().replace(new Range(
               new Position(lineNumber, startChar),
               new Position(lineNumber, endChar)), newString);
       String level = matcher.group("level");
@@ -127,7 +127,7 @@ public class DaCoMaidProcessor {
       String layoutUsage = matcher.group("layoutUsage");
       if (level != null) {
         Range range = new Range(new Position(lineNumber, matcher.start("layoutId")), new Position(lineNumber, matcher.end("layoutId")));
-        range = context.mapLocation(range).getRange();
+        range = context.getExtendedSource().mapLocation(range).getRange();
         copyMaidNodes.add(
                 createMaidCopybookNode(context, Integer.parseInt(level), layoutId, layoutUsage, lastSuffix, range, errors)
         );
@@ -138,15 +138,15 @@ public class DaCoMaidProcessor {
 
   private CopyNode createMaidCopybookNode(DialectProcessingContext context, int startingLevel, String layoutId, String layoutUsage, String lastSuffix, Range range, List<SyntaxError> errors) {
     Locality locality = Locality.builder()
-            .uri(context.getCurrentUri())
+            .uri(context.getExtendedSource().getCurrentUri())
             .range(range)
             .build();
     DaCoCopyNode cbNode = new DaCoCopyNode(locality, makeCopybookFileName(layoutId, layoutUsage), layoutUsage, lastSuffix);
 
     CopybookName copybookName = new CopybookName(makeCopybookFileName(layoutId, layoutUsage), DaCoDialect.NAME);
     CopybookModel copybookModel = copybookService.resolve(copybookName,
-            context.getCurrentUri(),
-            context.getCurrentUri(),
+            context.getExtendedSource().getCurrentUri(),
+            context.getExtendedSource().getCurrentUri(),
             context.getCopybookConfig(),
             true);
     if (copybookModel.getContent() != null) {
