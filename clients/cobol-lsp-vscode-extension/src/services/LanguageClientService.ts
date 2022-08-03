@@ -34,6 +34,7 @@ import {JavaCheck} from "./JavaCheck";
 import {Middleware} from "./Middleware";
 import { SettingsService } from "./Settings";
 
+
 export class LanguageClientService {
     private executablePath: string;
     private languageClient: LanguageClient;
@@ -196,4 +197,3 @@ export function nativeServer(jarPath: string) {
         }
     return executable;
 }
-

@@ -26,7 +26,6 @@ import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
-import org.eclipse.lsp.cobol.service.delegates.completions.Snippets;
 import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
@@ -61,7 +60,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private final DisposableLSPStateService disposableLSPStateService;
   private final CopybookNameService copybookNameService;
   private final Keywords keywords;
-  private final Snippets snippets;
 
   @Inject
   public CobolWorkspaceServiceImpl(
@@ -74,8 +72,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
       ConfigurationService configurationService,
       DisposableLSPStateService disposableLSPStateService,
       CopybookNameService copybookNameService,
-      Keywords keywords,
-      Snippets snippets) {
+      Keywords keywords) {
     this.dataBus = dataBus;
     this.settingsService = settingsService;
     this.watchingService = watchingService;
@@ -86,7 +83,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     this.disposableLSPStateService = disposableLSPStateService;
     this.copybookNameService = copybookNameService;
     this.keywords = keywords;
-    this.snippets = snippets;
   }
 
   /**
@@ -136,7 +132,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     configurationService.updateConfigurationFromSettings();
     copybookNameService.collectLocalCopybookNames();
     keywords.updateStorage();
-    snippets.updateStorage();
   }
 
   private void acceptSettingsChange(List<String> localFolders) {
