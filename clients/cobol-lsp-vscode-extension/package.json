@@ -112,7 +112,39 @@
             "title": "COBOL Language Support",
             "properties": {
                 "cobol-lsp.smart-tab": {
-                    "type": ["boolean", "array", "object"],
+                    "oneOf": [
+                        { 
+                            "type": "boolean"
+                        },
+                        { 
+                            "type": "array",
+                            "items": { 
+                                "type": "number"
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "default": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "anchors": {
+                                    "type": "object",
+                                    "patternProperties": {
+                                        "^.*$": {
+                                            "type": "array",
+                                            "items": { 
+                                                "type": "number"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
                     "description": "Enable/disable smart tab",
                     "default": true
                 },
