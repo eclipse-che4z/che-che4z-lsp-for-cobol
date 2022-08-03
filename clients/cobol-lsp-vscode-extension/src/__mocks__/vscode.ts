@@ -55,3 +55,13 @@ export enum EndOfLine {
 
 export const Range = jest.fn().mockImplementation((start, end) => { return {start: start, end: end} })
 export const Position = jest.fn().mockImplementation((line, character) => { return {line: line, character: character} });
+
+export const commands = {
+    registerTextEditorCommand: jest.fn()
+};
+
+export const TextEditor = {
+    document: {
+        lineAt: jest.fn()
+    }
+}

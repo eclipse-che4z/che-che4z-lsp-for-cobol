@@ -111,8 +111,8 @@
         "configuration": {
             "title": "COBOL Language Support",
             "properties": {
-                "cobol-lsp.smart-tab.enabled": {
-                    "type": "boolean",
+                "cobol-lsp.smart-tab": {
+                    "type": ["boolean", "array", "object"],
                     "description": "Enable/disable smart tab",
                     "default": true
                 },
@@ -427,22 +427,22 @@
             {
                 "key": "tab",
                 "command": "cobol-lsp.smart-tab",
-                "when": "editorLangId == cobol && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab.enabled"
+                "when": "editorLangId == cobol && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
             },
             {
                 "key": "tab",
                 "command": "cobol-lsp.smart-tab",
-                "when": "editorLangId == COBOL && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab.enabled"
+                "when": "editorLangId == COBOL && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
             },
             {
                 "key": "shift+tab",
                 "command": "cobol-lsp.smart-outdent",
-                "when": "editorLangId == cobol && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab.enabled"
+                "when": "editorLangId == cobol && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
             },
             {
                 "key": "shift+tab",
                 "command": "cobol-lsp.smart-outdent",
-                "when": "editorLangId == COBOL && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab.enabled"
+                "when": "editorLangId == COBOL && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
             },
             {
                 "key": "ctrl+/",

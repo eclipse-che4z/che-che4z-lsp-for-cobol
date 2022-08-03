@@ -48,9 +48,4 @@ export const INSTALL_ZOWE = "Install Zowe Explorer";
 export const DACO_DIALECT = "DaCo";
 export const IDMS_DIALECT = "IDMS";
 export const DEFAULT_DIALECT = "COBOL";
-
-export enum PUNCH_CARD {
-    SEQUENCE_AREA_END_POS = 6,
-    INDICATOR_AREA = 7,
-    AREA_A_END_POS = 11
-}
+export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";

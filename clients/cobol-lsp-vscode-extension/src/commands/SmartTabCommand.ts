@@ -14,7 +14,7 @@
 
 import * as vscode from "vscode";
 import { Selection } from "vscode";
-import { PUNCH_CARD } from "../constants";
+import { SettingsService, TabSettings } from "../services/Settings";
 
 const SMART_TAB_COMMAND: string = "cobol-lsp.smart-tab";
 const SMART_OUTDENT_COMMAND: string = "cobol-lsp.smart-outdent";
@@ -49,19 +49,6 @@ abstract class SmartCommandProvider {
      * @param args is a command arguments
      */
     public abstract execute(editor: vscode.TextEditor, edit: vscode.TextEditorEdit, args: any[]);
-
-    getTabSize(): number {
-        let tabSize = vscode.window.activeTextEditor?.options?.tabSize;
-        if (tabSize) {
-            tabSize = +tabSize;
-        } else {
-            tabSize = 4;
-        }
-        if (tabSize === 0) {
-            tabSize = 4;
-        }
-        return +tabSize;
-    }
 }
 
 class SmartTabCommandProvider extends SmartCommandProvider {
@@ -73,7 +60,7 @@ class SmartTabCommandProvider extends SmartCommandProvider {
             let column = findNextSolidPosition(editor, position);
             if (column === -1) {
                 column = position.character;
-                const nextPosition = getNextPosition(editor, column, this.getTabSize());
+                const nextPosition = getNextPosition(editor, column, SettingsService.getTabSettings(), position.line);
                 const lineLen = getCurrentLine(editor, position.line).length;      
                 if (lineLen < nextPosition) {
                     const insertSize = nextPosition - lineLen;
@@ -81,10 +68,12 @@ class SmartTabCommandProvider extends SmartCommandProvider {
                 }                    
                 column = nextPosition;
             } else {
-                const nextPosition = getNextPosition(editor, column, this.getTabSize());
+                const nextPosition = getNextPosition(editor, column, SettingsService.getTabSettings(), position.line);
                 const insertSize = nextPosition - column;
-                edit.insert(position, ' '.repeat(insertSize));
-                column = nextPosition - insertSize;
+                if (insertSize > 0) {
+                    edit.insert(position, ' '.repeat(insertSize));
+                    column = nextPosition - insertSize;
+                }
             }
             const newPosition: vscode.Position = new vscode.Position(position.line, column);
             newSelections.push(new vscode.Selection(newPosition, newPosition));
@@ -105,12 +94,12 @@ class SmartOutdentCommandProvider extends SmartCommandProvider {
             if (charPosition === 0) {
                 return;
             }
-            let prevPosition = getPrevPosition(editor, charPosition, this.getTabSize());
+            let prevPosition = getPrevPosition(editor, charPosition, SettingsService.getTabSettings(), position.line);
             if (this.onlySpaces(getCurrentLine(editor, position.line), prevPosition, charPosition)) {
                 edit.delete(new vscode.Range(new vscode.Position(position.line, prevPosition), new vscode.Position(position.line, charPosition)));
             } else {
                 let prevSolidPosition = this.findPrevSolidPosition(editor, new vscode.Position(position.line, charPosition - 1));
-                let removeSize = Math.max(0, Math.min(charPosition - prevSolidPosition - 1, this.getTabSize()));
+                let removeSize = Math.max(0, Math.min(charPosition - prevSolidPosition - 1, getTabSize()));
                 edit.delete(new vscode.Range(new vscode.Position(position.line, charPosition - removeSize), new vscode.Position(position.line, charPosition)));
                 prevPosition = charPosition - removeSize;
             }
@@ -197,31 +186,84 @@ function getCurrentLine(editor: vscode.TextEditor, line: number): string {
 /**
  * Calculate next column predefined position
  * @param character is the current cursor position in the line
- * @param tabSize is a number of spaces in tab
  * @return next column predefined position
  */
-function getNextPosition(editor: vscode.TextEditor, character: number, tabSize: number): number {
-    for (const item in PUNCH_CARD) {
-        if (character < Number(item)) {
-            return Number(item);
+function getNextPosition(editor: vscode.TextEditor, character: number, tabSettings: TabSettings, line: number): number {
+    const rule = getRule(editor, line, tabSettings);
+
+    for (const stop of rule.stops) {
+        if (character < stop) {
+            return stop;
         }
     }
-    return character + tabSize;
+    if (rule.maxPosition > 0) {
+        return Math.min(character + getTabSize(), rule.maxPosition);
+    }
+    return character + getTabSize();
+}
+
+/**
+ * Founds a tab rule for current line
+ * @param editor 
+ * @param line is a current line number for a cursor
+ * @param tabSettings is a tab settings object
+ * @returns the tab rule that needs to be appliend for this line
+ */
+export function getRule(editor: vscode.TextEditor, line: number, tabSettings: TabSettings) {
+    let rule = tabSettings.defaultRule;
+    if (line > 0 && tabSettings.rules.length > 0) {
+        line -= 1;
+        const regexps = tabSettings.rules.map(r => new RegExp(r.regex));
+
+        while (line >= 0) {
+            let str = getCurrentLine(editor, line);
+            if (str.length > 6 && str.charAt(6) !== '*') {
+                for (let i = 0; i < regexps.length; i++) {
+                    if (regexps[i].test(str)) {
+                        return tabSettings.rules[i];
+                    }
+                }
+            }
+            line -= 1;
+        }
+    }
+    return rule;
 }
 
 /**
  * Calculate previous column predefined position
  * @param character is the current cursor position in the line
- * @param tabSize is a number of spaces in tab
  * @return previous predefined position
  */
- function getPrevPosition(editor: vscode.TextEditor, character: number, tabSize: number): number {
-    let prev: number = 0;
-    for (const item in PUNCH_CARD) {
-        if (character <= Number(item)) {
+ function getPrevPosition(editor: vscode.TextEditor, character: number, tabSettings: TabSettings, line: number): number {
+    const rule = getRule(editor, line, tabSettings);
+    let prev: number = rule.stops[0];
+
+    for (const stop of rule.stops) {
+        if (character <= stop) {
             return prev;
         }
-        prev = Number(item);
+        prev = stop;
     }
-    return Math.max(character - tabSize, 0);
+    if (prev === rule.stops[rule.stops.length - 1] && (prev > character - getTabSize() || character > rule.maxPosition) ) {
+        return prev;
+    }
+    return Math.max(character - getTabSize(), rule.stops[0]);
+}
+
+/**
+ * Gets a tab size from the current opened editor or a default tab value
+ * @returns a tab size
+ */
+function getTabSize(): number {
+    let tabSize = vscode.window.activeTextEditor?.options?.tabSize;
+    if (tabSize) {
+        tabSize = +tabSize;
+    } else {
+        tabSize = 4;
+    }
+    if (tabSize === 0) {
+        tabSize = 4;
+    }
+    return +tabSize;
 }
