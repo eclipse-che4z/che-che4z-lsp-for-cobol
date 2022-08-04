@@ -68,7 +68,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
   IdmsVisitor(DialectProcessingContext context) {
-    this.programDocumentUri = context.getExtendedSource().getCurrentUri();
+    this.programDocumentUri = context.getExtendedSource().getUri();
     this.context = context;
   }
 
@@ -213,7 +213,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   }
 
   private void addReplacementContext(ParserRuleContext ctx, String prefix) {
-    String newText = prefix + context.getExtendedSource().extendedText()
+    String newText = prefix + context.getExtendedSource().getText()
             .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
             .replaceAll("[^ \n]", CobolDialect.FILLER);
     context.getExtendedSource().replace(DialectUtils.constructRange(ctx), newText);

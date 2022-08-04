@@ -22,6 +22,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
@@ -31,18 +32,14 @@ import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
@@ -146,7 +143,7 @@ class CobolLanguageEngineTest {
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of());
 
     DialectProcessingContext context = DialectProcessingContext.builder()
-            .textTransformations(TextTransformations.of(TEXT, URI))
+            .extendedSource(new ExtendedSource(TEXT, URI))
             .build();
     context.getExtendedSource().commitTransformations();
     when(dialectService.process(anyList(), any()))
@@ -155,26 +152,10 @@ class CobolLanguageEngineTest {
         .thenReturn(new ResultWithErrors<>(TextTransformations.of(TEXT, URI), ImmutableList.of()));
     when(preprocessor.processCleanCode(
             eq(URI), eq(TEXT), eq(cpyConfig), any(CopybookHierarchy.class)))
-        .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));
-
-    Range outlineRange =
-        new Range(new org.eclipse.lsp4j.Position(0, 7), new org.eclipse.lsp4j.Position(0, 30));
-    List<DocumentSymbol> expectedOutlineTree =
-        ImmutableList.of(
-            new DocumentSymbol(
-                "PROGRAM",
-                NodeType.PROGRAM.getSymbolKind(),
-                outlineRange,
-                outlineRange,
-                "",
-                ImmutableList.of(
-                    new DocumentSymbol(
-                        "IDENTIFICATION DIVISION",
-                        NodeType.DIVISION.getSymbolKind(),
-                        outlineRange,
-                        outlineRange,
-                        "",
-                        ImmutableList.of()))));
+            .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));
+    when(preprocessor.processCleanCode(
+            anyString(), anyString(), any(CopybookConfig.class), any(CopybookHierarchy.class)))
+            .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of()));
 
     ResultWithErrors<Node> expected =
         new ResultWithErrors<>(

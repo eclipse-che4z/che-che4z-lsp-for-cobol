@@ -54,7 +54,7 @@ public class CICSTranslatorDialect implements CobolDialect {
    */
   @Override
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    CICSTranslatorLexer lexer = new CICSTranslatorLexer(CharStreams.fromString(context.getExtendedSource().extendedText()));
+    CICSTranslatorLexer lexer = new CICSTranslatorLexer(CharStreams.fromString(context.getExtendedSource().getText()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     CICSTranslatorParser parser = new CICSTranslatorParser(tokens);
     DialectParserListener listener = new DialectParserListener(context.getProgramDocumentUri());

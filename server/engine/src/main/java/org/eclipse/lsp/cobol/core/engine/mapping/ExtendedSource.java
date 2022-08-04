@@ -38,7 +38,7 @@ public class ExtendedSource {
     documents.put(textTransformations.getUri(), new DocumentMap(textTransformations));
   }
 
-  public String getCurrentUri() {
+  public String getUri() {
     return mainUri;
   }
 
@@ -72,6 +72,10 @@ public class ExtendedSource {
     return documents.get(mainUri).extendedText();
   }
 
+  /**
+   * Commit current accumulated transformations. Create a new text transformation level on top of
+   * current one.
+   */
   public void commitTransformations() {
     documents.get(mainUri).commitTransformations();
   }
@@ -79,20 +83,54 @@ public class ExtendedSource {
   /**
    * Map a range in an extended to its original location
    *
-   * @param range in the extended documetn
+   * @param range in the extended document
    * @return a location of original source
    */
   public Location mapLocation(Range range) {
     String lastUri = mainUri;
-    Location lastLocation = documents.get(lastUri).mapLocation(range);
+    Location lastLocation = documents.get(lastUri).mapLocation(range, true);
     while (!Objects.equals(lastLocation.getUri(), lastUri)) {
-      lastLocation = documents.get(lastUri).mapLocation(range);
+      lastUri = lastLocation.getUri();
+      lastLocation = documents.get(lastUri).mapLocation(lastLocation.getRange(), true);
     }
     return lastLocation;
   }
 
-  public void extend(CopyNode copyNode, DocumentMap copybookMap) {
-    documents.get(mainUri).extend(copyNode, TextTransformations.of(copybookMap.extendedText(), copybookMap.getUri()));
+  /**
+   * Map a range in an extended to its original location even if there are uncommitted changed
+   *
+   * @param range in the extended document
+   * @return a location of original source
+   */
+  public Location mapLocationUnsafe(Range range) {
+    String lastUri = mainUri;
+    Location lastLocation = documents.get(lastUri).mapLocation(range, false);
+    while (!Objects.equals(lastLocation.getUri(), lastUri)) {
+      lastUri = lastLocation.getUri();
+      lastLocation = documents.get(lastUri).mapLocation(lastLocation.getRange(), false);
+    }
+    return lastLocation;
+  }
+
+
+  /**
+   * Replace copy statement with result of copybook substitution
+   *
+   * @param document document to extend
+   * @param copyNode node representation of copybook
+   * @param copybookMap a map of a copybook
+   */
+  public void extend(DocumentMap document, CopyNode copyNode, DocumentMap copybookMap) {
+    documents.computeIfAbsent(document.getUri(), uri -> document)
+            .extend(copyNode, TextTransformations.of(copybookMap.extendedText(), copybookMap.getUri()));
     documents.put(copybookMap.getUri(), copybookMap);
+  }
+
+  public DocumentMap getMainMap() {
+    return documents.get(mainUri);
+  }
+
+  public String getText() {
+    return documents.get(mainUri).getText();
   }
 }

@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.core.DaCoParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.*;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.provider.DaCoImplicitCodeProvider;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
+import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -69,12 +70,13 @@ public final class DaCoDialect implements CobolDialect {
   @Override
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
     List<SyntaxError> errors = new ArrayList<>();
-    removeDcDb(context);
+    removeDcDb(context.getExtendedSource());
     DialectOutcome maidOutcome = maidProcessor.process(context, errors);
-    DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(context.getExtendedSource().extendedText()));
+    context.getExtendedSource().commitTransformations();
+    DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(context.getExtendedSource().getText()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     DaCoParser parser = new DaCoParser(tokens);
-    DialectParserListener listener = new DialectParserListener(context.getExtendedSource().getCurrentUri());
+    DialectParserListener listener = new DialectParserListener(context.getExtendedSource().getUri());
     lexer.removeErrorListeners();
     lexer.addErrorListener(listener);
     parser.removeErrorListeners();
@@ -88,20 +90,20 @@ public final class DaCoDialect implements CobolDialect {
 
     DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider(maidProcessor.getSections());
     Multimap<String, Pair<String, String>> implicitCode =
-            provider.getImplicitCode(context.getExtendedSource().extendedText(), nodes, context.getCopybookConfig());
+            provider.getImplicitCode(context.getExtendedSource().getText(), nodes, context.getCopybookConfig());
 
     DialectOutcome result = new DialectOutcome(nodes, implicitCode, context);
     return new ResultWithErrors<>(result, errors);
   }
 
-  private void removeDcDb(DialectProcessingContext ctx) {
-    String input = ctx.getExtendedSource().extendedText();
+  private void removeDcDb(ExtendedSource extendedSource) {
+    String input = extendedSource.getText();
     Matcher matcher = dcdbPattern.matcher(input);
     while (matcher.find()) {
       Position start = DialectUtils.findPosition(input, matcher.start());
       Position end = DialectUtils.findPosition(input, matcher.end());
       String replace = new String(new char[matcher.end() - matcher.start()]).replace('\0', ' ');
-      ctx.getExtendedSource().replace(new Range(start, end), replace);
+      extendedSource.replace(new Range(start, end), replace);
     }
   }
 

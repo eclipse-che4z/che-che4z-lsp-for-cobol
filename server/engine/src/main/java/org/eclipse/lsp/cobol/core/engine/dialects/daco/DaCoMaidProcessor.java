@@ -75,7 +75,7 @@ public class DaCoMaidProcessor {
     List<Node> copyMaidNodes = new ArrayList<>();
     DaCoMaidProcessingState state = DaCoMaidProcessingState.START;
 
-    String[] lines = context.getExtendedSource().extendedText().split("\n", -1);
+    String[] lines = context.getExtendedSource().getText().split("\n", -1);
     String lastSuffix = null;
     sections.clear();
     for (int i = 0; i < lines.length; i++) {
@@ -119,15 +119,16 @@ public class DaCoMaidProcessor {
       int endChar = matcher.end();
       int len = endChar - startChar;
       String newString = String.join("", Collections.nCopies(len, CobolDialect.FILLER));
-      context.getExtendedSource().replace(new Range(
+      Range rangeReplace = new Range(
               new Position(lineNumber, startChar),
-              new Position(lineNumber, endChar)), newString);
+              new Position(lineNumber, endChar));
+      context.getExtendedSource().replace(rangeReplace, newString);
       String level = matcher.group("level");
       String layoutId = matcher.group("layoutId");
       String layoutUsage = matcher.group("layoutUsage");
       if (level != null) {
         Range range = new Range(new Position(lineNumber, matcher.start("layoutId")), new Position(lineNumber, matcher.end("layoutId")));
-        range = context.getExtendedSource().mapLocation(range).getRange();
+        range = context.getExtendedSource().mapLocationUnsafe(range).getRange();
         copyMaidNodes.add(
                 createMaidCopybookNode(context, Integer.parseInt(level), layoutId, layoutUsage, lastSuffix, range, errors)
         );
@@ -138,15 +139,15 @@ public class DaCoMaidProcessor {
 
   private CopyNode createMaidCopybookNode(DialectProcessingContext context, int startingLevel, String layoutId, String layoutUsage, String lastSuffix, Range range, List<SyntaxError> errors) {
     Locality locality = Locality.builder()
-            .uri(context.getExtendedSource().getCurrentUri())
+            .uri(context.getExtendedSource().getUri())
             .range(range)
             .build();
     DaCoCopyNode cbNode = new DaCoCopyNode(locality, makeCopybookFileName(layoutId, layoutUsage), layoutUsage, lastSuffix);
 
     CopybookName copybookName = new CopybookName(makeCopybookFileName(layoutId, layoutUsage), DaCoDialect.NAME);
     CopybookModel copybookModel = copybookService.resolve(copybookName,
-            context.getExtendedSource().getCurrentUri(),
-            context.getExtendedSource().getCurrentUri(),
+            context.getExtendedSource().getUri(),
+            context.getExtendedSource().getUri(),
             context.getCopybookConfig(),
             true);
     if (copybookModel.getContent() != null) {

@@ -50,7 +50,6 @@ public class DocumentMap {
      * @param copyTransform Copybook's transformations
      */
     public void extend(CopyNode copyNode, TextTransformations copyTransform) {
-        transformations.push(copyTransform);
         topTransformations().extend(copyNode, copyNode.getLocality().getRange(), copyTransform);
     }
 
@@ -61,7 +60,7 @@ public class DocumentMap {
      * @param replacement new content
      */
     public void replace(Range range, String replacement) {
-        topTransformations().replace(mapLocation(range).getRange(), replacement);
+        topTransformations().replace(range, replacement);
     }
 
     /**
@@ -84,14 +83,17 @@ public class DocumentMap {
         return result;
     }
 
-    /**
-     * Commit current accumulated transformations. Create a new text transformation level on top of
-     * current one.
-     */
+  /**
+   * Commit current accumulated transformations. Create a new text transformation level on top of
+   * current one.
+   */
     public void commitTransformations() {
+      if (topTransformations().isChanged()) {
         String uri = topTransformations().getUri();
         mappings.push(new MappingService(topTransformations()));
-        transformations.push(new TextTransformations(topTransformations().calculateExtendedText(), uri));
+        transformations.push(
+            new TextTransformations(topTransformations().calculateExtendedText(), uri));
+      }
     }
 
     public String getUri() {
@@ -102,12 +104,16 @@ public class DocumentMap {
      * Map a range in an extended to its original location
      *
      * @param range in the extended documetn
+     * @param checkCommitted check if all changes were committed
      * @return a location of original source
      */
-    public Location mapLocation(Range range) {
+    public Location mapLocation(Range range, boolean checkCommitted) {
         Location extLocation = new Location();
         extLocation.setRange(range);
         extLocation.setUri(uri);
+        if (checkCommitted && topTransformations().isChanged()) {
+            throw new IllegalStateException("There are uncommitted changes in document map " + uri);
+        }
         if (mappings.isEmpty()) {
             return extLocation;
         }
@@ -116,12 +122,8 @@ public class DocumentMap {
     }
 
     private Location mapLocation(Location location, LinkedList<MappingService> maps) {
-        if (maps.isEmpty()) {
+        if (maps.isEmpty() || !Objects.equals(location.getUri(), uri)) {
             return location;
-        }
-        if (!Objects.equals(location.getUri(), uri)) {
-            LinkedList<MappingService> cbMaps = new LinkedList<>(mappings);
-            return mapLocation(location, cbMaps);
         }
         MappingService mappingService = maps.pop();
         Location originalLocation =
@@ -132,8 +134,11 @@ public class DocumentMap {
         return mapLocation(originalLocation, maps);
     }
 
-
     private TextTransformations topTransformations() {
         return transformations.peek();
+    }
+
+    public String getText() {
+        return topTransformations().getText();
     }
 }

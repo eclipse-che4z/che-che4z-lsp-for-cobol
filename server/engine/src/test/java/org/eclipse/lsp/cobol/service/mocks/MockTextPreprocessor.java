@@ -23,6 +23,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
+import static org.mockito.Mockito.mock;
+
 /**
  * Mock Text Processor class
  */
@@ -34,6 +36,6 @@ public class MockTextPreprocessor implements TextPreprocessor {
 
   @Override
   public ResultWithErrors<ExtendedDocument> processCleanCode(@NonNull String documentUri, @NonNull String cobolCode, @NonNull CopybookConfig copybookConfig, @NonNull CopybookHierarchy hierarchy) {
-    return null;
+    return new ResultWithErrors<>(mock(ExtendedDocument.class), ImmutableList.of());
   }
 }

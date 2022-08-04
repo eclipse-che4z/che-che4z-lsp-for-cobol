@@ -121,8 +121,8 @@ public class MappingService {
       result.addAll(map);
     }
 
-    String[] originalLines = textTransformations.getText().split("\r?\n");
-    int size = originalLines.length - originalDocumentLine + (textTransformations.getText().endsWith("\n") ? 1 : 0);
+    String[] originalLines = textTransformations.getText().split("\r?\n", -1);
+    int size = originalLines.length;
 
     MappingItem last = new MappingItem(new Range(new Position(extendedDocumentLine, 0), new Position(extendedDocumentLine + size - 1, LINE_LEN)),
         new Location(textTransformations.getUri(), new Range(new Position(originalDocumentLine, 0), new Position(originalDocumentLine + size - 1, LINE_LEN))), null);

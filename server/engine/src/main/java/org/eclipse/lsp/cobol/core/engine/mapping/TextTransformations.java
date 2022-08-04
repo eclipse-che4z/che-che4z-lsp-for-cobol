@@ -142,4 +142,16 @@ public class TextTransformations {
     result.addAll(copyNodes);
     return result;
   }
+
+  /**
+   * Check if there are any changes
+   *
+   * @return true if there were any changes.
+   */
+  public boolean isChanged() {
+    if (!extensions.isEmpty()) {
+      return true;
+    }
+    return !replacements.isEmpty();
+  }
 }

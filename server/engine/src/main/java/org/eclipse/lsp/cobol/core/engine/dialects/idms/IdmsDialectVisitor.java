@@ -36,7 +36,7 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
 
   @Override
   public List<IdmsCopybookDescriptor> visitCopyIdmsStatement(IdmsParser.CopyIdmsStatementContext ctx) {
-    return ImmutableList.of(IdmsCopybookDescriptor.from(ctx, context.getExtendedSource().getCurrentUri()));
+    return ImmutableList.of(IdmsCopybookDescriptor.from(ctx, context.getExtendedSource().getUri()));
   }
 
   @Override

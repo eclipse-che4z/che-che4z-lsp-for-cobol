@@ -100,9 +100,9 @@ class MappingServiceTest {
     assertEquals("copybook", mapping.get(1).getOriginalLocation().getUri());
 
     assertEquals(12, mapping.get(2).getExtendedRange().getStart().getLine());
-    assertEquals(12, mapping.get(2).getExtendedRange().getEnd().getLine());
+    assertEquals(20, mapping.get(2).getExtendedRange().getEnd().getLine());
     assertEquals(8, mapping.get(2).getOriginalLocation().getRange().getStart().getLine());
-    assertEquals(8, mapping.get(2).getOriginalLocation().getRange().getEnd().getLine());
+    assertEquals(16, mapping.get(2).getOriginalLocation().getRange().getEnd().getLine());
     assertEquals("original", mapping.get(2).getOriginalLocation().getUri());
   }
 
@@ -256,7 +256,7 @@ class MappingServiceTest {
   void testLocationOutOfCode() {
     var service = prepareService();
     Optional<Location> location = service.getOriginalLocation(new Range(new Position(13, 10), new Position(13, 15)));
-    assertFalse(location.isPresent());
+    assertTrue(location.isPresent());
 
     location = service.getOriginalLocation(new Range(new Position(-1, 10), new Position(-1, 15)));
     assertFalse(location.isPresent());
