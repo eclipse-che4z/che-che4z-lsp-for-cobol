@@ -48,6 +48,7 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
+import org.eclipse.lsp4j.Location;
 
 import java.util.*;
 import java.util.function.Function;
@@ -206,9 +207,10 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   }
 
   private Locality constructLocality(ParserRuleContext ctx) {
+    Location location = context.getExtendedSource().mapLocationUnsafe(DialectUtils.constructRange(ctx));
     return Locality.builder()
-        .uri(programDocumentUri)
-        .range(DialectUtils.constructRange(ctx))
+        .uri(location.getUri())
+        .range(location.getRange())
         .build();
   }
 

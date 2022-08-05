@@ -35,9 +35,8 @@ public class TestLineContinuation2 {
           + "      -    \"\n"
           + "      -    \"REMARKS\".                                                   \n"
           + "       PROCEDURE DIVISION.                                              \n"
-          + "           COPY                                                      CBB\n"
-          + "           .\n";
-  private static final String CBB = "       P-001.\n" + "           PERFORM {~MISSING-PAR|CBB}.";
+          + "           {_COPY                                           {~CBB}.|CBBMAIN\n_}";
+  private static final String CBB = "       {#*P-001}.\n" + "           PERFORM {MISSING-PAR|CBB}.";
 
   @Test
   void test() {
@@ -45,12 +44,19 @@ public class TestLineContinuation2 {
         TEXT,
         ImmutableList.of(new CobolText("CBB", CBB)),
         ImmutableMap.of(
-            "CBB",
+            "CBBMAIN",
             new Diagnostic(
                 new Range(),
                 "The following paragraph is not defined: MISSING-PAR",
                 Error,
-                "COBOL Language Support (parsing)",
-                null)));
+                "COBOL Language Support (copybook)",
+                null),
+            "CBB",
+            new Diagnostic(
+                    new Range(),
+                    "The following paragraph is not defined: MISSING-PAR",
+                    Error,
+                    "COBOL Language Support (parsing)",
+                    null)));
   }
 }
