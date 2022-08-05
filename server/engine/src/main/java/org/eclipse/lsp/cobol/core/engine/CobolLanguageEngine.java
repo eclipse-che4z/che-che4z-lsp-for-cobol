@@ -157,6 +157,13 @@ public class CobolLanguageEngine {
         .forEach(
             (k, v) -> v.setRange(dialectOutcome.getContext().getExtendedSource().mapLocation(v.getRange()).getRange()));
 
+    // Update copybook definition statements with proper positions
+    extendedDocument
+        .getCopybooks()
+        .getDefinitionStatements()
+        .forEach(
+            (k, v) -> v.setRange(dialectOutcome.getContext().getExtendedSource().mapLocation(v.getRange()).getRange()));
+
     preprocessorErrors.forEach(
         e ->
             e.getLocality()
