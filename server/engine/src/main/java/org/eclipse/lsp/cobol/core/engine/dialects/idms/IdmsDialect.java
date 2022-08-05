@@ -105,7 +105,7 @@ public final class IdmsDialect implements CobolDialect {
             true);
     CopyNode copyNode = new CopyNode(cb.getStatement(), cb.getName(), IdmsDialect.NAME);
     if (recursiveCall(copybookStack, copyNode.getName())) {
-      extendedSource.replace(copyNode.getLocality().getRange(), "");
+      currentMap.replace(copyNode.getLocality().getRange(), "");
       errors.add(ErrorHelper.circularDependency(messageService, cb.getUsage(), cb.getName()));
       return;
     }
