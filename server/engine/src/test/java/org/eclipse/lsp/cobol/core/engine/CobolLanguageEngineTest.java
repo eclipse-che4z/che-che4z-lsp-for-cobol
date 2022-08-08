@@ -27,7 +27,7 @@ import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.RootNode;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
@@ -157,18 +157,18 @@ class CobolLanguageEngineTest {
             anyString(), anyString(), any(CopybookConfig.class), any(CopybookHierarchy.class)))
             .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of()));
 
-    ResultWithErrors<Node> expected =
-        new ResultWithErrors<>(
-            new RootNode(
-                Locality.builder()
-                    .uri(URI)
-                    .range(new Range(new Position(0, 7), new Position(0, 31)))
-                    .token("IDENTIFICATION")
-                    .build(),
-                new CopybooksRepository()),
-            ImmutableList.of(error, eofError));
-
+    Range programRange = new Range(new Position(0, 7), new Position(0, 31));
     ResultWithErrors<Node> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
-    assertEquals(expected, actual);
+    Node root = actual.getResult();
+    Node program = root.getChildren().get(0);
+    Node division = program.getChildren().get(0);
+
+    assertEquals(NodeType.ROOT, root.getNodeType());
+    assertEquals(programRange, root.getLocality().getRange());
+    assertEquals(NodeType.PROGRAM, program.getNodeType());
+    assertEquals(programRange, program.getLocality().getRange());
+    assertEquals(NodeType.DIVISION, division.getNodeType());
+    assertEquals(programRange, division.getLocality().getRange());
+    assertEquals(0, division.getChildren().size());
   }
 }
