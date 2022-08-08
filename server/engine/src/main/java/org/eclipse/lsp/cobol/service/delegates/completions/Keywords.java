@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.service.SettingsService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -36,39 +37,40 @@ public class Keywords extends CompletionStorage<String> {
   private static final String KEYWORDS_FILE_PATH = "LanguageKeywords.txt";
   private static final String KEYWORDS_IDMS_FILE_PATH = "LanguageKeywordsIDMS.txt";
   private static final String KEYWORDS_DACO_FILE_PATH = "LanguageKeywordsDaCo.txt";
-  private InputStream finalStream;
 
   @Inject
   Keywords(SettingsService settingsService) {
     super(settingsService);
   }
 
-
   @Override
-  protected Map<String, String> getDataMap(String dialectType) {
+  protected Map<String, String> getDataMap(List<String> dialectType) {
     Properties props = new Properties();
     try {
       props.load(getDataStream(dialectType));
       return props.entrySet().stream()
-              .collect(
-                      Collectors.toMap(
-                              entry -> entry.getKey().toString(),
-                              entry -> processDescription(entry.getValue().toString())));
+          .collect(
+              Collectors.toMap(
+                  entry -> entry.getKey().toString(),
+                  entry -> processDescription(entry.getValue().toString())));
     } catch (IOException e) {
       LOG.error("Unable to load the Keywords file {}", e.getMessage());
     }
     return ImmutableMap.of();
   }
 
-  private InputStream getDataStream(String dialectType) {
+  private InputStream getDataStream(List<String> dialectType) {
     InputStream cobolStream = getInputStream(KEYWORDS_FILE_PATH);
-    if (dialectType.equalsIgnoreCase(DaCoDialect.NAME)) {
-      InputStream idmsStream = getSequenceStream(cobolStream, getInputStream(KEYWORDS_IDMS_FILE_PATH));
-      finalStream = getSequenceStream(idmsStream, getInputStream(KEYWORDS_DACO_FILE_PATH));
-    } else if (dialectType.equalsIgnoreCase(IdmsDialect.NAME)) {
-      finalStream = getSequenceStream(cobolStream, getInputStream(KEYWORDS_IDMS_FILE_PATH));
-    } else
-      finalStream = cobolStream;
+    InputStream finalStream;
+    if (dialectType.contains(IdmsDialect.NAME)) {
+      InputStream idmsStream =
+          getSequenceStream(cobolStream, getInputStream(KEYWORDS_IDMS_FILE_PATH));
+      if (dialectType.contains(DaCoDialect.NAME))
+        finalStream = getSequenceStream(idmsStream, getInputStream(KEYWORDS_DACO_FILE_PATH));
+      else finalStream = idmsStream;
+    } else if (dialectType.contains(DaCoDialect.NAME)) {
+      finalStream = getSequenceStream(cobolStream, getInputStream(KEYWORDS_DACO_FILE_PATH));
+    } else finalStream = cobolStream;
 
     return finalStream;
   }

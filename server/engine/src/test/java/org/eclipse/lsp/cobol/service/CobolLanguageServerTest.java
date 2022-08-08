@@ -22,7 +22,6 @@ import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.model.ErrorCode;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
-import org.eclipse.lsp.cobol.service.delegates.completions.Snippets;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -74,7 +73,6 @@ class CobolLanguageServerTest {
     ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
-    Snippets snippets = mock(Snippets.class);
 
     JsonArray arr = new JsonArray();
     String path = "foo/bar";
@@ -101,8 +99,7 @@ class CobolLanguageServerTest {
             stateService,
             configurationService,
             copybookNameService,
-            keywords,
-            snippets);
+            keywords);
 
     server.initialized(new InitializedParams());
 
@@ -124,7 +121,7 @@ class CobolLanguageServerTest {
   void initialize() {
     CobolLanguageServer server =
         new CobolLanguageServer(
-            null, null, null, null, null, customExecutor, stateService, null, null, null, null);
+            null, null, null, null, null, customExecutor, stateService, null, null, null);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
@@ -151,7 +148,6 @@ class CobolLanguageServerTest {
             null,
             customExecutor,
             stateService,
-            null,
             null,
             null,
             null);

@@ -14,12 +14,11 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.service.SettingsService;
 
 import java.util.List;
@@ -36,27 +35,21 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.DIALECT
  */
 @Slf4j
 public abstract class CompletionStorage<T> {
-  private static final String DEFAULT = "COBOL";
-  private String dialectType;
+  private List<String> dialectType = ImmutableList.of();
   private Map<String, T> storage;
   private SettingsService settingsService;
 
-
   CompletionStorage(SettingsService settingsService) {
     this.settingsService = settingsService;
-    this.dialectType = DEFAULT;
     resetStorage();
   }
 
-  /**
-   * Updates the storage of keywords and snippets based on enabled dialects defined in user's
-   * settings
-   */
+  /** Updates the storage of keywords based on enabled dialects defined in user's settings */
   public void updateStorage() {
     this.settingsService.getConfiguration(DIALECTS.label).thenAccept(this::getDialectArray);
   }
 
-  protected abstract Map<String, T> getDataMap(String dialectType);
+  protected abstract Map<String, T> getDataMap(List<String> dialectType);
 
   /**
    * Return a full set of the registered keywords
@@ -73,25 +66,14 @@ public abstract class CompletionStorage<T> {
    *
    * @param label - Keyword to find a description
    * @return description
-   *
    */
   String getInformationFor(String label) {
     return (String) storage.get(label);
   }
 
-  /**
-   * Return a snippet for given label or null not found
-   *
-   * @param label - Keyword to find a description
-   * @return description
-   */
-  SnippetsModel getSnippet(String label) {
-    return (SnippetsModel) storage.get(label);
-  }
-
   private void fillInStorage(Map<String, T> props) {
     this.storage =
-            props.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        props.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   private void getDialectArray(List<Object> dialectObject) {
@@ -100,15 +82,8 @@ public abstract class CompletionStorage<T> {
     resetStorage();
   }
 
-  private String setDialect(JsonArray dialectList) {
-    if (dialectList.isEmpty()) return DEFAULT;
-
-    return Streams.stream(dialectList)
-            .map(JsonElement::getAsString)
-            .collect(toList())
-            .contains(DaCoDialect.NAME)
-        ? DaCoDialect.NAME
-        : IdmsDialect.NAME;
+  private List<String> setDialect(JsonArray dialectList) {
+    return Streams.stream(dialectList).map(JsonElement::getAsString).collect(toList());
   }
 
   private void resetStorage() {

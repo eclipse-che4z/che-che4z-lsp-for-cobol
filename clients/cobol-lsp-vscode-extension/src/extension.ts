@@ -24,8 +24,9 @@ import { initSmartTab } from "./commands/SmartTabCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { Middleware } from "./services/Middleware";
 import { TelemetryService } from "./services/reporter/TelemetryService";
-import { createFileWithGivenPath } from "./services/Settings";
+import { createFileWithGivenPath, SettingsService } from "./services/Settings";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
+import { SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
 
 let copyBooksDownloader: CopybookDownloadService;
@@ -48,17 +49,18 @@ export async function activate(context: vscode.ExtensionContext) {
     copyBooksDownloader.start();
 
     // Commands
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook",
+        (copybook, programName) => {
         fetchCopybookCommand(copybook, copyBooksDownloader, programName);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings", () => {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings",
+        () => {
         gotoCopybookSettings();
     }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE) }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
-
     // create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
@@ -68,6 +70,11 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerCodeActionsProvider(
             { scheme: "file", language: LANGUAGE_ID },
             new CopybooksCodeActionProvider()));
+    const completionProvider =  vscode.languages.registerCompletionItemProvider(
+                { scheme: "file", language: LANGUAGE_ID },
+                new SnippetCompletionProvider());
+    context.subscriptions.push(completionProvider);
+
 
     try {
         await languageClientService.checkPrerequisites();
