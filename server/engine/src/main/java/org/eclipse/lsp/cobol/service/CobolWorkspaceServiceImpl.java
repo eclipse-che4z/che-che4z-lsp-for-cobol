@@ -124,17 +124,18 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
-    if (disposableLSPStateService.isServerShutdown()) return;
-    copybookNameService.copybookLocalFolders().thenAccept(this::acceptSettingsChange);
+    if (!disposableLSPStateService.isServerShutdown()) {
+      copybookNameService.copybookLocalFolders().thenAccept(this::acceptSettingsChange);
 
-    settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
-    settingsService
-        .fetchConfiguration(LOGGING_LEVEL.label)
-        .thenAccept(LogLevelUtils.updateLogLevel());
-    configurationService.updateConfigurationFromSettings();
-    copybookNameService.collectLocalCopybookNames();
-    keywords.updateStorage();
-    snippets.updateStorage();
+      settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
+      settingsService
+          .fetchConfiguration(LOGGING_LEVEL.label)
+          .thenAccept(LogLevelUtils.updateLogLevel());
+      configurationService.updateConfigurationFromSettings();
+      copybookNameService.collectLocalCopybookNames();
+      keywords.updateStorage();
+      snippets.updateStorage();
+    }
   }
 
   private void acceptSettingsChange(List<String> localFolders) {
@@ -160,9 +161,10 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    */
   @Override
   public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) {
-    if (disposableLSPStateService.isServerShutdown()) return;
-    copybookNameService.collectLocalCopybookNames();
-    rerunAnalysis(false);
+    if (!disposableLSPStateService.isServerShutdown()) {
+      copybookNameService.collectLocalCopybookNames();
+      rerunAnalysis(false);
+    }
   }
 
   private void rerunAnalysis(boolean verbose) {

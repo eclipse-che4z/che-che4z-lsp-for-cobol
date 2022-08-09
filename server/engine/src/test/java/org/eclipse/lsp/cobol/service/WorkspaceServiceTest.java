@@ -167,7 +167,7 @@ class WorkspaceServiceTest {
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     String path = "foo/bar";
 
-    when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
+    when(copybookNameService.copybookLocalFolders())
         .thenReturn(completedFuture(singletonList(path)));
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
@@ -219,7 +219,7 @@ class WorkspaceServiceTest {
 
     String path = "foo/bar";
 
-    when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
+    when(copybookNameService.copybookLocalFolders())
         .thenReturn(completedFuture(singletonList(path)));
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
@@ -268,7 +268,7 @@ class WorkspaceServiceTest {
     String path = "foo/bar";
     arr.add(new JsonPrimitive(path));
 
-    when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
+    when(copybookNameService.copybookLocalFolders())
         .thenReturn(completedFuture(emptyList()));
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
@@ -314,7 +314,7 @@ class WorkspaceServiceTest {
             stateService,
             copybookNameService, keywords, snippets);
 
-    when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
+    when(copybookNameService.copybookLocalFolders())
         .thenReturn(completedFuture(emptyList()));
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));

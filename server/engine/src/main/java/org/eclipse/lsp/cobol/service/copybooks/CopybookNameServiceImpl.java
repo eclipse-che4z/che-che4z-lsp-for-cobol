@@ -89,6 +89,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
         .anyMatch(uri::contains);
   }
 
+  @Override
   public CompletableFuture<List<String>> copybookLocalFolders() {
     List<CompletableFuture<List<String>>> copybookLocalFolders = new ArrayList<>();
     copybookLocalFolders.add(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label));

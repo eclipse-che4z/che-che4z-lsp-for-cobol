@@ -76,6 +76,8 @@ class CopybookNameServiceTest {
     when(client.workspaceFolders()).thenReturn(CompletableFuture.completedFuture(workspace));
     when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(CompletableFuture.completedFuture(copyNames));
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(CompletableFuture.completedFuture(emptyList()));
   }
 
   static Stream<Arguments> collectCopybookNamesData() {
@@ -146,13 +148,10 @@ class CopybookNameServiceTest {
   @MethodSource("copybooksWithExtensionsOrderData")
   void testCopybooksWithExtensionsOrder(
       List<String> extensionsInConfig,
-      List<String> dialectsInConfig,
       Optional<CopybookName> copybookFound
   ) {
 
     validFoldersMock();
-    when(settingsService.fetchTextConfiguration(DIALECTS.label))
-        .thenReturn(CompletableFuture.completedFuture(dialectsInConfig));
     when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(extensionsInConfig));
     when(files.listFilesInDirectory(wrkPath)).thenReturn(emptyList());
@@ -177,8 +176,6 @@ class CopybookNameServiceTest {
       int expectedCopybookFound
   ) {
     validFoldersMock();
-    when(settingsService.fetchTextConfiguration(DIALECTS.label))
-        .thenReturn(CompletableFuture.completedFuture(emptyList()));
     when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
     when(files.listFilesInDirectory(wrkPath)).thenReturn(filesInWorkingDirectory);
@@ -196,8 +193,6 @@ class CopybookNameServiceTest {
     CopybookNameService copybookNameService =
         new CopybookNameServiceImpl(settingsService, files, provider);
 
-    when(settingsService.fetchTextConfiguration(DIALECTS.label))
-        .thenReturn(CompletableFuture.completedFuture(emptyList()));
     when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(Collections.singletonList("cpy")));
     when(files.decodeURI(VALID_CPY_URI)).thenReturn(null);
