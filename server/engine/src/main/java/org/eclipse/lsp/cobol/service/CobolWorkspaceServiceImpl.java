@@ -125,9 +125,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
     if (disposableLSPStateService.isServerShutdown()) return;
-    settingsService
-        .fetchTextConfiguration(CPY_LOCAL_PATHS.label)
-        .thenAccept(this::acceptSettingsChange);
+    copybookNameService.copybookLocalFolders().thenAccept(this::acceptSettingsChange);
 
     settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
     settingsService

@@ -36,15 +36,6 @@ public class CopybookName {
     return displayName;
   }
 
-  /**
-   * Gets the name with extension
-   *
-   * @return the name with extension
-   */
-  public String nameWithExtension() {
-    return String.join(".", displayName, extension);
-  }
-
   public CopybookName(String displayName) {
     this.displayName = displayName;
     this.extension = null;

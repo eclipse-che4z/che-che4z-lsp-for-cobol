@@ -200,7 +200,6 @@ public class CopybookServiceImpl implements CopybookService {
               COPYBOOK_RESOLVE.label,
               mainProgramFileName,
               copybookName.getDisplayName(),
-              copybookName.getExtension(),
               Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL)).get()
       );
     } catch (InterruptedException e) {

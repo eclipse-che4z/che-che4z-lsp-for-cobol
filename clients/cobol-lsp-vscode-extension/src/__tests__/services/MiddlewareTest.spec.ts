@@ -40,14 +40,14 @@ describe("Copybook downloader", () => {
     });
 
     it("Handle copybook request", async () => {
-        const params = constructParams("cobol-lsp.copybook-resolve.cobFile.bookName.cpy.COBOL");
+        const params = constructParams("cobol-lsp.copybook-resolve.cobFile.bookName.COBOL");
         expect(await middleware.handleConfigurationRequest(params, null, null)).toEqual(["copybookUri"]);
-        expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName.cpy", "cobFile", "COBOL");
+        expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName", "cobFile", "COBOL");
     });
     it("Handle copybook request for name with dots", async () => {
-        const params = constructParams("cobol-lsp.copybook-resolve.USER.CLIST.COB.bookName.cpy.COBOL");
+        const params = constructParams("cobol-lsp.copybook-resolve.USER.CLIST.COB.bookName.COBOL");
         expect(await middleware.handleConfigurationRequest(params, null, null)).toEqual(["copybookUri"]);
-        expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName.cpy", "USER.CLIST.COB", "COBOL");
+        expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName", "USER.CLIST.COB", "COBOL");
     });
     it("Handle copybook download request", async () => {
         const params = {

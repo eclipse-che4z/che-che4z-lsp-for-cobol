@@ -18,9 +18,7 @@ import {CopybookDownloadService} from "./copybook/CopybookDownloadService";
 import {CopybookURI} from "./copybook/CopybookURI";
 import { InfoStorage } from "./copybook/InfoStorage";
 
-//TODO #1478 JSON format for client-server communication. Replace regexp parsing with JSON processing
-const PARAMS_WITHOUT_COPYBOOK_EXTENSION_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+)\.([^.]+)$/;
-const PARAMS_WITH_COPYBOOK_EXTENSION_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+\.[^.]+)\.([^.]+)$/;
+const PARAMS_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+)\.([^.]+)$/
 
 export class Middleware {
     constructor(
@@ -38,7 +36,7 @@ export class Middleware {
                 case "copybook-resolve":
                     InfoStorage.set(requestLines[0].cobolFileName, requestLines[0].copybookName, requestLines[0].dialectName);
                     return [await CopybookURI.resolveCopybookURI(requestLines[0].copybookName,
-                        requestLines[0].cobolFileName, requestLines[0].dialectName)];
+                        requestLines[0].cobolFileName, requestLines[0].dialectName)]
                 case "copybook-download":
                     const copybookNames = requestLines.map(requestLine => requestLine.copybookName);
                     this.copybookDownloader.downloadCopybooks(requestLines[0].cobolFileName, copybookNames,
@@ -50,9 +48,7 @@ export class Middleware {
     }
 
     private static parseLine(line: string): RequestLine | undefined {
-        const match = line.split(".")[1] === "copybook-resolve" ?
-            PARAMS_WITH_COPYBOOK_EXTENSION_REGEX.exec(line) :
-            PARAMS_WITHOUT_COPYBOOK_EXTENSION_REGEX.exec(line);
+        const match = PARAMS_REGEX.exec(line);
         if (match !== null) {
             return new RequestLine(
                 match[1],

@@ -52,8 +52,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   private final Provider<CobolLanguageClient> clientProvider;
   private final SettingsService settingsService;
   private Set<CopybookName> listOfCopybookNames;
-  private List<String> dialects;
-  private List<String>  listOfCopybookFolders;
+  private List<String> listOfCopybookFolders;
 
   @Inject
   public CopybookNameServiceImpl(
@@ -85,44 +84,44 @@ public class CopybookNameServiceImpl implements CopybookNameService {
     String fileName = fileNameWithExtension.split("\\.")[0];
     return findByName(fileName).isPresent()
         || Optional.ofNullable(listOfCopybookFolders)
-            .orElse(emptyList())
-            .stream()
-            .anyMatch(uri::contains);
+        .orElse(emptyList())
+        .stream()
+        .anyMatch(uri::contains);
   }
 
-  private CompletableFuture<List<String>> copybookLocalFolders(List<String> dialects) {
+  public CompletableFuture<List<String>> copybookLocalFolders() {
     List<CompletableFuture<List<String>>> copybookLocalFolders = new ArrayList<>();
     copybookLocalFolders.add(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label));
-
-    dialects.forEach(dialect -> {
-      copybookLocalFolders.add(
-          settingsService.fetchTextConfiguration("cpy-manager." + dialect.toLowerCase() + ".paths-local"));
-    });
-
-    return CompletableFuture.allOf(copybookLocalFolders.toArray(new CompletableFuture<?>[0]))
-        .thenApply(v -> copybookLocalFolders.stream()
-            .map(CompletableFuture::join)
-            .flatMap(List::stream)
-            .collect(Collectors.toList())
-        );
+    return settingsService.fetchTextConfiguration(DIALECTS.label)
+        .thenAccept(
+            dialects -> dialects.forEach(dialect -> {
+              copybookLocalFolders.add(
+                  settingsService.fetchTextConfiguration(
+                      String.format("cpy-manager.%s.paths-local", dialect.toLowerCase())));
+            }))
+        .thenCompose(
+            c -> CompletableFuture.allOf(copybookLocalFolders.toArray(new CompletableFuture<?>[0]))
+                .thenApply(v -> copybookLocalFolders.stream()
+                    .map(CompletableFuture::join)
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList())
+                ));
   }
 
   @Override
   public void collectLocalCopybookNames() {
+    listOfCopybookNames = new HashSet<>();
     CompletableFuture<List<WorkspaceFolder>> copybookWorkspaces = clientProvider.get()
         .workspaceFolders();
     CompletableFuture<List<String>> copybooksExtensions = settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label);
-    settingsService.fetchTextConfiguration(DIALECTS.label).thenAccept(dialects -> {
-      this.dialects = dialects;
-      CompletableFuture<List<String>> copybookLocalFolders = copybookLocalFolders(dialects);
-      CompletableFuture.allOf(copybookLocalFolders, copybookWorkspaces, copybooksExtensions)
-          .thenAccept(
-              (aVoid) -> resolveNames(
-                  copybookWorkspaces.join(),
-                  copybookLocalFolders.join(),
-                  copybooksExtensions.join()));
-    });
+    CompletableFuture<List<String>> copybookLocalFolders = copybookLocalFolders();
+    CompletableFuture.allOf(copybookLocalFolders, copybookWorkspaces, copybooksExtensions)
+        .thenAccept(
+            (aVoid) -> resolveNames(
+                copybookWorkspaces.join(),
+                copybookLocalFolders.join(),
+                copybooksExtensions.join()));
   }
 
   private void resolveNames(
@@ -136,25 +135,25 @@ public class CopybookNameServiceImpl implements CopybookNameService {
     listOfCopybookFolders = copybookFolders;
     listOfCopybookNames = ImmutableSet.copyOf(
         copybookFolders.stream()
-                .map(copybookFolder -> listExistedFiles(workspaceFolderList, copybookFolder))
-                .flatMap(List::stream)
-                .map(nameAndExtension -> nameAndExtension.split("\\."))
-                .map(nameAndExtension -> CopybookName
-                    .builder()
-                    .displayName(nameAndExtension[0])
-                    .extension(nameAndExtension.length == 1 ? "" : nameAndExtension[1])
-                    .build())
-                .filter(copybookName -> copybookExtensionsWithoutDotAsSet.contains(
-                    copybookName.getExtension()))
-                .collect(Collectors.toMap(
-                    CopybookName::getDisplayName,
-                    Function.identity(),
-                    (existing, replacement) ->
-                        copybookExtensionsWithoutDot.indexOf(existing.getExtension())
-                            < copybookExtensionsWithoutDot.indexOf(replacement.getExtension())
-                            ? existing : replacement
+            .map(copybookFolder -> listExistedFiles(workspaceFolderList, copybookFolder))
+            .flatMap(List::stream)
+            .map(nameAndExtension -> nameAndExtension.split("\\."))
+            .map(nameAndExtension -> CopybookName
+                .builder()
+                .displayName(nameAndExtension[0])
+                .extension(nameAndExtension.length == 1 ? "" : nameAndExtension[1])
+                .build())
+            .filter(copybookName -> copybookExtensionsWithoutDotAsSet.contains(
+                copybookName.getExtension()))
+            .collect(Collectors.toMap(
+                CopybookName::getDisplayName,
+                Function.identity(),
+                (existing, replacement) ->
+                    copybookExtensionsWithoutDot.indexOf(existing.getExtension())
+                        < copybookExtensionsWithoutDot.indexOf(replacement.getExtension())
+                        ? existing : replacement
 
-                )).values());
+            )).values());
   }
 
   private List<String> listExistedFiles(List<WorkspaceFolder> workspace, String fileName) {

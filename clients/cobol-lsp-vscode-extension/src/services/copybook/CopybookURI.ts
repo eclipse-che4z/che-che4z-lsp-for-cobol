@@ -37,11 +37,11 @@ export class CopybookURI {
         // check on local paths provided by the user
         let result: string;
         result = searchInWorkspace(copybookName,
-            SettingsService.getCopybookLocalPath(cobolFileName, dialectType), []);
+            SettingsService.getCopybookLocalPath(cobolFileName, dialectType), SettingsService.getCopybookExtension());
         // check in subfolders under .copybooks (copybook downloaded from MF)
         if (!result) {
             result = searchInWorkspace(copybookName,
-                CopybookURI.createPathForCopybookDownloaded(cobolFileName, dialectType), []);
+                CopybookURI.createPathForCopybookDownloaded(cobolFileName, dialectType), SettingsService.getCopybookExtension());
         }
         return result || "";
     }
