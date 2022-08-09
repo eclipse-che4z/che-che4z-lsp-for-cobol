@@ -36,6 +36,7 @@
         "Programming Languages"
     ],
     "activationEvents": [
+        "onCommand:cobol-lsp.smart-tab",
         "onLanguage:COBOL",
         "workspaceContains:/.c4z"
     ],
@@ -43,10 +44,6 @@
     "main": "./out/extension.js",
     "contributes": {
         "commands": [
-            {
-                "command": "cobol-lsp.cpy-manager.redownload",
-                "title": "Redownload all copybooks"
-            },
             {
                 "command": "cobol-lsp.cpy-manager.fetch-copybook",
                 "title": "Fetch copybook"
@@ -98,6 +95,43 @@
         "configuration": {
             "title": "COBOL Language Support",
             "properties": {
+                "cobol-lsp.smart-tab": {
+                    "oneOf": [
+                        { 
+                            "type": "boolean"
+                        },
+                        { 
+                            "type": "array",
+                            "items": { 
+                                "type": "number"
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "default": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "anchors": {
+                                    "type": "object",
+                                    "patternProperties": {
+                                        "^.*$": {
+                                            "type": "array",
+                                            "items": { 
+                                                "type": "number"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "description": "Enable/disable smart tab",
+                    "default": true
+                },
                 "cobol-lsp.cpy-manager.profiles": {
                     "type": "string",
                     "description": "Current default profile for copybook downloader\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe"
@@ -414,22 +448,22 @@
             {
                 "key": "tab",
                 "command": "cobol-lsp.smart-tab",
-                "when": "editorLangId == cobol && !inSnippetMode"
+                "when": "editorLangId == cobol && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
             },
             {
                 "key": "tab",
                 "command": "cobol-lsp.smart-tab",
-                "when": "editorLangId == COBOL && !inSnippetMode"
+                "when": "editorLangId == COBOL && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
             },
             {
                 "key": "shift+tab",
                 "command": "cobol-lsp.smart-outdent",
-                "when": "editorLangId == cobol && !inSnippetMode"
+                "when": "editorLangId == cobol && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
             },
             {
                 "key": "shift+tab",
                 "command": "cobol-lsp.smart-outdent",
-                "when": "editorLangId == COBOL && !inSnippetMode"
+                "when": "editorLangId == COBOL && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
             },
             {
                 "key": "ctrl+/",
@@ -442,6 +476,7 @@
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "postinstall": "patch-package",
+        "test:integration": "npm run compile && node ./out/test/runTest.js",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "test": "jest -w 1 --unhandled-rejections=strict",
@@ -456,10 +491,16 @@
     },
     "devDependencies": {
         "@types/jest": "^27.0.0",
+        "@types/mocha": "^9.1.1",
         "@types/node": "^12.6.2",
         "@types/vscode": "^1.55.0",
+        "@vscode/test-electron": "^2.1.5",
+        "decache": "^4.6.1",
+        "glob": "^8.0.3",
         "jest": "^27.0.0",
         "jest-sonar-reporter": "^2.0.0",
+        "mocha": "^10.0.0",
+        "nyc": "^15.1.0",
         "patch-package": "^6.4.7",
         "ts-jest": "^27.0.0",
         "tslint": "^5.18.0",

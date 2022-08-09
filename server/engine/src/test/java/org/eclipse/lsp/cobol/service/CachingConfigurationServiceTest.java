@@ -45,7 +45,7 @@ class CachingConfigurationServiceTest {
             new CopybookConfig(
                 CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of()),
             ImmutableList.of(),
-            ImmutableList.of()),
+            ImmutableList.of("CICSTranslator")),
         configuration.getConfig(CopybookProcessingMode.ENABLED));
   }
 
@@ -86,7 +86,7 @@ class CachingConfigurationServiceTest {
             new CopybookConfig(
                 CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(EmbeddedCodeNode.Language.SQL),
-            ImmutableList.of("Dialect")),
+            ImmutableList.of("Dialect", "CICSTranslator")),
         configuration.getConfig(CopybookProcessingMode.DISABLED));
   }
 
@@ -121,7 +121,7 @@ class CachingConfigurationServiceTest {
             new CopybookConfig(
                 CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(EmbeddedCodeNode.Language.SQL, EmbeddedCodeNode.Language.CICS),
-            ImmutableList.of("Dialect")),
+            ImmutableList.of("Dialect", "CICSTranslator")),
         configuration.getConfig(CopybookProcessingMode.DISABLED));
   }
 }

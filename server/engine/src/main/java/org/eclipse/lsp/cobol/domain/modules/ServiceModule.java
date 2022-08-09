@@ -87,14 +87,12 @@ public class ServiceModule extends AbstractModule {
     completionBinding.addBinding().to(VariableCompletion.class);
     completionBinding.addBinding().to(ParagraphCompletion.class);
     completionBinding.addBinding().to(SectionCompletion.class);
-    completionBinding.addBinding().to(SnippetCompletion.class);
     completionBinding.addBinding().to(KeywordCompletion.class);
     completionBinding.addBinding().to(CopybookCompletion.class);
     completionBinding.addBinding().to(SubroutineCompletion.class);
     completionBinding.addBinding().to(CopybookNameCompletion.class);
 
     bind(CompletionStorage.class).annotatedWith(named("Keywords")).to(Keywords.class);
-    bind(CompletionStorage.class).annotatedWith(named("Snippets")).to(Snippets.class);
   }
 
   private void bindCodeActions() {

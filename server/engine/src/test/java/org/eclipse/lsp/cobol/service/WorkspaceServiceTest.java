@@ -25,7 +25,6 @@ import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
-import org.eclipse.lsp.cobol.service.delegates.completions.Snippets;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
@@ -85,7 +84,7 @@ class WorkspaceServiceTest {
             configurationService,
             stateService,
             copybookNameService,
-            null, null);
+            null);
 
     CompletableFuture<Object> result =
         service.executeCommand(
@@ -124,7 +123,7 @@ class WorkspaceServiceTest {
             configurationService,
             stateService,
             copybookNameService,
-            null, null);
+            null);
 
     CompletableFuture<Object> result =
         service.executeCommand(new ExecuteCommandParams("Missing command name", emptyList()));
@@ -149,7 +148,6 @@ class WorkspaceServiceTest {
     ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
-    Snippets snippets = mock(Snippets.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
@@ -162,7 +160,7 @@ class WorkspaceServiceTest {
             configurationService,
             stateService,
             copybookNameService,
-                keywords, snippets);
+                keywords);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     String path = "foo/bar";
@@ -202,7 +200,6 @@ class WorkspaceServiceTest {
     ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
-    Snippets snippets = mock(Snippets.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
@@ -215,7 +212,7 @@ class WorkspaceServiceTest {
             configurationService,
             stateService,
             copybookNameService,
-                keywords, snippets);
+                keywords);
 
     String path = "foo/bar";
 
@@ -249,7 +246,6 @@ class WorkspaceServiceTest {
     ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
-    Snippets snippets = mock(Snippets.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
@@ -261,7 +257,7 @@ class WorkspaceServiceTest {
             subroutineService,
             configurationService,
             stateService,
-            copybookNameService, keywords, snippets);
+            copybookNameService, keywords);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     JsonArray arr = new JsonArray();
@@ -300,7 +296,6 @@ class WorkspaceServiceTest {
     ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
-    Snippets snippets = mock(Snippets.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
@@ -312,7 +307,7 @@ class WorkspaceServiceTest {
             subroutineService,
             configurationService,
             stateService,
-            copybookNameService, keywords, snippets);
+            copybookNameService, keywords);
 
     when(copybookNameService.copybookLocalFolders())
         .thenReturn(completedFuture(emptyList()));
@@ -383,7 +378,7 @@ class WorkspaceServiceTest {
             subroutineService,
             configurationService,
             stateService,
-            copybookNameService, null, null);
+            copybookNameService, null);
 
     DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));
     service.didChangeWatchedFiles(params);

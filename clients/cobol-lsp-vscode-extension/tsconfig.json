@@ -16,16 +16,19 @@
 	"compilerOptions": {
 		"types": [
 			"node",
-			"jest"
-		  ],	
+			"jest",
+            "mocha"
+		  ],
 		"target": "es6",
+        "skipLibCheck": true,
 		"lib": [
             "es6"
         ],
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"outDir": "out",
-		"sourceMap": true
+		"sourceMap": true,
+        "resolveJsonModule": true
 	},
 	"exclude": [
 		"node_modules",

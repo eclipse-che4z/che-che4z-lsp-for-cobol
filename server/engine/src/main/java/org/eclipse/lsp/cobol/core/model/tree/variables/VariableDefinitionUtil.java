@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableType.*;
 
 /** The utility class is for converting VariableDefinitionNode into appropriate VariableNode. */
 @UtilityClass
@@ -170,9 +171,16 @@ public class VariableDefinitionUtil {
     List<Node> children = node.getChildren();
     if (children.isEmpty()) return;
     children.forEach(VariableDefinitionUtil::reshapeVariablesLocality);
-    if (node.getNodeType() == NodeType.VARIABLE)
-      ((VariableNode) node)
+    if (node.getNodeType() == NodeType.VARIABLE) {
+      VariableNode variableNode = (VariableNode) node;
+      if (isGroupedVariable(variableNode))
+      variableNode
           .extendLocality(children.get(children.size() - 1).getLocality().getRange().getEnd());
+    }
+  }
+
+  private boolean isGroupedVariable(VariableNode variableNode) {
+    return !ImmutableList.of(FD, SD).contains(variableNode.getVariableType());
   }
 
   private void registerVariablesInProgram(Node node) {
@@ -280,7 +288,7 @@ public class VariableDefinitionUtil {
           new FileDescriptionNode(
               definitionNode.getLocality(),
               getName(definitionNode),
-              definitionNode.isSortDescription() ? VariableType.SD : VariableType.FD,
+              definitionNode.isSortDescription() ? SD : FD,
               definitionNode.isGlobal(),
               definitionNode.getFileDescriptor(),
               definitionNode.getFileControlClause());

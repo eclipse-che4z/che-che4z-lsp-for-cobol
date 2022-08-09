@@ -37,24 +37,38 @@ import static org.mockito.Mockito.mock;
  */
 class KeywordCompletionTest {
   private static final String DOCUMENTATION_TEXT =
-          "The ACCEPT statement transfers data or system date-related information into the "
-                  + "data area referenced by the specified identifier.\r\n\r\n"
-                  + "[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/"
-                  + "com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsacce.htm)\r\n\r\n"
-                  + "© Copyright IBM Corporation 1994, 2019.\r\n\r\n"
-                  + "U.S. Government Users Restricted Rights - "
-                  + "Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.";
+      "The ACCEPT statement transfers data or system date-related information into the "
+          + "data area referenced by the specified identifier.\r\n\r\n"
+          + "[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/"
+          + "com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsacce.htm)\r\n\r\n"
+          + "© Copyright IBM Corporation 1994, 2019.\r\n\r\n"
+          + "U.S. Government Users Restricted Rights - "
+          + "Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.";
   private static final String LABEL = "ACCEPT";
+  private static SettingsService settingsService = mock(SettingsService.class);
 
-  private KeywordCompletion completion = new KeywordCompletion(new Keywords(mock(SettingsService.class)));
-
+  private KeywordCompletion completion =
+      new KeywordCompletion(new Keywords(mock(SettingsService.class)));
 
   @Test
   void testCompletionEmptyResult() {
     assertThat(
-            completion.getCompletionItems(
-                    "accep", new CobolDocumentModel("", AnalysisResult.builder().build())),
-            is(createExpected()));
+        completion.getCompletionItems(
+            "accep", new CobolDocumentModel("", AnalysisResult.builder().build())),
+        is(createExpected()));
+  }
+
+  @Test
+  void testGetStreamDataMap() {
+    Keywords keywords = new Keywords(settingsService);
+    List<String> dialectType = ImmutableList.of("");
+    assertEquals(2344, keywords.getDataMap(dialectType).size());
+    dialectType = ImmutableList.of("IDMS");
+    assertEquals(2380, keywords.getDataMap(dialectType).size());
+    dialectType = ImmutableList.of("DaCo");
+    assertEquals(2419, keywords.getDataMap(dialectType).size());
+    dialectType = ImmutableList.of("DaCo", "IDMS");
+    assertEquals(2454, keywords.getDataMap(dialectType).size());
   }
 
   @Test
@@ -65,7 +79,7 @@ class KeywordCompletionTest {
   @Test
   void testCompletionMock() {
     assertEquals(
-            createExpected(), completion.getCompletionItems("ACCEP", MockCompletionModel.MODEL));
+        createExpected(), completion.getCompletionItems("ACCEP", MockCompletionModel.MODEL));
   }
 
   private List<CompletionItem> createExpected() {
@@ -81,7 +95,7 @@ class KeywordCompletionTest {
     item.setInsertText(LABEL);
     item.setDocumentation(doc);
     item.setKind(CompletionItemKind.Keyword);
-    item.setSortText("7" + LABEL);
+    item.setSortText("6" + LABEL);
     return item;
   }
 }

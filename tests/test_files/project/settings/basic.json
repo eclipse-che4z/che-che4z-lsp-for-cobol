@@ -6,5 +6,6 @@
         ".copybooks/zowe-profile-1/DATA.SET.PATH2",
         "testing"
       ],
-    "cobol-lsp.cpy-manager.paths-dsn": []
+    "cobol-lsp.cpy-manager.paths-dsn": [],
+    "editor.snippetSuggestions": "top"
 }

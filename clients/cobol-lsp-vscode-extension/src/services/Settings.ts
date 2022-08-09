@@ -15,7 +15,10 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { PATHS_LOCAL_KEY, PATHS_USS, PATHS_ZOWE, SERVER_PORT, SETTINGS_CPY_SECTION, SETTINGS_SUBROUTINE_LOCAL_KEY } from "../constants";
+import { DACO_DIALECT, IDMS_DIALECT, PATHS_LOCAL_KEY, PATHS_USS, PATHS_ZOWE, SERVER_PORT, SETTINGS_CPY_SECTION, SETTINGS_SUBROUTINE_LOCAL_KEY, SETTINGS_DIALECT, SETTINGS_TAB_CONFIG } from "../constants";
+import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
+import dacoSnippets = require("../services/snippetcompletion/dacoSnippets.json");
+import idmsSnippets = require("../services/snippetcompletion/idmsSnippets.json");
 
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
@@ -48,6 +51,14 @@ export function createFileWithGivenPath(folderPath: string, fileName: string, pa
         vscode.window.showErrorMessage("File error: " + e.toString());
     }
 
+}
+
+export class TabRule {
+    public constructor (public stops: number[], public maxPosition: number, public regex: string | undefined = undefined) {}
+}
+
+export class TabSettings {
+    public constructor(public rules: TabRule[], public defaultRule: TabRule) {};
 }
 
 /**
@@ -110,6 +121,44 @@ export class SettingsService {
         return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles")
     }
 
+    /**
+     * Retrieves and parse tab settings configuration that can be boolean, array or an object
+     * @returns a TabSettings object
+     */
+    public static getTabSettings(): TabSettings {
+        const config = vscode.workspace.getConfiguration().get(SETTINGS_TAB_CONFIG);
+        let settings = new TabSettings([], new TabRule([0, 6, 7, 11], 72));
+        if (Array.isArray(config)) {
+            const stops = config as number[];
+            if (stops !== undefined && stops.length > 0) {
+                const tabRule = new TabRule(stops, stops[stops.length - 1]);
+                settings = new TabSettings( [], tabRule);
+            }
+        } else if (typeof config === "object") {
+            const obj = config as {default, anchors};
+            let defaultRule = new TabRule([0, 6, 7, 11], 72);
+            const stops = obj.default as number[];
+            if (stops !== undefined && stops.length > 0) {
+                defaultRule = new TabRule(stops, stops[stops.length - 1]);
+            }
+            let rules = [];
+            const anchors = obj.anchors;
+            if (obj.anchors !== undefined && Object.keys(anchors).length > 0) {
+                const keys = Object.keys(anchors);
+                const values = Object.values(anchors);
+                for (let i = 0; i < keys.length; i++) {
+                    const regex = keys[i] as string;
+                    const stops = values[i] as number[];
+                    if (regex !== undefined && stops !== undefined && stops.length > 0) {
+                        rules.push(new TabRule(stops, stops[stops.length - 1], regex));
+                    }
+                }
+            }
+            settings = new TabSettings(rules, defaultRule);
+        }
+        return settings;
+    }
+
     private static evaluateVariable(dataList: string[], variable: string, value: string): string[] {
         const result: string[] = [];
         if (dataList) {
@@ -125,6 +174,33 @@ export class SettingsService {
     public static getCopybookFileEncoding() {
         return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("copybook-file-encoding")
     }
+
+    /**
+     * Return the dialect type supplied by user
+     * @returns Map of snippets
+     */
+     public static getSnippetsForUserDialect(): Map<any, any>{
+        const dialectList: string[] =  vscode.workspace.getConfiguration().get(SETTINGS_DIALECT);
+        const cobolMap = new Map(Object.entries(cobolSnippets));
+        let finalSnippetMap = cobolMap;
+        if(dialectList.includes(IDMS_DIALECT)){
+            var idmsMap: Map<any,any> = new Map(Object.entries(idmsSnippets));
+            finalSnippetMap = new Map([...cobolMap, ...idmsMap])
+
+            if(dialectList.includes(DACO_DIALECT)){
+                var dacoMap: Map<any,any> = new Map(Object.entries(dacoSnippets));
+                finalSnippetMap = new Map([...cobolMap, ...idmsMap, ...dacoMap])
+            }
+        }
+       else
+            if(dialectList.includes(DACO_DIALECT)){
+                var dacoMap: Map<any,any> = new Map(Object.entries(dacoSnippets));
+                finalSnippetMap = new Map([...cobolMap, ...dacoMap])
+            }
+
+        return finalSnippetMap;
+
+    }
     private static getCopybookConfigValues(section: string, cobolFileName: string, dialectType: string) {
         const programFile = cobolFileName.replace(/\.[^/.]+$/, "");
         if (dialectType !== SettingsService.DEFAULT_DIALECT) {
@@ -136,4 +212,5 @@ export class SettingsService {
         const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(section);
         return SettingsService.evaluateVariable(pathList, "fileBasenameNoExtension", programFile);
     }
+
 }

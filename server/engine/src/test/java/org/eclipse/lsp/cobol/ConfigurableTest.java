@@ -52,7 +52,9 @@ public abstract class ConfigurableTest {
    * @return {@link CobolTextRegistry}.
    */
   public static CobolTextRegistry retrieveTextsRegistry() {
-    return new FolderTextRegistry(ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
+    return new FolderTextRegistry(
+        ofNullable(getProperty(PATH_TO_TEST_RESOURCES))
+            .orElse("..\\..\\Cobol85PositiveTestsSuite"));
   }
 
   @BeforeAll
