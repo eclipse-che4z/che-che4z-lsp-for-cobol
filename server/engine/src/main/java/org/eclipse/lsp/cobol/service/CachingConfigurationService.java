@@ -121,7 +121,7 @@ public class CachingConfigurationService implements ConfigurationService {
   }
 
   private List<EmbeddedCodeNode.Language> parseFeatures(JsonElement features) {
-    if (features.isJsonArray()) {
+    if (features.isJsonArray() && features.getAsJsonArray().size() > 0) {
       return Streams.stream((JsonArray) features)
           .map(JsonElement::getAsString)
           .map(EmbeddedCodeNode.Language::valueOf)

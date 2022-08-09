@@ -32,6 +32,9 @@ class TestSqlSelectStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*MAX1}  PIC A  VALUE 'ONAT'.\n"
+          + "       01 {$*MIN1}  PIC 9  VALUE '44'.\n"
+          + "       01 {$*AVG1}  PIC 9  VALUE '44'.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL\n";
 
@@ -62,7 +65,7 @@ class TestSqlSelectStatement {
   private static final String SELECT5 =
       TEXT
           + "            SELECT MAX(BONUS), MIN(BONUS), AVG(BONUS) \n"
-          + "               INTO :MAX, :MIN, :AVG \n"
+          + "               INTO :{$MAX1}, :{$MIN1}, :{$AVG1} \n"
           + "               FROM DSN8C10.EMP \n"
           + "               WITH UR \n"
           + "               QUERYNO 13; \n"
