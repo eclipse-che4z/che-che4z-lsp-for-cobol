@@ -661,7 +661,7 @@ dbs_fetch_single: (WITH CONTINUE)? dbs_fetch_rowpos? FROM? dbs_cursor_name dbs_f
 dbs_fetch_rowpos: (NEXT | PRIOR | FIRST | LAST | CURRENT CONTINUE? | (ABSOLUTE | RELATIVE) (dbs_host_variable | dbs_integer_constant));
 dbs_fetch_singlerow: INTO (DESCRIPTOR dbs_descriptor_name | dbs_array_variable LSQUAREBRACKET dbs_array_index RSQUAREBRACKET |
                     dbs_fetch_target_variable (dbs_comma_separator dbs_fetch_target_variable)*);
-dbs_fetch_target_variable: (dbs_global_variable_name | dbs_host_variable_name | dbs_sql_parameter_name |
+dbs_fetch_target_variable: (dbs_global_variable_name | dbs_host_variable | dbs_sql_parameter_name |
                     dbs_sql_variable_name | dbs_transition_variable_name);
 dbs_fetch_multi: dbs_fetch_rowsetpos? FROM? dbs_cursor_name dbs_fetch_multirow;
 dbs_fetch_rowsetpos: (ROWSET STARTING AT (ABSOLUTE | RELATIVE) (dbs_host_variable | dbs_integer_constant) | (NEXT | PRIOR |
@@ -925,7 +925,7 @@ dbs_set_connection: CONNECTION (dbs_location_name | dbs_host_variable);
 //SET ASSIGNMENT STATEMENT
 dbs_set_assign: (target_variable EQUALCHAR CURRENT (PACKAGESET | PACKAGE PATH |  SERVER) | dbs_array_variable_name
                 LSQUAREBRACKET dbs_array_variable_name RSQUAREBRACKET EQUALCHAR (dbs_expression | NULL) | target_variable_loop);
-target_variable: (dbs_global_variable_name | dbs_host_variable_name | dbs_sql_parameter_name | dbs_sql_variable_name | dbs_transition_variable_name);
+target_variable: (dbs_global_variable_name | dbs_host_variable | dbs_sql_parameter_name | dbs_sql_variable_name | dbs_transition_variable_name);
 target_variable_eq_opt:  (dbs_expressions | NULL | DEFAULT);
 target_variable_eq_opt_loop:  target_variable_eq_opt (dbs_comma_separator target_variable_eq_opt)*;
 target_variable_val_loop: LPARENCHAR target_variable (dbs_comma_separator target_variable)*  RPARENCHAR;
@@ -1050,7 +1050,7 @@ dbs_values: VALUES (dbs_values_null | dbs_values_into);
 dbs_values_null: (dbs_expression | LPARENCHAR dbs_expression (dbs_comma_separator dbs_expression)* RPARENCHAR);
 dbs_values_into: (dbs_expression | NULL | LPARENCHAR (dbs_expression | NULL) (dbs_comma_separator (dbs_expression | NULL))* RPARENCHAR) INTO
                 (dbs_values_target (dbs_comma_separator dbs_values_target)* | dbs_array_variable);
-dbs_values_target: (dbs_global_variable_name | dbs_host_variable_name | dbs_sql_parameter_name | dbs_sql_variable_name | dbs_transition_variable_name);
+dbs_values_target: (dbs_global_variable_name | dbs_host_variable | dbs_sql_parameter_name | dbs_sql_variable_name | dbs_transition_variable_name);
 
 /*WHENEVER */
 dbs_whenever: WHENEVER (NOT FOUND | SQLERROR | SQLWARNING) (CONTINUE | (GOTO | GO TO) COLONCHAR? dbs_host_label);
@@ -1276,7 +1276,7 @@ dbs_select_into: (WITH common_table_expression_loop)?  dbs_select_clause INTO (t
                  dbs_orderby_clause? dbs_offset_clause?  dbs_fetch_clause?  (dbs_select_statement_isolation_clause | dbs_select_statement_skip_locked_data)* dbs_select_statement_queryno_clause?;
 common_table_expression_loop: dbs_select_statement_common_table_expression (dbs_comma_separator dbs_select_statement_common_table_expression)*;
 target_variable_names_loop: target_variable_names_opts (dbs_comma_separator target_variable_names_opts)*;
-target_variable_names_opts: dbs_global_variable_name | dbs_host_variable_name | dbs_sql_parameter_name | dbs_sql_variable_name | dbs_transition_variable_name;
+target_variable_names_opts: dbs_global_variable_name | dbs_host_variable | dbs_sql_parameter_name | dbs_sql_variable_name | dbs_transition_variable_name;
 dbs_select_statement_common_table_expression: dbs_sql_identifier LPARENCHAR dbs_sql_identifier (dbs_comma_separator dbs_sql_identifier)* RPARENCHAR AS dbs_fullselect;
 dbs_select_statement_isolation_clause: WITH (RR dbs_select_statement_isolation_clause_lock_clause | RS dbs_select_statement_isolation_clause_lock_clause | CS | UR );
 dbs_select_statement_isolation_clause_lock_clause: USE AND KEEP (EXCLUSIVE | UPDATE | SHARE) LOCKS;
@@ -1463,9 +1463,11 @@ dbs_clone_table_name: T=dbs_sql_identifier {validateLength($T.text, "clone table
 dbs_collection_id: IDENTIFIER;
 dbs_collection_id_package_name: FILENAME;
 dbs_collection_name: T=dbs_sql_identifier {validateLength($T.text, "collection name", 128);}; // SQLIDENTIFIER are case sensitive. allows only uppercase or quoted string as per doc.
-dbs_generic_name
-    : ADDRESS | AVG | COUNT | COMMENT | FILENAME | GROUP | HOUR | HOURS | ID | IN | IDENTIFIER | LOCATION | LOCATOR
-    | MAX | MIN | MONTH | NAME | NONNUMERICLITERAL | YEAR | DATE | DAY | SERVER | SQLCODE | TRANSACTION | TYPE | V1
+dbs_generic_name: dbs_host_names | NONNUMERICLITERAL;
+dbs_host_names: dbs_special_name | IDENTIFIER;
+dbs_special_name
+    : ADDRESS | AVG | COUNT | COMMENT | FILENAME | GROUP | HOUR | HOURS | ID | IN | LOCATION | LOCATOR
+    | MAX | MIN | MONTH | NAME | YEAR | DATE | DAY | SERVER | SQLCODE | TRANSACTION | TYPE | V1
     | TIMESTAMP
     ;
 dbs_column_name: (dbs_generic_name DOT_FS)? T=dbs_generic_name {validateLength($T.text, "column name", 30);};
@@ -1499,11 +1501,10 @@ dbs_global_variable_name: dbs_generic_name | ROWID;
 dbs_graphic_string_constant: GRAPHIC_CONSTANT;
 dbs_history_table_name: dbs_table_name;
 dbs_host_label: IDENTIFIER | HANDLER;
-dbs_host_variable: COLONCHAR? dbs_host_variable_val;
-dbs_host_variable_val: (FILENAME | IDENTIFIER) (INDICATOR? COLONCHAR (FILENAME | IDENTIFIER))?;
+dbs_host_variable: dbs_host_variable_val (INDICATOR? dbs_host_variable_val)?;
+dbs_host_variable_val: COLONCHAR? dbs_host_var_identifier;
 dbs_host_variable_array: IDENTIFIER; // variable array must be defined in the application program
-dbs_host_variable_name: T=dbs_host_var_identifier {validateLength($T.text, "host variable name", 128);};
-dbs_host_var_identifier: COLONCHAR dbs_generic_name (INDICATOR? COLONCHAR dbs_generic_name)?;
+dbs_host_var_identifier: T=dbs_host_names {validateLength($T.text, "host variable name", 128);};
 dbs_id_host_variable: NUMERICLITERAL;
 dbs_identifier: dbs_sql_identifier;
 dbs_imptkmod_param: YES | NO;
@@ -1568,9 +1569,9 @@ dbs_sqlstate_string_constant: NONNUMERICLITERAL;
 dbs_statement_name: T=dbs_generic_name {validateLength($T.text, "statement name", 128);};
 dbs_stogroup_name: T=dbs_sql_identifier {validateLength($T.text, "storage group name", 128);};
 dbs_string_constant: dbs_binary_string_constant | dbs_character_string_constant | dbs_graphic_string_constant | NONNUMERICLITERAL;
-dbs_string_expression: DOUBLEQUOTE (dbs_allocate | dbs_alter | dbs_associate | dbs_comment | dbs_commit | dbs_create | dbs_declare_global |
+dbs_string_expression: (DOUBLEQUOTE | SINGLEQUOTE) (dbs_allocate | dbs_alter | dbs_associate | dbs_comment | dbs_commit | dbs_create | dbs_declare_global |
   dbs_delete | dbs_drop | dbs_explain | dbs_free | dbs_grant |dbs_hold |dbs_insert | dbs_label | dbs_lock | dbs_merge | dbs_refresh | dbs_release|
-  dbs_rename | dbs_revoke | dbs_rollback | dbs_savepoint | dbs_set | dbs_signal |dbs_truncate | dbs_update) DOUBLEQUOTE; // ref- https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_executeimmediate.html
+  dbs_rename | dbs_revoke | dbs_rollback | dbs_savepoint | dbs_set | dbs_signal |dbs_truncate | dbs_update) (DOUBLEQUOTE | SINGLEQUOTE); // ref- https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_executeimmediate.html
 dbs_synonym: T=dbs_sql_identifier {validateLength($T.text, "synonym name", 128);};
 dbs_table_identifier: dbs_sql_identifier;
 dbs_table_name: T=dbs_sql_identifier {validateLength($T.text, "table name", 128);};
