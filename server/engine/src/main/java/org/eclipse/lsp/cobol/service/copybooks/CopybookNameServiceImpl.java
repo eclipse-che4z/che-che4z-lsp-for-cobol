@@ -56,9 +56,9 @@ public class CopybookNameServiceImpl implements CopybookNameService {
 
   @Inject
   public CopybookNameServiceImpl(
-      SettingsService settingsService,
-      FileSystemService files,
-      Provider<CobolLanguageClient> clientProvider) {
+      final SettingsService settingsService,
+      final FileSystemService files,
+      final Provider<CobolLanguageClient> clientProvider) {
     this.settingsService = settingsService;
     this.files = files;
     this.clientProvider = clientProvider;
@@ -71,14 +71,14 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   }
 
   @Override
-  public Optional<CopybookName> findByName(String displayName) {
+  public Optional<CopybookName> findByName(final String displayName) {
     return listOfCopybookNames.stream()
         .filter(copybookName -> displayName.equalsIgnoreCase(copybookName.getDisplayName()))
         .findAny();
   }
 
   @Override
-  public boolean isCopybook(String uri) {
+  public boolean isCopybook(final String uri) {
     String[] uriAsArray = uri.split("/");
     String fileNameWithExtension = uriAsArray[uriAsArray.length - 1];
     String fileName = fileNameWithExtension.split("\\.")[0];
@@ -126,9 +126,9 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   }
 
   private void resolveNames(
-      List<WorkspaceFolder> workspaceFolderList,
-      List<String> copybookFolders,
-      List<String> copybookExtensions) {
+      final List<WorkspaceFolder> workspaceFolderList,
+      final List<String> copybookFolders,
+      final List<String> copybookExtensions) {
     List<String> copybookExtensionsWithoutDot = copybookExtensions.stream()
         .map(extension -> extension.replaceFirst("\\.", ""))
         .collect(Collectors.toList());
@@ -157,7 +157,9 @@ public class CopybookNameServiceImpl implements CopybookNameService {
             )).values());
   }
 
-  private List<String> listExistedFiles(List<WorkspaceFolder> workspace, String fileName) {
+  private List<String> listExistedFiles(
+      final List<WorkspaceFolder> workspace,
+      final String fileName) {
     return workspace.stream()
         .map(
             path ->

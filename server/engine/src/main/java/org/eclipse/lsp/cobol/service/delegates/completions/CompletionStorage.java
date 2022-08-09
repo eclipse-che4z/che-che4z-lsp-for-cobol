@@ -15,9 +15,6 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.service.SettingsService;
 
@@ -38,7 +35,7 @@ public abstract class CompletionStorage<T> {
   private Map<String, T> storage;
   private SettingsService settingsService;
 
-  CompletionStorage(SettingsService settingsService) {
+  CompletionStorage(final SettingsService settingsService) {
     this.settingsService = settingsService;
     resetStorage();
   }
@@ -66,22 +63,18 @@ public abstract class CompletionStorage<T> {
    * @param label - Keyword to find a description
    * @return description
    */
-  String getInformationFor(String label) {
+  String getInformationFor(final String label) {
     return (String) storage.get(label);
   }
 
-  private void fillInStorage(Map<String, T> props) {
+  private void fillInStorage(final Map<String, T> props) {
     this.storage =
         props.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  private void updateDialects(List<String> dialects) {
-    this.dialectType = setDialect(dialects);
+  private void updateDialects(final List<String> dialects) {
+    this.dialectType = dialects;
     resetStorage();
-  }
-
-  private List<String> setDialect(JsonArray dialectList) {
-    return Streams.stream(dialectList).map(JsonElement::getAsString).collect(toList());
   }
 
   private void resetStorage() {

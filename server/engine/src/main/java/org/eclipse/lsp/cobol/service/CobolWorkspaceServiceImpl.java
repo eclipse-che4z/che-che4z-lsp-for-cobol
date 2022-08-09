@@ -130,7 +130,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
       configurationService.updateConfigurationFromSettings();
       copybookNameService.collectLocalCopybookNames();
       keywords.updateStorage();
-      snippets.updateStorage();
     }
   }
 
