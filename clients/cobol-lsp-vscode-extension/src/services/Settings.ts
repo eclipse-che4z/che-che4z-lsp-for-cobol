@@ -97,6 +97,11 @@ export class SettingsService {
         return SettingsService.getCopybookConfigValues(PATHS_LOCAL_KEY, cobolFileName, dialectType);
     }
 
+
+    public static getCopybookExtension(): string[] {
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(COPYBOOK_EXTENSIONS);
+    }
+
     /**
      * Get Lsp Port from configuration
      * @returns lsp port number
