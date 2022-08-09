@@ -23,7 +23,7 @@ import org.eclipse.lsp.cobol.core.model.CopybookName;
 public interface CopybookNameService {
 
   /**
-   * Get the resolved copybook names across the open workspace and copybook paths defined in
+   * Get resolved copybook names across the open workspace and copybook paths defined in
    * settings
    *
    * @return List of resolved copybook names
@@ -31,7 +31,7 @@ public interface CopybookNameService {
   List<CopybookName> getNames();
 
   /**
-   *
+   * Get copybook folders paths based on local settings (paths, dialects etc)
    * @return List of copybook folders
    */
   CompletableFuture<List<String>> copybookLocalFolders();
