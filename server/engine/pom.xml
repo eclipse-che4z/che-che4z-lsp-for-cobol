@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.eclipse.lsp.cobol</groupId>
     <artifactId>engine</artifactId>
-    <version>${revision}</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>COBOL LSP :: Server</name>
 
@@ -51,7 +51,6 @@
         <mockito.core.version>2.23.0</mockito.core.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <revision>1.0.0-SNAPSHOT</revision>
         <slf4j.api.version>1.7.25</slf4j.api.version>
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
         <filesToTestPath>${project.basedir}${file.separator}..${file.separator}..${file.separator}Cobol85PositiveTestsSuite</filesToTestPath>
@@ -294,7 +293,7 @@
                         </property>
                     </systemProperties>
                     <!--suppress UnresolvedMavenProperty -->
-                    <argLine>${argLine} -Xmx2048m -Djava.awt.headless=true</argLine>
+<!--                    <argLine>${argLine} -Xmx2048m -Djava.awt.headless=true</argLine>-->
                 </configuration>
             </plugin>
 
