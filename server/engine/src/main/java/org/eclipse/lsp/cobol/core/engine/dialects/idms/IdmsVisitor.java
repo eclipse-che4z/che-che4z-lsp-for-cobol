@@ -189,11 +189,17 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   private List<Node> addTreeNode(Node node, List<Node> children) {
     children.forEach(node::addChild);
+    Location location = context.getExtendedSource().mapLocationUnsafe(node.getLocality().getRange());
+    node.getLocality().setRange(location.getRange());
+    node.getLocality().setUri(location.getUri());
     return ImmutableList.of(node);
   }
 
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
     Node node = nodeConstructor.apply(constructLocality(ctx));
+    Location location = context.getExtendedSource().mapLocationUnsafe(node.getLocality().getRange());
+    node.getLocality().setRange(location.getRange());
+    node.getLocality().setUri(location.getUri());
     visitChildren(ctx).forEach(node::addChild);
     return ImmutableList.of(node);
   }

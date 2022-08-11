@@ -50,6 +50,7 @@ public class DialectParserListener extends BaseErrorListener {
       String msg,
       RecognitionException e) {
     int errorLine = line - 1;
+    int offendingSymbolSize = offendingSymbol == null ? 1 : getOffendingSymbolSize(offendingSymbol);
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.DIALECT)
@@ -63,7 +64,7 @@ public class DialectParserListener extends BaseErrorListener {
                             new Position(errorLine, charPositionInLine),
                             new Position(
                                 errorLine,
-                                charPositionInLine + getOffendingSymbolSize(offendingSymbol))))
+                                charPositionInLine + offendingSymbolSize)))
                     .build())
             .severity(ErrorSeverity.ERROR)
             .build();
