@@ -32,7 +32,7 @@ class TestCopyMaidWithWrkDoesNotTakeNameFrom88 {
           + "       01 {$*PARENT}.\n"
           + "            05 {$*CHILD-XLD} PIC X(2).\n"
           + "               88 {$*AB} VALUE \"AB\".\n"
-          + "            05 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG_WRK} WRK.\n"
+          + "            05 COPY MAID {~BHTRGL-XBG!DaCo} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-XLD}.";
 
@@ -43,7 +43,7 @@ class TestCopyMaidWithWrkDoesNotTakeNameFrom88 {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG_WRK", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

@@ -38,7 +38,7 @@ class TestCopyMaidWithKmkRequestsCorrectFile {
           + "             05 {$*TABMAX-PW7} PIC S9(4) VALUE ZERO COMP-3.\n"
           + "             05 {$*BHTTAB-XW7}.\n"
           + "               07 {$*BHTREG-XW8} OCCURS 50.\n"
-          + "                 09 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG_KMK} KMK.\n"
+          + "                 09 COPY MAID {~BHTRGL-XBG!DaCo} KMK.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-XB4} OF {$BHTTAB-XW7}.";
 
@@ -55,7 +55,7 @@ class TestCopyMaidWithKmkRequestsCorrectFile {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG_KMK", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

@@ -34,7 +34,7 @@ class TestCopyMaidWithWrkShowsErrorOnShortVariableName {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "        01 {$*A}.\n"
-          + "            05 COPY MAID {_{~BHTRGL-XBG!DaCo`BHTRGL-XBG_WRK}|1_} WRK.\n"
+          + "            05 COPY MAID {_{~BHTRGL-XBG!DaCo}|1_} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-X}.";
 
@@ -45,7 +45,7 @@ class TestCopyMaidWithWrkShowsErrorOnShortVariableName {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG_WRK", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
         ImmutableMap.of(
             "1",
             new Diagnostic(

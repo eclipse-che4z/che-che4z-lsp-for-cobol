@@ -30,7 +30,7 @@ class TestCopyMaidWithWrkShortName {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "        01 {$*PARENT-XNT}.\n"
-          + "            05 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG_WRK} WRK.\n"
+          + "            05 COPY MAID {~BHTRGL-XBG!DaCo} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$A}.";
 
@@ -43,7 +43,7 @@ class TestCopyMaidWithWrkShortName {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(new CobolText("BHTRGL-XBG_WRK", DaCoDialect.NAME, BHTRGL_XBG)),
+        ImmutableList.of(new CobolText("BHTRGL-XBG", DaCoDialect.NAME, BHTRGL_XBG)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

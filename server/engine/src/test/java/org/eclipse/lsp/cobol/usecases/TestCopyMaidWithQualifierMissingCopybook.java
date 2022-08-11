@@ -37,7 +37,7 @@ class TestCopyMaidWithQualifierMissingCopybook {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*MRB|1}.\n"
-          + "           03 COPY MAID {~ABCDEFG123!DaCo`ABCDEFG123_ABC|2} ABC.\n"
+          + "           03 COPY MAID {~ABCDEFG123!DaCo|2} ABC.\n"
           + "       01  {$*QWE} PIC 9.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {VAR1|3}.\n"
@@ -59,7 +59,7 @@ class TestCopyMaidWithQualifierMissingCopybook {
             "2",
             new Diagnostic(
                 new Range(),
-                "ABCDEFG123_ABC: Copybook not found",
+                "ABCDEFG123: Copybook not found",
                 DiagnosticSeverity.Error,
                 ErrorSource.DIALECT.getText(),
                 ErrorCode.MISSING_COPYBOOK.getLabel()),

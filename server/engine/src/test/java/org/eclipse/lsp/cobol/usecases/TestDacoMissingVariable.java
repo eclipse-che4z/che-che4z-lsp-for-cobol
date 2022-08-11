@@ -26,29 +26,32 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
+/** Test for DaCo and IDMS copybooks mix. */
 public class TestDacoMissingVariable {
-  private static final String TEXT = "       IDENTIFICATION DIVISION.\n" +
-          "       PROGRAM-ID. MIN5.\n" +
-          "       DATA   DIVISION.\n" +
-          "       WORKING-STORAGE SECTION.\n" +
-          "       01  {$*ROOT}.\n" +
-          "           02 {$*OLEN-ABC} PIC S9(3)   VALUE ZERO  COMP.\n" +
-          "       01  COPY IDMS {~CB!IDMS}.\n" +
-          "       PROCEDURE DIVISION.\n" +
-          "            WRITE TRANSACTION ABCD LENGTH {$OLEN-ABC}.\n  \t\n";
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. MIN5.\n"
+          + "       DATA   DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01  {$*ROOT}.\n"
+          + "           02 {$*OLEN-ABC} PIC S9(3)   VALUE ZERO  COMP.\n"
+          + "       01  COPY IDMS {~CB!IDMS}.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "            WRITE TRANSACTION ABCD LENGTH {$OLEN-ABC}.\n  \t\n";
 
   private static final String CB = "\t \n ";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
-            TEXT,
-            ImmutableList.of(new CobolText("CB", IdmsDialect.NAME, CB)),
-            ImmutableMap.of(),
+        TEXT,
+        ImmutableList.of(new CobolText("CB", IdmsDialect.NAME, CB)),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        new AnalysisConfig(
+            new CopybookConfig(
+                CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(),
-            new AnalysisConfig(
-                    new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
-                    ImmutableList.of(),
-                    ImmutableList.of(DaCoDialect.NAME)));
+            ImmutableList.of(DaCoDialect.NAME)));
   }
 }
