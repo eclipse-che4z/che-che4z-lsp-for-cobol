@@ -292,8 +292,6 @@
                             <value>${listingSnap}</value>
                         </property>
                     </systemProperties>
-                    <!--suppress UnresolvedMavenProperty -->
-<!--                    <argLine>${argLine} -Xmx2048m -Djava.awt.headless=true</argLine>-->
                 </configuration>
             </plugin>
 
@@ -444,13 +442,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ftp</artifactId>
-            </extension>
-        </extensions>
 
     </build>
     <profiles>
