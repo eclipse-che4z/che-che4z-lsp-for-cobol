@@ -192,7 +192,7 @@ class WorkspaceServiceTest {
   @Test
   void testChangeConfigurationNoChangesInPaths() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
-    SettingsService settingsService = mock(SettingsServiceImpl.class);
+    SettingsService settingsService = mock(SettingsService.class);
     WatcherService watchingService = mock(WatcherService.class);
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);

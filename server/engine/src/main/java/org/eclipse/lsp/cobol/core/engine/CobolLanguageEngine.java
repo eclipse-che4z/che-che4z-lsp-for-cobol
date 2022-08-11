@@ -117,7 +117,6 @@ public class CobolLanguageEngine {
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     String cleanText = preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
 
-    //TODO Alex - try to perform copybook collection here
     DialectOutcome dialectOutcome = dialectService
         .process(analysisConfig.getDialects(), DialectProcessingContext.builder()
             .programDocumentUri(documentUri)
