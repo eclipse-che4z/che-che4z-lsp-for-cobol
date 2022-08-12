@@ -62,25 +62,11 @@ spec:
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
-    resources:
-      limits:
-        memory: "2Gi"
-        cpu: "2"
-      requests:
-        memory: "2Gi"
-        cpu: "2"
   - name: cypress
     image: cypress/included:8.5.0
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
-    resources:
-      limits:
-        memory: "2Gi"
-        cpu: "1"
-      requests:
-        memory: "2Gi"
-        cpu: "1"
 """
 
 boolean isTimeTriggeredBuild() {
