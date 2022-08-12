@@ -17,10 +17,10 @@ spec:
     tty: true
     resources:
       limits:
-        memory: "2Gi"
+        memory: "3Gi"
         cpu: "1"
       requests:
-        memory: "2Gi"
+        memory: "3Gi"
         cpu: "1"
     volumeMounts:
     - name: m2-repo
