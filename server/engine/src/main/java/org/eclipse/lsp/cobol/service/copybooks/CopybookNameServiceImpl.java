@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
@@ -35,7 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.DIALECTS;
@@ -52,7 +54,9 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   private final Provider<CobolLanguageClient> clientProvider;
   private final SettingsService settingsService;
   private Set<CopybookName> listOfCopybookNames;
-  private List<String> listOfCopybookFolders;
+  private Set<String> listOfCopybookFolders;
+
+  private final String downloadedCopybooksFolders = ".c4z/.copybooks";
 
   @Inject
   public CopybookNameServiceImpl(
@@ -62,6 +66,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
     this.settingsService = settingsService;
     this.files = files;
     this.clientProvider = clientProvider;
+    this.listOfCopybookFolders = singleton(downloadedCopybooksFolders);
     this.listOfCopybookNames = new HashSet<>();
   }
 
@@ -84,7 +89,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
     String fileName = fileNameWithExtension.split("\\.")[0];
     return findByName(fileName).isPresent()
         || Optional.ofNullable(listOfCopybookFolders)
-        .orElse(emptyList())
+        .orElse(emptySet())
         .stream()
         .anyMatch(uri::contains);
   }
@@ -133,7 +138,9 @@ public class CopybookNameServiceImpl implements CopybookNameService {
         .map(extension -> extension.replaceFirst("\\.", ""))
         .collect(Collectors.toList());
     Set<String> copybookExtensionsWithoutDotAsSet = new HashSet<>(copybookExtensionsWithoutDot);
-    listOfCopybookFolders = copybookFolders;
+    listOfCopybookFolders = Stream.concat(copybookFolders.stream(), Stream.of(downloadedCopybooksFolders))
+        .collect(Collectors.toSet());
+    listOfCopybookFolders.addAll(copybookFolders);
     listOfCopybookNames = ImmutableSet.copyOf(
         copybookFolders.stream()
             .map(copybookFolder -> listExistedFiles(workspaceFolderList, copybookFolder))

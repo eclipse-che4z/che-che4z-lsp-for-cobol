@@ -65,7 +65,6 @@ public class InjectService {
 
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
     ContentProvider contentProvider = contentProviderFactory.getInstanceFor(FILE);
-    //TODO Alex - add dialect, cobolProgramName, extension
     descriptors.add(new InjectDescriptor("DFHEIBLC", analysis, contentProvider));
     return descriptors;
   }
