@@ -64,10 +64,10 @@ spec:
     args: [ "while true; do sleep 1000; done;" ]
     resources:
       limits:
-        memory: "2300m"
+        memory: "2Gi"
         cpu: "2"
       requests:
-        memory: "2300m"
+        memory: "2Gi"
         cpu: "2"
   - name: cypress
     image: cypress/included:8.5.0
@@ -76,10 +76,10 @@ spec:
     args: [ "while true; do sleep 1000; done;" ]
     resources:
       limits:
-        memory: "2300m"
+        memory: "2Gi"
         cpu: "1"
       requests:
-        memory: "2300m"
+        memory: "2Gi"
         cpu: "1"
 """
 
