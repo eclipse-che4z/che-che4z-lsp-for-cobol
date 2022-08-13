@@ -15,11 +15,15 @@
 
 package org.eclipse.lsp.cobol.service.mocks;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.service.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.service.CobolLSPServerStateService;
 import org.eclipse.lsp.cobol.service.CobolTextDocumentService;
 import org.eclipse.lsp.cobol.service.ConfigurationService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
@@ -46,6 +50,8 @@ public class MockTextDocumentService {
   @Mock protected Formations formations;
   @Mock protected HoverProvider hoverProvider;
   @Mock protected ConfigurationService configurationService;
+  @Mock protected CopybookNameService copybookNameService;
+
 
   /**
    * Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing. All tasks run
@@ -53,6 +59,7 @@ public class MockTextDocumentService {
    */
   protected CobolTextDocumentService getMockedTextDocumentServiceUsingSameThread() {
     return CobolTextDocumentService.builder()
+        .copybookNameService(copybookNameService)
         .communications(communications)
         .engine(engine)
         .dataBus(broker)
@@ -74,6 +81,7 @@ public class MockTextDocumentService {
    */
   protected CobolTextDocumentService getMockedTextDocumentServiceUsingSeparateThread() {
     return CobolTextDocumentService.builder()
+        .copybookNameService(copybookNameService)
         .communications(communications)
         .engine(engine)
         .dataBus(broker)
@@ -86,5 +94,10 @@ public class MockTextDocumentService {
         .hoverProvider(hoverProvider)
         .configurationService(configurationService)
         .build();
+  }
+
+  protected void mockSettingServiceForCopybooks(boolean answer) {
+    when(copybookNameService.isCopybook(any()))
+        .thenReturn(answer);
   }
 }

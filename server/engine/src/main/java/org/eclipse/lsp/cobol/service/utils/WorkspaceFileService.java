@@ -124,7 +124,7 @@ public class WorkspaceFileService implements FileSystemService {
 
   @Override
   public List<String> listFilesInDirectory(Path path) {
-    try (Stream<Path> streamPath = Files.list(path)) {
+    try (Stream<Path> streamPath = Files.walk(path, 2)) {
       return
           streamPath
               .map(Path::toFile)

@@ -163,17 +163,14 @@ class WorkspaceServiceTest {
                 keywords);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
-    JsonArray arr = new JsonArray();
     String path = "foo/bar";
-    arr.add(new JsonPrimitive(path));
 
-    when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.getConfiguration(LOCALE.label))
+    when(copybookNameService.copybookLocalFolders())
+        .thenReturn(completedFuture(singletonList(path)));
+    when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
-    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(singletonList("INFO")));
-    when(settingsService.toStrings(any())).thenCallRealMethod();
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
@@ -195,7 +192,7 @@ class WorkspaceServiceTest {
   @Test
   void testChangeConfigurationNoChangesInPaths() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
-    SettingsService settingsService = mock(SettingsServiceImpl.class);
+    SettingsService settingsService = mock(SettingsService.class);
     WatcherService watchingService = mock(WatcherService.class);
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
@@ -217,17 +214,14 @@ class WorkspaceServiceTest {
             copybookNameService,
                 keywords);
 
-    JsonArray arr = new JsonArray();
     String path = "foo/bar";
-    arr.add(new JsonPrimitive(path));
 
-    when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.getConfiguration(LOCALE.label))
+    when(copybookNameService.copybookLocalFolders())
+        .thenReturn(completedFuture(singletonList(path)));
+    when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
-    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(singletonList("INFO")));
-    when(settingsService.toStrings(any())).thenCallRealMethod();
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
@@ -270,11 +264,11 @@ class WorkspaceServiceTest {
     String path = "foo/bar";
     arr.add(new JsonPrimitive(path));
 
-    when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
+    when(copybookNameService.copybookLocalFolders())
         .thenReturn(completedFuture(emptyList()));
-    when(settingsService.getConfiguration(LOCALE.label))
+    when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
-    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(singletonList("INFO")));
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
@@ -315,11 +309,11 @@ class WorkspaceServiceTest {
             stateService,
             copybookNameService, keywords);
 
-    when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
+    when(copybookNameService.copybookLocalFolders())
         .thenReturn(completedFuture(emptyList()));
-    when(settingsService.getConfiguration(LOCALE.label))
+    when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
-    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(singletonList("INFO")));
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});

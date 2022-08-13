@@ -142,12 +142,12 @@ public class CobolLanguageServer implements LanguageServer {
 
   private void getLogLevelFromClient() {
     settingsService
-        .getConfiguration(LOGGING_LEVEL.label)
+        .fetchConfiguration(LOGGING_LEVEL.label)
         .thenAccept(LogLevelUtils.updateLogLevel());
   }
 
   private void getLocaleFromClient() {
-    settingsService.getConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
+    settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
   }
 
   @Override
@@ -198,11 +198,11 @@ public class CobolLanguageServer implements LanguageServer {
 
   private void addLocalFilesWatcher() {
     settingsService
-        .getConfiguration(CPY_LOCAL_PATHS.label)
-        .thenAccept(it -> watchingService.addWatchers(settingsService.toStrings(it)));
+        .fetchTextConfiguration(CPY_LOCAL_PATHS.label)
+        .thenAccept(watchingService::addWatchers);
     settingsService
-        .getConfiguration(SUBROUTINE_LOCAL_PATHS.label)
-        .thenAccept(it -> watchingService.addWatchers(settingsService.toStrings(it)));
+        .fetchTextConfiguration(SUBROUTINE_LOCAL_PATHS.label)
+        .thenAccept(watchingService::addWatchers);
   }
 
   @NonNull

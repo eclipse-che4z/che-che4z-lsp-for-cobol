@@ -120,18 +120,17 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
-    if (disposableLSPStateService.isServerShutdown()) return;
-    settingsService
-        .getConfiguration(CPY_LOCAL_PATHS.label)
-        .thenAccept(it -> acceptSettingsChange(settingsService.toStrings(it)));
+    if (!disposableLSPStateService.isServerShutdown()) {
+      copybookNameService.copybookLocalFolders().thenAccept(this::acceptSettingsChange);
 
-    settingsService.getConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
-    settingsService
-        .getConfiguration(LOGGING_LEVEL.label)
-        .thenAccept(LogLevelUtils.updateLogLevel());
-    configurationService.updateConfigurationFromSettings();
-    copybookNameService.collectLocalCopybookNames();
-    keywords.updateStorage();
+      settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
+      settingsService
+          .fetchConfiguration(LOGGING_LEVEL.label)
+          .thenAccept(LogLevelUtils.updateLogLevel());
+      configurationService.updateConfigurationFromSettings();
+      copybookNameService.collectLocalCopybookNames();
+      keywords.updateStorage();
+    }
   }
 
   private void acceptSettingsChange(List<String> localFolders) {

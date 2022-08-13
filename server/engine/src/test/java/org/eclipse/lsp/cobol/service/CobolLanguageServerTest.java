@@ -78,15 +78,15 @@ class CobolLanguageServerTest {
     String path = "foo/bar";
     arr.add(new JsonPrimitive(path));
 
-    when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
+    when(settingsService.fetchTextConfiguration(anyString())).thenCallRealMethod();
+    when(settingsService.fetchConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.toStrings(any())).thenCallRealMethod();
     when(localeStore.notifyLocaleStore()).thenReturn(System.out::println);
-    when(settingsService.getConfiguration(LOCALE.label))
+    when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.getConfiguration(SUBROUTINE_LOCAL_PATHS.label))
+    when(settingsService.fetchConfiguration(SUBROUTINE_LOCAL_PATHS.label))
         .thenReturn(completedFuture(ImmutableList.of()));
-    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(ImmutableList.of("INFO")));
     CobolLanguageServer server =
         new CobolLanguageServer(
@@ -105,8 +105,8 @@ class CobolLanguageServerTest {
 
     verify(watchingService).watchConfigurationChange();
     verify(watchingService).watchPredefinedFolder();
-    verify(settingsService).getConfiguration(CPY_LOCAL_PATHS.label);
-    verify(settingsService).getConfiguration(LOCALE.label);
+    verify(settingsService).fetchConfiguration(CPY_LOCAL_PATHS.label);
+    verify(settingsService).fetchConfiguration(LOCALE.label);
     verify(watchingService).addWatchers(singletonList(path));
     verify(localeStore).notifyLocaleStore();
     verify(configurationService).updateConfigurationFromSettings();

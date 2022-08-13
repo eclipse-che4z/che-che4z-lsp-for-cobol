@@ -15,7 +15,19 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { DACO_DIALECT, IDMS_DIALECT, PATHS_LOCAL_KEY, PATHS_USS, PATHS_ZOWE, SERVER_PORT, SETTINGS_CPY_SECTION, SETTINGS_SUBROUTINE_LOCAL_KEY, SETTINGS_DIALECT, SETTINGS_TAB_CONFIG } from "../constants";
+import {
+    DACO_DIALECT,
+    IDMS_DIALECT,
+    PATHS_LOCAL_KEY,
+    PATHS_USS,
+    PATHS_ZOWE,
+    SERVER_PORT,
+    SETTINGS_CPY_SECTION,
+    SETTINGS_SUBROUTINE_LOCAL_KEY,
+    SETTINGS_DIALECT,
+    SETTINGS_TAB_CONFIG,
+    COPYBOOK_EXTENSIONS
+} from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import dacoSnippets = require("../services/snippetcompletion/dacoSnippets.json");
 import idmsSnippets = require("../services/snippetcompletion/idmsSnippets.json");
@@ -83,6 +95,11 @@ export class SettingsService {
      */
     public static getCopybookLocalPath(cobolFileName: string, dialectType: string): string[] {
         return SettingsService.getCopybookConfigValues(PATHS_LOCAL_KEY, cobolFileName, dialectType);
+    }
+
+
+    public static getCopybookExtension(): string[] {
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(COPYBOOK_EXTENSIONS);
     }
 
     /**
