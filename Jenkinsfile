@@ -65,10 +65,10 @@ spec:
     resources:
       limits:
         memory: "700Mi"
-        cpu: "2"
+        cpu: "1"
       requests:
         memory: "700Mi"
-        cpu: "2"
+        cpu: "1"
   - name: cypress
     image: cypress/included:8.5.0
     tty: true
