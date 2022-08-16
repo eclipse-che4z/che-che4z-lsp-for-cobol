@@ -72,13 +72,13 @@ public final class IdmsDialect implements CobolDialect {
   }
 
   @Override
-  public void extend(DialectProcessingContext context) {
+  public List<SyntaxError> extend(DialectProcessingContext context) {
     Deque<String> copybookStack = new LinkedList<>();
 
     List<SyntaxError> errors = new LinkedList<>();
 
     IdmsDialectVisitor inlineVisitor = new IdmsDialectVisitor(context);
-    IdmsParser.StartRuleContext ruleContext = parseIdms(context.getExtendedSource().getText(), "", errors);
+    IdmsParser.StartRuleContext ruleContext = parseIdms(context.getExtendedSource().getText(), context.getProgramDocumentUri(), errors);
 
     List<IdmsCopybookDescriptor> cbs = inlineVisitor.visitStartRule(ruleContext);
     cbs.forEach(cb ->
@@ -90,6 +90,7 @@ public final class IdmsDialect implements CobolDialect {
                     context.getExtendedSource().getUri(),
                     context.getCopybookConfig(),
                     copybookStack));
+    return errors;
   }
 
   private void insertIdmsCopybook(ExtendedSource extendedSource, DocumentMap currentMap, List<SyntaxError> errors,
@@ -103,6 +104,13 @@ public final class IdmsDialect implements CobolDialect {
             currentUri,
             copybookConfig,
             true);
+
+    if (copybookModel.getUri() == null || copybookModel.getContent() == null) {
+      errors.add(ErrorHelper.missingCopybooks(messageService, cb.getUsage(), cb.getName()));
+      extendedSource.replace(cb.getStatement().getRange(), "");
+      return;
+    }
+
     CopyNode copyNode = new CopyNode(cb.getStatement(), cb.getName(), IdmsDialect.NAME);
     if (recursiveCall(copybookStack, copyNode.getName())) {
       currentMap.replace(copyNode.getLocality().getRange(), "");

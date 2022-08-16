@@ -53,7 +53,7 @@ public class TestCopyIdmsNested {
       + "           03 COPY IDMS {~COPY1!IDMS}.\n"
       + "       PROCEDURE DIVISION.\n";
 
-  private static final String COPY_LOOP =  "       01  COPY IDMS COPY1.\n";
+  private static final String COPY_LOOP =  "       01  COPY IDMS {COPY1|1}.\n";
 
   @Test
   void testNestedIdmsCopybook() {
@@ -72,7 +72,7 @@ public class TestCopyIdmsNested {
             "COPY1: Copybook has circular dependency",
             DiagnosticSeverity.Error,
             ErrorSource.DIALECT.getText(),
-            "MISSING_COPYBOOK");
+            "missing copybook");
 
     UseCaseEngine.runTest(
         TEXT_CIRCULAR, ImmutableList.of(

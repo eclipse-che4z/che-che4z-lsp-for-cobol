@@ -134,6 +134,7 @@ public class CobolLanguageEngine {
             .process(analysisConfig.getDialects(), dialectProcessingContext)
             .unwrap(accumulatedErrors::addAll);
 
+    accumulatedErrors = accumulatedErrors.stream().distinct().collect(toList());
     timingBuilder.getDialectsTimer().stop();
 
     timingBuilder.getPreprocessorTimer().start();

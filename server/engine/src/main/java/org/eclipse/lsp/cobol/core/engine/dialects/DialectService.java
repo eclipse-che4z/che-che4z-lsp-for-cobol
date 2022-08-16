@@ -66,13 +66,14 @@ public class DialectService {
    * @return dialects outcome
    */
   public ResultWithErrors<DialectOutcome> process(List<String> dialects, DialectProcessingContext context) {
-    LinkedList<CobolDialect> orderedDialects = sortDialects(dialects);
+    List<CobolDialect> orderedDialects = sortDialects(dialects);
+    List<SyntaxError> errors = new LinkedList<>();
     for (CobolDialect orderedDialect : orderedDialects) {
-      orderedDialect.extend(context);
+      errors.addAll(orderedDialect.extend(context));
       context.getExtendedSource().commitTransformations();
     }
-    ResultWithErrors<DialectOutcome> acc = ResultWithErrors.of(
-            new DialectOutcome(ImmutableList.of(), ImmutableMultimap.of(), context));
+    ResultWithErrors<DialectOutcome> acc = new ResultWithErrors(
+        new DialectOutcome(ImmutableList.of(), ImmutableMultimap.of(), context), errors);
     for (CobolDialect orderedDialect : orderedDialects) {
       acc = processDialect(acc, orderedDialect, context);
       context.getExtendedSource().commitTransformations();

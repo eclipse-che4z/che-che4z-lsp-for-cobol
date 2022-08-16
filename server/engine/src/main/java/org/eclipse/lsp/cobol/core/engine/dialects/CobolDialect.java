@@ -18,7 +18,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 
+import java.util.List;
 import java.util.Set;
 
 /** A COBOL dialect */
@@ -45,9 +47,10 @@ public interface CobolDialect {
    * Get document extension data from dialect. This data should be added to an argument.
    *
    * @param context data related to dialect processing
+   * @return a list of syntax errors
    */
-  default void extend(DialectProcessingContext context) {
-    // no-op
+  default List<SyntaxError> extend(DialectProcessingContext context) {
+    return ImmutableList.of();
   }
 
   /**

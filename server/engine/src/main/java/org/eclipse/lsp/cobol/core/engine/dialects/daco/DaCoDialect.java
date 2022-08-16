@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects.daco;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import lombok.RequiredArgsConstructor;
@@ -108,7 +109,8 @@ public final class DaCoDialect implements CobolDialect {
   }
 
   @Override
-  public void extend(DialectProcessingContext context) {
+  public List<SyntaxError> extend(DialectProcessingContext context) {
+    return ImmutableList.of();
   }
 
   @Override
