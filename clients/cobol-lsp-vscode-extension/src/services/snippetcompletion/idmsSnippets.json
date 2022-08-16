@@ -73,7 +73,7 @@
         "       PROGRAM-ID. ${1:${1:${TM_FILENAME/(.*)\\..+$/$1/}}}.",
         "       ENVIRONMENT DIVISION.",
         "        IDMS-CONTROL SECTION.",
-        "        PROTOCOL. MODE IS {$2:operating-mode}.",
+        "        PROTOCOL. MODE IS ${2:operating-mode}.",
         "       DATA DIVISION.",
         "        FILE SECTION.",
         "        SCHEMA SECTION.",

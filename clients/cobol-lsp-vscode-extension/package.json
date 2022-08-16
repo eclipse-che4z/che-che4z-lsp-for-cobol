@@ -1,521 +1,523 @@
 {
-    "name": "cobol-language-support",
-    "displayName": "COBOL Language Support",
-    "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
-    "author": "Broadcom",
-    "license": "EPL-2.0",
-    "version": "1.0.2",
-    "preview": false,
-    "publisher": "BroadcomMFD",
-    "engines": {
-        "vscode": "^1.55.0"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/eclipse/che-che4z-lsp-for-cobol.git"
-    },
-    "bugs": {
-        "url": "https://github.com/eclipse/che-che4z-lsp-for-cobol/issues"
-    },
-    "keywords": [
-        "mainframe",
-        "lsp",
-        "cobol",
-        "z/os",
-        "zos",
-        "language-server",
-        "jcl",
-        "zowe",
-        "ibm cobol",
-        "idms",
-        "datacom",
-        "cics",
-        "db2"
-    ],
-    "categories": [
-        "Programming Languages"
-    ],
-    "activationEvents": [
-        "onCommand:cobol-lsp.smart-tab",
-        "onLanguage:COBOL",
-        "workspaceContains:/.c4z"
-    ],
-    "icon": "resources/logo.png",
-    "main": "./out/extension.js",
-    "contributes": {
-        "commands": [
-            {
-                "command": "cobol-lsp.cpy-manager.fetch-copybook",
-                "title": "Fetch copybook"
-            },
-            {
-                "command": "cobol-lsp.cpy-manager.goto-settings",
-                "title": "Open Copybook location settings"
-            },
-            {
-                "command": "cobol-lsp.commentLine.toggle",
-                "title": "Toggle COBOL Line Comment"
-            },
-            {
-                "command": "cobol-lsp.commentLine.comment",
-                "title": "Add Cobol Line Comment"
-            },
-            {
-                "command": "cobol-lsp.commentLine.uncomment",
-                "title": "Remove COBOL Line Comment"
-            }
-        ],
-        "languages": [
-            {
-                "id": "COBOL",
-                "extensions": [
-                    ".cbl",
-                    ".cob",
-                    ".cobol",
-                    ".cpy",
-                    ".copy"
-                ],
-                "filenamePatterns": [
-                    "**/*copybook*/**"
-                ],
-                "configuration": "./syntaxes/lang-config.json"
-            }
-        ],
-        "snippets": [
-            {
-                "language": "COBOL",
-                "path": "resources/cobolSnippets.json"
-            },
-            {
-                "language": "COBOL Copybook",
-                "path": "resources/cobolSnippets.json"
-            }
-        ],
-        "grammars": [
-            {
-                "language": "COBOL",
-                "scopeName": "source.cobol",
-                "path": "./syntaxes/COBOL.tmLanguage.json",
-                "embeddedLanguages": {
-                    "meta.embedded.block.sql": "sql",
-                    "meta.embedded.block.html": "html"
-                }
-            }
-        ],
-        "configuration": {
-            "title": "COBOL Language Support",
-            "properties": {
-                "cobol-lsp.smart-tab": {
-                    "oneOf": [
-                        {
-                            "type": "boolean"
-                        },
-                        {
-                            "type": "array",
-                            "items": {
-                                "type": "number"
-                            }
-                        },
-                        {
-                            "type": "object",
-                            "properties": {
-                                "default": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "number"
-                                    }
-                                },
-                                "anchors": {
-                                    "type": "object",
-                                    "patternProperties": {
-                                        "^.*$": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "number"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    ],
-                    "description": "Enable/disable smart tab",
-                    "default": true
-                },
-                "cobol-lsp.cpy-manager.profiles": {
-                    "type": "string",
-                    "description": "Current default profile for copybook downloader\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe"
-                },
-                "cobol-lsp.cpy-manager.paths-local": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of relative local paths to search for copybooks",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.paths-dsn": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of datasets to search for copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.paths-uss": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of USS paths to search for copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.daco.paths-local": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of relative local paths to search for MAID copybooks",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.daco.paths-dsn": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of datasets to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.daco.paths-uss": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of USS paths to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.idms.paths-local": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of relative local paths to search for IDMS copybooks",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.idms.paths-dsn": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of datasets to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.idms.paths-uss": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of USS paths to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.copybook-extensions": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": [
-                        ".CPY",
-                        ".COPY",
-                        ".cpy",
-                        ".copy"
-                    ],
-                    "description": "List of copybook extensions",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.copybook-file-encoding": {
-                    "type": "string",
-                    "markdownDescription": "The encoding for the copybooks. Alternatively edit in .vscode\\settings.json. Other supported encodings can be found at [supported encodings](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings) ",
-                    "enum": [
-                        "utf8",
-                        "ucs2",
-                        "utf16le",
-                        "ascii",
-                        "base64",
-                        "UTF7",
-                        "UTF7-IMAP",
-                        "UTF-16BE",
-                        "UTF-16",
-                        "UCS-4",
-                        "UTF-32",
-                        "UTF-32LE",
-                        "UTF-32BE",
-                        "ISO-8859-1",
-                        "ISO-8859-2",
-                        "ISO-8859-3",
-                        "ISO-8859-4",
-                        "ISO-8859-5",
-                        "ISO-8859-6",
-                        "ISO-8859-7",
-                        "ISO-8859-8",
-                        "ISO-8859-9",
-                        "ISO-8859-10",
-                        "ISO-8859-11",
-                        "ISO-8859-12",
-                        "ISO-8859-13",
-                        "ISO-8859-14",
-                        "ISO-8859-15",
-                        "ISO-8859-16",
-                        "cp437",
-                        "cp720",
-                        "cp737",
-                        "cp775",
-                        "cp808",
-                        "cp850",
-                        "cp852",
-                        "cp855",
-                        "cp856",
-                        "cp857",
-                        "cp858",
-                        "cp860",
-                        "cp861",
-                        "cp862",
-                        "cp863",
-                        "cp864",
-                        "cp865",
-                        "cp866",
-                        "cp869",
-                        "cp922",
-                        "cp1046",
-                        "cp1124",
-                        "cp1125",
-                        "cp1129",
-                        "cp1133",
-                        "cp1161",
-                        "cp1162",
-                        "cp1163",
-                        "cp1047",
-                        "cp1140",
-                        "cp1147",
-                        "cp1148",
-                        "cp037",
-                        "cp500",
-                        "iso646cn",
-                        "iso646jp"
-                    ],
-                    "enumDescriptions": [
-                        "utf8",
-                        "ucs2",
-                        "utf16le",
-                        "ascii",
-                        "base64",
-                        "UTF7",
-                        "UTF7-IMAP",
-                        "UTF-16BE",
-                        "UTF-16",
-                        "UCS-4",
-                        "UTF-32",
-                        "UTF-32LE",
-                        "UTF-32BE",
-                        "ISO-8859-1",
-                        "ISO-8859-2",
-                        "ISO-8859-3",
-                        "ISO-8859-4",
-                        "ISO-8859-5",
-                        "ISO-8859-6",
-                        "ISO-8859-7",
-                        "ISO-8859-8",
-                        "ISO-8859-9",
-                        "ISO-8859-10",
-                        "ISO-8859-11",
-                        "ISO-8859-12",
-                        "ISO-8859-13",
-                        "ISO-8859-14",
-                        "ISO-8859-15",
-                        "ISO-8859-16",
-                        "IBM-437",
-                        "IBM-720",
-                        "IBM-737",
-                        "IBM-775",
-                        "IBM-808",
-                        "IBM-850",
-                        "IBM-852",
-                        "IBM-855",
-                        "IBM-856",
-                        "IBM-857",
-                        "IBM-858",
-                        "IBM-860",
-                        "IBM-861",
-                        "IBM-862",
-                        "IBM-863",
-                        "IBM-864",
-                        "IBM-865",
-                        "IBM-866",
-                        "IBM-869",
-                        "IBM-922",
-                        "IBM-1046",
-                        "IBM-1124",
-                        "IBM-1125",
-                        "IBM-1129",
-                        "IBM-1133",
-                        "IBM-1161",
-                        "IBM-1162",
-                        "IBM-1163",
-                        "IBM-1047",
-                        "IBM-1140",
-                        "IBM-1147",
-                        "IBM-1148",
-                        "IBM-037",
-                        "IBM-500",
-                        "iso646cn",
-                        "iso646jp"
-                    ]
-                },
-                "cobol-lsp.subroutine-manager.paths-local": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "List of relative local paths to search for subroutines",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.logging.level.root": {
-                    "type": "string",
-                    "default": "ERROR",
-                    "enum": [
-                        "ERROR",
-                        "WARN",
-                        "INFO",
-                        "DEBUG",
-                        "TRACE",
-                        "ALL"
-                    ],
-                    "enumDescriptions": [
-                        "ERROR level logs error events which may or not be fatal to the application",
-                        "WARN level logs potentially harmful situations",
-                        "INFO level logs informational messages highlighting overall progress of the application",
-                        "DEBUG level logs informational events of very low importance",
-                        "TRACE level logs informational events of very low importance",
-                        "ALL level is used to turn on all logging"
-                    ],
-                    "description": "The logging level for COBOL LS backend"
-                },
-                "cobol-lsp.target-sql-backend": {
-                    "type": "string",
-                    "default": "DB2_SERVER",
-                    "enum": [
-                        "DB2_SERVER",
-                        "DATACOM_SERVER"
-                    ],
-                    "enumDescriptions": [
-                        "DB2_SERVER  - IBM DB2 SQL Server",
-                        "DATACOM_SERVER - CA DATACOM Server"
-                    ],
-                    "description": "The target SQL backend server which will be used in mainframe"
-                },
-                "cobol-lsp.dialects": {
-                    "type": "array",
-                    "items": {
-                        "type": "string",
-                        "enum": [
-                            "DaCo",
-                            "IDMS"
-                        ]
-                    },
-                    "description": "List of enabled dialects",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.predefined-sections": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "List of predefined sections",
-                    "default": [
-                        "S930",
-                        "S940",
-                        "S950",
-                        "S990",
-                        "S991",
-                        "S997",
-                        "S999"
-                    ],
-                    "uniqueItems": true
-                }
-            }
-        },
-        "configurationDefaults": {
-            "[COBOL]": {
-                "editor.renderIndentGuides": false,
-                "editor.rulers": [
-                    7,
-                    11,
-                    72,
-                    80
-                ]
-            }
-        },
-        "keybindings": [
-            {
-                "key": "tab",
-                "command": "cobol-lsp.smart-tab",
-                "when": "editorLangId == cobol && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
-            },
-            {
-                "key": "tab",
-                "command": "cobol-lsp.smart-tab",
-                "when": "editorLangId == COBOL && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
-            },
-            {
-                "key": "shift+tab",
-                "command": "cobol-lsp.smart-outdent",
-                "when": "editorLangId == cobol && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
-            },
-            {
-                "key": "shift+tab",
-                "command": "cobol-lsp.smart-outdent",
-                "when": "editorLangId == COBOL && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
-            },
-            {
-                "key": "ctrl+/",
-                "mac": "cmd+/",
-                "command": "cobol-lsp.commentLine.toggle",
-                "when": "editorLangId =~ /^cobol$/i && editorTextFocus && !editorReadonly"
-            }
-        ]
-    },
-    "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "postinstall": "patch-package",
-        "test:integration": "npm run compile && node ./out/test/runTest.js",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "test": "jest -w 1 --unhandled-rejections=strict",
-        "coverage": "jest --coverage --runInBand",
-        "package": "vsce package"
-    },
-    "dependencies": {
-        "@zowe/zowe-explorer-api": "^1.17.0",
-        "iconv-lite": "^0.6.3",
-        "vscode-extension-telemetry": "0.1.6",
-        "vscode-languageclient": "5.2.1"
-    },
-    "devDependencies": {
-        "@types/jest": "^27.0.0",
-        "@types/mocha": "^9.1.1",
-        "@types/node": "^12.6.2",
-        "@types/vscode": "^1.55.0",
-        "@vscode/test-electron": "^2.1.5",
-        "decache": "^4.6.1",
-        "glob": "^8.0.3",
-        "jest": "^27.0.0",
-        "jest-sonar-reporter": "^2.0.0",
-        "mocha": "^10.0.0",
-        "nyc": "^15.1.0",
-        "patch-package": "^6.4.7",
-        "ts-jest": "^27.0.0",
-        "tslint": "^5.18.0",
-        "tslint-sonarts": "^1.9.0",
-        "typescript": "^3.5.3",
-        "vsce": "^2.7.0"
-    }
+	"name": "cobol-language-support",
+	"displayName": "COBOL Language Support",
+	"description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
+	"author": "Broadcom",
+	"license": "EPL-2.0",
+	"version": "1.0.2",
+	"preview": false,
+	"publisher": "BroadcomMFD",
+	"engines": {
+		"vscode": "^1.55.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/eclipse/che-che4z-lsp-for-cobol.git"
+	},
+	"bugs": {
+		"url": "https://github.com/eclipse/che-che4z-lsp-for-cobol/issues"
+	},
+	"keywords": [
+		"mainframe",
+		"lsp",
+		"cobol",
+		"z/os",
+		"zos",
+		"language-server",
+		"jcl",
+		"zowe",
+		"ibm cobol",
+		"idms",
+		"datacom",
+		"cics",
+		"db2"
+	],
+	"categories": [
+		"Programming Languages"
+	],
+	"activationEvents": [
+		"onCommand:cobol-lsp.smart-tab",
+		"onLanguage:COBOL",
+		"workspaceContains:/.c4z"
+	],
+	"icon": "resources/logo.png",
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "cobol-lsp.cpy-manager.fetch-copybook",
+				"title": "Fetch copybook"
+			},
+			{
+				"command": "cobol-lsp.cpy-manager.goto-settings",
+				"title": "Open Copybook location settings"
+			},
+			{
+				"command": "cobol-lsp.commentLine.toggle",
+				"title": "Toggle COBOL Line Comment"
+			},
+			{
+				"command": "cobol-lsp.commentLine.comment",
+				"title": "Add Cobol Line Comment"
+			},
+			{
+				"command": "cobol-lsp.commentLine.uncomment",
+				"title": "Remove COBOL Line Comment"
+			}
+		],
+		"languages": [
+			{
+				"id": "COBOL",
+				"extensions": [
+					".cbl",
+					".cob",
+					".cobol",
+					".cpy",
+					".copy"
+				],
+				"filenamePatterns": [
+					"**/*copybook*/**"
+				],
+				"configuration": "./syntaxes/lang-config.json"
+			}
+		],
+		"snippets": [
+			{
+				"language": "COBOL",
+				"path": "resources/cobolSnippets.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "COBOL",
+				"scopeName": "source.cobol",
+				"path": "./syntaxes/COBOL.tmLanguage.json",
+				"embeddedLanguages": {
+					"meta.embedded.block.sql": "sql",
+					"meta.embedded.block.html": "html"
+				}
+			}
+		],
+		"configuration": {
+			"title": "COBOL Language Support",
+			"properties": {
+				"cobol-lsp.smart-tab": {
+					"oneOf": [
+						{
+							"type": "boolean"
+						},
+						{
+							"type": "array",
+							"items": {
+								"type": "number"
+							}
+						},
+						{
+							"type": "object",
+							"properties": {
+								"default": {
+									"type": "array",
+									"items": {
+										"type": "number"
+									}
+								},
+								"anchors": {
+									"type": "object",
+									"patternProperties": {
+										"^.*$": {
+											"type": "array",
+											"items": {
+												"type": "number"
+											}
+										}
+									}
+								}
+							}
+						}
+					],
+					"description": "Enable/disable smart tab",
+					"default": true
+				},
+				"cobol-lsp.cpy-manager.profiles": {
+					"type": "string",
+					"description": "Current default profile for copybook downloader\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe"
+				},
+				"cobol-lsp.cpy-manager.paths-local": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"description": "Default list of relative local paths to search for copybooks",
+					"uniqueItems": true
+				},
+				"cobol-lsp.cpy-manager.paths-dsn": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"description": "Default list of datasets to search for copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+					"uniqueItems": true
+				},
+				"cobol-lsp.cpy-manager.paths-uss": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"description": "Default list of USS paths to search for copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+					"uniqueItems": true
+				},
+				"cobol-lsp.cpy-manager.daco.paths-local": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"description": "Default list of relative local paths to search for MAID copybooks",
+					"uniqueItems": true
+				},
+				"cobol-lsp.cpy-manager.daco.paths-dsn": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"description": "Default list of datasets to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+					"uniqueItems": true
+				},
+				"cobol-lsp.cpy-manager.daco.paths-uss": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"description": "Default list of USS paths to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+					"uniqueItems": true
+				},
+				"cobol-lsp.cpy-manager.idms.paths-local": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"description": "Default list of relative local paths to search for IDMS copybooks",
+					"uniqueItems": true
+				},
+				"cobol-lsp.cpy-manager.idms.paths-dsn": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"description": "Default list of datasets to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+					"uniqueItems": true
+				},
+				"cobol-lsp.cpy-manager.idms.paths-uss": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"description": "Default list of USS paths to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+					"uniqueItems": true
+				},
+				"cobol-lsp.cpy-manager.copybook-extensions": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [
+						".CPY",
+						".COPY",
+						".cpy",
+						".copy"
+					],
+					"description": "List of copybook extensions",
+					"uniqueItems": true
+				},
+				"cobol-lsp.cpy-manager.copybook-file-encoding": {
+					"type": "string",
+					"markdownDescription": "The encoding for the copybooks. Alternatively edit in .vscode\\settings.json. Other supported encodings can be found at [supported encodings](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings) ",
+					"enum": [
+						"utf8",
+						"ucs2",
+						"utf16le",
+						"ascii",
+						"base64",
+						"UTF7",
+						"UTF7-IMAP",
+						"UTF-16BE",
+						"UTF-16",
+						"UCS-4",
+						"UTF-32",
+						"UTF-32LE",
+						"UTF-32BE",
+						"ISO-8859-1",
+						"ISO-8859-2",
+						"ISO-8859-3",
+						"ISO-8859-4",
+						"ISO-8859-5",
+						"ISO-8859-6",
+						"ISO-8859-7",
+						"ISO-8859-8",
+						"ISO-8859-9",
+						"ISO-8859-10",
+						"ISO-8859-11",
+						"ISO-8859-12",
+						"ISO-8859-13",
+						"ISO-8859-14",
+						"ISO-8859-15",
+						"ISO-8859-16",
+						"cp437",
+						"cp720",
+						"cp737",
+						"cp775",
+						"cp808",
+						"cp850",
+						"cp852",
+						"cp855",
+						"cp856",
+						"cp857",
+						"cp858",
+						"cp860",
+						"cp861",
+						"cp862",
+						"cp863",
+						"cp864",
+						"cp865",
+						"cp866",
+						"cp869",
+						"cp922",
+						"cp1046",
+						"cp1124",
+						"cp1125",
+						"cp1129",
+						"cp1133",
+						"cp1161",
+						"cp1162",
+						"cp1163",
+						"cp1047",
+						"cp1140",
+						"cp1147",
+						"cp1148",
+						"cp037",
+						"cp500",
+						"iso646cn",
+						"iso646jp"
+					],
+					"enumDescriptions": [
+						"utf8",
+						"ucs2",
+						"utf16le",
+						"ascii",
+						"base64",
+						"UTF7",
+						"UTF7-IMAP",
+						"UTF-16BE",
+						"UTF-16",
+						"UCS-4",
+						"UTF-32",
+						"UTF-32LE",
+						"UTF-32BE",
+						"ISO-8859-1",
+						"ISO-8859-2",
+						"ISO-8859-3",
+						"ISO-8859-4",
+						"ISO-8859-5",
+						"ISO-8859-6",
+						"ISO-8859-7",
+						"ISO-8859-8",
+						"ISO-8859-9",
+						"ISO-8859-10",
+						"ISO-8859-11",
+						"ISO-8859-12",
+						"ISO-8859-13",
+						"ISO-8859-14",
+						"ISO-8859-15",
+						"ISO-8859-16",
+						"IBM-437",
+						"IBM-720",
+						"IBM-737",
+						"IBM-775",
+						"IBM-808",
+						"IBM-850",
+						"IBM-852",
+						"IBM-855",
+						"IBM-856",
+						"IBM-857",
+						"IBM-858",
+						"IBM-860",
+						"IBM-861",
+						"IBM-862",
+						"IBM-863",
+						"IBM-864",
+						"IBM-865",
+						"IBM-866",
+						"IBM-869",
+						"IBM-922",
+						"IBM-1046",
+						"IBM-1124",
+						"IBM-1125",
+						"IBM-1129",
+						"IBM-1133",
+						"IBM-1161",
+						"IBM-1162",
+						"IBM-1163",
+						"IBM-1047",
+						"IBM-1140",
+						"IBM-1147",
+						"IBM-1148",
+						"IBM-037",
+						"IBM-500",
+						"iso646cn",
+						"iso646jp"
+					]
+				},
+				"cobol-lsp.subroutine-manager.paths-local": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"description": "List of relative local paths to search for subroutines",
+					"uniqueItems": true
+				},
+				"cobol-lsp.logging.level.root": {
+					"type": "string",
+					"default": "ERROR",
+					"enum": [
+						"ERROR",
+						"WARN",
+						"INFO",
+						"DEBUG",
+						"TRACE",
+						"ALL"
+					],
+					"enumDescriptions": [
+						"ERROR level logs error events which may or not be fatal to the application",
+						"WARN level logs potentially harmful situations",
+						"INFO level logs informational messages highlighting overall progress of the application",
+						"DEBUG level logs informational events of very low importance",
+						"TRACE level logs informational events of very low importance",
+						"ALL level is used to turn on all logging"
+					],
+					"description": "The logging level for COBOL LS backend"
+				},
+				"cobol-lsp.target-sql-backend": {
+					"type": "string",
+					"default": "DB2_SERVER",
+					"enum": [
+						"DB2_SERVER",
+						"DATACOM_SERVER"
+					],
+					"enumDescriptions": [
+						"DB2_SERVER  - IBM DB2 SQL Server",
+						"DATACOM_SERVER - CA DATACOM Server"
+					],
+					"description": "The target SQL backend server which will be used in mainframe"
+				},
+				"cobol-lsp.dialects": {
+					"type": "array",
+					"items": {
+						"type": "string",
+						"enum": [
+							"DaCo",
+							"IDMS"
+						]
+					},
+					"description": "List of enabled dialects",
+					"uniqueItems": true
+				},
+				"cobol-lsp.predefined-sections": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"description": "List of predefined sections",
+					"default": [
+						"S930",
+						"S940",
+						"S950",
+						"S990",
+						"S991",
+						"S997",
+						"S999"
+					],
+					"uniqueItems": true
+				}
+			}
+		},
+		"configurationDefaults": {
+			"[COBOL]": {
+				"editor.renderIndentGuides": false,
+				"editor.rulers": [
+					7,
+					11,
+					72,
+					80
+				]
+			}
+		},
+		"keybindings": [
+			{
+				"key": "tab",
+				"command": "cobol-lsp.smart-tab",
+				"when": "editorLangId == cobol && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
+			},
+			{
+				"key": "tab",
+				"command": "cobol-lsp.smart-tab",
+				"when": "editorLangId == COBOL && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
+			},
+			{
+				"key": "shift+tab",
+				"command": "cobol-lsp.smart-outdent",
+				"when": "editorLangId == cobol && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
+			},
+			{
+				"key": "shift+tab",
+				"command": "cobol-lsp.smart-outdent",
+				"when": "editorLangId == COBOL && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
+			},
+			{
+				"key": "ctrl+/",
+				"mac": "cmd+/",
+				"command": "cobol-lsp.commentLine.toggle",
+				"when": "editorLangId =~ /^cobol$/i && editorTextFocus && !editorReadonly"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"postinstall": "patch-package",
+		"test:integration": "npm run compile && node ./out/test/runTest.js",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"test": "jest -w 1 --unhandled-rejections=strict",
+		"coverage": "jest --coverage --runInBand",
+		"package": "vsce package"
+	},
+	"dependencies": {
+		"@zowe/zowe-explorer-api": "^1.17.0",
+		"iconv-lite": "^0.6.3",
+		"vscode-extension-telemetry": "0.1.6",
+		"vscode-languageclient": "5.2.1"
+	},
+	"devDependencies": {
+		"@types/jest": "^27.0.0",
+		"@types/mocha": "^9.1.1",
+		"@types/node": "^12.6.2",
+		"@types/vscode": "^1.55.0",
+		"@vscode/test-electron": "^2.1.5",
+		"decache": "^4.6.1",
+		"glob": "^8.0.3",
+		"jest": "^27.0.0",
+		"jest-sonar-reporter": "^2.0.0",
+		"mocha": "^10.0.0",
+		"nyc": "^15.1.0",
+		"patch-package": "^6.4.7",
+		"ts-jest": "^27.0.0",
+		"tslint": "^5.18.0",
+		"tslint-sonarts": "^1.9.0",
+		"typescript": "^3.5.3",
+		"vsce": "^2.7.0"
+	},
+	"__metadata": {
+		"id": "1a291a59-0a06-42e0-8783-fbdae290b3e5",
+		"publisherDisplayName": "Broadcom",
+		"publisherId": "4c523590-e5db-4102-93bf-d6e37ca84a62",
+		"isPreReleaseVersion": false
+	}
 }
