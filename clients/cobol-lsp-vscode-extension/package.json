@@ -81,6 +81,16 @@
                 "configuration": "./syntaxes/lang-config.json"
             }
         ],
+        "snippets": [
+            {
+                "language": "COBOL",
+                "path": "resources/cobolSnippets.json"
+            },
+            {
+                "language": "COBOL Copybook",
+                "path": "resources/cobolSnippets.json"
+            }
+        ],
         "grammars": [
             {
                 "language": "COBOL",
@@ -97,12 +107,12 @@
             "properties": {
                 "cobol-lsp.smart-tab": {
                     "oneOf": [
-                        { 
+                        {
                             "type": "boolean"
                         },
-                        { 
+                        {
                             "type": "array",
-                            "items": { 
+                            "items": {
                                 "type": "number"
                             }
                         },
@@ -120,7 +130,7 @@
                                     "patternProperties": {
                                         "^.*$": {
                                             "type": "array",
-                                            "items": { 
+                                            "items": {
                                                 "type": "number"
                                             }
                                         }

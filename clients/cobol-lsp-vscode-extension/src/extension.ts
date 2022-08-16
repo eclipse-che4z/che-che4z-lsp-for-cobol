@@ -70,10 +70,10 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerCodeActionsProvider(
             { scheme: "file", language: LANGUAGE_ID },
             new CopybooksCodeActionProvider()));
-    const completionProvider =  vscode.languages.registerCompletionItemProvider(
-                { scheme: "file", language: LANGUAGE_ID },
-                new SnippetCompletionProvider());
-    context.subscriptions.push(completionProvider);
+
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
+        { scheme: "file", language: LANGUAGE_ID },
+        new SnippetCompletionProvider()));
 
 
     try {

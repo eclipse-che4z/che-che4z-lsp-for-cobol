@@ -15,20 +15,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import {
-    DACO_DIALECT,
-    IDMS_DIALECT,
-    PATHS_LOCAL_KEY,
-    PATHS_USS,
-    PATHS_ZOWE,
-    SERVER_PORT,
-    SETTINGS_CPY_SECTION,
-    SETTINGS_SUBROUTINE_LOCAL_KEY,
-    SETTINGS_DIALECT,
-    SETTINGS_TAB_CONFIG,
-    COPYBOOK_EXTENSIONS
-} from "../constants";
-import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
+import { DACO_DIALECT, IDMS_DIALECT, PATHS_LOCAL_KEY, PATHS_USS, PATHS_ZOWE, SERVER_PORT, SETTINGS_CPY_SECTION, SETTINGS_SUBROUTINE_LOCAL_KEY, SETTINGS_DIALECT, SETTINGS_TAB_CONFIG,  COPYBOOK_EXTENSIONS } from "../constants";
+
 import dacoSnippets = require("../services/snippetcompletion/dacoSnippets.json");
 import idmsSnippets = require("../services/snippetcompletion/idmsSnippets.json");
 
@@ -198,21 +186,21 @@ export class SettingsService {
      */
      public static getSnippetsForUserDialect(): Map<any, any>{
         const dialectList: string[] =  vscode.workspace.getConfiguration().get(SETTINGS_DIALECT);
-        const cobolMap = new Map(Object.entries(cobolSnippets));
-        let finalSnippetMap = cobolMap;
+
+        let finalSnippetMap = new Map<any,any>();
         if(dialectList.includes(IDMS_DIALECT)){
             var idmsMap: Map<any,any> = new Map(Object.entries(idmsSnippets));
-            finalSnippetMap = new Map([...cobolMap, ...idmsMap])
+            finalSnippetMap = idmsMap;
 
             if(dialectList.includes(DACO_DIALECT)){
                 var dacoMap: Map<any,any> = new Map(Object.entries(dacoSnippets));
-                finalSnippetMap = new Map([...cobolMap, ...idmsMap, ...dacoMap])
+                finalSnippetMap = new Map([...idmsMap, ...dacoMap])
             }
         }
        else
             if(dialectList.includes(DACO_DIALECT)){
                 var dacoMap: Map<any,any> = new Map(Object.entries(dacoSnippets));
-                finalSnippetMap = new Map([...cobolMap, ...dacoMap])
+                finalSnippetMap = dacoMap;
             }
 
         return finalSnippetMap;
