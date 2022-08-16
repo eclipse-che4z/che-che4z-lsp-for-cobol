@@ -67,13 +67,16 @@
         ],
         "languages": [
             {
-                "id": "COBOL",
+                "id": "cobol",
                 "extensions": [
                     ".cbl",
                     ".cob",
                     ".cobol",
                     ".cpy",
                     ".copy"
+                ],
+                "aliases": [
+                    "COBOL"
                 ],
                 "filenamePatterns": [
                     "**/*copybook*/**"
@@ -97,12 +100,12 @@
             "properties": {
                 "cobol-lsp.smart-tab": {
                     "oneOf": [
-                        { 
+                        {
                             "type": "boolean"
                         },
-                        { 
+                        {
                             "type": "array",
-                            "items": { 
+                            "items": {
                                 "type": "number"
                             }
                         },
@@ -120,7 +123,7 @@
                                     "patternProperties": {
                                         "^.*$": {
                                             "type": "array",
-                                            "items": { 
+                                            "items": {
                                                 "type": "number"
                                             }
                                         }
