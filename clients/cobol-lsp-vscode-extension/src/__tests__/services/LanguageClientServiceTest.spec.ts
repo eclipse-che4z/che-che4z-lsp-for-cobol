@@ -14,8 +14,8 @@
 
 import * as fs from "fs-extra";
 import * as os from "os";
+import { join } from "path";
 import * as vscode from "vscode";
-import * as path from "path";
 import { LanguageClient } from "vscode-languageclient";
 import { CopybookDownloadService } from "../../services/copybook/CopybookDownloadService";
 import { JavaCheck } from "../../services/JavaCheck";
@@ -61,7 +61,7 @@ describe("LanguageClientService positive scenario", () => {
     });
 
     test("Test LanguageClientService switches native flag", async () => {
-        (languageClientService as any).initializeExecutables = jest.fn()
+        (languageClientService as any).initializeExecutables = jest.fn();
         fs.existsSync = jest.fn().mockReturnValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(9999);
         languageClientService.enableNativeBuild();
@@ -90,7 +90,7 @@ describe("LanguageClientService positive scenario", () => {
 
     test("Test LanguageClientService starts language client", () => {
         LanguageClient.prototype.start = jest.fn().mockReturnValue(SERVER_STARTED_MSG);
-        const serverPath = path.join("/test", "server", "jar", "server.jar");
+        const serverPath = join("/test", "server", "jar", "server.jar");
         expect(languageClientService.start()).toBe(SERVER_STARTED_MSG);
         expect(LanguageClient).toHaveBeenCalledTimes(1);
         expect(LanguageClient).toHaveBeenCalledWith(SERVER_ID, SERVER_DESC, {
@@ -138,7 +138,7 @@ describe("LanguageClientService positive scenario", () => {
         expect(executableName.command).toBe("engine.exe");
         (languageClientService as any).giveExecutePermission = jest.fn();
         const executableLocation = (languageClientService as any).initializeExecutables("/test");
-        expect(executableLocation).toBe(path.join("/test", "package-win"));
+        expect(executableLocation).toBe(join("/test", "package-win"));
     });
 
     test("LanguageClientServer detects executable path for Linux", () => {
@@ -148,7 +148,7 @@ describe("LanguageClientService positive scenario", () => {
         expect(executableName.command).toBe("./server");
         (languageClientService as any).giveExecutePermission = jest.fn();
         const executableLocation = (languageClientService as any).initializeExecutables("/test");
-        expect(executableLocation).toBe(path.join("/test", "package-linux"));
+        expect(executableLocation).toBe(join("/test", "package-linux"));
     });
 
     test("LanguageClientServer detects executable path for Mac", () => {
@@ -158,7 +158,7 @@ describe("LanguageClientService positive scenario", () => {
         expect(executableName.command).toBe("./server-mac-amd64");
         (languageClientService as any).giveExecutePermission = jest.fn();
         const executableLocation = (languageClientService as any).initializeExecutables("/test");
-        expect(executableLocation).toBe(path.join("/test", "package-macos"));
+        expect(executableLocation).toBe(join("/test", "package-macos"));
     });
 
     test("LanguageClientServer detects executable path for unKnown OS", () => {

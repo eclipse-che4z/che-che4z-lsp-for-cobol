@@ -14,13 +14,7 @@
 -->
 
 # COBOL LSP server running information
-Put in this folder the COBOL LSP linux native build for server
+This folder contains native executable "COBOL LSP server" for linux.
 
-```
-server
-```
-In Linux environment be sure that the server folder have read/write permission, in case simply run the command
+Ensure the server folder has read/write permission
 
-```
-chmod -R 777 server
-```

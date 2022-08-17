@@ -14,8 +14,4 @@
 -->
 
 # COBOL LSP server running information
-Put in this folder the COBOL LSP windows native build and dll for server
-
-```
-engine.exe
-```
+This folder contains native executable "COBOL LSP server" and dll for windows.

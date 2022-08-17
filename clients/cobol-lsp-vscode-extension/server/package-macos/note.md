@@ -14,8 +14,6 @@
 -->
 
 # COBOL LSP server running information
-Put in this folder the COBOL LSP macos native build for server
+This folder contains native executable "COBOL LSP server" for macos.
 
-```
-server-mac-amd64
-```
+Ensure the server folder has read/write permission

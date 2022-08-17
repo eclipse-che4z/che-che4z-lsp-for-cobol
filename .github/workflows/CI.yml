@@ -139,10 +139,10 @@ jobs:
           cp ../../staging/package-win/sunmscapi.dll ./server/package-win
       - name: configure mac executable
         working-directory: clients/cobol-lsp-vscode-extension
-        run: "cp ../../staging/package-macos/server-mac-amd64 ./server/package-macos"
+        run: "chmod +x ../../staging/package-macos/server-mac-amd64; cp ../../staging/package-macos/server-mac-amd64 ./server/package-macos"
       - name: configure linux executable
         working-directory: clients/cobol-lsp-vscode-extension
-        run: "cp ../../staging/package-linux/server ./server/package-linux"
+        run: "chmod +x ../../staging/package-linux/server; cp ../../staging/package-linux/server ./server/package-linux"
       - name: coverage
         run: npm run coverage
         working-directory: clients/cobol-lsp-vscode-extension
