@@ -37,7 +37,7 @@
     ],
     "activationEvents": [
         "onCommand:cobol-lsp.smart-tab",
-        "onLanguage:COBOL",
+        "onLanguage:cobol",
         "workspaceContains:/.c4z"
     ],
     "icon": "resources/logo.png",
@@ -86,7 +86,7 @@
         ],
         "grammars": [
             {
-                "language": "COBOL",
+                "language": "cobol",
                 "scopeName": "source.cobol",
                 "path": "./syntaxes/COBOL.tmLanguage.json",
                 "embeddedLanguages": {
@@ -437,7 +437,7 @@
             }
         },
         "configurationDefaults": {
-            "[COBOL]": {
+            "[cobol]": {
                 "editor.renderIndentGuides": false,
                 "editor.rulers": [
                     7,
