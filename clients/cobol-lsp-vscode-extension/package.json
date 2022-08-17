@@ -63,6 +63,11 @@
 			{
 				"command": "cobol-lsp.commentLine.uncomment",
 				"title": "Remove COBOL Line Comment"
+			},
+			{
+				"command": "cobol-lsp.snippets.insertSnippets",
+				"title": "Insert COBOL Snippet",
+				"category": "Snippets"
 			}
 		],
 		"languages": [
@@ -79,12 +84,6 @@
 					"**/*copybook*/**"
 				],
 				"configuration": "./syntaxes/lang-config.json"
-			}
-		],
-		"snippets": [
-			{
-				"language": "COBOL",
-				"path": "resources/cobolSnippets.json"
 			}
 		],
 		"grammars": [

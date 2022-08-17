@@ -45,7 +45,7 @@ describe("Test CompletionProvider", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
         get: jest.fn().mockReturnValue(["DaCo"]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(79);
+    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(301);
     });
     test("Suggest all IDMS Snippets", async () => {
     const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: ""})} as any;
@@ -55,7 +55,7 @@ describe("Test CompletionProvider", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
         get: jest.fn().mockReturnValue(["IDMS"]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(10);
+    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(232);
 });
     test("Suggest all Cobol only Snippets", async () => {
     const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: ""})} as any;
@@ -65,7 +65,7 @@ describe("Test CompletionProvider", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
         get: jest.fn().mockReturnValue([""]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(0);
+    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(222);
 });
 
     test("Suggest Snippets when both IDMS and DaCo is set", async () => {
@@ -76,7 +76,7 @@ describe("Test CompletionProvider", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
         get: jest.fn().mockReturnValue(["DaCo", "IDMS"]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(89);
+    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(311);
 });
 
     test(" Test number of suggestions for COPY when no dialect is selected", async () => {
@@ -87,7 +87,7 @@ describe("Test CompletionProvider", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
         get: jest.fn().mockReturnValue([""]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(0);
+    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(1);
 });
 
     test(" Test number of suggestions for COPY when dialect is IDMS", async () => {
@@ -98,8 +98,19 @@ describe("Test CompletionProvider", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
         get: jest.fn().mockReturnValue(["IDMS"]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(6);
-});
+    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(7);
+})
+
+test(" Test number of suggestions for WRITE when dialect is IDMS", async () => {
+    const doc = { uri: { fsPath: "ws-path" }, fileName: "SNIPPET.cbl", lineAt: jest.fn().mockReturnValue({text: "WRITE"})} as any;
+    const position = jest.fn().mockImplementation((line, character) => { return {line: 0, character: 4} });
+    const token = { isCancellationRequested: false, onCancellationRequested: jest.fn() };
+
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+        get: jest.fn().mockReturnValue(["IDMS"]),
+    });
+    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(1);
+})
 
     test(" Test number of suggestions for WRITE when dialect is Daco", async () => {
     const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: "WRITE"})} as any;
@@ -109,7 +120,7 @@ describe("Test CompletionProvider", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
         get: jest.fn().mockReturnValue(["DaCo", "IDMS"]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(9);
+    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(10);
 });
 
 });

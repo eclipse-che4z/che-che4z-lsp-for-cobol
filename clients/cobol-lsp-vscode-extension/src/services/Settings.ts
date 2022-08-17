@@ -15,8 +15,20 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { DACO_DIALECT, IDMS_DIALECT, PATHS_LOCAL_KEY, PATHS_USS, PATHS_ZOWE, SERVER_PORT, SETTINGS_CPY_SECTION, SETTINGS_SUBROUTINE_LOCAL_KEY, SETTINGS_DIALECT, SETTINGS_TAB_CONFIG,  COPYBOOK_EXTENSIONS } from "../constants";
-
+import {
+    COPYBOOK_EXTENSIONS,
+    DACO_DIALECT,
+    IDMS_DIALECT,
+    PATHS_LOCAL_KEY,
+    PATHS_USS,
+    PATHS_ZOWE,
+    SERVER_PORT,
+    SETTINGS_CPY_SECTION,
+    SETTINGS_DIALECT,
+    SETTINGS_SUBROUTINE_LOCAL_KEY,
+    SETTINGS_TAB_CONFIG,
+} from "../constants";
+import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import dacoSnippets = require("../services/snippetcompletion/dacoSnippets.json");
 import idmsSnippets = require("../services/snippetcompletion/idmsSnippets.json");
 
@@ -123,7 +135,7 @@ export class SettingsService {
      * @returns a profile name
      */
     public static getProfileName(): string {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles")
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles");
     }
 
     /**
@@ -146,7 +158,7 @@ export class SettingsService {
             if (stops !== undefined && stops.length > 0) {
                 defaultRule = new TabRule(stops, stops[stops.length - 1]);
             }
-            let rules = [];
+            const rules = [];
             const anchors = obj.anchors;
             if (obj.anchors !== undefined && Object.keys(anchors).length > 0) {
                 const keys = Object.keys(anchors);
@@ -164,14 +176,6 @@ export class SettingsService {
         return settings;
     }
 
-    private static evaluateVariable(dataList: string[], variable: string, value: string): string[] {
-        const result: string[] = [];
-        if (dataList) {
-            dataList.forEach(d => result.push(d.replace(`$\{${variable}\}`, value)))
-        }
-        return result;
-    }
-
     /**
      * Return the code page for the copybook file encoding supplied by user
      * @returns string
@@ -184,27 +188,34 @@ export class SettingsService {
      * Return the dialect type supplied by user
      * @returns Map of snippets
      */
-     public static getSnippetsForUserDialect(): Map<any, any>{
+    public static getSnippetsForUserDialect(): Map<any, any>{
         const dialectList: string[] =  vscode.workspace.getConfiguration().get(SETTINGS_DIALECT);
-
-        let finalSnippetMap = new Map<any,any>();
+        const cobolMap = new Map(Object.entries(cobolSnippets));
+        let finalSnippetMap = cobolMap;
         if(dialectList.includes(IDMS_DIALECT)){
-            var idmsMap: Map<any,any> = new Map(Object.entries(idmsSnippets));
-            finalSnippetMap = idmsMap;
+            const idmsMap: Map<any,any> = new Map(Object.entries(idmsSnippets));
+            finalSnippetMap = new Map([...cobolMap, ...idmsMap])
 
             if(dialectList.includes(DACO_DIALECT)){
-                var dacoMap: Map<any,any> = new Map(Object.entries(dacoSnippets));
-                finalSnippetMap = new Map([...idmsMap, ...dacoMap])
+                const dacoMap: Map<any,any> = new Map(Object.entries(dacoSnippets));
+                finalSnippetMap = new Map([...cobolMap, ...idmsMap, ...dacoMap])
             }
-        }
-       else
+        } else
             if(dialectList.includes(DACO_DIALECT)){
-                var dacoMap: Map<any,any> = new Map(Object.entries(dacoSnippets));
-                finalSnippetMap = dacoMap;
+                const dacoMap: Map<any,any> = new Map(Object.entries(dacoSnippets));
+                finalSnippetMap = new Map([...cobolMap, ...dacoMap])
             }
 
         return finalSnippetMap;
 
+    }
+
+    private static evaluateVariable(dataList: string[], variable: string, value: string): string[] {
+        const result: string[] = [];
+        if (dataList) {
+            dataList.forEach(d => result.push(d.replace(`$\{${variable}\}`, value)))
+        }
+        return result;
     }
     private static getCopybookConfigValues(section: string, cobolFileName: string, dialectType: string) {
         const programFile = cobolFileName.replace(/\.[^/.]+$/, "");
