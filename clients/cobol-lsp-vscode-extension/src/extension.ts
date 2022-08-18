@@ -20,14 +20,14 @@ import { C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID } from "./constants";
 import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
+import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab } from "./commands/SmartTabCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { Middleware } from "./services/Middleware";
 import { TelemetryService } from "./services/reporter/TelemetryService";
 import { createFileWithGivenPath, SettingsService } from "./services/Settings";
+import { pickSnippet, SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
-import { SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
-import { CommentAction, commentCommand } from "./commands/CommentCommand";
 
 let copyBooksDownloader: CopybookDownloadService;
 let middleware: Middleware;
@@ -58,9 +58,14 @@ export async function activate(context: vscode.ExtensionContext) {
         () => {
         gotoCopybookSettings();
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE) }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle",
+     () => { commentCommand(CommentAction.TOGGLE); }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment",
+    () => { commentCommand(CommentAction.COMMENT); }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment",
+    () => { commentCommand(CommentAction.UNCOMMENT); }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.snippets.insertSnippets",
+    async () => { pickSnippet(); }));
     // create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
@@ -70,10 +75,10 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerCodeActionsProvider(
             { scheme: "file", language: LANGUAGE_ID },
             new CopybooksCodeActionProvider()));
-    const completionProvider =  vscode.languages.registerCompletionItemProvider(
-                { scheme: "file", language: LANGUAGE_ID },
-                new SnippetCompletionProvider());
-    context.subscriptions.push(completionProvider);
+
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
+        { scheme: "file", language: LANGUAGE_ID },
+        new SnippetCompletionProvider()));
 
 
     try {
