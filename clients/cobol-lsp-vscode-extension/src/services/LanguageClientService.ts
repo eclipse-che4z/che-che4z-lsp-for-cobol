@@ -16,7 +16,9 @@ import * as cp from "child_process";
 import * as fs from "fs";
 import * as net from "net";
 import * as os from "os";
+import { join } from "path";
 import * as vscode from "vscode";
+
 import {
     ConfigurationParams,
     ConfigurationRequest,
@@ -32,7 +34,6 @@ import {JavaCheck} from "./JavaCheck";
 import {Middleware} from "./Middleware";
 import { SettingsService } from "./Settings";
 
-
 export class LanguageClientService {
     private executablePath: string;
     private languageClient: LanguageClient;
@@ -41,7 +42,7 @@ export class LanguageClientService {
 
     constructor(private middleware: Middleware) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
-        this.executablePath = `${ext.extensionPath}/server/jar/server.jar`;
+        this.executablePath = join(ext.extensionPath, "server", "jar", "server.jar");
     }
 
     public enableNativeBuild() {
@@ -147,28 +148,18 @@ export class LanguageClientService {
         let executablePath;
         switch (os.type()) {
             case "Windows_NT":
-                executablePath = `${serverPath}/package-win`;
+                executablePath = join(serverPath, "package-win");
                 break;
             case "Darwin":
-                executablePath = `${serverPath}/package-macos`;
-                this.giveExecutePermission(executablePath);
+                executablePath = join(serverPath, "package-macos");
                 break;
             case "Linux":
-                executablePath = `${serverPath}/package-linux`;
-                this.giveExecutePermission(executablePath);
+                executablePath = join(serverPath, "package-linux");
                 break;
             default:
                 break;
         }
         return executablePath;
-    }
-
-    private giveExecutePermission(executablePath) {
-        cp.exec(`cd ${executablePath}; chmod 755 *`, (err, stdout, stderr) => {
-            if (err) {
-                vscode.window.showInformationMessage(`couldn't initialize executable as ${executablePath}. Please change the permission to execution mode`);
-            }
-        });
     }
 }
 export function nativeServer(jarPath: string) {

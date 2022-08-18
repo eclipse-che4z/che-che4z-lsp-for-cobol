@@ -2,14 +2,17 @@ VERSION 0.6
 FROM maven:3-openjdk-8-slim
 WORKDIR /server
 
+listing:
+    LOCALLY
+    SAVE ARTIFACT ../Cobol85PositiveTestsSuite .
+
 deps:
+    COPY --dir +listing/Cobol85PositiveTestsSuite ./testFiles
     COPY pom.xml ./
-    COPY --dir src/style ./src/style
-    RUN mvn dependency:go-offline verify --no-transfer-progress
+    COPY --dir engine ./
     RUN mvn clean
 
 build:
     FROM +deps
-    COPY --dir lombok.config src ./
-    RUN mvn verify -B
-    SAVE ARTIFACT target/server.jar server.jar
+    RUN mvn -DfilesToTestPath=../testFiles -DlistingSnap=../testFiles/compileListing/snapshot clean verify --no-transfer-progress
+    SAVE ARTIFACT engine/target/server.jar server.jar
