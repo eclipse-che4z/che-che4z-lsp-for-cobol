@@ -81,16 +81,17 @@ suite('Integration Test Suite', () => {
         editor = helper.get_editor("USER2.cbl");
         await helper.sleep(2000);
         const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-        assert.ok(diagnostics.length === 3
-            && diagnostics[0].message === "There is an issue with PROGRAM-ID paragraph"
-            && diagnostics[0].severity === vscode.DiagnosticSeverity.Warning
-            && helper.assertRangeIsEqual(diagnostics[0].range, new vscode.Range(new vscode.Position(49, 19), new vscode.Position(49, 30)))
-            && diagnostics[1].message === "Variable USER-CITY1 is not defined"
-            && helper.assertRangeIsEqual(diagnostics[1].range, new vscode.Range(new vscode.Position(39, 28), new vscode.Position(39, 38)))
-            && diagnostics[2].message === "Syntax error on 'Program1-id' expected PROGRAM-ID"
-            && helper.assertRangeIsEqual(diagnostics[2].range, new vscode.Range(new vscode.Position(14, 7), new vscode.Position(14, 18)))
-            && diagnostics[1].severity === diagnostics[2].severity
-            && diagnostics[2].severity === vscode.DiagnosticSeverity.Error, 'No syntax errors detected in USER2.cbl');
+        assert.strictEqual(diagnostics.length, 3);
+        assert.ok(diagnostics.length === 3);
+        assert.strictEqual(diagnostics[0].message, "There is an issue with PROGRAM-ID paragraph");
+        assert.strictEqual(diagnostics[0].severity, vscode.DiagnosticSeverity.Warning);
+        helper.assertRangeIsEqual(diagnostics[0].range, new vscode.Range(new vscode.Position(49, 19), new vscode.Position(49, 30)));
+        assert.strictEqual(diagnostics[1].message, "Variable USER-CITY1 is not defined");
+        helper.assertRangeIsEqual(diagnostics[1].range, new vscode.Range(new vscode.Position(39, 28), new vscode.Position(39, 38)));
+        assert.strictEqual(diagnostics[2].message, "Syntax error on 'Program1-id' expected PROGRAM-ID");
+        helper.assertRangeIsEqual(diagnostics[2].range, new vscode.Range(new vscode.Position(14, 7), new vscode.Position(14, 18)));
+        assert.strictEqual(diagnostics[1].severity, diagnostics[2].severity);
+        assert.strictEqual(diagnostics[2].severity, vscode.DiagnosticSeverity.Error, 'No syntax errors detected in USER2.cbl');
     }).timeout(10000).slow(4000);
 
     test('TC152054 Auto format of right trailing spaces', async () => {
