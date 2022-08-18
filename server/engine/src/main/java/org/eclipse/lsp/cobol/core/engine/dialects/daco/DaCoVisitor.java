@@ -33,6 +33,7 @@ import org.eclipse.lsp.cobol.core.model.tree.SortTableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
@@ -99,7 +100,8 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
   }
 
   private Locality constructLocality(ParserRuleContext ctx) {
-    return Locality.builder().uri(context.getExtendedSource().getUri()).range(DialectUtils.constructRange(ctx)).build();
+    Location location = context.getExtendedSource().getMainMap().mapLocation(DialectUtils.constructRange(ctx), false);
+    return Locality.builder().uri(context.getExtendedSource().getUri()).range(location.getRange()).build();
   }
 
   public List<SyntaxError> getErrors() {
