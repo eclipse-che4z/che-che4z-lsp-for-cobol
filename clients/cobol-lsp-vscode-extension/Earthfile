@@ -12,7 +12,7 @@ build:
     FROM +deps
     COPY --dir src resources tslint.json tsconfig.json jest.config.js ./
     RUN npm run coverage
-    COPY ../../server+build/server.jar ./server/
+    COPY ../../server+build/server.jar ./server/jar/
     COPY --dir syntaxes .vscodeignore CHANGELOG.md README.md LICENSE ./
     RUN npm run package
     SAVE ARTIFACT *.vsix AS LOCAL ./
