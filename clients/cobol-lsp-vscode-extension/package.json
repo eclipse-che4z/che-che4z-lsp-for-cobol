@@ -37,7 +37,7 @@
     ],
     "activationEvents": [
         "onCommand:cobol-lsp.smart-tab",
-        "onLanguage:COBOL",
+        "onLanguage:cobol",
         "workspaceContains:/.c4z"
     ],
     "icon": "resources/logo.png",
@@ -67,13 +67,16 @@
         ],
         "languages": [
             {
-                "id": "COBOL",
+                "id": "cobol",
                 "extensions": [
                     ".cbl",
                     ".cob",
                     ".cobol",
                     ".cpy",
                     ".copy"
+                ],
+                "aliases": [
+                    "COBOL"
                 ],
                 "filenamePatterns": [
                     "**/*copybook*/**"
@@ -83,7 +86,7 @@
         ],
         "grammars": [
             {
-                "language": "COBOL",
+                "language": "cobol",
                 "scopeName": "source.cobol",
                 "path": "./syntaxes/COBOL.tmLanguage.json",
                 "embeddedLanguages": {
@@ -97,12 +100,12 @@
             "properties": {
                 "cobol-lsp.smart-tab": {
                     "oneOf": [
-                        { 
+                        {
                             "type": "boolean"
                         },
-                        { 
+                        {
                             "type": "array",
-                            "items": { 
+                            "items": {
                                 "type": "number"
                             }
                         },
@@ -120,7 +123,7 @@
                                     "patternProperties": {
                                         "^.*$": {
                                             "type": "array",
-                                            "items": { 
+                                            "items": {
                                                 "type": "number"
                                             }
                                         }
@@ -434,7 +437,7 @@
             }
         },
         "configurationDefaults": {
-            "[COBOL]": {
+            "[cobol]": {
                 "editor.renderIndentGuides": false,
                 "editor.rulers": [
                     7,

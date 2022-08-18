@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-// import { CompletionItem } from "vscode";
 import * as vscode from "vscode";
 import { SnippetCompletionProvider  } from "../../../services/snippetcompletion/SnippetCompletionProvider";
 

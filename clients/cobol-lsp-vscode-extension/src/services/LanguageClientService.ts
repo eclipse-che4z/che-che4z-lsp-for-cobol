@@ -93,7 +93,7 @@ export class LanguageClientService {
     private getLanguageClient() {
         if (!this.languageClient) {
             this.languageClient = new LanguageClient(LANGUAGE_ID,
-                "LSP extension for " + LANGUAGE_ID + " language",
+                "LSP extension for " + LANGUAGE_ID.toUpperCase() + " language",
                 this.createServerOptions(this.executablePath),
                 this.createClientOptions());
         }

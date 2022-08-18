@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.service.mocks;
 
-//import com.google.common.collect.ImmutableList;
-//import com.google.gson.JsonPrimitive;
 import com.google.inject.Singleton;
 import java.util.Collections;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
