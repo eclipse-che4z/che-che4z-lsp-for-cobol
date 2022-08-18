@@ -18,7 +18,7 @@
       "body": [
         "ADD CORR ${1:id} TO ${2:id}"
       ],
-      "description": "ADD CORRESPONDING is used to add the corresponding variables or fiels in two identical group variables"
+      "description": "ADD CORRESPONDING is used to add the corresponding variables or fields in two identical group variables"
     },
     "ACCEPT": {
       "prefix": "ACCEPT variable",
@@ -84,7 +84,7 @@
       "body": [
         "ALSO ${1:id|exp|TRUE|FALSE}"
       ],
-      "description": "ALSO id|dlit|exp|TRUE|FALSE}"
+      "description": "ALSO id|exp|TRUE|FALSE"
     },
     "ALTER TO": {
       "prefix": "ALTER TO",
@@ -132,7 +132,7 @@
       "prefix": "CALL",
       "body": [
         "CALL \"$1\" USING",
-        "    BY ${2|value,reference,content|} ${3:identifer}",
+        "    BY ${2|value,reference,content|} ${3:identifier}",
         "    RETURNING ${4:return-code}",
         "END-CALL",
         "$0"
@@ -908,7 +908,7 @@
       "body": [
         "FUNCTION SQRT(${1:number})$0"
       ],
-      "description": "APROXIMATION OF THE SQUARE ROOT OF NUMBER"
+      "description": "APPROXIMATION OF THE SQUARE ROOT OF NUMBER"
     },
     "FUNCTION SUM": {
       "prefix":
@@ -1516,7 +1516,7 @@
       "body": [
         "RETURNING ${1:dataname}"
       ],
-      "description": "RETURNING dataname"
+      "description": "RETURNING dataName"
     },
     "REWRITE": {
       "prefix": "REWRITE",

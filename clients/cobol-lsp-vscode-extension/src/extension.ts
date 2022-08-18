@@ -26,7 +26,10 @@ import { LanguageClientService } from "./services/LanguageClientService";
 import { Middleware } from "./services/Middleware";
 import { TelemetryService } from "./services/reporter/TelemetryService";
 import { createFileWithGivenPath, SettingsService } from "./services/Settings";
-import { pickSnippet, SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
+import {
+    pickSnippet,
+    SnippetCompletionProvider,
+} from "./services/snippetcompletion/SnippetCompletionProvider";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 
 let copyBooksDownloader: CopybookDownloadService;
@@ -44,28 +47,62 @@ export async function activate(context: vscode.ExtensionContext) {
     initialize();
     initSmartTab(context);
 
-    TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
+    TelemetryService.registerEvent(
+        "log",
+        ["bootstrap", "experiment-tag"],
+        "Extension activation event was triggered"
+    );
 
     copyBooksDownloader.start();
 
     // Commands
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook",
-        (copybook, programName) => {
-        fetchCopybookCommand(copybook, copyBooksDownloader, programName);
-    }));
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            "cobol-lsp.cpy-manager.fetch-copybook",
+            (copybook, programName) => {
+                fetchCopybookCommand(
+                    copybook,
+                    copyBooksDownloader,
+                    programName
+                );
+            }
+        )
+    );
 
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings",
-        () => {
-        gotoCopybookSettings();
-    }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle",
-     () => { commentCommand(CommentAction.TOGGLE); }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment",
-    () => { commentCommand(CommentAction.COMMENT); }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment",
-    () => { commentCommand(CommentAction.UNCOMMENT); }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.snippets.insertSnippets",
-    async () => { pickSnippet(); }));
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            "cobol-lsp.cpy-manager.goto-settings",
+            () => {
+                gotoCopybookSettings();
+            }
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => {
+            commentCommand(CommentAction.TOGGLE);
+        })
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => {
+            commentCommand(CommentAction.COMMENT);
+        })
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            "cobol-lsp.commentLine.uncomment",
+            () => {
+                commentCommand(CommentAction.UNCOMMENT);
+            }
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            "cobol-lsp.snippets.insertSnippets",
+            () => {
+                pickSnippet();
+            }
+        )
+    );
     // create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
@@ -74,23 +111,35 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
             { scheme: "file", language: LANGUAGE_ID },
-            new CopybooksCodeActionProvider()));
+            new CopybooksCodeActionProvider()
+        )
+    );
 
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
-        { scheme: "file", language: LANGUAGE_ID },
-        new SnippetCompletionProvider()));
-
+    context.subscriptions.push(
+        vscode.languages.registerCompletionItemProvider(
+            { scheme: "file", language: LANGUAGE_ID },
+            new SnippetCompletionProvider()
+        )
+    );
 
     try {
         await languageClientService.checkPrerequisites();
     } catch (err) {
         vscode.window.showErrorMessage(err.toString());
         languageClientService.enableNativeBuild();
-        TelemetryService.registerExceptionEvent("RuntimeException", err.toString(), ["bootstrap", "experiment-tag"], "Client has wrong Java version installed. Native builds activated.");
+        TelemetryService.registerExceptionEvent(
+            "RuntimeException",
+            err.toString(),
+            ["bootstrap", "experiment-tag"],
+            "Client has wrong Java version installed. Native builds activated."
+        );
     }
 
     // Custom client handlers
-    languageClientService.addRequestHandler("cobol/resolveSubroutine", resolveSubroutineURI);
+    languageClientService.addRequestHandler(
+        "cobol/resolveSubroutine",
+        resolveSubroutineURI
+    );
 
     context.subscriptions.push(languageClientService.start());
 
