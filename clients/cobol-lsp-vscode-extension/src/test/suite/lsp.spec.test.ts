@@ -33,7 +33,7 @@ suite('Integration Test Suite', () => {
     test('TC152048 Cobol file is recognized by LSP', async () => {
         // setting a language takes a while but shouldn't take longer than a second
         await helper.sleep(1000);
-        assert.ok(editor.document.languageId === 'COBOL');
+        assert.ok(editor.document.languageId === 'cobol');
     }).timeout(10000).slow(4000);
 
 

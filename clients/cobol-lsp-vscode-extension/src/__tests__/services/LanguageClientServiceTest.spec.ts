@@ -41,7 +41,7 @@ const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService
 const middleware: Middleware = new Middleware(copyBooksDownloader);
 let languageClientService: LanguageClientService;
 
-const SERVER_DESC = "LSP extension for cobol language";
+const SERVER_DESC = "LSP extension for COBOL language";
 const SERVER_ID = "cobol";
 
 beforeEach(() => {
