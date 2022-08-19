@@ -270,7 +270,6 @@ DISPLAYDB : D I S P L A Y D B;
 DISTINCT : D I S T I N C T;
 DO : D O;
 DOUBLE : D O U B L E;
-DOUBLEQUOTE : D O U B L E Q U O T E;
 DROP : D R O P;
 DROPIN : D R O P I N;
 DSNDB04 : D S N D B '0' '4'; //TODO: ask if this is required or it should be just an identifier

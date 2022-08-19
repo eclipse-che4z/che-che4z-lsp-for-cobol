@@ -24,7 +24,6 @@ import org.eclipse.lsp.cobol.core.messages.LogLevelUtils;
 import org.eclipse.lsp.cobol.core.model.ErrorCode;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
-import org.eclipse.lsp.cobol.service.delegates.completions.Snippets;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -61,7 +60,6 @@ public class CobolLanguageServer implements LanguageServer {
   private final ConfigurationService configurationService;
   private final CopybookNameService copybookNameService;
   private final Keywords keywords;
-  private final Snippets snippets;
 
   @Inject
   @SuppressWarnings("squid:S107")
@@ -75,8 +73,7 @@ public class CobolLanguageServer implements LanguageServer {
       DisposableLSPStateService disposableLSPStateService,
       ConfigurationService configurationService,
       CopybookNameService copybookNameService,
-      Keywords keywords,
-      Snippets snippets) {
+      Keywords keywords) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
@@ -87,7 +84,6 @@ public class CobolLanguageServer implements LanguageServer {
     this.configurationService = configurationService;
     this.copybookNameService = copybookNameService;
     this.keywords = keywords;
-    this.snippets = snippets;
   }
 
   @Override
@@ -142,17 +138,16 @@ public class CobolLanguageServer implements LanguageServer {
     getLogLevelFromClient();
     copybookNameService.collectLocalCopybookNames();
     keywords.updateStorage();
-    snippets.updateStorage();
   }
 
   private void getLogLevelFromClient() {
     settingsService
-        .getConfiguration(LOGGING_LEVEL.label)
+        .fetchConfiguration(LOGGING_LEVEL.label)
         .thenAccept(LogLevelUtils.updateLogLevel());
   }
 
   private void getLocaleFromClient() {
-    settingsService.getConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
+    settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
   }
 
   @Override
@@ -203,11 +198,11 @@ public class CobolLanguageServer implements LanguageServer {
 
   private void addLocalFilesWatcher() {
     settingsService
-        .getConfiguration(CPY_LOCAL_PATHS.label)
-        .thenAccept(it -> watchingService.addWatchers(settingsService.toStrings(it)));
+        .fetchTextConfiguration(CPY_LOCAL_PATHS.label)
+        .thenAccept(watchingService::addWatchers);
     settingsService
-        .getConfiguration(SUBROUTINE_LOCAL_PATHS.label)
-        .thenAccept(it -> watchingService.addWatchers(settingsService.toStrings(it)));
+        .fetchTextConfiguration(SUBROUTINE_LOCAL_PATHS.label)
+        .thenAccept(watchingService::addWatchers);
   }
 
   @NonNull

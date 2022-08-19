@@ -21,6 +21,7 @@ import { CopybooksCodeActionProvider } from "../services/copybook/CopybooksCodeA
 import { LanguageClientService } from "../services/LanguageClientService";
 import { TelemetryService } from "../services/reporter/TelemetryService";
 import { createFileWithGivenPath } from "../services/Settings";
+import { SnippetCompletionProvider } from "../services/snippetcompletion/SnippetCompletionProvider";
 
 jest.mock("../commands/SmartTabCommand");
 jest.mock("../commands/FetchCopybookCommand");
@@ -41,6 +42,7 @@ jest.mock("vscode", () => ({
     },
     languages: {
         registerCodeActionsProvider: jest.fn(),
+        registerCompletionItemProvider: jest.fn()
     },
     window: {
         showErrorMessage: jest.fn().mockReturnValue("test"),
@@ -84,6 +86,9 @@ describe("Check plugin extension for cobol starts successfully.", () => {
 
         expect(vscode.languages.registerCodeActionsProvider)
             .toBeCalledWith({ scheme: "file", language: "COBOL" }, expect.any(CopybooksCodeActionProvider));
+
+        expect(vscode.languages.registerCompletionItemProvider)
+             .toBeCalledWith({ scheme: "file", language: "COBOL" }, expect.any(SnippetCompletionProvider));
 
     });
 

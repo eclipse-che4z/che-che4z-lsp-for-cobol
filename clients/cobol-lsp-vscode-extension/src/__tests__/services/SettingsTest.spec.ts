@@ -120,3 +120,43 @@ describe("SettingsService evaluate variables", () => {
 
 });
 
+
+describe("SettingsService returns correct tab settings", () => {
+    test("Returns default tab settigs for boolean value", () => {
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue(true),
+        });
+
+        const tabSettings = SettingsService.getTabSettings();
+        expect(tabSettings.defaultRule.maxPosition).toBe(72);
+    });
+
+    test("Max position is the last threashold position for array", () => {
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue([1, 3, 5, 7, 25]),
+        });
+
+        const tabSettings = SettingsService.getTabSettings();
+        expect(tabSettings.defaultRule.maxPosition).toBe(25);
+    });
+
+    test("Different rules for different divisions with default rule", () => {
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue({
+                "default": [1, 2 ,3, 40],
+                "anchors": {
+                    "DATA +DIVISON": [1, 7, 8 ,15, 40, 52],
+                    "PROCEDURE +DIVISON": [1, 7, 8, 15, 40, 45, 50]
+                }
+            })            
+        });
+
+        const tabSettings = SettingsService.getTabSettings();
+        expect(tabSettings.defaultRule.maxPosition).toBe(40);
+        expect(tabSettings.defaultRule.regex).toBeUndefined();
+        expect(tabSettings.defaultRule.stops[3]).toBe(40);
+        expect(tabSettings.rules.length).toBe(2);
+    });
+
+});
+

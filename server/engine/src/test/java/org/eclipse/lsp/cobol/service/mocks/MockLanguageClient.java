@@ -14,9 +14,10 @@
  */
 package org.eclipse.lsp.cobol.service.mocks;
 
-import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonPrimitive;
+//import com.google.common.collect.ImmutableList;
+//import com.google.gson.JsonPrimitive;
 import com.google.inject.Singleton;
+import java.util.Collections;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp4j.*;
 
@@ -75,8 +76,7 @@ public class MockLanguageClient implements CobolLanguageClient {
    * @return - config value
    */
   public CompletableFuture<List<Object>> configuration(ConfigurationParams configurationParams) {
-    return CompletableFuture.completedFuture(
-        ImmutableList.of("DB2_SERVER", new JsonPrimitive("DB2_SERVER")));
+      return CompletableFuture.completedFuture(Collections.emptyList());
   }
 
   /** Clean the client state. */

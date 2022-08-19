@@ -19,8 +19,6 @@ import com.google.inject.multibindings.Multibinder;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.*;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActionProvider;
@@ -71,7 +69,6 @@ public class ServiceModule extends AbstractModule {
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(HoverProvider.class).to(VariableHover.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
-    bind(CopybookNameService.class).to(CopybookNameServiceImpl.class);
 
     bindFormations();
     bindCompletions();
@@ -90,14 +87,12 @@ public class ServiceModule extends AbstractModule {
     completionBinding.addBinding().to(VariableCompletion.class);
     completionBinding.addBinding().to(ParagraphCompletion.class);
     completionBinding.addBinding().to(SectionCompletion.class);
-    completionBinding.addBinding().to(SnippetCompletion.class);
     completionBinding.addBinding().to(KeywordCompletion.class);
     completionBinding.addBinding().to(CopybookCompletion.class);
     completionBinding.addBinding().to(SubroutineCompletion.class);
     completionBinding.addBinding().to(CopybookNameCompletion.class);
 
     bind(CompletionStorage.class).annotatedWith(named("Keywords")).to(Keywords.class);
-    bind(CompletionStorage.class).annotatedWith(named("Snippets")).to(Snippets.class);
   }
 
   private void bindCodeActions() {

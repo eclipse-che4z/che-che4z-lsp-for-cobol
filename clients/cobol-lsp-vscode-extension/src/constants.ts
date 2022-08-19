@@ -13,7 +13,8 @@
  */
 export const SETTINGS_CPY_SECTION: string = "cobol-lsp.cpy-manager";
 
-export const SERVER_PORT = "cobol-lsp.server.port"
+export const SERVER_PORT = "cobol-lsp.server.port";
+export const SETTINGS_DIALECT = "cobol-lsp.dialects";
 export const PATHS_LOCAL_KEY = "paths-local";
 export const PATHS_ZOWE = "paths-dsn";
 export const PATHS_USS = "paths-uss";
@@ -39,16 +40,13 @@ export const COBOL_COB_EXT = ".COB";
 export const COBOL_COBOL_EXT = ".COBOL";
 export const COBOL_EXT_ARRAY = [COBOL_CBL_EXT, COBOL_COB_EXT, COBOL_COBOL_EXT];
 export const COPYBOOK_CPY_EXT = ".CPY";
+export const COPYBOOK_EXTENSIONS = "copybook-extensions";
 export const COPYBOOK_EXT_ARRAY = [COPYBOOK_CPY_EXT];
 export const EXTENSION_ID = "broadcommfd.cobol-language-support";
 export const TELEMETRY_DEFAULT_CONTENT = "INVALID_INSTRUMENTATION_KEY";
 export const ZOWE_EXT_MISSING_MSG = "Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe."
 export const INSTALL_ZOWE = "Install Zowe Explorer";
-
-export enum PUNCH_CARD {
-    SEQUENCE_AREA_END_POS = 6,
-    INDICATOR_AREA = 7,
-    AREA_A_END_POS = 11,
-    AREA_B_END_POS = 72,
-    IDENTIFICATION_AREA_END_POS = 80,
-}
+export const DACO_DIALECT = "DaCo";
+export const IDMS_DIALECT = "IDMS";
+export const DEFAULT_DIALECT = "COBOL";
+export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";

@@ -27,7 +27,8 @@
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"outDir": "out",
-		"sourceMap": true
+		"sourceMap": true,
+        "resolveJsonModule": true
 	},
 	"exclude": [
 		"node_modules",

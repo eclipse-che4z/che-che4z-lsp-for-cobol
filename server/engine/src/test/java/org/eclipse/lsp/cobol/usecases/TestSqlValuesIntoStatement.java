@@ -33,17 +33,20 @@ class TestSqlValuesIntoStatement {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*LOB1}  PIC A  VALUE 'GOWY'.\n"
+          + "       01 {$*HV1}  PIC A  VALUE 'GOWY'.\n"
+          + "       01 {$*MEM}  PIC A  VALUE 'GOWY'.\n"
+          + "       01 {$*DETAILS}  PIC A  VALUE 'GOWY'.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL \n";
 
   private static final String VALUES_INTO =
-      TEXT + "            VALUES(CURRENT PATH) INTO :HV1; END-EXEC.";
+      TEXT + "            VALUES(CURRENT PATH) INTO :{$HV1}; END-EXEC.";
 
   private static final String VALUES_INTO2 =
-      TEXT + "            VALUES(CURRENT MEMBER) INTO :MEM; END-EXEC.";
+      TEXT + "            VALUES(CURRENT MEMBER) INTO :{$MEM}; END-EXEC.";
 
   private static final String VALUES_INTO3 =
-      TEXT + "            VALUES (SUBSTR(:{$LOB1},1,35)) INTO :DETAILS; END-EXEC.";
+      TEXT + "            VALUES (SUBSTR(:{$LOB1},1,35)) INTO :{$DETAILS}; END-EXEC.";
 
   private static final String VALUES_INTO4 =
       TEXT + "            VALUES INTVAR1 INTO MYINTARRAY1[23]; END-EXEC.";

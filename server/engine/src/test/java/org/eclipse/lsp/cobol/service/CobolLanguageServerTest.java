@@ -22,7 +22,6 @@ import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.model.ErrorCode;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
-import org.eclipse.lsp.cobol.service.delegates.completions.Snippets;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -74,21 +73,20 @@ class CobolLanguageServerTest {
     ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
-    Snippets snippets = mock(Snippets.class);
 
     JsonArray arr = new JsonArray();
     String path = "foo/bar";
     arr.add(new JsonPrimitive(path));
 
-    when(settingsService.getConfiguration(CPY_LOCAL_PATHS.label))
+    when(settingsService.fetchTextConfiguration(anyString())).thenCallRealMethod();
+    when(settingsService.fetchConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.toStrings(any())).thenCallRealMethod();
     when(localeStore.notifyLocaleStore()).thenReturn(System.out::println);
-    when(settingsService.getConfiguration(LOCALE.label))
+    when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.getConfiguration(SUBROUTINE_LOCAL_PATHS.label))
+    when(settingsService.fetchConfiguration(SUBROUTINE_LOCAL_PATHS.label))
         .thenReturn(completedFuture(ImmutableList.of()));
-    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(ImmutableList.of("INFO")));
     CobolLanguageServer server =
         new CobolLanguageServer(
@@ -101,15 +99,14 @@ class CobolLanguageServerTest {
             stateService,
             configurationService,
             copybookNameService,
-            keywords,
-            snippets);
+            keywords);
 
     server.initialized(new InitializedParams());
 
     verify(watchingService).watchConfigurationChange();
     verify(watchingService).watchPredefinedFolder();
-    verify(settingsService).getConfiguration(CPY_LOCAL_PATHS.label);
-    verify(settingsService).getConfiguration(LOCALE.label);
+    verify(settingsService).fetchConfiguration(CPY_LOCAL_PATHS.label);
+    verify(settingsService).fetchConfiguration(LOCALE.label);
     verify(watchingService).addWatchers(singletonList(path));
     verify(localeStore).notifyLocaleStore();
     verify(configurationService).updateConfigurationFromSettings();
@@ -124,7 +121,7 @@ class CobolLanguageServerTest {
   void initialize() {
     CobolLanguageServer server =
         new CobolLanguageServer(
-            null, null, null, null, null, customExecutor, stateService, null, null, null, null);
+            null, null, null, null, null, customExecutor, stateService, null, null, null);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
@@ -151,7 +148,6 @@ class CobolLanguageServerTest {
             null,
             customExecutor,
             stateService,
-            null,
             null,
             null,
             null);
