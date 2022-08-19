@@ -14,128 +14,81 @@
 import * as vscode from "vscode";
 import { LANGUAGE_ID } from "../../constants";
 import { SettingsService } from "../Settings";
-export class SnippetCompletionProvider
-    implements vscode.CompletionItemProvider
-{
+export class SnippetCompletionProvider implements vscode.CompletionItemProvider {
     private matchingWordsList: vscode.CompletionItem[] = new Array();
-    private freshList: vscode.CompletionItem[] = new Array();
+    private otherList: vscode.CompletionItem[] = new Array();
 
-    public async provideCompletionItems(
-        document: vscode.TextDocument,
-        position: vscode.Position,
-        token: vscode.CancellationToken,
-        context: vscode.CompletionContext
-    ): Promise<vscode.CompletionItem[]> {
-        this.resetList();
-        const textUptoCursor = getCurrentLineText(document, position);
-        const wordsUptoCursor = fetchWordsList(textUptoCursor);
-        if (textUptoCursor === "") {
-            return fullList(position, document);
+    public async provideCompletionItems(document: vscode.TextDocument,
+                                        position: vscode.Position,
+                                        token: vscode.CancellationToken,
+                                        context: vscode.CompletionContext):
+        Promise<vscode.CompletionItem[]> {
+            var textUptoCursor = getCurrentLineText(document, position);
+            const wordsUptoCursor = fetchWordsList(textUptoCursor);
+
+            this.resetList();
+            getSnippetsMapForUserDialect().forEach((value,key) => {
+                const prefixList: string[] = fetchWordsList(value.prefix);
+                    const matchedWords = getMatchedWords(prefixList, wordsUptoCursor);
+                    matchedWords.length > 0 ? this.matchingWordsList.push(createCompletionItem(value,key, position, document)):
+                            this.otherList.push(createCompletionItem(value, key, position,document));
+            });
+            return this.matchingWordsList.length > 0 ? this.matchingWordsList:this.otherList;
         }
-        getSnippetsMapForUserDialect().forEach((value, key) => {
-            const prefixList: string[] = fetchWordsList(value.prefix);
-            const matchedWords = getMatchedWords(prefixList, wordsUptoCursor);
-            if (matchedWords.length > 0) {
-                this.matchingWordsList.push(
-                    createCompletionItem(value, key, position, document)
-                );
-            } else {
-                this.freshList.push(
-                    createCompletionItem(value, key, position, document)
-                );
-            }
-        });
-
-        return this.matchingWordsList.length > 0
-            ? this.matchingWordsList
-            : this.freshList;
-    }
-
     public resetList() {
         this.matchingWordsList = [];
-        this.freshList = [];
+        this.otherList = [];
     }
 }
-function createCompletionItem(
-    value: any,
-    key: string,
-    position: vscode.Position,
-    document?: vscode.TextDocument
-): vscode.CompletionItem {
-    const firstCharacterPosition = findPosition(position, document);
-    const bodyDescription: string = value.description;
-    const itemLabel: vscode.CompletionItemLabel = {
-        description: key,
-        label: value.prefix,
-    };
+function createCompletionItem(value: any, key:string, position: vscode.Position, document?: vscode.TextDocument): vscode.CompletionItem {
+
+    const itemLabel: vscode.CompletionItemLabel = {label: value.prefix, description: key};
     const completionItem = new vscode.CompletionItem(itemLabel);
-    completionItem.detail = bodyDescription;
+    completionItem.detail = value.description;
     completionItem.insertText = new vscode.SnippetString(value.body.join("\n"));
-    completionItem.documentation = new vscode.MarkdownString().appendCodeblock(
-        value.body.join("\n"),
-        LANGUAGE_ID
-    );
+    completionItem.documentation = new vscode.MarkdownString().appendCodeblock(formatString(value.body.join("\n")),LANGUAGE_ID);
     completionItem.kind = vscode.CompletionItemKind.Snippet;
-    const insertingRange = new vscode.Position(
-        position.line,
-        firstCharacterPosition
-    );
+     //Find the start position of the first word in the line
+    const firstCharacterPosition = findPosition(position, document);
+    const insertingRange = new vscode.Position(position.line, firstCharacterPosition);
     const replaceRange = new vscode.Position(position.line, position.character);
-    completionItem.range = new vscode.Range(insertingRange, replaceRange);
+    completionItem.range = new vscode.Range(insertingRange,replaceRange);
     return completionItem;
 }
 function getSnippetsMapForUserDialect() {
-    return SettingsService.getSnippetsForUserDialect();
+   return SettingsService.getSnippetsForUserDialect();
 }
 
 function fetchWordsList(text: string) {
-    const wordsList = text.split(/(\s+)/).filter(function (e) {
-        return e.trim().length > 0;
-    });
+    const wordsList =  text.split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } );
     return wordsList;
 }
 
-function getCurrentLineText(
-    document: vscode.TextDocument,
-    position: vscode.Position
-) {
-    return document.lineAt(position).text.slice(0, position.character).trim();
+function getCurrentLineText(document: vscode.TextDocument, position: vscode.Position) {
+    return document.lineAt(position).text.slice(0,position.character).trim();
 }
 
-function fullList(
-    position,
-    document
-): vscode.CompletionItem[] | PromiseLike<vscode.CompletionItem[]> {
-    const list: vscode.CompletionItem[] = new Array();
-    getSnippetsMapForUserDialect().forEach((value, key) => {
-        list.push(createCompletionItem(value, key, position, document));
-    });
-    return list;
-}
-
-function findPosition(
-    position: vscode.Position,
-    document?: vscode.TextDocument
-) {
-    const lineText = document
-        .lineAt(position)
-        .text.slice(0, position.character);
-    const charPosition: number = 7;
-    for (let index: number = 0; index < lineText.length; index++) {
-        if (lineText.charAt(index) !== " ") {
+function findPosition(position: vscode.Position, document?: vscode.TextDocument) {
+    const lineText = document.lineAt(position).text.slice(0,position.character);
+    var charPosition: number = 7;
+    for( var index: number = 0 ;index< lineText.length ; index++){
+        if(lineText.charAt(index) !== " ")
             return index;
-        }
     }
     return charPosition;
 }
 
 function getMatchedWords(words1: string[], words2: string[]) {
-    const word = words1.filter((word) => words2.includes(word));
+    const word = words1.filter(word => words2.includes(word));
     return word;
 }
 
+function formatString(arg: string) {
+   return arg.replace(/(\$\{*\d*\/*:*|\/\(.*\)|\\\.\.\+|\$\/|\})/g,"");
+}
+
 export function pickSnippet() {
-    try {
+      try{
         const editor = vscode.window.activeTextEditor;
         const snippetList = new Array();
         const mapKeyForSelectedSnippet = new Map<string, any>();
@@ -164,7 +117,8 @@ export function pickSnippet() {
             editor.insertSnippet(snippet);
         });
         input.show();
-    } catch (error) {
+    } catch (error){
         console.log(error);
     }
 }
+
