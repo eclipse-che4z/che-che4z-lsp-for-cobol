@@ -2,7 +2,7 @@
     "ADD": {
       "prefix": "ADD",
       "body": [
-        "ADD ${1:a} TO ${2:b} GIVING ${3:C}"
+        "ADD ${1:a} TO ${2:b} GIVING ${3:c}"
       ],
       "description": "ADD a TO b GIVING c"
     },
