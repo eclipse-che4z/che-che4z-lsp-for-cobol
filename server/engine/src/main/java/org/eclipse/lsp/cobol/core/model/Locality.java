@@ -39,7 +39,7 @@ import org.eclipse.lsp4j.Range;
 @Builder(toBuilder = true)
 public class Locality {
   @Builder.Default private String uri = "";
-  @Builder.Default private Range range = new Range(new Position(0, 0), new Position(0, 0));
+  @Builder.Default private Range range = new Range(new Position(), new Position());
   @Builder.Default private String copybookId = null;
   @Builder.Default private String token = null;
   @Builder.Default private Class recognizer = Object.class;

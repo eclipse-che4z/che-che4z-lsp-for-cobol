@@ -332,7 +332,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         DOCUMENT_URI,
         singletonList(
             new Diagnostic(
-                new Range(new Position(0, 0), new Position(0, INCORRECT_TEXT_EXAMPLE.length())),
+                new Range(new Position(), new Position(0, INCORRECT_TEXT_EXAMPLE.length())),
                 INCORRECT_TEXT_EXAMPLE)));
   }
   /**

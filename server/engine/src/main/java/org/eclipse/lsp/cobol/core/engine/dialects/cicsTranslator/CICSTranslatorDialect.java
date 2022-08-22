@@ -68,6 +68,6 @@ public class CICSTranslatorDialect implements CobolDialect {
     cicsTranslatorVisitor.visitStartRule(parser.startRule());
 
     List<SyntaxError> errors = new ArrayList<>(listener.getErrors());
-    return new ResultWithErrors<>(new DialectOutcome(Collections.emptyList(), ImmutableMultimap.of(), context), errors);
+    return new ResultWithErrors<>(new DialectOutcome(context), errors);
   }
 }

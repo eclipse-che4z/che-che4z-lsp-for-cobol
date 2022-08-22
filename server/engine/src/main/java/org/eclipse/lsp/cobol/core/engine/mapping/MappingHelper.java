@@ -42,13 +42,11 @@ public class MappingHelper {
 
     if (smallRange.getStart().getLine() == bigRange.getStart().getLine()) {
       return smallRange.getStart().getCharacter() >= bigRange.getStart().getCharacter();
-    }
-
-    if (smallRange.getStart().getLine() == bigRange.getEnd().getLine()) {
+    } else if (smallRange.getStart().getLine() == bigRange.getEnd().getLine()) {
       return smallRange.getStart().getCharacter() <= bigRange.getEnd().getCharacter();
+    } else {
+      return false;
     }
-
-    return false;
   }
 
   /**

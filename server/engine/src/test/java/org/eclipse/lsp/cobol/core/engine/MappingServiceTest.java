@@ -191,7 +191,7 @@ class MappingServiceTest {
     TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
     CopyNode copyNode = new CopyNode(Locality.builder().range(new Range(new Position(7, 11), new Position(7, 21))).build(),
             "copybook");
-    CopyNode copyNode2 = new CopyNode(Locality.builder().range(new Range(new Position(0, 0), new Position(0, 24))).build(),
+    CopyNode copyNode2 = new CopyNode(Locality.builder().range(new Range(new Position(), new Position(0, 24))).build(),
             "copybook2");
     TextTransformations copybookTT = TextTransformations.of(COPYBOOK, "copybook");
     textTransformations.extend(copyNode, copyNode.getLocality().getRange(), copybookTT);

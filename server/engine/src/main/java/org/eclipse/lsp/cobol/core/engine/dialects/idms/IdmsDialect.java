@@ -73,8 +73,6 @@ public final class IdmsDialect implements CobolDialect {
 
   @Override
   public List<SyntaxError> extend(DialectProcessingContext context) {
-    Deque<String> copybookStack = new LinkedList<>();
-
     List<SyntaxError> errors = new LinkedList<>();
 
     IdmsDialectVisitor inlineVisitor = new IdmsDialectVisitor(context);
@@ -88,9 +86,15 @@ public final class IdmsDialect implements CobolDialect {
                     errors, cb,
                     context.getProgramDocumentUri(),
                     context.getExtendedSource().getUri(),
-                    context.getCopybookConfig(),
-                    copybookStack));
+                    context.getCopybookConfig()));
     return errors;
+  }
+
+  private void insertIdmsCopybook(ExtendedSource extendedSource, DocumentMap currentMap, List<SyntaxError> errors,
+      IdmsCopybookDescriptor cb, String programDocumentUri, String currentUri,
+      CopybookConfig copybookConfig) {
+    insertIdmsCopybook(extendedSource, currentMap, errors, cb, programDocumentUri, currentUri,
+        copybookConfig, new LinkedList<>());
   }
 
   private void insertIdmsCopybook(ExtendedSource extendedSource, DocumentMap currentMap, List<SyntaxError> errors,
@@ -125,7 +129,7 @@ public final class IdmsDialect implements CobolDialect {
 
     DocumentMap copybookMap = new DocumentMap(copybookModel.getUri(), copybookModel.getContent());
     processTextTransformation(extendedSource, copybookMap,
-            errors, copybookConfig, programDocumentUri, cb.level, copybookStack);
+            errors, copybookConfig, programDocumentUri, cb.getLevel(), copybookStack);
     copybookMap.commitTransformations();
     extendedSource.extend(currentMap, copyNode, copybookMap);
     copyNode.setLocality(cb.getUsage());
@@ -155,7 +159,7 @@ public final class IdmsDialect implements CobolDialect {
     });
     cbs.forEach(cb -> {
       if (copybookLevel > 0) {
-        cb.level = copybookLevel;
+        cb.setLevel(copybookLevel);
       }
 
       insertIdmsCopybook(extendedSource, currentDocumentMap, errors, cb, programDocumentUri, currentDocumentMap.getUri(), copybookConfig, copybookStack);

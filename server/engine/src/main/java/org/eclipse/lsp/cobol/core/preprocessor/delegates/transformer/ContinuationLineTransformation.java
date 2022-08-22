@@ -137,7 +137,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   }
 
   private void adjustBlankOrCommentLines(CobolLine cobolLine) {
-    if (!Objects.nonNull(cobolLine.getPredecessor())) {
+    if (Objects.isNull(cobolLine.getPredecessor())) {
       return;
     }
 
@@ -203,7 +203,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
 
   /** Check with a good pattern if there is an unclosed string */
   private boolean checkIfLineHasUnclosedString(CobolLine cobolLine) {
-    if (cobolLine == null || isCommentLine(cobolLine))  {
+    if (Objects.isNull(cobolLine) || isCommentLine(cobolLine))  {
       return false;
     }
 

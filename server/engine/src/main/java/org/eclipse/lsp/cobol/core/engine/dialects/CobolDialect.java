@@ -39,7 +39,7 @@ public interface CobolDialect {
    * @return the dialect processing result
    */
   default ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    return new ResultWithErrors<>(new DialectOutcome(ImmutableList.of(), ImmutableMultimap.of(), context),
+    return new ResultWithErrors<>(new DialectOutcome(context),
             ImmutableList.of());
   }
 

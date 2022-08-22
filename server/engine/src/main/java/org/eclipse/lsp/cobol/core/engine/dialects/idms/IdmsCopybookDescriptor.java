@@ -49,11 +49,11 @@ import org.eclipse.lsp4j.Range;
  */
 @Data
 public class IdmsCopybookDescriptor {
-  String name;
-  Locality usage;
-  Locality statement;
-  Range levelRange;
-  int level;
+  private String name;
+  private Locality usage;
+  private Locality statement;
+  private Range levelRange;
+  private int level;
 
   /**
    * Factory method for copybook description object

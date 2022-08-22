@@ -112,7 +112,6 @@ public class DaCoMaidProcessor {
 
   private void collectCopyMaid(String input, int lineNumber, List<Node> copyMaidNodes, String lastSuffix, DialectProcessingContext context, List<SyntaxError> errors) {
     Matcher matcher = copyMaidPattern.matcher(input);
-
     if (matcher.find()) {
       String indent = matcher.group("indent");
       int startChar = indent == null ? 0 : matcher.end("indent");

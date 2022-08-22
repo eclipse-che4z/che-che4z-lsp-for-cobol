@@ -14,13 +14,18 @@
  */
 package org.eclipse.lsp.cobol.core.engine.mapping;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Value;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.*;
 import java.util.stream.Collectors;
 
 /**

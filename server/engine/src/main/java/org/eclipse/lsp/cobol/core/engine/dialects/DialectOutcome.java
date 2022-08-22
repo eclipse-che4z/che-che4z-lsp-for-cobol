@@ -14,7 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -25,8 +28,15 @@ import java.util.List;
  * The result of dialect processing
  */
 @Value
+@AllArgsConstructor
 public class DialectOutcome {
-  List<Node> dialectNodes;
-  Multimap<String, Pair<String, String>> implicitCode;
-  DialectProcessingContext context;
+  final List<Node> dialectNodes;
+  final Multimap<String, Pair<String, String>> implicitCode;
+  final DialectProcessingContext context;
+
+  public DialectOutcome(DialectProcessingContext context) {
+    this.context = context;
+    this.dialectNodes = ImmutableList.of();
+    this.implicitCode = ImmutableMultimap.of();
+  }
 }
