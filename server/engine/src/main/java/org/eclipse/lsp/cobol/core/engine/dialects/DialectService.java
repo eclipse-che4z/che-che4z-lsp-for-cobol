@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
@@ -73,7 +71,7 @@ public class DialectService {
       context.getExtendedSource().commitTransformations();
     }
     ResultWithErrors<DialectOutcome> acc = new ResultWithErrors(
-        new DialectOutcome(ImmutableList.of(), ImmutableMultimap.of(), context), errors);
+        new DialectOutcome(context), errors);
     for (CobolDialect orderedDialect : orderedDialects) {
       acc = processDialect(acc, orderedDialect, context);
       context.getExtendedSource().commitTransformations();

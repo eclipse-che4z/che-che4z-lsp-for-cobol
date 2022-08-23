@@ -15,7 +15,6 @@
 
 package org.eclipse.lsp.cobol.core.engine.dialects.cicsTranslator;
 
-import com.google.common.collect.ImmutableMultimap;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -31,7 +30,6 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /** Process the text according to the CICS Translator rules */
@@ -68,6 +66,6 @@ public class CICSTranslatorDialect implements CobolDialect {
     cicsTranslatorVisitor.visitStartRule(parser.startRule());
 
     List<SyntaxError> errors = new ArrayList<>(listener.getErrors());
-    return new ResultWithErrors<>(new DialectOutcome(Collections.emptyList(), ImmutableMultimap.of(), context), errors);
+    return new ResultWithErrors<>(new DialectOutcome(context), errors);
   }
 }

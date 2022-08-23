@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.engine;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
@@ -78,7 +77,7 @@ class CobolLanguageEngineTest {
     Locality locality =
         Locality.builder()
             .uri(URI)
-            .range(new Range(new Position(0, 0), new Position(0, 0)))
+            .range(new Range(new Position(), new Position()))
             .build();
     SyntaxError error =
         SyntaxError.syntaxError()
@@ -110,7 +109,7 @@ class CobolLanguageEngineTest {
                     ImmutableList.of(
                         Locality.builder()
                             .uri(URI)
-                            .range(new Range(new Position(0, 0), new Position(0, 7)))
+                            .range(new Range(new Position(), new Position(0, 7)))
                             .token("       ")
                             .build(),
                         Locality.builder()
@@ -147,7 +146,7 @@ class CobolLanguageEngineTest {
             .build();
     context.getExtendedSource().commitTransformations();
     when(dialectService.process(anyList(), any()))
-        .thenReturn(new ResultWithErrors<>(new DialectOutcome(ImmutableList.of(), ImmutableMultimap.of(), context), ImmutableList.of()));
+        .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
     when(preprocessor.cleanUpCode(URI, TEXT))
         .thenReturn(new ResultWithErrors<>(TextTransformations.of(TEXT, URI), ImmutableList.of()));
     when(preprocessor.processCleanCode(

@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class MappingHelperTest {
   @Test
   void testSplitMiddle() {
-    Range bigRange = new Range(new Position(0, 0), new Position(10, 80));
+    Range bigRange = new Range(new Position(), new Position(10, 80));
     Range splitter = new Range(new Position(5, 5), new Position(6, 4));
     List<Range> ranges = MappingHelper.split(splitter, bigRange);
 
@@ -53,7 +53,7 @@ class MappingHelperTest {
 
   @Test
   void testConcatMiddle() {
-    Range bigRange = new Range(new Position(0, 0), new Position(10, 80));
+    Range bigRange = new Range(new Position(), new Position(10, 80));
     Range splitter = new Range(new Position(5, 5), new Position(6, 4));
     List<Range> ranges = MappingHelper.concat(splitter, bigRange);
 
@@ -77,7 +77,7 @@ class MappingHelperTest {
 
   @Test
   void testSplitFullLineMiddle() {
-    Range bigRange = new Range(new Position(0, 0), new Position(10, 80));
+    Range bigRange = new Range(new Position(), new Position(10, 80));
     Range splitter = new Range(new Position(5, 0), new Position(5, 80));
     List<Range> ranges = MappingHelper.split(splitter, bigRange);
 
@@ -101,7 +101,7 @@ class MappingHelperTest {
 
   @Test
   void testConcatFullLineMiddle() {
-    Range bigRange = new Range(new Position(0, 0), new Position(10, 80));
+    Range bigRange = new Range(new Position(), new Position(10, 80));
     Range splitter = new Range(new Position(5, 0), new Position(5, 80));
     List<Range> ranges = MappingHelper.concat(splitter, bigRange);
 

@@ -108,7 +108,7 @@ class CobolDocumentModelTest {
   @Test
   void testTokenRetrieving() {
     CobolDocumentModel model = new CobolDocumentModel("a bc\r\nde", AnalysisResult.builder().build());
-    assertEquals("", model.getTokenBeforePosition(new Position(0, 0)));
+    assertEquals("", model.getTokenBeforePosition(new Position()));
     assertEquals("a", model.getTokenBeforePosition(new Position(0, 1)));
     assertEquals("bc", model.getTokenBeforePosition(new Position(0, 4)));
     assertEquals("d", model.getTokenBeforePosition(new Position(1, 1)));

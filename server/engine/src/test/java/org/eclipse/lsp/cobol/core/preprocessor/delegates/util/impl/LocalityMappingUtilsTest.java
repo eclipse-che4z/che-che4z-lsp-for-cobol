@@ -71,7 +71,7 @@ class LocalityMappingUtilsTest {
     Token exit = mock(Token.class);
 
     // Compiler directives should be skipped by predefined shift
-    Range range = new Range(new Position(0, 0), new Position(0, 0));
+    Range range = new Range(new Position(), new Position());
     Locality localityToShift =
         Locality.builder().uri(copybook).range(range).token("PROCESS").build();
     Locality locality0 = Locality.builder().uri(copybook).range(range).token("token0").build();

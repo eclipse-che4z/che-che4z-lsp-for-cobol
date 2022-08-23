@@ -259,7 +259,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
           || ImplicitCodeUtils.isImplicit(uri)))
         copybooks.define(
             metaData.getCopybookName().getQualifiedName(),
-                metaData.getCopybookName().getDialectType(), new Location(uri, new Range(new Position(0, 0), new Position(0, 0))));
+                metaData.getCopybookName().getDialectType(), new Location(uri, new Range(new Position(), new Position())));
     };
   }
 

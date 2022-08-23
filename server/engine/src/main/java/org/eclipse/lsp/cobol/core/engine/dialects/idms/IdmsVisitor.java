@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.eclipse.lsp.cobol.core.*;
 import org.eclipse.lsp.cobol.core.IdmsParser.CobolWordContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.DataNameContext;
@@ -26,7 +25,6 @@ import org.eclipse.lsp.cobol.core.IdmsParser.IdmsIfConditionContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.IdmsIfStatementContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.IdmsSectionsContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.IdmsStatementsContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.CopyIdmsStatementContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.Idms_db_entity_nameContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.Idms_map_nameContext;
 import org.eclipse.lsp.cobol.core.IdmsParser.Idms_map_name_definitionContext;
@@ -62,26 +60,24 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  */
 class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private static final String IF = "_IF_ ";
-  private final String programDocumentUri;
   private final DialectProcessingContext context;
 
   @Getter private final IdmsRecordsDescriptor recordsDescriptor = new IdmsRecordsDescriptor();
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
   IdmsVisitor(DialectProcessingContext context) {
-    this.programDocumentUri = context.getExtendedSource().getUri();
     this.context = context;
   }
 
   @Override
   public List<Node> visitIdmsStatements(IdmsStatementsContext ctx) {
-    addReplacementContext(ctx, "");
+    addReplacementContext(ctx);
     return visitChildren(ctx);
   }
 
   @Override
   public List<Node> visitIdmsSections(IdmsSectionsContext ctx) {
-    addReplacementContext(ctx, "");
+    addReplacementContext(ctx);
     return visitChildren(ctx);
   }
 
@@ -93,7 +89,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitIdmsIfCondition(IdmsIfConditionContext ctx) {
-    addReplacementContext(ctx, "");
+    addReplacementContext(ctx);
     return visitChildren(ctx);
   }
 
@@ -180,13 +176,6 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     return result;
   }
 
-  private int getLevel(CopyIdmsStatementContext ctx) {
-    return Optional.ofNullable(ctx.LEVEL_NUMBER())
-        .map(ParseTree::getText)
-        .map(Integer::parseInt)
-        .orElse(0);
-  }
-
   private List<Node> addTreeNode(Node node, List<Node> children) {
     children.forEach(node::addChild);
     return ImmutableList.of(node);
@@ -212,6 +201,10 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
         .uri(location.getUri())
         .range(location.getRange())
         .build();
+  }
+
+  private void addReplacementContext(ParserRuleContext ctx) {
+    addReplacementContext(ctx, "");
   }
 
   private void addReplacementContext(ParserRuleContext ctx, String prefix) {

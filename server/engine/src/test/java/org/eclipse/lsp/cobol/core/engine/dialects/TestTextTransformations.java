@@ -44,7 +44,7 @@ public class TestTextTransformations {
   @Test
   void replaceMultiline2() {
     TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
-    tt.replace(new Range(new Position(0, 0), new Position(0, 2)), "hi");
+    tt.replace(new Range(new Position(), new Position(0, 2)), "hi");
     tt.replace(new Range(new Position(0, 3), new Position(1, 7)), "hi");
     assertEquals("hi hi\n", tt.calculateExtendedText());
   }
@@ -85,10 +85,10 @@ public class TestTextTransformations {
   void extRegionsTest() {
     TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
     Range range1 = new Range(new Position(0, 7), new Position(0, 7));
-    Range range2 = new Range(new Position(0, 0), new Position(0, 1));
+    Range range2 = new Range(new Position(), new Position(0, 1));
     Range range3 = new Range(new Position(1, 0), new Position(1, 3));
     Range exRange1 = new Range(new Position(0, 8), new Position(0, 9));
-    Range exRange2 = new Range(new Position(0, 0), new Position(0, 2));
+    Range exRange2 = new Range(new Position(), new Position(0, 2));
     tt.replace(range1, "e");
     tt.replace(range2, "00");
     tt.replace(range3, "");
