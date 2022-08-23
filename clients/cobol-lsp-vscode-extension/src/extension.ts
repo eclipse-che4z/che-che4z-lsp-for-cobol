@@ -26,7 +26,7 @@ import { Middleware } from "./services/Middleware";
 import { TelemetryService } from "./services/reporter/TelemetryService";
 import { createFileWithGivenPath, SettingsService } from "./services/Settings";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
-import { SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
+import { pickSnippet, SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
 
 let copyBooksDownloader: CopybookDownloadService;
@@ -61,6 +61,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE) }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.snippets.insertSnippets", () => { pickSnippet();}));
     // create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
@@ -70,10 +71,9 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerCodeActionsProvider(
             { scheme: "file", language: LANGUAGE_ID },
             new CopybooksCodeActionProvider()));
-    const completionProvider =  vscode.languages.registerCompletionItemProvider(
-                { scheme: "file", language: LANGUAGE_ID },
-                new SnippetCompletionProvider());
-    context.subscriptions.push(completionProvider);
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
+            { scheme: "file", language: LANGUAGE_ID },
+            new SnippetCompletionProvider()));
 
 
     try {

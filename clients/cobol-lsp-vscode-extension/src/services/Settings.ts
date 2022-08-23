@@ -16,6 +16,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import {
+    COPYBOOK_EXTENSIONS,
     DACO_DIALECT,
     IDMS_DIALECT,
     PATHS_LOCAL_KEY,
@@ -23,10 +24,9 @@ import {
     PATHS_ZOWE,
     SERVER_PORT,
     SETTINGS_CPY_SECTION,
-    SETTINGS_SUBROUTINE_LOCAL_KEY,
     SETTINGS_DIALECT,
+    SETTINGS_SUBROUTINE_LOCAL_KEY,
     SETTINGS_TAB_CONFIG,
-    COPYBOOK_EXTENSIONS
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import dacoSnippets = require("../services/snippetcompletion/dacoSnippets.json");
@@ -196,28 +196,15 @@ export class SettingsService {
      * Return the dialect type supplied by user
      * @returns Map of snippets
      */
-     public static getSnippetsForUserDialect(): Map<any, any>{
-        const dialectList: string[] =  vscode.workspace.getConfiguration().get(SETTINGS_DIALECT);
-        const cobolMap = new Map(Object.entries(cobolSnippets));
-        let finalSnippetMap = cobolMap;
-        if(dialectList.includes(IDMS_DIALECT)){
-            var idmsMap: Map<any,any> = new Map(Object.entries(idmsSnippets));
-            finalSnippetMap = new Map([...cobolMap, ...idmsMap])
-
-            if(dialectList.includes(DACO_DIALECT)){
-                var dacoMap: Map<any,any> = new Map(Object.entries(dacoSnippets));
-                finalSnippetMap = new Map([...cobolMap, ...idmsMap, ...dacoMap])
-            }
-        }
-       else
-            if(dialectList.includes(DACO_DIALECT)){
-                var dacoMap: Map<any,any> = new Map(Object.entries(dacoSnippets));
-                finalSnippetMap = new Map([...cobolMap, ...dacoMap])
-            }
-
-        return finalSnippetMap;
+    public static getSnippetsForUserDialect(): Map<any, any> {
+        const dialectList: string[] = vscode.workspace.getConfiguration()
+            .get(SETTINGS_DIALECT);
+        return new Map<any, any>([...Object.entries(cobolSnippets),
+            ...dialectList.includes(IDMS_DIALECT)? Object.entries(idmsSnippets): [],
+            ...dialectList.includes(DACO_DIALECT)? Object.entries(dacoSnippets): []]);
 
     }
+
     private static getCopybookConfigValues(section: string, cobolFileName: string, dialectType: string) {
         const programFile = cobolFileName.replace(/\.[^/.]+$/, "");
         if (dialectType !== SettingsService.DEFAULT_DIALECT) {
@@ -229,5 +216,4 @@ export class SettingsService {
         const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(section);
         return SettingsService.evaluateVariable(pathList, "fileBasenameNoExtension", programFile);
     }
-
 }
