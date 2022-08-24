@@ -45,7 +45,7 @@ public class MappingService {
   }
 
   /**
-   * Chift object
+   * Shift object
    */
   @Value
   public static class CharShift {

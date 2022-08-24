@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test for empty lines shift in copybooks
  */
-public class TestErrorLocationLines {
+class TestErrorLocationLines {
   private static final String TEXT = "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. SMP.\n"
           + "       DATA   DIVISION.\n"

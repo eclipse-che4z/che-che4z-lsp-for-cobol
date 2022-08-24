@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** Idms copybook may contain COBOL code */
-public class TestIdmsCopybookWithCobol {
+class TestIdmsCopybookWithCobol {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.                                         \n"
           + "       PROGRAM-ID. MIN.\n"

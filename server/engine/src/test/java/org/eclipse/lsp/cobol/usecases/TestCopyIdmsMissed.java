@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test for missed IDMS copybook functionality
  */
-public class TestCopyIdmsMissed {
+class TestCopyIdmsMissed {
 
   private static final String TEXT = "        IDENTIFICATION DIVISION. \n"
       + "        PROGRAM-ID. test1.\n"

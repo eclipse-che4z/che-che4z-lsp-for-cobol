@@ -37,7 +37,6 @@ public class DocumentMap {
         transformations.push(new TextTransformations(text, uri));
     }
 
-    @Deprecated
     public DocumentMap(TextTransformations textTransformations) {
         this.uri = textTransformations.getUri();
         transformations.push(textTransformations);

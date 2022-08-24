@@ -70,7 +70,7 @@ public class DialectService {
       errors.addAll(orderedDialect.extend(context));
       context.getExtendedSource().commitTransformations();
     }
-    ResultWithErrors<DialectOutcome> acc = new ResultWithErrors(
+    ResultWithErrors<DialectOutcome> acc = new ResultWithErrors<>(
         new DialectOutcome(context), errors);
     for (CobolDialect orderedDialect : orderedDialects) {
       acc = processDialect(acc, orderedDialect, context);

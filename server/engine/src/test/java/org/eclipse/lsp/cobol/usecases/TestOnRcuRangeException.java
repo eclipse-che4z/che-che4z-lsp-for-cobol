@@ -20,7 +20,7 @@ import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** This test covers case with overlap locations in mapping */
-public class TestOnRcuRangeException {
+class TestOnRcuRangeException {
   static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST.\n"

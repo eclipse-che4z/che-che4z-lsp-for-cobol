@@ -186,10 +186,10 @@ public final class IdmsDialect implements CobolDialect {
     nodes.addAll(visitor.visitStartRule(startRuleContext));
     nodes.addAll(context.getExtendedSource().calculateCopyNodes());
 
-    new ArrayList<>(nodes).stream().filter(c -> c instanceof CopyNode).forEach(n -> {
+    new ArrayList<>(nodes).stream().filter(CopyNode.class::isInstance).forEach(n -> {
       new ArrayList<>(nodes).stream()
           .filter(cn -> cn != n)
-          .filter(cn -> cn instanceof CopyNode)
+          .filter(CopyNode.class::isInstance)
           .map(CopyNode.class::cast)
           .filter(cn -> cn.getDefinition().getLocation().getUri().equals(n.getLocality().getUri()))
           .forEach(cn -> {

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** Test if variable usage position tracked correctly with line concatenation. */
-public class TestLineContinuation2 {
+class TestLineContinuation2 {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. MIN.\n"

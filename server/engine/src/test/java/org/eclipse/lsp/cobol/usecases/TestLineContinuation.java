@@ -27,7 +27,7 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 /**
  * Test if variable usage position tracked correctly with line concatenation.
  */
-public class TestLineContinuation {
+class TestLineContinuation {
   private static final String TEXT =
       "000100 IDENTIFICATION DIVISION.                                         NC2054.2\n"
           + "000200 PROGRAM-ID.                                                      NC2054.2\n"

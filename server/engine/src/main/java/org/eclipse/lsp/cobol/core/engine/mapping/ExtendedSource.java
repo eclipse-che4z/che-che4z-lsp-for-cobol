@@ -32,7 +32,6 @@ public class ExtendedSource {
     documents.put(uri, new DocumentMap(uri, text));
   }
 
-  @Deprecated
   public ExtendedSource(TextTransformations textTransformations) {
     mainUri = textTransformations.getUri();
     documents.put(textTransformations.getUri(), new DocumentMap(textTransformations));

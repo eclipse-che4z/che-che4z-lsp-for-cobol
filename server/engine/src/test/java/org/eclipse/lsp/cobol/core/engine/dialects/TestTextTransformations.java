@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Text Transformation tests */
-public class TestTextTransformations {
+class TestTextTransformations {
   private static final String TEST = "0: abcd\n1: TEST\n";
 
   @Test

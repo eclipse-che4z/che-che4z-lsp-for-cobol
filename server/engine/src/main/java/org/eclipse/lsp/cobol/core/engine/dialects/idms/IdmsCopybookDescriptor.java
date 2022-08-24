@@ -20,29 +20,7 @@ import org.eclipse.lsp.cobol.core.IdmsCopyParser;
 import org.eclipse.lsp.cobol.core.IdmsParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-/*
- * copyIdmsOptions
- *     : (RECORD copyIdmsSource versionClause? (REDEFINES cobolWord)?)
- *     | (FILE copyIdmsSource versionClause?)
- *     | ((MAP | MAP_CONTROL) copyIdmsSource)
- *     | (MODULE? copyIdmsSource versionClause?)
- *     ;
- *
- * copyIdmsSource
- *     : copySource
- *     ;
- *
- * copySource
- *    : (literal | cobolWord | SUBSCHEMA_NAMES) ((OF | IN) copyLibrary)?
- *    ;
- *
- * copyLibrary
- *    : literal | cobolWord
- *    ;
- */
 
 /**
  * Description of IDMS copybook
@@ -67,7 +45,7 @@ public class IdmsCopybookDescriptor {
     Range range = DialectUtils.constructRange(ctx.copyIdmsOptions().copyIdmsSource());
 
     if (ctx.LEVEL_NUMBER() != null && ctx.LEVEL_NUMBER().getSymbol() != null) {
-      result.levelRange = extractLevelRange(ctx.LEVEL_NUMBER().getSymbol());
+      result.levelRange = IdmsParserHelper.extractLevelRange(ctx.LEVEL_NUMBER().getSymbol());
       result.level = extractLevel(ctx.LEVEL_NUMBER().getSymbol());
     }
 
@@ -96,7 +74,7 @@ public class IdmsCopybookDescriptor {
     Range range = DialectUtils.constructRange(ctx.copyIdmsOptions().copyIdmsSource());
 
     if (ctx.LEVEL_NUMBER() != null && ctx.LEVEL_NUMBER().getSymbol() != null) {
-      result.levelRange = extractLevelRange(ctx.LEVEL_NUMBER().getSymbol());
+      result.levelRange = IdmsParserHelper.extractLevelRange(ctx.LEVEL_NUMBER().getSymbol());
       result.level = extractLevel(ctx.LEVEL_NUMBER().getSymbol());
     }
 
@@ -115,13 +93,6 @@ public class IdmsCopybookDescriptor {
 
   private static int extractLevel(Token token) {
     return Integer.parseInt(token.getText());
-  }
-
-  private static Range extractLevelRange(Token token) {
-    Range range = new Range();
-    range.setStart(new Position(token.getLine() - 1, token.getCharPositionInLine()));
-    range.setEnd(new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getText().length() - 1));
-    return range;
   }
 
   private static String getName(IdmsCopyParser.CopyIdmsStatementContext ctx) {
