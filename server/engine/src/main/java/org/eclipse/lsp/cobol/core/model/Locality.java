@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.core.model;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -35,11 +35,11 @@ import org.eclipse.lsp4j.Range;
  * <p>Warning: LSP lines and position are 0-based, and ANTLR ones are 1-based. Keep it in mind while
  * creating a range for a locality.
  */
-@Value
+@Data
 @Builder(toBuilder = true)
 public class Locality {
   @Builder.Default private String uri = "";
-  @Builder.Default private Range range = new Range(new Position(0, 0), new Position(0, 0));
+  @Builder.Default private Range range = new Range(new Position(), new Position());
   @Builder.Default private String copybookId = null;
   @Builder.Default private String token = null;
   @Builder.Default private Class recognizer = Object.class;

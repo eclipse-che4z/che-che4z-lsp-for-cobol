@@ -85,7 +85,7 @@ class IdmsCopybookService {
 
     Location location = new Location();
     location.setUri(copybookModel.getUri());
-    location.setRange(new Range(new Position(0, 0), new Position(0, 0)));
+    location.setRange(new Range(new Position(), new Position()));
 
     node.setDefinition(new CopyDefinition(location, copybookModel.getUri()));
 

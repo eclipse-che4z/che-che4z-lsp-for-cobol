@@ -22,6 +22,8 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
@@ -130,8 +132,11 @@ public class UseCaseUtils {
                 bind(FileSystemService.class).toInstance(new WorkspaceFileService());
                 bind(CobolLanguageClient.class).toInstance(languageClient);
                 bind(SubroutineService.class).to(SubroutineServiceImpl.class);
+                bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
               }
             });
+
+    TextPreprocessor preprocessor = injector.getInstance(TextPreprocessor.class);
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
     PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks())
@@ -139,6 +144,14 @@ public class UseCaseUtils {
 
     useCase.getCopybooks()
         .forEach(cobolText -> {
+
+          String copybookText = cobolText.getFullText();
+          if (cobolText.isPreprocess()) {
+            copybookText = preprocessor.cleanUpCode("uri", cobolText.getFullText())
+                .getResult().calculateExtendedText();
+          }
+
+          cobolText = new CobolText(cobolText.getFileName(), cobolText.getDialectType(), copybookText);
           CopybookModel copybookModel = UseCaseUtils.toCopybookModel(cobolText);
           copybookService.store(copybookModel, useCase.fileName);
         });

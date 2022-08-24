@@ -16,7 +16,9 @@ package org.eclipse.lsp.cobol.core.engine;
 
 import lombok.Value;
 
-/** The collection of timing data. */
+/**
+ * The collection of timing data.
+ */
 @Value
 class Timing {
   long preprocessorTime;
@@ -32,7 +34,9 @@ class Timing {
     return new Builder();
   }
 
-  /** The collection of timers. */
+  /**
+   * The collection of timers.
+   */
   @Value
   static class Builder {
     Timer preprocessorTimer = new Timer();
@@ -46,18 +50,20 @@ class Timing {
 
     Timing build() {
       return new Timing(
-          preprocessorTimer.getTotalTime(),
-          dialectsTimer.getTotalTime(),
-          parserTimer.getTotalTime(),
-          mappingTimer.getTotalTime(),
-          splittingLanguageTimer.getTotalTime(),
-          visitorTimer.getTotalTime(),
-          syntaxTreeTimer.getTotalTime(),
-          lateErrorProcessingTimer.getTotalTime());
+              preprocessorTimer.getTotalTime(),
+              dialectsTimer.getTotalTime(),
+              parserTimer.getTotalTime(),
+              mappingTimer.getTotalTime(),
+              splittingLanguageTimer.getTotalTime(),
+              visitorTimer.getTotalTime(),
+              syntaxTreeTimer.getTotalTime(),
+              lateErrorProcessingTimer.getTotalTime());
     }
   }
 
-  /** The stop watch timer. */
+  /**
+   * The stop watch timer.
+   */
   static class Timer {
     long startTime = 0;
     long totalTime = 0;

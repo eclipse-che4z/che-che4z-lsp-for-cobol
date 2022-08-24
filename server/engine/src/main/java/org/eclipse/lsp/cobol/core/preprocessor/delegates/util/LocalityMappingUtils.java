@@ -177,15 +177,15 @@ public class LocalityMappingUtils {
   /**
    * Change the current document to consume positions of the nested one.
    *
-   * @param documentId URI of the current document or copybook id
-   * @param documentPositions position mappings
+   * @param documentUri URI of the current document or copybook id
+   * @param documentPositions position mappings [uri -> DocumentMapping]
    * @param documentHierarchyStack stack of processing documents
    */
   private void enterDocument(
-      String documentId,
+      String documentUri,
       Map<String, DocumentMapping> documentPositions,
       Deque<DocumentHierarchyLevel> documentHierarchyStack) {
-    documentHierarchyStack.push(new DocumentHierarchyLevel(documentPositions.get(documentId)));
+    documentHierarchyStack.push(new DocumentHierarchyLevel(documentPositions.get(documentUri)));
   }
 
   /**

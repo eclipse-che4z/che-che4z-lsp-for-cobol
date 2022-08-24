@@ -67,16 +67,15 @@ public class DaCoMaidProcessor {
 
   /**
    * Process MAID copybooks in the source code
-   * @param input source code
    * @param context dialect processing context
    * @param errors a container to propagate errors from dialect processing
    * @return processed text and dialect nodes
    */
-  public DialectOutcome process(String input, DialectProcessingContext context, List<SyntaxError> errors) {
+  public DialectOutcome process(DialectProcessingContext context, List<SyntaxError> errors) {
     List<Node> copyMaidNodes = new ArrayList<>();
     DaCoMaidProcessingState state = DaCoMaidProcessingState.START;
 
-    String[] lines = input.split("\n");
+    String[] lines = context.getExtendedSource().getText().split("\n", -1);
     String lastSuffix = null;
     sections.clear();
     for (int i = 0; i < lines.length; i++) {
@@ -105,51 +104,49 @@ public class DaCoMaidProcessor {
           sections.add(sectionMatcher.group("name"));
         }
       }
-      lines[i] = collectCopyMaid(line, i, copyMaidNodes, lastSuffix, context, errors);
+      collectCopyMaid(line, i, copyMaidNodes, lastSuffix, context, errors);
     }
-    input = String.join("\n", lines);
 
-    return new DialectOutcome(input, copyMaidNodes, ImmutableMultimap.of());
+    return new DialectOutcome(copyMaidNodes, ImmutableMultimap.of(), context);
   }
 
-  private String collectCopyMaid(String input, int lineNumber, List<Node> copyMaidNodes, String lastSuffix, DialectProcessingContext context, List<SyntaxError> errors) {
+  private void collectCopyMaid(String input, int lineNumber, List<Node> copyMaidNodes, String lastSuffix, DialectProcessingContext context, List<SyntaxError> errors) {
     Matcher matcher = copyMaidPattern.matcher(input);
-
     if (matcher.find()) {
-      StringBuffer sb = new StringBuffer();
       String indent = matcher.group("indent");
       int startChar = indent == null ? 0 : matcher.end("indent");
-      int endChar = matcher.end(matcher.groupCount() - 1);
+      int endChar = matcher.end();
       int len = endChar - startChar;
-      matcher.appendReplacement(sb, (indent == null ? "" : indent)
-              + String.join("", Collections.nCopies(len, CobolDialect.FILLER)));
+      String newString = String.join("", Collections.nCopies(len, CobolDialect.FILLER));
+      Range rangeReplace = new Range(
+              new Position(lineNumber, startChar),
+              new Position(lineNumber, endChar));
+      context.getExtendedSource().replace(rangeReplace, newString);
       String level = matcher.group("level");
       String layoutId = matcher.group("layoutId");
       String layoutUsage = matcher.group("layoutUsage");
       if (level != null) {
         Range range = new Range(new Position(lineNumber, matcher.start("layoutId")), new Position(lineNumber, matcher.end("layoutId")));
+        range = context.getExtendedSource().mapLocationUnsafe(range).getRange();
         copyMaidNodes.add(
                 createMaidCopybookNode(context, Integer.parseInt(level), layoutId, layoutUsage, lastSuffix, range, errors)
         );
       }
-      matcher.appendTail(sb);
-      return sb.toString();
     }
-    return input;
   }
 
 
   private CopyNode createMaidCopybookNode(DialectProcessingContext context, int startingLevel, String layoutId, String layoutUsage, String lastSuffix, Range range, List<SyntaxError> errors) {
     Locality locality = Locality.builder()
-            .uri(context.getProgramDocumentUri())
+            .uri(context.getExtendedSource().getUri())
             .range(range)
             .build();
     DaCoCopyNode cbNode = new DaCoCopyNode(locality, makeCopybookFileName(layoutId, layoutUsage), layoutUsage, lastSuffix);
 
     CopybookName copybookName = new CopybookName(makeCopybookFileName(layoutId, layoutUsage), DaCoDialect.NAME);
     CopybookModel copybookModel = copybookService.resolve(copybookName,
-            context.getProgramDocumentUri(),
-            context.getProgramDocumentUri(),
+            context.getExtendedSource().getUri(),
+            context.getExtendedSource().getUri(),
             context.getCopybookConfig(),
             true);
     if (copybookModel.getContent() != null) {

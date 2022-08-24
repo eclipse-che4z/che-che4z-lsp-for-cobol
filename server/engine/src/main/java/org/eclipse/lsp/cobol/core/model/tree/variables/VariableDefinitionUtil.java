@@ -137,8 +137,27 @@ public class VariableDefinitionUtil {
             copybooks.add((CopyNode) c);
           }
         });
+
     copybooks.sort(Comparator.comparingInt(c -> c.getLocality().getRange().getStart().getLine()));
-    copybooks.forEach(copyNode -> {
+
+    List<CopyNode> allCopybooks = copybooks.stream().flatMap(Node::getDepthFirstStream).filter(n -> n.getNodeType() == NodeType.COPY)
+        .map(CopyNode.class::cast)
+        .collect(Collectors.toList());
+
+    allCopybooks.stream()
+        .filter(c -> c.getDefinition() != null)
+        .filter(c -> c.getDefinition().getLocation() != null)
+        .forEach(c -> new ArrayList<>(variables).stream()
+            .filter(Objects::nonNull)
+            .filter(v -> v.getLocality() != null)
+            .filter(v -> v.getLocality().getUri() != null)
+            .filter(v -> v.getLocality().getUri().equals(c.getDefinition().getLocation().getUri()))
+            .forEach(v -> {
+              variables.remove(v);
+              c.addChild(v);
+            }));
+
+    allCopybooks.forEach(copyNode -> {
       int copybookLine = copyNode.getLocality().getRange().getStart().getLine();
       String uri = copyNode.getLocality().getUri();
       AtomicInteger index = new AtomicInteger();
@@ -158,7 +177,7 @@ public class VariableDefinitionUtil {
           .distinct()
           .forEach(copyNodeVariable -> variables.add(index.getAndIncrement(), copyNodeVariable));
     });
-    return variables;
+    return variables.stream().distinct().collect(Collectors.toList());
   }
 
   /**

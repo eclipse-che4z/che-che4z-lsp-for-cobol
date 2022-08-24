@@ -28,6 +28,8 @@ import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
@@ -47,6 +49,7 @@ import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,28 +118,63 @@ public class CobolLanguageEngine {
 
     timingBuilder.getDialectsTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
-    String cleanText = preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
+    TextTransformations cleanText =
+        preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
 
-    DialectOutcome dialectOutcome = dialectService
-        .process(analysisConfig.getDialects(), DialectProcessingContext.builder()
-            .programDocumentUri(documentUri)
-            .text(cleanText)
+    DialectProcessingContext dialectProcessingContext =
+        DialectProcessingContext.builder()
             .copybookConfig(analysisConfig.getCopybookConfig())
-            .build())
-        .unwrap(accumulatedErrors::addAll);
+            .programDocumentUri(documentUri)
+            .extendedSource(new ExtendedSource(cleanText))
+            .build();
+    dialectProcessingContext.getExtendedSource().commitTransformations();
+
+    DialectOutcome dialectOutcome =
+        dialectService
+            .process(analysisConfig.getDialects(), dialectProcessingContext)
+            .unwrap(accumulatedErrors::addAll);
+
+    accumulatedErrors = accumulatedErrors.stream().distinct().collect(toList());
     timingBuilder.getDialectsTimer().stop();
 
     timingBuilder.getPreprocessorTimer().start();
     injectService.setImplicitCode(dialectOutcome.getImplicitCode());
+
+    List<SyntaxError> preprocessorErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =
         preprocessor
             .processCleanCode(
                 documentUri,
-                dialectOutcome.getText(),
+                dialectOutcome.getContext().getExtendedSource().extendedText(),
                 analysisConfig.getCopybookConfig(),
                 new CopybookHierarchy())
-            .unwrap(accumulatedErrors::addAll);
+            .unwrap(preprocessorErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
+
+    // Update copybook usages with proper positions
+    extendedDocument
+        .getCopybooks()
+        .getUsages()
+        .forEach(
+            (k, v) -> v.setRange(dialectOutcome.getContext().getExtendedSource().mapLocation(v.getRange()).getRange()));
+
+    // Update copybook definition statements with proper positions
+    extendedDocument
+        .getCopybooks()
+        .getDefinitionStatements()
+        .forEach(
+            (k, v) -> v.setRange(dialectOutcome.getContext().getExtendedSource().mapLocation(v.getRange()).getRange()));
+
+    preprocessorErrors.forEach(
+        e ->
+            e.getLocality()
+                .setRange(
+                    dialectOutcome
+                        .getContext()
+                        .getExtendedSource()
+                        .mapLocation(e.getLocality().getRange())
+                        .getRange()));
+    accumulatedErrors.addAll(preprocessorErrors);
 
     timingBuilder.getParserTimer().start();
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(extendedDocument.getText()));
@@ -161,7 +199,8 @@ public class CobolLanguageEngine {
 
     timingBuilder.getMappingTimer().start();
     Map<Token, Locality> positionMapping =
-        getPositionMapping(documentUri, extendedDocument, tokens, embeddedCodeParts);
+        getPositionMapping(
+            documentUri, extendedDocument, tokens, embeddedCodeParts, dialectProcessingContext.getExtendedSource());
     timingBuilder.getMappingTimer().stop();
 
     timingBuilder.getVisitorTimer().start();
@@ -175,8 +214,7 @@ public class CobolLanguageEngine {
             messageService,
             subroutineService,
             dialectOutcome.getDialectNodes(),
-            cachingConfigurationService
-        );
+            cachingConfigurationService);
     List<Node> syntaxTree = visitor.visit(tree);
     accumulatedErrors.addAll(visitor.getErrors());
     timingBuilder.getVisitorTimer().stop();
@@ -214,13 +252,15 @@ public class CobolLanguageEngine {
         rootNode, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
-  private CopybooksRepository applyDialectCopybooks(CopybooksRepository copybooks, DialectOutcome dialectOutcome) {
+  private CopybooksRepository applyDialectCopybooks(
+      CopybooksRepository copybooks, DialectOutcome dialectOutcome) {
     dialectOutcome.getDialectNodes().stream()
         .flatMap(Node::getDepthFirstStream)
         .filter(n -> n.getNodeType().equals(NodeType.COPY))
         .map(CopyNode.class::cast)
-            .filter(n -> n.getDefinition() != null)
-        .forEach(n -> copybooks.define(n.getName(), n.getDialect(), n.getDefinition().getLocation()));
+        .filter(n -> n.getDefinition() != null)
+        .forEach(
+            n -> copybooks.define(n.getName(), n.getDialect(), n.getDefinition().getLocation()));
     return copybooks;
   }
 
@@ -254,10 +294,31 @@ public class CobolLanguageEngine {
       String documentUri,
       ExtendedDocument extendedDocument,
       CommonTokenStream tokens,
-      Map<Token, EmbeddedCode> embeddedCodeParts) {
+      Map<Token, EmbeddedCode> embeddedCodeParts,
+      ExtendedSource extendedSource) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    return LocalityMappingUtils.createPositionMapping(
-        tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri, embeddedCodeParts);
+    Map<Token, Locality> mapping =
+        LocalityMappingUtils.createPositionMapping(
+            tokens.getTokens(),
+            extendedDocument.getDocumentMapping(),
+            documentUri,
+            embeddedCodeParts);
+    return updateMapping(documentUri, mapping, extendedSource);
+  }
+
+  private Map<Token, Locality> updateMapping(
+      String documentUri, Map<Token, Locality> mapping, ExtendedSource extendedSource) {
+    mapping.forEach(
+        (k, v) -> {
+          if (v.getUri().equals(documentUri)) {
+            Location l = extendedSource.mapLocation(v.getRange());
+
+            v.getRange().setStart(l.getRange().getStart());
+            v.getRange().setEnd(l.getRange().getEnd());
+            v.setUri(l.getUri());
+          }
+        });
+    return mapping;
   }
 
   private void analyzeEmbeddedCode(List<Node> syntaxTree, Map<Token, Locality> mapping) {
@@ -284,7 +345,8 @@ public class CobolLanguageEngine {
     return err ->
         err.toBuilder()
             .locality(LocalityUtils.findPreviousVisibleLocality(err.getOffendedToken(), mapping))
-            .suggestion(messageService.getMessage(err.getSuggestion())).errorSource(ErrorSource.PARSING)
+            .suggestion(messageService.getMessage(err.getSuggestion()))
+            .errorSource(ErrorSource.PARSING)
             .build();
   }
 
@@ -300,8 +362,11 @@ public class CobolLanguageEngine {
   private List<SyntaxError> raiseError(SyntaxError error, Map<String, Locality> copyStatements) {
     return Stream.of(error)
         .filter(shouldRaise())
-        .map(err -> err.toBuilder().locality(copyStatements.get(err.getLocality().getCopybookId()))
-        .errorSource(ErrorSource.COPYBOOK))
+        .map(
+            err ->
+                err.toBuilder()
+                    .locality(copyStatements.get(err.getLocality().getCopybookId()))
+                    .errorSource(ErrorSource.COPYBOOK))
         .map(SyntaxError.SyntaxErrorBuilder::build)
         .flatMap(err -> Stream.concat(raiseError(err, copyStatements).stream(), Stream.of(err)))
         .collect(toList());

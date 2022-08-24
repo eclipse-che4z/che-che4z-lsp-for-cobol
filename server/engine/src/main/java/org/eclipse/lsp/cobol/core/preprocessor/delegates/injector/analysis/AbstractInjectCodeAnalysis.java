@@ -181,7 +181,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
                       hierarchy,
                       preprocessor
                           .cleanUpCode(model.getUri(), model.getContent())
-                          .unwrap(errors::addAll))
+                          .unwrap(errors::addAll).calculateExtendedText())
                   .unwrap(errors::addAll))
           .accumulateErrors(errors);
     };
@@ -216,8 +216,6 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
     if (hierarchy.hasRecursion(copybookMetaData.getCopybookName()))
       return emptyModel(
           copybookMetaData.getCopybookName(), hierarchy.mapCopybooks(this::reportRecursiveCopybook));
-
-    new CopybookModel(copybookMetaData.getCopybookName(), null, null);
 
     String programDocumentUri = hierarchy.getRootDocumentUri().orElse(copybookMetaData.getDocumentUri());
 
@@ -261,7 +259,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
           || ImplicitCodeUtils.isImplicit(uri)))
         copybooks.define(
             metaData.getCopybookName().getQualifiedName(),
-                metaData.getCopybookName().getDialectType(), new Location(uri, new Range(new Position(0, 0), new Position(0, 0))));
+                metaData.getCopybookName().getDialectType(), new Location(uri, new Range(new Position(), new Position())));
     };
   }
 

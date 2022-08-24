@@ -15,8 +15,12 @@
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableSet;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
+
+import java.util.List;
+import java.util.Set;
 
 /** A COBOL dialect */
 public interface CobolDialect {
@@ -34,6 +38,25 @@ public interface CobolDialect {
    * @return the dialect processing result
    */
   default ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    return new ResultWithErrors<>(new DialectOutcome(context.getText(), ImmutableList.of(), ImmutableMultimap.of()), ImmutableList.of());
+    return new ResultWithErrors<>(new DialectOutcome(context),
+            ImmutableList.of());
+  }
+
+  /**
+   * Get document extension data from dialect. This data should be added to an argument.
+   *
+   * @param context data related to dialect processing
+   * @return a list of syntax errors
+   */
+  default List<SyntaxError> extend(DialectProcessingContext context) {
+    return ImmutableList.of();
+  }
+
+  /**
+   * Define a order for dialect execution
+   * @return set of dialect processors, that should follow this one
+   */
+  default Set<String> runBefore() {
+    return ImmutableSet.of();
   }
 }

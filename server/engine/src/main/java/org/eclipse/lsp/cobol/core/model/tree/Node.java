@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 @Getter
 @EqualsAndHashCode
 public abstract class Node {
-  protected Locality locality;
+  @Setter protected Locality locality;
   private final NodeType nodeType;
   private final String dialect;
 

@@ -129,10 +129,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private void addDialectsNode(Node rootNode) {
     for (Node dialectNode : dialectNodes) {
-      RangeUtils.findNodeByPosition(
+      Optional<Node> nodeByPosition = RangeUtils.findNodeByPosition(
               rootNode,
               dialectNode.getLocality().getUri(),
-              dialectNode.getLocality().getRange().getStart())
+              dialectNode.getLocality().getRange().getStart());
+
+      nodeByPosition
           .orElse(rootNode)
           .addChild(dialectNode);
     }
@@ -776,7 +778,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     List<Node> result = new ArrayList<>(aggregate.size() + nextResult.size());
     result.addAll(aggregate);
     result.addAll(nextResult);
-    return result;
+    return result.stream().distinct().collect(toList());
   }
 
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {

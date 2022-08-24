@@ -15,7 +15,6 @@
 
 package org.eclipse.lsp.cobol.core.engine.dialects.cicsTranslator;
 
-import com.google.common.collect.ImmutableMultimap;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -31,7 +30,6 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /** Process the text according to the CICS Translator rules */
@@ -54,7 +52,7 @@ public class CICSTranslatorDialect implements CobolDialect {
    */
   @Override
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    CICSTranslatorLexer lexer = new CICSTranslatorLexer(CharStreams.fromString(context.getText()));
+    CICSTranslatorLexer lexer = new CICSTranslatorLexer(CharStreams.fromString(context.getExtendedSource().getText()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     CICSTranslatorParser parser = new CICSTranslatorParser(tokens);
     DialectParserListener listener = new DialectParserListener(context.getProgramDocumentUri());
@@ -64,10 +62,10 @@ public class CICSTranslatorDialect implements CobolDialect {
     parser.addErrorListener(listener);
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
 
-    CICSTranslatorVisitor cicsTranslatorVisitor = new CICSTranslatorVisitor(context.getText());
+    CICSTranslatorVisitor cicsTranslatorVisitor = new CICSTranslatorVisitor(context);
     cicsTranslatorVisitor.visitStartRule(parser.startRule());
 
     List<SyntaxError> errors = new ArrayList<>(listener.getErrors());
-    return new ResultWithErrors<>(new DialectOutcome(cicsTranslatorVisitor.getResultedText(), Collections.emptyList(), ImmutableMultimap.of()), errors);
+    return new ResultWithErrors<>(new DialectOutcome(context), errors);
   }
 }

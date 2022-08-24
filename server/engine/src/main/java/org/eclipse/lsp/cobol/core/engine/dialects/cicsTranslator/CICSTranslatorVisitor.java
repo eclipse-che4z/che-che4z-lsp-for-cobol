@@ -17,8 +17,10 @@ package org.eclipse.lsp.cobol.core.engine.dialects.cicsTranslator;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.CICSTranslatorParser;
 import org.eclipse.lsp.cobol.core.CICSTranslatorParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp4j.Range;
 
 import java.util.List;
 
@@ -28,10 +30,11 @@ import java.util.List;
  */
 @Slf4j
 public class CICSTranslatorVisitor extends CICSTranslatorParserBaseVisitor<List<Node>> {
-  private final TextReplacement textReplacement;
+  private final DialectProcessingContext context;
 
-  public CICSTranslatorVisitor(String text) {
-    textReplacement = new TextReplacement(text);
+  public CICSTranslatorVisitor(DialectProcessingContext context) {
+
+    this.context = context;
   }
 
   /**
@@ -40,11 +43,11 @@ public class CICSTranslatorVisitor extends CICSTranslatorParserBaseVisitor<List<
    */
   @Override
   public List<Node> visitCicsTranslatorStmt(CICSTranslatorParser.CicsTranslatorStmtContext ctx) {
-    textReplacement.addReplacementContext(ctx, "ADATA", "");
+    String newText = "ADATA" + context.getExtendedSource().getText()
+            .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
+            .replaceAll("[^ \n]", "");
+    Range range = DialectUtils.constructRange(ctx);
+    context.getExtendedSource().replace(range, newText);
     return visitChildren(ctx);
-  }
-
-  public String getResultedText() {
-    return textReplacement.getResultingText();
   }
 }

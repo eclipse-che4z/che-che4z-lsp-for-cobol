@@ -53,13 +53,14 @@ public class TestCopyIdmsNested {
       + "           03 COPY IDMS {~COPY1!IDMS}.\n"
       + "       PROCEDURE DIVISION.\n";
 
-  private static final String COPY_LOOP =  "       01  COPY IDMS {COPY1!IDMS|1}.\n";
+  private static final String COPY_LOOP =  "       01  COPY IDMS {COPY1|1}.\n";
 
   @Test
   void testNestedIdmsCopybook() {
     UseCaseEngine.runTest(
-        TEXT, ImmutableList.of(new CobolText("COPY1", IdmsDialect.NAME, COPY1),
-            new CobolText("NESTED_COPY", IdmsDialect.NAME, NESTED_COPY, UseCaseUtils.toURI("COPY1"))),
+        TEXT, ImmutableList.of(
+                new CobolText("COPY1", IdmsDialect.NAME, COPY1),
+                new CobolText("NESTED_COPY", IdmsDialect.NAME, NESTED_COPY, UseCaseUtils.toURI("NESTED_COPY"), false)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
   }
 
@@ -71,7 +72,7 @@ public class TestCopyIdmsNested {
             "COPY1: Copybook has circular dependency",
             DiagnosticSeverity.Error,
             ErrorSource.DIALECT.getText(),
-            "MISSING_COPYBOOK");
+            "missing copybook");
 
     UseCaseEngine.runTest(
         TEXT_CIRCULAR, ImmutableList.of(

@@ -51,7 +51,7 @@ class GrammarPreprocessorImplTest {
   private static final Locality RESULT_POS =
       Locality.builder()
           .uri(CPYNAME)
-          .range(new Range(new Position(0, 0), new Position(0, 6)))
+          .range(new Range(new Position(), new Position(0, 6)))
           .build();
   private static final Locality CPYNAME_POS =
       Locality.builder()
@@ -61,7 +61,7 @@ class GrammarPreprocessorImplTest {
   private static final Locality COPY_POS =
       Locality.builder()
           .uri(DOCUMENT)
-          .range(new Range(new Position(0, 0), new Position(0, 4)))
+          .range(new Range(new Position(), new Position(0, 4)))
           .build();
 
   @Test
