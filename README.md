@@ -78,8 +78,6 @@ The extension enables outline view and breadcrumb view, which show the structure
 ### Code Snippets
 Before you write your COBOL code from scratch, search the snippet library for useful templates.
 
-**Follow these steps:**
-
 1. Press `F1` to open the command palette.
 2. Type **Insert Snippet** and press enter.
 3. Select the snippet that you want to insert.
@@ -89,6 +87,34 @@ Before you write your COBOL code from scratch, search the snippet library for us
 You can also insert a code snippet by typing the name of the snippet in your code and clicking on the autocomplete text.
 
 The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder.
+
+### Smart Tab
+
+Configure the smart tab function in your `settings.json` file to set tab stops at specific columns in the editor window. The cursor stops at these columns when you use **Tab** and **Shift+Tab** to move forwards and backwards in the code. You can specify custom tab stops, and use regular expressions to set conditional tab settings for different sections and divisions of the code.
+
+To configure the smart tab feature, open your `settings.json` file and change the `"cobol-lsp-smart-tab":` parameter.
+
+**Tip:** You can open your `settings.json` file directly from the COBOL Language Support extension settings. Under **Cobol-lsp: Smart-tab**, click **Edit in settings.json**.
+
+- Specify `false` to use the default tab settings for Visual Studio Code (every 4 columns).
+- Specify `true` to use the default tab settings for COBOL Language Support. This adds extra tab stops for the margins at columns 8, 12 and 73.
+- To specify custom tab stops for the whole file, specify an array of integers. The tab stops are set at the next column after the numbers that you specify.   
+   Example: a value of `[0, 7, 20]` sets tab stops at columns 1, 8 and 21 and nowhere else.
+- To specify conditional tab settings for different anchors in the document, specify a JSON element containing the parameters `"default":` and `"anchors":`.
+   - For `"anchors":`, specify a JSON element containing any number of parameters of the format `"ANCHOR": tab stops`. 
+      - The `ANCHOR` can be a regular expression and corresponds to a string that occurs in the code. 
+      - The `tab stops` are an array of integers that specify tab stops. These tab stop settings apply to all lines in the code below the string specified in the anchor until another condition is met.
+   - For `"default":`, specify an array of integers that specify tab stops when no condition is met.
+   - The following example sets tab stops after columns 1, 2, 3 and 4 after the line `DATA DIVISION`, after columns 3, 5 and 70 in the `PROCEDURE DIVISION` and after columns 5, 10 and 15 elsewhere.
+   ```
+   "cobol-lsp.smart-tab": {  
+        "default": [5, 10, 15],
+        "anchors": {
+            "DATA +DIVISION": [1 ,2, 3, 4],
+            "PROCEDURE +DIVISION": [3, 5, 70]
+        }
+    }
+    ```
 
 ### Dialects
 
@@ -106,9 +132,7 @@ The COBOL Language Support extension supports subroutines specified in CALL stat
 
 To enable subroutine support, specify the paths of folders containing subroutine files in your workspace extension settings.
 
-**Follow these steps:**
-
-1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings.
+1. Open the COBOL Language Support extension settings.
 2. Switch from **User** to **Workspace**.
 3. Under **Subroutine-manager: Paths-local**, specify the paths of the folders containing subroutines.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
@@ -140,9 +164,7 @@ COBOL Language Support supports the following copybook types:
 
 You can store your copybooks locally in folders in your workspace and specify those folder paths in your workspace extension settings.
 
-**Follow these steps:**
-
-1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings.
+1. Open the COBOL Language Support extension settings.
 2. Switch from **User** to **Workspace**.
 3. Specify the paths of the folders containing copybooks:
    - Under **Cpy-manager: Paths-local** for standard IBM Enterprise COBOL and Datacom.
@@ -162,10 +184,8 @@ To resolve copybook names manually, hover over the copybook name with the error 
 
 You can also set up automatic copybook retrieval from the mainframe to download copybooks from mainframe data sets and USS directories to your workspace.
 
-**Follow these steps:**
-
 1. Ensure that you have a [Zowe Explorer profile](https://docs.zowe.org/stable/user-guide/ze-profiles/) configured, with credentials and a connection URL defined.
-2. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings.
+2. Open the COBOL Language Support extension settings.
 3. Switch from **User** to **Workspace**.
 4. Under **Cpy-manager: Paths-dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
 5. Under **Cpy-manager: Paths-uss**, list absolute paths of directories on USS subsystems to search for copybooks. The directories are searched in the order they are listed, so if two directories contain a copybook with the same member name, the one from the directory higher on the list is downloaded. If copybooks with the same name are found in both a mainframe data set and a USS directory, the one from the mainframe data set is downloaded.
