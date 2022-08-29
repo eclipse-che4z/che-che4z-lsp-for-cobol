@@ -175,12 +175,12 @@ describe("LanguageClientService positive scenario", () => {
 
 describe("LanguageClientService negative scenario.", () => {
 
-    test.skip("LSP port not defined and jar path doesn't exists", async () => {
+    test("LSP port not defined and jar path doesn't exists", async () => {
         fs.existsSync = jest.fn().mockReturnValue(false);
         try {
             await new LanguageClientService(undefined).checkPrerequisites();
         } catch (error) {
-            expect(error.toString()).toBe("Error: LSP server for COBOL not found");
+            expect(error.toString()).toBe("Error: LSP server for cobol not found");
         }
     });
 });
