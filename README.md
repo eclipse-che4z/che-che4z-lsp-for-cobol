@@ -176,11 +176,9 @@ You can also set up automatic copybook retrieval from the mainframe to download 
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets and USS directories that you specified in steps 4 and 5.  
    Copybook support features are now enabled.
 
-#### Managing Copybooks Downloaded from the Mainframe
+Copybooks that you retrieve from mainframe data sets are stored in the **.c4z/.copybooks** directory within the workspace, which is created automatically. 
 
-Copybooks that you retrieve from mainframe data sets are stored in the **.c4z/.copybooks** directory within the workspace, which is created automatically. Copybooks downloaded from the mainframe using an older version of COBOL Language Support might also be found in a **.copybooks** directory in the workspace root. We recommend that you delete this folder so that all files are downloaded again to the **.c4z/.copybooks** folder.
-
-Because copybooks that are downloaded to the .copybooks folder might change on the mainframe, we recommend that you refresh your copybooks from time to time. To refresh your copybooks, press **F1** and run the command **Clear downloaded copybooks**. This command clears the **.c4z/.copybooks** directory so that copybooks are downloaded again from the mainframe.
+We recommend that you refresh your copybooks from time to time. To refresh your copybooks, press **F1** and run the command **Clear downloaded copybooks**. This command clears the **.c4z/.copybooks** directory so that copybooks are downloaded again from the mainframe.
 
 ### Copybook Support Features
 
