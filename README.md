@@ -96,7 +96,7 @@ To configure the smart tab feature, open your `settings.json` file and change th
 
 **Tip:** You can open your `settings.json` file directly from the COBOL Language Support extension settings. Under **Cobol-lsp: Smart-tab**, click **Edit in settings.json**.
 
-- Specify `false` to use the default tab settings for Visual Studio Code (every 4 columns).
+- Specify `false` to use the default tab settings for Visual Studio Code.
 - Specify `true` to use the default tab settings for COBOL Language Support. This adds extra tab stops for the margins at columns 8, 12 and 73.
 - To specify custom tab stops for the whole file, specify an array of integers. The tab stops are set at the next column after the numbers that you specify.   
    Example: a value of `[0, 7, 20]` sets tab stops at columns 1, 8 and 21 and nowhere else.
