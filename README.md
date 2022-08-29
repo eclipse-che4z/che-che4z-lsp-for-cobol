@@ -104,8 +104,8 @@ To configure the smart tab feature, open your `settings.json` file and change th
    - For `"anchors":`, specify a JSON element containing any number of parameters of the format `"ANCHOR": tab stops`. 
       - The `ANCHOR` can be a regular expression and corresponds to a string that occurs in the code. 
       - The `tab stops` are an array of integers that specify tab stops. These tab stop settings apply to all lines in the code below the string specified in the anchor until another condition is met.
-   - For `"default":`, specify an array of integers that specify tab stops when no condition is met.
-   - The following example sets tab stops after columns 1, 2, 3 and 4 after the line `DATA DIVISION`, after columns 3, 5 and 70 in the `PROCEDURE DIVISION` and after columns 5, 10 and 15 elsewhere.
+   - For `"default":`, specify an array of integers that specify tab stops when no condition is met.  
+The following example sets tab stops after columns 1, 2, 3 and 4 after the line `DATA DIVISION`, after columns 3, 5 and 70 after the line `PROCEDURE DIVISION` and after columns 5, 10 and 15 elsewhere.
    ```
    "cobol-lsp.smart-tab": {  
         "default": [5, 10, 15],
