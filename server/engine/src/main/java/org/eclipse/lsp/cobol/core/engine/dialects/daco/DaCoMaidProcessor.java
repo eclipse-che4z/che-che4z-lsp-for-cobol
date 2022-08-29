@@ -141,9 +141,9 @@ public class DaCoMaidProcessor {
             .uri(context.getExtendedSource().getUri())
             .range(range)
             .build();
-    DaCoCopyNode cbNode = new DaCoCopyNode(locality, makeCopybookFileName(layoutId, layoutUsage), layoutUsage, lastSuffix);
+    DaCoCopyNode cbNode = new DaCoCopyNode(locality, makeCopybookFileName(startingLevel, layoutId, layoutUsage), layoutUsage, lastSuffix);
 
-    CopybookName copybookName = new CopybookName(makeCopybookFileName(layoutId, layoutUsage), DaCoDialect.NAME);
+    CopybookName copybookName = new CopybookName(makeCopybookFileName(startingLevel, layoutId, layoutUsage), DaCoDialect.NAME);
     CopybookModel copybookModel = copybookService.resolve(copybookName,
             context.getExtendedSource().getUri(),
             context.getExtendedSource().getUri(),
@@ -204,8 +204,8 @@ public class DaCoMaidProcessor {
     return visitor.visit(ctx);
   }
 
-  private static String makeCopybookFileName(String layoutId, String layoutUsage) {
-    if (layoutUsage == null) {
+  private static String makeCopybookFileName(int startingLevel, String layoutId, String layoutUsage) {
+    if (layoutUsage == null || startingLevel > 1) {
       return layoutId;
     }
     return String.format("%s_%s", layoutId.toUpperCase(Locale.ROOT), layoutUsage.toUpperCase(Locale.ROOT));

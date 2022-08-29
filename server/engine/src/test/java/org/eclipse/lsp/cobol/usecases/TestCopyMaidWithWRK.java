@@ -38,7 +38,7 @@ class TestCopyMaidWithWRK {
           + "             05 {$*TABMAX-PW7} PIC S9(4) VALUE ZERO COMP-3.\n"
           + "             05 {$*BHTTAB-XW7}.\n"
           + "               07 {$*BHTREG-XW8} OCCURS 50.\n"
-          + "                 09 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG_WRK} WRK.\n"
+          + "                 09 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-XW8} OF {$BHTTAB-XW7}.";
 
@@ -55,7 +55,7 @@ class TestCopyMaidWithWRK {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG_WRK", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }
