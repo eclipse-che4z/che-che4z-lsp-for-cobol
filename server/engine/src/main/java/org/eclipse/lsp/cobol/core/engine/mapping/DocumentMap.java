@@ -53,6 +53,16 @@ public class DocumentMap {
     }
 
     /**
+    * Insert copybook as a text after defined line
+    *
+    * @param copyNode node representation of copybook
+    * @param copyTransform Copybook's transformations
+    */
+    public void insert(CopyNode copyNode, TextTransformations copyTransform) {
+      topTransformations().insert(copyNode, copyNode.getLocality().getRange().getStart().getLine(), copyTransform);
+    }
+
+    /**
      * Substitute location of original document with a new content.
      *
      * @param range location

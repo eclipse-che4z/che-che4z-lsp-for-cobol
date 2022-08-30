@@ -132,4 +132,17 @@ public class ExtendedSource {
   public String getText() {
     return documents.get(mainUri).getText();
   }
+
+  /**
+   * Insert copybook content as a text document after defined line
+   *
+   * @param document document to extend
+   * @param copyNode node representation of copybook
+   * @param copybookMap a map of a copybook
+   */
+  public void insert(DocumentMap document, CopyNode copyNode, DocumentMap copybookMap) {
+    documents.computeIfAbsent(document.getUri(), uri -> document)
+        .insert(copyNode, TextTransformations.of(copybookMap.extendedText(), copybookMap.getUri()));
+    documents.put(copybookMap.getUri(), copybookMap);
+  }
 }

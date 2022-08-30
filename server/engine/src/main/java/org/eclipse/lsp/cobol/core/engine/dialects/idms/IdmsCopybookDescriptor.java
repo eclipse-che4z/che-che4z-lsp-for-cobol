@@ -32,6 +32,7 @@ public class IdmsCopybookDescriptor {
   private Locality statement;
   private Range levelRange;
   private int level;
+  private boolean insert;
 
   /**
    * Factory method for copybook description object

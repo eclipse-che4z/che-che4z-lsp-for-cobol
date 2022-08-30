@@ -33,6 +33,7 @@ public class TextTransformations {
   private final String text;
   private final String uri;
   private final Map<Range, TextTransformations> extensions = new HashMap<>();
+  private final Set<Integer> inserts = new HashSet<>();
   private final Map<Range, String> replacements = new HashMap<>();
   private final List<CopyNode> copyNodes = new ArrayList<>();
 
@@ -78,6 +79,15 @@ public class TextTransformations {
         } else {
           replace = replacements.get(currentRange);
         }
+        if (inserts.contains(lineNumber)) {
+          eda.append(lines[lineNumber]);
+          prevRange = currentRange;
+          currentRange = ranges.isEmpty() ? null : ranges.removeFirst();
+          eda.append(replace);
+          //eda.append("\n");
+          lineNumber++;
+          continue;
+        }
         eda.append(replace);
         lineNumber = currentRange.getEnd().getLine();
         prevRange = currentRange;
@@ -108,6 +118,23 @@ public class TextTransformations {
             new Position(range.getStart().getLine(), 0),
             new Position(range.getEnd().getLine(), range.getEnd().getCharacter()));
     extensions.put(extRange, textTransformations);
+  }
+
+  /**
+   * Insert copybook content as a text document after defined line
+   *
+   * @param copyNode node representation of copybook
+   * @param line a line number to insert after
+   * @param textTransformations Copybook's transformations
+   */
+  public void insert(CopyNode copyNode, int line, TextTransformations textTransformations) {
+    copyNodes.add(copyNode);
+    Range extRange =
+        new Range(
+            new Position(line, 0),
+            new Position(line, 80));
+    extensions.put(extRange, textTransformations);
+    inserts.add(line);
   }
 
   /**
@@ -153,5 +180,14 @@ public class TextTransformations {
       return true;
     }
     return !replacements.isEmpty();
+  }
+
+  /**
+   * Determines if defined line has insertion flag
+   * @param line is a line number
+   * @return true if line has insertion and false otherwise
+   */
+  public boolean isInsert(int line) {
+    return inserts.contains(line);
   }
 }
