@@ -26,10 +26,13 @@ public class DaCoCopyNode extends CopyNode {
   String layoutUsage;
   String suffix;
 
-  public DaCoCopyNode(Locality locality, String layoutId, String layoutUsage, String suffix) {
+  int startingLevel;
+
+  public DaCoCopyNode(Locality locality, String layoutId, String layoutUsage, int startingLevel, String suffix) {
     super(locality, layoutId, DaCoDialect.NAME);
     this.layoutUsage = layoutUsage;
     this.suffix = suffix;
+    this.startingLevel = startingLevel;
   }
 
   public String getParentSuffix() {
