@@ -37,7 +37,7 @@ export class JavaCheck {
             });
             ls.on("close", (code: number) => {
                 if (code !== 0) {
-                    reject("An error occurred when checking if Java was installed. Switching to native builds");
+                    reject("An error occurred when checking if Java was installed. Switching to native build.");
                 }
                 if (!resolved) {
                     reject("Minimum expected Java version is 8. Switching to native builds");

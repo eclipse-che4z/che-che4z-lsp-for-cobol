@@ -442,6 +442,16 @@
                         "S999"
                     ],
                     "uniqueItems": true
+                },
+                "cobol-lsp.serverType": {
+                    "type": "string",
+                    "enum": ["JAVA", "NATIVE"],
+                    "default": "JAVA",
+                    "enumDescriptions": [
+                        "JAVA  - Run java Server",
+                        "NATIVE - Run native Server"
+                    ],
+                    "description": "COBOL LS server type."
                 }
             }
         },

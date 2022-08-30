@@ -452,7 +452,7 @@
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
-                        <version>0.9.7.1</version>
+                        <version>0.9.13</version>
                         <extensions>true</extensions>
                         <executions>
                             <execution>
@@ -472,6 +472,12 @@
                                 <buildArg>--verbose</buildArg>
                                 <buildArg>--no-fallback</buildArg>
                             </buildArgs>
+                            <agent>
+                                <options>
+                                    <option>access-filter-file=${basedir}/src/test/resources/access-filter.json</option>
+                                    <option>experimental-class-loader-support</option>
+                                </options>
+                            </agent>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -484,7 +490,7 @@
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
-                        <version>0.9.7.1</version>
+                        <version>0.9.13</version>
                         <extensions>true</extensions>
                         <executions>
                             <execution>
@@ -505,6 +511,12 @@
                                 <buildArg>--verbose</buildArg>
                                 <buildArg>--no-fallback</buildArg>
                             </buildArgs>
+                            <agent>
+                                <options>
+                                    <option>access-filter-file=${basedir}/src/test/resources/access-filter.json</option>
+                                    <option>experimental-class-loader-support</option>
+                                </options>
+                            </agent>
                         </configuration>
                     </plugin>
                 </plugins>

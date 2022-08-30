@@ -81,7 +81,7 @@ describe("SettingsService evaluate variables", () => {
             get: jest.fn().mockReturnValue(["copybook/${fileBasenameNoExtension}"]),
         });
         const paths = SettingsService.getCopybookLocalPath("program", "COBOL");
-        expect(paths[0]).toEqual("copybook/program")
+        expect(paths[0]).toEqual("copybook/program");
     });
 
     test("Evaluate fileBasenameNoExtension", () => {
@@ -89,7 +89,7 @@ describe("SettingsService evaluate variables", () => {
             get: jest.fn().mockReturnValue(["copybook/${fileBasenameNoExtension}"]),
         });
         const paths = SettingsService.getCopybookLocalPath("program.cbl", "COBOL");
-        expect(paths[0]).toEqual("copybook/program")
+        expect(paths[0]).toEqual("copybook/program");
     });
 
     test("Evaluate fileBasenameNoExtension with extension and dots", () => {
@@ -97,29 +97,37 @@ describe("SettingsService evaluate variables", () => {
             get: jest.fn().mockReturnValue(["copybook/${fileBasenameNoExtension}"]),
         });
         const paths = SettingsService.getCopybookLocalPath("program.file.cbl", "COBOL");
-        expect(paths[0]).toEqual("copybook/program.file")
+        expect(paths[0]).toEqual("copybook/program.file");
     });
 
     test("Get local settings for a dialect", () => {
         const tracking = jest.fn().mockReturnValue(["copybook"]);
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: tracking
+            get: tracking,
         });
         SettingsService.getCopybookLocalPath("PROGRAM", "COBOL");
-        expect(tracking).toBeCalledWith("paths-local")
+        expect(tracking).toBeCalledWith("paths-local");
     });
 
     test("Get local settings for dialect", () => {
         const tracking = jest.fn().mockReturnValue(["copybook"]);
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: tracking
+            get: tracking,
         });
         SettingsService.getCopybookLocalPath("PROGRAM", "MAID");
-        expect(tracking).toBeCalledWith("maid.paths-local")
+        expect(tracking).toBeCalledWith("maid.paths-local");
+    });
+
+    test("Get native build enable settings", () => {
+        const tracking = jest.fn();
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: tracking,
+        });
+        SettingsService.serverType();
+        expect(tracking).toBeCalledWith("cobol-lsp.serverType");
     });
 
 });
-
 
 describe("SettingsService returns correct tab settings", () => {
     test("Returns default tab settigs for boolean value", () => {
@@ -143,12 +151,12 @@ describe("SettingsService returns correct tab settings", () => {
     test("Different rules for different divisions with default rule", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue({
-                "default": [1, 2 ,3, 40],
-                "anchors": {
-                    "DATA +DIVISON": [1, 7, 8 ,15, 40, 52],
-                    "PROCEDURE +DIVISON": [1, 7, 8, 15, 40, 45, 50]
-                }
-            })            
+                default: [1, 2 , 3, 40],
+                anchors: {
+                    "DATA +DIVISON": [1, 7, 8 , 15, 40, 52],
+                    "PROCEDURE +DIVISON": [1, 7, 8, 15, 40, 45, 50],
+                },
+            }),
         });
 
         const tabSettings = SettingsService.getTabSettings();
@@ -159,4 +167,3 @@ describe("SettingsService returns correct tab settings", () => {
     });
 
 });
-
