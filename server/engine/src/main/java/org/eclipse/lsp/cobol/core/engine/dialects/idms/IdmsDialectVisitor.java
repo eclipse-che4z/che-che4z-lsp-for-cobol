@@ -21,7 +21,6 @@ import org.eclipse.lsp.cobol.core.IdmsParser;
 import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -117,9 +116,9 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
     for (int i = 0; i < lines.length; i++) {
       Matcher matcher = pattern.matcher(lines[i]);
       if (matcher.find()) {
-        result.add(createDescriptor(i, SUBSCHEMA_COPY));
+        result.add(createDescriptor(i, SUBSCHEMA_COPY, matcher.start(), matcher.end()));
         if (recordsDescriptor.isMapSectionExists()) {
-          result.add(createDescriptor(i, MAPS_COPY));
+          result.add(createDescriptor(i, MAPS_COPY, matcher.start(), matcher.end()));
         }
         break;
       }
@@ -127,12 +126,12 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
     return result;
   }
 
-  private IdmsCopybookDescriptor createDescriptor(int i, String name) {
+  private IdmsCopybookDescriptor createDescriptor(int i, String name, int start, int end) {
     IdmsCopybookDescriptor descriptor = new IdmsCopybookDescriptor();
     descriptor.setName(name);
     Locality locality = Locality.builder()
-        .uri(ImplicitCodeUtils.createFullUrl("IDMS-" + name))
-        .range(new Range(new Position(i, 0), new Position(i, 0)))
+        .uri(context.getProgramDocumentUri())
+        .range(new Range(new Position(i, start), new Position(i, end)))
         .build();
 
     descriptor.setUsage(locality);

@@ -52,13 +52,13 @@ class TestErrorLocationLines {
             ImmutableMap.of(
                     "A",
                     new Diagnostic(
-                            new Range(new Position(11, 24), new Position(11, 25)),
+                            new Range(new Position(10, 24), new Position(10, 25)),
                             "Variable A is not defined",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
                     "B",
                     new Diagnostic(
-                            new Range(new Position(11, 33), new Position(11, 34)),
+                            new Range(new Position(10, 33), new Position(10, 34)),
                             "Variable B is not defined",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())),

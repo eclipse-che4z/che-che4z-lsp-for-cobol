@@ -101,6 +101,12 @@ public class MappingService {
     int originalDocumentLine = 0;
     int extendedDocumentLine = 0;
     for (Range range : ranges) {
+      TextTransformations rangeText = textTransformations.getExtensions().get(range);
+
+      if (textTransformations.isInsert(range.getStart().getLine()) && rangeText.getText().length() == 0) {
+        continue;
+      }
+
       MappingItem mappingItem = buildMappingItemForRange(textTransformations.getUri(), range, originalDocumentLine,
           extendedDocumentLine,
           textTransformations.isInsert(range.getStart().getLine()));
@@ -111,34 +117,28 @@ public class MappingService {
       extendedDocumentLine += (range.getEnd().getLine() - originalDocumentLine);
       originalDocumentLine = range.getEnd().getLine() + 1;
 
-      TextTransformations rangeText = textTransformations.getExtensions().get(range);
-      if (rangeText.getText().length() > 0) {
-        if (textTransformations.isInsert(range.getStart().getLine())) {
-          extendedDocumentLine++;
-        }
-        List<MappingItem> map = buildLocalityMap(rangeText);
-        for (MappingItem item : map) {
-          Position start = item.extendedRange.getStart();
-          Position end = item.extendedRange.getEnd();
-          int size = end.getLine() - start.getLine() + 1;
-
-          if (textTransformations.isInsert(range.getStart().getLine())) {
-            size--;
-          }
-
-          start.setLine(extendedDocumentLine);
-          start.setCharacter(range.getStart().getCharacter());
-          end.setLine(extendedDocumentLine + size - 1);
-          item.extendedRange.setStart(start);
-          item.extendedRange.setEnd(end);
-          extendedDocumentLine += size;
-        }
-        result.addAll(map);
-      } else {
-        if (textTransformations.isInsert(range.getStart().getLine())) {
-          originalDocumentLine--;
-        }
+      if (textTransformations.isInsert(range.getStart().getLine())) {
+        extendedDocumentLine++;
       }
+
+      List<MappingItem> map = buildLocalityMap(rangeText);
+      for (MappingItem item : map) {
+        Position start = item.extendedRange.getStart();
+        Position end = item.extendedRange.getEnd();
+        int size = end.getLine() - start.getLine() + 1;
+
+        if (textTransformations.isInsert(range.getStart().getLine())) {
+          size--;
+        }
+
+        start.setLine(extendedDocumentLine);
+        start.setCharacter(range.getStart().getCharacter());
+        end.setLine(extendedDocumentLine + size - 1);
+        item.extendedRange.setStart(start);
+        item.extendedRange.setEnd(end);
+        extendedDocumentLine += size;
+      }
+      result.addAll(map);
     }
 
     String[] originalLines = textTransformations.getText().split("\r?\n", -1);

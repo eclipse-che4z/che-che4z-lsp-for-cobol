@@ -385,8 +385,7 @@ class MappingServiceTest {
 
     textTransformations.calculateExtendedText();
     location = mappingService.getOriginalLocation(new Range(new Position(9, 11), new Position(9, 21)));
-    assertTrue(location.isPresent());
-    assertEquals(9, location.get().getRange().getStart().getLine());
+    assertFalse(location.isPresent());
   }
 
   private MappingService prepareService() {

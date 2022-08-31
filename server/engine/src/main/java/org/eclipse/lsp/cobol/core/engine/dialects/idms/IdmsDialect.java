@@ -111,7 +111,9 @@ public final class IdmsDialect implements CobolDialect {
 
     if (copybookModel.getUri() == null || copybookModel.getContent() == null) {
       errors.add(ErrorHelper.missingCopybooks(messageService, cb.getUsage(), cb.getName()));
-      extendedSource.replace(cb.getStatement().getRange(), "");
+      if (!cb.isInsert()) {
+        extendedSource.replace(cb.getStatement().getRange(), "");
+      }
       return;
     }
 
