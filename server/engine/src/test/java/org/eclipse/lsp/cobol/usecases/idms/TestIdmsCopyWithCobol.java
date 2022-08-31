@@ -30,6 +30,10 @@ class TestIdmsCopyWithCobol {
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE ABC.\n"
+          + "            IDMS-RECORDS MANUAL\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
           + "        01 {$*EMPLOYEE} PIC X(10).\n"

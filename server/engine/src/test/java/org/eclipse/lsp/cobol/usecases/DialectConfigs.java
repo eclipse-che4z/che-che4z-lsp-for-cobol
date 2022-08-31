@@ -44,7 +44,12 @@ public class DialectConfigs {
             ImmutableList.of(DaCoDialect.NAME));
   }
 
-  AnalysisConfig getDaCoAnalysisConfig(CopybookConfig copybookConfig) {
+  /**
+   * Provides DaCo dialect configuration with specified copybook configuration
+   * @param copybookConfig a copybook configuration
+   * @return DaCo dialect configuration
+   */
+  public AnalysisConfig getDaCoAnalysisConfig(CopybookConfig copybookConfig) {
     return new AnalysisConfig(copybookConfig, ImmutableList.of(), ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME));
   }
 }

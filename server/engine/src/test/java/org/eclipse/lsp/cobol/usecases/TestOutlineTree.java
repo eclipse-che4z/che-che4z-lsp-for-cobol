@@ -42,6 +42,10 @@ class TestOutlineTree {
           + "000020 Identification Division.\n"
           + "000030 Program-id.  HELLO-WORLD       .\n"
           + "000040\n"
+          + "000041  ENVIRONMENT DIVISION.\n"
+          + "000042  IDMS-CONTROL SECTION.\n"
+          + "000043      PROTOCOL. MODE ABC.\n"
+          + "000044      IDMS-RECORDS MANUAL\n"
           + "000050 Data Division.\n"
           + "000051 MAP SECTION.\n"
           + "000052     MAX FIELD LIST IS 12 \n"
@@ -167,6 +171,12 @@ class TestOutlineTree {
                     "IDENTIFICATION DIVISION",
                     NodeType.DIVISION,
                     nested(node("PROGRAM-ID HELLO-WORLD", NodeType.PROGRAM_ID))),
+                node("ENVIRONMENT DIVISION",
+                    NodeType.DIVISION,
+                    nested(
+                        node("IDMS-CONTROL SECTION",
+                            NodeType.SECTION)
+                    )),
                 node(
                     "DATA DIVISION",
                     NodeType.DIVISION,
