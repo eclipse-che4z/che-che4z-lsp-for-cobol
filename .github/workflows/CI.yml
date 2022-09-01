@@ -252,7 +252,7 @@ jobs:
         with:
             path: staging
       - name: make cobol-lsp plugin folder
-        run: mkdir tests/theia/plugins
+        run: mkdir -p tests/theia/plugins
       - name: Copy vsix file
         run: cp staging/*.vsix tests/theia/plugins
       - name: up docker immage
