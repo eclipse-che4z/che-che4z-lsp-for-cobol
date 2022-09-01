@@ -215,7 +215,7 @@ jobs:
       #   run: |
       #     cp -p ../../staging/package-macos/server-mac-amd64 ./server/package-macos
       #     chmod +x ./server/package-macos/server-mac-amd64
-      - name: configure linux executable
+      #- name: configure linux executable
         # working-directory: clients/cobol-lsp-vscode-extension
         # run: |
         #   cp -p ../../staging/package-linux/server ./server/package-linux
