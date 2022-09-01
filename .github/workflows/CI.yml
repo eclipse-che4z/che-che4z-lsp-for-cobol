@@ -254,11 +254,16 @@ jobs:
         run: mkdir -p tests/theia/plugins
       - name: Copy vsix file
         run: cp staging/vsix-package/*.vsix tests/theia/plugins
+      - name: Add on
+        run: |
+          pwd 
+          ls 
+          ls tests/theia/plugins
       - name: up docker immage
         uses: addnab/docker-run-action@v3
         with:
           image: "quay.io/zowe-explorer/theia:1.25.0"
-          options: -v "tests/theia/plugins:/home/theia" -v "tests/test_files/project:/home/project"
+          options: -v tests/theia/plugins:/home/theia -v tests/test_files/project:/home/project
       - name: Build the node modules after cleaning the cache
         run: |
           rm -rf node_modules/ yarn.lock
