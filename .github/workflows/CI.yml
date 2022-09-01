@@ -7,109 +7,109 @@ on: push
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  generateNativeConfig:
-    runs-on: ubuntu-latest
-    steps:
-        - uses: actions/checkout@v2
-        - uses: ayltai/setup-graalvm@v1
-          with:
-            java-version: 11
-            graalvm-version: 22.2.0
-            native-image: true
-        - name: Generate assisted configuration for GraalVM native build
-          working-directory: server
-          run: mvn -e -B -Pnative -Dagent=true test
-        - uses: actions/upload-artifact@v3
-          with:
-            name: configuration
-            path: server/engine/target/native/agent-output/test/*
+  #  generateNativeConfig:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #       - uses: actions/checkout@v2
+  #       - uses: ayltai/setup-graalvm@v1
+  #         with:
+  #           java-version: 11
+  #           graalvm-version: 22.2.0
+  #           native-image: true
+  #       - name: Generate assisted configuration for GraalVM native build
+  #         working-directory: server
+  #         run: mvn -e -B -Pnative -Dagent=true test
+  #       - uses: actions/upload-artifact@v3
+  #         with:
+  #           name: configuration
+  #           path: server/engine/target/native/agent-output/test/*
 
-  buildOnWindows:
-    runs-on: windows-latest
-    needs: [generateNativeConfig]
-    steps:
-      - uses: al-cheb/configure-pagefile-action@v1.2
-        with:
-          minimum-size: 16GB
-          maximum-size: 16GB
-          disk-root: "C:"
-      - uses: actions/checkout@v2
-      - name: Retrieve native build configurations
-        uses: actions/download-artifact@v3
-        with:
-          path: configuration
-          name: configuration
-      - name: Add graalVM configuration to server
-        run: cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
-        shell: bash
-      - uses: ilammy/msvc-dev-cmd@v1.5.0
-      - uses: microsoft/setup-msbuild@v1
-      - uses: ayltai/setup-graalvm@v1
-        with:
-          java-version: 11
-          graalvm-version: 22.2.0
-          native-image: true
-      - name: Build with Maven
-        working-directory: server
-        run: mvn -e -B -Pnative -DskipTests clean package
-        shell: powershell
-      - uses: actions/upload-artifact@v3
-        with:
-          if-no-files-found: warn
-          name: package-win
-          path: |
-            server/engine/target/*.exe
-            server/engine/target/*.dll
-            server/engine/target/*.txt
-      - uses: actions/upload-artifact@v3
-        with:
-          if-no-files-found: warn
-          name: logs
-          path: engine/target/*.log
+  # buildOnWindows:
+  #   runs-on: windows-latest
+  #   needs: [generateNativeConfig]
+  #   steps:
+  #     - uses: al-cheb/configure-pagefile-action@v1.2
+  #       with:
+  #         minimum-size: 16GB
+  #         maximum-size: 16GB
+  #         disk-root: "C:"
+  #     - uses: actions/checkout@v2
+  #     - name: Retrieve native build configurations
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         path: configuration
+  #         name: configuration
+  #     - name: Add graalVM configuration to server
+  #       run: cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
+  #       shell: bash
+  #     - uses: ilammy/msvc-dev-cmd@v1.5.0
+  #     - uses: microsoft/setup-msbuild@v1
+  #     - uses: ayltai/setup-graalvm@v1
+  #       with:
+  #         java-version: 11
+  #         graalvm-version: 22.2.0
+  #         native-image: true
+  #     - name: Build with Maven
+  #       working-directory: server
+  #       run: mvn -e -B -Pnative -DskipTests clean package
+  #       shell: powershell
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         if-no-files-found: warn
+  #         name: package-win
+  #         path: |
+  #           server/engine/target/*.exe
+  #           server/engine/target/*.dll
+  #           server/engine/target/*.txt
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         if-no-files-found: warn
+  #         name: logs
+  #         path: engine/target/*.log
 
-  buildOnMac:
-    runs-on: macos-latest
-    needs: [generateNativeConfig]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ayltai/setup-graalvm@v1
-        with:
-          java-version: 11
-          graalvm-version: 22.2.0
-          native-image: true
-      - name: Retrieve native build configurations
-        uses: actions/download-artifact@v3
-        with:
-          path: configuration
-          name: configuration
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: configuration
-      - name: Add graalVM configuration to server
-        run: cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
-      - name: Build with Maven
-        working-directory: server
-        run: mvn -e -B -Pnative -DskipTests clean package
-      - name: Run UPX
-        uses: svenstaro/upx-action@v2
-        with:
-          file: server/engine/target/engine
-          args: '-7'
-      - name: Upload artifacts
-        run: mkdir staging && cp server/engine/target/engine staging/server-mac-amd64
-      - uses: actions/upload-artifact@v3
-        with:
-          name: package-macos
-          path: staging
-      - uses: actions/upload-artifact@v3
-        with:
-          if-no-files-found: warn
-          name: logs
-          path: engine/target/*.log
+  # buildOnMac:
+  #   runs-on: macos-latest
+  #   needs: [generateNativeConfig]
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: ayltai/setup-graalvm@v1
+  #       with:
+  #         java-version: 11
+  #         graalvm-version: 22.2.0
+  #         native-image: true
+  #     - name: Retrieve native build configurations
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         path: configuration
+  #         name: configuration
+  #     - name: Display structure of downloaded files
+  #       run: ls -R
+  #       working-directory: configuration
+  #     - name: Add graalVM configuration to server
+  #       run: cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
+  #     - name: Build with Maven
+  #       working-directory: server
+  #       run: mvn -e -B -Pnative -DskipTests clean package
+  #     - name: Run UPX
+  #       uses: svenstaro/upx-action@v2
+  #       with:
+  #         file: server/engine/target/engine
+  #         args: '-7'
+  #     - name: Upload artifacts
+  #       run: mkdir staging && cp server/engine/target/engine staging/server-mac-amd64
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: package-macos
+  #         path: staging
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         if-no-files-found: warn
+  #         name: logs
+  #         path: engine/target/*.log
 
   buildOnLinux:
     runs-on: ubuntu-latest
-    needs: [generateNativeConfig]
+    # needs: [generateNativeConfig]
     steps:
       - uses: actions/checkout@v2
       - uses: ayltai/setup-graalvm@v1
@@ -154,7 +154,7 @@ jobs:
 
   tests:
     runs-on: windows-latest
-    needs: [buildOnLinux, buildOnMac, buildOnWindows]
+    needs: [buildOnLinux]
     defaults:
       run:
         shell: bash
@@ -182,13 +182,13 @@ jobs:
       - name: configure server jar
         working-directory: clients/cobol-lsp-vscode-extension
         run: "cp -R ../../staging/jar/* ./server/jar"
-      - name: coverage
-        run: npm run coverage
-        working-directory: clients/cobol-lsp-vscode-extension
-      - name: integration-test
-        uses: GabrielBB/xvfb-action@v1.0
-        with:
-          run: npm --prefix clients/cobol-lsp-vscode-extension run test:integration
+      # - name: coverage
+      #   run: npm run coverage
+      #   working-directory: clients/cobol-lsp-vscode-extension
+      # - name: integration-test
+      #   uses: GabrielBB/xvfb-action@v1.0
+      #   with:
+      #     run: npm --prefix clients/cobol-lsp-vscode-extension run test:integration
   build:
     runs-on: ubuntu-latest
     needs: [tests]
@@ -204,17 +204,17 @@ jobs:
       - name: configure server jar
         working-directory: clients/cobol-lsp-vscode-extension
         run: "cp -R ../../staging/jar/* ./server/jar"
-      - name: configure windows executable
-        working-directory: clients/cobol-lsp-vscode-extension
-        run: |
-          cp ../../staging/package-win/engine.build_artifacts.txt ./server/package-win
-          cp ../../staging/package-win/engine.exe ./server/package-win
-          cp ../../staging/package-win/sunmscapi.dll ./server/package-win
-      - name: configure mac executable
-        working-directory: clients/cobol-lsp-vscode-extension
-        run: |
-          cp -p ../../staging/package-macos/server-mac-amd64 ./server/package-macos
-          chmod +x ./server/package-macos/server-mac-amd64
+      # - name: configure windows executable
+      #   working-directory: clients/cobol-lsp-vscode-extension
+      #   run: |
+      #     cp ../../staging/package-win/engine.build_artifacts.txt ./server/package-win
+      #     cp ../../staging/package-win/engine.exe ./server/package-win
+      #     cp ../../staging/package-win/sunmscapi.dll ./server/package-win
+      # - name: configure mac executable
+      #   working-directory: clients/cobol-lsp-vscode-extension
+      #   run: |
+      #     cp -p ../../staging/package-macos/server-mac-amd64 ./server/package-macos
+      #     chmod +x ./server/package-macos/server-mac-amd64
       - name: configure linux executable
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
