@@ -136,8 +136,7 @@ jobs:
       #     version: latest
       #     file: server/engine/target/engine
       #     args: '-7'
-      - name: Upload artifacts
-        run: mkdir staging && cp server/engine/target/engine staging/server
+      #  run: mkdir staging && cp server/engine/target/engine staging/server
       # - uses: actions/upload-artifact@v3
       #   with:
       #     name: package-linux
