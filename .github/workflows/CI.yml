@@ -129,19 +129,19 @@ jobs:
       #   run: cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
       - name: Build with Maven
         working-directory: server
-        run: mvn -e -B -Pnative -Dagent=true -DskipTests clean package
-      - name: Run UPX
-        uses: crazy-max/ghaction-upx@v1.3.3
-        with:
-          version: latest
-          file: server/engine/target/engine
-          args: '-7'
+        run: mvn -DskipTests clean package
+      # - name: Run UPX
+      #   uses: crazy-max/ghaction-upx@v1.3.3
+      #   with:
+      #     version: latest
+      #     file: server/engine/target/engine
+      #     args: '-7'
       - name: Upload artifacts
         run: mkdir staging && cp server/engine/target/engine staging/server
-      - uses: actions/upload-artifact@v3
-        with:
-          name: package-linux
-          path: staging
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: package-linux
+      #     path: staging
       - uses: actions/upload-artifact@v3
         with:
           name: jar
@@ -216,10 +216,10 @@ jobs:
       #     cp -p ../../staging/package-macos/server-mac-amd64 ./server/package-macos
       #     chmod +x ./server/package-macos/server-mac-amd64
       - name: configure linux executable
-        working-directory: clients/cobol-lsp-vscode-extension
-        run: |
-          cp -p ../../staging/package-linux/server ./server/package-linux
-          chmod +x ./server/package-linux/server
+        # working-directory: clients/cobol-lsp-vscode-extension
+        # run: |
+        #   cp -p ../../staging/package-linux/server ./server/package-linux
+        #   chmod +x ./server/package-linux/server
       - uses: actions/upload-artifact@v3
         with:
           name: serverContent
@@ -254,7 +254,7 @@ jobs:
       - name: make cobol-lsp plugin folder
         run: mkdir -p tests/theia/plugins
       - name: Copy vsix file
-        run: cp staging/*.vsix tests/theia/plugins
+        run: cp staging/vsix-package/*.vsix tests/theia/plugins
       - name: up docker immage
         uses: addnab/docker-run-action@v3
         with:
