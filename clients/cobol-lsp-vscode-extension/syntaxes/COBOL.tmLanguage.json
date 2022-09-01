@@ -25,7 +25,7 @@
   } ],
   "repository" : {
     "comment-line" : {
-      "match" : "^(.{6})(\\*.*)$",
+      "match" : "^(.{6})(\\/.*|\\*.*)$",
       "captures" : {
         "1" : {
           "name" : "constant.numeric.integer"
