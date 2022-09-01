@@ -249,7 +249,6 @@ jobs:
           node-version: 14
       - name: Retrieve native images
         uses: actions/download-artifact@v3
-
         with:
             path: staging
       - name: make cobol-lsp plugin folder
@@ -257,8 +256,7 @@ jobs:
       - name: Copy vsix file
         run: cp staging/*.vsix tests/theia/plugins
       - name: up docker immage
-  
-      - uses: addnab/docker-run-action@v3
+        uses: addnab/docker-run-action@v3
         with:
           image: "quay.io/zowe-explorer/theia:1.25.0"
           options: -v "tests/theia/plugins:/home/theia" -v "tests/test_files/project:/home/project"
