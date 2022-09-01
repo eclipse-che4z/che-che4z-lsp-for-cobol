@@ -239,6 +239,60 @@ jobs:
         with:
           name: vsix-package
           path: '*.vsix'
+  cypress-run:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+      - name: Retrieve native images
+        uses: actions/download-artifact@v3
+
+        with:
+            path: staging
+      - name: make cobol-lsp plugin folder
+        run: mkdir tests/theia/plugins
+      - name: Copy vsix file
+        run: cp staging/*.vsix tests/theia/plugins
+      - name: up docker immage
+  
+      - uses: addnab/docker-run-action@v3
+        with:
+          image: "quay.io/zowe-explorer/theia:1.25.0"
+          options: -v "tests/theia/plugins:/home/theia" -v "tests/test_files/project:/home/project"
+      - name: Build the node modules after cleaning the cache
+        run:  rm -rf node_modules/ yarn.lock
+              cd tests
+              yarn cache clean
+              yarn install --frozen-lockfile
+              npm run ts:build
+      - name: Cypress run
+        uses: cypress-io/github-action@v4
+        with:         
+          start: npm run cy:run:ci -- --env ide=theia         
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
 
 
        
