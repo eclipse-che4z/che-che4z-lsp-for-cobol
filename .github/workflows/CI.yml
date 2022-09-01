@@ -117,16 +117,16 @@ jobs:
           java-version: 11
           graalvm-version: 22.2.0
           native-image: true
-      - name: Retrieve native build configurations
-        uses: actions/download-artifact@v3
-        with:
-          path: configuration
-          name: configuration
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: configuration
-      - name: Add graalVM configuration to server
-        run: cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
+      # - name: Retrieve native build configurations
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     path: configuration
+      #     name: configuration
+      # - name: Display structure of downloaded files
+      #   run: ls -R
+      #   working-directory: configuration
+      # - name: Add graalVM configuration to server
+      #   run: cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
       - name: Build with Maven
         working-directory: server
         run: mvn -e -B -Pnative -Dagent=true -DskipTests clean package
