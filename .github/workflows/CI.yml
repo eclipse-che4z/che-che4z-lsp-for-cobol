@@ -263,11 +263,12 @@ jobs:
           image: "quay.io/zowe-explorer/theia:1.25.0"
           options: -v "tests/theia/plugins:/home/theia" -v "tests/test_files/project:/home/project"
       - name: Build the node modules after cleaning the cache
-        run:  rm -rf node_modules/ yarn.lock
-              cd tests
-              yarn cache clean
-              yarn install --frozen-lockfile
-              npm run ts:build
+        run: |
+          rm -rf node_modules/ yarn.lock
+          cd tests
+          yarn cache clean
+          yarn install --frozen-lockfile
+          npm run ts:build
       - name: Cypress run
         uses: cypress-io/github-action@v4
         with:         
