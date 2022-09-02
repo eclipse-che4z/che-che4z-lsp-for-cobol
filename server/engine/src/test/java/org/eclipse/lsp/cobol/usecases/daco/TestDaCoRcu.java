@@ -25,6 +25,10 @@ class TestDaCoRcu {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE ABC.\n"
+          + "            IDMS-RECORDS MANUAL\n"
           + "       DATA   DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*ROOT} PIC X.\n"

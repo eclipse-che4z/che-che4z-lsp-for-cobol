@@ -115,4 +115,20 @@ class TestTextTransformations {
 //    assertEquals(range, map.get(extBoomRange).getRange());
 //    assertEquals(boomUri, map.get(extMRange).getUri());
   }
+
+  @Test
+  void insert() {
+    TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
+
+    Range range = new Range(new Position(1, 0), new Position(1, 7));
+    CopyNode copyNode = new CopyNode(Locality.builder().range(range).build(), "BOOM");
+    String boomUri = "BOOM.cpy";
+    TextTransformations boom = TextTransformations.of("Line 1\nLine 2\n", boomUri);
+
+    tt.insert(copyNode, 0, boom);
+    assertEquals("0: abcd\n"
+        + "Line 1\n"
+        + "Line 2\n"
+        + "1: TEST\n", tt.calculateExtendedText());
+  }
 }

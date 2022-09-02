@@ -229,8 +229,9 @@ public class UseCaseEngine {
    * @param subroutineNames - list of subroutine names used in the document
    * @param analysisConfig - analysis settings: copybook processing mode and the SQL backend for the
    *     analysis
+   * @return analysis result object
    */
-  public void runTestForDiagnostics(String text,
+  public AnalysisResult runTestForDiagnostics(String text,
                                     List<CobolText> copybooks,
                                     Map<String, Diagnostic> expectedDiagnostics,
                                     List<String> subroutineNames,
@@ -259,6 +260,7 @@ public class UseCaseEngine {
                 .build());
 
     assertDiagnostics(document.getTestData().getDiagnostics(), actual.getDiagnostics());
+    return actual;
   }
 
   private static void assertResultEquals(AnalysisResult actual, TestData expected) {
