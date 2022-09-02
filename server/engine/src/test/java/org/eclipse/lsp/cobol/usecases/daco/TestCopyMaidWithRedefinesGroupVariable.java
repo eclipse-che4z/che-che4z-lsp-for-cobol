@@ -37,7 +37,7 @@ class TestCopyMaidWithRedefinesGroupVariable {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*ROOT-SSS}.\n"
-          + "       02  COPY MAID {~CB!DaCo`CB_WRK} WRK.\n"
+          + "       02  COPY MAID {~CB!DaCo`CB} WRK.\n"
           + "           04 {$*D} REDEFINES {$B-SSS}.\n";
 
   private static final String COPYBOOK_CONTENT =
@@ -50,7 +50,7 @@ class TestCopyMaidWithRedefinesGroupVariable {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("CB_WRK", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+            new CobolText("CB", DaCoDialect.NAME, COPYBOOK_CONTENT)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

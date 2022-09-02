@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2022 Broadcom.
- * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ * Copyright (c) 2022 DAF Trucks NV.
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *    Broadcom, Inc. - initial API and implementation
- *
+ * DAF Trucks NV – implementation of DaCo COBOL statements
+ * and DAF development standards
  */
 package org.eclipse.lsp.cobol.usecases.daco;
 
@@ -22,32 +21,33 @@ import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** WRK qualifier does not retrieve the name of the previous 88 variable. */
-class TestCopyMaidWithWrkDoesNotTakeNameFrom88 {
+/** Test COPY MAID with variable definition on the same level */
+public class TestDaCoWithVarDefAfterMaidStatement {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID.    TEST.\n"
+          + "       PROGRAM-ID.    CPYFROM.\n"
           + "        ENVIRONMENT DIVISION.\n"
           + "        IDMS-CONTROL SECTION.\n"
           + "            PROTOCOL. MODE ABC.\n"
           + "            IDMS-RECORDS MANUAL\n"
-          + "       DATA DIVISION.\n"
+          + "       DATA   DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*PARENT}.\n"
-          + "            05 {$*CHILD-XLD} PIC X(2).\n"
-          + "               88 {$*AB} VALUE \"AB\".\n"
-          + "            05 COPY MAID {~BHTRGL-XBG!DaCo} WRK.\n"
+          + "       01  {$*ROOT-XXX}.\n"
+          + "         03  COPY MAID {~CB!DACO}.\n"
+          + "         03  {$*PR1} PIC 9(9).\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           DISPLAY {$BHTRGL-XLD}.";
+          + "           DISPLAY {$PR1-XXX}.\n";
 
-  private static final String COPYBOOK_CONTENT = "1           09 {$*BHTRGL-X`BHTRGL-XLD} PIC X.\n";
+  private static final String CB =
+      "       01  {$*ROOT}.\n" + "         03 {$*PR1-XDY`PR1-XXX} PIC 9(9).\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableList.of(new CobolText("CB", DaCoDialect.NAME, CB)),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

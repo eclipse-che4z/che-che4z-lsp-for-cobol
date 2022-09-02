@@ -14,6 +14,8 @@
  */
  package org.eclipse.lsp.cobol.core.engine.dialects.daco;
 
+import java.util.Optional;
+
 /** DaCo related utilites */
 public class DaCoHelper {
 
@@ -21,21 +23,21 @@ public class DaCoHelper {
    *  @param name of variable
    *  @return suffix or null if not found
    */
-  public static String extractSuffix(String name) {
+  public static Optional<String> extractSuffix(String name) {
     if (name.length() < 3) {
-      return null;
+      return Optional.empty();
     }
     int l2 = name.length() - 2;
     if (name.charAt(l2) == '-') {
-      return "";
+      return Optional.of("");
     }
     if (name.length() < 5) {
-      return null;
+      return Optional.empty();
     }
     int l4 = name.length() - 4;
     if (name.charAt(l4) == '-') {
-      return name.substring(l2);
+      return Optional.of(name.substring(l2));
     }
-    return null;
+    return Optional.empty();
   }
 }

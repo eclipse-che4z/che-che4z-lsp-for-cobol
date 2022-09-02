@@ -36,7 +36,7 @@ class TestCopyMaidWithQualifier {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*MRB}.\n"
-          + "           03 COPY MAID {~ABCDEFG123!DaCo`ABCDEFG123_ABC} ABC.\n"
+          + "           03 COPY MAID {~ABCDEFG123!DaCo} ABC.\n"
           + "       01  {$*QWE} PIC 9.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$QWE}.\n"
@@ -50,7 +50,7 @@ class TestCopyMaidWithQualifier {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(new CobolText(COPYBOOK_NAME + "_ABC", DaCoDialect.NAME, COPYBOOK)),
+        ImmutableList.of(new CobolText(COPYBOOK_NAME, DaCoDialect.NAME, COPYBOOK)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

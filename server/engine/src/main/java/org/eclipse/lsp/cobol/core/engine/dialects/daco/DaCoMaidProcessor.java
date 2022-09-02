@@ -92,7 +92,7 @@ public class DaCoMaidProcessor {
                   && VariableDefinitionUtil.LEVEL_66 != lvl
                   && VariableDefinitionUtil.LEVEL_77 != lvl
                   && VariableDefinitionUtil.LEVEL_88 != lvl) {
-            lastSuffix = DaCoHelper.extractSuffix(name);
+            lastSuffix = DaCoHelper.extractSuffix(name).orElse(lastSuffix);
           }
         }
       } else if (dataDivisionPattern.matcher(line).find()) {
@@ -141,9 +141,9 @@ public class DaCoMaidProcessor {
             .uri(context.getExtendedSource().getUri())
             .range(range)
             .build();
-    DaCoCopyNode cbNode = new DaCoCopyNode(locality, makeCopybookFileName(layoutId, layoutUsage), layoutUsage, lastSuffix);
+    DaCoCopyNode cbNode = new DaCoCopyNode(locality, makeCopybookFileName(startingLevel, layoutId, layoutUsage), layoutUsage, startingLevel, lastSuffix);
 
-    CopybookName copybookName = new CopybookName(makeCopybookFileName(layoutId, layoutUsage), DaCoDialect.NAME);
+    CopybookName copybookName = new CopybookName(makeCopybookFileName(startingLevel, layoutId, layoutUsage), DaCoDialect.NAME);
     CopybookModel copybookModel = copybookService.resolve(copybookName,
             context.getExtendedSource().getUri(),
             context.getExtendedSource().getUri(),
@@ -154,7 +154,8 @@ public class DaCoMaidProcessor {
       CopyDefinition definition = new CopyDefinition(location, copybookModel.getUri());
       cbNode.setDefinition(definition);
       checkWrkSuffix(cbNode, layoutUsage, errors);
-      parseCopybookContent(copybookModel, startingLevel, MAID_WRK_QUALIFIER.equalsIgnoreCase(layoutUsage) ? cbNode.getParentSuffix() : null)
+      String suffix = calculateSuffix(layoutUsage, cbNode);
+      parseCopybookContent(copybookModel, startingLevel, suffix)
               .forEach(cbNode::addChild);
     } else {
       SyntaxError error = SyntaxError.syntaxError().errorSource(ErrorSource.DIALECT)
@@ -167,6 +168,16 @@ public class DaCoMaidProcessor {
       LOG.debug("Syntax error by reportMissingCopybooks: {}", error.toString());
     }
     return cbNode;
+  }
+
+  private static String calculateSuffix(String layoutUsage, DaCoCopyNode cbNode) {
+    if (MAID_WRK_QUALIFIER.equalsIgnoreCase(layoutUsage)) {
+      return cbNode.getParentSuffix();
+    }
+    if (cbNode.getStartingLevel() > 1) {
+      return cbNode.getParentSuffix();
+    }
+    return null;
   }
 
   private void checkWrkSuffix(DaCoCopyNode node, String layoutUsage, List<SyntaxError> errors) {
@@ -204,8 +215,8 @@ public class DaCoMaidProcessor {
     return visitor.visit(ctx);
   }
 
-  private static String makeCopybookFileName(String layoutId, String layoutUsage) {
-    if (layoutUsage == null) {
+  private static String makeCopybookFileName(int startingLevel, String layoutId, String layoutUsage) {
+    if (layoutUsage == null || startingLevel > 1) {
       return layoutId;
     }
     return String.format("%s_%s", layoutId.toUpperCase(Locale.ROOT), layoutUsage.toUpperCase(Locale.ROOT));
