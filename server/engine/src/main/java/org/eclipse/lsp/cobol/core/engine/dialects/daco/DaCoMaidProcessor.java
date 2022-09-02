@@ -92,7 +92,7 @@ public class DaCoMaidProcessor {
                   && VariableDefinitionUtil.LEVEL_66 != lvl
                   && VariableDefinitionUtil.LEVEL_77 != lvl
                   && VariableDefinitionUtil.LEVEL_88 != lvl) {
-            lastSuffix = DaCoHelper.extractSuffix(name);
+            lastSuffix = DaCoHelper.extractSuffix(name).orElse(lastSuffix);
           }
         }
       } else if (dataDivisionPattern.matcher(line).find()) {
