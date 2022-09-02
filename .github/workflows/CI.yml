@@ -266,20 +266,18 @@ jobs:
           options: -p 3000:3000 -v /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins:/home/theia -v /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project:/home/project
           run: |
              cd /home/theia
-             THEIA_HOME = "$env.WORKSPACE/tests/theia/home"
-             PROJECT_FOLDER = "$env.WORKSPACE/tests/test_files/project"
-             THEIA_PLUGINS = "$env.WORKSPACE/tests/theia/plugins"
+             THEIA_HOME=tests/theia/home
+             PROJECT_FOLDER=tests/test_files/project
+             THEIA_PLUGINS=tests/theia/plugins
              mkdir -p $THEIA_HOME
              export HOME=$THEIA_HOME
              export _JAVA_OPTIONS=-Duser.home=$THEIA_HOME
-             node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=local-dir:$THEIA_PLUGINS > $THEIA_HOME/theia.log 2>&1 & '''
+             node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=tests/theia/plugins > $THEIA_HOME/theia.log 2>&1 & '''
       - name: Build the node modules after cleaning the cache
         run: |
-          CYPRESS_HOME = "$env.WORKSPACE/tests/cypress/home"
           export HOME=$CYPRESS_HOME
           export CYPRESS_CACHE_FOLDER=$CYPRESS_HOME/.cache/Cypress
           cd tests
-          rm -rf node_modules/ yarn.lock
           rm -rf node_modules/ yarn.lock
           yarn cache clean
           yarn install --frozen-lockfile
@@ -288,7 +286,7 @@ jobs:
         uses: cypress-io/github-action@v4         
         with:         
           start: npm run cy:run:ci -- --env ide=theia  
-          working-directory: tests       
+          working-directory: tests
 
     
 
