@@ -263,7 +263,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: "quay.io/zowe-explorer/theia:1.25.0"
-          options: -v /home/runner/work/che-che4z-lsp-for-cobol/tests/theia/plugins:/home/theia -v /home/runner/work/che-che4z-lsp-for-cobol/tests/test_files/project:/home/project
+          options: -v /home/runner/work/che-che4z-lsp-for-cobol/tests/theia/plugins:/home/theia" -v "/home/runner/work/che-che4z-lsp-for-cobol/tests/test_files/project:/home/project"
       - name: Build the node modules after cleaning the cache
         run: |
           rm -rf node_modules/ yarn.lock
