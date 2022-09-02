@@ -264,9 +264,16 @@ jobs:
         with:
           image: "grianbrcom/theia-full:1.15.0"
           options: --rm -p 3000:3000 -v /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins:/home/theia -v /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project:/home/project --hostname=0.0.0.0 
-          
+          run: |
+             cd /home/theia
+            #  PROJECT_FOLDER=tests/test_files/project
+            #  THEIA_PLUGINS=tests/theia/plugins
+            #  export HOME=$THEIA_HOME
+            #  export _JAVA_OPTIONS=-Duser.home=$THEIA_HOME
+            #  node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=tests/theia/plugins 
       - name: Build the node modules after cleaning the cache
         run: |
+          rm -rf node_modules/ yarn.lock
           yarn cache clean
           yarn install --frozen-lockfile
           npm run ts:build
