@@ -266,13 +266,11 @@ jobs:
           options: -p 3000:3000 -v /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins:/home/theia -v /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project:/home/project
           run: |
              cd /home/theia
-             THEIA_HOME=tests/theia/home
              PROJECT_FOLDER=tests/test_files/project
              THEIA_PLUGINS=tests/theia/plugins
-             mkdir -p $THEIA_HOME
              export HOME=$THEIA_HOME
              export _JAVA_OPTIONS=-Duser.home=$THEIA_HOME
-             node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=tests/theia/plugins > $THEIA_HOME/theia.log 2>&1 & '''
+             node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=tests/theia/plugins 
       - name: Build the node modules after cleaning the cache
         run: |
           export HOME=$CYPRESS_HOME
