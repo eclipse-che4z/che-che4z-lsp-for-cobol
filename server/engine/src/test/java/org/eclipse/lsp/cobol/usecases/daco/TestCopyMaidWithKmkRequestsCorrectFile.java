@@ -42,24 +42,24 @@ class TestCopyMaidWithKmkRequestsCorrectFile {
           + "             05 {$*TABMAX-PW7} PIC S9(4) VALUE ZERO COMP-3.\n"
           + "             05 {$*BHTTAB-XW7}.\n"
           + "               07 {$*BHTREG-XW8} OCCURS 50.\n"
-          + "                 09 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG_KMK} KMK.\n"
+          + "                 09 COPY MAID {~BHTRGL-XBG!DaCo} KMK.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           DISPLAY {$BHTRGL-XB4} OF {$BHTTAB-XW7}.";
+          + "           DISPLAY {$BHTRGL-XW8} OF {$BHTTAB-XW7}.";
 
   private static final String COPYBOOK_CONTENT =
-            "1           09 {$*BHTRGL-XB4}.\n"
-          + "2             11 {$*BHTRGLVLG-XB4}.\n"
-          + "3               13 {$*FABLYN-XB4}.\n"
-          + "4                 15 {$*FABLYNPOSEEN-XB4} PIC X.\n"
-          + "5                 15 {$*LYNKOD-XB4} PIC X(2).\n"
-          + "6               13 {$*BHTORSKOD-XB4} PIC X(2).";
+            "1           09 {$*BHTRGL-XB4`BHTRGL-XW8}.\n"
+          + "2             11 {$*BHTRGLVLG-XB4`BHTRGLVLG-XW8}.\n"
+          + "3               13 {$*FABLYN-XB4`FABLYN-XW8}.\n"
+          + "4                 15 {$*FABLYNPOSEEN-XB4`FABLYNPOSEEN-XW8} PIC X.\n"
+          + "5                 15 {$*LYNKOD-XB4`LYNKOD-XW8} PIC X(2).\n"
+          + "6               13 {$*BHTORSKOD-XB4`BHTORSKOD-XW8} PIC X(2).";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG_KMK", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

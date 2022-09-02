@@ -48,19 +48,19 @@ class TestAdjustCopyMaidNumbers {
           + "023500           09 COPY MAID {~BHTRGL-XBG!DaCo}.\n"
           + "             05 {$*NOT-ADJUSTED} PIC X.\n"
           + "        Procedure Division.\n"
-          + "           display {$FABLYNPOSEEN-X} OF {$FABLYN-X}.\n"
-          + "           display {$BHTRGL-X} OF {$BHTTAB-XW7}.\n"
+          + "           display {$FABLYNPOSEEN-XW8} OF {$FABLYN-XW8}.\n"
+          + "           display {$BHTRGL-XW8} OF {$BHTTAB-XW7}.\n"
           + "           display {$NOT-ADJUSTED} OF {$AREA-XW7}.\n"
           + "           display {_NOT-ADJUSTED OF TABMAX-PW7|invalid_}.\n";
 
   private static final String COPYBOOK_CONTENT =
-      "     1           {03^09} {$*BHTRGL-X}.  \n"
-          + "     2             {05^11} {$*BHTRGLVLG-X}.\n"
-          + "     3               {07^13} {$*FABLYN-X}.\n"
-          + "     4                 {09^15} {$*FABLYNPOSEEN-X}\n"
+      "     1           {03^09} {$*BHTRGL-X`BHTRGL-XW8}.  \n"
+          + "     2             {05^11} {$*BHTRGLVLG-X`BHTRGLVLG-XW8}.\n"
+          + "     3               {07^13} {$*FABLYN-X`FABLYN-XW8}.\n"
+          + "     4                 {09^15} {$*FABLYNPOSEEN-X`FABLYNPOSEEN-XW8}\n"
           + "     4                                 PIC X.\n"
-          + "     5                 {09^15} {$*LYNKOD-X}     PIC X(2).\n"
-          + "     6               {07^13} {$*BHTORSKOD-X}    PIC X(2).\n";
+          + "     5                 {09^15} {$*LYNKOD-X`LYNKOD-XW8}     PIC X(2).\n"
+          + "     6               {07^13} {$*BHTORSKOD-X`BHTORSKOD-XW8}    PIC X(2).\n";
 
   @Test
   void test() {

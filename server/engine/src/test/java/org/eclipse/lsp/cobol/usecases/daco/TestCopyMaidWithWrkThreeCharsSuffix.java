@@ -34,7 +34,7 @@ class TestCopyMaidWithWrkThreeCharsSuffix {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "        01 {$*PARENT-XNT}.\n"
-          + "            05 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG_WRK} wrk.\n"
+          + "            05 COPY MAID {~BHTRGL-XBG!DaCo} wrk.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-XNT}.";
 
@@ -46,7 +46,7 @@ class TestCopyMaidWithWrkThreeCharsSuffix {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG_WRK", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }

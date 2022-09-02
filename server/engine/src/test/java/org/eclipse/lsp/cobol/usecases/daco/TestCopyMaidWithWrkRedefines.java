@@ -37,7 +37,7 @@ class TestCopyMaidWithWrkRedefines {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "        01 {$*PARENT-XLO}.\n"
-          + "           05 COPY MAID {~BHTRGL-XBG!DaCo`BHTRGL-XBG_WRK} WRK.\n";
+          + "           05 COPY MAID {~BHTRGL-XBG!DaCo} WRK.\n";
 
   private static final String COPYBOOK_CONTENT =
       "       01  {$*MAIN-X`MAIN-XLO}.\n"
@@ -51,7 +51,7 @@ class TestCopyMaidWithWrkRedefines {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG_WRK", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
 }
