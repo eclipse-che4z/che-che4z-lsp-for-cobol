@@ -338,6 +338,56 @@ class MappingServiceTest {
     assertEquals(0, location.get().getRange().getStart().getCharacter());
   }
 
+  @Test
+  void testInsertMiddle() {
+    TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
+
+    Range copybookRange = new Range(new Position(7, 11), new Position(7, 21));
+    CopyNode copyNode = new CopyNode(Locality.builder()
+        .range(copybookRange)
+        .build(), "copybook");
+
+    textTransformations.insert(copyNode, 7, TextTransformations.of(COPYBOOK2, "copybook"));
+    MappingService mappingService = new MappingService(textTransformations);
+
+    Optional<Location> location = mappingService.getOriginalLocation(copybookRange);
+    assertTrue(location.isPresent());
+    assertEquals(7, location.get().getRange().getStart().getLine());
+
+    location = mappingService.getOriginalLocation(new Range(new Position(8, 11), new Position(8, 21)));
+    assertTrue(location.isPresent());
+    assertEquals(0, location.get().getRange().getStart().getLine());
+
+    location = mappingService.getOriginalLocation(new Range(new Position(9, 11), new Position(9, 21)));
+    assertTrue(location.isPresent());
+    assertEquals(8, location.get().getRange().getStart().getLine());
+  }
+
+  @Test
+  void testInsertBlank() {
+    TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
+
+    Range copybookRange = new Range(new Position(7, 11), new Position(7, 21));
+    CopyNode copyNode = new CopyNode(Locality.builder()
+        .range(copybookRange)
+        .build(), "copybook");
+
+    textTransformations.insert(copyNode, 7, TextTransformations.of("", "copybook"));
+    MappingService mappingService = new MappingService(textTransformations);
+
+    Optional<Location> location = mappingService.getOriginalLocation(copybookRange);
+    assertTrue(location.isPresent());
+    assertEquals(7, location.get().getRange().getStart().getLine());
+
+    location = mappingService.getOriginalLocation(new Range(new Position(8, 11), new Position(8, 21)));
+    assertTrue(location.isPresent());
+    assertEquals(8, location.get().getRange().getStart().getLine());
+
+    textTransformations.calculateExtendedText();
+    location = mappingService.getOriginalLocation(new Range(new Position(9, 11), new Position(9, 21)));
+    assertFalse(location.isPresent());
+  }
+
   private MappingService prepareService() {
     TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
 

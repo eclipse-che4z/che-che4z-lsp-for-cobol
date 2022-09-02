@@ -65,6 +65,10 @@
                 "title": "Remove COBOL Line Comment"
             },
             {
+                "command": "cobol-lsp.clear.downloaded.copybooks",
+                "title": "Clear downloaded copybooks"
+            },
+            {
                 "command": "cobol-lsp.snippets.insertSnippets",
                 "title": "Insert COBOL Snippet",
                 "category": "Snippets"
@@ -438,6 +442,16 @@
                         "S999"
                     ],
                     "uniqueItems": true
+                },
+                "cobol-lsp.serverType": {
+                    "type": "string",
+                    "enum": ["JAVA", "NATIVE"],
+                    "default": "JAVA",
+                    "enumDescriptions": [
+                        "JAVA  - Run java Server",
+                        "NATIVE - Run native Server"
+                    ],
+                    "description": "COBOL LS server type."
                 }
             }
         },
@@ -450,7 +464,8 @@
                     72,
                     80
                 ]
-            }
+            },
+            "editor.wordSeparators": "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
         },
         "keybindings": [
             {
@@ -500,7 +515,7 @@
     "devDependencies": {
         "@types/jest": "^27.0.0",
         "@types/mocha": "^9.1.1",
-        "@types/node": "^12.6.2",
+        "@types/node": "^14.14.31",
         "@types/vscode": "^1.55.0",
         "@vscode/test-electron": "^2.1.5",
         "decache": "^4.6.1",

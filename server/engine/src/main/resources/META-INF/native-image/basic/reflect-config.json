@@ -1,0 +1,1843 @@
+[
+  {
+    "name":"[Ljava.lang.Object;"
+  },
+  {
+    "name":"[Ljava.lang.String;"
+  },
+  {
+    "name":"ch.qos.logback.classic.encoder.PatternLayoutEncoder",
+    "queryAllPublicMethods":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"ch.qos.logback.classic.pattern.DateConverter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"ch.qos.logback.classic.pattern.LevelConverter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"ch.qos.logback.classic.pattern.LineSeparatorConverter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"ch.qos.logback.classic.pattern.LoggerConverter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"ch.qos.logback.classic.pattern.MessageConverter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"ch.qos.logback.classic.pattern.ThreadConverter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"ch.qos.logback.core.OutputStreamAppender",
+    "methods":[{"name":"setEncoder","parameterTypes":["ch.qos.logback.core.encoder.Encoder"] }]
+  },
+  {
+    "name":"ch.qos.logback.core.encoder.LayoutWrappingEncoder",
+    "methods":[{"name":"setParent","parameterTypes":["ch.qos.logback.core.Appender"] }]
+  },
+  {
+    "name":"ch.qos.logback.core.pattern.PatternLayoutEncoderBase",
+    "methods":[{"name":"setPattern","parameterTypes":["java.lang.String"] }]
+  },
+  {
+    "name":"ch.qos.logback.core.rolling.RollingFileAppender",
+    "queryAllPublicMethods":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name":"setFile","parameterTypes":["java.lang.String"] },
+      {"name":"setRollingPolicy","parameterTypes":["ch.qos.logback.core.rolling.RollingPolicy"] }
+    ]
+  },
+  {
+    "name":"ch.qos.logback.core.rolling.RollingPolicyBase",
+    "methods":[
+      {"name":"setFileNamePattern","parameterTypes":["java.lang.String"] },
+      {"name":"setParent","parameterTypes":["ch.qos.logback.core.FileAppender"] }
+    ]
+  },
+  {
+    "name":"ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy",
+    "queryAllPublicMethods":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name":"setMaxFileSize","parameterTypes":["ch.qos.logback.core.util.FileSize"] }
+    ]
+  },
+  {
+    "name":"ch.qos.logback.core.rolling.TimeBasedRollingPolicy",
+    "methods":[
+      {"name":"setMaxHistory","parameterTypes":["int"] },
+      {"name":"setTotalSizeCap","parameterTypes":["ch.qos.logback.core.util.FileSize"] }
+    ]
+  },
+  {
+    "name":"ch.qos.logback.core.rolling.helper.DateTokenConverter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"ch.qos.logback.core.rolling.helper.IntegerTokenConverter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"ch.qos.logback.core.util.FileSize",
+    "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+  },
+  {
+    "name":"com.google.common.util.concurrent.AbstractFuture",
+    "fields":[
+      {"name":"listeners"},
+      {"name":"value"},
+      {"name":"waiters"}
+    ]
+  },
+  {
+    "name":"com.google.common.util.concurrent.AbstractFuture$Waiter",
+    "fields":[
+      {"name":"next"},
+      {"name":"thread"}
+    ]
+  },
+  {
+    "name":"com.google.inject.AbstractModule",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.assistedinject.Assisted",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.assistedinject.FactoryModuleBuilder$1",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.assistedinject.FactoryProvider2",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "methods":[{"name":"initialize","parameterTypes":["com.google.inject.Injector"] }]
+  },
+  {
+    "name":"com.google.inject.assistedinject.FactoryProvider2$2",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.assistedinject.FactoryProvider2$ThreadLocalProvider",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.internal.Annotations",
+    "queriedMethods":[{"name":"determineWhetherToQuote","parameterTypes":[] }]
+  },
+  {
+    "name":"com.google.inject.internal.Element",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.internal.InjectorShell$InheritedScannersModule",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.internal.InjectorShell$RootModule",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.internal.InternalProviderInstanceBindingImpl$Factory",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.internal.RealMultibinder",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.internal.RealMultibinder$RealMultibinderCollectionOfProvidersProvider",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.internal.RealMultibinder$RealMultibinderProvider",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.internal.UniqueAnnotations$Internal",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.name.Named",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.google.inject.util.Modules$EmptyModule",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"java.io.FilePermission"
+  },
+  {
+    "name":"java.lang.Boolean",
+    "queriedMethods":[{"name":"parseBoolean","parameterTypes":["java.lang.String"] }]
+  },
+  {
+    "name":"java.lang.Byte",
+    "queriedMethods":[{"name":"parseByte","parameterTypes":["java.lang.String"] }]
+  },
+  {
+    "name":"java.lang.Double",
+    "queriedMethods":[{"name":"parseDouble","parameterTypes":["java.lang.String"] }]
+  },
+  {
+    "name":"java.lang.Float",
+    "queriedMethods":[{"name":"parseFloat","parameterTypes":["java.lang.String"] }]
+  },
+  {
+    "name":"java.lang.Integer",
+    "queriedMethods":[{"name":"parseInt","parameterTypes":["java.lang.String"] }]
+  },
+  {
+    "name":"java.lang.Long",
+    "queriedMethods":[{"name":"parseLong","parameterTypes":["java.lang.String"] }]
+  },
+  {
+    "name":"java.lang.Object",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"java.lang.RuntimePermission"
+  },
+  {
+    "name":"java.lang.Short",
+    "queriedMethods":[{"name":"parseShort","parameterTypes":["java.lang.String"] }]
+  },
+  {
+    "name":"java.lang.String",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"java.lang.ThreadLocal",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"java.lang.Throwable",
+    "methods":[{"name":"getSuppressed","parameterTypes":[] }]
+  },
+  {
+    "name":"java.lang.reflect.AccessibleObject",
+    "fields":[{"name":"override"}]
+  },
+  {
+    "name":"java.net.NetPermission"
+  },
+  {
+    "name":"java.net.SocketPermission"
+  },
+  {
+    "name":"java.net.URLPermission",
+    "methods":[{"name":"<init>","parameterTypes":["java.lang.String","java.lang.String"] }]
+  },
+  {
+    "name":"java.security.AllPermission"
+  },
+  {
+    "name":"java.security.MessageDigestSpi"
+  },
+  {
+    "name":"java.security.SecureRandomParameters"
+  },
+  {
+    "name":"java.security.SecurityPermission"
+  },
+  {
+    "name":"java.sql.Date"
+  },
+  {
+    "name":"java.util.ArrayList",
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"java.util.Collections$EmptyList",
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"java.util.PropertyPermission"
+  },
+  {
+    "name":"javax.management.ObjectName"
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.CICSParser$CicsWordsContext",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.CobolParser$CobolCompilerDirectivesKeywordsContext",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.CobolParser$CobolKeywordsContext",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor","org.eclipse.lsp.cobol.core.messages.MessageService","org.antlr.v4.runtime.tree.ParseTreeListener","org.eclipse.lsp.cobol.service.SubroutineService","org.eclipse.lsp.cobol.service.CachingConfigurationService","org.eclipse.lsp.cobol.core.engine.dialects.DialectService","org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.engine.dialects.DialectService",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.copybooks.CopybookService","org.antlr.v4.runtime.tree.ParseTreeListener","org.eclipse.lsp.cobol.core.messages.MessageService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.delegates.communications.Communications"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.messages.PropertiesMessageService",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["java.lang.String","org.eclipse.lsp.cobol.core.messages.LocaleStore"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor","org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader","org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter","org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation","org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory","org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacePreprocessorFactory"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory",
+    "queryAllPublicMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["java.lang.String","org.antlr.v4.runtime.BufferedTokenStream","org.eclipse.lsp.cobol.service.copybooks.CopybookConfig","org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy","org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService","org.eclipse.lsp.cobol.core.messages.MessageService","org.eclipse.lsp.cobol.service.copybooks.CopybookNameService","org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacePreProcessorListener",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["java.lang.String","org.antlr.v4.runtime.BufferedTokenStream","org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy","org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacePreprocessorFactory",
+    "queryAllPublicMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingServiceImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.messages.MessageService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysisFactory","org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysisFactory",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor","org.eclipse.lsp.cobol.core.messages.MessageService","org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.utils.FileSystemService","org.eclipse.lsp.cobol.service.copybooks.CopybookService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.messages.MessageService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.messages.MessageService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.visitor.InterruptingTreeListener",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.domain.databus.api.DeadEventSubscriber",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.domain.databus.impl.DefaultDataBusBroker",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor","org.eclipse.lsp.cobol.domain.databus.api.DeadEventSubscriber"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.domain.databus.impl.DefaultDeadEventSubscriber",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.domain.modules.DatabusModule",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.domain.modules.EngineModule",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.domain.modules.ServiceModule",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.jrpc.CobolLanguageClient",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.jrpc.ExtendedApi",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.CFASTBuilderImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.CachingConfigurationService",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.SettingsService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.CobolLSPServerStateService",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.CobolLanguageServer",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp4j.services.TextDocumentService","org.eclipse.lsp4j.services.WorkspaceService","org.eclipse.lsp.cobol.service.WatcherService","org.eclipse.lsp.cobol.service.SettingsService","org.eclipse.lsp.cobol.core.messages.LocaleStore","org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor","org.eclipse.lsp.cobol.service.DisposableLSPStateService","org.eclipse.lsp.cobol.service.ConfigurationService","org.eclipse.lsp.cobol.service.copybooks.CopybookNameService","org.eclipse.lsp.cobol.service.delegates.completions.Keywords"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.CobolLanguageServer$ShutdownResponse",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.CobolTextDocumentService",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.delegates.communications.Communications","org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade","org.eclipse.lsp.cobol.service.delegates.formations.Formations","org.eclipse.lsp.cobol.service.delegates.completions.Completions","org.eclipse.lsp.cobol.service.delegates.references.Occurrences","org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker","org.eclipse.lsp.cobol.service.delegates.actions.CodeActions","org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor","org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider","org.eclipse.lsp.cobol.service.CFASTBuilder","org.eclipse.lsp.cobol.service.DisposableLSPStateService","org.eclipse.lsp.cobol.service.copybooks.CopybookNameService","org.eclipse.lsp.cobol.service.ConfigurationService"] },
+      {"name":"onRunAnalysisEventCallback","parameterTypes":["org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent"] }
+    ]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.CobolWorkspaceServiceImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker","org.eclipse.lsp.cobol.service.SettingsService","org.eclipse.lsp.cobol.service.WatcherService","org.eclipse.lsp.cobol.service.copybooks.CopybookService","org.eclipse.lsp.cobol.core.messages.LocaleStore","org.eclipse.lsp.cobol.service.SubroutineService","org.eclipse.lsp.cobol.service.ConfigurationService","org.eclipse.lsp.cobol.service.DisposableLSPStateService","org.eclipse.lsp.cobol.service.copybooks.CopybookNameService","org.eclipse.lsp.cobol.service.delegates.completions.Keywords"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.SettingsServiceImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["com.google.inject.Provider"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.SubroutineServiceImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["com.google.inject.Provider","int","int","java.lang.String"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.WatcherServiceImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["com.google.inject.Provider"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.copybooks.CopybookCache",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["int","int","java.lang.String"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.SettingsService","org.eclipse.lsp.cobol.service.utils.FileSystemService","com.google.inject.Provider"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.copybooks.CopybookService",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker","org.eclipse.lsp.cobol.service.SettingsService","org.eclipse.lsp.cobol.service.utils.FileSystemService","org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor","org.eclipse.lsp.cobol.service.copybooks.CopybookCache"] },
+      {"name":"handleAnalysisFinishedEvent","parameterTypes":["org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent"] }
+    ]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.actions.CodeActions",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["java.util.Set"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.actions.FindCopybookCommand",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.communications.ServerCommunications",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["com.google.inject.Provider","org.eclipse.lsp.cobol.service.utils.FileSystemService","org.eclipse.lsp.cobol.core.messages.MessageService","org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.completions.CompletionStorage",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.completions.Completions",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["java.util.Set"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.completions.CopybookCompletion",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.completions.CopybookNameCompletion",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.copybooks.CopybookNameService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.completions.KeywordCompletion",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.delegates.completions.CompletionStorage"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.completions.Keywords",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.SettingsService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.completions.ParagraphCompletion",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.completions.SectionCompletion",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.completions.SubroutineCompletion",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.SubroutineService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.completions.VariableCompletion",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.formations.Formations",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["java.util.Set"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.formations.TrimFormation",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.hover.VariableHover",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.providers.ClientProvider",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["int","int","int","int"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.utils.WorkspaceFileService",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.AbstractTextDocumentRegistrationAndWorkDoneProgressOptions",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp4j.AbstractWorkDoneProgressOptions",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp4j.CallHierarchyCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CallHierarchyRegistrationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ChangeAnnotation",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ClientCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CodeAction",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CodeActionCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CodeActionContext",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CodeActionDisabled",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CodeActionKindCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CodeActionLiteralSupportCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CodeActionOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CodeActionParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CodeActionResolveSupportCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CodeActionTriggerKind",
+    "fields":[{"name":"value"}]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CodeLensCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CodeLensOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CodeLensWorkspaceCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ColorProviderCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ColorProviderOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.Command",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionContext",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionItem",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionItemCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionItemDefaults",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionItemInsertTextModeSupportCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionItemKind",
+    "fields":[{"name":"value"}]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionItemKindCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionItemLabelDetails",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionItemOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionItemResolveSupportCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionItemTag",
+    "fields":[{"name":"value"}]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionItemTagSupportCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionList",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionListCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CompletionTriggerKind",
+    "fields":[{"name":"value"}]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ConfigurationItem",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ConfigurationParams",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CreateFile",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.CreateFileOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DeclarationCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DeclarationRegistrationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DefinitionCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DefinitionOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DefinitionParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DeleteFile",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DeleteFileOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.Diagnostic",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DiagnosticCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DiagnosticCodeDescription",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DiagnosticRegistrationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DiagnosticRelatedInformation",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DiagnosticSeverity",
+    "fields":[{"name":"value"}]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DiagnosticTag",
+    "fields":[{"name":"value"}]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DiagnosticWorkspaceCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DiagnosticsTagSupport",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DidChangeConfigurationCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DidChangeConfigurationParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DidChangeTextDocumentParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DidChangeWatchedFilesCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DidChangeWatchedFilesRegistrationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DidCloseTextDocumentParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DidOpenTextDocumentParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DidSaveTextDocumentParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentFilter",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentFormattingOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentFormattingParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentHighlight",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentHighlightCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentHighlightKind",
+    "fields":[{"name":"value"}]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentHighlightOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentHighlightParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentLinkCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentLinkOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentOnTypeFormattingOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentRangeFormattingOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentSymbol",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentSymbolCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentSymbolOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DocumentSymbolParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DynamicRegistrationCapabilities",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp4j.ExecuteCommandCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ExecuteCommandOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ExecuteCommandParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FileOperationFilter",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FileOperationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FileOperationPattern",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FileOperationPatternOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FileOperationsServerCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FileOperationsWorkspaceCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FileSystemWatcher",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FoldingRange",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FoldingRangeCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FoldingRangeKindSupportCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FoldingRangeProviderOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FoldingRangeRequestParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FoldingRangeSupportCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FormattingCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FormattingOptions",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.GeneralClientCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.HoverCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.HoverOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.HoverParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ImplementationCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ImplementationRegistrationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.InitializeResult",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.InitializedParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.InlayHintCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.InlayHintRegistrationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.InlayHintResolveSupportCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.InlayHintWorkspaceCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.InlineValueCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.InlineValueRegistrationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.InlineValueWorkspaceCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.InsertReplaceEdit",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.InsertReplaceRange",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.InsertTextFormat",
+    "fields":[{"name":"value"}]
+  },
+  {
+    "name":"org.eclipse.lsp4j.InsertTextMode",
+    "fields":[{"name":"value"}]
+  },
+  {
+    "name":"org.eclipse.lsp4j.LinkedEditingRangeCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.LinkedEditingRangeRegistrationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.Location",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.MarkdownCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.MarkedString",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.MarkupContent",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.MessageParams",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.MessageType",
+    "fields":[{"name":"value"}]
+  },
+  {
+    "name":"org.eclipse.lsp4j.MonikerCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.MonikerRegistrationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.OnTypeFormattingCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ParameterInformationCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.Position",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.PrepareSupportDefaultBehavior",
+    "fields":[{"name":"value"}]
+  },
+  {
+    "name":"org.eclipse.lsp4j.PublishDiagnosticsCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.PublishDiagnosticsParams",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.Range",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.RangeFormattingCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ReferenceContext",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ReferenceOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ReferenceParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ReferencesCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.Registration",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.RegistrationParams",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.RegularExpressionsCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.RelativePattern",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.RenameCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.RenameFile",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.RenameFileOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.RenameOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ResourceOperation",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp4j.SaveOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SelectionRangeCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SelectionRangeRegistrationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SemanticTokensCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SemanticTokensClientCapabilitiesRequests",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SemanticTokensClientCapabilitiesRequestsFull",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SemanticTokensLegend",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SemanticTokensServerFull",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SemanticTokensWithRegistrationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SemanticTokensWorkspaceCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ServerCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ServerInfo",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ShowDocumentCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SignatureHelpCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SignatureHelpOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SignatureInformationCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.StaleRequestCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SymbolCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SymbolKind",
+    "fields":[{"name":"value"}]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SymbolKindCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SymbolTag",
+    "fields":[{"name":"value"}]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SymbolTagSupportCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.SynchronizationCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.TextDocumentClientCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.TextDocumentContentChangeEvent",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.TextDocumentEdit",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.TextDocumentIdentifier",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.TextDocumentItem",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.TextDocumentPositionAndWorkDoneProgressAndPartialResultParams",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp4j.TextDocumentPositionAndWorkDoneProgressParams",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp4j.TextDocumentPositionParams",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp4j.TextDocumentRegistrationOptions",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp4j.TextDocumentSyncOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.TextEdit",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.TypeDefinitionCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.TypeDefinitionRegistrationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.TypeHierarchyCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.TypeHierarchyRegistrationOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.Unregistration",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.UnregistrationParams",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.WindowClientCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.WindowShowMessageRequestActionItemCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.WindowShowMessageRequestCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.WorkDoneProgressAndPartialResultParams",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp4j.WorkspaceClientCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.WorkspaceEdit",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.WorkspaceEditCapabilities",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.WorkspaceEditChangeAnnotationSupportCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.WorkspaceFolder",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.WorkspaceFoldersOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.WorkspaceServerCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.WorkspaceSymbolOptions",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.WorkspaceSymbolResolveSupportCapabilities",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.CodeActionResponseAdapter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.CompletionItemDefaultsEditRangeTypeAdapter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.CompletionItemTextEditTypeAdapter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.DocumentChangeListAdapter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.DocumentSymbolResponseAdapter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.HoverTypeAdapter$Factory",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.InitializeParamsTypeAdapter$Factory",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.LocationLinkListAdapter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.PrepareRenameResponseAdapter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.ResourceOperationTypeAdapter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.SemanticTokensFullDeltaResponseAdapter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.VersionedTextDocumentIdentifierTypeAdapter$Factory",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.WorkspaceSymbolResponseAdapter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.jsonrpc.json.adapters.JsonElementTypeAdapter$Factory",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.jsonrpc.messages.CancelParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.jsonrpc.messages.ResponseError",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.services.LanguageClient",
+    "queryAllDeclaredMethods":true
+  },
+  {
+    "name":"org.eclipse.lsp4j.services.LanguageServer",
+    "queryAllDeclaredMethods":true,
+    "methods":[
+      {"name":"exit","parameterTypes":[] },
+      {"name":"getTextDocumentService","parameterTypes":[] },
+      {"name":"getWorkspaceService","parameterTypes":[] },
+      {"name":"initialize","parameterTypes":["org.eclipse.lsp4j.InitializeParams"] },
+      {"name":"initialized","parameterTypes":["org.eclipse.lsp4j.InitializedParams"] },
+      {"name":"shutdown","parameterTypes":[] }
+    ]
+  },
+  {
+    "name":"org.eclipse.lsp4j.services.TextDocumentService",
+    "queryAllDeclaredMethods":true,
+    "methods":[
+      {"name":"codeAction","parameterTypes":["org.eclipse.lsp4j.CodeActionParams"] },
+      {"name":"completion","parameterTypes":["org.eclipse.lsp4j.CompletionParams"] },
+      {"name":"definition","parameterTypes":["org.eclipse.lsp4j.DefinitionParams"] },
+      {"name":"didChange","parameterTypes":["org.eclipse.lsp4j.DidChangeTextDocumentParams"] },
+      {"name":"didClose","parameterTypes":["org.eclipse.lsp4j.DidCloseTextDocumentParams"] },
+      {"name":"didOpen","parameterTypes":["org.eclipse.lsp4j.DidOpenTextDocumentParams"] },
+      {"name":"didSave","parameterTypes":["org.eclipse.lsp4j.DidSaveTextDocumentParams"] },
+      {"name":"documentHighlight","parameterTypes":["org.eclipse.lsp4j.DocumentHighlightParams"] },
+      {"name":"documentSymbol","parameterTypes":["org.eclipse.lsp4j.DocumentSymbolParams"] },
+      {"name":"foldingRange","parameterTypes":["org.eclipse.lsp4j.FoldingRangeRequestParams"] },
+      {"name":"formatting","parameterTypes":["org.eclipse.lsp4j.DocumentFormattingParams"] },
+      {"name":"hover","parameterTypes":["org.eclipse.lsp4j.HoverParams"] },
+      {"name":"references","parameterTypes":["org.eclipse.lsp4j.ReferenceParams"] }
+    ]
+  },
+  {
+    "name":"org.eclipse.lsp4j.services.WorkspaceService",
+    "queryAllDeclaredMethods":true,
+    "methods":[
+      {"name":"didChangeConfiguration","parameterTypes":["org.eclipse.lsp4j.DidChangeConfigurationParams"] },
+      {"name":"executeCommand","parameterTypes":["org.eclipse.lsp4j.ExecuteCommandParams"] }
+    ]
+  },
+  {
+    "name":"sun.misc.Unsafe",
+    "allDeclaredFields":true,
+    "methods":[
+      {"name":"allocateInstance","parameterTypes":["java.lang.Class"] },
+      {"name":"objectFieldOffset","parameterTypes":["java.lang.reflect.Field"] },
+      {"name":"putBoolean","parameterTypes":["java.lang.Object","long","boolean"] }
+    ],
+    "queriedMethods":[{"name":"allocateInstance","parameterTypes":["java.lang.Class"] }]
+  },
+  {
+    "name":"sun.security.provider.DRBG",
+    "methods":[{"name":"<init>","parameterTypes":["java.security.SecureRandomParameters"] }]
+  },
+  {
+    "name":"sun.security.provider.SHA",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"sun.security.provider.SHA2$SHA256",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  }
+]

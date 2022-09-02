@@ -101,8 +101,15 @@ public class MappingService {
     int originalDocumentLine = 0;
     int extendedDocumentLine = 0;
     for (Range range : ranges) {
+      TextTransformations rangeText = textTransformations.getExtensions().get(range);
 
-      MappingItem mappingItem = buildMappingItemForRange(textTransformations.getUri(), range, originalDocumentLine, extendedDocumentLine);
+      if (textTransformations.isInsert(range.getStart().getLine()) && rangeText.getText().length() == 0) {
+        continue;
+      }
+
+      MappingItem mappingItem = buildMappingItemForRange(textTransformations.getUri(), range, originalDocumentLine,
+          extendedDocumentLine,
+          textTransformations.isInsert(range.getStart().getLine()));
       if (MappingHelper.size(mappingItem.extendedRange) > 0) {
         result.add(mappingItem);
       }
@@ -110,11 +117,19 @@ public class MappingService {
       extendedDocumentLine += (range.getEnd().getLine() - originalDocumentLine);
       originalDocumentLine = range.getEnd().getLine() + 1;
 
-      List<MappingItem> map = buildLocalityMap(textTransformations.getExtensions().get(range));
+      if (textTransformations.isInsert(range.getStart().getLine())) {
+        extendedDocumentLine++;
+      }
+
+      List<MappingItem> map = buildLocalityMap(rangeText);
       for (MappingItem item : map) {
         Position start = item.extendedRange.getStart();
         Position end = item.extendedRange.getEnd();
         int size = end.getLine() - start.getLine() + 1;
+
+        if (textTransformations.isInsert(range.getStart().getLine())) {
+          size--;
+        }
 
         start.setLine(extendedDocumentLine);
         start.setCharacter(range.getStart().getCharacter());
@@ -140,15 +155,17 @@ public class MappingService {
     return result;
   }
 
-  private MappingItem buildMappingItemForRange(String uri, Range range, int originalDocumentLine, int extendedDocumentLine) {
+  private MappingItem buildMappingItemForRange(String uri, Range range, int originalDocumentLine, int extendedDocumentLine, boolean insert) {
     int size = range.getStart().getLine() - originalDocumentLine;
     int charPos = range.getStart().getCharacter() - 1;
     int originalEndLine = range.getStart().getLine();
     int extendedEndLine = extendedDocumentLine + size;
     if (charPos < 0) {
       charPos = LINE_LEN;
-      originalEndLine -= 1;
-      extendedEndLine -= 1;
+      if (!insert) {
+        originalEndLine -= 1;
+        extendedEndLine -= 1;
+      }
     }
     Location originalLocation = new Location(uri, new Range(new Position(originalDocumentLine, 0), new Position(originalEndLine, charPos)));
     Range extended = new Range(new Position(extendedDocumentLine, 0), new Position(extendedEndLine, charPos));

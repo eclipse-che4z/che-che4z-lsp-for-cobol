@@ -23,6 +23,7 @@ import {
     PATHS_USS,
     PATHS_ZOWE,
     SERVER_PORT,
+    SERVER_TYPE,
     SETTINGS_CPY_SECTION,
     SETTINGS_DIALECT,
     SETTINGS_SUBROUTINE_LOCAL_KEY,
@@ -66,11 +67,12 @@ export function createFileWithGivenPath(folderPath: string, fileName: string, pa
 }
 
 export class TabRule {
-    public constructor (public stops: number[], public maxPosition: number, public regex: string | undefined = undefined) {}
+    // tslint:disable-next-line:no-unnecessary-initializer
+    public constructor(public stops: number[], public maxPosition: number, public regex: string | undefined = undefined) {}
 }
 
 export class TabSettings {
-    public constructor(public rules: TabRule[], public defaultRule: TabRule) {};
+    public constructor(public rules: TabRule[], public defaultRule: TabRule) {}
 }
 
 /**
@@ -96,7 +98,6 @@ export class SettingsService {
     public static getCopybookLocalPath(cobolFileName: string, dialectType: string): string[] {
         return SettingsService.getCopybookConfigValues(PATHS_LOCAL_KEY, cobolFileName, dialectType);
     }
-
 
     public static getCopybookExtension(): string[] {
         return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(COPYBOOK_EXTENSIONS);
@@ -135,7 +136,7 @@ export class SettingsService {
      * @returns a profile name
      */
     public static getProfileName(): string {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles")
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles");
     }
 
     /**
@@ -189,7 +190,7 @@ export class SettingsService {
      * @returns string
      */
     public static getCopybookFileEncoding() {
-        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("copybook-file-encoding")
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("copybook-file-encoding");
     }
 
     /**
@@ -200,8 +201,8 @@ export class SettingsService {
         const dialectList: string[] = vscode.workspace.getConfiguration()
             .get(SETTINGS_DIALECT);
         return new Map<any, any>([...Object.entries(cobolSnippets),
-            ...dialectList.includes(IDMS_DIALECT)? Object.entries(idmsSnippets): [],
-            ...dialectList.includes(DACO_DIALECT)? Object.entries(dacoSnippets): []]);
+            ...dialectList.includes(IDMS_DIALECT) ? Object.entries(idmsSnippets) : [],
+            ...dialectList.includes(DACO_DIALECT) ? Object.entries(dacoSnippets) : []]);
 
     }
 
@@ -216,4 +217,14 @@ export class SettingsService {
         const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(section);
         return SettingsService.evaluateVariable(pathList, "fileBasenameNoExtension", programFile);
     }
+
+   /**
+    * Checks if native build is enabled.
+    *
+    * @returns is native build enabled
+    */
+    public static serverType(): string {
+        return vscode.workspace.getConfiguration().get(SERVER_TYPE);
+    }
+
 }

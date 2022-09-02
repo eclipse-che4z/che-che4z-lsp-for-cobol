@@ -111,7 +111,9 @@ public final class IdmsDialect implements CobolDialect {
 
     if (copybookModel.getUri() == null || copybookModel.getContent() == null) {
       errors.add(ErrorHelper.missingCopybooks(messageService, cb.getUsage(), cb.getName()));
-      extendedSource.replace(cb.getStatement().getRange(), "");
+      if (!cb.isInsert()) {
+        extendedSource.replace(cb.getStatement().getRange(), "");
+      }
       return;
     }
 
@@ -131,7 +133,11 @@ public final class IdmsDialect implements CobolDialect {
     processTextTransformation(extendedSource, copybookMap,
             errors, copybookConfig, programDocumentUri, cb.getLevel(), copybookStack);
     copybookMap.commitTransformations();
-    extendedSource.extend(currentMap, copyNode, copybookMap);
+    if (cb.isInsert()) {
+      extendedSource.insert(currentMap, copyNode, copybookMap);
+    } else {
+      extendedSource.extend(currentMap, copyNode, copybookMap);
+    }
     copyNode.setLocality(cb.getUsage());
     copybookStack.pop();
   }
