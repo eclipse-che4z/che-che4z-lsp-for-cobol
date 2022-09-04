@@ -273,6 +273,7 @@ jobs:
             #  node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=tests/theia/plugins 
       - name: Build the node modules after cleaning the cache
         run: |
+          cd tests
           rm -rf node_modules/ yarn.lock
           yarn cache clean
           yarn install --frozen-lockfile
