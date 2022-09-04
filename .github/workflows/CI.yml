@@ -272,8 +272,9 @@ jobs:
           yarn install --frozen-lockfile
           npm run ts:build
       - name: Cypress run
-        uses: cypress-io/github-action@v4         
+        uses: cypress-io/github-action@v2         
         with:    
+          command: npm run cy:run:ci -- --env ide=theia
           working-directory: tests
 
     
