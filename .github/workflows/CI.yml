@@ -274,8 +274,7 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v4         
         with:    
-          build: npm run ts:build  
-          start: npm run cy:run:ci -- --env ide=theia  
+          run: npm run cy:run:ci -- --env ide=theia
           working-directory: tests
 
     
