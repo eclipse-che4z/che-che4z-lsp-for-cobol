@@ -282,7 +282,9 @@ jobs:
         uses: cypress-io/github-action@v4         
         with:         
           start: npm run cy:run:ci -- --env ide=theia  
-          working-directory: tests
+          working-directory: |
+               tests
+               clients/cobol-lsp-vscode-extension
 
     
 
