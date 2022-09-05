@@ -266,6 +266,7 @@ jobs:
           options: -p 3000:3000 -v /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins:/home/theia -v /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project:/home/project --hostname=0.0.0.0 
       - name: Build the node modules after cleaning the cache
         run: |
+          docker ps
           rm -rf node_modules/ yarn.lock
           cd tests
           yarn cache clean
