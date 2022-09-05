@@ -33,6 +33,13 @@ class TestSqlInsertStatement {
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*HV_ENUM}  PIC 9 VALUE '63'.\n"
           + "       01 {$*TAD}  PIC 9 VALUE '144'.\n"
+          + "       01 {$*DB2-POLICYNUM-INT}  PIC 9 VALUE '144'.\n"
+          + "       01 {$*CA-H-PROPERTY-TYPE}  PIC 9 VALUE '144'.\n"
+          + "       01 {$*DB2-H-BEDROOMS-SINT}  PIC 9 VALUE '144'.\n"
+          + "       01 {$*DB2-H-VALUE-INT}  PIC 9 VALUE '144'.\n"
+          + "       01 {$*CA-H-HOUSE-NAME}  PIC 9 VALUE '144'.\n"
+          + "       01 {$*CA-H-HOUSE-NUMBER}  PIC 9 VALUE '144'.\n"
+          + "       01 {$*CA-H-POSTCODE}  PIC 9 VALUE '144'.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL";
   private static final String INSERT1 =
@@ -78,8 +85,27 @@ class TestSqlInsertStatement {
           + "           B SMALLINT) VALUEs {$TAD}+1;\n"
           + "           END-EXEC.";
 
+  public static final String INSERT7 =
+      TEXT
+          + "           INSERT INTO HOUSE\n"
+          + "                       ( POLICYNUMBER,\n"
+          + "                         PROPERTYTYPE,\n"
+          + "                         BEDROOMS,\n"
+          + "                         VALUE,\n"
+          + "                         HOUSENAME,\n"
+          + "                         HOUSENUMBER,\n"
+          + "                         POSTCODE          )\n"
+          + "                VALUES ( :{$DB2-POLICYNUM-INT},\n"
+          + "                         :{$CA-H-PROPERTY-TYPE},\n"
+          + "                         :{$DB2-H-BEDROOMS-SINT},\n"
+          + "                         :{$DB2-H-VALUE-INT},\n"
+          + "                         :{$CA-H-HOUSE-NAME},\n"
+          + "                         :{$CA-H-HOUSE-NUMBER},\n"
+          + "                         :{$CA-H-POSTCODE}      )"
+          + "           END-EXEC.";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(INSERT1, INSERT2, INSERT3, INSERT4, INSERT5, INSERT6);
+    return Stream.of(INSERT1, INSERT2, INSERT3, INSERT4, INSERT5, INSERT6, INSERT7);
   }
 
   @ParameterizedTest
