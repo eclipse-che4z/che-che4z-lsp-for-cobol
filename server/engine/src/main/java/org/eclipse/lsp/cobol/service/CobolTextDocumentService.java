@@ -14,13 +14,32 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
+
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -45,23 +64,34 @@ import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
-import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.CodeAction;
+import org.eclipse.lsp4j.CodeActionParams;
+import org.eclipse.lsp4j.Command;
+import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.CompletionList;
+import org.eclipse.lsp4j.CompletionParams;
+import org.eclipse.lsp4j.DefinitionParams;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DidChangeTextDocumentParams;
+import org.eclipse.lsp4j.DidCloseTextDocumentParams;
+import org.eclipse.lsp4j.DidOpenTextDocumentParams;
+import org.eclipse.lsp4j.DidSaveTextDocumentParams;
+import org.eclipse.lsp4j.DocumentFormattingParams;
+import org.eclipse.lsp4j.DocumentHighlight;
+import org.eclipse.lsp4j.DocumentHighlightParams;
+import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.DocumentSymbolParams;
+import org.eclipse.lsp4j.FoldingRange;
+import org.eclipse.lsp4j.FoldingRangeRequestParams;
+import org.eclipse.lsp4j.Hover;
+import org.eclipse.lsp4j.HoverParams;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.LocationLink;
+import org.eclipse.lsp4j.ReferenceParams;
+import org.eclipse.lsp4j.SymbolInformation;
+import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
-
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -97,6 +127,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final ConfigurationService configurationService;
   private DisposableLSPStateService disposableLSPStateService;
   private final CopybookNameService copybookNameService;
+  private final Map<String, Map<String, List<Diagnostic>>> errorsByFileForEachProgram;
 
   @Inject
   @Builder
@@ -128,7 +159,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.disposableLSPStateService = disposableLSPStateService;
     this.configurationService = configurationService;
     this.copybookNameService = copybookNameService;
-
+    this.errorsByFileForEachProgram = new HashMap<>();
     dataBus.subscribe(this);
   }
 
@@ -264,10 +295,28 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     String uri = params.getTextDocument().getUri();
     LOG.info(format("Document closing invoked on URI %s", uri));
     interruptAnalysis(uri);
-    communications.publishDiagnostics(ImmutableMap.of(uri, Collections.emptyList()));
+    if (copybookNameService.isCopybook(uri)) {
+      return;
+    }
+
+    errorsByFileForEachProgram.get(uri).forEach((k, v) ->
+        errorsByFileForEachProgram.get(uri).put(k, Collections.emptyList()));
+
+    communications.publishDiagnostics(collectAllDiagnostics());
     communications.cancelProgressNotification(uri);
     docs.remove(uri);
     clearAnalysedFutureObject(uri);
+  }
+
+  Map<String, List<Diagnostic>> collectAllDiagnostics() {
+    return errorsByFileForEachProgram.values()
+        .stream()
+        .flatMap(map -> map.entrySet().stream())
+        .collect(Collectors.toMap(
+            Entry::getKey,
+            Entry::getValue,
+            (o, n) -> Stream.concat(o.stream(), n.stream()).collect(toList()))
+        );
   }
 
   private void interruptAnalysis(String uri) {
@@ -340,6 +389,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                     AnalysisConfig config = configurationService.getConfig(processingMode);
                     AnalysisResult result = engine.analyze(uri, text, config);
                     ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
+                    errorsByFileForEachProgram.put(uri, result.getDiagnostics());
                     publishResult(uri, result, processingMode);
                     outlineMap.computeIfPresent(
                         uri,
@@ -377,7 +427,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                     AnalysisConfig config = configurationService.getConfig(processingMode);
                     AnalysisResult result = engine.analyze(uri, text, config);
                     registerDocument(uri, new CobolDocumentModel(text, result));
-                    communications.publishDiagnostics(result.getDiagnostics());
+                    errorsByFileForEachProgram.put(uri, result.getDiagnostics());
+                    communications.publishDiagnostics(collectAllDiagnostics());
                     outlineMap
                         .get(uri)
                         .complete(
@@ -397,7 +448,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       String uri, AnalysisResult result, CopybookProcessingMode copybookProcessingMode) {
     notifyAnalysisFinished(uri, extractCopybookUsages(result), copybookProcessingMode);
     communications.cancelProgressNotification(uri);
-    communications.publishDiagnostics(result.getDiagnostics());
+    communications.publishDiagnostics(collectAllDiagnostics());
     if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
   }
 
