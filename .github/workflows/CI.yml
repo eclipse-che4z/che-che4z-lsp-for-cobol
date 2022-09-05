@@ -275,6 +275,9 @@ jobs:
         uses: cypress-io/github-action@v2         
         with:    
           command: npm run cy:run:ci -- --env ide=theia
+          browser: chrome
+          headless: true
+          wait-on: 'http://localhost:3000'
           working-directory: tests
 
     
