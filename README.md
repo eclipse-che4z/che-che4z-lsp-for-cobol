@@ -40,6 +40,8 @@ Integrating COBOL Language Support with Zowe Explorer lets you:
 
 To enable these features, install the [Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=Zowe.vscode-extension-for-zowe) extension and configure a Zowe Explorer `zosmf` or `zftp` profile with credentials and a connection URL.
 
+<a href="https://www.openmainframeproject.org/all-projects/zowe/conformance"><img alt="This extension is Zowe v2 conformant" src="https://artwork.openmainframeproject.org/other/zowe-conformant/zowev2/explorer/color/zowe-conformant-zowev2-explorer-color.png" width=20% height=20% /></a>
+
 ## Features
 COBOL Language Support provides the following COBOL syntax awareness features:
 
