@@ -262,6 +262,7 @@ jobs:
       - name: up docker image
         uses: addnab/docker-run-action@v3
         with:
+          username: root
           image: "grianbrcom/theia-full:1.15.0"
           options: -p 3000:3000 -v /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins:/home/theia -v /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project:/home/project
           run: |
@@ -273,7 +274,7 @@ jobs:
              export HOME=$THEIA_HOME
              export _JAVA_OPTIONS=-Duser.home=$THEIA_HOME
              node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=local-dir:$THEIA_PLUGINS > $THEIA_HOME/theia.log 2>&1
-             docker ps
+            #  docker ps
             #  rm -rf node_modules/ yarn.lock
             #  cd tests
             #  yarn cache clean
