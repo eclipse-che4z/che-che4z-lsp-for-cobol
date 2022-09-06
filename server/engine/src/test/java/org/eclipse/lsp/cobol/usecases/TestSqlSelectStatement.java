@@ -84,8 +84,23 @@ class TestSqlSelectStatement {
           + "             AS Result FROM SYSIBM.SYSDUMMY1;\n"
           + "           END-EXEC.\n";
 
+  private static final String SELECT8 =
+          TEXT
+                  + "            select all all, avg from all; \n"
+                  + "           END-EXEC.\n";
+
+  private static final String SELECT9 =
+          TEXT
+                  + "            select all, avg from all;\n"
+                  + "           END-EXEC.\n";
+
+  private static final String SELECT10 =
+          TEXT
+                  + "            select all all as all, avg from all;\n"
+                  + "           END-EXEC.\n";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(SELECT, SELECT2, SELECT3, SELECT4, SELECT5, SELECT6, SELECT7);
+    return Stream.of(SELECT, SELECT2, SELECT3, SELECT4, SELECT5, SELECT6, SELECT7, SELECT8, SELECT9, SELECT10);
   }
 
   @ParameterizedTest

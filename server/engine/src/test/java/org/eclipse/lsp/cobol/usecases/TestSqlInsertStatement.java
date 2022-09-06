@@ -104,8 +104,19 @@ class TestSqlInsertStatement {
           + "                         :{$CA-H-POSTCODE}      )"
           + "           END-EXEC.";
 
+  private static final String INSERT8 =
+          TEXT
+                  + "           insert into all values(1,1);\n"
+                  + "           END-EXEC.";
+
+  private static final String INSERT9 =
+          TEXT
+                  + "           insert into all(all,avg) \n"
+                  + "           select all all as all, avg from all;\n"
+                  + "           END-EXEC.";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(INSERT1, INSERT2, INSERT3, INSERT4, INSERT5, INSERT6, INSERT7);
+    return Stream.of(INSERT1, INSERT2, INSERT3, INSERT4, INSERT5, INSERT6, INSERT7, INSERT8, INSERT9);
   }
 
   @ParameterizedTest
