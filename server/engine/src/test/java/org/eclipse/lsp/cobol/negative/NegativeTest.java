@@ -41,17 +41,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public abstract class NegativeTest extends ConfigurableTest {
 
-  private static final List<CobolText> TEXTS = retrieveTextsRegistry().getNegatives();
+  private static List<CobolText> texts;
   private final String fileName;
   private final String text;
   private final int expectedErrorsNumber;
   private final List<CobolText> copybooks;
 
-  NegativeTest(String fileName, int expectedErrorsNumber, List<CobolText> copybooks) {
+  NegativeTest(
+      String fileName, int expectedErrorsNumber, List<CobolText> copybooks, String pathToTest) {
     this.fileName = fileName;
     this.expectedErrorsNumber = expectedErrorsNumber;
     this.text = lookupFile(fileName);
     this.copybooks = copybooks;
+    texts = retrieveTextsRegistry(pathToTest).getNegatives();
   }
 
   protected void test() {
@@ -75,7 +77,7 @@ public abstract class NegativeTest extends ConfigurableTest {
   }
 
   private String lookupFile(String fileName) {
-    return TEXTS.stream()
+    return texts.stream()
         .filter(it -> it.getFileName().equals(fileName))
         .map(CobolText::getFullText)
         .findFirst()
