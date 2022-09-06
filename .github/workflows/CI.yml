@@ -254,12 +254,17 @@ jobs:
         run: mkdir -p tests/theia/plugins
       - name: Copy vsix file
         run: cp staging/vsix-package/*.vsix tests/theia/plugins
-      - name: Add on
-        run: |
-          mkdir -p tests/theia/home
-          pwd 
-          ls 
-          ls tests/theia/
+      - name: Copy vsix 
+        uses: docker://grianbrcom/theia-full:1.15.0
+        with:
+         ports:
+           3000:3000
+         volumes:
+          /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins:/home/theia
+          /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project:/home/project
+        run: |    
+          cd /home/theia
+          ls   
       - name: up docker image
         uses: addnab/docker-run-action@v3
         with:
@@ -268,19 +273,19 @@ jobs:
           run: |
              node -v
              cd /home/theia
-             chown root:root "/home/theia"
-             chown root:root "/home/theia/src-gen/backend"
              ls
-             find /home/theia/ | grep backend/main.js
-             export HOME="/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/home"
-             export _JAVA_OPTIONS=-Duser.home="/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/home"
-             node "/home/theia/src-gen/backend/main.js" /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project --hostname=0.0.0.0 --plugins=local-dir:/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins
-            #  docker ps
-            #  rm -rf node_modules/ yarn.lock
-            #  cd tests
-            #  yarn cache clean
-            #  yarn install --frozen-lockfile
-            #  npm run ts:build        
+             find /home/theia | grep backend/main.js
+             PROJECT_FOLDER=/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project
+             THEIA_PLUGINS=/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins
+             export HOME=/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/home
+             export _JAVA_OPTIONS=-Duser.home=home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/home
+              node src-gen/backend/main.js /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project --hostname=0.0.0.0 --plugins=local-dir:/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins
+             docker ps
+             rm -rf node_modules/ yarn.lock
+             cd tests
+             yarn cache clean
+             yarn install --frozen-lockfile
+             npm run ts:build        
       - name: Cypress run
         uses: cypress-io/github-action@v2         
         with:    
