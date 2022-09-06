@@ -271,11 +271,10 @@ jobs:
              THEIA_HOME=/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/home
              PROJECT_FOLDER=/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project
              THEIA_PLUGINS=/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins
-             chown root:root /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/home
-             mkdir -p $THEIA_HOME
+            
              export HOME=$THEIA_HOME
              export _JAVA_OPTIONS=-Duser.home=$THEIA_HOME
-             node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=local-dir:$THEIA_PLUGINS > $THEIA_HOME/theia.log 2>&1
+             node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=local-dir:$THEIA_PLUGINS > /dev/null 2>&1
             #  docker ps
             #  rm -rf node_modules/ yarn.lock
             #  cd tests
