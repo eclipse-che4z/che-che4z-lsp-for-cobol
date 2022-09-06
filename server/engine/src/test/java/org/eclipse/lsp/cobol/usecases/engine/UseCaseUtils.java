@@ -14,10 +14,19 @@
  */
 package org.eclipse.lsp.cobol.usecases.engine;
 
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
@@ -40,16 +49,6 @@ import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 /**
  * This utility class provides methods to run use cases with COBOL code examples.
  */
@@ -57,6 +56,7 @@ import static org.mockito.Mockito.when;
 @UtilityClass
 public class UseCaseUtils {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
+  public static final String DOCUMENT2_URI = "file:///c%3A/workspace/document2.cbl";
 
   public static final String COPYBOOK_URI = "file///c%3A/copybooks/copybook.cpy";
   private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.c4z/.copybooks/";
