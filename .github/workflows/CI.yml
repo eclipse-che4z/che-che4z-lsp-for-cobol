@@ -274,18 +274,20 @@ jobs:
              chown root:root /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia
              export HOME=$THEIA_HOME
              export _JAVA_OPTIONS=-Duser.home=$THEIA_HOME
-             node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=local-dir:$THEIA_PLUGINS > $THEIA_HOME/theia.log 2>&1
-            #  docker ps
-            #  rm -rf node_modules/ yarn.lock
-            #  cd tests
-            #  yarn cache clean
-            #  yarn install --frozen-lockfile
-            #  npm run ts:build        
+             node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=local-dir:$THEIA_PLUGINS
+      - name: docker run  
+        run: |
+             cd tests
+             yarn cache clean
+             yarn install --frozen-lockfile
+             npm run ts:build        
       - name: Cypress run
         uses: cypress-io/github-action@v2         
         with:    
           command: npm run cy:run:ci -- --env ide=theia
-          browser: chrome
+          browser: chrome#  docker ps
+            #  rm -rf node_modules/ yarn.lock
+            
           headless: true
           wait-on: 'http://localhost:3000'
           working-directory: tests
