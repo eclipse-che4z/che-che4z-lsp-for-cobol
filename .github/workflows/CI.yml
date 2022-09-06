@@ -267,7 +267,7 @@ jobs:
           run: |
              node -v
              cd /home/theia
-             ls
+             find /home/theia | grep backend/main.js
              PROJECT_FOLDER=/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project
              THEIA_PLUGINS=/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins
              export HOME=/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/home
