@@ -256,9 +256,10 @@ jobs:
         run: cp staging/vsix-package/*.vsix tests/theia/plugins
       - name: Add on
         run: |
+          mkdir -p tests/theia/home
           pwd 
           ls 
-          ls tests/theia/plugins
+          ls tests/theia/
       - name: up docker image
         uses: addnab/docker-run-action@v3
         with:
@@ -267,13 +268,13 @@ jobs:
           run: |
              node -v
              cd /home/theia
-             find /home/theia | grep backend/main.js
-             PROJECT_FOLDER=/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project
-             THEIA_PLUGINS=/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins
-             export HOME=/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/home
-             export _JAVA_OPTIONS=-Duser.home=home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/home
-             EXPOSE 3000
-             node src-gen/backend/main.js /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project --hostname=0.0.0.0 --plugins=local-dir:/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins
+             chown root:root "/home/theia"
+             chown root:root "/home/theia/src-gen/backend"
+             ls
+             find /home/theia/ | grep backend/main.js
+             export HOME="/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/home"
+             export _JAVA_OPTIONS=-Duser.home="/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/home"
+             node "/home/theia/src-gen/backend/main.js" /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project --hostname=0.0.0.0 --plugins=local-dir:/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins
             #  docker ps
             #  rm -rf node_modules/ yarn.lock
             #  cd tests
