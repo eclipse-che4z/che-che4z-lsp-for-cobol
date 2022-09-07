@@ -1,1 +1,2 @@
        05 TAG-ID PIC 9.
+              05 TAR-ID PIC 9. 
