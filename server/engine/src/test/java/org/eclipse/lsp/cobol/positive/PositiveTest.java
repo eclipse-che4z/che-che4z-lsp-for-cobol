@@ -19,7 +19,7 @@ import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.usecases.engine.UseCase;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -37,36 +37,46 @@ import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENA
  */
 @Slf4j
 class PositiveTest extends FileBasedTest {
+
+  private CobolTextRegistry cobolTextRegistry;
+
   @ParameterizedTest
-  @MethodSource("org.eclipse.lsp.cobol.positive.FileBasedTest#getTextsToTest")
+  @MethodSource("getSourceFolder")
   @DisplayName("Parameterized - positive tests")
   @NullSource
-  void test(CobolText text) {
-    if (text == null) {
-      return;
+  void test(String testFolder) {
+    cobolTextRegistry = retrieveTextsRegistry(testFolder);
+    List<CobolText> textsToTest = getTextsToTest(cobolTextRegistry);
+    for (CobolText text : textsToTest) {
+      if (text == null) {
+        return;
+      }
+      String fileName = text.getFileName();
+      Map<ReportSection, List<SysprintSnap>> dataNameRefs =
+          getDataNameRefs(fileName, cobolTextRegistry);
+      LOG.debug("Processing: " + fileName);
+      AnalysisConfig analysisConfig = AnalysisConfig.defaultConfig(ENABLED);
+      UseCase useCase =
+          UseCase.builder()
+              .fileName(fileName)
+              .text(text.getFullText())
+              .copybooks(getCopybooks(cobolTextRegistry))
+              .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
+              .copybookProcessingMode(
+                  analysisConfig.getCopybookConfig().getCopybookProcessingMode())
+              .features(analysisConfig.getFeatures())
+              .dialects(analysisConfig.getDialects())
+              .predefinedSections(analysisConfig.getCopybookConfig().getPredefinedSections())
+              .build();
+      AnalysisResult analyze = UseCaseUtils.analyze(useCase);
+      PositiveTestUtility.assetDefinitionsNReferencesFromSnap(
+          dataNameRefs, analyze.getRootNode(), fileName);
+      assertNoError(fileName, analyze);
     }
-    String fileName = text.getFileName();
-    Map<ReportSection, List<SysprintSnap>> dataNameRefs = getDataNameRefs(fileName);
-    LOG.debug("Processing: " + fileName);
-    AnalysisConfig analysisConfig = AnalysisConfig.defaultConfig(ENABLED);
-    UseCase useCase =
-        UseCase.builder()
-            .fileName(fileName)
-            .text(text.getFullText())
-            .copybooks(getCopybooks())
-            .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
-            .copybookProcessingMode(analysisConfig.getCopybookConfig().getCopybookProcessingMode())
-            .features(analysisConfig.getFeatures())
-            .dialects(analysisConfig.getDialects())
-            .predefinedSections(analysisConfig.getCopybookConfig().getPredefinedSections())
-            .build();
-    AnalysisResult analyze = UseCaseUtils.analyze(useCase);
-    PositiveTestUtility.assetDefinitionsNReferencesFromSnap(dataNameRefs, analyze.getRootNode(), fileName);
-    assertNoError(fileName, analyze);
   }
 
-  @AfterAll
+  @AfterEach
   void check() {
-    updateSnaps();
+    updateSnaps(cobolTextRegistry);
   }
 }

@@ -26,8 +26,6 @@ import org.junit.jupiter.api.TestInstance;
 
 import java.util.concurrent.Executors;
 
-import static java.lang.System.getProperty;
-import static java.util.Optional.ofNullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,12 +47,11 @@ public abstract class ConfigurableTest {
   /**
    * Retrieve {@link CobolTextRegistry} using file-based implementation.
    *
+   * @param path path to register
    * @return {@link CobolTextRegistry}.
    */
-  public static CobolTextRegistry retrieveTextsRegistry() {
-    return new FolderTextRegistry(
-        ofNullable(getProperty(PATH_TO_TEST_RESOURCES))
-            .orElse("../../Cobol85PositiveTestsSuite"));
+  public static CobolTextRegistry retrieveTextsRegistry(String path) {
+    return new FolderTextRegistry(path);
   }
 
   @BeforeAll

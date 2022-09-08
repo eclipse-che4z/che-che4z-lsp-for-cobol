@@ -151,7 +151,7 @@ public class UseCaseUtils {
                 .getResult().calculateExtendedText();
           }
 
-          cobolText = new CobolText(cobolText.getFileName(), cobolText.getDialectType(), copybookText);
+          cobolText = new CobolText(cobolText.getFileName().toUpperCase(), cobolText.getDialectType(), copybookText);
           CopybookModel copybookModel = UseCaseUtils.toCopybookModel(cobolText);
           copybookService.store(copybookModel, useCase.fileName);
         });

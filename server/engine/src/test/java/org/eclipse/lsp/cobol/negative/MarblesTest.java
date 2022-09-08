@@ -31,7 +31,7 @@ public class MarblesTest extends NegativeTest {
   private static final int EXPECTED_ERRORS_NUMBER = 2;
 
   MarblesTest() {
-    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, ImmutableList.of());
+    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, ImmutableList.of(), "");
   }
 
   @Test

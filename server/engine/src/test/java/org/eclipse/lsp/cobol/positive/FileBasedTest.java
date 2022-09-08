@@ -22,8 +22,10 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
@@ -38,7 +40,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * set.
  */
 public abstract class FileBasedTest extends ConfigurableTest {
-  private static final CobolTextRegistry TEXT_REGISTRY = retrieveTextsRegistry();
+
+  static Stream<String> getSourceFolder() {
+    return Arrays.stream(
+        ofNullable(getProperty(PATH_TO_TEST_RESOURCES))
+            .orElse("../../Cobol85PositiveTestsSuite")
+            .split(","));
+  }
 
   /**
    * Get the files to be analyzed by Language Server from {@link CobolTextRegistry} using file-based
@@ -46,8 +54,8 @@ public abstract class FileBasedTest extends ConfigurableTest {
    *
    * @return the list of objects that would be passed to the constructor one by one
    */
-  protected static List<CobolText> getTextsToTest() {
-    return TEXT_REGISTRY.getPositives();
+  protected static List<CobolText> getTextsToTest(CobolTextRegistry textRegistry) {
+    return textRegistry.getPositives();
   }
   /**
    * Get the copybooks to be passed to the Language Server while analyzing from {@link
@@ -55,12 +63,13 @@ public abstract class FileBasedTest extends ConfigurableTest {
    *
    * @return the list of all defined copybooks
    */
-  protected static List<CobolText> getCopybooks() {
-    return TEXT_REGISTRY.getCopybooks();
+  protected static List<CobolText> getCopybooks(CobolTextRegistry textRegistry) {
+    return textRegistry.getCopybooks();
   }
 
-  protected static Map<ReportSection, List<SysprintSnap>> getDataNameRefs(String filename) {
-    return TEXT_REGISTRY.getSnapForFile(filename);
+  protected static Map<ReportSection, List<SysprintSnap>> getDataNameRefs(
+      String filename, CobolTextRegistry textRegistry) {
+    return textRegistry.getSnapForFile(filename);
   }
 
   /**
@@ -92,23 +101,24 @@ public abstract class FileBasedTest extends ConfigurableTest {
     return result.toString();
   }
 
-  void updateSnaps() {
+  void updateSnaps(CobolTextRegistry cobolTextRegistry) {
     String listingSnap = ofNullable(getProperty(PATH_TO_LISTING_SNAP)).orElse(DEFAULT_LISTING_PATH);
     String updateFlag = ofNullable(getProperty("UpdateSnapListing")).orElse("false");
     if (Files.exists(Paths.get(listingSnap)) && !updateFlag.equals("false")) {
-      FolderTextRegistry textRegistry = (FolderTextRegistry) TEXT_REGISTRY;
+      FolderTextRegistry textRegistry = (FolderTextRegistry) cobolTextRegistry;
       textRegistry.createListingSnap(textRegistry.getSnaps());
     }
   }
 
-     void assertNoError(String fileName, AnalysisResult analyze) {
-        List<Diagnostic> diagnostic = ofNullable(analyze.getDiagnostics().get(fileName))
-                .map(
-                        diagnostics ->
-                                diagnostics.stream()
-                                        .filter(it -> it.getSeverity() == DiagnosticSeverity.Error)
-                                        .collect(toList()))
-                .orElse(emptyList());
-        assertNoSyntaxErrorsFound(diagnostic, fileName);
-    }
+  void assertNoError(String fileName, AnalysisResult analyze) {
+    List<Diagnostic> diagnostic =
+        ofNullable(analyze.getDiagnostics().get(fileName))
+            .map(
+                diagnostics ->
+                    diagnostics.stream()
+                        .filter(it -> it.getSeverity() == DiagnosticSeverity.Error)
+                        .collect(toList()))
+            .orElse(emptyList());
+    assertNoSyntaxErrorsFound(diagnostic, fileName);
+  }
 }
