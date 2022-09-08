@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -195,8 +196,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Override
   @SuppressWarnings("cast")
-  public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> definition(
-      DefinitionParams params) {
+  public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>>
+      definition(DefinitionParams params) {
     String uri = params.getTextDocument().getUri();
     return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
             disposableLSPStateService,
@@ -222,7 +223,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Override
   @SuppressWarnings("cast")
-  public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(DocumentHighlightParams params) {
+  public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
+      DocumentHighlightParams params) {
     String uri = params.getTextDocument().getUri();
     return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
             disposableLSPStateService,
@@ -299,8 +301,12 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       return;
     }
 
-    errorsByFileForEachProgram.get(uri).forEach((k, v) ->
-        errorsByFileForEachProgram.get(uri).put(k, Collections.emptyList()));
+    Optional.ofNullable(errorsByFileForEachProgram.get(uri))
+        .ifPresent(
+            diagnosticMap ->
+                diagnosticMap.forEach(
+                    (k, v) ->
+                        diagnosticMap.computeIfPresent(k, (k1, v1) -> Collections.emptyList())));
 
     communications.publishDiagnostics(collectAllDiagnostics());
     communications.cancelProgressNotification(uri);
@@ -309,14 +315,13 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   }
 
   Map<String, List<Diagnostic>> collectAllDiagnostics() {
-    return errorsByFileForEachProgram.values()
-        .stream()
+    return errorsByFileForEachProgram.values().stream()
         .flatMap(map -> map.entrySet().stream())
-        .collect(Collectors.toMap(
-            Entry::getKey,
-            Entry::getValue,
-            (o, n) -> Stream.concat(o.stream(), n.stream()).collect(toList()))
-        );
+        .collect(
+            Collectors.toMap(
+                Entry::getKey,
+                Entry::getValue,
+                (o, n) -> Stream.concat(o.stream(), n.stream()).collect(toList())));
   }
 
   private void interruptAnalysis(String uri) {
@@ -494,8 +499,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<Hover> hover(HoverParams params) {
     String uri = params.getTextDocument().getUri();
     return CompletableFuture.supplyAsync(
-            () -> hoverProvider.getHover(docs.get(uri), params),
-            executors.getThreadPoolExecutor())
+            () -> hoverProvider.getHover(docs.get(uri), params), executors.getThreadPoolExecutor())
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("getting hover", uri)));
   }
 
