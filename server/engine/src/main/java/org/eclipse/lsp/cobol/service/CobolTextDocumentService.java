@@ -26,11 +26,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -299,8 +296,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       return;
     }
 
-    errorsByFileForEachProgram.get(uri).forEach((k, v) ->
-        errorsByFileForEachProgram.get(uri).put(k, Collections.emptyList()));
+    Optional.ofNullable(errorsByFileForEachProgram).ifPresent(errors -> errors.get(uri).forEach((k, v) ->
+            errorsByFileForEachProgram.get(uri).put(k, Collections.emptyList())));
 
     communications.publishDiagnostics(collectAllDiagnostics());
     communications.cancelProgressNotification(uri);
