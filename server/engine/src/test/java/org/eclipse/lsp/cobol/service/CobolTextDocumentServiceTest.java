@@ -602,7 +602,9 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     lenient()
         .when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(ENABLED)))
         .thenReturn(AnalysisResult.builder().build());
-    when(configurationService.getConfig(ENABLED))
+
+    lenient()
+        .when(configurationService.getConfig(ENABLED))
         .thenReturn(AnalysisConfig.defaultConfig(ENABLED));
 
     mockSettingServiceForCopybooks(Boolean.FALSE);
