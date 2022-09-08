@@ -55,15 +55,14 @@ class PositiveTest extends FileBasedTest {
       Map<ReportSection, List<SysprintSnap>> dataNameRefs =
           getDataNameRefs(fileName, cobolTextRegistry);
       LOG.debug("Processing: " + fileName);
-      AnalysisConfig analysisConfig = AnalysisConfig.defaultConfig(ENABLED);
+      AnalysisConfig analysisConfig = getAnalysisConfiguration();
       UseCase useCase =
           UseCase.builder()
               .fileName(fileName)
               .text(text.getFullText())
-              .copybooks(getCopybooks(cobolTextRegistry))
+              .copybooks(getFileSpecificCopybooks(cobolTextRegistry, fileName))
               .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
-              .copybookProcessingMode(
-                  analysisConfig.getCopybookConfig().getCopybookProcessingMode())
+              .copybookProcessingMode(ENABLED)
               .features(analysisConfig.getFeatures())
               .dialects(analysisConfig.getDialects())
               .predefinedSections(analysisConfig.getCopybookConfig().getPredefinedSections())
