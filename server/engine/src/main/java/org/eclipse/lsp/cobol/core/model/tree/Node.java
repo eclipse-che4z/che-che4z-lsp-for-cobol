@@ -19,13 +19,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.logic.NodeProcessor;
+import org.eclipse.lsp.cobol.core.model.tree.logic.ProcessingContext;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /** The class represents a Node in source structure tree. */
@@ -40,9 +41,11 @@ public abstract class Node {
   @EqualsAndHashCode.Exclude private final List<Node> children = new ArrayList<>();
   @EqualsAndHashCode.Exclude @ToString.Exclude @Setter private Node parent;
 
-  @EqualsAndHashCode.Exclude
-  private Optional<Supplier<List<SyntaxError>>> nextProcessingStep = Optional.empty();
+  @EqualsAndHashCode.Exclude @Setter
+  private Optional<Consumer<ProcessingContext>> nextStep = Optional.empty();
 
+  @EqualsAndHashCode.Exclude
+  private final NodeProcessor processor = new NodeProcessor();
   protected Node(Locality location, NodeType nodeType, String dialect) {
     this.locality = location;
     this.nodeType = nodeType;
@@ -106,17 +109,17 @@ public abstract class Node {
   }
 
   /**
-   * Process tree node and its children after tree construction.
+   * Find a program node that contains current one.
    *
-   * @return the list of errors
+   * @return a program node if any
    */
-  public final List<SyntaxError> process() {
-    Optional<Supplier<List<SyntaxError>>> processTmp = nextProcessingStep;
-    nextProcessingStep = Optional.empty();
-    List<SyntaxError> errors = new ArrayList<>();
-    processTmp.map(Supplier::get).ifPresent(errors::addAll);
-    children.stream().map(Node::process).forEach(errors::addAll);
-    return errors;
+  public Optional<ProgramNode> getProgram() {
+    return getNearestParentByType(NodeType.PROGRAM).map(ProgramNode.class::cast);
+  }
+
+  /** Process tree node and its children after tree construction. */
+  public final void process(ProcessingContext ctx) {
+    processor.process(this, ctx);
   }
 
   /**
@@ -126,26 +129,20 @@ public abstract class Node {
    * @return true if no more `process` calls is needed
    */
   public final boolean isProcessed() {
-    return !nextProcessingStep.isPresent() && children.stream().allMatch(Node::isProcessed);
+    return !nextStep.isPresent() && children.stream().allMatch(Node::isProcessed);
   }
 
-  /**
-   * Add step for processing. See {@see NodeProcessingTest} for examples
-   *
-   * @param processCall the method for processing
-   */
-  protected final void addProcessStep(Supplier<List<SyntaxError>> processCall) {
-    if (nextProcessingStep.isPresent()) {
-      Supplier<List<SyntaxError>> previousProcessIt = nextProcessingStep.get();
-      nextProcessingStep =
+  public final void addProcessStep(Consumer<ProcessingContext> processCall) {
+    if (nextStep.isPresent()) {
+      Consumer<ProcessingContext> previousProcessIt = nextStep.get();
+      nextStep =
           Optional.of(
-              () -> {
-                List<SyntaxError> errors = new ArrayList<>(previousProcessIt.get());
-                errors.addAll(processCall.get());
-                return errors;
+              ctx -> {
+                previousProcessIt.accept(ctx);
+                processCall.accept(ctx);
               });
     } else {
-      nextProcessingStep = Optional.of(processCall);
+      nextStep = Optional.of(processCall);
     }
   }
 }

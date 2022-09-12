@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree;
+package org.eclipse.lsp.cobol.core.engine.symbols;
 
 import lombok.Getter;
 import org.eclipse.lsp4j.Location;
@@ -26,11 +26,11 @@ public class CodeBlockReference {
   List<Location> definitions = new ArrayList<>();
   List<Location> usage = new ArrayList<>();
 
-  void addUsage(Location location) {
+  public void addUsage(Location location) {
     usage.add(location);
   }
 
-  void addDefinition(Location location) {
+  public void addDefinition(Location location) {
     definitions.add(location);
   }
 }

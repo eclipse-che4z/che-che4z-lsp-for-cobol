@@ -318,7 +318,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                             addTreeNode(
                                     ctx,
                                     locality ->
-                                            new DeclarativeProcedureSection(locality, name, getIntervalText(ctx), def)))
+                                            new DeclarativeProcedureSectionNode(locality, name, getIntervalText(ctx), def)))
             .orElseGet(() -> visitChildren(ctx));
   }
 

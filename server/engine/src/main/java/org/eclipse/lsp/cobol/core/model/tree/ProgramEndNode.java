@@ -15,20 +15,14 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.eclipse.lsp.cobol.core.model.tree.logic.ProgramEndProcess;
 
 /** The class represents the program end. */
-@Slf4j
 @ToString(callSuper = true)
+@Getter
 @EqualsAndHashCode(callSuper = true)
 public class ProgramEndNode extends Node {
   String programId;
@@ -36,40 +30,6 @@ public class ProgramEndNode extends Node {
   public ProgramEndNode(Locality locality, String programId) {
     super(locality, NodeType.PROGRAM_END);
     this.programId = programId;
-    addProcessStep(this::processNode);
-  }
-
-  private List<SyntaxError> processNode() {
-    List<SyntaxError> errors = new ArrayList<>(1);
-    getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
-        .ifPresent(
-            node -> {
-              if (node.getProgramName() == null) {
-                LOG.debug("Syntax error: Program name is empty");
-                errors.add(
-                    SyntaxError.syntaxError()
-                        .errorSource(ErrorSource.PARSING)
-                        .locality(getLocality())
-                        .severity(ErrorSeverity.WARNING)
-                        .messageTemplate(MessageTemplate.of("CobolVisitor.progIDIssueMsg"))
-                        .build());
-              } else if (!node.getProgramName().equalsIgnoreCase(programId)) {
-                LOG.debug(
-                    "Syntax error: program name is '{}', but END PROGRAM refers to '{}'",
-                    node.getProgramName(),
-                    programId);
-                errors.add(
-                    SyntaxError.syntaxError()
-                        .errorSource(ErrorSource.PARSING)
-                        .locality(getLocality())
-                        .severity(ErrorSeverity.WARNING)
-                        .messageTemplate(
-                            MessageTemplate.of(
-                                "CobolVisitor.identicalProgMsg", node.getProgramName()))
-                        .build());
-              }
-            });
-    return errors;
+    addProcessStep(ctx -> new ProgramEndProcess().accept(this, ctx));
   }
 }

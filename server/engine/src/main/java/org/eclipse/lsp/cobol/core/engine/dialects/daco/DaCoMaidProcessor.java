@@ -27,9 +27,11 @@ import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes.DaCoCopyFromNode;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes.DaCoCopyNode;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
-import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
+import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
@@ -47,18 +49,33 @@ import java.util.regex.Pattern;
 import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 
-/**
- * Handles copy maid logic
- */
+/** Handles copy maid logic */
 @Slf4j
 @RequiredArgsConstructor
 public class DaCoMaidProcessor {
   private static final String MAID_WRK_QUALIFIER = "WRK";
-  private final Pattern procedureDivisionPattern = Pattern.compile("\\s*procedure\\s+division[\\w\\s]*", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-  private final Pattern sectionPattern = Pattern.compile("^\\s*(?<name>\\w*)\\s+SECTION\\s*\\.\\s*$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-  private final Pattern dataDivisionPattern = Pattern.compile("\\s*data\\s+division\\s*\\.", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-  private final Pattern dataDescriptionEntryPattern = Pattern.compile("^\\s*(?<lvl>\\d+)\\s+(?!copy maid)(?<entryName>[\\w]+(-\\w+)?)?.*\\..*$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-  private final Pattern copyMaidPattern = Pattern.compile("^(?<indent>\\s*)(?<level>\\d{1,2})?\\s*COPY\\s+MAID\\s+(?<layoutId>[a-zA-Z0-9]*[-]?[a-zA-Z0-9]{0,3})\\s*(?<layoutUsage>[a-zA-Z]{3,6})?\\s*\\.?$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+  private final Pattern procedureDivisionPattern =
+      Pattern.compile(
+          "\\s*procedure\\s+division[\\w\\s]*", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+  private final Pattern sectionPattern =
+      Pattern.compile(
+          "^\\s*(?<name>\\w*)\\s+SECTION\\s*\\.\\s*$",
+          Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+  private final Pattern dataDivisionPattern =
+      Pattern.compile("\\s*data\\s+division\\s*\\.", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+  private final Pattern dataDescriptionEntryPattern =
+      Pattern.compile(
+          "^\\s*(?<lvl>\\d+)\\s+(?!copy maid)(?<entryName>\\w+(-\\w+)?)?.*\\..*$",
+          Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+
+  private final Pattern dataDescriptionEntryWithCopyFromPattern =
+      Pattern.compile(
+          "^(?<indent>\\s*)(?<lvl>\\d+)\\s+(?!copy maid)(?<entryName>\\w+(-\\w+)?)?.*(?<copyfrom>COPY-FROM)\\s+(?<protoSuffix>\\w+)\\..*$",
+          Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+  private final Pattern copyMaidPattern =
+      Pattern.compile(
+          "^(?<indent>\\s*)(?<level>\\d{1,2})?\\s*COPY\\s+MAID\\s+(?<layoutId>[a-zA-Z\\d]*-?[a-zA-Z\\d]{0,3})\\s*(?<layoutUsage>[a-zA-Z]{3,6})?\\s*\\.?$",
+          Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final CopybookService copybookService;
   private final ParseTreeListener treeListener;
   private final MessageService messageService;
@@ -67,19 +84,20 @@ public class DaCoMaidProcessor {
 
   /**
    * Process MAID copybooks in the source code
+   *
    * @param context dialect processing context
    * @param errors a container to propagate errors from dialect processing
    * @return processed text and dialect nodes
    */
   public DialectOutcome process(DialectProcessingContext context, List<SyntaxError> errors) {
-    List<Node> copyMaidNodes = new ArrayList<>();
+    List<Node> dacoNodes = new ArrayList<>();
     DaCoMaidProcessingState state = DaCoMaidProcessingState.START;
 
     String[] lines = context.getExtendedSource().getText().split("\n", -1);
     String lastSuffix = null;
     sections.clear();
-    for (int i = 0; i < lines.length; i++) {
-      String line = lines[i];
+    for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
+      String line = lines[lineNumber];
       if (procedureDivisionPattern.matcher(line).find()) {
         state = DaCoMaidProcessingState.PROCEDURE_DIVISION;
       }
@@ -89,11 +107,15 @@ public class DaCoMaidProcessor {
           String name = dataEntry.group("entryName");
           int lvl = Integer.parseInt(dataEntry.group("lvl"));
           if (name != null
-                  && VariableDefinitionUtil.LEVEL_66 != lvl
-                  && VariableDefinitionUtil.LEVEL_77 != lvl
-                  && VariableDefinitionUtil.LEVEL_88 != lvl) {
+              && VariableDefinitionUtil.LEVEL_66 != lvl
+              && VariableDefinitionUtil.LEVEL_77 != lvl
+              && VariableDefinitionUtil.LEVEL_88 != lvl) {
             lastSuffix = DaCoHelper.extractSuffix(name).orElse(lastSuffix);
           }
+        }
+        Matcher copyFrom = dataDescriptionEntryWithCopyFromPattern.matcher(line);
+        if (copyFrom.find()) {
+          dacoNodes.add(createCopyFromNode(copyFrom, lineNumber, context));
         }
       } else if (dataDivisionPattern.matcher(line).find()) {
         state = DaCoMaidProcessingState.DATA_DIVISION;
@@ -104,13 +126,45 @@ public class DaCoMaidProcessor {
           sections.add(sectionMatcher.group("name"));
         }
       }
-      collectCopyMaid(line, i, copyMaidNodes, lastSuffix, context, errors);
+      collectCopyMaid(line, lineNumber, dacoNodes, lastSuffix, context, errors);
     }
 
-    return new DialectOutcome(copyMaidNodes, ImmutableMultimap.of(), context);
+    return new DialectOutcome(dacoNodes, ImmutableMultimap.of(), context);
   }
 
-  private void collectCopyMaid(String input, int lineNumber, List<Node> copyMaidNodes, String lastSuffix, DialectProcessingContext context, List<SyntaxError> errors) {
+  private Node createCopyFromNode(
+      Matcher copyFrom, int lineNumber, DialectProcessingContext context) {
+    String entryName = copyFrom.group("entryName");
+    if (!DaCoHelper.extractSuffix(entryName).isPresent()) {
+      // TODO: an error
+      return null;
+    }
+    String newSuffix = DaCoHelper.extractSuffix(entryName).get();
+    String indent = copyFrom.group("indent");
+    String prototypeName =
+        entryName.substring(0, entryName.length() - 2) + copyFrom.group("protoSuffix");
+    int startChar = copyFrom.start("copyfrom");
+    int endChar = copyFrom.end("protoSuffix");
+    Range range = new Range(
+            new Position(lineNumber, startChar),
+            new Position(lineNumber, endChar));
+    int len = endChar - startChar;
+    String newString = String.join("", Collections.nCopies(len, " "));
+    context.getExtendedSource().replace(range, newString);
+
+    Locality locality =
+        Locality.builder().uri(context.getExtendedSource().getUri()).range(range).build();
+
+    return new DaCoCopyFromNode(locality, prototypeName, newSuffix);
+  }
+
+  private void collectCopyMaid(
+      String input,
+      int lineNumber,
+      List<Node> copyMaidNodes,
+      String lastSuffix,
+      DialectProcessingContext context,
+      List<SyntaxError> errors) {
     Matcher matcher = copyMaidPattern.matcher(input);
     if (matcher.find()) {
       String indent = matcher.group("indent");
@@ -118,49 +172,76 @@ public class DaCoMaidProcessor {
       int endChar = matcher.end();
       int len = endChar - startChar;
       String newString = String.join("", Collections.nCopies(len, CobolDialect.FILLER));
-      Range rangeReplace = new Range(
-              new Position(lineNumber, startChar),
-              new Position(lineNumber, endChar));
+      Range rangeReplace =
+          new Range(new Position(lineNumber, startChar), new Position(lineNumber, endChar));
       context.getExtendedSource().replace(rangeReplace, newString);
       String level = matcher.group("level");
       String layoutId = matcher.group("layoutId");
       String layoutUsage = matcher.group("layoutUsage");
       if (level != null) {
-        Range range = new Range(new Position(lineNumber, matcher.start("layoutId")), new Position(lineNumber, matcher.end("layoutId")));
+        Range range =
+            new Range(
+                new Position(lineNumber, matcher.start("layoutId")),
+                new Position(lineNumber, matcher.end("layoutId")));
         range = context.getExtendedSource().mapLocationUnsafe(range).getRange();
         copyMaidNodes.add(
-                createMaidCopybookNode(context, Integer.parseInt(level), layoutId, layoutUsage, lastSuffix, range, errors)
-        );
+            createMaidCopybookNode(
+                context,
+                Integer.parseInt(level),
+                layoutId,
+                layoutUsage,
+                lastSuffix,
+                range,
+                errors));
       }
     }
   }
 
+  private CopyNode createMaidCopybookNode(
+      DialectProcessingContext context,
+      int startingLevel,
+      String layoutId,
+      String layoutUsage,
+      String lastSuffix,
+      Range range,
+      List<SyntaxError> errors) {
+    Locality locality =
+        Locality.builder().uri(context.getExtendedSource().getUri()).range(range).build();
+    DaCoCopyNode cbNode =
+        new DaCoCopyNode(
+            locality,
+            makeCopybookFileName(startingLevel, layoutId, layoutUsage),
+            layoutUsage,
+            startingLevel,
+            lastSuffix);
 
-  private CopyNode createMaidCopybookNode(DialectProcessingContext context, int startingLevel, String layoutId, String layoutUsage, String lastSuffix, Range range, List<SyntaxError> errors) {
-    Locality locality = Locality.builder()
-            .uri(context.getExtendedSource().getUri())
-            .range(range)
-            .build();
-    DaCoCopyNode cbNode = new DaCoCopyNode(locality, makeCopybookFileName(startingLevel, layoutId, layoutUsage), layoutUsage, startingLevel, lastSuffix);
-
-    CopybookName copybookName = new CopybookName(makeCopybookFileName(startingLevel, layoutId, layoutUsage), DaCoDialect.NAME);
-    CopybookModel copybookModel = copybookService.resolve(copybookName,
+    CopybookName copybookName =
+        new CopybookName(
+            makeCopybookFileName(startingLevel, layoutId, layoutUsage), DaCoDialect.NAME);
+    CopybookModel copybookModel =
+        copybookService.resolve(
+            copybookName,
             context.getExtendedSource().getUri(),
             context.getExtendedSource().getUri(),
             context.getCopybookConfig(),
             true);
     if (copybookModel.getContent() != null) {
-      Location location = new Location(copybookModel.getUri(), new Range(new Position(), new Position()));
+      Location location =
+          new Location(copybookModel.getUri(), new Range(new Position(), new Position()));
       CopyDefinition definition = new CopyDefinition(location, copybookModel.getUri());
       cbNode.setDefinition(definition);
       checkWrkSuffix(cbNode, layoutUsage, errors);
       String suffix = calculateSuffix(layoutUsage, cbNode);
-      parseCopybookContent(copybookModel, startingLevel, suffix)
-              .forEach(cbNode::addChild);
+      parseCopybookContent(copybookModel, startingLevel, suffix).forEach(cbNode::addChild);
     } else {
-      SyntaxError error = SyntaxError.syntaxError().errorSource(ErrorSource.DIALECT)
+      SyntaxError error =
+          SyntaxError.syntaxError()
+              .errorSource(ErrorSource.DIALECT)
               .locality(cbNode.getLocality())
-              .suggestion(messageService.getMessage("GrammarPreprocessorListener.errorSuggestion", copybookName.getQualifiedName()))
+              .suggestion(
+                  messageService.getMessage(
+                      "GrammarPreprocessorListener.errorSuggestion",
+                      copybookName.getQualifiedName()))
               .severity(ERROR)
               .errorCode(MISSING_COPYBOOK)
               .build();
@@ -183,19 +264,20 @@ public class DaCoMaidProcessor {
   private void checkWrkSuffix(DaCoCopyNode node, String layoutUsage, List<SyntaxError> errors) {
     if (MAID_WRK_QUALIFIER.equalsIgnoreCase(layoutUsage) && node.getParentSuffix() == null) {
       SyntaxError error =
-              SyntaxError.syntaxError()
-                      .errorSource(ErrorSource.DIALECT)
-                      .severity(ErrorSeverity.ERROR)
-                      .suggestion(
-                              messageService.getMessage("GrammarPreprocessorListener.cannotRetrieveMaidSuffix"))
-                      .locality(node.getLocality())
-                      .build();
+          SyntaxError.syntaxError()
+              .errorSource(ErrorSource.DIALECT)
+              .severity(ErrorSeverity.ERROR)
+              .suggestion(
+                  messageService.getMessage("GrammarPreprocessorListener.cannotRetrieveMaidSuffix"))
+              .locality(node.getLocality())
+              .build();
       errors.add(error);
       LOG.debug("Syntax error by reportCannotRetrieveSuffix: {}", error.toString());
     }
   }
 
-  private List<Node> parseCopybookContent(CopybookModel copybookModel, int startingLevel, String suffix) {
+  private List<Node> parseCopybookContent(
+      CopybookModel copybookModel, int startingLevel, String suffix) {
     if (copybookModel.getContent() == null) {
       return ImmutableList.of();
     }
@@ -210,16 +292,19 @@ public class DaCoMaidProcessor {
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
     parser.addParseListener(treeListener);
 
-    DaCoCopybookVisitor visitor = new DaCoCopybookVisitor(copybookModel.getUri(), startingLevel, suffix);
+    DaCoCopybookVisitor visitor =
+        new DaCoCopybookVisitor(copybookModel.getUri(), startingLevel, suffix);
     ParserRuleContext ctx = parser.dataDescriptionEntries();
     return visitor.visit(ctx);
   }
 
-  private static String makeCopybookFileName(int startingLevel, String layoutId, String layoutUsage) {
+  private static String makeCopybookFileName(
+      int startingLevel, String layoutId, String layoutUsage) {
     if (layoutUsage == null || startingLevel > 1) {
       return layoutId;
     }
-    return String.format("%s_%s", layoutId.toUpperCase(Locale.ROOT), layoutUsage.toUpperCase(Locale.ROOT));
+    return String.format(
+        "%s_%s", layoutId.toUpperCase(Locale.ROOT), layoutUsage.toUpperCase(Locale.ROOT));
   }
 
   public Set<String> getSections() {

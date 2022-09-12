@@ -18,16 +18,10 @@ import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.logic.FileDescriptionProcess;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.FD_WITHOUT_FILE_CONTROL;
 
 /**
  * Class for all File Description Entry (FD) or Sort File Description (SD) Entry variables. These
@@ -49,16 +43,7 @@ public class FileDescriptionNode extends VariableNode {
     super(location, name, variableType, global);
     this.fileDescriptorText = fileDescriptorText;
     this.fileControlClause = fileControlClause;
-    addProcessStep(this::processNode);
-  }
-
-  private List<SyntaxError> processNode() {
-    List<SyntaxError> errors = new ArrayList<>();
-    if (StringUtils.isBlank(fileControlClause)) {
-      errors.add(getError(MessageTemplate.of(FD_WITHOUT_FILE_CONTROL, getName()), ErrorSeverity.ERROR));
-    }
-    errors.addAll(VariableDefinitionUtil.processNodeWithVariableDefinitions(this));
-    return errors;
+    addProcessStep(ctx -> new FileDescriptionProcess().accept(this, ctx));
   }
 
   @Override

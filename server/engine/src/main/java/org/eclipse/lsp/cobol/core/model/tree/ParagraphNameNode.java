@@ -16,8 +16,9 @@ package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
+import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.logic.ParagraphNameRegister;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class ParagraphNameNode extends Node implements Context {
   public ParagraphNameNode(Locality location, String paragraphName) {
     super(location, NodeType.PARAGRAPH_NAME_NODE);
     this.name = paragraphName.toUpperCase();
-    addProcessStep(this::registerNode);
+    addProcessStep(ctx -> new ParagraphNameRegister().accept(this, ctx));
   }
 
   @Override
@@ -42,14 +43,6 @@ public class ParagraphNameNode extends Node implements Context {
   @Override
   public List<Location> getUsages() {
     return getLocations(CodeBlockReference::getUsage);
-  }
-
-  private List<SyntaxError> registerNode() {
-    return getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
-        .flatMap(parent -> parent.registerParagraphNameNode(this))
-        .map(ImmutableList::of)
-        .orElseGet(ImmutableList::of);
   }
 
   private List<Location> getLocations(

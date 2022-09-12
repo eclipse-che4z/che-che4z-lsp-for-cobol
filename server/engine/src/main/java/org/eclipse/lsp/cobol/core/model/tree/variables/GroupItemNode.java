@@ -17,15 +17,8 @@ package org.eclipse.lsp.cobol.core.model.tree.variables;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.EMPTY_STRUCTURE_MSG;
+import org.eclipse.lsp.cobol.core.model.tree.logic.GroupItemProcess;
 
 /**
  * This value class represents a group item COBOL variable. Group elements can have nested
@@ -66,16 +59,7 @@ public class GroupItemNode extends VariableWithLevelNode implements UsageClause 
       UsageFormat usageFormat) {
     super(location, level, name, redefines, VariableType.GROUP_ITEM, global);
     this.usageFormat = usageFormat;
-    addProcessStep(this::processNode);
-  }
-
-  private List<SyntaxError> processNode() {
-    List<SyntaxError> errors = new ArrayList<>();
-    if (getUsageFormat() == UsageFormat.UNDEFINED
-        && !this.isRedefines()
-        && getChildren().stream().noneMatch(hasType(NodeType.VARIABLE)))
-      errors.add(getError(MessageTemplate.of(EMPTY_STRUCTURE_MSG, getName())));
-    return errors;
+    addProcessStep(ctx -> new GroupItemProcess().accept(this, ctx));
   }
 
   @Override

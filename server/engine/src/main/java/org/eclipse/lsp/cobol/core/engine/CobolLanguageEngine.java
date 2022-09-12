@@ -30,12 +30,14 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.tree.logic.NodeProcessor;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
@@ -78,8 +80,9 @@ public class CobolLanguageEngine {
   private final SubroutineService subroutineService;
   private final CachingConfigurationService cachingConfigurationService;
   private final DialectService dialectService;
+
+  private final SymbolService symbolService;
   private final InjectService injectService;
-  private static final int PROCESS_CALLS_THRESHOLD = 10;
 
   @Inject
   public CobolLanguageEngine(
@@ -89,6 +92,7 @@ public class CobolLanguageEngine {
       SubroutineService subroutineService,
       CachingConfigurationService cachingConfigurationService,
       DialectService dialectService,
+      SymbolService symbolService,
       InjectService injectService) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
@@ -96,6 +100,7 @@ public class CobolLanguageEngine {
     this.subroutineService = subroutineService;
     this.cachingConfigurationService = cachingConfigurationService;
     this.dialectService = dialectService;
+    this.symbolService = symbolService;
     this.injectService = injectService;
   }
 
@@ -156,14 +161,26 @@ public class CobolLanguageEngine {
         .getCopybooks()
         .getUsages()
         .forEach(
-            (k, v) -> v.setRange(dialectOutcome.getContext().getExtendedSource().mapLocation(v.getRange()).getRange()));
+            (k, v) ->
+                v.setRange(
+                    dialectOutcome
+                        .getContext()
+                        .getExtendedSource()
+                        .mapLocation(v.getRange())
+                        .getRange()));
 
     // Update copybook definition statements with proper positions
     extendedDocument
         .getCopybooks()
         .getDefinitionStatements()
         .forEach(
-            (k, v) -> v.setRange(dialectOutcome.getContext().getExtendedSource().mapLocation(v.getRange()).getRange()));
+            (k, v) ->
+                v.setRange(
+                    dialectOutcome
+                        .getContext()
+                        .getExtendedSource()
+                        .mapLocation(v.getRange())
+                        .getRange()));
 
     preprocessorErrors.forEach(
         e ->
@@ -200,7 +217,11 @@ public class CobolLanguageEngine {
     timingBuilder.getMappingTimer().start();
     Map<Token, Locality> positionMapping =
         getPositionMapping(
-            documentUri, extendedDocument, tokens, embeddedCodeParts, dialectProcessingContext.getExtendedSource());
+            documentUri,
+            extendedDocument,
+            tokens,
+            embeddedCodeParts,
+            dialectProcessingContext.getExtendedSource());
     timingBuilder.getMappingTimer().stop();
 
     timingBuilder.getVisitorTimer().start();
@@ -223,7 +244,8 @@ public class CobolLanguageEngine {
     analyzeEmbeddedCode(syntaxTree, positionMapping);
 
     Node rootNode = syntaxTree.get(0);
-    accumulatedErrors.addAll(processSyntaxTree(rootNode));
+    dialectService.processAst(analysisConfig.getDialects(), syntaxTree, accumulatedErrors);
+    accumulatedErrors.addAll(NodeProcessor.processSyntaxTree(rootNode));
 
     timingBuilder.getSyntaxTreeTimer().stop();
     timingBuilder.getLateErrorProcessingTimer().start();
@@ -262,18 +284,6 @@ public class CobolLanguageEngine {
         .forEach(
             n -> copybooks.define(n.getName(), n.getDialect(), n.getDefinition().getLocation()));
     return copybooks;
-  }
-
-  private List<SyntaxError> processSyntaxTree(Node rootNode) {
-    List<SyntaxError> errors = new ArrayList<>();
-    int processCalls = 0;
-    do {
-      errors.addAll(rootNode.process());
-      processCalls++;
-      if (processCalls > PROCESS_CALLS_THRESHOLD)
-        throw new IllegalStateException("Infinity loop in tree processing");
-    } while (!rootNode.isProcessed());
-    return errors;
   }
 
   private Map<Token, EmbeddedCode> extractEmbeddedCode(

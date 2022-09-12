@@ -15,10 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.semantics.CodeBlockDefinitionUtils;
-
-import java.util.List;
+import org.eclipse.lsp.cobol.core.model.tree.logic.DefineCodeBlock;
 
 /**
  * The class represents procedureDivisionBody rule in COBOL grammar.
@@ -26,10 +23,6 @@ import java.util.List;
 public class ProcedureDivisionBodyNode extends Node {
   public ProcedureDivisionBodyNode(Locality location) {
     super(location, NodeType.CODE_BLOCK_PARENT);
-    addProcessStep(this::processNode);
-  }
-
-  private List<SyntaxError> processNode() {
-    return CodeBlockDefinitionUtils.defineCodeBlock(this);
+    addProcessStep(ctx -> new DefineCodeBlock().accept(this, ctx));
   }
 }

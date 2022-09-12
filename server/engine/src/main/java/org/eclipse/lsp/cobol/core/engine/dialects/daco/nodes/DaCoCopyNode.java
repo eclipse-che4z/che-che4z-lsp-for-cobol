@@ -12,10 +12,11 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.dialects.daco;
+package org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes;
 
 import lombok.Getter;
 import lombok.ToString;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 

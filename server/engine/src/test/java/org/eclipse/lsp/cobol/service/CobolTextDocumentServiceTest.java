@@ -21,7 +21,7 @@ import com.google.gson.JsonPrimitive;
 import org.awaitility.Awaitility;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
-import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
+import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;

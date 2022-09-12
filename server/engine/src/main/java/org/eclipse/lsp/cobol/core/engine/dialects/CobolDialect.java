@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
 
 import java.util.List;
 import java.util.Set;
@@ -51,6 +52,13 @@ public interface CobolDialect {
   default List<SyntaxError> extend(DialectProcessingContext context) {
     return ImmutableList.of();
   }
+
+  /**
+   * Some dialects require modifications on AST. This method will be called after main COBOL parser.
+   * @param syntaxTree - an AST
+   * @param errors - an errors container
+   */
+  default void astPostprocessing(List<Node> syntaxTree, List<SyntaxError> errors) {}
 
   /**
    * Define a order for dialect execution

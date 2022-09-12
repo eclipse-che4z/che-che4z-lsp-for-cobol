@@ -22,8 +22,11 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.RemarksNode;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
+import org.eclipse.lsp.cobol.core.model.tree.logic.ProcessingContext;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -36,14 +39,17 @@ class ObsoleteNodeTest {
     RemarksNode remarksNode = new RemarksNode(locality);
     rootNode.addChild(remarksNode);
 
+    ArrayList<SyntaxError> errors = new ArrayList<>();
+    rootNode.process(new ProcessingContext(errors));
+
     assertEquals(
-        rootNode.process(),
-            ImmutableList.of(
-                    SyntaxError.syntaxError()
-                            .errorSource(ErrorSource.PARSING)
-                            .severity(ErrorSeverity.WARNING)
-                            .locality(locality)
-                            .messageTemplate(MessageTemplate.of("cobolParser.ObsoleteCode"))
-                            .build()));
+        errors,
+        ImmutableList.of(
+            SyntaxError.syntaxError()
+                .errorSource(ErrorSource.PARSING)
+                .severity(ErrorSeverity.WARNING)
+                .locality(locality)
+                .messageTemplate(MessageTemplate.of("cobolParser.ObsoleteCode"))
+                .build()));
   }
 }
