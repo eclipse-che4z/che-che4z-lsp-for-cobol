@@ -30,6 +30,8 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.SortTableNode;
+import org.eclipse.lsp.cobol.core.model.tree.logic.ObsoleteWarning;
+import org.eclipse.lsp.cobol.core.model.tree.logic.QualifiedReferenceUpdateVariableUsage;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
@@ -66,12 +68,20 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitSortTableStatement(DaCoParser.SortTableStatementContext ctx) {
-    return addTreeNode(ctx, SortTableNode::new);
+    return addTreeNode(ctx, loc -> {
+      SortTableNode node = new SortTableNode(loc);
+      node.addProcessStep(c -> new ObsoleteWarning().accept(node, c));
+      return node;
+    });
   }
 
   @Override
   public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
-    return addTreeNode(ctx, QualifiedReferenceNode::new);
+    return addTreeNode(ctx, location -> {
+      QualifiedReferenceNode node = new QualifiedReferenceNode(location);
+      node.addProcessStep(c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
+      return node;
+    });
   }
 
   @Override

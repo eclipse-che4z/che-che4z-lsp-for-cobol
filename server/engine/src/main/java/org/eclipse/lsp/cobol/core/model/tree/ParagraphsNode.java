@@ -15,12 +15,10 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.DefineCodeBlock;
 
 /** The class represents paragraphs rule in COBOL grammar. */
 public class ParagraphsNode extends Node {
   public ParagraphsNode(Locality location) {
     super(location, NodeType.CODE_BLOCK_PARENT);
-    addProcessStep(ctx -> new DefineCodeBlock().accept(this, ctx));
   }
 }

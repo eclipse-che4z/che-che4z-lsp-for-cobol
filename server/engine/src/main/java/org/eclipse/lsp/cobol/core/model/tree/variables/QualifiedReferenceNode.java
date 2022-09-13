@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.logic.QualifiedReferenceWaitForVariableDefinition;
 
 import java.util.Optional;
 
@@ -37,7 +36,6 @@ public class QualifiedReferenceNode extends Node {
 
   public QualifiedReferenceNode(Locality location) {
     super(location, NodeType.QUALIFIED_REFERENCE_NODE);
-    addProcessStep(ctx -> new QualifiedReferenceWaitForVariableDefinition().accept(this, ctx));
   }
 
   public Optional<VariableNode> getVariableDefinitionNode() {

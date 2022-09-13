@@ -3,6 +3,7 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 
@@ -14,11 +15,8 @@ public class FileDescriptionProcess implements BiConsumer<FileDescriptionNode, P
   @Override
   public void accept(FileDescriptionNode node, ProcessingContext ctx) {
     if (StringUtils.isBlank(node.getFileControlClause())) {
-      ctx.getErrors()
-          .add(
-              node.getError(
-                  MessageTemplate.of(FD_WITHOUT_FILE_CONTROL, node.getName()),
-                  ErrorSeverity.ERROR));
+      SyntaxError error = node.getError(MessageTemplate.of(FD_WITHOUT_FILE_CONTROL, node.getName()), ErrorSeverity.ERROR);
+      ctx.getErrors().add(error);
     }
     ctx.getErrors().addAll(VariableDefinitionUtil.processNodeWithVariableDefinitions(node));
   }

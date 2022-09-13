@@ -40,14 +40,19 @@ public class StatementValidate implements BiConsumer<StatementNode, ProcessingCo
   };
 
   @Override
-  public void accept(StatementNode node, ProcessingContext ctx) {
+  public void accept(StatementNode node, ProcessingContext _ctx) {
+    node.addProcessStep(
+        NodeProcessor.runNextTime(
+            node, NodeProcessor.runNextTime(node, ctx -> validate(node, ctx))));
+  }
+
+  private void validate(StatementNode node, ProcessingContext ctx) {
     if (node instanceof SetToBooleanStatement) {
       ctx.getErrors()
           .addAll(
               validateVariableType(
                   ((SetToBooleanStatement) node).getReceivingFields(),
-                  ImmutableList.of(VariableType.CONDITION_DATA_NAME),
-                  INVALID_RECEIVING_FIELD_TEMPLATE));
+                  ImmutableList.of(VariableType.CONDITION_DATA_NAME)));
     }
 
     if (node instanceof SetToOnOffStatement) {
@@ -55,8 +60,7 @@ public class StatementValidate implements BiConsumer<StatementNode, ProcessingCo
           .addAll(
               validateVariableType(
                   ((SetToOnOffStatement) node).getReceivingFields(),
-                  ImmutableList.of(VariableType.MNEMONIC_NAME),
-                  INVALID_RECEIVING_FIELD_TEMPLATE));
+                  ImmutableList.of(VariableType.MNEMONIC_NAME)));
     }
 
     if (node instanceof SetUpDownByStatement) {
@@ -64,9 +68,7 @@ public class StatementValidate implements BiConsumer<StatementNode, ProcessingCo
       ctx.getErrors()
           .addAll(
               validateVariableType(
-                  (node1).getReceivingFields(),
-                  ImmutableList.of(VariableType.INDEX_ITEM),
-                  INVALID_RECEIVING_FIELD_TEMPLATE));
+                  (node1).getReceivingFields(), ImmutableList.of(VariableType.INDEX_ITEM)));
 
       if (hasSendingFieldProducesError(node1))
         ctx.getErrors()
@@ -79,7 +81,7 @@ public class StatementValidate implements BiConsumer<StatementNode, ProcessingCo
   }
 
   private List<SyntaxError> validateVariableType(
-      List<Node> fields, List<VariableType> allowedTypes, String template) {
+      List<Node> fields, List<VariableType> allowedTypes) {
     return fields.stream()
         .filter(Node.hasType(QUALIFIED_REFERENCE_NODE))
         .map(QualifiedReferenceNode.class::cast)
@@ -93,7 +95,7 @@ public class StatementValidate implements BiConsumer<StatementNode, ProcessingCo
             variableNode ->
                 createError(
                     variableNode.getLocality(),
-                    template,
+                    INVALID_RECEIVING_FIELD_TEMPLATE,
                     allowedTypes.stream()
                         .map(VariableType::getTemplate)
                         .toArray(MessageTemplate[]::new)))

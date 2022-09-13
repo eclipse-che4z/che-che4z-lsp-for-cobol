@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.logic.ElementaryProcessStandAlone;
 import org.eclipse.lsp.cobol.core.model.tree.logic.ProcessingContext;
 import org.junit.jupiter.api.Test;
 
@@ -38,6 +39,7 @@ class ElementaryNodeTest {
   @Test
   void testValidatePicAndUsageClauseWhenPicAndUsageAreInCompatible() {
     ElementaryItemNode node = getNode("PIC 9", UsageFormat.COMPUTATIONAL_1);
+    node.addProcessStep(ctx -> new ElementaryProcessStandAlone().accept(node, ctx));
     ArrayList<SyntaxError> errors = new ArrayList<>();
     node.process(new ProcessingContext(errors));
     assertEquals(1, errors.size());
@@ -48,6 +50,7 @@ class ElementaryNodeTest {
   @Test
   void testValidatePicAndUsageClauseWhenPicAndUsageContradicts() {
     ElementaryItemNode node = getNode("PIC X", UsageFormat.COMPUTATIONAL_5);
+    node.addProcessStep(ctx -> new ElementaryProcessStandAlone().accept(node, ctx));
     ArrayList<SyntaxError> errors = new ArrayList<>();
     ProcessingContext ctx = new ProcessingContext(errors);
     node.process(ctx);
@@ -77,6 +80,7 @@ class ElementaryNodeTest {
     ElementaryItemNode elementNode =
         new ElementaryItemNode(
             null, 2, "TEST-NODE", false, "PIC X", "", UsageFormat.UTF_8, false, true, false);
+    elementNode.addProcessStep(ctx -> new ElementaryProcessStandAlone().accept(elementNode, ctx));
     ArrayList<SyntaxError> errors = new ArrayList<>();
     elementNode.process(new ProcessingContext(errors));
     assertEquals(1, errors.size());

@@ -19,7 +19,6 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.logic.VariableWithLevelCheckLevel;
 
 /** The abstract class for variables with level number. */
 @Getter
@@ -42,7 +41,6 @@ public abstract class VariableWithLevelNode extends VariableNode {
     this.level = level;
     this.redefines = redefines;
     this.specifiedGlobal = global;
-    addProcessStep(ctx -> new VariableWithLevelCheckLevel().accept(this, ctx));
   }
 
   protected VariableWithLevelNode(
@@ -51,7 +49,6 @@ public abstract class VariableWithLevelNode extends VariableNode {
     this.level = level;
     this.redefines = redefines;
     this.specifiedGlobal = false;
-    addProcessStep(ctx -> new VariableWithLevelCheckLevel().accept(this, ctx));
   }
 
   @Override

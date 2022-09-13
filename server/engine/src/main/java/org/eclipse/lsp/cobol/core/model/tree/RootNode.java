@@ -19,7 +19,6 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.RootNodeWaitForVariableStructure;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Location;
 
@@ -39,7 +38,6 @@ public class RootNode extends Node {
 
   public RootNode(Locality locality, CopybooksRepository copybooks) {
     super(locality, ROOT);
-    addProcessStep(ctx -> new RootNodeWaitForVariableStructure().accept(this, ctx));
     createCopyBookDefinitionNode(copybooks.getDefinitions());
   }
 

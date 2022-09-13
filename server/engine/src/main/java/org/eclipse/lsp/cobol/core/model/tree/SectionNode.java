@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.core.model.tree;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.ProcessNodeWithVariableDefinitions;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
 
 /** The class represents section in COBOL. */
@@ -30,6 +29,5 @@ public class SectionNode extends Node {
   public SectionNode(Locality locality, SectionType section) {
     super(locality, NodeType.SECTION);
     this.sectionType = section;
-    addProcessStep(ctx -> new ProcessNodeWithVariableDefinitions().accept(this, ctx));
   }
 }

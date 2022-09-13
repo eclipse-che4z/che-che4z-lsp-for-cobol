@@ -19,7 +19,6 @@ import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.logic.ObsoleteWarning;
 
 /** The class represents a Obsolete Node in Cobol. It throws warning message. */
 @ToString(callSuper = true)
@@ -28,6 +27,5 @@ public abstract class ObsoleteNode extends Node {
 
   protected ObsoleteNode(Locality location) {
     super(location, NodeType.OBSOLETE);
-    addProcessStep(ctx -> new ObsoleteWarning().accept(this, ctx));
   }
 }

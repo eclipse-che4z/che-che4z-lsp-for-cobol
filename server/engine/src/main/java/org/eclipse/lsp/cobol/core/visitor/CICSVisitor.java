@@ -25,6 +25,9 @@ import org.eclipse.lsp.cobol.core.CICSParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.logic.CodeBlockProcess;
+import org.eclipse.lsp.cobol.core.model.tree.logic.NodeProcessor;
+import org.eclipse.lsp.cobol.core.model.tree.logic.QualifiedReferenceUpdateVariableUsage;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 
@@ -46,15 +49,17 @@ public class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
-    return addTreeNode(ctx, QualifiedReferenceNode::new);
+    return addTreeNode(ctx, location -> {
+      QualifiedReferenceNode node = new QualifiedReferenceNode(location);
+      node.addProcessStep(c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
+      return node;
+    });
   }
 
   @Override
   public List<Node> visitDataName(DataNameContext ctx) {
     return addTreeNode(
-        ctx,
-        locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality)
-    );
+        ctx, locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality));
   }
 
   @Override
@@ -63,7 +68,12 @@ public class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
         positions,
         visitChildren(ctx),
         ctx,
-        locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx)));
+        locality -> {
+          CodeBlockUsageNode node = new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx));
+          node.addProcessStep(
+              NodeProcessor.runNextTime(node, c -> new CodeBlockProcess().accept(node, c)));
+          return node;
+        });
   }
 
   // NOTE: Visitor is not managed by Guice DI, so can't use annotation here.

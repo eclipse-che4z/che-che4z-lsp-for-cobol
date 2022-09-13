@@ -21,7 +21,6 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.CodeBlockUsageWaitForDefinition;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;
@@ -37,8 +36,6 @@ public class CodeBlockUsageNode extends Node implements Context {
   public CodeBlockUsageNode(Locality location, String name) {
     super(location, NodeType.CODE_BLOCK_USAGE);
     this.name = name;
-    addProcessStep(ctx ->
-            new CodeBlockUsageWaitForDefinition().accept(this, null));
   }
 
   @Override

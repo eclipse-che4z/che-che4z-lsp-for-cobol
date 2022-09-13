@@ -18,16 +18,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.DeclarativeProcedureSectionRegister;
 
 /** The class represents declarative procedure section in COBOL. */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class DeclarativeProcedureSectionNode extends ProcedureSectionNode {
-  public DeclarativeProcedureSectionNode(
-      Locality location, String name, String text, Locality definition) {
+  public DeclarativeProcedureSectionNode(Locality location, String name, String text, Locality definition) {
     super(location, name, text, definition);
-    addProcessStep(ctx -> new DeclarativeProcedureSectionRegister().accept(this, ctx));
   }
 }

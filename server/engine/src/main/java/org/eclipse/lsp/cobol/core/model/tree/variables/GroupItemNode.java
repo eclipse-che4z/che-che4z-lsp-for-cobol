@@ -18,7 +18,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.GroupItemProcess;
 
 /**
  * This value class represents a group item COBOL variable. Group elements can have nested
@@ -59,7 +58,6 @@ public class GroupItemNode extends VariableWithLevelNode implements UsageClause 
       UsageFormat usageFormat) {
     super(location, level, name, redefines, VariableType.GROUP_ITEM, global);
     this.usageFormat = usageFormat;
-    addProcessStep(ctx -> new GroupItemProcess().accept(this, ctx));
   }
 
   @Override

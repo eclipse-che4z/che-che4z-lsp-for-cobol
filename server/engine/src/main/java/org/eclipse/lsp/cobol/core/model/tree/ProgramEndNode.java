@@ -18,7 +18,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.ProgramEndProcess;
 
 /** The class represents the program end. */
 @ToString(callSuper = true)
@@ -30,6 +29,5 @@ public class ProgramEndNode extends Node {
   public ProgramEndNode(Locality locality, String programId) {
     super(locality, NodeType.PROGRAM_END);
     this.programId = programId;
-    addProcessStep(ctx -> new ProgramEndProcess().accept(this, ctx));
   }
 }

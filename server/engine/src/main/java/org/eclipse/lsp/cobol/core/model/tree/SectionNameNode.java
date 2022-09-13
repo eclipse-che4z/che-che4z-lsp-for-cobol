@@ -21,7 +21,6 @@ import lombok.ToString;
 import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.SectionNameRegister;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;
@@ -40,7 +39,6 @@ public class SectionNameNode extends Node implements Context {
     super(location, NodeType.SECTION_NAME_NODE);
     this.name = name.toUpperCase();
     this.messageService = messageService;
-    addProcessStep(ctx -> new SectionNameRegister().accept(this, ctx));
   }
 
   @Override

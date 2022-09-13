@@ -19,7 +19,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.FileDescriptionProcess;
 
 import java.util.List;
 
@@ -43,7 +42,6 @@ public class FileDescriptionNode extends VariableNode {
     super(location, name, variableType, global);
     this.fileDescriptorText = fileDescriptorText;
     this.fileControlClause = fileControlClause;
-    addProcessStep(ctx -> new FileDescriptionProcess().accept(this, ctx));
   }
 
   @Override

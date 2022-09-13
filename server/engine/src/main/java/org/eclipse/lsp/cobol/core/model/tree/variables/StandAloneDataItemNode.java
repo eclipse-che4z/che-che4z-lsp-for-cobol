@@ -19,7 +19,6 @@ import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.StandAloneDataItemProcess;
 
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_77;
 
@@ -56,7 +55,6 @@ public class StandAloneDataItemNode extends ElementaryNode {
         picClause,
         usageFormat);
     this.value = value;
-    addProcessStep(ctx -> new StandAloneDataItemProcess().accept(this, ctx));
   }
 
   @Override

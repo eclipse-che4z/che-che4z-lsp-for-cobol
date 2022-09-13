@@ -18,7 +18,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.FileEntryProcess;
 
 /** The class represents file entry item in COBOL */
 @ToString(callSuper = true)
@@ -33,6 +32,5 @@ public class FileEntryNode extends Node {
     super(location, NodeType.FILE_CONTROL_ENTRY);
     this.fileName = name;
     this.fileControlClause = fileControlClause;
-    addProcessStep(ctx -> new FileEntryProcess().accept(this, ctx));
   }
 }

@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.ParagraphNameRegister;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;
@@ -32,7 +31,6 @@ public class ParagraphNameNode extends Node implements Context {
   public ParagraphNameNode(Locality location, String paragraphName) {
     super(location, NodeType.PARAGRAPH_NAME_NODE);
     this.name = paragraphName.toUpperCase();
-    addProcessStep(ctx -> new ParagraphNameRegister().accept(this, ctx));
   }
 
   @Override

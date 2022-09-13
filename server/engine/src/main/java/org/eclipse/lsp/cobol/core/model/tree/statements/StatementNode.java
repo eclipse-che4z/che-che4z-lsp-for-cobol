@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.core.model.tree.statements;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.logic.StatementWaitForVariableDefinition;
 
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.STATEMENT;
 
@@ -31,6 +30,5 @@ public abstract class StatementNode extends Node {
 
   protected StatementNode(Locality locality) {
     super(locality, STATEMENT);
-    addProcessStep(ctx -> new StatementWaitForVariableDefinition().accept(this, ctx));
   }
 }

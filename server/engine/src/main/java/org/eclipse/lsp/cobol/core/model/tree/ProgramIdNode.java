@@ -18,7 +18,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.ProgramIdProcess;
 
 /** The class represents program ID. */
 @ToString(callSuper = true)
@@ -30,6 +29,5 @@ public class ProgramIdNode extends Node {
   public ProgramIdNode(Locality locality, String programId) {
     super(locality, NodeType.PROGRAM_ID);
     this.programId = programId;
-    addProcessStep(ctx -> new ProgramIdProcess().accept(this, ctx));
   }
 }

@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.core.model.tree.logic.*;
 import org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 
 import java.util.*;
@@ -35,7 +36,8 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableType.*;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableType.FD;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableType.SD;
 
 /** The utility class is for converting VariableDefinitionNode into appropriate VariableNode. */
 @UtilityClass
@@ -294,6 +296,7 @@ public class VariableDefinitionUtil {
             getName(definitionNode),
             definitionNode.hasRedefines(),
             global);
+    variable.addProcessStep(c -> new VariableWithLevelCheckLevel().accept(variable, c));
     createVariableNameNode(variable, definitionNode.getVariableName());
     List<SyntaxError> errors = processRenamesBoundaries(variable, group, definitionNode);
     if (errors.isEmpty()) variable.setVarGroupParent(group);
@@ -311,6 +314,7 @@ public class VariableDefinitionUtil {
               definitionNode.isGlobal(),
               definitionNode.getFileDescriptor(),
               definitionNode.getFileControlClause());
+      variable.addProcessStep(ctx -> new FileDescriptionProcess().accept(variable, ctx));
       createVariableNameNode(variable, definitionNode.getVariableName());
       return new ResultWithErrors<>(variable, Collections.emptyList());
     }
@@ -328,6 +332,7 @@ public class VariableDefinitionUtil {
             definitionNode.hasRedefines(),
             definitionNode.getValueIntervals(),
             definitionNode.getValueToken());
+    variable.addProcessStep(c -> new VariableWithLevelCheckLevel().accept(variable, c));
     createVariableNameNode(variable, definitionNode.getVariableName());
     VariableWithLevelNode precedingVariable = getVariableForConditional(definitionNode);
     List<SyntaxError> errors = ImmutableList.of();
@@ -375,6 +380,10 @@ public class VariableDefinitionUtil {
             definitionNode.getUsage(),
             definitionNode.isBlankWhenZeroPresent(),
             definitionNode.isSignClausePresent());
+    variable.addProcessStep(ctx -> new VariableWithLevelCheckLevel().accept(variable, ctx));
+    variable.addProcessStep(ctx -> new ElementaryProcessStandAlone().accept(variable, ctx));
+    variable.addProcessStep(ctx -> new StandAloneDataItemProcess().accept(variable, ctx));
+
     createVariableNameNode(variable, definitionNode.getVariableName());
     return new ResultWithErrors<>(variable, ImmutableList.of());
   }
@@ -394,6 +403,7 @@ public class VariableDefinitionUtil {
               definitionNode.getOccursNumber(),
               definitionNode.getUsage(),
               definitionNode.isGlobal());
+      variable.addProcessStep(ctx -> new VariableWithLevelCheckLevel().accept(variable, ctx));
       createVariableNameNode(variable, definitionNode.getVariableName());
       for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes())
         variable.addChild(
@@ -421,6 +431,8 @@ public class VariableDefinitionUtil {
               definitionNode.isGlobal(),
               definitionNode.hasRedefines(),
               definitionNode.getUsage());
+      variable.addProcessStep(ctx -> new VariableWithLevelCheckLevel().accept(variable, ctx));
+      variable.addProcessStep(ctx -> new GroupItemProcess().accept(variable, ctx));
       createVariableNameNode(variable, definitionNode.getVariableName());
       return new ResultWithErrors<>(variable, ImmutableList.of());
     }
@@ -445,6 +457,8 @@ public class VariableDefinitionUtil {
               definitionNode.getUsage(),
               definitionNode.isBlankWhenZeroPresent(),
               definitionNode.isSignClausePresent());
+      variable.addProcessStep(ctx -> new VariableWithLevelCheckLevel().accept(variable, ctx));
+      variable.addProcessStep(ctx -> new ElementaryProcessStandAlone().accept(variable, ctx));
       createVariableNameNode(variable, definitionNode.getVariableName());
       for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes())
         variable.addChild(
@@ -472,6 +486,8 @@ public class VariableDefinitionUtil {
               definitionNode.hasRedefines(),
               definitionNode.isBlankWhenZeroPresent(),
               definitionNode.isSignClausePresent());
+      variable.addProcessStep(ctx -> new VariableWithLevelCheckLevel().accept(variable, ctx));
+      variable.addProcessStep(ctx -> new ElementaryProcessStandAlone().accept(variable, ctx));
       createVariableNameNode(variable, definitionNode.getVariableName());
       return new ResultWithErrors<>(variable, errors);
     }

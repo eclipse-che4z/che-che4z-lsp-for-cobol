@@ -25,6 +25,11 @@ public class QualifiedReferenceUpdateVariableUsage
 
   @Override
   public void accept(QualifiedReferenceNode node, ProcessingContext ctx) {
+    node.addProcessStep(NodeProcessor.runNextTime(
+                    node, _ctx -> updateVariableUsage(node, _ctx)));
+  }
+
+  private void updateVariableUsage(QualifiedReferenceNode node, ProcessingContext ctx) {
     List<VariableUsageNode> variableUsageNodes =
         node.getChildren().stream()
             .filter(Node.hasType(NodeType.VARIABLE_USAGE))

@@ -19,13 +19,17 @@ public class RootNodeUpdateCopyNodesByPositionInTree
     implements BiConsumer<RootNode, ProcessingContext> {
   @Override
   public void accept(RootNode node, ProcessingContext ctx) {
+    node.addProcessStep(NodeProcessor.runNextTime(node, c -> updateCopyNodes(node)));
+  }
+
+  private void updateCopyNodes(RootNode node) {
     List<Node> nodes =
         node.getChildren().stream().filter(Node.hasType(NodeType.COPY)).collect(toList());
     nodes.forEach(node::removeChild);
     nodes.forEach(
         it ->
             RangeUtils.findNodeByPosition(
-                    node, it.getLocality().getUri(), it.getLocality().getRange().getStart())
+                            node, it.getLocality().getUri(), it.getLocality().getRange().getStart())
                 .orElse(node)
                 .addChild(it));
 
