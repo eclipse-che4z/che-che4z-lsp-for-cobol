@@ -16,23 +16,30 @@
 package org.eclipse.lsp.cobol.positive;
 
 import org.eclipse.lsp.cobol.ConfigurableTest;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
+import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp.cobol.usecases.DialectConfigs;
+import org.eclipse.lsp.cobol.utils.Fixtures;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.lang.System.getProperty;
+import static java.lang.System.getenv;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.positive.FolderTextRegistry.DEFAULT_LISTING_PATH;
 import static org.eclipse.lsp.cobol.positive.FolderTextRegistry.PATH_TO_LISTING_SNAP;
+import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -41,10 +48,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public abstract class FileBasedTest extends ConfigurableTest {
 
+  public static final String SYS_ENV_VAR_TESTING_DIALECTS = "TestingDialects";
+
   static Stream<String> getSourceFolder() {
     return Arrays.stream(
         ofNullable(getProperty(PATH_TO_TEST_RESOURCES))
-            .orElse("../../Cobol85PositiveTestsSuite")
+            .orElse("../../tests/test_files/Cobol85PositiveTestsSuite")
             .split(","));
   }
 
@@ -65,6 +74,16 @@ public abstract class FileBasedTest extends ConfigurableTest {
    */
   protected static List<CobolText> getCopybooks(CobolTextRegistry textRegistry) {
     return textRegistry.getCopybooks();
+  }
+
+  /**
+   * Get the copybooks to be passed to the Language Server while analyzing from {@link
+   * CobolTextRegistry} using file-based implementation.
+   *
+   * @return the list of all defined copybooks
+   */
+  protected static List<CobolText> getCopybooks(CobolTextRegistry textRegistry, String filename) {
+    return textRegistry.getCopybooks(filename);
   }
 
   protected static Map<ReportSection, List<SysprintSnap>> getDataNameRefs(
@@ -106,7 +125,7 @@ public abstract class FileBasedTest extends ConfigurableTest {
     String updateFlag = ofNullable(getProperty("UpdateSnapListing")).orElse("false");
     if (Files.exists(Paths.get(listingSnap)) && !updateFlag.equals("false")) {
       FolderTextRegistry textRegistry = (FolderTextRegistry) cobolTextRegistry;
-      textRegistry.createListingSnap(textRegistry.getSnaps());
+      textRegistry.createListingSnap(textRegistry.getSnaps(), textRegistry.getTestResourcePath());
     }
   }
 
@@ -120,5 +139,45 @@ public abstract class FileBasedTest extends ConfigurableTest {
                         .collect(toList()))
             .orElse(emptyList());
     assertNoSyntaxErrorsFound(diagnostic, fileName);
+  }
+
+  /**
+   * Get the copybooks specific to a cobol file, to be passed to the Language Server while analyzing
+   * from {@link CobolTextRegistry} using file-based implementation.
+   *
+   * @param cobolTextRegistry {@link CobolTextRegistry}
+   * @param fileName file to be analysed
+   * @return List of copybooks
+   */
+  protected List<CobolText> getFileSpecificCopybooks(
+      CobolTextRegistry cobolTextRegistry, String fileName) {
+    List<CobolText> copybooks = new ArrayList<>(getCopybooks(cobolTextRegistry));
+    copybooks.add(Fixtures.subschemaCopy(""));
+    Stream<CobolText> cobolTextStream =
+        copybooks.stream()
+            .filter(
+                book ->
+                    getCopybooks(cobolTextRegistry, fileName.split("\\.")[0]).stream()
+                        .noneMatch(b1 -> b1.getFileName().equals(book.getFileName())));
+    return Stream.concat(
+            cobolTextStream, getCopybooks(cobolTextRegistry, fileName.split("\\.")[0]).stream())
+        .collect(toList());
+  }
+
+  /**
+   * Returns a {@link AnalysisConfig} based on passed system variables
+   *
+   * @return {@link AnalysisConfig}
+   */
+  protected AnalysisConfig getAnalysisConfiguration() {
+    String passedDialects =
+        ofNullable(getProperty(SYS_ENV_VAR_TESTING_DIALECTS))
+            .orElse(ofNullable(getenv("dialect")).orElse("default"));
+    List<String> testDialectsLists = Arrays.asList(passedDialects.split(","));
+
+    if (testDialectsLists.contains(DaCoDialect.NAME)) {
+      return DialectConfigs.getDaCoAnalysisConfig();
+    }
+    return AnalysisConfig.defaultConfig(ENABLED);
   }
 }
