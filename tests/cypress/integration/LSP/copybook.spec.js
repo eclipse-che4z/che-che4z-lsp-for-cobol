@@ -27,7 +27,7 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC174655 Copybook - Nominal', () => {
-    it.skip(
+    it(
       ['flaky_theia'],
       'Checks that when opening Cobol file with correct reference to copybook, there is syntax ok message shown',
       () => {
@@ -39,7 +39,7 @@ context('This is a Copybook spec', () => {
   });
 
   describe('Copybook - not exist: no syntax ok message', () => {
-    it.skip(
+    it(
       ['flaky_theia'],
       'Checks that when opening Cobol file which refers to non-existent copybook, \
        syntax ok message does not appear and copybook is underlined',
@@ -52,7 +52,7 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC174956 Copybook - not exist: error underlined', () => {
-    it.skip(['smoke', 'CI'], 'Checks that error lines are marked in a file', () => {
+    it(['smoke', 'CI'], 'Checks that error lines are marked in a file', () => {
       cy.openFile('USERC1F.cbl');
       cy.goToLine(19);
       cy.get(IDE.editorError)
@@ -66,20 +66,20 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC174658 Copybook - not exist: detailed hint', () => {
-    it.skip(['smoke', 'investigation'], 'Checks that error lines for missing copybook have detailed hints', () => {
+    it(['smoke', 'investigation'], 'Checks that error lines for missing copybook have detailed hints', () => {
       cy.openFile('USERC1F.cbl');
       cy.get(IDE.editorError)
         .getElementLineNumber()
         .then((lineNumber) => {
           expect(lineNumber).to.be.equal(19);
-          cy.getLineByNumber(lineNumber).find('span').eq(-1).click().realHover({ position: 'center' });
+          cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
         });
       cy.get(IDE.hoverOverContent).contains('BOOK3: Copybook not foundCOBOL Language Support');
     });
   });
 
   describe('TC174916 Copybook - recursive error', () => {
-    it.skip(
+    it(
       ['smoke', 'CI'],
       'Checks that when opening Cobol file which recursively refers to copybooks, copybook is underlined with an error',
       () => {
@@ -96,7 +96,7 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC174917 Copybook - recursive detailed hint', () => {
-    it.skip(
+    it(
       ['smoke', 'investigation'],
       'Checks that when opening Cobol file which recursively refers to copybooks, have detailed error hint',
       () => {
@@ -105,7 +105,7 @@ context('This is a Copybook spec', () => {
           .getElementLineNumber()
           .then((lineNumber) => {
             expect(lineNumber).to.be.equal(19);
-            cy.getLineByNumber(lineNumber).find('span').eq(-1).click().realHover({ position: 'center' });
+            cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
           });
         cy.get(IDE.hoverOverContent).contains('Recursive copybook declaration for: BOOK2R');
       },
@@ -113,7 +113,7 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC174932 Copybook - invalid definition', () => {
-    it.skip(
+    it(
       ['smoke', 'CI'],
       'Checks that when opening Cobol file which uses invalid definition from copybook, \
        this definition is underlined as a semantic error',
@@ -132,7 +132,7 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC174933 Copybook - invalid definition hint', () => {
-    it.skip(
+    it(
       ['smoke', 'investigation'],
       'Checks that when opening Cobol file which uses invalid definition from copybook, has detailed hint on mouse hover',
       () => {
@@ -143,7 +143,7 @@ context('This is a Copybook spec', () => {
           .getElementLineNumber()
           .then((lineNumber) => {
             expect(lineNumber).to.be.equal(52);
-            cy.getLineByNumber(lineNumber).find('span').eq(-1).click().realHover({ position: 'center' });
+            cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
           });
         cy.get(IDE.hoverOverContent).contains('Variable USER-PHONE-MOBILE1 is not defined');
       },
@@ -154,7 +154,7 @@ context('This is a Copybook spec', () => {
     afterEach(() => {
       cy.closeFolder('.copybooks');
     });
-    it.skip(
+    it(
       ['smoke', 'investigation'],
       'Checks that Peek Definition functionality works in theia in cobol file via context menu',
       () => {
@@ -171,7 +171,7 @@ context('This is a Copybook spec', () => {
     afterEach(() => {
       cy.closeFolder('.copybooks');
     });
-    it.skip(['smoke'], 'Checks that Peek Definition functionality works in theia in cobol file via Ctrl+Click', () => {
+    it(['smoke'], 'Checks that Peek Definition functionality works in theia in cobol file via Ctrl+Click', () => {
       cy.openFile('USERC1N1.cbl');
       cy.getLineByNumber(42).findText('User-Phone-Mobile.').type('{ctrl}', { release: false, delay: 2500 }).click();
       cy.getCurrentTab().should('contain.text', 'BOOK2N.cpy');
@@ -182,7 +182,7 @@ context('This is a Copybook spec', () => {
 
   describe('TC174931 Copybook - peek references', () => {
     //TODO - goToReferences is not working correctly in VSC 1.63
-    it.skip(['smoke'], 'Checks that LSP can find all references (also in copybooks) and navigate by them', () => {
+    it(['smoke'], 'Checks that LSP can find all references (also in copybooks) and navigate by them', () => {
       cy.openFile('USERC1N1.cbl');
       cy.getLineByNumber(42).findText('User-Phone-Mobile.').goToReferences();
       cy.get(Theia.zoneWidget)
@@ -210,15 +210,13 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC174952 Copybook - not exist, but dynamically appears', () => {
-    afterEach(() => {
-      cy.closeFolder('.copybooks');
-    });
-    it.skip(
+    it(
       ['smoke', 'CI'],
       'Checks that LSP can dynamically detect appearance of copybook and rescan cobol file on the fly',
       () => {
         cy.readFile('test_files/project/.copybooks/zowe-profile-1/DATA.SET.PATH2/BOOK3T.cpy').then((text) => {
           cy.writeFile('test_files/project/.copybooks/zowe-profile-1/DATA.SET.PATH2/BOOK3.cpy', text);
+          cy.closeFolder('.copybooks');
         });
         cy.openFolder('.copybooks/zowe-profile-1/DATA.SET.PATH2');
         cy.openFile('USERC1F.cbl');
@@ -236,7 +234,7 @@ context('This is a Copybook spec', () => {
       cy.closeFolder('.copybooks');
     });
 
-    it.skip(
+    it(
       ['smoke', 'CI'],
       'Checks that LSP can dynamically detect definitions from an appeared copybook and rescan cobol file on the fly',
       () => {
@@ -257,7 +255,7 @@ context('This is a Copybook spec', () => {
       cy.closeFolder('.copybooks');
     });
 
-    it.skip(['smoke'], 'Underscore a copy statement if its copybook contains error with nested copybooks', () => {
+    it(['smoke'], 'Underscore a copy statement if its copybook contains error with nested copybooks', () => {
       cy.openFile('TEST.CBL').goToLine(22);
       cy.getCurrentLine().type('{end}', { delay: 200 }).type('{enter}    COPY A.', { delay: 200 });
       cy.getCurrentLineErrors({ expectedLine: 23 })
@@ -289,28 +287,24 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC266074 LSP analysis for extended sources - basic scenario', () => {
-    it.skip(
-      ['smoke', 'CI'],
-      'If extended sources are places under .c4z/.extsrcs, then ignore COPY instructions',
-      () => {
-        cy.readFile('test_files/project/USER1.cbl').then((context) => {
-          cy.writeFile('test_files/project/.c4z/.extsrcs/USER1.cbl', context);
-        });
-        cy.openFolder('.c4z/.extsrcs').openFile('USER1.cbl');
-        cy.goToLine(26);
-        cy.getCurrentLine().type('           COPY ABC.');
-        cy.getCurrentLineOverlay().children().should('not.have.class', IDE.editorError);
-        cy.getCurrentLine().type('{end}{backspace}');
-        cy.getCurrentLineErrors({ expectedLine: 26 })
-          .eq(0)
-          .getHoverErrorMessage()
-          .contains("Syntax error on 'COPY' expected");
-        cy.getCurrentLine().type('{end}{enter}Mov');
-        cy.getCurrentLineOverlay().children().should('not.have.class', IDE.editorWarn);
-      },
-    );
+    it(['smoke', 'CI'], 'If extended sources are places under .c4z/.extsrcs, then ignore COPY instructions', () => {
+      cy.readFile('test_files/project/USER1.cbl').then((context) => {
+        cy.writeFile('test_files/project/.c4z/.extsrcs/USER1.cbl', context);
+      });
+      cy.openFolder('.c4z/.extsrcs').openFile('USER1.cbl');
+      cy.goToLine(26);
+      cy.getCurrentLine().type('           COPY ABC.');
+      cy.getCurrentLineOverlay().children().should('not.have.class', IDE.editorError);
+      cy.getCurrentLine().type('{end}{backspace}');
+      cy.getCurrentLineErrors({ expectedLine: 26 })
+        .eq(0)
+        .getHoverErrorMessage()
+        .contains("Syntax error on 'COPY' expected");
+      cy.getCurrentLine().type('{end}{enter}Mov');
+      cy.getCurrentLineOverlay().children().should('not.have.class', IDE.editorWarn);
+    });
 
-    it.skip(['smoke', 'CI'], '.c4z', () => {
+    it(['smoke', 'CI'], '.c4z', () => {
       cy.readFile('test_files/project/.c4z/.extsrcs/USER1.cbl').then((context) => {
         cy.writeFile('test_files/project/.c4z/USER1.cbl', context);
       });
@@ -332,7 +326,7 @@ context('This is a Copybook spec', () => {
 
   describe('TC312878 Edit missing copybook and resolve', () => {
     // TODO - add selectors for VSC
-    it.skip(['flaky_theia'], 'Edits missing copybook and resolves', () => {
+    it(['flaky_theia'], 'Edits missing copybook and resolves', () => {
       cy.openFile('USERC1F.cbl');
       cy.goToLine(19);
       cy.getCurrentLine().type('{end}{backspace}{backspace}123.');
@@ -344,7 +338,7 @@ context('This is a Copybook spec', () => {
 
   describe('TC314393 Variable usage should be found in a CALL statement', () => {
     //TODO - goToReferences is not working correctly in VSC 1.63
-    it.skip(['smoke'], 'The variable used in a CALL statement should be found in the references list.', () => {
+    it(['smoke'], 'The variable used in a CALL statement should be found in the references list.', () => {
       cy.openFile('HELLO-WORLD.cbl');
       cy.getLineByNumber(23).findText('VARIABLE').goToReferences();
       cy.get(Theia.zoneWidget)
@@ -364,7 +358,7 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC314935 Copybook with Name in Quotes is Recognized', () => {
-    it.skip(['flaky'], 'Copybook with Name in Quotes is Recognized', () => {
+    it(['flaky'], 'Copybook with Name in Quotes is Recognized', () => {
       cy.openFile('VAR.cbl');
       cy.goToLine(21);
       cy.getLineByNumber(21).type("{end}{enter}COPY 'BBB'.").wait(500);
@@ -376,19 +370,6 @@ context('This is a Copybook spec', () => {
       cy.getLineByNumber(24).type("{end}{enter}COPY 'NEW'.").wait(500);
       cy.getCurrentLine().should('not.have.class', IDE.editorError);
     });
-  });
-
-  describe("TC315293 program ID - 'COBOL Copybook'", () => {
-    it.skip(
-      ['smoke', 'CI'],
-      "New program ID - 'COBOL copybook' is used in the following development \
-       for limited syntax awareness for the copybooks.",
-      () => {
-        cy.openFile('USERC1N1.cbl');
-        cy.selectLangMode().should('contain.text', 'COBOL');
-        cy.changeLangMode('COBOL Copybook');
-      },
-    );
   });
 
   describe('TC318696 Load copybooks outside the workspace', () => {
@@ -412,29 +393,29 @@ context('This is a Copybook spec', () => {
     const notHaveSyntaxError = () => {
       return cy.openFile('USERC1F.cbl').getLineByNumber(19).should('not.have.class', IDE.editorError);
     };
-    it.skip(['smoke'], 'specify copybooks outside the current workspace ../test', () => {
+    it(['smoke'], 'specify copybooks outside the current workspace ../test', () => {
       copyBookNotFound();
       setPathsLocalSetting('../test');
       cy.closeCurrentTab();
       notHaveSyntaxError();
     });
-    it.skip(['smoke'], 'specify copybooks outside the current workspace /home/test', () => {
+    it(['smoke'], 'specify copybooks outside the current workspace /home/test', () => {
       setPathsLocalSetting('/home/test');
       notHaveSyntaxError();
     });
-    it.skip(['smoke'], 'specify copybooks outside the current workspace ../test/files', () => {
+    it(['smoke'], 'specify copybooks outside the current workspace ../test/files', () => {
       setPathsLocalSetting('../test/files');
       notHaveSyntaxError();
     });
-    it.skip(['smoke'], 'specify copybooks outside the current workspace /test', () => {
+    it(['smoke'], 'specify copybooks outside the current workspace /test', () => {
       setPathsLocalSetting('/test');
       copyBookNotFound();
     });
-    it.skip(['smoke'], 'specify copybooks outside the current workspace ./test', () => {
+    it(['smoke'], 'specify copybooks outside the current workspace ./test', () => {
       setPathsLocalSetting('./test');
       copyBookNotFound();
     });
-    it.skip(['smoke'], 'specify copybooks outside the current workspace ./test/files', () => {
+    it(['smoke'], 'specify copybooks outside the current workspace ./test/files', () => {
       setPathsLocalSetting('./test/files');
       copyBookNotFound();
     });
@@ -471,7 +452,7 @@ context('This is a Copybook spec', () => {
         input: 'փորձիր ինձ',
       },
     ].forEach((parameters) => {
-      it.skip(['smoke'], parameters.test, () => {
+      it(['smoke'], parameters.test, () => {
         copyBookNotFound('UTF8');
         cy.writeFile('test_files/project/testing/UTF8', `            MOVE "${parameters.input}" TO ABC.`, {
           encoding: 'utf-8',
@@ -488,7 +469,7 @@ context('This is a Copybook spec', () => {
   });
 
   describe('Load resource file', () => {
-    it.skip(['smoke', 'CI'], 'Checks loading of resource file', () => {
+    it(['smoke', 'CI'], 'Checks loading of resource file', () => {
       cy.openFile('RES.cbl');
       cy.goToLine(6);
       cy.getCurrentLineErrors({ expectedLine: 6 })
@@ -497,7 +478,7 @@ context('This is a Copybook spec', () => {
         .contains("Syntax error on 'FILE-CONTROsL'");
     });
   });
-
+  //Refactor COPY MAID statements test
   describe('TC327253 Support COPY MAID statements', () => {
     beforeEach(() => {
       cy.updateConfigs('testing');

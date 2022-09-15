@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2022 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
 
  * This program and the accompanying materials are made
@@ -27,16 +27,16 @@ const backspace3times = '{backspace}'.repeat(3);
 
 context('This is a F96117 spec', () => {
   describe('TC247497 - Local Copybooks - check .gitignore file and hidden folders under c4z', () => {
-    it.skip(['smoke', 'CI'], 'Finds .gitignore file under .c4z', () => {
+    it(['smoke', 'CI'], 'Finds .gitignore file under .c4z', () => {
       cy.openFolder('.c4z');
       cy.openFile('.gitignore');
       cy.get(IDE.lineContent).findText('/**');
     });
-    it.skip(['smoke', 'CI'], 'Delete .c4z folder and refresh', () => {
+    it(['smoke', 'CI'], 'Delete .c4z folder and refresh', () => {
       cy.deleteFile('.c4z');
     });
 
-    it.skip(['smoke', 'CI'], 'Check .c4z/.gitignore', () => {
+    it(['smoke', 'CI'], 'Check .c4z/.gitignore', () => {
       cy.openFile('USER1.cbl');
       cy.openFolder('.c4z');
       cy.openFile('.gitignore');
@@ -56,7 +56,7 @@ context('This is a F96117 spec', () => {
       cy.closeFolder('.vscode');
     });
 
-    it.skip(['smoke'], 'Lets check structure in settings.json file ', () => {
+    it(['smoke'], 'Lets check structure in settings.json file ', () => {
       cy.openFolder('.vscode').openFile('settings.json');
       cy.get(IDE.lineContent).then(($line) => {
         cy.wrap($line).eq(0).should('have.text', '{');
@@ -74,9 +74,9 @@ context('This is a F96117 spec', () => {
 
   describe('TC248015 - Quick Fix" actions', () => {
     afterEach(() => {
-      cy.closeCurrentTab();
+      // cy.closeCurrentTab();
     });
-    it.skip(
+    it(
       ['smoke'],
       '"Quick Fix" allows the user either to trigger copybooks fetch or open the settings.json for editing',
       () => {
@@ -118,7 +118,7 @@ context('This is a F96117 spec', () => {
     afterEach(() => {
       cy.closeFolder('testing');
     });
-    it.skip('Let test "Change settings" button with local copybooks ', () => {
+    it('Let test "Change settings" button with local copybooks ', () => {
       // Open file and click on 'Change settings'
       cy.openFile('USERC1F.cbl');
 
@@ -145,11 +145,10 @@ context('This is a F96117 spec', () => {
       cy.closeCurrentTab();
       cy.closeFolder('testing');
     });
-    it.skip('Watch a folder and then delete', () => {
+    it('Watch a folder and then delete', () => {
       // Create in folder 'testing' copybook 'BOOK3.cpy'
       cy.createNewFile('testing', 'BOOK3.cpy');
-      cy.closeCurrentTab();
-
+      cy.closeFolder('testing');
       // Check that syntax error is not present
       cy.openFile('USERC1F.cbl').get(IDE.editorError).should('not.exist');
 
@@ -181,7 +180,7 @@ context('This is a F96117 spec', () => {
       cy.closeCurrentTab();
       cy.closeFolder('testing');
     });
-    it.skip(['smoke'], 'Nested copybooks with "no extension" are supported', () => {
+    it(['smoke'], 'Nested copybooks with "no extension" are supported', () => {
       cy.openFile('TEST.CBL');
 
       // Check that variable is available
