@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.RemarksNode;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
+import org.eclipse.lsp.cobol.core.model.tree.logic.NodeProcessor;
 import org.eclipse.lsp.cobol.core.model.tree.logic.ObsoleteWarning;
 import org.eclipse.lsp.cobol.core.model.tree.logic.ProcessingContext;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
@@ -38,13 +39,13 @@ class ObsoleteNodeTest {
     Locality locality = Locality.builder().build();
     RootNode rootNode = new RootNode(locality, new CopybooksRepository());
     RemarksNode remarksNode = new RemarksNode(locality);
-    remarksNode.addProcessStep(c -> new ObsoleteWarning().accept(remarksNode, c));
+    NodeProcessor.addProcessStep(remarksNode, c -> new ObsoleteWarning().accept(remarksNode, c));
     rootNode.addChild(remarksNode);
 
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    rootNode.process(new ProcessingContext(errors));
+      NodeProcessor.process(rootNode, new ProcessingContext(errors));
 
-    assertEquals(
+      assertEquals(
         errors,
         ImmutableList.of(
             SyntaxError.syntaxError()

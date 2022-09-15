@@ -44,8 +44,8 @@ public abstract class Node {
   @EqualsAndHashCode.Exclude @Setter
   private Optional<Consumer<ProcessingContext>> nextStep = Optional.empty();
 
-  @EqualsAndHashCode.Exclude
-  private final NodeProcessor processor = new NodeProcessor();
+  @EqualsAndHashCode.Exclude private final NodeProcessor processor = new NodeProcessor();
+
   protected Node(Locality location, NodeType nodeType, String dialect) {
     this.locality = location;
     this.nodeType = nodeType;
@@ -115,34 +115,5 @@ public abstract class Node {
    */
   public Optional<ProgramNode> getProgram() {
     return getNearestParentByType(NodeType.PROGRAM).map(ProgramNode.class::cast);
-  }
-
-  /** Process tree node and its children after tree construction. */
-  public final void process(ProcessingContext ctx) {
-    processor.process(this, ctx);
-  }
-
-  /**
-   * Return true if this node and all its children was fully processed and there is no need to do
-   * extra `process` calls in order to finish node processing.
-   *
-   * @return true if no more `process` calls is needed
-   */
-  public final boolean isProcessed() {
-    return !nextStep.isPresent() && children.stream().allMatch(Node::isProcessed);
-  }
-
-  public final void addProcessStep(Consumer<ProcessingContext> processCall) {
-    if (nextStep.isPresent()) {
-      Consumer<ProcessingContext> previousProcessIt = nextStep.get();
-      nextStep =
-          Optional.of(
-              ctx -> {
-                previousProcessIt.accept(ctx);
-                processCall.accept(ctx);
-              });
-    } else {
-      nextStep = Optional.of(processCall);
-    }
   }
 }

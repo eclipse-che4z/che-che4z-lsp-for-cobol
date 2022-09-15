@@ -40,6 +40,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNode;
+import org.eclipse.lsp.cobol.core.model.tree.logic.NodeProcessor;
 import org.eclipse.lsp.cobol.core.model.tree.logic.ProcessNodeWithVariableDefinitions;
 import org.eclipse.lsp.cobol.core.model.tree.logic.QualifiedReferenceUpdateVariableUsage;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
@@ -98,7 +99,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
     return addTreeNode(ctx, location -> {
       QualifiedReferenceNode node = new QualifiedReferenceNode(location);
-      node.addProcessStep(c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
       return node;
     });
   }
@@ -107,7 +108,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   public List<Node> visitIdms_db_entity_name(Idms_db_entity_nameContext ctx) {
     return addTreeNode(ctx, location -> {
       QualifiedReferenceNode node = new QualifiedReferenceNode(location);
-      node.addProcessStep(c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
       return node;
     });
   }
@@ -116,7 +117,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   public List<Node> visitIdms_procedure_name(Idms_procedure_nameContext ctx) {
     return addTreeNode(ctx, location -> {
       QualifiedReferenceNode node = new QualifiedReferenceNode(location);
-      node.addProcessStep(c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
       return node;
     });
   }
@@ -125,7 +126,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   public List<Node> visitIdms_map_name(Idms_map_nameContext ctx) {
     return addTreeNode(ctx, location -> {
       QualifiedReferenceNode node = new QualifiedReferenceNode(location);
-      node.addProcessStep(c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
       return node;
     });
   }
@@ -142,7 +143,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
         ctx,
         locality -> {
           SectionNode node = new SectionNode(locality, SectionType.MAP);
-          node.addProcessStep(c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
+          NodeProcessor.addProcessStep(node, c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
           return node;
         });
   }
@@ -170,7 +171,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
         ctx,
         locality -> {
           SectionNode node = new SectionNode(locality, SectionType.IDMS_CONTROL);
-          node.addProcessStep(c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
+          NodeProcessor.addProcessStep(node, c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
           return node;
         });
   }
@@ -181,7 +182,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
         ctx,
         locality -> {
           SectionNode node = new SectionNode(locality, SectionType.SCHEMA);
-          node.addProcessStep(c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
+          NodeProcessor.addProcessStep(node, c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
           return node;
         });
   }

@@ -19,7 +19,7 @@ public class RootNodeUpdateCopyNodesByPositionInTree
     implements BiConsumer<RootNode, ProcessingContext> {
   @Override
   public void accept(RootNode node, ProcessingContext ctx) {
-    node.addProcessStep(NodeProcessor.runNextTime(node, c -> updateCopyNodes(node)));
+    NodeProcessor.addProcessStep(node, NodeProcessor.runNextTime(node, c -> updateCopyNodes(node)));
   }
 
   private void updateCopyNodes(RootNode node) {

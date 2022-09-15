@@ -51,7 +51,7 @@ public class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
     return addTreeNode(ctx, location -> {
       QualifiedReferenceNode node = new QualifiedReferenceNode(location);
-      node.addProcessStep(c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
       return node;
     });
   }
@@ -70,7 +70,7 @@ public class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
         ctx,
         locality -> {
           CodeBlockUsageNode node = new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx));
-          node.addProcessStep(
+          NodeProcessor.addProcessStep(node,
               NodeProcessor.runNextTime(node, c -> new CodeBlockProcess().accept(node, c)));
           return node;
         });

@@ -115,7 +115,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         retrieveRangeLocality(ctx, positions)
             .map(it -> {
               RootNode node = new RootNode(it, copybooks);
-              node.addProcessStep(c -> new RootNodeUpdateCopyNodesByPositionInTree().accept(node, c));
+              NodeProcessor.addProcessStep(node, c -> new RootNodeUpdateCopyNodesByPositionInTree().accept(node, c));
               return node;
             })
             .map(
@@ -129,7 +129,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                 () -> {
                   LOG.warn("The root node for syntax tree was not constructed");
                   RootNode node = new RootNode(Locality.builder().build(), copybooks);
-                  node.addProcessStep(c -> new RootNodeUpdateCopyNodesByPositionInTree().accept(node, c));
+                  NodeProcessor.addProcessStep(node, c -> new RootNodeUpdateCopyNodesByPositionInTree().accept(node, c));
                   return node;
                 }));
   }
@@ -164,7 +164,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                 retrieveRangeLocality(ctx, positions)
                     .ifPresent(locality -> {
                       ProgramIdNode node = new ProgramIdNode(locality, name);
-                      node.addProcessStep(c -> new ProgramIdProcess().accept(node, c));
+                      NodeProcessor.addProcessStep(node, c -> new ProgramIdProcess().accept(node, c));
                       result.add(node);
                     }));
     return result;
@@ -212,7 +212,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitWorkingStorageSection(WorkingStorageSectionContext ctx) {
     return addTreeNode(ctx, locality -> {
       SectionNode node = new SectionNode(locality, SectionType.WORKING_STORAGE);
-      node.addProcessStep(c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
       return node;
     });
   }
@@ -333,7 +333,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                       DeclarativeProcedureSectionNode node =
                           new DeclarativeProcedureSectionNode(
                               locality, name, getIntervalText(ctx), def);
-                      node.addProcessStep(
+                      NodeProcessor.addProcessStep(node,
                           c -> new DeclarativeProcedureSectionRegister().accept(node, c));
                       return node;
                     }))
@@ -349,7 +349,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .map(PreprocessorStringUtils::trimQuotes)
         .map(id -> addTreeNode(ctx.programName(), locality -> {
           ProgramEndNode node = new ProgramEndNode(locality, id);
-          node.addProcessStep(c -> new ProgramEndProcess().accept(node, c));
+          NodeProcessor.addProcessStep(node, c -> new ProgramEndProcess().accept(node, c));
           return node;
         }))
         .orElse(ImmutableList.of());
@@ -359,7 +359,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitConfigurationSection(ConfigurationSectionContext ctx) {
     return addTreeNode(ctx, locality -> {
       SectionNode node = new SectionNode(locality, SectionType.CONFIGURATION);
-      node.addProcessStep(c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
       return node;
     });
   }
@@ -368,7 +368,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitInputOutputSection(InputOutputSectionContext ctx) {
     return addTreeNode(ctx, locality -> {
       SectionNode node = new SectionNode(locality, SectionType.INPUT_OUTPUT);
-      node.addProcessStep(c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
       return node;
     });
   }
@@ -383,7 +383,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
           ctx,
           locality -> {
             FileEntryNode node = new FileEntryNode(locality, filename, fileControlClause);
-            node.addProcessStep(c -> new FileEntryProcess().accept(node, c));
+            NodeProcessor.addProcessStep(node, c -> new FileEntryProcess().accept(node, c));
             return node;
           });
     }
@@ -391,7 +391,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         ctx,
         locality -> {
           FileEntryNode node = new FileEntryNode(locality, filename, "");
-          node.addProcessStep(c -> new FileEntryProcess().accept(node, c));
+          NodeProcessor.addProcessStep(node, c -> new FileEntryProcess().accept(node, c));
           return node;
         });
   }
@@ -421,7 +421,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitFileSection(FileSectionContext ctx) {
     return addTreeNode(ctx, locality -> {
       SectionNode node = new SectionNode(locality, SectionType.FILE);
-      node.addProcessStep(c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
       return node;
     });
   }
@@ -430,7 +430,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitLinkageSection(LinkageSectionContext ctx) {
     return addTreeNode(ctx, locality -> {
       SectionNode node = new SectionNode(locality, SectionType.LINKAGE);
-      node.addProcessStep(c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
       return node;
     });
   }
@@ -439,7 +439,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitLocalStorageSection(LocalStorageSectionContext ctx) {
     return addTreeNode(ctx, locality -> {
       SectionNode node = new SectionNode(locality, SectionType.LOCAL_STORAGE);
-      node.addProcessStep(c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
       return node;
     });
   }
@@ -449,7 +449,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return addTreeNode(
         ctx, locality -> {
               SectionNameNode node = new SectionNameNode(locality, ctx.getText(), messageService);
-              node.addProcessStep(c -> new SectionNameRegister().accept(node, c));
+              NodeProcessor.addProcessStep(node, c -> new SectionNameRegister().accept(node, c));
               return node;
             });
   }
@@ -545,7 +545,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         ctx,
         locality -> {
           CodeBlockUsageNode node = new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx));
-          node.addProcessStep(
+          NodeProcessor.addProcessStep(node,
               NodeProcessor.runNextTime(node, c -> new CodeBlockProcess().accept(node, c)));
           return node;
         });
@@ -557,7 +557,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         ctx,
         loc -> {
           RemarksNode node = new RemarksNode(loc);
-          node.addProcessStep(c -> new ObsoleteWarning().accept(node, c));
+          NodeProcessor.addProcessStep(node, c -> new ObsoleteWarning().accept(node, c));
           return node;
         });
   }
@@ -690,7 +690,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             retrieveRangeLocality(ctx, positions).orElse(null),
             receivingField,
             sendingField.get(0));
-    statement.addProcessStep(c -> new StatementValidate().accept(statement, c));
+    NodeProcessor.addProcessStep(statement, c -> new StatementValidate().accept(statement, c));
     return addTreeNode(statement, children);
   }
 
@@ -700,7 +700,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         ctx.receivingField().stream().map(this::visit).flatMap(List::stream).collect(toList());
     SetToOnOffStatement statement =
         new SetToOnOffStatement(retrieveRangeLocality(ctx, positions).orElse(null), receivingField);
-    statement.addProcessStep(c -> new StatementValidate().accept(statement, c));
+    NodeProcessor.addProcessStep(statement, c -> new StatementValidate().accept(statement, c));
     return addTreeNode(statement, receivingField);
   }
 
@@ -711,7 +711,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     SetToBooleanStatement statement =
         new SetToBooleanStatement(
             retrieveRangeLocality(ctx, positions).orElse(null), receivingField);
-    statement.addProcessStep(c -> new StatementValidate().accept(statement, c));
+    NodeProcessor.addProcessStep(statement, c -> new StatementValidate().accept(statement, c));
     return addTreeNode(statement, receivingField);
   }
 
@@ -724,7 +724,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
     return addTreeNode(ctx, location -> {
       QualifiedReferenceNode node = new QualifiedReferenceNode(location);
-      node.addProcessStep(c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
       return node;
     });
   }
@@ -741,7 +741,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         locality -> {
           Node usage = new VariableUsageNode(getName(ctx), locality);
           QualifiedReferenceNode reference = new QualifiedReferenceNode(locality);
-          reference.addProcessStep(c -> new QualifiedReferenceUpdateVariableUsage().accept(reference, c));
+          NodeProcessor.addProcessStep(reference, c -> new QualifiedReferenceUpdateVariableUsage().accept(reference, c));
           reference.addChild(usage);
           return reference;
         });
@@ -801,7 +801,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         ctx,
         loc -> {
           ParagraphsNode node = new ParagraphsNode(loc);
-          node.addProcessStep(c -> new DefineCodeBlock().accept(node, c));
+          NodeProcessor.addProcessStep(node, c -> new DefineCodeBlock().accept(node, c));
           return node;
         });
   }
@@ -810,7 +810,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitProcedureDivisionBody(ProcedureDivisionBodyContext ctx) {
     return addTreeNode(ctx, loc -> {
       ProcedureDivisionBodyNode node = new ProcedureDivisionBodyNode(loc);
-      node.addProcessStep(c -> new DefineCodeBlock().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new DefineCodeBlock().accept(node, c));
       return node;
     });
   }
@@ -819,7 +819,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitParagraphDefinitionName(ParagraphDefinitionNameContext ctx) {
     return addTreeNode(ctx, locality -> {
       ParagraphNameNode node = new ParagraphNameNode(locality, ctx.getText());
-      node.addProcessStep(c -> new ParagraphNameRegister().accept(node, c));
+      NodeProcessor.addProcessStep(node, c -> new ParagraphNameRegister().accept(node, c));
       return node;
     });
   }

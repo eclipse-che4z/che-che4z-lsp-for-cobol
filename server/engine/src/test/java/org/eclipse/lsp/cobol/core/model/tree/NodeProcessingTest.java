@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.logic.NodeProcessor;
 import org.eclipse.lsp.cobol.core.model.tree.logic.ProcessingContext;
 import org.junit.jupiter.api.Test;
 
@@ -41,11 +42,11 @@ class NodeProcessingTest {
     }
 
     SimpleNode node = new SimpleNode();
-    assertTrue(node.isProcessed());
+    assertTrue(NodeProcessor.isProcessed(node));
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    node.process(new ProcessingContext(errors));
-    assertEquals(ImmutableList.of(), errors);
-    assertTrue(node.isProcessed());
+      NodeProcessor.process(node, new ProcessingContext(errors));
+      assertEquals(ImmutableList.of(), errors);
+    assertTrue(NodeProcessor.isProcessed(node));
   }
 
   @Test
@@ -54,7 +55,7 @@ class NodeProcessingTest {
     class ErrorNode extends Node {
       ErrorNode() {
         super(null, NodeType.ROOT);
-        addProcessStep(ctx -> ctx.getErrors().addAll(processTheNode()));
+        NodeProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processTheNode()));
       }
 
       private List<SyntaxError> processTheNode() {
@@ -63,11 +64,11 @@ class NodeProcessingTest {
     }
 
     ErrorNode node = new ErrorNode();
-    assertFalse(node.isProcessed());
+    assertFalse(NodeProcessor.isProcessed(node));
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    node.process(new ProcessingContext(errors));
-    assertEquals(ImmutableList.of(ERROR_1), errors);
-    assertTrue(node.isProcessed());
+      NodeProcessor.process(node, new ProcessingContext(errors));
+      assertEquals(ImmutableList.of(ERROR_1), errors);
+    assertTrue(NodeProcessor.isProcessed(node));
   }
 
   @Test
@@ -76,11 +77,11 @@ class NodeProcessingTest {
     class ErrorNode extends Node {
       ErrorNode() {
         super(null, NodeType.ROOT);
-        addProcessStep(ctx -> ctx.getErrors().addAll(processTheNodeFirst()));
+        NodeProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processTheNodeFirst()));
       }
 
       private List<SyntaxError> processTheNodeFirst() {
-        addProcessStep(ctx -> ctx.getErrors().addAll(processTheNodeSecond()));
+        NodeProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processTheNodeSecond()));
 
         return ImmutableList.of(ERROR_1);
       }
@@ -93,14 +94,14 @@ class NodeProcessingTest {
     ErrorNode node = new ErrorNode();
     ArrayList<SyntaxError> errors = new ArrayList<>();
     ProcessingContext ctx = new ProcessingContext(errors);
-    node.process(ctx);
-    assertFalse(node.isProcessed());
+      NodeProcessor.process(node, ctx);
+      assertFalse(NodeProcessor.isProcessed(node));
     assertEquals(ImmutableList.of(ERROR_1), ctx.getErrors());
-    assertFalse(node.isProcessed());
+    assertFalse(NodeProcessor.isProcessed(node));
     ctx.getErrors().clear();
-    node.process(ctx);
-    assertEquals(ImmutableList.of(ERROR_2), ctx.getErrors());
-    assertTrue(node.isProcessed());
+      NodeProcessor.process(node, ctx);
+      assertEquals(ImmutableList.of(ERROR_2), ctx.getErrors());
+    assertTrue(NodeProcessor.isProcessed(node));
   }
 
   @Test
@@ -109,7 +110,7 @@ class NodeProcessingTest {
     class NodeForExtension extends Node {
       NodeForExtension() {
         super(null, NodeType.ROOT);
-        addProcessStep(ctx -> ctx.getErrors().addAll(processFirst()));
+        NodeProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processFirst()));
       }
 
       private List<SyntaxError> processFirst() {
@@ -120,7 +121,7 @@ class NodeProcessingTest {
     /** Do processing in one step and return ERROR_2 */
     class LeafNode extends NodeForExtension {
       LeafNode() {
-        addProcessStep(ctx -> ctx.getErrors().addAll(processSecond()));
+        NodeProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processSecond()));
       }
 
       private List<SyntaxError> processSecond() {
@@ -129,11 +130,11 @@ class NodeProcessingTest {
     }
 
     LeafNode node = new LeafNode();
-    assertFalse(node.isProcessed());
+    assertFalse(NodeProcessor.isProcessed(node));
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    node.process(new ProcessingContext(errors));
-    assertEquals(ImmutableList.of(ERROR_1, ERROR_2), errors);
-    assertTrue(node.isProcessed());
+      NodeProcessor.process(node, new ProcessingContext(errors));
+      assertEquals(ImmutableList.of(ERROR_1, ERROR_2), errors);
+    assertTrue(NodeProcessor.isProcessed(node));
   }
 
   @Test
@@ -142,7 +143,7 @@ class NodeProcessingTest {
     class NodeForExtension extends Node {
       NodeForExtension() {
         super(null, NodeType.ROOT);
-        addProcessStep(ctx -> ctx.getErrors().addAll(processFirst()));
+        NodeProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processFirst()));
       }
 
       private List<SyntaxError> processFirst() {
@@ -153,11 +154,11 @@ class NodeProcessingTest {
     /** Do processing in two steps and return ERROR_2 and then ERROR_3 */
     class LeafNode extends NodeForExtension {
       LeafNode() {
-        addProcessStep(ctx -> ctx.getErrors().addAll(processStep1()));
+        NodeProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processStep1()));
       }
 
       private List<SyntaxError> processStep1() {
-        addProcessStep(ctx -> ctx.getErrors().addAll(processStep2()));
+        NodeProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processStep2()));
         return ImmutableList.of(ERROR_2);
       }
 
@@ -167,16 +168,16 @@ class NodeProcessingTest {
     }
 
     LeafNode node = new LeafNode();
-    assertFalse(node.isProcessed());
+    assertFalse(NodeProcessor.isProcessed(node));
     ArrayList<SyntaxError> errors = new ArrayList<>();
     ProcessingContext ctx = new ProcessingContext(errors);
-    node.process(ctx);
-    assertEquals(ImmutableList.of(ERROR_1, ERROR_2), ctx.getErrors());
-    assertFalse(node.isProcessed());
+      NodeProcessor.process(node, ctx);
+      assertEquals(ImmutableList.of(ERROR_1, ERROR_2), ctx.getErrors());
+    assertFalse(NodeProcessor.isProcessed(node));
     ctx.getErrors().clear();
-    node.process(ctx);
-    assertEquals(ImmutableList.of(ERROR_3), ctx.getErrors());
-    assertTrue(node.isProcessed());
+      NodeProcessor.process(node, ctx);
+      assertEquals(ImmutableList.of(ERROR_3), ctx.getErrors());
+    assertTrue(NodeProcessor.isProcessed(node));
   }
 
   @Test
@@ -185,11 +186,11 @@ class NodeProcessingTest {
     class NodeForExtension extends Node {
       NodeForExtension() {
         super(null, NodeType.ROOT);
-        addProcessStep(ctx -> ctx.getErrors().addAll(processStep1()));
+        NodeProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processStep1()));
       }
 
       private List<SyntaxError> processStep1() {
-        addProcessStep(ctx -> ctx.getErrors().addAll(processStep2()));
+        NodeProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processStep2()));
         return ImmutableList.of(ERROR_1);
       }
 
@@ -201,7 +202,7 @@ class NodeProcessingTest {
     /** Do processing in one step and return ERROR_3 */
     class LeafNode extends NodeForExtension {
       LeafNode() {
-        addProcessStep(ctx -> ctx.getErrors().addAll(processSecond()));
+        NodeProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processSecond()));
       }
 
       private List<SyntaxError> processSecond() {
@@ -210,16 +211,16 @@ class NodeProcessingTest {
     }
 
     LeafNode node = new LeafNode();
-    assertFalse(node.isProcessed());
+    assertFalse(NodeProcessor.isProcessed(node));
     ArrayList<SyntaxError> errors = new ArrayList<>();
     ProcessingContext ctx = new ProcessingContext(errors);
-    node.process(ctx);
-    assertEquals(ImmutableList.of(ERROR_1, ERROR_3), ctx.getErrors());
-    assertFalse(node.isProcessed());
+      NodeProcessor.process(node, ctx);
+      assertEquals(ImmutableList.of(ERROR_1, ERROR_3), ctx.getErrors());
+    assertFalse(NodeProcessor.isProcessed(node));
     ctx.getErrors().clear();
-    node.process(ctx);
-    assertEquals(ImmutableList.of(ERROR_2), errors);
-    assertTrue(node.isProcessed());
+      NodeProcessor.process(node, ctx);
+      assertEquals(ImmutableList.of(ERROR_2), errors);
+    assertTrue(NodeProcessor.isProcessed(node));
   }
 
   private static SyntaxError getError(String message) {

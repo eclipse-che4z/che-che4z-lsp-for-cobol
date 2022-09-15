@@ -19,7 +19,7 @@ public class DeclarativeProcedureSectionRegister
     ProgramNode program = programOpt.get();
     program.registerCodeBlock(node);
     ParagraphNameNode paragraphNameNode = new ParagraphNameNode(node.getLocality(), node.getName());
-    paragraphNameNode.addProcessStep(ctx -> new ParagraphNameRegister().accept(paragraphNameNode, ctx));
+    NodeProcessor.addProcessStep(paragraphNameNode, ctx -> new ParagraphNameRegister().accept(paragraphNameNode, ctx));
     program.registerParagraphNameNode(paragraphNameNode);
   }
 }

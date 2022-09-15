@@ -34,6 +34,7 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.logic.ElementaryProcessStandAlone;
+import org.eclipse.lsp.cobol.core.model.tree.logic.NodeProcessor;
 import org.eclipse.lsp.cobol.core.model.tree.logic.VariableWithLevelCheckLevel;
 import org.eclipse.lsp.cobol.core.model.tree.variables.ElementaryItemNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNameNode;
@@ -191,8 +192,8 @@ public final class DaCoDialect implements CobolDialect {
               elNode.isRedefines(),
               elNode.isBlankWhenZeroPresent(),
               elNode.isSignClausePresent());
-      cloneNode.addProcessStep(ctx -> new VariableWithLevelCheckLevel().accept(cloneNode, ctx));
-      cloneNode.addProcessStep(ctx -> new ElementaryProcessStandAlone().accept(cloneNode, ctx));
+      NodeProcessor.addProcessStep(cloneNode, ctx -> new VariableWithLevelCheckLevel().accept(cloneNode, ctx));
+      NodeProcessor.addProcessStep(cloneNode, ctx -> new ElementaryProcessStandAlone().accept(cloneNode, ctx));
       cloneNode.addChild(new VariableDefinitionNameNode(node.getLocality(), newName));
       return cloneNode;
     }

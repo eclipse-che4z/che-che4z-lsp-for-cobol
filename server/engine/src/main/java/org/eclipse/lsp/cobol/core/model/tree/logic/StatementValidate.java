@@ -41,7 +41,7 @@ public class StatementValidate implements BiConsumer<StatementNode, ProcessingCo
 
   @Override
   public void accept(StatementNode node, ProcessingContext _ctx) {
-    node.addProcessStep(
+    NodeProcessor.addProcessStep(node,
         NodeProcessor.runNextTime(
             node, NodeProcessor.runNextTime(node, ctx -> validate(node, ctx))));
   }

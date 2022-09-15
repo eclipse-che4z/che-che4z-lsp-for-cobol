@@ -25,7 +25,7 @@ public class QualifiedReferenceUpdateVariableUsage
 
   @Override
   public void accept(QualifiedReferenceNode node, ProcessingContext ctx) {
-    node.addProcessStep(NodeProcessor.runNextTime(
+    NodeProcessor.addProcessStep(node, NodeProcessor.runNextTime(
                     node, _ctx -> updateVariableUsage(node, _ctx)));
   }
 
