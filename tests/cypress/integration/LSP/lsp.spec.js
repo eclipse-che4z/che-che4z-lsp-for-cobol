@@ -76,7 +76,7 @@ context('This is a LSP spec', () => {
       .contains(documentation);
   };
 
-  describe.skip('TC314392 LOG level', () => {
+  describe('TC314392 LOG level', () => {
     // Theia doesn't show settings.json correctly
     // Check for VSCode as well!
     beforeEach(() => {
@@ -86,7 +86,7 @@ context('This is a LSP spec', () => {
       cy.closeFolder('.theia');
     });
 
-    it.skip(['flaky_theia'], 'Lets check structure in settings.json file ', () => {
+    it(['flaky_theia'], 'Lets check structure in settings.json file ', () => {
       cy.openFolder('.theia').openFile('settings.json').goToLine(4);
       cy.getCurrentLine().type('{end}{enter}').wait(500);
       cy.getCurrentLine().type('"cobol-lsp.logging.level.root": "ERROR"');
@@ -99,34 +99,30 @@ context('This is a LSP spec', () => {
           cy.wrap($error).getElementLineNumber().should('eq', 4);
           cy.getCurrentLine().trigger('mousemove', $error[0].offsetLeft, $error[0].offsetTop);
         });
-      cy.get(hoverOverContent).contains(
+      cy.get(IDE.hoverOverContent).contains(
         'Value is not accepted. Valid values: "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL".',
       );
     });
   });
 
   describe('TC266094 Underline the entire incorrect variable structure', () => {
-    it.skip(
-      ['smoke', 'CI'],
-      'This test checks that parser can find and underline an incorrect variable structure.',
-      () => {
-        function underline(lineNumber, variable) {
-          return cy
-            .openFile('VAR.cbl')
-            .goToLine(lineNumber)
-            .wait(500)
-            .getCurrentLineErrors({ expectedLine: lineNumber })
-            .getHoverErrorMessage(variable)
-            .contains(`Variable ${variable} is not defined`);
-        }
+    it(['smoke', 'CI'], 'This test checks that parser can find and underline an incorrect variable structure.', () => {
+      function underline(lineNumber, variable) {
+        return cy
+          .openFile('VAR.cbl')
+          .goToLine(lineNumber)
+          .wait(500)
+          .getCurrentLineErrors({ expectedLine: lineNumber })
+          .getHoverErrorMessage(variable)
+          .contains(`Variable ${variable} is not defined`);
+      }
 
-        underline(23, 'CHILD1');
-        underline(24, 'CHILD2');
-      },
-    );
+      underline(23, 'CHILD1');
+      underline(24, 'CHILD2');
+    });
   });
 
-  describe.skip('TC314614 paragraph is not defined', () => {
+  describe('TC314614 paragraph is not defined', () => {
     beforeEach(() => {
       cy.writeFile(
         'test_files/project/CALC-DATA.cbl',
@@ -144,7 +140,7 @@ context('This is a LSP spec', () => {
       );
     });
 
-    it.skip('Checks Syntax and Semantic Errors from Copybooks', () => {
+    it('Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('USERC1N2.cbl').wait(500).goToLine(32);
       cy.getCurrentLine().should('not.have.class', Theia.editorError);
       cy.goToLine(35);
@@ -176,7 +172,7 @@ context('This is a LSP spec', () => {
     });
   });
 
-  describe.skip('TC314736 Semantic analysis for Sections', () => {
+  describe('TC314736 Semantic analysis for Sections', () => {
     beforeEach(() => {
       cy.writeFile(
         'test_files/project/CALC-DATA.cbl',
@@ -194,7 +190,7 @@ context('This is a LSP spec', () => {
       );
     });
 
-    it.skip(['smoke'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
+    it(['smoke'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('CALC-DATA.cbl').wait(500).goToLine(5);
       cy.getLineByNumber(5).findText('GET-DATA').goToDefinition().wait(500);
       cy.getCurrentLineNumber().should('eq', 8);
@@ -206,7 +202,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC250114 Implement syntax coloring', () => {
-    it.skip(['smoke'], 'Lets check the positions of rulers ', () => {
+    it(['smoke'], 'Lets check the positions of rulers ', () => {
       cy.openFile('TEST.CBL').wait(500).goToLine(24);
       cy.getCurrentLine().type('{end}{enter}');
       [
@@ -225,54 +221,39 @@ context('This is a LSP spec', () => {
     });
   });
 
-  describe.skip('TC289633 Provide default COBOL code snippets  - basic scenario', () => {
+  describe('TC289633 Provide default COBOL code snippets  - basic scenario', () => {
     const fileName = 'CALC-DATA';
 
     beforeEach(() => {
-      cy.writeFile(`test_files/project/${fileName}.cbl`, 's');
+      cy.writeFile(
+        'test_files/project/CALC-DATA.cbl',
+        `       IDENTIFICATION DIVISION. 
+        PROGRAM-ID. CALC-DATA. 
+        DATA DIVISION. 
+        PROCEDURE DIVISION.
+             PERFORM GET-DATA.
+             PERFORM CALC_DATA.
+            STOP RUN.
+        GET-DATA SECTION.
+            DISPLAY FIRST-VAR.
+        CALC_DATA.
+            DISPLAY FIRST-VAR.`,
+      );
     });
 
     afterEach(() => {
-      cy.deleteFile(`${fileName}.cbl`);
+      cy.deleteFile('CALC-DATA.cbl');
     });
-    it.skip(['smoke', 'CI'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
+    it(['smoke', 'CI'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
-      cy.getCurrentLine().type('{selectall}shell').wait(500);
-      cy.get(Theia.suggestWidget).contains('SHELL').click();
       cy.getLineByNumber(2).contains(`PROGRAM-ID. ${fileName}.`);
-      cy.getLineByNumber(8).contains('DATA DIVISION.');
-      cy.getLineByNumber(16).contains('STOP RUN.');
-    });
-  });
-
-  describe('TC289635 Provide default COBOL code snippets', () => {
-    const fileName = 'CALC-DATA';
-
-    beforeEach(() => {
-      cy.writeFile(`test_files/project/${fileName}.cbl`, 's');
-    });
-
-    it.skip('Checks Syntax and Semantic Errors from Copybooks', () => {
-      cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
-      cy.getCurrentLine().type('{selectall}shell').wait(500);
-      cy.get(Theia.suggestWidget).contains('shell').click();
-      cy.goToLine(15).getCurrentLine().type('COPY ABC.');
-      cy.wait(500)
-        .getCurrentLineErrors({ expectedLine: 15 })
-        .eq(0)
-        .getHoverErrorMessage('ABC')
-        .contains('ABC: Copybook not foundCOBOL Language Support (copybook)(missing copybook)');
-      cy.getCurrentLine().type('{end}{enter}');
-      cy.getCurrentLine().type('FUNCTION-CO');
-      cy.get(Theia.suggestWidget).contains('FUNCTION-COS');
-      //lower case
-      cy.getCurrentLine().type('{selectall}function-co', { delay: 200 });
-      cy.get(Theia.suggestWidget).contains('function-cos');
+      cy.getLineByNumber(3).contains('DATA DIVISION.');
+      cy.getLineByNumber(7).contains('STOP RUN.');
     });
   });
 
   describe('TC152049 Navigate through definitions', () => {
-    it.skip('Checks behavior of go to definition action', () => {
+    it('Checks behavior of go to definition action', () => {
       cy.openFile('USER1.cbl').wait(500);
       cy.getLineByNumber(14).type('{home}{enter}');
       cy.goToLine(14).getCurrentLine().type('TITLE "something"');
@@ -283,7 +264,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC315355 Server Rejects Outline Request for Unsupported Files', () => {
-    it.skip(['smoke'], 'Request should be rejected immediately', () => {
+    it(['smoke'], 'Request should be rejected immediately', () => {
       cy.writeFile('test_files/project/some_text.txt', '');
       cy.openFile('some_text.txt');
       cy.changeLangMode('COBOL');
@@ -299,7 +280,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC315392 PROGRAM-ID Check Is Not Case Sensitive', () => {
-    it.skip('Checks Syntax and Semantic Errors from Copybooks', () => {
+    it('Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('USER1.cbl').wait(500);
       cy.getLineByNumber(49).type('{selectall}{backspace}        End program hello-world.');
       cy.getCurrentLineOverlay().children().should('not.have.class', IDE.editorWarn).goToLine(41);
@@ -315,7 +296,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC319689 Hover over variable shows its hierarchy definition', () => {
-    it.skip(
+    it(
       ['smoke'],
       'Checks a variable definition with a snippet of its structure when user hovers over the variable.',
       () => {
@@ -333,7 +314,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC319969 Provide the variables definition as documentation', () => {
-    it.skip(['smoke'], 'Checks variable definition into VSC autocomplete documentation.', () => {
+    it(['smoke'], 'Checks variable definition into VSC autocomplete documentation.', () => {
       cy.openFile('HOVER.CBL');
       varDifinitionAutocomplete('ADFSF', '01 SOMETHING. 03 ADFSF OCCURS 30 TIMES. INDEXED BY INDX 05 OL-NO PIC X(8).');
       varDifinitionAutocomplete('FILE-RECORD', '01 FILE-RECORD PIC X(113).');
@@ -350,7 +331,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('Show 88 Items On Hover', () => {
-    it.skip(['smoke'], 'Show 88 Items On Hover', () => {
+    it(['smoke'], 'Show 88 Items On Hover', () => {
       cy.openFile('TEST.CBL');
       cy.goToLine(19);
       cy.getLineByNumber(20).type('{home}{enter}');
@@ -372,14 +353,14 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC327254 Semicolon as a Separators Not Produces Error', () => {
-    it.skip(['smoke', 'CI'], 'Semicolon as a Separators Not Produces Error', () => {
+    it(['smoke', 'CI'], 'Semicolon as a Separators Not Produces Error', () => {
       cy.openFile('TEST.CBL');
       cy.goToLine(23).getLineByNumber(23).type('{end}{backspace};');
       cy.getLineByNumber(23).should('not.have.class', IDE.editorError);
     });
   });
 
-  describe.skip('TC328483 support floating comment indicators (*>)', () => {
+  describe('TC328483 support floating comment indicators (*>)', () => {
     function checkForErrors(lineNumber) {
       return cy
         .goToLine(lineNumber)
@@ -396,34 +377,30 @@ context('This is a LSP spec', () => {
     function addComment(lineNumber, comment) {
       return cy.openFile('USER2.cbl').getLineByNumber(lineNumber).type(comment);
     }
-    it.skip(['smoke'], 'support floating comment indicators (*>) - with space', () => {
+    it(['smoke'], 'support floating comment indicators (*>) - with space', () => {
       addComment(26, "      *> ---- Let's have a comment with space");
       checkForErrors(26);
     });
-    it.skip(['smoke'], 'support floating comment indicators (*>) - without space', () => {
+    it(['smoke'], 'support floating comment indicators (*>) - without space', () => {
       addComment(26, "      *>---- Let's have a comment without space");
       checkForErrors(26);
     });
 
-    it.skip(['smoke'], 'support floating comment indicators (*>) - comment in non-empty string', () => {
+    it(['smoke'], 'support floating comment indicators (*>) - comment in non-empty string', () => {
       addComment(29, '{end} *> here');
       checkForErrors(29);
     });
-    it.skip(
-      ['smoke'],
-      'support floating comment indicators (*>) - comment in non-empty string with expected error',
-      () => {
-        addComment(29, '{end} *>');
-        expectErrors(29);
-      },
-    );
-    it.skip(['smoke'], 'support floating comment indicators (*>) - out of 80 characters', () => {
+    it(['smoke'], 'support floating comment indicators (*>) - comment in non-empty string with expected error', () => {
+      addComment(29, '{end} *>');
+      expectErrors(29);
+    });
+    it(['smoke'], 'support floating comment indicators (*>) - out of 80 characters', () => {
       addComment(29, '{end} *> ddddddddddddddddddddddddddddddddddddddddddd');
       expectErrors(29);
     });
   });
 
-  describe.skip('TC331303 Define the constants as variables', () => {
+  describe('TC331303 Define the constants as variables', () => {
     function goToDefinitionExtended(line1, text, line2) {
       return cy
         .getLineByNumber(line1)
@@ -449,7 +426,7 @@ context('This is a LSP spec', () => {
             GOBACK. `,
       );
     });
-    it.skip('Define the constants as variables - check the linkage section enabled', () => {
+    it('Define the constants as variables - check the linkage section enabled', () => {
       cy.openFile('1VSAMTEST.cbl');
       cy.goToLine(9)
         .getCurrentLineErrors({ expectedLine: 9 })
@@ -458,13 +435,13 @@ context('This is a LSP spec', () => {
       cy.getLineByNumber(6).type('LINKAGE SECTION.');
       cy.getLineByNumber(10).should('not.have.class', '.squiggly-error');
     });
-    it.skip('Define the constants as variables - check the go to definition', () => {
+    it('Define the constants as variables - check the go to definition', () => {
       cy.openFile('1VSAMTEST.cbl');
       cy.getLineByNumber(6).type('LINKAGE SECTION.');
       goToDefinitionExtended(5, 'RECORD-FILE-STATUS', 8);
       goToDefinitionExtended(8, 'RECORD-FILE-STATUS', 5);
     });
-    it.skip('Define the constants as variables - autocomplete', () => {
+    it('Define the constants as variables - autocomplete', () => {
       cy.openFile('1VSAMTEST.cbl');
       cy.getLineByNumber(6).type('LINKAGE SECTION.');
       cy.getLineByNumber(9)
