@@ -1,5 +1,20 @@
+/*
+ * Copyright (c) 2022 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ *
+ */
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -15,11 +30,12 @@ import java.util.function.BiConsumer;
 
 import static java.util.stream.Collectors.toList;
 
+/** RootNode processor */
 public class RootNodeUpdateCopyNodesByPositionInTree
     implements BiConsumer<RootNode, ProcessingContext> {
   @Override
   public void accept(RootNode node, ProcessingContext ctx) {
-    NodeProcessor.addProcessStep(node, NodeProcessor.runNextTime(node, c -> updateCopyNodes(node)));
+    updateCopyNodes(node);
   }
 
   private void updateCopyNodes(RootNode node) {
@@ -29,7 +45,7 @@ public class RootNodeUpdateCopyNodesByPositionInTree
     nodes.forEach(
         it ->
             RangeUtils.findNodeByPosition(
-                            node, it.getLocality().getUri(), it.getLocality().getRange().getStart())
+                    node, it.getLocality().getUri(), it.getLocality().getRange().getStart())
                 .orElse(node)
                 .addChild(it));
 

@@ -33,9 +33,6 @@ import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.logic.ElementaryProcessStandAlone;
-import org.eclipse.lsp.cobol.core.model.tree.logic.NodeProcessor;
-import org.eclipse.lsp.cobol.core.model.tree.logic.VariableWithLevelCheckLevel;
 import org.eclipse.lsp.cobol.core.model.tree.variables.ElementaryItemNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
@@ -150,12 +147,12 @@ public final class DaCoDialect implements CobolDialect {
                                   && Objects.equals(vdn.getVariableName().getName(), cfn.getPrototypeName())
                   )
                   .collect(Collectors.toList());
-          if (protoCandidates.size() != 1) {
-            // TODO: error, should be only one candidate
-          }
-          if (cfn.getParent().getNodeType() != NodeType.VARIABLE_DEFINITION) {
-            // TODO error reporting
-          }
+//          if (protoCandidates.size() != 1) {
+//            // TODO: error, should be only one candidate
+//          }
+//          if (cfn.getParent().getNodeType() != NodeType.VARIABLE_DEFINITION) {
+//            // TODO error reporting
+//          }
           copyFrom(protoCandidates.get(0), cfn.getParent(), cfn);
         });
     // clone variables from source, replace suffixes
@@ -192,8 +189,6 @@ public final class DaCoDialect implements CobolDialect {
               elNode.isRedefines(),
               elNode.isBlankWhenZeroPresent(),
               elNode.isSignClausePresent());
-      NodeProcessor.addProcessStep(cloneNode, ctx -> new VariableWithLevelCheckLevel().accept(cloneNode, ctx));
-      NodeProcessor.addProcessStep(cloneNode, ctx -> new ElementaryProcessStandAlone().accept(cloneNode, ctx));
       cloneNode.addChild(new VariableDefinitionNameNode(node.getLocality(), newName));
       return cloneNode;
     }

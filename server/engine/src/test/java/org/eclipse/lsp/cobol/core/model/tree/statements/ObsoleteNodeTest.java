@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.statements;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ErrorSource;
@@ -22,9 +23,9 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.RemarksNode;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
-import org.eclipse.lsp.cobol.core.model.tree.logic.NodeProcessor;
 import org.eclipse.lsp.cobol.core.model.tree.logic.ObsoleteWarning;
-import org.eclipse.lsp.cobol.core.model.tree.logic.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.junit.jupiter.api.Test;
 
@@ -39,11 +40,11 @@ class ObsoleteNodeTest {
     Locality locality = Locality.builder().build();
     RootNode rootNode = new RootNode(locality, new CopybooksRepository());
     RemarksNode remarksNode = new RemarksNode(locality);
-    NodeProcessor.addProcessStep(remarksNode, c -> new ObsoleteWarning().accept(remarksNode, c));
+    AstProcessor astProcessor = new AstProcessor();
+    astProcessor.register(ObsoleteNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteWarning());
     rootNode.addChild(remarksNode);
-
     ArrayList<SyntaxError> errors = new ArrayList<>();
-      NodeProcessor.process(rootNode, new ProcessingContext(errors));
+    astProcessor.process(ProcessingPhase.TRANSFORMATION, rootNode, new ProcessingContext(errors));
 
       assertEquals(
         errors,

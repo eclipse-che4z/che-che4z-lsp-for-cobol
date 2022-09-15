@@ -19,9 +19,11 @@ import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /** A test case for COPY FROM statement */
+@Disabled("WIP")
 public class TestDaCoCopyFrom {
   private static final String TEXT =
             "       IDENTIFICATION DIVISION.\n"

@@ -1,7 +1,22 @@
+/*
+ * Copyright (c) 2022 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ *
+ */
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -40,10 +55,8 @@ public class StatementValidate implements BiConsumer<StatementNode, ProcessingCo
   };
 
   @Override
-  public void accept(StatementNode node, ProcessingContext _ctx) {
-    NodeProcessor.addProcessStep(node,
-        NodeProcessor.runNextTime(
-            node, NodeProcessor.runNextTime(node, ctx -> validate(node, ctx))));
+  public void accept(StatementNode node, ProcessingContext ctx) {
+    validate(node, ctx);
   }
 
   private void validate(StatementNode node, ProcessingContext ctx) {
@@ -67,8 +80,7 @@ public class StatementValidate implements BiConsumer<StatementNode, ProcessingCo
       SetUpDownByStatement node1 = (SetUpDownByStatement) node;
       ctx.getErrors()
           .addAll(
-              validateVariableType(
-                  (node1).getReceivingFields(), ImmutableList.of(VariableType.INDEX_ITEM)));
+              validateVariableType(node1.getReceivingFields(), ImmutableList.of(VariableType.INDEX_ITEM)));
 
       if (hasSendingFieldProducesError(node1))
         ctx.getErrors()

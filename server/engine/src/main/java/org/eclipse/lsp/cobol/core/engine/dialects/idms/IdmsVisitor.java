@@ -17,32 +17,16 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.eclipse.lsp.cobol.core.*;
-import org.eclipse.lsp.cobol.core.IdmsParser.CobolWordContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.DataNameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsControlSectionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsIfConditionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsIfStatementContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsSectionsContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsStatementsContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_db_entity_nameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_map_nameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_map_name_definitionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_procedure_nameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.MapClauseContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.MapSectionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.QualifiedDataNameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.SchemaSectionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.VariableUsageNameContext;
+import org.eclipse.lsp.cobol.core.IdmsParser;
+import org.eclipse.lsp.cobol.core.IdmsParser.*;
+import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
-import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNode;
-import org.eclipse.lsp.cobol.core.model.tree.logic.NodeProcessor;
-import org.eclipse.lsp.cobol.core.model.tree.logic.ProcessNodeWithVariableDefinitions;
-import org.eclipse.lsp.cobol.core.model.tree.logic.QualifiedReferenceUpdateVariableUsage;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
@@ -51,7 +35,9 @@ import org.eclipse.lsp.cobol.core.model.variables.SectionType;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Location;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
@@ -97,38 +83,22 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
-    return addTreeNode(ctx, location -> {
-      QualifiedReferenceNode node = new QualifiedReferenceNode(location);
-      NodeProcessor.addProcessStep(node, c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
-      return node;
-    });
+    return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
   @Override
   public List<Node> visitIdms_db_entity_name(Idms_db_entity_nameContext ctx) {
-    return addTreeNode(ctx, location -> {
-      QualifiedReferenceNode node = new QualifiedReferenceNode(location);
-      NodeProcessor.addProcessStep(node, c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
-      return node;
-    });
+    return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
   @Override
   public List<Node> visitIdms_procedure_name(Idms_procedure_nameContext ctx) {
-    return addTreeNode(ctx, location -> {
-      QualifiedReferenceNode node = new QualifiedReferenceNode(location);
-      NodeProcessor.addProcessStep(node, c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
-      return node;
-    });
+    return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
   @Override
   public List<Node> visitIdms_map_name(Idms_map_nameContext ctx) {
-    return addTreeNode(ctx, location -> {
-      QualifiedReferenceNode node = new QualifiedReferenceNode(location);
-      NodeProcessor.addProcessStep(node, c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
-      return node;
-    });
+    return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
   @Override
@@ -139,13 +109,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitMapSection(MapSectionContext ctx) {
-    return addTreeNode(
-        ctx,
-        locality -> {
-          SectionNode node = new SectionNode(locality, SectionType.MAP);
-          NodeProcessor.addProcessStep(node, c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
-          return node;
-        });
+    return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.MAP));
   }
 
   @Override
@@ -167,24 +131,12 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitIdmsControlSection(IdmsControlSectionContext ctx) {
-    return addTreeNode(
-        ctx,
-        locality -> {
-          SectionNode node = new SectionNode(locality, SectionType.IDMS_CONTROL);
-          NodeProcessor.addProcessStep(node, c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
-          return node;
-        });
+    return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.IDMS_CONTROL));
   }
 
   @Override
   public List<Node> visitSchemaSection(SchemaSectionContext ctx) {
-    return addTreeNode(
-        ctx,
-        locality -> {
-          SectionNode node = new SectionNode(locality, SectionType.SCHEMA);
-          NodeProcessor.addProcessStep(node, c -> new ProcessNodeWithVariableDefinitions().accept(node, c));
-          return node;
-        });
+    return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.SCHEMA));
   }
 
   @Override

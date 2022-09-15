@@ -1,7 +1,22 @@
+/*
+ * Copyright (c) 2022 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ *
+ */
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ErrorSource;
@@ -17,6 +32,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+/** QualifiedReferenceNode processor */
 @Slf4j
 public class QualifiedReferenceUpdateVariableUsage
     implements BiConsumer<QualifiedReferenceNode, ProcessingContext> {
@@ -25,8 +41,7 @@ public class QualifiedReferenceUpdateVariableUsage
 
   @Override
   public void accept(QualifiedReferenceNode node, ProcessingContext ctx) {
-    NodeProcessor.addProcessStep(node, NodeProcessor.runNextTime(
-                    node, _ctx -> updateVariableUsage(node, _ctx)));
+    updateVariableUsage(node, ctx);
   }
 
   private void updateVariableUsage(QualifiedReferenceNode node, ProcessingContext ctx) {

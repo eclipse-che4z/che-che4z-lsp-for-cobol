@@ -18,9 +18,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.logic.NodeProcessor;
-import org.eclipse.lsp.cobol.core.model.tree.logic.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public abstract class Node {
   @EqualsAndHashCode.Exclude @Setter
   private Optional<Consumer<ProcessingContext>> nextStep = Optional.empty();
 
-  @EqualsAndHashCode.Exclude private final NodeProcessor processor = new NodeProcessor();
+  @EqualsAndHashCode.Exclude private final AstProcessor processor = new AstProcessor();
 
   protected Node(Locality location, NodeType nodeType, String dialect) {
     this.locality = location;

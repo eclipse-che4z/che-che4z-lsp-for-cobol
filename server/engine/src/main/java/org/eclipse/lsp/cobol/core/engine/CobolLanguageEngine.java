@@ -30,14 +30,16 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
-import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.logic.NodeProcessor;
+import org.eclipse.lsp.cobol.core.model.tree.*;
+import org.eclipse.lsp.cobol.core.model.tree.logic.*;
+import org.eclipse.lsp.cobol.core.model.tree.statements.ObsoleteNode;
+import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
@@ -81,6 +83,7 @@ public class CobolLanguageEngine {
   private final CachingConfigurationService cachingConfigurationService;
   private final DialectService dialectService;
 
+  private final AstProcessor astProcessor;
   private final SymbolService symbolService;
   private final InjectService injectService;
 
@@ -92,6 +95,7 @@ public class CobolLanguageEngine {
       SubroutineService subroutineService,
       CachingConfigurationService cachingConfigurationService,
       DialectService dialectService,
+      AstProcessor astProcessor,
       SymbolService symbolService,
       InjectService injectService) {
     this.preprocessor = preprocessor;
@@ -100,6 +104,7 @@ public class CobolLanguageEngine {
     this.subroutineService = subroutineService;
     this.cachingConfigurationService = cachingConfigurationService;
     this.dialectService = dialectService;
+    this.astProcessor = astProcessor;
     this.symbolService = symbolService;
     this.injectService = injectService;
   }
@@ -119,6 +124,7 @@ public class CobolLanguageEngine {
   public ResultWithErrors<Node> run(
       @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
+    registerProcessors(analysisConfig);
     Timing.Builder timingBuilder = Timing.builder();
 
     timingBuilder.getDialectsTimer().start();
@@ -245,7 +251,7 @@ public class CobolLanguageEngine {
 
     Node rootNode = syntaxTree.get(0);
     dialectService.processAst(analysisConfig.getDialects(), syntaxTree, accumulatedErrors);
-    accumulatedErrors.addAll(NodeProcessor.processSyntaxTree(rootNode));
+    accumulatedErrors.addAll(astProcessor.processSyntaxTree(rootNode));
 
     timingBuilder.getSyntaxTreeTimer().stop();
     timingBuilder.getLateErrorProcessingTimer().start();
@@ -272,6 +278,35 @@ public class CobolLanguageEngine {
 
     return new ResultWithErrors<>(
         rootNode, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
+  }
+
+  private void registerProcessors(AnalysisConfig analysisConfig) {
+    // Phase TRANSFORMATION
+    astProcessor.register(ProgramIdNode.class, ProcessingPhase.TRANSFORMATION, new ProgramIdProcess());
+    astProcessor.register(DeclarativeProcedureSectionNode.class, ProcessingPhase.TRANSFORMATION, new DeclarativeProcedureSectionRegister());
+    astProcessor.register(ElementaryNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryProcessStandAlone());
+    astProcessor.register(FileDescriptionNode.class, ProcessingPhase.TRANSFORMATION, new FileDescriptionProcess());
+    astProcessor.register(FileEntryNode.class, ProcessingPhase.TRANSFORMATION, new FileEntryProcess());
+    astProcessor.register(GroupItemNode.class, ProcessingPhase.TRANSFORMATION, new GroupItemProcess());
+    astProcessor.register(ObsoleteNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteWarning());
+    astProcessor.register(ProgramEndNode.class, ProcessingPhase.TRANSFORMATION, new ProgramEndProcess());
+    astProcessor.register(StandAloneDataItemNode.class, ProcessingPhase.TRANSFORMATION, new StandAloneDataItemProcess());
+    astProcessor.register(VariableWithLevelNode.class, ProcessingPhase.TRANSFORMATION, new VariableWithLevelCheckLevel());
+    astProcessor.register(SectionNameNode.class, ProcessingPhase.TRANSFORMATION, new SectionNameRegister());
+    astProcessor.register(SectionNode.class, ProcessingPhase.TRANSFORMATION, new ProcessNodeWithVariableDefinitions());
+    // Phase DEFINITION
+    astProcessor.register(ParagraphsNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock());
+    astProcessor.register(ParagraphNameNode.class, ProcessingPhase.DEFINITION, new ParagraphNameRegister());
+    astProcessor.register(ProcedureDivisionBodyNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock());
+    // Phase USAGE
+    astProcessor.register(CodeBlockUsageNode.class, ProcessingPhase.USAGE, new CodeBlockUsage());
+    astProcessor.register(RootNode.class, ProcessingPhase.USAGE, new RootNodeUpdateCopyNodesByPositionInTree());
+    astProcessor.register(QualifiedReferenceNode.class, ProcessingPhase.USAGE, new QualifiedReferenceUpdateVariableUsage());
+    // Phase VALIDATION
+    astProcessor.register(StatementNode.class, ProcessingPhase.VALIDATION, new StatementValidate());
+    // Unknown
+    // TODO: register
+    //    dialectService.getProcessors(analysisConfig.getDialects());
   }
 
   private CopybooksRepository applyDialectCopybooks(

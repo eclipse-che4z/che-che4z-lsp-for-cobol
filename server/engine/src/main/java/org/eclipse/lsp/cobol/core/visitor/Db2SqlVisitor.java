@@ -25,8 +25,6 @@ import org.eclipse.lsp.cobol.core.Db2SqlParser;
 import org.eclipse.lsp.cobol.core.Db2SqlParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.logic.NodeProcessor;
-import org.eclipse.lsp.cobol.core.model.tree.logic.QualifiedReferenceUpdateVariableUsage;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 
@@ -50,30 +48,18 @@ public class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitDbs_host_variable(Dbs_host_variableContext ctx) {
-    return addTreeNode(ctx, loc -> {
-      QualifiedReferenceNode node = new QualifiedReferenceNode(loc);
-      NodeProcessor.addProcessStep(node, c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
-      return node;
-    });
+    return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
   @Override
   public List<Node> visitDbs_rs_locator_variable(Dbs_rs_locator_variableContext ctx) {
-    return addTreeNode(ctx, loc -> {
-      QualifiedReferenceNode node = new QualifiedReferenceNode(loc);
-      NodeProcessor.addProcessStep(node, c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
-      return node;
-    });
+    return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
   @Override
   public List<Node> visitDbs_host_variable_val(Db2SqlParser.Dbs_host_variable_valContext ctx) {
 
-    return addTreeNode(ctx, loc -> {
-      QualifiedReferenceNode node = new QualifiedReferenceNode(loc);
-      NodeProcessor.addProcessStep(node, c -> new QualifiedReferenceUpdateVariableUsage().accept(node, c));
-      return node;
-    });
+    return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
   @Override

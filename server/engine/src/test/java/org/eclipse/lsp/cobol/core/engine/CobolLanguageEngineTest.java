@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
@@ -71,11 +72,12 @@ class CobolLanguageEngineTest {
     InjectService injectService = mock(InjectService.class);
     cobolErrorStrategy.setMessageService(mockMessageService);
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
+    AstProcessor astProcessor = mock(AstProcessor.class);
 
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
             preprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-            dialectService, symbolService, injectService);
+            dialectService, astProcessor, symbolService, injectService);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()

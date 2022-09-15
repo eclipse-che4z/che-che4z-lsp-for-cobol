@@ -20,16 +20,29 @@ import org.eclipse.lsp4j.Location;
 import java.util.ArrayList;
 import java.util.List;
 
-/** The class represents definitions and references for Section and Paragraphs name node in COBOL grammar. */
+/**
+ * The class represents definitions and references for Section and Paragraphs name node in COBOL
+ * grammar.
+ */
 @Getter
 public class CodeBlockReference {
   List<Location> definitions = new ArrayList<>();
   List<Location> usage = new ArrayList<>();
 
+  /**
+   * Add a location of code block usage
+   *
+   * @param location the usage location.
+   */
   public void addUsage(Location location) {
     usage.add(location);
   }
 
+  /**
+   * Add a location of code block definition
+   *
+   * @param location the definition location.
+   */
   public void addDefinition(Location location) {
     definitions.add(location);
   }
