@@ -14,16 +14,25 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.DIALECTS;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
@@ -31,16 +40,6 @@ import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.SettingsService;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import org.eclipse.lsp4j.WorkspaceFolder;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.DIALECTS;
 
 /**
  * This service processes all the copybook names present in the local directory. The service also
@@ -165,16 +164,23 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   }
 
   private List<String> listExistedFiles(
-      final List<WorkspaceFolder> workspace,
-      final String fileName) {
-    return workspace.stream()
-        .map(
-            path ->
-                files
-                    .getPathFromURI(files.decodeURI(path.getUri()))
-                    .resolve(files.decodeURI(fileName)))
-        .filter(files::fileExists)
-        .map(files::listFilesInDirectory)
+      final List<WorkspaceFolder> workspaces,
+      final String copybookUriAsString) {
+    return workspaces.stream()
+        .map(workspace -> files.decodeURI(workspace.getUri()))
+        .map(uri -> {
+          String copybookURI = files.decodeURI(copybookUriAsString);
+          if (!files.isUriAbsolute(copybookURI)) {
+           if (copybookURI.startsWith("/")){
+             copybookURI = copybookURI.substring(1, copybookURI.length() - 1);
+           }
+           if (uri.endsWith("/")) {
+             copybookURI = uri.substring(1);
+           }
+          }
+          copybookURI = files.isUriAbsolute(copybookURI) ? copybookURI : String.format("%s/%s", uri, copybookURI);
+          return files.listFilesInDirectory(copybookURI);
+        })
         .flatMap(List::stream)
         .collect(Collectors.toList());
   }

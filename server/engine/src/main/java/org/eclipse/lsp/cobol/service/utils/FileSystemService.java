@@ -15,15 +15,14 @@
 
 package org.eclipse.lsp.cobol.service.utils;
 
-import lombok.NonNull;
-
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
+import javax.annotation.Nullable;
+import lombok.NonNull;
 
 /** This interface represents API for low-level file systems access */
 public interface FileSystemService {
@@ -39,6 +38,8 @@ public interface FileSystemService {
    */
   @Nullable
   Path getPathFromURI(@NonNull String uri);
+
+  boolean isUriAbsolute(@NonNull String uri);
 
   /**
    * Extract the name and extension of a file from a valid {@link URI} and return the name back to
@@ -91,10 +92,9 @@ public interface FileSystemService {
   /**
    * Lists the files of the directory path by name.
    *
-   * @param path the directory
+   * @param uri URI to process
    * @return the lists of the files
-   * @throws IOException in case if file is not found or cannot be loaded
    */
   @NonNull
-  List<String> listFilesInDirectory(Path path);
+  List<String> listFilesInDirectory(String uri);
 }
