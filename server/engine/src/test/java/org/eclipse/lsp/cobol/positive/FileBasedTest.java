@@ -54,7 +54,7 @@ public abstract class FileBasedTest extends ConfigurableTest {
     return Arrays.stream(
         ofNullable(getProperty(PATH_TO_TEST_RESOURCES))
             .orElse("../../tests/test_files/Cobol85PositiveTestsSuite")
-            .split(","));
+            .split(",")).map(String::trim);
   }
 
   /**

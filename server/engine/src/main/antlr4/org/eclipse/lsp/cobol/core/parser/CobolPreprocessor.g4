@@ -119,7 +119,7 @@ openingPseudoTextDelimiter
    ;
 
 closingPseudoTextDelimiter
-   : DOUBLEEQUALCHAR (COMMACHAR | DOT_FS | SEMICOLON_FS)?
+   : DOUBLEEQUALCHAR (COMMACHAR | SEMICOLON_FS)?
    ;
 
 replaceable
