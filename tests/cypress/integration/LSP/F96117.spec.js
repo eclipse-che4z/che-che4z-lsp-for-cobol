@@ -36,7 +36,6 @@ context('This is a F96117 spec', () => {
     });
 
     it(['smoke', 'CI'], 'Check .c4z/.gitignore', () => {
-      cy.openFile('USER1.cbl');
       cy.openFolder('.c4z').openFile('.gitignore');
       cy.get(IDE.lineContent).findText('/**');
       if (IDE === Theia) {
