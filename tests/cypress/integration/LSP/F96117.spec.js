@@ -29,7 +29,6 @@ context('This is a F96117 spec', () => {
   describe('TC247497 - Local Copybooks - check .gitignore file and hidden folders under c4z', () => {
     it(['smoke', 'CI'], 'Finds .gitignore file under .c4z', () => {
       cy.openFolder('.c4z').openFile('.gitignore');
-      //cy.openFile('.gitignore');
       cy.get(IDE.lineContent).findText('/**');
     });
     it(['smoke', 'CI'], 'Delete .c4z folder and refresh', () => {
@@ -39,7 +38,6 @@ context('This is a F96117 spec', () => {
     it(['smoke', 'CI'], 'Check .c4z/.gitignore', () => {
       cy.openFile('USER1.cbl');
       cy.openFolder('.c4z').openFile('.gitignore');
-      // cy.openFile('.gitignore');
       cy.get(IDE.lineContent).findText('/**');
       if (IDE === Theia) {
         cy.closeCurrentTab();
