@@ -121,14 +121,4 @@ public class DialectService {
     implicitCode.putAll(result.getImplicitCode());
     return new ResultWithErrors<>(new DialectOutcome(nodes, implicitCode, context), errors);
   }
-
-  /**
-   * Run postprocessing on AST by dialects
-   * @param dialects list of active dialects
-   * @param syntaxTree - a AST
-   * @param accumulatedErrors - an errors container
-   */
-  public void processAst(List<String> dialects, List<Node> syntaxTree, List<SyntaxError> accumulatedErrors) {
-      sortDialects(dialects).forEach(d -> d.astPostprocessing(syntaxTree, accumulatedErrors));
-    }
 }

@@ -32,7 +32,6 @@ import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
@@ -84,7 +83,6 @@ public class CobolLanguageEngine {
   private final DialectService dialectService;
 
   private final AstProcessor astProcessor;
-  private final SymbolService symbolService;
   private final InjectService injectService;
 
   @Inject
@@ -96,7 +94,6 @@ public class CobolLanguageEngine {
       CachingConfigurationService cachingConfigurationService,
       DialectService dialectService,
       AstProcessor astProcessor,
-      SymbolService symbolService,
       InjectService injectService) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
@@ -105,7 +102,6 @@ public class CobolLanguageEngine {
     this.cachingConfigurationService = cachingConfigurationService;
     this.dialectService = dialectService;
     this.astProcessor = astProcessor;
-    this.symbolService = symbolService;
     this.injectService = injectService;
   }
 
@@ -250,7 +246,6 @@ public class CobolLanguageEngine {
     analyzeEmbeddedCode(syntaxTree, positionMapping);
 
     Node rootNode = syntaxTree.get(0);
-    dialectService.processAst(analysisConfig.getDialects(), syntaxTree, accumulatedErrors);
     accumulatedErrors.addAll(astProcessor.processSyntaxTree(rootNode));
 
     timingBuilder.getSyntaxTreeTimer().stop();
