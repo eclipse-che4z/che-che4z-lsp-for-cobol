@@ -37,6 +37,6 @@
     "defaultSeverity": "warning",
     "extends": [
         "tslint:recommended",
-        "tslint-sonarts"
+        "eslint-plugin-sonarjs"
     ]
 }
