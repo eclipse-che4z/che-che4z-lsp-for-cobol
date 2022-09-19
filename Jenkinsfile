@@ -155,8 +155,10 @@ pipeline {
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
+                                sh 'npm cache clean --force'
                                 sh 'npm ci --ignore-scripts'
                                 sh 'npm run postinstall'
+                                sh 'npm --global cache verify'
                             }
                         }
                     }
