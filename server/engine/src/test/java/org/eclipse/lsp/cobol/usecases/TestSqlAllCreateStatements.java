@@ -1022,6 +1022,9 @@ class TestSqlAllCreateStatements {
           + "              WHERE DATE BETWEEN '03/01/2000' and '03/31/2000';  \n"
           + "           END-EXEC.";
 
+  private static final String CREATE_TABLE1 =
+      TEXT + "            create table all (all integer, avg integer); \n" + "           END-EXEC.";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         CREATE_ALIAS,
@@ -1095,7 +1098,8 @@ class TestSqlAllCreateStatements {
         CREATE_VARIABLE,
         CREATE_VARIABLE2,
         CREATE_VIEW,
-        CREATE_VIEW2);
+        CREATE_VIEW2,
+        CREATE_TABLE1);
   }
 
   @ParameterizedTest
