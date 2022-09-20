@@ -247,7 +247,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 14
-      - name: Retrieve native images
+      - name: Download vsix file
         uses: actions/download-artifact@v3
         with:
             path: staging
