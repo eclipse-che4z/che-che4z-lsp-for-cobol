@@ -13,7 +13,7 @@
  */
 
 import { fetchCopybookCommand } from "../../commands/FetchCopybookCommand";
-import { CopybookDownloadService } from "../../services/copybook/CopybookDownloadService";
+import { CopybookDownloadService, CopybookName } from "../../services/copybook/CopybookDownloadService";
 import { TelemetryService } from "../../services/reporter/TelemetryService";
 
 jest.mock("../../services/reporter/TelemetryService");
@@ -26,5 +26,5 @@ test("Test fetchCopybookCommand calls telementry services and coprbook download 
     expect(fetchCopybookCommand).toBeTruthy();
     fetchCopybookCommand(copybook, copybookDownloadService, progName);
     expect(TelemetryService.registerEvent).toBeCalledWith("Fetch copybook", ["COBOL", "copybook", "quickfix"], "The user tries to resolve a copybook that is not currently found");
-    expect(copybookDownloadService.downloadCopybooks).toBeCalledWith(progName, [copybook], false);
+    expect(copybookDownloadService.downloadCopybooks).toBeCalledWith(progName, [new CopybookName(copybook, "COBOL")], false);
 });
