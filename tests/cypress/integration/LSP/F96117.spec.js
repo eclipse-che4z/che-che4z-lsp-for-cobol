@@ -26,10 +26,9 @@ const IDE = env === 'theia' ? Theia : VSCODE;
 const backspace3times = '{backspace}'.repeat(3);
 
 context('This is a F96117 spec', () => {
-  describe('TC247497 - Local Copybooks - check .gitignore file and hidden folders under c4z', () => {
-    it.skip(['smoke', 'CI'], 'Finds .gitignore file under .c4z', () => {
-      cy.openFolder('.c4z/.extsrcs').openFile('.gitignore');
-      cy.get(IDE.lineContent);
+  describe('TC247497 - Local Copybooks - check hidden folders under c4z', () => {
+    it(['smoke', 'CI'], 'Finds .gitignore file under .c4z', () => {
+      cy.openFolder('.c4z/.extsrcs');
     });
     it(['smoke', 'CI'], 'Delete .c4z folder and refresh', () => {
       cy.deleteFile('.c4z');
