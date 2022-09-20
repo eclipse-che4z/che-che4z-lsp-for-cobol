@@ -27,10 +27,11 @@ const backspace3times = '{backspace}'.repeat(3);
 
 context('This is a F96117 spec', () => {
   describe('TC247497 - Local Copybooks - check hidden folders under c4z', () => {
-    it(['smoke', 'CI'], 'Finds .gitignore file under .c4z', () => {
+    it(['smoke', 'CI'], 'Finds hidden folder .c4z', () => {
       cy.openFolder('.c4z/.extsrcs');
     });
-    it(['smoke', 'CI'], 'Delete .c4z folder and refresh', () => {
+    it.skip(['smoke', 'CI'], 'Delete .c4z folder and refresh', () => {
+      cy.openFolder('.c4z/.extsrcs').deleteFile('USER1.CBL');
       cy.deleteFile('.c4z');
     });
 
