@@ -15,15 +15,15 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 
-import java.util.function.BiConsumer;
-
 /** SectionNode processor */
-public class ProcessNodeWithVariableDefinitions implements BiConsumer<SectionNode, ProcessingContext> {
+public class ProcessNodeWithVariableDefinitions implements Processor<SectionNode> {
   @Override
   public void accept(SectionNode node, ProcessingContext ctx) {
     ctx.getErrors().addAll(VariableDefinitionUtil.processNodeWithVariableDefinitions(node));
+    VariableDefinitionUtil.registerVariablesInProgram(node);
   }
 }

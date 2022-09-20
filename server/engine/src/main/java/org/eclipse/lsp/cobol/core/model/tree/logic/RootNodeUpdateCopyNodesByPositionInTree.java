@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -26,13 +27,11 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 
 import static java.util.stream.Collectors.toList;
 
 /** RootNode processor */
-public class RootNodeUpdateCopyNodesByPositionInTree
-    implements BiConsumer<RootNode, ProcessingContext> {
+public class RootNodeUpdateCopyNodesByPositionInTree implements Processor<RootNode> {
   @Override
   public void accept(RootNode node, ProcessingContext ctx) {
     updateCopyNodes(node);

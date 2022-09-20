@@ -15,18 +15,17 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.variables.GroupItemNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormat;
 
-import java.util.function.BiConsumer;
-
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.EMPTY_STRUCTURE_MSG;
 
 /** GroupItemNode processor */
-public class GroupItemProcess implements BiConsumer<GroupItemNode, ProcessingContext> {
+public class GroupItemProcess implements Processor<GroupItemNode> {
   @Override
   public void accept(GroupItemNode node, ProcessingContext ctx) {
     if (node.getUsageFormat() == UsageFormat.UNDEFINED

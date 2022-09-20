@@ -12,10 +12,15 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.symbols;
+package org.eclipse.lsp.cobol.core.engine.processor;
+
+import org.eclipse.lsp.cobol.core.model.tree.Node;
+
+import java.util.function.BiConsumer;
 
 /**
- * Symbol attributes data object
+ * AST Processor marker
+ *
+ * @param <T> a node type to process
  */
-public interface SymbolAttributes {
-}
+public interface Processor<T extends Node> extends BiConsumer<T, ProcessingContext> {}

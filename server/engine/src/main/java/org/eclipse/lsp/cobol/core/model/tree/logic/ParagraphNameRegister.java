@@ -16,12 +16,11 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.ParagraphNameNode;
 
-import java.util.function.BiConsumer;
-
 /** ParagraphNameNode processor */
-public class ParagraphNameRegister implements BiConsumer<ParagraphNameNode, ProcessingContext> {
+public class ParagraphNameRegister implements Processor<ParagraphNameNode> {
   @Override
   public void accept(ParagraphNameNode node, ProcessingContext ctx) {
     node.getProgram()

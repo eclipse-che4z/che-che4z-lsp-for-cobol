@@ -83,6 +83,7 @@ class VariableDefinitionUtilTest {
             .variableNameAndLocality(new VariableNameAndLocality("Level-01-order-3", LOCALITY))
             .build());
     VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
+    VariableDefinitionUtil.registerVariablesInProgram(programNode);
     List<VariableNode> nodesLevel01 = getVariables(programNode);
     checkNames(nodesLevel01, "Level-01-order-1", "Level-01-order-2", "Level-01-order-3");
     List<VariableNode> nodesLevel05 = getVariables(nodesLevel01.get(1));
@@ -123,6 +124,7 @@ class VariableDefinitionUtilTest {
             .variableNameAndLocality(new VariableNameAndLocality("Level-07", LOCALITY))
             .build());
     VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
+    VariableDefinitionUtil.registerVariablesInProgram(programNode);
     List<VariableNode> nodesLowLevel = getVariables(programNode);
     checkNames(nodesLowLevel, "Level-05", "Level-01");
     List<VariableNode> nodesNestedLevel = getVariables(nodesLowLevel.get(1));
@@ -154,6 +156,7 @@ class VariableDefinitionUtilTest {
             .variableNameAndLocality(new VariableNameAndLocality("Level-66", LOCALITY))
             .build());
     VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
+    VariableDefinitionUtil.registerVariablesInProgram(programNode);
     List<VariableNode> nodesLevel01 = getVariables(programNode);
     checkNames(nodesLevel01, "Level-01", "Level-66");
   }
@@ -202,6 +205,7 @@ class VariableDefinitionUtilTest {
             .variableNameAndLocality(new VariableNameAndLocality("Level-05-2", LOCALITY))
             .build());
     VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
+    VariableDefinitionUtil.registerVariablesInProgram(programNode);
     List<VariableNode> nodesLevel01 = getVariables(programNode);
     checkNames(nodesLevel01, "Level-01");
     List<VariableNode> nodesUnder01 = getVariables(nodesLevel01.get(0));

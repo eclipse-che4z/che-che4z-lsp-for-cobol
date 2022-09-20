@@ -15,16 +15,16 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.DeclarativeProcedureSectionNode;
 import org.eclipse.lsp.cobol.core.model.tree.ParagraphNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 /** DeclarativeProcedureSectionNode processor */
 public class DeclarativeProcedureSectionRegister
-    implements BiConsumer<DeclarativeProcedureSectionNode, ProcessingContext> {
+    implements Processor<DeclarativeProcedureSectionNode> {
   @Override
   public void accept(DeclarativeProcedureSectionNode node, ProcessingContext processingContext) {
     Optional<ProgramNode> programOpt = node.getProgram();

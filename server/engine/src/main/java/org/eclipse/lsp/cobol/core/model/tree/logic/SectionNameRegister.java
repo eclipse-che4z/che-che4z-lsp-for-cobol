@@ -16,15 +16,15 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNameNode;
 
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROCEDURE_SECTION;
 
 /** SectionNameNode processor */
-public class SectionNameRegister implements BiConsumer<SectionNameNode, ProcessingContext> {
+public class SectionNameRegister implements Processor<SectionNameNode> {
   @Override
   public void accept(SectionNameNode node, ProcessingContext ctx) {
     if (node.getParent().getNodeType() != PROCEDURE_SECTION) {

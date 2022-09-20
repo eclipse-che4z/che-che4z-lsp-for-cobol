@@ -453,6 +453,9 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                       if (stripQuotes) {
                         storedText = PreprocessorStringUtils.trimQuotes(storedText);
                       }
+                      if (replacement!=null && replacement.ORIGINAL_SIZE_COPY_START() != null) {
+                        addTokenLocation(it, text.toUpperCase(), range);
+                      }
                       addTokenLocation(it, storedText.toUpperCase(), range);
                     });
 

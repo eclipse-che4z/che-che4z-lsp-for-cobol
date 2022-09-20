@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.FileEntryNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
@@ -23,9 +24,8 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 
 import java.util.Optional;
-import java.util.function.BiConsumer;
 /** FileEntryNode processor */
-public class FileEntryProcess implements BiConsumer<FileEntryNode, ProcessingContext> {
+public class FileEntryProcess implements Processor<FileEntryNode> {
   @Override
   public void accept(FileEntryNode node, ProcessingContext ctx) {
     Optional<ProgramNode> programOpt = node.getProgram();

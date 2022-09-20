@@ -21,8 +21,8 @@ import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** A test case for COPY FROM statement */
-public class TestDaCoCopyFrom {
+/** A test case for COPY FROM statement with group variables*/
+public class TestDaCoCopyFrom2 {
   private static final String TEXT =
             "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    CPYFROM.\n"
@@ -33,8 +33,7 @@ public class TestDaCoCopyFrom {
           + "       DATA   DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*ROOT}.\n"
-          + "           03 {$*AREA-XXX}.\n"
-          + "             05 {$*PROTO-XXX} COPY-FROM DY.\n"
+          + "           03 {$*AREA-XXX} COPY-FROM DY.\n"
           + "       01  COPY MAID {~PROTOCB!DACO}.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$PR1-XXX}.\n";
@@ -42,7 +41,7 @@ public class TestDaCoCopyFrom {
   private static final String PROTOCB =
       "       01  {$*ROOT}.\n"
           + "           03 {$*AREA-XDY}.\n"
-          + "             05 {$*PROTO-XDY}.\n"
+          + "             05 {$*PROTO-XDY`&PROTO-XXX}.\n"
           + "               07 {$*PR1-XDY`&PR1-XXX} PIC 9(9).\n";
 
   @Test

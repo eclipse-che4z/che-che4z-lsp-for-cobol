@@ -29,10 +29,12 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.CUSTOM;
 @Getter
 public class DaCoCopyFromNode extends Node {
     String newSuffix;
+    private int level;
     String prototypeName;
-    public DaCoCopyFromNode(Locality location, String prototypeName, String newSuffix) {
+    public DaCoCopyFromNode(Locality location, String prototypeName, String newSuffix, int level) {
         super(location, CUSTOM, DaCoDialect.NAME);
         this.prototypeName = prototypeName;
         this.newSuffix = newSuffix;
+        this.level = level;
     }
 }

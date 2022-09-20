@@ -18,14 +18,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -38,13 +35,8 @@ public abstract class Node {
   private final NodeType nodeType;
   private final String dialect;
 
-  @EqualsAndHashCode.Exclude private final List<Node> children = new ArrayList<>();
+  @EqualsAndHashCode.Exclude private final List<Node> children = new CopyOnWriteArrayList<>();
   @EqualsAndHashCode.Exclude @ToString.Exclude @Setter private Node parent;
-
-  @EqualsAndHashCode.Exclude @Setter
-  private Optional<Consumer<ProcessingContext>> nextStep = Optional.empty();
-
-  @EqualsAndHashCode.Exclude private final AstProcessor processor = new AstProcessor();
 
   protected Node(Locality location, NodeType nodeType, String dialect) {
     this.locality = location;

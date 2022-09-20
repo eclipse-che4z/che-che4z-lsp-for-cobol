@@ -15,12 +15,11 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramIdNode;
 
-import java.util.function.BiConsumer;
-
 /** ProgramIdNode processor */
-public class ProgramIdProcess implements BiConsumer<ProgramIdNode, ProcessingContext> {
+public class ProgramIdProcess implements Processor<ProgramIdNode> {
   @Override
   public void accept(ProgramIdNode node, ProcessingContext ctx) {
     node.getProgram().ifPresent(it -> it.setProgramName(node.getProgramId()));

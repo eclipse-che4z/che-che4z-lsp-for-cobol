@@ -16,18 +16,17 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 
-import java.util.function.BiConsumer;
-
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.FD_WITHOUT_FILE_CONTROL;
 
 /** FileDescriptionNode processor */
-public class FileDescriptionProcess implements BiConsumer<FileDescriptionNode, ProcessingContext> {
+public class FileDescriptionProcess implements Processor<FileDescriptionNode> {
   @Override
   public void accept(FileDescriptionNode node, ProcessingContext ctx) {
     if (StringUtils.isBlank(node.getFileControlClause())) {
@@ -35,5 +34,6 @@ public class FileDescriptionProcess implements BiConsumer<FileDescriptionNode, P
       ctx.getErrors().add(error);
     }
     ctx.getErrors().addAll(VariableDefinitionUtil.processNodeWithVariableDefinitions(node));
+    VariableDefinitionUtil.registerVariablesInProgram(node);
   }
 }

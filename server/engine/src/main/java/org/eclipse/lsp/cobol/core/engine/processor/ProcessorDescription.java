@@ -12,17 +12,19 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.symbols;
+package org.eclipse.lsp.cobol.core.engine.processor;
 
-import lombok.Getter;
-
-import java.util.HashMap;
-import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
 
 /**
- * Data structure to store symbols attributes
+ * AST Processor descriptor class
  */
-@Getter
-public class SymbolTable {
-    Map<String, SymbolAttributes> symbols = new HashMap<>();
+@Data
+@AllArgsConstructor
+public class ProcessorDescription {
+    Class<? extends Node> nodeClass;
+    ProcessingPhase phase;
+    Processor<? extends Node> processor;
 }

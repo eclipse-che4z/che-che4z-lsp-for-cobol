@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ErrorSource;
@@ -29,13 +30,11 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /** QualifiedReferenceNode processor */
 @Slf4j
-public class QualifiedReferenceUpdateVariableUsage
-    implements BiConsumer<QualifiedReferenceNode, ProcessingContext> {
+public class QualifiedReferenceUpdateVariableUsage implements Processor<QualifiedReferenceNode> {
   private static final String NOT_DEFINED_ERROR = "semantics.notDefined";
   private static final String DUPLICATED_DEFINITION_ERROR = "semantics.duplicated";
 

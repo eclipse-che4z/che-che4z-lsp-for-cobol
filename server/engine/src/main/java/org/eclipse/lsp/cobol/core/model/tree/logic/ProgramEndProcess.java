@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ErrorSource;
@@ -23,11 +24,9 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramEndNode;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 
-import java.util.function.BiConsumer;
-
 /** ProgramEndNode processor */
 @Slf4j
-public class ProgramEndProcess implements BiConsumer<ProgramEndNode, ProcessingContext> {
+public class ProgramEndProcess implements Processor<ProgramEndNode> {
   @Override
   public void accept(ProgramEndNode programEndNode, ProcessingContext ctx) {
     if (!programEndNode.getProgram().isPresent()) {

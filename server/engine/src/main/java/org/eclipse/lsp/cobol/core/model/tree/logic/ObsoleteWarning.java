@@ -15,16 +15,15 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.statements.ObsoleteNode;
 
-import java.util.function.BiConsumer;
-
 /** ObsoleteNode processor */
-public class ObsoleteWarning implements BiConsumer<ObsoleteNode, ProcessingContext> {
+public class ObsoleteWarning implements Processor<ObsoleteNode> {
   @Override
   public void accept(ObsoleteNode node, ProcessingContext ctx) {
     ctx.getErrors()

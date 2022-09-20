@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -26,10 +27,9 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormatUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 
 /** Validate proper use of PIC and USAGE clause for elementary nodes */
-public class ElementaryProcessStandAlone implements BiConsumer<ElementaryNode, ProcessingContext> {
+public class ElementaryProcessStandAlone implements Processor<ElementaryNode> {
   private static final String SEMANTICS_NO_PIC_CLAUSE = "semantics.noPicClause";
   private static final String BLANK_WHEN_ZERO = "variables.blankWhenZero";
   private static final String SIGN_CLAUSE = "variables.signClause";

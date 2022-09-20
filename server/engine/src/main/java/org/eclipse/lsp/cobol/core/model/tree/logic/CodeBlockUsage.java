@@ -15,15 +15,15 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 /** CodeBlockUsageNode processor */
-public class CodeBlockUsage implements BiConsumer<CodeBlockUsageNode, ProcessingContext> {
+public class CodeBlockUsage implements Processor<CodeBlockUsageNode> {
   @Override
   public void accept(CodeBlockUsageNode node, ProcessingContext ctx) {
     Optional<ProgramNode> programOpt = node.getProgram();

@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.logic.ElementaryProcessStandAlone;
@@ -43,7 +44,7 @@ class ElementaryNodeTest {
     ElementaryItemNode node = getNode("PIC 9", UsageFormat.COMPUTATIONAL_1);
     ArrayList<SyntaxError> errors = new ArrayList<>();
     AstProcessor astProcessor = new AstProcessor();
-    astProcessor.register(ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryProcessStandAlone());
+    astProcessor.register(new ProcessorDescription(ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryProcessStandAlone()));
     astProcessor.process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors));
     assertEquals(1, errors.size());
     assertEquals(ErrorSeverity.WARNING, errors.get(0).getSeverity());
@@ -55,7 +56,7 @@ class ElementaryNodeTest {
     ElementaryItemNode node = getNode("PIC X", UsageFormat.COMPUTATIONAL_5);
     ArrayList<SyntaxError> errors = new ArrayList<>();
     AstProcessor astProcessor = new AstProcessor();
-    astProcessor.register(ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryProcessStandAlone());
+    astProcessor.register(new ProcessorDescription(ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryProcessStandAlone()));
     astProcessor.process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors));
     assertEquals(1, errors.size());
     assertEquals(ErrorSeverity.WARNING, errors.get(0).getSeverity());
@@ -85,7 +86,7 @@ class ElementaryNodeTest {
             null, 2, "TEST-NODE", false, "PIC X", "", UsageFormat.UTF_8, false, true, false);
     ArrayList<SyntaxError> errors = new ArrayList<>();
     AstProcessor astProcessor = new AstProcessor();
-    astProcessor.register(ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryProcessStandAlone());
+    astProcessor.register(new ProcessorDescription(ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryProcessStandAlone()));
     astProcessor.process(ProcessingPhase.TRANSFORMATION, elementNode, new ProcessingContext(errors));
     assertEquals(1, errors.size());
     assertEquals(ErrorSeverity.WARNING, errors.get(0).getSeverity());

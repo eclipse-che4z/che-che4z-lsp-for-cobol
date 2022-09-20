@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.model.tree.statements;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ErrorSource;
@@ -41,12 +42,14 @@ class ObsoleteNodeTest {
     RootNode rootNode = new RootNode(locality, new CopybooksRepository());
     RemarksNode remarksNode = new RemarksNode(locality);
     AstProcessor astProcessor = new AstProcessor();
-    astProcessor.register(ObsoleteNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteWarning());
+    astProcessor.register(
+        new ProcessorDescription(
+            ObsoleteNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteWarning()));
     rootNode.addChild(remarksNode);
     ArrayList<SyntaxError> errors = new ArrayList<>();
     astProcessor.process(ProcessingPhase.TRANSFORMATION, rootNode, new ProcessingContext(errors));
 
-      assertEquals(
+    assertEquals(
         errors,
         ImmutableList.of(
             SyntaxError.syntaxError()

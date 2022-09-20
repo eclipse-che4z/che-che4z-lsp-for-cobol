@@ -16,10 +16,11 @@ package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -54,11 +55,12 @@ public interface CobolDialect {
   }
 
   /**
-   * Some dialects require modifications on AST. This method will be called after main COBOL parser.
-   * @param syntaxTree - an AST
-   * @param errors - an errors container
+   * Return a list of processor descriptors.
+   * @return a list of processor descriptors for the dialect
    */
-  default void astPostprocessing(List<Node> syntaxTree, List<SyntaxError> errors) {}
+  default List<ProcessorDescription> getProcessors() {
+    return Collections.emptyList();
+  }
 
   /**
    * Define a order for dialect execution

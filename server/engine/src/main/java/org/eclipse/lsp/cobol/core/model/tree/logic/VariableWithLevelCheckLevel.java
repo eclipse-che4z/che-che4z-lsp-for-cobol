@@ -15,16 +15,14 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableWithLevelNode;
-
-import java.util.function.BiConsumer;
 
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
 
 /** VariableWithLevelNode processor */
-public class VariableWithLevelCheckLevel
-    implements BiConsumer<VariableWithLevelNode, ProcessingContext> {
+public class VariableWithLevelCheckLevel implements Processor<VariableWithLevelNode> {
   @Override
   public void accept(VariableWithLevelNode node, ProcessingContext ctx) {
     if ((node.getLevel() == LEVEL_01 || node.getLevel() == LEVEL_77)

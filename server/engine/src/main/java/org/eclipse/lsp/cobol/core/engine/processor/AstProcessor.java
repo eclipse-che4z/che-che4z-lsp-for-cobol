@@ -56,9 +56,9 @@ public class AstProcessor {
     node.getChildren().forEach(n -> process(phase, n, ctx));
   }
 
-  private List<BiConsumer<Node, ProcessingContext>> findProcessors(
+  private List<Processor<Node>> findProcessors(
       ProcessingPhase phase, Class<? extends Node> nodeClass) {
-    List<BiConsumer<Node, ProcessingContext>> result = new ArrayList<>();
+    List<Processor<Node>> result = new ArrayList<>();
     if (!processors.containsKey(phase)) {
       return result;
     }
@@ -67,7 +67,7 @@ public class AstProcessor {
         .forEach(
             (key, value) -> {
               if (key.isAssignableFrom(nodeClass)) {
-                value.forEach(v -> result.add((BiConsumer<Node, ProcessingContext>) v));
+                value.forEach(v -> result.add((Processor<Node>) v));
               }
             });
     return result;
@@ -76,18 +76,13 @@ public class AstProcessor {
   /**
    * Register node type processor
    *
-   * @param nodeClass the node class
-   * @param phase In what phase the processor will be called.
-   * @param processor Processor itself.
+   * @param processorDesc Processor descriptor.
    * @param <T> Specific node type
    */
-  public <T extends Node> void register(
-      Class<? extends T> nodeClass,
-      ProcessingPhase phase,
-      BiConsumer<? extends Node, ProcessingContext> processor) {
+  public <T extends Node> void register(ProcessorDescription processorDesc) {
     processors
-        .computeIfAbsent(phase, v -> new LinkedHashMap<>())
-        .computeIfAbsent(nodeClass, v -> new ArrayList<>())
-        .add(processor);
+        .computeIfAbsent(processorDesc.getPhase(), v -> new LinkedHashMap<>())
+        .computeIfAbsent(processorDesc.getNodeClass(), v -> new ArrayList<>())
+        .add(processorDesc.getProcessor());
   }
 }

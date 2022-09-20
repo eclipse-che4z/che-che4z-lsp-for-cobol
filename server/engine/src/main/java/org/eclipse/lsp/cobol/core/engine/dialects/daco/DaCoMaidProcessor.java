@@ -145,9 +145,7 @@ public class DaCoMaidProcessor {
         entryName.substring(0, entryName.length() - 2) + copyFrom.group("protoSuffix");
     int startChar = copyFrom.start("copyfrom");
     int endChar = copyFrom.end("protoSuffix");
-    Range range = new Range(
-            new Position(lineNumber, startChar),
-            new Position(lineNumber, endChar));
+    Range range = new Range(new Position(lineNumber, startChar), new Position(lineNumber, endChar));
     int len = endChar - startChar;
     String newString = String.join("", Collections.nCopies(len, " "));
     context.getExtendedSource().replace(range, newString);
@@ -155,7 +153,8 @@ public class DaCoMaidProcessor {
     Locality locality =
         Locality.builder().uri(context.getExtendedSource().getUri()).range(range).build();
 
-    return new DaCoCopyFromNode(locality, prototypeName, newSuffix);
+    return new DaCoCopyFromNode(
+        locality, prototypeName, newSuffix, Integer.parseInt(copyFrom.group("lvl")));
   }
 
   private void collectCopyMaid(

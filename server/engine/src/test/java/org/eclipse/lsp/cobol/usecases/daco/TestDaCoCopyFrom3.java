@@ -21,10 +21,10 @@ import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** A test case for COPY FROM statement */
-public class TestDaCoCopyFrom {
+/** A test case for COPY FROM statement with level correction */
+public class TestDaCoCopyFrom3 {
   private static final String TEXT =
-            "       IDENTIFICATION DIVISION.\n"
+      "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    CPYFROM.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       IDMS-CONTROL SECTION.\n"
@@ -33,17 +33,16 @@ public class TestDaCoCopyFrom {
           + "       DATA   DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*ROOT}.\n"
-          + "           03 {$*AREA-XXX}.\n"
-          + "             05 {$*PROTO-XXX} COPY-FROM DY.\n"
+          + "           02 {$*AREA-XXX} COPY-FROM DY.\n"
           + "       01  COPY MAID {~PROTOCB!DACO}.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$PR1-XXX}.\n";
 
   private static final String PROTOCB =
       "       01  {$*ROOT}.\n"
-          + "           03 {$*AREA-XDY}.\n"
-          + "             05 {$*PROTO-XDY}.\n"
-          + "               07 {$*PR1-XDY`&PR1-XXX} PIC 9(9).\n";
+          + "           02 {$*AREA-XDY}.\n"
+          + "             03 {$*PROTO-XDY`&PROTO-XXX}.\n"
+          + "               08 {$*PR1-XDY`&PR1-XXX} PIC 9(9).\n";
 
   @Test
   void test() {

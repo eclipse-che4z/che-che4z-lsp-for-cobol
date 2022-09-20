@@ -15,15 +15,14 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.ParagraphsNode;
 import org.eclipse.lsp.cobol.core.model.tree.ProcedureDivisionBodyNode;
 import org.eclipse.lsp.cobol.core.semantics.CodeBlockDefinitionUtils;
 
-import java.util.function.BiConsumer;
-
 /** Processor for ProcedureDivisionBodyNode and ParagraphsNode nodes */
-public class DefineCodeBlock implements BiConsumer<Node, ProcessingContext> {
+public class DefineCodeBlock implements Processor<Node> {
   @Override
   public void accept(Node node, ProcessingContext ctx) {
     if ((node instanceof ProcedureDivisionBodyNode) || (node instanceof ParagraphsNode)) {

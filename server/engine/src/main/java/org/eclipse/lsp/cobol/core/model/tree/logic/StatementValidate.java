@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -32,7 +33,6 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,7 +45,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.QUALIFIED_REFERENCE
  * definition" error is defined on the previous steps.
  */
 @Slf4j
-public class StatementValidate implements BiConsumer<StatementNode, ProcessingContext> {
+public class StatementValidate implements Processor<StatementNode> {
   private static final String INVALID_RECEIVING_FIELD_TEMPLATE = "statements.invalidReceivingField";
   private static final String INVALID_SENDING_FIELD_TEMPLATE = "statements.invalidSendingField";
   private static final String INTEGER_LITERAL = "[+-]?\\d+";
