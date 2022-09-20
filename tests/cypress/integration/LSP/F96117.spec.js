@@ -30,18 +30,6 @@ context('This is a F96117 spec', () => {
     it(['smoke', 'CI'], 'Finds hidden folder .c4z', () => {
       cy.openFolder('.c4z/.extsrcs');
     });
-    it.skip(['smoke', 'CI'], 'Delete .c4z folder and refresh', () => {
-      cy.openFolder('.c4z/.extsrcs').deleteFile('USER1.CBL');
-      cy.deleteFile('.c4z');
-    });
-
-    it(['smoke', 'CI'], 'Check .c4z/.gitignore', () => {
-      cy.openFolder('.c4z/.extsrcs');
-      if (IDE === Theia) {
-        cy.closeCurrentTab();
-      }
-      cy.closeFolder('.c4z');
-    });
   });
 
   describe('TC247555 Check predefined structure in settings.json', () => {
