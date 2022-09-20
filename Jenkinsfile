@@ -137,17 +137,17 @@ pipeline {
                     }
                 }
 
-                stage('SonarCloud analysis-Server') {
-                    steps {
-                        container('maven') {
-                            dir('server') {
-                                withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
-                                    sh 'mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${BRANCH_NAME} --no-transfer-progress'
-                                }
-                            }
-                        }
-                    }
-                }
+//                 stage('SonarCloud analysis-Server') {
+//                     steps {
+//                         container('maven') {
+//                             dir('server') {
+//                                 withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
+//                                     sh 'mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${BRANCH_NAME} --no-transfer-progress'
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 }
                 stage('Client - Install dependencies') {
                     environment {
                         npm_config_cache = "$env.WORKSPACE"
@@ -155,27 +155,25 @@ pipeline {
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
-                                sh 'npm cache clean --force'
                                 sh 'npm ci --ignore-scripts'
                                 sh 'npm run postinstall'
-                                sh 'npm --global cache verify'
                             }
                         }
                     }
                 }
 
-                stage('Client - Unit tests'){
-                  environment {
-                      npm_config_cache = "$env.WORKSPACE"
-                  }
-                  steps {
-                      container('node') {
-                          dir('clients/cobol-lsp-vscode-extension') {
-                            sh 'npm run coverage'
-                          }
-                      }
-                  }
-                }
+//                 stage('Client - Unit tests'){
+//                   environment {
+//                       npm_config_cache = "$env.WORKSPACE"
+//                   }
+//                   steps {
+//                       container('node') {
+//                           dir('clients/cobol-lsp-vscode-extension') {
+//                             sh 'npm run coverage'
+//                           }
+//                       }
+//                   }
+//                 }
 
 //                 stage('Client - API integration tests'){
 //                   environment {
@@ -190,22 +188,6 @@ pipeline {
 //                   }
 //                 }
 
-                stage('SonarCloud analysis-Client') {
-                    environment {
-                        npm_config_cache = "$env.WORKSPACE"
-                        SONAR_BINARY_CACHE="$env.WORKSPACE"
-                    }
-                    steps {
-                        container('node') {
-                            dir('clients/cobol-lsp-vscode-extension') {
-                                sh 'npm i sonarqube-scanner'
-                                withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
-                                    sh 'node_modules/sonarqube-scanner/dist/bin/sonar-scanner -Dsonar.projectKey=com.ca.lsp:com.ca.lsp.cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${BRANCH_NAME}'
-                                }
-                            }
-                        }
-                    }
-                }
 
                 stage('Client - Change version') {
                     environment {
@@ -224,22 +206,22 @@ pipeline {
                     }
                 }
 
-                stage('Update telemetry key') {
-                    when {
-                        expression { branchName == 'master' }
-                    }
-
-                    steps{
-                        container('node') {
-                            dir('clients/cobol-lsp-vscode-extension') {
-                                //test telemetry key generation
-                                withCredentials([string(credentialsId: 'TELEMETRY_INSTRUMENTATION_KEY', variable: 'TELKEY')]) {
-                                    sh 'echo ${TELKEY}|base64 > resources/TELEMETRY_KEY'
-                                }
-                            }
-                        }
-                    }
-                }
+//                 stage('Update telemetry key') {
+//                     when {
+//                         expression { branchName == 'master' }
+//                     }
+//
+//                     steps{
+//                         container('node') {
+//                             dir('clients/cobol-lsp-vscode-extension') {
+//                                 //test telemetry key generation
+//                                 withCredentials([string(credentialsId: 'TELEMETRY_INSTRUMENTATION_KEY', variable: 'TELKEY')]) {
+//                                     sh 'echo ${TELKEY}|base64 > resources/TELEMETRY_KEY'
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 }
 
                 stage('Client - Package') {
                     environment {
@@ -250,6 +232,23 @@ pipeline {
                             dir('clients/cobol-lsp-vscode-extension') {
                                 sh 'npm run package'
                                 archiveArtifacts "*.vsix"
+                            }
+                        }
+                    }
+                }
+
+               stage('SonarCloud analysis-Client') {
+                    environment {
+                        npm_config_cache = "$env.WORKSPACE"
+                        SONAR_BINARY_CACHE="$env.WORKSPACE"
+                    }
+                    steps {
+                        container('node') {
+                            dir('clients/cobol-lsp-vscode-extension') {
+                                sh 'npm i sonarqube-scanner'
+                                withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
+                                    sh 'node_modules/sonarqube-scanner/dist/bin/sonar-scanner -Dsonar.projectKey=com.ca.lsp:com.ca.lsp.cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${BRANCH_NAME}'
+                                }
                             }
                         }
                     }
