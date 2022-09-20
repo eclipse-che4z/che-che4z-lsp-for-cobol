@@ -279,7 +279,7 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/cypress/screenshots/LSP/F96117.spec.js/
+          path: /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/cypress/screenshots/LSP/*/
       # Test run video was always captured, so this action uses "always()" condition
       # - uses: actions/upload-artifact@v2
       #   if: always()
