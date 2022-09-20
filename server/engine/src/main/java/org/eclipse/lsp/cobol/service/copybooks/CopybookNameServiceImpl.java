@@ -171,7 +171,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
         .map(uri -> {
           String copybookURI = files.decodeURI(copybookUriAsString);
           if (!files.isUriAbsolute(copybookURI)) {
-           if (copybookURI.startsWith("/")){
+           if (copybookURI.startsWith("/")) {
              copybookURI = copybookURI.substring(1, copybookURI.length() - 1);
            }
            if (uri.endsWith("/")) {

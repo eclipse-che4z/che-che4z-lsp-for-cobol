@@ -39,6 +39,11 @@ public interface FileSystemService {
   @Nullable
   Path getPathFromURI(@NonNull String uri);
 
+  /**
+   * Detect whether URI is absolute or not
+   * @param uri URI string representation of a file, could contain * or $ symbols
+   * @return true if, and only if, this URI is absolute
+   */
   boolean isUriAbsolute(@NonNull String uri);
 
   /**

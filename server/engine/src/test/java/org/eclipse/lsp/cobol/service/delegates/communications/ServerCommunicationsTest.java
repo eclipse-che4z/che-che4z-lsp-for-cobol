@@ -15,32 +15,41 @@
 
 package org.eclipse.lsp.cobol.service.delegates.communications;
 
+import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp4j.MessageType.Info;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Provider;
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.Executors;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
-import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.MessageParams;
+import org.eclipse.lsp4j.MessageType;
+import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.internal.util.reflection.FieldSetter;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.Executors;
-
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
-import static org.eclipse.lsp4j.MessageType.Info;
-import static org.mockito.Mockito.*;
 
 /** This unit tests verifies the capabilities of {@link ServerCommunications} */
 @ExtendWith(MockitoExtension.class)
@@ -152,8 +161,15 @@ class ServerCommunicationsTest {
     String uri = UUID.randomUUID().toString();
     when(files.decodeURI(uri)).thenReturn(uri);
 
-    FieldSetter.setField(
-        communications, communications.getClass().getDeclaredField("uriInProgress"), uriInProgress);
+
+    Field f = communications.getClass().getDeclaredField("uriInProgress");
+    f.setAccessible(true);
+    try {
+      f.set(communications, uriInProgress);
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
+
     communications.cancelProgressNotification(uri);
     verify(uriInProgress, times(1)).remove(uri);
   }

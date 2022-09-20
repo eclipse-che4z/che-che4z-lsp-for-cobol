@@ -15,9 +15,20 @@
 
 package org.eclipse.lsp.cobol.service.utils;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.MockedStatic;
 
 /** This test checks the logic File Service methods that do not interact with the file system */
 class WorkspaceFileServiceTest {
@@ -59,6 +70,51 @@ class WorkspaceFileServiceTest {
         new WorkspaceFileService()
             .getNameFromURI(
                 "file:///c%3A/workspace/POSITIVE_TESTS/.e4e/AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl"));
+  }
+
+
+  static Stream<Arguments> listFilesSource() {
+    return Stream.of(
+        Arguments.of(
+            "file:///c%3A/workspace/POSITIVE_TESTS/*",
+            "file:///c%3A/workspace/POSITIVE_TESTS/",
+            1),
+        Arguments.of(
+            "file:///c%3A/workspace/POSITIVE_TESTS/*/SUBFOLDER",
+            "file:///c%3A/workspace/POSITIVE_TESTS/",
+            2),
+        Arguments.of(
+            "file:///c%3A/workspace/POSITIVE_TESTS/${placeholder}/SUBFOLDER",
+            "file:///c%3A/workspace/POSITIVE_TESTS/",
+            2)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("listFilesSource")
+  void listFilesInDirectory(
+      String searchUri,
+      String uriToTheFolder,
+      int maxDepth
+  ) {
+    try (MockedStatic<Files> filesMock = mockStatic(Files.class)) {
+      FileSystemService fileSystemService = new WorkspaceFileService();
+
+      Path pathToTheFolder = fileSystemService.getPathFromURI(uriToTheFolder);
+
+      filesMock.when(() -> Files.find(eq(pathToTheFolder), eq(maxDepth), any()))
+          .thenReturn(Stream.of(fileSystemService.getPathFromURI("file:///")));
+
+      fileSystemService.listFilesInDirectory(searchUri);
+
+      filesMock.verify(
+          () -> Files.find(eq(pathToTheFolder), eq(maxDepth), any()),
+          times(1)
+      );
+      //test code
+
+      //verify mock
+    }
   }
 
   @Test

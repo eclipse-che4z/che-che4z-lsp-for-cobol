@@ -66,10 +66,11 @@ public class WorkspaceFileService implements FileSystemService {
   }
 
   @Override
-  public boolean isUriAbsolute(@NonNull String uri) {
-    String[] schemeParseResult = uri.split(":");
-    return schemeParseResult.length > 1 &&
-        schemeParseResult[0].contains("/");
+  public boolean isUriAbsolute(@NonNull final String uri) {
+    String cleanedUpUri = uri.replaceFirst("file:", "");
+    String[] schemeParseResult = cleanedUpUri.split("%3A");
+    return schemeParseResult.length > 1
+        && schemeParseResult[0].contains("/");
   }
 
   @Nullable
@@ -136,6 +137,7 @@ public class WorkspaceFileService implements FileSystemService {
   }
 
   @Override
+  @NonNull
   public List<String> listFilesInDirectory(final String uri) {
 
     final String[] pathSplittedByFirstAsterisk = uriWithReplacedPlaceholdersToAsterisks(
