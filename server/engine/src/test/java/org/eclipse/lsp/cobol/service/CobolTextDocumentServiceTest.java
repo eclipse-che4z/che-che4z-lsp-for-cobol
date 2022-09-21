@@ -126,7 +126,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
   private static final String DOCUMENT_WITH_ERRORS_URI =
-      "file:///c%3A/workspace/incorrect_document.cbl";
+      "file:///c:/workspace/incorrect_document.cbl";
 
   private CobolTextDocumentService service;
 

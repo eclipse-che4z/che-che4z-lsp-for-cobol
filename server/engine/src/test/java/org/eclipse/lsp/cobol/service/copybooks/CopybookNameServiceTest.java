@@ -56,8 +56,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 class CopybookNameServiceTest {
-  private static final String VALID_CPY_URI = "file:///c%3A/copybooks";
-  private static final String WORKSPACE_PROGRAM_URI = "file:///c%3A/workspace";
+  private static final String VALID_CPY_URI = "file:///c:/copybooks";
+  private static final String WORKSPACE_PROGRAM_URI = "file:///c:/workspace";
 
   private final List<WorkspaceFolder> workspace = new ArrayList<>();
   private final List<String> copyNames = new ArrayList<>();
@@ -214,7 +214,7 @@ class CopybookNameServiceTest {
 
     when(files.getPathFromURI(WORKSPACE_PROGRAM_URI)).thenReturn(wrkPath);
     when(files.getPathFromURI(VALID_CPY_URI)).thenReturn(cpyPath);
-//
+
     when(wrkPath.resolve(WORKSPACE_PROGRAM_URI)).thenReturn(wrkPath);
     when(wrkPath.resolve(VALID_CPY_URI)).thenReturn(cpyPath);
 

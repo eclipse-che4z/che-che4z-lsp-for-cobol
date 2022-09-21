@@ -37,7 +37,7 @@ class WorkspaceFileServiceTest {
     assertEquals(
         "ACTSOAPI.cbl",
         new WorkspaceFileService()
-            .getNameFromURI("file:///c%3A/workspace/POSITIVE_TESTS/positive/ACTSOAPI.cbl"));
+            .getNameFromURI("file:///c:/workspace/POSITIVE_TESTS/positive/ACTSOAPI.cbl"));
   }
 
   @Test
@@ -45,7 +45,7 @@ class WorkspaceFileServiceTest {
     assertEquals(
         "ACTSOAPI",
         new WorkspaceFileService()
-            .getNameFromURI("file:///c%3A/workspace/POSITIVE_TESTS/positive/ACTSOAPI"));
+            .getNameFromURI("file:///c:/workspace/POSITIVE_TESTS/positive/ACTSOAPI"));
   }
 
   @Test
@@ -69,24 +69,28 @@ class WorkspaceFileServiceTest {
         "AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl",
         new WorkspaceFileService()
             .getNameFromURI(
-                "file:///c%3A/workspace/POSITIVE_TESTS/.e4e/AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl"));
+                "file:///c:/workspace/POSITIVE_TESTS/.e4e/AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl"));
   }
 
 
   static Stream<Arguments> listFilesSource() {
     return Stream.of(
         Arguments.of(
-            "file:///c%3A/workspace/POSITIVE_TESTS/*",
-            "file:///c%3A/workspace/POSITIVE_TESTS/",
-            1),
+            "file:///c:/workspace/POSITIVE_TESTS/",
+            "file:///c:/workspace/POSITIVE_TESTS/",
+            0),
         Arguments.of(
-            "file:///c%3A/workspace/POSITIVE_TESTS/*/SUBFOLDER",
-            "file:///c%3A/workspace/POSITIVE_TESTS/",
+            "file:///c:/workspace/POSITIVE_TESTS/*",
+            "file:///c:/workspace/POSITIVE_TESTS/",
             2),
         Arguments.of(
-            "file:///c%3A/workspace/POSITIVE_TESTS/${placeholder}/SUBFOLDER",
-            "file:///c%3A/workspace/POSITIVE_TESTS/",
-            2)
+            "file:///c:/workspace/POSITIVE_TESTS/*/SUBFOLDER",
+            "file:///c:/workspace/POSITIVE_TESTS/",
+            3),
+        Arguments.of(
+            "file:///c:/workspace/POSITIVE_TESTS/${placeholder}/SUBFOLDER",
+            "file:///c:/workspace/POSITIVE_TESTS/",
+            3)
     );
   }
 
@@ -123,7 +127,7 @@ class WorkspaceFileServiceTest {
         "CAWA02-version-0133ED5400EA4E17.cbl",
         new WorkspaceFileService()
             .getNameFromURI(
-                "file:///c%3A/workspace/POSITIVE_TESTS/.e4e/CAWA02-version-0133ED5400EA4E17.cbl?%7B%22service%22%3A%7B%22credential%22%3A%7B%22"));
+                "file:///c:/workspace/POSITIVE_TESTS/.e4e/CAWA02-version-0133ED5400EA4E17.cbl?%7B%22service%22:%7B%22credential%22:%7B%22"));
   }
 
   @Test
@@ -132,6 +136,6 @@ class WorkspaceFileServiceTest {
         "AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl",
         new WorkspaceFileService()
             .getNameFromURI(
-                "file:///c%3A/workspace/POSITIVE_TESTS/.e4e/AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl?%7B%22service%22%3A%7B%22credential%22%3A%7B%22"));
+                "file:///c:/workspace/POSITIVE_TESTS/.e4e/AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl?%7B%22service%22:%7B%22credential%22:%7B%22"));
   }
 }

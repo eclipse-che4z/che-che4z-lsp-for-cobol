@@ -54,17 +54,17 @@ import static org.mockito.Mockito.*;
 class CopybookServiceTest {
   private static final String VALID_CPY_NAME = "VALIDNAME";
   private static final String VALID_CPY_URI =
-      "file:///c%3A/workspace/.c4z/.copybooks/VALIDNAME.CPY";
+      "file:///c:/workspace/.c4z/.copybooks/VALIDNAME.CPY";
   private static final String INVALID_CPY_NAME = "INVALID";
   private static final String INVALID_2_CPY_NAME = "INVALID_2";
   private static final String PARENT_CPY_NAME = "PARENT";
-  private static final String PARENT_CPY_URI = "file:///c%3A/workspace/.c4z/.copybooks/PARENT.CPY";
+  private static final String PARENT_CPY_URI = "file:///c:/workspace/.c4z/.copybooks/PARENT.CPY";
   private static final String PARENT_CONTENT = "         COPY NESTED.";
   private static final String NESTED_CPY_NAME = "nested";
   private static final String CONTENT = "content";
   private static final String SQLCA = "SQLCA";
   private static final String SQLDA = "SQLDA";
-  private static final String DOCUMENT_2_URI = "file:///c%3A/workspace/document2.cbl";
+  private static final String DOCUMENT_2_URI = "file:///c:/workspace/document2.cbl";
   private static final String DOCUMENT_3_URI = "implicit:///implicitCopybooks/SQLCA_DB2.cpy";
 
   private final DataBusBroker broker = mock(DataBusBroker.class);
@@ -412,7 +412,7 @@ class CopybookServiceTest {
   @Test
   void testPredefinedCopybooksResolvedInsteadOfStaticOnes() {
     final String copybookName = PredefinedCopybooks.Copybook.SQLCA.name();
-    final String copybookUri = "file:///c%3A/workspace/.c4z/.copybooks/" + copybookName + ".cpy";
+    final String copybookUri = "file:///c:/workspace/.c4z/.copybooks/" + copybookName + ".cpy";
 
     when(settingsService.fetchConfiguration("copybook-resolve", "document", copybookName, "COBOL"))
         .thenReturn(supplyAsync(() -> ImmutableList.of(new JsonPrimitive(copybookUri))));

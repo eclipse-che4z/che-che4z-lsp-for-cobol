@@ -67,7 +67,7 @@ class TestDefinitionOnLongCopybooks {
     assertEquals(1, definitions.size());
     assertEquals(
         new Location(
-            "file:///c%3A/workspace/.c4z/.copybooks/ABCD.cpy",
+            "file:///c:/workspace/.c4z/.copybooks/ABCD.cpy",
             new Range(new Position(), new Position())),
         definitions.get(0));
   }
