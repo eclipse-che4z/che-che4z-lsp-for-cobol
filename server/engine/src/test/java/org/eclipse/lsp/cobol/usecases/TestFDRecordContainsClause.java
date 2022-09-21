@@ -41,22 +41,26 @@ public class TestFDRecordContainsClause {
   private static final String TEXT =
       BASE
           + "002700     RECORD IS VARYING IN SIZE TO 4089 CHARACTERS                 00002700\n"
-          + "002800     DATA RECORD IS EXCP-INPUT.                                   00002800";
+          + "002800     DATA RECORD IS {$EXCP-INPUT}.                                   00002800\n"
+          + "       01 {$*EXCP-INPUT} PIC 9(2).\n";
 
   private static final String TEXT2 =
       BASE
           + "002700     RECORD IS VARYING IN SIZE FROM 4089 CHARACTERS           \n"
-          + "002800     DATA RECORD IS EXCP-INPUT.                                   00002800";
+          + "002800     DATA RECORD IS {$EXCP-INPUT}.                                   00002800\n"
+          + "       01 {$*EXCP-INPUT} PIC 9(2).\n";
 
   private static final String TEXT3 =
       BASE
           + "002700     RECORD IS VARYING IN SIZE FROM 4089 TO 5409 CHARACTERS \n"
-          + "002800     DATA RECORD IS EXCP-INPUT.                                   00002800";
+          + "002800     DATA RECORD IS {$EXCP-INPUT}.                                   00002800\n"
+          + "       01 {$*EXCP-INPUT} PIC 9(2).\n";
 
   private static final String TEXT4 =
       BASE
           + "002700     RECORD IS VARYING IN SIZE 4089 CHARACTERS \n"
-          + "002800     DATA RECORD IS EXCP-INPUT.                                   00002800";
+          + "002800     DATA RECORD IS {$EXCP-INPUT}.                                   00002800\n"
+          + "       01 {$*EXCP-INPUT} PIC 9(2).\n";
 
   @Test
   void test() {
