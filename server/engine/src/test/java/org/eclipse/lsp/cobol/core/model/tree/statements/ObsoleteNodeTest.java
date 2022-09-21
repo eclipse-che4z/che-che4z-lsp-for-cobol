@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.RemarksNode;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
-import org.eclipse.lsp.cobol.core.model.tree.logic.ObsoleteWarning;
+import org.eclipse.lsp.cobol.core.model.tree.logic.ObsoleteNodeCheck;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
@@ -42,12 +42,13 @@ class ObsoleteNodeTest {
     RootNode rootNode = new RootNode(locality, new CopybooksRepository());
     RemarksNode remarksNode = new RemarksNode(locality);
     AstProcessor astProcessor = new AstProcessor();
-    astProcessor.register(
-        new ProcessorDescription(
-            ObsoleteNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteWarning()));
-    rootNode.addChild(remarksNode);
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    astProcessor.process(ProcessingPhase.TRANSFORMATION, rootNode, new ProcessingContext(errors));
+    ProcessingContext ctx = new ProcessingContext(errors);
+    ctx.register(
+        new ProcessorDescription(
+            ObsoleteNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteNodeCheck()));
+    rootNode.addChild(remarksNode);
+    astProcessor.process(ProcessingPhase.TRANSFORMATION, rootNode, ctx);
 
     assertEquals(
         errors,

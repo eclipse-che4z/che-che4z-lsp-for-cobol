@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 /** Validate proper use of PIC and USAGE clause for elementary nodes */
-public class ElementaryProcessStandAlone implements Processor<ElementaryNode> {
+public class ElementaryNodeCheck implements Processor<ElementaryNode> {
   private static final String SEMANTICS_NO_PIC_CLAUSE = "semantics.noPicClause";
   private static final String BLANK_WHEN_ZERO = "variables.blankWhenZero";
   private static final String SIGN_CLAUSE = "variables.signClause";

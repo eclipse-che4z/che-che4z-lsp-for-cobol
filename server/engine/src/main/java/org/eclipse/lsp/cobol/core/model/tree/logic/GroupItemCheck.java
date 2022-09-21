@@ -17,16 +17,20 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.tree.variables.StandAloneDataItemNode;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.tree.variables.GroupItemNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormat;
 
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.EMPTY_STRUCTURE_MSG;
 
-/** StandAloneDataItemNode processor */
-public class StandAloneDataItemProcess implements Processor<StandAloneDataItemNode> {
+/** GroupItemNode processor */
+public class GroupItemCheck implements Processor<GroupItemNode> {
   @Override
-  public void accept(StandAloneDataItemNode node, ProcessingContext ctx) {
-    if (node.getPicClause().isEmpty() && node.getUsageFormat() != UsageFormat.INDEX) {
+  public void accept(GroupItemNode node, ProcessingContext ctx) {
+    if (node.getUsageFormat() == UsageFormat.UNDEFINED
+        && !node.isRedefines()
+        && node.getChildren().stream().noneMatch(Node.hasType(NodeType.VARIABLE))) {
       ctx.getErrors().add(node.getError(MessageTemplate.of(EMPTY_STRUCTURE_MSG, node.getName())));
     }
   }

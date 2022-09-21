@@ -17,6 +17,8 @@ package org.eclipse.lsp.cobol.core.engine.dialects.daco;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes.DaCoCopyFromNode;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.processor.Processor;
+import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -47,20 +49,18 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
                 vdn ->
                     vdn.getName() != null && Objects.equals(vdn.getName(), node.getPrototypeName()))
             .collect(Collectors.toList());
-    //          if (protoCandidates.size() != 1) {
-    //            // TODO: error, should be only one candidate
-    //          }
-    //          if (cfn.getParent().getNodeType() != NodeType.VARIABLE_DEFINITION) {
-    //            // TODO error reporting
-    //          }
+    if (protoCandidates.size() != 1) {
+      errors.add(
+          SyntaxError.syntaxError()
+              .errorSource(ErrorSource.DIALECT)
+              .locality(node.getLocality())
+              .suggestion("Can't find source for " + node.getPrototypeName())
+              .severity(ErrorSeverity.ERROR)
+              .build());
+      return;
+    }
     copyFrom(node.getLevel(), protoCandidates.get(0), node.getParent(), node);
     VariableDefinitionUtil.registerVariablesInProgram(node.getParent());
-    // clone variables from source, replace suffixes
-    // 1. get variable that is extended
-    // 2. find a prototype variable
-    // 3. check if we know what to do (ony one prototype)
-    // 4. clone definition
-    // 5. adjust levels and names
   }
 
   private void copyFrom(

@@ -17,8 +17,10 @@ package org.eclipse.lsp.cobol.core.engine.processor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
 
-import java.util.List;
+import java.util.*;
+import java.util.function.BiConsumer;
 
 /**
  * AST processing context. Stores the state of processing progress.
@@ -26,5 +28,23 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class ProcessingContext {
+    private final Map<
+            ProcessingPhase,
+            Map<Class<? extends Node>, List<BiConsumer<? extends Node, ProcessingContext>>>>
+            processors = new HashMap<>();
+
     final List<SyntaxError> errors;
+
+    /**
+     * Register node type processor
+     *
+     * @param processorDesc Processor descriptor.
+     * @param <T> Specific node type
+     */
+    public <T extends Node> void register(ProcessorDescription processorDesc) {
+        processors
+                .computeIfAbsent(processorDesc.getPhase(), v -> new LinkedHashMap<>())
+                .computeIfAbsent(processorDesc.getNodeClass(), v -> new ArrayList<>())
+                .add(processorDesc.getProcessor());
+    }
 }

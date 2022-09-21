@@ -19,7 +19,7 @@ import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.logic.ElementaryProcessStandAlone;
+import org.eclipse.lsp.cobol.core.model.tree.logic.ElementaryNodeCheck;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.junit.jupiter.api.Test;
@@ -43,9 +43,12 @@ class ElementaryNodeTest {
   void testValidatePicAndUsageClauseWhenPicAndUsageAreInCompatible() {
     ElementaryItemNode node = getNode("PIC 9", UsageFormat.COMPUTATIONAL_1);
     ArrayList<SyntaxError> errors = new ArrayList<>();
+    ProcessingContext ctx = new ProcessingContext(errors);
     AstProcessor astProcessor = new AstProcessor();
-    astProcessor.register(new ProcessorDescription(ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryProcessStandAlone()));
-    astProcessor.process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors));
+    ctx.register(
+        new ProcessorDescription(
+            ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryNodeCheck()));
+    astProcessor.process(ProcessingPhase.TRANSFORMATION, node, ctx);
     assertEquals(1, errors.size());
     assertEquals(ErrorSeverity.WARNING, errors.get(0).getSeverity());
     assertEquals("semantics.noPicClause", errors.get(0).getMessageTemplate().getTemplate());
@@ -56,12 +59,14 @@ class ElementaryNodeTest {
     ElementaryItemNode node = getNode("PIC X", UsageFormat.COMPUTATIONAL_5);
     ArrayList<SyntaxError> errors = new ArrayList<>();
     AstProcessor astProcessor = new AstProcessor();
-    astProcessor.register(new ProcessorDescription(ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryProcessStandAlone()));
-    astProcessor.process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors));
+    ProcessingContext ctx = new ProcessingContext(errors);
+    ctx.register(
+        new ProcessorDescription(
+            ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryNodeCheck()));
+    astProcessor.process(ProcessingPhase.TRANSFORMATION, node, ctx);
     assertEquals(1, errors.size());
     assertEquals(ErrorSeverity.WARNING, errors.get(0).getSeverity());
-    assertEquals(
-        "semantics.picAndUsageConflict", errors.get(0).getMessageTemplate().getTemplate());
+    assertEquals("semantics.picAndUsageConflict", errors.get(0).getMessageTemplate().getTemplate());
   }
 
   @Test
@@ -75,7 +80,8 @@ class ElementaryNodeTest {
     // NEED CLARIFICATION. If PIC 999 UTF-8 is valid.
     node = getNode("PIC 9", UsageFormat.UTF_8);
     ArrayList<SyntaxError> errors2 = new ArrayList<>();
-    new AstProcessor().process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors2));
+    new AstProcessor()
+        .process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors2));
     assertEquals(0, errors2.size());
   }
 
@@ -85,14 +91,17 @@ class ElementaryNodeTest {
         new ElementaryItemNode(
             null, 2, "TEST-NODE", false, "PIC X", "", UsageFormat.UTF_8, false, true, false);
     ArrayList<SyntaxError> errors = new ArrayList<>();
+    ProcessingContext ctx = new ProcessingContext(errors);
     AstProcessor astProcessor = new AstProcessor();
-    astProcessor.register(new ProcessorDescription(ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryProcessStandAlone()));
-    astProcessor.process(ProcessingPhase.TRANSFORMATION, elementNode, new ProcessingContext(errors));
+    ctx.register(
+        new ProcessorDescription(
+            ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryNodeCheck()));
+    astProcessor.process(ProcessingPhase.TRANSFORMATION, elementNode, ctx);
     assertEquals(1, errors.size());
     assertEquals(ErrorSeverity.WARNING, errors.get(0).getSeverity());
     assertEquals(
         "semantics.improperUseBlankWhenZeroAndSignClause",
-            errors.get(0).getMessageTemplate().getTemplate());
+        errors.get(0).getMessageTemplate().getTemplate());
   }
 
   @Test

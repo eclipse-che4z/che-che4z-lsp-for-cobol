@@ -126,6 +126,6 @@ public final class DaCoDialect implements CobolDialect {
   public List<ProcessorDescription> getProcessors() {
     return Collections.singletonList(
         new ProcessorDescription(
-            DaCoCopyFromNode.class, ProcessingPhase.POST_TRANSFORMATION, new DaCoCopyFromProcessor()));
+            DaCoCopyFromNode.class, ProcessingPhase.POST_DEFINITION, new DaCoCopyFromProcessor()));
   }
 }

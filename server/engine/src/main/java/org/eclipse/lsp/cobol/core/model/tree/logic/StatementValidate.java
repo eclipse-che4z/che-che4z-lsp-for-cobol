@@ -56,10 +56,6 @@ public class StatementValidate implements Processor<StatementNode> {
 
   @Override
   public void accept(StatementNode node, ProcessingContext ctx) {
-    validate(node, ctx);
-  }
-
-  private void validate(StatementNode node, ProcessingContext ctx) {
     if (node instanceof SetToBooleanStatement) {
       ctx.getErrors()
           .addAll(
@@ -80,7 +76,8 @@ public class StatementValidate implements Processor<StatementNode> {
       SetUpDownByStatement node1 = (SetUpDownByStatement) node;
       ctx.getErrors()
           .addAll(
-              validateVariableType(node1.getReceivingFields(), ImmutableList.of(VariableType.INDEX_ITEM)));
+              validateVariableType(
+                  node1.getReceivingFields(), ImmutableList.of(VariableType.INDEX_ITEM)));
 
       if (hasSendingFieldProducesError(node1))
         ctx.getErrors()

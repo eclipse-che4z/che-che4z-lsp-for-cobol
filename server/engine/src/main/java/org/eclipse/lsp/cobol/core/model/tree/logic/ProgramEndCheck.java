@@ -26,7 +26,7 @@ import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 
 /** ProgramEndNode processor */
 @Slf4j
-public class ProgramEndProcess implements Processor<ProgramEndNode> {
+public class ProgramEndCheck implements Processor<ProgramEndNode> {
   @Override
   public void accept(ProgramEndNode programEndNode, ProcessingContext ctx) {
     if (!programEndNode.getProgram().isPresent()) {

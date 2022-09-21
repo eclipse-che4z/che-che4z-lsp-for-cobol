@@ -31,6 +31,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
@@ -121,7 +122,6 @@ public class CobolLanguageEngine {
   public ResultWithErrors<Node> run(
       @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    registerProcessors(analysisConfig);
     Timing.Builder timingBuilder = Timing.builder();
 
     timingBuilder.getDialectsTimer().start();
@@ -247,7 +247,9 @@ public class CobolLanguageEngine {
     analyzeEmbeddedCode(syntaxTree, positionMapping);
 
     Node rootNode = syntaxTree.get(0);
-    accumulatedErrors.addAll(astProcessor.processSyntaxTree(rootNode));
+    ProcessingContext ctx = new ProcessingContext(new ArrayList<>());
+    registerProcessors(analysisConfig, ctx);
+    accumulatedErrors.addAll(astProcessor.processSyntaxTree(ctx, rootNode));
 
     timingBuilder.getSyntaxTreeTimer().stop();
     timingBuilder.getLateErrorProcessingTimer().start();
@@ -276,34 +278,35 @@ public class CobolLanguageEngine {
         rootNode, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
-  private void registerProcessors(AnalysisConfig analysisConfig) {
+  private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx) {
     // Phase TRANSFORMATION
-    astProcessor.register(new ProcessorDescription(ProgramIdNode.class, ProcessingPhase.TRANSFORMATION, new ProgramIdProcess()));
-    astProcessor.register(new ProcessorDescription(DeclarativeProcedureSectionNode.class, ProcessingPhase.TRANSFORMATION, new DeclarativeProcedureSectionRegister()));
-    astProcessor.register(new ProcessorDescription(FileDescriptionNode.class, ProcessingPhase.TRANSFORMATION, new FileDescriptionProcess()));
-    astProcessor.register(new ProcessorDescription(FileEntryNode.class, ProcessingPhase.TRANSFORMATION, new FileEntryProcess()));
-    astProcessor.register(new ProcessorDescription(ProgramEndNode.class, ProcessingPhase.TRANSFORMATION, new ProgramEndProcess()));
-    astProcessor.register(new ProcessorDescription(StandAloneDataItemNode.class, ProcessingPhase.TRANSFORMATION, new StandAloneDataItemProcess()));
-    astProcessor.register(new ProcessorDescription(SectionNameNode.class, ProcessingPhase.TRANSFORMATION, new SectionNameRegister()));
-    astProcessor.register(new ProcessorDescription(SectionNode.class, ProcessingPhase.TRANSFORMATION, new ProcessNodeWithVariableDefinitions()));
+    ctx.register(new ProcessorDescription(ProgramIdNode.class, ProcessingPhase.TRANSFORMATION, new ProgramIdProcess()));
+    ctx.register(new ProcessorDescription(SectionNode.class, ProcessingPhase.TRANSFORMATION, new ProcessNodeWithVariableDefinitions()));
+    ctx.register(new ProcessorDescription(FileEntryNode.class, ProcessingPhase.TRANSFORMATION, new FileEntryProcess()));
+    ctx.register(new ProcessorDescription(FileDescriptionNode.class, ProcessingPhase.TRANSFORMATION, new FileDescriptionProcess()));
+    ctx.register(new ProcessorDescription(DeclarativeProcedureSectionNode.class, ProcessingPhase.TRANSFORMATION, new DeclarativeProcedureSectionRegister()));
     // Phase DEFINITION
-    astProcessor.register(new ProcessorDescription(ParagraphsNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock()));
-    astProcessor.register(new ProcessorDescription(ParagraphNameNode.class, ProcessingPhase.DEFINITION, new ParagraphNameRegister()));
-    astProcessor.register(new ProcessorDescription(ProcedureDivisionBodyNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock()));
+    ctx.register(new ProcessorDescription(ParagraphsNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock()));
+    ctx.register(new ProcessorDescription(SectionNameNode.class, ProcessingPhase.DEFINITION, new SectionNameRegister()));
+    ctx.register(new ProcessorDescription(ParagraphNameNode.class, ProcessingPhase.DEFINITION, new ParagraphNameRegister()));
+    ctx.register(new ProcessorDescription(ProcedureDivisionBodyNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock()));
     // Phase USAGE
-    astProcessor.register(new ProcessorDescription(CodeBlockUsageNode.class, ProcessingPhase.USAGE, new CodeBlockUsage()));
-    astProcessor.register(new ProcessorDescription(RootNode.class, ProcessingPhase.USAGE, new RootNodeUpdateCopyNodesByPositionInTree()));
-    astProcessor.register(new ProcessorDescription(QualifiedReferenceNode.class, ProcessingPhase.USAGE, new QualifiedReferenceUpdateVariableUsage()));
+    ctx.register(new ProcessorDescription(CodeBlockUsageNode.class, ProcessingPhase.USAGE, new CodeBlockUsage()));
+    ctx.register(new ProcessorDescription(RootNode.class, ProcessingPhase.USAGE, new RootNodeUpdateCopyNodesByPositionInTree()));
+    ctx.register(new ProcessorDescription(QualifiedReferenceNode.class, ProcessingPhase.USAGE, new QualifiedReferenceUpdateVariableUsage()));
+
     // Phase VALIDATION
-    astProcessor.register(new ProcessorDescription(VariableWithLevelNode.class, ProcessingPhase.VALIDATION, new VariableWithLevelCheckLevel()));
-    astProcessor.register(new ProcessorDescription(StatementNode.class, ProcessingPhase.VALIDATION, new StatementValidate()));
-    astProcessor.register(new ProcessorDescription(ElementaryNode.class, ProcessingPhase.VALIDATION, new ElementaryProcessStandAlone()));
-    astProcessor.register(new ProcessorDescription(GroupItemNode.class, ProcessingPhase.VALIDATION, new GroupItemProcess()));
-    astProcessor.register(new ProcessorDescription(ObsoleteNode.class, ProcessingPhase.VALIDATION, new ObsoleteWarning()));
+    ctx.register(new ProcessorDescription(VariableWithLevelNode.class, ProcessingPhase.VALIDATION, new VariableWithLevelCheck()));
+    ctx.register(new ProcessorDescription(StatementNode.class, ProcessingPhase.VALIDATION, new StatementValidate()));
+    ctx.register(new ProcessorDescription(ElementaryNode.class, ProcessingPhase.VALIDATION, new ElementaryNodeCheck()));
+    ctx.register(new ProcessorDescription(GroupItemNode.class, ProcessingPhase.VALIDATION, new GroupItemCheck()));
+    ctx.register(new ProcessorDescription(ObsoleteNode.class, ProcessingPhase.VALIDATION, new ObsoleteNodeCheck()));
+    ctx.register(new ProcessorDescription(StandAloneDataItemNode.class, ProcessingPhase.VALIDATION, new StandAloneDataItemCheck()));
+    ctx.register(new ProcessorDescription(ProgramEndNode.class, ProcessingPhase.VALIDATION, new ProgramEndCheck()));
 
     // Dialects
     List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());
-    pds.forEach(astProcessor::register);
+    pds.forEach(ctx::register);
   }
 
   private CopybooksRepository applyDialectCopybooks(

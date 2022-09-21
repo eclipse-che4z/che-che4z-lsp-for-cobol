@@ -23,7 +23,7 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.statements.ObsoleteNode;
 
 /** ObsoleteNode processor */
-public class ObsoleteWarning implements Processor<ObsoleteNode> {
+public class ObsoleteNodeCheck implements Processor<ObsoleteNode> {
   @Override
   public void accept(ObsoleteNode node, ProcessingContext ctx) {
     ctx.getErrors()

@@ -17,18 +17,14 @@ package org.eclipse.lsp.cobol.core.engine.processor;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 
-import java.util.*;
-import java.util.function.BiConsumer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * AST processor. This class contains node type specific processors and handles abstract syntax tree
  * processing.
  */
 public class AstProcessor {
-  private final Map<
-          ProcessingPhase,
-          Map<Class<? extends Node>, List<BiConsumer<? extends Node, ProcessingContext>>>>
-      processors = new HashMap<>();
 
   /**
    * The entry point to AST processing
@@ -36,8 +32,7 @@ public class AstProcessor {
    * @param rootNode the root node of AST
    * @return a list of errors
    */
-  public List<SyntaxError> processSyntaxTree(Node rootNode) {
-    ProcessingContext ctx = new ProcessingContext(new ArrayList<>());
+  public List<SyntaxError> processSyntaxTree(ProcessingContext ctx, Node rootNode) {
     for (ProcessingPhase phase : ProcessingPhase.values()) {
       process(phase, rootNode, ctx);
     }
@@ -52,17 +47,17 @@ public class AstProcessor {
    * @param ctx processing context
    */
   public void process(ProcessingPhase phase, Node node, ProcessingContext ctx) {
-    findProcessors(phase, node.getClass()).forEach(p -> p.accept(node, ctx));
+    findProcessors(ctx, phase, node.getClass()).forEach(p -> p.accept(node, ctx));
     node.getChildren().forEach(n -> process(phase, n, ctx));
   }
 
-  private List<Processor<Node>> findProcessors(
+  private List<Processor<Node>> findProcessors(ProcessingContext ctx,
       ProcessingPhase phase, Class<? extends Node> nodeClass) {
     List<Processor<Node>> result = new ArrayList<>();
-    if (!processors.containsKey(phase)) {
+    if (!ctx.getProcessors().containsKey(phase)) {
       return result;
     }
-    processors
+    ctx.getProcessors()
         .get(phase)
         .forEach(
             (key, value) -> {
@@ -71,18 +66,5 @@ public class AstProcessor {
               }
             });
     return result;
-  }
-
-  /**
-   * Register node type processor
-   *
-   * @param processorDesc Processor descriptor.
-   * @param <T> Specific node type
-   */
-  public <T extends Node> void register(ProcessorDescription processorDesc) {
-    processors
-        .computeIfAbsent(processorDesc.getPhase(), v -> new LinkedHashMap<>())
-        .computeIfAbsent(processorDesc.getNodeClass(), v -> new ArrayList<>())
-        .add(processorDesc.getProcessor());
   }
 }

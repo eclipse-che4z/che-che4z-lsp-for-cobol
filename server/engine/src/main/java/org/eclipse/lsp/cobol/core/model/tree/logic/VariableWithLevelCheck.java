@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableWithLevelNode;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
 
 /** VariableWithLevelNode processor */
-public class VariableWithLevelCheckLevel implements Processor<VariableWithLevelNode> {
+public class VariableWithLevelCheck implements Processor<VariableWithLevelNode> {
   @Override
   public void accept(VariableWithLevelNode node, ProcessingContext ctx) {
     if ((node.getLevel() == LEVEL_01 || node.getLevel() == LEVEL_77)

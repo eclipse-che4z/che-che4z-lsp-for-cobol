@@ -19,8 +19,8 @@ package org.eclipse.lsp.cobol.core.engine.processor;
  */
 public enum ProcessingPhase {
     TRANSFORMATION,
-    POST_TRANSFORMATION,
     DEFINITION,
+    POST_DEFINITION,
     USAGE,
     VALIDATION
 }
