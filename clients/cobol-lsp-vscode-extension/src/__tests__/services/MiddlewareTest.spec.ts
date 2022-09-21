@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import { CopybookName } from "../../services/copybook/CopybookDownloadService";
 import { CopybookURI } from "../../services/copybook/CopybookURI";
 import {Middleware, RequestLine} from "../../services/Middleware";
 
@@ -57,7 +58,8 @@ describe("Copybook downloader", () => {
             ].map(sectionName => ({section: sectionName}))
         };
         await expect(middleware.handleConfigurationRequest(params, null, null)).resolves.toEqual([]);
-        expect(downloadCopybooksMock).toHaveBeenCalledWith("cobFile", ["bookName", "bookName2"], true);
+        expect(downloadCopybooksMock).toHaveBeenCalledWith("cobFile", [new CopybookName("bookName", "COBOL"), 
+            new CopybookName("bookName2", "COBOL")], true);
     });
     it("Call next for non cobol params", async () => {
         const params = constructParams("foo.bar");

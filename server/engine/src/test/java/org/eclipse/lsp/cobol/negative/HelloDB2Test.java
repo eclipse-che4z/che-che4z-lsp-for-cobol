@@ -35,7 +35,7 @@ public class HelloDB2Test extends NegativeTest {
   private static final int EXPECTED_ERRORS_NUMBER = 5;
 
   HelloDB2Test() {
-    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, ImmutableList.of());
+    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, ImmutableList.of(), "");
   }
 
   @Test

@@ -14,9 +14,8 @@
 
 import {CancellationToken, HandlerResult} from "vscode-jsonrpc";
 import {ConfigurationParams, ConfigurationRequest} from "vscode-languageclient";
-import {CopybookDownloadService} from "./copybook/CopybookDownloadService";
+import {CopybookDownloadService, CopybookName} from "./copybook/CopybookDownloadService";
 import {CopybookURI} from "./copybook/CopybookURI";
-import { InfoStorage } from "./copybook/InfoStorage";
 
 const PARAMS_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+)\.([^.]+)$/
 
@@ -34,11 +33,10 @@ export class Middleware {
         if (requestLines.length > 0 && requestLines[0] !== undefined && requestLines[0].prefix == "cobol-lsp") {
             switch (requestLines[0].command) {
                 case "copybook-resolve":
-                    InfoStorage.set(requestLines[0].cobolFileName, requestLines[0].copybookName, requestLines[0].dialectName);
                     return [await CopybookURI.resolveCopybookURI(requestLines[0].copybookName,
                         requestLines[0].cobolFileName, requestLines[0].dialectName)]
                 case "copybook-download":
-                    const copybookNames = requestLines.map(requestLine => requestLine.copybookName);
+                    const copybookNames: CopybookName[] = requestLines.map(requestLine => new CopybookName(requestLine.copybookName, requestLine.dialectName));
                     this.copybookDownloader.downloadCopybooks(requestLines[0].cobolFileName, copybookNames,
                         requestLines[0].quiet);
                     return [];

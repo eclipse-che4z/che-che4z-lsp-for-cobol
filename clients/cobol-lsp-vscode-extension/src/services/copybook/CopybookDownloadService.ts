@@ -25,7 +25,10 @@ import { SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { CopybookURI } from "./CopybookURI";
 import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
-import { InfoStorage } from "./InfoStorage";
+
+export class CopybookName {
+    public constructor(public name: string, public dialect: string) {};
+}
 
 const experimentTag = "experiment-tag";
 export class CopybookDownloadService implements vscode.Disposable {
@@ -232,10 +235,10 @@ export class CopybookDownloadService implements vscode.Disposable {
      * @param copybookNames list of names of the copybooks required by the LSP server
      * @param quiet flag described that interaction with a user is not allowed
      */
-    public async downloadCopybooks(cobolFileName: string, copybookNames: string[], quiet: boolean = true)
+    public async downloadCopybooks(cobolFileName: string, copybookNames: CopybookName[], quiet: boolean = true)
         : Promise<void> {
         if (!CopybookDownloadService.isEligibleForCopybookDownload()) {
-            if (!quiet) { CopybookDownloadService.createErrorMessageForCopybooks(new Set<string>(copybookNames)); }
+            if (!quiet) { CopybookDownloadService.createErrorMessageForCopybooks(new Set<string>(copybookNames.map(c => c.name))); }
             return;
         }
         if (CopybookDownloadService.isEligibleForCopybookDownload() && !ZoweVsCodeExtension.getZoweExplorerApi()) {
@@ -276,9 +279,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         }
 
         copybookNames.forEach(copybook => {
-            for (const dialectType of InfoStorage.get(cobolFileName, copybook)) {
-                this.queue.push(cobolFileName, copybook, dialectType, profile, quiet);
-            }
+            this.queue.push(cobolFileName, copybook.name, copybook.dialect, profile, quiet);
         });
     }
 

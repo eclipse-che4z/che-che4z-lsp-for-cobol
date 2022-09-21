@@ -688,6 +688,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitExitStatement(ExitStatementContext ctx) {
+    if (ctx.PROGRAM() != null) {
+      return addTreeNode(ctx, StopNode::new);
+    }
     return addTreeNode(ctx, ExitNode::new);
   }
 

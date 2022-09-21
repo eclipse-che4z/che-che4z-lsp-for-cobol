@@ -71,7 +71,11 @@ public class DialectService {
     List<CobolDialect> orderedDialects = sortDialects(dialects);
     List<SyntaxError> errors = new LinkedList<>();
     for (CobolDialect orderedDialect : orderedDialects) {
-      errors.addAll(orderedDialect.extend(context));
+      List<SyntaxError> dialectErrors = orderedDialect.extend(context);
+      dialectErrors.forEach(e -> e.getLocality().setRange(
+          context.getExtendedSource().getMainMap().mapLocation(e.getLocality().getRange(), false).getRange()));
+
+      errors.addAll(dialectErrors);
       context.getExtendedSource().commitTransformations();
     }
     ResultWithErrors<DialectOutcome> acc =

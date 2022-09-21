@@ -1,0 +1,47 @@
+[
+  {
+    "name": "STPRG",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 15.0,
+        "character": 8.0
+      },
+      "end": {
+        "line": 19.0,
+        "character": 18.0
+      }
+    },
+    "type": "program",
+    "children": [
+      {
+        "targetName": "PARAG1",
+        "type": "perform"
+      },
+      {
+        "type": "stop"
+      },
+      {
+        "snippet": "PARAG1.\r\n            EXIT.",
+        "name": "PARAG1",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 18.0,
+            "character": 8.0
+          },
+          "end": {
+            "line": 19.0,
+            "character": 18.0
+          }
+        },
+        "type": "paragraph",
+        "children": [
+          {
+            "type": "exit"
+          }
+        ]
+      }
+    ]
+  }
+]

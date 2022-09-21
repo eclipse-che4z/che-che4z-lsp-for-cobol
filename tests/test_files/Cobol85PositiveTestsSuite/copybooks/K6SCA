@@ -165,8 +165,8 @@
 016500 CLOSE-FILES.                                                     K6SCA4.2
 016600     PERFORM END-ROUTINE THRU END-ROUTINE-13. CLOSE PRINT-FILE.   K6SCA4.2
 016700 TERMINATE-CCVS.                                                  K6SCA4.2
-016800S    EXIT PROGRAM.                                                K6SCA4.2
-016900STERMINATE-CALL.                                                  K6SCA4.2
+016800     EXIT PROGRAM.                                                K6SCA4.2
+016900 TERMINATE-CALL.                                                  K6SCA4.2
 017000     STOP     RUN.                                                K6SCA4.2
 017100 INSPT. MOVE "INSPT" TO P-OR-F. ADD 1 TO INSPECT-COUNTER.         K6SCA4.2
 017200 PASS.  MOVE "PASS " TO P-OR-F.  ADD 1 TO PASS-COUNTER.           K6SCA4.2

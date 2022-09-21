@@ -23,7 +23,7 @@ import {
     COPYBOOKS_FOLDER, DOWNLOAD_QUEUE_LOCKED_ERROR_MSG,
     PROFILE_NAME_PLACEHOLDER, PROVIDE_PROFILE_MSG, UNLOCK_DOWNLOAD_QUEUE_MSG,
 } from "../../../constants";
-import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
+import { CopybookDownloadService, CopybookName } from "../../../services/copybook/CopybookDownloadService";
 import { CopybookProfile } from "../../../services/copybook/DownloadQueue";
 import { TelemetryService } from "../../../services/reporter/TelemetryService";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
@@ -257,7 +257,7 @@ describe("Test downloadCopybook user interaction", () => {
     test("check download fails and pass message when download parameters are not provided", async () => {
         (CopybookDownloadService as any).checkWorkspace = jest.fn().mockReturnValue(false);
         (CopybookDownloadService as any).isEligibleForCopybookDownload = jest.fn().mockReturnValue(false);
-        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
+        await copybooksDownloadService.downloadCopybooks("fileName", [new CopybookName("copybook", "dialect")], false);
         expect(vscode.window.showErrorMessage).toBeCalledWith("Some copybooks could not be located. Ensure your configuration contains correct paths to copybooks, including nested copybooks. Missing copybooks: copybook", "Change settings");
         expect(queuePush).not.toBeCalled();
     });
@@ -266,49 +266,49 @@ describe("Test downloadCopybook user interaction", () => {
         (CopybookDownloadService as any).checkWorkspace = jest.fn().mockReturnValue(false);
         ZoweVsCodeExtension.getZoweExplorerApi = jest.fn().mockReturnValue(undefined);
         (CopybookDownloadService as any).isEligibleForCopybookDownload = jest.fn().mockReturnValue(true);
-        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
+        await copybooksDownloadService.downloadCopybooks("fileName", [new CopybookName("copybook", "dialect")], false);
         expect(vscode.window.showErrorMessage).toBeCalledWith("Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe.", "Install Zowe Explorer");
         expect(queuePush).not.toBeCalled();
     });
 
     test("check workspace fail", async () => {
         (CopybookDownloadService as any).checkWorkspace = jest.fn().mockReturnValue(false);
-        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
+        await copybooksDownloadService.downloadCopybooks("fileName", [new CopybookName("copybook", "dialect")], false);
         expect(vscode.window.showErrorMessage).not.toBeCalled();
         expect(queuePush).not.toBeCalled();
     });
 
     test("check profile not found", async () => {
         ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(undefined);
-        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
+        await copybooksDownloadService.downloadCopybooks("fileName", [new CopybookName("copybook", "dialect")], false);
         expect(vscode.window.showErrorMessage).toBeCalledWith("Please specify a valid Zowe Explorer profile to download copybooks from the mainframe.", "Change settings");
         expect(queuePush).not.toBeCalled();
     });
 
     test("check profile not found with user interaction", async () => {
         ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(undefined);
-        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
+        await copybooksDownloadService.downloadCopybooks("fileName", [new CopybookName("copybook", "dialect")], false);
         expect(vscode.window.showErrorMessage).toBeCalledWith(PROVIDE_PROFILE_MSG , anything());
         expect(queuePush).not.toBeCalled();
     });
 
     test("check good path", async () => {
         ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue("profile");
-        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"]);
+        await copybooksDownloadService.downloadCopybooks("fileName", [new CopybookName("copybook", "dialect")]);
         expect(vscode.window.showErrorMessage).not.toBeCalled();
-        expect(queuePush).toBeCalledWith("fileName", "copybook", SettingsService.DEFAULT_DIALECT, "profile", true);
+        expect(queuePush).toBeCalledWith("fileName", "copybook", "dialect", "profile", true);
     });
 
     test("check locked profile", async () => {
         ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(wrongCredProfile);
-        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"]);
+        await copybooksDownloadService.downloadCopybooks("fileName", [new CopybookName("copybook", "dialect")]);
         expect(vscode.window.showErrorMessage).not.toBeCalled();
         expect(queuePush).not.toBeCalled();
     });
 
     test("check locked profile and user kept it locked", async () => {
         ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(wrongCredProfile);
-        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
+        await copybooksDownloadService.downloadCopybooks("fileName", [new CopybookName("copybook", "dialect")], false);
         expect(vscode.window.showErrorMessage).toBeCalledWith(downloadQueueLockedErrorMsg, anything());
         expect(queuePush).not.toBeCalled();
         expect((copybooksDownloadService as any).lockedProfile).toContain(wrongCredProfile);
@@ -317,9 +317,9 @@ describe("Test downloadCopybook user interaction", () => {
     test("queue locked and user unlocked it", async () => {
         ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(wrongCredProfile);
         vscode.window.showErrorMessage = jest.fn().mockResolvedValue(UNLOCK_DOWNLOAD_QUEUE_MSG);
-        await copybooksDownloadService.downloadCopybooks("fileName", ["copybook"], false);
+        await copybooksDownloadService.downloadCopybooks("fileName", [new CopybookName("copybook", "dialect")], false);
         expect(vscode.window.showErrorMessage).toBeCalledWith(downloadQueueLockedErrorMsg, anything());
-        expect(queuePush).toBeCalledWith("fileName", "copybook", SettingsService.DEFAULT_DIALECT, wrongCredProfile, false);
+        expect(queuePush).toBeCalledWith("fileName", "copybook", "dialect", wrongCredProfile, false);
         expect((copybooksDownloadService as any).lockedProfile).not.toContain(wrongCredProfile);
     });
 });

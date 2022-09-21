@@ -239,7 +239,51 @@ jobs:
         with:
           name: vsix-package
           path: '*.vsix'
-
-
-       
+  cypress-run:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+      - name: Download vsix file
+        uses: actions/download-artifact@v3
+        with:
+            path: staging
+      - name: make cobol-lsp plugin folder
+        run: mkdir -p tests/theia/plugins
+      - name: Copy vsix file
+        run: cp staging/vsix-package/*.vsix tests/theia/plugins
+      - name: Up theia docker image
+        run:
+        # Run the docker commande
+          docker run -d -p 3000:3000 -v "/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins":/home/theia/plugins -v "/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project":/home/project grianbrcom/theia-full:1.15.0
+      - name: up docker image
+        run: |
+             docker ps
+             rm -rf node_modules/ yarn.lock
+             cd tests
+             yarn cache clean
+             yarn install --frozen-lockfile
+             npm run ts:build        
+      - name: Cypress run
+        uses: cypress-io/github-action@v2         
+        with:    
+          command: npm run cy:run:ci -- --env ide=theia
+          browser: chrome
+          headless: true
+          wait-on: 'http://localhost:3000'
+          working-directory: tests
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/cypress/screenshots/LSP/*/*
+      # Test run video was always captured, so this action uses "always()" condition
+      # - uses: actions/upload-artifact@v2
+      #   if: always()
+      #   with:
+      #     name: cypress-videos
+      #     path: cypress/videos
 

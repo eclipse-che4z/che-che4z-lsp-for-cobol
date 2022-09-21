@@ -53,8 +53,10 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4j.api.version>1.7.25</slf4j.api.version>
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
-        <filesToTestPath>${project.basedir}${file.separator}..${file.separator}..${file.separator}Cobol85PositiveTestsSuite</filesToTestPath>
-        <listingSnap>${project.basedir}${file.separator}..${file.separator}..${file.separator}Cobol85PositiveTestsSuite${file.separator}compileListing${file.separator}snapshot</listingSnap>
+        <filesToTestPath>${project.basedir}${file.separator}..${file.separator}..${file.separator}tests${file.separator}test_files${file.separator}Cobol85PositiveTestsSuite,
+            ${project.basedir}${file.separator}..${file.separator}..${file.separator}tests${file.separator}test_files${file.separator}cicsGenApp,
+            ${project.basedir}${file.separator}..${file.separator}..${file.separator}tests${file.separator}test_files${file.separator}aws-mainframe-modernization-carddemo</filesToTestPath>
+        <listingSnap>${project.basedir}${file.separator}..${file.separator}..${file.separator}tests${file.separator}test_files${file.separator}Cobol85PositiveTestsSuite${file.separator}compileListing${file.separator}snapshot</listingSnap>
     </properties>
     <dependencies>
         <dependency>
