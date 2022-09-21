@@ -507,7 +507,7 @@
         "package": "vsce package"
     },
     "dependencies": {
-        "@zowe/zowe-explorer-api": "^1.17.0",
+        "@zowe/zowe-explorer-api": "^1.22.1",
         "iconv-lite": "^0.6.3",
         "vscode-extension-telemetry": "0.1.6",
         "vscode-languageclient": "5.2.1"
