@@ -99,7 +99,7 @@ context('This is a LSP spec', () => {
           cy.wrap($error).getElementLineNumber().should('eq', 4);
           cy.getCurrentLine().trigger('mousemove', $error[0].offsetLeft, $error[0].offsetTop);
         });
-      cy.get(hoverOverContent).contains(
+      cy.get(IDE.hoverOverContent).contains(
         'Value is not accepted. Valid values: "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL".',
       );
     });
@@ -225,45 +225,30 @@ context('This is a LSP spec', () => {
     const fileName = 'CALC-DATA';
 
     beforeEach(() => {
-      cy.writeFile(`test_files/project/${fileName}.cbl`, 's');
+      cy.writeFile(
+        'test_files/project/CALC-DATA.cbl',
+        `       IDENTIFICATION DIVISION. 
+        PROGRAM-ID. CALC-DATA. 
+        DATA DIVISION. 
+        PROCEDURE DIVISION.
+             PERFORM GET-DATA.
+             PERFORM CALC_DATA.
+            STOP RUN.
+        GET-DATA SECTION.
+            DISPLAY FIRST-VAR.
+        CALC_DATA.
+            DISPLAY FIRST-VAR.`,
+      );
     });
 
     afterEach(() => {
-      cy.deleteFile(`${fileName}.cbl`);
+      cy.deleteFile('CALC-DATA.cbl');
     });
     it(['smoke', 'CI'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
-      cy.getCurrentLine().type('{selectall}shell').wait(500);
-      cy.get(Theia.suggestWidget).contains('SHELL').click();
       cy.getLineByNumber(2).contains(`PROGRAM-ID. ${fileName}.`);
-      cy.getLineByNumber(8).contains('DATA DIVISION.');
-      cy.getLineByNumber(16).contains('STOP RUN.');
-    });
-  });
-
-  describe('TC289635 Provide default COBOL code snippets', () => {
-    const fileName = 'CALC-DATA';
-
-    beforeEach(() => {
-      cy.writeFile(`test_files/project/${fileName}.cbl`, 's');
-    });
-
-    it('Checks Syntax and Semantic Errors from Copybooks', () => {
-      cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
-      cy.getCurrentLine().type('{selectall}shell').wait(500);
-      cy.get(Theia.suggestWidget).contains('shell').click();
-      cy.goToLine(15).getCurrentLine().type('COPY ABC.');
-      cy.wait(500)
-        .getCurrentLineErrors({ expectedLine: 15 })
-        .eq(0)
-        .getHoverErrorMessage('ABC')
-        .contains('ABC: Copybook not foundCOBOL Language Support (copybook)(missing copybook)');
-      cy.getCurrentLine().type('{end}{enter}');
-      cy.getCurrentLine().type('FUNCTION-CO');
-      cy.get(Theia.suggestWidget).contains('FUNCTION-COS');
-      //lower case
-      cy.getCurrentLine().type('{selectall}function-co', { delay: 200 });
-      cy.get(Theia.suggestWidget).contains('function-cos');
+      cy.getLineByNumber(3).contains('DATA DIVISION.');
+      cy.getLineByNumber(7).contains('STOP RUN.');
     });
   });
 

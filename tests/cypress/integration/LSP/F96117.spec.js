@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2022 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
 
  * This program and the accompanying materials are made
@@ -26,25 +26,9 @@ const IDE = env === 'theia' ? Theia : VSCODE;
 const backspace3times = '{backspace}'.repeat(3);
 
 context('This is a F96117 spec', () => {
-  describe('TC247497 - Local Copybooks - check .gitignore file and hidden folders under c4z', () => {
-    it(['smoke', 'CI'], 'Finds .gitignore file under .c4z', () => {
-      cy.openFolder('.c4z');
-      cy.openFile('.gitignore');
-      cy.get(IDE.lineContent).findText('/**');
-    });
-    it(['smoke', 'CI'], 'Delete .c4z folder and refresh', () => {
-      cy.deleteFile('.c4z');
-    });
-
-    it(['smoke', 'CI'], 'Check .c4z/.gitignore', () => {
-      cy.openFile('USER1.cbl');
-      cy.openFolder('.c4z');
-      cy.openFile('.gitignore');
-      cy.get(IDE.lineContent).findText('/**');
-      if (IDE === Theia) {
-        cy.closeCurrentTab();
-      }
-      cy.closeFolder('.c4z');
+  describe('TC247497 - Local Copybooks - check hidden folders under c4z', () => {
+    it(['smoke', 'CI'], 'Finds hidden folder .c4z', () => {
+      cy.openFolder('.c4z/.extsrcs');
     });
   });
 
@@ -74,7 +58,7 @@ context('This is a F96117 spec', () => {
 
   describe('TC248015 - Quick Fix" actions', () => {
     afterEach(() => {
-      cy.closeCurrentTab();
+      // cy.closeCurrentTab();
     });
     it(
       ['smoke'],
@@ -148,8 +132,7 @@ context('This is a F96117 spec', () => {
     it('Watch a folder and then delete', () => {
       // Create in folder 'testing' copybook 'BOOK3.cpy'
       cy.createNewFile('testing', 'BOOK3.cpy');
-      cy.closeCurrentTab();
-
+      cy.closeFolder('testing');
       // Check that syntax error is not present
       cy.openFile('USERC1F.cbl').get(IDE.editorError).should('not.exist');
 
