@@ -46,7 +46,7 @@ class NodeProcessingTest {
     SimpleNode node = new SimpleNode();
     ArrayList<SyntaxError> errors = new ArrayList<>();
     new AstProcessor().process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors));
-    assertEquals(ImmutableList.of(), errors);
+    assertTrue(errors.isEmpty());
   }
 
   @Test
@@ -59,7 +59,7 @@ class NodeProcessingTest {
     }
 
     ErrorNode node = new ErrorNode();
-    ArrayList<SyntaxError> errors = new ArrayList<>();
+    List<SyntaxError> errors = new ArrayList<>();
     AstProcessor astProcessor = new AstProcessor();
     ProcessingContext processingContext = new ProcessingContext(errors);
     processingContext.register(
@@ -108,7 +108,7 @@ class NodeProcessingTest {
     class LeafNode extends NodeForExtension {}
 
     LeafNode node = new LeafNode();
-    ArrayList<SyntaxError> errors = new ArrayList<>();
+    List<SyntaxError> errors = new ArrayList<>();
     ProcessingContext ctx = new ProcessingContext(errors);
     AstProcessor astProcessor = new AstProcessor();
     ctx.register(
@@ -140,17 +140,10 @@ class NodeProcessingTest {
 
     /** Do processing in two steps and return ERROR_2 and then ERROR_3 */
     class LeafNode extends NodeForExtension {
-      LeafNode() {
-        //        AstProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processStep1()));
-      }
+      LeafNode() {}
 
       private List<SyntaxError> processStep1() {
-        //        AstProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processStep2()));
         return ImmutableList.of(ERROR_2);
-      }
-
-      private List<SyntaxError> processStep2() {
-        return ImmutableList.of(ERROR_3);
       }
     }
     LeafNode node = new LeafNode();
@@ -189,17 +182,22 @@ class NodeProcessingTest {
     class LeafNode extends NodeForExtension {}
 
     LeafNode node = new LeafNode();
-    ArrayList<SyntaxError> errors = new ArrayList<>();
+    List<SyntaxError> errors = new ArrayList<>();
     ProcessingContext ctx = new ProcessingContext(errors);
     AstProcessor astProcessor = new AstProcessor();
-    ctx.register(new ProcessorDescription(
-        NodeForExtension.class,
-        ProcessingPhase.TRANSFORMATION,
-        (n, c) -> c.getErrors().add(ERROR_1)));
-    ctx.register(new ProcessorDescription(
-        NodeForExtension.class, ProcessingPhase.VALIDATION, (n, c) -> c.getErrors().add(ERROR_2)));
-    ctx.register(new ProcessorDescription(
-        LeafNode.class, ProcessingPhase.TRANSFORMATION, (n, c) -> c.getErrors().add(ERROR_3)));
+    ctx.register(
+        new ProcessorDescription(
+            NodeForExtension.class,
+            ProcessingPhase.TRANSFORMATION,
+            (n, c) -> c.getErrors().add(ERROR_1)));
+    ctx.register(
+        new ProcessorDescription(
+            NodeForExtension.class,
+            ProcessingPhase.VALIDATION,
+            (n, c) -> c.getErrors().add(ERROR_2)));
+    ctx.register(
+        new ProcessorDescription(
+            LeafNode.class, ProcessingPhase.TRANSFORMATION, (n, c) -> c.getErrors().add(ERROR_3)));
 
     astProcessor.process(ProcessingPhase.TRANSFORMATION, node, ctx);
     assertEquals(ImmutableList.of(ERROR_1, ERROR_3), ctx.getErrors());

@@ -139,7 +139,7 @@ public class DaCoMaidProcessor {
       // TODO: an error
       return null;
     }
-    String newSuffix = DaCoHelper.extractSuffix(entryName).get();
+    Optional<String> newSuffix = DaCoHelper.extractSuffix(entryName);
     String indent = copyFrom.group("indent");
     String prototypeName =
         entryName.substring(0, entryName.length() - 2) + copyFrom.group("protoSuffix");
@@ -154,7 +154,7 @@ public class DaCoMaidProcessor {
         Locality.builder().uri(context.getExtendedSource().getUri()).range(range).build();
 
     return new DaCoCopyFromNode(
-        locality, prototypeName, newSuffix, Integer.parseInt(copyFrom.group("lvl")));
+        locality, prototypeName, newSuffix.orElse(""), Integer.parseInt(copyFrom.group("lvl")));
   }
 
   private void collectCopyMaid(

@@ -29,11 +29,7 @@ import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 public class ProgramEndCheck implements Processor<ProgramEndNode> {
   @Override
   public void accept(ProgramEndNode programEndNode, ProcessingContext ctx) {
-    if (!programEndNode.getProgram().isPresent()) {
-      // TODO an error
-      return;
-    }
-    ProgramNode node = programEndNode.getProgram().get();
+    ProgramNode node = programEndNode.getProgram().orElseThrow(RuntimeException::new);
     if (node.getProgramName() == null) {
       LOG.debug("Syntax error: Program name is empty");
       ctx.getErrors()

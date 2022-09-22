@@ -34,7 +34,7 @@ public class ElementaryNodeCheck implements Processor<ElementaryNode> {
   private static final String BLANK_WHEN_ZERO = "variables.blankWhenZero";
   private static final String SIGN_CLAUSE = "variables.signClause";
   private static final String SEMANTIC_IMPROPER_USE_BLANK_WHEN_ZERO_AND_SIGN_CLAUSE =
-          "semantics.improperUseBlankWhenZeroAndSignClause";
+      "semantics.improperUseBlankWhenZeroAndSignClause";
 
   @Override
   public void accept(ElementaryNode node, ProcessingContext ctx) {
@@ -46,11 +46,12 @@ public class ElementaryNodeCheck implements Processor<ElementaryNode> {
     if (StringUtils.isBlank(node.getPicClause())) {
       return Collections.emptyList();
     }
-    if (UsageFormatUtils.noPicClauseUsage.contains(node.getUsageFormat()))
+    if (UsageFormatUtils.noPicClauseUsage.contains(node.getUsageFormat())) {
       return ImmutableList.of(
           node.getError(
               MessageTemplate.of(SEMANTICS_NO_PIC_CLAUSE, node.getUsageFormat().toString()),
               ErrorSeverity.WARNING));
+    }
 
     return UsageFormatUtils.picAndUsageClauseValidator
         .getOrDefault(node.getEffectiveDataType(), n -> ImmutableList.of())
@@ -68,12 +69,14 @@ public class ElementaryNodeCheck implements Processor<ElementaryNode> {
       return Collections.emptyList();
     }
     boolean check = node.isSignClausePresent() || node.isBlankWhenZeroPresent();
-    if (UsageFormatUtils.blankAndSignNotAllowedUsage.contains(node.getUsageFormat()) && check)
+    if (UsageFormatUtils.blankAndSignNotAllowedUsage.contains(node.getUsageFormat()) && check) {
       return ImmutableList.of(
           node.getError(
               MessageTemplate.of(
-                  SEMANTIC_IMPROPER_USE_BLANK_WHEN_ZERO_AND_SIGN_CLAUSE, getInCompatibleClause(node)),
+                  SEMANTIC_IMPROPER_USE_BLANK_WHEN_ZERO_AND_SIGN_CLAUSE,
+                  getInCompatibleClause(node)),
               ErrorSeverity.WARNING));
+    }
     return Collections.emptyList();
   }
 }

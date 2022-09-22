@@ -16,6 +16,8 @@ package org.eclipse.lsp.cobol.core.model.tree.statements;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
@@ -25,12 +27,11 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.RemarksNode;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.model.tree.logic.ObsoleteNodeCheck;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -42,7 +43,7 @@ class ObsoleteNodeTest {
     RootNode rootNode = new RootNode(locality, new CopybooksRepository());
     RemarksNode remarksNode = new RemarksNode(locality);
     AstProcessor astProcessor = new AstProcessor();
-    ArrayList<SyntaxError> errors = new ArrayList<>();
+    List<SyntaxError> errors = new ArrayList<>();
     ProcessingContext ctx = new ProcessingContext(errors);
     ctx.register(
         new ProcessorDescription(
