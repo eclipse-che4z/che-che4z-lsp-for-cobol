@@ -74,7 +74,7 @@ class CachingConfigurationServiceTest {
                 TARGET_SQL_BACKEND.label,
                 ANALYSIS_FEATURES.label,
                 DIALECTS.label,
-                PREDEFINED_SECTIONS.label,
+                DaCo_PREDEFINED_SECTIONS.label,
                 SUBROUTINE_LOCAL_PATHS.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
 
@@ -109,7 +109,7 @@ class CachingConfigurationServiceTest {
                 TARGET_SQL_BACKEND.label,
                 ANALYSIS_FEATURES.label,
                 DIALECTS.label,
-                PREDEFINED_SECTIONS.label,
+                DaCo_PREDEFINED_SECTIONS.label,
                 SUBROUTINE_LOCAL_PATHS.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
 
