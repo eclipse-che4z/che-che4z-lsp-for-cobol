@@ -29,6 +29,7 @@ public class AstProcessor {
   /**
    * The entry point to AST processing
    *
+   * @param ctx processing context
    * @param rootNode the root node of AST
    * @return a list of errors
    */
