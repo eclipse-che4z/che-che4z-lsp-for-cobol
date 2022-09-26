@@ -49,7 +49,7 @@ public class TestRecordDescNotIncludedInFD {
           + "       DATA DIVISION.\n"
           + "       FILE SECTION.\n"
           + "       FD  {$*ACCTFILE}                          IS EXTERNAL\n"
-          + "           DATA RECORD IS ACCOUNT-RECORD.\n"
+          + "           DATA RECORD IS {$ACCOUNT-RECORD}.\n"
           + "           COPY {~ACCFILE1}.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*WS-INPUT-FIELDS}.\n"

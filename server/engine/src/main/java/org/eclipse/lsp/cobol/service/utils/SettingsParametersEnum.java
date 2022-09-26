@@ -34,7 +34,7 @@ public enum SettingsParametersEnum {
   TARGET_SQL_BACKEND("target-sql-backend"),
   ANALYSIS_FEATURES("analysis.features"),
   DIALECTS("dialects"),
-  PREDEFINED_SECTIONS("predefined-sections");
+  DaCo_PREDEFINED_SECTIONS("daco.predefined-sections");
 
   public final String label;
 

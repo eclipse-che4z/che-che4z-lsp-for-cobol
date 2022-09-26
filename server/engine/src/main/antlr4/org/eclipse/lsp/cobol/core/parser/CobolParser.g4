@@ -592,7 +592,7 @@ valuePair
    ;
 
 dataRecordsClause
-   : DATA (RECORD IS? | RECORDS ARE?) dataName+
+   : DATA (RECORD IS? | RECORDS ARE?) qualifiedDataName+
    ;
 
 linageClause
