@@ -58,6 +58,7 @@ public class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitDbs_host_variable_val(Db2SqlParser.Dbs_host_variable_valContext ctx) {
+
     return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 

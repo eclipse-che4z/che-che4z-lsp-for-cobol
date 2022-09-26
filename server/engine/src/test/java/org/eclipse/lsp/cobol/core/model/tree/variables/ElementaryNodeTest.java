@@ -15,11 +15,16 @@
 
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.logic.ElementaryNodeCheck;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -37,33 +42,47 @@ class ElementaryNodeTest {
   @Test
   void testValidatePicAndUsageClauseWhenPicAndUsageAreInCompatible() {
     ElementaryItemNode node = getNode("PIC 9", UsageFormat.COMPUTATIONAL_1);
-    List<SyntaxError> actualResult = node.process();
-    assertEquals(1, actualResult.size());
-    assertEquals(ErrorSeverity.WARNING, actualResult.get(0).getSeverity());
-    assertEquals("semantics.noPicClause", actualResult.get(0).getMessageTemplate().getTemplate());
+    ArrayList<SyntaxError> errors = new ArrayList<>();
+    ProcessingContext ctx = new ProcessingContext(errors);
+    AstProcessor astProcessor = new AstProcessor();
+    ctx.register(
+        new ProcessorDescription(
+            ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryNodeCheck()));
+    astProcessor.process(ProcessingPhase.TRANSFORMATION, node, ctx);
+    assertEquals(1, errors.size());
+    assertEquals(ErrorSeverity.WARNING, errors.get(0).getSeverity());
+    assertEquals("semantics.noPicClause", errors.get(0).getMessageTemplate().getTemplate());
   }
 
   @Test
   void testValidatePicAndUsageClauseWhenPicAndUsageContradicts() {
     ElementaryItemNode node = getNode("PIC X", UsageFormat.COMPUTATIONAL_5);
-    List<SyntaxError> actualResult = node.process();
-    assertEquals(1, actualResult.size());
-    assertEquals(ErrorSeverity.WARNING, actualResult.get(0).getSeverity());
-    assertEquals(
-        "semantics.picAndUsageConflict", actualResult.get(0).getMessageTemplate().getTemplate());
+    ArrayList<SyntaxError> errors = new ArrayList<>();
+    AstProcessor astProcessor = new AstProcessor();
+    ProcessingContext ctx = new ProcessingContext(errors);
+    ctx.register(
+        new ProcessorDescription(
+            ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryNodeCheck()));
+    astProcessor.process(ProcessingPhase.TRANSFORMATION, node, ctx);
+    assertEquals(1, errors.size());
+    assertEquals(ErrorSeverity.WARNING, errors.get(0).getSeverity());
+    assertEquals("semantics.picAndUsageConflict", errors.get(0).getMessageTemplate().getTemplate());
   }
 
   @Test
   void testValidatePicAndUsageClauseWhenPicAndUsageAreCompatible() {
     ElementaryItemNode node = getNode("PIC 9", UsageFormat.DISPLAY);
-    List<SyntaxError> actualResult = node.process();
-    assertEquals(0, actualResult.size());
+    ArrayList<SyntaxError> errors = new ArrayList<>();
+    new AstProcessor().process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors));
+    assertEquals(0, errors.size());
 
     // TODO:
     // NEED CLARIFICATION. If PIC 999 UTF-8 is valid.
     node = getNode("PIC 9", UsageFormat.UTF_8);
-    List<SyntaxError> actualResult1 = node.process();
-    assertEquals(0, actualResult1.size());
+    ArrayList<SyntaxError> errors2 = new ArrayList<>();
+    new AstProcessor()
+        .process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors2));
+    assertEquals(0, errors2.size());
   }
 
   @Test
@@ -71,12 +90,18 @@ class ElementaryNodeTest {
     ElementaryItemNode elementNode =
         new ElementaryItemNode(
             null, 2, "TEST-NODE", false, "PIC X", "", UsageFormat.UTF_8, false, true, false);
-    List<SyntaxError> actualResult = elementNode.process();
-    assertEquals(1, actualResult.size());
-    assertEquals(ErrorSeverity.WARNING, actualResult.get(0).getSeverity());
+    ArrayList<SyntaxError> errors = new ArrayList<>();
+    ProcessingContext ctx = new ProcessingContext(errors);
+    AstProcessor astProcessor = new AstProcessor();
+    ctx.register(
+        new ProcessorDescription(
+            ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryNodeCheck()));
+    astProcessor.process(ProcessingPhase.TRANSFORMATION, elementNode, ctx);
+    assertEquals(1, errors.size());
+    assertEquals(ErrorSeverity.WARNING, errors.get(0).getSeverity());
     assertEquals(
         "semantics.improperUseBlankWhenZeroAndSignClause",
-        actualResult.get(0).getMessageTemplate().getTemplate());
+        errors.get(0).getMessageTemplate().getTemplate());
   }
 
   @Test

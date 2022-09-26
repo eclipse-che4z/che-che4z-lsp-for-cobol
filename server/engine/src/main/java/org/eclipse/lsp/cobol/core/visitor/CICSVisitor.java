@@ -52,9 +52,7 @@ public class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitDataName(DataNameContext ctx) {
     return addTreeNode(
-        ctx,
-        locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality)
-    );
+        ctx, locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality));
   }
 
   @Override

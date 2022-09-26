@@ -20,10 +20,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.core.engine.dialects.cicsTranslator.CICSTranslatorDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoMaidProcessor;
-import org.eclipse.lsp.cobol.core.engine.dialects.cicsTranslator.CICSTranslatorDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -31,25 +32,27 @@ import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-/**
- * Dialect utility class
- */
+/** Dialect utility class */
 @Singleton
 public class DialectService {
   private static final CobolDialect EMPTY_DIALECT = () -> "COBOL";
   private final Map<String, CobolDialect> dialectSuppliers;
 
   @Inject
-  public DialectService(CopybookService copybookService,
-                        ParseTreeListener treeListener,
-                        MessageService messageService) {
+  public DialectService(
+      CopybookService copybookService,
+      ParseTreeListener treeListener,
+      MessageService messageService) {
     dialectSuppliers = new HashMap<>();
 
     CobolDialect dialect = new IdmsDialect(copybookService, messageService);
     dialectSuppliers.put(dialect.getName(), dialect);
 
-    dialect = new DaCoDialect(messageService, new DaCoMaidProcessor(copybookService, treeListener, messageService));
+    dialect =
+        new DaCoDialect(
+            messageService, new DaCoMaidProcessor(copybookService, treeListener, messageService));
     dialectSuppliers.put(dialect.getName(), dialect);
 
     dialect = new CICSTranslatorDialect(messageService);
@@ -60,10 +63,11 @@ public class DialectService {
    * Process the source file text with dialects
    *
    * @param dialects the list of enabled dialects
-   * @param context  is a DialectProcessingContext class with all needed data for dialect processing
+   * @param context is a DialectProcessingContext class with all needed data for dialect processing
    * @return dialects outcome
    */
-  public ResultWithErrors<DialectOutcome> process(List<String> dialects, DialectProcessingContext context) {
+  public ResultWithErrors<DialectOutcome> process(
+      List<String> dialects, DialectProcessingContext context) {
     List<CobolDialect> orderedDialects = sortDialects(dialects);
     List<SyntaxError> errors = new LinkedList<>();
     for (CobolDialect orderedDialect : orderedDialects) {
@@ -74,8 +78,8 @@ public class DialectService {
       errors.addAll(dialectErrors);
       context.getExtendedSource().commitTransformations();
     }
-    ResultWithErrors<DialectOutcome> acc = new ResultWithErrors<>(
-        new DialectOutcome(context), errors);
+    ResultWithErrors<DialectOutcome> acc =
+        new ResultWithErrors<>(new DialectOutcome(context), errors);
     for (CobolDialect orderedDialect : orderedDialects) {
       acc = processDialect(acc, orderedDialect, context);
       context.getExtendedSource().commitTransformations();
@@ -112,11 +116,13 @@ public class DialectService {
     return dialectSuppliers.getOrDefault(dialectName, EMPTY_DIALECT);
   }
 
-  private static ResultWithErrors<DialectOutcome> processDialect(ResultWithErrors<DialectOutcome> previousResult,
-                                                                 CobolDialect dialect,
-                                                                 DialectProcessingContext context) {
+  private static ResultWithErrors<DialectOutcome> processDialect(
+      ResultWithErrors<DialectOutcome> previousResult,
+      CobolDialect dialect,
+      DialectProcessingContext context) {
     List<Node> nodes = new ArrayList<>(previousResult.getResult().getDialectNodes());
-    Multimap<String, Pair<String, String>> implicitCode = LinkedListMultimap.create(previousResult.getResult().getImplicitCode());
+    Multimap<String, Pair<String, String>> implicitCode =
+        LinkedListMultimap.create(previousResult.getResult().getImplicitCode());
 
     List<SyntaxError> errors = new ArrayList<>(previousResult.getErrors());
 
@@ -126,4 +132,16 @@ public class DialectService {
     return new ResultWithErrors<>(new DialectOutcome(nodes, implicitCode, context), errors);
   }
 
+  /**
+   * Return a list of processor descriptors for provided dialects.
+   * @param dialects dialect names
+   * @return a list of processor descriptors
+   */
+  public List<ProcessorDescription> getProcessors(List<String> dialects) {
+    return dialects.stream()
+            .filter(dialectSuppliers::containsKey)
+            .map(dialectSuppliers::get)
+            .flatMap(d -> d.getProcessors().stream())
+            .collect(Collectors.toList());
+  }
 }

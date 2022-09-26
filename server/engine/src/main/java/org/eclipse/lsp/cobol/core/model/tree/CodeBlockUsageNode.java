@@ -19,12 +19,11 @@ import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 /** The class represents usages of paragraphs or sections. */
@@ -37,22 +36,6 @@ public class CodeBlockUsageNode extends Node implements Context {
   public CodeBlockUsageNode(Locality location, String name) {
     super(location, NodeType.CODE_BLOCK_USAGE);
     this.name = name;
-    addProcessStep(this::waitForBlockDefinitions);
-  }
-
-  private List<SyntaxError> waitForBlockDefinitions() {
-    addProcessStep(this::registerNode);
-    return ImmutableList.of();
-  }
-
-  private List<SyntaxError> registerNode() {
-    return getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
-        .map(program -> program.registerCodeBlockUsage(this))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .map(ImmutableList::of)
-        .orElseGet(ImmutableList::of);
   }
 
   @Override

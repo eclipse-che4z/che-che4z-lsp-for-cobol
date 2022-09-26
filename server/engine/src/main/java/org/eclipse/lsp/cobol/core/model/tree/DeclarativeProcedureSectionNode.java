@@ -18,31 +18,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-
-import java.util.Collections;
-import java.util.List;
-
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 
 /** The class represents declarative procedure section in COBOL. */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class DeclarativeProcedureSection extends ProcedureSectionNode {
-  public DeclarativeProcedureSection(
-      Locality location, String name, String text, Locality definition) {
+public class DeclarativeProcedureSectionNode extends ProcedureSectionNode {
+  public DeclarativeProcedureSectionNode(Locality location, String name, String text, Locality definition) {
     super(location, name, text, definition);
-    addProcessStep(this::registerNode);
-  }
-
-  private List<SyntaxError> registerNode() {
-    this.getNearestParentByType(PROGRAM)
-            .map(ProgramNode.class::cast)
-        .ifPresent(parent -> {
-          parent.registerCodeBlock(this);
-          parent.registerParagraphNameNode(new ParagraphNameNode(locality, name));
-        });
-    return Collections.emptyList();
   }
 }

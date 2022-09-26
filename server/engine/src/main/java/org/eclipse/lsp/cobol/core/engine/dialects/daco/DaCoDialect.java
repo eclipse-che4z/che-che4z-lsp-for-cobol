@@ -24,9 +24,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.DaCoLexer;
 import org.eclipse.lsp.cobol.core.DaCoParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.*;
+import org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes.DaCoCopyFromNode;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.provider.DaCoImplicitCodeProvider;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -36,14 +39,13 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Process the text according to the DaCo rules
- */
+/** Process the text according to the DaCo rules */
 @RequiredArgsConstructor
 public final class DaCoDialect implements CobolDialect {
   public static final String NAME = "DaCo";
@@ -77,7 +79,8 @@ public final class DaCoDialect implements CobolDialect {
     DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(context.getExtendedSource().getText()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     DaCoParser parser = new DaCoParser(tokens);
-    DialectParserListener listener = new DialectParserListener(context.getExtendedSource().getUri());
+    DialectParserListener listener =
+        new DialectParserListener(context.getExtendedSource().getUri());
     lexer.removeErrorListeners();
     lexer.addErrorListener(listener);
     parser.removeErrorListeners();
@@ -91,7 +94,8 @@ public final class DaCoDialect implements CobolDialect {
 
     DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider(maidProcessor.getSections());
     Multimap<String, Pair<String, String>> implicitCode =
-            provider.getImplicitCode(context.getExtendedSource().getText(), nodes, context.getCopybookConfig());
+        provider.getImplicitCode(
+            context.getExtendedSource().getText(), nodes, context.getCopybookConfig());
 
     DialectOutcome result = new DialectOutcome(nodes, implicitCode, context);
     return new ResultWithErrors<>(result, errors);
@@ -116,5 +120,12 @@ public final class DaCoDialect implements CobolDialect {
   @Override
   public Set<String> runBefore() {
     return ImmutableSet.of(IdmsDialect.NAME);
+  }
+
+  @Override
+  public List<ProcessorDescription> getProcessors() {
+    return Collections.singletonList(
+        new ProcessorDescription(
+            DaCoCopyFromNode.class, ProcessingPhase.POST_DEFINITION, new DaCoCopyFromProcessor()));
   }
 }

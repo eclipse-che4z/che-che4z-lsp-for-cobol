@@ -35,7 +35,8 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableType.*;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableType.FD;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableType.SD;
 
 /** The utility class is for converting VariableDefinitionNode into appropriate VariableNode. */
 @UtilityClass
@@ -115,12 +116,12 @@ public class VariableDefinitionUtil {
     errors.addAll(checkGlobalUniqueNames(node));
     errors.addAll(checkTopNumbers(node));
     reshapeVariablesLocality(node);
-    registerVariablesInProgram(node);
     return errors;
   }
 
   /**
    * Collects node children variables including copybook nested variables
+   *
    * @param node - node for processing
    * @return a list of unwrapped variables
    */
@@ -129,54 +130,69 @@ public class VariableDefinitionUtil {
     List<CopyNode> copybooks = new LinkedList<>();
 
     node.getChildren()
-        .forEach(c -> {
-          if (c.getNodeType() == NodeType.VARIABLE_DEFINITION) {
-            variables.add((VariableDefinitionNode) c);
-          }
-          if (c.getNodeType() == NodeType.COPY) {
-            copybooks.add((CopyNode) c);
-          }
-        });
+        .forEach(
+            c -> {
+              if (c.getNodeType() == NodeType.VARIABLE_DEFINITION) {
+                variables.add((VariableDefinitionNode) c);
+              }
+              if (c.getNodeType() == NodeType.COPY) {
+                copybooks.add((CopyNode) c);
+              }
+            });
 
     copybooks.sort(Comparator.comparingInt(c -> c.getLocality().getRange().getStart().getLine()));
 
-    List<CopyNode> allCopybooks = copybooks.stream().flatMap(Node::getDepthFirstStream).filter(n -> n.getNodeType() == NodeType.COPY)
-        .map(CopyNode.class::cast)
-        .collect(Collectors.toList());
+    List<CopyNode> allCopybooks =
+        copybooks.stream()
+            .flatMap(Node::getDepthFirstStream)
+            .filter(n -> n.getNodeType() == NodeType.COPY)
+            .map(CopyNode.class::cast)
+            .collect(Collectors.toList());
 
     allCopybooks.stream()
         .filter(c -> c.getDefinition() != null)
         .filter(c -> c.getDefinition().getLocation() != null)
-        .forEach(c -> new ArrayList<>(variables).stream()
-            .filter(Objects::nonNull)
-            .filter(v -> v.getLocality() != null)
-            .filter(v -> v.getLocality().getUri() != null)
-            .filter(v -> v.getLocality().getUri().equals(c.getDefinition().getLocation().getUri()))
-            .forEach(v -> {
-              variables.remove(v);
-              c.addChild(v);
-            }));
+        .forEach(
+            c ->
+                new ArrayList<>(variables)
+                    .stream()
+                        .filter(Objects::nonNull)
+                        .filter(v -> v.getLocality() != null)
+                        .filter(v -> v.getLocality().getUri() != null)
+                        .filter(
+                            v ->
+                                v.getLocality()
+                                    .getUri()
+                                    .equals(c.getDefinition().getLocation().getUri()))
+                        .forEach(
+                            v -> {
+                              variables.remove(v);
+                              c.addChild(v);
+                            }));
 
-    allCopybooks.forEach(copyNode -> {
-      int copybookLine = copyNode.getLocality().getRange().getStart().getLine();
-      String uri = copyNode.getLocality().getUri();
-      AtomicInteger index = new AtomicInteger();
-      for (Node variable : variables) {
-        int variableLine = variable.getLocality().getRange().getStart().getLine();
-        if (variable.getLocality().getUri().equals(uri) && variableLine > copybookLine) {
-          break;
-        }
-        index.incrementAndGet();
-      }
+    allCopybooks.forEach(
+        copyNode -> {
+          int copybookLine = copyNode.getLocality().getRange().getStart().getLine();
+          String uri = copyNode.getLocality().getUri();
+          AtomicInteger index = new AtomicInteger();
+          for (Node variable : variables) {
+            int variableLine = variable.getLocality().getRange().getStart().getLine();
+            if (variable.getLocality().getUri().equals(uri) && variableLine > copybookLine) {
+              break;
+            }
+            index.incrementAndGet();
+          }
 
-      copyNode.getDepthFirstStream()
-          .filter(hasType(NodeType.COPY))
-          .flatMap(Node::getDepthFirstStream)
-          .filter(hasType(NodeType.VARIABLE_DEFINITION))
-          .map(VariableDefinitionNode.class::cast)
-          .distinct()
-          .forEach(copyNodeVariable -> variables.add(index.getAndIncrement(), copyNodeVariable));
-    });
+          copyNode
+              .getDepthFirstStream()
+              .filter(hasType(NodeType.COPY))
+              .flatMap(Node::getDepthFirstStream)
+              .filter(hasType(NodeType.VARIABLE_DEFINITION))
+              .map(VariableDefinitionNode.class::cast)
+              .distinct()
+              .forEach(
+                  copyNodeVariable -> variables.add(index.getAndIncrement(), copyNodeVariable));
+        });
     return variables.stream().distinct().collect(Collectors.toList());
   }
 
@@ -193,8 +209,8 @@ public class VariableDefinitionUtil {
     if (node.getNodeType() == NodeType.VARIABLE) {
       VariableNode variableNode = (VariableNode) node;
       if (isGroupedVariable(variableNode))
-      variableNode
-          .extendLocality(children.get(children.size() - 1).getLocality().getRange().getEnd());
+        variableNode.extendLocality(
+            children.get(children.size() - 1).getLocality().getRange().getEnd());
     }
   }
 
@@ -202,7 +218,11 @@ public class VariableDefinitionUtil {
     return !ImmutableList.of(FD, SD).contains(variableNode.getVariableType());
   }
 
-  private void registerVariablesInProgram(Node node) {
+  /**
+   * * Register variable definitions into nearest ProgramNode
+   * @param node the node with VariableDefinitionNodes
+   */
+  public void registerVariablesInProgram(Node node) {
     // The variable can have nested variable definitions (like IndexItemNode), we need to
     // collect them
     List<VariableNode> variables =
@@ -297,8 +317,7 @@ public class VariableDefinitionUtil {
     createVariableNameNode(variable, definitionNode.getVariableName());
     List<SyntaxError> errors = processRenamesBoundaries(variable, group, definitionNode);
     if (errors.isEmpty()) variable.setVarGroupParent(group);
-    return new ResultWithErrors<>(
-        variable, errors);
+    return new ResultWithErrors<>(variable, errors);
   }
 
   private ResultWithErrors<VariableNode> fdMatcher(VariableDefinitionNode definitionNode) {
@@ -375,6 +394,7 @@ public class VariableDefinitionUtil {
             definitionNode.getUsage(),
             definitionNode.isBlankWhenZeroPresent(),
             definitionNode.isSignClausePresent());
+
     createVariableNameNode(variable, definitionNode.getVariableName());
     return new ResultWithErrors<>(variable, ImmutableList.of());
   }
@@ -536,12 +556,10 @@ public class VariableDefinitionUtil {
       return ImmutableList.of(variable.getError(MessageTemplate.of(NO_STRUCTURE_BEFORE_RENAME)));
     List<SyntaxError> errors = new ArrayList<>();
     Integer renamesIndex =
-        processRenamesClauseAndGetIndex(
-                variable, definitionNode.getRenamesClause(), group)
+        processRenamesClauseAndGetIndex(variable, definitionNode.getRenamesClause(), group)
             .unwrap(errors::addAll);
     Integer renamesThruIndex =
-        processRenamesClauseAndGetIndex(
-                variable, definitionNode.getRenamesThruClause(), group)
+        processRenamesClauseAndGetIndex(variable, definitionNode.getRenamesThruClause(), group)
             .unwrap(errors::addAll);
     if (renamesIndex != -1 && renamesThruIndex != -1 && renamesIndex >= renamesThruIndex)
       errors.add(variable.getError(MessageTemplate.of(INCORRECT_CHILDREN_ORDER)));
@@ -549,16 +567,14 @@ public class VariableDefinitionUtil {
   }
 
   private ResultWithErrors<Integer> processRenamesClauseAndGetIndex(
-      RenameItemNode variable,
-      List<VariableNameAndLocality> renames,
-      GroupItemNode group) {
+      RenameItemNode variable, List<VariableNameAndLocality> renames, GroupItemNode group) {
     List<SyntaxError> errors = new ArrayList<>();
     List<VariableNode> nodesForRenaming =
-            group.getChildren().stream()
-                    .flatMap(Node::getDepthFirstStream)
-                    .filter(hasType(NodeType.VARIABLE))
-                    .map(VariableNode.class::cast)
-                    .collect(Collectors.toList());
+        group.getChildren().stream()
+            .flatMap(Node::getDepthFirstStream)
+            .filter(hasType(NodeType.VARIABLE))
+            .map(VariableNode.class::cast)
+            .collect(Collectors.toList());
     if (renames == null) return new ResultWithErrors<>(-1, errors);
     String renamesName = renames.get(0).getName();
     int renamesIndex = Iterables.indexOf(nodesForRenaming, it -> renamesName.equals(it.getName()));
@@ -573,7 +589,9 @@ public class VariableDefinitionUtil {
         if (Objects.nonNull(allowedQualifier)) {
           processRenameClause(variable, renames.get(1), allowedQualifier);
         } else {
-          errors.add(variable.getError(MessageTemplate.of(CHILD_TO_RENAME_NOT_FOUND, renames.get(1).getName())));
+          errors.add(
+              variable.getError(
+                  MessageTemplate.of(CHILD_TO_RENAME_NOT_FOUND, renames.get(1).getName())));
         }
       }
     } else
@@ -583,18 +601,24 @@ public class VariableDefinitionUtil {
     return new ResultWithErrors<>(renamesIndex, errors);
   }
 
-  private void processRenameClause(RenameItemNode variable, VariableNameAndLocality rename, VariableNode allowedQualifier) {
+  private void processRenameClause(
+      RenameItemNode variable, VariableNameAndLocality rename, VariableNode allowedQualifier) {
     VariableUsageNode qualifiedVar = new VariableUsageNode(rename.getName(), rename.getLocality());
     variable.addChild(qualifiedVar);
     allowedQualifier.addUsage(qualifiedVar);
   }
 
-  private static VariableNode getAllowedQualifier(GroupItemNode group, VariableNode childVar, VariableNameAndLocality variable) {
+  private static VariableNode getAllowedQualifier(
+      GroupItemNode group, VariableNode childVar, VariableNameAndLocality variable) {
     if (group.getName().equals(variable.getName())) return group;
     VariableNode parentNode = childVar;
     while (!parentNode.getName().equals(variable.getName())) {
-        parentNode = parentNode.getNearestParentByType(NodeType.VARIABLE).map(VariableNode.class::cast).orElse(null);
-        if (Objects.isNull(parentNode)) break;
+      parentNode =
+          parentNode
+              .getNearestParentByType(NodeType.VARIABLE)
+              .map(VariableNode.class::cast)
+              .orElse(null);
+      if (Objects.isNull(parentNode)) break;
     }
     return parentNode;
   }
@@ -660,8 +684,7 @@ public class VariableDefinitionUtil {
   private boolean checkLevel77Mismatch(
       VariableDefinitionNode definitionNode, VariableWithLevelNode allowedRedefinedNode) {
     return allowedRedefinedNode.getLevel() != definitionNode.getLevel()
-        && (allowedRedefinedNode.getLevel() == LEVEL_77
-            || definitionNode.getLevel() == LEVEL_77);
+        && (allowedRedefinedNode.getLevel() == LEVEL_77 || definitionNode.getLevel() == LEVEL_77);
   }
 
   private static List<VariableWithLevelNode> getEligibleNodesForRedefine(

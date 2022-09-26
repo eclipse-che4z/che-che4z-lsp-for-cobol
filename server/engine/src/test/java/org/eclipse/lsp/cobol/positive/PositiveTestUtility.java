@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.positive;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.core.model.tree.CodeBlockReference;
+import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;

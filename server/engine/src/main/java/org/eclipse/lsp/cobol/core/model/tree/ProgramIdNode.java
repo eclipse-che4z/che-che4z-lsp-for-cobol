@@ -14,14 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-
-import java.util.List;
 
 /** The class represents program ID. */
 @ToString(callSuper = true)
@@ -33,13 +29,5 @@ public class ProgramIdNode extends Node {
   public ProgramIdNode(Locality locality, String programId) {
     super(locality, NodeType.PROGRAM_ID);
     this.programId = programId;
-    addProcessStep(this::processNode);
-  }
-
-  private List<SyntaxError> processNode() {
-    getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
-        .ifPresent(it -> it.setProgramName(programId));
-    return ImmutableList.of();
   }
 }

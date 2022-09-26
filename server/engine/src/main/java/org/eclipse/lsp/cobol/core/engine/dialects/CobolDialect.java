@@ -16,9 +16,11 @@ package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -50,6 +52,14 @@ public interface CobolDialect {
    */
   default List<SyntaxError> extend(DialectProcessingContext context) {
     return ImmutableList.of();
+  }
+
+  /**
+   * Return a list of processor descriptors.
+   * @return a list of processor descriptors for the dialect
+   */
+  default List<ProcessorDescription> getProcessors() {
+    return Collections.emptyList();
   }
 
   /**

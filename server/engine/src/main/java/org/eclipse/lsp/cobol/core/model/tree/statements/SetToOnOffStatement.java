@@ -15,33 +15,21 @@
 
 package org.eclipse.lsp.cobol.core.model.tree.statements;
 
-import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import lombok.Getter;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableType;
 
 import java.util.List;
 
 /** This class implements the logic for SET TO ON/OFF statement. */
 @EqualsAndHashCode(callSuper = true)
+@Getter
 public class SetToOnOffStatement extends StatementNode {
-  protected static final String INVALID_RECEIVING_FIELD_TEMPLATE =
-      "statements.invalidReceivingField";
-  private static final List<VariableType> ALLOWED_TYPES =
-      ImmutableList.of(VariableType.MNEMONIC_NAME);
   List<Node> receivingFields;
 
   public SetToOnOffStatement(Locality locality, List<Node> receivingFields) {
     super(locality);
     this.receivingFields = receivingFields;
-  }
-
-  @Override
-  @NonNull
-  public List<SyntaxError> validate() {
-    return validateVariableType(receivingFields, ALLOWED_TYPES, INVALID_RECEIVING_FIELD_TEMPLATE);
   }
 }

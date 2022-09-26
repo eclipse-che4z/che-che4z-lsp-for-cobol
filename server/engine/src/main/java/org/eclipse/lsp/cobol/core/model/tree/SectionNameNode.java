@@ -15,28 +15,30 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
+import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp4j.Location;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.*;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 
 /** The class represents section name node in COBOL grammar. */
 @Getter
 public class SectionNameNode extends Node implements Context {
   private final String name;
+  @EqualsAndHashCode.Exclude @ToString.Exclude
+  private final MessageService messageService;
 
   public SectionNameNode(Locality location, String name, MessageService messageService) {
     super(location, NodeType.SECTION_NAME_NODE);
     this.name = name.toUpperCase();
-    addProcessStep(() -> registerNode(messageService));
+    this.messageService = messageService;
   }
 
   @Override
@@ -47,19 +49,6 @@ public class SectionNameNode extends Node implements Context {
   @Override
   public List<Location> getUsages() {
     return getLocations(CodeBlockReference::getUsage);
-  }
-
-  private List<SyntaxError> registerNode(MessageService messageService) {
-    if (getParent().getNodeType() != PROCEDURE_SECTION) {
-      // TODO: register usage
-      return Collections.emptyList();
-    }
-    return getNearestParentByType(PROGRAM)
-        .map(ProgramNode.class::cast)
-        .flatMap(parent -> parent.verifySectionNodeDuplication(this, messageService).map(Optional::of)
-                .orElse(parent.registerSectionNameNode(this)))
-        .map(ImmutableList::of)
-        .orElseGet(ImmutableList::of);
   }
 
   private List<Location> getLocations(
