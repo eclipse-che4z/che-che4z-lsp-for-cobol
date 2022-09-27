@@ -22,10 +22,12 @@ import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Location;
 
+import java.io.File;
 import java.util.*;
 import java.util.function.Function;
 
@@ -45,10 +47,12 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final int FIRST_LINE_SEQ_AND_EXTRA_OP = 8;
 
   private final CobolLanguageEngine engine;
+  private final WatcherService watcherService;
 
   @Inject
-  CobolLanguageEngineFacade(CobolLanguageEngine engine) {
+  CobolLanguageEngineFacade(CobolLanguageEngine engine, WatcherService watcherService) {
     this.engine = engine;
+    this.watcherService = watcherService;
   }
 
   /**
@@ -67,7 +71,12 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     if (isEmpty(text)) {
       return AnalysisResult.builder().build();
     }
-    return toAnalysisResult(engine.run(uri, text, analysisConfig), uri);
+    // start watching file specific copybooks
+    List<String> fileNameSpecificWatchFolders = filenameSpecificWatchFolders(uri);
+    watcherService.addWatchers(fileNameSpecificWatchFolders);
+    AnalysisResult result = toAnalysisResult(engine.run(uri, text, analysisConfig), uri);
+    watcherService.removeWatchers(fileNameSpecificWatchFolders);
+    return result;
   }
 
   /**
@@ -138,5 +147,16 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private static DiagnosticSeverity checkSeverity(ErrorSeverity severity) {
     return DiagnosticSeverity.forValue(severity.ordinal() + 1);
+  }
+
+  private String getNameFromURI(String uri) {
+    return new File(uri).getName().replaceFirst("\\?.*$", "").split("\\.")[0];
+  }
+
+  private List<String> filenameSpecificWatchFolders(String uri) {
+    return new ArrayList<>(watcherService.getWatchingFolders()).stream()
+            .filter(txt -> txt.contains("${fileBasenameNoExtension}"))
+            .map(txt -> txt.replaceAll("\\$\\{fileBasenameNoExtension\\}", getNameFromURI(uri)))
+            .collect(toList());
   }
 }

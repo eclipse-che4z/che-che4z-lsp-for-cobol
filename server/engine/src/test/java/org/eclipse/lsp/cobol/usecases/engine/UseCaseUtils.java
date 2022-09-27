@@ -40,6 +40,10 @@ import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.SettingsService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
+import org.eclipse.lsp.cobol.service.WatcherService;
+import org.eclipse.lsp.cobol.service.WatcherServiceImpl;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -133,6 +137,8 @@ public class UseCaseUtils {
                 bind(CobolLanguageClient.class).toInstance(languageClient);
                 bind(SubroutineService.class).to(SubroutineServiceImpl.class);
                 bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
+                bind(WatcherService.class).to(WatcherServiceImpl.class);
+                bind(CopybookReferenceRepo.class).toInstance(new CopybookReferenceRepoImpl());
               }
             });
 
