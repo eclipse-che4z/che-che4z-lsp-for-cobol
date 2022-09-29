@@ -85,6 +85,12 @@ class TestIdmsGetStatement {
           + "           TO {$WK_AREA2} LENGTH {$WK_LENGTH} WAIT KEEP LONG\r\n"
           + "           SHARED STGID '123' VALUE IS HIGH-VALUE LOCATION IS ANY.";
 
+  public static final String GET_STORAGE_2 =
+      DEFS
+          + "           GET STORAGE FOR {$WK_AREA1} TO {$WK_ID} KEEP\n"
+          + "               STGID {$WK_AREA2}\n"
+          + "               VALUE LOW-VALUE.";
+
   private static final String GET_TIME = DEFS + "           GET TIME.\r\n";
 
   private static final String GET_TIME_ALL_PARMS =
@@ -100,6 +106,7 @@ class TestIdmsGetStatement {
         GET_SCRATCH_WITH_ALL_LITERALS,
         GET_SCRATCH_WITH_ALL_VARIABLES,
         GET_STORAGE,
+        GET_STORAGE_2,
         GET_STORAGE_WITH_ALL_PARMS,
         GET_TIME,
         GET_TIME_ALL_PARMS);
