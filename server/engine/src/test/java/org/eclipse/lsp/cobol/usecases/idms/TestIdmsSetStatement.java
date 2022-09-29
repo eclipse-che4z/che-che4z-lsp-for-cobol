@@ -85,6 +85,11 @@ class TestIdmsSetStatement {
       DEFS
           + "           SET ABEND EXIT PROGRAM 'TSTPROG'\r\n"
           + "             ON {$ANY-ERROR-STATUS} DISPLAY 'SET ERROR'.\r\n";
+
+  private static final String SET_ABEND_ON_1 =
+      DEFS
+          + "           SET EXIT PROGRAM 'TSTPROG'\r\n"
+          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'SET ERROR'.\r\n";
   private static final String SET_TIMER_ON =
       DEFS
           + "           SET TIMER POST INTERVAL 10 EVENT {$WK_EVENT} TIMER ID {$WK_TIMER} \r\n"
@@ -102,6 +107,7 @@ class TestIdmsSetStatement {
         SET_TIMER_START_LIT_NO_PRIORITY,
         SET_TIMER_START_VARIABLE_NO_PRIORITY,
         SET_ABEND_ON,
+        SET_ABEND_ON_1,
         SET_TIMER_ON);
   }
 
