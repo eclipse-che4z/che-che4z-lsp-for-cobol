@@ -14,10 +14,10 @@
  */
 package org.eclipse.lsp.cobol.jrpc;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.services.LanguageClient;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * The class extends LSP language client with COBOL related methods.
@@ -32,6 +32,42 @@ public interface CobolLanguageClient extends LanguageClient {
    */
   @JsonRequest("cobol/resolveSubroutine")
   default CompletableFuture<String> resolveSubroutine(String name) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * The copybook/resolve request is sent from the server to the client to
+   * resolve copybook local absolute path if found
+   *
+   * @param cobolFilename the name of cobol program
+   * @param copybookName the name of copybook to resolve
+   * @param dialectType the name of copybook dialect
+   * @return corresponding local file absolute path
+   */
+  @JsonRequest("copybook/resolve")
+  default CompletableFuture<String> resolveCopybook(
+      String cobolFilename,
+      String copybookName,
+      String dialectType) {
+    throw new UnsupportedOperationException();
+  }
+
+  /** TODO
+   * The copybook/download request is sent from the server to the client to
+   * download remote copybook
+   *
+   * @param cobolFilename the name of cobol program
+   * @param copybookNames list of copybooks to download
+   * @param dialectType the name of copybook dialect
+   * @param quietMode the name of copybook dialect
+   * @return corresponding local file absolute path
+   */
+  @JsonRequest("copybook/download")
+  default CompletableFuture<Void> downloadCopybooks(
+      String cobolFilename,
+      List<String> copybookNames,
+      String dialectType,
+      boolean quietMode) {
     throw new UnsupportedOperationException();
   }
 }

@@ -63,7 +63,7 @@ export class CopybookURI {
      * @param profile represent a name of a folder within the .copybooks folder that have the same name as the
      * connection name needed to download copybooks from mainframe.
      */
-    private static createPathForCopybookDownloaded(filename: string, dialectType: string): string[] {
+    public static createPathForCopybookDownloaded(filename: string, dialectType: string): string[] {
         const profile = ProfileUtils.getProfileNameForCopybook(filename);
 
         let result: string[] = [];
