@@ -20,6 +20,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.core.engine.symbols.Context;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp4j.Location;
 
@@ -48,10 +49,8 @@ public class CodeBlockUsageNode extends Node implements Context {
     return getLocations(CodeBlockReference::getUsage);
   }
 
-  private List<Location> getLocations(
-      Function<CodeBlockReference, List<Location>> retriveLocations) {
-    return getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
+  private List<Location> getLocations(Function<CodeBlockReference, List<Location>> retriveLocations) {
+    return getProgram()
         .map(p -> p.getCodeBlockReference(getName()))
         .map(retriveLocations)
         .orElse(ImmutableList.of());

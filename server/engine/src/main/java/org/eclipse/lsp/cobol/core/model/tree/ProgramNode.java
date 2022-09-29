@@ -26,7 +26,6 @@ import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
-import org.eclipse.lsp4j.Location;
 
 import java.util.*;
 
@@ -56,6 +55,7 @@ public class ProgramNode extends Node {
 
   /**
    * Search for a block reference in a paragraph and then in a section map
+   *
    * @param name the name of the block
    * @return the block reference or null if not found
    */
@@ -68,15 +68,6 @@ public class ProgramNode extends Node {
   }
 
   /**
-   * Add the variable definition to that program context.
-   *
-   * @param node the variable definition node
-   */
-  public void addVariableDefinition(VariableNode node) {
-    variables.put(node.getName(), node);
-  }
-
-  /**
    * Get variable definition node based on list of variable usage nodes.
    *
    * @param usageNodes represents variable name and its parents
@@ -85,14 +76,15 @@ public class ProgramNode extends Node {
   public List<VariableNode> getVariableDefinition(List<VariableUsageNode> usageNodes) {
     List<VariableNode> foundDefinitions =
         VariableUsageUtils.findVariablesForUsage(variables, usageNodes);
-    if (foundDefinitions.isEmpty()) {
-      Multimap<String, VariableNode> globals = ArrayListMultimap.create();
-      getMapOfGlobalVariables()
-          .values()
-          .forEach(variableNode -> globals.put(variableNode.getName(), variableNode));
-      foundDefinitions = VariableUsageUtils.findVariablesForUsage(globals, usageNodes);
+    if (!foundDefinitions.isEmpty()) {
+      return foundDefinitions;
     }
-    return foundDefinitions;
+
+    Multimap<String, VariableNode> globals = ArrayListMultimap.create();
+    getMapOfGlobalVariables()
+        .values()
+        .forEach(variableNode -> globals.put(variableNode.getName(), variableNode));
+    return VariableUsageUtils.findVariablesForUsage(globals, usageNodes);
   }
 
   /**
@@ -138,10 +130,7 @@ public class ProgramNode extends Node {
 
   private Map<String, VariableNode> getMapOfGlobalVariables() {
     Map<String, VariableNode> result =
-        getNearestParentByType(PROGRAM)
-            .map(ProgramNode.class::cast)
-            .map(ProgramNode::getMapOfGlobalVariables)
-            .orElseGet(HashMap::new);
+        getProgram().map(ProgramNode::getMapOfGlobalVariables).orElseGet(HashMap::new);
     variables.values().stream()
         .filter(VariableNode::isGlobal)
         .forEach(variableNode -> result.put(variableNode.getName(), variableNode));
@@ -154,7 +143,9 @@ public class ProgramNode extends Node {
    * @return syntax error if the code block duplicates
    */
   public Optional<SyntaxError> registerParagraphNameNode(ParagraphNameNode node) {
-    updateMap(paragraphMap, node.getName(), node.locality.toLocation());
+    paragraphMap
+        .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
+        .addDefinition(node.locality.toLocation());
     return Optional.empty();
   }
   /**
@@ -164,31 +155,30 @@ public class ProgramNode extends Node {
    * @return syntax error if the code block duplicates
    */
   public Optional<SyntaxError> registerSectionNameNode(SectionNameNode node) {
-    updateMap(sectionMap, node.getName(), node.locality.toLocation());
+    sectionMap
+        .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
+        .addDefinition(node.locality.toLocation());
     return Optional.empty();
   }
 
   /**
    * Check if we have this section node defined already
+   *
    * @param node new section node
    * @param messageService message formatter
    * @return an error if any
    */
-  public Optional<SyntaxError> verifySectionNodeDuplication(SectionNameNode node, MessageService messageService) {
+  public Optional<SyntaxError> verifySectionNodeDuplication(
+      SectionNameNode node, MessageService messageService) {
     if (sectionMap.containsKey(node.getName())) {
-      return Optional.of(SyntaxError.syntaxError().errorSource(ErrorSource.PARSING)
-             .suggestion(messageService.getMessage("semantics.duplicated", node.getName()))
-             .severity(ERROR)
-             .locality(node.getLocality())
-             .build());
+      return Optional.of(
+          SyntaxError.syntaxError()
+              .errorSource(ErrorSource.PARSING)
+              .suggestion(messageService.getMessage("semantics.duplicated", node.getName()))
+              .severity(ERROR)
+              .locality(node.getLocality())
+              .build());
     }
     return Optional.empty();
-  }
-
-  private void updateMap(Map<String, CodeBlockReference> map, String name, Location location) {
-    map.putIfAbsent(name, new CodeBlockReference());
-    CodeBlockReference references = map.get(name);
-    // TODO: add uniqueness check for section definition
-    references.addDefinition(location);
   }
 }

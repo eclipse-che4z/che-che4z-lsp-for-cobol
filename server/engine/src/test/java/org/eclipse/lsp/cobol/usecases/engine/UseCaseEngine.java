@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.usecases.engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.core.model.tree.Context;
+import org.eclipse.lsp.cobol.core.engine.symbols.Context;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;

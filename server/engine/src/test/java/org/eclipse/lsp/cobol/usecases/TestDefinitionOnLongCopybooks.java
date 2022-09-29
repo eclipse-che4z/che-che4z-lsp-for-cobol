@@ -16,6 +16,8 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.engine.symbols.Context;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
@@ -24,10 +26,14 @@ import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test Go to Definition works on a COPY statement that is at the end of a file, and the copybook
@@ -57,18 +63,19 @@ class TestDefinitionOnLongCopybooks {
     AnalysisResult result =
         UseCaseEngine.runTest(
             TEXT, ImmutableList.of(new CobolText("ABCD", COPYBOOK_CONTENT)), ImmutableMap.of());
-    List<Location> definitions =
-        new ElementOccurrences()
-            .findDefinitions(
-                new CobolDocumentModel(TEXT, result),
-                new TextDocumentPositionParams(
-                    new TextDocumentIdentifier(DOCUMENT_URI), new Position(4, 15)));
+    SymbolService symbolService = mock(SymbolService.class);
+    CobolDocumentModel document = new CobolDocumentModel(TEXT, result);
+    TextDocumentPositionParams position = new TextDocumentPositionParams(
+            new TextDocumentIdentifier(DOCUMENT_URI), new Position(4, 15));
+    Location expectedDef = new Location(
+            "file:///c%3A/workspace/.c4z/.copybooks/ABCD.cpy",
+            new Range(new Position(), new Position()));
+    Context ctx = mock(Context.class);
+    when(ctx.getDefinitions()).thenReturn(Collections.singletonList(expectedDef));
+    when(symbolService.findElementByPosition(eq(document), eq(position))).thenReturn(ctx);
+    List<Location> definitions = new ElementOccurrences(symbolService).findDefinitions(document, position);
 
     assertEquals(1, definitions.size());
-    assertEquals(
-        new Location(
-            "file:///c%3A/workspace/.c4z/.copybooks/ABCD.cpy",
-            new Range(new Position(), new Position())),
-        definitions.get(0));
+    assertEquals(expectedDef, definitions.get(0));
   }
 }

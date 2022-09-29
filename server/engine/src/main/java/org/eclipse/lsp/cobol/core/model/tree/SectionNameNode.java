@@ -19,6 +19,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.core.engine.symbols.Context;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp4j.Location;

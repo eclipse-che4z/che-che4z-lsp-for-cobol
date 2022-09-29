@@ -16,14 +16,21 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.processor.Processor;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 
 /** SectionNode processor */
 public class ProcessNodeWithVariableDefinitions implements Processor<SectionNode> {
+  private final SymbolService symbolService;
+
+  public ProcessNodeWithVariableDefinitions(SymbolService symbolService) {
+    this.symbolService = symbolService;
+  }
+
   @Override
   public void accept(SectionNode node, ProcessingContext ctx) {
     ctx.getErrors().addAll(VariableDefinitionUtil.processNodeWithVariableDefinitions(node));
-    VariableDefinitionUtil.registerVariablesInProgram(node);
+    symbolService.registerVariablesInProgram(node);
   }
 }

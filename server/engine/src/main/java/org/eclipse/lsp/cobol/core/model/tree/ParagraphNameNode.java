@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.core.engine.symbols.Context;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp4j.Location;
 
@@ -45,8 +46,7 @@ public class ParagraphNameNode extends Node implements Context {
 
   private List<Location> getLocations(
       Function<CodeBlockReference, List<Location>> retrieveLocations) {
-    return getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
+    return getProgram()
         .map(ProgramNode::getParagraphMap)
         .map(it -> it.get(getName()))
         .map(retrieveLocations)

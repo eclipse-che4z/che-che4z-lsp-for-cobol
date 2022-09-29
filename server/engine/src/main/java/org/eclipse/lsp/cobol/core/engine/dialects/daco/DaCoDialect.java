@@ -30,6 +30,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -53,6 +54,7 @@ public final class DaCoDialect implements CobolDialect {
 
   private final MessageService messageService;
   private final DaCoMaidProcessor maidProcessor;
+  private final SymbolService symbolService;
 
   /**
    * Gets the name of the dialect
@@ -126,6 +128,7 @@ public final class DaCoDialect implements CobolDialect {
   public List<ProcessorDescription> getProcessors() {
     return Collections.singletonList(
         new ProcessorDescription(
-            DaCoCopyFromNode.class, ProcessingPhase.POST_DEFINITION, new DaCoCopyFromProcessor()));
+            DaCoCopyFromNode.class, ProcessingPhase.POST_DEFINITION,
+                new DaCoCopyFromProcessor(symbolService)));
   }
 }

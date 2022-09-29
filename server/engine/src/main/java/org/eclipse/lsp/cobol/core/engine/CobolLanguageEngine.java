@@ -34,6 +34,7 @@ import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
@@ -83,26 +84,27 @@ public class CobolLanguageEngine {
   private final SubroutineService subroutineService;
   private final CachingConfigurationService cachingConfigurationService;
   private final DialectService dialectService;
-
+  private final SymbolService symbolService;
   private final AstProcessor astProcessor;
   private final InjectService injectService;
 
   @Inject
   public CobolLanguageEngine(
-      TextPreprocessor preprocessor,
-      MessageService messageService,
-      ParseTreeListener treeListener,
-      SubroutineService subroutineService,
-      CachingConfigurationService cachingConfigurationService,
-      DialectService dialectService,
-      AstProcessor astProcessor,
-      InjectService injectService) {
+          TextPreprocessor preprocessor,
+          MessageService messageService,
+          ParseTreeListener treeListener,
+          SubroutineService subroutineService,
+          CachingConfigurationService cachingConfigurationService,
+          DialectService dialectService,
+          SymbolService symbolService, AstProcessor astProcessor,
+          InjectService injectService) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.treeListener = treeListener;
     this.subroutineService = subroutineService;
     this.cachingConfigurationService = cachingConfigurationService;
     this.dialectService = dialectService;
+    this.symbolService = symbolService;
     this.astProcessor = astProcessor;
     this.injectService = injectService;
   }
@@ -281,9 +283,9 @@ public class CobolLanguageEngine {
   private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx) {
     // Phase TRANSFORMATION
     ctx.register(new ProcessorDescription(ProgramIdNode.class, ProcessingPhase.TRANSFORMATION, new ProgramIdProcess()));
-    ctx.register(new ProcessorDescription(SectionNode.class, ProcessingPhase.TRANSFORMATION, new ProcessNodeWithVariableDefinitions()));
+    ctx.register(new ProcessorDescription(SectionNode.class, ProcessingPhase.TRANSFORMATION, new ProcessNodeWithVariableDefinitions(symbolService)));
     ctx.register(new ProcessorDescription(FileEntryNode.class, ProcessingPhase.TRANSFORMATION, new FileEntryProcess()));
-    ctx.register(new ProcessorDescription(FileDescriptionNode.class, ProcessingPhase.TRANSFORMATION, new FileDescriptionProcess()));
+    ctx.register(new ProcessorDescription(FileDescriptionNode.class, ProcessingPhase.TRANSFORMATION, new FileDescriptionProcess(symbolService)));
     ctx.register(new ProcessorDescription(DeclarativeProcedureSectionNode.class, ProcessingPhase.TRANSFORMATION, new DeclarativeProcedureSectionRegister()));
     // Phase DEFINITION
     ctx.register(new ProcessorDescription(ParagraphsNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock()));
