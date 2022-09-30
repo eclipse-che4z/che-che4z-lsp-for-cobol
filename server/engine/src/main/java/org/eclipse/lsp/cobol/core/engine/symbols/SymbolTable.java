@@ -14,8 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.engine.symbols;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.tree.CodeBlockDefinitionNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,4 +31,5 @@ public class SymbolTable {
   List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
   Map<String, CodeBlockReference> paragraphMap = new HashMap<>();
   Map<String, CodeBlockReference> sectionMap = new HashMap<>();
+  Multimap<String, VariableNode> variables = ArrayListMultimap.create();
 }

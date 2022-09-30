@@ -353,7 +353,7 @@ public class PositiveTestUtility {
                   .forEach(
                       entry -> paragraphDefFromLSPEngine.put(entry.getKey(), entry.getValue()));
 
-              programNode.getVariables().values().stream()
+              symbolService.getVariables(programNode).values().stream()
                   .flatMap(Node::getDepthFirstStream)
                   .filter(VariableNode.class::isInstance)
                   .map(VariableNode.class::cast)

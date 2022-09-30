@@ -14,15 +14,20 @@
  */
 package org.eclipse.lsp.cobol.core.engine.symbols;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
+import com.google.inject.Singleton;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -39,6 +44,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils.findNodeByPosition;
 
 /** Service to handle symbol information and dependencies */
+@Singleton
 public class SymbolService {
   private final Map<String, SymbolTable> programSymbols;
 
@@ -56,8 +62,8 @@ public class SymbolService {
    * @param programNode the program where this variable belongs to.
    * @param node the variable definition node
    */
-  public static void addVariableDefinition(ProgramNode programNode, VariableNode node) {
-    programNode.getVariables().put(node.getName(), node);
+  public void addVariableDefinition(ProgramNode programNode, VariableNode node) {
+    createOrGetSymbolTable(programNode).getVariables().put(node.getName(), node);
   }
   /**
    * Find element using a position
@@ -270,6 +276,47 @@ public class SymbolService {
    */
   public Map<String, SymbolTable> getProgramSymbols() {
     return programSymbols;
+  }
+
+  /**
+   * Get variable definition node based on list of variable usage nodes.
+   *
+   * @param programNode the program node
+   * @param usageNodes represents variable name and its parents
+   * @return the list of founded variable definitions
+   */
+  public List<VariableNode> getVariableDefinition(
+      ProgramNode programNode, List<VariableUsageNode> usageNodes) {
+    Multimap<String, VariableNode> variables = createOrGetSymbolTable(programNode).getVariables();
+    List<VariableNode> foundDefinitions =
+        VariableUsageUtils.findVariablesForUsage(variables, usageNodes);
+    if (!foundDefinitions.isEmpty()) {
+      return foundDefinitions;
+    }
+
+    Multimap<String, VariableNode> globals = ArrayListMultimap.create();
+    getMapOfGlobalVariables(programNode)
+        .values()
+        .forEach(variableNode -> globals.put(variableNode.getName(), variableNode));
+    return VariableUsageUtils.findVariablesForUsage(globals, usageNodes);
+  }
+
+  private Map<String, VariableNode> getMapOfGlobalVariables(ProgramNode programNode) {
+    Map<String, VariableNode> result =
+        programNode.getProgram().map(this::getMapOfGlobalVariables).orElseGet(HashMap::new);
+    createOrGetSymbolTable(programNode).getVariables().values().stream()
+        .filter(VariableNode::isGlobal)
+        .forEach(variableNode -> result.put(variableNode.getName(), variableNode));
+    return result;
+  }
+
+  /**
+   * Get variables data
+   * @param programNode the program node
+   * @return map of variables
+   */
+  public Multimap<String, VariableNode> getVariables(ProgramNode programNode) {
+    return createOrGetSymbolTable(programNode).getVariables();
   }
 
   @Value

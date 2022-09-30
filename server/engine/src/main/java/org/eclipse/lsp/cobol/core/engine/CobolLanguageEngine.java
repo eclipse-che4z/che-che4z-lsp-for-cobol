@@ -340,7 +340,7 @@ public class CobolLanguageEngine {
         new ProcessorDescription(
             QualifiedReferenceNode.class,
             ProcessingPhase.USAGE,
-            new QualifiedReferenceUpdateVariableUsage()));
+            new QualifiedReferenceUpdateVariableUsage(symbolService)));
 
     // Phase VALIDATION
     ctx.register(

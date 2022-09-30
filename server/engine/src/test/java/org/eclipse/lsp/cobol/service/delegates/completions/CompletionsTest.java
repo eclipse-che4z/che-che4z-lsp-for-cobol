@@ -16,7 +16,6 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableSet;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.*;
 import org.hamcrest.Matchers;
@@ -25,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.COPYBOOKS;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.VARIABLES;
 import static org.eclipse.lsp.cobol.service.delegates.completions.MockCompletionModel.RESULT;
+import static org.eclipse.lsp.cobol.service.delegates.completions.MockCompletionModel.SYMBOL_SERVICE;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -34,11 +34,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 class CompletionsTest {
   @Test
   void testCollecting() {
-    SymbolService symbolService = new SymbolService();
     Completions completions =
         new Completions(
             ImmutableSet.of(
-                new CopybookCompletion(), new VariableCompletion(), new ParagraphCompletion(symbolService)));
+                new CopybookCompletion(), new VariableCompletion(SYMBOL_SERVICE),
+                    new ParagraphCompletion(SYMBOL_SERVICE)));
     CompletionList actual =
         completions.collectFor(
             new CobolDocumentModel("Lorem ipsum dolor c amet", RESULT),

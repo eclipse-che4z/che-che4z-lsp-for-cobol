@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
@@ -187,16 +188,16 @@ public class TestRecordDescNotIncludedInFD {
         UseCaseEngine.runTest(
             PGM, ImmutableList.of(new CobolText("ACCFILE1", COPYBOOK)), ImmutableMap.of());
 
-    Collection<VariableNode> acctfile =
+    SymbolService symbolService = new SymbolService(result.getSymbolTableMap());
+    ProgramNode programNode =
         result
             .getRootNode()
             .getDepthFirstStream()
             .filter(node -> node.getNodeType() == NodeType.PROGRAM)
             .map(ProgramNode.class::cast)
             .collect(Collectors.toList())
-            .get(0)
-            .getVariables()
-            .get("ACCTFILE");
+            .get(0);
+    Collection<VariableNode> acctfile = symbolService.getVariables(programNode).get("ACCTFILE");
     assertEquals(acctfile.size(), 1);
     acctfile.forEach(
         node -> {

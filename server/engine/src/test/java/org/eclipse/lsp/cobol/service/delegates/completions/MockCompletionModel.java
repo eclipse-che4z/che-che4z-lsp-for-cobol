@@ -44,7 +44,7 @@ class MockCompletionModel {
         .forEach(
             name -> {
               VariableNode variable = new MnemonicNameNode(Locality.builder().build(), "sys", name);
-              SymbolService.addVariableDefinition(programNode, variable);
+                SYMBOL_SERVICE.addVariableDefinition(programNode, variable);
             });
 
     ImmutableList.of("parD1", "ParD2", "Not-parD")
