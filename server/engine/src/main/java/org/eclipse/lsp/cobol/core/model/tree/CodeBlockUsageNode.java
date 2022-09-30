@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.engine.symbols.Context;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp4j.Location;
 
@@ -33,10 +34,12 @@ import java.util.function.Function;
 @EqualsAndHashCode(callSuper = true)
 public class CodeBlockUsageNode extends Node implements Context {
   String name;
+  final SymbolService symbolService;
 
-  public CodeBlockUsageNode(Locality location, String name) {
+  public CodeBlockUsageNode(Locality location, String name, SymbolService symbolService) {
     super(location, NodeType.CODE_BLOCK_USAGE);
     this.name = name;
+    this.symbolService = symbolService;
   }
 
   @Override
@@ -51,7 +54,7 @@ public class CodeBlockUsageNode extends Node implements Context {
 
   private List<Location> getLocations(Function<CodeBlockReference, List<Location>> retriveLocations) {
     return getProgram()
-        .map(p -> p.getCodeBlockReference(getName()))
+        .map(p -> symbolService.getCodeBlockReference(p, getName()))
         .map(retriveLocations)
         .orElse(ImmutableList.of());
   }

@@ -14,10 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.engine.symbols;
 
+import com.google.common.collect.ImmutableList;
 import lombok.Value;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
+import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
@@ -25,19 +29,27 @@ import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils.findNodeByPosition;
 
-/**
- * Service to handle symbol information and dependencies
- */
+/** Service to handle symbol information and dependencies */
 public class SymbolService {
+  private final Map<String, SymbolTable> programSymbols;
+
+  public SymbolService() {
+    this.programSymbols = new HashMap<>();
+  }
+
+  public SymbolService(Map<String, SymbolTable> symbolTableMap) {
+    this.programSymbols = symbolTableMap;
+  }
+
   /**
    * Add the variable definition to that program context.
    *
@@ -96,6 +108,168 @@ public class SymbolService {
             .collect(Collectors.toList());
     node.getProgram()
         .ifPresent(programNode -> variables.forEach(v -> addVariableDefinition(programNode, v)));
+  }
+
+  /**
+   * Add a paragraph defined in the program context.
+   *
+   * @param program - the program to register code block in
+   * @param node - the paragraph node
+   */
+  public void registerCodeBlock(ProgramNode program, CodeBlockDefinitionNode node) {
+    SymbolTable symbolTable = createOrGetSymbolTable(program);
+    symbolTable.getCodeBlocks().add(node);
+  }
+
+  /**
+   * Add the usage of a code block defined in this program. Returns an optional syntax error if the
+   * paragraph is not defined.
+   *
+   * @param program the program to register block usage in
+   * @param node the usage node to register
+   * @return Optional error if the paragraph or section with the given name is not defined
+   */
+  public Optional<SyntaxError> registerCodeBlockUsage(
+      ProgramNode program, CodeBlockUsageNode node) {
+    SymbolTable symbolTable = createOrGetSymbolTable(program);
+
+    final Optional<CodeBlockDefinitionNode> definition =
+        symbolTable.getCodeBlocks().stream()
+            .filter(it -> it.getName().equals(node.getName()))
+            .findAny();
+    definition.ifPresent(it -> it.addUsage(node.getLocality()));
+
+    Optional.ofNullable(symbolTable.getParagraphMap().get(node.getName()))
+        .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
+    Optional.ofNullable(symbolTable.getSectionMap().get(node.getName()))
+        .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
+
+    return definition.isPresent()
+        ? Optional.empty()
+        : Optional.of(
+            SyntaxError.syntaxError()
+                .errorSource(ErrorSource.PARSING)
+                .messageTemplate(
+                    MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
+                .severity(ErrorSeverity.ERROR)
+                .locality(node.getLocality())
+                .build());
+  }
+
+  private SymbolTable createOrGetSymbolTable(ProgramNode program) {
+    return programSymbols.computeIfAbsent(
+        program.getProgramName() + "%" + program.getLocality().getUri(), p -> new SymbolTable());
+  }
+
+  /**
+   * Check if we have this section node defined already
+   *
+   * @param program the program to verify
+   * @param node new section node
+   * @param messageService message formatter
+   * @return an error if any
+   */
+  public Optional<SyntaxError> verifySectionNodeDuplication(
+      ProgramNode program, SectionNameNode node, MessageService messageService) {
+    if (!createOrGetSymbolTable(program).getSectionMap().containsKey(node.getName())) {
+      return Optional.empty();
+    }
+
+    return Optional.of(
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
+            .suggestion(messageService.getMessage("semantics.duplicated", node.getName()))
+            .severity(ERROR)
+            .locality(node.getLocality())
+            .build());
+  }
+
+  /**
+   * Add a section definition name node in the program context.
+   *
+   * @param program the program to register section in
+   * @param node - the section definition node
+   * @return syntax error if the code block duplicates
+   */
+  public Optional<SyntaxError> registerSectionNameNode(ProgramNode program, SectionNameNode node) {
+    createOrGetSymbolTable(program)
+        .getSectionMap()
+        .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
+        .addDefinition(node.getLocality().toLocation());
+    return Optional.empty();
+  }
+
+  /**
+   * Add a paragraph definition name node in the program context.
+   *
+   * @param programNode the program to register in
+   * @param node - the section definition node
+   * @return syntax error if the code block duplicates
+   */
+  public Optional<SyntaxError> registerParagraphNameNode(
+      ProgramNode programNode, ParagraphNameNode node) {
+    createOrGetSymbolTable(programNode)
+        .getParagraphMap()
+        .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
+        .addDefinition(node.getLocality().toLocation());
+    return Optional.empty();
+  }
+
+  /**
+   * Search for a block reference in a paragraph and then in a section map
+   *
+   * @param programNode the program to search block references in
+   * @param name the name of the block
+   * @return the block reference or null if not found
+   */
+  public CodeBlockReference getCodeBlockReference(ProgramNode programNode, String name) {
+    SymbolTable symbolTable = createOrGetSymbolTable(programNode);
+    return symbolTable.getParagraphMap().computeIfAbsent(name, symbolTable.getSectionMap()::get);
+  }
+
+  /**
+   * Get Section locations
+   *
+   * @param node the section node
+   * @param retrieveLocations location extract function
+   * @return a list of locations
+   */
+  public List<Location> getSectionLocations(
+      SectionNameNode node, Function<CodeBlockReference, List<Location>> retrieveLocations) {
+    return node.getProgram()
+        .map(this::createOrGetSymbolTable)
+        .map(SymbolTable::getSectionMap)
+        .map(it -> it.get(node.getName()))
+        .map(retrieveLocations)
+        .orElse(ImmutableList.of());
+  }
+
+  /**
+   * Get paragraphs data
+   *
+   * @param programNode the program node
+   * @return map of paragraphs
+   */
+  public Map<String, CodeBlockReference> getParagraphMap(ProgramNode programNode) {
+    return createOrGetSymbolTable(programNode).getParagraphMap();
+  }
+  /**
+   * Get section data
+   *
+   * @param programNode the program node
+   * @return map of sections
+   */
+  public Map<String, CodeBlockReference> getSectionMap(ProgramNode programNode) {
+    return createOrGetSymbolTable(programNode).getSectionMap();
+  }
+
+  /**
+   * Extract all accumulated symbols information
+   *
+   * @return Symbol Tables
+   */
+  public Map<String, SymbolTable> getProgramSymbols() {
+    return programSymbols;
   }
 
   @Value

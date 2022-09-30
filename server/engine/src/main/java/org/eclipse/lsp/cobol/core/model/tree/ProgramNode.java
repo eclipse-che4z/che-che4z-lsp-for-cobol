@@ -20,16 +20,15 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 
 /** This class represents program context in COBOL. */
@@ -39,10 +38,6 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 @Slf4j
 public class ProgramNode extends Node {
   private final Multimap<String, VariableNode> variables = ArrayListMultimap.create();
-  private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
-  private final Map<String, CodeBlockReference> paragraphMap = new HashMap<>();
-  private final Map<String, CodeBlockReference> sectionMap = new HashMap<>();
-
   private String programName;
 
   public ProgramNode(Locality locality) {
@@ -51,16 +46,6 @@ public class ProgramNode extends Node {
 
   public String getProgramName() {
     return programName;
-  }
-
-  /**
-   * Search for a block reference in a paragraph and then in a section map
-   *
-   * @param name the name of the block
-   * @return the block reference or null if not found
-   */
-  public CodeBlockReference getCodeBlockReference(String name) {
-    return paragraphMap.computeIfAbsent(name, sectionMap::get);
   }
 
   public void setProgramName(String programName) {
@@ -87,47 +72,6 @@ public class ProgramNode extends Node {
     return VariableUsageUtils.findVariablesForUsage(globals, usageNodes);
   }
 
-  /**
-   * Add a paragraph defined in the program context.
-   *
-   * @param node - the paragraph node
-   * @return syntax error if the code block duplicates
-   */
-  public Optional<SyntaxError> registerCodeBlock(CodeBlockDefinitionNode node) {
-    codeBlocks.add(node);
-    // TODO: add uniqueness check for paragraphs
-    return Optional.empty();
-  }
-
-  /**
-   * Add the usage of a code block defined in this program. Returns an optional syntax error if the
-   * paragraph is not defined.
-   *
-   * @param node the usage node to register
-   * @return Optional error if the paragraph or section with the given name is not defined
-   */
-  public Optional<SyntaxError> registerCodeBlockUsage(CodeBlockUsageNode node) {
-    final Optional<CodeBlockDefinitionNode> definition =
-        codeBlocks.stream().filter(it -> it.getName().equals(node.getName())).findAny();
-    definition.ifPresent(it -> it.addUsage(node.getLocality()));
-
-    Optional.ofNullable(paragraphMap.get(node.getName()))
-        .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
-    Optional.ofNullable(sectionMap.get(node.getName()))
-        .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
-
-    return definition.isPresent()
-        ? Optional.empty()
-        : Optional.of(
-            SyntaxError.syntaxError()
-                .errorSource(ErrorSource.PARSING)
-                .messageTemplate(
-                    MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
-                .severity(ErrorSeverity.ERROR)
-                .locality(node.getLocality())
-                .build());
-  }
-
   private Map<String, VariableNode> getMapOfGlobalVariables() {
     Map<String, VariableNode> result =
         getProgram().map(ProgramNode::getMapOfGlobalVariables).orElseGet(HashMap::new);
@@ -135,50 +79,5 @@ public class ProgramNode extends Node {
         .filter(VariableNode::isGlobal)
         .forEach(variableNode -> result.put(variableNode.getName(), variableNode));
     return result;
-  }
-  /**
-   * Add a paragraph definition name node in the program context.
-   *
-   * @param node - the section definition node
-   * @return syntax error if the code block duplicates
-   */
-  public Optional<SyntaxError> registerParagraphNameNode(ParagraphNameNode node) {
-    paragraphMap
-        .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
-        .addDefinition(node.locality.toLocation());
-    return Optional.empty();
-  }
-  /**
-   * Add a section definition name node in the program context.
-   *
-   * @param node - the section definition node
-   * @return syntax error if the code block duplicates
-   */
-  public Optional<SyntaxError> registerSectionNameNode(SectionNameNode node) {
-    sectionMap
-        .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
-        .addDefinition(node.locality.toLocation());
-    return Optional.empty();
-  }
-
-  /**
-   * Check if we have this section node defined already
-   *
-   * @param node new section node
-   * @param messageService message formatter
-   * @return an error if any
-   */
-  public Optional<SyntaxError> verifySectionNodeDuplication(
-      SectionNameNode node, MessageService messageService) {
-    if (sectionMap.containsKey(node.getName())) {
-      return Optional.of(
-          SyntaxError.syntaxError()
-              .errorSource(ErrorSource.PARSING)
-              .suggestion(messageService.getMessage("semantics.duplicated", node.getName()))
-              .severity(ERROR)
-              .locality(node.getLocality())
-              .build());
-    }
-    return Optional.empty();
   }
 }

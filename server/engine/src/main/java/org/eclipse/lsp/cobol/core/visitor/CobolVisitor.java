@@ -30,10 +30,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
-import org.eclipse.lsp.cobol.core.model.tree.logic.*;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToOnOffStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetUpDownByStatement;
@@ -82,21 +82,23 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final MessageService messageService;
   private final SubroutineService subroutineService;
   private final AnalysisConfig analysisConfig;
+
+  private final SymbolService symbolService;
   private final List<Node> dialectNodes;
   private Map<String, FileControlEntryContext> fileControls = null;
   private final Map<String, SubroutineDefinition> subroutineDefinitionMap = new HashMap<>();
   private final CachingConfigurationService cachingConfigurationService;
 
   public CobolVisitor(
-      @NonNull CopybooksRepository copybooks,
-      @NonNull CommonTokenStream tokenStream,
-      @NonNull Map<Token, Locality> positions,
-      @NonNull AnalysisConfig analysisConfig,
-      Map<Token, EmbeddedCode> embeddedCodeParts,
-      MessageService messageService,
-      SubroutineService subroutineService,
-      List<Node> dialectNodes,
-      CachingConfigurationService cachingConfigurationService) {
+          @NonNull CopybooksRepository copybooks,
+          @NonNull CommonTokenStream tokenStream,
+          @NonNull Map<Token, Locality> positions,
+          @NonNull AnalysisConfig analysisConfig,
+          Map<Token, EmbeddedCode> embeddedCodeParts,
+          MessageService messageService,
+          SubroutineService subroutineService,
+          SymbolService symbolService, List<Node> dialectNodes,
+          CachingConfigurationService cachingConfigurationService) {
     this.copybooks = copybooks;
     this.positions = positions;
     this.embeddedCodeParts = embeddedCodeParts;
@@ -104,6 +106,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     this.messageService = messageService;
     this.subroutineService = subroutineService;
     this.analysisConfig = analysisConfig;
+    this.symbolService = symbolService;
     this.dialectNodes = dialectNodes;
     this.cachingConfigurationService = cachingConfigurationService;
   }
@@ -392,7 +395,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitSectionName(SectionNameContext ctx) {
     return addTreeNode(
-        ctx, locality -> new SectionNameNode(locality, ctx.getText(), messageService));
+        ctx, locality -> new SectionNameNode(locality, ctx.getText(), messageService, symbolService));
   }
 
   @Override
@@ -436,7 +439,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                         it ->
                             ImmutableList.of(
                                 new EmbeddedCodeNode(
-                                    it, code.getTokenStream(), code.getTree(), language))))
+                                    it, code.getTokenStream(), code.getTree(), language, symbolService))))
         .orElse(ImmutableList.of());
   }
 
@@ -483,7 +486,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitParagraphName(ParagraphNameContext ctx) {
     return addTreeNode(
-        ctx, locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx)));
+        ctx, locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx), symbolService));
   }
 
   @Override
@@ -731,7 +734,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitParagraphDefinitionName(ParagraphDefinitionNameContext ctx) {
-    return addTreeNode(ctx, locality -> new ParagraphNameNode(locality, ctx.getText()));
+    return addTreeNode(ctx, locality -> new ParagraphNameNode(locality, ctx.getText(), symbolService));
   }
 
   @Override

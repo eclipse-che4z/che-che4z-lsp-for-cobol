@@ -38,6 +38,7 @@ import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
@@ -162,8 +163,8 @@ class CobolLanguageEngineTest {
             .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of()));
 
     Range programRange = new Range(new Position(0, 7), new Position(0, 31));
-    ResultWithErrors<Node> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
-    Node root = actual.getResult();
+    ResultWithErrors<AnalysisResult> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
+    Node root = actual.getResult().getRootNode();
     Node program = root.getChildren().get(0);
     Node division = program.getChildren().get(0);
 

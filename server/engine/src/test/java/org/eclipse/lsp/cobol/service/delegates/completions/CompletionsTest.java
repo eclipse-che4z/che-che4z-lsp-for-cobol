@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableSet;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.*;
 import org.hamcrest.Matchers;
@@ -33,10 +34,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 class CompletionsTest {
   @Test
   void testCollecting() {
+    SymbolService symbolService = new SymbolService();
     Completions completions =
         new Completions(
             ImmutableSet.of(
-                new CopybookCompletion(), new VariableCompletion(), new ParagraphCompletion()));
+                new CopybookCompletion(), new VariableCompletion(), new ParagraphCompletion(symbolService)));
     CompletionList actual =
         completions.collectFor(
             new CobolDocumentModel("Lorem ipsum dolor c amet", RESULT),

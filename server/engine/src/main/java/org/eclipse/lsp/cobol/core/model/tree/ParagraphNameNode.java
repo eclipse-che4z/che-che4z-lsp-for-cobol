@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.engine.symbols.Context;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp4j.Location;
 
@@ -28,10 +29,12 @@ import java.util.function.Function;
 @Getter
 public class ParagraphNameNode extends Node implements Context {
   private final String name;
+  private final SymbolService symbolService;
 
-  public ParagraphNameNode(Locality location, String paragraphName) {
+  public ParagraphNameNode(Locality location, String paragraphName, SymbolService symbolService) {
     super(location, NodeType.PARAGRAPH_NAME_NODE);
     this.name = paragraphName.toUpperCase();
+    this.symbolService = symbolService;
   }
 
   @Override
@@ -47,7 +50,7 @@ public class ParagraphNameNode extends Node implements Context {
   private List<Location> getLocations(
       Function<CodeBlockReference, List<Location>> retrieveLocations) {
     return getProgram()
-        .map(ProgramNode::getParagraphMap)
+        .map(symbolService::getParagraphMap)
         .map(it -> it.get(getName()))
         .map(retrieveLocations)
         .orElse(ImmutableList.of());

@@ -55,6 +55,7 @@ import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
@@ -90,14 +91,15 @@ public class CobolLanguageEngine {
 
   @Inject
   public CobolLanguageEngine(
-          TextPreprocessor preprocessor,
-          MessageService messageService,
-          ParseTreeListener treeListener,
-          SubroutineService subroutineService,
-          CachingConfigurationService cachingConfigurationService,
-          DialectService dialectService,
-          SymbolService symbolService, AstProcessor astProcessor,
-          InjectService injectService) {
+      TextPreprocessor preprocessor,
+      MessageService messageService,
+      ParseTreeListener treeListener,
+      SubroutineService subroutineService,
+      CachingConfigurationService cachingConfigurationService,
+      DialectService dialectService,
+      SymbolService symbolService,
+      AstProcessor astProcessor,
+      InjectService injectService) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.treeListener = treeListener;
@@ -121,7 +123,7 @@ public class CobolLanguageEngine {
    *     the client
    */
   @NonNull
-  public ResultWithErrors<Node> run(
+  public ResultWithErrors<AnalysisResult> run(
       @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
@@ -239,6 +241,7 @@ public class CobolLanguageEngine {
             embeddedCodeParts,
             messageService,
             subroutineService,
+            symbolService,
             dialectOutcome.getDialectNodes(),
             cachingConfigurationService);
     List<Node> syntaxTree = visitor.visit(tree);
@@ -277,34 +280,92 @@ public class CobolLanguageEngine {
     }
 
     return new ResultWithErrors<>(
-        rootNode, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
+        AnalysisResult.builder()
+                .rootNode(rootNode)
+                .symbolTableMap(symbolService.getProgramSymbols())
+                .build(),
+        accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
   private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx) {
     // Phase TRANSFORMATION
-    ctx.register(new ProcessorDescription(ProgramIdNode.class, ProcessingPhase.TRANSFORMATION, new ProgramIdProcess()));
-    ctx.register(new ProcessorDescription(SectionNode.class, ProcessingPhase.TRANSFORMATION, new ProcessNodeWithVariableDefinitions(symbolService)));
-    ctx.register(new ProcessorDescription(FileEntryNode.class, ProcessingPhase.TRANSFORMATION, new FileEntryProcess()));
-    ctx.register(new ProcessorDescription(FileDescriptionNode.class, ProcessingPhase.TRANSFORMATION, new FileDescriptionProcess(symbolService)));
-    ctx.register(new ProcessorDescription(DeclarativeProcedureSectionNode.class, ProcessingPhase.TRANSFORMATION, new DeclarativeProcedureSectionRegister()));
+    ctx.register(
+        new ProcessorDescription(
+            ProgramIdNode.class, ProcessingPhase.TRANSFORMATION, new ProgramIdProcess()));
+    ctx.register(
+        new ProcessorDescription(
+            SectionNode.class,
+            ProcessingPhase.TRANSFORMATION,
+            new ProcessNodeWithVariableDefinitions(symbolService)));
+    ctx.register(
+        new ProcessorDescription(
+            FileEntryNode.class, ProcessingPhase.TRANSFORMATION, new FileEntryProcess()));
+    ctx.register(
+        new ProcessorDescription(
+            FileDescriptionNode.class,
+            ProcessingPhase.TRANSFORMATION,
+            new FileDescriptionProcess(symbolService)));
+    ctx.register(
+        new ProcessorDescription(
+            DeclarativeProcedureSectionNode.class,
+            ProcessingPhase.TRANSFORMATION,
+            new DeclarativeProcedureSectionRegister(symbolService)));
     // Phase DEFINITION
-    ctx.register(new ProcessorDescription(ParagraphsNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock()));
-    ctx.register(new ProcessorDescription(SectionNameNode.class, ProcessingPhase.DEFINITION, new SectionNameRegister()));
-    ctx.register(new ProcessorDescription(ParagraphNameNode.class, ProcessingPhase.DEFINITION, new ParagraphNameRegister()));
-    ctx.register(new ProcessorDescription(ProcedureDivisionBodyNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock()));
+    ctx.register(
+        new ProcessorDescription(
+            ParagraphsNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock(symbolService)));
+    ctx.register(
+        new ProcessorDescription(
+            SectionNameNode.class,
+            ProcessingPhase.DEFINITION,
+            new SectionNameRegister(symbolService)));
+    ctx.register(
+        new ProcessorDescription(
+            ParagraphNameNode.class,
+            ProcessingPhase.DEFINITION,
+            new ParagraphNameRegister(symbolService)));
+    ctx.register(
+        new ProcessorDescription(
+            ProcedureDivisionBodyNode.class,
+            ProcessingPhase.DEFINITION,
+            new DefineCodeBlock(symbolService)));
     // Phase USAGE
-    ctx.register(new ProcessorDescription(CodeBlockUsageNode.class, ProcessingPhase.USAGE, new CodeBlockUsage()));
-    ctx.register(new ProcessorDescription(RootNode.class, ProcessingPhase.USAGE, new RootNodeUpdateCopyNodesByPositionInTree()));
-    ctx.register(new ProcessorDescription(QualifiedReferenceNode.class, ProcessingPhase.USAGE, new QualifiedReferenceUpdateVariableUsage()));
+    ctx.register(
+        new ProcessorDescription(
+            CodeBlockUsageNode.class, ProcessingPhase.USAGE, new CodeBlockUsage(symbolService)));
+    ctx.register(
+        new ProcessorDescription(
+            RootNode.class, ProcessingPhase.USAGE, new RootNodeUpdateCopyNodesByPositionInTree()));
+    ctx.register(
+        new ProcessorDescription(
+            QualifiedReferenceNode.class,
+            ProcessingPhase.USAGE,
+            new QualifiedReferenceUpdateVariableUsage()));
 
     // Phase VALIDATION
-    ctx.register(new ProcessorDescription(VariableWithLevelNode.class, ProcessingPhase.VALIDATION, new VariableWithLevelCheck()));
-    ctx.register(new ProcessorDescription(StatementNode.class, ProcessingPhase.VALIDATION, new StatementValidate()));
-    ctx.register(new ProcessorDescription(ElementaryNode.class, ProcessingPhase.VALIDATION, new ElementaryNodeCheck()));
-    ctx.register(new ProcessorDescription(GroupItemNode.class, ProcessingPhase.VALIDATION, new GroupItemCheck()));
-    ctx.register(new ProcessorDescription(ObsoleteNode.class, ProcessingPhase.VALIDATION, new ObsoleteNodeCheck()));
-    ctx.register(new ProcessorDescription(StandAloneDataItemNode.class, ProcessingPhase.VALIDATION, new StandAloneDataItemCheck()));
-    ctx.register(new ProcessorDescription(ProgramEndNode.class, ProcessingPhase.VALIDATION, new ProgramEndCheck()));
+    ctx.register(
+        new ProcessorDescription(
+            VariableWithLevelNode.class, ProcessingPhase.VALIDATION, new VariableWithLevelCheck()));
+    ctx.register(
+        new ProcessorDescription(
+            StatementNode.class, ProcessingPhase.VALIDATION, new StatementValidate()));
+    ctx.register(
+        new ProcessorDescription(
+            ElementaryNode.class, ProcessingPhase.VALIDATION, new ElementaryNodeCheck()));
+    ctx.register(
+        new ProcessorDescription(
+            GroupItemNode.class, ProcessingPhase.VALIDATION, new GroupItemCheck()));
+    ctx.register(
+        new ProcessorDescription(
+            ObsoleteNode.class, ProcessingPhase.VALIDATION, new ObsoleteNodeCheck()));
+    ctx.register(
+        new ProcessorDescription(
+            StandAloneDataItemNode.class,
+            ProcessingPhase.VALIDATION,
+            new StandAloneDataItemCheck()));
+    ctx.register(
+        new ProcessorDescription(
+            ProgramEndNode.class, ProcessingPhase.VALIDATION, new ProgramEndCheck()));
 
     // Dialects
     List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());
