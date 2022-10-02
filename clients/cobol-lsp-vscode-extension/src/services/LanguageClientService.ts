@@ -30,7 +30,6 @@ import {ConfigurationWorkspaceMiddleware} from "vscode-languageclient/lib/config
 import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
 import {LANGUAGE_ID} from "../constants";
 import {JavaCheck} from "./JavaCheck";
-import {Middleware} from "./Middleware";
 import {TelemetryService} from "./reporter/TelemetryService";
 import { SettingsService } from "./Settings";
 
@@ -42,7 +41,7 @@ export class LanguageClientService {
     private handlers: Array<(languageClient: LanguageClient) => void> = [];
     private isNativeBuildEnabled: boolean = false;
 
-    constructor(private middleware: Middleware, private outputChannel: vscode.OutputChannel) {
+    constructor(private outputChannel: vscode.OutputChannel) {
         const ext = vscode.extensions.getExtension(extensionId);
         this.executablePath = join(ext.extensionPath, "server", "jar", "server.jar");
     }
@@ -109,7 +108,7 @@ export class LanguageClientService {
             params: ConfigurationParams,
             token: vscode.CancellationToken,
             next: ConfigurationRequest.HandlerSignature) => {
-            return await this.middleware.handleConfigurationRequest(params, token, next);
+            return next(params, token);
         };
         const configurationMiddleware: ConfigurationWorkspaceMiddleware = {
             configuration: signatureFunc,

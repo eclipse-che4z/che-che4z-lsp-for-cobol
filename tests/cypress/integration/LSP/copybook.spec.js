@@ -72,7 +72,7 @@ context('This is a Copybook spec', () => {
         .getElementLineNumber()
         .then((lineNumber) => {
           expect(lineNumber).to.be.equal(19);
-          cy.getLineByNumber(lineNumber).find('span').eq(-1).click().realHover({ position: 'center' });
+          cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
         });
       cy.get(IDE.hoverOverContent).contains('BOOK3: Copybook not foundCOBOL Language Support');
     });
@@ -105,7 +105,7 @@ context('This is a Copybook spec', () => {
           .getElementLineNumber()
           .then((lineNumber) => {
             expect(lineNumber).to.be.equal(19);
-            cy.getLineByNumber(lineNumber).find('span').eq(-1).click().realHover({ position: 'center' });
+            cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
           });
         cy.get(IDE.hoverOverContent).contains('Recursive copybook declaration for: BOOK2R');
       },
@@ -143,7 +143,7 @@ context('This is a Copybook spec', () => {
           .getElementLineNumber()
           .then((lineNumber) => {
             expect(lineNumber).to.be.equal(52);
-            cy.getLineByNumber(lineNumber).find('span').eq(-1).click().realHover({ position: 'center' });
+            cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
           });
         cy.get(IDE.hoverOverContent).contains('Variable USER-PHONE-MOBILE1 is not defined');
       },
@@ -210,15 +210,13 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC174952 Copybook - not exist, but dynamically appears', () => {
-    afterEach(() => {
-      cy.closeFolder('.copybooks');
-    });
     it(
       ['smoke', 'CI'],
       'Checks that LSP can dynamically detect appearance of copybook and rescan cobol file on the fly',
       () => {
         cy.readFile('test_files/project/.copybooks/zowe-profile-1/DATA.SET.PATH2/BOOK3T.cpy').then((text) => {
           cy.writeFile('test_files/project/.copybooks/zowe-profile-1/DATA.SET.PATH2/BOOK3.cpy', text);
+          cy.closeFolder('.copybooks');
         });
         cy.openFolder('.copybooks/zowe-profile-1/DATA.SET.PATH2');
         cy.openFile('USERC1F.cbl');
@@ -374,19 +372,6 @@ context('This is a Copybook spec', () => {
     });
   });
 
-  describe("TC315293 program ID - 'COBOL Copybook'", () => {
-    it(
-      ['smoke', 'CI'],
-      "New program ID - 'COBOL copybook' is used in the following development \
-       for limited syntax awareness for the copybooks.",
-      () => {
-        cy.openFile('USERC1N1.cbl');
-        cy.selectLangMode().should('contain.text', 'COBOL');
-        cy.changeLangMode('COBOL Copybook');
-      },
-    );
-  });
-
   describe('TC318696 Load copybooks outside the workspace', () => {
     const copyBookNotFound = () => {
       return cy
@@ -493,12 +478,12 @@ context('This is a Copybook spec', () => {
         .contains("Syntax error on 'FILE-CONTROsL'");
     });
   });
-
+  //Refactor COPY MAID statements test
   describe('TC327253 Support COPY MAID statements', () => {
     beforeEach(() => {
       cy.updateConfigs('testing');
     });
-    it(['smoke', 'ci'], 'Support COPY MAID statements', () => {
+    it.skip(['smoke', 'ci'], 'Support COPY MAID statements', () => {
       cy.openFile('TEST.CBL');
       cy.goToLine(20);
       cy.getLineByNumber(20).type('{end}{enter}    05 COPY MAID A.');

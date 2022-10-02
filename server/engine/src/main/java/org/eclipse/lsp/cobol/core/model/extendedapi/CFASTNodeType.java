@@ -26,6 +26,8 @@ public enum CFASTNodeType {
   PERFORM("perform"),
   SECTION("section"),
   STOP("stop"),
+  EXIT("exit"),
+  GOBACK("goback"),
   IF("if"),
   ELSE("else"),
   ENDIF("endif"),

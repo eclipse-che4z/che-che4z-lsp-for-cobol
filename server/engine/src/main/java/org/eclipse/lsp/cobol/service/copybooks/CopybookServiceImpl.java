@@ -14,37 +14,37 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
+import static java.util.stream.Collectors.toList;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
-import org.eclipse.lsp.cobol.service.SettingsService;
+import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
-
-import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-
-import static java.lang.String.join;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK_DOWNLOAD;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK_RESOLVE;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.QUIET;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.VERBOSE;
 
 /**
  * This service processes copybook requests and returns content by its name. The service also caches
@@ -55,7 +55,7 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.VERBOSE
 @SuppressWarnings("UnstableApiUsage")
 public class CopybookServiceImpl implements CopybookService {
 
-  private final SettingsService settingsService;
+  private final Provider<CobolLanguageClient> clientProvider;
   private final FileSystemService files;
   public final TextPreprocessor preprocessor;
   private static final String COBOL = "COBOL";
@@ -68,12 +68,12 @@ public class CopybookServiceImpl implements CopybookService {
   @Inject
   public CopybookServiceImpl(
       DataBusBroker dataBus,
-      SettingsService settingsService,
+      Provider<CobolLanguageClient> clientProvider,
       FileSystemService files,
       TextPreprocessor preprocessor,
       CopybookCache copybookCache) {
-    this.settingsService = settingsService;
     this.files = files;
+    this.clientProvider = clientProvider;
     this.preprocessor = preprocessor;
     this.copybookCache = copybookCache;
     dataBus.subscribe(this);
@@ -194,13 +194,10 @@ public class CopybookServiceImpl implements CopybookService {
   private Optional<String> resolveCopybookFromWorkspace(
       CopybookName copybookName, String mainProgramFileName) {
     try {
-      return SettingsService.getValueAsString(
-          settingsService.fetchConfiguration(
-              COPYBOOK_RESOLVE.label,
-              mainProgramFileName,
-              copybookName.getDisplayName(),
-              Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL)).get()
-      );
+      return Optional.ofNullable(clientProvider.get().resolveCopybook(
+          mainProgramFileName,
+          copybookName.getDisplayName(),
+          Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL)).get());
     } catch (InterruptedException e) {
       // rethrowing the InterruptedException to interrupt the parent thread.
       throw new UncheckedExecutionException(e);
@@ -244,25 +241,21 @@ public class CopybookServiceImpl implements CopybookService {
     String document = files.getNameFromURI(documentUri);
 
     if (event.getCopybookProcessingMode().download) {
-      List<String> copybooksToDownload =
+      List<CopybookName> copybooksToDownload =
           uris.stream()
               .map(files::getNameFromURI)
               .map(copybooksForDownloading::remove)
               .filter(Objects::nonNull)
               .flatMap(Set::stream)
-              .map(
-                  copybook ->
-                      join(
-                          ".",
-                          COPYBOOK_DOWNLOAD.label,
-                          getUserInteractionType(event.getCopybookProcessingMode()),
-                          document,
-                          copybook.getQualifiedName(),
-                          Optional.ofNullable(copybook.getDialectType()).orElse(COBOL)))
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
       if (!copybooksToDownload.isEmpty()) {
-        settingsService.fetchConfigurations(copybooksToDownload);
+        clientProvider.get().downloadCopybooks(
+            document,
+            copybooksToDownload.stream().map(CopybookName::getQualifiedName).collect(toList()),
+            Optional.ofNullable(copybooksToDownload.stream().findFirst().get().getDialectType()).orElse(COBOL),
+            !event.getCopybookProcessingMode().userInteraction);
+
       }
     }
   }
@@ -272,7 +265,4 @@ public class CopybookServiceImpl implements CopybookService {
     return ImmutableMap.copyOf(copybooksForDownloading);
   }
 
-  private String getUserInteractionType(CopybookProcessingMode copybookProcessingMode) {
-    return copybookProcessingMode.userInteraction ? VERBOSE.label : QUIET.label;
-  }
 }
