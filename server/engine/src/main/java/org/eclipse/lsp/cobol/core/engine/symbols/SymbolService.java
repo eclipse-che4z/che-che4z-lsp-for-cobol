@@ -312,11 +312,25 @@ public class SymbolService {
 
   /**
    * Get variables data
+   *
    * @param programNode the program node
    * @return map of variables
    */
   public Multimap<String, VariableNode> getVariables(ProgramNode programNode) {
     return createOrGetSymbolTable(programNode).getVariables();
+  }
+
+  /**
+   * Remove program related symbols
+   *
+   * @param documentUri the program uri
+   */
+  public void reset(String documentUri) {
+    programSymbols.keySet().stream()
+        .filter(k -> k.endsWith("%" + documentUri))
+        .collect(Collectors.toList())
+        .forEach(programSymbols::remove);
+    programSymbols.remove(documentUri);
   }
 
   @Value
