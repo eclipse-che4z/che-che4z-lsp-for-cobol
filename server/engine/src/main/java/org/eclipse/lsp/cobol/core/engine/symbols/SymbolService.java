@@ -319,6 +319,14 @@ public class SymbolService {
     return createOrGetSymbolTable(programNode).getVariables();
   }
 
+  /**
+   * Remove program related symbols
+   * @param documentUri the program uri
+   */
+  public void reset(String documentUri) {
+    programSymbols.remove(documentUri);
+  }
+
   @Value
   private static class Element implements Context {
     String name;

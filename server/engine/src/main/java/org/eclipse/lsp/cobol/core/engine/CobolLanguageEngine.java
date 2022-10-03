@@ -129,6 +129,7 @@ public class CobolLanguageEngine {
     Timing.Builder timingBuilder = Timing.builder();
 
     timingBuilder.getDialectsTimer().start();
+    symbolService.reset(documentUri);
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     TextTransformations cleanText =
         preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
