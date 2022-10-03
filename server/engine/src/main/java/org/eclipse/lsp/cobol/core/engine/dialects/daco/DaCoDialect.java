@@ -100,6 +100,11 @@ public final class DaCoDialect implements CobolDialect {
             context.getExtendedSource().getText(), nodes, context.getCopybookConfig());
 
     DialectOutcome result = new DialectOutcome(nodes, implicitCode, context);
+    // Map errors locations
+    errors.forEach(error -> {
+      error.getLocality().setRange(
+              context.getExtendedSource().mapLocationUnsafe(error.getLocality().getRange()).getRange());
+    });
     return new ResultWithErrors<>(result, errors);
   }
 
