@@ -104,11 +104,6 @@ describe("LanguageClientService positive scenario", () => {
             options: { stdio: "pipe", detached: false },
         }, {
             documentSelector: [SERVER_ID],
-            middleware: {
-                workspace: {
-                    configuration: expect.any(Function),
-                },
-            },
             outputChannel: expect.any(Function),
         });
     });
@@ -121,11 +116,6 @@ describe("LanguageClientService positive scenario", () => {
         expect(LanguageClient).toHaveBeenLastCalledWith(SERVER_ID, SERVER_DESC,
             expect.any(Function), {
             documentSelector: [SERVER_ID],
-            middleware: {
-                workspace: {
-                    configuration: expect.any(Function),
-                },
-            },
             outputChannel: expect.any(Function),
         });
     });

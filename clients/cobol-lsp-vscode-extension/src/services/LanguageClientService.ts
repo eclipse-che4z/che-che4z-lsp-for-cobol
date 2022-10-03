@@ -104,19 +104,8 @@ export class LanguageClientService {
     }
 
     private createClientOptions(): LanguageClientOptions {
-        const signatureFunc: ConfigurationRequest.MiddlewareSignature = async (
-            params: ConfigurationParams,
-            token: vscode.CancellationToken,
-            next: ConfigurationRequest.HandlerSignature) => {
-            return next(params, token);
-        };
-        const configurationMiddleware: ConfigurationWorkspaceMiddleware = {
-            configuration: signatureFunc,
-        };
-
         return {
             documentSelector: [LANGUAGE_ID],
-            middleware: {workspace: configurationMiddleware},
             outputChannel: this.outputChannel,
         };
     }
