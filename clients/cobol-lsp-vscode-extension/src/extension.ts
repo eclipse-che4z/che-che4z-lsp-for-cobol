@@ -24,20 +24,22 @@ import { clearCache } from "./commands/ClearCopybookCacheCommand";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab } from "./commands/SmartTabCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
-import { Middleware } from "./services/Middleware";
 import { TelemetryService } from "./services/reporter/TelemetryService";
 import { createFileWithGivenPath, SettingsService } from "./services/Settings";
 import { pickSnippet, SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
+import {
+    downloadCopybookHandler,
+    resolveCopybookHandler
+} from "./services/copybook/CopybookMessageHandler";
 
 let languageClientService: LanguageClientService;
 
 function initialize() {
     // We need lazy initialization to be able to mock this for unit testing
     const copyBooksDownloader = new CopybookDownloadService();
-    const middleware = new Middleware(copyBooksDownloader);
     const outputChannel = vscode.window.createOutputChannel( "COBOL Language Support");
-    languageClientService = new LanguageClientService(middleware, outputChannel);
+    languageClientService = new LanguageClientService(outputChannel);
     return {copyBooksDownloader, outputChannel};
 }
 
@@ -107,6 +109,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // Custom client handlers
     languageClientService.addRequestHandler("cobol/resolveSubroutine", resolveSubroutineURI);
+    languageClientService.addRequestHandler("copybook/resolve", resolveCopybookHandler);
+    languageClientService.addRequestHandler("copybook/download", downloadCopybookHandler);
 
     context.subscriptions.push(languageClientService.start());
 
