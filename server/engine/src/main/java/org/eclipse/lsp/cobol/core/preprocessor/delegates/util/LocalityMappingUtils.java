@@ -103,8 +103,53 @@ public class LocalityMappingUtils {
         i += embeddedCode.getShift();
       } else {
         mapToken(token, documentPositions, tokenAccumulator, documentHierarchyStack);
+        if (!tokenAccumulator.containsKey(token) && !(token.getType() == COPYENTRY || token.getType() == COPYEXIT)) {
+          i = expandEmbeddedTokens(tokens, documentHierarchyStack, tokenAccumulator, i);
+        }
       }
     }
+  }
+
+  private int expandEmbeddedTokens(List<Token> tokens, Deque<DocumentHierarchyLevel> documentHierarchyStack, Map<Token, Locality> tokenAccumulator, int i) {
+    int extendedIndex = expandEmbeddedTokensToMatchCurrentLocality(tokens, documentHierarchyStack, tokenAccumulator, i);
+    if (extendedIndex == i) {
+      handleNoLocalityMatchForExpandedEmbeddedTokens(tokens, documentHierarchyStack, tokenAccumulator, i);
+    } else {
+      i = extendedIndex;
+    }
+    return i;
+  }
+
+  private void handleNoLocalityMatchForExpandedEmbeddedTokens(List<Token> tokens, Deque<DocumentHierarchyLevel> documentHierarchyStack, Map<Token, Locality> tokenAccumulator, int i) {
+    DocumentHierarchyLevel document = currentDocument(documentHierarchyStack);
+    tokenAccumulator.put(tokens.get(i), document.getLastLocality());
+    document.forward();
+  }
+
+  private int expandEmbeddedTokensToMatchCurrentLocality(
+      List<Token> tokens,
+      Deque<DocumentHierarchyLevel> documentHierarchyStack,
+      Map<Token, Locality> tokenAccumulator,
+      int currentIndex) {
+    DocumentHierarchyLevel documentHierarchyLevel = currentDocument(documentHierarchyStack);
+    Optional<Locality> currentDocument = ofNullable(documentHierarchyLevel.getCurrent());
+    StringBuilder currentEmbeddedTokenText = new StringBuilder();
+    if (currentDocument.isPresent()
+        && currentDocument.get().getToken().startsWith(currentEmbeddedTokenText.toString())) {
+      List<Integer> matchedTokenIndex = new ArrayList<>();
+      for (int j = currentIndex; j < tokens.size(); j++) {
+        matchedTokenIndex.add(j);
+        currentEmbeddedTokenText.append(tokens.get(j).getText());
+        if (currentDocument.get().getToken().contentEquals(currentEmbeddedTokenText)) {
+          currentIndex = j;
+          matchedTokenIndex.forEach(
+              element ->
+                  tokenAccumulator.put(tokens.get(element), documentHierarchyLevel.getCurrent()));
+          documentHierarchyLevel.forward();
+        }
+      }
+    }
+    return currentIndex;
   }
 
   private void mapToken(
@@ -231,6 +276,6 @@ public class LocalityMappingUtils {
    */
   private boolean tokenMatches(
       String token, Locality position, @NonNull DocumentHierarchyLevel localitySource) {
-    return token.equals(position.getToken()) || localitySource.isLastLocality(position);
+    return token.equals(position.getToken());
   }
 }

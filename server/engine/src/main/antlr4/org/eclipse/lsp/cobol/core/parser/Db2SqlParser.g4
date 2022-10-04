@@ -196,7 +196,7 @@ dbs_alter_tablespace: TABLESPACE dbs_database_name? dbs_table_space_name (DROP P
                       MEMBER CLUSTER (YES|NO) | TRACKMOD (YES|NO) | dbs_alter_tablespace_using | dbs_alter_tablespace_free | dbs_alter_tablespace_gbpcache)+) dbs_alter_tablespace_alter?;
 
 dbs_alter_tablespace_move: MOVE TABLE dbs_table_name TO TABLESPACE (dbs_database_name DOT_FS)? dbs_table_space_name;
-dbs_alter_tablespace_using: (USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name) | (PRIQTY | SECQTY) dbs_integer | ERASE (YES|NO))+;
+dbs_alter_tablespace_using: (USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name) | (PRIQTY | SECQTY) MINUSCHAR? dbs_integer | ERASE (YES|NO))+;
 dbs_alter_tablespace_free: (FREEPAGE dbs_integer | PCTFREE dbs_smallint? (FOR UPDATE dbs_smallint)?)+;
 dbs_alter_tablespace_gbpcache: GBPCACHE (CHANGED | ALL | SYSTEM | NONE);
 dbs_alter_tablespace_alter: (ALTER PARTITION dbs_integer dbs_alter_tablespace_loop)+;
@@ -595,7 +595,7 @@ dbs_describe_cursor: CURSOR (dbs_cursor_name | dbs_host_variable) INTO dbs_descr
 dbs_describe_input: INPUT dbs_statement_name INTO dbs_descriptor_name;
 dbs_describe_output: OUTPUT? dbs_statement_name INTO dbs_descriptor_name (USING (NAMES | LABELS | ANY | BOTH))?;
 dbs_describe_procedure: PROCEDURE (dbs_procedure_name | dbs_host_variable) INTO dbs_descriptor_name;
-dbs_describe_table: TABLE dbs_host_variable INTO dbs_descriptor_name (USING (NAMES | LABELS | ANY | BOTH))?;
+dbs_describe_table: TABLE dbs_host_names_var INTO dbs_descriptor_name (USING (NAMES | LABELS | ANY | BOTH))?;
 
 
 /*DROP */
@@ -907,7 +907,7 @@ dbs_orderby_clause: ORDER BY (INPUT SEQUENCE | ORDER OF dbs_table_designator | d
 dbs_sort_key:  INTEGERLITERAL | dbs_sort_key_expression;
 dbs_offset_clause: OFFSET INTEGERLITERAL (ROW | ROWS);
 
-dbs_fullselect: (dbs_subselect | LPARENCHAR dbs_fullselect RPARENCHAR | dbs_value_clause | dbs_select_into)
+dbs_fullselect: (dbs_select_into | LPARENCHAR dbs_fullselect RPARENCHAR | dbs_value_clause | dbs_subselect)
 ((UNION|EXCEPT|INTERSECT) (DISTINCT|ALL)? (dbs_subselect | LPARENCHAR dbs_fullselect RPARENCHAR))*
 dbs_orderby_clause? dbs_offset_clause? dbs_fetch_clause?;
 dbs_value_clause: VALUES dbs_sequence_reference | LPARENCHAR dbs_sequence_reference (dbs_comma_separator dbs_sequence_reference)* RPARENCHAR;
@@ -1053,7 +1053,7 @@ dbs_values_into: (dbs_expression | NULL | LPARENCHAR (dbs_expression | NULL) (db
 dbs_values_target: (dbs_global_variable_name | dbs_host_variable | dbs_sql_parameter_name | dbs_sql_variable_name | dbs_transition_variable_name);
 
 /*WHENEVER */
-dbs_whenever: WHENEVER (NOT FOUND | SQLERROR | SQLWARNING) (CONTINUE | (GOTO | GO TO) COLONCHAR? dbs_host_label);
+dbs_whenever: WHENEVER (NOT FOUND | SQLERROR | SQLWARNING) (CONTINUE | (GOTO | GO TO) COLONCHAR? dbs_host_name_container);
 
 /*data types*/
 data_type: (common_built_in_type | data_type_arr_or_distinct);
@@ -1075,7 +1075,7 @@ common_bit_decimal_opt: (DECIMAL | DEC | NUMERIC);
 common_bit_decimal: common_bit_decimal_opt  (LPARENCHAR (dbs_integer (dbs_comma_separator dbs_integer)? | NUMERICLITERAL) RPARENCHAR)?;
 common_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
 common_bit_decfloat: DECFLOAT (LPARENCHAR (dbs_integer34
-             | LEVEL_NUMBER {validate34or16($LEVEL_NUMBER.text);}
+             | INTEGERLITERAL {validate34or16($INTEGERLITERAL.text);}
              | dbs_integer16) RPARENCHAR)?;
 common_bit_char: (CHARACTER | CHAR) (VARYING common_bit_varandchar | LARGE OBJECT common_bit_clobandobj | LPARENCHAR dbs_integer RPARENCHAR common_bit_charopts);
 common_bit_char2: ((CHARACTER | CHAR) (LPARENCHAR dbs_integer RPARENCHAR)? | (VARCHAR | (CHARACTER | CHAR) VARYING) (LPARENCHAR dbs_integer RPARENCHAR)) (common_bit_fordata | CCSID dbs_integer1208)?;
@@ -1305,7 +1305,7 @@ dbs_expression: (PLUSCHAR | MINUSCHAR)? (dbs_function_invocation |
  dbs_sequence_reference |
  dbs_variable);
 
-dbs_expression_operator: (CONCAT | PIPECHAR | SLASHCHAR | ASTERISKCHAR | PLUSCHAR | MINUSCHAR);
+dbs_expression_operator: (CONCAT | PIPECHAR | PIPECHAR2 | SLASHCHAR | ASTERISKCHAR | PLUSCHAR | MINUSCHAR);
 
 dbs_expressions: (dbs_expression| LPARENCHAR dbs_expressions RPARENCHAR) (dbs_expression_operator dbs_expression)* (AS common_built_in_type_core)?;
 //https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_predicatesoverview.html
@@ -1464,7 +1464,9 @@ dbs_collection_id: IDENTIFIER;
 dbs_collection_id_package_name: FILENAME;
 dbs_collection_name: T=dbs_sql_identifier {validateLength($T.text, "collection name", 128);}; // SQLIDENTIFIER are case sensitive. allows only uppercase or quoted string as per doc.
 dbs_generic_name: dbs_host_names | NONNUMERICLITERAL;
-dbs_host_names: dbs_special_name | IDENTIFIER;
+dbs_host_names: dbs_special_name | IDENTIFIER ;
+dbs_host_names_var:  COLONCHAR? dbs_host_name_container;
+dbs_host_name_container: dbs_host_names (MINUSCHAR (dbs_host_names | INTEGERLITERAL))*;
 dbs_special_name: ABSOLUTE | ACCELERATION | ACCELERATOR | ACCESS | ACCESSCTRL | ACCTNG| ACTION | ACTIVATE | ACTIVE
                   | ADD | ADDRESS | AFTER | AGE| ALGORITHM | ALIAS | ALL | ALLOCATE | ALLOW | ALTER | ALTERIN | ALWAYS
                   | AND | ANY | APPEND | APPLCOMPAT | APPLICATION | APPLNAME | ARCHIVE | ARRAY| ARRAY_EXISTS | AS
@@ -1584,11 +1586,9 @@ dbs_function_name: T=dbs_sql_identifier {validateLength($T.text, "function name"
 dbs_global_variable_name: dbs_generic_name | ROWID;
 dbs_graphic_string_constant: GRAPHIC_CONSTANT;
 dbs_history_table_name: dbs_table_name;
-dbs_host_label: IDENTIFIER | HANDLER;
-dbs_host_variable: dbs_host_variable_val (INDICATOR? dbs_host_variable_val)?;
-dbs_host_variable_val: COLONCHAR? dbs_host_var_identifier;
+dbs_host_variable: dbs_host_var_identifier (INDICATOR? dbs_host_var_identifier)?;
 dbs_host_variable_array: IDENTIFIER; // variable array must be defined in the application program
-dbs_host_var_identifier: T=dbs_host_names {validateLength($T.text, "host variable name", 128);};
+dbs_host_var_identifier: T=dbs_host_names_var {validateLength($T.text, "host variable name", 128);};
 dbs_id_host_variable: NUMERICLITERAL;
 dbs_identifier: dbs_sql_identifier;
 dbs_imptkmod_param: YES | NO;
@@ -1629,7 +1629,7 @@ dbs_registered_xml_schema_name: dbs_sql_identifier;
 dbs_result_expression1: dbs_expressions;
 dbs_role_name: T=dbs_sql_identifier+ {validateLength($T.text, "role name", 128);};
 dbs_routine_version_id: IDENTIFIER {validateLength($IDENTIFIER.text, "Routine version identifier in UTF-8", 122);};
-dbs_rs_locator_variable: COLONCHAR? dbs_sql_identifier;
+dbs_rs_locator_variable: dbs_host_var_identifier;
 dbs_run_time_options: NONNUMERICLITERAL; // a character string that is no longer than 254 bytes
 dbs_s: SINGLEDIGITLITERAL ; // a number between 1 and 9
 dbs_sc_name: IDENTIFIER;// must be from 1-8 characters in length
