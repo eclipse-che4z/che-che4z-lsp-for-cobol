@@ -97,4 +97,12 @@ class DocumentHierarchyLevel {
   public boolean isLastLocality(Locality locality) {
     return localities.indexOf(locality) == localities.size() - 1;
   }
+
+  /**
+   * Returns the last locality in the list
+   * @return last locality in the list
+   */
+  public Locality getLastLocality() {
+    return localities.get(localities.size() - 1);
+  }
 }
