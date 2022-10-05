@@ -23,11 +23,17 @@ import org.eclipse.lsp.cobol.core.model.ErrorCode;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
-import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.InitializeParams;
+import org.eclipse.lsp4j.InitializeResult;
+import org.eclipse.lsp4j.InitializedParams;
+import org.eclipse.lsp4j.ServerCapabilities;
+import org.eclipse.lsp4j.TextDocumentSyncKind;
+import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.verification.Times;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -81,6 +87,10 @@ class CobolLanguageServerTest {
     when(settingsService.fetchTextConfiguration(anyString())).thenCallRealMethod();
     when(settingsService.fetchConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.fetchConfiguration(DaCo_CPY_LOCAL_PATHS.label))
+            .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.fetchConfiguration(IDMS_CPY_LOCAL_PATHS.label))
+            .thenReturn(completedFuture(singletonList(arr)));
     when(localeStore.notifyLocaleStore()).thenReturn(System.out::println);
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList(arr)));
@@ -106,8 +116,10 @@ class CobolLanguageServerTest {
     verify(watchingService).watchConfigurationChange();
     verify(watchingService).watchPredefinedFolder();
     verify(settingsService).fetchConfiguration(CPY_LOCAL_PATHS.label);
+    verify(settingsService).fetchConfiguration(DaCo_CPY_LOCAL_PATHS.label);
+    verify(settingsService).fetchConfiguration(IDMS_CPY_LOCAL_PATHS.label);
     verify(settingsService).fetchConfiguration(LOCALE.label);
-    verify(watchingService).addWatchers(singletonList(path));
+    verify(watchingService, new Times(3)).addWatchers(singletonList(path));
     verify(localeStore).notifyLocaleStore();
     verify(configurationService).updateConfigurationFromSettings();
   }

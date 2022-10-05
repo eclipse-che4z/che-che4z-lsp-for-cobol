@@ -201,6 +201,12 @@ public class CobolLanguageServer implements LanguageServer {
         .fetchTextConfiguration(CPY_LOCAL_PATHS.label)
         .thenAccept(watchingService::addWatchers);
     settingsService
+            .fetchTextConfiguration(DaCo_CPY_LOCAL_PATHS.label)
+            .thenAccept(watchingService::addWatchers);
+    settingsService
+            .fetchTextConfiguration(IDMS_CPY_LOCAL_PATHS.label)
+            .thenAccept(watchingService::addWatchers);
+    settingsService
         .fetchTextConfiguration(SUBROUTINE_LOCAL_PATHS.label)
         .thenAccept(watchingService::addWatchers);
   }
