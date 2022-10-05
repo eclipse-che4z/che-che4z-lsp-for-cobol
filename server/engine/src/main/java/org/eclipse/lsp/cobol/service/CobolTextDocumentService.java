@@ -14,36 +14,18 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.Builder;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.model.CopybookModel;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -54,6 +36,8 @@ import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
 import org.eclipse.lsp.cobol.jrpc.ExtendedApi;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
@@ -94,6 +78,31 @@ import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.lang.String.format;
+import static java.net.URLDecoder.decode;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
+
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
  * that start with "textDocument" go here. The current implementation contains only supported
@@ -128,6 +137,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final ConfigurationService configurationService;
   private DisposableLSPStateService disposableLSPStateService;
   private final CopybookNameService copybookNameService;
+  private final CopybookService copybookService;
+  private final CopybookReferenceRepo copybookReferenceRepo;
   private final Map<String, Map<String, List<Diagnostic>>> errorsByFileForEachProgram;
 
   @Inject
@@ -146,7 +157,9 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       CFASTBuilder cfastBuilder,
       DisposableLSPStateService disposableLSPStateService,
       CopybookNameService copybookNameService,
-      ConfigurationService configurationService) {
+      ConfigurationService configurationService,
+      CopybookService copybookService,
+      CopybookReferenceRepo copybookReferenceRepo) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -161,6 +174,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.configurationService = configurationService;
     this.copybookNameService = copybookNameService;
     this.errorsByFileForEachProgram = new HashMap<>();
+    this.copybookService = copybookService;
+    this.copybookReferenceRepo = copybookReferenceRepo;
     dataBus.subscribe(this);
   }
 
@@ -286,6 +301,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     analyzeDocumentFirstTime(uri, text, false);
   }
 
+  @SneakyThrows
   @Override
   public void didChange(DidChangeTextDocumentParams params) {
     if (disposableLSPStateService.isServerShutdown()) return;
@@ -293,11 +309,30 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     outlineMap.put(uri, new CompletableFuture<>());
     cfAstMap.put(uri, new CompletableFuture<>());
     if (copybookNameService.isCopybook(uri)) {
+      reanalyseOpenedPrograms(params, uri);
       return;
     }
     String text = params.getContentChanges().get(0).getText();
     interruptAnalysis(uri);
     analyzeChanges(uri, text);
+  }
+
+  private void reanalyseOpenedPrograms(DidChangeTextDocumentParams params, String uri)
+      throws UnsupportedEncodingException {
+    copybookReferenceRepo
+        .getCopybookUsageReference(decode(uri, StandardCharsets.UTF_8.name()))
+        .forEach(
+            val -> {
+              CopybookModel copybookModel =
+                  new CopybookModel(
+                      new CopybookName(
+                          val.getCopybookName().getDisplayName(),
+                          val.getCopybookName().getDialectType()),
+                      uri,
+                      params.getContentChanges().get(0).getText());
+              this.copybookService.store(copybookModel, val.getUri(), true);
+            });
+    dataBus.postData(new RunAnalysisEvent(false));
   }
 
   @Override

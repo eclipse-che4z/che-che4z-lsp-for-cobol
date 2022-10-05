@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
-import static java.util.stream.Collectors.toList;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
@@ -24,15 +22,6 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
@@ -45,6 +34,18 @@ import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
+
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * This service processes copybook requests and returns content by its name. The service also caches
@@ -64,6 +65,7 @@ public class CopybookServiceImpl implements CopybookService {
       new ConcurrentHashMap<>(8, 0.9f, 1);
 
   private final CopybookCache copybookCache;
+  private final CopybookReferenceRepo copybookReferenceRepo;
 
   @Inject
   public CopybookServiceImpl(
@@ -71,11 +73,13 @@ public class CopybookServiceImpl implements CopybookService {
       Provider<CobolLanguageClient> clientProvider,
       FileSystemService files,
       TextPreprocessor preprocessor,
-      CopybookCache copybookCache) {
+      CopybookCache copybookCache,
+      CopybookReferenceRepo copybookReferenceRepo) {
     this.files = files;
     this.clientProvider = clientProvider;
     this.preprocessor = preprocessor;
     this.copybookCache = copybookCache;
+    this.copybookReferenceRepo = copybookReferenceRepo;
     dataBus.subscribe(this);
   }
 
@@ -84,6 +88,7 @@ public class CopybookServiceImpl implements CopybookService {
     LOG.debug("Copybooks for downloading: {}", copybooksForDownloading);
     LOG.debug("Copybook cache: {}", copybookCache);
     LOG.debug("Cache invalidated");
+    copybookReferenceRepo.clearReferences();
     copybooksForDownloading.clear();
     copybookCache.invalidateAll();
   }
@@ -116,6 +121,7 @@ public class CopybookServiceImpl implements CopybookService {
         if (preprocess) {
           copybookModel = cleanupCopybook(copybookModel);
         }
+        copybookReferenceRepo.storeCopybookUsageReference(copybookName, documentUri, copybookModel);
         return copybookModel;
       });
     } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
@@ -127,6 +133,14 @@ public class CopybookServiceImpl implements CopybookService {
   @Override
   public void store(CopybookModel copybookModel, String documentUri) {
     copybookCache.store(copybookModel, documentUri);
+  }
+
+  @Override
+  public void store(CopybookModel copybookModel, String documentUri, boolean doCleanUp) {
+    if (doCleanUp) {
+      copybookModel = cleanupCopybook(copybookModel);
+    }
+    store(copybookModel, documentUri);
   }
 
   private CopybookModel resolveSync(
@@ -253,7 +267,7 @@ public class CopybookServiceImpl implements CopybookService {
         clientProvider.get().downloadCopybooks(
             document,
             copybooksToDownload.stream().map(CopybookName::getQualifiedName).collect(toList()),
-            Optional.ofNullable(copybooksToDownload.stream().findFirst().get().getDialectType()).orElse(COBOL),
+            Optional.ofNullable(copybooksToDownload.stream().findFirst().get().getDialectType()).orElse(COBOL), //NOSONAR
             !event.getCopybookProcessingMode().userInteraction);
 
       }

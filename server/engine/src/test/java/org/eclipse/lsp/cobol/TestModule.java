@@ -22,10 +22,7 @@ import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.*;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
+import org.eclipse.lsp.cobol.service.copybooks.*;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.actions.FindCopybookCommand;
@@ -74,6 +71,7 @@ public class TestModule extends AbstractModule {
     bind(WatcherService.class).to(WatcherServiceImpl.class);
     bind(FileSystemService.class).to(WorkspaceFileService.class);
     bind(CopybookNameService.class).to(CopybookNameServiceImpl.class);
+    bind(CopybookReferenceRepo.class).to(CopybookReferenceRepoImpl.class);
     bind(String.class)
         .annotatedWith(named(PATH_TO_TEST_RESOURCES))
         .toProvider(() -> ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));

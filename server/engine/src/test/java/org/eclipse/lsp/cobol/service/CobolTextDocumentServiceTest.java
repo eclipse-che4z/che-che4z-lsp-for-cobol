@@ -359,6 +359,19 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   }
 
   /**
+   * This test verifies that when a copybook document updated in DID_CHANGE mode, the analysis is triggered with updated cache
+   */
+  @Test
+  void copybookChangeTriggerReAnalysisDidChangeTest() {
+    mockSettingServiceForCopybooks(Boolean.TRUE);
+    service.didChange(
+            new DidChangeTextDocumentParams(
+                    new VersionedTextDocumentIdentifier(COPYBOOK_URI, 0),
+                    ImmutableList.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
+    verify(broker).postData(any(RunAnalysisEvent.class));
+  }
+
+  /**
    * This test checks that {@link CobolTextDocumentService} is subscribed to the databus events and
    * may re-run analysis of the open documents if it receives a notification.
    */

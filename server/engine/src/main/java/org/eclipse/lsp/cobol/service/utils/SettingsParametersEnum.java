@@ -26,6 +26,8 @@ public enum SettingsParametersEnum {
   VERBOSE("verbose"),
   DATASETS("cpy-manager.paths-dsn"),
   CPY_LOCAL_PATHS("cpy-manager.paths-local"),
+  DaCo_CPY_LOCAL_PATHS("cpy-manager.daco.paths-local"),
+  IDMS_CPY_LOCAL_PATHS("cpy-manager.idms.paths-local"),
   CPY_EXTENSIONS("cpy-manager.copybook-extensions"),
   SUBROUTINE_LOCAL_PATHS("subroutine-manager.paths-local"),
   LSP_PREFIX("cobol-lsp"),

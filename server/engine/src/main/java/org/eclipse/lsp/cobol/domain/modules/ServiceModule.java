@@ -19,6 +19,8 @@ import com.google.inject.multibindings.Multibinder;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.*;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActionProvider;
@@ -69,6 +71,7 @@ public class ServiceModule extends AbstractModule {
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(HoverProvider.class).to(VariableHover.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
+    bind(CopybookReferenceRepo.class).to(CopybookReferenceRepoImpl.class);
 
     bindFormations();
     bindCompletions();
