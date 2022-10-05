@@ -103,7 +103,10 @@ public class LocalityMappingUtils {
         i += embeddedCode.getShift();
       } else {
         mapToken(token, documentPositions, tokenAccumulator, documentHierarchyStack);
-        if (!tokenAccumulator.containsKey(token) && !(token.getType() == COPYENTRY || token.getType() == COPYEXIT)) {
+        Locality currentLocality = currentDocument(documentHierarchyStack).getCurrent();
+        if (!tokenAccumulator.containsKey(token)
+            && !(token.getType() == COPYENTRY || token.getType() == COPYEXIT)
+            && Objects.nonNull(currentLocality)) {
           i = expandEmbeddedTokens(tokens, documentHierarchyStack, tokenAccumulator, i);
         }
       }
