@@ -1309,7 +1309,7 @@ dbs_expression_operator: (CONCAT | PIPECHAR | PIPECHAR2 | SLASHCHAR | ASTERISKCH
 
 dbs_expressions: (dbs_expression| LPARENCHAR dbs_expressions RPARENCHAR) (dbs_expression_operator dbs_expression)* (AS common_built_in_type_core)?;
 //https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_predicatesoverview.html
-dbs_predicate_condition: (EQUALCHAR | ERRORCHAR EQUALCHAR | LESSTHANCHAR | MORETHANCHAR | MORETHANOREQUAL | LESSTHANOREQUAL);
+dbs_predicate_condition: (EQUALCHAR | ERRORCHAR EQUALCHAR | LESSTHANCHAR | MORETHANCHAR | MORETHANOREQUAL | LESSTHANOREQUAL | NOTEQUALCHAR);
 dbs_basic_predicate: dbs_expressions dbs_predicate_condition dbs_expressions | dbs_expressions IS NULL;
 dbs_quantified_predicate: dbs_expression dbs_predicate_condition (SOME|ANY|ALL)  LPARENCHAR dbs_select RPARENCHAR;
 dbs_array_exists_predicate: ARRAY_EXISTS LPARENCHAR dbs_sql_identifier dbs_comma_separator INTEGERLITERAL RPARENCHAR;
@@ -1560,12 +1560,12 @@ dbs_column_name: (dbs_generic_name DOT_FS)? T=dbs_generic_name {validateLength($
 dbs_constant : (dbs_string_constant | dbs_integer_constant | DATELITERAL);
 dbs_constraint_name: T=dbs_sql_identifier {validateLength($T.text, "constraint name", 128);};
 dbs_context: dbs_sql_identifier;
-dbs_context_name: T=dbs_sql_identifier {validateLength($T.text, "profile name", 127);};
+dbs_context_name: T=dbs_host_name_container {validateLength($T.text, "profile name", 127);};
 dbs_copy_id: CURRENT | PREVIOUS | ORIGINAL;
-dbs_correlation_name: T=dbs_generic_name {validateLength($T.text, "correlation name", 128);};
-dbs_cursor_name: T=dbs_sql_identifier {validateLength($T.text, "cursor name", 128);};
-dbs_database_name: T=dbs_sql_identifier {validateLength($T.text, "database name", 8);};
-dbs_dc_name: dbs_sql_identifier;// JAVA - lenght must be < 9
+dbs_correlation_name: T=dbs_host_name_container {validateLength($T.text, "correlation name", 128);};
+dbs_cursor_name: T=dbs_host_name_container {validateLength($T.text, "cursor name", 128);};
+dbs_database_name: T=dbs_host_name_container {validateLength($T.text, "database name", 8);};
+dbs_dc_name: dbs_host_name_container;// JAVA - lenght must be < 9
 dbs_descriptor_name: COLONCHAR? (SQLD | SQLDABC | SQLN | SQLVAR | SQLDA | IDENTIFIER);
 dbs_diagnostic_string_expression: dbs_expressions;
 dbs_distinct_type: db2sql_data_types+;
