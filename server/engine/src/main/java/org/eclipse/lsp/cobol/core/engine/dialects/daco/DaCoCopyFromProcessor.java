@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects.daco;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes.DaCoCopyFromNode;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.processor.Processor;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -32,6 +33,10 @@ import java.util.stream.Collectors;
 
 /** Handle Copy From node */
 public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
+  private final SymbolService symbolService;
+  public DaCoCopyFromProcessor(SymbolService symbolService) {
+    this.symbolService = symbolService;
+  }
   @Override
   public void accept(DaCoCopyFromNode copyFromNode, ProcessingContext processingContext) {
     astPostprocessing(copyFromNode, processingContext.getErrors());
@@ -60,7 +65,7 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
       return;
     }
     copyFrom(node.getLevel(), protoCandidates.get(0), node.getParent(), node);
-    VariableDefinitionUtil.registerVariablesInProgram(node.getParent());
+    symbolService.registerVariablesInProgram(node.getParent());
   }
 
   private void copyFrom(

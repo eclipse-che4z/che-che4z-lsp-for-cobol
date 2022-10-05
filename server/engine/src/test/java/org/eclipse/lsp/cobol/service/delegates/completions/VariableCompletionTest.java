@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.CompletionItem;
@@ -34,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * completion suggestions works correctly
  */
 class VariableCompletionTest {
-  private Completion completion = new VariableCompletion();
 
   private static final String HEADER =
       "       Identification Division.\n"
@@ -42,32 +42,37 @@ class VariableCompletionTest {
           + "       Data Division.\n"
           + "       Working-Storage Section.\n";
 
-  private static final String FULL_TEXT = HEADER
-      + "       01 {$*var1} PIC 9.\n"
-      + "       01 {$*VAR2} PIC 9.\n"
-      + "       01 {$*ANOTHER} PIC 9.\n";
+  private static final String FULL_TEXT =
+      HEADER
+          + "       01 {$*var1} PIC 9.\n"
+          + "       01 {$*VAR2} PIC 9.\n"
+          + "       01 {$*ANOTHER} PIC 9.\n";
 
   @Test
   void testCompletionEmptyResult() {
-    assertThat(
-        completion.getCompletionItems(
-            "smth",
-            getModel(HEADER)),
-        is(empty()));
+    CobolDocumentModel model = getModel(HEADER);
+    Completion completion =
+        new VariableCompletion(new SymbolService(model.getAnalysisResult().getSymbolTableMap()));
+    assertThat(completion.getCompletionItems("smth", model), is(empty()));
   }
 
   @Test
   void testCompletionNull() {
+    Completion completion = new VariableCompletion(new SymbolService());
     assertThat(completion.getCompletionItems("smth", null), is(empty()));
   }
 
   @Test
   void testCompletionMock() {
-    assertEquals(createExpected(), completion.getCompletionItems("va", getModel(FULL_TEXT)));
+    CobolDocumentModel model = getModel(FULL_TEXT);
+    Completion completion =
+        new VariableCompletion(new SymbolService(model.getAnalysisResult().getSymbolTableMap()));
+    assertEquals(createExpected(), completion.getCompletionItems("va", model));
   }
 
   private List<CompletionItem> createExpected() {
-    return ImmutableList.of(createItem("VAR1", "01 VAR1 PIC 9."), createItem("VAR2", "01 VAR2 PIC 9."));
+    return ImmutableList.of(
+        createItem("VAR1", "01 VAR1 PIC 9."), createItem("VAR2", "01 VAR2 PIC 9."));
   }
 
   private CompletionItem createItem(String name, String desc) {
@@ -81,6 +86,7 @@ class VariableCompletionTest {
   }
 
   private CobolDocumentModel getModel(String text) {
-    return new CobolDocumentModel(text, UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of()));
+    return new CobolDocumentModel(
+        text, UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of()));
   }
 }

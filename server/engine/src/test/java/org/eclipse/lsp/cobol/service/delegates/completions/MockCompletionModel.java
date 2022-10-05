@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.*;
@@ -34,39 +35,41 @@ class MockCompletionModel {
           .rootNode(new RootNode(Locality.builder().build(), new CopybooksRepository()))
           .build();
   static final CobolDocumentModel MODEL = new CobolDocumentModel("some text", RESULT);
+  static final SymbolService SYMBOL_SERVICE = new SymbolService();
 
   static {
     ProgramNode programNode = new ProgramNode(Locality.builder().build());
     RESULT.getRootNode().addChild(programNode);
-
     ImmutableList.of("constD1", "ConstD2")
         .forEach(
             name -> {
               VariableNode variable = new MnemonicNameNode(Locality.builder().build(), "sys", name);
-              programNode.addVariableDefinition(variable);
+                SYMBOL_SERVICE.addVariableDefinition(programNode, variable);
             });
 
     ImmutableList.of("parD1", "ParD2", "Not-parD")
         .forEach(
             name -> {
-              ParagraphNameNode nameNode = new ParagraphNameNode(Locality.builder().build(), name);
-              programNode.registerParagraphNameNode(nameNode);
+              ParagraphNameNode nameNode =
+                  new ParagraphNameNode(Locality.builder().build(), name, SYMBOL_SERVICE);
+              SYMBOL_SERVICE.registerParagraphNameNode(programNode, nameNode);
             });
     ImmutableList.of("secD1", "SecD2", "Not-secD")
         .forEach(
             name -> {
-              SectionNameNode nameNode = new SectionNameNode(Locality.builder().build(), name, mock(MessageService.class));
-              programNode.registerSectionNameNode(nameNode);
+              SectionNameNode nameNode =
+                  new SectionNameNode(
+                      Locality.builder().build(), name, mock(MessageService.class), SYMBOL_SERVICE);
+              SYMBOL_SERVICE.registerSectionNameNode(programNode, nameNode);
             });
 
     RootNode rootNode = new RootNode(Locality.builder().build(), new CopybooksRepository());
     RESULT.getRootNode().addChild(rootNode);
     ImmutableList.of("cpyU1", "CpyU2", "Not-cpyU")
-              .forEach(
-                      name -> {
-                          CopyNode nameNode = new CopyNode(Locality.builder().build(), name);
-                          rootNode.addChild(nameNode);
-                      });
-
+        .forEach(
+            name -> {
+              CopyNode nameNode = new CopyNode(Locality.builder().build(), name);
+              rootNode.addChild(nameNode);
+            });
   }
 }

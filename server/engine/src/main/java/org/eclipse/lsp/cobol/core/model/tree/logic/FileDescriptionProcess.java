@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.processor.Processor;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -27,13 +28,21 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
 
 /** FileDescriptionNode processor */
 public class FileDescriptionProcess implements Processor<FileDescriptionNode> {
+  private final SymbolService symbolService;
+
+  public FileDescriptionProcess(SymbolService symbolService) {
+    this.symbolService = symbolService;
+  }
+
   @Override
   public void accept(FileDescriptionNode node, ProcessingContext ctx) {
     if (StringUtils.isBlank(node.getFileControlClause())) {
-      SyntaxError error = node.getError(MessageTemplate.of(FD_WITHOUT_FILE_CONTROL, node.getName()), ErrorSeverity.ERROR);
+      SyntaxError error =
+          node.getError(
+              MessageTemplate.of(FD_WITHOUT_FILE_CONTROL, node.getName()), ErrorSeverity.ERROR);
       ctx.getErrors().add(error);
     }
     ctx.getErrors().addAll(VariableDefinitionUtil.processNodeWithVariableDefinitions(node));
-    VariableDefinitionUtil.registerVariablesInProgram(node);
+    symbolService.registerVariablesInProgram(node);
   }
 }

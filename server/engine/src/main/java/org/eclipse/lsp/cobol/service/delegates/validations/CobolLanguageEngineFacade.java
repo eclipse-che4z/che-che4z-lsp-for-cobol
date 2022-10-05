@@ -17,7 +17,10 @@ package org.eclipse.lsp.cobol.service.delegates.validations;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
-import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.ErrorCode;
+import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
@@ -80,9 +83,10 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     return text.length() <= FIRST_LINE_SEQ_AND_EXTRA_OP;
   }
 
-  private AnalysisResult toAnalysisResult(ResultWithErrors<Node> result, String uri) {
-    Node rootNode = result.getResult();
+  private AnalysisResult toAnalysisResult(ResultWithErrors<AnalysisResult> result, String uri) {
+    Node rootNode = result.getResult().getRootNode();
     return AnalysisResult.builder()
+        .symbolTableMap(result.getResult().getSymbolTableMap())
         .diagnostics(
             collectDiagnosticsForAffectedDocuments(
                 convertErrors(result.getErrors()),

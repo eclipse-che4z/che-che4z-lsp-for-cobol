@@ -22,6 +22,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.eclipse.lsp.cobol.core.CICSParserBaseVisitor;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -44,6 +45,8 @@ import static org.eclipse.lsp.cobol.core.CICSParser.*;
 public class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   private final Map<Token, Locality> positions;
 
+  private final SymbolService symbolService;
+
   @Override
   public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
     return addTreeNode(ctx, QualifiedReferenceNode::new);
@@ -61,7 +64,7 @@ public class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
         positions,
         visitChildren(ctx),
         ctx,
-        locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx)));
+        locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx), symbolService));
   }
 
   // NOTE: Visitor is not managed by Guice DI, so can't use annotation here.

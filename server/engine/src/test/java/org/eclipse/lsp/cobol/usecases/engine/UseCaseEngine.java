@@ -18,7 +18,8 @@ package org.eclipse.lsp.cobol.usecases.engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.core.model.tree.Context;
+import org.eclipse.lsp.cobol.core.engine.symbols.Context;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
@@ -321,12 +322,13 @@ public class UseCaseEngine {
       Predicate<VariableNode> predicate,
       Function<Context, List<Location>> extractor) {
 
+    SymbolService symbolService =  new SymbolService(result.getSymbolTableMap());
     Map<String, List<Location>> map = result
             .getRootNode()
             .getDepthFirstStream()
             .filter(hasType(PROGRAM))
             .map(ProgramNode.class::cast)
-            .map(ProgramNode::getVariables)
+            .map(symbolService::getVariables)
             .map(Multimap::values)
             .flatMap(Collection::stream)
             .filter(it -> !FILLER_NAME.equals(it.getName()))

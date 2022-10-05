@@ -17,6 +17,8 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.processor.Processor;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNameNode;
 
 import java.util.Optional;
@@ -25,22 +27,28 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROCEDURE_SECTION;
 
 /** SectionNameNode processor */
 public class SectionNameRegister implements Processor<SectionNameNode> {
+  private final SymbolService symbolService;
+
+  public SectionNameRegister(SymbolService symbolService) {
+    this.symbolService = symbolService;
+  }
+
   @Override
   public void accept(SectionNameNode node, ProcessingContext ctx) {
     if (node.getParent().getNodeType() != PROCEDURE_SECTION) {
       // TODO: register usage
       return;
     }
-    ctx.getErrors()
-        .addAll(
-            node.getProgram()
-                .flatMap(
-                    program ->
-                        program
-                            .verifySectionNodeDuplication(node, node.getMessageService())
-                            .map(Optional::of)
-                            .orElse(program.registerSectionNameNode(node)))
-                .map(ImmutableList::of)
-                .orElseGet(ImmutableList::of));
+    ImmutableList<SyntaxError> errors =
+        node.getProgram()
+            .flatMap(
+                program -> symbolService
+                    .verifySectionNodeDuplication(program, node, node.getMessageService())
+                    .map(Optional::of)
+                    .orElse(symbolService.registerSectionNameNode(program, node)))
+            .map(ImmutableList::of)
+            .orElseGet(ImmutableList::of);
+
+    ctx.getErrors().addAll(errors);
   }
 }

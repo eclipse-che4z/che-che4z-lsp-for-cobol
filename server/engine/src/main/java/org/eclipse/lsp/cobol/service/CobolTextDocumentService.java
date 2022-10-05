@@ -199,10 +199,13 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>>
       definition(DefinitionParams params) {
     String uri = params.getTextDocument().getUri();
+    List<Location> definitions = docs.containsKey(uri)
+            ? occurrences.findDefinitions(docs.get(uri), params)
+            : Collections.emptyList();
     return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
             disposableLSPStateService,
             (Supplier<Either<List<? extends Location>, List<? extends LocationLink>>>)
-                () -> Either.forLeft(occurrences.findDefinitions(docs.get(uri), params)),
+                () -> Either.forLeft(definitions),
             executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("definitions resolving", uri)));
@@ -212,10 +215,12 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   @SuppressWarnings("cast")
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
     String uri = params.getTextDocument().getUri();
+    List<Location> references = docs.containsKey(uri)
+            ? occurrences.findReferences(docs.get(uri), params, params.getContext())
+            : Collections.emptyList();
     return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
             disposableLSPStateService,
-            (Supplier<List<? extends Location>>)
-                () -> occurrences.findReferences(docs.get(uri), params, params.getContext()),
+            (Supplier<List<? extends Location>>) () -> references,
             executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("references resolving", uri)));
@@ -226,10 +231,14 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
       DocumentHighlightParams params) {
     String uri = params.getTextDocument().getUri();
+    Supplier<List<? extends DocumentHighlight>> listSupplier =
+        () ->
+            docs.containsKey(uri)
+                ? occurrences.findHighlights(docs.get(uri), params)
+                : Collections.emptyList();
     return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
             disposableLSPStateService,
-            (Supplier<List<? extends DocumentHighlight>>)
-                () -> occurrences.findHighlights(docs.get(uri), params),
+            (Supplier<List<? extends DocumentHighlight>>) listSupplier,
             executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("document highlighting", uri)));

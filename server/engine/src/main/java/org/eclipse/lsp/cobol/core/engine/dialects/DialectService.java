@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoMaidProcessor;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -44,6 +45,7 @@ public class DialectService {
   public DialectService(
       CopybookService copybookService,
       ParseTreeListener treeListener,
+      SymbolService symbolService,
       MessageService messageService) {
     dialectSuppliers = new HashMap<>();
 
@@ -52,7 +54,9 @@ public class DialectService {
 
     dialect =
         new DaCoDialect(
-            messageService, new DaCoMaidProcessor(copybookService, treeListener, messageService));
+            messageService,
+            new DaCoMaidProcessor(copybookService, treeListener, messageService),
+            symbolService);
     dialectSuppliers.put(dialect.getName(), dialect);
 
     dialect = new CICSTranslatorDialect(messageService);
@@ -72,8 +76,15 @@ public class DialectService {
     List<SyntaxError> errors = new LinkedList<>();
     for (CobolDialect orderedDialect : orderedDialects) {
       List<SyntaxError> dialectErrors = orderedDialect.extend(context);
-      dialectErrors.forEach(e -> e.getLocality().setRange(
-          context.getExtendedSource().getMainMap().mapLocation(e.getLocality().getRange(), false).getRange()));
+      dialectErrors.forEach(
+          e ->
+              e.getLocality()
+                  .setRange(
+                      context
+                          .getExtendedSource()
+                          .getMainMap()
+                          .mapLocation(e.getLocality().getRange(), false)
+                          .getRange()));
 
       errors.addAll(dialectErrors);
       context.getExtendedSource().commitTransformations();
@@ -134,14 +145,15 @@ public class DialectService {
 
   /**
    * Return a list of processor descriptors for provided dialects.
+   *
    * @param dialects dialect names
    * @return a list of processor descriptors
    */
   public List<ProcessorDescription> getProcessors(List<String> dialects) {
     return dialects.stream()
-            .filter(dialectSuppliers::containsKey)
-            .map(dialectSuppliers::get)
-            .flatMap(d -> d.getProcessors().stream())
-            .collect(Collectors.toList());
+        .filter(dialectSuppliers::containsKey)
+        .map(dialectSuppliers::get)
+        .flatMap(d -> d.getProcessors().stream())
+        .collect(Collectors.toList());
   }
 }

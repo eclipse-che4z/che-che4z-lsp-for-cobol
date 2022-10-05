@@ -24,7 +24,6 @@ import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 
 import java.util.*;
@@ -216,24 +215,6 @@ public class VariableDefinitionUtil {
 
   private boolean isGroupedVariable(VariableNode variableNode) {
     return !ImmutableList.of(FD, SD).contains(variableNode.getVariableType());
-  }
-
-  /**
-   * * Register variable definitions into nearest ProgramNode
-   * @param node the node with VariableDefinitionNodes
-   */
-  public void registerVariablesInProgram(Node node) {
-    // The variable can have nested variable definitions (like IndexItemNode), we need to
-    // collect them
-    List<VariableNode> variables =
-        node.getChildren().stream()
-            .flatMap(Node::getDepthFirstStream)
-            .filter(hasType(NodeType.VARIABLE))
-            .map(VariableNode.class::cast)
-            .collect(Collectors.toList());
-    node.getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
-        .ifPresent(programNode -> variables.forEach(programNode::addVariableDefinition));
   }
 
   private List<SyntaxError> processDefinition(

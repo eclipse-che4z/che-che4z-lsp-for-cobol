@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.processor.Processor;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ErrorSource;
@@ -38,6 +39,12 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
   private static final String NOT_DEFINED_ERROR = "semantics.notDefined";
   private static final String DUPLICATED_DEFINITION_ERROR = "semantics.duplicated";
 
+  private final SymbolService symbolService;
+
+  public QualifiedReferenceUpdateVariableUsage(SymbolService symbolService) {
+    this.symbolService = symbolService;
+  }
+
   @Override
   public void accept(QualifiedReferenceNode node, ProcessingContext ctx) {
     updateVariableUsage(node, ctx);
@@ -56,7 +63,7 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
 
     List<VariableNode> foundDefinitions =
         node.getProgram()
-            .map(programNode -> programNode.getVariableDefinition(variableUsageNodes))
+            .map(programNode -> symbolService.getVariableDefinition(programNode, variableUsageNodes))
             .orElseGet(ImmutableList::of);
 
     for (VariableNode definitionNode : foundDefinitions) {
