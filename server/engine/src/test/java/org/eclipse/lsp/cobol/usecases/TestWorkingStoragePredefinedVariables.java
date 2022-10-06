@@ -17,11 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,7 +39,7 @@ class TestWorkingStoragePredefinedVariables {
             + "          05  {$*LAST-MAP}                     PIC x.\n"
             + "       Procedure Division.\n"
             + "       {#*000-Main-Logic}.\n"
-            + "           MOVE {$EIBRESP}        TO {$XML-TEXT|1}.\n"
+            + "           MOVE {$EIBRESP}        TO {$XML-TEXT}.\n"
             + "           MOVE {$EIBDATE} TO {$LDAY}.\n"
             + "           EXEC CICS RETURN\n"
             + "                TRANSID({$EIBTRNID})\n"
@@ -54,13 +50,7 @@ class TestWorkingStoragePredefinedVariables {
     UseCaseEngine.runTest(
         text,
         ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(),
-                "Duplicated definition for XML-TEXT",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+        ImmutableMap.of());
   }
 
   @Test
