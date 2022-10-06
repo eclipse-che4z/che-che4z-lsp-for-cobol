@@ -28,4 +28,22 @@ export class SettingsUtils {
         });
         return result;
     }
+
+    public static getWorkspaceFoldersPath(): string[] {
+        const result: string[] = [];
+        vscode.workspace.workspaceFolders.forEach(workspaceFolder => {
+            result.push(workspaceFolder.uri.path);
+        });
+        return result;
+    }
+
+    static findUriScheme(path: string): string {
+        return vscode.workspace.workspaceFolders.find(workspaceFolder => {
+            return workspaceFolder.uri.path === path;
+        }).uri.scheme;
+    }
+
+    public static absolutePath(workspaceFolderPath: string, basePath: string): string {
+        return this.findUriScheme(workspaceFolderPath) + "://" + basePath;
+    }
 }

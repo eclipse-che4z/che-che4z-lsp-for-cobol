@@ -25,7 +25,8 @@ const FILENAME: string = "test.cbl";
 beforeAll(() => {
     const FILENAME_URI = createFile();
     const fileDirectoryURI: string = path.dirname(FILENAME_URI);
-    SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + fileDirectoryURI]);
+    SettingsUtils.findUriScheme = jest.fn().mockReturnValue("file");
+    SettingsUtils.getWorkspaceFoldersPath = jest.fn().mockReturnValue([fileDirectoryURI]);
 });
 
 afterAll(() => {

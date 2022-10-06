@@ -13,7 +13,7 @@
  */
 import {URL} from "url";
 import {CopybookResolver} from "./CopybookResolver";
-import { getURIFromResource } from "../util/FSUtils";
+import {getURIFromResource} from "../util/FSUtils";
 
 /**
  * This class implement the resolution of paths defined into the configuration file in a list
@@ -32,10 +32,12 @@ export class LocalCopybookResolver implements CopybookResolver {
     private resolveURIList(list: string[]): string[] {
         const result: Set<string> = new Set<string>();
         list.filter(resource => resource !== "*").forEach(resource => {
-            const URI: URL = getURIFromResource(resource);
-            if (URI !== undefined) {
-                result.add(URI.href);
-            }
+            const uris: URL[] = getURIFromResource(resource);
+            uris.forEach(uri => {
+                if (uri != undefined) {
+                    result.add(uri.href);
+                }
+            });
         });
         return [...result];
     }

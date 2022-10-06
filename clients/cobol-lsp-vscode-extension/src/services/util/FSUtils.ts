@@ -18,6 +18,7 @@ import * as path from "path";
 import * as glob from "glob";
 import * as vscode from "vscode";
 import * as urlUtil from "url";
+import {SettingsUtils} from "./SettingsUtils";
 
 /**
  * This method is responsible to return a valid URI without extension if the extension is not provided or an URI
@@ -61,8 +62,8 @@ function posixPath(windowsPath) {
  */
 export function getURIFromResource(resource: string): urlUtil.URL[] {
     let uris: urlUtil.URL[] = [];
-    for (const workspaceFolderUri of vscode.workspace.workspaceFolders) {
-        const workspaceFolder = workspaceFolderUri.uri.path.replace(/\/(.*:)/, "$1");
+    for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
+        const workspaceFolder = workspaceFolderPath.replace(/\/(.*:)/, "$1");
 
         const pathName: string = path.resolve(resource) === path.normalize(resource)
             ? resource
@@ -74,7 +75,8 @@ export function getURIFromResource(resource: string): urlUtil.URL[] {
             let findPath = pathName.replace(basePath, "").replace("\\", "/");
             let folders = glob.sync(findPath, {cwd: basePath});
             for (const folder of folders) {
-                let uri = new urlUtil.URL(path.join(workspaceFolderUri.uri.scheme + "://" + basePath, folder));
+                let uri = new urlUtil.URL(path.join(
+                    SettingsUtils.absolutePath(workspaceFolderPath, basePath), folder));
                 if (fs.existsSync(uri)) {
                     uris.push(uri);
                 }
@@ -82,7 +84,8 @@ export function getURIFromResource(resource: string): urlUtil.URL[] {
         } else {
             let uri = (path.resolve(resource) === path.normalize(resource))
                 ? urlUtil.pathToFileURL(resource) :
-                new urlUtil.URL(path.normalize(path.join(workspaceFolder, resource)));
+                new urlUtil.URL(path.normalize(path.join(
+                    SettingsUtils.absolutePath(workspaceFolderPath, workspaceFolder), resource)));
             if (fs.existsSync(uri)) {
                 uris.push(uri);
             }

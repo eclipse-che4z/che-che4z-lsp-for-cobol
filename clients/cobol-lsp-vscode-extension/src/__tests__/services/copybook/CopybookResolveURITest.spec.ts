@@ -26,7 +26,9 @@ const copybookNameWithExtension: string = "NSTCOPY2.CPY";
 const CPY_FOLDER_NAME = ".cobcopy";
 const RELATIVE_CPY_FOLDER_NAME = "../relativeCobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
-SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + __dirname]);
+
+SettingsUtils.findUriScheme = jest.fn().mockReturnValue("file");
+SettingsUtils.getWorkspaceFoldersPath = jest.fn().mockReturnValue([__dirname]);
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
     get: jest.fn().mockReturnValue(undefined),
 });
