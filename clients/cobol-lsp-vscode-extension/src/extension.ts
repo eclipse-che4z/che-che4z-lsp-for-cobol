@@ -110,7 +110,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // Custom client handlers
     languageClientService.addRequestHandler("cobol/resolveSubroutine", resolveSubroutineURI);
     languageClientService.addRequestHandler("copybook/resolve", resolveCopybookHandler);
-    languageClientService.addRequestHandler("copybook/download", downloadCopybookHandler);
+    languageClientService.addRequestHandler("copybook/download", downloadCopybookHandler.bind(copyBooksDownloader));
 
     context.subscriptions.push(languageClientService.start());
 
