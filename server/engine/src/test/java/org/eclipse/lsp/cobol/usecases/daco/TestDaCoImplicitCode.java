@@ -80,6 +80,14 @@ class TestDaCoImplicitCode {
           + "        PROCEDURE DIVISION. \n"
           + "               MOVE 6 to {$RUSNAM-BAA}.\n";
 
+  private static final String TEXT_SML =
+      "        IDENTIFICATION DIVISION. \r\n"
+          + "        PROGRAM-ID. test1. \r\n"
+          + "        DATA DIVISION. \r\n"
+          + "        WORKING-STORAGE SECTION. \r\n"
+          + "        PROCEDURE DIVISION. \r\n"
+          + "               MOVE 6 to {$USIzXSH}.\r\n";
+
   @Test
   void testImplicitWorkingStorageCode() {
     UseCaseEngine.runTestForDiagnostics(
@@ -116,6 +124,14 @@ class TestDaCoImplicitCode {
   void testImplicitWorkingStorageCode_DynamicWithDuplicates() {
     UseCaseEngine.runTestForDiagnostics(
         TEXT_DYN_DUPLICATE,
+        ImmutableList.of(Fixtures.subschemaCopy("")),
+        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+  }
+
+  @Test
+  void testImplicitWorkingStorageSML() {
+    UseCaseEngine.runTestForDiagnostics(
+        TEXT_SML,
         ImmutableList.of(Fixtures.subschemaCopy("")),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
