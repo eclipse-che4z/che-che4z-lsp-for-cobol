@@ -15,21 +15,10 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.semantics.CodeBlockDefinitionUtils;
 
-import java.util.List;
-
-/**
- * The class represents paragraphs rule in COBOL grammar.
- */
+/** The class represents paragraphs rule in COBOL grammar. */
 public class ParagraphsNode extends Node {
   public ParagraphsNode(Locality location) {
     super(location, NodeType.CODE_BLOCK_PARENT);
-    addProcessStep(this::processNode);
-  }
-
-  private List<SyntaxError> processNode() {
-    return CodeBlockDefinitionUtils.defineCodeBlock(this);
   }
 }

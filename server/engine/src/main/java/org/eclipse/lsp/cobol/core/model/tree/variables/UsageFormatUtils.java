@@ -35,7 +35,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormat.*;
 @UtilityClass
 public class UsageFormatUtils {
 
-  final List<UsageFormat> blankAndSignNotAllowedUsage = ImmutableList.of(UTF_8, NATIONAL);
+  public final List<UsageFormat> blankAndSignNotAllowedUsage = ImmutableList.of(UTF_8, NATIONAL);
   final ImmutableList<UsageFormat> stringUsageFormat =
       ImmutableList.of(NATIONAL, DISPLAY_1, UTF_8, DISPLAY);
   final ImmutableList<UsageFormat> numericDatatypeUsageFormat =
@@ -54,7 +54,7 @@ public class UsageFormatUtils {
           COMPUTATIONAL_5,
           NATIONAL,
           DISPLAY);
-  final List<UsageFormat> noPicClauseUsage =
+  public final List<UsageFormat> noPicClauseUsage =
       ImmutableList.of(
           INDEX,
           POINTER_32,
@@ -87,7 +87,7 @@ public class UsageFormatUtils {
         return Collections.emptyList();
       };
 
-  Map<EffectiveDataType, Function<ElementaryNode, List<SyntaxError>>> picAndUsageClauseValidator =
+  public Map<EffectiveDataType, Function<ElementaryNode, List<SyntaxError>>> picAndUsageClauseValidator =
       new EnumMap<>(
           ImmutableMap.of(
               STRING, checkStringUsage,

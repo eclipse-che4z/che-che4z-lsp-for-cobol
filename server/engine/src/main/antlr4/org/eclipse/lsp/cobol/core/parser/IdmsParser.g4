@@ -482,7 +482,7 @@ getStorageClause
     ;
 
 getStorageValueClause
-    : VALUE IS (LOW_VALUE | HIGH_VALUE | generalIdentifier)
+    : VALUE IS? (LOW_VALUE | HIGH_VALUE | generalIdentifier)
     ;
 
 getStorageLocClause
@@ -966,7 +966,7 @@ setIdmsDcStatement
    ;
 
 setAbendExitStatement
-   : ABEND EXIT ((ON? PROGRAM (generalIdentifier | literal)) | OFF)
+   : ABEND? EXIT ((ON? PROGRAM (generalIdentifier | literal)) | OFF)
    ;
 
 setTimerStatement

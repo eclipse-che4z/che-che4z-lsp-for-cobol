@@ -14,19 +14,10 @@
  */
 package org.eclipse.lsp.cobol.usecases.engine;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
@@ -40,6 +31,10 @@ import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.SettingsService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
+import org.eclipse.lsp.cobol.service.WatcherService;
+import org.eclipse.lsp.cobol.service.WatcherServiceImpl;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -48,6 +43,16 @@ import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * This utility class provides methods to run use cases with COBOL code examples.
@@ -111,7 +116,7 @@ public class UseCaseUtils {
    * Analyze the given text using a real language engine providing copybooks required for the
    * analysis with the required sync type
    *
-   * @param useCase use case instance to analyze
+   * @param useCase       use case instance to analyze
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(UseCase useCase) {
@@ -133,6 +138,8 @@ public class UseCaseUtils {
                 bind(CobolLanguageClient.class).toInstance(languageClient);
                 bind(SubroutineService.class).to(SubroutineServiceImpl.class);
                 bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
+                bind(WatcherService.class).to(WatcherServiceImpl.class);
+                bind(CopybookReferenceRepo.class).toInstance(new CopybookReferenceRepoImpl());
               }
             });
 

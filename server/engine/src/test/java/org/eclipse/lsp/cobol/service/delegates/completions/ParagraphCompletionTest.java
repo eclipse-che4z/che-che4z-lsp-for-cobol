@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * completion suggestions works correctly
  */
 class ParagraphCompletionTest {
-  private Completion completion = new ParagraphCompletion();
+  private final Completion completion = new ParagraphCompletion(MockCompletionModel.SYMBOL_SERVICE);
 
   @Test
   void testCompletionEmptyResult() {

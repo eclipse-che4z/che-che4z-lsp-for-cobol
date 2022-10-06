@@ -26,6 +26,8 @@ public enum SettingsParametersEnum {
   VERBOSE("verbose"),
   DATASETS("cpy-manager.paths-dsn"),
   CPY_LOCAL_PATHS("cpy-manager.paths-local"),
+  DaCo_CPY_LOCAL_PATHS("cpy-manager.daco.paths-local"),
+  IDMS_CPY_LOCAL_PATHS("cpy-manager.idms.paths-local"),
   CPY_EXTENSIONS("cpy-manager.copybook-extensions"),
   SUBROUTINE_LOCAL_PATHS("subroutine-manager.paths-local"),
   LSP_PREFIX("cobol-lsp"),
@@ -34,7 +36,7 @@ public enum SettingsParametersEnum {
   TARGET_SQL_BACKEND("target-sql-backend"),
   ANALYSIS_FEATURES("analysis.features"),
   DIALECTS("dialects"),
-  PREDEFINED_SECTIONS("predefined-sections");
+  DaCo_PREDEFINED_SECTIONS("daco.predefined-sections");
 
   public final String label;
 

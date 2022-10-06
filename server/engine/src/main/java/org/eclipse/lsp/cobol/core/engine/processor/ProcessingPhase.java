@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2022 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,16 +12,15 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree;
+package org.eclipse.lsp.cobol.core.engine.processor;
 
 /**
- * The interface represents structure that can show formatted line to the user.
+ * AST processing phases. The order of them is important.
  */
-public interface Describable {
-  /**
-   * Get user friendly node description.
-   *
-   * @return the string with description.
-   */
-  String getFormattedDisplayString();
+public enum ProcessingPhase {
+    TRANSFORMATION,
+    DEFINITION,
+    POST_DEFINITION,
+    USAGE,
+    VALIDATION
 }

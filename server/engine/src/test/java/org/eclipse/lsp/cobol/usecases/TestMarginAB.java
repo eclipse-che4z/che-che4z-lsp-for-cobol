@@ -45,6 +45,7 @@ class TestMarginAB {
           + "000000     BLOCK CONTAINS 0 RECORDS\n"
           + "000000     RECORD CONTAINS 113 CHARACTERS\n"
           + "000000     DATA RECORD IS BILL-LADING-RECORD.\n"
+          + "000000  01 BILL-LADING-RECORD PIC 9(2).\n"
           + "000000  WORKING-STORAGE SECTION.\n"
           + "000000  01 TAPARM1      PIC 9.\n"
           + "000000  01 TAPARM2      PIC 99 VALUE 2.\n"

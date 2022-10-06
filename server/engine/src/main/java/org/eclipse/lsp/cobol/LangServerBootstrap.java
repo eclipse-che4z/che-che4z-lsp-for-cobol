@@ -14,6 +14,9 @@
  */
 package org.eclipse.lsp.cobol;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.ConsoleAppender;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.NonNull;
@@ -27,6 +30,8 @@ import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,6 +80,13 @@ public class LangServerBootstrap {
       if (isPipeEnabled(args)) {
         launchServerWithPipes(server, provider);
       } else {
+        // Enable logging
+        ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        ConsoleAppender<ILoggingEvent> ca = new ConsoleAppender<>();
+        ca.setContext(rootLogger.getLoggerContext());
+        ca.setName("console");
+        rootLogger.addAppender(ca);
+        rootLogger.setLevel(Level.ALL);
         launchServerWithSocket(server, provider);
       }
     } catch (ExecutionException e) {

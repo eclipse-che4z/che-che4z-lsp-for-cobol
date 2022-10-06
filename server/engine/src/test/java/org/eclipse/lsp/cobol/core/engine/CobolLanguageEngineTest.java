@@ -23,6 +23,8 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -36,6 +38,7 @@ import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
@@ -69,10 +72,13 @@ class CobolLanguageEngineTest {
     InjectService injectService = mock(InjectService.class);
     cobolErrorStrategy.setMessageService(mockMessageService);
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
+    AstProcessor astProcessor = mock(AstProcessor.class);
+    SymbolService symbolService = mock(SymbolService.class);
+
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
             preprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-            dialectService, injectService);
+            dialectService, symbolService, astProcessor, injectService);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()
@@ -157,8 +163,8 @@ class CobolLanguageEngineTest {
             .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of()));
 
     Range programRange = new Range(new Position(0, 7), new Position(0, 31));
-    ResultWithErrors<Node> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
-    Node root = actual.getResult();
+    ResultWithErrors<AnalysisResult> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
+    Node root = actual.getResult().getRootNode();
     Node program = root.getChildren().get(0);
     Node division = program.getChildren().get(0);
 

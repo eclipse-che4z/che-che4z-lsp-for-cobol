@@ -33,7 +33,7 @@ import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
+import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
@@ -139,6 +139,9 @@ public final class IdmsDialect implements CobolDialect {
       extendedSource.extend(currentMap, copyNode, copybookMap);
     }
     copyNode.setLocality(cb.getUsage());
+    Range range = extendedSource.mapLocationUnsafe(copyNode.getLocality().getRange()).getRange();
+    copyNode.getLocality().setRange(range);
+
     copybookStack.pop();
   }
 
@@ -192,17 +195,16 @@ public final class IdmsDialect implements CobolDialect {
     nodes.addAll(visitor.visitStartRule(startRuleContext));
     nodes.addAll(context.getExtendedSource().calculateCopyNodes());
 
-    new ArrayList<>(nodes).stream().filter(CopyNode.class::isInstance).forEach(n -> {
-      new ArrayList<>(nodes).stream()
-          .filter(cn -> cn != n)
-          .filter(CopyNode.class::isInstance)
-          .map(CopyNode.class::cast)
-          .filter(cn -> cn.getDefinition().getLocation().getUri().equals(n.getLocality().getUri()))
-          .forEach(cn -> {
-            nodes.remove(n);
-            cn.addChild(n);
-          });
-    });
+    new ArrayList<>(nodes).stream().filter(CopyNode.class::isInstance).forEach(n ->
+        new ArrayList<>(nodes).stream()
+        .filter(cn -> cn != n)
+        .filter(CopyNode.class::isInstance)
+        .map(CopyNode.class::cast)
+        .filter(cn -> cn.getDefinition().getLocation().getUri().equals(n.getLocality().getUri()))
+        .forEach(cn -> {
+          nodes.remove(n);
+          cn.addChild(n);
+        }));
 
     errors.addAll(visitor.getErrors());
 

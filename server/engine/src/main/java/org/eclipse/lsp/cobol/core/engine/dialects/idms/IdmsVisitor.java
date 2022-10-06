@@ -17,27 +17,14 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.eclipse.lsp.cobol.core.*;
-import org.eclipse.lsp.cobol.core.IdmsParser.CobolWordContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.DataNameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsControlSectionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsIfConditionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsIfStatementContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsSectionsContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsStatementsContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_db_entity_nameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_map_nameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_map_name_definitionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_procedure_nameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.MapClauseContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.MapSectionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.QualifiedDataNameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.SchemaSectionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.VariableUsageNameContext;
+import org.eclipse.lsp.cobol.core.IdmsParser;
+import org.eclipse.lsp.cobol.core.IdmsParser.*;
+import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
-import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
@@ -48,15 +35,17 @@ import org.eclipse.lsp.cobol.core.model.variables.SectionType;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Location;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_MAP_NAME;
 
 /**
- *  This extension of {@link IdmsParserBaseVisitor} applies the semantic analysis based on the
- *  abstract syntax tree built by {@link IdmsParser}.
+ * This extension of {@link IdmsParserBaseVisitor} applies the semantic analysis based on the
+ * abstract syntax tree built by {@link IdmsParser}.
  */
 class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private static final String IF = "_IF_ ";
@@ -114,7 +103,8 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitVariableUsageName(VariableUsageNameContext ctx) {
-    return addTreeNode(ctx, locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality));
+    return addTreeNode(
+        ctx, locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality));
   }
 
   @Override
@@ -182,11 +172,9 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   }
 
   private Locality constructLocality(ParserRuleContext ctx) {
-    Location location = context.getExtendedSource().mapLocationUnsafe(DialectUtils.constructRange(ctx));
-    return Locality.builder()
-        .uri(location.getUri())
-        .range(location.getRange())
-        .build();
+    Location location =
+        context.getExtendedSource().mapLocationUnsafe(DialectUtils.constructRange(ctx));
+    return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
   }
 
   private void addReplacementContext(ParserRuleContext ctx) {
@@ -194,10 +182,13 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   }
 
   private void addReplacementContext(ParserRuleContext ctx, String prefix) {
-    String newText = prefix + context.getExtendedSource().getText()
-            .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
-            .replaceAll("[^ \n]", CobolDialect.FILLER);
+    String newText =
+        prefix
+            + context
+                .getExtendedSource()
+                .getText()
+                .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
+                .replaceAll("[^ \n]", CobolDialect.FILLER);
     context.getExtendedSource().replace(DialectUtils.constructRange(ctx), newText);
   }
-
 }

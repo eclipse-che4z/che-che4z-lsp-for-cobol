@@ -15,14 +15,13 @@
 
 package org.eclipse.lsp.cobol.service.delegates.references;
 
+import lombok.NonNull;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.DocumentHighlight;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.ReferenceContext;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 
-import lombok.NonNull;
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -43,7 +42,7 @@ public interface Occurrences {
    */
   @NonNull
   List<Location> findDefinitions(
-      @Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position);
+      @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position);
 
   /**
    * Resolve project-wide references for the symbol denoted by the given text document position. The
@@ -57,7 +56,7 @@ public interface Occurrences {
    */
   @NonNull
   List<Location> findReferences(
-      @Nullable CobolDocumentModel document,
+      @NonNull CobolDocumentModel document,
       @NonNull TextDocumentPositionParams position,
       @NonNull ReferenceContext context);
 
@@ -72,5 +71,5 @@ public interface Occurrences {
    */
   @NonNull
   List<DocumentHighlight> findHighlights(
-      @Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position);
+      @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position);
 }

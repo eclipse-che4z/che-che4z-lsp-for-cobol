@@ -426,7 +426,7 @@
                     "description": "List of enabled dialects",
                     "uniqueItems": true
                 },
-                "cobol-lsp.predefined-sections": {
+                "cobol-lsp.daco.predefined-sections": {
                     "type": "array",
                     "items": {
                         "type": "string"

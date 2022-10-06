@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * suggestions works correctly
  */
 class SectionCompletionTest {
-  private Completion completion = new SectionCompletion();
+  private final Completion completion = new SectionCompletion(MockCompletionModel.SYMBOL_SERVICE);;
 
   @Test
   void testCompletionEmptyResult() {

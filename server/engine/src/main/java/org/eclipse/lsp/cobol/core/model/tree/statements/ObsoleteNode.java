@@ -14,38 +14,18 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.statements;
 
-import com.google.common.collect.ImmutableList;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-
-import java.util.List;
 
 /** The class represents a Obsolete Node in Cobol. It throws warning message. */
 @ToString(callSuper = true)
 @Getter
-@EqualsAndHashCode
 public abstract class ObsoleteNode extends Node {
 
   protected ObsoleteNode(Locality location) {
     super(location, NodeType.OBSOLETE);
-    addProcessStep(this::throwObsoleteNodeWarning);
-  }
-
-  private List<SyntaxError> throwObsoleteNodeWarning() {
-    return ImmutableList.of(
-        SyntaxError.syntaxError()
-            .errorSource(ErrorSource.PARSING)
-            .severity(ErrorSeverity.WARNING)
-            .locality(getLocality())
-            .messageTemplate(MessageTemplate.of("cobolParser.ObsoleteCode"))
-            .build());
   }
 }

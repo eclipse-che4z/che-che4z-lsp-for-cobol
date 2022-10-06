@@ -67,7 +67,7 @@ import java.util.stream.Stream;
 import org.awaitility.Awaitility;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
-import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
+import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
@@ -356,6 +356,19 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     ArgumentCaptor<AnalysisConfig> argument = ArgumentCaptor.forClass(AnalysisConfig.class);
     verify(engine).analyze(eq(COPYBOOK_URI), anyString(), argument.capture());
     assertEquals(SKIP, argument.getValue().getCopybookConfig().getCopybookProcessingMode());
+  }
+
+  /**
+   * This test verifies that when a copybook document updated in DID_CHANGE mode, the analysis is triggered with updated cache
+   */
+  @Test
+  void copybookChangeTriggerReAnalysisDidChangeTest() {
+    mockSettingServiceForCopybooks(Boolean.TRUE);
+    service.didChange(
+            new DidChangeTextDocumentParams(
+                    new VersionedTextDocumentIdentifier(COPYBOOK_URI, 0),
+                    ImmutableList.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
+    verify(broker).postData(any(RunAnalysisEvent.class));
   }
 
   /**
