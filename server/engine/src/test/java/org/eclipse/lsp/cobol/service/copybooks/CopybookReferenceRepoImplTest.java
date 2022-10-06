@@ -14,19 +14,18 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Set;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 /** Test @{@link CopybookReferenceRepo} */
 class CopybookReferenceRepoImplTest {
 
-  public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
-  private static final String CPY_URI = "file:///c%3A/workspace/.c4z/.copybooks/PARENT.CPY";
+  public static final String DOCUMENT_URI = "file:///c:/workspace/document.cbl";
+  private static final String CPY_URI = "file:///c:/workspace/.c4z/.copybooks/PARENT.CPY";
   public static final String COPYBOOK_CONTENT = "sample copybook text";
 
   @Test
