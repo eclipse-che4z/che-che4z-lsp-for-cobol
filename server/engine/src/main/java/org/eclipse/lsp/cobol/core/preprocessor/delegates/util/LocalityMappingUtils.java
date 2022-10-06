@@ -102,16 +102,44 @@ public class LocalityMappingUtils {
         // to be used
         i += embeddedCode.getShift();
       } else {
-        mapToken(token, documentPositions, tokenAccumulator, documentHierarchyStack);
+        i = mapToken(tokens, documentPositions, tokenAccumulator, documentHierarchyStack, i);
       }
     }
   }
 
-  private void mapToken(
-      Token token,
+  private int expandEmbeddedTokensToMatchCurrentLocality(
+      List<Token> tokens,
+      DocumentHierarchyLevel documentHierarchyLevel,
+      Map<Token, Locality> tokenAccumulator,
+      int currentIndex) {
+    Optional<Locality> currentDocument = ofNullable(documentHierarchyLevel.getCurrent());
+    StringBuilder currentEmbeddedTokenText = new StringBuilder();
+    if (currentDocument.isPresent()) {
+      List<Integer> matchedTokenIndex = new ArrayList<>();
+      for (int j = currentIndex; j < tokens.size(); j++) {
+        matchedTokenIndex.add(j);
+        currentEmbeddedTokenText.append(tokens.get(j).getText());
+        if (currentDocument.get().getToken().contentEquals(currentEmbeddedTokenText)) {
+          matchedTokenIndex.forEach(
+              element ->
+                  tokenAccumulator.put(tokens.get(element), documentHierarchyLevel.getCurrent()));
+          documentHierarchyLevel.forward();
+          return j;
+        }
+        if (currentEmbeddedTokenText.length() >= currentDocument.get().getToken().length()) {
+          break;
+        }
+      }
+    }
+    return currentIndex;
+  }
+
+  private int mapToken(
+          List<Token> tokens,
       Map<String, DocumentMapping> documentPositions,
       Map<Token, Locality> result,
-      Deque<DocumentHierarchyLevel> documentHierarchyStack) {
+      Deque<DocumentHierarchyLevel> documentHierarchyStack, int currentIndex) {
+    Token token = tokens.get(currentIndex);
     // Check that this token is copy entry as defined in CobolLexer
     if (token.getType() == COPYENTRY && token.getTokenSource() instanceof CobolLexer) {
       enterDocument(
@@ -119,20 +147,42 @@ public class LocalityMappingUtils {
     } else if (token.getType() == COPYEXIT && token.getTokenSource() instanceof CobolLexer) {
       exitDocument(documentHierarchyStack);
     } else {
-      mapTokenToPosition(token, result, currentDocument(documentHierarchyStack));
+      currentIndex = mapTokenToPosition(tokens, result, currentDocument(documentHierarchyStack), currentIndex);
     }
+    return currentIndex;
   }
 
-  private void mapTokenToPosition(
-      Token token, Map<Token, Locality> mappingAccumulator, DocumentHierarchyLevel document) {
+  private int mapTokenToPosition(
+          List<Token> tokens, Map<Token, Locality> mappingAccumulator, DocumentHierarchyLevel document, int currentIndex) {
     Locality locality = document.getCurrent();
-    if (locality == null) return;
+    Token token = tokens.get(currentIndex);
+    if (locality == null) return currentIndex;
     if (tokenMatches(token.getText(), locality, document)) {
       mappingAccumulator.put(token, locality);
       document.forward();
     } else {
-      applyLookAhead(token, mappingAccumulator, document);
+      currentIndex = tryAndMatchToken(tokens, mappingAccumulator, document, currentIndex, locality);
     }
+    return currentIndex;
+  }
+
+  private int tryAndMatchToken(List<Token> tokens, Map<Token, Locality> mappingAccumulator, DocumentHierarchyLevel document, int currentIndex, Locality locality) {
+    int expandedIndex = currentIndex;
+    Token token = tokens.get(currentIndex);
+    if (isTokenSubsetOfLocality(token.getText(), locality, document)
+        && currentIndex <= tokens.size()) {
+      expandedIndex = expandEmbeddedTokensToMatchCurrentLocality(tokens, document, mappingAccumulator, currentIndex);
+      }
+    if (expandedIndex == currentIndex) {
+      applyLookAhead(token, mappingAccumulator, document);
+    } else {
+      currentIndex = expandedIndex;
+    }
+    return currentIndex;
+  }
+
+  private static boolean isTokenSubsetOfLocality(String token, Locality position, DocumentHierarchyLevel document) {
+    return position.getToken().startsWith(token);
   }
 
   /**

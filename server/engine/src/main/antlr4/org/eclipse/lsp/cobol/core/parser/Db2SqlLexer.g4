@@ -808,6 +808,7 @@ LSQUAREBRACKET :     '[';
 RSQUAREBRACKET :     ']';
 UNDERSCORECHAR :     '_';
 PIPECHAR : '||';
+PIPECHAR2 : '!!';
 QUESTIONMARK : '?';
 PERCENT : '%';
 SELECT_ALL : '.*';
@@ -820,6 +821,10 @@ DATELITERAL: '\'' (DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT | //y
                    DIGIT DIGIT '/' DIGIT DIGIT '/' DIGIT DIGIT DIGIT DIGIT | //mm/dd/yyyy
                    DIGIT DIGIT '.' DIGIT DIGIT '.' DIGIT DIGIT DIGIT DIGIT |//dd.mm.yyyy
                    DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT DIGIT DIGIT) TIMESTAMPLITERAL? '\'';//yyyy-mm-dd
+
+INTEGERLITERAL : DIGIT+ ;
+IDENTIFIER : [a-zA-Z0-9][_a-zA-Z0-9]*;
+COPYBOOK_IDENTIFIER : [a-zA-Z0-9#@$][_a-zA-Z0-9#@$]*;
 
 fragment BXNUMBER :
 	B X '"' [0-9A-F]+ '"'
