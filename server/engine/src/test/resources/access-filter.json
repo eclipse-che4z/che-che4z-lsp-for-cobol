@@ -1,6 +1,11 @@
 { "rules": [
   {"excludeClasses": "org.eclipse.lsp.cobol.usecases.**"},
   {"excludeClasses":  "net.bytebuddy.implementation.**"},
+  {"excludeClasses" : "net.bytebuddy.description.**"},
+  {"excludeClasses" : "net.bytebuddy.asm.**"},
+  {"excludeClasses" : "net.bytebuddy.agent.**"},
+  {"excludeClasses" : "java.lang.instrument.Instrumentation"},
+  {"excludeClasses" : "net.bytebuddy.utility.**"},
   {"excludeClasses": "org.apache.maven.surefire.**"},
   {"excludeClasses":  "org.antlr.v4.runtime.**"},
   {"excludeClasses":  "org.mockito.**"},
