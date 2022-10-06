@@ -69,6 +69,7 @@ SKIP3 : S K I P '3' DOT_FS? -> channel(HIDDEN);
 DOUBLEEQUALCHAR : '==';
 EMPTYPSEUDOTEXT : '====';
 PIPECHAR : '||';
+PIPECHAR2: '!!';
 SELECT_ALL : '.*';
 
 // COBOL special separators
