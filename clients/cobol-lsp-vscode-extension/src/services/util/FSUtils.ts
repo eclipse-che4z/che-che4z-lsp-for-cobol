@@ -70,11 +70,9 @@ export function getURIFromResource(resource: string): urlUtil.URL[] {
             : path.normalize(path.join(workspaceFolder, resource));
 
         if (pathName.includes("*")) {
-            let pathNameSplitedByAsterisk = pathName.split("*", 2);
-            let basePath = pathNameSplitedByAsterisk[0]
-            let findPath = pathName.replace(basePath, "").replace("\\", "/");
-            let folders = glob.sync(findPath, {cwd: basePath});
-            for (const folder of folders) {
+            const basePath = pathName.split("*", 2)[0]
+            const findPath = pathName.replace(basePath, "").replace("\\", "/");
+            for (const folder of glob.sync(findPath, {cwd: basePath})) {
                 let uri = new urlUtil.URL(path.join(
                     SettingsUtils.absolutePath(workspaceFolderPath, basePath), folder));
                 if (fs.existsSync(uri)) {
@@ -82,7 +80,7 @@ export function getURIFromResource(resource: string): urlUtil.URL[] {
                 }
             }
         } else {
-            let uri = (path.resolve(resource) === path.normalize(resource))
+            const uri = (path.resolve(resource) === path.normalize(resource))
                 ? urlUtil.pathToFileURL(resource) :
                 new urlUtil.URL(path.normalize(path.join(
                     SettingsUtils.absolutePath(workspaceFolderPath, workspaceFolder), resource)));
