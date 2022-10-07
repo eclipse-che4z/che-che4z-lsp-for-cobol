@@ -63,7 +63,8 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
 
     List<VariableNode> foundDefinitions =
         node.getProgram()
-            .map(programNode -> symbolService.getVariableDefinition(programNode, variableUsageNodes))
+            .map(
+                programNode -> symbolService.getVariableDefinition(programNode, variableUsageNodes))
             .orElseGet(ImmutableList::of);
 
     for (VariableNode definitionNode : foundDefinitions) {
@@ -84,6 +85,12 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
         }
         definitionNode.addUsage(usageNode);
       }
+    }
+    if (foundDefinitions.size() > 1) {
+      foundDefinitions =
+          foundDefinitions.stream()
+              .filter(d -> !d.getLocality().getUri().startsWith("implicit:"))
+              .collect(Collectors.toList());
     }
     if (foundDefinitions.size() == 1) {
       return;

@@ -34,9 +34,11 @@ import java.util.stream.Collectors;
 /** Handle Copy From node */
 public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
   private final SymbolService symbolService;
+
   public DaCoCopyFromProcessor(SymbolService symbolService) {
     this.symbolService = symbolService;
   }
+
   @Override
   public void accept(DaCoCopyFromNode copyFromNode, ProcessingContext processingContext) {
     astPostprocessing(copyFromNode, processingContext.getErrors());
@@ -97,7 +99,8 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
               groupItemNode.isGlobal(),
               groupItemNode.isRedefines(),
               groupItemNode.getUsageFormat());
-      cloneNode.addChild(createVariableDefinitionNameNode(node, newName));
+      createVariableDefinitionNameNode(node, newName).ifPresent(cloneNode::addChild);
+
       groupItemNode
           .getChildren()
           .forEach(c -> cloneVarNode(lvlShift, c, newSuffix).ifPresent(cloneNode::addChild));
@@ -118,19 +121,44 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
               elNode.isRedefines(),
               elNode.isBlankWhenZeroPresent(),
               elNode.isSignClausePresent());
-      cloneNode.addChild(createVariableDefinitionNameNode(node, newName));
+      createVariableDefinitionNameNode(node, newName).ifPresent(cloneNode::addChild);
+      return Optional.of(cloneNode);
+    }
+    if (node instanceof MultiTableDataNameNode) {
+      MultiTableDataNameNode srcNode = (MultiTableDataNameNode) node;
+      String newName = srcNode.getName().substring(0, srcNode.getName().length() - 2) + newSuffix;
+      MultiTableDataNameNode cloneNode =
+          new MultiTableDataNameNode(
+              srcNode.getLocality(),
+              srcNode.getLevel(),
+              newName,
+              srcNode.isRedefines(),
+              srcNode.getOccursTimes(),
+              srcNode.getUsageFormat(),
+              srcNode.isGlobal());
+      createVariableDefinitionNameNode(node, newName).ifPresent(cloneNode::addChild);
+      srcNode
+          .getChildren()
+          .forEach(c -> cloneVarNode(lvlShift, c, newSuffix).ifPresent(cloneNode::addChild));
       return Optional.of(cloneNode);
     }
     return Optional.empty();
   }
 
-  private VariableDefinitionNameNode createVariableDefinitionNameNode(Node node, String newName) {
+  private Optional<VariableDefinitionNameNode> createVariableDefinitionNameNode(
+      Node node, String newName) {
+    if (!(node instanceof VariableNode)) {
+      return Optional.empty();
+    }
+    if ("FILLER".equalsIgnoreCase(((VariableNode) node).getName())) {
+      return Optional.empty();
+    }
     Locality defNameLocality =
         node.getChildren().stream()
             .filter(VariableDefinitionNameNode.class::isInstance)
             .findFirst()
             .orElseThrow(RuntimeException::new)
             .getLocality();
-    return new VariableDefinitionNameNode(defNameLocality, newName);
+    return Optional.of(new VariableDefinitionNameNode(defNameLocality, newName));
   }
 }
