@@ -60,9 +60,6 @@ boolean isTimeTriggeredBuild() {
 
 pipeline {
     agent none
-    parameters {
-        booleanParam(defaultValue: false, description: 'Run integration tests.', name: 'integrationTests')
-    }
     triggers {
         // Only development branch has nightly builds
         cron(env.BRANCH_NAME == 'development' ? '20 22 * * 1-5' : '')
