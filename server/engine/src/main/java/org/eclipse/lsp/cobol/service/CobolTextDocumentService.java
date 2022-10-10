@@ -140,6 +140,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final CopybookService copybookService;
   private final CopybookReferenceRepo copybookReferenceRepo;
   private final Map<String, Map<String, List<Diagnostic>>> errorsByFileForEachProgram;
+  private final SyncProvider syncProvider;
 
   @Inject
   @Builder
@@ -159,7 +160,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       CopybookNameService copybookNameService,
       ConfigurationService configurationService,
       CopybookService copybookService,
-      CopybookReferenceRepo copybookReferenceRepo) {
+      CopybookReferenceRepo copybookReferenceRepo,
+      SyncProvider syncProvider) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -176,6 +178,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.errorsByFileForEachProgram = new HashMap<>();
     this.copybookService = copybookService;
     this.copybookReferenceRepo = copybookReferenceRepo;
+    this.syncProvider = syncProvider;
     dataBus.subscribe(this);
   }
 
@@ -356,6 +359,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     communications.cancelProgressNotification(uri);
     docs.remove(uri);
     clearAnalysedFutureObject(uri);
+    syncProvider.remove(uri);
   }
 
   Map<String, List<Diagnostic>> collectAllDiagnostics() {
@@ -422,13 +426,13 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   @SuppressWarnings("java:S1181")
   private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
     registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.builder().build()));
-    synchronized (CobolTextDocumentService.this) {
+    synchronized (syncProvider.getSync(uri)) {
       Future<?> docAnalysisFuture =
           executors
               .getThreadPoolExecutor()
               .submit(
                   () -> {
-                    synchronized (CobolTextDocumentService.this) {
+                    synchronized (syncProvider.getSync(uri)) {
                       try {
                         CopybookProcessingMode processingMode =
                             CopybookProcessingMode.getCopybookProcessingMode(
@@ -463,23 +467,21 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   }
 
   private void registerToFutureMap(String uri, Future<?> docAnalysisFuture) {
-    synchronized (CobolTextDocumentService.this) {
-      Optional.ofNullable(futureMap.get(uri))
-          .ifPresent(f -> f.cancel(true)
-          );
-      futureMap.put(uri, docAnalysisFuture);
-    }
+    Optional.ofNullable(futureMap.get(uri))
+        .ifPresent(f -> f.cancel(true)
+        );
+    futureMap.put(uri, docAnalysisFuture);
   }
 
   @SuppressWarnings("java:S1181")
   void analyzeChanges(String uri, String text) {
-    synchronized (CobolTextDocumentService.this) {
+    synchronized (syncProvider.getSync(uri)) {
       Future<?> analyseSubmitFuture =
           executors
               .getThreadPoolExecutor()
               .submit(
                   () -> {
-                    synchronized (CobolTextDocumentService.this) {
+                    synchronized (syncProvider.getSync(uri)) {
                       try {
                         CopybookProcessingMode processingMode =
                             CopybookProcessingMode.getCopybookProcessingMode(
