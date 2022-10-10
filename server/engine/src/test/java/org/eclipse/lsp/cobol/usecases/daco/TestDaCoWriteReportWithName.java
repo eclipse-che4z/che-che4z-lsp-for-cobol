@@ -110,7 +110,7 @@ class TestDaCoWriteReportWithName {
                         new Diagnostic(
                                 new Range(),
                                 "Allowed range is 80 to 200",
-                                DiagnosticSeverity.Error,
+                                DiagnosticSeverity.Warning,
                                 ErrorSource.DIALECT.getText()),
                         "4",
                         new Diagnostic(
