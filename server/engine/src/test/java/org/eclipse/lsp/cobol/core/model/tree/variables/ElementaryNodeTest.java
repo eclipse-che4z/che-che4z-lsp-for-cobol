@@ -16,12 +16,12 @@
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.logic.ElementaryNodeCheck;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -33,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * ElementaryNode}
  */
 class ElementaryNodeTest {
-
   ElementaryItemNode getNode(String picClause, UsageFormat usageClause) {
     return new ElementaryItemNode(
         null, 2, "TEST-NODE", false, picClause, "", usageClause, false, false, false);

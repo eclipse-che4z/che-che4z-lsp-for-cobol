@@ -282,9 +282,9 @@ public class CobolLanguageEngine {
 
     return new ResultWithErrors<>(
         AnalysisResult.builder()
-                .rootNode(rootNode)
-                .symbolTableMap(symbolService.getProgramSymbols())
-                .build(),
+            .rootNode(rootNode)
+            .symbolTableMap(symbolService.getProgramSymbols())
+            .build(),
         accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
@@ -365,8 +365,11 @@ public class CobolLanguageEngine {
             ProcessingPhase.VALIDATION,
             new StandAloneDataItemCheck()));
     ctx.register(
+            new ProcessorDescription(
+                    ProgramEndNode.class, ProcessingPhase.VALIDATION, new ProgramEndCheck()));
+    ctx.register(
         new ProcessorDescription(
-            ProgramEndNode.class, ProcessingPhase.VALIDATION, new ProgramEndCheck()));
+            CICSTranslatorNode.class, ProcessingPhase.VALIDATION, new CICSTranslatorProcessor(analysisConfig, messageService)));
 
     // Dialects
     List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());

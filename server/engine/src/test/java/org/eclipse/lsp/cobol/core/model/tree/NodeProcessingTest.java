@@ -16,17 +16,18 @@ package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Test that nodes can be processed in several steps */
 class NodeProcessingTest {
@@ -36,6 +37,7 @@ class NodeProcessingTest {
 
   @Test
   void testSimple() {
+
     /** Do nothing */
     class SimpleNode extends Node {
       SimpleNode() {
@@ -45,7 +47,11 @@ class NodeProcessingTest {
 
     SimpleNode node = new SimpleNode();
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    new AstProcessor().process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors));
+    new AstProcessor()
+        .process(
+            ProcessingPhase.TRANSFORMATION,
+            node,
+            new ProcessingContext(errors));
     assertTrue(errors.isEmpty());
   }
 

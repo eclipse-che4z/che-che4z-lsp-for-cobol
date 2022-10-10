@@ -68,6 +68,6 @@ class TestSqlAnalysisDisabled {
         new AnalysisConfig(
             new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of()),
             ImmutableList.of(),
-            ImmutableList.of()));
+            ImmutableList.of(), true));
   }
 }

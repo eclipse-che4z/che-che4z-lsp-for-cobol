@@ -24,8 +24,6 @@ import java.util.List;
 
 /** This interface handles the request for configurations from the client settings */
 public interface ConfigurationService {
-  String CICS_TRANSLATOR_DIALECT = "CICSTranslator";
-
   /** Update all the configurations from the client Settings */
   void updateConfigurationFromSettings();
 
@@ -56,13 +54,15 @@ public interface ConfigurationService {
     List<String> dialects;
     List<String> predefinedParagraphs;
     List<String> subroutines;
+    boolean cicsTranslatorEnabled;
 
     public ConfigurationEntity() {
       sqlBackend = SQLBackend.DB2_SERVER;
       features = ImmutableList.of();
-      dialects = ImmutableList.of(CICS_TRANSLATOR_DIALECT);
+      dialects = ImmutableList.of();
       predefinedParagraphs = ImmutableList.of();
       subroutines = ImmutableList.of();
+      cicsTranslatorEnabled = true;
     }
   }
 }

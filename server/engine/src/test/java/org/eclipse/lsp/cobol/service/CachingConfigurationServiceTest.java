@@ -45,7 +45,8 @@ class CachingConfigurationServiceTest {
             new CopybookConfig(
                 CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of()),
             ImmutableList.of(),
-            ImmutableList.of("CICSTranslator")),
+            ImmutableList.of(),
+            true),
         configuration.getConfig(CopybookProcessingMode.ENABLED));
   }
 
@@ -67,7 +68,8 @@ class CachingConfigurationServiceTest {
             featuresArray,
             dialectSettings,
             predefinedParagraphs,
-            subroutines);
+            subroutines,
+            new JsonPrimitive("true"));
 
     when(settingsService.fetchConfigurations(
             Arrays.asList(
@@ -75,7 +77,8 @@ class CachingConfigurationServiceTest {
                 ANALYSIS_FEATURES.label,
                 DIALECTS.label,
                 DaCo_PREDEFINED_SECTIONS.label,
-                SUBROUTINE_LOCAL_PATHS.label)))
+                SUBROUTINE_LOCAL_PATHS.label,
+                CICS_TRANSLATOR_ENABLED.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration = new CachingConfigurationService(settingsService);
@@ -86,7 +89,8 @@ class CachingConfigurationServiceTest {
             new CopybookConfig(
                 CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(EmbeddedCodeNode.Language.SQL),
-            ImmutableList.of("Dialect", "CICSTranslator")),
+            ImmutableList.of("Dialect"),
+            true),
         configuration.getConfig(CopybookProcessingMode.DISABLED));
   }
 
@@ -103,14 +107,16 @@ class CachingConfigurationServiceTest {
             new JsonNull(),
             dialectSettings,
             new JsonNull(),
-            subroutineSettings);
+            subroutineSettings,
+            new JsonNull());
     when(settingsService.fetchConfigurations(
             Arrays.asList(
                 TARGET_SQL_BACKEND.label,
                 ANALYSIS_FEATURES.label,
                 DIALECTS.label,
                 DaCo_PREDEFINED_SECTIONS.label,
-                SUBROUTINE_LOCAL_PATHS.label)))
+                SUBROUTINE_LOCAL_PATHS.label,
+                CICS_TRANSLATOR_ENABLED.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration = new CachingConfigurationService(settingsService);
@@ -121,7 +127,8 @@ class CachingConfigurationServiceTest {
             new CopybookConfig(
                 CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(EmbeddedCodeNode.Language.SQL, EmbeddedCodeNode.Language.CICS),
-            ImmutableList.of("Dialect", "CICSTranslator")),
+            ImmutableList.of("Dialect"),
+            false),
         configuration.getConfig(CopybookProcessingMode.DISABLED));
   }
 }

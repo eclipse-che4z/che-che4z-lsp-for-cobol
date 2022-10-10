@@ -16,12 +16,22 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.SQLBackend;
+import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp.cobol.usecases.engine.UseCase;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
+import org.eclipse.lsp4j.Diagnostic;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
+
+import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
 
 /**
  * Tests CICS translator options. Refer <a
@@ -103,5 +113,25 @@ public class TestCICSTranslatorOptions {
   void testCompilerDirectivesMixedWithCICSTranslatorOptions() {
     UseCaseEngine.runTest(
         MIXED_COMPILER_DIRECTIVE_CICS_TRANSLATOR, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testCompilerDirectivesMixedWithCICSTranslatorOptionsWhenDisabled() {
+    UseCase useCase =
+        UseCase.builder()
+            .fileName(UseCaseUtils.DOCUMENT_URI)
+            .text(MIXED_COMPILER_DIRECTIVE_CICS_TRANSLATOR)
+            .copybooks(ImmutableList.of())
+            .sqlBackend(SQLBackend.DB2_SERVER)
+            .copybookProcessingMode(ENABLED)
+            .features(ImmutableList.of())
+            .dialects(ImmutableList.of())
+            .cicsTranslator(false)
+            .build();
+    AnalysisResult analyze = UseCaseUtils.analyze(useCase);
+    Map<String, List<Diagnostic>> diagnostics = analyze.getDiagnostics();
+    Assertions.assertEquals(1, diagnostics.get(UseCaseUtils.DOCUMENT_URI).size());
+    Assertions.assertEquals(
+        "Enable CICS translator in the settings", diagnostics.get(UseCaseUtils.DOCUMENT_URI).get(0).getMessage());
   }
 }

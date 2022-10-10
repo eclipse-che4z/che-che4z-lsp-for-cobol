@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
@@ -56,7 +57,8 @@ public class CachingConfigurationService implements ConfigurationService {
                     ANALYSIS_FEATURES.label,
                     DIALECTS.label,
                     DaCo_PREDEFINED_SECTIONS.label,
-                    SUBROUTINE_LOCAL_PATHS.label))
+                    SUBROUTINE_LOCAL_PATHS.label,
+                    CICS_TRANSLATOR_ENABLED.label))
             .thenApply(this::parseConfig);
   }
 
@@ -100,7 +102,8 @@ public class CachingConfigurationService implements ConfigurationService {
         parseFeatures((JsonElement) clientConfig.get(1)),
         parseDialects((JsonArray) clientConfig.get(2)),
         parsePredefinedParagraphs((JsonElement) clientConfig.get(3)),
-        parseSubroutineFolder((JsonElement) clientConfig.get(4)));
+        parseSubroutineFolder((JsonElement) clientConfig.get(4)),
+        parseCicsTranslatorOption((JsonElement) clientConfig.get(5)));
   }
 
   private SQLBackend parseSQLBackend(List<Object> objects) {
@@ -109,15 +112,18 @@ public class CachingConfigurationService implements ConfigurationService {
         .orElse(SQLBackend.DB2_SERVER);
   }
 
-  private List<String> parseDialects(JsonArray dialects) {
-    List<String> providedDialects = Streams.stream(dialects).map(JsonElement::getAsString).collect(toList());
-    setSystemDialects(providedDialects);
-    return providedDialects;
+  private boolean parseCicsTranslatorOption(JsonElement options) {
+    if (options instanceof JsonNull) {
+      return false;
+    } else {
+      return options.getAsBoolean();
+    }
   }
 
-  private void setSystemDialects(List<String> providedDialects) {
-    if (!providedDialects.contains(CICS_TRANSLATOR_DIALECT))
-      providedDialects.add(CICS_TRANSLATOR_DIALECT);
+  private List<String> parseDialects(JsonArray dialects) {
+    List<String> providedDialects =
+        Streams.stream(dialects).map(JsonElement::getAsString).collect(toList());
+    return providedDialects;
   }
 
   private List<EmbeddedCodeNode.Language> parseFeatures(JsonElement features) {
