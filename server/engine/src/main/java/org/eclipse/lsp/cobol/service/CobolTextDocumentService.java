@@ -422,75 +422,88 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   @SuppressWarnings("java:S1181")
   private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
     registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.builder().build()));
-    Future<?> docAnalysisFuture =
-        executors
-            .getThreadPoolExecutor()
-            .submit(
-                () -> {
-                  try {
-                    CopybookProcessingMode processingMode =
-                        CopybookProcessingMode.getCopybookProcessingMode(
-                            uri,
-                            userRequest
-                                ? CopybookProcessingMode.ENABLED_VERBOSE
-                                : CopybookProcessingMode.ENABLED);
+    synchronized (CobolTextDocumentService.this) {
+      Future<?> docAnalysisFuture =
+          executors
+              .getThreadPoolExecutor()
+              .submit(
+                  () -> {
+                    synchronized (CobolTextDocumentService.this) {
+                      try {
+                        CopybookProcessingMode processingMode =
+                            CopybookProcessingMode.getCopybookProcessingMode(
+                                uri,
+                                userRequest
+                                    ? CopybookProcessingMode.ENABLED_VERBOSE
+                                    : CopybookProcessingMode.ENABLED);
 
-                    AnalysisConfig config = configurationService.getConfig(processingMode);
-                    AnalysisResult result = engine.analyze(uri, text, config);
-                    ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
-                    errorsByFileForEachProgram.put(uri, result.getDiagnostics());
-                    publishResult(uri, result, processingMode);
-                    outlineMap.computeIfPresent(
-                        uri,
-                        (key, value) -> {
-                          value.complete(
-                              BuildOutlineTreeFromSyntaxTree.convert(result.getRootNode(), uri));
-                          return value;
-                        });
-                    cfAstMap.get(uri).complete(result.getRootNode());
-                  } catch (Throwable e) {
-                    cfAstMap.get(uri).completeExceptionally(e);
-                    LOG.error(createDescriptiveErrorMessage("analysis", uri), e);
-                  } finally {
-                    clearAnalysedFutureObject(uri);
-                  }
-                });
-    registerToFutureMap(uri, docAnalysisFuture);
+                        AnalysisConfig config = configurationService.getConfig(processingMode);
+                        AnalysisResult result = engine.analyze(uri, text, config);
+                        ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
+                        errorsByFileForEachProgram.put(uri, result.getDiagnostics());
+                        publishResult(uri, result, processingMode);
+                        outlineMap.computeIfPresent(
+                            uri,
+                            (key, value) -> {
+                              value.complete(
+                                  BuildOutlineTreeFromSyntaxTree.convert(result.getRootNode(), uri));
+                              return value;
+                            });
+                        cfAstMap.get(uri).complete(result.getRootNode());
+                      } catch (Throwable e) {
+                        cfAstMap.get(uri).completeExceptionally(e);
+                        LOG.error(createDescriptiveErrorMessage("analysis", uri), e);
+                      } finally {
+                        clearAnalysedFutureObject(uri);
+                      }
+                    }
+                  });
+      registerToFutureMap(uri, docAnalysisFuture);
+    }
   }
 
   private void registerToFutureMap(String uri, Future<?> docAnalysisFuture) {
-    futureMap.put(uri, docAnalysisFuture);
+    synchronized (CobolTextDocumentService.this) {
+      Optional.ofNullable(futureMap.get(uri))
+          .ifPresent(f -> f.cancel(true)
+          );
+      futureMap.put(uri, docAnalysisFuture);
+    }
   }
 
   @SuppressWarnings("java:S1181")
   void analyzeChanges(String uri, String text) {
-    Future<?> analyseSubmitFuture =
-        executors
-            .getThreadPoolExecutor()
-            .submit(
-                () -> {
-                  try {
-                    CopybookProcessingMode processingMode =
-                        CopybookProcessingMode.getCopybookProcessingMode(
-                            uri, CopybookProcessingMode.SKIP);
-                    AnalysisConfig config = configurationService.getConfig(processingMode);
-                    AnalysisResult result = engine.analyze(uri, text, config);
-                    registerDocument(uri, new CobolDocumentModel(text, result));
-                    errorsByFileForEachProgram.put(uri, result.getDiagnostics());
-                    communications.publishDiagnostics(collectAllDiagnostics());
-                    outlineMap
-                        .get(uri)
-                        .complete(
-                            BuildOutlineTreeFromSyntaxTree.convert(result.getRootNode(), uri));
-                    cfAstMap.get(uri).complete(result.getRootNode());
-                  } catch (Throwable ex) {
-                    cfAstMap.get(uri).completeExceptionally(ex);
-                    LOG.error(createDescriptiveErrorMessage("analysis", uri), ex);
-                  } finally {
-                    clearAnalysedFutureObject(uri);
-                  }
-                });
-    registerToFutureMap(uri, analyseSubmitFuture);
+    synchronized (CobolTextDocumentService.this) {
+      Future<?> analyseSubmitFuture =
+          executors
+              .getThreadPoolExecutor()
+              .submit(
+                  () -> {
+                    synchronized (CobolTextDocumentService.this) {
+                      try {
+                        CopybookProcessingMode processingMode =
+                            CopybookProcessingMode.getCopybookProcessingMode(
+                                uri, CopybookProcessingMode.SKIP);
+                        AnalysisConfig config = configurationService.getConfig(processingMode);
+                        AnalysisResult result = engine.analyze(uri, text, config);
+                        registerDocument(uri, new CobolDocumentModel(text, result));
+                        errorsByFileForEachProgram.put(uri, result.getDiagnostics());
+                        communications.publishDiagnostics(collectAllDiagnostics());
+                        outlineMap
+                            .get(uri)
+                            .complete(
+                                BuildOutlineTreeFromSyntaxTree.convert(result.getRootNode(), uri));
+                        cfAstMap.get(uri).complete(result.getRootNode());
+                      } catch (Throwable ex) {
+                        cfAstMap.get(uri).completeExceptionally(ex);
+                        LOG.error(createDescriptiveErrorMessage("analysis", uri), ex);
+                      } finally {
+                        clearAnalysedFutureObject(uri);
+                      }
+                    }
+                  });
+      registerToFutureMap(uri, analyseSubmitFuture);
+    }
   }
 
   private void publishResult(
