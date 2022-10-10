@@ -22,9 +22,7 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -43,7 +41,8 @@ public class ElementOccurrences implements Occurrences {
   @Override
   public @NonNull List<Location> findDefinitions(
       @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
-    return symbolService.findElementByPosition(document, position).getDefinitions();
+    return symbolService.findElementByPosition(document, position)
+            .map(Context::getDefinitions).orElse(Collections.emptyList());
   }
 
   @Override
@@ -51,10 +50,13 @@ public class ElementOccurrences implements Occurrences {
       @NonNull CobolDocumentModel document,
       @NonNull TextDocumentPositionParams position,
       @NonNull ReferenceContext refCtx) {
-    Context element = symbolService.findElementByPosition(document, position);
-    List<Location> references = new ArrayList<>(element.getUsages());
+    Optional<Context> element = symbolService.findElementByPosition(document, position);
+    if (!element.isPresent()) {
+      return Collections.emptyList();
+    }
+    List<Location> references = new ArrayList<>(element.get().getUsages());
     if (refCtx.isIncludeDeclaration()) {
-      references.addAll(element.getDefinitions());
+      references.addAll(element.get().getDefinitions());
     }
     return references;
   }
@@ -62,11 +64,11 @@ public class ElementOccurrences implements Occurrences {
   @Override
   public @NonNull List<DocumentHighlight> findHighlights(
       @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
-    Context element = symbolService.findElementByPosition(document, position);
-    return Streams.concat(element.getUsages().stream(), element.getDefinitions().stream())
-        .filter(byUri(position))
-        .map(toDocumentHighlight())
-        .collect(Collectors.toList());
+    Optional<Context> element = symbolService.findElementByPosition(document, position);
+    return element.map(context -> Streams.concat(context.getUsages().stream(), context.getDefinitions().stream())
+            .filter(byUri(position))
+            .map(toDocumentHighlight())
+            .collect(Collectors.toList())).orElse(Collections.emptyList());
   }
 
   @NonNull

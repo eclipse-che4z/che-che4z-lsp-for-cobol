@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -72,7 +73,7 @@ class TestDefinitionOnLongCopybooks {
             new Range(new Position(), new Position()));
     Context ctx = mock(Context.class);
     when(ctx.getDefinitions()).thenReturn(Collections.singletonList(expectedDef));
-    when(symbolService.findElementByPosition(eq(document), eq(position))).thenReturn(ctx);
+    when(symbolService.findElementByPosition(eq(document), eq(position))).thenReturn(Optional.of(ctx));
     List<Location> definitions = new ElementOccurrences(symbolService).findDefinitions(document, position);
 
     assertEquals(1, definitions.size());

@@ -203,13 +203,20 @@ public class VariableDefinitionUtil {
    */
   private void reshapeVariablesLocality(Node node) {
     List<Node> children = node.getChildren();
-    if (children.isEmpty()) return;
+    if (children.isEmpty()) {
+      return;
+    }
     children.forEach(VariableDefinitionUtil::reshapeVariablesLocality);
     if (node.getNodeType() == NodeType.VARIABLE) {
       VariableNode variableNode = (VariableNode) node;
-      if (isGroupedVariable(variableNode))
-        variableNode.extendLocality(
-            children.get(children.size() - 1).getLocality().getRange().getEnd());
+      if (isGroupedVariable(variableNode)) {
+        List<Node> sameFileChildren = children.stream()
+                .filter(c -> c.getLocality().getUri().equals(variableNode.getLocality().getUri()))
+                .collect(Collectors.toList());
+        if (!sameFileChildren.isEmpty()) {
+          variableNode.extendLocality(sameFileChildren.get(sameFileChildren.size() - 1).getLocality().getRange().getEnd());
+        }
+      }
     }
   }
 
