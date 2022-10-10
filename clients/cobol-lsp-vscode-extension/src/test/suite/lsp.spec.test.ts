@@ -34,7 +34,7 @@ suite('Integration Test Suite', () => {
         // setting a language takes a while but shouldn't take longer than a second
         await helper.sleep(1000);
         assert.ok(editor.document.languageId === 'cobol');
-    }).timeout(10000).slow(4000);
+    }).timeout(2000).slow(1000);
 
 
     test('TC152046 Nominal - check syntax Ok message', async () => {
@@ -42,7 +42,7 @@ suite('Integration Test Suite', () => {
         const uri = vscode.window.activeTextEditor.document.uri;
         const diagnostics = vscode.languages.getDiagnostics(uri);
         assert.strictEqual(diagnostics.length, 0, "Checks that when opening Cobol file with correct syntax there is an appropriate message is shown");
-    }).timeout(10000).slow(4000);
+    }).timeout(2000).slow(1000);
 
     test('TC152049 Navigate through definitions', async () => {
         vscode.commands.executeCommand('vscode.executeDefinitionProvider', editor.document.uri, new vscode.Position(28, 24)).then((result: any[]) => {
@@ -51,7 +51,7 @@ suite('Integration Test Suite', () => {
                 && result[0].range.start.line === 31
                 && result[0].range.start.character === 7, 'Checks behavior of go to definition action');
         });
-    }).timeout(10000).slow(4000);
+    }).timeout(2000).slow(1000);
 
     test('TC152080 Find all references from the word middle', async () => {
         vscode.commands.executeCommand('vscode.executeReferenceProvider', editor.document.uri, new vscode.Position(20, 15))
@@ -62,7 +62,7 @@ suite('Integration Test Suite', () => {
                     && result[1].range.start.line === 34
                     && result[2].range.start.line === 42, 'Checks that LSP can find all references and navigate by them')
             });
-    }).timeout(10000).slow(4000);
+    }).timeout(2000).slow(1000);
 
     test('TC152080 Find all references from the word begin', async () => {
         vscode.commands.executeCommand('vscode.executeReferenceProvider', editor.document.uri, new vscode.Position(20, 10))
@@ -73,7 +73,7 @@ suite('Integration Test Suite', () => {
                     && result[1].range.start.line === 34
                     && result[2].range.start.line === 42, 'Checks that LSP can find all references and navigate by them');
             });
-    }).timeout(10000).slow(4000);
+    }).timeout(2000).slow(1000);
 
 
     test('TC152047/ TC152052/ TC152051/ TC152050/ TC152053 Error case - file has syntax errors and semantic errors are marked and have detailed hints', async () => {
@@ -92,28 +92,84 @@ suite('Integration Test Suite', () => {
         helper.assertRangeIsEqual(diagnostics[2].range, new vscode.Range(new vscode.Position(14, 7), new vscode.Position(14, 18)));
         assert.strictEqual(diagnostics[0].severity, diagnostics[2].severity);
         assert.strictEqual(diagnostics[2].severity, vscode.DiagnosticSeverity.Error, 'No syntax errors detected in USER2.cbl');
-    }).timeout(10000).slow(4000);
+    }).timeout(5000).slow(1000);
 
     test('TC152054 Auto format of right trailing spaces', async () => {
         await helper.insertString(editor, new vscode.Position(34, 57), "        ");
         vscode.commands.executeCommand('vscode.executeFormatDocumentProvider', editor.document.uri, { tabSize: 4, insertSpaces: true })
-        .then((result: vscode.TextEdit[]) => {
-            assert.ok(helper.assertRangeIsEqual(result[0].range, new vscode.Range(new vscode.Position(34, 57), new vscode.Position(34, 65)))
-            && result[0].newText === "",
-            "Checks that auto format removed sight trailing spaces")
+        .then((result: any[]) => {
+            helper.assertRangeIsEqual(result[0].range, new vscode.Range(new vscode.Position(34, 57),
+                new vscode.Position(34, 65)));
+            assert.strictEqual(result[0].newText, "");
         });
-    }).timeout(10000).slow(4000);
+    }).timeout(3000).slow(1000);
 
     test('TC288736 error message for 80chars limit', async () => {
         await helper.showDocument("TEST.CBL");
-        editor = helper.get_editor("TEST.CBL");
+        const editor = helper.get_editor("TEST.CBL");
         await helper.insertString(editor, new vscode.Position(22, 7), "oi3Bd5kC1f3nMFp0IWg62ZZgWMxHPJnuLWm4DqplZDzMIX69C6vjeL24YbobdQnoQsDenL35omljznHd0l1fP");
         await helper.sleep(1000);
         const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-        assert.ok(diagnostics.length === 4
-            && diagnostics[0].message === "Source text cannot go past column 80"
-            && helper.assertRangeIsEqual(diagnostics[0].range, new vscode.Range(new vscode.Position(22, 80), new vscode.Position(22, 131))),
-            "Source text can not go past column 80")
+        assert.strictEqual(diagnostics.length, 4);
+        assert.strictEqual(diagnostics[0].message, "Source text cannot go past column 80");
+        helper.assertRangeIsEqual(diagnostics[0].range,
+            new vscode.Range(new vscode.Position(22, 80), new vscode.Position(22, 131)));
 
-    }).timeout(10000).slow(4000);
-})
+    }).timeout(2000).slow(1000);
+
+    test("TC174655 Copybook - Nominal", async () => {
+        await helper.showDocument("USERC1N1.cbl");
+        let editor = helper.get_editor("USERC1N1.cbl");
+        await helper.sleep(1000);
+        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics[0].severity, vscode.DiagnosticSeverity.Error,
+            'No syntax errors detected in USERC1N1.cbl');
+    }).timeout(2000).slow(1000);
+
+    test("TC174657: Copybook - not exist: no syntax ok message", async () => {
+        await helper.showDocument("USERC1F.cbl");
+        let editor = helper.get_editor("USERC1F.cbl");
+        await helper.sleep(1000);
+        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics[0].severity, vscode.DiagnosticSeverity.Error,
+            'No syntax errors detected in USERC1F.cbl');
+    }).timeout(2000).slow(1000);
+
+    test("TC174658/TC174658 Copybook - not exist: error underlying and detailed hint", async () => {
+        await helper.showDocument("USERC1F.cbl");
+        let editor = helper.get_editor("USERC1F.cbl");
+        await helper.sleep(1000);
+        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 3);
+        helper.assertRangeIsEqual(diagnostics[0].range,
+            new vscode.Range(new vscode.Position(18, 12), new vscode.Position(18, 17)));
+        assert.strictEqual(diagnostics[0].message, "BOOK3: Copybook not found");
+
+    }).timeout(2000).slow(1000);
+
+    test("TC174916/TC174917 Copybook - recursive error and detailed hint", async () => {
+        await helper.showDocument("USERC1R.cbl");
+        let editor = helper.get_editor("USERC1R.cbl");
+        await helper.sleep(1000);
+        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 5);
+        helper.assertRangeIsEqual(diagnostics[0].range,
+            new vscode.Range(new vscode.Position(18, 12), new vscode.Position(18, 18)));
+        assert.strictEqual(diagnostics[0].message, "Recursive copybook declaration for: BOOK1R");
+
+    }).timeout(2000).slow(1000);
+
+    test("TC174932/TC174933 Copybook - invalid definition and hint", async () => {
+        await helper.showDocument("USERC1N2.cbl");
+        let editor = helper.get_editor("USERC1N2.cbl");
+        await helper.sleep(1000);
+        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        diagnostics.forEach(d => console.log(d.message));
+        assert.strictEqual(diagnostics.length, 8);
+        helper.assertRangeIsEqual(diagnostics[1].range,
+            new vscode.Range(new vscode.Position(51, 38), new vscode.Position(51, 56)));
+        assert.strictEqual(diagnostics[1].message, "Variable USER-PHONE-MOBILE1 is not defined");
+
+    }).timeout(2000).slow(1000);
+
+});

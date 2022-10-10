@@ -103,10 +103,10 @@ function recursiveCopySync(origin, dest) {
 }
 
 export function assertRangeIsEqual(providedRange: vscode.Range, expectedRange: vscode.Range) {
-   return providedRange.start.line == expectedRange.start.line
-        && providedRange.start.character == expectedRange.start.character
-        && providedRange.end.line == expectedRange.end.line
-        && providedRange.end.character == expectedRange.end.character;
+   assert.strictEqual(providedRange.start.line, expectedRange.start.line);
+   assert.strictEqual(providedRange.start.character, expectedRange.start.character);
+   assert.strictEqual(providedRange.end.line, expectedRange.end.line);
+   assert.strictEqual(providedRange.end.character, expectedRange.end.character);
 }
 
 export async function executeCommandMultipleTimes(command: string, times: number) {
