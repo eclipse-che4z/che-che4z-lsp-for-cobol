@@ -19,10 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
-import org.eclipse.lsp.cobol.service.CFASTBuilderImpl;
-import org.eclipse.lsp.cobol.service.CobolLSPServerStateService;
-import org.eclipse.lsp.cobol.service.CobolTextDocumentService;
-import org.eclipse.lsp.cobol.service.ConfigurationService;
+import org.eclipse.lsp.cobol.service.*;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
@@ -78,6 +75,7 @@ public class MockTextDocumentService {
         .configurationService(configurationService)
         .copybookService(copybookService)
         .copybookReferenceRepo(new CopybookReferenceRepoImpl())
+        .syncProvider(new SyncProvider())
         .build();
   }
 
@@ -99,6 +97,7 @@ public class MockTextDocumentService {
         .executors(new CustomThreadPoolExecutorService(1, 1, 60, 1))
         .hoverProvider(hoverProvider)
         .configurationService(configurationService)
+        .syncProvider(new SyncProvider())
         .build();
   }
 
