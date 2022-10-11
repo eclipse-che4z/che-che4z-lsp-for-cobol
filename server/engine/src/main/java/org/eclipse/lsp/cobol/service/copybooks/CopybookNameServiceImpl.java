@@ -88,10 +88,13 @@ public class CopybookNameServiceImpl implements CopybookNameService {
     String fileNameWithExtension = uriAsArray[uriAsArray.length - 1];
     String fileName = fileNameWithExtension.split("\\.")[0];
     return findByName(fileName).isPresent()
-        || Optional.ofNullable(listOfCopybookFolders)
-        .orElse(emptySet())
-        .stream()
-        .anyMatch(uri::contains);
+        || Optional.of(
+                listOfCopybookFolders.stream()
+                    .map(str -> str.split("\\$\\{fileBasenameNoExtension}")[0])
+                    .collect(Collectors.toSet()))
+            .orElse(emptySet())
+            .stream()
+            .anyMatch(uri::contains);
   }
 
   @Override

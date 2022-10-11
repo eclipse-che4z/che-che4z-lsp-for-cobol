@@ -141,6 +141,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final CopybookReferenceRepo copybookReferenceRepo;
   private final Map<String, Map<String, List<Diagnostic>>> errorsByFileForEachProgram;
   private final SyncProvider syncProvider;
+  private final WatcherService watcherService;
 
   @Inject
   @Builder
@@ -161,7 +162,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       ConfigurationService configurationService,
       CopybookService copybookService,
       CopybookReferenceRepo copybookReferenceRepo,
-      SyncProvider syncProvider) {
+      SyncProvider syncProvider,
+      WatcherService watcherService) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -179,6 +181,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.copybookService = copybookService;
     this.copybookReferenceRepo = copybookReferenceRepo;
     this.syncProvider = syncProvider;
+    this.watcherService = watcherService;
     dataBus.subscribe(this);
   }
 
@@ -359,6 +362,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     communications.cancelProgressNotification(uri);
     docs.remove(uri);
     clearAnalysedFutureObject(uri);
+    watcherService.removeRuntimeWatchers(uri);
     syncProvider.remove(uri);
   }
 

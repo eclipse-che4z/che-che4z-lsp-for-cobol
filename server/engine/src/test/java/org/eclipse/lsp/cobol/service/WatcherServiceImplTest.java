@@ -92,6 +92,26 @@ class WatcherServiceImplTest {
   }
 
   @Test
+  void addRuntimeWatchers() {
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
+    ClientProvider provider = new ClientProvider();
+    provider.setClient(client);
+    ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
+    WatcherService watcherService = new WatcherServiceImpl(provider);
+
+    watcherService.addRuntimeWatchers(ImmutableList.of("foo/bar", "baz", "bar\\foo"), "document.cbl");
+
+    verify(client).registerCapability(captor.capture());
+    RegistrationParams params = captor.getValue();
+
+    assertEquals(3, params.getRegistrations().size());
+
+    assertRegistration(params.getRegistrations().get(0), "foo/bar");
+    assertRegistration(params.getRegistrations().get(1), "baz");
+    assertRegistration(params.getRegistrations().get(2), "bar\\foo");
+  }
+
+  @Test
   void removeWatchers() {
     CobolLanguageClient client = mock(CobolLanguageClient.class);
     ClientProvider provider = new ClientProvider();
@@ -113,6 +133,29 @@ class WatcherServiceImplTest {
     Unregistration unregistration = unregistrations.get(0);
     assertEquals("foo/bar", unregistration.getId());
     assertEquals("workspace/didChangeWatchedFiles", unregistration.getMethod());
+  }
+
+  @Test
+  void removeRuntimeWatchers() {
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
+    ClientProvider provider = new ClientProvider();
+    provider.setClient(client);
+    ArgumentCaptor<UnregistrationParams> captor = forClass(UnregistrationParams.class);
+    WatcherService watcherService = new WatcherServiceImpl(provider);
+
+    watcherService.addRuntimeWatchers(ImmutableList.of("foo/bar", "baz", "bar\\foo"), "document.cbl");
+    watcherService.removeRuntimeWatchers("document.cbl");
+
+    verify(client).unregisterCapability(captor.capture());
+    UnregistrationParams params = captor.getValue();
+
+    List<Unregistration> unregistrations = params.getUnregisterations();
+    assertEquals(3, unregistrations.size());
+
+    assertEquals("foo/bar", unregistrations.get(0).getId());
+    assertEquals("baz", unregistrations.get(1).getId());
+    assertEquals("bar\\foo", unregistrations.get(2).getId());
+    assertEquals("workspace/didChangeWatchedFiles", unregistrations.get(0).getMethod());
   }
 
   private void assertRegistration(Registration registration, String glob) {
