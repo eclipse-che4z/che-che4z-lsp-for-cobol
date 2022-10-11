@@ -39,12 +39,27 @@ public interface WatcherService {
   void addWatchers(@NonNull List<String> paths);
 
   /**
+   * Watch all types of file system changes in folders with given paths relative to workspace folder
+   *
+   * @param paths - folders inside workspace to watch
+   * @param documentUri - documents for which specified path need to be watched.
+   */
+  void addRuntimeWatchers(@NonNull List<String> paths, String documentUri);
+
+  /**
    * Stop watching all types of file system changes in folders with given paths relative to
    * workspace folder
    *
    * @param paths - folders inside workspace to stop watching
    */
   void removeWatchers(@NonNull List<String> paths);
+
+  /**
+   * Stop watching all types of file system changes specified for a document.
+   *
+   * @param documentUri - document for which runtime watchers need to be removed.
+   */
+  void removeRuntimeWatchers(@NonNull String documentUri);
 
   /**
    * Get a list of paths of registered custom watchers not including .copybooks folder
