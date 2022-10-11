@@ -54,7 +54,7 @@ public class TestDaCoMapping {
             new Diagnostic(
                 new Range(),
                 "Allowed range is 80 to 200",
-                DiagnosticSeverity.Error,
+                DiagnosticSeverity.Warning,
                 "COBOL Language Support (dialect)")),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());
