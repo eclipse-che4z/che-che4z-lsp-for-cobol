@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.service.CobolTextDocumentService;
 import org.eclipse.lsp.cobol.service.ConfigurationService;
 import org.eclipse.lsp.cobol.service.SyncProvider;
 import org.eclipse.lsp.cobol.service.WatcherService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
@@ -54,7 +54,7 @@ public class MockTextDocumentService {
   @Mock protected Formations formations;
   @Mock protected HoverProvider hoverProvider;
   @Mock protected ConfigurationService configurationService;
-  @Mock protected CopybookNameService copybookNameService;
+  @Mock protected CopybookIdentificationService copybookIdentificationService;
   @Mock protected CopybookService copybookService;
   @Mock protected WatcherService watcherService;
 
@@ -64,7 +64,7 @@ public class MockTextDocumentService {
    */
   protected CobolTextDocumentService getMockedTextDocumentServiceUsingSameThread() {
     return CobolTextDocumentService.builder()
-        .copybookNameService(copybookNameService)
+        .copybookIdentificationService(copybookIdentificationService)
         .communications(communications)
         .engine(engine)
         .dataBus(broker)
@@ -90,7 +90,7 @@ public class MockTextDocumentService {
    */
   protected CobolTextDocumentService getMockedTextDocumentServiceUsingSeparateThread() {
     return CobolTextDocumentService.builder()
-        .copybookNameService(copybookNameService)
+        .copybookIdentificationService(copybookIdentificationService)
         .communications(communications)
         .engine(engine)
         .dataBus(broker)
@@ -108,6 +108,6 @@ public class MockTextDocumentService {
   }
 
   protected void mockSettingServiceForCopybooks(boolean answer) {
-    when(copybookNameService.isCopybook(any())).thenReturn(answer);
+    when(copybookIdentificationService.isCopybook(any())).thenReturn(answer);
   }
 }

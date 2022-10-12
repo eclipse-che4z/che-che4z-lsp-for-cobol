@@ -37,15 +37,6 @@ public interface CopybookNameService {
   CompletableFuture<List<String>> copybookLocalFolders();
 
   /**
-   * Check if URI belongs to copybooks (defined by extension list)
-   * and list of copybook folder (defined by copybook folder list)
-   *
-   * @param uri an attribute to check
-   * @return true if URI belongs to known copybooks.
-   */
-  boolean isCopybook(String uri);
-
-  /**
    * Find copybook in the list of unique copybookNames
    * in the open workspace that match displayName
    * @param displayName an attribute to find by

@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
@@ -86,6 +87,15 @@ public class TestModule extends AbstractModule {
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(HoverProvider.class).to(VariableHover.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
+    bind(CopybookIdentificationService.class)
+            .annotatedWith(Names.named("contentStrategy"))
+            .to(CopybookIdentificationServiceBasedOnContent.class);
+    bind(CopybookIdentificationService.class)
+            .annotatedWith(Names.named("suffixStrategy"))
+            .to(CopybookIdentificationBasedOnExtension.class);
+    bind(CopybookIdentificationService.class)
+            .annotatedWith(Names.named("combinedStrategy"))
+            .to(CopybookIdentificationCombinedStrategy.class);
 
     bindFormations();
     bindCompletions();

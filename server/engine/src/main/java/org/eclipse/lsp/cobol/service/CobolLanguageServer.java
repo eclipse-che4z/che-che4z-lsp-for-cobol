@@ -16,12 +16,15 @@ package org.eclipse.lsp.cobol.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.messages.LogLevelUtils;
 import org.eclipse.lsp.cobol.core.model.ErrorCode;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationBasedOnExtension;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
@@ -60,6 +63,7 @@ public class CobolLanguageServer implements LanguageServer {
   private final ConfigurationService configurationService;
   private final CopybookNameService copybookNameService;
   private final Keywords keywords;
+  private final CopybookIdentificationService copybookIdentificationService;
 
   @Inject
   @SuppressWarnings("squid:S107")
@@ -73,7 +77,8 @@ public class CobolLanguageServer implements LanguageServer {
       DisposableLSPStateService disposableLSPStateService,
       ConfigurationService configurationService,
       CopybookNameService copybookNameService,
-      Keywords keywords) {
+      Keywords keywords,
+      @Named("suffixStrategy") CopybookIdentificationService copybookIdentificationService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
@@ -84,6 +89,7 @@ public class CobolLanguageServer implements LanguageServer {
     this.configurationService = configurationService;
     this.copybookNameService = copybookNameService;
     this.keywords = keywords;
+    this.copybookIdentificationService = copybookIdentificationService;
   }
 
   @Override
@@ -138,6 +144,19 @@ public class CobolLanguageServer implements LanguageServer {
     getLogLevelFromClient();
     copybookNameService.collectLocalCopybookNames();
     keywords.updateStorage();
+    notifyConfiguredCopybookExtensions();
+  }
+
+  private void notifyConfiguredCopybookExtensions() {
+    settingsService
+        .fetchTextConfiguration(CPY_EXTENSIONS.label)
+        .thenAccept(
+            config -> {
+              if (copybookIdentificationService instanceof CopybookIdentificationBasedOnExtension) {
+                ((CopybookIdentificationBasedOnExtension) copybookIdentificationService)
+                    .notifyExtensionConfig(config);
+              }
+            });
   }
 
   private void getLogLevelFromClient() {

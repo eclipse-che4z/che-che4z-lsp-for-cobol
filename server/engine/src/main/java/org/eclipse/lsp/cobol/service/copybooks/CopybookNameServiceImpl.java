@@ -19,12 +19,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
@@ -33,14 +27,17 @@ import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import org.eclipse.lsp4j.WorkspaceFolder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.DIALECTS;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
 /**
  * This service processes all the copybook names present in the local directory. The service also
@@ -83,31 +80,14 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   }
 
   @Override
-  public boolean isCopybook(final String uri) {
-    String[] uriAsArray = uri.split("/");
-    String fileNameWithExtension = uriAsArray[uriAsArray.length - 1];
-    String fileName = fileNameWithExtension.split("\\.")[0];
-    return findByName(fileName).isPresent()
-        || Optional.of(
-                listOfCopybookFolders.stream()
-                    .map(str -> str.split("\\$\\{fileBasenameNoExtension}")[0])
-                    .collect(Collectors.toSet()))
-            .orElse(emptySet())
-            .stream()
-            .anyMatch(uri::contains);
-  }
-
-  @Override
   public CompletableFuture<List<String>> copybookLocalFolders() {
     List<CompletableFuture<List<String>>> copybookLocalFolders = new ArrayList<>();
     copybookLocalFolders.add(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label));
     return settingsService.fetchTextConfiguration(DIALECTS.label)
         .thenAccept(
-            dialects -> dialects.forEach(dialect -> {
-              copybookLocalFolders.add(
-                  settingsService.fetchTextConfiguration(
-                      String.format("cpy-manager.%s.paths-local", dialect.toLowerCase())));
-            }))
+            dialects -> dialects.forEach(dialect -> copybookLocalFolders.add(
+                settingsService.fetchTextConfiguration(
+                    String.format("cpy-manager.%s.paths-local", dialect.toLowerCase())))))
         .thenCompose(
             c -> CompletableFuture.allOf(copybookLocalFolders.toArray(new CompletableFuture<?>[0]))
                 .thenApply(v -> copybookLocalFolders.stream()
