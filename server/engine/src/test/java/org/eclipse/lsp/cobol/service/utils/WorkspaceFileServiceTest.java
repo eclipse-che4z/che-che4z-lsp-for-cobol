@@ -25,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 import org.apache.commons.io.FileSystem;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -35,12 +34,12 @@ import org.mockito.MockedStatic;
 /** This test checks the logic File Service methods that do not interact with the file system */
 class WorkspaceFileServiceTest {
 
-  private static String pathPrefix;
-  private static String uriPrefix;
-  @BeforeEach
-  void setup() {
-    pathPrefix = FileSystem.WINDOWS.equals(FileSystem.getCurrent()) ? "c:/" : "/";
-    uriPrefix = "file://" + pathPrefix;
+  private static String pathPrefix(){
+    return FileSystem.WINDOWS.equals(FileSystem.getCurrent()) ? "c:/" : "/";
+  }
+
+  private static String uriPrefix(){
+    return "file:///" + pathPrefix();
   }
 
   @Test
@@ -48,7 +47,7 @@ class WorkspaceFileServiceTest {
     assertEquals(
         "ACTSOAPI.cbl",
         new WorkspaceFileService()
-            .getNameFromURI(uriPrefix + "workspace/POSITIVE_TESTS/positive/ACTSOAPI.cbl"));
+            .getNameFromURI(uriPrefix() + "workspace/POSITIVE_TESTS/positive/ACTSOAPI.cbl"));
   }
 
   @Test
@@ -56,7 +55,7 @@ class WorkspaceFileServiceTest {
     assertEquals(
         "ACTSOAPI",
         new WorkspaceFileService()
-            .getNameFromURI(uriPrefix + "workspace/POSITIVE_TESTS/positive/ACTSOAPI"));
+            .getNameFromURI(uriPrefix() + "workspace/POSITIVE_TESTS/positive/ACTSOAPI"));
   }
 
   @Test
@@ -80,27 +79,27 @@ class WorkspaceFileServiceTest {
         "AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl",
         new WorkspaceFileService()
             .getNameFromURI(
-                uriPrefix + "workspace/POSITIVE_TESTS/.e4e/AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl"));
+                uriPrefix() + "workspace/POSITIVE_TESTS/.e4e/AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl"));
   }
 
 
   static Stream<Arguments> listFilesSource() {
     return Stream.of(
         Arguments.of(
-            pathPrefix + "workspace/POSITIVE_TESTS/",
-            uriPrefix + "workspace/POSITIVE_TESTS/",
+            pathPrefix() + "workspace/POSITIVE_TESTS/",
+            uriPrefix() + "workspace/POSITIVE_TESTS/",
             0),
         Arguments.of(
-            pathPrefix + "workspace/POSITIVE_TESTS/*",
-            uriPrefix + "workspace/POSITIVE_TESTS/",
+            pathPrefix() + "workspace/POSITIVE_TESTS/*",
+            uriPrefix() + "workspace/POSITIVE_TESTS/",
             2),
         Arguments.of(
-            pathPrefix + "workspace/POSITIVE_TESTS/*/SUBFOLDER",
-            uriPrefix + "workspace/POSITIVE_TESTS/",
+            pathPrefix() + "workspace/POSITIVE_TESTS/*/SUBFOLDER",
+            uriPrefix() + "workspace/POSITIVE_TESTS/",
             3),
         Arguments.of(
-            pathPrefix + "workspace/POSITIVE_TESTS/${placeholder}/SUBFOLDER",
-            uriPrefix + "workspace/POSITIVE_TESTS/",
+            pathPrefix() + "workspace/POSITIVE_TESTS/${placeholder}/SUBFOLDER",
+            uriPrefix() + "workspace/POSITIVE_TESTS/",
             3)
     );
   }
@@ -126,9 +125,6 @@ class WorkspaceFileServiceTest {
           () -> Files.find(eq(pathToTheFolder), eq(maxDepth), any()),
           times(1)
       );
-      //test code
-
-      //verify mock
     }
   }
 
