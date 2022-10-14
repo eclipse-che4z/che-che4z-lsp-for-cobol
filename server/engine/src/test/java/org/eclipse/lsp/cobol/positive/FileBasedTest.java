@@ -188,7 +188,7 @@ public abstract class FileBasedTest extends ConfigurableTest {
       return new AnalysisConfig(
           new CopybookConfig(ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of()),
           Arrays.asList(EmbeddedCodeNode.Language.values()),
-          ImmutableList.of(IdmsDialect.NAME));
+          ImmutableList.of(IdmsDialect.NAME), true);
     }
     return AnalysisConfig.defaultConfig(ENABLED);
   }

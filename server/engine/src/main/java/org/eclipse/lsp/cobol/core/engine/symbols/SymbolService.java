@@ -72,18 +72,16 @@ public class SymbolService {
    * @param position the position to check
    * @return element at specified position
    */
-  public Context findElementByPosition(
+  public Optional<Context> findElementByPosition(
       CobolDocumentModel document, TextDocumentPositionParams position) {
     AnalysisResult result = document.getAnalysisResult();
-    return Optional.ofNullable(result.getRootNode())
-        .flatMap(
-            rootNode ->
-                findNodeByPosition(
-                    rootNode, position.getTextDocument().getUri(), position.getPosition()))
-        .filter(node -> node instanceof Context)
-        .map(Context.class::cast)
-        .map(this::constructElementsExcludingImplicits)
-        .orElseGet(() -> new Element("", Collections.emptyList(), Collections.emptyList()));
+    if (result.getRootNode() == null) {
+      return Optional.empty();
+    }
+    Optional<Node> node = findNodeByPosition(result.getRootNode(), position.getTextDocument().getUri(), position.getPosition());
+    return node.filter(Context.class::isInstance)
+            .map(Context.class::cast)
+            .map(this::constructElementsExcludingImplicits);
   }
 
   private Context constructElementsExcludingImplicits(Context ctx) {

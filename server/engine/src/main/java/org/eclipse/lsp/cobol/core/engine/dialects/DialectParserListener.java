@@ -65,10 +65,15 @@ public class DialectParserListener extends BaseErrorListener {
                                 errorLine,
                                 charPositionInLine + getOffendingSymbolSize(offendingSymbol))))
                     .build())
-            .severity(ErrorSeverity.ERROR)
+            .severity(getSeverity(msg))
             .build();
     LOG.debug("Syntax error by DialectParserListener " + error.toString());
     errors.add(error);
+  }
+
+  private static ErrorSeverity getSeverity(String msg) {
+    // Message with id "parsers.intRangeValue" should be treated as warning
+    return "Allowed range is 80 to 200".equals(msg) ? ErrorSeverity.WARNING : ErrorSeverity.ERROR;
   }
 
   private int getOffendingSymbolSize(Object offendingSymbol) {

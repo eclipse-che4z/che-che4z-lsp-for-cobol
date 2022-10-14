@@ -207,6 +207,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitCompilerXOpts(CompilerXOptsContext ctx) {
+    return addTreeNode(ctx, locality -> new CICSTranslatorNode(locality, NodeType.CUSTOM));
+  }
+
+  @Override
   public List<Node> visitProgramUnit(ProgramUnitContext ctx) {
     fileControls = new HashMap<>();
     return addTreeNode(ctx, ProgramNode::new);

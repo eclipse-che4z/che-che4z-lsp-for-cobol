@@ -31,7 +31,12 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Location;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 import static java.util.Collections.emptyList;
@@ -76,10 +81,8 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     }
     // start watching file specific copybooks
     List<String> fileNameSpecificWatchFolders = filenameSpecificWatchFolders(uri);
-    watcherService.addWatchers(fileNameSpecificWatchFolders);
-    AnalysisResult result = toAnalysisResult(engine.run(uri, text, analysisConfig), uri);
-    watcherService.removeWatchers(fileNameSpecificWatchFolders);
-    return result;
+    watcherService.addRuntimeWatchers(fileNameSpecificWatchFolders, uri);
+    return toAnalysisResult(engine.run(uri, text, analysisConfig), uri);
   }
 
   /**

@@ -83,28 +83,14 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   }
 
   @Override
-  public boolean isCopybook(final String uri) {
-    String[] uriAsArray = uri.split("/");
-    String fileNameWithExtension = uriAsArray[uriAsArray.length - 1];
-    String fileName = fileNameWithExtension.split("\\.")[0];
-    return findByName(fileName).isPresent()
-        || Optional.ofNullable(listOfCopybookFolders)
-        .orElse(emptySet())
-        .stream()
-        .anyMatch(uri::contains);
-  }
-
-  @Override
   public CompletableFuture<List<String>> copybookLocalFolders() {
     List<CompletableFuture<List<String>>> copybookLocalFolders = new ArrayList<>();
     copybookLocalFolders.add(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label));
     return settingsService.fetchTextConfiguration(DIALECTS.label)
         .thenAccept(
-            dialects -> dialects.forEach(dialect -> {
-              copybookLocalFolders.add(
-                  settingsService.fetchTextConfiguration(
-                      String.format("cpy-manager.%s.paths-local", dialect.toLowerCase())));
-            }))
+            dialects -> dialects.forEach(dialect -> copybookLocalFolders.add(
+                settingsService.fetchTextConfiguration(
+                    String.format("cpy-manager.%s.paths-local", dialect.toLowerCase())))))
         .thenCompose(
             c -> CompletableFuture.allOf(copybookLocalFolders.toArray(new CompletableFuture<?>[0]))
                 .thenApply(v -> copybookLocalFolders.stream()
