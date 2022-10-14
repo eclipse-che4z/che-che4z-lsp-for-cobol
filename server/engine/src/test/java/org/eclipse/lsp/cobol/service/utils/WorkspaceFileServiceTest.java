@@ -34,11 +34,11 @@ import org.mockito.MockedStatic;
 /** This test checks the logic File Service methods that do not interact with the file system */
 class WorkspaceFileServiceTest {
 
-  private static String pathPrefix(){
+  private static String pathPrefix() {
     return FileSystem.WINDOWS.equals(FileSystem.getCurrent()) ? "c:/" : "/";
   }
 
-  private static String uriPrefix(){
+  private static String uriPrefix() {
     return "file:///" + pathPrefix();
   }
 
