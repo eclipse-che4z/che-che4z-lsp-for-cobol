@@ -171,17 +171,6 @@ suite('Integration Test Suite', () => {
 
     }).timeout(2000).slow(1000);
 
-    test("TC266074 LSP analysis for extended sources - basic scenario", async () => {
-        await helper.showDocument("USER1.cbl");
-        let editor = helper.get_editor("USERC1N2.cbl");
-        await helper.sleep(1000);
-        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-        assert.strictEqual(diagnostics.length, 8);
-        helper.assertRangeIsEqual(diagnostics[1].range,
-            new vscode.Range(new vscode.Position(51, 38), new vscode.Position(51, 56)));
-        assert.strictEqual(diagnostics[1].message, "Variable USER-PHONE-MOBILE1 is not defined");
-    }).timeout(2000).slow(1000);
-
     test("TC312735 Check EXEC CICS is in Procedure Division", async () => {
         await helper.showDocument("ADSORT.cbl");
         let editor = helper.get_editor("ADSORT.cbl");
