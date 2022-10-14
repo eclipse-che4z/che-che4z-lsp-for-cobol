@@ -56,7 +56,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 class CopybookNameServiceTest {
-  private static final String VALID_CPY_URI = "file:///c:/copybooks";
+  private static final String VALID_CPY_PATH = "c:/copybooks";
+
+  private static final String WORKSPACE_PROGRAM_PATH = "c:/workspace";
   private static final String WORKSPACE_PROGRAM_URI = "file:///c:/workspace";
 
   private final List<WorkspaceFolder> workspace = new ArrayList<>();
@@ -72,8 +74,7 @@ class CopybookNameServiceTest {
   @BeforeEach
   void setupMocks() {
     workspace.add(folder);
-    copyNames.addAll(ImmutableList.of(VALID_CPY_URI, WORKSPACE_PROGRAM_URI));
-    when(files.isUriAbsolute(anyString())).thenCallRealMethod();
+    copyNames.addAll(ImmutableList.of(VALID_CPY_PATH, WORKSPACE_PROGRAM_PATH));
     when(provider.get()).thenReturn(client);
     when(client.workspaceFolders()).thenReturn(CompletableFuture.completedFuture(workspace));
     when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
@@ -85,33 +86,27 @@ class CopybookNameServiceTest {
   static Stream<Arguments> collectCopybookNamesData() {
     return Stream.of(
         Arguments.of(
-            Collections.singletonList("VALIDNAME2.CPY"),
-            Collections.singletonList("VALIDNAME.CPY"),
+            Arrays.asList("VALIDNAME2.CPY", "VALIDNAME.CPY"),
             Arrays.asList(".cpy", ".CPY"),
             2),
         Arguments.of(
-            Collections.singletonList("VALIDNAME2.CPY"),
-            Collections.singletonList("VALIDNAME.CPY"),
+            Arrays.asList("VALIDNAME2.CPY", "VALIDNAME.CPY"),
             Collections.singletonList(".cpy"),
             0), // lowercase extension, copybooks not found
         Arguments.of(
             Collections.emptyList(),
-            Collections.emptyList(),
             Arrays.asList(".cpy", ".CPY"),
             0), // no folders with copybooks, nothing found
         Arguments.of(
-            Collections.singletonList("VALIDNAME2.CPY"),
-            Collections.singletonList("VALIDNAME.CPY"),
+            Arrays.asList("VALIDNAME2.CPY", "VALIDNAME.CPY"),
             Arrays.asList(".abc", ".cde"),
             0), // copybooks with extensions from config wasn't found.
         Arguments.of(
-            Collections.singletonList("VALIDNAME2.abc"),
-            Collections.singletonList("VALIDNAME.cde"),
+            Arrays.asList("VALIDNAME2.abc", "VALIDNAME.cde"),
             Arrays.asList(".abc", ".cde"),
             2),
         Arguments.of(
-            Collections.singletonList("VALIDNAME2"),
-            Collections.singletonList("VALIDNAME"),
+            Arrays.asList("VALIDNAME2", "VALIDNAME"),
             singletonList(""),
             2)
     );
@@ -172,7 +167,6 @@ class CopybookNameServiceTest {
   @MethodSource("collectCopybookNamesData")
   void
   testValidFoldersWithCopybooks(
-      List<String> filesInWorkingDirectory,
       List<String> filesInCopybookDirectory,
       List<String> extensionsInCofig,
       int expectedCopybookFound
@@ -180,8 +174,7 @@ class CopybookNameServiceTest {
     validFoldersMock();
     when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
-    when(files.listFilesInDirectory(WORKSPACE_PROGRAM_URI)).thenReturn(filesInWorkingDirectory);
-    when(files.listFilesInDirectory(VALID_CPY_URI)).thenReturn(filesInCopybookDirectory);
+    when(files.listFilesInDirectory(VALID_CPY_PATH)).thenReturn(filesInCopybookDirectory);
 
     CopybookNameService copybookNameService =
         new CopybookNameServiceImpl(settingsService, files, provider);
@@ -197,26 +190,19 @@ class CopybookNameServiceTest {
 
     when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(Collections.singletonList("cpy")));
-    when(files.decodeURI(VALID_CPY_URI)).thenReturn(null);
-    when(files.getPathFromURI(VALID_CPY_URI)).thenReturn(null);
-    when(cpyPath.resolve(VALID_CPY_URI)).thenReturn(null);
+    when(files.decodeURI(VALID_CPY_PATH)).thenReturn(null);
+    when(files.getPathFromURI(VALID_CPY_PATH)).thenReturn(null);
+    when(cpyPath.resolve(VALID_CPY_PATH)).thenReturn(null);
 
     copybookNameService.collectLocalCopybookNames();
     assertEquals(0, copybookNameService.getNames().size());
   }
 
   private void validFoldersMock() {
-    when(wrkPath.toUri()).thenReturn(URI.create(WORKSPACE_PROGRAM_URI));
-    when(cpyPath.toUri()).thenReturn(URI.create(VALID_CPY_URI));
-
-    when(files.decodeURI(WORKSPACE_PROGRAM_URI)).thenReturn(WORKSPACE_PROGRAM_URI);
-    when(files.decodeURI(VALID_CPY_URI)).thenReturn(VALID_CPY_URI);
+    when(wrkPath.toUri()).thenReturn(URI.create(WORKSPACE_PROGRAM_PATH));
+    when(cpyPath.toUri()).thenReturn(URI.create(VALID_CPY_PATH));
 
     when(files.getPathFromURI(WORKSPACE_PROGRAM_URI)).thenReturn(wrkPath);
-    when(files.getPathFromURI(VALID_CPY_URI)).thenReturn(cpyPath);
-
-    when(wrkPath.resolve(WORKSPACE_PROGRAM_URI)).thenReturn(wrkPath);
-    when(wrkPath.resolve(VALID_CPY_URI)).thenReturn(cpyPath);
 
     when(files.fileExists(wrkPath)).thenReturn(true);
     when(files.fileExists(cpyPath)).thenReturn(true);

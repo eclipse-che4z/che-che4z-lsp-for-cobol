@@ -76,19 +76,19 @@ class WorkspaceFileServiceTest {
   static Stream<Arguments> listFilesSource() {
     return Stream.of(
         Arguments.of(
-            "file:///c:/workspace/POSITIVE_TESTS/",
+            "c:/workspace/POSITIVE_TESTS/",
             "file:///c:/workspace/POSITIVE_TESTS/",
             0),
         Arguments.of(
-            "file:///c:/workspace/POSITIVE_TESTS/*",
+            "c:/workspace/POSITIVE_TESTS/*",
             "file:///c:/workspace/POSITIVE_TESTS/",
             2),
         Arguments.of(
-            "file:///c:/workspace/POSITIVE_TESTS/*/SUBFOLDER",
+            "c:/workspace/POSITIVE_TESTS/*/SUBFOLDER",
             "file:///c:/workspace/POSITIVE_TESTS/",
             3),
         Arguments.of(
-            "file:///c:/workspace/POSITIVE_TESTS/${placeholder}/SUBFOLDER",
+            "c:/workspace/POSITIVE_TESTS/${placeholder}/SUBFOLDER",
             "file:///c:/workspace/POSITIVE_TESTS/",
             3)
     );

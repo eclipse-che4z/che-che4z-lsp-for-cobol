@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -137,7 +138,8 @@ public class CopybookNameServiceImpl implements CopybookNameService {
         .map(extension -> extension.replaceFirst("\\.", ""))
         .collect(Collectors.toList());
     Set<String> copybookExtensionsWithoutDotAsSet = new HashSet<>(copybookExtensionsWithoutDot);
-    listOfCopybookFolders = Stream.concat(copybookFolders.stream(), Stream.of(downloadedCopybooksFolders))
+    listOfCopybookFolders = Stream.concat(copybookFolders.stream(),
+            Stream.of(downloadedCopybooksFolders))
         .collect(Collectors.toSet());
     listOfCopybookFolders.addAll(copybookFolders);
     listOfCopybookNames = ImmutableSet.copyOf(
@@ -165,21 +167,16 @@ public class CopybookNameServiceImpl implements CopybookNameService {
 
   private List<String> listExistedFiles(
       final List<WorkspaceFolder> workspaces,
-      final String copybookUriAsString) {
+      final String copybookPath) {
     return workspaces.stream()
-        .map(workspace -> files.decodeURI(workspace.getUri()))
-        .map(uri -> {
-          String copybookURI = files.decodeURI(copybookUriAsString);
-          if (!files.isUriAbsolute(copybookURI)) {
-           if (copybookURI.startsWith("/")) {
-             copybookURI = copybookURI.substring(1, copybookURI.length() - 1);
-           }
-           if (uri.endsWith("/")) {
-             copybookURI = uri.substring(1);
-           }
-          }
-          copybookURI = files.isUriAbsolute(copybookURI) ? copybookURI : String.format("%s/%s", uri, copybookURI);
-          return files.listFilesInDirectory(copybookURI);
+        .map(workspace -> files.getPathFromURI(workspace.getUri()))
+        .map(workspacePath -> {
+          String copybookFinalPath = Paths.get(copybookPath).isAbsolute() ? copybookPath
+              : String.join("/",
+                  Optional.ofNullable(workspacePath)
+                      .orElseThrow(IllegalArgumentException::new)
+                          .toString(), copybookPath);
+          return files.listFilesInDirectory(copybookFinalPath);
         })
         .flatMap(List::stream)
         .collect(Collectors.toList());

@@ -65,14 +65,6 @@ public class WorkspaceFileService implements FileSystemService {
     }
   }
 
-  @Override
-  public boolean isUriAbsolute(@NonNull final String uri) {
-    String cleanedUpUri = uri.replaceFirst("file:", "");
-    String[] schemeParseResult = cleanedUpUri.split(":");
-    return schemeParseResult.length > 1
-        && schemeParseResult[0].contains("/");
-  }
-
   @Nullable
   @Override
   public String getNameFromURI(@NonNull String uri) {
@@ -138,10 +130,10 @@ public class WorkspaceFileService implements FileSystemService {
 
   @Override
   @NonNull
-  public List<String> listFilesInDirectory(final String uri) {
+  public List<String> listFilesInDirectory(final String path) {
 
     final String[] pathSplittedByFirstAsterisk = uriWithReplacedPlaceholdersToAsterisks(
-        uri).split("\\*", 2);
+        path).split("\\*", 2);
     final String pathToResolve = pathSplittedByFirstAsterisk[0];
     final boolean isPathContainsAsterisk = pathSplittedByFirstAsterisk.length >= 2;
     int maxDepth = 0;
@@ -150,7 +142,7 @@ public class WorkspaceFileService implements FileSystemService {
     }
 
     try (Stream<Path> streamPath = Files.find(
-        getPathFromURI(pathToResolve),
+        Paths.get(pathToResolve),
         maxDepth,
         (a, c) -> {
           final String uriPath = a.toUri().getPath().replaceAll("\\\\", "/");
