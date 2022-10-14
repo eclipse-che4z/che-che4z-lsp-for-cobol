@@ -91,6 +91,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
@@ -120,6 +121,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
 @SuppressWarnings("UnstableApiUsage")
 public class CobolTextDocumentService implements TextDocumentService, ExtendedApi {
   private static final String GIT_FS_URI = "gitfs:/";
+  private static final String GIT_URI = "git:/";
   private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
   private final Map<String, CobolDocumentModel> docs = new ConcurrentHashMap<>();
   private final Map<String, CompletableFuture<List<DocumentSymbol>>> outlineMap =
@@ -144,6 +146,9 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final Map<String, Map<String, List<Diagnostic>>> errorsByFileForEachProgram;
   private final SyncProvider syncProvider;
   private final WatcherService watcherService;
+  private final CountDownLatch waitConfig = new CountDownLatch(1);
+
+  private List<String> copybookExtensions;
 
   @Inject
   @Builder
@@ -262,7 +267,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                 : Collections.emptyList();
     return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
             disposableLSPStateService,
-            (Supplier<List<? extends DocumentHighlight>>) listSupplier,
+            listSupplier,
             executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("document highlighting", uri)));
@@ -300,13 +305,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     outlineMap.put(uri, new CompletableFuture<>());
     cfAstMap.put(uri, new CompletableFuture<>());
     // git FS URIs are not currently supported
-    if (uri.startsWith(GIT_FS_URI)) {
+    if (uri.startsWith(GIT_FS_URI) || uri.startsWith(GIT_URI)) {
       LOG.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
-    }
-    if (copybookIdentificationService.isCopybook(params.getTextDocument())) {
       return;
     }
-    communications.notifyThatLoadingInProgress(uri);
     analyzeDocumentFirstTime(uri, text, false);
   }
 
@@ -321,7 +323,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     TextDocumentItem docIdentifier = new TextDocumentItem();
     docIdentifier.setText(text);
     docIdentifier.setUri(uri);
-    if (copybookIdentificationService.isCopybook(docIdentifier)) {
+    if (copybookIdentificationService.isCopybook(docIdentifier.getUri(), docIdentifier.getText(), copybookExtensions)) {
       reanalyseOpenedPrograms(params, uri);
       return;
     }
@@ -355,7 +357,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     interruptAnalysis(uri);
     TextDocumentItem docIdentifier = new TextDocumentItem();
     docIdentifier.setUri(uri);
-    if (copybookIdentificationService.isCopybook(docIdentifier)) {
+    if (copybookIdentificationService.isCopybook(docIdentifier.getUri(), docIdentifier.getText(), copybookExtensions)) {
       return;
     }
 
@@ -452,6 +454,11 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                                 userRequest
                                     ? CopybookProcessingMode.ENABLED_VERBOSE
                                     : CopybookProcessingMode.ENABLED);
+
+                        if (copybookIdentificationService.isCopybook(uri, text, waitExtensionConfig())) {
+                          return;
+                        }
+                        communications.notifyThatLoadingInProgress(uri);
 
                         AnalysisConfig config = configurationService.getConfig(processingMode);
                         AnalysisResult result = engine.analyze(uri, text, config);
@@ -608,5 +615,20 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       foldingRanges.addAll(getFoldingRangeFromDocumentSymbol(documentSymbol.getChildren()));
     }
     return foldingRanges;
+  }
+
+  /**
+   * Notifies that config is now available
+   * @param config is a config
+   */
+  public void notifyExtensionConfig(List<String> config) {
+    this.copybookExtensions =  Collections.unmodifiableList(config);
+    this.waitConfig.countDown();
+  }
+
+  @SneakyThrows
+  private List<String> waitExtensionConfig() {
+    waitConfig.await();
+    return this.copybookExtensions;
   }
 }

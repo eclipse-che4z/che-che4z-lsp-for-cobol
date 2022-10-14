@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -95,6 +96,7 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
       throws ExecutionException, InterruptedException {
 
     stateService.shutdown();
+    ((CobolTextDocumentService) service).notifyExtensionConfig(ImmutableList.of());
     ((CobolTextDocumentService) service).setDisposableLSPStateService(stateService);
     assertEquals(0, stateService.getExitCode());
 
@@ -140,6 +142,8 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
   void testFindMultipleCopybookReferences() throws ExecutionException, InterruptedException {
     client.clean();
     TextDocumentService textService = getInjector().getInstance(TextDocumentService.class);
+
+    ((CobolTextDocumentService) textService).notifyExtensionConfig(ImmutableList.of());
     textService.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK1, true, textService);
@@ -155,6 +159,7 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
 
     TextDocumentService textService = getInjector().getInstance(TextDocumentService.class);
 
+    ((CobolTextDocumentService) textService).notifyExtensionConfig(ImmutableList.of());
     textService.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK2, true, textService);

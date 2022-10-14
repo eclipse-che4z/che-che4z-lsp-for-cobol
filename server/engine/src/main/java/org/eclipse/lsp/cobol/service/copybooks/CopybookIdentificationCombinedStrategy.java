@@ -17,7 +17,8 @@ package org.eclipse.lsp.cobol.service.copybooks;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import org.eclipse.lsp4j.TextDocumentItem;
+
+import java.util.List;
 
 /**
  * A CopybookIdentificationService which combines different implementation of {@link
@@ -40,16 +41,18 @@ public class CopybookIdentificationCombinedStrategy implements CopybookIdentific
   /**
    * Identifies a copybook
    *
-   * @param copybookIdentifier Identifier for a copybook. It can be a copybook URI or text content.
+   * @param uri of the document
+   * @param text of the document
+   * @param config is a config
    * @return True if it's a copybook. False otherwise
    */
   @Override
-  public boolean isCopybook(TextDocumentItem copybookIdentifier)
+  public boolean isCopybook(String uri, String text, List<String> config)
       throws UndeterminedDocumentException {
     try {
-      return service1.isCopybook(copybookIdentifier);
+      return service1.isCopybook(uri, text, config);
     } catch (UndeterminedDocumentException ex) {
-      return service2.isCopybook(copybookIdentifier);
+      return service2.isCopybook(uri, text, config);
     }
   }
 }
