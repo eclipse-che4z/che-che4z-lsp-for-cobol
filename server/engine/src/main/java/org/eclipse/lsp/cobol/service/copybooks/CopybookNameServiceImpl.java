@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
-import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;

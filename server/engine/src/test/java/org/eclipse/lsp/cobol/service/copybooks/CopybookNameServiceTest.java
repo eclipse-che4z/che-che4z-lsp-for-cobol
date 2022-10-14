@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
+import org.apache.commons.io.FileSystem;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.SettingsService;
@@ -56,14 +57,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 class CopybookNameServiceTest {
-  private static final String VALID_CPY_PATH = "c:/copybooks";
-
-  private static final String WORKSPACE_PROGRAM_PATH = "c:/workspace";
-  private static final String WORKSPACE_PROGRAM_URI = "file:///c:/workspace";
+  private static String validCpyPath;
+  private static String workspaceProgramPath;
+  private static String workspaceProgramUri;
 
   private final List<WorkspaceFolder> workspace = new ArrayList<>();
   private final List<String> copyNames = new ArrayList<>();
-  private final WorkspaceFolder folder = new WorkspaceFolder(WORKSPACE_PROGRAM_URI);
   private final SettingsService settingsService = mock(SettingsService.class);
   private final FileSystemService files = mock(WorkspaceFileService.class);
   private final Path cpyPath = mock(Path.class);
@@ -73,8 +72,12 @@ class CopybookNameServiceTest {
 
   @BeforeEach
   void setupMocks() {
-    workspace.add(folder);
-    copyNames.addAll(ImmutableList.of(VALID_CPY_PATH, WORKSPACE_PROGRAM_PATH));
+    String pathPrefix = FileSystem.WINDOWS.equals(FileSystem.getCurrent()) ? "c:/" : "/";
+    workspaceProgramPath = pathPrefix + "workspace";
+    validCpyPath = pathPrefix + "copybooks";
+    workspaceProgramUri = "file:///" + workspaceProgramUri;
+    workspace.add(new WorkspaceFolder(workspaceProgramUri));
+    copyNames.addAll(ImmutableList.of(validCpyPath, workspaceProgramPath));
     when(provider.get()).thenReturn(client);
     when(client.workspaceFolders()).thenReturn(CompletableFuture.completedFuture(workspace));
     when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
@@ -174,7 +177,7 @@ class CopybookNameServiceTest {
     validFoldersMock();
     when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
-    when(files.listFilesInDirectory(VALID_CPY_PATH)).thenReturn(filesInCopybookDirectory);
+    when(files.listFilesInDirectory(validCpyPath)).thenReturn(filesInCopybookDirectory);
 
     CopybookNameService copybookNameService =
         new CopybookNameServiceImpl(settingsService, files, provider);
@@ -190,19 +193,19 @@ class CopybookNameServiceTest {
 
     when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(Collections.singletonList("cpy")));
-    when(files.decodeURI(VALID_CPY_PATH)).thenReturn(null);
-    when(files.getPathFromURI(VALID_CPY_PATH)).thenReturn(null);
-    when(cpyPath.resolve(VALID_CPY_PATH)).thenReturn(null);
+    when(files.decodeURI(validCpyPath)).thenReturn(null);
+    when(files.getPathFromURI(validCpyPath)).thenReturn(null);
+    when(cpyPath.resolve(validCpyPath)).thenReturn(null);
 
     copybookNameService.collectLocalCopybookNames();
     assertEquals(0, copybookNameService.getNames().size());
   }
 
   private void validFoldersMock() {
-    when(wrkPath.toUri()).thenReturn(URI.create(WORKSPACE_PROGRAM_PATH));
-    when(cpyPath.toUri()).thenReturn(URI.create(VALID_CPY_PATH));
+    when(wrkPath.toUri()).thenReturn(URI.create(workspaceProgramPath));
+    when(cpyPath.toUri()).thenReturn(URI.create(validCpyPath));
 
-    when(files.getPathFromURI(WORKSPACE_PROGRAM_URI)).thenReturn(wrkPath);
+    when(files.getPathFromURI(workspaceProgramUri)).thenReturn(wrkPath);
 
     when(files.fileExists(wrkPath)).thenReturn(true);
     when(files.fileExists(cpyPath)).thenReturn(true);
