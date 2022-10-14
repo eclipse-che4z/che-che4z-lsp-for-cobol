@@ -57,7 +57,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 class CopybookNameServiceTest {
-  private static String validCpyPath;
+  private static String absoluteValidCpyPath;
+  private static String relativeValidCpyPath;
   private static String workspaceProgramPath;
   private static String workspaceProgramUri;
 
@@ -74,10 +75,11 @@ class CopybookNameServiceTest {
   void setupMocks() {
     String pathPrefix = FileSystem.WINDOWS.equals(FileSystem.getCurrent()) ? "c:/" : "/";
     workspaceProgramPath = pathPrefix + "workspace";
-    validCpyPath = pathPrefix + "copybooks";
+    absoluteValidCpyPath = pathPrefix + "copybooks";
+    relativeValidCpyPath = "copybooks";
     workspaceProgramUri = "file:///" + workspaceProgramUri;
     workspace.add(new WorkspaceFolder(workspaceProgramUri));
-    copyNames.addAll(ImmutableList.of(validCpyPath, workspaceProgramPath));
+    copyNames.addAll(ImmutableList.of(absoluteValidCpyPath, relativeValidCpyPath, workspaceProgramPath));
     when(provider.get()).thenReturn(client);
     when(client.workspaceFolders()).thenReturn(CompletableFuture.completedFuture(workspace));
     when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
@@ -177,7 +179,7 @@ class CopybookNameServiceTest {
     validFoldersMock();
     when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
-    when(files.listFilesInDirectory(validCpyPath)).thenReturn(filesInCopybookDirectory);
+    when(files.listFilesInDirectory(absoluteValidCpyPath)).thenReturn(filesInCopybookDirectory);
 
     CopybookNameService copybookNameService =
         new CopybookNameServiceImpl(settingsService, files, provider);
@@ -193,9 +195,9 @@ class CopybookNameServiceTest {
 
     when(settingsService.fetchTextConfiguration(
         CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(Collections.singletonList("cpy")));
-    when(files.decodeURI(validCpyPath)).thenReturn(null);
-    when(files.getPathFromURI(validCpyPath)).thenReturn(null);
-    when(cpyPath.resolve(validCpyPath)).thenReturn(null);
+    when(files.decodeURI(absoluteValidCpyPath)).thenReturn(null);
+    when(files.getPathFromURI(absoluteValidCpyPath)).thenReturn(null);
+    when(cpyPath.resolve(absoluteValidCpyPath)).thenReturn(null);
 
     copybookNameService.collectLocalCopybookNames();
     assertEquals(0, copybookNameService.getNames().size());
@@ -203,7 +205,7 @@ class CopybookNameServiceTest {
 
   private void validFoldersMock() {
     when(wrkPath.toUri()).thenReturn(URI.create(workspaceProgramPath));
-    when(cpyPath.toUri()).thenReturn(URI.create(validCpyPath));
+    when(cpyPath.toUri()).thenReturn(URI.create(absoluteValidCpyPath));
 
     when(files.getPathFromURI(workspaceProgramUri)).thenReturn(wrkPath);
 

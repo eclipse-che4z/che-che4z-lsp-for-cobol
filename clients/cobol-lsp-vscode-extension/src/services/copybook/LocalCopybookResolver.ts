@@ -34,7 +34,7 @@ export class LocalCopybookResolver implements CopybookResolver {
         list.filter(resource => resource !== "*").forEach(resource => {
             const uris: URL[] = getURIFromResource(resource);
             uris.forEach(uri => {
-                if (uri != undefined) {
+                if (uri !== undefined) {
                     result.add(uri.href);
                 }
             });

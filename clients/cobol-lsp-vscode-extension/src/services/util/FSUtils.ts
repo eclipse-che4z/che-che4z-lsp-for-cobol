@@ -47,21 +47,13 @@ export function getURIFrom(folder: string, entityName: string, extensions?: stri
     }
 }
 
-
-function posixPath(windowsPath) {
-    return windowsPath
-    .replace(/^\\\\\?\\/, "")
-    .replace(/^\\(.*:)?\\/g, '\/')
-    .replace(/\/\/+/g, '\/');
-}
-
 /**
  * This function construct an URI from a valid resource provided from the setting configuration
  * @param resource represent the file to search within the workspace folder list
  * @return an URI representation of the file or undefined if not found
  */
 export function getURIFromResource(resource: string): urlUtil.URL[] {
-    let uris: urlUtil.URL[] = [];
+    const uris: urlUtil.URL[] = [];
     for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
         const workspaceFolder = workspaceFolderPath.replace(/\/(.*:)/, "$1");
 
@@ -73,7 +65,7 @@ export function getURIFromResource(resource: string): urlUtil.URL[] {
             const basePath = pathName.split("*", 2)[0]
             const findPath = pathName.replace(basePath, "").replace("\\", "/");
             for (const folder of glob.sync(findPath, {cwd: basePath})) {
-                let uri = new urlUtil.URL(path.join(
+                const uri = new urlUtil.URL(path.join(
                     SettingsUtils.absolutePath(workspaceFolderPath, basePath), folder));
                 if (fs.existsSync(uri)) {
                     uris.push(uri);
