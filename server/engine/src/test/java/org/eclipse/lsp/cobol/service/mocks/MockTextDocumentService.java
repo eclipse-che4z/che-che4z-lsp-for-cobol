@@ -108,6 +108,6 @@ public class MockTextDocumentService {
   }
 
   protected void mockSettingServiceForCopybooks(boolean answer) {
-    when(copybookIdentificationService.isCopybook(any())).thenReturn(answer);
+    when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(answer);
   }
 }

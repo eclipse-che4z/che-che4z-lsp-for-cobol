@@ -37,6 +37,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.internal.verification.Times;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
@@ -54,7 +55,7 @@ class CobolLanguageServerTest {
 
   private static CustomThreadPoolExecutor customExecutor;
   private DisposableLSPStateService stateService;
-  private CopybookIdentificationBasedOnExtension copybookIdentificationBasedOnExtension =
+  private final CopybookIdentificationBasedOnExtension copybookIdentificationBasedOnExtension =
       mock(CopybookIdentificationBasedOnExtension.class);
 
   @BeforeAll
@@ -83,26 +84,9 @@ class CobolLanguageServerTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
 
-    JsonArray arr = new JsonArray();
-    String path = "foo/bar";
-    arr.add(new JsonPrimitive(path));
-
     when(settingsService.fetchTextConfiguration(anyString())).thenCallRealMethod();
-    when(settingsService.fetchConfiguration(CPY_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.fetchConfiguration(DaCo_CPY_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.fetchConfiguration(IDMS_CPY_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
-    when(localeStore.notifyLocaleStore()).thenReturn(System.out::println);
-    when(settingsService.fetchConfiguration(LOCALE.label))
-        .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.fetchConfiguration(SUBROUTINE_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(ImmutableList.of()));
-    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
-        .thenReturn(completedFuture(ImmutableList.of("INFO")));
-    when(settingsService.fetchConfiguration(CPY_EXTENSIONS.label))
-            .thenReturn(completedFuture(ImmutableList.of("cpy")));
+    prepareSettingsService(settingsService, localeStore);
+
     CobolLanguageServer server =
         new CobolLanguageServer(
             null,
@@ -126,9 +110,64 @@ class CobolLanguageServerTest {
     verify(settingsService).fetchConfiguration(IDMS_CPY_LOCAL_PATHS.label);
     verify(settingsService).fetchConfiguration(LOCALE.label);
     verify(settingsService).fetchConfiguration(CPY_EXTENSIONS.label);
-    verify(watchingService, new Times(3)).addWatchers(singletonList(path));
+    verify(watchingService, new Times(3)).addWatchers(singletonList("foo/bar"));
     verify(localeStore).notifyLocaleStore();
     verify(configurationService).updateConfigurationFromSettings();
+  }
+
+  private void prepareSettingsService(SettingsService settingsService, LocaleStore localeStore) {
+    JsonArray arr = new JsonArray();
+    String path = "foo/bar";
+    arr.add(new JsonPrimitive(path));
+
+    when(settingsService.fetchConfiguration(CPY_LOCAL_PATHS.label))
+        .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.fetchConfiguration(DaCo_CPY_LOCAL_PATHS.label))
+        .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.fetchConfiguration(IDMS_CPY_LOCAL_PATHS.label))
+        .thenReturn(completedFuture(singletonList(arr)));
+    when(localeStore.notifyLocaleStore()).thenReturn(System.out::println);
+    when(settingsService.fetchConfiguration(LOCALE.label))
+        .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.fetchConfiguration(SUBROUTINE_LOCAL_PATHS.label))
+        .thenReturn(completedFuture(ImmutableList.of()));
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
+        .thenReturn(completedFuture(ImmutableList.of("INFO")));
+    when(settingsService.fetchConfiguration(CPY_EXTENSIONS.label))
+        .thenReturn(completedFuture(ImmutableList.of("cpy")));
+  }
+
+  @Test
+  void initializedConfig() {
+    SettingsService settingsService = mock(SettingsServiceImpl.class);
+    WatcherService watchingService = mock(WatcherService.class);
+    LocaleStore localeStore = mock(LocaleStore.class);
+    ConfigurationService configurationService = mock(ConfigurationService.class);
+    CopybookNameService copybookNameService = mock(CopybookNameService.class);
+    Keywords keywords = mock(Keywords.class);
+    CobolTextDocumentService textService = mock(CobolTextDocumentService.class);
+
+    when(settingsService.fetchTextConfiguration(anyString()))
+        .thenReturn(CompletableFuture.supplyAsync(ImmutableList::of));
+    prepareSettingsService(settingsService, localeStore);
+
+    CobolLanguageServer server =
+        new CobolLanguageServer(
+            textService,
+            null,
+            watchingService,
+            settingsService,
+            localeStore,
+            customExecutor,
+            stateService,
+            configurationService,
+            copybookNameService,
+            keywords,
+            copybookIdentificationBasedOnExtension);
+
+    server.initialized(new InitializedParams());
+    verify(textService, times(1)).notifyExtensionConfig(any());
+
   }
 
   /**

@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.messages.LogLevelUtils;
 import org.eclipse.lsp.cobol.core.model.ErrorCode;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationBasedOnExtension;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
@@ -152,9 +151,8 @@ public class CobolLanguageServer implements LanguageServer {
         .fetchTextConfiguration(CPY_EXTENSIONS.label)
         .thenAccept(
             config -> {
-              if (copybookIdentificationService instanceof CopybookIdentificationBasedOnExtension) {
-                ((CopybookIdentificationBasedOnExtension) copybookIdentificationService)
-                    .notifyExtensionConfig(config);
+              if (textService instanceof CobolTextDocumentService) {
+                ((CobolTextDocumentService) textService).notifyExtensionConfig(config);
               }
             });
   }

@@ -125,7 +125,7 @@ public class ServerCommunications implements Communications {
         (uri, diagnostic) ->
             getClient()
                 .publishDiagnostics(
-                    new PublishDiagnosticsParams(files.decodeURI(uri), clean(diagnostic))));
+                    new PublishDiagnosticsParams(uri, clean(diagnostic))));
   }
 
   /**

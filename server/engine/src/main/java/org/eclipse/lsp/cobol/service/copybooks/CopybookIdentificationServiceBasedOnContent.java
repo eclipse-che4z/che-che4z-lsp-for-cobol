@@ -16,8 +16,8 @@ package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
-import org.eclipse.lsp4j.TextDocumentItem;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 /** Identifies a copybook based on the content. */
 @Singleton
 public class CopybookIdentificationServiceBasedOnContent implements CopybookIdentificationService {
-  private Pattern detectCobolProgram =
+  private final Pattern detectCobolProgram =
       Pattern.compile(
           "(?i)^(?<sequence>.{0,6})(?<indicator>.?)(PROGRAM-ID)\\s*\\.\\s+(?<programName>.{1,30})\\s*\\.",
           Pattern.MULTILINE);
@@ -33,12 +33,14 @@ public class CopybookIdentificationServiceBasedOnContent implements CopybookIden
    * Identifies a copybook based on the content. If the text contains a valid program-id, we detect
    * it as a cobol program, else it's a copybook.
    *
-   * @param doc copybook.
+   * @param uri of the document
+   * @param text of the document
+   * @param config is a config
    * @return True if it's a copybook. False otherwise
    */
   @Override
-  public boolean isCopybook(TextDocumentItem doc) throws UndeterminedDocumentException {
-    String copybookContent = Optional.ofNullable(doc.getText()).orElse("");
+  public boolean isCopybook(String uri, String text, List<String> config) throws UndeterminedDocumentException {
+    String copybookContent = Optional.ofNullable(text).orElse("");
     Matcher matcher = detectCobolProgram.matcher(copybookContent);
     while (matcher.find()) {
       if (!ImmutableList.of("*", "/").contains(matcher.group("indicator"))) {
