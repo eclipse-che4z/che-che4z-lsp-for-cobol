@@ -75,7 +75,6 @@ suite('Integration Test Suite', () => {
             });
     }).timeout(2000).slow(1000);
 
-
     test('TC152047/ TC152052/ TC152051/ TC152050/ TC152053 Error case - file has syntax errors and semantic errors are marked and have detailed hints', async () => {
         await helper.showDocument("USER2.cbl");
         editor = helper.get_editor("USER2.cbl");
@@ -187,5 +186,77 @@ suite('Integration Test Suite', () => {
         assert.strictEqual(diagnostics[0].message, "Missing token SQL at execSqlStatement");
     }).timeout(10000).slow(1000);
 
+    test("TC266094 Underline the entire incorrect variable structure", async () => {
+        await helper.showDocument("VAR.cbl");
+        let editor = helper.get_editor("VAR.cbl");
+        await helper.sleep(5000);
+
+        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 2);
+        helper.assertRangeIsEqual(diagnostics[0].range,
+            new vscode.Range(new vscode.Position(22, 23), new vscode.Position(22, 43)));
+        assert.strictEqual(diagnostics[0].message, "Variable CHILD1 is not defined");
+        helper.assertRangeIsEqual(diagnostics[1].range,
+            new vscode.Range(new vscode.Position(23, 23), new vscode.Position(23, 44)));
+        assert.strictEqual(diagnostics[1].message, "Variable CHILD2 is not defined");
+    }).timeout(10000).slow(1000);
+
+    test("TC174952 Copybook - not exist, but dynamically appears", async () => {
+        await helper.showDocument("VAR.cbl");
+        let editor = helper.get_editor("VAR.cbl");
+        await helper.sleep(5000);
+
+        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 2);
+        helper.assertRangeIsEqual(diagnostics[0].range,
+            new vscode.Range(new vscode.Position(22, 23), new vscode.Position(22, 43)));
+        assert.strictEqual(diagnostics[0].message, "Variable CHILD1 is not defined");
+        helper.assertRangeIsEqual(diagnostics[1].range,
+            new vscode.Range(new vscode.Position(23, 23), new vscode.Position(23, 44)));
+        assert.strictEqual(diagnostics[1].message, "Variable CHILD2 is not defined");
+    }).timeout(10000).slow(1000);
+
+    test("Load resource file', () => {\n", async () => {
+        await helper.showDocument("RES.cbl");
+        let editor = helper.get_editor("RES.cbl");
+        await helper.sleep(2000);
+        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+
+        assert.strictEqual(diagnostics.length, 1);
+            assert.ok(diagnostics[0].message.includes( "Syntax error on 'FILE-CONTROsL"));
+            helper.assertRangeIsEqual(diagnostics[0].range,
+                new vscode.Range(new vscode.Position(5, 7), new vscode.Position(5, 20)));
+    }).timeout(3000).slow(1000);
+
+    test("TC174952 / TC174953 Copybook - definition not exist, but dynamically appears", async () => {
+        await helper.showDocument("USERC1F.cbl");
+        let editor = helper.get_editor("USERC1F.cbl");
+        await helper.sleep(3000);
+
+        let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        helper.assertRangeIsEqual(diagnostics[1].range,
+            new vscode.Range(new vscode.Position(41, 29), new vscode.Position(41, 46)));
+        assert.strictEqual(diagnostics[1].message, "Variable USER-PHONE-MOBILE is not defined");
+
+        await editor.edit(edit => {
+            edit.replace(
+                new vscode.Range(new vscode.Position(18, 17), new vscode.Position(18, 18)),
+                "T.");
+        });
+        await helper.sleep(3000);
+
+        diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        for (const diagnostic of diagnostics) {
+            assert.ok(!diagnostic.message.includes("Variable USER-PHONE-MOBILE is not defined"));
+        }
+
+        helper.deleteFile(".copybooks/zowe-profile-1/DATA.SET.PATH2", "BOOK3T.cpy");
+        await helper.sleep(3000);
+        diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        helper.assertRangeIsEqual(diagnostics[1].range,
+            new vscode.Range(new vscode.Position(41, 29), new vscode.Position(41, 46)));
+        assert.strictEqual(diagnostics[1].message, "Variable USER-PHONE-MOBILE is not defined");
+
+    }).timeout(10000).slow(1000);
 
 });

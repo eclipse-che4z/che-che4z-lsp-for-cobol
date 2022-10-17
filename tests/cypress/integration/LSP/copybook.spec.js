@@ -85,47 +85,6 @@ context('This is a Copybook spec', () => {
     });
   });
 
-  describe('TC174952 Copybook - not exist, but dynamically appears', () => {
-    it(
-      ['smoke', 'CI'],
-      'Checks that LSP can dynamically detect appearance of copybook and rescan cobol file on the fly',
-      () => {
-        cy.readFile('test_files/project/.copybooks/zowe-profile-1/DATA.SET.PATH2/BOOK3T.cpy').then((text) => {
-          cy.writeFile('test_files/project/.copybooks/zowe-profile-1/DATA.SET.PATH2/BOOK3.cpy', text);
-          cy.closeFolder('.copybooks');
-        });
-        cy.openFolder('.copybooks/zowe-profile-1/DATA.SET.PATH2');
-        cy.openFile('USERC1F.cbl');
-        cy.get(IDE.editorError).should('not.exist');
-        cy.deleteFile('BOOK3.cpy');
-        cy.closeCurrentTab();
-        cy.openFile('USERC1F.cbl');
-        cy.get(IDE.editorError).should('have.length', 2).getElementLineNumber().should('eq', 19);
-      },
-    );
-  });
-
-  describe('TC174953 Copybook - definition not exist, but dynamically appears', () => {
-    afterEach(() => {
-      cy.closeFolder('.copybooks');
-    });
-
-    it(
-      ['smoke', 'CI'],
-      'Checks that LSP can dynamically detect definitions from an appeared copybook and rescan cobol file on the fly',
-      () => {
-        cy.openFile('USERC1F.cbl').goToLine(42);
-        cy.get(IDE.editorError).should('have.length', 1).getElementLineNumber().should('eq', 42);
-        cy.goToLine(19);
-        cy.getCurrentLine().type('{end}{backspace}T.').wait(500);
-        cy.goToLine(42);
-        cy.get(IDE.editorInfo).should('not.have.length', 1);
-        cy.getCurrentLine().type('{end}{backspace}{backspace}');
-        cy.get(IDE.editorInfo).should('have.length', 0);
-      },
-    );
-  });
-
   describe('TC288744 Underscore a copy statement if its copybook contains error: nested copybooks', () => {
     afterEach(() => {
       cy.closeFolder('.copybooks');
@@ -344,16 +303,6 @@ context('This is a Copybook spec', () => {
     });
   });
 
-  describe('Load resource file', () => {
-    it(['smoke', 'CI'], 'Checks loading of resource file', () => {
-      cy.openFile('RES.cbl');
-      cy.goToLine(6);
-      cy.getCurrentLineErrors({ expectedLine: 6 })
-        .eq(0)
-        .getHoverErrorMessage()
-        .contains("Syntax error on 'FILE-CONTROsL'");
-    });
-  });
   //Refactor COPY MAID statements test
   describe('TC327253 Support COPY MAID statements', () => {
     beforeEach(() => {
