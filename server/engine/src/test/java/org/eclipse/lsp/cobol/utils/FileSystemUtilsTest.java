@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
 
@@ -48,7 +48,7 @@ class FileSystemUtilsTest {
     try (MockedStatic<URLDecoder> urlDecoderMock = mockStatic(URLDecoder.class)) {
       FileSystemService fileSystemService = new WorkspaceFileService();
 
-      urlDecoderMock.when(() -> URLDecoder.decode(eq(decodedURI), any()))
+      urlDecoderMock.when(() -> URLDecoder.decode(eq(decodedURI), anyString()))
           .thenThrow(UnsupportedEncodingException.class);
 
       IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
