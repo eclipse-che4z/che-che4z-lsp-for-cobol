@@ -26,8 +26,9 @@ export class JavaCheck {
             ls.stderr.on("data", (data: any) => {
                 if (JavaCheck.isJavaVersionSupported(data.toString())) {
                     resolved = true;
-                    resolve();
+                    resolve(resolved);
                 }
+
             });
             ls.on("error", (code: any) => {
                 if ("Error: spawn java ENOENT" === code.toString()) {

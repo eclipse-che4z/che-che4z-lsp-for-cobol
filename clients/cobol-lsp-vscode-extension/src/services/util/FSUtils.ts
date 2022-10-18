@@ -85,13 +85,3 @@ export function searchInWorkspace(entityName: string, targetFolders: string[], e
         }
     }
 }
-
-/**
- * This method delete the folder's content.
- * @param pathToClear represents the folder to be cleaned.
- */
-export function cleanDirectory(pathToClear: string) {
-    if (fs.existsSync(pathToClear)) {
-        readdirSync(pathToClear).forEach(f => fs.rmSync(path.join(pathToClear, `${f}`), { recursive: true }));
-    }
-}

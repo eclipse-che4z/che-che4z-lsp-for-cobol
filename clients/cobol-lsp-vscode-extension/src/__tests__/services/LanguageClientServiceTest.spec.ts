@@ -12,10 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "fs-extra";
 import * as os from "os";
-import { join } from "path";
+import * as fs from "fs";
 import * as vscode from "vscode";
+import { join } from "path";
 import { LanguageClient } from "vscode-languageclient";
 import { CopybookDownloadService } from "../../services/copybook/CopybookDownloadService";
 import { JavaCheck } from "../../services/JavaCheck";
@@ -40,7 +40,14 @@ jest.mock("vscode", () => ({
 jest.mock("vscode-languageclient", () => ({
     LanguageClient: jest.fn(),
 }));
-
+jest.mock('fs', () => ({
+    fs: jest.fn(),
+}));
+jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
+    return {
+      ZoweVsCodeExtension: jest.fn()
+    };
+  });
 const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService();
 let languageClientService: LanguageClientService;
 
@@ -59,12 +66,13 @@ describe("LanguageClientService positive scenario", () => {
         languageClientService = new LanguageClientService(jest.fn() as any);
         new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(0);
-        fs.existsSync = jest.fn().mockReturnValue(true);
+        (fs.existsSync as any)= jest.fn().mockReturnValue(true);
     });
 
     test("Test LanguageClientService switches native flag", async () => {
         (languageClientService as any).initializeExecutables = jest.fn();
-        fs.existsSync = jest.fn().mockReturnValue(true);
+        (fs.existsSync as any) = jest.fn().mockReturnValue(true);
+        Object.defineProperty(fs, 'existsSync', {value: jest.fn()})
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(9999);
         languageClientService.enableNativeBuild();
 
@@ -75,7 +83,7 @@ describe("LanguageClientService positive scenario", () => {
 
     test("Test LanguageClientService checkPrerequisites passes", async () => {
         let message = false;
-        fs.existsSync = jest.fn().mockReturnValue(true);
+        (fs.existsSync as any)= jest.fn().mockReturnValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(9999);
         try {
             await languageClientService.checkPrerequisites();
@@ -173,7 +181,7 @@ describe("LanguageClientService positive scenario", () => {
 describe("LanguageClientService negative scenario.", () => {
 
     test("LSP port not defined and jar path doesn't exists", async () => {
-        fs.existsSync = jest.fn().mockReturnValue(false);
+        (fs.existsSync as any) = jest.fn().mockReturnValue(false);
         try {
             await new LanguageClientService(jest.fn() as any).checkPrerequisites();
         } catch (error) {
