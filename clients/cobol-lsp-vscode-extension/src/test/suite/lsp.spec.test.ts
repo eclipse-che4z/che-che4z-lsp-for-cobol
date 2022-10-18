@@ -15,6 +15,8 @@
 import * as assert from 'assert';
 import * as helper from './testHelper';
 import * as vscode from "vscode";
+import {getWorkspacePath, recursiveCopySync} from "./testHelper";
+import * as path from 'path';
 
 suite('Integration Test Suite', () => {
     const workspace_file = 'USER1.cbl';
@@ -184,7 +186,7 @@ suite('Integration Test Suite', () => {
         helper.assertRangeIsEqual(diagnostics[0].range,
             new vscode.Range(new vscode.Position(34, 11), new vscode.Position(34, 15)));
         assert.strictEqual(diagnostics[0].message, "Missing token SQL at execSqlStatement");
-    }).timeout(10000).slow(1000);
+    }).timeout(8000).slow(1000);
 
     test("TC266094 Underline the entire incorrect variable structure", async () => {
         await helper.showDocument("VAR.cbl");
@@ -199,7 +201,7 @@ suite('Integration Test Suite', () => {
         helper.assertRangeIsEqual(diagnostics[1].range,
             new vscode.Range(new vscode.Position(23, 23), new vscode.Position(23, 44)));
         assert.strictEqual(diagnostics[1].message, "Variable CHILD2 is not defined");
-    }).timeout(10000).slow(1000);
+    }).timeout(7000).slow(1000);
 
     test("TC174952 Copybook - not exist, but dynamically appears", async () => {
         await helper.showDocument("VAR.cbl");
@@ -214,7 +216,7 @@ suite('Integration Test Suite', () => {
         helper.assertRangeIsEqual(diagnostics[1].range,
             new vscode.Range(new vscode.Position(23, 23), new vscode.Position(23, 44)));
         assert.strictEqual(diagnostics[1].message, "Variable CHILD2 is not defined");
-    }).timeout(10000).slow(1000);
+    }).timeout(7000).slow(1000);
 
     test("Load resource file', () => {\n", async () => {
         await helper.showDocument("RES.cbl");
@@ -250,7 +252,7 @@ suite('Integration Test Suite', () => {
             assert.ok(!diagnostic.message.includes("Variable USER-PHONE-MOBILE is not defined"));
         }
 
-        helper.deleteFile(".copybooks/zowe-profile-1/DATA.SET.PATH2", "BOOK3T.cpy");
+        helper.deleteFile(path.join(getWorkspacePath(),".copybooks/zowe-profile-1/DATA.SET.PATH2", "BOOK3T.cpy"));
         await helper.sleep(3000);
         diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         helper.assertRangeIsEqual(diagnostics[1].range,
@@ -258,5 +260,52 @@ suite('Integration Test Suite', () => {
         assert.strictEqual(diagnostics[1].message, "Variable USER-PHONE-MOBILE is not defined");
 
     }).timeout(10000).slow(1000);
+
+    test("'TC266074 LSP analysis for extended sources - basic scenario", async () => {
+        const extSrcUser1FilePath = path.join(".c4z", ".extsrcs", "USER1.cbl");
+        const user1FilePath = "USER1.cbl";
+        helper.recursiveCopySync(
+            path.join(getWorkspacePath(), user1FilePath),
+            path.join(getWorkspacePath(), extSrcUser1FilePath));
+
+        await helper.showDocument(extSrcUser1FilePath);
+        let editor = helper.get_editor(extSrcUser1FilePath);
+        await helper.insertString(editor, new vscode.Position(25, 0), "           COPY ABC.");
+
+        let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 0);
+
+        await editor.edit(edit => {
+            edit.delete(
+                new vscode.Range(new vscode.Position(25, 19),
+                    new vscode.Position(25, 20)));
+        });
+        await helper.sleep(1500);
+        diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 1);
+        assert.ok(diagnostics[0].message.includes("Syntax error on 'COPY' expected"));
+
+        await helper.insertString(editor, new vscode.Position(25, 20), "\n           Mov");
+        await helper.sleep(1500);
+        assert.strictEqual(vscode.languages.getDiagnostics(editor.document.uri).length, 1);
+
+        await helper.showDocument("USER1.cbl");
+        editor = helper.get_editor("USER1.cbl");
+        await helper.insertString(editor, new vscode.Position(40, 0), "           COPY ABC.");
+        await helper.sleep(1500);
+        diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        await helper.printAllDiagnostics(diagnostics);
+
+        assert.strictEqual(diagnostics.length, 1);
+        assert.ok(diagnostics[0].message.includes("ABC: Copybook not found"));
+        assert.ok(diagnostics[0].source.includes("COBOL Language Support (copybook)"));
+
+        await helper.insertString(editor, new vscode.Position(40, 21), "\n           Mov");
+        await helper.sleep(1500);
+        diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 4);
+        assert.ok(diagnostics[1].message.includes("A misspelled word, maybe you want to put MOVE"));
+
+    }).timeout(20000).slow(1000);
 
 });

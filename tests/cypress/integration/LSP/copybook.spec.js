@@ -121,44 +121,6 @@ context('This is a Copybook spec', () => {
     });
   });
 
-  describe('TC266074 LSP analysis for extended sources - basic scenario', () => {
-    it(['smoke', 'CI'], 'If extended sources are places under .c4z/.extsrcs, then ignore COPY instructions', () => {
-      cy.readFile('test_files/project/USER1.cbl').then((context) => {
-        cy.writeFile('test_files/project/.c4z/.extsrcs/USER1.cbl', context);
-      });
-      cy.openFolder('.c4z/.extsrcs').openFile('USER1.cbl');
-      cy.goToLine(26);
-      cy.getCurrentLine().type('           COPY ABC.');
-      cy.getCurrentLineOverlay().children().should('not.have.class', IDE.editorError);
-      cy.getCurrentLine().type('{end}{backspace}');
-      cy.getCurrentLineErrors({ expectedLine: 26 })
-        .eq(0)
-        .getHoverErrorMessage()
-        .contains("Syntax error on 'COPY' expected");
-      cy.getCurrentLine().type('{end}{enter}Mov');
-      cy.getCurrentLineOverlay().children().should('not.have.class', IDE.editorWarn);
-    });
-
-    it(['smoke', 'CI'], '.c4z', () => {
-      cy.readFile('test_files/project/.c4z/.extsrcs/USER1.cbl').then((context) => {
-        cy.writeFile('test_files/project/.c4z/USER1.cbl', context);
-      });
-      cy.openFolder('.c4z').openFile('USER1.cbl');
-      // Replace typing by save in previous test?
-      cy.goToLine(40);
-      cy.getCurrentLine().type('           COPY ABC.');
-      cy.getCurrentLineErrors({ expectedLine: 40 })
-        .eq(0)
-        .getHoverErrorMessage()
-        .contains('ABC: Copybook not foundCOBOL Language Support (copybook)(missing copybook)');
-      cy.getCurrentLine().type('{end}{enter}Mov');
-      cy.getCurrentLineErrors({ expectedLine: 41, errorType: 'warning' })
-        .eq(0)
-        .getHoverErrorMessage()
-        .contains('A misspelled word, maybe you want to put MOVE');
-    });
-  });
-
   describe('TC312878 Edit missing copybook and resolve', () => {
     // TODO - add selectors for VSC
     it(['flaky_theia'], 'Edits missing copybook and resolves', () => {

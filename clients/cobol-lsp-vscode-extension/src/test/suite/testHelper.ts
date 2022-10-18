@@ -93,13 +93,11 @@ export function updateConfig(configFileName: string) {
     recursiveCopySync(settingvalueLoc, settinsFileLoc);
 }
 
-export function deleteFile(folder: string, fileName: string){
-    const folderPath = path.join(getWorkspacePath(), folder);
-    console.log(folderPath);
-    fs.rmSync(path.join(folderPath, fileName));
+export function deleteFile(path: string){
+    fs.rmSync(path);
 }
 
-function recursiveCopySync(origin, dest) {
+export function recursiveCopySync(origin, dest) {
     if (fs.existsSync(origin)) {
         if (fs.statSync(origin).isDirectory()) {
             fs.mkdirSync(dest);
