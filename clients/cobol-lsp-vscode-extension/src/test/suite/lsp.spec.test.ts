@@ -15,7 +15,7 @@
 import * as assert from 'assert';
 import * as helper from './testHelper';
 import * as vscode from "vscode";
-import {getWorkspacePath, recursiveCopySync} from "./testHelper";
+import {getWorkspacePath, moveCursor, recursiveCopySync} from "./testHelper";
 import * as path from 'path';
 
 suite('Integration Test Suite', () => {
@@ -294,7 +294,6 @@ suite('Integration Test Suite', () => {
         await helper.insertString(editor, new vscode.Position(40, 0), "           COPY ABC.");
         await helper.sleep(1500);
         diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-        await helper.printAllDiagnostics(diagnostics);
 
         assert.strictEqual(diagnostics.length, 1);
         assert.ok(diagnostics[0].message.includes("ABC: Copybook not found"));
@@ -306,6 +305,94 @@ suite('Integration Test Suite', () => {
         assert.strictEqual(diagnostics.length, 4);
         assert.ok(diagnostics[1].message.includes("A misspelled word, maybe you want to put MOVE"));
 
-    }).timeout(20000).slow(1000);
+    }).timeout(10000).slow(1000);
 
+
+    test("TC250107 Test Area A, check DIVISION and paragraph name warnings", async () => {
+        await helper.showDocument("USER1.cbl");
+        let editor = helper.get_editor("USER1.cbl");
+        await helper.insertString(editor, new vscode.Position(13, 0), "      ");
+        await helper.sleep(1500);
+        let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 1);
+        assert.strictEqual(diagnostics[0].message, "The following token must start in Area A: Identification");
+
+        await helper.insertString(editor, new vscode.Position(16, 0), "      ");
+        await helper.sleep(1500);
+        diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 2);
+        assert.strictEqual(diagnostics[1].message, "The following token must start in Area A: Data");
+
+        await helper.insertString(editor, new vscode.Position(26, 0), "      ");
+        await helper.sleep(1500);
+        diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 3);
+        assert.strictEqual(diagnostics[2].message, "The following token must start in Area A: Procedure");
+
+        await helper.insertString(editor, new vscode.Position(31, 0), "      ");
+        await helper.sleep(1500);
+        diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 4);
+        assert.strictEqual(diagnostics[3].message, "The following token must start in Area A: 100-Print-User");
+
+        await helper.insertString(editor, new vscode.Position(17, 0), "       FILE SECTION.\n");
+        await helper.insertString(editor, new vscode.Position(18, 0), "    FD  TRANS-FILE-IN IS EXTERNAL.\n");
+        await helper.sleep(1500);
+        diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        helper.printDocument(editor);
+        helper.printAllDiagnostics(diagnostics);
+        assert.strictEqual(diagnostics.length, 5);
+        assert.strictEqual(diagnostics[3].message, "The following token must start in Area A: 100-Print-User");
+
+    }).timeout(7000).slow(1000);
+
+    test("TC250107 Test Area A, Check FD/SD level data", async () => {
+        await helper.showDocument("USER1.cbl");
+        let editor = helper.get_editor("USER1.cbl");
+        await helper.insertString(editor, new vscode.Position(17, 0), "       FILE SECTION.\n");
+        await helper.insertString(editor, new vscode.Position(18, 0), "           FD  TRANS-FILE-IN IS EXTERNAL.\n");
+        await helper.sleep(2000);
+        let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        helper.printDocument(editor);
+        helper.printAllDiagnostics(diagnostics);
+        assert.strictEqual(diagnostics.length, 2);
+        assert.strictEqual(diagnostics[0].message, "The following token must start in Area A: FD");
+
+    }).timeout(3000).slow(1000);
+
+    test("TC250109 Test Area B", async () => {
+        await helper.showDocument("USER1.cbl");
+        const editor = helper.get_editor("USER1.cbl");
+        await editor.edit(edit => {
+            edit.replace(new vscode.Range(new vscode.Position(32, 0),
+                            new vscode.Position(32, 3)), "");
+        });
+        await helper.sleep(1500);
+        let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 1);
+        assert.strictEqual(diagnostics[0].message, "The following token must start in Area B: Move");
+
+        await editor.edit(edit => {
+            edit.replace(new vscode.Range(new vscode.Position(41, 0),
+                new vscode.Position(41, 3)), "");
+        });
+        await helper.sleep(1500);
+        diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 2);
+        assert.strictEqual(diagnostics[1].message, "The following token must start in Area B: Display");
+    }).timeout(5000).slow(1000);
+
+    test("TC250108 Test Program Name", async () => {
+        await helper.showDocument("USER1.cbl");
+        const editor = helper.get_editor("USER1.cbl");
+        await editor.edit(edit => {
+            edit.replace(new vscode.Range(new vscode.Position(48, 30),
+                new vscode.Position(48, 32)), "1.");
+        });
+        await helper.sleep(1500);
+        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 1);
+        assert.strictEqual(diagnostics[0].message, "Program-name must be identical to the program-name of the corresponding PROGRAM-ID paragraph: HELLO-WORLD");
+
+    }).timeout(3000).slow(1000);
 });
