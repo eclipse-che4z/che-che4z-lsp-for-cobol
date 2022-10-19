@@ -27,7 +27,7 @@ export function clearCache() {
                 vscode.window.showInformationMessage(COPYBOOK_CACHE_CLEARED_INFO).then(_val => resolve(true));
             }
             const folderUri = vscode.workspace.workspaceFolders[0].uri;
-            const fileUri = vscode.Uri.parse(path.join(folderUri.fsPath, C4Z_FOLDER, COPYBOOKS_FOLDER));
+            const fileUri = folderUri.with({ path: path.join(folderUri.fsPath, C4Z_FOLDER, COPYBOOKS_FOLDER) });
             vscode.workspace.fs.delete(fileUri, { recursive: true});
             vscode.window.showInformationMessage(COPYBOOK_CACHE_CLEARED_INFO);
     }catch(error){

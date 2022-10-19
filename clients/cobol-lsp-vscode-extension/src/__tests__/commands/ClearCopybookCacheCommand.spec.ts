@@ -25,7 +25,7 @@ const wsPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, C4Z_FO
 jest.mock("vscode", () => ({
     Uri: {
         parse: jest.fn().mockReturnValue(path.join("tmp-ws", ".c4z", ".copybooks"))
-        
+
 
     },
     window: {
