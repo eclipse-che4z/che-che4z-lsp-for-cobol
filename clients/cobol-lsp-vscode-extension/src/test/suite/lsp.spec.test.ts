@@ -107,14 +107,14 @@ suite('Integration Test Suite', () => {
         await helper.showDocument("TEST.CBL");
         const editor = helper.get_editor("TEST.CBL");
         await helper.insertString(editor, new vscode.Position(22, 7), "oi3Bd5kC1f3nMFp0IWg62ZZgWMxHPJnuLWm4DqplZDzMIX69C6vjeL24YbobdQnoQsDenL35omljznHd0l1fP");
-        await helper.sleep(1000);
+        await helper.sleep(1500);
         const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         assert.strictEqual(diagnostics.length, 4);
         assert.strictEqual(diagnostics[0].message, "Source text cannot go past column 80");
         helper.assertRangeIsEqual(diagnostics[0].range,
             new vscode.Range(new vscode.Position(22, 80), new vscode.Position(22, 131)));
 
-    }).timeout(2000).slow(1000);
+    }).timeout(4000).slow(1000);
 
     test("TC174655 Copybook - Nominal", async () => {
         await helper.showDocument("USERC1N1.cbl");
