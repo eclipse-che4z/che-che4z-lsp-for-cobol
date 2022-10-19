@@ -30,14 +30,12 @@ suite('Integration Test Suite', () => {
         await helper.activate();
     });
 
-
     // open 'open' file, should be recognized as hlasm
     test('TC152048 Cobol file is recognized by LSP', async () => {
         // setting a language takes a while but shouldn't take longer than a second
         await helper.sleep(1000);
         assert.ok(editor.document.languageId === 'cobol');
     }).timeout(2000).slow(1000);
-
 
     test('TC152046 Nominal - check syntax Ok message', async () => {
         await helper.sleep(1000);
@@ -206,7 +204,7 @@ suite('Integration Test Suite', () => {
     test("TC174952 Copybook - not exist, but dynamically appears", async () => {
         await helper.showDocument("VAR.cbl");
         let editor = helper.get_editor("VAR.cbl");
-        await helper.sleep(5000);
+        await helper.sleep(6000);
 
         const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         assert.strictEqual(diagnostics.length, 2);
@@ -234,7 +232,6 @@ suite('Integration Test Suite', () => {
         await helper.showDocument("USERC1F.cbl");
         let editor = helper.get_editor("USERC1F.cbl");
         await helper.sleep(3000);
-
         let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         helper.assertRangeIsEqual(diagnostics[1].range,
             new vscode.Range(new vscode.Position(41, 29), new vscode.Position(41, 46)));
@@ -251,13 +248,6 @@ suite('Integration Test Suite', () => {
         for (const diagnostic of diagnostics) {
             assert.ok(!diagnostic.message.includes("Variable USER-PHONE-MOBILE is not defined"));
         }
-
-        helper.deleteFile(path.join(getWorkspacePath(),".copybooks/zowe-profile-1/DATA.SET.PATH2", "BOOK3T.cpy"));
-        await helper.sleep(3000);
-        diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-        helper.assertRangeIsEqual(diagnostics[1].range,
-            new vscode.Range(new vscode.Position(41, 29), new vscode.Position(41, 46)));
-        assert.strictEqual(diagnostics[1].message, "Variable USER-PHONE-MOBILE is not defined");
 
     }).timeout(10000).slow(1000);
 
@@ -304,15 +294,14 @@ suite('Integration Test Suite', () => {
         diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         assert.strictEqual(diagnostics.length, 4);
         assert.ok(diagnostics[1].message.includes("A misspelled word, maybe you want to put MOVE"));
-
-    }).timeout(10000).slow(1000);
-
+        await helper.closeAllEditors();
+    }).timeout(15000).slow(1000);
 
     test("TC250107 Test Area A, check DIVISION and paragraph name warnings", async () => {
         await helper.showDocument("USER1.cbl");
         let editor = helper.get_editor("USER1.cbl");
         await helper.insertString(editor, new vscode.Position(13, 0), "      ");
-        await helper.sleep(1500);
+        await helper.sleep(2500);
         let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         assert.strictEqual(diagnostics.length, 1);
         assert.strictEqual(diagnostics[0].message, "The following token must start in Area A: Identification");
@@ -334,17 +323,8 @@ suite('Integration Test Suite', () => {
         diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         assert.strictEqual(diagnostics.length, 4);
         assert.strictEqual(diagnostics[3].message, "The following token must start in Area A: 100-Print-User");
-
-        await helper.insertString(editor, new vscode.Position(17, 0), "       FILE SECTION.\n");
-        await helper.insertString(editor, new vscode.Position(18, 0), "    FD  TRANS-FILE-IN IS EXTERNAL.\n");
-        await helper.sleep(1500);
-        diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-        helper.printDocument(editor);
-        helper.printAllDiagnostics(diagnostics);
-        assert.strictEqual(diagnostics.length, 5);
-        assert.strictEqual(diagnostics[3].message, "The following token must start in Area A: 100-Print-User");
-
-    }).timeout(7000).slow(1000);
+        await helper.closeAllEditors();
+    }).timeout(8000).slow(1000);
 
     test("TC250107 Test Area A, Check FD/SD level data", async () => {
         await helper.showDocument("USER1.cbl");
@@ -353,10 +333,9 @@ suite('Integration Test Suite', () => {
         await helper.insertString(editor, new vscode.Position(18, 0), "           FD  TRANS-FILE-IN IS EXTERNAL.\n");
         await helper.sleep(2000);
         let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-        helper.printDocument(editor);
-        helper.printAllDiagnostics(diagnostics);
         assert.strictEqual(diagnostics.length, 2);
         assert.strictEqual(diagnostics[0].message, "The following token must start in Area A: FD");
+        await helper.closeAllEditors();
 
     }).timeout(3000).slow(1000);
 
@@ -380,6 +359,8 @@ suite('Integration Test Suite', () => {
         diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         assert.strictEqual(diagnostics.length, 2);
         assert.strictEqual(diagnostics[1].message, "The following token must start in Area B: Display");
+        await helper.closeAllEditors();
+
     }).timeout(5000).slow(1000);
 
     test("TC250108 Test Program Name", async () => {
@@ -393,6 +374,7 @@ suite('Integration Test Suite', () => {
         const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         assert.strictEqual(diagnostics.length, 1);
         assert.strictEqual(diagnostics[0].message, "Program-name must be identical to the program-name of the corresponding PROGRAM-ID paragraph: HELLO-WORLD");
+        await helper.closeAllEditors();
 
     }).timeout(3000).slow(1000);
 });
