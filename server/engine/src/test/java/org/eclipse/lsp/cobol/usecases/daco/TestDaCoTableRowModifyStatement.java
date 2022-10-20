@@ -51,6 +51,7 @@ class TestDaCoTableRowModifyStatement {
           + "            ROW MODIFY {$TBLPRO-XL1} ON 'ASDF' WITH {$DSAPRO-XL1}. \r\n"
           + "            ROW MODIFY {$TBFPRO-XL1} ON {$DSAPRO-XL1} WITH {$DSAPRO-XL1}. \r\n"
           + "            ROW MODIFY {$TBFPRO-XL1} ON 'FDERT' WITH {$DSAPRO-XL1}. \r\n"
+          + "            ROW MODIFY {$TBFPRO-XL1} ON 'FDERT' WITH 'Y'. \r\n"
           // Negative tests
           + "            ROW MODIFY {$DSAPRO-XL1|1} ON {$DSAPRO-XL1} WITH {$DSAPRO-XL1}. \r\n"
           + "            ROW MODIFY {GBR4|1|2} ON {$DSAPRO-XL1} WITH {$DSAPRO-XL1}. \r\n"
