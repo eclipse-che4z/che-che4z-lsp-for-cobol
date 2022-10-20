@@ -21,18 +21,11 @@ import { C4Z_FOLDER, CLEARING_COPYBOOK_CACHE, COPYBOOK_CACHE_CLEARED_INFO, COPYB
  *
  */
 export function clearCache() {
-    vscode.window.setStatusBarMessage(CLEARING_COPYBOOK_CACHE, new Promise((resolve, _reject) => {
-    try{
-            if (!vscode.workspace.workspaceFolders || !vscode.workspace.workspaceFolders[0]) {
-                vscode.window.showInformationMessage(COPYBOOK_CACHE_CLEARED_INFO).then(_val => resolve(true));
-            }
-            const folderUri = vscode.workspace.workspaceFolders[0].uri;
-            const fileUri = folderUri.with({ path: path.join(folderUri.fsPath, C4Z_FOLDER, COPYBOOKS_FOLDER) });
-            vscode.workspace.fs.delete(fileUri, { recursive: true});
-            vscode.window.showInformationMessage(COPYBOOK_CACHE_CLEARED_INFO);
-    }catch(error){
-        vscode.window.showInformationMessage("Encountered problem while clearing copybook cache");
-        console.log(error)
-    }
-    }));
-}
+    vscode.window.setStatusBarMessage(CLEARING_COPYBOOK_CACHE, Promise.resolve().then(()=>{
+        const folderUri = vscode.workspace.workspaceFolders[0].uri;
+        const fileUri = folderUri.with({ path: path.join(folderUri.fsPath, C4Z_FOLDER, COPYBOOKS_FOLDER) });
+        vscode.workspace.fs.delete(fileUri, { recursive: true});
+        vscode.window.showInformationMessage(COPYBOOK_CACHE_CLEARED_INFO);
+    }, ()=>vscode.window.showInformationMessage("Encountered problem while clearing copybook cache")))
+ }
+

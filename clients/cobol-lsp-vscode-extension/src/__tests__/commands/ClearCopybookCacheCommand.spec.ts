@@ -25,14 +25,9 @@ const wsPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, C4Z_FO
 jest.mock("vscode", () => ({
     Uri: {
         parse: jest.fn().mockReturnValue(path.join("tmp-ws", ".c4z", ".copybooks"))
-
-
     },
     window: {
-        setStatusBarMessage: jest.fn()
-            .mockImplementation(async (text: string, hideWhenDone: Thenable<any>) => {
-                await hideWhenDone;
-            }),
+        setStatusBarMessage: jest.fn().mockResolvedValue(true),
         showInformationMessage: jest.fn().mockImplementation((message: string) => Promise.resolve(message)),
     },
     workspace: {
@@ -59,12 +54,6 @@ afterAll(() => {
 );
 
 describe("Tests downloaded copybook cache clear", () => {
-    it("deletes the copybookfolder", () => {
-        clearCache();
-        expect(vscode.workspace.fs.delete).toBeCalled();
-        expect(vscode.workspace.fs.delete).toBeCalledWith(wsPath, { recursive: true});
-    });
-
     it("checks running command multiple times doesn't produce error", () => {
         expect(() => {
             for (let index = 0; index < 3; index++) {
