@@ -512,6 +512,7 @@
         "package": "vsce package"
     },
     "dependencies": {
+        "glob": "^8.0.3",
         "@zowe/zowe-explorer-api": "^1.17.0",
         "iconv-lite": "^0.6.3",
         "vscode-extension-telemetry": "0.1.6",
@@ -524,7 +525,6 @@
         "@types/vscode": "^1.55.0",
         "@vscode/test-electron": "^2.1.5",
         "decache": "^4.6.1",
-        "glob": "^8.0.3",
         "jest": "^27.0.0",
         "jest-sonar-reporter": "^2.0.0",
         "mocha": "^10.0.0",
