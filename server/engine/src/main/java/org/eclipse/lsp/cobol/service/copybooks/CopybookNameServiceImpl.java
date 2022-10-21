@@ -55,7 +55,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   private Set<CopybookName> listOfCopybookNames;
   private Set<String> listOfCopybookFolders;
 
-  private final String downloadedCopybooksFolders = ".c4z/.copybooks";
+  private static final String CPY_DOWNLOAD_FOLDER_PATH = ".c4z/.copybooks";
 
   @Inject
   public CopybookNameServiceImpl(
@@ -65,7 +65,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
     this.settingsService = settingsService;
     this.files = files;
     this.clientProvider = clientProvider;
-    this.listOfCopybookFolders = singleton(downloadedCopybooksFolders);
+    this.listOfCopybookFolders = singleton(CPY_DOWNLOAD_FOLDER_PATH);
     this.listOfCopybookNames = new HashSet<>();
   }
 
@@ -124,7 +124,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
         .collect(Collectors.toList());
     Set<String> copybookExtensionsWithoutDotAsSet = new HashSet<>(copybookExtensionsWithoutDot);
     listOfCopybookFolders = Stream.concat(copybookFolders.stream(),
-            Stream.of(downloadedCopybooksFolders))
+            Stream.of(CPY_DOWNLOAD_FOLDER_PATH))
         .collect(Collectors.toSet());
     listOfCopybookFolders.addAll(copybookFolders);
     listOfCopybookNames = ImmutableSet.copyOf(
@@ -156,7 +156,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
     return workspaces.stream()
         .map(workspace -> files.getPathFromURI(workspace.getUri()))
         .map(workspacePath -> {
-          String copybookFinalPath = Paths.get(copybookPath).isAbsolute() ? copybookPath
+          String copybookFinalPath = Paths.get(copybookPath.replace("*", "tmp")).isAbsolute() ? copybookPath
               : String.join("/",
                   Optional.ofNullable(workspacePath)
                       .orElseThrow(IllegalArgumentException::new)
