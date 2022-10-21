@@ -32,8 +32,13 @@ dacoStatements
     | fileDMLStatement
     | stringDMLStatement
     | debugStatement
+    | ifRowCondition
     | execStatement DOT_FS?
     ;
+
+ifRowCondition
+   : ROW qualifiedDataName ON qualifiedDataName
+   ;
 
 readTransactionStatement
     : READ TRANSACTION daco_task_name?

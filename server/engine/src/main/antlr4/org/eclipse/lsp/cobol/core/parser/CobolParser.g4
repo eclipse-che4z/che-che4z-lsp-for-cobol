@@ -2380,7 +2380,7 @@ power
    ;
 
 basis
-   : generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
+   : dialectNodeFiller | generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
    ;
 
 cobolWord
