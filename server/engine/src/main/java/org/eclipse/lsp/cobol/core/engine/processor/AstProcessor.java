@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processor;
 
+import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 
@@ -48,6 +49,7 @@ public class AstProcessor {
    * @param ctx processing context
    */
   public void process(ProcessingPhase phase, Node node, ProcessingContext ctx) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     findProcessors(ctx, phase, node.getClass()).forEach(p -> p.accept(node, ctx));
     node.getChildren().forEach(n -> process(phase, n, ctx));
   }
