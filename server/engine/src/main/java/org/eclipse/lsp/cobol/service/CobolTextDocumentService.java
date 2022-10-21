@@ -454,7 +454,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                         uri, firstTime
                                 ? (userRequest ? CopybookProcessingMode.ENABLED_VERBOSE : CopybookProcessingMode.ENABLED)
                                 : CopybookProcessingMode.SKIP);
-        if(firstTime) {
+        if (firstTime) {
           if (copybookIdentificationService.isCopybook(uri, text, waitExtensionConfig())) {
             return;
           }
