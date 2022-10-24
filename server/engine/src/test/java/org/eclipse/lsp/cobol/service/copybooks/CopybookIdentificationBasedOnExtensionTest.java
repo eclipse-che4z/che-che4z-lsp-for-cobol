@@ -28,18 +28,16 @@ class CopybookIdentificationBasedOnExtensionTest {
   @Test
   void whenExtensionMatchSettingThenReturnTrue() {
     CopybookIdentificationBasedOnExtension service = new CopybookIdentificationBasedOnExtension();
-    service.notifyExtensionConfig(ImmutableList.of(".cpy"));
     TextDocumentItem doc = new TextDocumentItem();
     doc.setUri("blah/blah1/copy.txt.cpy");
-    Assertions.assertTrue(service.isCopybook(doc));
+    Assertions.assertTrue(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of(".cpy")));
   }
 
   @Test
   void whenExtensionDoesNotMatchTheCopybookExtSettingsThenReturnFalse() {
     CopybookIdentificationBasedOnExtension service = new CopybookIdentificationBasedOnExtension();
-    service.notifyExtensionConfig(ImmutableList.of("cpyy"));
     TextDocumentItem doc = new TextDocumentItem();
     doc.setUri("blah/blah1/copy.cpy");
-    Assertions.assertFalse(service.isCopybook(doc));
+    Assertions.assertFalse(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of("cpyy")));
   }
 }

@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
-import org.eclipse.lsp4j.TextDocumentItem;
+import java.util.List;
 
 /** Identifies a copybook */
 public interface CopybookIdentificationService {
@@ -22,10 +22,12 @@ public interface CopybookIdentificationService {
   /**
    * Identifies a copybook
    *
-   * @param copybookIdentifier Identifier for a copybook. It can be a copybook URI or text content.
+   * @param uri of the document
+   * @param text of the document
+   * @param config is a config
    * @return True if it's a copybook. False otherwise
    */
-  boolean isCopybook(TextDocumentItem copybookIdentifier) throws UndeterminedDocumentException;
+  boolean isCopybook(String uri, String text, List<String> config) throws UndeterminedDocumentException;
 
   /** Runtime exception in case a doc is not recognisable if it's a copybook or a cobol program. */
   class UndeterminedDocumentException extends RuntimeException {}

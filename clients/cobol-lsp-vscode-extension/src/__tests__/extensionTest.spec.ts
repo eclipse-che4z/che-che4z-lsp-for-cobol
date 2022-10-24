@@ -28,11 +28,17 @@ jest.mock("../commands/FetchCopybookCommand");
 jest.mock("../commands/OpenSettingsCommand");
 jest.mock("../services/LanguageClientService");
 jest.mock("../services/copybook/CopybookDownloadService");
+jest.mock("../commands/ClearCopybookCacheCommand");
 
 jest.mock("../services/Settings", () => ({
     createFileWithGivenPath: jest.fn(),
     initializeSettings: jest.fn(),
 }));
+jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
+    return {
+      ZoweVsCodeExtension: jest.fn()
+    };
+  });
 jest.mock("vscode", () => ({
     commands: {
         registerCommand: jest.fn().mockImplementation((command, callback) => callback()),

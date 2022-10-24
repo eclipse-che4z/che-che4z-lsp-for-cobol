@@ -36,6 +36,11 @@ describe("Test Copybook code action provider", () => {
         };
         (vscode.CodeAction as any) = jest.fn();
         TelemetryService.registerEvent = jest.fn();
+        jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
+            return {
+              ZoweVsCodeExtension: jest.fn()
+            };
+          });
     });
 
     afterAll(() => {

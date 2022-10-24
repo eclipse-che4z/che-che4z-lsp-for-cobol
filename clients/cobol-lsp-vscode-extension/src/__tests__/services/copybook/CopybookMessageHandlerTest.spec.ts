@@ -22,6 +22,12 @@ vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
     get: jest.fn().mockReturnValue("testProfile"),
 });
 
+jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
+    return {
+      ZoweVsCodeExtension: jest.fn()
+    };
+  });
+
 describe("Test the copybook message handler", () => {
     it("checks local present copybooks are resolved", () => {
         SettingsService.getCopybookExtension = jest.fn().mockReturnValue([".cpy"]);

@@ -144,7 +144,6 @@ class ServerCommunicationsTest {
     Diagnostic diagnostic = new Diagnostic(new Range(), "\r\ntest\r\n");
     List<Diagnostic> diagnostics = ImmutableList.of(diagnostic);
 
-    when(files.decodeURI(uri)).thenReturn(uri);
     communications.publishDiagnostics(ImmutableMap.of(uri, diagnostics));
 
     // Check that cleanup was performed for Diagnostic message

@@ -43,6 +43,11 @@ vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
 });
 (vscode.ProgressLocation as any) = { Notification: "notify" };
 
+jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
+    return {
+      ZoweVsCodeExtension: jest.fn()
+    };
+  });
 const getContentMock = jest.fn();
 const getUSSContentsMock = jest.fn();
 const getZoweExplorerMock = (forError: boolean = false, mentionedError?: any) => {

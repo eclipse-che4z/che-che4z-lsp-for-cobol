@@ -117,7 +117,7 @@ export function pickSnippet() {
             editor.insertSnippet(snippet);
         });
         input.show();
-    } catch (error){
+    } catch(error){
         console.log(error);
     }
 }
