@@ -30,14 +30,15 @@ SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + __dirnam
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
     get: jest.fn().mockReturnValue(undefined),
 });
+jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
+    return {
+      ZoweVsCodeExtension: jest.fn()
+    };
+  });
 
 // file utils
 function createFile(filename: string, folderPath: string): string {
-    fs.writeFileSync(path.join(folderPath, filename), "Some dummy content", err => {
-        if (err) {
-            return null;
-        }
-    });
+    fs.writeFileSync(path.join(folderPath, filename), "Some dummy content");
     return path.resolve(folderPath, filename);
 }
 

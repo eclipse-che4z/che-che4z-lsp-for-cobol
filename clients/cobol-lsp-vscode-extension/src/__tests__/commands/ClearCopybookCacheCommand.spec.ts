@@ -12,70 +12,53 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
 import { clearCache } from "../../commands/ClearCopybookCacheCommand";
-import { C4Z_FOLDER, COPYBOOK_CACHE_CLEARED_INFO, COPYBOOKS_FOLDER } from "../../constants";
+import { C4Z_FOLDER, COPYBOOKS_FOLDER } from "../../constants";
 
 const fsPath = "tmp-ws";
-let wsPath: string;
-let c4zPath: string;
+
 let copybookCachePath: string;
+const wsPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, C4Z_FOLDER, COPYBOOKS_FOLDER);
 
-// fs utils
-function createDirectory(targetPath: string) {
-    fs.mkdirSync(targetPath, { recursive: true });
-}
-
-function createFile(filename: string, folderPath: string): string {
-    fs.writeFileSync(path.join(folderPath, filename), "Some dummy content", (err: any) => {
-        if (err) {
-            return null;
-        }
-    });
-    return path.resolve(folderPath, filename);
-}
-
+jest.mock("vscode", () => ({
+    Uri: {
+        parse: jest.fn().mockReturnValue(path.join("tmp-ws", ".c4z", ".copybooks"))
+    },
+    window: {
+        setStatusBarMessage: jest.fn().mockResolvedValue(true),
+        showInformationMessage: jest.fn().mockImplementation((message: string) => Promise.resolve(message)),
+    },
+    workspace: {
+        fs: {
+            delete: jest.fn().mockReturnValue(true),
+        },
+        workspaceFolders: [{
+            uri: {
+                fsPath: "tmp-ws",
+                with: jest.fn().mockImplementation((change: { scheme?: string; authority?: string; path?: string; query?: string; fragment?: string }) => {
+                    return change.path;
+                })
+            }
+        } as any],
+    },
+}));
 beforeEach(() => {
     jest.clearAllMocks();
 });
 
-beforeAll(() => {
-    (vscode.workspace.workspaceFolders as any) = [{ uri: { fsPath } } as any];
-    wsPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath);
-    c4zPath = path.join(wsPath, C4Z_FOLDER);
-    copybookCachePath = path.join(c4zPath, COPYBOOKS_FOLDER);
-    createDirectory(copybookCachePath);
-    createFile("test.cpy", copybookCachePath);
-    vscode.window.setStatusBarMessage = jest.fn()
-        .mockImplementation(async (text: string, hideWhenDone: Thenable<any>) => {
-        await hideWhenDone;
-    });
-    vscode.window.showInformationMessage = jest.fn().mockImplementation((message: string) => Promise.resolve(message));
-});
 afterAll(() => {
-    if (fs.existsSync(wsPath)) {
-        fs.remove(wsPath);
-    }
     jest.clearAllMocks();
-});
+  }
+);
 
 describe("Tests downloaded copybook cache clear", () => {
-    it("deletes the copybookfolder", () => {
-        expect(fs.pathExistsSync(path.join(copybookCachePath, "test.cpy"))).toBe(true);
-        clearCache();
-        expect(fs.pathExistsSync(path.join(copybookCachePath, "test.cpy"))).toBe(false);
-        expect(vscode.window.showInformationMessage).toBeCalledWith(COPYBOOK_CACHE_CLEARED_INFO);
-    });
-
     it("checks running command multiple times doesn't produce error", () => {
         expect(() => {
             for (let index = 0; index < 3; index++) {
                 clearCache();
             }
         }).not.toThrowError();
-        expect(fs.pathExistsSync(path.join(copybookCachePath, "test.cpy"))).toBe(false);
-        expect(vscode.window.showInformationMessage).toBeCalledWith(COPYBOOK_CACHE_CLEARED_INFO);
     });
 });
