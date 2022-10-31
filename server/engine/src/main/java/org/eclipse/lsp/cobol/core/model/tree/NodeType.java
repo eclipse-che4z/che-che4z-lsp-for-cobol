@@ -34,6 +34,7 @@ public enum NodeType {
   PROCEDURE_SECTION,
   PERFORM,
   EXIT,
+  EXIT_SECTION,
   GO_BACK,
   STOP,
   EVALUATE,
