@@ -16,6 +16,9 @@ package org.eclipse.lsp.cobol.usecases.daco;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
+import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
@@ -24,7 +27,7 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test line concatenation with mapping
+ * Test DaCo dialect mapping
  */
 public class TestDaCoMapping {
   private static final String TEXT =
@@ -44,6 +47,24 @@ public class TestDaCoMapping {
           + "       PROCEDURE DIVISION.\n"
           + "           WRITE REPORT TABCD FROM {$VAR} LENGTH {79|1} AFTER PAGE\n";
 
+  private static final String TEXT_MISSING_COPY = "       IDENTIFICATION DIVISION.\n"
+      + "       PROGRAM-ID.    BMVV171M.\n"
+      + "       ENVIRONMENT  DIVISION.\n"
+      + "       IDMS-CONTROL SECTION.\n"
+      + "       PROTOCOL.    MODE IS BATCH DEBUG\n"
+      + "                    IDMS-RECORDS MANUAL.\n"
+      + "       DATA   DIVISION.\n"
+      + "      *     COMMENTED LINE \n"
+      + "      -  \n"
+      + "       WORKING-STORAGE SECTION.\n"
+      + "       01  COPY IDMS {~SUBSCHEMA-NAMES!IDMS}.\n"
+      + "       LINKAGE SECTION.\n"
+      + "       01  COPY MAID {~LDVV171M!DaCo|1} INP.";
+
+  private static final String COPY = "      *   * This copybook remains empty,\n"
+      + "      *   * because the content is of no interest while editing COBOL\n"
+      + "       01  FILLER                      PIC X(0).\n";
+
   @Test
   void test() {
     UseCaseEngine.runTest(
@@ -59,4 +80,16 @@ public class TestDaCoMapping {
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());
   }
+
+  @Test
+  void testMissingCopy() {
+    UseCaseEngine.runTestForDiagnostics(
+        TEXT_MISSING_COPY,
+        ImmutableList.of(new CobolText("SUBSCHEMA-NAMES", IdmsDialect.NAME, COPY, "url", true)),
+        ImmutableMap.of("1", new Diagnostic(new Range(), "LDVV171M_INP: Copybook not found",
+            DiagnosticSeverity.Error, ErrorSource.DIALECT.getText(), "missing copybook")),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
+  }
+
 }

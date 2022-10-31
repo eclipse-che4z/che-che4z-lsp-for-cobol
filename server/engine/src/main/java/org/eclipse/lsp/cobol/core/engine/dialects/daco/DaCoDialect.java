@@ -39,10 +39,7 @@ import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -91,8 +88,15 @@ public final class DaCoDialect implements CobolDialect {
     DaCoVisitor visitor = new DaCoVisitor(context);
     List<Node> nodes = visitor.visitStartRule(parser.startRule());
     nodes.addAll(maidOutcome.getDialectNodes());
-    errors.addAll(listener.getErrors());
-    errors.addAll(visitor.getErrors());
+
+    List<SyntaxError> parserErrors = new LinkedList<>();
+    parserErrors.addAll(listener.getErrors());
+    parserErrors.addAll(visitor.getErrors());
+
+    parserErrors.forEach(error -> error.getLocality().setRange(
+            context.getExtendedSource().mapLocationUnsafe(error.getLocality().getRange()).getRange()));
+
+    errors.addAll(parserErrors);
 
     DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider(maidProcessor.getSections());
     Multimap<String, Pair<String, String>> implicitCode =
@@ -100,11 +104,6 @@ public final class DaCoDialect implements CobolDialect {
             context.getExtendedSource().getText(), nodes, context.getCopybookConfig());
 
     DialectOutcome result = new DialectOutcome(nodes, implicitCode, context);
-    // Map errors locations
-    errors.forEach(error -> {
-      error.getLocality().setRange(
-              context.getExtendedSource().mapLocationUnsafe(error.getLocality().getRange()).getRange());
-    });
     return new ResultWithErrors<>(result, errors);
   }
 

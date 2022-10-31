@@ -90,6 +90,8 @@ public class CFASTBuilderImpl implements CFASTBuilder {
             parent,
             new Perform(((PerformNode) node).getParagraph(), ((PerformNode) node).getSection()));
       }
+    } else if (node instanceof ExitSectionNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.EXIT_SECTION.getValue()));
     } else if (node instanceof ExitNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.EXIT.getValue()));
     } else if (node instanceof GoBackNode) {

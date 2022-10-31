@@ -49,7 +49,7 @@ public class SymbolService {
   private final Map<String, SymbolTable> programSymbols;
 
   public SymbolService() {
-    this.programSymbols = new HashMap<>();
+    this.programSymbols = Collections.synchronizedMap(new HashMap<>());
   }
 
   public SymbolService(Map<String, SymbolTable> symbolTableMap) {
