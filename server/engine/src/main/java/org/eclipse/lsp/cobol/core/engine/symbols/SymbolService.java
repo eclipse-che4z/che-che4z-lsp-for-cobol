@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.inject.Singleton;
 import lombok.Value;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ErrorSource;
@@ -39,7 +38,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils.findNodeByPosition;
 
@@ -137,55 +135,91 @@ public class SymbolService {
       ProgramNode program, CodeBlockUsageNode node) {
     SymbolTable symbolTable = createOrGetSymbolTable(program);
 
-    final Optional<CodeBlockDefinitionNode> definition =
+    List<CodeBlockDefinitionNode> definitions =
         symbolTable.getCodeBlocks().stream()
-            .filter(it -> it.getName().equals(node.getName()))
-            .findAny();
-    definition.ifPresent(it -> it.addUsage(node.getLocality()));
+            .filter(it -> filterNodes(it, node))
+            .collect(Collectors.toList());
+
+    if (definitions.size() == 0) {
+      return Optional.of(
+          SyntaxError.syntaxError()
+              .errorSource(ErrorSource.PARSING)
+              .messageTemplate(
+                  MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
+              .severity(ErrorSeverity.ERROR)
+              .locality(node.getLocality())
+              .build());
+    }
+
+    if (definitions.size() > 1) {
+      // Try to resolve ambiguous reference.
+      // If GO TO is in the same section as a paragraph - no errors
+      String usageSectionName = getSectionName(node);
+
+      definitions = definitions.stream()
+          .filter(d -> getSectionName(d).equalsIgnoreCase(usageSectionName))
+          .collect(Collectors.toList());
+
+      if (definitions.size() > 1) {
+        return Optional.of(
+            SyntaxError.syntaxError()
+                .errorSource(ErrorSource.PARSING)
+                .messageTemplate(
+                    MessageTemplate.of("semantics.ambiguous", node.getName()))
+                .severity(ErrorSeverity.ERROR)
+                .locality(node.getLocality())
+                .build());
+      }
+    }
+
+    CodeBlockDefinitionNode definition = definitions.get(0);
+    definition.addUsage(node.getLocality());
 
     Optional.ofNullable(symbolTable.getParagraphMap().get(node.getName()))
         .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
     Optional.ofNullable(symbolTable.getSectionMap().get(node.getName()))
         .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
 
-    return definition.isPresent()
-        ? Optional.empty()
-        : Optional.of(
-            SyntaxError.syntaxError()
-                .errorSource(ErrorSource.PARSING)
-                .messageTemplate(
-                    MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
-                .severity(ErrorSeverity.ERROR)
-                .locality(node.getLocality())
-                .build());
+    return Optional.empty();
   }
+
+  private boolean filterNodes(CodeBlockDefinitionNode definition, CodeBlockUsageNode usage) {
+    if (!usage.getName().equalsIgnoreCase(definition.getName())) {
+      return false;
+    }
+
+    //Filter nodes in case of section usage in the PERFORM or GO TO statements. i.e. GO TO PARAG1 OF SECTION-1.
+    if (usage.getParent().getNodeType() == NodeType.PERFORM
+        || usage.getParent().getNodeType() == NodeType.GO_TO
+        || usage.getParent().getNodeType() == NodeType.SENTENCE) {
+      Optional<SectionNameNode> sectionNameNode = usage.getParent().getChildren().stream()
+          .filter(c -> c instanceof SectionNameNode)
+          .map(SectionNameNode.class::cast).findFirst();
+
+      return sectionNameNode
+          .map(SectionNameNode::getName)
+          .map(n -> n.equalsIgnoreCase(getSectionName(definition)))
+          .orElse(true);
+    }
+    return true;
+  }
+
+  private String getSectionName(Node node) {
+    Node parent = node.getParent();
+    while (parent != null) {
+      if (parent instanceof ProcedureSectionNode) {
+        return ((ProcedureSectionNode) parent).getName();
+      }
+      node = parent;
+      parent = node.getParent();
+    }
+    return "";
+  }
+
 
   private SymbolTable createOrGetSymbolTable(ProgramNode program) {
     return programSymbols.computeIfAbsent(
         program.getProgramName() + "%" + program.getLocality().getUri(), p -> new SymbolTable());
-  }
-
-  /**
-   * Check if we have this section node defined already
-   *
-   * @param program the program to verify
-   * @param node new section node
-   * @param messageService message formatter
-   * @return an error if any
-   */
-  public Optional<SyntaxError> verifySectionNodeDuplication(
-      ProgramNode program, SectionNameNode node, MessageService messageService) {
-    if (!createOrGetSymbolTable(program).getSectionMap().containsKey(node.getName())) {
-      return Optional.empty();
-    }
-
-    return Optional.of(
-        SyntaxError.syntaxError()
-            .errorSource(ErrorSource.PARSING)
-            .suggestion(messageService.getMessage("semantics.duplicated", node.getName()))
-            .severity(ERROR)
-            .locality(node.getLocality())
-            .build());
   }
 
   /**
