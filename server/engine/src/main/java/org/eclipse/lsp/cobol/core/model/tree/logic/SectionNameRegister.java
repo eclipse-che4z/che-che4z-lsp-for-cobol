@@ -21,8 +21,6 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNameNode;
 
-import java.util.Optional;
-
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROCEDURE_SECTION;
 
 /** SectionNameNode processor */
@@ -41,11 +39,7 @@ public class SectionNameRegister implements Processor<SectionNameNode> {
     }
     ImmutableList<SyntaxError> errors =
         node.getProgram()
-            .flatMap(
-                program -> symbolService
-                    .verifySectionNodeDuplication(program, node, node.getMessageService())
-                    .map(Optional::of)
-                    .orElse(symbolService.registerSectionNameNode(program, node)))
+            .flatMap(program -> symbolService.registerSectionNameNode(program, node))
             .map(ImmutableList::of)
             .orElseGet(ImmutableList::of);
 

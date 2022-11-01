@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class QualifiedReferenceUpdateVariableUsage implements Processor<QualifiedReferenceNode> {
   private static final String NOT_DEFINED_ERROR = "semantics.notDefined";
-  private static final String DUPLICATED_DEFINITION_ERROR = "semantics.duplicated";
+  private static final String AMBIGUOUS_REFERENCE_ERROR = "semantics.ambiguous";
 
   private final SymbolService symbolService;
 
@@ -108,7 +108,7 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
             .locality(node.getLocality())
             .messageTemplate(
                 MessageTemplate.of(
-                    foundDefinitions.isEmpty() ? NOT_DEFINED_ERROR : DUPLICATED_DEFINITION_ERROR,
+                    foundDefinitions.isEmpty() ? NOT_DEFINED_ERROR : AMBIGUOUS_REFERENCE_ERROR,
                     dataName))
             .build();
     ctx.getErrors().add(error);
