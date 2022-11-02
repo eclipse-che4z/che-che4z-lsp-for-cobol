@@ -14,7 +14,8 @@ All notable changes to the COBOL Language Support extension are documented in th
 - Miscellaneous bug fixes
 
 #### Changed
-- Language ID is now lowercase
+- Language ID changed from uppercase "COBOL" to lowercase "cobol"
+- "COBOL Copybook" language ID removed
 - Readme update
 
 ## [1.0.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.1...1.0.2) (2022-06-29)
