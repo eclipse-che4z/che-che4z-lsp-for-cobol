@@ -7,6 +7,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 - Support for SML variables
 - Support for nested IDMS copybooks
 - User predefined labels
+- Custom copybook file extension setting
 - Configurable CICS translator
 - Support for custom smart tab settings
 
