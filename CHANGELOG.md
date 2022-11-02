@@ -83,7 +83,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ### Features
 
-* Add error source in thegeneration. ([069e3bf](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/069e3bf92721babd719a9a9f2e7fee9f834c7596))
+* Add error source in the generation. ([069e3bf](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/069e3bf92721babd719a9a9f2e7fee9f834c7596))
 * Add SML variables support. ([56f89b9](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/56f89b92cb5d425d98b2e036acfbd4ec5160a6a3))
 * Allow nested IDMS copybooks. ([a705f5c](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a705f5c0021eda7dc603a76ca6f184a4efb72867))
 * Allow parallel analysis. ([e8915b2](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/e8915b284fbbe3aefbd24d4f9fd043b7aabb2dec))
