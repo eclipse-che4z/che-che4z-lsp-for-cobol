@@ -51,6 +51,6 @@ class TestIdmsCopyWithCobol {
         ImmutableList.of(new CobolText("CB", IdmsDialect.NAME, TEXT_IDMS_COPYBOOK)),
         ImmutableMap.of(),
         ImmutableList.of(),
-        DialectConfigs.getDaCoAnalysisConfig());
+        DialectConfigs.getIDMSAnalysisConfig());
   }
 }

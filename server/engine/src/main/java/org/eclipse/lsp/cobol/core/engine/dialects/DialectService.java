@@ -20,8 +20,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoMaidProcessor;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
@@ -49,15 +47,6 @@ public class DialectService {
     dialectSuppliers = new HashMap<>();
 
     CobolDialect dialect = new IdmsDialect(copybookService, messageService);
-    dialectSuppliers.put(dialect.getName(), dialect);
-
-    dialect =
-        new DaCoDialect(
-            messageService,
-            new DaCoMaidProcessor(copybookService, treeListener, messageService),
-            symbolService);
-    dialectSuppliers.put(dialect.getName(), dialect);
-
     dialectSuppliers.put(dialect.getName(), dialect);
   }
 
