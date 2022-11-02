@@ -91,6 +91,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Analyse the subroutines only when settings is defined. ([11b3ccf](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/11b3ccff340f80f9221485e72e28be52853bb05a))
 * Compare LS engine analysis against compiler SYSPRINT for positive tests. ([76e8408](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/76e8408b771e4bddc751c746b2b7a2d61f3a9162))
 * Configurable CICS translator. ([b083c55](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/b083c55cae9b283a558150b568fc7af2ead7d748))
+* Convert language ID from "COBOL" to "cobol" [#1508](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/1508)
 * Support different smart tabs settings for different divisions. ([e2d5c28](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/e2d5c28dafdd46d5e20ffee361b7dabb38a47e29)) ([15dd23e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/15dd23ed4f989a304b9862eb19d095a2d05b8c31))
 * Process IDMS Records. ([87794d1](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/87794d1b00fd7d2cfe59f8b3baca24a72e8f68bf)) ([29d6574](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/29d657488ff6182b81ad440878b20cb90868ed9f))
 * Separate IDMS copybook lexer and parser. ([3e0a3f0](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/3e0a3f074230a5b146d8e2587db78f5e5464d1e1))
