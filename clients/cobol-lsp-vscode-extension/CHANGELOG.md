@@ -1,6 +1,20 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
-Changelog:
+
+## [1.1.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.2...1.1.0) (2022-11-02)
+
+#### Added
+- Support for SML variables
+- Support for nested IDMS copybooks
+- User predefined labels
+- Configurable CICS translator
+- Support for custom smart tab settings
+
+#### Fixed
+- Miscellaneous bug fixes
+
+#### Changed
+- Readme update
 
 ## [1.0.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.1...1.0.2) (2022-06-29)
 
