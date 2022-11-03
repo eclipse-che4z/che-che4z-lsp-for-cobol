@@ -179,7 +179,6 @@ You can store your copybooks locally in folders in your workspace and specify th
 6. Open a program or project.  
    Copybook support features are now enabled.
 
-
 If you specify your copybook folders using absolute paths or paths containing `../` or `./`, the copybook folders are not watched for changes. You might need to resolve names of recently added copybooks in your code manually.
 
 To resolve copybook names manually, hover over the copybook name with the error underline, select **Quick Fix...** and **Resolve copybook**.
