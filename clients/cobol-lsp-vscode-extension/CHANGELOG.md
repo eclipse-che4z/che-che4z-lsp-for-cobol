@@ -9,13 +9,14 @@ All notable changes to the COBOL Language Support extension are documented in th
 - Configurable CICS translator
 - Support for custom smart tab settings
 
-#### Fixed
-- Miscellaneous bug fixes
-
 #### Changed
 - Language ID changed from uppercase "COBOL" to lowercase "cobol"
 - "COBOL Copybook" language ID removed
 - Readme update
+
+#### Fixed
+- Added COBOL 85 and modernization demo test suits including many bug fixes
+- Miscellaneous bug fixes
 
 ## [1.0.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.1...1.0.2) (2022-06-29)
 
