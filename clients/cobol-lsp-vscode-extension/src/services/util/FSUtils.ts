@@ -12,13 +12,12 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {existsSync, readdirSync} from "fs";
+import { existsSync, readdirSync } from "fs";
 import * as fs from "fs";
 import * as path from "path";
 import * as glob from "glob";
-import * as vscode from "vscode";
 import * as urlUtil from "url";
-import {SettingsUtils} from "./SettingsUtils";
+import { SettingsUtils } from "./SettingsUtils";
 
 /**
  * This method is responsible to return a valid URI without extension if the extension is not provided or an URI
@@ -57,29 +56,26 @@ export function getURIFromResource(resource: string): urlUtil.URL[] {
     for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
         const workspaceFolder = workspaceFolderPath.replace(/\/(.*:)/, "$1");
 
-        const pathName: string = path.resolve(resource) === path.normalize(resource)
-            ? resource
-            : path.normalize(path.join(workspaceFolder, resource));
+        // const pathName: string = isAbsolute(resource) ? resource : path.normalize(path.join(workspaceFolder, resource));
 
-        if (pathName.includes("*")) {
-            const basePath = pathName.split("*", 2)[0]
-            const findPath = pathName.replace(basePath, "").replace("\\", "/");
-            for (const folder of glob.sync(findPath, {cwd: basePath})) {
-                const uri = new urlUtil.URL(path.join(
-                    SettingsUtils.absolutePath(workspaceFolderPath, basePath), folder));
-                if (fs.existsSync(uri)) {
-                    uris.push(uri);
-                }
-            }
-        } else {
-            const uri = (path.resolve(resource) === path.normalize(resource))
-                ? urlUtil.pathToFileURL(resource) :
-                new urlUtil.URL(path.normalize(path.join(
-                    SettingsUtils.absolutePath(workspaceFolderPath, workspaceFolder), resource)));
+        // if (pathName.includes("*")) {
+        //     const basePath = pathName.split("*", 2)[0]
+        //     const findPath = pathName.replace(basePath, "");
+        //     for (const folder of globSearch(findPath, basePath)) {
+        //         const uri = new urlUtil.URL(path.join(
+        //             SettingsUtils.absolutePath(workspaceFolderPath, basePath), folder));
+        //         if (fs.existsSync(uri)) {
+        //             uris.push(uri);
+        //         }
+        //     }
+        // } else {
+            const uri = isAbsolute(resource) ? urlUtil.pathToFileURL(resource)
+                : new urlUtil.URL(path.normalize(path.join(SettingsUtils.absolutePath(workspaceFolderPath, workspaceFolder), resource)));
+
             if (fs.existsSync(uri)) {
                 uris.push(uri);
             }
-        }
+        // }
     }
     return uris;
 }
@@ -87,27 +83,39 @@ export function getURIFromResource(resource: string): urlUtil.URL[] {
 /**
  * This method scans the list of folders as given input and find the required entity name within the folder.
  * If found returns its URI representation
- * @param entityName name of the entity asked by the server
- * @param targetFolders list of folders from where to search the copybook
- * @param extensions list of extensions
+ * @param copybookName name of the entity asked by the server
+ * @param copybookFolders list of folders from where to search the copybook
+ * @param extensions list of possible copybooks extensions
  */
-export function searchInWorkspace(entityName: string, targetFolders: string[], extensions: string[]): string {
-    if (targetFolders) {
-        const localFolderList: string[] = targetFolders
-        .map(getURIFromResource)
-        .reduce((acc, val) => acc.concat(val), [])
-        .filter((url: urlUtil.URL) => url !== undefined)
-        .map((url: urlUtil.URL) => url.href);
-        for (const folder of localFolderList) {
-            let uri: urlUtil.URL = getURIFrom(folder, entityName);
-            if (!uri) {
-                uri = getURIFrom(folder, entityName, extensions);
-            }
-            if (uri) {
-                return uri.href;
+export function searchCopybookInWorkspace(copybookName: string, copybookFolders: string[], extensions: string[]): string | undefined {
+    for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
+        const workspaceFolder = workspaceFolderPath.replace(/\/(.*:)/, "$1");
+        for (const p of copybookFolders) {
+            for (const ext of extensions) {
+                const searchResult = globSearch(workspaceFolder, p, copybookName, ext);
+                if (searchResult) {
+                    return new urlUtil.URL(SettingsUtils.absolutePath(workspaceFolderPath, searchResult)).href;
+                }
             }
         }
     }
+    return undefined;
+}
+
+function globSearch(workspaceFolder: string, resource: string, copybookName: string, ext: string): string | undefined {
+    const pathName: string = isAbsolute(resource) ? resource : path.normalize(path.join(workspaceFolder, resource));
+    const cwd = pathName.split("*", 2)[0]
+    let pattern = pathName.replace(cwd, "");
+    // You must use forward-slashes only in glob expressions
+    pattern = pattern.replace("\\", "/");
+    const suffix = (pattern.length == 0 || pattern.endsWith("/") ? "" : "/") + copybookName + ext;
+    pattern = pattern + suffix;
+    const result = glob.sync(pattern, { cwd });
+    return result[0] ? path.join(cwd, result[0]) : undefined;
+}
+
+function isAbsolute(resource: string): boolean {
+    return path.resolve(resource) === path.normalize(resource);
 }
 
 /**
@@ -116,6 +124,6 @@ export function searchInWorkspace(entityName: string, targetFolders: string[], e
  */
 export function cleanDirectory(pathToClear: string) {
     if (fs.existsSync(pathToClear)) {
-        readdirSync(pathToClear).forEach(f => fs.rmSync(path.join(pathToClear, `${f}`), {recursive: true}));
+        readdirSync(pathToClear).forEach(f => fs.rmSync(path.join(pathToClear, `${f}`), { recursive: true }));
     }
 }

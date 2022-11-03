@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {searchInWorkspace} from "./FSUtils";
+import {searchCopybookInWorkspace} from "./FSUtils";
 import {COBOL_EXT_ARRAY} from "../../constants";
 import { SettingsService } from "../Settings";
 
@@ -24,5 +24,5 @@ import { SettingsService } from "../Settings";
  */
 export function resolveSubroutineURI(name: string): string {
     const folders: string[] = SettingsService.getSubroutineLocalPath();
-    return searchInWorkspace(name, folders, COBOL_EXT_ARRAY);
+    return searchCopybookInWorkspace(name, folders, COBOL_EXT_ARRAY);
 }
