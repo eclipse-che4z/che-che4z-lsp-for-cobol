@@ -78,7 +78,7 @@ class TestProgramContexts {
             "1",
             new Diagnostic(
                 new Range(new Position(15, 21), new Position(15, 28)),
-                "Duplicated definition for VARNAME",
+                "Ambiguous reference for VARNAME",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
