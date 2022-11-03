@@ -77,17 +77,15 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Update version of LSP4J. ([3735c92](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/3735c92c3f36c77cb7f0399fade9bff9973d249e))
 * Variable declaration hover converts hyphens to underscores. ([09a016c](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/09a016cb18ce28a66f29395f0d9ef806c5547e52)), closes [#1319](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1319)
 * Watch folders specified using fileBasenameNoExtension variable. ([bb9ac58](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/bb9ac58de6651f47e74c486b6c2c8b3447e75a1d))
-* Fix missing IDMS and MAID mixed variables mapping ([8440dd4](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/8440dd4f0fd987f24116919d182201e11fb906d0))
+* Fix missing IDMS variables mapping ([8440dd4](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/8440dd4f0fd987f24116919d182201e11fb906d0))
 * Fix missing IDMS copybook error processing ([fc70701](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/fc70701c146b64181d37110b2b21fd18c7a3541b))
 * Fix copybook definition statement location ([b9e22f6](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/b9e22f6b951f31be5d98a2423704b8834e72ab0b))
 
 ### Features
 
 * Add error source in the generation. ([069e3bf](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/069e3bf92721babd719a9a9f2e7fee9f834c7596))
-* Add SML variables support. ([56f89b9](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/56f89b92cb5d425d98b2e036acfbd4ec5160a6a3))
 * Allow nested IDMS copybooks. ([a705f5c](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a705f5c0021eda7dc603a76ca6f184a4efb72867))
 * Allow parallel analysis. ([e8915b2](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/e8915b284fbbe3aefbd24d4f9fd043b7aabb2dec))
-* Allow user predefined labels. ([7780c77](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/7780c77064fc6ae2f1117ae630806f9b8e966fb0))
 * Analyse the subroutines only when settings is defined. ([11b3ccf](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/11b3ccff340f80f9221485e72e28be52853bb05a))
 * Compare LS engine analysis against compiler SYSPRINT for positive tests. ([76e8408](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/76e8408b771e4bddc751c746b2b7a2d61f3a9162))
 * Configurable CICS translator. ([b083c55](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/b083c55cae9b283a558150b568fc7af2ead7d748))
