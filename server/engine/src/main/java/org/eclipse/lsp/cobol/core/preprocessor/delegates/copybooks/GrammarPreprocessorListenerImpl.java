@@ -39,6 +39,7 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 import java.util.*;
 import java.util.function.Consumer;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
@@ -67,6 +68,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private final MessageService messageService;
   private final CopybookHierarchy hierarchy;
   private final InjectService injectService;
+  private final CopybookNameService copybookNameService;
 
   @Inject
   GrammarPreprocessorListenerImpl(
@@ -76,6 +78,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       @Assisted CopybookHierarchy hierarchy,
       ReplacingService replacingService,
       MessageService messageService,
+      CopybookNameService copybookNameService,
       InjectService injectService) {
     this.documentUri = documentUri;
     this.tokens = tokens;
@@ -84,6 +87,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     this.messageService = messageService;
     this.injectService = injectService;
     this.hierarchy = hierarchy;
+    this.copybookNameService = copybookNameService;
     textAccumulator.push(new StringBuilder());
   }
 
@@ -223,7 +227,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     descriptors.forEach(c -> c.getInjectCodeAnalysis()
         .injectCode(
             c.getContentProvider(),
-            new CopybookName(c.getInjectedSourceName()),
+            copybookNameService.findByName(c.getInjectedSourceName())
+                .orElse(new CopybookName(c.getInjectedSourceName())),
             context, copyContext, copybookConfig, documentUri)
         .apply(hierarchy)
         .apply(this)

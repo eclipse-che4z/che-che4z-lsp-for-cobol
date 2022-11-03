@@ -15,17 +15,34 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 
 /** Provide API definition to resolve for copybooks files present in CopyBook setting path. */
 public interface CopybookNameService {
 
   /**
-   * Get the resolved copybook names across the open workspace and copybook paths defined in
+   * Get resolved copybook names across the open workspace and copybook paths defined in
    * settings
    *
    * @return List of resolved copybook names
    */
-  List<String> getNames();
+  List<CopybookName> getNames();
+
+  /**
+   * Get copybook folders paths based on local settings (paths, dialects etc)
+   * @return List of copybook folders
+   */
+  CompletableFuture<List<String>> copybookLocalFolders();
+
+  /**
+   * Find copybook in the list of unique copybookNames
+   * in the open workspace that match displayName
+   * @param displayName an attribute to find by
+   * @return optional CopybookName
+   */
+  Optional<CopybookName> findByName(String displayName);
 
   /** Resolves the paths defined in Settings.json for cobol-lsp.cpy-manager.paths-local */
   void collectLocalCopybookNames();

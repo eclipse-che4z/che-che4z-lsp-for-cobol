@@ -270,7 +270,6 @@ DISPLAYDB : D I S P L A Y D B;
 DISTINCT : D I S T I N C T;
 DO : D O;
 DOUBLE : D O U B L E;
-DOUBLEQUOTE : D O U B L E Q U O T E;
 DROP : D R O P;
 DROPIN : D R O P I N;
 DSNDB04 : D S N D B '0' '4'; //TODO: ask if this is required or it should be just an identifier
@@ -809,6 +808,7 @@ LSQUAREBRACKET :     '[';
 RSQUAREBRACKET :     ']';
 UNDERSCORECHAR :     '_';
 PIPECHAR : '||';
+PIPECHAR2 : '!!';
 QUESTIONMARK : '?';
 PERCENT : '%';
 SELECT_ALL : '.*';
@@ -821,6 +821,10 @@ DATELITERAL: '\'' (DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT | //y
                    DIGIT DIGIT '/' DIGIT DIGIT '/' DIGIT DIGIT DIGIT DIGIT | //mm/dd/yyyy
                    DIGIT DIGIT '.' DIGIT DIGIT '.' DIGIT DIGIT DIGIT DIGIT |//dd.mm.yyyy
                    DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT DIGIT DIGIT) TIMESTAMPLITERAL? '\'';//yyyy-mm-dd
+
+INTEGERLITERAL : DIGIT+ ;
+IDENTIFIER : [a-zA-Z0-9][_a-zA-Z0-9]*;
+COPYBOOK_IDENTIFIER : [a-zA-Z0-9#@$][_a-zA-Z0-9#@$]*;
 
 fragment BXNUMBER :
 	B X '"' [0-9A-F]+ '"'

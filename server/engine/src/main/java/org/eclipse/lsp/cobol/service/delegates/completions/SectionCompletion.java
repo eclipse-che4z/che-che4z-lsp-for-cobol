@@ -14,8 +14,10 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
@@ -35,6 +37,13 @@ import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrde
 @Singleton
 public class SectionCompletion implements Completion {
 
+  private final SymbolService symbolService;
+
+  @Inject
+  public SectionCompletion(SymbolService symbolService) {
+    this.symbolService = symbolService;
+  }
+
   @Override
   public @NonNull Collection<CompletionItem> getCompletionItems(
       @NonNull String token, @Nullable CobolDocumentModel document) {
@@ -45,7 +54,7 @@ public class SectionCompletion implements Completion {
         .getDepthFirstStream()
         .filter(hasType(PROGRAM))
         .map(ProgramNode.class::cast)
-        .map(ProgramNode::getSectionMap)
+        .map(symbolService::getSectionMap)
         .map(Map::keySet)
         .flatMap(Collection::stream)
         .filter(DocumentationUtils.startsWithIgnoreCase(token))

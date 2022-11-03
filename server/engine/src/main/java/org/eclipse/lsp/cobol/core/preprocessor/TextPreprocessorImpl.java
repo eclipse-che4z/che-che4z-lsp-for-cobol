@@ -18,6 +18,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
@@ -62,17 +63,16 @@ public class TextPreprocessorImpl implements TextPreprocessor {
   }
 
   @Override
-  public ResultWithErrors<String> cleanUpCode(String documentUri, String cobolCode) {
+  public ResultWithErrors<TextTransformations> cleanUpCode(String documentUri, String cobolCode) {
     List<SyntaxError> errors = new ArrayList<>();
     List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
     List<CobolLine> transformedLines = transformLines(documentUri, lines).unwrap(errors::addAll);
     List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
 
-    String code = writer.serialize(rewrittenLines);
+    TextTransformations code = writer.serialize(rewrittenLines, documentUri);
     return new ResultWithErrors<>(code, errors);
   }
 
-  @NonNull
   @Override
   public ResultWithErrors<ExtendedDocument> processCleanCode(
       @NonNull String documentUri,
@@ -87,8 +87,7 @@ public class TextPreprocessorImpl implements TextPreprocessor {
     return reader.processLines(documentURI, cobolCode);
   }
 
-  private ResultWithErrors<List<CobolLine>> transformLines(
-      String documentURI, List<CobolLine> lines) {
+  private ResultWithErrors<List<CobolLine>> transformLines(String documentURI, List<CobolLine> lines) {
     return transformation.transformLines(documentURI, lines);
   }
 

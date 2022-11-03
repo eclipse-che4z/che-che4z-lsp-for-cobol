@@ -144,18 +144,19 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
             CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
                 WS, conditionalRightTrimmedContentArea, line);
     } else {
-      /* As fallback trim leading whitespace. We also need to remove the starting quotes if exist */
       result =
           CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-              WS, trimLeadingWhitespace(conditionalRightTrimmedContentArea), line);
+                  WS, conditionalRightTrimmedContentArea, line);
     }
     return result;
   }
 
   private String conditionalRightTrimContentArea(final CobolLine line) {
-    return !isNextLineContinuation(line) || !isEndingWithOpenLiteral(line)
-        ? rightTrimContentArea(line.getContentArea())
-        : line.getContentArea();
+    if (!isNextLineContinuation(line) || !isEndingWithOpenLiteral(line)) {
+      return rightTrimContentArea(line.getContentArea());
+    } else {
+      return line.getContentArea();
+    }
   }
 
   private boolean isEndingWithOpenLiteral(final CobolLine line) {

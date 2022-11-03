@@ -17,31 +17,12 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.eclipse.lsp.cobol.core.*;
-import org.eclipse.lsp.cobol.core.IdmsParser.CobolWordContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.DataNameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsControlSectionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsIfConditionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsIfStatementContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsSectionsContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.IdmsStatementsContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.CopyIdmsStatementContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_db_entity_nameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_map_nameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_map_name_definitionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.Idms_procedure_nameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.MapClauseContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.MapSectionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.QualifiedDataNameContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.SchemaSectionContext;
-import org.eclipse.lsp.cobol.core.IdmsParser.VariableUsageNameContext;
+import org.eclipse.lsp.cobol.core.IdmsParser;
+import org.eclipse.lsp.cobol.core.IdmsParser.*;
+import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
+import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
-import org.eclipse.lsp.cobol.core.engine.dialects.TextReplacement;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -51,84 +32,52 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import org.eclipse.lsp4j.Location;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_MAP_NAME;
 
 /**
- *  This extension of {@link IdmsParserBaseVisitor} applies the semantic analysis based on the
- *  abstract syntax tree built by {@link IdmsParser}.
+ * This extension of {@link IdmsParserBaseVisitor} applies the semantic analysis based on the
+ * abstract syntax tree built by {@link IdmsParser}.
  */
 class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private static final String IF = "_IF_ ";
-  private final CopybookService copybookService;
-  private final IdmsCopybookService idmsCopybookService;
-  private final CopybookConfig copybookConfig;
-  private final String programDocumentUri;
-  private final TextReplacement textReplacement;
-  @Getter private final IdmsRecordsDescriptor recordsDescriptor = new IdmsRecordsDescriptor();
+  private final DialectProcessingContext context;
+
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
-  IdmsVisitor(CopybookService copybookService,
-                     ParseTreeListener treeListener,
-                     MessageService messageService,
-                     DialectProcessingContext context) {
-    this.copybookService = copybookService;
-    this.idmsCopybookService = new IdmsCopybookService(context.getProgramDocumentUri(), copybookService,
-        context.getCopybookConfig(), treeListener, messageService, new HashSet<>());
-    this.copybookConfig = context.getCopybookConfig();
-    this.programDocumentUri = context.getProgramDocumentUri();
-
-    textReplacement = new TextReplacement(context.getText());
-  }
-
-  public String getResultedText() {
-    return textReplacement.getResultingText();
-  }
-
-  @Override
-  public List<Node> visitCopyIdmsStatement(CopyIdmsStatementContext ctx) {
-    IdmsParser.CopyIdmsSourceContext optionsContext = ctx.copyIdmsOptions().copyIdmsSource();
-    String nameToken = optionsContext.getText().toUpperCase();
-    CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
-
-    CopybookModel copybookModel = copybookService.resolve(copybookName, programDocumentUri, programDocumentUri, copybookConfig, true);
-    textReplacement.addReplacementContext(ctx);
-
-    Locality locality = IdmsParserHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), programDocumentUri);
-    return idmsCopybookService.processCopybook(copybookModel, getLevel(ctx), locality, copybookName)
-        .unwrap(errors::addAll);
+  IdmsVisitor(DialectProcessingContext context) {
+    this.context = context;
   }
 
   @Override
   public List<Node> visitIdmsStatements(IdmsStatementsContext ctx) {
-    textReplacement.addReplacementContext(ctx);
+    addReplacementContext(ctx);
     return visitChildren(ctx);
   }
 
   @Override
   public List<Node> visitIdmsSections(IdmsSectionsContext ctx) {
-    textReplacement.addReplacementContext(ctx);
+    addReplacementContext(ctx);
     return visitChildren(ctx);
   }
 
   @Override
   public List<Node> visitIdmsIfStatement(IdmsIfStatementContext ctx) {
-    textReplacement.addReplacementContext(ctx, IF);
+    addReplacementContext(ctx, IF);
     return visitChildren(ctx);
   }
 
   @Override
   public List<Node> visitIdmsIfCondition(IdmsIfConditionContext ctx) {
-    textReplacement.addReplacementContext(ctx);
+    addReplacementContext(ctx);
     return visitChildren(ctx);
   }
 
@@ -154,12 +103,12 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitVariableUsageName(VariableUsageNameContext ctx) {
-    return addTreeNode(ctx, locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality));
+    return addTreeNode(
+        ctx, locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality));
   }
 
   @Override
   public List<Node> visitMapSection(MapSectionContext ctx) {
-    recordsDescriptor.setMapSectionExists(true);
     return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.MAP));
   }
 
@@ -191,18 +140,6 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitIdmsRecordLocationParagraph(IdmsParser.IdmsRecordLocationParagraphContext ctx) {
-    if (ctx.withinClause() != null) {
-      if (ctx.withinClause().withinEntry() != null && ctx.withinClause().withinEntry().children.size() > 1) {
-        recordsDescriptor.setRecordsWithinPlacement(ctx.withinClause().withinEntry().getChild(1).getText().toUpperCase());
-      } else if ("MANUAL".equalsIgnoreCase(ctx.withinClause().getText())) {
-        recordsDescriptor.setRecordsManualExists(true);
-      }
-    }
-    return visitChildren(ctx);
-  }
-
-  @Override
   protected List<Node> defaultResult() {
     return ImmutableList.of();
   }
@@ -213,13 +150,6 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     result.addAll(aggregate);
     result.addAll(nextResult);
     return result;
-  }
-
-  private int getLevel(CopyIdmsStatementContext ctx) {
-    return Optional.ofNullable(ctx.LEVEL_NUMBER())
-        .map(ParseTree::getText)
-        .map(Integer::parseInt)
-        .orElse(0);
   }
 
   private List<Node> addTreeNode(Node node, List<Node> children) {
@@ -242,10 +172,23 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   }
 
   private Locality constructLocality(ParserRuleContext ctx) {
-    return Locality.builder()
-        .uri(programDocumentUri)
-        .range(DialectUtils.constructRange(ctx))
-        .build();
+    Location location =
+        context.getExtendedSource().mapLocationUnsafe(DialectUtils.constructRange(ctx));
+    return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
   }
 
+  private void addReplacementContext(ParserRuleContext ctx) {
+    addReplacementContext(ctx, "");
+  }
+
+  private void addReplacementContext(ParserRuleContext ctx, String prefix) {
+    String newText =
+        prefix
+            + context
+                .getExtendedSource()
+                .getText()
+                .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
+                .replaceAll("[^ \n]", CobolDialect.FILLER);
+    context.getExtendedSource().replace(DialectUtils.constructRange(ctx), newText);
+  }
 }

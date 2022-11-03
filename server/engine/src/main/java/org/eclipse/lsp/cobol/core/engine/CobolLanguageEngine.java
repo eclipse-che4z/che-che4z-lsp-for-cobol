@@ -28,12 +28,20 @@ import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
-import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.tree.*;
+import org.eclipse.lsp.cobol.core.model.tree.logic.*;
+import org.eclipse.lsp.cobol.core.model.tree.statements.ObsoleteNode;
+import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
@@ -47,6 +55,8 @@ import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,8 +85,9 @@ public class CobolLanguageEngine {
   private final SubroutineService subroutineService;
   private final CachingConfigurationService cachingConfigurationService;
   private final DialectService dialectService;
+  private final SymbolService symbolService;
+  private final AstProcessor astProcessor;
   private final InjectService injectService;
-  private static final int PROCESS_CALLS_THRESHOLD = 10;
 
   @Inject
   public CobolLanguageEngine(
@@ -86,6 +97,8 @@ public class CobolLanguageEngine {
       SubroutineService subroutineService,
       CachingConfigurationService cachingConfigurationService,
       DialectService dialectService,
+      SymbolService symbolService,
+      AstProcessor astProcessor,
       InjectService injectService) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
@@ -93,6 +106,8 @@ public class CobolLanguageEngine {
     this.subroutineService = subroutineService;
     this.cachingConfigurationService = cachingConfigurationService;
     this.dialectService = dialectService;
+    this.symbolService = symbolService;
+    this.astProcessor = astProcessor;
     this.injectService = injectService;
   }
 
@@ -108,35 +123,83 @@ public class CobolLanguageEngine {
    *     the client
    */
   @NonNull
-  public ResultWithErrors<Node> run(
+  public ResultWithErrors<AnalysisResult> run(
       @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
 
     timingBuilder.getDialectsTimer().start();
+    symbolService.reset(documentUri);
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
-    String cleanText = preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
+    TextTransformations cleanText =
+        preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
 
-    DialectOutcome dialectOutcome = dialectService
-        .process(analysisConfig.getDialects(), DialectProcessingContext.builder()
-            .programDocumentUri(documentUri)
-            .text(cleanText)
+    DialectProcessingContext dialectProcessingContext =
+        DialectProcessingContext.builder()
             .copybookConfig(analysisConfig.getCopybookConfig())
-            .build())
-        .unwrap(accumulatedErrors::addAll);
+            .programDocumentUri(documentUri)
+            .extendedSource(new ExtendedSource(cleanText))
+            .build();
+    dialectProcessingContext.getExtendedSource().commitTransformations();
+
+    DialectOutcome dialectOutcome =
+        dialectService
+            .process(analysisConfig.getDialects(), dialectProcessingContext)
+            .unwrap(accumulatedErrors::addAll);
+
+    accumulatedErrors = accumulatedErrors.stream().distinct().collect(toList());
     timingBuilder.getDialectsTimer().stop();
 
     timingBuilder.getPreprocessorTimer().start();
     injectService.setImplicitCode(dialectOutcome.getImplicitCode());
+
+    List<SyntaxError> preprocessorErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =
         preprocessor
             .processCleanCode(
                 documentUri,
-                dialectOutcome.getText(),
+                dialectOutcome.getContext().getExtendedSource().extendedText(),
                 analysisConfig.getCopybookConfig(),
                 new CopybookHierarchy())
-            .unwrap(accumulatedErrors::addAll);
+            .unwrap(preprocessorErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
+
+    // Update copybook usages with proper positions
+    extendedDocument
+        .getCopybooks()
+        .getUsages()
+        .forEach(
+            (k, v) ->
+                v.setRange(
+                    dialectOutcome
+                        .getContext()
+                        .getExtendedSource()
+                        .mapLocation(v.getRange())
+                        .getRange()));
+
+    // Update copybook definition statements with proper positions
+    extendedDocument
+        .getCopybooks()
+        .getDefinitionStatements()
+        .forEach(
+            (k, v) ->
+                v.setRange(
+                    dialectOutcome
+                        .getContext()
+                        .getExtendedSource()
+                        .mapLocation(v.getRange())
+                        .getRange()));
+
+    preprocessorErrors.forEach(
+        e ->
+            e.getLocality()
+                .setRange(
+                    dialectOutcome
+                        .getContext()
+                        .getExtendedSource()
+                        .mapLocation(e.getLocality().getRange())
+                        .getRange()));
+    accumulatedErrors.addAll(preprocessorErrors);
 
     timingBuilder.getParserTimer().start();
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(extendedDocument.getText()));
@@ -161,7 +224,12 @@ public class CobolLanguageEngine {
 
     timingBuilder.getMappingTimer().start();
     Map<Token, Locality> positionMapping =
-        getPositionMapping(documentUri, extendedDocument, tokens, embeddedCodeParts);
+        getPositionMapping(
+            documentUri,
+            extendedDocument,
+            tokens,
+            embeddedCodeParts,
+            dialectProcessingContext.getExtendedSource());
     timingBuilder.getMappingTimer().stop();
 
     timingBuilder.getVisitorTimer().start();
@@ -174,9 +242,9 @@ public class CobolLanguageEngine {
             embeddedCodeParts,
             messageService,
             subroutineService,
+            symbolService,
             dialectOutcome.getDialectNodes(),
-            cachingConfigurationService
-        );
+            cachingConfigurationService);
     List<Node> syntaxTree = visitor.visit(tree);
     accumulatedErrors.addAll(visitor.getErrors());
     timingBuilder.getVisitorTimer().stop();
@@ -185,7 +253,9 @@ public class CobolLanguageEngine {
     analyzeEmbeddedCode(syntaxTree, positionMapping);
 
     Node rootNode = syntaxTree.get(0);
-    accumulatedErrors.addAll(processSyntaxTree(rootNode));
+    ProcessingContext ctx = new ProcessingContext(new ArrayList<>());
+    registerProcessors(analysisConfig, ctx);
+    accumulatedErrors.addAll(astProcessor.processSyntaxTree(ctx, rootNode));
 
     timingBuilder.getSyntaxTreeTimer().stop();
     timingBuilder.getLateErrorProcessingTimer().start();
@@ -211,29 +281,111 @@ public class CobolLanguageEngine {
     }
 
     return new ResultWithErrors<>(
-        rootNode, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
+        AnalysisResult.builder()
+            .rootNode(rootNode)
+            .symbolTableMap(symbolService.getProgramSymbols())
+            .build(),
+        accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
-  private CopybooksRepository applyDialectCopybooks(CopybooksRepository copybooks, DialectOutcome dialectOutcome) {
+  private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx) {
+    // Phase TRANSFORMATION
+    ctx.register(
+        new ProcessorDescription(
+            ProgramIdNode.class, ProcessingPhase.TRANSFORMATION, new ProgramIdProcess()));
+    ctx.register(
+        new ProcessorDescription(
+            SectionNode.class,
+            ProcessingPhase.TRANSFORMATION,
+            new ProcessNodeWithVariableDefinitions(symbolService)));
+    ctx.register(
+        new ProcessorDescription(
+            FileEntryNode.class, ProcessingPhase.TRANSFORMATION, new FileEntryProcess()));
+    ctx.register(
+        new ProcessorDescription(
+            FileDescriptionNode.class,
+            ProcessingPhase.TRANSFORMATION,
+            new FileDescriptionProcess(symbolService)));
+    ctx.register(
+        new ProcessorDescription(
+            DeclarativeProcedureSectionNode.class,
+            ProcessingPhase.TRANSFORMATION,
+            new DeclarativeProcedureSectionRegister(symbolService)));
+    // Phase DEFINITION
+    ctx.register(
+        new ProcessorDescription(
+            ParagraphsNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock(symbolService)));
+    ctx.register(
+        new ProcessorDescription(
+            SectionNameNode.class,
+            ProcessingPhase.DEFINITION,
+            new SectionNameRegister(symbolService)));
+    ctx.register(
+        new ProcessorDescription(
+            ParagraphNameNode.class,
+            ProcessingPhase.DEFINITION,
+            new ParagraphNameRegister(symbolService)));
+    ctx.register(
+        new ProcessorDescription(
+            ProcedureDivisionBodyNode.class,
+            ProcessingPhase.DEFINITION,
+            new DefineCodeBlock(symbolService)));
+    // Phase USAGE
+    ctx.register(
+        new ProcessorDescription(
+            CodeBlockUsageNode.class, ProcessingPhase.USAGE, new CodeBlockUsage(symbolService)));
+    ctx.register(
+        new ProcessorDescription(
+            RootNode.class, ProcessingPhase.USAGE, new RootNodeUpdateCopyNodesByPositionInTree()));
+    ctx.register(
+        new ProcessorDescription(
+            QualifiedReferenceNode.class,
+            ProcessingPhase.USAGE,
+            new QualifiedReferenceUpdateVariableUsage(symbolService)));
+
+    // Phase VALIDATION
+    ctx.register(
+        new ProcessorDescription(
+            VariableWithLevelNode.class, ProcessingPhase.VALIDATION, new VariableWithLevelCheck()));
+    ctx.register(
+        new ProcessorDescription(
+            StatementNode.class, ProcessingPhase.VALIDATION, new StatementValidate()));
+    ctx.register(
+        new ProcessorDescription(
+            ElementaryNode.class, ProcessingPhase.VALIDATION, new ElementaryNodeCheck()));
+    ctx.register(
+        new ProcessorDescription(
+            GroupItemNode.class, ProcessingPhase.VALIDATION, new GroupItemCheck()));
+    ctx.register(
+        new ProcessorDescription(
+            ObsoleteNode.class, ProcessingPhase.VALIDATION, new ObsoleteNodeCheck()));
+    ctx.register(
+        new ProcessorDescription(
+            StandAloneDataItemNode.class,
+            ProcessingPhase.VALIDATION,
+            new StandAloneDataItemCheck()));
+    ctx.register(
+            new ProcessorDescription(
+                    ProgramEndNode.class, ProcessingPhase.VALIDATION, new ProgramEndCheck()));
+    ctx.register(
+        new ProcessorDescription(
+            CICSTranslatorNode.class, ProcessingPhase.VALIDATION, new CICSTranslatorProcessor(analysisConfig, messageService)));
+
+    // Dialects
+    List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());
+    pds.forEach(ctx::register);
+  }
+
+  private CopybooksRepository applyDialectCopybooks(
+      CopybooksRepository copybooks, DialectOutcome dialectOutcome) {
     dialectOutcome.getDialectNodes().stream()
         .flatMap(Node::getDepthFirstStream)
         .filter(n -> n.getNodeType().equals(NodeType.COPY))
         .map(CopyNode.class::cast)
-            .filter(n -> n.getDefinition() != null)
-        .forEach(n -> copybooks.define(n.getName(), n.getDialect(), n.getDefinition().getLocation()));
+        .filter(n -> n.getDefinition() != null)
+        .forEach(
+            n -> copybooks.define(n.getName(), n.getDialect(), n.getDefinition().getLocation()));
     return copybooks;
-  }
-
-  private List<SyntaxError> processSyntaxTree(Node rootNode) {
-    List<SyntaxError> errors = new ArrayList<>();
-    int processCalls = 0;
-    do {
-      errors.addAll(rootNode.process());
-      processCalls++;
-      if (processCalls > PROCESS_CALLS_THRESHOLD)
-        throw new IllegalStateException("Infinity loop in tree processing");
-    } while (!rootNode.isProcessed());
-    return errors;
   }
 
   private Map<Token, EmbeddedCode> extractEmbeddedCode(
@@ -254,10 +406,31 @@ public class CobolLanguageEngine {
       String documentUri,
       ExtendedDocument extendedDocument,
       CommonTokenStream tokens,
-      Map<Token, EmbeddedCode> embeddedCodeParts) {
+      Map<Token, EmbeddedCode> embeddedCodeParts,
+      ExtendedSource extendedSource) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    return LocalityMappingUtils.createPositionMapping(
-        tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri, embeddedCodeParts);
+    Map<Token, Locality> mapping =
+        LocalityMappingUtils.createPositionMapping(
+            tokens.getTokens(),
+            extendedDocument.getDocumentMapping(),
+            documentUri,
+            embeddedCodeParts);
+    return updateMapping(documentUri, mapping, extendedSource);
+  }
+
+  private Map<Token, Locality> updateMapping(
+      String documentUri, Map<Token, Locality> mapping, ExtendedSource extendedSource) {
+    mapping.forEach(
+        (k, v) -> {
+          if (v.getUri().equals(documentUri)) {
+            Location l = extendedSource.mapLocation(v.getRange());
+
+            v.getRange().setStart(l.getRange().getStart());
+            v.getRange().setEnd(l.getRange().getEnd());
+            v.setUri(l.getUri());
+          }
+        });
+    return mapping;
   }
 
   private void analyzeEmbeddedCode(List<Node> syntaxTree, Map<Token, Locality> mapping) {
@@ -284,7 +457,8 @@ public class CobolLanguageEngine {
     return err ->
         err.toBuilder()
             .locality(LocalityUtils.findPreviousVisibleLocality(err.getOffendedToken(), mapping))
-            .suggestion(messageService.getMessage(err.getSuggestion())).errorSource(ErrorSource.PARSING)
+            .suggestion(messageService.getMessage(err.getSuggestion()))
+            .errorSource(ErrorSource.PARSING)
             .build();
   }
 
@@ -300,8 +474,11 @@ public class CobolLanguageEngine {
   private List<SyntaxError> raiseError(SyntaxError error, Map<String, Locality> copyStatements) {
     return Stream.of(error)
         .filter(shouldRaise())
-        .map(err -> err.toBuilder().locality(copyStatements.get(err.getLocality().getCopybookId()))
-        .errorSource(ErrorSource.COPYBOOK))
+        .map(
+            err ->
+                err.toBuilder()
+                    .locality(copyStatements.get(err.getLocality().getCopybookId()))
+                    .errorSource(ErrorSource.COPYBOOK))
         .map(SyntaxError.SyntaxErrorBuilder::build)
         .flatMap(err -> Stream.concat(raiseError(err, copyStatements).stream(), Stream.of(err)))
         .collect(toList());

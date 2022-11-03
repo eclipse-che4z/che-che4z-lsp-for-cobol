@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.positive;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
@@ -28,7 +29,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.Continuatio
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
 import org.eclipse.lsp.cobol.usecases.engine.UseCase;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
 import java.util.concurrent.*;
@@ -46,11 +48,14 @@ import java.util.stream.IntStream;
 class TypingTest extends FileBasedTest {
   private static final String MODE_PROPERTY_NAME = "tests.typing";
   private static final String TEST_MODE = System.getProperty(MODE_PROPERTY_NAME);
+  private CobolTextRegistry cobolTextRegistry;
 
-  @Test
-  void typingTest() {
+  @ParameterizedTest
+  @MethodSource("getSourceFolder")
+  void typingTest(String testFolder) {
+    cobolTextRegistry = retrieveTextsRegistry(testFolder);
     if (!Boolean.TRUE.toString().equals(TEST_MODE)) return;
-    List<CobolText> textsToTest = getTextsToTest();
+    List<CobolText> textsToTest = getTextsToTest(cobolTextRegistry);
     final int size = textsToTest.size();
     for (int i = 0; i < size; i++) {
       CobolText cobolText = textsToTest.get(i);
@@ -59,41 +64,47 @@ class TypingTest extends FileBasedTest {
       final long start = System.currentTimeMillis();
       analyze(name, getCleanText(cobolText));
       final long duration = System.currentTimeMillis() - start;
-      LOG.info("{} analyzed in {}. Progress: {}/{}.",
+      LOG.info(
+          "{} analyzed in {}. Progress: {}/{}.",
           name,
           DurationFormatUtils.formatDurationHMS(duration),
-          i + 1, size);
+          i + 1,
+          size);
     }
   }
 
   private String getCleanText(CobolText cobolText) {
-    TextPreprocessor preprocessor = new TextPreprocessorImpl(
-        null,
-        new CobolLineReaderImpl(null),
-        new CobolLineWriterImpl(),
-        new ContinuationLineTransformation(null),
-        new CobolLineIndicatorProcessorImpl()
-    );
-    ResultWithErrors<String> cleanTextResult = preprocessor.cleanUpCode(cobolText.getFileName(), cobolText.getFullText());
-    for (SyntaxError error: cleanTextResult.getErrors())
-      LOG.error(error.toString());
-    return cleanTextResult.getResult();
+    TextPreprocessor preprocessor =
+        new TextPreprocessorImpl(
+            null,
+            new CobolLineReaderImpl(null),
+            new CobolLineWriterImpl(),
+            new ContinuationLineTransformation(null),
+            new CobolLineIndicatorProcessorImpl());
+    ResultWithErrors<TextTransformations> cleanTextResult =
+        preprocessor.cleanUpCode(cobolText.getFileName(), cobolText.getFullText());
+    for (SyntaxError error : cleanTextResult.getErrors()) LOG.error(error.toString());
+    return cleanTextResult.getResult().calculateExtendedText();
   }
 
   private void analyze(String name, String fullText) {
     AtomicInteger position = new AtomicInteger();
     ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(1);
     int textSize = fullText.length();
-    scheduled.scheduleAtFixedRate(() -> {
-      int done = position.get();
-      String percents = String.format("%.2f", (float) 100 * done / textSize);
-      LOG.info("{}% in work. Position {} of {}", percents, done, textSize);
-    }, 10, 10, TimeUnit.MINUTES);
-    ForkJoinPool.commonPool().invokeAll(
-        IntStream.rangeClosed(0, ForkJoinPool.commonPool().getParallelism())
-            .mapToObj(i -> new UseCaseRun(name, fullText, position))
-            .collect(Collectors.toList())
-    );
+    scheduled.scheduleAtFixedRate(
+        () -> {
+          int done = position.get();
+          String percents = String.format("%.2f", (float) 100 * done / textSize);
+          LOG.info("{}% in work. Position {} of {}", percents, done, textSize);
+        },
+        10,
+        10,
+        TimeUnit.MINUTES);
+    ForkJoinPool.commonPool()
+        .invokeAll(
+            IntStream.rangeClosed(0, ForkJoinPool.commonPool().getParallelism())
+                .mapToObj(i -> new UseCaseRun(name, fullText, position))
+                .collect(Collectors.toList()));
     scheduled.shutdown();
   }
 
@@ -112,19 +123,23 @@ class TypingTest extends FileBasedTest {
     public Void call() throws Exception {
       SimpleTimeLimiter timeLimiter = SimpleTimeLimiter.create(ForkJoinPool.commonPool());
       for (int currentPos = position.incrementAndGet();
-           currentPos <= fullText.length();
-           currentPos = position.incrementAndGet()) {
+          currentPos <= fullText.length();
+          currentPos = position.incrementAndGet()) {
         if (fullText.charAt(currentPos - 1) == ' ') continue;
         String text = fullText.substring(0, currentPos);
         try {
-          timeLimiter.callWithTimeout(() -> {
-            UseCaseUtils.analyzeForErrors(UseCase.builder()
-                .text(text)
-                .fileName(name)
-                .copybooks(getCopybooks())
-                .build());
-            return null;
-          }, 30, TimeUnit.SECONDS);
+          timeLimiter.callWithTimeout(
+              () -> {
+                UseCaseUtils.analyzeForErrors(
+                    UseCase.builder()
+                        .text(text)
+                        .fileName(name)
+                        .copybooks(getCopybooks(cobolTextRegistry))
+                        .build());
+                return null;
+              },
+              30,
+              TimeUnit.SECONDS);
         } catch (Exception e) {
           LOG.error("Text that produced the error:\n{}", text, e);
         }

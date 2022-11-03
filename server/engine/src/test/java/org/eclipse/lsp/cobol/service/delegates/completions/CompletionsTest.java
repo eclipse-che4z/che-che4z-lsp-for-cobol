@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.COPYBOOKS;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.VARIABLES;
 import static org.eclipse.lsp.cobol.service.delegates.completions.MockCompletionModel.RESULT;
+import static org.eclipse.lsp.cobol.service.delegates.completions.MockCompletionModel.SYMBOL_SERVICE;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -36,7 +37,8 @@ class CompletionsTest {
     Completions completions =
         new Completions(
             ImmutableSet.of(
-                new CopybookCompletion(), new VariableCompletion(), new ParagraphCompletion()));
+                new CopybookCompletion(), new VariableCompletion(SYMBOL_SERVICE),
+                    new ParagraphCompletion(SYMBOL_SERVICE)));
     CompletionList actual =
         completions.collectFor(
             new CobolDocumentModel("Lorem ipsum dolor c amet", RESULT),

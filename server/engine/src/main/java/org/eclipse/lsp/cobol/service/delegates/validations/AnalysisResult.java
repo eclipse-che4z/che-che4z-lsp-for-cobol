@@ -15,7 +15,9 @@
 package org.eclipse.lsp.cobol.service.delegates.validations;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
@@ -35,4 +37,5 @@ import java.util.Map;
 public class AnalysisResult {
   @Builder.Default Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
   @Builder.Default Node rootNode = new RootNode(Locality.builder().build(), new CopybooksRepository());
+  @EqualsAndHashCode.Exclude @Builder.Default Map<String, SymbolTable> symbolTableMap = new HashMap<>();
 }

@@ -15,8 +15,10 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.Multimap;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
@@ -43,6 +45,13 @@ import static org.eclipse.lsp4j.CompletionItemKind.Variable;
 @Singleton
 public class VariableCompletion implements Completion {
 
+  private final SymbolService symbolService;
+
+  @Inject
+  public VariableCompletion(SymbolService symbolService) {
+    this.symbolService = symbolService;
+  }
+
   @Override
   public @NonNull Collection<CompletionItem> getCompletionItems(
       @NonNull String token, @Nullable CobolDocumentModel document) {
@@ -53,7 +62,7 @@ public class VariableCompletion implements Completion {
         .getDepthFirstStream()
         .filter(hasType(PROGRAM))
         .map(ProgramNode.class::cast)
-        .map(ProgramNode::getVariables)
+        .map(symbolService::getVariables)
         .map(Multimap::values)
         .flatMap(Collection::stream)
         .filter(matchNames(token))

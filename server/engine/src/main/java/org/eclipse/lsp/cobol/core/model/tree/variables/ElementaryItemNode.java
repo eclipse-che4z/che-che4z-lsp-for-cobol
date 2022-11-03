@@ -55,7 +55,6 @@ public class ElementaryItemNode extends ElementaryNode {
         isSignClausePresent,
         picClause,
         usageFormat);
-
     this.value = value;
   }
 

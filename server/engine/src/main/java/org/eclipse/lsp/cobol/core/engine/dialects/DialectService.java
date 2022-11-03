@@ -14,17 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoMaidProcessor;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
+import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -32,6 +30,7 @@ import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /** Dialect utility class */
 @Singleton
@@ -40,15 +39,14 @@ public class DialectService {
   private final Map<String, CobolDialect> dialectSuppliers;
 
   @Inject
-  public DialectService(CopybookService copybookService,
-                        ParseTreeListener treeListener,
-                        MessageService messageService) {
+  public DialectService(
+      CopybookService copybookService,
+      ParseTreeListener treeListener,
+      SymbolService symbolService,
+      MessageService messageService) {
     dialectSuppliers = new HashMap<>();
 
-    CobolDialect dialect = new IdmsDialect(copybookService, treeListener, messageService);
-    dialectSuppliers.put(dialect.getName(), dialect);
-
-    dialect = new DaCoDialect(messageService, new DaCoMaidProcessor(copybookService, treeListener, messageService));
+    CobolDialect dialect = new IdmsDialect(copybookService, messageService);
     dialectSuppliers.put(dialect.getName(), dialect);
   }
 
@@ -59,40 +57,90 @@ public class DialectService {
    * @param context is a DialectProcessingContext class with all needed data for dialect processing
    * @return dialects outcome
    */
-  public ResultWithErrors<DialectOutcome> process(List<String> dialects, DialectProcessingContext context) {
-    return dialects.stream()
-        .map(this::getDialectByName)
-        .reduce(
-            ResultWithErrors.of(new DialectOutcome(context.getText(), ImmutableList.of(), ImmutableMultimap.of())),
-            (previousResult, dialect) -> processDialect(previousResult, dialect, context),
-            DialectService::mergeResults
-        );
+  public ResultWithErrors<DialectOutcome> process(
+      List<String> dialects, DialectProcessingContext context) {
+    List<CobolDialect> orderedDialects = sortDialects(dialects);
+    List<SyntaxError> errors = new LinkedList<>();
+    for (CobolDialect orderedDialect : orderedDialects) {
+      List<SyntaxError> dialectErrors = orderedDialect.extend(context);
+      dialectErrors.forEach(
+          e ->
+              e.getLocality()
+                  .setRange(
+                      context
+                          .getExtendedSource()
+                          .getMainMap()
+                          .mapLocation(e.getLocality().getRange(), false)
+                          .getRange()));
+
+      errors.addAll(dialectErrors);
+      context.getExtendedSource().commitTransformations();
+    }
+    ResultWithErrors<DialectOutcome> acc =
+        new ResultWithErrors<>(new DialectOutcome(context), errors);
+    for (CobolDialect orderedDialect : orderedDialects) {
+      acc = processDialect(acc, orderedDialect, context);
+      context.getExtendedSource().commitTransformations();
+    }
+    return acc;
+  }
+
+  private LinkedList<CobolDialect> sortDialects(List<String> dialects) {
+    LinkedList<CobolDialect> orderedDialects = new LinkedList<>();
+    LinkedList<String> dialectsQueue = new LinkedList<>(dialects);
+    while (!dialectsQueue.isEmpty()) {
+      CobolDialect dialect = getDialectByName(dialectsQueue.pop());
+      if (dialect.runBefore().isEmpty()) {
+        orderedDialects.add(dialect);
+      } else {
+        for (String name : dialect.runBefore()) {
+          CobolDialect d = getDialectByName(name);
+          int index = orderedDialects.indexOf(d);
+          if (index >= 0) {
+            orderedDialects.add(index, dialect);
+          } else {
+            if (!dialectsQueue.contains(d.getName())) {
+              dialectsQueue.add(d.getName());
+            }
+            dialectsQueue.add(dialect.getName());
+          }
+        }
+      }
+    }
+    return orderedDialects;
   }
 
   private CobolDialect getDialectByName(String dialectName) {
     return dialectSuppliers.getOrDefault(dialectName, EMPTY_DIALECT);
   }
 
-  private static ResultWithErrors<DialectOutcome> processDialect(ResultWithErrors<DialectOutcome> previousResult,
-                                                                 CobolDialect dialect,
-                                                                 DialectProcessingContext context) {
+  private static ResultWithErrors<DialectOutcome> processDialect(
+      ResultWithErrors<DialectOutcome> previousResult,
+      CobolDialect dialect,
+      DialectProcessingContext context) {
     List<Node> nodes = new ArrayList<>(previousResult.getResult().getDialectNodes());
-    Multimap<String, Pair<String, String>> implicitCode = LinkedListMultimap.create(previousResult.getResult().getImplicitCode());
+    Multimap<String, Pair<String, String>> implicitCode =
+        LinkedListMultimap.create(previousResult.getResult().getImplicitCode());
 
     List<SyntaxError> errors = new ArrayList<>(previousResult.getErrors());
 
-    DialectOutcome result = dialect.processText(context.toBuilder()
-            .text(previousResult.getResult().getText())
-            .build())
-        .unwrap(errors::addAll);
+    DialectOutcome result = dialect.processText(context).unwrap(errors::addAll);
     nodes.addAll(result.getDialectNodes());
     implicitCode.putAll(result.getImplicitCode());
-    return new ResultWithErrors<>(new DialectOutcome(result.getText(), nodes, implicitCode), errors);
+    return new ResultWithErrors<>(new DialectOutcome(nodes, implicitCode, context), errors);
   }
 
-  private static ResultWithErrors<DialectOutcome> mergeResults(ResultWithErrors<DialectOutcome> result1,
-                                                               ResultWithErrors<DialectOutcome> result2) {
-    throw new ConcurrentModificationException("The reduction must be done sequentially");
+  /**
+   * Return a list of processor descriptors for provided dialects.
+   *
+   * @param dialects dialect names
+   * @return a list of processor descriptors
+   */
+  public List<ProcessorDescription> getProcessors(List<String> dialects) {
+    return dialects.stream()
+        .filter(dialectSuppliers::containsKey)
+        .map(dialectSuppliers::get)
+        .flatMap(d -> d.getProcessors().stream())
+        .collect(Collectors.toList());
   }
-
 }

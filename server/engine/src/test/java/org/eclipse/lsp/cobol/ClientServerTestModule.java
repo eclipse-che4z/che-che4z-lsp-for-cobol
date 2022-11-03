@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
@@ -23,6 +24,10 @@ import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.*;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationBasedOnExtension;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationCombinedStrategy;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationServiceBasedOnContent;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
@@ -89,6 +94,15 @@ public class ClientServerTestModule extends AbstractModule {
     bind(HoverProvider.class).to(VariableHover.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
     bind(TextPreprocessor.class).to(MockTextPreprocessor.class);
+    bind(CopybookIdentificationService.class)
+            .annotatedWith(Names.named("contentStrategy"))
+            .to(CopybookIdentificationServiceBasedOnContent.class);
+    bind(CopybookIdentificationService.class)
+            .annotatedWith(Names.named("suffixStrategy"))
+            .to(CopybookIdentificationBasedOnExtension.class);
+    bind(CopybookIdentificationService.class)
+            .annotatedWith(Names.named("combinedStrategy"))
+            .to(CopybookIdentificationCombinedStrategy.class);
 
     bindFormations();
     bindCompletions();
@@ -107,12 +121,10 @@ public class ClientServerTestModule extends AbstractModule {
     completionBinding.addBinding().to(VariableCompletion.class);
     completionBinding.addBinding().to(ParagraphCompletion.class);
     completionBinding.addBinding().to(SectionCompletion.class);
-    completionBinding.addBinding().to(SnippetCompletion.class);
     completionBinding.addBinding().to(KeywordCompletion.class);
     completionBinding.addBinding().to(CopybookCompletion.class);
 
     bind(CompletionStorage.class).annotatedWith(named("Keywords")).to(Keywords.class);
-    bind(CompletionStorage.class).annotatedWith(named("Snippets")).to(Snippets.class);
   }
 
   private void bindCodeActions() {

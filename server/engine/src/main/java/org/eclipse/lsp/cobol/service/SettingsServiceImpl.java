@@ -47,13 +47,22 @@ public class SettingsServiceImpl implements SettingsService {
 
   @NonNull
   @Override
-  public CompletableFuture<List<Object>> getConfiguration(@NonNull String... param) {
-    return getConfigurations(singletonList(Joiner.on(".").join(param)));
+  public CompletableFuture<List<Object>> fetchConfiguration(@NonNull String... param) {
+    return fetchConfigurations(singletonList(Joiner.on(".").join(param)));
+  }
+
+  @Override
+  public CompletableFuture<List<String>> fetchTextConfiguration(@NonNull String... section) {
+    return fetchConfiguration(section).thenApply(objects -> objects.stream()
+            .map(obj -> (JsonArray) obj)
+            .flatMap(Streams::stream)
+            .map(JsonElement::getAsString)
+            .collect(toList()));
   }
 
   @NonNull
   @Override
-  public CompletableFuture<List<Object>> getConfigurations(@NonNull List<String> sections) {
+  public CompletableFuture<List<Object>> fetchConfigurations(@NonNull List<String> sections) {
     return clientProvider
         .get()
         .configuration(
@@ -65,20 +74,9 @@ public class SettingsServiceImpl implements SettingsService {
   }
 
   @NonNull
-  @Override
-  public List<String> toStrings(@NonNull List<Object> objects) {
-    return objects.stream()
-        .map(obj -> (JsonArray) obj)
-        .flatMap(Streams::stream)
-        .map(JsonElement::getAsString)
-        .collect(toList());
-  }
-
-  @NonNull
   private static ConfigurationItem buildConfigurationItem(@NonNull String section) {
     ConfigurationItem item = new ConfigurationItem();
     item.setSection(section);
-    item.setScopeUri(null);
     return item;
   }
 }

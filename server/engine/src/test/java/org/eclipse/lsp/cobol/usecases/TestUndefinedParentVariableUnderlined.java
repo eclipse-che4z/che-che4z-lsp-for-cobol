@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.model.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCase;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
@@ -28,7 +29,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.DISABLED;
 import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
-import org.eclipse.lsp.cobol.core.model.ErrorSource;
 
 /**
  * This test checks that the undefined parent variable underlined while variable call hierarchy
@@ -52,8 +52,7 @@ class TestUndefinedParentVariableUnderlined {
   void assertCopybookProcessingModeNotChangesLogic() {
     Assertions.assertEquals(
         UseCaseUtils.analyze(UseCase.builder().text(TEXT).copybookProcessingMode(ENABLED).build()),
-        UseCaseUtils.analyze(
-            UseCase.builder().text(TEXT).copybookProcessingMode(DISABLED).build()));
+        UseCaseUtils.analyze(UseCase.builder().text(TEXT).copybookProcessingMode(DISABLED).build()));
   }
 
   @Test

@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.service.delegates.hover;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
 import lombok.NonNull;
-import org.eclipse.lsp.cobol.core.model.tree.Describable;
+import org.eclipse.lsp.cobol.core.model.tree.variables.Describable;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;

@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service.delegates.references;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
@@ -180,7 +181,8 @@ class ElementOccurrencesTest {
     CobolDocumentModel cobolDocumentModel = new CobolDocumentModel("", analysisResult);
     TextDocumentPositionParams textDocumentPositionParams =
         new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage);
-    ElementOccurrences elementOccurrences = new ElementOccurrences();
+    SymbolService symbolService = new SymbolService();
+    ElementOccurrences elementOccurrences = new ElementOccurrences(symbolService);
     assertEquals(
         ImmutableList.of(definition),
         elementOccurrences.findDefinitions(cobolDocumentModel, textDocumentPositionParams));
@@ -215,8 +217,9 @@ class ElementOccurrencesTest {
     rootNode.addChild(variableUsageNode);
     rootNode.addChild(variableUsageNodeInOtherFile);
     AnalysisResult analysisResult = AnalysisResult.builder().rootNode(rootNode).build();
+    SymbolService symbolService = new SymbolService();
     List<DocumentHighlight> highlights =
-        new ElementOccurrences()
+        new ElementOccurrences(symbolService)
             .findHighlights(
                 new CobolDocumentModel("", analysisResult),
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage));
@@ -231,8 +234,9 @@ class ElementOccurrencesTest {
   @MethodSource("variousData")
   void variousCases(
       AnalysisResult analysisResult, Position position, List<Location> expectedLocations) {
+    SymbolService symbolService = new SymbolService();
     List<Location> actualLocations =
-        new ElementOccurrences()
+        new ElementOccurrences(symbolService)
             .findReferences(
                 new CobolDocumentModel("", analysisResult),
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), position),

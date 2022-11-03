@@ -16,8 +16,10 @@ package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
+import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.core.engine.symbols.Context;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;
@@ -27,11 +29,12 @@ import java.util.function.Function;
 @Getter
 public class ParagraphNameNode extends Node implements Context {
   private final String name;
+  private final SymbolService symbolService;
 
-  public ParagraphNameNode(Locality location, String paragraphName) {
+  public ParagraphNameNode(Locality location, String paragraphName, SymbolService symbolService) {
     super(location, NodeType.PARAGRAPH_NAME_NODE);
     this.name = paragraphName.toUpperCase();
-    addProcessStep(this::registerNode);
+    this.symbolService = symbolService;
   }
 
   @Override
@@ -44,19 +47,10 @@ public class ParagraphNameNode extends Node implements Context {
     return getLocations(CodeBlockReference::getUsage);
   }
 
-  private List<SyntaxError> registerNode() {
-    return getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
-        .flatMap(parent -> parent.registerParagraphNameNode(this))
-        .map(ImmutableList::of)
-        .orElseGet(ImmutableList::of);
-  }
-
   private List<Location> getLocations(
       Function<CodeBlockReference, List<Location>> retrieveLocations) {
-    return getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
-        .map(ProgramNode::getParagraphMap)
+    return getProgram()
+        .map(symbolService::getParagraphMap)
         .map(it -> it.get(getName()))
         .map(retrieveLocations)
         .orElse(ImmutableList.of());

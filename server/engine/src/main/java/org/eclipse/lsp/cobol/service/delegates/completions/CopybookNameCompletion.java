@@ -18,6 +18,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp4j.CompletionItem;
@@ -48,6 +49,7 @@ public class CopybookNameCompletion implements Completion {
       @NonNull String token, @Nullable CobolDocumentModel document) {
 
     return copybookNameService.getNames().stream()
+        .map(CopybookName::getQualifiedName)
         .filter(DocumentationUtils.startsWithIgnoreCase(token))
         .map(this::toCopybookCompletion)
         .collect(toList());

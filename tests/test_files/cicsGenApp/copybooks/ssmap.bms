@@ -1,0 +1,688 @@
+******************************************************************
+*                                                                *
+* (C) Copyright IBM Corp. 2011, 2020                             *
+*                                                                *
+******************************************************************
+SSMAP   DFHMSD TYPE=MAP,MODE=INOUT,LANG=COBOL,STORAGE=AUTO,            X
+               TIOAPFX=YES,EXTATT=MAPONLY,CTRL=(FREEKB)
+***********************************************************************
+*
+*       Customer Screen Image
+*
+***********************************************************************
+SSMAPC1 DFHMDI SIZE=(24,80)
+        DFHMDF POS=(1,1),LENGTH=4,ATTRB=(ASKIP,BRT),INITIAL='SSC1'
+        DFHMDF POS=(1,12),LENGTH=31,ATTRB=(BRT,ASKIP),                 X
+               INITIAL='General Insurance Customer Menu'
+*
+        DFHMDF POS=(4,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='1. Cust Inquiry '
+        DFHMDF POS=(5,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='2. Cust Add     '
+        DFHMDF POS=(6,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='                '
+        DFHMDF POS=(7,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='4. Cust Update  '
+*
+        DFHMDF POS=(04,30),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Cust Number '
+ENT1CNO DFHMDF POS=(04,50),LENGTH=10,ATTRB=(NORM,UNPROT,IC,FSET),      *
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(04,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(05,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Cust Name :First'
+ENT1FNA DFHMDF POS=(05,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(05,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+        DFHMDF POS=(06,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='          :Last'
+ENT1LNA DFHMDF POS=(06,50),LENGTH=20,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(06,71),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(07,30),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='DOB         '
+ENT1DOB DFHMDF POS=(07,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(07,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+        DFHMDF POS=(07,63),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='(yyyy-mm-dd)'
+*
+        DFHMDF POS=(08,30),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='House Name  '
+ENT1HNM DFHMDF POS=(08,50),LENGTH=20,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(08,71),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(09,30),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='House Number'
+ENT1HNO DFHMDF POS=(09,50),LENGTH=04,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(09,55),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(10,30),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Postcode    '
+ENT1HPC DFHMDF POS=(10,50),LENGTH=08,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(10,59),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(11,30),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Phone: Home '
+ENT1HP1 DFHMDF POS=(11,50),LENGTH=20,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(11,71),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' ',JUSTIFY=(BLANK)
+*
+        DFHMDF POS=(12,30),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Phone: Mob  '
+ENT1HP2 DFHMDF POS=(12,50),LENGTH=20,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' ',JUSTIFY=(BLANK)
+        DFHMDF POS=(12,71),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(13,30),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Email  Addr '
+ENT1HMO DFHMDF POS=(13,50),LENGTH=27,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' ',JUSTIFY=(BLANK)
+        DFHMDF POS=(13,78),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(22,08),LENGTH=14,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Select Option '
+ENT1OPT DFHMDF POS=(22,24),LENGTH=1,ATTRB=(NORM,NUM,UNPROT,FSET),      X
+               VALIDN=(MUSTENTER),INITIAL=' '
+        DFHMDF POS=(22,26),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+ERRFLD  DFHMDF POS=(24,8),LENGTH=40,ATTRB=(BRT,ASKIP,PROT),            X
+               INITIAL=' '
+***********************************************************************
+*
+*       Motor Policy Screen
+*
+***********************************************************************
+SSMAPP1 DFHMDI SIZE=(24,80)
+        DFHMDF POS=(1,1),LENGTH=4,ATTRB=(ASKIP,BRT),INITIAL='SSP1'
+        DFHMDF POS=(1,12),LENGTH=37,ATTRB=(BRT,ASKIP),                 X
+               INITIAL='General Insurance Motor Policy Menu  '
+*
+        DFHMDF POS=(4,08),LENGTH=18,ATTRB=(NORM,ASKIP),                X
+               INITIAL='1. Policy Inquiry '
+        DFHMDF POS=(5,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='2. Policy Add     '
+        DFHMDF POS=(6,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='3. Policy Delete  '
+        DFHMDF POS=(7,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='4. Policy Update  '
+*
+        DFHMDF POS=(04,30),LENGTH=15,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Policy Number '
+ENP1PNO DFHMDF POS=(04,50),LENGTH=10,ATTRB=(NORM,UNPROT,IC,FSET),      *
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(04,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(05,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Cust Number '
+ENP1CNO DFHMDF POS=(05,50),LENGTH=10,ATTRB=(NORM,UNPROT,IC,FSET),      *
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(05,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(06,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Issue date '
+ENP1IDA DFHMDF POS=(06,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(06,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+        DFHMDF POS=(06,63),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='(yyyy-mm-dd)'
+*
+        DFHMDF POS=(07,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Expiry date '
+ENP1EDA DFHMDF POS=(07,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(07,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+        DFHMDF POS=(07,63),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='(yyyy-mm-dd)'
+*
+        DFHMDF POS=(08,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Car Make       '
+ENP1CMK DFHMDF POS=(08,50),LENGTH=20,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(08,71),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(09,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Car Model '
+ENP1CMO DFHMDF POS=(09,50),LENGTH=20,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(09,71),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(10,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Car Value   '
+ENP1VAL DFHMDF POS=(10,50),LENGTH=06,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' ',JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(10,57),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(11,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Registration '
+ENP1REG DFHMDF POS=(11,50),LENGTH=07,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(11,58),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(12,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Car Colour  '
+ENP1COL DFHMDF POS=(12,50),LENGTH=08,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(12,59),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(13,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='CC  '
+ENP1CC  DFHMDF POS=(13,50),LENGTH=08,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' ',JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(13,59),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(14,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Manufacture Date'
+ENP1MAN DFHMDF POS=(14,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(14,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+        DFHMDF POS=(14,63),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='(yyyy-mm-dd)'
+*
+        DFHMDF POS=(15,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='No. of Accidents'
+ENP1ACC DFHMDF POS=(15,50),LENGTH=06,ATTRB=(NORM,UNPROT,FSET),         *
+               JUSTIFY=(RIGHT,ZERO),INITIAL=' '
+        DFHMDF POS=(15,57),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(16,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Policy Premium  '
+ENP1PRE DFHMDF POS=(16,50),LENGTH=06,ATTRB=(NORM,UNPROT,FSET),         *
+               JUSTIFY=(RIGHT,ZERO),INITIAL=' '
+        DFHMDF POS=(16,57),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(22,08),LENGTH=14,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Select Option '
+ENP1OPT DFHMDF POS=(22,24),LENGTH=1,ATTRB=(NORM,NUM,UNPROT,FSET),      X
+               VALIDN=(MUSTENTER),INITIAL=' '
+        DFHMDF POS=(22,26),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+ERP1FLD DFHMDF POS=(24,8),LENGTH=40,ATTRB=(BRT,ASKIP,PROT),            X
+               INITIAL=' '
+***********************************************************************
+*
+*       Endowment Policy Screen
+*
+***********************************************************************
+SSMAPP2 DFHMDI SIZE=(24,80)
+        DFHMDF POS=(1,1),LENGTH=4,ATTRB=(ASKIP,BRT),INITIAL='SSP2'
+        DFHMDF POS=(1,12),LENGTH=40,ATTRB=(BRT,ASKIP),                 X
+               INITIAL='General Insurance Endowment Policy Menu '
+*
+        DFHMDF POS=(4,08),LENGTH=18,ATTRB=(NORM,ASKIP),                X
+               INITIAL='1. Policy Inquiry '
+        DFHMDF POS=(5,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='2. Policy Add     '
+        DFHMDF POS=(6,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='3. Policy Delete  '
+        DFHMDF POS=(7,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='4. Policy Update  '
+*
+        DFHMDF POS=(04,30),LENGTH=15,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Policy Number '
+ENP2PNO DFHMDF POS=(04,50),LENGTH=10,ATTRB=(NORM,UNPROT,IC,FSET),      *
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(04,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(05,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Cust Number '
+ENP2CNO DFHMDF POS=(05,50),LENGTH=10,ATTRB=(NORM,UNPROT,IC,FSET),      *
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(05,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(06,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Issue date '
+ENP2IDA DFHMDF POS=(06,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(06,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+        DFHMDF POS=(06,63),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='(yyyy-mm-dd)'
+*
+        DFHMDF POS=(07,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Expiry date '
+ENP2EDA DFHMDF POS=(07,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(07,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+        DFHMDF POS=(07,63),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='(yyyy-mm-dd)'
+*
+        DFHMDF POS=(08,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Fund Name '    '
+ENP2FNM DFHMDF POS=(08,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(08,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(09,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Term      '
+ENP2TER DFHMDF POS=(09,50),LENGTH=02,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(09,53),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(10,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Sum Assured '
+ENP2SUM DFHMDF POS=(10,50),LENGTH=06,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' ',JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(10,57),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(11,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Life Assured '
+ENP2LIF DFHMDF POS=(11,50),LENGTH=25,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' ',JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(11,76),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(12,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='With Profits '
+ENP2WPR DFHMDF POS=(12,50),LENGTH=01,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(12,52),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(13,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Equities     '
+ENP2EQU DFHMDF POS=(13,50),LENGTH=01,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(13,52),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(14,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Managed Funds'
+ENP2MAN DFHMDF POS=(14,50),LENGTH=01,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(14,52),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(22,08),LENGTH=14,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Select Option '
+ENP2OPT DFHMDF POS=(22,24),LENGTH=1,ATTRB=(NORM,NUM,UNPROT,FSET),      X
+               VALIDN=(MUSTENTER),INITIAL=' '
+        DFHMDF POS=(22,26),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+ERP2FLD DFHMDF POS=(24,8),LENGTH=40,ATTRB=(BRT,ASKIP,PROT),            X
+               INITIAL=' '
+***********************************************************************
+*
+*       House Policy Screen
+*
+***********************************************************************
+SSMAPP3 DFHMDI SIZE=(24,80)
+        DFHMDF POS=(1,1),LENGTH=4,ATTRB=(ASKIP,BRT),INITIAL='SSP3'
+        DFHMDF POS=(1,12),LENGTH=40,ATTRB=(BRT,ASKIP),                 X
+               INITIAL='General Insurance House Policy Menu '
+*
+        DFHMDF POS=(4,08),LENGTH=18,ATTRB=(NORM,ASKIP),                X
+               INITIAL='1. Policy Inquiry '
+        DFHMDF POS=(5,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='2. Policy Add     '
+        DFHMDF POS=(6,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='3. Policy Delete  '
+        DFHMDF POS=(7,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='4. Policy Update  '
+*
+        DFHMDF POS=(04,30),LENGTH=15,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Policy Number '
+ENP3PNO DFHMDF POS=(04,50),LENGTH=10,ATTRB=(NORM,UNPROT,IC,FSET),      *
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(04,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(05,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Cust Number '
+ENP3CNO DFHMDF POS=(05,50),LENGTH=10,ATTRB=(NORM,UNPROT,IC,FSET),      *
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(05,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(06,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Issue date '
+ENP3IDA DFHMDF POS=(06,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(06,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+        DFHMDF POS=(06,63),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='(yyyy-mm-dd)'
+*
+        DFHMDF POS=(07,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Expiry date '
+ENP3EDA DFHMDF POS=(07,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(07,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+        DFHMDF POS=(07,63),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='(yyyy-mm-dd)'
+*
+        DFHMDF POS=(08,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Property Type  '
+ENP3TYP DFHMDF POS=(08,50),LENGTH=15,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(08,66),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(09,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Bedrooms  '
+ENP3BED DFHMDF POS=(09,50),LENGTH=03,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' ',JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(09,54),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(10,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='House Value '
+ENP3VAL DFHMDF POS=(10,50),LENGTH=08,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' ',JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(10,59),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(11,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='House Name   '
+ENP3HNM DFHMDF POS=(11,50),LENGTH=20,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(11,71),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(12,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='House Number '
+ENP3HNO DFHMDF POS=(12,50),LENGTH=04,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(12,55),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(13,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Postcode     '
+ENP3HPC DFHMDF POS=(13,50),LENGTH=08,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(13,59),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+*
+        DFHMDF POS=(22,08),LENGTH=14,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Select Option '
+ENP3OPT DFHMDF POS=(22,24),LENGTH=1,ATTRB=(NORM,NUM,UNPROT,FSET),      X
+               VALIDN=(MUSTENTER),INITIAL=' '
+        DFHMDF POS=(22,26),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+ERP3FLD DFHMDF POS=(24,8),LENGTH=40,ATTRB=(BRT,ASKIP,PROT),            X
+               INITIAL=' '
+***********************************************************************
+*
+*       Commercial Property Policy Screen
+*
+***********************************************************************
+SSMAPP4 DFHMDI SIZE=(24,80)
+        DFHMDF POS=(1,1),LENGTH=4,ATTRB=(ASKIP,BRT),INITIAL='SSP4'
+        DFHMDF POS=(1,12),LENGTH=41,ATTRB=(BRT,ASKIP),                 X
+               INITIAL='General Insurance Commercial Policy Menu '
+*
+        DFHMDF POS=(4,08),LENGTH=18,ATTRB=(NORM,ASKIP),                X
+               INITIAL='1. Policy Inquiry '
+        DFHMDF POS=(5,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='2. Policy Add     '
+        DFHMDF POS=(6,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='3. Policy Delete  '
+*       DFHMDF POS=(7,08),LENGTH=16,ATTRB=(NORM,ASKIP),
+*              INITIAL='4. Policy Update  '
+*
+        DFHMDF POS=(04,30),LENGTH=15,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Policy Number '
+ENP4PNO DFHMDF POS=(04,50),LENGTH=10,ATTRB=(NORM,UNPROT,IC,FSET),      *
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(04,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(05,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Cust Number '
+ENP4CNO DFHMDF POS=(05,50),LENGTH=10,ATTRB=(NORM,UNPROT,IC,FSET),      *
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(05,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(06,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Start date '
+ENP4IDA DFHMDF POS=(06,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(06,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+        DFHMDF POS=(06,63),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='(yyyy-mm-dd)'
+*
+        DFHMDF POS=(07,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Expiry date '
+ENP4EDA DFHMDF POS=(07,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(07,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+        DFHMDF POS=(07,63),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='(yyyy-mm-dd)'
+*
+        DFHMDF POS=(08,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Address '
+ENP4ADD DFHMDF POS=(08,50),LENGTH=25,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(08,76),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(09,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Postcode     '
+ENP4HPC DFHMDF POS=(09,50),LENGTH=08,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(09,59),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(10,30),LENGTH=18,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Latitude/Longitude'
+ENP4LAT DFHMDF POS=(10,50),LENGTH=11,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' ',JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(10,62),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+ENP4LON DFHMDF POS=(10,64),LENGTH=11,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' ',JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(10,76),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(11,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Customer Name'
+ENP4CUS DFHMDF POS=(11,50),LENGTH=25,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(11,76),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(12,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Property Type'
+ENP4PTY DFHMDF POS=(12,50),LENGTH=25,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(12,76),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(13,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Fire Peril/Prem'
+ENP4FPE DFHMDF POS=(13,50),LENGTH=4,ATTRB=(NORM,UNPROT,FSET),          X
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(13,55),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+ENP4FPR DFHMDF POS=(13,56),LENGTH=8,ATTRB=(NORM,UNPROT,FSET),          X
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(13,65),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(14,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Crime Peril/Prem'
+ENP4CPE DFHMDF POS=(14,50),LENGTH=4,ATTRB=(NORM,UNPROT,FSET),          X
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(14,55),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+ENP4CPR DFHMDF POS=(14,56),LENGTH=8,ATTRB=(NORM,UNPROT,FSET),          X
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(14,65),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(15,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Flood Peril/Prem'
+ENP4XPE DFHMDF POS=(15,50),LENGTH=4,ATTRB=(NORM,UNPROT,FSET),          X
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(15,55),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+ENP4XPR DFHMDF POS=(15,56),LENGTH=8,ATTRB=(NORM,UNPROT,FSET),          X
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(15,65),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(16,30),LENGTH=18,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Weather Peril/Prem'
+ENP4WPE DFHMDF POS=(16,50),LENGTH=4,ATTRB=(NORM,UNPROT,FSET),          X
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(16,55),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+ENP4WPR DFHMDF POS=(16,56),LENGTH=8,ATTRB=(NORM,UNPROT,FSET),          X
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(16,65),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(17,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Status'
+ENP4STA DFHMDF POS=(17,50),LENGTH=4,ATTRB=(NORM,UNPROT,FSET),          X
+               INITIAL=' ',JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(17,55),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(18,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Reject Reason'
+ENP4REJ DFHMDF POS=(18,50),LENGTH=25,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' ',JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(18,76),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(22,08),LENGTH=14,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Select Option '
+ENP4OPT DFHMDF POS=(22,24),LENGTH=1,ATTRB=(NORM,NUM,UNPROT,FSET),      X
+               VALIDN=(MUSTENTER),INITIAL=' '
+        DFHMDF POS=(22,26),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+ERP4FLD DFHMDF POS=(24,8),LENGTH=40,ATTRB=(BRT,ASKIP,PROT),            X
+               INITIAL=' '
+***********************************************************************
+*
+*       Claim Policy Screen
+*
+***********************************************************************
+SSMAPP5 DFHMDI SIZE=(24,80)
+        DFHMDF POS=(1,1),LENGTH=4,ATTRB=(ASKIP,BRT),INITIAL='SSP5'
+        DFHMDF POS=(1,12),LENGTH=40,ATTRB=(BRT,ASKIP),                 X
+               INITIAL='General Insurance Policy Claim Menu '
+*
+        DFHMDF POS=(4,08),LENGTH=18,ATTRB=(NORM,ASKIP),                X
+               INITIAL='1. Claim Inquiry '
+        DFHMDF POS=(5,08),LENGTH=16,ATTRB=(NORM,ASKIP),                X
+               INITIAL='2. Claim Add     '
+*       DFHMDF POS=(6,08),LENGTH=16,ATTRB=(NORM,ASKIP),
+*              INITIAL='3. Policy Delete  '
+*       DFHMDF POS=(7,08),LENGTH=16,ATTRB=(NORM,ASKIP),
+*              INITIAL='4. Policy Update  '
+*
+        DFHMDF POS=(04,30),LENGTH=15,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Claim Number '
+ENP5LNO DFHMDF POS=(04,50),LENGTH=10,ATTRB=(NORM,UNPROT,IC,FSET),      *
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(04,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(05,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Policy Number '
+ENP5PNO DFHMDF POS=(05,50),LENGTH=10,ATTRB=(NORM,UNPROT,IC,FSET),      *
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(05,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(06,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Customer Number '
+ENP5CNO DFHMDF POS=(06,50),LENGTH=10,ATTRB=(NORM,UNPROT,IC,FSET),      *
+               JUSTIFY=(RIGHT,ZERO)
+        DFHMDF POS=(06,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(07,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Claim date '
+ENP5CDA DFHMDF POS=(07,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(07,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+        DFHMDF POS=(07,63),LENGTH=12,ATTRB=(NORM,ASKIP),               X
+               INITIAL='(yyyy-mm-dd)'
+*
+        DFHMDF POS=(08,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Paid'
+ENP5PAD DFHMDF POS=(08,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               JUSTIFY=(RIGHT,ZERO),XINIT='00000000000000000000'
+        DFHMDF POS=(08,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(09,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Value   '
+ENP5VAL DFHMDF POS=(09,50),LENGTH=10,ATTRB=(NORM,UNPROT,FSET),         X
+               JUSTIFY=(RIGHT,ZERO),XINIT='00000000000000000000'
+        DFHMDF POS=(09,61),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(10,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Cause        '
+ENP5CAU DFHMDF POS=(10,50),LENGTH=25,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(10,76),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(11,30),LENGTH=16,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Observation '
+ENP5OBS DFHMDF POS=(11,50),LENGTH=25,ATTRB=(NORM,UNPROT,FSET),         X
+               INITIAL=' '
+        DFHMDF POS=(11,76),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+        DFHMDF POS=(22,08),LENGTH=14,ATTRB=(NORM,ASKIP),               X
+               INITIAL='Select Option '
+ENP5OPT DFHMDF POS=(22,24),LENGTH=1,ATTRB=(NORM,NUM,UNPROT,FSET),      X
+               VALIDN=(MUSTENTER),INITIAL=' '
+        DFHMDF POS=(22,26),LENGTH=1,ATTRB=(PROT,ASKIP),                X
+               INITIAL=' '
+*
+ERP5FLD DFHMDF POS=(24,8),LENGTH=40,ATTRB=(BRT,ASKIP,PROT),            X
+               INITIAL=' '
+        DFHMSD TYPE=FINAL
+        END

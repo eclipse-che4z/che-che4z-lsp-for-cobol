@@ -12,11 +12,11 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as urlUtil from "url";
-import * as path from "path";
-import { readdirSync, existsSync } from "fs";
-import { SettingsUtils } from "./SettingsUtils";
+import { existsSync, readdirSync } from "fs";
 import * as fs from "fs";
+import * as path from "path";
+import * as urlUtil from "url";
+import { SettingsUtils } from "./SettingsUtils";
 
 /**
  * This method is responsible to return a valid URI without extension if the extension is not provided or an URI
@@ -37,7 +37,7 @@ export function getURIFrom(folder: string, entityName: string, extensions?: stri
         const fileList = readdirSync(new urlUtil.URL(folder));
         for (const extension of extensions) {
             const copybookFileWithExtension = (entityName + extension).toUpperCase();
-            const found = fileList.find(filename => filename.toUpperCase() === copybookFileWithExtension.toUpperCase())
+            const found = fileList.find(filename => filename.toUpperCase() === copybookFileWithExtension.toUpperCase());
             if (found) {
                 return new urlUtil.URL(path.join(folder, found));
             }

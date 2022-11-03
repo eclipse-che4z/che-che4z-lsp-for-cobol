@@ -11,7 +11,7 @@
 
 COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using the Zowe Explorer extension to automatically retrieve copybooks used in your programs and store them in your workspace. COBOL Language Support also supports COBOL programs which interact with IDMS, Datacom, CICS, and DB2 SQL.
 
-COBOL Language Support recognizes files with the extensions `.cob`, `.cbl` and `.cobol` as COBOL files, and `.cpy` and `.copy` as COBOL copybooks.
+COBOL Language Support recognizes files with the extensions `.cob`, `.cbl` and `.cobol` as COBOL files.
 
 > How can we improve COBOL Language Support? [Let us know on our Git repository](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues)
 
@@ -39,6 +39,8 @@ Integrating COBOL Language Support with Zowe Explorer lets you:
 - Enable automatic copybook retrieval from the mainframe.
 
 To enable these features, install the [Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=Zowe.vscode-extension-for-zowe) extension and configure a Zowe Explorer `zosmf` or `zftp` profile with credentials and a connection URL.
+
+<a href="https://www.openmainframeproject.org/all-projects/zowe/conformance"><img alt="This extension is Zowe v2 conformant" src="https://artwork.openmainframeproject.org/other/zowe-conformant/zowev2/explorer/color/zowe-conformant-zowev2-explorer-color.png" width=20% height=20% /></a>
 
 ## Features
 COBOL Language Support provides the following COBOL syntax awareness features:
@@ -78,8 +80,6 @@ The extension enables outline view and breadcrumb view, which show the structure
 ### Code Snippets
 Before you write your COBOL code from scratch, search the snippet library for useful templates.
 
-**Follow these steps:**
-
 1. Press `F1` to open the command palette.
 2. Type **Insert Snippet** and press enter.
 3. Select the snippet that you want to insert.
@@ -89,6 +89,34 @@ Before you write your COBOL code from scratch, search the snippet library for us
 You can also insert a code snippet by typing the name of the snippet in your code and clicking on the autocomplete text.
 
 The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder.
+
+### Smart Tab
+
+Configure the smart tab function in your `settings.json` file to set tab stops at specific columns in the editor window. The cursor stops at these columns when you use **Tab** and **Shift+Tab** to move forwards and backwards in the code. You can specify custom tab stops, and use regular expressions to set conditional tab settings for different sections and divisions of the code.
+
+To configure the smart tab feature, open your `settings.json` file and change the `"cobol-lsp-smart-tab":` parameter.
+
+**Tip:** You can open your `settings.json` file directly from the COBOL Language Support extension settings. Under **Cobol-lsp: Smart-tab**, click **Edit in settings.json**.
+
+- Specify `false` to use the default tab settings for Visual Studio Code.
+- Specify `true` to use the default tab settings for COBOL Language Support. This adds extra tab stops for the margins at columns 8, 12 and 73.
+- To specify custom tab stops for the whole file, specify an array of integers. The tab stops are set at the next column after the numbers that you specify.   
+   Example: a value of `[0, 7, 20]` sets tab stops at columns 1, 8 and 21 and nowhere else.
+- To specify conditional tab settings for different anchors in the document, specify a JSON element containing the parameters `"default":` and `"anchors":`.
+   - For `"anchors":`, specify a JSON element containing any number of parameters of the format `"ANCHOR": tab stops`. 
+      - The `ANCHOR` can be a regular expression and corresponds to a string that occurs in the code. 
+      - The `tab stops` are an array of integers that specify tab stops. These tab stop settings apply to all lines in the code below the string specified in the anchor until another condition is met.
+   - For `"default":`, specify an array of integers that specify tab stops when no condition is met.  
+The following example sets tab stops after columns 1, 2, 3 and 4 after the line `DATA DIVISION`, after columns 3, 5 and 70 after the line `PROCEDURE DIVISION` and after columns 5, 10 and 15 elsewhere.
+   ```
+   "cobol-lsp.smart-tab": {  
+        "default": [5, 10, 15],
+        "anchors": {
+            "DATA +DIVISION": [1 ,2, 3, 4],
+            "PROCEDURE +DIVISION": [3, 5, 70]
+        }
+    }
+    ```
 
 ### Dialects
 
@@ -106,9 +134,7 @@ The COBOL Language Support extension supports subroutines specified in CALL stat
 
 To enable subroutine support, specify the paths of folders containing subroutine files in your workspace extension settings.
 
-**Follow these steps:**
-
-1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings.
+1. Open the COBOL Language Support extension settings.
 2. Switch from **User** to **Workspace**.
 3. Under **Subroutine-manager: Paths-local**, specify the paths of the folders containing subroutines.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
@@ -120,9 +146,9 @@ If you specify your subroutine folders using absolute paths or paths containing 
 
 ## Copybook Support
 
-The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace.
+The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If you have copybooks stored in mainframe data sets or USS directories, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace.
 
-You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
+To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a remote location, the one in the local folder is used.
 
 Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
 
@@ -140,16 +166,17 @@ COBOL Language Support supports the following copybook types:
 
 You can store your copybooks locally in folders in your workspace and specify those folder paths in your workspace extension settings.
 
-**Follow these steps:**
-
-1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings.
+1. Open the COBOL Language Support extension settings.
 2. Switch from **User** to **Workspace**.
 3. Specify the paths of the folders containing copybooks:
    - Under **Cpy-manager: Paths-local** for standard IBM Enterprise COBOL and Datacom.
    - Under **Cpy-manager: Paths-local: Idms** for the IDMS dialect.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
-   - The folders are searched in the order they are listed. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
-4. Open a program or project.  
+   - You can use the wildcard * to substitute one whole level of the path. For example, specifying the path `*/copybooks` searches all subfolders named "copybooks" in  subfolders of your workspace root, while the path `copybooks/*` searches all subfolders one level below the `copybooks` folder in the workspace root.
+   - The folders are searched in the order they are listed, or in alphabetical order if multiple paths are indexed by a wildcard. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
+4. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
+5. (Optional) Under **Cpy-manager: Copybook-file-encoding**, specify the file encoding used in your copybooks.
+6. Open a program or project.  
    Copybook support features are now enabled.
 
 If you specify your copybook folders using absolute paths or paths containing `../` or `./`, the copybook folders are not watched for changes. You might need to resolve names of recently added copybooks in your code manually.
@@ -158,24 +185,23 @@ To resolve copybook names manually, hover over the copybook name with the error 
 
 ### Retrieving Copybooks from the Mainframe
 
-You can also set up automatic copybook retrieval from the mainframe to download copybooks from mainframe data sets to your workspace.
-
-**Follow these steps:**
+You can also set up automatic copybook retrieval from the mainframe to download copybooks from mainframe data sets and USS directories to your workspace.
 
 1. Ensure that you have a [Zowe Explorer profile](https://docs.zowe.org/stable/user-guide/ze-profiles/) configured, with credentials and a connection URL defined.
-2. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings.
+2. Open the COBOL Language Support extension settings.
 3. Switch from **User** to **Workspace**.
 4. Under **Cpy-manager: Paths-dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
-5. Under **Profile**, enter the name of your Zowe Explorer profile.
-6. Open a program or project.  
-   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3.  
+5. Under **Cpy-manager: Paths-uss**, list absolute paths of directories on USS subsystems to search for copybooks. The directories are searched in the order they are listed, so if two directories contain a copybook with the same member name, the one from the directory higher on the list is downloaded. If copybooks with the same name are found in both a mainframe data set and a USS directory, the one from the mainframe data set is downloaded.
+6. Under **Cpy-manager: Profiles**, enter the name of your Zowe Explorer profile.
+7. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
+8. (Optional) Under **Cpy-manager: Copybook-file-encoding**, specify the file encoding used in your copybooks.
+9. Open a program or project.  
+   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets and USS directories that you specified in steps 4 and 5.  
    Copybook support features are now enabled.
 
-Copybooks that you retrieve from mainframe data sets are stored in the **.c4z/.copybooks** directory within the workspace, which is created automatically.
+Copybooks that you retrieve from mainframe data sets are stored in the **.c4z/.copybooks** directory within the workspace, which is created automatically. 
 
-Because copybooks that are downloaded to the .copybooks folder might change on the mainframe, we recommend that you refresh your copybooks from time to time. To refresh your copybooks, manually delete the .copybooks folder in your workspace. The copybooks are then re-downloaded from the mainframe the next time you open a file that references each copybook.
-
-Copybooks downloaded from the mainframe using an older version of COBOL Language Support might also be found in a **.copybooks** directory in the workspace root. We recommend that you delete this folder so that all files are downloaded again to the **.c4z/.copybooks** folder.
+We recommend that you refresh your copybooks from time to time. To refresh your copybooks, press **F1** and run the command **Clear downloaded copybooks**. This command clears the **.c4z/.copybooks** directory so that copybooks are downloaded again from the mainframe.
 
 ### Copybook Support Features
 

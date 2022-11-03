@@ -30,7 +30,7 @@ class TestSqlExecuteImmediateStatement {
           + "       WORKING-STORAGE SECTION.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL\n"
-          + "             EXECUTE IMMEDIATE 'DELETE FROM DSN8C10.DEPT WHERE || PREDS' \n"
+          + "             EXECUTE IMMEDIATE \"DELETE FROM DSN8C10.DEPT WHERE ABC = 1\" \n"
           + "           END-EXEC.\n";
 
   @Test

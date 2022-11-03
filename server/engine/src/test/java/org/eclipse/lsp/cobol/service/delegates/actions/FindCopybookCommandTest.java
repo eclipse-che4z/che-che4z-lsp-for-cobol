@@ -39,7 +39,7 @@ class FindCopybookCommandTest {
   private static final String TITLE = "Resolve copybook";
   private static final String COPYBOOK_NAME = "CPYNAME";
 
-  private static final Range RANGE = new Range(new Position(0, 0), new Position(0, 1));
+  private static final Range RANGE = new Range(new Position(), new Position(0, 1));
   private static final Diagnostic SYNTAX_ERROR =
       new Diagnostic(RANGE, "Syntax error", Error, null, null);
   private static final Diagnostic COPYBOOK_ERROR =

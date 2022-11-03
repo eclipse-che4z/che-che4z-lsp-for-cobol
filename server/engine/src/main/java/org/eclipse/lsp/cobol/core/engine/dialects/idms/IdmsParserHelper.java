@@ -191,4 +191,16 @@ class IdmsParserHelper {
     return stop < start ? "" : ctx.getStart().getInputStream().getText(new Interval(start, stop));
   }
 
+  /**
+   * Extracts a level range
+   * @param token a token with a defined level
+   * @return a range of a level statement
+   */
+  public Range extractLevelRange(Token token) {
+    Range range = new Range();
+    range.setStart(new Position(token.getLine() - 1, token.getCharPositionInLine()));
+    range.setEnd(new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getText().length() - 1));
+    return range;
+  }
+
 }

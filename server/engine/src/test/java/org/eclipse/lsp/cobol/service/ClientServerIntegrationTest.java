@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -22,6 +23,8 @@ import com.google.inject.Injector;
 import org.eclipse.lsp.cobol.ClientServerTestModule;
 import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp4j.*;
@@ -93,6 +96,7 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
       throws ExecutionException, InterruptedException {
 
     stateService.shutdown();
+    ((CobolTextDocumentService) service).notifyExtensionConfig(ImmutableList.of());
     ((CobolTextDocumentService) service).setDisposableLSPStateService(stateService);
     assertEquals(0, stateService.getExitCode());
 
@@ -138,6 +142,8 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
   void testFindMultipleCopybookReferences() throws ExecutionException, InterruptedException {
     client.clean();
     TextDocumentService textService = getInjector().getInstance(TextDocumentService.class);
+
+    ((CobolTextDocumentService) textService).notifyExtensionConfig(ImmutableList.of());
     textService.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK1, true, textService);
@@ -153,6 +159,7 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
 
     TextDocumentService textService = getInjector().getInstance(TextDocumentService.class);
 
+    ((CobolTextDocumentService) textService).notifyExtensionConfig(ImmutableList.of());
     textService.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK2, true, textService);
@@ -170,6 +177,7 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
           protected void configure() {
             bind(LanguageEngineFacade.class).to(ClientServerIntegrationTestImpl.class);
             bind(TextDocumentService.class).to(CobolTextDocumentService.class);
+            bind(CopybookReferenceRepo.class).to(CopybookReferenceRepoImpl.class);
           }
         });
   }

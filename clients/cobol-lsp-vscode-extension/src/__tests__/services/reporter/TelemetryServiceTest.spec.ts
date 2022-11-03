@@ -12,8 +12,8 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import TelemetryReporter from "@vscode/extension-telemetry";
 import * as path from "path";
+import TelemetryReporter from "vscode-extension-telemetry";
 import {TelemetryReporterImpl} from "../../../services/reporter/TelemetryReporterImpl";
 import {TelemetryService} from "../../../services/reporter/TelemetryService";
 
@@ -21,7 +21,7 @@ const USERNAME: string = "usernameToAnonymize";
 const FAKE_ROOT_PATH: string = path.join("C:", "Users", USERNAME, "folder1", "folder2", "folder3");
 let spySendTelemetry;
 let spySendExceptionTelemetry;
-jest.mock("@vscode/extension-telemetry");
+jest.mock("vscode-extension-telemetry");
 jest.mock("../../../services/util/ExtensionUtils");
 
 function runScenario(expectedNumberOfCalls, eventType: string, eventName?: string, categories?: string[], rootCause?: string, telemetryMeasurements?: Map<string, number>) {

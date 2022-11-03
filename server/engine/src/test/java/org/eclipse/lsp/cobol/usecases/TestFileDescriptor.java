@@ -57,7 +57,7 @@ class TestFileDescriptor {
           + "       FILE SECTION.\n"
           + "       FD  {$*INFILE}\n"
           + "           LABEL RECORDS ARE STANDARD\n"
-          + "           DATA RECORD IS InputRec\n"
+          + "           DATA RECORD IS {$InputRec}\n"
           + "      * ------- some comments ,dont expect this on hover\n"
           + "           RECORD CONTAINS 80 CHARACTERS\n"
           + "           RECORDING MODE IS F\n"
@@ -115,10 +115,11 @@ class TestFileDescriptor {
           + "       FILE SECTION.\n"
           + "       FD  {$*INFILE|1}\n"
           + "           LABEL RECORDS ARE STANDARD\n"
-          + "           DATA RECORD IS InputRec\n"
+          + "           DATA RECORD IS {$InputRec}\n"
           + "           RECORD CONTAINS 80 CHARACTERS\n"
           + "           RECORDING MODE IS F\n"
-          + "           BLOCK CONTAINS 0 RECORDS.\n";
+          + "           BLOCK CONTAINS 0 RECORDS.\n"
+          + "       01  {$*InputRec} PIC X(8).\n";
 
   private static final String FILE_CONTROL_WITH_NO_FD =
       "       IDENTIFICATION DIVISION.\n"
@@ -152,10 +153,12 @@ class TestFileDescriptor {
           + "       FILE SECTION.\n"
           + "       FD  {$*INFILE}\n"
           + "           LABEL RECORDS ARE STANDARD\n"
-          + "           DATA RECORD IS InputRec\n"
+          + "           DATA RECORD IS {$InputRec}\n"
           + "           RECORD CONTAINS 80 CHARACTERS\n"
           + "           RECORDING MODE IS F\n"
-          + "           BLOCK CONTAINS 0 RECORDS.";
+          + "           BLOCK CONTAINS 0 RECORDS.\n"
+          + "       01  {$*InputRec} PIC X(8).";
+
 
   private static final String MULTIPLE_ASSIGNMENTS_NAME_TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -178,7 +181,7 @@ class TestFileDescriptor {
           + "006700 FILE SECTION.                                                    IX1014.2\n"
           + "008700 FD  {$*IX-FS1}                                                       IX1014.2\n"
           + "008800     LABEL RECORD IS STANDARD                                     IX1014.2\n"
-          + "008900     DATA RECORD IS IX-FS1R1-F-G-240                              IX1014.2\n"
+          + "008900     DATA RECORD IS {$IX-FS1R1-F-G-240}                              IX1014.2\n"
           + "009000     BLOCK CONTAINS 1 RECORDS                                     IX1014.2\n"
           + "009100     RECORD CONTAINS 240 CHARACTERS.                              IX1014.2\n"
           + "009200 01  {$*IX-FS1R1-F-G-240}.                                            IX1014.2\n"

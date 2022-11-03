@@ -359,7 +359,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   }
 
   private Map<String, List<Location>> makeSubroutinesDefinitions(List<String> subroutineNames) {
-    Range fileStart = new Range(new Position(0, 0), new Position(0, 0));
+    Range fileStart = new Range(new Position(), new Position());
     return subroutineNames.stream()
             .collect(
                     toMap(
@@ -378,7 +378,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     return copybookName ->
             copybookDefinitions.put(
                     copybookName.toUpperCase(),
-                    singletonList(new Location(uri, new Range(new Position(0, 0), new Position(0, 0)))));
+                    singletonList(new Location(uri, new Range(new Position(), new Position()))));
   }
 
   private void processCopybookToken(
@@ -452,6 +452,9 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                       String storedText = replacementText;
                       if (stripQuotes) {
                         storedText = PreprocessorStringUtils.trimQuotes(storedText);
+                      }
+                      if (replacement != null && replacement.ORIGINAL_SIZE_COPY_START() != null) {
+                        addTokenLocation(it, text.toUpperCase(), range);
                       }
                       addTokenLocation(it, storedText.toUpperCase(), range);
                     });

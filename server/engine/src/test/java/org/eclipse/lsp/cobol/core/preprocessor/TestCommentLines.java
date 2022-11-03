@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /** This test checks multiple comment entries are parsed and cleaned up correctly */
@@ -71,7 +72,8 @@ class TestCommentLines {
         new TextPreprocessorImpl(
             grammarPreprocessor, reader, writer, transformation, indicatorProcessor);
     String actual =
-        textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
+        textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll).calculateExtendedText();
     assertEquals(EXPECTED, actual);
+    assertTrue(accumulatedErrors.isEmpty());
   }
 }

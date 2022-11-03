@@ -21,6 +21,7 @@ dacoRules: dacoStatements .*?;
 dacoStatements
     : readTransactionStatement
     | writeTransactionStatement
+    | dfldRcu
     | writeReportStatement
     | openPacketStatement
     | getMetaInfoStatement
@@ -31,8 +32,13 @@ dacoStatements
     | fileDMLStatement
     | stringDMLStatement
     | debugStatement
+    | ifRowCondition
     | execStatement DOT_FS?
     ;
+
+ifRowCondition
+   : ROW qualifiedDataName ON qualifiedDataName
+   ;
 
 readTransactionStatement
     : READ TRANSACTION daco_task_name?
@@ -42,6 +48,9 @@ writeTransactionStatement
     : WRITE TRANSACTION (daco_task_name | INPUT)
         (LENGTH ({validateIntegerRange(_input.LT(1).getText(), 4, 2048);} integerLiteral | qualifiedDataName))?
         (TO ({validateLength(_input.LT(1).getText(), "dbu", 19);} (qualifiedDataName | integerLiteral)))?
+    ;
+dfldRcu
+    : DFLD IDENTIFIER ON RCU
     ;
 
 writeReportStatement
@@ -235,7 +244,7 @@ rowMatchStatement
 tableRowUpdateStatement
     : ROW (rowDeleteStatement | rowAddStatement | rowInsertStatement |
       rowModifyStatement | rowSortStatement | rowSingleStatement |
-      rowDuplicateStatement | rowInvertStatement)
+      rowDuplicateStatement | rowInvertStatement | rowInitializeStatement)
     ;
 
 rowDeleteStatement
@@ -255,7 +264,7 @@ rowInsertStatement
 rowModifyStatement
     : MODIFY daco_table_name
       (ON (qualifiedDataName | literal))?
-      (WITH qualifiedDataName)?
+      (WITH (qualifiedDataName | literal))?
     ;
 
 rowSortStatement
@@ -275,6 +284,10 @@ rowDuplicateStatement
 
 rowInvertStatement
     : INVERT daco_table_name
+    ;
+
+rowInitializeStatement
+    : INITIALIZE daco_table_name
     ;
 
 tableDMLStatement

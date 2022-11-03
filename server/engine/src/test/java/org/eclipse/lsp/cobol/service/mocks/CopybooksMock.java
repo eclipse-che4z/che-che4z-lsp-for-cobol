@@ -23,4 +23,12 @@ public interface CopybooksMock {
 
   /** @return all the Cobol files for copybooks */
   List<CobolText> getCopybooks();
+
+
+  /**
+   *
+   * @param filename
+   * @return all the Cobol files for copybooks associated with a file
+   */
+  List<CobolText> getCopybooks(String filename);
 }

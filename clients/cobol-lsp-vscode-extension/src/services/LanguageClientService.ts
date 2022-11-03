@@ -12,11 +12,12 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as cp from "child_process";
 import * as fs from "fs";
 import * as net from "net";
 import * as os from "os";
+import { join } from "path";
 import * as vscode from "vscode";
+
 import {
     ConfigurationParams,
     ConfigurationRequest,
@@ -29,8 +30,10 @@ import {ConfigurationWorkspaceMiddleware} from "vscode-languageclient/lib/config
 import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
 import {LANGUAGE_ID} from "../constants";
 import {JavaCheck} from "./JavaCheck";
-import {Middleware} from "./Middleware";
+import {TelemetryService} from "./reporter/TelemetryService";
 import { SettingsService } from "./Settings";
+
+const extensionId = "BroadcomMFD.cobol-language-support";
 
 export class LanguageClientService {
     private executablePath: string;
@@ -38,15 +41,17 @@ export class LanguageClientService {
     private handlers: Array<(languageClient: LanguageClient) => void> = [];
     private isNativeBuildEnabled: boolean = false;
 
-    constructor(private middleware: Middleware) {
-        const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
-        this.executablePath = `${ext.extensionPath}/server/jar/server.jar`;
+    constructor(private outputChannel: vscode.OutputChannel) {
+        const ext = vscode.extensions.getExtension(extensionId);
+        this.executablePath = join(ext.extensionPath, "server", "jar", "server.jar");
     }
 
     public enableNativeBuild() {
-        const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
+        const ext = vscode.extensions.getExtension(extensionId);
         this.isNativeBuildEnabled = true;
         this.executablePath = this.initializeExecutables(`${ext.extensionPath}/server`);
+        TelemetryService.registerEvent("Native Build enabled", ["COBOL", "native build enabled", "settings"],
+            "Native build enabled");
     }
 
     public async checkPrerequisites(): Promise<void> {
@@ -91,7 +96,7 @@ export class LanguageClientService {
     private getLanguageClient() {
         if (!this.languageClient) {
             this.languageClient = new LanguageClient(LANGUAGE_ID,
-                "LSP extension for " + LANGUAGE_ID + " language",
+                "LSP extension for " + LANGUAGE_ID.toUpperCase() + " language",
                 this.createServerOptions(this.executablePath),
                 this.createClientOptions());
         }
@@ -99,19 +104,9 @@ export class LanguageClientService {
     }
 
     private createClientOptions(): LanguageClientOptions {
-        const signatureFunc: ConfigurationRequest.MiddlewareSignature = async (
-            params: ConfigurationParams,
-            token: vscode.CancellationToken,
-            next: ConfigurationRequest.HandlerSignature) => {
-            return await this.middleware.handleConfigurationRequest(params, token, next);
-        };
-        const configurationMiddleware: ConfigurationWorkspaceMiddleware = {
-            configuration: signatureFunc,
-        };
-
         return {
             documentSelector: [LANGUAGE_ID],
-            middleware: {workspace: configurationMiddleware},
+            outputChannel: this.outputChannel,
         };
     }
 
@@ -142,32 +137,22 @@ export class LanguageClientService {
         };
     }
 
-    private initializeExecutables(serverPath: String) {
+    private initializeExecutables(serverPath: string) {
         let executablePath;
         switch (os.type()) {
             case "Windows_NT":
-                executablePath = `${serverPath}/package-win`;
+                executablePath = join(serverPath, "package-win");
                 break;
             case "Darwin":
-                executablePath = `${serverPath}/package-macos`;
-                this.giveExecutePermission(executablePath);
+                executablePath = join(serverPath, "package-macos");
                 break;
             case "Linux":
-                executablePath = `${serverPath}/package-linux`;
-                this.giveExecutePermission(executablePath);
+                executablePath = join(serverPath, "package-linux");
                 break;
             default:
                 break;
         }
         return executablePath;
-    }
-
-    private giveExecutePermission(executablePath) {
-        cp.exec(`cd ${executablePath}; chmod 755 *`, (err, stdout, stderr) => {
-            if (err) {
-                vscode.window.showInformationMessage(`couldn't initialize executable as ${executablePath}. Please change the permission to execution mode`);
-            }
-        });
     }
 }
 export function nativeServer(jarPath: string) {
@@ -194,4 +179,3 @@ export function nativeServer(jarPath: string) {
         }
     return executable;
 }
-

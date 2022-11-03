@@ -214,12 +214,12 @@ public class DaCoCopybookVisitor extends CobolParserBaseVisitor<List<Node>> {
   private VariableNameAndLocality extractNameAndLocality(CobolParser.CobolWordContext context) {
     String name = getName(context);
     String generatedName = name;
-    String cbSuffix = DaCoHelper.extractSuffix(name);
-    if (cbSuffix != null && suffix != null) {
-      if (cbSuffix.isEmpty()) {
+    Optional<String> cbSuffix = DaCoHelper.extractSuffix(name);
+    if (cbSuffix.isPresent() && suffix != null) {
+      if (cbSuffix.get().isEmpty()) {
         generatedName += suffix;
       }
-      if (cbSuffix.length() == 2) {
+      if (cbSuffix.get().length() == 2) {
         generatedName = name.substring(0, name.length() - 2) + suffix;
       }
     }

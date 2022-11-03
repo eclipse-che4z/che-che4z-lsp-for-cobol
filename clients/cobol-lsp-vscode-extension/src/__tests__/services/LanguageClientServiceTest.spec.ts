@@ -12,16 +12,17 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "fs-extra";
 import * as os from "os";
+import * as fs from "fs";
 import * as vscode from "vscode";
+import { join } from "path";
 import { LanguageClient } from "vscode-languageclient";
 import { CopybookDownloadService } from "../../services/copybook/CopybookDownloadService";
 import { JavaCheck } from "../../services/JavaCheck";
 import { LanguageClientService, nativeServer } from "../../services/LanguageClientService";
-import { Middleware } from "../../services/Middleware";
+import {TelemetryService} from "../../services/reporter/TelemetryService";
 
-jest.mock("../../services/Middleware");
+jest.mock("../../services/reporter/TelemetryService");
 jest.mock("../../services/copybook/CopybookURI");
 jest.mock("vscode", () => ({
     extensions: {
@@ -32,17 +33,26 @@ jest.mock("vscode", () => ({
             get: jest.fn().mockReturnValue(0),
         }),
     },
+    window: {
+        createOutputChannel: jest.fn(),
+    },
 }));
 jest.mock("vscode-languageclient", () => ({
     LanguageClient: jest.fn(),
 }));
-
+jest.mock('fs', () => ({
+    fs: jest.fn(),
+}));
+jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
+    return {
+      ZoweVsCodeExtension: jest.fn()
+    };
+  });
 const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService();
-const middleware: Middleware = new Middleware(copyBooksDownloader);
 let languageClientService: LanguageClientService;
 
 const SERVER_DESC = "LSP extension for COBOL language";
-const SERVER_ID = "COBOL";
+const SERVER_ID = "cobol";
 
 beforeEach(() => {
     jest.clearAllMocks();
@@ -53,22 +63,27 @@ const SERVER_STARTED_MSG = "server started";
 const SERVER_STOPPED_MSG = "server stopped";
 describe("LanguageClientService positive scenario", () => {
     beforeEach(() => {
-        languageClientService = new LanguageClientService(middleware);
+        languageClientService = new LanguageClientService(jest.fn() as any);
         new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(0);
-        fs.existsSync = jest.fn().mockReturnValue(true);
+        (fs.existsSync as any)= jest.fn().mockReturnValue(true);
     });
 
     test("Test LanguageClientService switches native flag", async () => {
-        fs.existsSync = jest.fn().mockReturnValue(true);
+        (languageClientService as any).initializeExecutables = jest.fn();
+        (fs.existsSync as any) = jest.fn().mockReturnValue(true);
+        Object.defineProperty(fs, 'existsSync', {value: jest.fn()})
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(9999);
         languageClientService.enableNativeBuild();
+
+        expect(TelemetryService.registerEvent).toHaveBeenCalledWith("Native Build enabled", ["COBOL", "native build enabled", "settings"],
+            "Native build enabled");
         expect((languageClientService as any).isNativeBuildEnabled).toBeTruthy();
     });
 
     test("Test LanguageClientService checkPrerequisites passes", async () => {
         let message = false;
-        fs.existsSync = jest.fn().mockReturnValue(true);
+        (fs.existsSync as any)= jest.fn().mockReturnValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(9999);
         try {
             await languageClientService.checkPrerequisites();
@@ -88,19 +103,16 @@ describe("LanguageClientService positive scenario", () => {
 
     test("Test LanguageClientService starts language client", () => {
         LanguageClient.prototype.start = jest.fn().mockReturnValue(SERVER_STARTED_MSG);
+        const serverPath = join("/test", "server", "jar", "server.jar");
         expect(languageClientService.start()).toBe(SERVER_STARTED_MSG);
         expect(LanguageClient).toHaveBeenCalledTimes(1);
         expect(LanguageClient).toHaveBeenCalledWith(SERVER_ID, SERVER_DESC, {
-            args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", "/test/server/jar/server.jar", "pipeEnabled"],
+            args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", serverPath, "pipeEnabled"],
             command: "java",
             options: { stdio: "pipe", detached: false },
         }, {
             documentSelector: [SERVER_ID],
-            middleware: {
-                workspace: {
-                    configuration: expect.any(Function),
-                },
-            },
+            outputChannel: expect.any(Function),
         });
     });
 
@@ -112,11 +124,7 @@ describe("LanguageClientService positive scenario", () => {
         expect(LanguageClient).toHaveBeenLastCalledWith(SERVER_ID, SERVER_DESC,
             expect.any(Function), {
             documentSelector: [SERVER_ID],
-            middleware: {
-                workspace: {
-                    configuration: expect.any(Function),
-                },
-            },
+            outputChannel: expect.any(Function),
         });
     });
 
@@ -133,9 +141,9 @@ describe("LanguageClientService positive scenario", () => {
         spy.mockReturnValue("Windows_NT");
         const executableName = nativeServer("/test");
         expect(executableName.command).toBe("engine.exe");
-
+        (languageClientService as any).giveExecutePermission = jest.fn();
         const executableLocation = (languageClientService as any).initializeExecutables("/test");
-        expect(executableLocation).toBe("/test/package-win");
+        expect(executableLocation).toBe(join("/test", "package-win"));
     });
 
     test("LanguageClientServer detects executable path for Linux", () => {
@@ -143,8 +151,9 @@ describe("LanguageClientService positive scenario", () => {
         spy.mockReturnValue("Linux");
         const executableName = nativeServer("/test");
         expect(executableName.command).toBe("./server");
+        (languageClientService as any).giveExecutePermission = jest.fn();
         const executableLocation = (languageClientService as any).initializeExecutables("/test");
-        expect(executableLocation).toBe("/test/package-linux");
+        expect(executableLocation).toBe(join("/test", "package-linux"));
     });
 
     test("LanguageClientServer detects executable path for Mac", () => {
@@ -152,8 +161,9 @@ describe("LanguageClientService positive scenario", () => {
         spy.mockReturnValue("Darwin");
         const executableName = nativeServer("/test");
         expect(executableName.command).toBe("./server-mac-amd64");
+        (languageClientService as any).giveExecutePermission = jest.fn();
         const executableLocation = (languageClientService as any).initializeExecutables("/test");
-        expect(executableLocation).toBe("/test/package-macos");
+        expect(executableLocation).toBe(join("/test", "package-macos"));
     });
 
     test("LanguageClientServer detects executable path for unKnown OS", () => {
@@ -161,6 +171,7 @@ describe("LanguageClientService positive scenario", () => {
         spy.mockReturnValue("Android");
         const executableName = nativeServer("/test");
         expect(executableName.command).toBe("");
+        (languageClientService as any).giveExecutePermission = jest.fn();
         const executableLocation = (languageClientService as any).initializeExecutables("/test");
         expect(executableLocation).toBe(undefined);
     });
@@ -169,12 +180,12 @@ describe("LanguageClientService positive scenario", () => {
 
 describe("LanguageClientService negative scenario.", () => {
 
-    test.skip("LSP port not defined and jar path doesn't exists", async () => {
-        fs.existsSync = jest.fn().mockReturnValue(false);
+    test("LSP port not defined and jar path doesn't exists", async () => {
+        (fs.existsSync as any) = jest.fn().mockReturnValue(false);
         try {
-            await new LanguageClientService(undefined).checkPrerequisites();
+            await new LanguageClientService(jest.fn() as any).checkPrerequisites();
         } catch (error) {
-            expect(error.toString()).toBe("Error: LSP server for COBOL not found");
+            expect(error.toString()).toBe("Error: LSP server for cobol not found");
         }
     });
 });

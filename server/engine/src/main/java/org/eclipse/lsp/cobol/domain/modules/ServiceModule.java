@@ -16,11 +16,28 @@ package org.eclipse.lsp.cobol.domain.modules;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.*;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
+import org.eclipse.lsp.cobol.service.CFASTBuilder;
+import org.eclipse.lsp.cobol.service.CFASTBuilderImpl;
+import org.eclipse.lsp.cobol.service.CobolLSPServerStateService;
+import org.eclipse.lsp.cobol.service.CobolLanguageServer;
+import org.eclipse.lsp.cobol.service.CobolTextDocumentService;
+import org.eclipse.lsp.cobol.service.CobolWorkspaceServiceImpl;
+import org.eclipse.lsp.cobol.service.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.service.SettingsService;
+import org.eclipse.lsp.cobol.service.SettingsServiceImpl;
+import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
+import org.eclipse.lsp.cobol.service.WatcherService;
+import org.eclipse.lsp.cobol.service.WatcherServiceImpl;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationBasedOnExtension;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationCombinedStrategy;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationServiceBasedOnContent;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActionProvider;
@@ -62,7 +79,6 @@ public class ServiceModule extends AbstractModule {
     bind(CopybookService.class).to(CopybookServiceImpl.class);
     bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
-    bind(TextDocumentService.class).to(CobolTextDocumentService.class);
     bind(CobolLanguageClient.class).toProvider(ClientProvider.class);
     bind(SettingsService.class).to(SettingsServiceImpl.class);
     bind(WatcherService.class).to(WatcherServiceImpl.class);
@@ -71,7 +87,17 @@ public class ServiceModule extends AbstractModule {
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(HoverProvider.class).to(VariableHover.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
-    bind(CopybookNameService.class).to(CopybookNameServiceImpl.class);
+    bind(CopybookReferenceRepo.class).to(CopybookReferenceRepoImpl.class);
+    bind(CopybookIdentificationService.class)
+        .annotatedWith(Names.named("contentStrategy"))
+        .to(CopybookIdentificationServiceBasedOnContent.class);
+    bind(CopybookIdentificationService.class)
+        .annotatedWith(Names.named("suffixStrategy"))
+        .to(CopybookIdentificationBasedOnExtension.class);
+    bind(CopybookIdentificationService.class)
+        .annotatedWith(Names.named("combinedStrategy"))
+        .to(CopybookIdentificationCombinedStrategy.class);
+    bind(TextDocumentService.class).to(CobolTextDocumentService.class);
 
     bindFormations();
     bindCompletions();
@@ -90,14 +116,12 @@ public class ServiceModule extends AbstractModule {
     completionBinding.addBinding().to(VariableCompletion.class);
     completionBinding.addBinding().to(ParagraphCompletion.class);
     completionBinding.addBinding().to(SectionCompletion.class);
-    completionBinding.addBinding().to(SnippetCompletion.class);
     completionBinding.addBinding().to(KeywordCompletion.class);
     completionBinding.addBinding().to(CopybookCompletion.class);
     completionBinding.addBinding().to(SubroutineCompletion.class);
     completionBinding.addBinding().to(CopybookNameCompletion.class);
 
     bind(CompletionStorage.class).annotatedWith(named("Keywords")).to(Keywords.class);
-    bind(CompletionStorage.class).annotatedWith(named("Snippets")).to(Snippets.class);
   }
 
   private void bindCodeActions() {

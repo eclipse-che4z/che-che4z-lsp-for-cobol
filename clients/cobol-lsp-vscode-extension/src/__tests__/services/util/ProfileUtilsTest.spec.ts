@@ -34,7 +34,11 @@ const getZoweExplorerMock = () => {
     },
     );
 };
-
+jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
+    return {
+      ZoweVsCodeExtension: jest.fn()
+    };
+  });
 describe("Test profile Utils", () => {
     const programName = "COBOLFILE.cbl";
     const profile = "profile";

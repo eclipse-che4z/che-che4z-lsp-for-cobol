@@ -13,7 +13,9 @@
  */
 export const SETTINGS_CPY_SECTION: string = "cobol-lsp.cpy-manager";
 
-export const SERVER_PORT = "cobol-lsp.server.port"
+export const SERVER_PORT = "cobol-lsp.server.port";
+export const SERVER_TYPE = "cobol-lsp.serverType";
+export const SETTINGS_DIALECT = "cobol-lsp.dialects";
 export const PATHS_LOCAL_KEY = "paths-local";
 export const PATHS_ZOWE = "paths-dsn";
 export const PATHS_USS = "paths-uss";
@@ -21,7 +23,7 @@ export const SETTINGS_SUBROUTINE_LOCAL_KEY = "cobol-lsp.subroutine-manager.paths
 export const C4Z_FOLDER: string = ".c4z";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
 export const GITIGNORE_FILE: string = ".gitignore";
-export const LANGUAGE_ID = "COBOL";
+export const LANGUAGE_ID = "cobol";
 export const PROFILE_NAME_PLACEHOLDER = "<profilename>";
 export const DOWNLOAD_QUEUE_LOCKED_ERROR_MSG = `Invalid credentials for profile: ${PROFILE_NAME_PLACEHOLDER}. Copybook retrieval is blocked. Ensure the profile contains correct credentials.`;
 export const UNLOCK_DOWNLOAD_QUEUE_MSG = "Unblock and retry";
@@ -39,11 +41,18 @@ export const COBOL_COB_EXT = ".COB";
 export const COBOL_COBOL_EXT = ".COBOL";
 export const COBOL_EXT_ARRAY = [COBOL_CBL_EXT, COBOL_COB_EXT, COBOL_COBOL_EXT];
 export const COPYBOOK_CPY_EXT = ".CPY";
+export const COPYBOOK_EXTENSIONS = "copybook-extensions";
 export const COPYBOOK_EXT_ARRAY = [COPYBOOK_CPY_EXT];
 export const EXTENSION_ID = "broadcommfd.cobol-language-support";
 export const TELEMETRY_DEFAULT_CONTENT = "INVALID_INSTRUMENTATION_KEY";
-export const ZOWE_EXT_MISSING_MSG = "Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe."
+export const ZOWE_EXT_MISSING_MSG = "Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe.";
 export const INSTALL_ZOWE = "Install Zowe Explorer";
+export const DACO_DIALECT = "DaCo";
+export const IDMS_DIALECT = "IDMS";
+export const DEFAULT_DIALECT = "COBOL";
+export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";
+export const CLEARING_COPYBOOK_CACHE = "Clearing downloaded copybook cache";
+export const COPYBOOK_CACHE_CLEARED_INFO = "Downloaded copybooks removed";
 
 export enum PUNCH_CARD {
     SEQUENCE_AREA_END_POS = 6,

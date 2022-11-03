@@ -27,6 +27,9 @@ class TestSqlOpenStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*DNUM}  PIC A  VALUE 'GOWY'.\n"
+          + "       01 {$*DNAME}  PIC A  VALUE 'GOWY'.\n"
+          + "       01 {$*MNUM}  PIC A  VALUE 'GOWY'.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL\n"
           + "            DECLARE C1 CURSOR FOR\n"
@@ -34,7 +37,7 @@ class TestSqlOpenStatement {
           + "            WHERE ADMRDEPT = 'A00';\n"
           + "\n"
           + "            OPEN C1;\n"
-          + "            FETCH C1 INTO :DNUM, :DNAME, :MNUM;\n"
+          + "            FETCH C1 INTO :{$DNUM}, :{$DNAME}, :{$MNUM};\n"
           + "            CLOSE C1;\n"
           + "           END-EXEC.";
 

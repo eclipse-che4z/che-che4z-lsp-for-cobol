@@ -104,10 +104,11 @@ class AnnotatedDocumentCleaning {
       Map<String, Diagnostic> expectedDiagnostics,
       TestData testData) {
     return copybooks
-        .map(processCopybook(expectedDiagnostics))
-        .map(collectDataFromCopybooks(testData))
-        .map(test -> new CobolText(test.getCopybookName(), test.getDialectType(), test.getText()))
-        .collect(toList());
+        .map(c -> {
+          TestData test = processCopybook(expectedDiagnostics).apply(c);
+          test = collectDataFromCopybooks(testData).apply(test);
+          return new CobolText(test.getCopybookName(), test.getDialectType(), test.getText(), c.getUrl(), c.isPreprocess());
+        }).collect(toList());
   }
 
   private Function<CobolText, TestData> processCopybook(Map<String, Diagnostic> expectedDiagnostics) {

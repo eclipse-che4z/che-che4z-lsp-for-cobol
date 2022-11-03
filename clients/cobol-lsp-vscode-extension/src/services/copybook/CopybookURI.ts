@@ -13,7 +13,7 @@
  */
 import * as path from "path";
 import * as vscode from "vscode";
-import { C4Z_FOLDER, COPYBOOK_EXT_ARRAY, COPYBOOKS_FOLDER } from "../../constants";
+import { C4Z_FOLDER, COPYBOOKS_FOLDER } from "../../constants";
 import { SettingsService } from "../Settings";
 import { searchInWorkspace } from "../util/FSUtils";
 import { ProfileUtils } from "../util/ProfileUtils";
@@ -37,13 +37,11 @@ export class CopybookURI {
         // check on local paths provided by the user
         let result: string;
         result = searchInWorkspace(copybookName,
-            SettingsService.getCopybookLocalPath(cobolFileName, dialectType),
-            COPYBOOK_EXT_ARRAY);
+            SettingsService.getCopybookLocalPath(cobolFileName, dialectType), SettingsService.getCopybookExtension());
         // check in subfolders under .copybooks (copybook downloaded from MF)
         if (!result) {
             result = searchInWorkspace(copybookName,
-                CopybookURI.createPathForCopybookDownloaded(cobolFileName, dialectType),
-                COPYBOOK_EXT_ARRAY);
+                CopybookURI.createPathForCopybookDownloaded(cobolFileName, dialectType), SettingsService.getCopybookExtension());
         }
         return result || "";
     }
@@ -53,11 +51,11 @@ export class CopybookURI {
         const copybookDirPath = path.join(rootPath, C4Z_FOLDER, COPYBOOKS_FOLDER, profileName, dataset);
         return path.join(copybookDirPath, copybook + ".cpy");
     }
-    
+
     public static createDatasetPath(profileName: string, dataset: string): string {
         const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
         return path.join(rootPath, C4Z_FOLDER, COPYBOOKS_FOLDER, profileName, dataset);
-    }    
+    }
     /**
      * This method produce an array with element that following the schema
      * "file://[WORKSPACE_FOLDER]/.c4z/.copybooks/PROFILE/DATASET" or
@@ -65,9 +63,9 @@ export class CopybookURI {
      * @param profile represent a name of a folder within the .copybooks folder that have the same name as the
      * connection name needed to download copybooks from mainframe.
      */
-    private static createPathForCopybookDownloaded(filename: string, dialectType: string): string[] {
+    public static createPathForCopybookDownloaded(filename: string, dialectType: string): string[] {
         const profile = ProfileUtils.getProfileNameForCopybook(filename);
-        
+
         let result: string[] = [];
         const datasets: string[] = SettingsService.getDsnPath(filename, dialectType);
         if (profile && datasets) {

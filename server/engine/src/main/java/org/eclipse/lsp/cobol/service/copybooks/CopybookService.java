@@ -14,9 +14,8 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
 
 /**
@@ -33,7 +32,8 @@ public interface CopybookService {
    * @param copybookName - the name of the copybook to be retrieved
    * @param programDocumentUri - the currently processing program document
    * @param documentUri - the currently processing document that contains the copy statement
-   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql server
+   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql
+   *     server
    * @param preprocess - indicates if copybook needs to be preprocessed after resolving
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
@@ -51,4 +51,13 @@ public interface CopybookService {
    * @param documentUri is a URI of a document from where the copybook is imported.
    */
   void store(CopybookModel copybookModel, String documentUri);
+
+  /**
+   * Store the copybookModel in cache. Copybook depends on a document from where it is imported.
+   *
+   * @param copybookModel the copybook model
+   * @param documentUri is a URI of a document from where the copybook is imported.
+   * @param doCleanUp is copybook clean up required before storing copybookModel.
+   */
+  void store(CopybookModel copybookModel, String documentUri, boolean doCleanUp);
 }

@@ -34,6 +34,7 @@ public enum NodeType {
   PROCEDURE_SECTION,
   PERFORM,
   EXIT,
+  EXIT_SECTION,
   GO_BACK,
   STOP,
   EVALUATE,
@@ -53,5 +54,6 @@ public enum NodeType {
   SUBROUTINE_NAME_NODE,
   PARAGRAPH_NAME_NODE,
   SECTION_NAME_NODE,
+  CUSTOM,
   OBSOLETE;
 }

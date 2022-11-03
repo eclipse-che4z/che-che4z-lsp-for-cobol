@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.eclipse.lsp.cobol</groupId>
     <artifactId>engine</artifactId>
-    <version>${revision}</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>COBOL LSP :: Server</name>
 
@@ -28,8 +28,8 @@
         <antlr.version>4.7.1</antlr.version>
         <awaitility.version>3.0.0</awaitility.version>
         <commons.io.version>2.10.0</commons.io.version>
-        <commons.lang.version>3.9</commons.lang.version>
-        <commons.text.version>1.6</commons.text.version>
+        <commons.lang.version>3.12.0</commons.lang.version>
+        <commons.text.version>1.10.0</commons.text.version>
         <concurrentunit.version>0.4.6</concurrentunit.version>
         <exclude.tests>nothing.to.exclude</exclude.tests>
         <google.guava.version>30.1.1-jre</google.guava.version>
@@ -51,11 +51,12 @@
         <mockito.core.version>2.23.0</mockito.core.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <revision>1.0.0-SNAPSHOT</revision>
         <slf4j.api.version>1.7.25</slf4j.api.version>
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
-        <filesToTestPath>${project.basedir}${file.separator}..${file.separator}..${file.separator}Cobol85PositiveTestsSuite</filesToTestPath>
-        <listingSnap>${project.basedir}${file.separator}..${file.separator}..${file.separator}Cobol85PositiveTestsSuite${file.separator}compileListing${file.separator}snapshot</listingSnap>
+        <filesToTestPath>${project.basedir}${file.separator}..${file.separator}..${file.separator}tests${file.separator}test_files${file.separator}Cobol85PositiveTestsSuite,
+            ${project.basedir}${file.separator}..${file.separator}..${file.separator}tests${file.separator}test_files${file.separator}cicsGenApp,
+            ${project.basedir}${file.separator}..${file.separator}..${file.separator}tests${file.separator}test_files${file.separator}aws-mainframe-modernization-carddemo</filesToTestPath>
+        <listingSnap>${project.basedir}${file.separator}..${file.separator}..${file.separator}tests${file.separator}test_files${file.separator}Cobol85PositiveTestsSuite${file.separator}compileListing${file.separator}snapshot</listingSnap>
     </properties>
     <dependencies>
         <dependency>
@@ -293,8 +294,6 @@
                             <value>${listingSnap}</value>
                         </property>
                     </systemProperties>
-                    <!--suppress UnresolvedMavenProperty -->
-                    <argLine>${argLine} -Xmx2048m -Djava.awt.headless=true</argLine>
                 </configuration>
             </plugin>
 
@@ -446,13 +445,6 @@
             </plugins>
         </pluginManagement>
 
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ftp</artifactId>
-            </extension>
-        </extensions>
-
     </build>
     <profiles>
         <profile>
@@ -462,7 +454,7 @@
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
-                        <version>0.9.7.1</version>
+                        <version>0.9.15</version>
                         <extensions>true</extensions>
                         <executions>
                             <execution>
@@ -482,6 +474,12 @@
                                 <buildArg>--verbose</buildArg>
                                 <buildArg>--no-fallback</buildArg>
                             </buildArgs>
+                            <agent>
+                                <options>
+                                    <option>access-filter-file=${basedir}/src/test/resources/access-filter.json</option>
+                                    <option>experimental-class-loader-support</option>
+                                </options>
+                            </agent>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -494,7 +492,7 @@
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
-                        <version>0.9.7.1</version>
+                        <version>0.9.13</version>
                         <extensions>true</extensions>
                         <executions>
                             <execution>
@@ -515,6 +513,12 @@
                                 <buildArg>--verbose</buildArg>
                                 <buildArg>--no-fallback</buildArg>
                             </buildArgs>
+                            <agent>
+                                <options>
+                                    <option>access-filter-file=${basedir}/src/test/resources/access-filter.json</option>
+                                    <option>experimental-class-loader-support</option>
+                                </options>
+                            </agent>
                         </configuration>
                     </plugin>
                 </plugins>

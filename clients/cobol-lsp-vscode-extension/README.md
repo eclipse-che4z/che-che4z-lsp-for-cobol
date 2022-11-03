@@ -76,17 +76,7 @@ Contrasting colors are used in displayed code for ease of identifying and distin
 The extension enables outline view and breadcrumb view, which show the structure of elements within the program and allow easy navigation between them.
 
 ### Code Snippets
-Before you write your COBOL code from scratch, search the snippet library for useful templates.
-
-**Follow these steps:**
-
-1. Press `F1` to open the command palette.
-2. Type **Insert Snippet** and press enter.
-3. Select the snippet that you want to insert.
-
-![Code snippets](/docs/images/Snippet.gif)
-
-You can also insert a code snippet by typing the name of the snippet in your code and clicking on the autocomplete text.
+Before you write your COBOL code from scratch, you can insert a code snippet by typing the name of the snippet in your code and clicking on the autocomplete text.
 
 The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder.
 
@@ -113,7 +103,7 @@ To enable subroutine support, specify the paths of folders containing subroutine
 3. Under **Subroutine-manager: Paths-local**, specify the paths of the folders containing subroutines.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
    - The folders are searched in the order they are listed. If two folders contain a subroutine with the same file name, the one from the folder higher on the list is used.
-4. Open a program or project.  
+4. Open a program or project.
    Subroutine support features are now enabled.
 
 If you specify your subroutine folders using absolute paths or paths containing `../` or `./`, the subroutine folders are not watched for changes. You might need to resolve names of recently added files in your code manually.
@@ -149,7 +139,7 @@ You can store your copybooks locally in folders in your workspace and specify th
    - Under **Cpy-manager: Paths-local: Idms** for the IDMS dialect.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
    - The folders are searched in the order they are listed. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
-4. Open a program or project.  
+4. Open a program or project.
    Copybook support features are now enabled.
 
 If you specify your copybook folders using absolute paths or paths containing `../` or `./`, the copybook folders are not watched for changes. You might need to resolve names of recently added copybooks in your code manually.
@@ -167,8 +157,8 @@ You can also set up automatic copybook retrieval from the mainframe to download 
 3. Switch from **User** to **Workspace**.
 4. Under **Cpy-manager: Paths-dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
 5. Under **Profile**, enter the name of your Zowe Explorer profile.
-6. Open a program or project.  
-   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3.  
+6. Open a program or project.
+   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3.
    Copybook support features are now enabled.
 
 Copybooks that you retrieve from mainframe data sets are stored in the **.c4z/.copybooks** directory within the workspace, which is created automatically.

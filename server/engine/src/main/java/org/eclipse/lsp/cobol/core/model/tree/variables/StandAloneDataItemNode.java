@@ -18,14 +18,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.EMPTY_STRUCTURE_MSG;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_77;
 
 /**
@@ -61,14 +55,6 @@ public class StandAloneDataItemNode extends ElementaryNode {
         picClause,
         usageFormat);
     this.value = value;
-    addProcessStep(this::processNode);
-  }
-
-  private List<SyntaxError> processNode() {
-    List<SyntaxError> errors = new ArrayList<>();
-    if (picClause.isEmpty() && usageFormat != UsageFormat.INDEX)
-      errors.add(getError(MessageTemplate.of(EMPTY_STRUCTURE_MSG, getName())));
-    return errors;
   }
 
   @Override

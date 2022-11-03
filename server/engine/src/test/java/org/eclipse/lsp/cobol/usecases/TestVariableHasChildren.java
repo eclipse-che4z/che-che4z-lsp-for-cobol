@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
@@ -63,7 +64,7 @@ class TestVariableHasChildren {
             .filter(Node.hasType(NodeType.PROGRAM))
             .findFirst()
             .map(ProgramNode.class::cast)
-            .map(ProgramNode::getVariables)
+            .map(new SymbolService(result.getSymbolTableMap())::getVariables)
             .map(variableMap -> variableMap.get("TERMS-RECORD").iterator().next())
             .orElse(null);
 

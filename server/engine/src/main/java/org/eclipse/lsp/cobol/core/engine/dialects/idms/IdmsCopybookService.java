@@ -29,7 +29,7 @@ import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.CopyDefinition;
+import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
@@ -85,7 +85,7 @@ class IdmsCopybookService {
 
     Location location = new Location();
     location.setUri(copybookModel.getUri());
-    location.setRange(new Range(new Position(0, 0), new Position(0, 0)));
+    location.setRange(new Range(new Position(), new Position()));
 
     node.setDefinition(new CopyDefinition(location, copybookModel.getUri()));
 

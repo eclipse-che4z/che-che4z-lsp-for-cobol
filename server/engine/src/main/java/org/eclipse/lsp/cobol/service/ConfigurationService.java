@@ -54,6 +54,7 @@ public interface ConfigurationService {
     List<String> dialects;
     List<String> predefinedParagraphs;
     List<String> subroutines;
+    boolean cicsTranslatorEnabled;
 
     public ConfigurationEntity() {
       sqlBackend = SQLBackend.DB2_SERVER;
@@ -61,6 +62,7 @@ public interface ConfigurationService {
       dialects = ImmutableList.of();
       predefinedParagraphs = ImmutableList.of();
       subroutines = ImmutableList.of();
+      cicsTranslatorEnabled = true;
     }
   }
 }

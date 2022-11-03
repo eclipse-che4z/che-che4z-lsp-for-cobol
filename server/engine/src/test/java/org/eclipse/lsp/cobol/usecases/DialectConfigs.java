@@ -26,21 +26,31 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 /** IDMS and MAID related getter */
 @UtilityClass
 public class DialectConfigs {
-  AnalysisConfig getIDMSAnalysisConfig() {
+  public AnalysisConfig getIDMSAnalysisConfig() {
     return new AnalysisConfig(
         new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
         ImmutableList.of(),
-        ImmutableList.of(IdmsDialect.NAME));
+        ImmutableList.of(IdmsDialect.NAME), true);
   }
 
-  AnalysisConfig getDaCoAnalysisConfig() {
+  /**
+   * Provides DaCo dialect configuration
+   * @return DaCo dialect configuration
+   */
+  public AnalysisConfig getDaCoAnalysisConfig() {
     return new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
+            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of("S930", "S940", "S950",
+                    "S990", "S991", "S997", "S999")),
             ImmutableList.of(),
-            ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME));
+            ImmutableList.of(DaCoDialect.NAME), true);
   }
 
-  AnalysisConfig getDaCoAnalysisConfig(CopybookConfig copybookConfig) {
-    return new AnalysisConfig(copybookConfig, ImmutableList.of(), ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME));
+  /**
+   * Provides DaCo dialect configuration with specified copybook configuration
+   * @param copybookConfig a copybook configuration
+   * @return DaCo dialect configuration
+   */
+  public AnalysisConfig getDaCoAnalysisConfig(CopybookConfig copybookConfig) {
+    return new AnalysisConfig(copybookConfig, ImmutableList.of(), ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME), true);
   }
 }

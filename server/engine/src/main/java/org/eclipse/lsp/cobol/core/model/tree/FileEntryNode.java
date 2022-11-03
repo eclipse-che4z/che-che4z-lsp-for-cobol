@@ -14,18 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
-
-import java.util.List;
-
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 
 /** The class represents file entry item in COBOL */
 @ToString(callSuper = true)
@@ -40,18 +32,5 @@ public class FileEntryNode extends Node {
     super(location, NodeType.FILE_CONTROL_ENTRY);
     this.fileName = name;
     this.fileControlClause = fileControlClause;
-    addProcessStep(this::processNode);
   }
-
-  private List<SyntaxError> processNode() {
-    this.getNearestParentByType(PROGRAM)
-        .ifPresent(o -> o.getDepthFirstStream()
-            .filter(hasType(NodeType.VARIABLE_DEFINITION))
-            .map(VariableDefinitionNode.class::cast)
-            .filter(n -> n.getLevel() == VariableDefinitionUtil.LEVEL_FD_SD)
-            .filter(n -> n.getVariableName().getName().equals(fileName))
-            .forEach(n -> n.setFileControlClause(fileControlClause)));
-    return ImmutableList.of();
-  }
-
 }

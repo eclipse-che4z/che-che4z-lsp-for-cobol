@@ -25,12 +25,14 @@ public class CobolText {
   String dialectType;
   String fullText;
   String url;
+  boolean preprocess;
 
   public CobolText(String fileName, String fullText) {
     this.fileName = fileName;
     this.fullText = fullText;
     this.dialectType = null;
     this.url = null;
+    this.preprocess = false;
   }
 
   public CobolText(String fileName, String dialectType, String fullText) {
@@ -38,6 +40,7 @@ public class CobolText {
     this.dialectType = dialectType;
     this.fullText = fullText;
     this.url = null;
+    this.preprocess = false;
   }
 
   @Override

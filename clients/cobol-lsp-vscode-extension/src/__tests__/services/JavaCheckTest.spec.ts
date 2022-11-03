@@ -63,8 +63,8 @@ describe("Checks Java installation", () => {
         (cp as any).spawn = jest.fn().mockReturnValue({stderr: {on: stderrFn}, on: jest.fn()});
         const promise = javaCheck.isJavaInstalled();
         map.data("java 11 2018-09-25");
-
-        await expect(promise).resolves.toEqual(undefined);
+        
+        await expect(promise).resolves.toEqual(true);
     });
 
     it("should skip not relevant lines", async () => {
@@ -73,7 +73,7 @@ describe("Checks Java installation", () => {
         map.data("Picked up JAVA_TOOL_OPTIONS: -Xmx2254m");
         map.data("java 11 2018-09-25");
         map.close(0);
-        await expect(promise).resolves.toEqual(undefined);
+        await expect(promise).resolves.toEqual(true);
     });
 
     it("should skip not relevant lines and fail", async () => {
@@ -114,6 +114,6 @@ describe("Checks Java installation", () => {
         const promise = javaCheck.isJavaInstalled();
         map.close(23);
 
-        await expect(promise).rejects.toEqual("An error occurred when checking if Java was installed. Switching to native builds");
+        await expect(promise).rejects.toEqual("An error occurred when checking if Java was installed. Switching to native build.");
     });
 });

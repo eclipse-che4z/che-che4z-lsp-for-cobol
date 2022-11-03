@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer;
 
+import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
 
 import java.util.List;
@@ -27,8 +28,9 @@ public interface CobolLineWriter {
   /**
    * Convert a list of COBOL lines into one string
    *
-   * @param lines - list of lines
+   * @param lines       - list of lines
+   * @param documentUri - uri of the document
    * @return a string representation of the COBOL program
    */
-  String serialize(List<CobolLine> lines);
+  TextTransformations serialize(List<CobolLine> lines, String documentUri);
 }

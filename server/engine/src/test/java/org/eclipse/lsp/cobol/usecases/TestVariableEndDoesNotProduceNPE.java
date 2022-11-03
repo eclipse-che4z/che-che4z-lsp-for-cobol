@@ -49,12 +49,14 @@ class TestVariableEndDoesNotProduceNPE {
             "2",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'END' expected {BINARY, BLANK, COMP, COMPUTATIONAL, COMPUTATIONAL-1, "
-                    + "COMPUTATIONAL-2, COMPUTATIONAL-3, COMPUTATIONAL-4, COMPUTATIONAL-5, COMP-1, COMP-2, COMP-3, "
-                    + "COMP-4, COMP-5, DISPLAY, DISPLAY-1, DYNAMIC, EXTERNAL, FILLER, FUNCTION-POINTER, GLOBAL, "
-                    + "GROUP-USAGE, INDEX, IS, JUST, JUSTIFIED, LEADING, OCCURS, PACKED-DECIMAL, PIC, PICTURE, "
-                    + "POINTER, POINTER-32, PROCEDURE-POINTER, REDEFINES, SIGN, SYNC, SYNCHRONIZED, TRAILING, USAGE, "
-                    + "UTF-8, VALUE, VALUES, '.', IDENTIFIER}",
+                "Syntax error on 'END' expected {CBLCARD, COBOL2, COBOL3, CPSM, DLI, EDF, EXCI, FEPI, NATLANG, "
+                    + "NOCBLCARD, NOCPSM, NODEBUG, NOEDF, NOFEPI, NOLENGTH, NOLINKAGE, NOOPTIONS, NOSPIE, OPTIONS, SP,"
+                    + " SPIE, SYSEIB, BINARY, BLANK, COMP, COMPUTATIONAL, COMPUTATIONAL-1, COMPUTATIONAL-2, "
+                    + "COMPUTATIONAL-3, COMPUTATIONAL-4, COMPUTATIONAL-5, COMP-1, COMP-2, COMP-3, COMP-4, COMP-5, "
+                    + "DISPLAY, DISPLAY-1, DYNAMIC, EXTERNAL, FILLER, FUNCTION-POINTER, GLOBAL, GROUP-USAGE, INDEX, "
+                    + "IS, JUST, JUSTIFIED, LEADING, OCCURS, PACKED-DECIMAL, PIC, PICTURE, POINTER, POINTER-32, "
+                    + "PROCEDURE-POINTER, REDEFINES, SIGN, SYNC, SYNCHRONIZED, TRAILING, USAGE, UTF-8, VALUE, VALUES, "
+                    + "'.', IDENTIFIER}",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "3",

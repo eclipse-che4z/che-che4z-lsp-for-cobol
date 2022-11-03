@@ -20,28 +20,32 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
-import org.eclipse.lsp.cobol.service.SettingsService;
+import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
-import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
 /**
  * This service processes copybook requests and returns content by its name. The service also caches
@@ -51,7 +55,8 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 @Singleton
 @SuppressWarnings("UnstableApiUsage")
 public class CopybookServiceImpl implements CopybookService {
-  private final SettingsService settingsService;
+
+  private final Provider<CobolLanguageClient> clientProvider;
   private final FileSystemService files;
   public final TextPreprocessor preprocessor;
   private static final String COBOL = "COBOL";
@@ -60,18 +65,21 @@ public class CopybookServiceImpl implements CopybookService {
       new ConcurrentHashMap<>(8, 0.9f, 1);
 
   private final CopybookCache copybookCache;
+  private final CopybookReferenceRepo copybookReferenceRepo;
 
   @Inject
   public CopybookServiceImpl(
       DataBusBroker dataBus,
-      SettingsService settingsService,
+      Provider<CobolLanguageClient> clientProvider,
       FileSystemService files,
       TextPreprocessor preprocessor,
-      CopybookCache copybookCache) {
-    this.settingsService = settingsService;
+      CopybookCache copybookCache,
+      CopybookReferenceRepo copybookReferenceRepo) {
     this.files = files;
+    this.clientProvider = clientProvider;
     this.preprocessor = preprocessor;
     this.copybookCache = copybookCache;
+    this.copybookReferenceRepo = copybookReferenceRepo;
     dataBus.subscribe(this);
   }
 
@@ -80,6 +88,7 @@ public class CopybookServiceImpl implements CopybookService {
     LOG.debug("Copybooks for downloading: {}", copybooksForDownloading);
     LOG.debug("Copybook cache: {}", copybookCache);
     LOG.debug("Cache invalidated");
+    copybookReferenceRepo.clearReferences();
     copybooksForDownloading.clear();
     copybookCache.invalidateAll();
   }
@@ -88,15 +97,16 @@ public class CopybookServiceImpl implements CopybookService {
    * Retrieve and return the copybook by its name. Copybook may be cached to limit interactions with
    * the file system.
    *
-   * <p>Resolving works in synchronous way. Resolutions with different copybook names will not block
+   * <p>Resolving works in synchronous way. Resolutions with different copybook names will not
+   * block
    * each other.
    *
-   * @param copybookName - the name of the copybook to be retrieved
+   * @param copybookName       - the name of the copybook to be retrieved
    * @param programDocumentUri - the currently processing program document
-   * @param documentUri - the currently processing document that contains the copy statement
-   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql
-   *     server
-   * @param preprocess - indicates if copybook needs to be preprocessed after resolving
+   * @param documentUri        - the currently processing document that contains the copy statement
+   * @param copybookConfig     - contains config info like: copybook processing mode, target backend
+   *                           sql server
+   * @param preprocess         - indicates if copybook needs to be preprocessed after resolving
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   public CopybookModel resolve(
@@ -111,6 +121,7 @@ public class CopybookServiceImpl implements CopybookService {
         if (preprocess) {
           copybookModel = cleanupCopybook(copybookModel);
         }
+        copybookReferenceRepo.storeCopybookUsageReference(copybookName, documentUri, copybookModel);
         return copybookModel;
       });
     } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
@@ -122,6 +133,14 @@ public class CopybookServiceImpl implements CopybookService {
   @Override
   public void store(CopybookModel copybookModel, String documentUri) {
     copybookCache.store(copybookModel, documentUri);
+  }
+
+  @Override
+  public void store(CopybookModel copybookModel, String documentUri, boolean doCleanUp) {
+    if (doCleanUp) {
+      copybookModel = cleanupCopybook(copybookModel);
+    }
+    store(copybookModel, documentUri);
   }
 
   private CopybookModel resolveSync(
@@ -146,7 +165,7 @@ public class CopybookServiceImpl implements CopybookService {
    * Retrieve optional {@link CopybookModel} of the {@link PredefinedCopybooks} for the given name
    * if it is predefined.
    *
-   * @param copybookName - the name of copybook to check
+   * @param copybookName   - the name of copybook to check
    * @param copybookConfig - configuration for copybook resolution
    * @return optional model of a predefined copybook if it exists
    */
@@ -155,7 +174,8 @@ public class CopybookServiceImpl implements CopybookService {
     LOG.debug(
         "Trying to resolve predefined copybook {}, using config {}", copybookName, copybookConfig);
 
-    Optional<CopybookModel> copybookModel = Optional.ofNullable(PredefinedCopybooks.forName(copybookName.getQualifiedName()))
+    Optional<CopybookModel> copybookModel = Optional.ofNullable(
+            PredefinedCopybooks.forName(copybookName.getQualifiedName()))
         .map(c -> {
           String name = c.nameForBackend(copybookConfig.getSqlBackend());
           String content = ImplicitCodeUtils.readImplicitCode(files, name);
@@ -167,7 +187,7 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private CopybookModel cleanupCopybook(CopybookModel dirtyCopybook) {
-    String cleanText = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent()).getResult();
+    String cleanText = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent()).getResult().calculateExtendedText();
     return new CopybookModel(dirtyCopybook.getCopybookName(), dirtyCopybook.getUri(), cleanText);
   }
 
@@ -188,14 +208,10 @@ public class CopybookServiceImpl implements CopybookService {
   private Optional<String> resolveCopybookFromWorkspace(
       CopybookName copybookName, String mainProgramFileName) {
     try {
-      return SettingsService.getValueAsString(
-          settingsService
-              .getConfiguration(
-                  COPYBOOK_RESOLVE.label,
-                  mainProgramFileName,
-                  copybookName.getQualifiedName(),
-                  Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL))
-              .get());
+      return Optional.ofNullable(clientProvider.get().resolveCopybook(
+          mainProgramFileName,
+          copybookName.getDisplayName(),
+          Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL)).get());
     } catch (InterruptedException e) {
       // rethrowing the InterruptedException to interrupt the parent thread.
       throw new UncheckedExecutionException(e);
@@ -239,25 +255,21 @@ public class CopybookServiceImpl implements CopybookService {
     String document = files.getNameFromURI(documentUri);
 
     if (event.getCopybookProcessingMode().download) {
-      List<String> copybooksToDownload =
+      List<CopybookName> copybooksToDownload =
           uris.stream()
               .map(files::getNameFromURI)
               .map(copybooksForDownloading::remove)
               .filter(Objects::nonNull)
               .flatMap(Set::stream)
-              .map(
-                  copybook ->
-                      join(
-                          ".",
-                          COPYBOOK_DOWNLOAD.label,
-                          getUserInteractionType(event.getCopybookProcessingMode()),
-                          document,
-                          copybook.getQualifiedName(),
-                          Optional.ofNullable(copybook.getDialectType()).orElse(COBOL)))
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
       if (!copybooksToDownload.isEmpty()) {
-        settingsService.getConfigurations(copybooksToDownload);
+        clientProvider.get().downloadCopybooks(
+            document,
+            copybooksToDownload.stream().map(CopybookName::getQualifiedName).collect(toList()),
+            Optional.ofNullable(copybooksToDownload.stream().findFirst().get().getDialectType()).orElse(COBOL), //NOSONAR
+            !event.getCopybookProcessingMode().userInteraction);
+
       }
     }
   }
@@ -267,7 +279,4 @@ public class CopybookServiceImpl implements CopybookService {
     return ImmutableMap.copyOf(copybooksForDownloading);
   }
 
-  private String getUserInteractionType(CopybookProcessingMode copybookProcessingMode) {
-    return copybookProcessingMode.userInteraction ? VERBOSE.label : QUIET.label;
-  }
 }

@@ -43,7 +43,7 @@ public class Chetest2Test extends NegativeTest {
   private static final int EXPECTED_ERRORS_NUMBER = 19;
 
   Chetest2Test() {
-    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, ImmutableList.of());
+    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, ImmutableList.of(), "");
   }
 
   @Test

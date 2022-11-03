@@ -18,7 +18,8 @@ package org.eclipse.lsp.cobol.usecases.engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.core.model.tree.Context;
+import org.eclipse.lsp.cobol.core.engine.symbols.Context;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
@@ -219,6 +220,50 @@ public class UseCaseEngine {
     return actual;
   }
 
+  /**
+   * Run test and check only diagnostic, other errors will be ignored
+   * @param text - COBOL text to analyse. It will be cleaned up before analysis to exclude all the
+   *     technical tokens and collect syntax and semantic elements
+   * @param copybooks - list of the copybooks used in the document
+   * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
+   *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
+   * @param subroutineNames - list of subroutine names used in the document
+   * @param analysisConfig - analysis settings: copybook processing mode and the SQL backend for the
+   *     analysis
+   * @return analysis result object
+   */
+  public AnalysisResult runTestForDiagnostics(String text,
+                                    List<CobolText> copybooks,
+                                    Map<String, Diagnostic> expectedDiagnostics,
+                                    List<String> subroutineNames,
+                                    AnalysisConfig analysisConfig) {
+
+    PreprocessedDocument document =
+        AnnotatedDocumentCleaning.prepareDocument(
+            text,
+            copybooks,
+            subroutineNames,
+            expectedDiagnostics,
+            analysisConfig.getCopybookConfig().getSqlBackend());
+    AnalysisResult actual =
+        analyze(
+            UseCase.builder()
+                .fileName(DOCUMENT_URI)
+                .text(document.getText())
+                .copybooks(document.getCopybooks())
+                .subroutines(subroutineNames)
+                .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
+                .copybookProcessingMode(
+                    analysisConfig.getCopybookConfig().getCopybookProcessingMode())
+                .features(analysisConfig.getFeatures())
+                .dialects(analysisConfig.getDialects())
+                .predefinedSections(analysisConfig.getCopybookConfig().getPredefinedSections())
+                .build());
+
+    assertDiagnostics(document.getTestData().getDiagnostics(), actual.getDiagnostics());
+    return actual;
+  }
+
   private static void assertResultEquals(AnalysisResult actual, TestData expected) {
     assertDiagnostics(expected.getDiagnostics(), actual.getDiagnostics());
 
@@ -277,17 +322,19 @@ public class UseCaseEngine {
       Predicate<VariableNode> predicate,
       Function<Context, List<Location>> extractor) {
 
-    return result
-        .getRootNode()
-        .getDepthFirstStream()
-        .filter(hasType(PROGRAM))
-        .map(ProgramNode.class::cast)
-        .map(ProgramNode::getVariables)
-        .map(Multimap::values)
-        .flatMap(Collection::stream)
-        .filter(it -> !FILLER_NAME.equals(it.getName()))
-        .filter(predicate)
-        .collect(toMap(extractor, PROGRAM));
+    SymbolService symbolService =  new SymbolService(result.getSymbolTableMap());
+    Map<String, List<Location>> map = result
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(hasType(PROGRAM))
+            .map(ProgramNode.class::cast)
+            .map(symbolService::getVariables)
+            .map(Multimap::values)
+            .flatMap(Collection::stream)
+            .filter(it -> !FILLER_NAME.equals(it.getName()))
+            .filter(predicate)
+            .collect(toMap(extractor, PROGRAM));
+    return map;
   }
 
   private Map<String, List<Location>> extractDefinitions(AnalysisResult result, NodeType nodeType) {

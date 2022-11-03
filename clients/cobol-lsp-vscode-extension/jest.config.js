@@ -8,6 +8,7 @@ module.exports = {
     "modulePathIgnorePatterns": [
       "<rootDir>/out",
       "<rootDir>/dist",
+      "<rootDir>/src/test"
     ],
     "collectCoverage": true,
     "collectCoverageFrom": [
@@ -15,6 +16,7 @@ module.exports = {
         "resources/**/*.{js,jsx,ts}",
         "!**/node_modules/**",
         "!**/coverage/**",
+        "!src/test/suite/**",
         "!src/__tests__/*.ts"
      ],
     "testRunner" : 'jasmine2',

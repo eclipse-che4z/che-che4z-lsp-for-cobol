@@ -68,6 +68,14 @@ class TestSqlAllSetStatements {
           + "       01 {$*HV2}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
           + "       01 {$*RVID}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
           + "       01 {$*HVAR1}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       01 {$*SERVER}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       01 {$*XTIME}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       01 {$*MEM}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       01 {$*LOCATOR}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       01 {$*DETAILS}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       01 {$*HVL}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       01 {$*CURMAINTYPES}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       01 {$*CURSCHEMA}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL\n";
 
@@ -75,22 +83,22 @@ class TestSqlAllSetStatements {
       TEXT + "            SET CONNECTION TOROLAB1;\n" + "           END-EXEC.";
 
   private static final String SET_ASSIGNMENT_STATE =
-      TEXT + "            SET :HVL = CURRENT PATH;\n" + "           END-EXEC.";
+      TEXT + "            SET :{$HVL} = CURRENT PATH;\n" + "           END-EXEC.";
 
   private static final String SET_ASSIGNMENT_STATE2 =
       TEXT
-          + "            SET :SERVER = CURRENT PATH,\n"
-          + "           :XTIME = CURRENT TIME,\n"
-          + "           :MEM = CURRENT MEMBER;\n"
+          + "            SET :{$SERVER} = CURRENT PATH,\n"
+          + "           :{$XTIME} = CURRENT TIME,\n"
+          + "           :{$MEM} = CURRENT MEMBER;\n"
           + "           END-EXEC.";
 
   private static final String SET_ASSIGNMENT_STATE3 =
-      TEXT + "            SET :DETAILS = SUBSTR(:LOCATOR,1,35);\n" + "           END-EXEC.";
+      TEXT + "            SET :{$DETAILS} = SUBSTR(:{$LOCATOR},1,35);\n" + "           END-EXEC.";
 
   private static final String SET_ASSIGNMENT_STATE4 =
       TEXT
-          + "            SELECT SUBSTR(:LOCATOR,1,35)\n"
-          + "             INTO :DETAILS\n"
+          + "            SELECT SUBSTR(:{$LOCATOR},1,35)\n"
+          + "             INTO :{$DETAILS}\n"
           + "             FROM SYSIBM.SYSDUMMYU;\n"
           + "           END-EXEC.";
 
@@ -142,7 +150,7 @@ class TestSqlAllSetStatements {
 
   private static final String SET_CURRENT_MAINTAINED_TABLE2 =
       TEXT
-          + "             VALUES (CURRENT MAINTAINED TABLE TYPES) INTO :CURMAINTYPES;\n"
+          + "             VALUES (CURRENT MAINTAINED TABLE TYPES) INTO :{$CURMAINTYPES};\n"
           + "           END-EXEC.";
   private static final String SET_CURRENT_MAINTAINED_TABLE3 =
       TEXT + "             SET CURRENT MAINTAINED TABLE TYPES NONE;\n" + "           END-EXEC.";
@@ -236,7 +244,7 @@ class TestSqlAllSetStatements {
 
   private static final String SET_SCHEMA2 =
       TEXT
-          + "             SELECT CURRENT SCHEMA INTO :CURSCHEMA\n"
+          + "             SELECT CURRENT SCHEMA INTO :{$CURSCHEMA}\n"
           + "              FROM SYSIBM.SYSDUMMY1;\n"
           + "           END-EXEC.";
   private static final String SET_SCHEMA3 =

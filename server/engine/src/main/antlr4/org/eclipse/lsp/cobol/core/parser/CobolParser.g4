@@ -25,9 +25,53 @@ endProgramStatement
 
 // compiler options
 compilerOptions
-   : (PROCESS | CBL) (commaSeparator? compilerOption)+
+   : (PROCESS | CBL) (commaSeparator? compilerOption | compilerXOpts)+
    ;
 
+compilerXOpts
+   : XOPTS LPARENCHAR compilerXOptsOption (commaSeparator? compilerXOptsOption)* RPARENCHAR
+   ;
+
+compilerXOptsOption
+    : APOST |
+      CBLCARD |
+      CICS |
+      COBOL2 |
+      COBOL3 |
+      CPSM |
+      DBCS |
+      DEBUG |
+      DLI |
+      EDF |
+      EXCI |
+      FEPI |
+      ((FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (commaSeparator (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR) |
+      LENGTH |
+      ((LINECOUNT | LC) LPARENCHAR integerLiteral RPARENCHAR) |
+      LINKAGE |
+      NATLANG |
+      NOCBLCARD |
+      NOCPSM |
+      NODEBUG |
+      NOEDF |
+      NOFEPI |
+      NOLENGTH |
+      NOLINKAGE |
+      NONUM |
+      NOOPTIONS |
+      NOSEQ |
+      NOSPIE |
+      NOVBREF |
+      NUM |
+      OPTIONS |
+      QUOTE |
+      SEQ |
+      SP |
+      SPACE LPARENCHAR integerLiteral RPARENCHAR |
+      SPIE |
+      SYSEIB |
+      VBREF
+    ;
 // https://www.ibm.com/docs/en/cobol-zos/6.3?topic=program-compiler-options
 compilerOption
    : ADATA | NOADATA
@@ -568,7 +612,7 @@ recordContainsClauseFormat1
    ;
 
 recordContainsClauseFormat2
-   : IS? VARYING IN? SIZE? (FROM? integerLiteral recordContainsTo? CHARACTERS?)? (DEPENDING ON? qualifiedDataName)?
+   : IS? VARYING IN? SIZE? ((FROM? integerLiteral)? recordContainsTo? CHARACTERS?)? (DEPENDING ON? qualifiedDataName)?
    ;
 
 recordContainsClauseFormat3
@@ -592,7 +636,7 @@ valuePair
    ;
 
 dataRecordsClause
-   : DATA (RECORD IS? | RECORDS ARE?) dataName+
+   : DATA (RECORD IS? | RECORDS ARE?) qualifiedDataName+
    ;
 
 linageClause
@@ -2336,13 +2380,17 @@ power
    ;
 
 basis
-   : generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
+   : dialectNodeFiller | generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
    ;
 
 cobolWord
-   : IDENTIFIER | cobolCompilerDirectivesKeywords | cobolKeywords
+   : IDENTIFIER | cobolCompilerDirectivesKeywords | cobolKeywords | cicsTranslatorCompileDirectivedKeywords
    ;
 
+cicsTranslatorCompileDirectivedKeywords
+   : CBLCARD | COBOL2 | COBOL3 | CPSM | DLI | EDF | EXCI | FEPI | NATLANG | NOCBLCARD | NOCPSM | NODEBUG | NOEDF
+   | NOFEPI | NOLENGTH | NOLINKAGE | NOOPTIONS | NOSPIE | OPTIONS | SP | SPIE | SYSEIB
+   ;
 cobolKeywords
    : ADDRESS | BOTTOM | COUNT | CR | FIELD | FIRST | MMDDYYYY | PRINTER | DAY | TIME | DATE | DAY_OF_WEEK
    | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | TOP | YEAR | YYYYDDD | YYYYMMDD | WHEN_COMPILED

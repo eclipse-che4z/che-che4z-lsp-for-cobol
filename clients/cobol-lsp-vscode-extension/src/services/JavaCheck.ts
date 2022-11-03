@@ -26,8 +26,9 @@ export class JavaCheck {
             ls.stderr.on("data", (data: any) => {
                 if (JavaCheck.isJavaVersionSupported(data.toString())) {
                     resolved = true;
-                    resolve();
+                    resolve(resolved);
                 }
+
             });
             ls.on("error", (code: any) => {
                 if ("Error: spawn java ENOENT" === code.toString()) {
@@ -37,7 +38,7 @@ export class JavaCheck {
             });
             ls.on("close", (code: number) => {
                 if (code !== 0) {
-                    reject("An error occurred when checking if Java was installed. Switching to native builds");
+                    reject("An error occurred when checking if Java was installed. Switching to native build.");
                 }
                 if (!resolved) {
                     reject("Minimum expected Java version is 8. Switching to native builds");

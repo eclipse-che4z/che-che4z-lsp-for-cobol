@@ -37,22 +37,26 @@ class PerformanceTest extends FileBasedTest {
   private static final String TEST_MODE = System.getProperty(MODE_PROPERTY_NAME);
 
   @ParameterizedTest
-  @MethodSource("org.eclipse.lsp.cobol.positive.FileBasedTest#getTextsToTest")
+  @MethodSource("getSourceFolder")
   @DisplayName("Performance test")
   @NullSource
-  void performanceTest(CobolText text) {
-    if (!Boolean.TRUE.toString().equals(TEST_MODE) || text == null) return;
+  void performanceTest(String testFolder) {
+    CobolTextRegistry cobolTextRegistry = retrieveTextsRegistry(testFolder);
+    List<CobolText> textsToTest = getTextsToTest(cobolTextRegistry);
+    for (CobolText text : textsToTest) {
+      if (!Boolean.TRUE.toString().equals(TEST_MODE) || text == null) return;
 
-    String name = text.getFileName();
-    String fullText = text.getFullText();
+      String name = text.getFileName();
+      String fullText = text.getFullText();
 
-    long start = System.currentTimeMillis();
-    List<Diagnostic> result =
-        UseCaseUtils.analyzeForErrors(
-            UseCase.builder().fileName(name).text(fullText).copybooks(getCopybooks()).build());
-    long stop = System.currentTimeMillis();
+      long start = System.currentTimeMillis();
+      List<Diagnostic> result =
+          UseCaseUtils.analyzeForErrors(
+              UseCase.builder().fileName(name).text(fullText).copybooks(getCopybooks(cobolTextRegistry)).build());
+      long stop = System.currentTimeMillis();
 
-    assertNoSyntaxErrorsFound(result, name);
-    System.out.printf("%s %d %d\n", name, fullText.length(), stop - start);
+      assertNoSyntaxErrorsFound(result, name);
+      System.out.printf("%s %d %d\n", name, fullText.length(), stop - start);
+    }
   }
 }

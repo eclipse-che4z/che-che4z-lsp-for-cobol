@@ -32,25 +32,27 @@ class TestSqlSelectIntoStatement {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*MYINTVAR}  PIC 9  VALUE '23'.\n"
+          + "       01 {$*MAXSALRY}  PIC 9  VALUE '23'.\n"
+          + "       01 {$*EMPREC}  PIC 9  VALUE '23'.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL";
   private static final String SELECT_INTO1 =
       TEXT
           + "               SELECT MAX(SALARY)\n"
-          + "                 INTO :MAXSALRY\n"
+          + "                 INTO :{$MAXSALRY}\n"
           + "                 FROM DSN8C10.EMP;\n"
           + "               END-EXEC.";
 
   private static final String SELECT_INTO2 =
       TEXT
-          + "             SELECT * INTO :EMPREC\n"
+          + "             SELECT * INTO :{$EMPREC}\n"
           + "              FROM DSN8C10.EMP\n"
           + "              WHERE EMPNO = '528671'\n"
           + "           END-EXEC.";
 
   private static final String SELECT_INTO3 =
       TEXT
-          + "            SELECT * INTO :EMPREC\n"
+          + "            SELECT * INTO :{$EMPREC}\n"
           + "             FROM DSN8C10.EMP\n"
           + "             WHERE EMPNO = '528671'\n"
           + "             WITH RS USE AND KEEP EXCLUSIVE LOCKS\n"
@@ -59,7 +61,7 @@ class TestSqlSelectIntoStatement {
   private static final String SELECT_INTO4 =
       TEXT
           + "            SELECT INTCOL1 INTO \n"
-          + "             MYINTARRAY1[INTCOL2+{$MYINTVAR}+1]\n"
+          + "             MYINTARRAY1[INTCOL2+:{$MYINTVAR}+1]\n"
           + "             FROM T1\n"
           + "             WHERE INTCOL1 = MYINTARRAY1[INTCOL2]\n"
           + "           END-EXEC.";

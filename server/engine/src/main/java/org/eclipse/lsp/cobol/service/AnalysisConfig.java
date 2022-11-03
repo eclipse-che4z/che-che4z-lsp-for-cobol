@@ -33,6 +33,7 @@ public class AnalysisConfig {
   CopybookConfig copybookConfig;
   List<EmbeddedCodeNode.Language> features;
   List<String> dialects;
+  boolean isCicsTranslatorEnabled;
 
   /**
    * Create the default language features config, containing all features and the given copybook
@@ -45,7 +46,7 @@ public class AnalysisConfig {
     return new AnalysisConfig(
         new CopybookConfig(mode, SQLBackend.DB2_SERVER, ImmutableList.of()),
         Arrays.asList(EmbeddedCodeNode.Language.values()),
-        ImmutableList.of());
+        ImmutableList.of(), true);
   }
 
   /**
@@ -60,6 +61,6 @@ public class AnalysisConfig {
       CopybookProcessingMode mode, ConfigurationService.ConfigurationEntity entity) {
     CopybookConfig copybookConfig = new CopybookConfig(mode, entity.getSqlBackend(), entity.getPredefinedParagraphs());
 
-    return new AnalysisConfig(copybookConfig, entity.getFeatures(), entity.getDialects());
+    return new AnalysisConfig(copybookConfig, entity.getFeatures(), entity.getDialects(), entity.isCicsTranslatorEnabled());
   }
 }

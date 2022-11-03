@@ -14,23 +14,17 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.ToString;
+import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Range;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.ROOT;
 
 /**
@@ -44,7 +38,6 @@ public class RootNode extends Node {
 
   public RootNode(Locality locality, CopybooksRepository copybooks) {
     super(locality, ROOT);
-    addProcessStep(this::waitForVariableStructure);
     createCopyBookDefinitionNode(copybooks.getDefinitions());
   }
 
@@ -53,35 +46,5 @@ public class RootNode extends Node {
       copyDefinitionMap.put(
               copybook.getKey(), new CopyDefinition(copybook.getValue(), copybook.getKey()));
     }
-  }
-
-  private List<SyntaxError> waitForVariableStructure() {
-    addProcessStep(this::updateCopyNodesByPositionInTree);
-    return ImmutableList.of();
-  }
-
-  private List<SyntaxError> updateCopyNodesByPositionInTree() {
-    List<Node> nodes = getChildren().stream().filter(hasType(NodeType.COPY)).collect(toList());
-    nodes.forEach(this::removeChild);
-    nodes.forEach(
-            it ->
-                    RangeUtils.findNodeByPosition(
-                                    this, it.getLocality().getUri(), it.getLocality().getRange().getStart())
-                            .orElse(this)
-                            .addChild(it));
-
-    getDepthFirstStream().filter(hasType(NodeType.COPY)).map(CopyNode.class::cast).forEach(this::registerCopyUsage);
-    return ImmutableList.of();
-  }
-
-  private void registerCopyUsage(CopyNode copyNode) {
-    String copyBookId = copyNode.getDialect() == null ? copyNode.getName() : copyNode.getName() + '!' + copyNode.getDialect();
-    copyDefinitionMap.putIfAbsent(
-            copyBookId,
-            new CopyDefinition(
-                    new Location(ImplicitCodeUtils.createLocation(), new Range()), copyNode.getName()));
-    CopyDefinition foundDefinition = copyDefinitionMap.get(copyBookId);
-    foundDefinition.addUsages(copyNode);
-    copyNode.setDefinition(foundDefinition);
   }
 }

@@ -22,6 +22,8 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
@@ -29,6 +31,10 @@ import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.SettingsService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
+import org.eclipse.lsp.cobol.service.WatcherService;
+import org.eclipse.lsp.cobol.service.WatcherServiceImpl;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -55,7 +61,9 @@ import static org.mockito.Mockito.when;
 @UtilityClass
 public class UseCaseUtils {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
+  public static final String DOCUMENT2_URI = "file:///c%3A/workspace/document2.cbl";
 
+  public static final String COPYBOOK_URI = "file///c%3A/copybooks/copybook.cpy";
   private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.c4z/.copybooks/";
   private static final String CPY_URI_SUFFIX = ".cpy";
 
@@ -108,12 +116,12 @@ public class UseCaseUtils {
    * Analyze the given text using a real language engine providing copybooks required for the
    * analysis with the required sync type
    *
-   * @param useCase use case instance to analyze
+   * @param useCase       use case instance to analyze
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(UseCase useCase) {
     SettingsService mockSettingsService = mock(SettingsService.class);
-    when(mockSettingsService.getConfiguration(any()))
+    when(mockSettingsService.fetchConfiguration(any()))
         .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
 
     CobolLanguageClient languageClient = mock(CobolLanguageClient.class);
@@ -129,8 +137,13 @@ public class UseCaseUtils {
                 bind(FileSystemService.class).toInstance(new WorkspaceFileService());
                 bind(CobolLanguageClient.class).toInstance(languageClient);
                 bind(SubroutineService.class).to(SubroutineServiceImpl.class);
+                bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
+                bind(WatcherService.class).to(WatcherServiceImpl.class);
+                bind(CopybookReferenceRepo.class).toInstance(new CopybookReferenceRepoImpl());
               }
             });
+
+    TextPreprocessor preprocessor = injector.getInstance(TextPreprocessor.class);
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
     PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks())
@@ -138,6 +151,14 @@ public class UseCaseUtils {
 
     useCase.getCopybooks()
         .forEach(cobolText -> {
+
+          String copybookText = cobolText.getFullText();
+          if (cobolText.isPreprocess()) {
+            copybookText = preprocessor.cleanUpCode("uri", cobolText.getFullText())
+                .getResult().calculateExtendedText();
+          }
+
+          cobolText = new CobolText(cobolText.getFileName().toUpperCase(), cobolText.getDialectType(), copybookText);
           CopybookModel copybookModel = UseCaseUtils.toCopybookModel(cobolText);
           copybookService.store(copybookModel, useCase.fileName);
         });

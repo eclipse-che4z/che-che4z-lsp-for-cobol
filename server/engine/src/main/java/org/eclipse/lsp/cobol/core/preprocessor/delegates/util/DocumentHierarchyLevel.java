@@ -60,7 +60,9 @@ class DocumentHierarchyLevel {
   @NonNull
   List<Locality> lookahead() {
     int tail = localities.size() - index;
-    if (tail < 1) return Collections.emptyList();
+    if (tail < 1) {
+      return Collections.emptyList();
+    }
     return localities.subList(index, index + tail);
   }
 

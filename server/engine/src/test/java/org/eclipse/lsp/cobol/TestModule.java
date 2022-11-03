@@ -16,16 +16,14 @@ package org.eclipse.lsp.cobol;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.*;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
+import org.eclipse.lsp.cobol.service.copybooks.*;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.actions.FindCopybookCommand;
@@ -74,6 +72,7 @@ public class TestModule extends AbstractModule {
     bind(WatcherService.class).to(WatcherServiceImpl.class);
     bind(FileSystemService.class).to(WorkspaceFileService.class);
     bind(CopybookNameService.class).to(CopybookNameServiceImpl.class);
+    bind(CopybookReferenceRepo.class).to(CopybookReferenceRepoImpl.class);
     bind(String.class)
         .annotatedWith(named(PATH_TO_TEST_RESOURCES))
         .toProvider(() -> ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
@@ -88,6 +87,15 @@ public class TestModule extends AbstractModule {
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(HoverProvider.class).to(VariableHover.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
+    bind(CopybookIdentificationService.class)
+            .annotatedWith(Names.named("contentStrategy"))
+            .to(CopybookIdentificationServiceBasedOnContent.class);
+    bind(CopybookIdentificationService.class)
+            .annotatedWith(Names.named("suffixStrategy"))
+            .to(CopybookIdentificationBasedOnExtension.class);
+    bind(CopybookIdentificationService.class)
+            .annotatedWith(Names.named("combinedStrategy"))
+            .to(CopybookIdentificationCombinedStrategy.class);
 
     bindFormations();
     bindCompletions();
@@ -106,12 +114,10 @@ public class TestModule extends AbstractModule {
     completionBinding.addBinding().to(VariableCompletion.class);
     completionBinding.addBinding().to(ParagraphCompletion.class);
     completionBinding.addBinding().to(SectionCompletion.class);
-    completionBinding.addBinding().to(SnippetCompletion.class);
     completionBinding.addBinding().to(KeywordCompletion.class);
     completionBinding.addBinding().to(CopybookCompletion.class);
 
     bind(CompletionStorage.class).annotatedWith(named("Keywords")).to(Keywords.class);
-    bind(CompletionStorage.class).annotatedWith(named("Snippets")).to(Snippets.class);
   }
 
   private void bindCodeActions() {
