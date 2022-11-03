@@ -1,6 +1,23 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
-Changelog:
+
+## [1.1.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.2...1.1.0) (2022-11-03)
+
+#### Added
+- Support for nested IDMS copybooks
+- Custom copybook file extension setting
+- Configurable CICS translator
+- Support for custom smart tab settings
+
+#### Changed
+- Language ID changed from uppercase "COBOL" to lowercase "cobol"
+- "COBOL Copybook" language ID removed
+- Readme update
+
+#### Fixed
+- Added COBOL 85 and modernization demo test suits including many bug fixes
+- Miscellaneous bug fixes
+- For the full list of changes, see the [full changelog](https://github.com/eclipse/che-che4z-lsp-for-cobol/blob/v1.1.0/CHANGELOG.md)
 
 ## [1.0.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.1...1.0.2) (2022-06-29)
 
