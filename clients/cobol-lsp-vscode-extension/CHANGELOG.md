@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [1.1.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.2...1.1.0) (2022-11-02)
+## [1.1.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.2...1.1.0) (2022-11-03)
 
 #### Added
 - Support for nested IDMS copybooks
