@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.statements;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
@@ -27,7 +28,6 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.RemarksNode;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.model.tree.logic.ObsoleteNodeCheck;
-import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ class ObsoleteNodeTest {
   @Test
   public void testObsoleteNodeWarning() {
     Locality locality = Locality.builder().build();
-    RootNode rootNode = new RootNode(locality, new CopybooksRepository());
+    RootNode rootNode = new RootNode(locality, ImmutableMultimap.of());
     RemarksNode remarksNode = new RemarksNode(locality);
     AstProcessor astProcessor = new AstProcessor();
     List<SyntaxError> errors = new ArrayList<>();

@@ -15,10 +15,10 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
-import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -30,11 +30,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /** Test {@link Node} */
 class NodeTest {
   private static final Locality LOCALITY = Locality.builder().build();
-  private static final CopybooksRepository COPYBOOK = new CopybooksRepository();
 
   @Test
   void getDepthFirstStream() {
-    Node rootNode = new RootNode(LOCALITY, COPYBOOK);
+    Node rootNode = new RootNode(LOCALITY, ImmutableMultimap.of());
     Node firstProg = new ProgramNode(LOCALITY);
     Node sectionNode = new SectionNode(LOCALITY, SectionType.WORKING_STORAGE);
     Node definition = VariableDefinitionNode.builder().build();
@@ -63,7 +62,7 @@ class NodeTest {
 
   @Test
   void getParentByType() {
-    Node rootNode = new RootNode(LOCALITY, COPYBOOK);
+    Node rootNode = new RootNode(LOCALITY, ImmutableMultimap.of());
     Node program = new ProgramNode(LOCALITY);
     rootNode.addChild(program);
     Node nestedProgram = new ProgramNode(LOCALITY);
