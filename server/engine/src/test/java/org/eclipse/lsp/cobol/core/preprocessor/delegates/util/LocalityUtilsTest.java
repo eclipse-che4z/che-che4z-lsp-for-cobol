@@ -44,7 +44,7 @@ class LocalityUtilsTest {
     positions.put(placeholderToken, notExpected);
     positions.put(correctToken, expected);
 
-    Locality result = LocalityUtils.findPreviousVisibleLocality(correctToken, positions);
+    Locality result = LocalityUtils.findPreviousVisibleLocality(correctToken.getTokenIndex(), positions);
     assertEquals(expected, result);
   }
 
@@ -73,7 +73,7 @@ class LocalityUtilsTest {
     positions.put(hiddenToken1, notExpected);
     positions.put(hiddenToken2, notExpected);
 
-    Locality result = LocalityUtils.findPreviousVisibleLocality(tokenToCheck, positions);
+    Locality result = LocalityUtils.findPreviousVisibleLocality(tokenToCheck.getTokenIndex(), positions);
     assertEquals(expected, result);
   }
 
@@ -114,7 +114,7 @@ class LocalityUtilsTest {
     positions.put(hiddenToken4, notExpected);
     positions.put(hiddenToken5, notExpected);
 
-    Locality result = LocalityUtils.findPreviousVisibleLocality(tokenToCheck, positions);
+    Locality result = LocalityUtils.findPreviousVisibleLocality(tokenToCheck.getTokenIndex(), positions);
     assertNull(result);
   }
 
@@ -140,7 +140,7 @@ class LocalityUtilsTest {
     positions.put(correctToken, expected);
     positions.put(hiddenToken, notExpected);
 
-    Locality result = LocalityUtils.findPreviousVisibleLocality(tokenToCheck, positions);
+    Locality result = LocalityUtils.findPreviousVisibleLocality(tokenToCheck.getTokenIndex(), positions);
     assertNull(result);
   }
 }

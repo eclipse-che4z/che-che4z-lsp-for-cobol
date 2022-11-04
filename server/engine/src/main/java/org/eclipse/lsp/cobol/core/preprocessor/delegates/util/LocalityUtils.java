@@ -26,6 +26,7 @@ import org.eclipse.lsp4j.Range;
 import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -79,21 +80,22 @@ public class LocalityUtils {
    * Checks at most RANGE_LOOK_BACK_TOKENS previous tokens. For example, embedded languages may
    * produce errors on the edge positions that don't belong to the mapping.
    *
-   * @param token to find previous visible locality
+   * @param tokenIndex to find previous visible locality
    * @param mapping A Map of Token to Locality for a document in analysis.
    * @return Locality for a passed token or null
    */
-  public Locality findPreviousVisibleLocality(Token token, Map<Token, Locality> mapping) {
-    return mapping.computeIfAbsent(token, it -> lookBackLocality(it.getTokenIndex(), mapping));
+  public Locality findPreviousVisibleLocality(int tokenIndex, Map<Token, Locality> mapping) {
+    return Optional.ofNullable(lookBackLocality(tokenIndex, mapping))
+        .map(e ->  mapping.computeIfAbsent(e.getKey(), (it) -> e.getValue()))
+        .orElse(null);
   }
 
-  private Locality lookBackLocality(int index, Map<Token, Locality> mapping) {
+  private Map.Entry<Token, Locality> lookBackLocality(int index, Map<Token, Locality> mapping) {
     if (index < 0) return null;
     return mapping.entrySet().stream()
         .filter(previousIndexes(index))
         .filter(isNotHidden())
         .max(Comparator.comparingInt(it -> it.getKey().getTokenIndex()))
-        .map(Map.Entry::getValue)
         .orElse(null);
   }
 

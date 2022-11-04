@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Location;
 
 import java.util.HashMap;
@@ -36,9 +36,13 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.ROOT;
 public class RootNode extends Node {
   private final Map<String, CopyDefinition> copyDefinitionMap = new HashMap<>();
 
-  public RootNode(Locality locality, CopybooksRepository copybooks) {
+  public RootNode() {
+    this(Locality.builder().build(), ImmutableMultimap.of());
+  }
+
+  public RootNode(Locality locality, Multimap<String, Location> copybookDefinitions) {
     super(locality, ROOT);
-    createCopyBookDefinitionNode(copybooks.getDefinitions());
+    createCopyBookDefinitionNode(copybookDefinitions);
   }
 
   private void createCopyBookDefinitionNode(Multimap<String, Location> definition) {

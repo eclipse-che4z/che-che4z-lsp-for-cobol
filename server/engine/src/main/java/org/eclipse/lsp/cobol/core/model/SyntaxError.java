@@ -15,9 +15,7 @@
 package org.eclipse.lsp.cobol.core.model;
 
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Value;
-import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 
 /**
@@ -33,7 +31,7 @@ import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 public class SyntaxError {
   Locality locality;
   MessageTemplate messageTemplate;
-  @EqualsAndHashCode.Exclude Token offendedToken;
+  @Builder.Default int tokenIndex = -1;
   String suggestion;
   ErrorSeverity severity;
   ErrorCode errorCode;

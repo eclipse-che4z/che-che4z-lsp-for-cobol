@@ -26,6 +26,7 @@ import org.antlr.v4.runtime.Recognizer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /** This error listener registers syntax errors found by the COBOL parser. */
 @Slf4j
@@ -45,7 +46,9 @@ public class ParserListener extends BaseErrorListener {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
-            .offendedToken((CommonToken) offendingSymbol)
+            .tokenIndex(Optional.ofNullable((CommonToken) offendingSymbol)
+                .map(CommonToken::getTokenIndex)
+                .orElse(-1))
             .suggestion(msg)
             .severity(ErrorSeverity.ERROR)
             .build();
