@@ -22,7 +22,6 @@ const FAKE_ROOT_PATH: string = path.join("C:", "Users", USERNAME, "folder1", "fo
 let spySendTelemetry;
 let spySendExceptionTelemetry;
 jest.mock("vscode-extension-telemetry");
-jest.mock("../../../services/util/ExtensionUtils");
 
 function runScenario(expectedNumberOfCalls, eventType: string, eventName?: string, categories?: string[], rootCause?: string, telemetryMeasurements?: Map<string, number>) {
     if (eventType === "log") {
