@@ -51,6 +51,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -68,7 +69,6 @@ import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
 import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
@@ -684,10 +684,10 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testAnalysisFinishedNotification() throws ExecutionException, InterruptedException {
     AnalysisResult analysisResult =
         AnalysisResult.builder()
-            .rootNode(new RootNode(Locality.builder().build(), new CopybooksRepository()))
+            .rootNode(new RootNode(Locality.builder().build(), ImmutableMultimap.of()))
             .build();
 
-    RootNode rootNode = new RootNode(Locality.builder().build(), new CopybooksRepository());
+    RootNode rootNode = new RootNode(Locality.builder().build(), ImmutableMultimap.of());
     analysisResult.getRootNode().addChild(rootNode);
     CopyNode parent = new CopyNode(Locality.builder().uri(DOCUMENT_URI).build(), "PARENT");
     CopyNode nested = new CopyNode(Locality.builder().uri(PARENT_CPY_URI).build(), "NESTED");

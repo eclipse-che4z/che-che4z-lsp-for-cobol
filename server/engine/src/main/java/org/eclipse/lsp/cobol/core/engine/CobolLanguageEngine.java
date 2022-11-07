@@ -446,7 +446,7 @@ public class CobolLanguageEngine {
   private List<SyntaxError> finalizeErrors(
       @NonNull List<SyntaxError> errors, @NonNull Map<Token, Locality> mapping) {
     return errors.stream()
-        .filter(c -> c.getOffendedToken() != null)
+        .filter(c -> c.getTokenIndex() != -1)
         .map(convertError(mapping))
         .filter(it -> it.getLocality() != null)
         .collect(toList());
@@ -456,7 +456,7 @@ public class CobolLanguageEngine {
   private Function<SyntaxError, SyntaxError> convertError(@NonNull Map<Token, Locality> mapping) {
     return err ->
         err.toBuilder()
-            .locality(LocalityUtils.findPreviousVisibleLocality(err.getOffendedToken(), mapping))
+            .locality(LocalityUtils.findPreviousVisibleLocality(err.getTokenIndex(), mapping))
             .suggestion(messageService.getMessage(err.getSuggestion()))
             .errorSource(ErrorSource.PARSING)
             .build();

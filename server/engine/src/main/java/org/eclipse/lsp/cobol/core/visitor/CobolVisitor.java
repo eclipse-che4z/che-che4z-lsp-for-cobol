@@ -116,7 +116,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     // we can skip the other nodes, but not the root
     return ImmutableList.of(
         retrieveRangeLocality(ctx, positions)
-            .map(it -> new RootNode(it, copybooks))
+            .map(it -> new RootNode(it, copybooks.getDefinitions()))
             .map(
                 rootNode -> {
                   visitChildren(ctx).forEach(rootNode::addChild);
@@ -127,7 +127,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .orElseGet(
                 () -> {
                   LOG.warn("The root node for syntax tree was not constructed");
-                  return new RootNode(Locality.builder().build(), copybooks);
+                  return new RootNode(Locality.builder().build(), copybooks.getDefinitions());
                 }));
   }
 
@@ -400,7 +400,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitSectionName(SectionNameContext ctx) {
     return addTreeNode(
-        ctx, locality -> new SectionNameNode(locality, ctx.getText(), messageService, symbolService));
+        ctx, locality -> new SectionNameNode(locality, ctx.getText(), symbolService));
   }
 
   @Override

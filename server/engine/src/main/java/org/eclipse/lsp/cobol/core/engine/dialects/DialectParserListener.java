@@ -29,6 +29,7 @@ import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /** This error listener registers syntax errors found by dialect parser. */
 @Slf4j
@@ -53,7 +54,9 @@ public class DialectParserListener extends BaseErrorListener {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.DIALECT)
-            .offendedToken((CommonToken) offendingSymbol)
+            .tokenIndex(Optional.ofNullable((CommonToken) offendingSymbol)
+                .map(CommonToken::getTokenIndex)
+                .orElse(-1))
             .suggestion(msg)
             .locality(
                 Locality.builder()
