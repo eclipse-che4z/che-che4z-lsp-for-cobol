@@ -56,7 +56,7 @@ class MockCompletionModel {
             name -> {
               SectionNameNode nameNode =
                   new SectionNameNode(
-                      Locality.builder().build(), name, SYMBOL_SERVICE);
+                      Locality.builder().build(), name);
               SYMBOL_SERVICE.registerSectionNameNode(programNode, nameNode);
             });
 

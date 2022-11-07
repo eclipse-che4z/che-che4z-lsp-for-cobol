@@ -14,12 +14,9 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
-import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
+import lombok.Setter;
 import org.eclipse.lsp.cobol.core.engine.symbols.Context;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp4j.Location;
 
@@ -30,22 +27,24 @@ import java.util.List;
 public class SectionNameNode extends Node implements Context {
   private final String name;
 
-  @EqualsAndHashCode.Exclude @ToString.Exclude private final SymbolService symbolService;
+  @Setter
+  private List<Location> definitions;
+  @Setter
+  private List<Location> usages;
 
   public SectionNameNode(
-      Locality location, String name, SymbolService symbolService) {
+      Locality location, String name) {
     super(location, NodeType.SECTION_NAME_NODE);
     this.name = name.toUpperCase();
-    this.symbolService = symbolService;
   }
 
   @Override
   public List<Location> getDefinitions() {
-    return symbolService.getSectionLocations(this, CodeBlockReference::getDefinitions);
+    return definitions;
   }
 
   @Override
   public List<Location> getUsages() {
-    return symbolService.getSectionLocations(this, CodeBlockReference::getUsage);
+    return usages;
   }
 }

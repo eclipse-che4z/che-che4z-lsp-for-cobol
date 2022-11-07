@@ -70,7 +70,7 @@ public class EmbeddedCodeNode extends Node {
    */
   public ParseTreeVisitor<List<Node>> instanceVisitor(Map<Token, Locality> positions, Language lang) {
     if (Language.CICS == lang) {
-      return new CICSVisitor(positions, symbolService);
+      return new CICSVisitor(positions);
     }
 
     if (Language.SQL == lang) {
@@ -82,6 +82,6 @@ public class EmbeddedCodeNode extends Node {
   /** This enum holds all the supported embedded languages that require a separate parsing */
   public enum Language {
     SQL,
-    CICS;
+    CICS
   }
 }
