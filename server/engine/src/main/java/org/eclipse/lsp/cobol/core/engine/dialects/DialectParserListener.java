@@ -54,7 +54,9 @@ public class DialectParserListener extends BaseErrorListener {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.DIALECT)
-            .tokenIndex(Optional.ofNullable((CommonToken) offendingSymbol)
+            .tokenIndex(Optional.ofNullable(offendingSymbol)
+                .filter(t -> t instanceof CommonToken)
+                .map(CommonToken.class::cast)
                 .map(CommonToken::getTokenIndex)
                 .orElse(-1))
             .suggestion(msg)
@@ -80,7 +82,10 @@ public class DialectParserListener extends BaseErrorListener {
   }
 
   private int getOffendingSymbolSize(Object offendingSymbol) {
-    CommonToken token = (CommonToken) offendingSymbol;
-    return token.getStopIndex() - token.getStartIndex() + 1;
+    return Optional.ofNullable(offendingSymbol)
+        .filter(t -> t instanceof CommonToken)
+        .map(CommonToken.class::cast)
+        .map(token -> token.getStopIndex() - token.getStartIndex() + 1)
+        .orElse(0);
   }
 }

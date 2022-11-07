@@ -343,6 +343,18 @@ public class CobolLanguageEngine {
             ProcessingPhase.USAGE,
             new QualifiedReferenceUpdateVariableUsage(symbolService)));
 
+    // ENRICHMENT
+    ctx.register(
+        new ProcessorDescription(
+            SectionNameNode.class,
+            ProcessingPhase.VALIDATION,
+            new SectionNameNodeEnricher(symbolService)));
+    ctx.register(
+        new ProcessorDescription(
+            CodeBlockUsageNode.class,
+            ProcessingPhase.VALIDATION,
+            new CodeBlockUsageNodeEnricher(symbolService)));
+
     // Phase VALIDATION
     ctx.register(
         new ProcessorDescription(

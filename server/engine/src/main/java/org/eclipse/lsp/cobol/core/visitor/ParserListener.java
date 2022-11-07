@@ -46,7 +46,9 @@ public class ParserListener extends BaseErrorListener {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
-            .tokenIndex(Optional.ofNullable((CommonToken) offendingSymbol)
+            .tokenIndex(Optional.ofNullable(offendingSymbol)
+                .filter(t -> t instanceof CommonToken)
+                .map(CommonToken.class::cast)
                 .map(CommonToken::getTokenIndex)
                 .orElse(-1))
             .suggestion(msg)
