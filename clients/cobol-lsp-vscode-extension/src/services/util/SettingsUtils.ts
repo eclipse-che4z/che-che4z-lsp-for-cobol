@@ -36,14 +36,4 @@ export class SettingsUtils {
         });
         return result;
     }
-
-    static findUriScheme(path: string): string {
-        return vscode.workspace.workspaceFolders.find(workspaceFolder => {
-            return workspaceFolder.uri.path === path;
-        }).uri.scheme;
-    }
-
-    public static absolutePath(workspaceFolderPath: string, basePath: string): string {
-        return this.findUriScheme(workspaceFolderPath) + "://" + basePath;
-    }
 }

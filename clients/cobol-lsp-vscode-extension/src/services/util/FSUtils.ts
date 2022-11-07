@@ -55,27 +55,13 @@ export function getURIFromResource(resource: string): urlUtil.URL[] {
     const uris: urlUtil.URL[] = [];
     for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
         const workspaceFolder = workspaceFolderPath.replace(/\/(.*:)/, "$1");
+        const uri = isAbsolute(resource)
+            ? urlUtil.pathToFileURL(resource)
+            : new urlUtil.URL(path.normalize(path.join("file://" + workspaceFolder, resource)));
 
-        // const pathName: string = isAbsolute(resource) ? resource : path.normalize(path.join(workspaceFolder, resource));
-
-        // if (pathName.includes("*")) {
-        //     const basePath = pathName.split("*", 2)[0]
-        //     const findPath = pathName.replace(basePath, "");
-        //     for (const folder of globSearch(findPath, basePath)) {
-        //         const uri = new urlUtil.URL(path.join(
-        //             SettingsUtils.absolutePath(workspaceFolderPath, basePath), folder));
-        //         if (fs.existsSync(uri)) {
-        //             uris.push(uri);
-        //         }
-        //     }
-        // } else {
-            const uri = isAbsolute(resource) ? urlUtil.pathToFileURL(resource)
-                : new urlUtil.URL(path.normalize(path.join(SettingsUtils.absolutePath(workspaceFolderPath, workspaceFolder), resource)));
-
-            if (fs.existsSync(uri)) {
-                uris.push(uri);
-            }
-        // }
+        if (fs.existsSync(uri)) {
+            uris.push(uri);
+        }
     }
     return uris;
 }
@@ -94,7 +80,7 @@ export function searchCopybookInWorkspace(copybookName: string, copybookFolders:
             for (const ext of extensions) {
                 const searchResult = globSearch(workspaceFolder, p, copybookName, ext);
                 if (searchResult) {
-                    return new urlUtil.URL(SettingsUtils.absolutePath(workspaceFolderPath, searchResult)).href;
+                    return new urlUtil.URL("file://" + searchResult).href;
                 }
             }
         }
