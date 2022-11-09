@@ -19,9 +19,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.DISABLED;
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.SKIP;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.*;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.COPYBOOK_URI;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT2_URI;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
@@ -63,16 +61,15 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.awaitility.Awaitility;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.common.model.CopyDefinition;
+import org.eclipse.lsp.cobol.common.model.CopyNode;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
-import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
-import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -287,7 +284,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
   /**
    * This test verifies that when an extended document opened, the code analyzed, and the copybook
-   * analysis disabled using {@link CopybookProcessingMode#DISABLED}
+   * analysis disabled using {@link org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode#DISABLED}
    */
   @Test
   void disableCopybookAnalysisOnExtendedDoc() throws ExecutionException, InterruptedException {
@@ -308,7 +305,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
   /**
    * This test verifies that when a document opened in DID_OPEN mode, the code analyzed, and the
-   * copybook analysis is enabled using {@link CopybookProcessingMode#ENABLED}
+   * copybook analysis is enabled using {@link org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode#ENABLED}
    */
   @Test
   void enableCopybooksOnDidOpenTest() throws ExecutionException, InterruptedException {
@@ -337,7 +334,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
   /**
    * This test verifies that when a document updated in DID_CHANGE mode, the code analyzed, and the
-   * copybook analysis enabled using {@link CopybookProcessingMode#ENABLED}
+   * copybook analysis enabled using {@link org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode#ENABLED}
    */
   @Test
   void enableCopybooksOnDidChangeTest() throws ExecutionException, InterruptedException {
@@ -681,7 +678,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    * document URIs that contain nested copybooks, including the main document
    */
   @Test
-  void testAnalysisFinishedNotification() throws ExecutionException, InterruptedException {
+  void testAnalysisFinishedNotification() {
     AnalysisResult analysisResult =
         AnalysisResult.builder()
             .rootNode(new RootNode(Locality.builder().build(), ImmutableMultimap.of()))

@@ -14,8 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer;
 
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 
 import java.util.List;
 

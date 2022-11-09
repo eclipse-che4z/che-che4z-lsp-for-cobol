@@ -20,10 +20,10 @@ import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.ErrorSource;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -54,7 +54,9 @@ public class DialectParserListener extends BaseErrorListener {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.DIALECT)
-            .tokenIndex(Optional.ofNullable((CommonToken) offendingSymbol)
+            .tokenIndex(Optional.ofNullable(offendingSymbol)
+                .filter(t -> t instanceof CommonToken)
+                .map(CommonToken.class::cast)
                 .map(CommonToken::getTokenIndex)
                 .orElse(-1))
             .suggestion(msg)
@@ -80,7 +82,10 @@ public class DialectParserListener extends BaseErrorListener {
   }
 
   private int getOffendingSymbolSize(Object offendingSymbol) {
-    CommonToken token = (CommonToken) offendingSymbol;
-    return token.getStopIndex() - token.getStartIndex() + 1;
+    return Optional.ofNullable(offendingSymbol)
+        .filter(t -> t instanceof CommonToken)
+        .map(CommonToken.class::cast)
+        .map(token -> token.getStopIndex() - token.getStartIndex() + 1)
+        .orElse(0);
   }
 }

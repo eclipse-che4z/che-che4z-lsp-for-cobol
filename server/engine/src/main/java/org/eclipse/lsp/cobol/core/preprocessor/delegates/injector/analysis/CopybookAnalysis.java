@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
@@ -25,7 +25,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingServ
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 
 /**
  * This implementation of the {@link AbstractInjectCodeAnalysis} provides logic for plain COBOL logic

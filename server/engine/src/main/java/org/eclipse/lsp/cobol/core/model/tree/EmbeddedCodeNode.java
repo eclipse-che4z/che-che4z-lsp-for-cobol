@@ -22,15 +22,16 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Node;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.visitor.CICSVisitor;
 import org.eclipse.lsp.cobol.core.visitor.Db2SqlVisitor;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.EMBEDDED_CODE;
+import static org.eclipse.lsp.cobol.common.model.NodeType.EMBEDDED_CODE;
 
 /** This class represents embedded code parts in COBOL program, e.g. EXEC CICS and EXEC SQL */
 @Getter
@@ -70,7 +71,7 @@ public class EmbeddedCodeNode extends Node {
    */
   public ParseTreeVisitor<List<Node>> instanceVisitor(Map<Token, Locality> positions, Language lang) {
     if (Language.CICS == lang) {
-      return new CICSVisitor(positions, symbolService);
+      return new CICSVisitor(positions);
     }
 
     if (Language.SQL == lang) {
@@ -82,6 +83,6 @@ public class EmbeddedCodeNode extends Node {
   /** This enum holds all the supported embedded languages that require a separate parsing */
   public enum Language {
     SQL,
-    CICS;
+    CICS
   }
 }

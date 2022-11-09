@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.service.delegates.references;
 import com.google.common.collect.Streams;
 import com.google.inject.Inject;
 import lombok.NonNull;
-import org.eclipse.lsp.cobol.core.engine.symbols.Context;
+import org.eclipse.lsp.cobol.common.model.Context;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.*;

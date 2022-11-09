@@ -16,7 +16,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
 import org.antlr.v4.runtime.Token;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

@@ -16,10 +16,10 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
 import lombok.Data;
 import org.antlr.v4.runtime.Token;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.IdmsCopyParser;
 import org.eclipse.lsp.cobol.core.IdmsParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
-import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp4j.Range;
 
 /**

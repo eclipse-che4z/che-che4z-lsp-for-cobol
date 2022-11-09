@@ -14,8 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.reader;
 
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 
 import lombok.NonNull;
 import java.util.List;

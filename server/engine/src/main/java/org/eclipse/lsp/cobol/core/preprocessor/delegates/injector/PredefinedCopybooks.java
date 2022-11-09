@@ -16,7 +16,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector;
 
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.service.SQLBackend;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 
 import java.util.Arrays;
 import java.util.List;

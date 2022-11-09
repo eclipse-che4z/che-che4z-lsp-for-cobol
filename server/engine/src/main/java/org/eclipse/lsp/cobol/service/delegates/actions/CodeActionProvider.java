@@ -15,7 +15,6 @@
 
 package org.eclipse.lsp.cobol.service.delegates.actions;
 
-import org.eclipse.lsp.cobol.core.model.ErrorCode;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;

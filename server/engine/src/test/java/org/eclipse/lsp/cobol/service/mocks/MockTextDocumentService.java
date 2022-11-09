@@ -38,7 +38,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 /** Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing. */
@@ -108,6 +109,7 @@ public class MockTextDocumentService {
   }
 
   protected void mockSettingServiceForCopybooks(boolean answer) {
+    reset(copybookIdentificationService);
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(answer);
   }
 }

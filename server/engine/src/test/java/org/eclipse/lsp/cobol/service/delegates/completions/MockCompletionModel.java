@@ -17,8 +17,10 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
+import org.eclipse.lsp.cobol.common.model.CopyNode;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.ProgramNode;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
@@ -56,7 +58,7 @@ class MockCompletionModel {
             name -> {
               SectionNameNode nameNode =
                   new SectionNameNode(
-                      Locality.builder().build(), name, SYMBOL_SERVICE);
+                      Locality.builder().build(), name);
               SYMBOL_SERVICE.registerSectionNameNode(programNode, nameNode);
             });
 
