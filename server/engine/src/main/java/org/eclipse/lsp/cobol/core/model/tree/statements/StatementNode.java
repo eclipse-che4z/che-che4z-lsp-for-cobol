@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree.statements;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 import static org.eclipse.lsp.cobol.common.model.NodeType.STATEMENT;
 

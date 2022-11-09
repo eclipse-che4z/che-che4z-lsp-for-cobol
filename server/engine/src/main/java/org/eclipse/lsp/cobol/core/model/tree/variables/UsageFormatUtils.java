@@ -21,6 +21,7 @@ import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -29,7 +30,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static org.eclipse.lsp.cobol.core.model.tree.variables.EffectiveDataType.*;
-import static org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormat.*;
+import static org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat.*;
 
 /** The utility class is for handling usage clause of a data description entry. */
 @UtilityClass

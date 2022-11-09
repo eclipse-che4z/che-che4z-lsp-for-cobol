@@ -103,6 +103,7 @@ local.properties
 
 # ANTLR plugin
 /server/engine/gen
+/server/dialect-idms/gen
 
 # TeXlipse plugin
 .texlipse

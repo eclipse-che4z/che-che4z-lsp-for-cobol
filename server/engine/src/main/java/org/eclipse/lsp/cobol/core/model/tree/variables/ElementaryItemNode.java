@@ -19,6 +19,8 @@ import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
 
 /**
  * This value class represents an element item COBOL variable. It has a PIC clause representing its

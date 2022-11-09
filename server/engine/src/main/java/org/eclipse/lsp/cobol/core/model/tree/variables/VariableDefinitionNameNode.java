@@ -20,8 +20,10 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Context;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.Describable;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;

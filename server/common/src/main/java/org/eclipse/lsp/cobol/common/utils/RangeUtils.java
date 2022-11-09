@@ -13,11 +13,11 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
+package org.eclipse.lsp.cobol.common.utils;
 
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp4j.Position;
 
 import java.util.Optional;

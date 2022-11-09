@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.variables;
+package org.eclipse.lsp.cobol.common.model;
 
 import lombok.Getter;
 /** Enum for the different Section types */

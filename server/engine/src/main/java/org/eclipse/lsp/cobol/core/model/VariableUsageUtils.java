@@ -16,8 +16,8 @@ package org.eclipse.lsp.cobol.core.model;
 
 import com.google.common.collect.Multimap;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import lombok.experimental.UtilityClass;
 
 import java.util.*;

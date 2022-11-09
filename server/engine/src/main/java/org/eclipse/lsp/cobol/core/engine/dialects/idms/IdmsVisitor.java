@@ -17,21 +17,22 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.IdmsParser;
 import org.eclipse.lsp.cobol.core.IdmsParser.*;
 import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
-import org.eclipse.lsp.cobol.core.model.tree.SectionNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
-import org.eclipse.lsp.cobol.core.model.variables.SectionType;
+import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Location;
 
@@ -41,7 +42,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
-import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_MAP_NAME;
+import static org.eclipse.lsp.cobol.common.VariableConstantsProvider.LEVEL_MAP_NAME;
 
 /**
  * This extension of {@link IdmsParserBaseVisitor} applies the semantic analysis based on the
@@ -104,7 +105,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitVariableUsageName(VariableUsageNameContext ctx) {
     return addTreeNode(
-        ctx, locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality));
+        ctx, locality -> new VariableUsageNode(getName(ctx), locality));
   }
 
   @Override
@@ -150,6 +151,10 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     result.addAll(aggregate);
     result.addAll(nextResult);
     return result;
+  }
+
+  private String getName(ParserRuleContext context) {
+    return ofNullable(context).map(RuleContext::getText).map(String::toUpperCase).orElse("");
   }
 
   private List<Node> addTreeNode(Node node, List<Node> children) {

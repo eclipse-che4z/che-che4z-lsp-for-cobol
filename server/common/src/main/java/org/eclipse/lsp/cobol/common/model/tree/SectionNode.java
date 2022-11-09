@@ -13,14 +13,13 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree;
+package org.eclipse.lsp.cobol.common.model.tree;
 
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.core.model.variables.SectionType;
+import org.eclipse.lsp.cobol.common.model.SectionType;
 
 /** The class represents section in COBOL. */
 @Getter
