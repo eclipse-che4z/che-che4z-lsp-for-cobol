@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.common;
 
 import lombok.experimental.UtilityClass;
 
+
 /**
  * Provides constants
  */
