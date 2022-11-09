@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.service;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
+import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.LOCALE;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.LOGGING_LEVEL;
 import static org.eclipse.lsp4j.FileChangeType.Changed;

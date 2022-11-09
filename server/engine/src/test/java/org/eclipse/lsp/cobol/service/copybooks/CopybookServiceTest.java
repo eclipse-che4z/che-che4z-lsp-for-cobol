@@ -38,8 +38,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Set;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
+
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;

@@ -16,8 +16,9 @@ package org.eclipse.lsp.cobol.service.copybooks;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Set;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
+
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.junit.jupiter.api.Test;
 
 /** Test @{@link CopybookReferenceRepo} */

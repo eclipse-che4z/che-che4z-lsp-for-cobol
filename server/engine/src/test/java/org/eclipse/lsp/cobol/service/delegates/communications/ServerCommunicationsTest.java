@@ -34,7 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
+
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
