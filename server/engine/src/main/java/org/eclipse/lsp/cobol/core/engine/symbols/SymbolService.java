@@ -160,19 +160,20 @@ public class SymbolService {
       // If GO TO is in the same section as a paragraph - no errors
       String usageSectionName = getSectionName(node);
 
-      definitions = definitions.stream()
-          .filter(d -> getSectionName(d).equalsIgnoreCase(usageSectionName))
-          .collect(Collectors.toList());
-
-      if (definitions.size() > 1) {
+      List<CodeBlockDefinitionNode> inTheSameSection = definitions.stream()
+              .filter(d -> getSectionName(d).equalsIgnoreCase(usageSectionName))
+              .collect(Collectors.toList());
+      if (inTheSameSection.size() == 1) {
+        definitions = inTheSameSection;
+      } else {
         return Optional.of(
-            SyntaxError.syntaxError()
-                .errorSource(ErrorSource.PARSING)
-                .messageTemplate(
-                    MessageTemplate.of("semantics.ambiguous", node.getName()))
-                .severity(ErrorSeverity.ERROR)
-                .locality(node.getLocality())
-                .build());
+                SyntaxError.syntaxError()
+                        .errorSource(ErrorSource.PARSING)
+                        .messageTemplate(
+                                MessageTemplate.of("semantics.ambiguous", node.getName()))
+                        .severity(ErrorSeverity.ERROR)
+                        .locality(node.getLocality())
+                        .build());
       }
     }
 
