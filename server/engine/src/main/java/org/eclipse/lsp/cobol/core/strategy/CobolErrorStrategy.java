@@ -20,6 +20,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.*;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
 
 /**
  * This implementation of the error strategy customizes error messages that are extracted from the
@@ -28,7 +29,7 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 @Slf4j
 // for test
 @NoArgsConstructor
-public class CobolErrorStrategy extends DefaultErrorStrategy {
+public class CobolErrorStrategy extends DefaultErrorStrategy implements MessageServiceProvider {
   private static final String REPORT_NO_VIABLE_ALTERNATIVE =
       "ErrorStrategy.reportNoViableAlternative";
   private static final String REPORT_MISSING_TOKEN = "ErrorStrategy.reportMissingToken";

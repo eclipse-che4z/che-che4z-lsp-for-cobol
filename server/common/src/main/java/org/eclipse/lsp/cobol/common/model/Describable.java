@@ -12,14 +12,16 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree.variables;
+package org.eclipse.lsp.cobol.common.model;
 
-import lombok.Value;
-import org.eclipse.lsp.cobol.common.model.Locality;
-
-/** The class contains a variable name and its locality */
-@Value
-public class VariableNameAndLocality {
-  String name;
-  Locality locality;
+/**
+ * The interface represents structure that can show formatted line to the user.
+ */
+public interface Describable {
+  /**
+   * Get user friendly node description.
+   *
+   * @return the string with description.
+   */
+  String getFormattedDisplayString();
 }

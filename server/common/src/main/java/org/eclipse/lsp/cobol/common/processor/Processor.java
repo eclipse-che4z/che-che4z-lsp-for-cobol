@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.common.processor;
 
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 import java.util.function.BiConsumer;
 

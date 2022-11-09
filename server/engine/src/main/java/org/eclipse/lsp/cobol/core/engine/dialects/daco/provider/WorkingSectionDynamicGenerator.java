@@ -17,10 +17,10 @@ package org.eclipse.lsp.cobol.core.engine.dialects.daco.provider;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -12,11 +12,12 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.common.model;
+package org.eclipse.lsp.cobol.common.model.tree;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.eclipse.lsp.cobol.common.model.Locality;
 
 import static org.eclipse.lsp.cobol.common.model.NodeType.PROGRAM;
 

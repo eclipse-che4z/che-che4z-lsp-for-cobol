@@ -19,13 +19,13 @@ import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.model.tree.variables.OccursClause;
-import org.eclipse.lsp.cobol.core.model.tree.variables.ValueClause;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
+import org.eclipse.lsp.cobol.common.model.tree.variable.OccursClause;
+import org.eclipse.lsp.cobol.common.model.tree.variable.ValueClause;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -36,6 +36,7 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.common.VariableConstantsProvider.*;
 import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
 
 /**
@@ -43,9 +44,6 @@ import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
  */
 @RequiredArgsConstructor
 public class DaCoCopybookVisitor extends CobolParserBaseVisitor<List<Node>> {
-  public static final int LEVEL_66 = 66;
-  public static final int LEVEL_77 = 77;
-  public static final int LEVEL_88 = 88;
   private final String uri;
   private final int startingLevel;
   private final String suffix;

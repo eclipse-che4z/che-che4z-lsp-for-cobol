@@ -12,17 +12,14 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree;
+package org.eclipse.lsp.cobol.common.model.tree.variable;
 
-import lombok.ToString;
+import lombok.Value;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.NodeType;
 
-/** The class represents exit in COBOL. */
-@ToString(callSuper = true)
-public class ExitNode extends Node {
-  public ExitNode(Locality location) {
-    super(location, NodeType.EXIT);
-  }
+/** The class contains a variable name and its locality */
+@Value
+public class VariableNameAndLocality {
+  String name;
+  Locality locality;
 }

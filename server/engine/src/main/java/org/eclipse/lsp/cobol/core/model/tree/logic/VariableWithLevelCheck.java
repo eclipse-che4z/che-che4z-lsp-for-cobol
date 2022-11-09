@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableWithLevelNode;
 
+import static org.eclipse.lsp.cobol.common.VariableConstantsProvider.*;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
 
 /** VariableWithLevelNode processor */
