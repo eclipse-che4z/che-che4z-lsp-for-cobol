@@ -17,10 +17,10 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 import com.google.common.collect.ImmutableList;
 import lombok.Data;
 import lombok.Getter;
+import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.IdmsParser;
 import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
-import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 

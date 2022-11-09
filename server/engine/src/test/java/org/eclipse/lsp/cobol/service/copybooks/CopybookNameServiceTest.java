@@ -19,7 +19,8 @@ import com.google.inject.Provider;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
+
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.SettingsService;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;

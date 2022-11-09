@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.service.delegates.communications;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;

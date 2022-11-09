@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.model;
 
 import lombok.Value;
+import org.eclipse.lsp.cobol.common.model.Locality;
 
 import java.util.List;
 import java.util.Map;

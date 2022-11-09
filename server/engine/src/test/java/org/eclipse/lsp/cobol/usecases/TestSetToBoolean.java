@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -23,7 +24,6 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.collect.ImmutableMap.of;
-import org.eclipse.lsp.cobol.core.model.ErrorSource;
 
 /** This test checks that only mnemonic ames expected in the SET ON/OFF statement */
 class TestSetToBoolean {

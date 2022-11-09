@@ -19,7 +19,7 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 

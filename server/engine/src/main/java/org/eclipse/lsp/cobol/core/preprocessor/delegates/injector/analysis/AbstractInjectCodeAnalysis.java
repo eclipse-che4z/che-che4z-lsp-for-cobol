@@ -19,7 +19,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
@@ -28,7 +36,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUt
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -42,9 +49,9 @@ import java.util.function.Function;
 
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
-import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.INFO;
+import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.INFO;
 import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.*;
 
 /**

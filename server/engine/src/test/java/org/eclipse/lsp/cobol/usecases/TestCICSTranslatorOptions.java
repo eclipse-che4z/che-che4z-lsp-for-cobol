@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.SQLBackend;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.usecases.engine.UseCase;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
 
 /**
  * Tests CICS translator options. Refer <a

@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.messages;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonPrimitive;
+import org.eclipse.lsp.cobol.common.message.LocaleEnum;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

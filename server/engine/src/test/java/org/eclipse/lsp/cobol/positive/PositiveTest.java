@@ -29,7 +29,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
 
 /**
  * This class provides capability to run the server for actual cobol files that are provided using

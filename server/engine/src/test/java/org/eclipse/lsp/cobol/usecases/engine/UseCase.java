@@ -18,12 +18,12 @@ package org.eclipse.lsp.cobol.usecases.engine;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.SQLBackend;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +41,8 @@ public class UseCase {
   /** List of available subroutine names */
   @Singular List<String> subroutines;
   /** Copybook processing mode for the analysis */
-  @Builder.Default CopybookProcessingMode copybookProcessingMode = CopybookProcessingMode.ENABLED;
+  @Builder.Default
+  CopybookProcessingMode copybookProcessingMode = CopybookProcessingMode.ENABLED;
   /** SQL Backend for the analysis */
   @Builder.Default SQLBackend sqlBackend = SQLBackend.DB2_SERVER;
   /** Analysis features (SQL, CICS, etc.) */

@@ -20,7 +20,7 @@ package org.eclipse.lsp.cobol.core;
 import com.google.common.annotations.VisibleForTesting;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.TokenStream;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
+import org.eclipse.lsp.cobol.common.utils.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 
 import java.util.regex.Pattern;
@@ -40,7 +40,7 @@ public abstract class MessageServiceParser extends Parser {
   }
 
   /**
-   * Extend the functionality of {@link org.eclipse.lsp.cobol.core.messages.MessageService} for
+   * Extend the functionality of {@link org.eclipse.lsp.cobol.common.message.MessageService} for
    * {@link CobolParser}
    *
    * <p>Example: notifyError("db2SqlParser.validValueMsg", input, value); would notify errorListener

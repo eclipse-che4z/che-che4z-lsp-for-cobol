@@ -14,8 +14,8 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;

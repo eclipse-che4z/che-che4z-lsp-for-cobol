@@ -25,18 +25,18 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.model.CopyNode;
+import org.eclipse.lsp.cobol.common.model.Node;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
-import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
 import org.eclipse.lsp.cobol.jrpc.ExtendedApi;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
@@ -100,8 +100,8 @@ import static java.lang.String.format;
 import static java.net.URLDecoder.decode;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
+import static org.eclipse.lsp.cobol.common.model.Node.hasType;
+import static org.eclipse.lsp.cobol.common.model.NodeType.COPY;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests

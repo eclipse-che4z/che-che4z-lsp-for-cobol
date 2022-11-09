@@ -19,7 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
+import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 
 /**
  * This class used to implicitly check if the current interrupted while the parsing by the main

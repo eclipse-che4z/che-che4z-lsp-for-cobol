@@ -19,8 +19,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.eclipse.lsp.cobol.core.engine.symbols.Context;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Context;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;

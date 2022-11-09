@@ -15,8 +15,9 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
@@ -38,10 +39,10 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static org.eclipse.lsp.cobol.service.SQLBackend.DATACOM_SERVER;
-import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.SKIP;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.SKIP;
+import static org.eclipse.lsp.cobol.common.copybook.SQLBackend.DATACOM_SERVER;
+import static org.eclipse.lsp.cobol.common.copybook.SQLBackend.DB2_SERVER;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;

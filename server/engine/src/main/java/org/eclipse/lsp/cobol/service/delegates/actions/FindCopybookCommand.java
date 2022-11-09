@@ -28,7 +28,7 @@ import java.util.function.Function;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
+import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp4j.CodeActionKind.QuickFix;
 
 /**

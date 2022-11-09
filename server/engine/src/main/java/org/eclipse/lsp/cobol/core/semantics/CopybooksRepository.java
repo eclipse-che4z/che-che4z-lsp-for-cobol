@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.core.semantics;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Value;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
 
 import java.util.HashMap;

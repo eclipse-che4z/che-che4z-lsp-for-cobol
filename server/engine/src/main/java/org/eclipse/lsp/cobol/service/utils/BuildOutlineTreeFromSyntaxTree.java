@@ -16,6 +16,9 @@ package org.eclipse.lsp.cobol.service.utils;
 
 import com.google.common.collect.ImmutableList;
 import lombok.experimental.UtilityClass;
+import org.eclipse.lsp.cobol.common.model.CopyNode;
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;

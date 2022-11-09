@@ -18,12 +18,12 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.Token;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorListener;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
-import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
 
 import java.util.*;

@@ -14,10 +14,11 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
 
 /** Provide API definition to resolve for copybooks files present in CopyBook setting path. */
 public interface CopybookNameService {

@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import lombok.Getter;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 
 /**
  * Enumeration of variable node types. It describes only types that are related to the

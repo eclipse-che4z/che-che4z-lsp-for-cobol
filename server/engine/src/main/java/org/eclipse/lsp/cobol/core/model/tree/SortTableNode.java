@@ -14,7 +14,7 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import lombok.ToString;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.statements.ObsoleteNode;
 
 /** The class represents the Sort Table Node. **/

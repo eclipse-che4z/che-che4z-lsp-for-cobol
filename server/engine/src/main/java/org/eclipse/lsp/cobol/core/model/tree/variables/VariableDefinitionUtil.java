@@ -19,11 +19,15 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.*;
-import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.CopyNode;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 
 import java.util.*;
@@ -32,8 +36,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
-import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.common.model.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableType.FD;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableType.SD;
 

@@ -22,18 +22,23 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
+import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
+import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.CopyDefinition;
+import org.eclipse.lsp.cobol.common.model.CopyNode;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Node;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.core.engine.dialects.CobolDialect;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes.DaCoCopyFromNode;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes.DaCoCopyNode;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.*;
-import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
-import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
@@ -46,8 +51,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
-import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 
 /** Handles copy maid logic */
 @Slf4j

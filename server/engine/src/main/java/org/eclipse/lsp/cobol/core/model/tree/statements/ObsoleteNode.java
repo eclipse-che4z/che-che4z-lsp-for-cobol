@@ -16,9 +16,9 @@ package org.eclipse.lsp.cobol.core.model.tree.statements;
 
 import lombok.Getter;
 import lombok.ToString;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 
 /** The class represents a Obsolete Node in Cobol. It throws warning message. */
 @ToString(callSuper = true)

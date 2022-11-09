@@ -14,9 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processor;
 
-import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
+import org.eclipse.lsp.cobol.common.processor.Processor;
+import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +58,7 @@ public class AstProcessor {
   }
 
   private List<Processor<Node>> findProcessors(ProcessingContext ctx,
-      ProcessingPhase phase, Class<? extends Node> nodeClass) {
+                                               ProcessingPhase phase, Class<? extends Node> nodeClass) {
     List<Processor<Node>> result = new ArrayList<>();
     if (!ctx.getProcessors().containsKey(phase)) {
       return result;

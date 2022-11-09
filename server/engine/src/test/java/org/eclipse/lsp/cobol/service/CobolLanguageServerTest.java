@@ -18,8 +18,8 @@ package org.eclipse.lsp.cobol.service;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
-import org.eclipse.lsp.cobol.core.messages.LocaleStore;
-import org.eclipse.lsp.cobol.core.model.ErrorCode;
+import org.eclipse.lsp.cobol.common.error.ErrorCode;
+import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationBasedOnExtension;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
@@ -45,7 +45,6 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.values;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -236,7 +235,7 @@ class CobolLanguageServerTest {
     assertTrue(capabilities.getDocumentSymbolProvider().getLeft());
     assertTrue(capabilities.getFoldingRangeProvider().getLeft());
     assertEquals(
-        stream(values()).map(ErrorCode::getLabel).collect(toList()),
+        stream(ErrorCode.values()).map(ErrorCode::getLabel).collect(toList()),
         capabilities.getExecuteCommandProvider().getCommands());
 
     assertFalse(capabilities.getCompletionProvider().getResolveProvider());
