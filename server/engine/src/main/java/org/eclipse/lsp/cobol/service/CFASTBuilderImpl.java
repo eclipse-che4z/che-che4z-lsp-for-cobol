@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.extendedapi.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.variables.DivisionType;
@@ -24,8 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
+import static org.eclipse.lsp.cobol.common.model.Node.hasType;
+import static org.eclipse.lsp.cobol.common.model.NodeType.PROGRAM;
 
 /** CF tree builder implementation */
 public class CFASTBuilderImpl implements CFASTBuilder {

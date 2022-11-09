@@ -15,12 +15,12 @@
 
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
+import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.logic.ElementaryNodeCheck;
 import org.junit.jupiter.api.Test;
 

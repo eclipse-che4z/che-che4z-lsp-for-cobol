@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.core.model.tree.variables;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Node;
 
 /** The abstract class for variables with level number. */
 @Getter

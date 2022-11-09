@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
 

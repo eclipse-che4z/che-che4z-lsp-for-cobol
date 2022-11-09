@@ -20,11 +20,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 
 import java.util.List;
 import java.util.Objects;

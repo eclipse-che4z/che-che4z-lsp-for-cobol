@@ -18,14 +18,15 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.ToString;
-import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.common.model.CopyDefinition;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Node;
 import org.eclipse.lsp4j.Location;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.ROOT;
+import static org.eclipse.lsp.cobol.common.model.NodeType.ROOT;
 
 /**
  * The class represents the root. All trees must start with one root node. This class also creates

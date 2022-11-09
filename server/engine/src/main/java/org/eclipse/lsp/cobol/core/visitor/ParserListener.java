@@ -14,15 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.visitor;
 
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.ErrorSource;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -14,17 +14,19 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.core.engine.processor.Processor;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 
 import java.util.List;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.common.model.Node.hasType;
 
 /** Processor for ProcedureDivisionBodyNode and ParagraphsNode nodes */
 public class DefineCodeBlock implements Processor<Node> {

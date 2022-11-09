@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.model.Locality;
 
 import java.util.List;
 

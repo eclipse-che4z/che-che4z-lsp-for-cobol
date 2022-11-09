@@ -15,7 +15,9 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import lombok.ToString;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 
 /** The class represents go back in COBOL. */
 @ToString(callSuper = true)

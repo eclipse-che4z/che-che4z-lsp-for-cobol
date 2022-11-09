@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;

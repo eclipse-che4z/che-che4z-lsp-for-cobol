@@ -14,8 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorListener;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 
 /** A listener that processes the text of the COBOL document */
 public interface GrammarPreprocessorListener<T>

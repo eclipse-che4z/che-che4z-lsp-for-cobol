@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Locality;
 
 /** The class represents declarative procedure section in COBOL. */
 @ToString(callSuper = true)

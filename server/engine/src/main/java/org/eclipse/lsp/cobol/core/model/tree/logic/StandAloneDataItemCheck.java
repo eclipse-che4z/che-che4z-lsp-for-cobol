@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.core.engine.processor.Processor;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.variables.StandAloneDataItemNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormat;
 

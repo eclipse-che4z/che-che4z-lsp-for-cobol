@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.messages;
 
+import org.eclipse.lsp.cobol.common.message.LocaleEnum;
+import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import com.google.common.collect.Iterables;
 import com.google.gson.JsonPrimitive;
@@ -45,9 +47,9 @@ public final class LocaleStoreImpl implements LocaleStore {
   private final Lock readLock = readWriteLock.readLock();
   private final Lock writeLock = readWriteLock.writeLock();
   private final Locale defaultLocale = new Locale("en", "en");
-  private Communications communications;
+  private final Communications communications;
   private LocaleEnum supportedLocale;
-  private List<Consumer<Locale>> notifyList = new ArrayList<>();
+  private final List<Consumer<Locale>> notifyList = new ArrayList<>();
 
   @Inject
   public LocaleStoreImpl(Communications communications) {

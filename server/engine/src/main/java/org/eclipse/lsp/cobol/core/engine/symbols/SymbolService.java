@@ -19,10 +19,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.inject.Singleton;
 import lombok.Value;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.ErrorSource;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.Context;
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
@@ -38,7 +42,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.common.model.Node.hasType;
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils.findNodeByPosition;
 
 /** Service to handle symbol information and dependencies */

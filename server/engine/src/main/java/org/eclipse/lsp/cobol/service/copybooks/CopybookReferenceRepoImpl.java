@@ -15,8 +15,8 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.inject.Singleton;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 
 import java.util.*;
 

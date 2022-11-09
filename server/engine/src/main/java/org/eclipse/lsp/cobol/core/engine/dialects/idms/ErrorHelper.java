@@ -17,13 +17,13 @@ package org.eclipse.lsp.cobol.core.engine.dialects.idms;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.ErrorSource;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Locality;
 
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
-import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 
 /**
  * Helper class for syntax errors creation

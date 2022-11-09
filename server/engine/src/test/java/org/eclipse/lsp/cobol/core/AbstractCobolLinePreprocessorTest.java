@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.core;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
 

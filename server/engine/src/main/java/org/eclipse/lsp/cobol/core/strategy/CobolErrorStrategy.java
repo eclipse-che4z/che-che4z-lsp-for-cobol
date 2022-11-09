@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.*;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 
 /**
  * This implementation of the error strategy customizes error messages that are extracted from the

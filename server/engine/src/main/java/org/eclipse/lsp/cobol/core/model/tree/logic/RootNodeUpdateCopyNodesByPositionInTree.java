@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.core.engine.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
-import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.common.model.CopyDefinition;
+import org.eclipse.lsp.cobol.common.model.CopyNode;
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;

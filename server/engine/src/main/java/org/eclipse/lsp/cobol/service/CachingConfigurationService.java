@@ -21,8 +21,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 
 import javax.inject.Inject;
 import java.util.Arrays;

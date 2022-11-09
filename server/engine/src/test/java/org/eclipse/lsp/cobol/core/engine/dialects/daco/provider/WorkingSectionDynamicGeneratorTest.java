@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects.daco.provider;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
 import org.junit.jupiter.api.Test;
