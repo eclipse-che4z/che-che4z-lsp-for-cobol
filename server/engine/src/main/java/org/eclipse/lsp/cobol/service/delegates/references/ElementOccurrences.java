@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.service.delegates.references;
 import com.google.common.collect.Streams;
 import com.google.inject.Inject;
 import lombok.NonNull;
-import org.eclipse.lsp.cobol.core.engine.symbols.Context;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.common.model.Context;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.*;
 
@@ -31,17 +31,17 @@ import java.util.stream.Collectors;
  * This occurrences provider resolves the requests for the semantic elements based on its positions.
  */
 public class ElementOccurrences implements Occurrences {
-  private final SymbolService symbolService;
+  private final SymbolsRepository symbolsRepository;
 
   @Inject
-  public ElementOccurrences(SymbolService symbolService) {
-    this.symbolService = symbolService;
+  public ElementOccurrences(SymbolsRepository symbolsRepository) {
+    this.symbolsRepository = symbolsRepository;
   }
 
   @Override
   public @NonNull List<Location> findDefinitions(
       @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
-    return symbolService.findElementByPosition(document, position)
+    return symbolsRepository.findElementByPosition(document, position)
             .map(Context::getDefinitions).orElse(Collections.emptyList());
   }
 
@@ -50,7 +50,7 @@ public class ElementOccurrences implements Occurrences {
       @NonNull CobolDocumentModel document,
       @NonNull TextDocumentPositionParams position,
       @NonNull ReferenceContext refCtx) {
-    Optional<Context> element = symbolService.findElementByPosition(document, position);
+    Optional<Context> element = symbolsRepository.findElementByPosition(document, position);
     if (!element.isPresent()) {
       return Collections.emptyList();
     }
@@ -64,7 +64,7 @@ public class ElementOccurrences implements Occurrences {
   @Override
   public @NonNull List<DocumentHighlight> findHighlights(
       @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
-    Optional<Context> element = symbolService.findElementByPosition(document, position);
+    Optional<Context> element = symbolsRepository.findElementByPosition(document, position);
     return element.map(context -> Streams.concat(context.getUsages().stream(), context.getDefinitions().stream())
             .filter(byUri(position))
             .map(toDocumentHighlight())

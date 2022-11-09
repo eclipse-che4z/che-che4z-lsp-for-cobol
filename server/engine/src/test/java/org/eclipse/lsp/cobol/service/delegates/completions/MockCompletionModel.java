@@ -17,8 +17,11 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
+import org.eclipse.lsp.cobol.common.model.CopyNode;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.ProgramNode;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
@@ -33,6 +36,7 @@ class MockCompletionModel {
           .build();
   static final CobolDocumentModel MODEL = new CobolDocumentModel("some text", RESULT);
   static final SymbolService SYMBOL_SERVICE = new SymbolService();
+  static final SymbolsRepository SYMBOL_STORAGE = new SymbolsRepository();
 
   static {
     ProgramNode programNode = new ProgramNode(Locality.builder().build());
@@ -41,14 +45,14 @@ class MockCompletionModel {
         .forEach(
             name -> {
               VariableNode variable = new MnemonicNameNode(Locality.builder().build(), "sys", name);
-                SYMBOL_SERVICE.addVariableDefinition(programNode, variable);
+              SYMBOL_SERVICE.addVariableDefinition(programNode, variable);
             });
 
     ImmutableList.of("parD1", "ParD2", "Not-parD")
         .forEach(
             name -> {
               ParagraphNameNode nameNode =
-                  new ParagraphNameNode(Locality.builder().build(), name, SYMBOL_SERVICE);
+                  new ParagraphNameNode(Locality.builder().build(), name, SYMBOL_STORAGE);
               SYMBOL_SERVICE.registerParagraphNameNode(programNode, nameNode);
             });
     ImmutableList.of("secD1", "SecD2", "Not-secD")
@@ -56,7 +60,7 @@ class MockCompletionModel {
             name -> {
               SectionNameNode nameNode =
                   new SectionNameNode(
-                      Locality.builder().build(), name, SYMBOL_SERVICE);
+                      Locality.builder().build(), name);
               SYMBOL_SERVICE.registerSectionNameNode(programNode, nameNode);
             });
 
@@ -68,5 +72,6 @@ class MockCompletionModel {
               CopyNode nameNode = new CopyNode(Locality.builder().build(), name);
               rootNode.addChild(nameNode);
             });
+    SYMBOL_STORAGE.updateSymbols(SYMBOL_SERVICE.getProgramSymbols());
   }
 }

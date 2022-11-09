@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.tree.DeclarativeProcedureSectionNode;
 import org.eclipse.lsp.cobol.core.model.tree.ParagraphNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
@@ -28,9 +29,14 @@ public class DeclarativeProcedureSectionRegister
     implements Processor<DeclarativeProcedureSectionNode> {
 
   private final SymbolService symbolService;
-  public DeclarativeProcedureSectionRegister(SymbolService symbolService) {
+  private final SymbolsRepository symbolsRepository;
+
+  public DeclarativeProcedureSectionRegister(
+      SymbolService symbolService, SymbolsRepository symbolsRepository) {
     this.symbolService = symbolService;
+    this.symbolsRepository = symbolsRepository;
   }
+
   @Override
   public void accept(DeclarativeProcedureSectionNode node, ProcessingContext processingContext) {
     Optional<ProgramNode> programOpt = node.getProgram();
@@ -40,6 +46,7 @@ public class DeclarativeProcedureSectionRegister
     }
     ProgramNode program = programOpt.get();
     symbolService.registerCodeBlock(program, node);
-    symbolService.registerParagraphNameNode(program, new ParagraphNameNode(node.getLocality(), node.getName(), symbolService));
+    symbolService.registerParagraphNameNode(
+        program, new ParagraphNameNode(node.getLocality(), node.getName(), symbolsRepository));
   }
 }

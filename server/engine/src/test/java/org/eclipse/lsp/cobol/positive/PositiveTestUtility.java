@@ -17,11 +17,12 @@ package org.eclipse.lsp.cobol.positive;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.ProgramNode;
 import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
@@ -340,6 +341,8 @@ public class PositiveTestUtility {
       Multimap<String, Node> variableDefinitionFromLSPEngine,
       Multimap<String, CodeBlockReference> paragraphDefFromLSPEngine,
       Multimap<String, Node> programDefinitionFromLSPEngine) {
+      SymbolsRepository repo = new SymbolsRepository();
+      repo.updateSymbols(symbolService.getProgramSymbols());
     rootNode
         .getDepthFirstStream()
         .filter(node -> node.getNodeType() == NodeType.PROGRAM)
@@ -347,13 +350,13 @@ public class PositiveTestUtility {
         .forEach(
             programNode -> {
               Stream.of(
-                      symbolService.getParagraphMap(programNode),
-                      symbolService.getSectionMap(programNode))
+                      repo.getParagraphMap(programNode),
+                      repo.getSectionMap(programNode))
                   .flatMap(entry -> entry.entrySet().stream())
                   .forEach(
                       entry -> paragraphDefFromLSPEngine.put(entry.getKey(), entry.getValue()));
 
-              symbolService.getVariables(programNode).values().stream()
+              repo.getVariables(programNode).values().stream()
                   .flatMap(Node::getDepthFirstStream)
                   .filter(VariableNode.class::isInstance)
                   .map(VariableNode.class::cast)

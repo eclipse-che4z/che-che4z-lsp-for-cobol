@@ -28,10 +28,15 @@ import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.*;
+import org.eclipse.lsp.cobol.common.utils.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToBooleanStatement;
@@ -42,7 +47,6 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode.Bu
 import org.eclipse.lsp.cobol.core.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.core.model.variables.SectionType;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
@@ -83,7 +87,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final SubroutineService subroutineService;
   private final AnalysisConfig analysisConfig;
 
-  private final SymbolService symbolService;
+  private final SymbolsRepository symbolsRepository;
   private final List<Node> dialectNodes;
   private Map<String, FileControlEntryContext> fileControls = null;
   private final Map<String, SubroutineDefinition> subroutineDefinitionMap = new HashMap<>();
@@ -97,7 +101,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
           Map<Token, EmbeddedCode> embeddedCodeParts,
           MessageService messageService,
           SubroutineService subroutineService,
-          SymbolService symbolService, List<Node> dialectNodes,
+          SymbolsRepository symbolsRepository, List<Node> dialectNodes,
           CachingConfigurationService cachingConfigurationService) {
     this.copybooks = copybooks;
     this.positions = positions;
@@ -106,7 +110,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     this.messageService = messageService;
     this.subroutineService = subroutineService;
     this.analysisConfig = analysisConfig;
-    this.symbolService = symbolService;
+    this.symbolsRepository = symbolsRepository;
     this.dialectNodes = dialectNodes;
     this.cachingConfigurationService = cachingConfigurationService;
   }
@@ -400,7 +404,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitSectionName(SectionNameContext ctx) {
     return addTreeNode(
-        ctx, locality -> new SectionNameNode(locality, ctx.getText(), symbolService));
+        ctx, locality -> new SectionNameNode(locality, ctx.getText()));
   }
 
   @Override
@@ -444,7 +448,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                         it ->
                             ImmutableList.of(
                                 new EmbeddedCodeNode(
-                                    it, code.getTokenStream(), code.getTree(), language, symbolService))))
+                                    it, code.getTokenStream(), code.getTree(), language))))
         .orElse(ImmutableList.of());
   }
 
@@ -491,7 +495,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitParagraphName(ParagraphNameContext ctx) {
     return addTreeNode(
-        ctx, locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx), symbolService));
+        ctx, locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx)));
   }
 
   @Override
@@ -742,7 +746,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitParagraphDefinitionName(ParagraphDefinitionNameContext ctx) {
-    return addTreeNode(ctx, locality -> new ParagraphNameNode(locality, ctx.getText(), symbolService));
+    return addTreeNode(ctx, locality -> new ParagraphNameNode(locality, ctx.getText(), symbolsRepository));
   }
 
   @Override

@@ -37,7 +37,7 @@ import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -74,27 +74,33 @@ class CobolLanguageEngineTest {
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     AstProcessor astProcessor = mock(AstProcessor.class);
     SymbolService symbolService = mock(SymbolService.class);
+    SymbolsRepository storage = mock(SymbolsRepository.class);
 
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
-            preprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-            dialectService, symbolService, astProcessor, injectService);
+            preprocessor,
+            mockMessageService,
+            treeListener,
+            mock(SubroutineService.class),
+            null,
+            dialectService,
+            symbolService,
+            astProcessor,
+            injectService,
+            storage);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
-        Locality.builder()
-            .uri(URI)
-            .range(new Range(new Position(), new Position()))
-            .build();
+        Locality.builder().uri(URI).range(new Range(new Position(), new Position())).build();
     SyntaxError error =
         SyntaxError.syntaxError()
-                .errorSource(ErrorSource.PARSING)
+            .errorSource(ErrorSource.PARSING)
             .locality(locality)
             .suggestion("suggestion")
             .severity(ERROR)
             .build();
     SyntaxError eofError =
         SyntaxError.syntaxError()
-                .errorSource(ErrorSource.PARSING)
+            .errorSource(ErrorSource.PARSING)
             .locality(
                 Locality.builder()
                     .uri(URI)
@@ -147,9 +153,8 @@ class CobolLanguageEngineTest {
 
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of());
 
-    DialectProcessingContext context = DialectProcessingContext.builder()
-            .extendedSource(new ExtendedSource(TEXT, URI))
-            .build();
+    DialectProcessingContext context =
+        DialectProcessingContext.builder().extendedSource(new ExtendedSource(TEXT, URI)).build();
     context.getExtendedSource().commitTransformations();
     when(dialectService.process(anyList(), any()))
         .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
@@ -157,13 +162,14 @@ class CobolLanguageEngineTest {
         .thenReturn(new ResultWithErrors<>(TextTransformations.of(TEXT, URI), ImmutableList.of()));
     when(preprocessor.processCleanCode(
             eq(URI), eq(TEXT), eq(cpyConfig), any(CopybookHierarchy.class)))
-            .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));
+        .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));
     when(preprocessor.processCleanCode(
             anyString(), anyString(), any(CopybookConfig.class), any(CopybookHierarchy.class)))
-            .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of()));
+        .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of()));
 
     Range programRange = new Range(new Position(0, 7), new Position(0, 31));
-    ResultWithErrors<AnalysisResult> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
+    ResultWithErrors<AnalysisResult> actual =
+        engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
     Node root = actual.getResult().getRootNode();
     Node program = root.getChildren().get(0);
     Node division = program.getChildren().get(0);

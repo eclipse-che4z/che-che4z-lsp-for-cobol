@@ -18,28 +18,24 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.inject.Singleton;
-import lombok.Value;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.ErrorSource;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils.findNodeByPosition;
+import static org.eclipse.lsp.cobol.common.model.Node.hasType;
 
 /** Service to handle symbol information and dependencies */
 @Singleton
@@ -62,36 +58,6 @@ public class SymbolService {
    */
   public void addVariableDefinition(ProgramNode programNode, VariableNode node) {
     createOrGetSymbolTable(programNode).getVariables().put(node.getName(), node);
-  }
-  /**
-   * Find element using a position
-   *
-   * @param document the document to search in
-   * @param position the position to check
-   * @return element at specified position
-   */
-  public Optional<Context> findElementByPosition(
-      CobolDocumentModel document, TextDocumentPositionParams position) {
-    AnalysisResult result = document.getAnalysisResult();
-    if (result.getRootNode() == null) {
-      return Optional.empty();
-    }
-    Optional<Node> node = findNodeByPosition(result.getRootNode(), position.getTextDocument().getUri(), position.getPosition());
-    return node.filter(Context.class::isInstance)
-            .map(Context.class::cast)
-            .map(this::constructElementsExcludingImplicits);
-  }
-
-  private Context constructElementsExcludingImplicits(Context ctx) {
-    List<Location> definitions =
-        ctx.getDefinitions().stream().filter(uriNotImplicit()).collect(Collectors.toList());
-    List<Location> usages =
-        ctx.getUsages().stream().filter(uriNotImplicit()).collect(Collectors.toList());
-    return new Element("", definitions, usages);
-  }
-
-  private static Predicate<Location> uriNotImplicit() {
-    return i -> !ImplicitCodeUtils.isImplicit(i.getUri());
   }
 
   /**
@@ -283,25 +249,6 @@ public class SymbolService {
   }
 
   /**
-   * Get paragraphs data
-   *
-   * @param programNode the program node
-   * @return map of paragraphs
-   */
-  public Map<String, CodeBlockReference> getParagraphMap(ProgramNode programNode) {
-    return createOrGetSymbolTable(programNode).getParagraphMap();
-  }
-  /**
-   * Get section data
-   *
-   * @param programNode the program node
-   * @return map of sections
-   */
-  public Map<String, CodeBlockReference> getSectionMap(ProgramNode programNode) {
-    return createOrGetSymbolTable(programNode).getSectionMap();
-  }
-
-  /**
    * Extract all accumulated symbols information
    *
    * @return Symbol Tables
@@ -343,16 +290,6 @@ public class SymbolService {
   }
 
   /**
-   * Get variables data
-   *
-   * @param programNode the program node
-   * @return map of variables
-   */
-  public Multimap<String, VariableNode> getVariables(ProgramNode programNode) {
-    return createOrGetSymbolTable(programNode).getVariables();
-  }
-
-  /**
    * Remove program related symbols
    *
    * @param documentUri the program uri
@@ -363,12 +300,5 @@ public class SymbolService {
         .collect(Collectors.toList())
         .forEach(programSymbols::remove);
     programSymbols.remove(documentUri);
-  }
-
-  @Value
-  private static class Element implements Context {
-    String name;
-    List<Location> definitions;
-    List<Location> usages;
   }
 }

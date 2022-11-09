@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.ProgramNode;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
 
@@ -28,8 +28,8 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
+import static org.eclipse.lsp.cobol.common.model.Node.hasType;
+import static org.eclipse.lsp.cobol.common.model.NodeType.PROGRAM;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.PARAGRAPHS;
 import static org.eclipse.lsp4j.CompletionItemKind.Method;
 
@@ -37,11 +37,11 @@ import static org.eclipse.lsp4j.CompletionItemKind.Method;
 @Singleton
 public class ParagraphCompletion implements Completion {
 
-  private final SymbolService symbolService;
+  private final SymbolsRepository symbolsRepository;
 
   @Inject
-  public ParagraphCompletion(SymbolService symbolService) {
-    this.symbolService = symbolService;
+  public ParagraphCompletion(SymbolsRepository symbolsRepository) {
+    this.symbolsRepository = symbolsRepository;
   }
 
   @Override
@@ -54,7 +54,7 @@ public class ParagraphCompletion implements Completion {
         .getDepthFirstStream()
         .filter(hasType(PROGRAM))
         .map(ProgramNode.class::cast)
-        .map(symbolService::getParagraphMap)
+        .map(symbolsRepository::getParagraphMap)
         .map(Map::keySet)
         .flatMap(Collection::stream)
         .filter(DocumentationUtils.startsWithIgnoreCase(token))

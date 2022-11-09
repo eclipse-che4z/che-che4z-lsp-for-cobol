@@ -16,9 +16,9 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.ProgramNode;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -188,7 +188,7 @@ public class TestRecordDescNotIncludedInFD {
         UseCaseEngine.runTest(
             PGM, ImmutableList.of(new CobolText("ACCFILE1", COPYBOOK)), ImmutableMap.of());
 
-    SymbolService symbolService = new SymbolService(result.getSymbolTableMap());
+      SymbolsRepository repo = new SymbolsRepository(result.getSymbolTableMap());
     ProgramNode programNode =
         result
             .getRootNode()
@@ -197,7 +197,7 @@ public class TestRecordDescNotIncludedInFD {
             .map(ProgramNode.class::cast)
             .collect(Collectors.toList())
             .get(0);
-    Collection<VariableNode> acctfile = symbolService.getVariables(programNode).get("ACCTFILE");
+    Collection<VariableNode> acctfile = repo.getVariables(programNode).get("ACCTFILE");
     assertEquals(acctfile.size(), 1);
     acctfile.forEach(
         node -> {

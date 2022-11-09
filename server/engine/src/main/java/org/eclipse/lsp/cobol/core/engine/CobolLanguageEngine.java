@@ -55,12 +55,11 @@ import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Location;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -86,6 +85,7 @@ public class CobolLanguageEngine {
   private final CachingConfigurationService cachingConfigurationService;
   private final DialectService dialectService;
   private final SymbolService symbolService;
+  private final SymbolsRepository symbolsRepository;
   private final AstProcessor astProcessor;
   private final InjectService injectService;
 
@@ -99,7 +99,8 @@ public class CobolLanguageEngine {
       DialectService dialectService,
       SymbolService symbolService,
       AstProcessor astProcessor,
-      InjectService injectService) {
+      InjectService injectService,
+      SymbolsRepository symbolsRepository) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.treeListener = treeListener;
@@ -109,6 +110,7 @@ public class CobolLanguageEngine {
     this.symbolService = symbolService;
     this.astProcessor = astProcessor;
     this.injectService = injectService;
+    this.symbolsRepository = symbolsRepository;
   }
 
   /**
@@ -129,7 +131,6 @@ public class CobolLanguageEngine {
     Timing.Builder timingBuilder = Timing.builder();
 
     timingBuilder.getDialectsTimer().start();
-    symbolService.reset(documentUri);
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     TextTransformations cleanText =
         preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
@@ -242,7 +243,7 @@ public class CobolLanguageEngine {
             embeddedCodeParts,
             messageService,
             subroutineService,
-            symbolService,
+            symbolsRepository,
             dialectOutcome.getDialectNodes(),
             cachingConfigurationService);
     List<Node> syntaxTree = visitor.visit(tree);
@@ -254,7 +255,7 @@ public class CobolLanguageEngine {
 
     Node rootNode = syntaxTree.get(0);
     ProcessingContext ctx = new ProcessingContext(new ArrayList<>());
-    registerProcessors(analysisConfig, ctx);
+    registerProcessors(analysisConfig, ctx, symbolsRepository);
     accumulatedErrors.addAll(astProcessor.processSyntaxTree(ctx, rootNode));
 
     timingBuilder.getSyntaxTreeTimer().stop();
@@ -280,15 +281,18 @@ public class CobolLanguageEngine {
           timing.getLateErrorProcessingTime());
     }
 
+    symbolsRepository.updateSymbols(Collections.synchronizedMap(new HashMap<>(symbolService.getProgramSymbols())));
+    symbolService.reset(documentUri);
+
     return new ResultWithErrors<>(
         AnalysisResult.builder()
             .rootNode(rootNode)
-            .symbolTableMap(symbolService.getProgramSymbols())
+            .symbolTableMap(symbolsRepository.getProgramSymbols())
             .build(),
         accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
-  private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx) {
+  private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx, SymbolsRepository symbolsRepository) {
     // Phase TRANSFORMATION
     ctx.register(
         new ProcessorDescription(
@@ -310,7 +314,7 @@ public class CobolLanguageEngine {
         new ProcessorDescription(
             DeclarativeProcedureSectionNode.class,
             ProcessingPhase.TRANSFORMATION,
-            new DeclarativeProcedureSectionRegister(symbolService)));
+            new DeclarativeProcedureSectionRegister(symbolService, symbolsRepository)));
     // Phase DEFINITION
     ctx.register(
         new ProcessorDescription(
@@ -365,11 +369,13 @@ public class CobolLanguageEngine {
             ProcessingPhase.VALIDATION,
             new StandAloneDataItemCheck()));
     ctx.register(
-            new ProcessorDescription(
-                    ProgramEndNode.class, ProcessingPhase.VALIDATION, new ProgramEndCheck()));
+        new ProcessorDescription(
+            ProgramEndNode.class, ProcessingPhase.VALIDATION, new ProgramEndCheck()));
     ctx.register(
         new ProcessorDescription(
-            CICSTranslatorNode.class, ProcessingPhase.VALIDATION, new CICSTranslatorProcessor(analysisConfig, messageService)));
+            CICSTranslatorNode.class,
+            ProcessingPhase.VALIDATION,
+            new CICSTranslatorProcessor(analysisConfig, messageService)));
 
     // Dialects
     List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());
