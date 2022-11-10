@@ -20,7 +20,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
+import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 
 /** IDMS and MAID related getter */

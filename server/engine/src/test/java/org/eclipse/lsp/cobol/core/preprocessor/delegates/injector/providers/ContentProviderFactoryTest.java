@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

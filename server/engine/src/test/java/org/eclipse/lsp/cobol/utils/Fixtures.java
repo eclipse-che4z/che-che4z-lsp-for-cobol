@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.utils;
 
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
+import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.positive.CobolText;
 
 /**

@@ -36,7 +36,7 @@ import org.eclipse.lsp.cobol.core.DaCoParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.*;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes.DaCoCopyFromNode;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.provider.DaCoImplicitCodeProvider;
-import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
+import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp4j.Position;

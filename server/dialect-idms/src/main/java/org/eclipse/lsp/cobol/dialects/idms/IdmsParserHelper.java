@@ -13,18 +13,17 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.engine.dialects.idms;
+package org.eclipse.lsp.cobol.dialects.idms;
 
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
+import org.eclipse.lsp.cobol.common.OutlineNodeNames;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.core.IdmsCopyParser;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
-import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -35,7 +34,6 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
 
 /** Utility class for visitor and delegates classes with useful methods */
 @UtilityClass
@@ -104,7 +102,7 @@ class IdmsParserHelper {
     return ofNullable(context)
         .map(IdmsCopyParser.EntryNameContext::dataName)
         .map(VisitorHelper::getName)
-        .orElse(FILLER_NAME);
+        .orElse(OutlineNodeNames.FILLER_NAME);
   }
 
   /**

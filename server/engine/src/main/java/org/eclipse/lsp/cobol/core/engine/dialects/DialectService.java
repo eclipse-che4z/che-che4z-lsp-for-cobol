@@ -30,9 +30,9 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoMaidProcessor;
-import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
+import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -38,7 +38,7 @@ import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
 import org.eclipse.lsp.cobol.jrpc.ExtendedApi;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
