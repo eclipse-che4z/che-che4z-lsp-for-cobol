@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.dialects.idms;
+package org.eclipse.lsp.cobol.dialects.idms;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
@@ -20,9 +20,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.core.IdmsCopyParser;
-import org.eclipse.lsp.cobol.core.IdmsCopyParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 

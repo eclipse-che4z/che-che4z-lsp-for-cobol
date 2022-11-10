@@ -28,7 +28,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
-import org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames;
+import org.eclipse.lsp.cobol.common.OutlineNodeNames;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;

@@ -37,7 +37,7 @@ import static org.mockito.Mockito.mock;
 
 /** This test checks multiple comment entries are parsed and cleaned up correctly */
 class TestCommentLines {
-  public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
+  public static final String DOCUMENT_URI = "file:///c:/workspace/document.cbl";
   private static final String TEXT =
       "      * Copyright (c) 2021 Broadcom.\n"
           + "      * The term Broadcom  refers to Broadcom Inc. and/or its subsidiaries.\n"

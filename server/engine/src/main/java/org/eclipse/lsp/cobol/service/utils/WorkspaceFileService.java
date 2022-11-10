@@ -16,11 +16,13 @@ package org.eclipse.lsp.cobol.service.utils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.annotation.Nullable;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -35,6 +37,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This service implements API for low-level file systems access. It mainly oriented to work with
@@ -43,6 +48,7 @@ import java.util.stream.Stream;
 @Singleton
 @Slf4j
 public class WorkspaceFileService implements FileSystemService {
+
   @Override
   public boolean fileExists(@Nullable Path file) {
     return file != null && file.toFile().exists();
@@ -123,8 +129,26 @@ public class WorkspaceFileService implements FileSystemService {
   }
 
   @Override
-  public List<String> listFilesInDirectory(Path path) {
-    try (Stream<Path> streamPath = Files.walk(path, 2)) {
+  @NonNull
+  public List<String> listFilesInDirectory(final String path) {
+
+    final String[] pathSplittedByFirstAsterisk = uriWithReplacedPlaceholdersToAsterisks(
+        path).split("\\*", 2);
+    final String pathToResolve = pathSplittedByFirstAsterisk[0];
+    final boolean isPathContainsAsterisk = pathSplittedByFirstAsterisk.length >= 2;
+    int maxDepth = 0;
+    if (isPathContainsAsterisk) {
+      maxDepth = pathSplittedByFirstAsterisk[1].split("/").length + 1;
+    }
+
+    try (Stream<Path> streamPath = Files.find(
+        Paths.get(pathToResolve),
+        maxDepth,
+        (a, c) -> {
+          final String uriPath = a.toUri().getPath().replaceAll("\\\\", "/");
+          return !isPathContainsAsterisk || Pattern.compile(pathSplittedByFirstAsterisk[1])
+              .matcher(uriPath).find();
+        })) {
       return
           streamPath
               .map(Path::toFile)
@@ -135,5 +159,9 @@ public class WorkspaceFileService implements FileSystemService {
       LOG.error("An error occurred while reading list of files", e);
     }
     return ImmutableList.of();
+  }
+
+  private String uriWithReplacedPlaceholdersToAsterisks(String uri) {
+    return uri.replaceAll("\\$\\{.*\\}", "*");
   }
 }

@@ -40,7 +40,9 @@ jobs:
           path: configuration
           name: configuration
       - name: Add graalVM configuration to server
-        run: cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
+        run: |
+          cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
+          rm server/engine/src/main/resources/META-INF/native-image/session-*/jni-config.json
         shell: bash
       - uses: ilammy/msvc-dev-cmd@v1.5.0
       - uses: microsoft/setup-msbuild@v1
@@ -86,7 +88,9 @@ jobs:
         run: ls -R
         working-directory: configuration
       - name: Add graalVM configuration to server
-        run: cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
+        run: |
+          cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
+          rm server/engine/src/main/resources/META-INF/native-image/jni-config.json
       - name: Build with Maven
         working-directory: server
         run: mvn -e -B -Pnative -DskipTests clean package
@@ -126,7 +130,9 @@ jobs:
         run: ls -R
         working-directory: configuration
       - name: Add graalVM configuration to server
-        run: cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
+        run: |
+          cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
+          rm server/engine/src/main/resources/META-INF/native-image/session-*/jni-config.json
       - name: Build with Maven
         working-directory: server
         run: mvn -e -B -Pnative -Dagent=true -DskipTests clean package

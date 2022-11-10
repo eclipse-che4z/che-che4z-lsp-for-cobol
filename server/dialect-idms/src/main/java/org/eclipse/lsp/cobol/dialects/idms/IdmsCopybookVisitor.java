@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.engine.dialects.idms;
+package org.eclipse.lsp.cobol.dialects.idms;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
@@ -26,6 +26,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -35,10 +36,6 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.ValueClause;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.common.utils.PreprocessorStringUtils;
-import org.eclipse.lsp.cobol.core.IdmsCopyParser;
-import org.eclipse.lsp.cobol.core.IdmsCopyParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -47,7 +44,7 @@ import java.util.*;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.common.VariableConstants.*;
-import static org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsParserHelper.*;
+import static org.eclipse.lsp.cobol.dialects.idms.IdmsParserHelper.*;
 
 /**
  * This extension of {@link IdmsCopyParserBaseVisitor} applies the semantic analysis based on the
@@ -276,7 +273,7 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
   }
 
   private VariableNameAndLocality extractNameAndLocality(IdmsCopyParser.CobolWordContext context) {
-    String name = getName(context);
+    String name = IdmsParserHelper.getName(context);
     return new VariableNameAndLocality(name, buildNameRangeLocality(context, name, documentUri));
   }
 

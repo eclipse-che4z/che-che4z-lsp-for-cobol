@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.engine.dialects.idms;
+package org.eclipse.lsp.cobol.dialects.idms;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;

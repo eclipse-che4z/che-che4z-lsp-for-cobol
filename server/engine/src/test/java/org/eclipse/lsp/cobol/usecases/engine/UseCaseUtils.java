@@ -35,7 +35,7 @@ import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.WatcherServiceImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
@@ -60,11 +60,11 @@ import static org.mockito.Mockito.when;
 @Slf4j
 @UtilityClass
 public class UseCaseUtils {
-  public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
-  public static final String DOCUMENT2_URI = "file:///c%3A/workspace/document2.cbl";
+  public static final String DOCUMENT_URI = "file:///c:/workspace/document.cbl";
+  public static final String DOCUMENT2_URI = "file:///c:/workspace/document2.cbl";
 
-  public static final String COPYBOOK_URI = "file///c%3A/copybooks/copybook.cpy";
-  private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.c4z/.copybooks/";
+  public static final String COPYBOOK_URI = "file///c:/copybooks/copybook.cpy";
+  private static final String CPY_URI_PREFIX = "file:///c:/workspace/.c4z/.copybooks/";
   private static final String CPY_URI_SUFFIX = ".cpy";
 
   /**

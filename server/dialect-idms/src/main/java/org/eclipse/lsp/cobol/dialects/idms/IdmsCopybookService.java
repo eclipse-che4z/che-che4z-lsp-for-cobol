@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.engine.dialects.idms;
+package org.eclipse.lsp.cobol.dialects.idms;
 
 import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
@@ -32,11 +32,7 @@ import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
-import org.eclipse.lsp.cobol.core.IdmsCopyLexer;
-import org.eclipse.lsp.cobol.core.IdmsCopyParser;
-import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
-import org.eclipse.lsp.cobol.core.visitor.ParserListener;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;

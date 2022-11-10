@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.semantics.outline;
+package org.eclipse.lsp.cobol.common;
 
 import lombok.experimental.UtilityClass;
 

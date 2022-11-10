@@ -15,6 +15,7 @@
 import * as vscode from "vscode";
 import { SnippetCompletionProvider  } from "../../../services/snippetcompletion/SnippetCompletionProvider";
 
+
 describe("Test CompletionProvider", () => {
     const context = { triggerKind: {}, diagnostics: [], only: undefined };
     const snippetcompletion: SnippetCompletionProvider = new SnippetCompletionProvider();

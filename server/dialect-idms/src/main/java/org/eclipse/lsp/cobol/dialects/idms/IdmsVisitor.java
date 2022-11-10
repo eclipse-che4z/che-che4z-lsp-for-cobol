@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.dialects.idms;
+package org.eclipse.lsp.cobol.dialects.idms;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
@@ -23,17 +23,13 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.core.IdmsParser;
-import org.eclipse.lsp.cobol.core.IdmsParser.*;
-import org.eclipse.lsp.cobol.core.IdmsParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectUtils;
+import org.eclipse.lsp.cobol.dialects.idms.IdmsParser.*;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.model.SectionType;
-import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;

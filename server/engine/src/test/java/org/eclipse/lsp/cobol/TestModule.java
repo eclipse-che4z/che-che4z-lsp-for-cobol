@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;

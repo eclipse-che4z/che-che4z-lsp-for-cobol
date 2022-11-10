@@ -24,23 +24,6 @@ const IDE = env === 'theia' ? Theia : VSCODE;
 //F95833 - LSP for COBOL - support for CICS statements (basic intellisense)
 
 context('This is F95833 spec', () => {
-  describe('TC312735 Check EXEC CICS is in Procedure Division', () => {
-    it(['smoke', 'CI'], 'Checks that EXEC CICS could be run *only* under Procedure Division.', () => {
-      cy.openFile('ADSORT.cbl').goToLine(59);
-      cy.getCurrentLine().should('not.have.class', IDE.editorError);
-      cy.getCurrentLine().type('{selectall}{backspace}');
-      cy.goToLine(35);
-      cy.getCurrentLine().type('           EXEC CICS XCTL PROGRAM (XCTL1) END-EXEC.').wait(500);
-      cy.goToLine(35);
-      cy.getCurrentLineErrors({ expectedLine: 35 });
-      if (IDE === Theia) {
-        cy.getCurrentLineErrors({ expectedLine: 35 }).getHoverErrorMessage();
-      } else {
-        cy.getCurrentLineErrors({ expectedLine: 35 }).getHoverErrorMessage('CICS');
-      }
-      cy.contains('Missing token SQL at execSqlStatement');
-    });
-  });
 
   describe('TC312745 Error check', () => {
     it(['smoke'], 'Error check in CICS', () => {
