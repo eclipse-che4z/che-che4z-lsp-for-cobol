@@ -1,0 +1,22 @@
+[
+  {
+    "name": "CBACT01C",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 3,
+        "character": 9
+      },
+      "end": {
+        "line": 4,
+        "character": 30
+      }
+    },
+    "type": "program",
+    "children": [
+      {
+        "type": "stop"
+      }
+    ]
+  }
+]
