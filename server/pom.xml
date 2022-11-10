@@ -11,6 +11,7 @@
     <modules>
         <module>engine</module>
         <module>common</module>
+        <module>dialect-idms</module>
     </modules>
 
     <properties>

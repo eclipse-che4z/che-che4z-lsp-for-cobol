@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.dialects.idms;
+package org.eclipse.lsp.cobol.dialects.idms;
 
 import com.google.common.collect.ImmutableMultimap;
 import org.antlr.v4.runtime.CharStreams;
@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -32,13 +33,6 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.core.IdmsCopyLexer;
-import org.eclipse.lsp.cobol.core.IdmsCopyParser;
-import org.eclipse.lsp.cobol.core.IdmsLexer;
-import org.eclipse.lsp.cobol.core.IdmsParser;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectParserListener;
-import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;

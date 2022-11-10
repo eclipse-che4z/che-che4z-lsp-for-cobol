@@ -70,7 +70,7 @@ import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Lexer.HIDDEN;
 import static org.eclipse.lsp.cobol.common.VariableConstants.*;
 import static org.eclipse.lsp.cobol.core.CobolParser.*;
-import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
+import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
 import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
 
 /**

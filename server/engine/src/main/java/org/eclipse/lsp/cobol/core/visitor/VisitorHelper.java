@@ -38,7 +38,7 @@ import java.util.function.Function;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.CobolParser.*;
-import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
+import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
 
 /** Utility class for visitor and delegates classes with useful methods */
 @Slf4j
