@@ -45,7 +45,9 @@ import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolTable;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.logic.*;
@@ -68,9 +70,7 @@ import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Location;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -95,9 +95,10 @@ public class CobolLanguageEngine {
   private final SubroutineService subroutineService;
   private final CachingConfigurationService cachingConfigurationService;
   private final DialectService dialectService;
-  private final SymbolService symbolService;
+  private final SymbolAccumulatorService symbolAccumulatorService;
   private final AstProcessor astProcessor;
   private final InjectService injectService;
+  private final SymbolsRepository symbolsRepository;
 
   @Inject
   public CobolLanguageEngine(
@@ -107,18 +108,20 @@ public class CobolLanguageEngine {
       SubroutineService subroutineService,
       CachingConfigurationService cachingConfigurationService,
       DialectService dialectService,
-      SymbolService symbolService,
+      SymbolAccumulatorService symbolAccumulatorService,
       AstProcessor astProcessor,
-      InjectService injectService) {
+      InjectService injectService,
+      SymbolsRepository symbolsRepository) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.treeListener = treeListener;
     this.subroutineService = subroutineService;
     this.cachingConfigurationService = cachingConfigurationService;
     this.dialectService = dialectService;
-    this.symbolService = symbolService;
+    this.symbolAccumulatorService = symbolAccumulatorService;
     this.astProcessor = astProcessor;
     this.injectService = injectService;
+    this.symbolsRepository = symbolsRepository;
   }
 
   /**
@@ -139,7 +142,6 @@ public class CobolLanguageEngine {
     Timing.Builder timingBuilder = Timing.builder();
 
     timingBuilder.getDialectsTimer().start();
-    symbolService.reset(documentUri);
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     TextTransformations cleanText =
         preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
@@ -252,7 +254,7 @@ public class CobolLanguageEngine {
             embeddedCodeParts,
             messageService,
             subroutineService,
-            symbolService,
+            symbolsRepository,
             dialectOutcome.getDialectNodes(),
             cachingConfigurationService);
     List<Node> syntaxTree = visitor.visit(tree);
@@ -290,10 +292,14 @@ public class CobolLanguageEngine {
           timing.getLateErrorProcessingTime());
     }
 
+    Map<String, SymbolTable> symbolTableMap = Collections.synchronizedMap(new HashMap<>(symbolAccumulatorService.getProgramSymbols()));
+    symbolsRepository.updateSymbols(symbolTableMap);
+    symbolAccumulatorService.reset(documentUri);
+
     return new ResultWithErrors<>(
         AnalysisResult.builder()
             .rootNode(rootNode)
-            .symbolTableMap(symbolService.getProgramSymbols())
+            .symbolTableMap(symbolTableMap)
             .build(),
         accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
@@ -307,7 +313,7 @@ public class CobolLanguageEngine {
         new ProcessorDescription(
             SectionNode.class,
             ProcessingPhase.TRANSFORMATION,
-            new ProcessNodeWithVariableDefinitions(symbolService)));
+            new ProcessNodeWithVariableDefinitions(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             FileEntryNode.class, ProcessingPhase.TRANSFORMATION, new FileEntryProcess()));
@@ -315,35 +321,35 @@ public class CobolLanguageEngine {
         new ProcessorDescription(
             FileDescriptionNode.class,
             ProcessingPhase.TRANSFORMATION,
-            new FileDescriptionProcess(symbolService)));
+            new FileDescriptionProcess(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             DeclarativeProcedureSectionNode.class,
             ProcessingPhase.TRANSFORMATION,
-            new DeclarativeProcedureSectionRegister(symbolService)));
+            new DeclarativeProcedureSectionRegister(symbolAccumulatorService, symbolsRepository)));
     // Phase DEFINITION
     ctx.register(
         new ProcessorDescription(
-            ParagraphsNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock(symbolService)));
+            ParagraphsNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             SectionNameNode.class,
             ProcessingPhase.DEFINITION,
-            new SectionNameRegister(symbolService)));
+            new SectionNameRegister(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             ParagraphNameNode.class,
             ProcessingPhase.DEFINITION,
-            new ParagraphNameRegister(symbolService)));
+            new ParagraphNameRegister(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             ProcedureDivisionBodyNode.class,
             ProcessingPhase.DEFINITION,
-            new DefineCodeBlock(symbolService)));
+            new DefineCodeBlock(symbolAccumulatorService)));
     // Phase USAGE
     ctx.register(
         new ProcessorDescription(
-            CodeBlockUsageNode.class, ProcessingPhase.USAGE, new CodeBlockUsage(symbolService)));
+            CodeBlockUsageNode.class, ProcessingPhase.USAGE, new CodeBlockUsage(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             RootNode.class, ProcessingPhase.USAGE, new RootNodeUpdateCopyNodesByPositionInTree()));
@@ -351,19 +357,19 @@ public class CobolLanguageEngine {
         new ProcessorDescription(
             QualifiedReferenceNode.class,
             ProcessingPhase.USAGE,
-            new QualifiedReferenceUpdateVariableUsage(symbolService)));
+            new QualifiedReferenceUpdateVariableUsage(symbolAccumulatorService)));
 
     // ENRICHMENT
     ctx.register(
         new ProcessorDescription(
             SectionNameNode.class,
             ProcessingPhase.VALIDATION,
-            new SectionNameNodeEnricher(symbolService)));
+            new SectionNameNodeEnricher(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             CodeBlockUsageNode.class,
             ProcessingPhase.VALIDATION,
-            new CodeBlockUsageNodeEnricher(symbolService)));
+            new CodeBlockUsageNodeEnricher(symbolAccumulatorService)));
 
     // Phase VALIDATION
     ctx.register(

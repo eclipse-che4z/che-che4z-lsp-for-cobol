@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.positive;
 
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.usecases.engine.UseCase;
@@ -70,7 +70,7 @@ class PositiveTest extends FileBasedTest {
               .build();
       AnalysisResult analyze = UseCaseUtils.analyze(useCase);
       PositiveTestUtility.assetDefinitionsNReferencesFromSnap(
-          new SymbolService(analyze.getSymbolTableMap()), dataNameRefs, analyze.getRootNode(), fileName);
+          new SymbolAccumulatorService(analyze.getSymbolTableMap()), dataNameRefs, analyze.getRootNode(), fileName);
       assertNoError(fileName, analyze);
     }
   }

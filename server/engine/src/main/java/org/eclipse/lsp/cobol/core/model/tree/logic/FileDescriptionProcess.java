@@ -20,7 +20,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 
@@ -28,10 +28,10 @@ import static org.eclipse.lsp.cobol.common.VariableConstants.FD_WITHOUT_FILE_CON
 
 /** FileDescriptionNode processor */
 public class FileDescriptionProcess implements Processor<FileDescriptionNode> {
-  private final SymbolService symbolService;
+  private final SymbolAccumulatorService symbolAccumulatorService;
 
-  public FileDescriptionProcess(SymbolService symbolService) {
-    this.symbolService = symbolService;
+  public FileDescriptionProcess(SymbolAccumulatorService symbolAccumulatorService) {
+    this.symbolAccumulatorService = symbolAccumulatorService;
   }
 
   @Override
@@ -43,6 +43,6 @@ public class FileDescriptionProcess implements Processor<FileDescriptionNode> {
       ctx.getErrors().add(error);
     }
     ctx.getErrors().addAll(VariableDefinitionUtil.processNodeWithVariableDefinitions(node));
-    symbolService.registerVariablesInProgram(node);
+    symbolAccumulatorService.registerVariablesInProgram(node);
   }
 }

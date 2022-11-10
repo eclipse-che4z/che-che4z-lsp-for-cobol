@@ -18,7 +18,7 @@ import lombok.AllArgsConstructor;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNameNode;
 
 /**
@@ -26,11 +26,11 @@ import org.eclipse.lsp.cobol.core.model.tree.SectionNameNode;
  */
 @AllArgsConstructor
 public class SectionNameNodeEnricher implements Processor<SectionNameNode> {
-  private final SymbolService symbolService;
+  private final SymbolAccumulatorService symbolAccumulatorService;
 
   @Override
   public void accept(SectionNameNode sectionNameNode, ProcessingContext processingContext) {
-    sectionNameNode.setDefinitions(symbolService.getSectionLocations(sectionNameNode, CodeBlockReference::getDefinitions));
-    sectionNameNode.setUsages(symbolService.getSectionLocations(sectionNameNode, CodeBlockReference::getUsage));
+    sectionNameNode.setDefinitions(symbolAccumulatorService.getSectionLocations(sectionNameNode, CodeBlockReference::getDefinitions));
+    sectionNameNode.setUsages(symbolAccumulatorService.getSectionLocations(sectionNameNode, CodeBlockReference::getUsage));
   }
 }

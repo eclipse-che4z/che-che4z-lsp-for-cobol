@@ -37,7 +37,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.*;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes.DaCoCopyFromNode;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.provider.DaCoImplicitCodeProvider;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -54,7 +54,7 @@ public final class DaCoDialect implements CobolDialect {
 
   private final MessageService messageService;
   private final DaCoMaidProcessor maidProcessor;
-  private final SymbolService symbolService;
+  private final SymbolAccumulatorService symbolAccumulatorService;
 
   /**
    * Gets the name of the dialect
@@ -136,6 +136,6 @@ public final class DaCoDialect implements CobolDialect {
     return Collections.singletonList(
         new ProcessorDescription(
             DaCoCopyFromNode.class, ProcessingPhase.POST_DEFINITION,
-                new DaCoCopyFromProcessor(symbolService)));
+                new DaCoCopyFromProcessor(symbolAccumulatorService)));
   }
 }

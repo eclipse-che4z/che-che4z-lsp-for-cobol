@@ -31,7 +31,7 @@ import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoMaidProcessor;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.*;
@@ -47,7 +47,7 @@ public class DialectService {
   public DialectService(
       CopybookService copybookService,
       ParseTreeListener treeListener,
-      SymbolService symbolService,
+      SymbolAccumulatorService symbolAccumulatorService,
       MessageService messageService) {
     dialectSuppliers = new HashMap<>();
 
@@ -58,7 +58,7 @@ public class DialectService {
         new DaCoDialect(
             messageService,
             new DaCoMaidProcessor(copybookService, treeListener, messageService),
-            symbolService);
+                symbolAccumulatorService);
     dialectSuppliers.put(dialect.getName(), dialect);
 
     dialectSuppliers.put(dialect.getName(), dialect);

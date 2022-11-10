@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.service.delegates.references;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNameNode;
@@ -176,8 +176,8 @@ class ElementOccurrencesTest {
     CobolDocumentModel cobolDocumentModel = new CobolDocumentModel("", analysisResult);
     TextDocumentPositionParams textDocumentPositionParams =
         new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage);
-    SymbolService symbolService = new SymbolService();
-    ElementOccurrences elementOccurrences = new ElementOccurrences(symbolService);
+    SymbolsRepository symbolsRepository = new SymbolsRepository();
+    ElementOccurrences elementOccurrences = new ElementOccurrences(symbolsRepository);
     assertEquals(
         ImmutableList.of(definition),
         elementOccurrences.findDefinitions(cobolDocumentModel, textDocumentPositionParams));
@@ -212,9 +212,9 @@ class ElementOccurrencesTest {
     rootNode.addChild(variableUsageNode);
     rootNode.addChild(variableUsageNodeInOtherFile);
     AnalysisResult analysisResult = AnalysisResult.builder().rootNode(rootNode).build();
-    SymbolService symbolService = new SymbolService();
+    SymbolsRepository symbolsRepository = new SymbolsRepository();
     List<DocumentHighlight> highlights =
-        new ElementOccurrences(symbolService)
+        new ElementOccurrences(symbolsRepository)
             .findHighlights(
                 new CobolDocumentModel("", analysisResult),
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage));
@@ -229,9 +229,9 @@ class ElementOccurrencesTest {
   @MethodSource("variousData")
   void variousCases(
       AnalysisResult analysisResult, Position position, List<Location> expectedLocations) {
-    SymbolService symbolService = new SymbolService();
+    SymbolsRepository symbolsRepository = new SymbolsRepository();
     List<Location> actualLocations =
-        new ElementOccurrences(symbolService)
+        new ElementOccurrences(symbolsRepository)
             .findReferences(
                 new CobolDocumentModel("", analysisResult),
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), position),

@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.CompletionItem;
@@ -52,13 +52,13 @@ class VariableCompletionTest {
   void testCompletionEmptyResult() {
     CobolDocumentModel model = getModel(HEADER);
     Completion completion =
-        new VariableCompletion(new SymbolService(model.getAnalysisResult().getSymbolTableMap()));
+        new VariableCompletion(new SymbolsRepository(model.getAnalysisResult().getSymbolTableMap()));
     assertThat(completion.getCompletionItems("smth", model), is(empty()));
   }
 
   @Test
   void testCompletionNull() {
-    Completion completion = new VariableCompletion(new SymbolService());
+    Completion completion = new VariableCompletion(new SymbolsRepository());
     assertThat(completion.getCompletionItems("smth", null), is(empty()));
   }
 
@@ -66,7 +66,7 @@ class VariableCompletionTest {
   void testCompletionMock() {
     CobolDocumentModel model = getModel(FULL_TEXT);
     Completion completion =
-        new VariableCompletion(new SymbolService(model.getAnalysisResult().getSymbolTableMap()));
+        new VariableCompletion(new SymbolsRepository(model.getAnalysisResult().getSymbolTableMap()));
     assertEquals(createExpected(), completion.getCompletionItems("va", model));
   }
 

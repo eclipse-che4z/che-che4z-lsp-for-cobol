@@ -14,23 +14,23 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
+import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 
 /** SectionNode processor */
 public class ProcessNodeWithVariableDefinitions implements Processor<SectionNode> {
-  private final SymbolService symbolService;
+  private final SymbolAccumulatorService symbolAccumulatorService;
 
-  public ProcessNodeWithVariableDefinitions(SymbolService symbolService) {
-    this.symbolService = symbolService;
+  public ProcessNodeWithVariableDefinitions(SymbolAccumulatorService symbolAccumulatorService) {
+    this.symbolAccumulatorService = symbolAccumulatorService;
   }
 
   @Override
   public void accept(SectionNode node, ProcessingContext ctx) {
     ctx.getErrors().addAll(VariableDefinitionUtil.processNodeWithVariableDefinitions(node));
-    symbolService.registerVariablesInProgram(node);
+    symbolAccumulatorService.registerVariablesInProgram(node);
   }
 }
