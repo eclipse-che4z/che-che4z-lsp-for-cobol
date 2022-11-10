@@ -109,11 +109,16 @@ suite('Integration Test Suite', () => {
         await helper.insertString(editor, new vscode.Position(22, 7), "oi3Bd5kC1f3nMFp0IWg62ZZgWMxHPJnuLWm4DqplZDzMIX69C6vjeL24YbobdQnoQsDenL35omljznHd0l1fP");
         await helper.sleep(1500);
         const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-        assert.strictEqual(diagnostics.length, 4);
-        assert.strictEqual(diagnostics[0].message, "Source text cannot go past column 80");
-        helper.assertRangeIsEqual(diagnostics[0].range,
-            new vscode.Range(new vscode.Position(22, 80), new vscode.Position(22, 131)));
-
+        console.log(JSON.stringify(diagnostics));
+        for (const d of diagnostics) {
+            if (d.range.start.line == 22) {
+                assert.strictEqual(diagnostics[0].message, "Source text cannot go past column 80");
+                helper.assertRangeIsEqual(diagnostics[0].range,
+                    new vscode.Range(new vscode.Position(22, 80), new vscode.Position(22, 131)));
+                return;
+            }
+        }
+        assert.fail();
     }).timeout(4000).slow(1000);
 
     test("TC174655 Copybook - Nominal", async () => {
