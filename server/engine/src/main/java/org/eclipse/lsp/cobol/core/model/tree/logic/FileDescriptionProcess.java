@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 
-import static org.eclipse.lsp.cobol.common.VariableConstantsProvider.FD_WITHOUT_FILE_CONTROL;
+import static org.eclipse.lsp.cobol.common.VariableConstants.FD_WITHOUT_FILE_CONTROL;
 
 /** FileDescriptionNode processor */
 public class FileDescriptionProcess implements Processor<FileDescriptionNode> {

@@ -36,7 +36,7 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.common.VariableConstantsProvider.*;
+import static org.eclipse.lsp.cobol.common.VariableConstants.*;
 import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
 
 /**

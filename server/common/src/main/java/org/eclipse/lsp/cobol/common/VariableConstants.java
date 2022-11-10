@@ -21,7 +21,7 @@ import lombok.experimental.UtilityClass;
  * Provides constants
  */
 @UtilityClass
-public class VariableConstantsProvider {
+public class VariableConstants {
   public static final int LEVEL_FD_SD = -2;
   public static final int LEVEL_MAP_NAME = -1;
   public static final int LEVEL_MNEMONIC = 0;

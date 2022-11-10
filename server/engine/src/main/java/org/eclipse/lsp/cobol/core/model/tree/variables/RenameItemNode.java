@@ -25,7 +25,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
 
 import java.util.Optional;
 
-import static org.eclipse.lsp.cobol.common.VariableConstantsProvider.LEVEL_66;
+import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_66;
 
 /**
  * This value class represents a renaming data name entry, that has a level number 66. It may be one

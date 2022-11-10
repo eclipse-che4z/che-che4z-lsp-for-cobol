@@ -20,7 +20,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.eclipse.lsp.cobol.common.VariableConstantsProvider;
+import org.eclipse.lsp.cobol.common.VariableConstants;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -104,7 +104,7 @@ public final class VariableDefinitionNode extends Node {
   private static SyntaxError checkClauseIsSingle(
       VariableNode variableNode, Supplier<List<?>> clausesGetter, String clauseName) {
     if (clausesGetter.get().size() > 1)
-      return variableNode.getError(MessageTemplate.of(VariableConstantsProvider.TOO_MANY_CLAUSES_MSG, clauseName));
+      return variableNode.getError(MessageTemplate.of(VariableConstants.TOO_MANY_CLAUSES_MSG, clauseName));
     return null;
   }
 

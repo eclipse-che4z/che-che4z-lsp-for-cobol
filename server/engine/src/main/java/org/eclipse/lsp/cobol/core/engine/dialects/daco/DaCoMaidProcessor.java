@@ -22,7 +22,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.eclipse.lsp.cobol.common.VariableConstantsProvider;
+import org.eclipse.lsp.cobol.common.VariableConstants;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
@@ -112,9 +112,9 @@ public class DaCoMaidProcessor {
           String name = dataEntry.group("entryName");
           int lvl = Integer.parseInt(dataEntry.group("lvl"));
           if (name != null
-              && VariableConstantsProvider.LEVEL_66 != lvl
-              && VariableConstantsProvider.LEVEL_77 != lvl
-              && VariableConstantsProvider.LEVEL_88 != lvl) {
+              && VariableConstants.LEVEL_66 != lvl
+              && VariableConstants.LEVEL_77 != lvl
+              && VariableConstants.LEVEL_88 != lvl) {
             lastSuffix = DaCoHelper.extractSuffix(name).orElse(lastSuffix);
           }
         }

@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
-import static org.eclipse.lsp.cobol.common.VariableConstantsProvider.LEVEL_MAP_NAME;
+import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_MAP_NAME;
 
 /**
  * This extension of {@link IdmsParserBaseVisitor} applies the semantic analysis based on the

@@ -31,7 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
-import static org.eclipse.lsp.cobol.common.VariableConstantsProvider.*;
+import static org.eclipse.lsp.cobol.common.VariableConstants.*;
 
 /**
  * Visitor to collect all IDMS copybooks

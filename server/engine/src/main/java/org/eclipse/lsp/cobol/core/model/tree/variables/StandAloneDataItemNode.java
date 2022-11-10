@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
 
-import static org.eclipse.lsp.cobol.common.VariableConstantsProvider.LEVEL_77;
+import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_77;
 
 /**
  * This value class represents an independent element item COBOL variable, that has a level number

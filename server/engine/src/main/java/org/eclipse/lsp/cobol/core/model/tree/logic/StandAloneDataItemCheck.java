@@ -20,7 +20,7 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.variables.StandAloneDataItemNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 
-import static org.eclipse.lsp.cobol.common.VariableConstantsProvider.EMPTY_STRUCTURE_MSG;
+import static org.eclipse.lsp.cobol.common.VariableConstants.EMPTY_STRUCTURE_MSG;
 
 /** StandAloneDataItemNode processor */
 public class StandAloneDataItemCheck implements Processor<StandAloneDataItemNode> {

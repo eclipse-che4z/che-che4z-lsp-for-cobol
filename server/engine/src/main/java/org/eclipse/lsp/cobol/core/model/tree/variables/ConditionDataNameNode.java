@@ -27,7 +27,7 @@ import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
-import static org.eclipse.lsp.cobol.common.VariableConstantsProvider.LEVEL_88;
+import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_88;
 
 /**
  * This value class represents a conditional data name entry, that has a level number 88. It cannot
