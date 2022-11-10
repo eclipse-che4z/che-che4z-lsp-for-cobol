@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.extendedapi;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
 import org.eclipse.lsp.cobol.service.CFASTBuilder;
 import org.eclipse.lsp.cobol.service.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -56,7 +58,7 @@ class CFASTBuilderTest {
   @MethodSource("casesToTest")
   void cfastBuilderTest(String src, String jsonTree, String caseName) {
     AnalysisResult analysisResult =
-        UseCaseUtils.analyze(UseCase.builder().fileName("fake/path").text(src).build());
+        UseCaseUtils.analyze(UseCase.builder().fileName("fake/path").features(Arrays.asList(EmbeddedCodeNode.Language.values())).text(src).build());
     CFASTBuilder builder = new CFASTBuilderImpl();
     Assertions.assertEquals(
         GSON.toJson(GSON.fromJson(jsonTree, List.class)),
