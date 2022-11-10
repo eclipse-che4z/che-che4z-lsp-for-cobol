@@ -22,6 +22,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.common.VariableConstants;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
@@ -31,15 +32,14 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.common.model.CopyDefinition;
-import org.eclipse.lsp.cobol.common.model.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes.DaCoCopyFromNode;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes.DaCoCopyNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
@@ -112,9 +112,9 @@ public class DaCoMaidProcessor {
           String name = dataEntry.group("entryName");
           int lvl = Integer.parseInt(dataEntry.group("lvl"));
           if (name != null
-              && VariableDefinitionUtil.LEVEL_66 != lvl
-              && VariableDefinitionUtil.LEVEL_77 != lvl
-              && VariableDefinitionUtil.LEVEL_88 != lvl) {
+              && VariableConstants.LEVEL_66 != lvl
+              && VariableConstants.LEVEL_77 != lvl
+              && VariableConstants.LEVEL_88 != lvl) {
             lastSuffix = DaCoHelper.extractSuffix(name).orElse(lastSuffix);
           }
         }

@@ -13,10 +13,10 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
+package org.eclipse.lsp.cobol.common.utils;
 
 import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
+import org.eclipse.lsp.cobol.common.model.NodeSymbolType;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -61,6 +61,6 @@ class RangeUtilsTest {
     Range range =
         new Range(new Position(startLine, startSymbol), new Position(stopLine, stopSymbol));
     return new DocumentSymbol(
-        "", NodeType.FIELD.getSymbolKind(), range, range, "", ImmutableList.of());
+        "", NodeSymbolType.FIELD.getSymbolKind(), range, range, "", ImmutableList.of());
   }
 }

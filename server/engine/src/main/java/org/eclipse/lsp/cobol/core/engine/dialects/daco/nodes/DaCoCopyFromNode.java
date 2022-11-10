@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 
 import static org.eclipse.lsp.cobol.common.model.NodeType.CUSTOM;

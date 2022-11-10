@@ -24,13 +24,13 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Context;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.core.model.tree.*;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -42,8 +42,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.eclipse.lsp.cobol.common.model.Node.hasType;
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils.findNodeByPosition;
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.common.utils.RangeUtils.findNodeByPosition;
 
 /** Service to handle symbol information and dependencies */
 @Singleton
@@ -160,19 +160,20 @@ public class SymbolService {
       // If GO TO is in the same section as a paragraph - no errors
       String usageSectionName = getSectionName(node);
 
-      definitions = definitions.stream()
-          .filter(d -> getSectionName(d).equalsIgnoreCase(usageSectionName))
-          .collect(Collectors.toList());
-
-      if (definitions.size() > 1) {
+      List<CodeBlockDefinitionNode> inTheSameSection = definitions.stream()
+              .filter(d -> getSectionName(d).equalsIgnoreCase(usageSectionName))
+              .collect(Collectors.toList());
+      if (inTheSameSection.size() == 1) {
+        definitions = inTheSameSection;
+      } else {
         return Optional.of(
-            SyntaxError.syntaxError()
-                .errorSource(ErrorSource.PARSING)
-                .messageTemplate(
-                    MessageTemplate.of("semantics.ambiguous", node.getName()))
-                .severity(ErrorSeverity.ERROR)
-                .locality(node.getLocality())
-                .build());
+                SyntaxError.syntaxError()
+                        .errorSource(ErrorSource.PARSING)
+                        .messageTemplate(
+                                MessageTemplate.of("semantics.ambiguous", node.getName()))
+                        .severity(ErrorSeverity.ERROR)
+                        .locality(node.getLocality())
+                        .build());
       }
     }
 

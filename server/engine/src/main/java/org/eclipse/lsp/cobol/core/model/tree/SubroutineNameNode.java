@@ -19,7 +19,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Context;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp4j.Location;
 

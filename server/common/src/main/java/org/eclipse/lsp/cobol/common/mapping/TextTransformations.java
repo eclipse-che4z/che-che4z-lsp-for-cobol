@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.common.mapping;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.lsp.cobol.common.model.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 

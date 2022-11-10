@@ -24,10 +24,10 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.core.model.tree.variables.ValueInterval;
-import org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormat;
+import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
+import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 

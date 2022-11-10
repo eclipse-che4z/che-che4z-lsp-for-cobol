@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree.variables;
+package org.eclipse.lsp.cobol.common.model.tree.variable;
 
 import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
@@ -20,10 +20,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.eclipse.lsp.cobol.common.VariableConstants;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 
 import java.util.List;
@@ -32,8 +33,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.TOO_MANY_CLAUSES_MSG;
 
 /** The node represents a variable definition. */
 @Getter
@@ -105,7 +104,7 @@ public final class VariableDefinitionNode extends Node {
   private static SyntaxError checkClauseIsSingle(
       VariableNode variableNode, Supplier<List<?>> clausesGetter, String clauseName) {
     if (clausesGetter.get().size() > 1)
-      return variableNode.getError(MessageTemplate.of(TOO_MANY_CLAUSES_MSG, clauseName));
+      return variableNode.getError(MessageTemplate.of(VariableConstants.TOO_MANY_CLAUSES_MSG, clauseName));
     return null;
   }
 

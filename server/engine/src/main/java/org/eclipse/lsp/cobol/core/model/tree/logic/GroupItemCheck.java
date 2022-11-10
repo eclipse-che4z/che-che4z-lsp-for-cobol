@@ -15,14 +15,14 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.variables.GroupItemNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormat;
+import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 
-import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.EMPTY_STRUCTURE_MSG;
+import static org.eclipse.lsp.cobol.common.VariableConstants.EMPTY_STRUCTURE_MSG;
 
 /** GroupItemNode processor */
 public class GroupItemCheck implements Processor<GroupItemNode> {

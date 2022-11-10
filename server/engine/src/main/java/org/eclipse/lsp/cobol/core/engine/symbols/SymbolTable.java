@@ -18,7 +18,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.tree.CodeBlockDefinitionNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;

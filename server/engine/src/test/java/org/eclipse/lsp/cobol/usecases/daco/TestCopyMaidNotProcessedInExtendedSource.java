@@ -16,7 +16,7 @@
 package org.eclipse.lsp.cobol.usecases.daco;
 
 import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.common.model.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.positive.CobolText;
@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.DISABLED;
-import static org.eclipse.lsp.cobol.common.model.Node.hasType;
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.common.model.NodeType.COPY;
 import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertTrue;

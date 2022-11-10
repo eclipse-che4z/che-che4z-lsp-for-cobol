@@ -15,7 +15,7 @@
 
 package org.eclipse.lsp.cobol.common.mapping;
 
-import org.eclipse.lsp.cobol.common.model.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 

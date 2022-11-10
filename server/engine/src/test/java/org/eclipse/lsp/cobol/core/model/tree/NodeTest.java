@@ -17,11 +17,12 @@ package org.eclipse.lsp.cobol.core.model.tree;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.ProgramNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
-import org.eclipse.lsp.cobol.core.model.variables.SectionType;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
+import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

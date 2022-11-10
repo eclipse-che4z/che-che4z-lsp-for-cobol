@@ -14,14 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.VariableConstants;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.FileEntryNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
 
 import java.util.Optional;
 /** FileEntryNode processor */
@@ -38,7 +38,7 @@ public class FileEntryProcess implements Processor<FileEntryNode> {
         .getDepthFirstStream()
         .filter(Node.hasType(NodeType.VARIABLE_DEFINITION))
         .map(VariableDefinitionNode.class::cast)
-        .filter(n -> n.getLevel() == VariableDefinitionUtil.LEVEL_FD_SD)
+        .filter(n -> n.getLevel() == VariableConstants.LEVEL_FD_SD)
         .filter(n -> n.getVariableName().getName().equals(node.getFileName()))
         .forEach(n -> n.setFileControlClause(node.getFileControlClause()));
   }
