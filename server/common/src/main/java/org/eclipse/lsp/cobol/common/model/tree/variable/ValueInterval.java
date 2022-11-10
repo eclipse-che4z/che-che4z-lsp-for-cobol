@@ -12,16 +12,17 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree.variables;
+package org.eclipse.lsp.cobol.common.model.tree.variable;
+
+import lombok.Value;
 
 /**
- * The interface represents structure that can show formatted line to the user.
+ * The class represents value interval in COBOL. Including its THRU/THROUGH token. Examples: 88 SOME
+ * values 4. => [from: 4, to: null] 88 high-school values are 10 through 12. => [from: 10, to: 12]
  */
-public interface Describable {
-  /**
-   * Get user friendly node description.
-   *
-   * @return the string with description.
-   */
-  String getFormattedDisplayString();
+@Value
+public class ValueInterval {
+  String from;
+  String to;
+  String thruToken;
 }

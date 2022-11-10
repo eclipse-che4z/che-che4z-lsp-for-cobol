@@ -20,7 +20,7 @@ import com.google.common.collect.Multimap;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 import java.util.List;
 

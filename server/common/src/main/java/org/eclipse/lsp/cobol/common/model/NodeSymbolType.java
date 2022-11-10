@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.semantics.outline;
+package org.eclipse.lsp.cobol.common.model;
 
 import lombok.AllArgsConstructor;
 import org.eclipse.lsp4j.SymbolKind;
@@ -31,7 +31,7 @@ import static org.eclipse.lsp4j.SymbolKind.*;
  *     document symbol</a>
  */
 @AllArgsConstructor
-public enum NodeType {
+public enum NodeSymbolType {
   PROGRAM(Class),
   PROGRAM_ID(Method),
   DIVISION(Method),

@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.service.delegates.validations;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp4j.Diagnostic;

@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.core.model.tree.statements;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 import java.util.List;
 

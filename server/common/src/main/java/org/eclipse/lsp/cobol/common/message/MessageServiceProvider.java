@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,16 +12,15 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree.variables;
+package org.eclipse.lsp.cobol.common.message;
 
-import lombok.Value;
-
-import java.util.List;
-
-/** The class represents occurs clause in COBOL. */
-@Value
-public class OccursClause {
-  Integer from;
-  Integer to;
-  List<VariableNameAndLocality> indexed;
+/**
+ * MessageService provider
+ */
+public interface MessageServiceProvider {
+  /**
+   * Returns MessageService instance
+   * @return MessageService
+   */
+  MessageService getMessageService();
 }

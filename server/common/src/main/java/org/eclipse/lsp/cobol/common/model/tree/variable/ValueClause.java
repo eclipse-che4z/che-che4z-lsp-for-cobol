@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree.variables;
+package org.eclipse.lsp.cobol.common.model.tree.variable;
 
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.model.Locality;

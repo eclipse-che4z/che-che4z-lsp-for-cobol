@@ -22,11 +22,11 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.CICSParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.model.tree.CodeBlockUsageNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 
 import java.util.List;
 import java.util.Map;

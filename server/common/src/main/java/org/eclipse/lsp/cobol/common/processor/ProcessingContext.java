@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.common.processor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 import java.util.*;
 import java.util.function.BiConsumer;

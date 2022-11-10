@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.common.processor;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 /**
  * AST Processor descriptor class

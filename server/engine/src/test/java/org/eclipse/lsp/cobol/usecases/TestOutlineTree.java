@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
-import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
+import org.eclipse.lsp.cobol.common.model.NodeSymbolType;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
@@ -162,143 +162,143 @@ class TestOutlineTree {
 
   private List<DocumentSymbol> getExpectedOutlineNodes() {
     return nested(
-        node("COPY FOO", NodeType.COPYBOOK),
+        node("COPY FOO", NodeSymbolType.COPYBOOK),
         node(
             "PROGRAM: HELLO-WORLD",
-            NodeType.PROGRAM,
+            NodeSymbolType.PROGRAM,
             nested(
                 node(
                     "IDENTIFICATION DIVISION",
-                    NodeType.DIVISION,
-                    nested(node("PROGRAM-ID HELLO-WORLD", NodeType.PROGRAM_ID))),
+                    NodeSymbolType.DIVISION,
+                    nested(node("PROGRAM-ID HELLO-WORLD", NodeSymbolType.PROGRAM_ID))),
                 node("ENVIRONMENT DIVISION",
-                    NodeType.DIVISION,
+                    NodeSymbolType.DIVISION,
                     nested(
                         node("IDMS-CONTROL SECTION",
-                            NodeType.SECTION)
+                            NodeSymbolType.SECTION)
                     )),
                 node(
                     "DATA DIVISION",
-                    NodeType.DIVISION,
+                    NodeSymbolType.DIVISION,
                     nested(
                         node(
                             "MAP SECTION",
-                            NodeType.SECTION,
-                            nested(node("MAP1", NodeType.FIELD), node("EMPMAP", NodeType.FIELD))),
+                            NodeSymbolType.SECTION,
+                            nested(node("MAP1", NodeSymbolType.FIELD), node("EMPMAP", NodeSymbolType.FIELD))),
                         node(
                             "WORKING-STORAGE SECTION",
-                            NodeType.SECTION,
+                            NodeSymbolType.SECTION,
                             nested(
-                                node("COPY BAR", NodeType.COPYBOOK),
-                                node("USER-NUM1", NodeType.FIELD),
-                                node("USER-NUM2", NodeType.FIELD),
+                                node("COPY BAR", NodeSymbolType.COPYBOOK),
+                                node("USER-NUM1", NodeSymbolType.FIELD),
+                                node("USER-NUM2", NodeSymbolType.FIELD),
                                 node(
                                     "USER-ADDRESS",
-                                    NodeType.STRUCT,
+                                    NodeSymbolType.STRUCT,
                                     nested(
-                                        node("COPY BAZ", NodeType.COPYBOOK),
-                                        node("USER-CITY", NodeType.FIELD),
-                                        node("USER-COUNTRY", NodeType.FIELD),
-                                        node("USER-INDEX", NodeType.FIELD),
-                                        node("USER-PHONE", NodeType.FIELD))),
+                                        node("COPY BAZ", NodeSymbolType.COPYBOOK),
+                                        node("USER-CITY", NodeSymbolType.FIELD),
+                                        node("USER-COUNTRY", NodeSymbolType.FIELD),
+                                        node("USER-INDEX", NodeSymbolType.FIELD),
+                                        node("USER-PHONE", NodeSymbolType.FIELD))),
                                 node(
                                     "FILLER",
-                                    NodeType.STRUCT,
-                                    nested(node("FOO", NodeType.FIELD))))))),
+                                    NodeSymbolType.STRUCT,
+                                    nested(node("FOO", NodeSymbolType.FIELD))))))),
                 node(
                     "PROCEDURE DIVISION",
-                    NodeType.DIVISION,
+                    NodeSymbolType.DIVISION,
                     nested(
-                        node("000-MAIN-LOGIC", NodeType.PROCEDURE),
-                        node("100-PRINT-USER", NodeType.PROCEDURE))))),
+                        node("000-MAIN-LOGIC", NodeSymbolType.PROCEDURE),
+                        node("100-PRINT-USER", NodeSymbolType.PROCEDURE))))),
         node(
             "PROGRAM: OUTLINE",
-            NodeType.PROGRAM,
+            NodeSymbolType.PROGRAM,
             nested(
                 node(
                     "IDENTIFICATION DIVISION",
-                    NodeType.DIVISION,
-                    nested(node("PROGRAM-ID OUTLINE", NodeType.PROGRAM_ID))),
+                    NodeSymbolType.DIVISION,
+                    nested(node("PROGRAM-ID OUTLINE", NodeSymbolType.PROGRAM_ID))),
                 node(
                     "ENVIRONMENT DIVISION",
-                    NodeType.DIVISION,
+                    NodeSymbolType.DIVISION,
                     nested(
                         node(
                             "CONFIGURATION SECTION",
-                            NodeType.SECTION,
-                            nested(node("TOP-OF-PAGE", NodeType.MNEMONIC_NAME))),
+                            NodeSymbolType.SECTION,
+                            nested(node("TOP-OF-PAGE", NodeSymbolType.MNEMONIC_NAME))),
                         node(
                             "INPUT-OUTPUT SECTION",
-                            NodeType.SECTION,
-                            nested(node("TRANS-FILE-IN", NodeType.FILE))))),
+                            NodeSymbolType.SECTION,
+                            nested(node("TRANS-FILE-IN", NodeSymbolType.FILE))))),
                 node(
                     "DATA DIVISION",
-                    NodeType.DIVISION,
+                    NodeSymbolType.DIVISION,
                     nested(
                         node(
                             "FILE SECTION",
-                            NodeType.SECTION,
+                            NodeSymbolType.SECTION,
                             nested(
                                 node(
                                     "TRANS-FILE-IN",
-                                    NodeType.FILE,
-                                    nested(node("FILE-RECORD", NodeType.FIELD))),
+                                    NodeSymbolType.FILE,
+                                    nested(node("FILE-RECORD", NodeSymbolType.FIELD))),
                                 node(
                                     "TERMS-FILE",
-                                    NodeType.FILE,
+                                    NodeSymbolType.FILE,
                                     nested(
                                         node(
                                             "TERMS-RECORD",
-                                            NodeType.STRUCT,
+                                            NodeSymbolType.STRUCT,
                                             nested(
-                                                node("TERMS-KEY", NodeType.FIELD),
-                                                node("FILLER", NodeType.FIELD))))))),
+                                                node("TERMS-KEY", NodeSymbolType.FIELD),
+                                                node("FILLER", NodeSymbolType.FIELD))))))),
                         node(
                             "WORKING-STORAGE SECTION",
-                            NodeType.SECTION,
+                            NodeSymbolType.SECTION,
                             nested(
-                                node("COLR-DISPLAY", NodeType.FIELD),
+                                node("COLR-DISPLAY", NodeSymbolType.FIELD),
                                 node(
                                     "CTLFILE-REC",
-                                    NodeType.STRUCT,
+                                    NodeSymbolType.STRUCT,
                                     nested(
-                                        node("CTLFILE-PRIME", NodeType.FIELD),
-                                        node("CTLFILE-PAST-DUE-DIFF", NodeType.FIELD))),
+                                        node("CTLFILE-PRIME", NodeSymbolType.FIELD),
+                                        node("CTLFILE-PAST-DUE-DIFF", NodeSymbolType.FIELD))),
                                 node(
                                     "CTLFILE-REC-12",
-                                    NodeType.STRUCT,
+                                    NodeSymbolType.STRUCT,
                                     nested(
-                                        node("CTLFILE-DB-DATE", NodeType.FIELD),
-                                        node("CTLFILE-ATB-DATE", NodeType.FIELD),
+                                        node("CTLFILE-DB-DATE", NodeSymbolType.FIELD),
+                                        node("CTLFILE-ATB-DATE", NodeSymbolType.FIELD),
                                         node(
                                             "COST-RECORD-CODE",
-                                            NodeType.FIELD,
+                                            NodeSymbolType.FIELD,
                                             nested(
-                                                node("HEADER", NodeType.FIELD_88),
-                                                node("SUPPLR", NodeType.FIELD_88),
-                                                node("WREHOUSE", NodeType.FIELD_88))))))),
+                                                node("HEADER", NodeSymbolType.FIELD_88),
+                                                node("SUPPLR", NodeSymbolType.FIELD_88),
+                                                node("WREHOUSE", NodeSymbolType.FIELD_88))))))),
                         node(
                             "LINKAGE SECTION",
-                            NodeType.SECTION,
+                            NodeSymbolType.SECTION,
                             nested(
                                 node(
                                     "LINK-PRM0",
-                                    NodeType.STRUCT,
+                                    NodeSymbolType.STRUCT,
                                     nested(
-                                        node("PARM-LENGTH", NodeType.FIELD),
-                                        node("PARM", NodeType.FIELD))))))),
+                                        node("PARM-LENGTH", NodeSymbolType.FIELD),
+                                        node("PARM", NodeSymbolType.FIELD))))))),
                 node(
                     "PROCEDURE DIVISION",
-                    NodeType.DIVISION,
+                    NodeSymbolType.DIVISION,
                     nested(
-                        node("000-PROGRAM-DRIVER", NodeType.PROCEDURE_SECTION),
+                        node("000-PROGRAM-DRIVER", NodeSymbolType.PROCEDURE_SECTION),
                         node(
                             "100-HOUSEKEEPING",
-                            NodeType.PROCEDURE_SECTION,
+                            NodeSymbolType.PROCEDURE_SECTION,
                             nested(
-                                node("110-OPEN-FILES", NodeType.PROCEDURE),
-                                node("112-READ-WAREHOUS-FILE", NodeType.PROCEDURE),
-                                node("199-EXIT", NodeType.PROCEDURE))))))));
+                                node("110-OPEN-FILES", NodeSymbolType.PROCEDURE),
+                                node("112-READ-WAREHOUS-FILE", NodeSymbolType.PROCEDURE),
+                                node("199-EXIT", NodeSymbolType.PROCEDURE))))))));
   }
 
   private void assertNodeListEquals(
@@ -329,11 +329,11 @@ class TestOutlineTree {
     return Arrays.asList(nodes);
   }
 
-  private DocumentSymbol node(String name, NodeType nodeType) {
-    return node(name, nodeType, ImmutableList.of());
+  private DocumentSymbol node(String name, NodeSymbolType nodeSymbolType) {
+    return node(name, nodeSymbolType, ImmutableList.of());
   }
 
-  private DocumentSymbol node(String name, NodeType nodeType, List<DocumentSymbol> nested) {
-    return new DocumentSymbol(name, nodeType.getSymbolKind(), new Range(), new Range(), "", nested);
+  private DocumentSymbol node(String name, NodeSymbolType nodeSymbolType, List<DocumentSymbol> nested) {
+    return new DocumentSymbol(name, nodeSymbolType.getSymbolKind(), new Range(), new Range(), "", nested);
   }
 }

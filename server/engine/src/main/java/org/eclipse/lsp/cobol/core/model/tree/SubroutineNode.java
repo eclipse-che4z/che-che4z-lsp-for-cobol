@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.Node;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 
 /** The class represents the Subroutine Node. */
