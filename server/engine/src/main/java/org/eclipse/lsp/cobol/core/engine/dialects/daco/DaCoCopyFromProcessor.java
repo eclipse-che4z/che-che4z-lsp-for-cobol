@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.dialects.daco.nodes.DaCoCopyFromNode;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 
 import java.util.List;
@@ -34,10 +34,10 @@ import java.util.stream.Collectors;
 
 /** Handle Copy From node */
 public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
-  private final SymbolService symbolService;
+  private final SymbolAccumulatorService symbolAccumulatorService;
 
-  public DaCoCopyFromProcessor(SymbolService symbolService) {
-    this.symbolService = symbolService;
+  public DaCoCopyFromProcessor(SymbolAccumulatorService symbolAccumulatorService) {
+    this.symbolAccumulatorService = symbolAccumulatorService;
   }
 
   @Override
@@ -68,7 +68,7 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
       return;
     }
     copyFrom(node.getLevel(), protoCandidates.get(0), node.getParent(), node);
-    symbolService.registerVariablesInProgram(node.getParent());
+    symbolAccumulatorService.registerVariablesInProgram(node.getParent());
   }
 
   private void copyFrom(

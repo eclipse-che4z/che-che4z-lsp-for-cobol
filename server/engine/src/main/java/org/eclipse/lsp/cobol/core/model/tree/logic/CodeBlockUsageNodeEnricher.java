@@ -19,7 +19,7 @@ import lombok.AllArgsConstructor;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp4j.Location;
 
@@ -31,7 +31,7 @@ import java.util.function.Function;
  */
 @AllArgsConstructor
 public class CodeBlockUsageNodeEnricher implements Processor<CodeBlockUsageNode> {
-  private final SymbolService symbolService;
+  private final SymbolAccumulatorService symbolAccumulatorService;
 
   @Override
   public void accept(CodeBlockUsageNode node, ProcessingContext processingContext) {
@@ -41,7 +41,7 @@ public class CodeBlockUsageNodeEnricher implements Processor<CodeBlockUsageNode>
 
   private List<Location> getLocations(CodeBlockUsageNode node, Function<CodeBlockReference, List<Location>> retriveLocations) {
     return node.getProgram()
-        .map(p -> symbolService.getCodeBlockReference(p, node.getName()))
+        .map(p -> symbolAccumulatorService.getCodeBlockReference(p, node.getName()))
         .map(retriveLocations)
         .orElse(ImmutableList.of());
   }

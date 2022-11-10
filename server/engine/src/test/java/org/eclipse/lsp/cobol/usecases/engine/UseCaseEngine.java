@@ -23,8 +23,8 @@ import org.eclipse.lsp.cobol.common.model.Context;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
@@ -34,7 +34,10 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
@@ -322,19 +325,18 @@ public class UseCaseEngine {
       Predicate<VariableNode> predicate,
       Function<Context, List<Location>> extractor) {
 
-    SymbolService symbolService =  new SymbolService(result.getSymbolTableMap());
-    Map<String, List<Location>> map = result
+    SymbolsRepository repo =  new SymbolsRepository(result.getSymbolTableMap());
+    return result
             .getRootNode()
             .getDepthFirstStream()
             .filter(hasType(PROGRAM))
             .map(ProgramNode.class::cast)
-            .map(symbolService::getVariables)
+            .map(repo::getVariables)
             .map(Multimap::values)
             .flatMap(Collection::stream)
             .filter(it -> !FILLER_NAME.equals(it.getName()))
             .filter(predicate)
             .collect(toMap(extractor, PROGRAM));
-    return map;
   }
 
   private Map<String, List<Location>> extractDefinitions(AnalysisResult result, NodeType nodeType) {

@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.FigurativeConstants;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
@@ -39,10 +39,10 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
   private static final String NOT_DEFINED_ERROR = "semantics.notDefined";
   private static final String AMBIGUOUS_REFERENCE_ERROR = "semantics.ambiguous";
 
-  private final SymbolService symbolService;
+  private final SymbolAccumulatorService symbolAccumulatorService;
 
-  public QualifiedReferenceUpdateVariableUsage(SymbolService symbolService) {
-    this.symbolService = symbolService;
+  public QualifiedReferenceUpdateVariableUsage(SymbolAccumulatorService symbolAccumulatorService) {
+    this.symbolAccumulatorService = symbolAccumulatorService;
   }
 
   @Override
@@ -64,7 +64,7 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     List<VariableNode> foundDefinitions =
         node.getProgram()
             .map(
-                programNode -> symbolService.getVariableDefinition(programNode, variableUsageNodes))
+                programNode -> symbolAccumulatorService.getVariableDefinition(programNode, variableUsageNodes))
             .orElseGet(ImmutableList::of);
 
     for (VariableNode definitionNode : foundDefinitions) {

@@ -24,7 +24,6 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
 import org.eclipse.lsp.cobol.core.visitor.CICSVisitor;
 import org.eclipse.lsp.cobol.core.visitor.Db2SqlVisitor;
 
@@ -41,15 +40,13 @@ public class EmbeddedCodeNode extends Node {
   TokenStream tokens;
   ParserRuleContext tree;
   Language lang;
-  private final SymbolService symbolService;
 
   public EmbeddedCodeNode(
-          Locality location, TokenStream tokens, ParserRuleContext tree, Language lang, SymbolService symbolService) {
+          Locality location, TokenStream tokens, ParserRuleContext tree, Language lang) {
     super(location, EMBEDDED_CODE);
     this.tokens = tokens;
     this.tree = tree;
     this.lang = lang;
-    this.symbolService = symbolService;
   }
 
   /**
