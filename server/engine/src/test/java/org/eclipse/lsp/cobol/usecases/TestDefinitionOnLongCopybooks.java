@@ -69,7 +69,7 @@ class TestDefinitionOnLongCopybooks {
     TextDocumentPositionParams position = new TextDocumentPositionParams(
             new TextDocumentIdentifier(DOCUMENT_URI), new Position(4, 15));
     Location expectedDef = new Location(
-            "file:///c%3A/workspace/.c4z/.copybooks/ABCD.cpy",
+            "file:///c:/workspace/.c4z/.copybooks/ABCD.cpy",
             new Range(new Position(), new Position()));
     Context ctx = mock(Context.class);
     when(ctx.getDefinitions()).thenReturn(Collections.singletonList(expectedDef));

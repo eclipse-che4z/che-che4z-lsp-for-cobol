@@ -17,7 +17,6 @@ import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import {EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT} from "../../constants";
 
-import {ExtensionUtils} from "../util/ExtensionUtils";
 import {TelemetryEvent} from "./model/TelemetryEvent";
 import {TelemetryMeasurement} from "./model/TelemetryMeasurement";
 import {TelemetryReport} from "./TelemetryReport";
@@ -42,8 +41,8 @@ export class TelemetryReporterImpl implements TelemetryReport {
     }
 
     private static getTelemetryResourcePath() {
-        return vscode.Uri.file(
-            path.join(ExtensionUtils.getExtensionPath(), "resources", "TELEMETRY_KEY")).fsPath;
+        const extPath = vscode.extensions.getExtension(EXTENSION_ID).extensionPath;
+        return vscode.Uri.file(path.join(extPath, "resources", "TELEMETRY_KEY")).fsPath;
     }
 
     private static getInstrumentationKey(): string {
@@ -54,7 +53,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
         return {
             categories: content.categories.toString(),
             event: content.eventName,
-            IDE: ExtensionUtils.getIDEName(),
+            IDE: (vscode.env) ? vscode.env.appName : "N.D.",
             notes: content.notes,
             timestamp: content.timestamp,
             rootCause: content.rootCause,
@@ -77,7 +76,8 @@ export class TelemetryReporterImpl implements TelemetryReport {
     private reporter: TelemetryReporter;
 
     constructor(private telemetryKeyId: string) {
-        this.reporter = new TelemetryReporter(EXTENSION_ID, ExtensionUtils.getPackageVersion(), this.telemetryKeyId);
+        const version = vscode.extensions.getExtension(EXTENSION_ID).packageJSON.version;
+        this.reporter = new TelemetryReporter(EXTENSION_ID, version, this.telemetryKeyId);
     }
 
     public reportEvent(content: TelemetryEvent): void {

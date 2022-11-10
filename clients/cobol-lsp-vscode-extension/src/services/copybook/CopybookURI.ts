@@ -15,7 +15,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { C4Z_FOLDER, COPYBOOKS_FOLDER } from "../../constants";
 import { SettingsService } from "../Settings";
-import { searchInWorkspace } from "../util/FSUtils";
+import { searchCopybookInWorkspace } from "../util/FSUtils";
 import { ProfileUtils } from "../util/ProfileUtils";
 
 /**
@@ -36,11 +36,11 @@ export class CopybookURI {
     public static async resolveCopybookURI(copybookName: string, cobolFileName: string, dialectType: string): Promise<string> {
         // check on local paths provided by the user
         let result: string;
-        result = searchInWorkspace(copybookName,
+        result = searchCopybookInWorkspace(copybookName,
             SettingsService.getCopybookLocalPath(cobolFileName, dialectType), SettingsService.getCopybookExtension());
         // check in subfolders under .copybooks (copybook downloaded from MF)
         if (!result) {
-            result = searchInWorkspace(copybookName,
+            result = searchCopybookInWorkspace(copybookName,
                 CopybookURI.createPathForCopybookDownloaded(cobolFileName, dialectType), SettingsService.getCopybookExtension());
         }
         return result || "";

@@ -61,16 +61,22 @@ export function moveCursor(editor: vscode.TextEditor, position: vscode.Position)
     editor.selection = new vscode.Selection(position, position);
 }
 
+export async function deleteLine(editor: vscode.TextEditor, lineNumber: number) {
+    await editor.edit(edit => {
+        edit.delete(new vscode.Range(new vscode.Position(lineNumber, 0), new vscode.Position(lineNumber, 80)));
+    });
+}
+
 export async function insertString(editor: vscode.TextEditor, position: vscode.Position, str: string): Promise<vscode.Position> {
     await editor.edit(edit => {
         edit.insert(position, str);
     });
 
     // Get number of lines in string and compute the new end position
-    const str_split = str.split('\n');
+    const str_split = str.split("\n");
     const lines = str_split.length;
 
-    const movePosition = new vscode.Position(position.line + lines - 1, lines == 1 ? position.character + str.length : str_split[lines].length);
+    const movePosition = new vscode.Position(position.line + lines - 1, lines == 1 ? position.character + str.length : str_split[lines-1].length);
     editor.selection = new vscode.Selection(movePosition, movePosition);
 
     return movePosition;
@@ -87,7 +93,11 @@ export function updateConfig(configFileName: string) {
     recursiveCopySync(settingvalueLoc, settinsFileLoc);
 }
 
-function recursiveCopySync(origin, dest) {
+export function deleteFile(path: string){
+    fs.rmSync(path);
+}
+
+export function recursiveCopySync(origin, dest) {
     if (fs.existsSync(origin)) {
         if (fs.statSync(origin).isDirectory()) {
             fs.mkdirSync(dest);
@@ -103,10 +113,20 @@ function recursiveCopySync(origin, dest) {
 }
 
 export function assertRangeIsEqual(providedRange: vscode.Range, expectedRange: vscode.Range) {
-   return providedRange.start.line == expectedRange.start.line
-        && providedRange.start.character == expectedRange.start.character
-        && providedRange.end.line == expectedRange.end.line
-        && providedRange.end.character == expectedRange.end.character;
+   assert.strictEqual(providedRange.start.line, expectedRange.start.line);
+   assert.strictEqual(providedRange.start.character, expectedRange.start.character);
+   assert.strictEqual(providedRange.end.line, expectedRange.end.line);
+   assert.strictEqual(providedRange.end.character, expectedRange.end.character);
+}
+
+export function printDocument(editor : vscode.TextEditor) {
+    console.log(
+        editor.document.getText(
+            (new vscode.Range(new vscode.Position(0, 0), new vscode.Position(70, 80)))))
+}
+
+export function printAllDiagnostics(diagnostics: vscode.Diagnostic[]){
+    diagnostics.forEach(d => console.log(d.message + " " + d.range.start.line + "." + d.range.start.character + "_" + d.range.end.line + "." + d.range.end.character));
 }
 
 export async function executeCommandMultipleTimes(command: string, times: number) {

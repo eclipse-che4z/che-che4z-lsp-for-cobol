@@ -15,7 +15,7 @@
 import { resolveCopybookHandler } from "../../../services/copybook/CopybookMessageHandler";
 import { CopybookURI } from "../../../services/copybook/CopybookURI";
 import { SettingsService } from "../../../services/Settings";
-import { searchInWorkspace } from "../../../services/util/FSUtils";
+import { searchCopybookInWorkspace } from "../../../services/util/FSUtils";
 import * as vscode from "vscode";
 
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
@@ -32,7 +32,7 @@ describe("Test the copybook message handler", () => {
     it("checks local present copybooks are resolved", () => {
         SettingsService.getCopybookExtension = jest.fn().mockReturnValue([".cpy"]);
         SettingsService.getCopybookLocalPath = jest.fn().mockReturnValue("/configured/path/from/setting");
-        (searchInWorkspace as any) = jest.fn().mockReturnValue("copybook content");
+        (searchCopybookInWorkspace as any) = jest.fn().mockReturnValue("copybook content");
         expect(resolveCopybookHandler("cobolFileName", "copybookName", "dialectType")).toBe("copybook content");
     });
 
@@ -41,7 +41,7 @@ describe("Test the copybook message handler", () => {
         SettingsService.getCopybookLocalPath = jest.fn().mockReturnValue("");
         SettingsService.getDsnPath = jest.fn().mockReturnValue(["/configured/path"]);
         CopybookURI.createDatasetPath = jest.fn().mockReturnValue(["/downloaded/copybook/path"]);
-        (searchInWorkspace as any) = jest.fn().mockReturnValueOnce("").mockReturnValueOnce("Downloaded copybook content");
+        (searchCopybookInWorkspace as any) = jest.fn().mockReturnValueOnce("").mockReturnValueOnce("Downloaded copybook content");
         expect(resolveCopybookHandler("cobolFileName", "copybookName", "dialectType")).toBe("Downloaded copybook content");
     });
 
@@ -51,7 +51,7 @@ describe("Test the copybook message handler", () => {
         SettingsService.getDsnPath = jest.fn().mockReturnValue([]);
         SettingsService.getUssPath = jest.fn().mockReturnValue(["/configured/path"]);
         CopybookURI.createDatasetPath = jest.fn().mockReturnValue(["/downloaded/copybook/path"]);
-        (searchInWorkspace as any) = jest.fn().mockReturnValueOnce("").mockReturnValueOnce("")
+        (searchCopybookInWorkspace as any) = jest.fn().mockReturnValueOnce("").mockReturnValueOnce("")
             .mockReturnValue("Downloaded USS copybook content");
         expect(resolveCopybookHandler("cobolFileName", "copybookName", "dialectType")).toBe("Downloaded USS copybook content");
     });

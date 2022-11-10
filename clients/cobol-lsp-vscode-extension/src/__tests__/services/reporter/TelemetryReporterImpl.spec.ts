@@ -11,12 +11,10 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-
 import * as fs from "fs";
 import * as path from "path";
-import * as vscode from "vscode";
 import {TelemetryReporterImpl} from "../../../services/reporter/TelemetryReporterImpl";
-import {ExtensionUtils} from "../../../services/util/ExtensionUtils";
+import * as vscode from "vscode";
 
 const INVALID_TELEMETRY_KEY: string = "INVALID_INSTRUMENTATION_KEY";
 const INVALID_TELEMETRY_KEY_FOR_TESTING: string = "INSTRUMENTATION_KEY_FOR_TESTING";
@@ -34,7 +32,6 @@ function mockFsPath(inputPath: string): void {
 describe("Telemetry key retrieval functionality is able to return a decoded existing key or a default string", () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        (ExtensionUtils as any).getExtensionPath = jest.fn().mockReturnValue(path.join(__dirname, "../../"));
     });
 
     test("Given an existent flat file that contains telemetry key, then the content of that file is not empty and is returned", async () => {

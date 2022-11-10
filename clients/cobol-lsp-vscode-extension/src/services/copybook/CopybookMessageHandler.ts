@@ -13,7 +13,7 @@
  */
 
 import { SettingsService } from "../Settings";
-import { searchInWorkspace } from "../util/FSUtils";
+import { searchCopybookInWorkspace } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import { CopybookName } from "./CopybookDownloadService";
 
@@ -26,7 +26,7 @@ export function resolveCopybookHandler(cobolFileName: string, copybookName: stri
     result = searchCopybook(cobolFileName, copybookName, dialectType);
     // check in subfolders under .copybooks (copybook downloaded from MF)
     if (!result) {
-        result = searchInWorkspace(
+        result = searchCopybookInWorkspace(
             copybookName,
             CopybookURI.createPathForCopybookDownloaded(
                 cobolFileName,
@@ -41,9 +41,9 @@ function searchCopybook(cobolFileName: string, copybookName: string, dialectType
     for (let i = 0; i < Object.values(CopybookFolderKind).length; i++) {
         const folderKind = Object.values(CopybookFolderKind)[i];
         const targetFolder = getTargetFolderForCopybook(folderKind, cobolFileName, dialectType);
-        result = searchInWorkspace(copybookName, targetFolder, SettingsService.getCopybookExtension());
+        result = searchCopybookInWorkspace(copybookName, targetFolder, SettingsService.getCopybookExtension());
         if (result) {
-            break;
+            return result;
         }
     }
     return result;
@@ -61,10 +61,8 @@ function getTargetFolderForCopybook(folderKind: string | CopybookFolderKind, cob
         case CopybookFolderKind[CopybookFolderKind["downloaded-uss"]]:
             result = SettingsService.getUssPath(cobolFileName, dialectType).map(dnsPath => CopybookURI.createDatasetPath(SettingsService.getProfileName(), dnsPath));
             break;
-        default:
-            result = [];
     }
-    return result;
+    return result || [];
 }
 
 export function downloadCopybookHandler(cobolFileName: string, copybookNames: string[], dialectType: string, quietMode: boolean): string {

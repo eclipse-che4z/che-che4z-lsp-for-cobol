@@ -126,8 +126,18 @@ describe("SettingsService evaluate variables", () => {
         SettingsService.serverType();
         expect(tracking).toBeCalledWith("cobol-lsp.serverType");
     });
-
 });
+
+test("getWorkspaceFoldersPath return an array of paths", () => {
+    const paths = SettingsUtils.getWorkspaceFoldersPath();
+    expect(paths).toStrictEqual(["/ws-vscode"])
+});
+
+test("json validation", () => {
+    expect(SettingsUtils.isValidJSON(undefined)).toBeFalsy();
+    expect(SettingsUtils.isValidJSON("{}")).toBeTruthy();
+});
+
 
 describe("SettingsService returns correct tab settings", () => {
     test("Returns default tab settigs for boolean value", () => {
