@@ -57,8 +57,6 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
@@ -68,7 +66,6 @@ import org.eclipse.lsp.cobol.service.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp4j.Location;
 
 import java.util.*;
 import java.util.function.Function;
@@ -235,13 +232,9 @@ public class CobolLanguageEngine {
     timingBuilder.getSplittingLanguageTimer().stop();
 
     timingBuilder.getMappingTimer().start();
-    Map<Token, Locality> positionMapping =
-        getPositionMapping(
-            documentUri,
-            extendedDocument,
-            tokens,
-            embeddedCodeParts,
+    OldMapping positionMapping = new OldMapping(documentUri, extendedDocument, tokens, embeddedCodeParts,
             dialectProcessingContext.getExtendedSource());
+
     timingBuilder.getMappingTimer().stop();
 
     timingBuilder.getVisitorTimer().start();
@@ -430,38 +423,7 @@ public class CobolLanguageEngine {
     return new CobolParser(tokens);
   }
 
-  Map<Token, Locality> getPositionMapping(
-      String documentUri,
-      ExtendedDocument extendedDocument,
-      CommonTokenStream tokens,
-      Map<Token, EmbeddedCode> embeddedCodeParts,
-      ExtendedSource extendedSource) {
-    ThreadInterruptionUtil.checkThreadInterrupted();
-    Map<Token, Locality> mapping =
-        LocalityMappingUtils.createPositionMapping(
-            tokens.getTokens(),
-            extendedDocument.getDocumentMapping(),
-            documentUri,
-            embeddedCodeParts);
-    return updateMapping(documentUri, mapping, extendedSource);
-  }
-
-  private Map<Token, Locality> updateMapping(
-      String documentUri, Map<Token, Locality> mapping, ExtendedSource extendedSource) {
-    mapping.forEach(
-        (k, v) -> {
-          if (v.getUri().equals(documentUri)) {
-            Location l = extendedSource.mapLocation(v.getRange());
-
-            v.getRange().setStart(l.getRange().getStart());
-            v.getRange().setEnd(l.getRange().getEnd());
-            v.setUri(l.getUri());
-          }
-        });
-    return mapping;
-  }
-
-  private void analyzeEmbeddedCode(List<Node> syntaxTree, Map<Token, Locality> mapping) {
+  private void analyzeEmbeddedCode(List<Node> syntaxTree, OldMapping mapping) {
     syntaxTree.stream()
         .flatMap(Node::getDepthFirstStream)
         .filter(hasType(EMBEDDED_CODE))
@@ -472,7 +434,7 @@ public class CobolLanguageEngine {
 
   @NonNull
   private List<SyntaxError> finalizeErrors(
-      @NonNull List<SyntaxError> errors, @NonNull Map<Token, Locality> mapping) {
+      @NonNull List<SyntaxError> errors, @NonNull OldMapping mapping) {
     return errors.stream()
         .filter(c -> c.getTokenIndex() != -1)
         .map(convertError(mapping))
@@ -481,10 +443,10 @@ public class CobolLanguageEngine {
   }
 
   @NonNull
-  private Function<SyntaxError, SyntaxError> convertError(@NonNull Map<Token, Locality> mapping) {
+  private Function<SyntaxError, SyntaxError> convertError(@NonNull OldMapping mapping) {
     return err ->
         err.toBuilder()
-            .locality(LocalityUtils.findPreviousVisibleLocality(err.getTokenIndex(), mapping))
+            .locality(mapping.findPreviousVisibleLocality(err.getTokenIndex()))
             .suggestion(messageService.getMessage(err.getSuggestion()))
             .errorSource(ErrorSource.PARSING)
             .build();
