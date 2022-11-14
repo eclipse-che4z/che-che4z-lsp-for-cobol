@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+~ Copyright (c) 2022 Broadcom.
+~
+~ The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+~
+~ This program and the accompanying materials are made
+~ available under the terms of the Eclipse Public License 2.0
+~ which is available at https://www.eclipse.org/legal/epl-2.0/
+~
+~ SPDX-License-Identifier: EPL-2.0
+~
+~ Contributors:
+~ Broadcom, Inc. - initial API and implementation
+~
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <version>1.0-SNAPSHOT</version>
+    <artifactId>dialect-daco</artifactId>
+    <groupId>org.eclipse.lsp.cobol</groupId>
+    <modelVersion>4.0.0</modelVersion>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <maven.antlr4.plugin.version>4.7</maven.antlr4.plugin.version>
+        <antlr.version>4.7.1</antlr.version>
+        <lombok.version>1.18.22</lombok.version>
+        <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
+        <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.eclipse.lsp.cobol</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4</artifactId>
+            <version>${antlr.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>${antlr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-maven-plugin</artifactId>
+            <scope>provided</scope>
+            <version>${antlr.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.sonatype.sisu</groupId>
+                    <artifactId>sisu-guice</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/antlr4</directory>
+                <excludes>
+                    <exclude>**</exclude>
+                </excludes>
+                <includes>
+                    <include>*.tokens</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/test/antlr4</directory>
+                <excludes>
+                    <exclude>**</exclude>
+                </excludes>
+                <includes>
+                    <include>*.tokens</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven.resources.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>${maven.antlr4.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>build UseCasePreprocessor</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                        <configuration>
+                            <generateTestSources>true</generateTestSources>
+                            <arguments>
+                                <argument>-package</argument>
+                                <argument>org.eclipse.usecase</argument>
+                                <argument>-o</argument>
+                                <argument>${basedir}/target/generated-sources/antlr4/org/eclipse/usecase</argument>
+                            </arguments>
+                            <sourceDirectory>src/test/antlr4/org/eclipse/usecase</sourceDirectory>
+                            <listener>true</listener>
+                            <visitor>false</visitor>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>run antlr</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>
+                                <argument>-package</argument>
+                                <argument>org.eclipse.lsp.cobol.dialects.daco</argument>
+                                <argument>-o</argument>
+                                <argument>${basedir}/target/generated-sources/antlr4/org/eclipse/lsp/cobol/dialects/daco</argument>
+                            </arguments>
+                            <sourceDirectory>src/main/antlr4/org/eclipse/lsp/cobol/core/parser</sourceDirectory>
+                            <listener>true</listener>
+                            <visitor>true</visitor>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven.checkstyle.plugin.version}</version>
+                <configuration>
+                    <configLocation>${project.basedir}/src/style/checkstyle.xml</configLocation>
+                    <encoding>UTF-8</encoding>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.antlr</groupId>
+                                        <artifactId>antlr4-maven-plugin</artifactId>
+                                        <versionRange>[4.0,)</versionRange>
+                                        <goals>
+                                            <goal>antlr4</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <execute>
+                                            <runOnIncremental>true</runOnIncremental>
+                                        </execute>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+    </build>
+
+</project>

@@ -21,8 +21,8 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.model.tree.variables.ElementaryNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormatUtils;
+import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryNode;
+import org.eclipse.lsp.cobol.common.utils.UsageFormatUtils;
 
 import java.util.Collections;
 import java.util.List;

@@ -32,7 +32,7 @@ public class DeclarativeProcedureSectionRegister
   private final SymbolsRepository symbolsRepository;
 
   public DeclarativeProcedureSectionRegister(
-          SymbolAccumulatorService symbolAccumulatorService, SymbolsRepository symbolsRepository) {
+      SymbolAccumulatorService symbolAccumulatorService, SymbolsRepository symbolsRepository) {
     this.symbolAccumulatorService = symbolAccumulatorService;
     this.symbolsRepository = symbolsRepository;
   }

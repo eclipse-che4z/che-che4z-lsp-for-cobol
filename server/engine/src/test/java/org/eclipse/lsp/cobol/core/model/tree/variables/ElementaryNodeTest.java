@@ -17,6 +17,9 @@ package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.model.tree.variable.EffectiveDataType;
+import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryItemNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;

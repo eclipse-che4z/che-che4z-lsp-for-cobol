@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.eclipse.lsp.cobol.core.engine.dialects.daco.provider.SectionsGenerator;
+import org.eclipse.lsp.cobol.dialects.daco.provider.SectionsGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

@@ -19,7 +19,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.model.tree.variables.GroupItemNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.GroupItemNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 
 import static org.eclipse.lsp.cobol.common.VariableConstants.EMPTY_STRUCTURE_MSG;
