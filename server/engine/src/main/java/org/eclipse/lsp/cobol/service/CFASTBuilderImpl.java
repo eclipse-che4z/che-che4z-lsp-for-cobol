@@ -102,6 +102,10 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       addChild(parent, new CFASTNode(CFASTNodeType.STOP.getValue()));
     } else if (node instanceof ParagraphsNode || node instanceof ProcedureDivisionBodyNode) {
       node.getChildren().forEach(child -> traverse(parent, child));
+    } else if (node instanceof AtEndNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.AT_END.getValue()));
+      node.getChildren().forEach(child -> traverse(parent, child));
+      addChild(parent, new CFASTNode(CFASTNodeType.AT_END_EXIT.getValue()));
     }
   }
 

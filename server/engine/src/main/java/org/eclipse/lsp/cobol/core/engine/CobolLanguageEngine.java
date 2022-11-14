@@ -31,10 +31,10 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
@@ -48,7 +48,8 @@ import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
-import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.logic.*;
 import org.eclipse.lsp.cobol.core.model.tree.statements.ObsoleteNode;
@@ -77,8 +78,8 @@ import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.common.model.NodeType.EMBEDDED_CODE;
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
