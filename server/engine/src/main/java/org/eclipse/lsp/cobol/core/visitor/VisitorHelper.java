@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
+import org.eclipse.lsp.cobol.core.engine.OldMapping;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -187,12 +188,12 @@ public class VisitorHelper {
    * @param positions map of exact positions
    * @return locality which has a range from the start to the end of the rule
    */
-  Optional<Locality> retrieveRangeLocality(ParserRuleContext ctx, Map<Token, Locality> positions) {
+  Optional<Locality> retrieveRangeLocality(ParserRuleContext ctx, OldMapping positions) {
     if (ctx == null) {
       return Optional.empty();
     }
-    Locality start = positions.get(ctx.getStart());
-    Locality stop = positions.get(ctx.getStop());
+    Locality start = positions.map(ctx.getStart());
+    Locality stop = positions.map(ctx.getStop());
     if (start == null || stop == null) {
       return Optional.empty();
     }
@@ -240,11 +241,8 @@ public class VisitorHelper {
    * @param nodeConstructor function to create the node
    * @return list of nodes
    */
-  List<Node> createTreeNode(
-      Map<Token, Locality> positions,
-      List<Node> children,
-      ParserRuleContext ctx,
-      Function<Locality, Node> nodeConstructor) {
+  List<Node> createTreeNode(OldMapping positions, List<Node> children, ParserRuleContext ctx,
+                            Function<Locality, Node> nodeConstructor) {
     return retrieveRangeLocality(ctx, positions)
         .map(constructNode(nodeConstructor, children))
         .orElse(children);

@@ -41,6 +41,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.utils.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
+import org.eclipse.lsp.cobol.core.engine.OldMapping;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
@@ -85,7 +86,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
   private final CopybooksRepository copybooks;
   private final CommonTokenStream tokenStream;
-  private final Map<Token, Locality> positions;
+  private final OldMapping positions;
   private final Map<Token, EmbeddedCode> embeddedCodeParts;
   private final MessageService messageService;
   private final SubroutineService subroutineService;
@@ -100,7 +101,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public CobolVisitor(
           @NonNull CopybooksRepository copybooks,
           @NonNull CommonTokenStream tokenStream,
-          @NonNull Map<Token, Locality> positions,
+          @NonNull OldMapping positions,
           @NonNull AnalysisConfig analysisConfig,
           Map<Token, EmbeddedCode> embeddedCodeParts,
           MessageService messageService,
@@ -834,7 +835,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private Optional<Locality> getLocality(Token childToken) {
-    return ofNullable(positions.get(childToken));
+    return ofNullable(positions.map(childToken));
   }
 
   private void reportSubroutineNotDefined(String name, Locality locality) {
@@ -935,7 +936,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return ofNullable(ctx)
         .flatMap(
             context ->
-                ofNullable(positions.get(context.getStart()))
+                ofNullable(positions.map(context.getStart()))
                     .flatMap(
                         start ->
                             retrieveStopLocality(context.getStop().getTokenIndex(), start.getUri())
@@ -951,11 +952,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private Optional<Locality> retrieveStopLocality(int tokenIndex, String uri) {
     for (int index = tokenIndex; index < tokenStream.size(); index++) {
-      Locality locality = positions.get(tokenStream.get(index));
+      Locality locality = positions.map(tokenStream.get(index));
       if (locality != null && uri.equals(locality.getUri())) return Optional.of(locality);
     }
     for (int index = tokenIndex - 1; index >= 0; index--) {
-      Locality locality = positions.get(tokenStream.get(index));
+      Locality locality = positions.map(tokenStream.get(index));
       if (locality != null && uri.equals(locality.getUri())) return Optional.of(locality);
     }
     return Optional.empty();
@@ -1013,11 +1014,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private ValueClause retrieveValue(DataValueClauseContext context) {
     return new ValueClause(
         retrieveValueIntervals(context.dataValueClauseLiteral().dataValueInterval()),
-        positions.get(context.getStart()));
+        positions.map(context.getStart()));
   }
 
   private Locality getLevelLocality(TerminalNode terminalNode) {
-    return positions.get(terminalNode.getSymbol());
+    return positions.map(terminalNode.getSymbol());
   }
 
   private void addCopyNodes(Node rootNode, Multimap<String, Location> copybookUsages) {
