@@ -21,7 +21,9 @@ import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.variable.GroupItemNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 
 import java.util.Optional;
 

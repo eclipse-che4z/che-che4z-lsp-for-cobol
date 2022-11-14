@@ -23,10 +23,14 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
+import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp4j.Location;
@@ -39,7 +43,7 @@ import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /** Service to handle symbol information and dependencies */
 @Singleton
-public class SymbolAccumulatorService {
+public class SymbolAccumulatorService implements VariableAccumulator {
   private final Map<String, SymbolTable> programSymbols;
 
   public SymbolAccumulatorService() {

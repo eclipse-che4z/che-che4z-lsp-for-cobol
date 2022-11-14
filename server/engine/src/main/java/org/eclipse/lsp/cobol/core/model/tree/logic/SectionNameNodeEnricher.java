@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 import lombok.AllArgsConstructor;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNameNode;
 

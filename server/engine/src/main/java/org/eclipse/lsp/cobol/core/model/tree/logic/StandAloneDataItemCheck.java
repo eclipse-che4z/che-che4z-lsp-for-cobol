@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.model.tree.variables.StandAloneDataItemNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.StandAloneDataItemNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 
 import static org.eclipse.lsp.cobol.common.VariableConstants.EMPTY_STRUCTURE_MSG;
