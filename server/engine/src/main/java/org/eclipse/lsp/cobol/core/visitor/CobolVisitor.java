@@ -805,6 +805,19 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return result.stream().distinct().collect(toList());
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>The default implementation returns the result of calling
+   * {@link #visitChildren} on {@code ctx}.</p>
+   *
+   * @param ctx
+   */
+  @Override
+  public List<Node> visitAtEndPhrase(AtEndPhraseContext ctx) {
+    return addTreeNode(ctx, AtEndNode::new);
+  }
+
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {
     SyntaxError error =
         SyntaxError.syntaxError()

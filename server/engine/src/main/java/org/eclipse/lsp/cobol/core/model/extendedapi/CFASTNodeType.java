@@ -37,6 +37,8 @@ public enum CFASTNodeType {
   WHEN_OTHER("whenother"),
   END_EVALUATE("endevaluate"),
   INLINE_PERFORM("inlineperform"),
-  END_INLINE_PERFORM("endinlineperform");
+  END_INLINE_PERFORM("endinlineperform"),
+  AT_END("atEnd"),
+  AT_END_EXIT("atEndExit");
   @Getter final String value;
 }

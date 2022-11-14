@@ -55,5 +55,6 @@ public enum NodeType {
   PARAGRAPH_NAME_NODE,
   SECTION_NAME_NODE,
   CUSTOM,
-  OBSOLETE;
+  OBSOLETE,
+  AT_END
 }
