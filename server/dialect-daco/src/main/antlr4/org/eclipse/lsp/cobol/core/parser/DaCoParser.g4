@@ -253,7 +253,7 @@ rowDeleteStatement
 
 rowAddStatement
     : ADD daco_table_name
-      (WITH qualifiedDataName)?
+      (WITH daco_string_identifier)?
     ;
 
 rowInsertStatement
