@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 public class CopybookIdentificationServiceBasedOnContent implements CopybookIdentificationService {
   private final Pattern detectCobolProgram =
       Pattern.compile(
-          "(?i)^(?<sequence>.{0,6})(?<indicator>.?)(PROGRAM-ID)\\s*\\.\\s+(?<programName>.{1,30})\\s*\\.",
+          "(?i)^(?<sequence>.{0,6})(?<indicator>.?)\\s*(PROGRAM-ID)\\s*\\.\\s*(?<programName>.{1,30})\\s*\\.",
           Pattern.MULTILINE);
   /**
    * Identifies a copybook based on the content. If the text contains a valid program-id, we detect
