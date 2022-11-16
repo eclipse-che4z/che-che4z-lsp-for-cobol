@@ -45,7 +45,7 @@
         <maven.cobertura.plugin.version>2.7</maven.cobertura.plugin.version>
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
         <maven.coveralls.plugin.version>4.3.0</maven.coveralls.plugin.version>
-        <maven.jacoco.plugin.version>0.8.5</maven.jacoco.plugin.version>
+        <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
         <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
         <maven.surefire.plugin.version>3.0.0-M3</maven.surefire.plugin.version>
         <mockito.core.version>4.6.1</mockito.core.version>
