@@ -58,10 +58,6 @@ public class DaCoMaidProcessor {
   private final Pattern procedureDivisionPattern =
       Pattern.compile(
           "\\s*procedure\\s+division[\\w\\s]*", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-  private final Pattern sectionPattern =
-      Pattern.compile(
-          "^\\s*(?<name>\\w*)\\s+SECTION\\s*\\.\\s*$",
-          Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern dataDivisionPattern =
       Pattern.compile("\\s*data\\s+division\\s*\\.", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern dataDescriptionEntryPattern =
@@ -81,8 +77,6 @@ public class DaCoMaidProcessor {
   private final ParseTreeListener treeListener;
   private final MessageService messageService;
 
-  private final Set<String> sections = new HashSet<>();
-
   /**
    * Process MAID copybooks in the source code
    *
@@ -96,7 +90,6 @@ public class DaCoMaidProcessor {
 
     String[] lines = context.getExtendedSource().getText().split("\n", -1);
     String lastSuffix = null;
-    sections.clear();
     for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
       String line = lines[lineNumber];
       if (procedureDivisionPattern.matcher(line).find()) {
@@ -121,12 +114,6 @@ public class DaCoMaidProcessor {
       } else if (dataDivisionPattern.matcher(line).find()) {
         state = DaCoMaidProcessingState.DATA_DIVISION;
       }
-      if (state == DaCoMaidProcessingState.PROCEDURE_DIVISION) {
-        Matcher sectionMatcher = sectionPattern.matcher(line);
-        if (sectionMatcher.find()) {
-          sections.add(sectionMatcher.group("name"));
-        }
-      }
       collectCopyMaid(line, lineNumber, dacoNodes, lastSuffix, context, errors);
     }
 
@@ -141,7 +128,6 @@ public class DaCoMaidProcessor {
       return null;
     }
     Optional<String> newSuffix = DaCoHelper.extractSuffix(entryName);
-    String indent = copyFrom.group("indent");
     String prototypeName =
         entryName.substring(0, entryName.length() - 2) + copyFrom.group("protoSuffix");
     int startChar = copyFrom.start("copyfrom");
@@ -305,9 +291,5 @@ public class DaCoMaidProcessor {
     }
     return String.format(
         "%s_%s", layoutId.toUpperCase(Locale.ROOT), layoutUsage.toUpperCase(Locale.ROOT));
-  }
-
-  public Set<String> getSections() {
-    return sections;
   }
 }

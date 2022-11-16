@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.dialects.daco.provider;
+package org.eclipse.lsp.cobol.dialects.daco.processors.implicit;
 
 import lombok.Value;
 

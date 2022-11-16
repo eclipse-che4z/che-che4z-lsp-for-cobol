@@ -12,14 +12,13 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree;
+package org.eclipse.lsp.cobol.common.model.tree;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
 
 /** The class represents procedure section in COBOL. */
 @ToString(callSuper = true)

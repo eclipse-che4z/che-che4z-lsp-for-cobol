@@ -42,7 +42,8 @@ class TestDaCoImplicitCode {
           + "        DATA DIVISION. \r\n"
           + "        LINKAGE SECTION. \r\n"
           + "        PROCEDURE DIVISION. \r\n"
-          + "               MOVE 6 to {$PMT-XII}.\r\n";
+          + "               MOVE 6 to {$PMT-XII}.\r\n"
+          + "               MOVE 6 to {$RTTSTS-XII}.\r\n";
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \r\n"

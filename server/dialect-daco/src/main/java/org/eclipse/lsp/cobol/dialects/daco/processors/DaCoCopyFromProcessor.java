@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.dialects.daco;
+package org.eclipse.lsp.cobol.dialects.daco.processors;
 
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -33,10 +33,10 @@ import java.util.stream.Collectors;
 
 /** Handle Copy From node */
 public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
-  private final VariableAccumulator symbolAccumulatorService;
+  private final VariableAccumulator variableAccumulator;
 
-  public DaCoCopyFromProcessor(VariableAccumulator symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public DaCoCopyFromProcessor(VariableAccumulator variableAccumulator) {
+    this.variableAccumulator = variableAccumulator;
   }
 
   @Override
@@ -67,7 +67,7 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
       return;
     }
     copyFrom(node.getLevel(), protoCandidates.get(0), node.getParent(), node);
-    symbolAccumulatorService.registerVariablesInProgram(node.getParent());
+    variableAccumulator.registerVariablesInProgram(node.getParent());
   }
 
   private void copyFrom(

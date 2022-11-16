@@ -38,6 +38,7 @@ public class VariableUsageUtils {
   public static List<VariableNode> findVariablesForUsage(
       Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usageNodes) {
     return definedVariables.get(usageNodes.get(0).getName()).stream()
+        .distinct()
         .filter(it -> checkParents(it, usageNodes.subList(1, usageNodes.size())))
         .collect(Collectors.toList());
   }

@@ -23,9 +23,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
@@ -61,7 +59,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
    * @param node the variable definition node
    */
   public void addVariableDefinition(ProgramNode programNode, VariableNode node) {
-    createOrGetSymbolTable(programNode).getVariables().put(node.getName(), node);
+    createOrGetSymbolTable(programNode).getVariables().put(node.getName().toUpperCase(Locale.ROOT), node);
   }
 
   /**

@@ -12,15 +12,13 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.dialects.daco.provider;
+package org.eclipse.lsp.cobol.dialects.daco.processors.implicit;
 
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNameNode;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,18 +31,15 @@ class TreeScanner {
 
   /**
    * Scans nodes for variable definitions with defined name's pattern
-   * @param nodes is generated nodes with DaCo dialect processor
+   * @param programNode is a program node
    * @return a list of variable name info
    */
-  public List<VariableNameInfo> scan(List<Node> nodes) {
-    List<Node> list = new LinkedList<>(nodes);
-    nodes.forEach(n -> list.addAll(n.getDepthFirstStream().collect(Collectors.toList())));
-    return list.stream()
-        .filter(n -> n.getNodeType() == NodeType.VARIABLE_DEFINITION)
-        .map(VariableDefinitionNode.class::cast)
-        .map(VariableDefinitionNode::getVariableName)
+  public List<VariableNameInfo> scan(ProgramNode programNode) {
+    return programNode.getDepthFirstStream()
+        .filter(n -> n.getNodeType() == NodeType.VARIABLE_DEFINITION_NAME)
+        .map(VariableDefinitionNameNode.class::cast)
+        .map(VariableDefinitionNameNode::getName)
         .filter(Objects::nonNull)
-        .map(VariableNameAndLocality::getName)
         .map(TreeScanner::getVariableNameInfo)
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
