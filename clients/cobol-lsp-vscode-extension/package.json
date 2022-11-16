@@ -90,7 +90,8 @@
                 "filenamePatterns": [
                     "**/*copybook*/**"
                 ],
-                "configuration": "./syntaxes/lang-config.json"
+                "configuration": "./syntaxes/lang-config.json",
+                "firstLine": "^[0-9 ]{6}([*].*|[ ] *([Ii][Dd][Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn] +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ].*|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ].*|(CBL|PROCESS) +XOPTS\\b.*))$"
             }
         ],
         "grammars": [
