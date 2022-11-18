@@ -36,6 +36,7 @@
         <maven.cobertura.plugin.version>2.7</maven.cobertura.plugin.version>
         <maven.coveralls.plugin.version>4.3.0</maven.coveralls.plugin.version>
         <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
+        <maven.surefire.plugin.version>3.0.0-M3</maven.surefire.plugin.version>
     </properties>
 
     <dependencies>
@@ -141,6 +142,26 @@
         </resources>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <parallel>all</parallel>
+                    <systemProperties>
+                        <property>
+                            <name>filesToTestPath</name>
+                            <!--suppress UnresolvedMavenProperty -->
+                            <value>${filesToTestPath}</value>
+                        </property>
+                        <property>
+                            <name>listingSnap</name>
+                            <!--suppress UnresolvedMavenProperty -->
+                            <value>${listingSnap}</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>

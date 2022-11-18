@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 /**
  * This unit tests check the {@link SectionsGenerator} class functionality
  */
-class SectionsContentProviderTest {
+class SectionsGeneratorTest {
   @Test
   void testCreatesSectionsFromProvidedNames() {
     List<String> generated = SectionsGenerator.generate(ImmutableList.of("LABEL1", "LABEL2", "LABEL_EX"), ImmutableSet.of("LABEL_EX"))
