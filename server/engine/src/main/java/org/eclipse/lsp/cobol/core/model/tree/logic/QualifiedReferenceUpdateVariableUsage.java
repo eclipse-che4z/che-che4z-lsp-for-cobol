@@ -70,7 +70,7 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     for (VariableNode definitionNode : foundDefinitions) {
       node.setVariableDefinitionNode(definitionNode);
       for (VariableUsageNode usageNode : variableUsageNodes) {
-        while (definitionNode != null && !usageNode.getName().equals(definitionNode.getName())) {
+        while (definitionNode != null && !usageNode.getName().equalsIgnoreCase(definitionNode.getName())) {
           definitionNode =
               definitionNode
                   .getNearestParentByType(NodeType.VARIABLE)

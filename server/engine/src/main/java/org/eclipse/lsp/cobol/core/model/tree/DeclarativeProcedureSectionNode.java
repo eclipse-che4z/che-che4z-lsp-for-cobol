@@ -18,6 +18,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.ProcedureSectionNode;
 
 /** The class represents declarative procedure section in COBOL. */
 @ToString(callSuper = true)

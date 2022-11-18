@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ import org.junit.jupiter.api.Test;
  * If user has user defined labels they should be resolved without errors
  */
 class TestUserDefinedSections {
-  private static final String TEXT =
+  private static final String TEXT_GOTO =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST.\n"
           + "        ENVIRONMENT DIVISION.\n"
@@ -39,10 +40,54 @@ class TestUserDefinedSections {
           + "       PROCEDURE DIVISION.\n"
           + "           GO TO {@USERLABEL}.";
 
+  private static final String TEXT_PERFORM =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. UDPAR. \n"
+          + "       DATA DIVISION.\n"
+          + "       LINKAGE SECTION.\n"
+          + "       01  {$*LINK-PRM0}.\n"
+          + "           05  {$*PARM}                               PIC X(8).\n"
+          + "       PROCEDURE DIVISION USING {$LINK-PRM0}.\n"
+          + "           PERFORM {@USERLABEL}.";
+
+  private static final String TEXT_ALREADY_DEFINED =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. UDPAR. \n"
+          + "       DATA DIVISION.\n"
+          + "       LINKAGE SECTION.\n"
+          + "       01  {$*LINK-PRM0}.\n"
+          + "           05  {$*PARM}                               PIC X(8).\n"
+          + "       PROCEDURE DIVISION USING {$LINK-PRM0}.\n"
+          + "           PERFORM {@USERLABEL}.\n"
+          + "       {@*USERLABEL} SECTION.";
+
   @Test
-  void test() {
+  void testPerform() {
+    UseCaseEngine.runTestForDiagnostics(TEXT_PERFORM,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig(
+            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DB2_SERVER,
+                ImmutableList.of("USERLABEL"))));
+  }
+
+  @Test
+  void testGoTo() {
     CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of("USERLABEL"));
     AnalysisConfig analysisConfig = new AnalysisConfig(copybookConfig, ImmutableList.of(), ImmutableList.of("DaCo", "IDMS"), true);
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
+    UseCaseEngine.runTestForDiagnostics(TEXT_GOTO, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
   }
+
+  @Test
+  void testAlreadyDefined() {
+    UseCaseEngine.runTestForDiagnostics(TEXT_ALREADY_DEFINED,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig(
+            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DB2_SERVER,
+                ImmutableList.of("USERLABEL"))));
+  }
+
 }

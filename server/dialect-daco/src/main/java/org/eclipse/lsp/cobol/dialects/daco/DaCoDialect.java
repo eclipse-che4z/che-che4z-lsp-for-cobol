@@ -14,14 +14,12 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.*;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -29,11 +27,13 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 import org.eclipse.lsp.cobol.dialects.daco.nodes.DaCoCopyFromNode;
-import org.eclipse.lsp.cobol.dialects.daco.provider.DaCoImplicitCodeProvider;
+import org.eclipse.lsp.cobol.dialects.daco.processors.DaCoCopyFromProcessor;
+import org.eclipse.lsp.cobol.dialects.daco.processors.implicit.DaCoImplicitCodeProcessor;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -50,6 +50,8 @@ public final class DaCoDialect implements CobolDialect {
   private final MessageService messageService;
   private final DaCoMaidProcessor maidProcessor;
   private final VariableAccumulator symbolAccumulatorService;
+  private CopybookConfig copybookConfig;
+
   public static final String IDMS_DIALECT_NAME = "IDMS";
 
   /**
@@ -97,12 +99,8 @@ public final class DaCoDialect implements CobolDialect {
 
     errors.addAll(parserErrors);
 
-    DaCoImplicitCodeProvider provider = new DaCoImplicitCodeProvider(maidProcessor.getSections());
-    Multimap<String, Pair<String, String>> implicitCode =
-        provider.getImplicitCode(
-            context.getExtendedSource().getText(), nodes, context.getCopybookConfig());
-
-    DialectOutcome result = new DialectOutcome(nodes, implicitCode, context);
+    DialectOutcome result = new DialectOutcome(nodes, ImmutableMultimap.of(), context);
+    copybookConfig = context.getCopybookConfig();
     return new ResultWithErrors<>(result, errors);
   }
 
@@ -129,9 +127,12 @@ public final class DaCoDialect implements CobolDialect {
 
   @Override
   public List<ProcessorDescription> getProcessors() {
-    return Collections.singletonList(
+    return ImmutableList.of(
         new ProcessorDescription(
             DaCoCopyFromNode.class, ProcessingPhase.POST_DEFINITION,
-                new DaCoCopyFromProcessor(symbolAccumulatorService)));
+                new DaCoCopyFromProcessor(symbolAccumulatorService)),
+        new ProcessorDescription(ProgramNode.class, ProcessingPhase.POST_DEFINITION,
+                new DaCoImplicitCodeProcessor(symbolAccumulatorService, copybookConfig))
+    );
   }
 }
