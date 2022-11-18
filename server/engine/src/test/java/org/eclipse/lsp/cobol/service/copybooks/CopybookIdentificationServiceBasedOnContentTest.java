@@ -64,4 +64,18 @@ class CopybookIdentificationServiceBasedOnContentTest {
     doc.setText(content);
     Assertions.assertTrue(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of()));
   }
+
+  @Test
+  void WhenNoSpaceBetweenProgmIDAndProgramName_thenReturnFalse() {
+    String content =
+        "      *RETRIEVAL                                                        00340200\n"
+            + "      *DMLIST                                                           00340301\n"
+            + "       IDENTIFICATION DIVISION.                                         00340401\n"
+            + "            PROGRAM-ID.EMPRPT. ";
+
+    CopybookIdentificationService service = new CopybookIdentificationServiceBasedOnContent();
+    TextDocumentItem doc = new TextDocumentItem();
+    doc.setText(content);
+    Assertions.assertFalse(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of()));
+  }
 }
