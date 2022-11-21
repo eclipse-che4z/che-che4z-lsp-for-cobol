@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.dialects.daco;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultimap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
@@ -117,7 +116,7 @@ public class DaCoMaidProcessor {
       collectCopyMaid(line, lineNumber, dacoNodes, lastSuffix, context, errors);
     }
 
-    return new DialectOutcome(dacoNodes, ImmutableMultimap.of(), context);
+    return new DialectOutcome(dacoNodes, context);
   }
 
   private Node createCopyFromNode(

@@ -14,13 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -28,11 +26,10 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoMaidProcessor;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -133,15 +130,12 @@ public class DialectService {
       CobolDialect dialect,
       DialectProcessingContext context) {
     List<Node> nodes = new ArrayList<>(previousResult.getResult().getDialectNodes());
-    Multimap<String, Pair<String, String>> implicitCode =
-        LinkedListMultimap.create(previousResult.getResult().getImplicitCode());
 
     List<SyntaxError> errors = new ArrayList<>(previousResult.getErrors());
 
     DialectOutcome result = dialect.processText(context).unwrap(errors::addAll);
     nodes.addAll(result.getDialectNodes());
-    implicitCode.putAll(result.getImplicitCode());
-    return new ResultWithErrors<>(new DialectOutcome(nodes, implicitCode, context), errors);
+    return new ResultWithErrors<>(new DialectOutcome(nodes, context), errors);
   }
 
   /**

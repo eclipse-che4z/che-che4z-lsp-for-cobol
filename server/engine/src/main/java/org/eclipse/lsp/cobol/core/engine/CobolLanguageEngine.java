@@ -33,28 +33,30 @@ import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.*;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.ObsoleteNode;
+import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
+import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
-import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.logic.*;
 import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.*;
+import org.eclipse.lsp.cobol.core.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
@@ -92,7 +94,6 @@ public class CobolLanguageEngine {
   private final DialectService dialectService;
   private final SymbolAccumulatorService symbolAccumulatorService;
   private final AstProcessor astProcessor;
-  private final InjectService injectService;
   private final SymbolsRepository symbolsRepository;
 
   @Inject
@@ -105,7 +106,6 @@ public class CobolLanguageEngine {
       DialectService dialectService,
       SymbolAccumulatorService symbolAccumulatorService,
       AstProcessor astProcessor,
-      InjectService injectService,
       SymbolsRepository symbolsRepository) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
@@ -115,7 +115,6 @@ public class CobolLanguageEngine {
     this.dialectService = dialectService;
     this.symbolAccumulatorService = symbolAccumulatorService;
     this.astProcessor = astProcessor;
-    this.injectService = injectService;
     this.symbolsRepository = symbolsRepository;
   }
 
@@ -158,7 +157,6 @@ public class CobolLanguageEngine {
     timingBuilder.getDialectsTimer().stop();
 
     timingBuilder.getPreprocessorTimer().start();
-    injectService.setImplicitCode(dialectOutcome.getImplicitCode());
 
     List<SyntaxError> preprocessorErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =

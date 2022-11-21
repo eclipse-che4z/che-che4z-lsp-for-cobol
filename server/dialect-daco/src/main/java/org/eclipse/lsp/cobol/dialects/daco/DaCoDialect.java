@@ -99,7 +99,7 @@ public final class DaCoDialect implements CobolDialect {
 
     errors.addAll(parserErrors);
 
-    DialectOutcome result = new DialectOutcome(nodes, ImmutableMultimap.of(), context);
+    DialectOutcome result = new DialectOutcome(nodes, context);
     copybookConfig = context.getCopybookConfig();
     return new ResultWithErrors<>(result, errors);
   }
