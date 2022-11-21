@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
-import com.google.common.collect.ImmutableMultimap;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.lang3.tuple.Pair;
@@ -202,7 +201,7 @@ public final class IdmsDialect implements CobolDialect {
 
     errors.addAll(visitor.getErrors());
 
-    return new ResultWithErrors<>(new DialectOutcome(nodes, ImmutableMultimap.of(), context), errors);
+    return new ResultWithErrors<>(new DialectOutcome(nodes, context), errors);
   }
 
   private IdmsCopyParser.StartRuleContext parseCopyIdms(String text, String programDocumentUri, List<SyntaxError> errors) {

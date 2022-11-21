@@ -14,12 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysisFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory;
@@ -49,30 +43,20 @@ class InjectServiceTest {
   @BeforeEach
   void init() {
     injectService = new InjectService(analysisFactory, contentProviderFactory);
-    Multimap<String, Pair<String, String>> dialectInjectors = LinkedListMultimap.create();
-
-    dialectInjectors.put("1", new ImmutablePair<>("name1", "content1"));
-    dialectInjectors.put("2", new ImmutablePair<>("name2", "content2"));
-    dialectInjectors.put("3", new ImmutablePair<>("name3", "content3"));
-    injectService.setImplicitCode(dialectInjectors);
   }
 
   @Test
   void testLinkageSectionPickUpDialectInjectors_true() {
     CobolPreprocessor.LinkageSectionContext context = mock(CobolPreprocessor.LinkageSectionContext.class);
-    setupContext(context, "1");
-
     List<InjectDescriptor> descriptorList = injectService.getInjectors(context);
 
-    assertEquals(2, descriptorList.size());
-    assertEquals("name1", descriptorList.get(0).getInjectedSourceName());
-    assertEquals("DFHEIBLC", descriptorList.get(1).getInjectedSourceName());
+    assertEquals(1, descriptorList.size());
+    assertEquals("DFHEIBLC", descriptorList.get(0).getInjectedSourceName());
   }
 
   @Test
   void testLinkageSectionPickUpDialectInjectors_false() {
     CobolPreprocessor.LinkageSectionContext context = mock(CobolPreprocessor.LinkageSectionContext.class);
-    setupContext(context, "unknown");
 
     List<InjectDescriptor> descriptorList = injectService.getInjectors(context);
     assertEquals(1, descriptorList.size());
@@ -81,7 +65,6 @@ class InjectServiceTest {
   @Test
   void testProcedureDivisionPickUpDialectInjectors_false() {
     CobolPreprocessor.LinkageSectionContext context = mock(CobolPreprocessor.LinkageSectionContext.class);
-    setupContext(context, "unknown");
 
     List<InjectDescriptor> descriptorList = injectService.getInjectors(context);
     assertEquals(1, descriptorList.size());
@@ -90,19 +73,15 @@ class InjectServiceTest {
   @Test
   void testWorkingStoragePickUpDialectInjectors_true() {
     CobolPreprocessor.WorkingStorageSectionContext context = mock(CobolPreprocessor.WorkingStorageSectionContext.class);
-    setupContext(context, "3");
-
     List<InjectDescriptor> descriptorList = injectService.getInjectors(context);
 
-    assertEquals(2, descriptorList.size());
-    assertEquals("name3", descriptorList.get(0).getInjectedSourceName());
-    assertEquals("SPECIALREGISTERS", descriptorList.get(1).getInjectedSourceName());
+    assertEquals(1, descriptorList.size());
+    assertEquals("SPECIALREGISTERS", descriptorList.get(0).getInjectedSourceName());
   }
 
   @Test
   void testWorkingStoragePickUpDialectInjectors_false() {
     CobolPreprocessor.WorkingStorageSectionContext context = mock(CobolPreprocessor.WorkingStorageSectionContext.class);
-    setupContext(context, "unknown");
 
     List<InjectDescriptor> descriptorList = injectService.getInjectors(context);
     assertEquals(1, descriptorList.size());
@@ -142,12 +121,6 @@ class InjectServiceTest {
     List<InjectDescriptor> descriptorList = injectService.getInjectors(context);
     assertEquals(1, descriptorList.size());
     assertEquals("COPYBOOK3", descriptorList.get(0).getInjectedSourceName());
-  }
-
-  void setupContext(ParserRuleContext context, String text) {
-    Token token = mock(Token.class);
-    when(token.getText()).thenReturn(text);
-    when(context.getStart()).thenReturn(token);
   }
 
 }
