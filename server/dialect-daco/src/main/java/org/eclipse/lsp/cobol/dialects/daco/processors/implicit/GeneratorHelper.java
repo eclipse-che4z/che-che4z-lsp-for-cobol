@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryItemNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.GroupItemNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 
 /**
  * Helps to create variable nodes
@@ -27,14 +28,14 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 class GeneratorHelper {
   public GroupItemNode createGroupNode(int level, String name) {
     Locality locality = Locality.builder()
-        .uri("implicit://daco-implicit-code")
+        .uri(ImplicitCodeUtils.createFullUrl("daco-implicit-code"))
         .build();
     return new GroupItemNode(locality, level, name, false, false, UsageFormat.UNDEFINED);
   }
 
   public ElementaryItemNode createElementaryNode(int level, String name, String picClause, String value, UsageFormat usageFormat) {
     Locality locality = Locality.builder()
-        .uri("implicit://daco-implicit-code")
+        .uri(ImplicitCodeUtils.createFullUrl("daco-implicit-code"))
         .build();
     return new ElementaryItemNode(locality, level, name, false, picClause, value,
         usageFormat, false, false, false);

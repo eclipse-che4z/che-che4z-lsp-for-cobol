@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
@@ -48,7 +48,7 @@ class PredefinedCopybookUtils {
     return name ->
         new CobolText(
             name,
-            ImplicitCodeUtils.readImplicitCode(files, retrieveRealName(name, sqlBackend)));
+            files.readImplicitCode(retrieveRealName(name, sqlBackend)));
   }
 
   /**
@@ -74,7 +74,7 @@ class PredefinedCopybookUtils {
   private CopybookModel retrieveModel(CopybookName copybookName, SQLBackend sqlBackend) {
     final String name = retrieveRealName(copybookName.getDisplayName(), sqlBackend);
 
-    String content = ImplicitCodeUtils.readImplicitCode(files, name);
+    String content = files.readImplicitCode(name);
 
     final PreprocessedDocument cleanCopybook =
         AnnotatedDocumentCleaning.prepareDocument(

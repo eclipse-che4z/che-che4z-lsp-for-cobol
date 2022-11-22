@@ -14,31 +14,7 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
-import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.SKIP;
-import static org.eclipse.lsp.cobol.common.copybook.SQLBackend.DATACOM_SERVER;
-import static org.eclipse.lsp.cobol.common.copybook.SQLBackend.DB2_SERVER;
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.Set;
-
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
@@ -54,6 +30,24 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Path;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.SKIP;
+import static org.eclipse.lsp.cobol.common.copybook.SQLBackend.DATACOM_SERVER;
+import static org.eclipse.lsp.cobol.common.copybook.SQLBackend.DB2_SERVER;
+import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 /**
  * This unit tests check the of the {@link CopybookServiceImpl} how it resolves the copybook
@@ -74,6 +68,7 @@ class CopybookServiceTest {
   private static final String SQLDA = "SQLDA";
   private static final String DOCUMENT_2_URI = "file:///c:/workspace/document2.cbl";
   private static final String DOCUMENT_3_URI = "implicit:///implicitCopybooks/SQLCA_DB2.cpy";
+  private static final String COPYBOOK_3_NAME = "SQLCA_DB2";
 
   private final DataBusBroker broker = mock(DataBusBroker.class);
   private final CobolLanguageClient client = mock(CobolLanguageClient.class);
@@ -292,6 +287,7 @@ class CopybookServiceTest {
     verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(DOCUMENT_3_URI)).thenReturn("document2");
+    when(files.readImplicitCode(COPYBOOK_3_NAME)).thenReturn(CONTENT);
     when(client.resolveCopybook("document2", SQLCA, "COBOL"))
         .thenReturn(supplyAsync(() -> null));
 
@@ -308,6 +304,7 @@ class CopybookServiceTest {
     verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(DOCUMENT_URI)).thenReturn("document2");
+    when(files.readImplicitCode("SQLCA_DATACOM")).thenReturn(CONTENT);
     when(client.resolveCopybook("document2", SQLCA, "COBOL"))
         .thenReturn(supplyAsync(() -> null));
     CopybookModel cpy =
