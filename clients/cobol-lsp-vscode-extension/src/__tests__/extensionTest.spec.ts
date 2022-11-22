@@ -133,3 +133,29 @@ describe("Check plugin extension for cobol fails.", () => {
         expect(TelemetryService.registerEvent).toHaveBeenCalledWith("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
     });
 });
+
+describe.only("Check recognition of COBOL from first line", () => {
+  const manifest = require('../../package.json')
+  const firstLine = manifest.contributes.languages[0].firstLine;
+  const cobol = expect.stringMatching(firstLine)
+
+  test("Comment Line", () => {
+    const pgm = `000010*REALLY ANYTHING`;      
+    expect(pgm).toEqual(cobol)
+  })
+
+  test("Identification Division", () => {
+    const pgm = `000010 IDENTIFICATION DIVISION.`
+    expect(pgm).toEqual(cobol)
+  })
+
+  test("Data Definition (copybook)", () => {
+    const pgm = `000010 01 ABC-XYZ.`;      
+    expect(pgm).toEqual(cobol)
+  })
+
+  test("CICS Translator Directive", () => {
+    const pgm = `000010 CBL XOPTS(COBOL2)`;
+    expect(pgm).toEqual(cobol)
+  })
+});
