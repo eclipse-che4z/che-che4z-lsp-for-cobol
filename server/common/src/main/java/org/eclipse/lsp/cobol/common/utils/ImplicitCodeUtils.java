@@ -12,15 +12,10 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector;
+package org.eclipse.lsp.cobol.common.utils;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.service.utils.FileSystemService;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Utility class for implicit code injection
@@ -77,23 +72,5 @@ public class ImplicitCodeUtils {
    */
   public String createFullUrl(String name) {
     return PREF_IMPLICIT + createPath(name);
-  }
-
-  /**
-   * Reads implicit content
-   * @param files is a file system service
-   * @param name us a name of the implicit code
-   * @return the content as a string
-   */
-  public String readImplicitCode(FileSystemService files, String name) {
-    String uri = createPath(name);
-    String content = null;
-    try (InputStream inputStream = ImplicitCodeUtils.class.getResourceAsStream(uri)) {
-      content =
-          files.readFromInputStream(inputStream, StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      LOG.error("Implicit code was not loaded. ", e);
-    }
-    return content;
   }
 }

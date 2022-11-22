@@ -18,6 +18,7 @@ import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProcedureSectionNode;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -37,7 +38,7 @@ class SectionsGenerator {
    */
   public List<CodeBlockDefinitionNode> generate(List<String> predefinedSection, Set<String> existingSessions) {
     Locality locality = Locality.builder()
-        .uri("implicit://daco-generated-sections")
+        .uri(ImplicitCodeUtils.createFullUrl("daco-generated-sections"))
         .build();
 
     return predefinedSection.stream()

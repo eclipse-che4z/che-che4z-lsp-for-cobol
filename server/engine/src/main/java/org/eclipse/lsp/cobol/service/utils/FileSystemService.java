@@ -15,14 +15,15 @@
 
 package org.eclipse.lsp.cobol.service.utils;
 
+import lombok.NonNull;
+
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
-import javax.annotation.Nullable;
-import lombok.NonNull;
 
 /** This interface represents API for low-level file systems access */
 public interface FileSystemService {
@@ -95,4 +96,11 @@ public interface FileSystemService {
    */
   @NonNull
   List<String> listFilesInDirectory(String uri);
+
+  /**
+   * Reads implicit content
+   * @param name us a name of the implicit code
+   * @return the content as a string
+   */
+  String readImplicitCode(String name);
 }

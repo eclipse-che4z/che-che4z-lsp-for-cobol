@@ -30,7 +30,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
@@ -38,12 +38,8 @@ import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -120,7 +116,7 @@ public class CopybookServiceImpl implements CopybookService {
     try {
       return copybookCache.get(copybookName, programDocumentUri, () -> {
         CopybookModel copybookModel = resolveSync(copybookName, programDocumentUri, copybookConfig);
-        if (preprocess) {
+        if (preprocess && copybookModel.getUri() != null) {
           copybookModel = cleanupCopybook(copybookModel);
         }
         copybookReferenceRepo.storeCopybookUsageReference(copybookName, documentUri, copybookModel);
@@ -180,7 +176,7 @@ public class CopybookServiceImpl implements CopybookService {
             PredefinedCopybooks.forName(copybookName.getQualifiedName()))
         .map(c -> {
           String name = c.nameForBackend(copybookConfig.getSqlBackend());
-          String content = ImplicitCodeUtils.readImplicitCode(files, name);
+          String content = files.readImplicitCode(name);
           return new CopybookModel(copybookName, ImplicitCodeUtils.createFullUrl(name), content);
         });
 
@@ -210,10 +206,15 @@ public class CopybookServiceImpl implements CopybookService {
   private Optional<String> resolveCopybookFromWorkspace(
       CopybookName copybookName, String mainProgramFileName) {
     try {
-      return Optional.ofNullable(clientProvider.get().resolveCopybook(
+      CompletableFuture<String> future = clientProvider.get().resolveCopybook(
           mainProgramFileName,
           copybookName.getDisplayName(),
-          Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL)).get());
+          Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL));
+
+      if (future == null) {
+        return Optional.empty();
+      }
+      return Optional.ofNullable(future.get());
     } catch (InterruptedException e) {
       // rethrowing the InterruptedException to interrupt the parent thread.
       throw new UncheckedExecutionException(e);
@@ -225,9 +226,8 @@ public class CopybookServiceImpl implements CopybookService {
 
   private CopybookModel registerForDownloading(CopybookName copybookName, String cobolFileName) {
     LOG.debug("Registering copybook {} of {} for further downloading", copybookName, cobolFileName);
-    Optional.of(
-            copybooksForDownloading.computeIfAbsent(
-                cobolFileName, s -> ConcurrentHashMap.newKeySet()))
+    Optional.ofNullable(cobolFileName)
+        .map(name -> copybooksForDownloading.computeIfAbsent(name, s -> ConcurrentHashMap.newKeySet()))
         .ifPresent(it -> it.add(copybookName));
     return new CopybookModel(copybookName, null, null);
   }

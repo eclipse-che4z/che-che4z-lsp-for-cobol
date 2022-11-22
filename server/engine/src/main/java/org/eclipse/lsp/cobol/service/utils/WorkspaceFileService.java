@@ -16,13 +16,12 @@ package org.eclipse.lsp.cobol.service.utils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
+
+import javax.annotation.Nullable;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -37,9 +36,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * This service implements API for low-level file systems access. It mainly oriented to work with
@@ -103,18 +99,6 @@ public class WorkspaceFileService implements FileSystemService {
     }
   }
 
-  /**
-   * This method validates an URI to verify if is defined as extended document, according to a
-   * regex.
-   *
-   * @param uri document URI opened in the client
-   * @return true if the document is an extended document, false otherwise
-   */
-  public static boolean isFileUnderExtendedSourceFolder(String uri) {
-    // the regex will match resources in the format [file://<FOLDER>/.c4z/.extsrcs/<DOCUMENT>]
-    return Pattern.matches("file://.*?\\.c4z/\\.extsrcs/.+", uri);
-  }
-
   @Override
   @NonNull
   public String readFromInputStream(InputStream inputStream, Charset charset) throws IOException {
@@ -159,6 +143,22 @@ public class WorkspaceFileService implements FileSystemService {
       LOG.error("An error occurred while reading list of files", e);
     }
     return ImmutableList.of();
+  }
+
+  /**
+   * Reads implicit content
+   * @param name us a name of the implicit code
+   * @return the content as a string
+   */
+  public String readImplicitCode(String name) {
+    String uri = ImplicitCodeUtils.createPath(name);
+    String content = null;
+    try (InputStream inputStream = ImplicitCodeUtils.class.getResourceAsStream(uri)) {
+      content = readFromInputStream(inputStream, StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      LOG.error("Implicit code was not loaded. ", e);
+    }
+    return content;
   }
 
   private String uriWithReplacedPlaceholdersToAsterisks(String uri) {
