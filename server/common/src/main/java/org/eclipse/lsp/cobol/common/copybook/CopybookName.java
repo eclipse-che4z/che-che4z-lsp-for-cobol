@@ -47,4 +47,13 @@ public class CopybookName {
     this.dialectType = dialectType;
     this.extension = null;
   }
+
+  /**
+   * Create an id from CopybookName object
+   * @param programUri a program URI
+   * @return an instance of copybook id
+   */
+  public CopybookId toCopybookId(String programUri) {
+    return CopybookId.create(displayName, dialectType, programUri);
+  }
 }

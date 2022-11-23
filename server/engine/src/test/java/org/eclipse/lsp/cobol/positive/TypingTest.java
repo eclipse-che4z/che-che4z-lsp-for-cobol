@@ -133,7 +133,7 @@ class TypingTest extends FileBasedTest {
                 UseCaseUtils.analyzeForErrors(
                     UseCase.builder()
                         .text(text)
-                        .fileName(name)
+                        .documentUri(name)
                         .copybooks(getCopybooks(cobolTextRegistry))
                         .build());
                 return null;

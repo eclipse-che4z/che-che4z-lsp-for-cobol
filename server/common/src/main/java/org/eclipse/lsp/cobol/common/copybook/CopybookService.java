@@ -27,6 +27,7 @@ public interface CopybookService {
   /**
    * Retrieve and return the copybook by its name.
    *
+   * @param copybookId - the id of the copybook to be retrieved
    * @param copybookName - the name of the copybook to be retrieved
    * @param programDocumentUri - the currently processing program document
    * @param documentUri - the currently processing document that contains the copy statement
@@ -36,6 +37,7 @@ public interface CopybookService {
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   CopybookModel resolve(
+      @NonNull CopybookId copybookId,
       @NonNull CopybookName copybookName,
       @NonNull String programDocumentUri,
       @NonNull String documentUri,
@@ -46,16 +48,14 @@ public interface CopybookService {
    * Store the copybookModel in cache. Copybook depends on a document from where it is imported.
    *
    * @param copybookModel the copybook model
-   * @param documentUri is a URI of a document from where the copybook is imported.
    */
-  void store(CopybookModel copybookModel, String documentUri);
+  void store(CopybookModel copybookModel);
 
   /**
    * Store the copybookModel in cache. Copybook depends on a document from where it is imported.
    *
    * @param copybookModel the copybook model
-   * @param documentUri is a URI of a document from where the copybook is imported.
    * @param doCleanUp is copybook clean up required before storing copybookModel.
    */
-  void store(CopybookModel copybookModel, String documentUri, boolean doCleanUp);
+  void store(CopybookModel copybookModel, boolean doCleanUp);
 }

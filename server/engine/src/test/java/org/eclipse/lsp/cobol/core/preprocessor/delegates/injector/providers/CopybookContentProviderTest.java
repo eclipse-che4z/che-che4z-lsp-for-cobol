@@ -51,8 +51,9 @@ class CopybookContentProviderTest {
     String programDocumentUrl = UUID.randomUUID().toString();
     String documentUrl = UUID.randomUUID().toString();
 
-    when(copybookService.resolve(copybookName, programDocumentUrl, documentUrl, copybookConfig, false))
-        .thenReturn(new CopybookModel(copybookName, documentUrl, null));
+    when(copybookService.resolve(copybookName.toCopybookId(programDocumentUrl),
+            copybookName, programDocumentUrl, documentUrl, copybookConfig, false))
+        .thenReturn(new CopybookModel(CopybookId.fromString(copybookName.getDisplayName()), copybookName, documentUrl, null));
     Optional<CopybookModel> copybookModel = contentProvider.read(copybookConfig, copybookName, programDocumentUrl, documentUrl);
 
     assertFalse(copybookModel.isPresent());
@@ -62,9 +63,9 @@ class CopybookContentProviderTest {
   void testReturnsCopybookModelForExistingCopybookContent() {
     String programDocumentUrl = UUID.randomUUID().toString();
     String documentUrl = UUID.randomUUID().toString();
-    CopybookModel resolvedCopybookModel = new CopybookModel(copybookName, documentUrl, "");
+    CopybookModel resolvedCopybookModel = new CopybookModel(CopybookId.fromString(copybookName.getDisplayName()), copybookName, documentUrl, "");
 
-    when(copybookService.resolve(copybookName, programDocumentUrl, documentUrl, copybookConfig, false))
+    when(copybookService.resolve(copybookName.toCopybookId(programDocumentUrl), copybookName, programDocumentUrl, documentUrl, copybookConfig, false))
         .thenReturn(resolvedCopybookModel);
     Optional<CopybookModel> copybookModel = contentProvider.read(copybookConfig, copybookName, programDocumentUrl, documentUrl);
 

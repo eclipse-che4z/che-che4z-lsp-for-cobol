@@ -23,10 +23,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
-import org.eclipse.lsp.cobol.common.copybook.CopybookName;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -88,7 +85,13 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
     String nameToken = optionsContext.getText().toUpperCase();
     CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
 
-    CopybookModel copybookModel = copybookService.resolve(copybookName, programDocumentUri, documentUri, copybookConfig, true);
+    CopybookModel copybookModel = copybookService.resolve(
+            copybookName.toCopybookId(programDocumentUri),
+            copybookName,
+            programDocumentUri,
+            documentUri,
+            copybookConfig,
+            true);
     Locality locality = IdmsParserHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), documentUri);
 
     return idmsCopybookService.processCopybook(copybookModel, calculateLevel(getLevel(ctx)), locality, copybookName)

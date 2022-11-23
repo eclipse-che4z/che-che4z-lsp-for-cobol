@@ -205,6 +205,7 @@ public class DaCoMaidProcessor {
             makeCopybookFileName(startingLevel, layoutId, layoutUsage), DaCoDialect.NAME);
     CopybookModel copybookModel =
         copybookService.resolve(
+            copybookName.toCopybookId(context.getExtendedSource().getUri()),
             copybookName,
             context.getExtendedSource().getUri(),
             context.getExtendedSource().getUri(),

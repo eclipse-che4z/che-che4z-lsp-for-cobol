@@ -55,16 +55,16 @@ public class CopybookReferenceRepoImpl implements CopybookReferenceRepo {
    * Stores the references of cobol programs which refers a copybook.
    *
    * @param copybookName CopybookName for which references are to be maintained.
-   * @param documentUri Cobol program that refers the copybook
+   * @param programUri Cobol program that refers the copybook
    * @param copybookModel @copybookModel for the copybook.
    */
   @Override
   public void storeCopybookUsageReference(
-      CopybookName copybookName, String documentUri, CopybookModel copybookModel) {
+      CopybookName copybookName, String programUri, CopybookModel copybookModel) {
     Set<CopybookModel> copybookUsageRef =
         copybookRef.computeIfAbsent(copybookModel.getUri(), k -> new HashSet<>());
     CopybookModel copybookResolveContext =
-        new CopybookModel(copybookName, documentUri, copybookModel.getContent());
+        new CopybookModel(copybookName.toCopybookId(programUri), copybookName,  programUri, copybookModel.getContent());
     copybookUsageRef.add(copybookResolveContext);
     copybookRef.put(copybookModel.getUri(), copybookUsageRef);
   }

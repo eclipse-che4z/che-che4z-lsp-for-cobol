@@ -24,10 +24,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
-import org.eclipse.lsp.cobol.common.copybook.CopybookName;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
@@ -99,6 +96,7 @@ public class CopybookServiceImpl implements CopybookService {
    * block
    * each other.
    *
+   * @param copybookId         - the id of the copybook to be retrieved
    * @param copybookName       - the name of the copybook to be retrieved
    * @param programDocumentUri - the currently processing program document
    * @param documentUri        - the currently processing document that contains the copy statement
@@ -108,13 +106,14 @@ public class CopybookServiceImpl implements CopybookService {
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   public CopybookModel resolve(
+      @NonNull CopybookId copybookId,
       @NonNull CopybookName copybookName,
       @NonNull String programDocumentUri,
       @NonNull String documentUri,
       @NonNull CopybookConfig copybookConfig,
       boolean preprocess) {
     try {
-      return copybookCache.get(copybookName, programDocumentUri, () -> {
+      return copybookCache.get(copybookId, programDocumentUri, () -> {
         CopybookModel copybookModel = resolveSync(copybookName, programDocumentUri, copybookConfig);
         if (preprocess && copybookModel.getUri() != null) {
           copybookModel = cleanupCopybook(copybookModel);
@@ -124,21 +123,21 @@ public class CopybookServiceImpl implements CopybookService {
       });
     } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
-      return new CopybookModel(copybookName, null, null);
+      return new CopybookModel(copybookId, copybookName, null, null);
     }
   }
 
   @Override
-  public void store(CopybookModel copybookModel, String documentUri) {
-    copybookCache.store(copybookModel, documentUri);
+  public void store(CopybookModel copybookModel) {
+    copybookCache.store(copybookModel);
   }
 
   @Override
-  public void store(CopybookModel copybookModel, String documentUri, boolean doCleanUp) {
+  public void store(CopybookModel copybookModel, boolean doCleanUp) {
     if (doCleanUp) {
       copybookModel = cleanupCopybook(copybookModel);
     }
-    store(copybookModel, documentUri);
+    store(copybookModel);
   }
 
   private CopybookModel resolveSync(
@@ -146,17 +145,16 @@ public class CopybookServiceImpl implements CopybookService {
       @NonNull String programUri,
       @NonNull CopybookConfig copybookConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    final String mainProgramFileName = files.getNameFromURI(programUri);
     LOG.debug(
         "Trying to resolve copybook {} for {}, using config {}",
         copybookName,
         programUri,
         copybookConfig);
-    return tryResolveCopybookFromWorkspace(copybookName, mainProgramFileName)
+    return tryResolveCopybookFromWorkspace(copybookName, programUri)
         .orElseGet(
             () ->
                 tryResolvePredefinedCopybook(copybookName, copybookConfig)
-                    .orElseGet(() -> registerForDownloading(copybookName, mainProgramFileName)));
+                    .orElseGet(() -> registerForDownloading(copybookName, programUri)));
   }
 
   /**
@@ -177,7 +175,8 @@ public class CopybookServiceImpl implements CopybookService {
         .map(c -> {
           String name = c.nameForBackend(copybookConfig.getSqlBackend());
           String content = files.readImplicitCode(name);
-          return new CopybookModel(copybookName, ImplicitCodeUtils.createFullUrl(name), content);
+          return new CopybookModel(copybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(name)), copybookName,
+                  ImplicitCodeUtils.createFullUrl(name), content);
         });
 
     LOG.debug("Predefined copybook: {}", copybookModel);
@@ -186,28 +185,28 @@ public class CopybookServiceImpl implements CopybookService {
 
   private CopybookModel cleanupCopybook(CopybookModel dirtyCopybook) {
     String cleanText = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent()).getResult().calculateExtendedText();
-    return new CopybookModel(dirtyCopybook.getCopybookName(), dirtyCopybook.getUri(), cleanText);
+    return new CopybookModel(dirtyCopybook.getCopybookId(), dirtyCopybook.getCopybookName(), dirtyCopybook.getUri(), cleanText);
   }
 
   private Optional<CopybookModel> tryResolveCopybookFromWorkspace(
-      CopybookName copybookName, String mainProgramFileName) {
+      CopybookName copybookName, String programUri) {
     LOG.debug(
         "Trying to resolve copybook copybook {} for {} from workspace",
         copybookName,
-        mainProgramFileName);
+        files.getNameFromURI(programUri));
+
     final Optional<CopybookModel> copybookModel =
-        resolveCopybookFromWorkspace(copybookName, mainProgramFileName)
-            .map(uri -> loadCopybook(uri, copybookName, mainProgramFileName));
+        resolveCopybookFromWorkspace(copybookName, programUri)
+            .map(uri -> loadCopybook(uri, copybookName, programUri));
     LOG.debug("Copybook from workspace: {}", copybookModel);
     return copybookModel;
   }
 
   @SuppressWarnings("java:S2142")
-  private Optional<String> resolveCopybookFromWorkspace(
-      CopybookName copybookName, String mainProgramFileName) {
+  private Optional<String> resolveCopybookFromWorkspace(CopybookName copybookName, String programUri) {
     try {
       CompletableFuture<String> future = clientProvider.get().resolveCopybook(
-          mainProgramFileName,
+          files.getNameFromURI(programUri),
           copybookName.getDisplayName(),
           Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL));
 
@@ -224,20 +223,21 @@ public class CopybookServiceImpl implements CopybookService {
     }
   }
 
-  private CopybookModel registerForDownloading(CopybookName copybookName, String cobolFileName) {
+  private CopybookModel registerForDownloading(CopybookName copybookName, String programUri) {
+    String cobolFileName = files.getNameFromURI(programUri);
     LOG.debug("Registering copybook {} of {} for further downloading", copybookName, cobolFileName);
     Optional.ofNullable(cobolFileName)
         .map(name -> copybooksForDownloading.computeIfAbsent(name, s -> ConcurrentHashMap.newKeySet()))
         .ifPresent(it -> it.add(copybookName));
-    return new CopybookModel(copybookName, null, null);
+    return new CopybookModel(copybookName.toCopybookId(programUri), copybookName, null, null);
   }
 
-  private CopybookModel loadCopybook(String uri, CopybookName copybookName, String cobolFileName) {
+  private CopybookModel loadCopybook(String uri, CopybookName copybookName, String programUri) {
     Path file = files.getPathFromURI(uri);
-    LOG.debug("Loading {} with URI {} for {} from path {}", copybookName, uri, cobolFileName, file);
+    LOG.debug("Loading {} with URI {} for {} from path {}", copybookName, uri, files.getNameFromURI(programUri), file);
     return files.fileExists(file)
-        ? new CopybookModel(copybookName, uri, files.getContentByPath(Objects.requireNonNull(file)))
-        : registerForDownloading(copybookName, cobolFileName);
+        ? new CopybookModel(copybookName.toCopybookId(programUri), copybookName, uri, files.getContentByPath(Objects.requireNonNull(file)))
+        : registerForDownloading(copybookName, programUri);
   }
 
   /**

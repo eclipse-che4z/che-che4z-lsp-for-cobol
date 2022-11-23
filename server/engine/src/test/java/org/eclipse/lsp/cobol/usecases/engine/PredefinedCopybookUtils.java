@@ -55,11 +55,12 @@ class PredefinedCopybookUtils {
    * Load and clean up all the predefined copybooks
    *
    * @param sqlBackend backend for the copybooks
+   * @param programUri uri of the program
    * @return list of models for predefined copybooks
    */
-  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks) {
+  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks, String programUri) {
     return PredefinedCopybooks.getNames().stream()
-        .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), sqlBackend))
+        .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), programUri, sqlBackend))
         .collect(Collectors.toList());
   }
 
@@ -71,7 +72,7 @@ class PredefinedCopybookUtils {
         .orElse(null);
   }
 
-  private CopybookModel retrieveModel(CopybookName copybookName, SQLBackend sqlBackend) {
+  private CopybookModel retrieveModel(CopybookName copybookName, String programUri, SQLBackend sqlBackend) {
     final String name = retrieveRealName(copybookName.getDisplayName(), sqlBackend);
 
     String content = files.readImplicitCode(name);
@@ -83,7 +84,8 @@ class PredefinedCopybookUtils {
             ImmutableList.of(),
             ImmutableMap.of(),
             sqlBackend);
-    return new CopybookModel(copybookName, ImplicitCodeUtils.createFullUrl(name), cleanCopybook.getText());
+    String fullUrl = ImplicitCodeUtils.createFullUrl(name);
+    return new CopybookModel(copybookName.toCopybookId(programUri), copybookName, fullUrl, cleanCopybook.getText());
   }
 
   private String retrieveRealName(String name, SQLBackend sqlBackend) {

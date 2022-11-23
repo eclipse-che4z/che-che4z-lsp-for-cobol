@@ -59,7 +59,7 @@ class PositiveTest extends FileBasedTest {
       AnalysisConfig analysisConfig = getAnalysisConfiguration();
       UseCase useCase =
           UseCase.builder()
-              .fileName(fileName)
+              .documentUri(fileName)
               .text(text.getFullText())
               .copybooks(getFileSpecificCopybooks(cobolTextRegistry, fileName))
               .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())

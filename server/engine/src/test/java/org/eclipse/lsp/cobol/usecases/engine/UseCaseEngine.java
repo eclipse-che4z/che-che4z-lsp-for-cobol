@@ -208,7 +208,7 @@ public class UseCaseEngine {
     AnalysisResult actual =
         analyze(
             UseCase.builder()
-                .fileName(DOCUMENT_URI)
+                .documentUri(DOCUMENT_URI)
                 .text(document.getText())
                 .copybooks(document.getCopybooks())
                 .subroutines(subroutineNames)
@@ -251,7 +251,7 @@ public class UseCaseEngine {
     AnalysisResult actual =
         analyze(
             UseCase.builder()
-                .fileName(DOCUMENT_URI)
+                .documentUri(DOCUMENT_URI)
                 .text(document.getText())
                 .copybooks(document.getCopybooks())
                 .subroutines(subroutineNames)

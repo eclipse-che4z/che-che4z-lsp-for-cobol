@@ -119,7 +119,7 @@ public class TestCICSTranslatorOptions {
   void testCompilerDirectivesMixedWithCICSTranslatorOptionsWhenDisabled() {
     UseCase useCase =
         UseCase.builder()
-            .fileName(UseCaseUtils.DOCUMENT_URI)
+            .documentUri(UseCaseUtils.DOCUMENT_URI)
             .text(MIXED_COMPILER_DIRECTIVE_CICS_TRANSLATOR)
             .copybooks(ImmutableList.of())
             .sqlBackend(SQLBackend.DB2_SERVER)

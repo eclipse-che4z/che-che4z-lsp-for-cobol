@@ -25,9 +25,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
-import org.eclipse.lsp.cobol.common.copybook.CopybookName;
-import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
@@ -38,7 +36,6 @@ import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
 import org.eclipse.lsp.cobol.jrpc.ExtendedApi;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
@@ -335,13 +332,9 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         .forEach(
             val -> {
               CopybookModel copybookModel =
-                  new CopybookModel(
-                      new CopybookName(
-                          val.getCopybookName().getDisplayName(),
-                          val.getCopybookName().getDialectType()),
-                      uri,
-                      params.getContentChanges().get(0).getText());
-              this.copybookService.store(copybookModel, val.getUri(), true);
+                  new CopybookModel(val.getCopybookId(), val.getCopybookName(), uri,
+                          params.getContentChanges().get(0).getText());
+              this.copybookService.store(copybookModel, true);
             });
     dataBus.postData(new RunAnalysisEvent(false));
   }
