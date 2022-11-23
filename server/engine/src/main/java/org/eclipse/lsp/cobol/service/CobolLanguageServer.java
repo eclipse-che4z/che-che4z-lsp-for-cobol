@@ -117,7 +117,10 @@ public class CobolLanguageServer implements LanguageServer {
     capabilities.setDocumentSymbolProvider(TRUE);
     capabilities.setHoverProvider(TRUE);
     capabilities.setFoldingRangeProvider(TRUE);
-
+    DiagnosticRegistrationOptions diagnosticRegistrationOptions = new DiagnosticRegistrationOptions();
+    diagnosticRegistrationOptions.setWorkspaceDiagnostics(false);
+    diagnosticRegistrationOptions.setInterFileDependencies(true);
+    capabilities.setDiagnosticProvider(diagnosticRegistrationOptions);
     WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
     workspaceFoldersOptions.setSupported(TRUE);
     WorkspaceServerCapabilities workspaceServiceCapabilities =
@@ -218,11 +221,11 @@ public class CobolLanguageServer implements LanguageServer {
         .fetchTextConfiguration(CPY_LOCAL_PATHS.label)
         .thenAccept(watchingService::addWatchers);
     settingsService
-            .fetchTextConfiguration(DaCo_CPY_LOCAL_PATHS.label)
-            .thenAccept(watchingService::addWatchers);
+        .fetchTextConfiguration(DaCo_CPY_LOCAL_PATHS.label)
+        .thenAccept(watchingService::addWatchers);
     settingsService
-            .fetchTextConfiguration(IDMS_CPY_LOCAL_PATHS.label)
-            .thenAccept(watchingService::addWatchers);
+        .fetchTextConfiguration(IDMS_CPY_LOCAL_PATHS.label)
+        .thenAccept(watchingService::addWatchers);
     settingsService
         .fetchTextConfiguration(SUBROUTINE_LOCAL_PATHS.label)
         .thenAccept(watchingService::addWatchers);
