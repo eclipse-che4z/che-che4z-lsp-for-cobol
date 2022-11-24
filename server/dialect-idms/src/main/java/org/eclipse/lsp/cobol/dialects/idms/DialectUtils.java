@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.dialects.idms;
 
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -34,50 +33,11 @@ class DialectUtils {
   public Range constructRange(ParserRuleContext ctx) {
     return new Range(
             new Position(
-                    ctx.start.getLine() - 1,
-                    ctx.start.getCharPositionInLine()),
+                    ctx.getStart().getLine() - 1,
+                    ctx.getStart().getCharPositionInLine()),
             new Position(
-                    ctx.stop.getLine() - 1,
-                    ctx.stop.getCharPositionInLine() + ctx.stop.getStopIndex() - ctx.stop.getStartIndex() + 1)
+                    ctx.getStop().getLine() - 1,
+                    ctx.getStop().getCharPositionInLine() + ctx.getStop().getStopIndex() - ctx.getStop().getStartIndex() + 1)
     );
-  }
-
-  /**
-   * Construct the range from ANTLR token
-   *
-   * @param token the ANTLR token
-   * @return the range
-   */
-  public Range constructRange(TerminalNode token) {
-    int line = token.getSymbol().getLine();
-    int inLine = token.getSymbol().getCharPositionInLine();
-    return new Range(
-            new Position(line - 1, inLine),
-            new Position(
-                    line - 1,
-                    inLine + token.getSymbol().getStopIndex() - token.getSymbol().getStartIndex() + 1)
-    );
-  }
-
-  /**
-   * Find line column position by string index
-   * @param text input string
-   * @param pos position in text
-   * @return position
-   */
-  public static Position findPosition(String text, int pos) {
-    int c = 1;
-    int line = 0;
-    int col = 1;
-    while (c <= pos) {
-      if (text.charAt(c) == '\n') {
-        ++line;
-        col = 1;
-      } else {
-        ++col;
-      }
-      c++;
-    }
-    return new Position(line, col);
   }
 }

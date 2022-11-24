@@ -124,8 +124,8 @@ class IdmsParserHelper {
    */
   public Locality buildNameRangeLocality(ParserRuleContext ctx, String name, String uri) {
     Range range = new Range(
-        new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
-        new Position(ctx.stop.getLine() - 1, ctx.start.getCharPositionInLine() + name.length()));
+        new Position(ctx.getStart().getLine() - 1, ctx.getStart().getCharPositionInLine()),
+        new Position(ctx.getStop().getLine() - 1, ctx.getStart().getCharPositionInLine() + name.length()));
 
     return Locality.builder()
         .uri(uri)
