@@ -57,7 +57,6 @@
             ${project.basedir}${file.separator}..${file.separator}..${file.separator}tests${file.separator}test_files${file.separator}cicsGenApp,
             ${project.basedir}${file.separator}..${file.separator}..${file.separator}tests${file.separator}test_files${file.separator}aws-mainframe-modernization-carddemo</filesToTestPath>
         <listingSnap>${project.basedir}${file.separator}..${file.separator}..${file.separator}tests${file.separator}test_files${file.separator}Cobol85PositiveTestsSuite${file.separator}compileListing${file.separator}snapshot</listingSnap>
-        <sonar.exclusions>**/org/eclipse/lsp/cobol/dialects/daco/**/*</sonar.exclusions>
     </properties>
     <dependencies>
         <dependency>
@@ -354,7 +353,6 @@
                         <exclude>**/generated-test-sources/**/*</exclude>
                         <exclude>**/org/eclipse/lsp/cobol/core/parser/**/*</exclude>
                         <exclude>**/org/eclipse/lsp/cobol/domain/modules/**/*</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/dialects/daco/**/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
