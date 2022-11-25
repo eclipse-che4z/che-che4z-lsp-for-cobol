@@ -317,7 +317,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     }
     String uri = params.getTextDocument().getUri();
     String text = params.getContentChanges().get(0).getText();
-    docs.computeIfPresent(uri, (k,v) -> new CobolDocumentModel(text, v.getAnalysisResult()));
+    docs.computeIfPresent(uri, (k, v) -> new CobolDocumentModel(text, v.getAnalysisResult()));
     outlineMap.put(uri, new CompletableFuture<>());
     cfAstMap.put(uri, new CompletableFuture<>());
     TextDocumentItem docIdentifier = new TextDocumentItem();
