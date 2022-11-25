@@ -29,38 +29,38 @@ import org.junit.jupiter.api.Test;
 public class TestFDRecordContainsClause {
   private static final String BASE =
       "000900 IDENTIFICATION DIVISION.                                         00000900\n"
-          + "001000 PROGRAM-ID. DBGEXRPT.                                            00001000\n"
+          + "001000 PROGRAM-ID. ABCDEFGH.                                            00001000\n"
           + "001100 ENVIRONMENT DIVISION.                                            00001100\n"
           + "001200 INPUT-OUTPUT SECTION.                                            00001200\n"
           + "001300 FILE-CONTROL.                                                    00001300\n"
-          + "001400     SELECT {$EXCP-IN-OUT} ASSIGN TO EXCPDEF                    \n"
+          + "001400     SELECT {$ABCD} ASSIGN TO ABCDEFG                           \n"
           + "001500            ORGANIZATION IS INDEXED. \n"
           + "002300 DATA DIVISION.                                                   00002300\n"
           + "002400 FILE SECTION.                                                    00002400\n"
-          + "002500 FD  {$*EXCP-IN-OUT}                                                  00002500\n";
+          + "002500 FD  {$*ABCD}                                                         00002500\n";
   private static final String TEXT =
       BASE
-          + "002700     RECORD IS VARYING IN SIZE TO 4089 CHARACTERS                 00002700\n"
-          + "002800     DATA RECORD IS {$EXCP-INPUT}.                                   00002800\n"
-          + "       01 {$*EXCP-INPUT} PIC 9(2).\n";
+          + "002700     RECORD IS VARYING IN SIZE TO 4096 CHARACTERS                 00002700\n"
+          + "002800     DATA RECORD IS {$AAAAAAAAAA}.                                   00002800\n"
+          + "       01 {$*AAAAAAAAAA} PIC 9(2).\n";
 
   private static final String TEXT2 =
       BASE
-          + "002700     RECORD IS VARYING IN SIZE FROM 4089 CHARACTERS           \n"
-          + "002800     DATA RECORD IS {$EXCP-INPUT}.                                   00002800\n"
-          + "       01 {$*EXCP-INPUT} PIC 9(2).\n";
+          + "002700     RECORD IS VARYING IN SIZE FROM 4096 CHARACTERS           \n"
+          + "002800     DATA RECORD IS {$AAAAAAAAAA}.                                   00002800\n"
+          + "       01 {$*AAAAAAAAAA} PIC 9(2).\n";
 
   private static final String TEXT3 =
       BASE
-          + "002700     RECORD IS VARYING IN SIZE FROM 4089 TO 5409 CHARACTERS \n"
-          + "002800     DATA RECORD IS {$EXCP-INPUT}.                                   00002800\n"
-          + "       01 {$*EXCP-INPUT} PIC 9(2).\n";
+          + "002700     RECORD IS VARYING IN SIZE FROM 4096 TO 9192 CHARACTERS \n"
+          + "002800     DATA RECORD IS {$AAAAAAAAAA}.                                   00002800\n"
+          + "       01 {$*AAAAAAAAAA} PIC 9(2).\n";
 
   private static final String TEXT4 =
       BASE
-          + "002700     RECORD IS VARYING IN SIZE 4089 CHARACTERS \n"
-          + "002800     DATA RECORD IS {$EXCP-INPUT}.                                   00002800\n"
-          + "       01 {$*EXCP-INPUT} PIC 9(2).\n";
+          + "002700     RECORD IS VARYING IN SIZE 4096 CHARACTERS \n"
+          + "002800     DATA RECORD IS {$AAAAAAAAAA}.                                   00002800\n"
+          + "       01 {$*AAAAAAAAAA} PIC 9(2).\n";
 
   @Test
   void test() {
