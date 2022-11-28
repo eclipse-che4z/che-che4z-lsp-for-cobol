@@ -59,10 +59,11 @@ class IdmsCopybookService {
    * @param copybookModel - copybook model
    * @param parentLevel - copy statement parent level
    * @param locality - copybook statement locality
-   * @param copybookName - copybook name
    * @return - a list of generated nodes
    */
-  public ResultWithErrors<List<Node>> processCopybook(CopybookModel copybookModel, int parentLevel, Locality locality, CopybookName copybookName) {
+  public ResultWithErrors<List<Node>> processCopybook(CopybookModel copybookModel, int parentLevel, Locality locality) {
+    CopybookName copybookName = copybookModel.getCopybookName();
+
     if (copybookModel.getContent() == null) {
       List<SyntaxError> errors = new LinkedList<>();
       errors.add(ErrorHelper.missingCopybooks(messageService, locality, copybookName.getQualifiedName()));

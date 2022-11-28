@@ -264,7 +264,6 @@
                         <exclude>**/generated-sources/**/*</exclude>
                         <exclude>**/generated-test-sources/**/*</exclude>
                         <exclude>**/org/eclipse/lsp/cobol/core/parser/**/*</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/domain/modules/**/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

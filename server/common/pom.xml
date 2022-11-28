@@ -187,14 +187,6 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${maven.jacoco.plugin.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/generated-sources/**/*</exclude>
-                        <exclude>**/generated-test-sources/**/*</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/core/parser/**/*</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/domain/modules/**/*</exclude>
-                    </excludes>
-                </configuration>
                 <executions>
                     <execution>
                         <id>coverage-prepare-agent</id>

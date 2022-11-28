@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
@@ -28,7 +27,6 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.dialects.daco.DaCoMaidProcessor;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 
 import java.util.*;
@@ -43,21 +41,14 @@ public class DialectService {
   @Inject
   public DialectService(
       CopybookService copybookService,
-      ParseTreeListener treeListener,
       SymbolAccumulatorService symbolAccumulatorService,
       MessageService messageService) {
     dialectSuppliers = new HashMap<>();
 
-    CobolDialect dialect = new IdmsDialect(copybookService, messageService);
+    CobolDialect dialect = new IdmsDialect(copybookService, messageService, symbolAccumulatorService);
     dialectSuppliers.put(dialect.getName(), dialect);
 
-    dialect =
-        new DaCoDialect(
-            messageService,
-            new DaCoMaidProcessor(copybookService, treeListener, messageService),
-                symbolAccumulatorService);
-    dialectSuppliers.put(dialect.getName(), dialect);
-
+    dialect = new DaCoDialect(copybookService, messageService, symbolAccumulatorService);
     dialectSuppliers.put(dialect.getName(), dialect);
   }
 

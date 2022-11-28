@@ -113,7 +113,7 @@ class ErrorMessageHelper {
   private String getExpectedText(Parser recognizer, IntervalSet interval) {
     final String newMessage =
         buildErrorMessage(
-            removeIdentifierTokens(recognizer, collectErrorTokens(recognizer, interval)));
+            removeIdentifierTokens(collectErrorTokens(recognizer, interval)));
     return interval.size() > 1 ? String.format("{%s}", newMessage) : newMessage;
   }
 
@@ -130,7 +130,7 @@ class ErrorMessageHelper {
         .collect(joining(MSG_DELIMITER));
   }
 
-  private List<String> removeIdentifierTokens(Parser recognizer, List<String> tokens) {
+  private List<String> removeIdentifierTokens(List<String> tokens) {
     final Set<String> identifierTokens = ImmutableSet.of();
     if (tokens.containsAll(identifierTokens)) tokens.removeAll(identifierTokens);
     return tokens;
