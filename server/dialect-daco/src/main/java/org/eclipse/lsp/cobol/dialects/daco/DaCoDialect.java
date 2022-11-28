@@ -14,12 +14,13 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco;
 
-import com.google.common.collect.*;
-import lombok.RequiredArgsConstructor;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -37,20 +38,31 @@ import org.eclipse.lsp.cobol.dialects.daco.processors.implicit.DaCoImplicitCodeP
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Process the text according to the DaCo rules */
-@RequiredArgsConstructor
 public final class DaCoDialect implements CobolDialect {
   public static final String NAME = "DaCo";
   private final Pattern dcdbPattern = Pattern.compile("^[\\s\\d]{7}D-[BC]", Pattern.MULTILINE);
 
   private final MessageService messageService;
-  private final DaCoMaidProcessor maidProcessor;
   private final VariableAccumulator symbolAccumulatorService;
+
+  private final DaCoMaidProcessor maidProcessor;
+
   private CopybookConfig copybookConfig;
+
+  public DaCoDialect(CopybookService copybookService, MessageService messageService, VariableAccumulator symbolAccumulatorService) {
+    this.messageService = messageService;
+    this.symbolAccumulatorService = symbolAccumulatorService;
+    this.maidProcessor = new DaCoMaidProcessor(copybookService,
+        new InterruptingTreeListener(), messageService);
+  }
 
   public static final String IDMS_DIALECT_NAME = "IDMS";
 

@@ -315,6 +315,9 @@
                             <value>${listingSnap}</value>
                         </property>
                     </systemProperties>
+                    <excludes>
+                        <exclude>**/org/eclipse/lsp/cobol/dialects/daco/**/*</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 
