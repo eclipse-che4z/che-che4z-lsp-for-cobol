@@ -101,12 +101,12 @@ function globSearch(workspaceFolder: string, resource: string, copybookName: str
         }
     }
     // One must use forward-slashes only in glob expressions
-    const cwd = path.resolve(...cwdSegments).replace(backwardSlashRegex, "/");
+    const cwd = path.resolve("/", ...cwdSegments).replace(backwardSlashRegex, "/");
     const normalizePathName = pathName.replace(backwardSlashRegex, "/");
     let pattern = normalizePathName === cwd ? "" : normalizePathName.replace(cwd.endsWith("/") ? cwd : cwd + "/", "");
     const suffix = (pattern.length == 0 || pattern.endsWith("/") ? "" : "/") + copybookName + ext;
     pattern = pattern + suffix;
-    const result = glob.sync(pattern, { cwd });
+    const result = glob.sync(pattern, { cwd, "dot": true });
     // TODO report the case with more then one copybook fit the pattern.
     return result[0] ? path.join(cwd, result[0]) : undefined;
 }
