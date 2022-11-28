@@ -312,11 +312,14 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   @SneakyThrows
   @Override
   public void didChange(DidChangeTextDocumentParams params) {
-    if (disposableLSPStateService.isServerShutdown()) return;
+    if (disposableLSPStateService.isServerShutdown()) {
+      return;
+    }
     String uri = params.getTextDocument().getUri();
+    String text = params.getContentChanges().get(0).getText();
+    docs.computeIfPresent(uri, (k, v) -> new CobolDocumentModel(text, v.getAnalysisResult()));
     outlineMap.put(uri, new CompletableFuture<>());
     cfAstMap.put(uri, new CompletableFuture<>());
-    String text = params.getContentChanges().get(0).getText();
     TextDocumentItem docIdentifier = new TextDocumentItem();
     docIdentifier.setText(text);
     docIdentifier.setUri(uri);
