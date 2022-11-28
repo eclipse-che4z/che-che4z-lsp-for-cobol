@@ -23,6 +23,7 @@ import lombok.Value;
  */
 @Value
 public class CopybookModel {
+  CopybookId copybookId;
   CopybookName copybookName;
   String uri;
   String content;

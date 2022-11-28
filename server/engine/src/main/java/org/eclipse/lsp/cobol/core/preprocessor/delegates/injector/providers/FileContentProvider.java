@@ -48,6 +48,9 @@ public class FileContentProvider implements ContentProvider {
                                       String programDocumentUri, String documentUri) {
     String content = files.readImplicitCode(copybookName.getQualifiedName());
     return Optional.ofNullable(content)
-        .map(c -> new CopybookModel(copybookName, ImplicitCodeUtils.createFullUrl(copybookName.getQualifiedName()), c));
+        .map(c -> {
+          String fullUrl = ImplicitCodeUtils.createFullUrl(copybookName.getQualifiedName());
+          return new CopybookModel(copybookName.toCopybookId(programDocumentUri), copybookName, fullUrl, c);
+        });
   }
 }

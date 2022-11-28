@@ -53,7 +53,7 @@ class CopybookReferenceRepoImplTest {
   private CopybookReferenceRepo storeReferences() {
     CopybookReferenceRepo repo = new CopybookReferenceRepoImpl();
     CopybookName copybookName = new CopybookName("COPYBOOK");
-    CopybookModel copybookModel = new CopybookModel(copybookName, CPY_URI, COPYBOOK_CONTENT);
+    CopybookModel copybookModel = new CopybookModel(copybookName.toCopybookId(DOCUMENT_URI), copybookName, CPY_URI, COPYBOOK_CONTENT);
     repo.storeCopybookUsageReference(copybookName, DOCUMENT_URI, copybookModel);
     return repo;
   }

@@ -18,10 +18,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
-import org.eclipse.lsp.cobol.common.copybook.CopybookName;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -95,9 +92,11 @@ public final class IdmsDialect implements CobolDialect {
                                   IdmsCopybookDescriptor cb, String programDocumentUri, String currentUri,
                                   CopybookConfig copybookConfig,
                                   Deque<String> copybookStack) {
+    CopybookName copybookName = new CopybookName(cb.getName(), IdmsDialect.NAME);
     CopybookModel copybookModel =
         copybookService.resolve(
-            new CopybookName(cb.getName(), IdmsDialect.NAME),
+            copybookName.toCopybookId(programDocumentUri),
+            copybookName,
             programDocumentUri,
             currentUri,
             copybookConfig,

@@ -103,7 +103,7 @@ public class UseCaseUtils {
    * @return list of diagnostics with only severe errors
    */
   public static List<Diagnostic> analyzeForErrors(UseCase useCase) {
-    return ofNullable(analyze(useCase).getDiagnostics().get(useCase.getFileName()))
+    return ofNullable(analyze(useCase).getDiagnostics().get(useCase.getDocumentUri()))
         .map(
             diagnostics ->
                 diagnostics.stream()
@@ -146,8 +146,8 @@ public class UseCaseUtils {
     TextPreprocessor preprocessor = injector.getInstance(TextPreprocessor.class);
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
-    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks())
-        .forEach(copybookModel -> copybookService.store(copybookModel, useCase.fileName));
+    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.documentUri)
+        .forEach(copybookService::store);
 
     useCase.getCopybooks()
         .forEach(cobolText -> {
@@ -159,8 +159,7 @@ public class UseCaseUtils {
           }
 
           cobolText = new CobolText(cobolText.getFileName().toUpperCase(), cobolText.getDialectType(), copybookText);
-          CopybookModel copybookModel = UseCaseUtils.toCopybookModel(cobolText);
-          copybookService.store(copybookModel, useCase.fileName);
+          copybookService.store(UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri));
         });
 
     SubroutineService subroutines = injector.getInstance(SubroutineService.class);
@@ -168,20 +167,19 @@ public class UseCaseUtils {
 
     return injector
         .getInstance(CobolLanguageEngineFacade.class)
-        .analyze(useCase.getFileName(), useCase.getText(), useCase.getAnalysisConfig());
+        .analyze(useCase.getDocumentUri(), useCase.getText(), useCase.getAnalysisConfig());
   }
   /**
    * Convert CobolText to CopybookModel
    *
    * @param cobolText the CobolText instance
+   * @param programUri main program uri
    * @return the CopybookModel instance
    */
-  public static CopybookModel toCopybookModel(CobolText cobolText) {
-    return new CopybookModel(
-        new CopybookName(
-            cobolText.getFileName(),
-            cobolText.getDialectType()),
-        toURI(cobolText.getFileName(), cobolText.getDialectType()),
-        cobolText.getFullText());
+  public static CopybookModel toCopybookModel(CobolText cobolText, String programUri) {
+    String uri = toURI(cobolText.getFileName(), cobolText.getDialectType());
+    CopybookName copybookName = new CopybookName(cobolText.getFileName(), cobolText.getDialectType());
+    return new CopybookModel(copybookName.toCopybookId(programUri), copybookName,
+            uri, cobolText.getFullText());
   }
 }

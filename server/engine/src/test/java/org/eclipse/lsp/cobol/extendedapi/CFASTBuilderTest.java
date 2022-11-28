@@ -58,7 +58,7 @@ class CFASTBuilderTest {
   @MethodSource("casesToTest")
   void cfastBuilderTest(String src, String jsonTree, String caseName) {
     AnalysisResult analysisResult =
-        UseCaseUtils.analyze(UseCase.builder().fileName("fake/path").features(Arrays.asList(EmbeddedCodeNode.Language.values())).text(src).build());
+        UseCaseUtils.analyze(UseCase.builder().documentUri("fake/path").features(Arrays.asList(EmbeddedCodeNode.Language.values())).text(src).build());
     CFASTBuilder builder = new CFASTBuilderImpl();
     Assertions.assertEquals(
         GSON.toJson(GSON.fromJson(jsonTree, List.class)),

@@ -303,7 +303,8 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
 
   protected ResultWithErrors<CopybookModel> emptyModel(
       CopybookName copybookName, List<SyntaxError> errors) {
-    return new ResultWithErrors<>(new CopybookModel(copybookName, "", ""), errors);
+    return new ResultWithErrors<>(new CopybookModel(copybookName.toCopybookId(""), copybookName,
+            "", ""), errors);
   }
 
   protected SyntaxError addCopybookError(

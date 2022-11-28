@@ -35,7 +35,7 @@ public class UseCase {
   /** Text to analyze */
   String text;
   /** Name of the processing file */
-  @Builder.Default String fileName = UseCaseUtils.DOCUMENT_URI;
+  @Builder.Default String documentUri = UseCaseUtils.DOCUMENT_URI;
   /** List of the copybooks need for the analysis */
   @Singular List<CobolText> copybooks;
   /** List of available subroutine names */
