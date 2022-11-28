@@ -33,6 +33,7 @@ import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
+import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import org.eclipse.lsp.cobol.service.utils.TestThreadPoolExecutor;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -58,6 +59,7 @@ public class MockTextDocumentService {
   @Mock protected CopybookIdentificationService copybookIdentificationService;
   @Mock protected CopybookService copybookService;
   @Mock protected WatcherService watcherService;
+  @Mock protected FileSystemService fileSystemService;
 
   /**
    * Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing. All tasks run
@@ -82,6 +84,7 @@ public class MockTextDocumentService {
         .copybookReferenceRepo(new CopybookReferenceRepoImpl())
         .syncProvider(new SyncProvider())
         .watcherService(watcherService)
+        .fileSystemService(fileSystemService)
         .build();
   }
 
@@ -105,6 +108,7 @@ public class MockTextDocumentService {
         .configurationService(configurationService)
         .syncProvider(new SyncProvider())
         .watcherService(watcherService)
+        .fileSystemService(fileSystemService)
         .build();
   }
 
