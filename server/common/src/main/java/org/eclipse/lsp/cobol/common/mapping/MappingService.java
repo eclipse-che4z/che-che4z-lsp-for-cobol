@@ -50,7 +50,7 @@ public class MappingService {
   @Value
   public static class CharShift {
     int lineNumber;
-    int charShift;
+    int charShiftCount;
   }
 
   @Getter

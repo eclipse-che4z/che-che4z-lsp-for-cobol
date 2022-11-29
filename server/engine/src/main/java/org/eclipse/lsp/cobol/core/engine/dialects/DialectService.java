@@ -45,7 +45,7 @@ public class DialectService {
       MessageService messageService) {
     dialectSuppliers = new HashMap<>();
 
-    CobolDialect dialect = new IdmsDialect(copybookService, messageService, symbolAccumulatorService);
+    CobolDialect dialect = new IdmsDialect(copybookService, messageService);
     dialectSuppliers.put(dialect.getName(), dialect);
 
     dialect = new DaCoDialect(copybookService, messageService, symbolAccumulatorService);

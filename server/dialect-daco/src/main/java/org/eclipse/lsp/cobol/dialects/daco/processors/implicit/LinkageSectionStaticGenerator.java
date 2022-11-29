@@ -29,33 +29,37 @@ import java.util.List;
 @UtilityClass
 class LinkageSectionStaticGenerator {
 
+  public static final String SPACE_VALUE = "SPACE";
+
   /**
    * Generates static code for LINKAGE SECTION
    * @return a generated code pair where the key is a name and a value is a code
    */
   public List<VariableNode> generate() {
-//          "      *----------------------------------------------------------------*\n"
-//        + "      * Belongs at the end of LINKAGE SECTION\n"
-//        + "      *----------------------------------------------------------------*\n"
-//        + "*DACO: 01 KMKIDMdXII.\n"
-//        + "*DACO: 03 OPDATOdXII PIC X(3) VALUE SPACE.\n"
-//        + "*DACO: 03 LAYADR-BII POINTER.\n"
-//        + "*DACO: 03 OPDKOD-XII PIC X(4) VALUE SPACE.\n"
-//        + "*DACO: 03 PMONAM-XII PIC X(8) VALUE SPACE.\n"
-//        + "*DACO: 03 ENTNAM-XII PIC X(16) VALUE SPACE.\n"
-//        + "*DACO: 03 PMT-XII    PIC X(6) VALUE SPACE.\n"
-//        + "*DACO: 03 PMTBIN-BII PIC S9(9) VALUE ZERO COMP.\n"
-//        + "*DACO: 03 RTTKOD-XII VALUE ZERO.\n"
-//        + "*DACO: 05 RTTSTS-XII PIC X.\n"
-//        + "*DACO: 05 RTTMESdNII PIC 9(3).";
-
+    /*
+    Code illustration:
+                *----------------------------------------------------------------*
+                * Belongs at the end of LINKAGE SECTION
+                *----------------------------------------------------------------*
+          *DACO: 01 KMKIDMdXII.
+          *DACO: 03 OPDATOdXII PIC X(3) VALUE SPACE.
+          *DACO: 03 LAYADR-BII POINTER.
+          *DACO: 03 OPDKOD-XII PIC X(4) VALUE SPACE.
+          *DACO: 03 PMONAM-XII PIC X(8) VALUE SPACE.
+          *DACO: 03 ENTNAM-XII PIC X(16) VALUE SPACE.
+          *DACO: 03 PMT-XII    PIC X(6) VALUE SPACE.
+          *DACO: 03 PMTBIN-BII PIC S9(9) VALUE ZERO COMP.
+          *DACO: 03 RTTKOD-XII VALUE ZERO.
+          *DACO: 05 RTTSTS-XII PIC X.
+          *DACO: 05 RTTMESdNII PIC 9(3).
+    */
     GroupItemNode kmkid = GeneratorHelper.createGroupNode(1, "KMKIDMdXII");
-    kmkid.addChild(GeneratorHelper.createElementaryNode(3, "OPDATOdXII", "X(3)", "SPACE", UsageFormat.UNDEFINED));
+    kmkid.addChild(GeneratorHelper.createElementaryNode(3, "OPDATOdXII", "X(3)", SPACE_VALUE, UsageFormat.UNDEFINED));
     kmkid.addChild(GeneratorHelper.createElementaryNode(3, "LAYADR-BII", null, null, UsageFormat.POINTER));
-    kmkid.addChild(GeneratorHelper.createElementaryNode(3, "OPDKOD-XII", "X(4)", "SPACE", UsageFormat.UNDEFINED));
-    kmkid.addChild(GeneratorHelper.createElementaryNode(3, "PMONAM-XII", "X(8)", "SPACE", UsageFormat.UNDEFINED));
-    kmkid.addChild(GeneratorHelper.createElementaryNode(3, "ENTNAM-XII", "X(16)", "SPACE", UsageFormat.UNDEFINED));
-    kmkid.addChild(GeneratorHelper.createElementaryNode(3, "PMT-XII", "X(6)", "SPACE", UsageFormat.UNDEFINED));
+    kmkid.addChild(GeneratorHelper.createElementaryNode(3, "OPDKOD-XII", "X(4)", SPACE_VALUE, UsageFormat.UNDEFINED));
+    kmkid.addChild(GeneratorHelper.createElementaryNode(3, "PMONAM-XII", "X(8)", SPACE_VALUE, UsageFormat.UNDEFINED));
+    kmkid.addChild(GeneratorHelper.createElementaryNode(3, "ENTNAM-XII", "X(16)", SPACE_VALUE, UsageFormat.UNDEFINED));
+    kmkid.addChild(GeneratorHelper.createElementaryNode(3, "PMT-XII", "X(6)", SPACE_VALUE, UsageFormat.UNDEFINED));
     kmkid.addChild(GeneratorHelper.createElementaryNode(3, "PMTBIN-BII", "S9(9)", "ZERO", UsageFormat.COMP));
 
     ElementaryItemNode rtt = GeneratorHelper.createElementaryNode(3, "RTTKOD-XII", null, "ZERO", UsageFormat.UNDEFINED);

@@ -30,6 +30,7 @@ import java.util.function.Predicate;
 
 /**
  * The old mapping logic wrapper
+ * @deprecated should be replaced with the new mapping
  */
 @Deprecated
 public class OldMapping {

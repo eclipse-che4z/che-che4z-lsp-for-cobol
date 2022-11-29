@@ -17,9 +17,13 @@ package org.eclipse.lsp.cobol.common.utils;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
+import java.util.regex.Pattern;
+
 /** This utility class provides functions that are useful for pre-processing a COBOL document */
 @UtilityClass
 public class PreprocessorStringUtils {
+  public static final Pattern QUOTE_PATTERN = Pattern.compile("(^[\"'])|([\"']$)");
+
   /**
    * Remove leading quote char from the string
    *
@@ -28,6 +32,6 @@ public class PreprocessorStringUtils {
    */
   @NonNull
   public String trimQuotes(@NonNull String line) {
-    return line.replaceAll("(?:^[\"'])|(?:[\"']$)", "");
+    return QUOTE_PATTERN.matcher(line).replaceAll("");
   }
 }

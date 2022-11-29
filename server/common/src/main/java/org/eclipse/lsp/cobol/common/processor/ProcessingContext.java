@@ -39,9 +39,8 @@ public class ProcessingContext {
      * Register node type processor
      *
      * @param processorDesc Processor descriptor.
-     * @param <T> Specific node type
      */
-    public <T extends Node> void register(ProcessorDescription processorDesc) {
+    public void register(ProcessorDescription processorDesc) {
         processors
                 .computeIfAbsent(processorDesc.getPhase(), v -> new LinkedHashMap<>())
                 .computeIfAbsent(processorDesc.getNodeClass(), v -> new ArrayList<>())

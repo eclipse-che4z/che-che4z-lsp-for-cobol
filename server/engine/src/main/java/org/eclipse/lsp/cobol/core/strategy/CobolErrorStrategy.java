@@ -46,20 +46,26 @@ public class CobolErrorStrategy extends DefaultErrorStrategy implements MessageS
   public void reportError(Parser recognizer, RecognitionException e) {
     // if we've already reported an error and have not matched a token
     // yet successfully, don't report any errors.
-    if (inErrorRecoveryMode(recognizer)) {
-      return; // don't report spurious errors
+    if (!inErrorRecoveryMode(recognizer)) {
+      beginErrorCondition(recognizer);
+      reportErrorByType(recognizer, e);
     }
-    beginErrorCondition(recognizer);
+  }
 
+  private void reportErrorByType(Parser recognizer, RecognitionException e) {
+    if (e instanceof InputMismatchException) {
+      reportInputMismatch(recognizer, (InputMismatchException) e);
+      return;
+    }
     if (e instanceof NoViableAltException) {
       reportNoViableAlternative(recognizer, (NoViableAltException) e);
-    } else if (e instanceof InputMismatchException) {
-      reportInputMismatch(recognizer, (InputMismatchException) e);
-    } else if (e instanceof FailedPredicateException) {
-      reportFailedPredicate(recognizer, (FailedPredicateException) e);
-    } else {
-      reportUnrecognizedException(recognizer, e);
+      return;
     }
+    if (e instanceof FailedPredicateException) {
+      reportFailedPredicate(recognizer, (FailedPredicateException) e);
+      return;
+    }
+    reportUnrecognizedException(recognizer, e);
   }
 
   private void reportUnrecognizedException(Parser recognizer, RecognitionException e) {
