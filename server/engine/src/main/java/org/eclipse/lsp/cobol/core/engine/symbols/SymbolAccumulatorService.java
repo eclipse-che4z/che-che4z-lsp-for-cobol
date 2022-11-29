@@ -251,6 +251,23 @@ public class SymbolAccumulatorService implements VariableAccumulator {
   }
 
   /**
+   * Get Paragraph locations
+   *
+   * @param node the paragraph node
+   * @param retrieveLocations location extract function
+   * @return a list of locations
+   */
+  public List<Location> getParagraphLocations(
+      ParagraphNameNode node, Function<CodeBlockReference, List<Location>> retrieveLocations) {
+    return node.getProgram()
+        .map(this::createOrGetSymbolTable)
+        .map(SymbolTable::getParagraphMap)
+        .map(it -> it.get(node.getName()))
+        .map(retrieveLocations)
+        .orElse(ImmutableList.of());
+  }
+
+  /**
    * Extract all accumulated symbols information
    *
    * @return Symbol Tables

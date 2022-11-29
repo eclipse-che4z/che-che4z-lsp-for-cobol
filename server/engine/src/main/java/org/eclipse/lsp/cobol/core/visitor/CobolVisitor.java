@@ -39,7 +39,6 @@ import org.eclipse.lsp.cobol.common.utils.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.OldMapping;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToBooleanStatement;
@@ -89,7 +88,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final SubroutineService subroutineService;
   private final AnalysisConfig analysisConfig;
 
-  private final SymbolsRepository symbolsRepository;
   private final List<Node> dialectNodes;
   private Map<String, FileControlEntryContext> fileControls = null;
   private final Map<String, SubroutineDefinition> subroutineDefinitionMap = new HashMap<>();
@@ -103,7 +101,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
           Map<Token, EmbeddedCode> embeddedCodeParts,
           MessageService messageService,
           SubroutineService subroutineService,
-          SymbolsRepository symbolsRepository, List<Node> dialectNodes,
+          List<Node> dialectNodes,
           CachingConfigurationService cachingConfigurationService) {
     this.copybooks = copybooks;
     this.positions = positions;
@@ -112,7 +110,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     this.messageService = messageService;
     this.subroutineService = subroutineService;
     this.analysisConfig = analysisConfig;
-    this.symbolsRepository = symbolsRepository;
     this.dialectNodes = dialectNodes;
     this.cachingConfigurationService = cachingConfigurationService;
   }
@@ -748,7 +745,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitParagraphDefinitionName(ParagraphDefinitionNameContext ctx) {
-    return addTreeNode(ctx, locality -> new ParagraphNameNode(locality, ctx.getText(), symbolsRepository));
+    return addTreeNode(ctx, locality -> new ParagraphNameNode(locality, ctx.getText()));
   }
 
   @Override
