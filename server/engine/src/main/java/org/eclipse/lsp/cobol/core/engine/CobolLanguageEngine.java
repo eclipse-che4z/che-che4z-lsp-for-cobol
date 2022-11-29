@@ -243,7 +243,6 @@ public class CobolLanguageEngine {
             embeddedCodeParts,
             messageService,
             subroutineService,
-            symbolsRepository,
             dialectOutcome.getDialectNodes(),
             cachingConfigurationService);
     List<Node> syntaxTree = visitor.visit(tree);
@@ -313,7 +312,7 @@ public class CobolLanguageEngine {
         new ProcessorDescription(
             DeclarativeProcedureSectionNode.class,
             ProcessingPhase.TRANSFORMATION,
-            new DeclarativeProcedureSectionRegister(symbolAccumulatorService, symbolsRepository)));
+            new DeclarativeProcedureSectionRegister(symbolAccumulatorService)));
     // Phase DEFINITION
     ctx.register(
         new ProcessorDescription(
@@ -352,6 +351,11 @@ public class CobolLanguageEngine {
             SectionNameNode.class,
             ProcessingPhase.VALIDATION,
             new SectionNameNodeEnricher(symbolAccumulatorService)));
+    ctx.register(
+        new ProcessorDescription(
+            ParagraphNameNode.class,
+            ProcessingPhase.VALIDATION,
+            new ParagraphNameNodeEnricher(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             CodeBlockUsageNode.class,

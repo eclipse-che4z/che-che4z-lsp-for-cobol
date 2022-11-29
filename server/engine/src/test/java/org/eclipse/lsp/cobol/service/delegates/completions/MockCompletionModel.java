@@ -54,7 +54,7 @@ class MockCompletionModel {
         .forEach(
             name -> {
               ParagraphNameNode nameNode =
-                  new ParagraphNameNode(Locality.builder().build(), name, REPO);
+                  new ParagraphNameNode(Locality.builder().build(), name);
               SYMBOL_SERVICE.registerParagraphNameNode(programNode, nameNode);
             });
     ImmutableList.of("secD1", "SecD2", "Not-secD")

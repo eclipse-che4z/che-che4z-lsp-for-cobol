@@ -18,7 +18,6 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.tree.DeclarativeProcedureSectionNode;
 import org.eclipse.lsp.cobol.core.model.tree.ParagraphNameNode;
 
@@ -29,12 +28,10 @@ public class DeclarativeProcedureSectionRegister
     implements Processor<DeclarativeProcedureSectionNode> {
 
   private final SymbolAccumulatorService symbolAccumulatorService;
-  private final SymbolsRepository symbolsRepository;
 
   public DeclarativeProcedureSectionRegister(
-      SymbolAccumulatorService symbolAccumulatorService, SymbolsRepository symbolsRepository) {
+      SymbolAccumulatorService symbolAccumulatorService) {
     this.symbolAccumulatorService = symbolAccumulatorService;
-    this.symbolsRepository = symbolsRepository;
   }
 
   @Override
@@ -47,6 +44,6 @@ public class DeclarativeProcedureSectionRegister
     ProgramNode program = programOpt.get();
     symbolAccumulatorService.registerCodeBlock(program, node);
     symbolAccumulatorService.registerParagraphNameNode(
-        program, new ParagraphNameNode(node.getLocality(), node.getName(), symbolsRepository));
+        program, new ParagraphNameNode(node.getLocality(), node.getName()));
   }
 }
