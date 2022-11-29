@@ -51,7 +51,7 @@ abstract class SmartCommandProvider {
     public abstract execute(editor: vscode.TextEditor, edit: vscode.TextEditorEdit, args: any[]);
 }
 
-class SmartTabCommandProvider extends SmartCommandProvider {
+export class SmartTabCommandProvider extends SmartCommandProvider {
     public execute(editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
         const newSelections: Selection[] = new Array();
 

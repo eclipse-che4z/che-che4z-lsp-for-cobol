@@ -88,15 +88,26 @@ export function searchCopybookInWorkspace(copybookName: string, copybookFolders:
     return undefined;
 }
 
+const backwardSlashRegex = new RegExp("\\\\", "g");
 function globSearch(workspaceFolder: string, resource: string, copybookName: string, ext: string): string | undefined {
     const pathName: string = isAbsolute(resource) ? resource : path.normalize(path.join(workspaceFolder, resource));
-    const cwd = pathName.split("*", 2)[0]
-    let pattern = pathName.replace(cwd, "");
-    // You must use forward-slashes only in glob expressions
-    pattern = pattern.replace("\\", "/");
+    const segments = pathName.split(path.sep);
+    const cwdSegments: string[] = [];
+    for (const s of segments) {
+        if(!glob.hasMagic(s)) {
+            cwdSegments.push(s);
+        } else {
+            break;
+        }
+    }
+    // One must use forward-slashes only in glob expressions
+    const cwd = path.resolve("/", ...cwdSegments).replace(backwardSlashRegex, "/");
+    const normalizePathName = pathName.replace(backwardSlashRegex, "/");
+    let pattern = normalizePathName === cwd ? "" : normalizePathName.replace(cwd.endsWith("/") ? cwd : cwd + "/", "");
     const suffix = (pattern.length == 0 || pattern.endsWith("/") ? "" : "/") + copybookName + ext;
     pattern = pattern + suffix;
-    const result = glob.sync(pattern, { cwd });
+    const result = glob.sync(pattern, { cwd, "dot": true });
+    // TODO report the case with more then one copybook fit the pattern.
     return result[0] ? path.join(cwd, result[0]) : undefined;
 }
 
