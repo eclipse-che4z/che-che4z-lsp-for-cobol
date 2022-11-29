@@ -17,7 +17,15 @@ import * as url from "url";
 // tslint:disable: no-namespace no-empty
 export namespace workspace {
     export const workspaceFolders: [] = [];
-    export function getConfiguration() { }
+    export function getConfiguration() {
+        return {
+            get: key => {
+                if("cobol-lsp.smart-tab" === key) {
+                    return undefined;
+                }
+            }
+        }
+     }
 }
 
 export namespace extensions {
@@ -69,8 +77,9 @@ export enum EndOfLine {
 export const Range = jest.fn().mockImplementation((start, end) => { return { start: start, end: end } })
 export const Position = jest.fn().mockImplementation((line, character) => { return { line: line, character: character } });
 
-export const commands = {
-    registerTextEditorCommand: jest.fn()
+export namespace commands {
+    export const registerTextEditorCommand = jest.fn();
+    export const executeCommand = jest.fn();
 };
 
 export const TextEditor = {
@@ -78,3 +87,15 @@ export const TextEditor = {
         lineAt: jest.fn()
     }
 }
+
+export class Selection {
+    anchor: any;
+    active: any;
+
+    constructor(anchor: any, active: any) {
+        this.anchor = anchor;
+        this.active = active;
+    }
+}
+
+
