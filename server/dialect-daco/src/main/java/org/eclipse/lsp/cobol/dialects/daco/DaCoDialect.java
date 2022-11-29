@@ -31,7 +31,6 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
-import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 import org.eclipse.lsp.cobol.dialects.daco.nodes.DaCoCopyFromNode;
 import org.eclipse.lsp.cobol.dialects.daco.processors.DaCoCopyFromProcessor;
 import org.eclipse.lsp.cobol.dialects.daco.processors.implicit.DaCoImplicitCodeProcessor;
@@ -51,15 +50,13 @@ public final class DaCoDialect implements CobolDialect {
   private final Pattern dcdbPattern = Pattern.compile("^[\\s\\d]{7}D-[BC]", Pattern.MULTILINE);
 
   private final MessageService messageService;
-  private final VariableAccumulator symbolAccumulatorService;
 
   private final DaCoMaidProcessor maidProcessor;
 
   private CopybookConfig copybookConfig;
 
-  public DaCoDialect(CopybookService copybookService, MessageService messageService, VariableAccumulator symbolAccumulatorService) {
+  public DaCoDialect(CopybookService copybookService, MessageService messageService) {
     this.messageService = messageService;
-    this.symbolAccumulatorService = symbolAccumulatorService;
     this.maidProcessor = new DaCoMaidProcessor(copybookService,
         new InterruptingTreeListener(), messageService);
   }
@@ -142,9 +139,9 @@ public final class DaCoDialect implements CobolDialect {
     return ImmutableList.of(
         new ProcessorDescription(
             DaCoCopyFromNode.class, ProcessingPhase.POST_DEFINITION,
-                new DaCoCopyFromProcessor(symbolAccumulatorService)),
+                new DaCoCopyFromProcessor()),
         new ProcessorDescription(ProgramNode.class, ProcessingPhase.POST_DEFINITION,
-                new DaCoImplicitCodeProcessor(symbolAccumulatorService, copybookConfig))
+                new DaCoImplicitCodeProcessor(copybookConfig))
     );
   }
 }

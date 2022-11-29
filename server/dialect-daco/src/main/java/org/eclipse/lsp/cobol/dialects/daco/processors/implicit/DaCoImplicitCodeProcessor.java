@@ -22,7 +22,6 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +33,6 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 public class DaCoImplicitCodeProcessor implements Processor<ProgramNode> {
-  private final VariableAccumulator variableAccumulator;
   private final CopybookConfig copybookConfig;
 
   @Override
@@ -49,10 +47,10 @@ public class DaCoImplicitCodeProcessor implements Processor<ProgramNode> {
         .collect(Collectors.toList());
     variables.addAll(children);
 
-    variables.forEach(node -> variableAccumulator.addVariableDefinition(programNode, node));
+    variables.forEach(node -> processingContext.getVariableAccumulator().addVariableDefinition(programNode, node));
 
     SectionsGenerator.generate(copybookConfig.getPredefinedSections(), getExistingSections(programNode))
-        .forEach(node -> variableAccumulator.registerCodeBlock(programNode, node));
+        .forEach(node -> processingContext.getVariableAccumulator().registerCodeBlock(programNode, node));
   }
 
   private Set<String> getExistingSections(ProgramNode programNode) {

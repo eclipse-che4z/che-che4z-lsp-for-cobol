@@ -33,18 +33,13 @@ import java.util.stream.Collectors;
 
 /** Handle Copy From node */
 public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
-  private final VariableAccumulator variableAccumulator;
-
-  public DaCoCopyFromProcessor(VariableAccumulator variableAccumulator) {
-    this.variableAccumulator = variableAccumulator;
-  }
 
   @Override
   public void accept(DaCoCopyFromNode copyFromNode, ProcessingContext processingContext) {
-    astPostprocessing(copyFromNode, processingContext.getErrors());
+    astPostprocessing(processingContext.getVariableAccumulator(), copyFromNode, processingContext.getErrors());
   }
 
-  private void astPostprocessing(DaCoCopyFromNode node, List<SyntaxError> errors) {
+  private void astPostprocessing(VariableAccumulator variableAccumulator, DaCoCopyFromNode node, List<SyntaxError> errors) {
 
     List<GroupItemNode> protoCandidates =
         node.getNearestParentByType(NodeType.PROGRAM)

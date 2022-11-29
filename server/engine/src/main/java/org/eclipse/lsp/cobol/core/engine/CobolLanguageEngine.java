@@ -41,7 +41,6 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
-import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
@@ -67,7 +66,9 @@ import org.eclipse.lsp.cobol.service.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -104,7 +105,6 @@ public class CobolLanguageEngine {
       SubroutineService subroutineService,
       CachingConfigurationService cachingConfigurationService,
       DialectService dialectService,
-      SymbolAccumulatorService symbolAccumulatorService,
       AstProcessor astProcessor,
       SymbolsRepository symbolsRepository) {
     this.preprocessor = preprocessor;
@@ -113,7 +113,7 @@ public class CobolLanguageEngine {
     this.subroutineService = subroutineService;
     this.cachingConfigurationService = cachingConfigurationService;
     this.dialectService = dialectService;
-    this.symbolAccumulatorService = symbolAccumulatorService;
+    this.symbolAccumulatorService = new SymbolAccumulatorService();
     this.astProcessor = astProcessor;
     this.symbolsRepository = symbolsRepository;
   }
@@ -254,7 +254,7 @@ public class CobolLanguageEngine {
     analyzeEmbeddedCode(syntaxTree, positionMapping);
 
     Node rootNode = syntaxTree.get(0);
-    ProcessingContext ctx = new ProcessingContext(new ArrayList<>());
+    ProcessingContext ctx = new ProcessingContext(new ArrayList<>(), symbolAccumulatorService);
     registerProcessors(analysisConfig, ctx);
     accumulatedErrors.addAll(astProcessor.processSyntaxTree(ctx, rootNode));
 
@@ -281,14 +281,12 @@ public class CobolLanguageEngine {
           timing.getLateErrorProcessingTime());
     }
 
-    Map<String, SymbolTable> symbolTableMap = Collections.synchronizedMap(new HashMap<>(symbolAccumulatorService.getProgramSymbols()));
-    symbolsRepository.updateSymbols(symbolTableMap);
-    symbolAccumulatorService.reset(documentUri);
+    symbolsRepository.updateSymbols(symbolAccumulatorService.getProgramSymbols());
 
     return new ResultWithErrors<>(
         AnalysisResult.builder()
             .rootNode(rootNode)
-            .symbolTableMap(symbolTableMap)
+            .symbolTableMap(symbolAccumulatorService.getProgramSymbols())
             .build(),
         accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
