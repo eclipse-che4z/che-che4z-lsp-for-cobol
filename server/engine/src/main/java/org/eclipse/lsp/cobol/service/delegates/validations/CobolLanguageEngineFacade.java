@@ -163,7 +163,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private List<String> filenameSpecificWatchFolders(String uri) {
     return new ArrayList<>(watcherService.getWatchingFolders()).stream()
             .filter(txt -> txt.contains("${fileBasenameNoExtension}"))
-            .map(txt -> txt.replaceAll("\\$\\{fileBasenameNoExtension\\}", getNameFromURI(uri)))
+            .map(txt -> txt.replace("\\$\\{fileBasenameNoExtension\\}", getNameFromURI(uri)))
             .collect(toList());
   }
 }

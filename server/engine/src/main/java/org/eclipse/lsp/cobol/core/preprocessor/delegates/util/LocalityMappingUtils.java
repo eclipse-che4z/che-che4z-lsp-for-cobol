@@ -169,7 +169,7 @@ public class LocalityMappingUtils {
   private int tryAndMatchToken(List<Token> tokens, Map<Token, Locality> mappingAccumulator, DocumentHierarchyLevel document, int currentIndex, Locality locality) {
     int expandedIndex = currentIndex;
     Token token = tokens.get(currentIndex);
-    if (isTokenSubsetOfLocality(token.getText(), locality, document)
+    if (isTokenSubsetOfLocality(token.getText(), locality)
         && currentIndex <= tokens.size()) {
       expandedIndex = expandEmbeddedTokensToMatchCurrentLocality(tokens, document, mappingAccumulator, currentIndex);
       }
@@ -181,7 +181,7 @@ public class LocalityMappingUtils {
     return currentIndex;
   }
 
-  private static boolean isTokenSubsetOfLocality(String token, Locality position, DocumentHierarchyLevel document) {
+  private static boolean isTokenSubsetOfLocality(String token, Locality position) {
     return position.getToken().startsWith(token);
   }
 

@@ -53,13 +53,17 @@ class CobolErrorStrategy extends DefaultErrorStrategy implements MessageServiceP
 
     if (e instanceof NoViableAltException) {
       reportNoViableAlternative(recognizer, (NoViableAltException) e);
-    } else if (e instanceof InputMismatchException) {
-      reportInputMismatch(recognizer, (InputMismatchException) e);
-    } else if (e instanceof FailedPredicateException) {
-      reportFailedPredicate(recognizer, (FailedPredicateException) e);
-    } else {
-      reportUnrecognizedException(recognizer, e);
+      return;
     }
+    if (e instanceof InputMismatchException) {
+      reportInputMismatch(recognizer, (InputMismatchException) e);
+      return;
+    }
+    if (e instanceof FailedPredicateException) {
+      reportFailedPredicate(recognizer, (FailedPredicateException) e);
+      return;
+    }
+    reportUnrecognizedException(recognizer, e);
   }
 
   private void reportUnrecognizedException(Parser recognizer, RecognitionException e) {

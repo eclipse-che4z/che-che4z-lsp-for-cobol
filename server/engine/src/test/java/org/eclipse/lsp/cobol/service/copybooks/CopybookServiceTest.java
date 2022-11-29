@@ -460,8 +460,8 @@ class CopybookServiceTest {
     CopybookService copybookService = createCopybookService();
     copybookService.resolve(copybookName.toCopybookId(DOCUMENT_URI), copybookName, DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
     Set<CopybookModel> copybookUsageReference = copybookReferenceRepo.getCopybookUsageReference("file:///c:/workspace/.c4z/.copybooks/VALIDNAME.CPY");
-    assertEquals(copybookUsageReference.size(), 1);
+    assertEquals(1, copybookUsageReference.size());
     CopybookModel referencedCopybook = copybookUsageReference.toArray(new CopybookModel[0])[0];
-    assertEquals(referencedCopybook.getUri(), DOCUMENT_URI);
+    assertEquals(DOCUMENT_URI, referencedCopybook.getUri());
   }
 }

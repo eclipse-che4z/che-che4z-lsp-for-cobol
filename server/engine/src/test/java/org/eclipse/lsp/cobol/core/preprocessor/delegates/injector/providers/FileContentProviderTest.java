@@ -49,7 +49,7 @@ class FileContentProviderTest {
   void testReadReturnsContent() {
     when(files.readImplicitCode(any())).thenReturn("content");
     Optional<CopybookModel> model = contentProvider.read(copybookConfig, new CopybookName("copybook"), "uri", "uri");
-    assertEquals(model.get().getContent(), "content");
+    assertEquals("content", model.get().getContent());
   }
 
   @Test

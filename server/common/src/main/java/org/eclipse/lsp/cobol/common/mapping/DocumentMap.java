@@ -98,10 +98,9 @@ public class DocumentMap {
    */
     public void commitTransformations() {
       if (topTransformations().isChanged()) {
-        String uri = topTransformations().getUri();
         mappings.push(new MappingService(topTransformations()));
         transformations.push(
-            new TextTransformations(topTransformations().calculateExtendedText(), uri));
+            new TextTransformations(topTransformations().calculateExtendedText(), topTransformations().getUri()));
       }
     }
 

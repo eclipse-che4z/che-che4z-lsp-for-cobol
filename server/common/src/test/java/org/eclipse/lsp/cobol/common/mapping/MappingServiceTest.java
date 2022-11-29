@@ -274,7 +274,7 @@ class MappingServiceTest {
     assertTrue(location.isPresent());
 
     assertEquals(9, location.get().getRange().getStart().getLine());
-    assertEquals(location.get().getRange().getStart().getCharacter(), 5);
+    assertEquals(5, location.get().getRange().getStart().getCharacter());
 
     location = mappingService.getOriginalLocation(new Range(new Position(8, 5), new Position(8, 10)));
     assertTrue(location.isPresent());
@@ -300,7 +300,7 @@ class MappingServiceTest {
     assertTrue(location.isPresent());
 
     assertEquals(9, location.get().getRange().getStart().getLine());
-    assertEquals(location.get().getRange().getStart().getCharacter(), 5);
+    assertEquals(5, location.get().getRange().getStart().getCharacter());
   }
 
   @Test

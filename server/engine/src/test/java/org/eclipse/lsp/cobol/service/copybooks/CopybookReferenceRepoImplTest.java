@@ -41,8 +41,8 @@ class CopybookReferenceRepoImplTest {
     Set<CopybookModel> copybookUsageReference = setUpRepo();
     assertEquals(1, copybookUsageReference.size());
     CopybookModel referencedCopybookModels = copybookUsageReference.toArray(new CopybookModel[0])[0];
-    assertEquals(referencedCopybookModels.getContent(), COPYBOOK_CONTENT);
-    assertEquals(referencedCopybookModels.getUri(), DOCUMENT_URI);
+    assertEquals(COPYBOOK_CONTENT, referencedCopybookModels.getContent());
+    assertEquals(DOCUMENT_URI, referencedCopybookModels.getUri());
   }
 
   private Set<CopybookModel> setUpRepo() {
