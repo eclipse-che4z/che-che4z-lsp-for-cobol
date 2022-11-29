@@ -32,7 +32,6 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -50,7 +49,7 @@ public final class IdmsDialect implements CobolDialect {
 
   public IdmsDialect(
       CopybookService copybookService,
-      MessageService messageService, VariableAccumulator symbolAccumulatorService) {
+      MessageService messageService) {
     this.copybookService = copybookService;
     this.messageService = messageService;
   }

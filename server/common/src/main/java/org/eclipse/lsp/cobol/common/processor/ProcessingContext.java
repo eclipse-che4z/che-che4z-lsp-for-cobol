@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -34,7 +35,7 @@ public class ProcessingContext {
             processors = new HashMap<>();
 
     final List<SyntaxError> errors;
-
+    final VariableAccumulator variableAccumulator;
     /**
      * Register node type processor
      *

@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
@@ -86,7 +86,7 @@ public class PositiveTestUtility {
    * @param fileName test file
    */
   void assetDefinitionsNReferencesFromSnap(
-      SymbolAccumulatorService symbolAccumulatorService,
+      Map<String, SymbolTable> symbolTableMap,
       Map<ReportSection, List<SysprintSnap>> dataNameRefs,
       Node rootNode,
       String fileName) {
@@ -97,7 +97,7 @@ public class PositiveTestUtility {
 
     fetchReferencesFromLSPEngine(
         rootNode,
-            symbolAccumulatorService,
+            symbolTableMap,
         variableDefinitionFromLSPEngine,
         paragraphDefFromLSPEngine,
         programDefinitionFromLSPEngine);
@@ -337,12 +337,12 @@ public class PositiveTestUtility {
 
   private void fetchReferencesFromLSPEngine(
       Node rootNode,
-      SymbolAccumulatorService symbolAccumulatorService,
+      Map<String, SymbolTable> symbolTableMap,
       Multimap<String, Node> variableDefinitionFromLSPEngine,
       Multimap<String, CodeBlockReference> paragraphDefFromLSPEngine,
       Multimap<String, Node> programDefinitionFromLSPEngine) {
       SymbolsRepository repo = new SymbolsRepository();
-      repo.updateSymbols(symbolAccumulatorService.getProgramSymbols());
+      repo.updateSymbols(symbolTableMap);
     rootNode
         .getDepthFirstStream()
         .filter(node -> node.getNodeType() == NodeType.PROGRAM)

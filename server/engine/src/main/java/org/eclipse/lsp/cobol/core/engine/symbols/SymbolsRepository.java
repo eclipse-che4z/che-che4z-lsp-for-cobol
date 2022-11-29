@@ -14,8 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.engine.symbols;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Multimap;
 import com.google.inject.Singleton;
+import lombok.Synchronized;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.model.Context;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -29,11 +31,7 @@ import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -42,14 +40,15 @@ import static org.eclipse.lsp.cobol.common.utils.RangeUtils.findNodeByPosition;
 /** This class is a repository for symbols */
 @Singleton
 public class SymbolsRepository {
-  private volatile Map<String, SymbolTable> programSymbols;
-
-  public SymbolsRepository(Map<String, SymbolTable> symbols) {
-    programSymbols = symbols;
-  }
+  private final Map<String, SymbolTable> programSymbols;
 
   public SymbolsRepository() {
     programSymbols = Collections.synchronizedMap(new HashMap<>());
+  }
+
+  @VisibleForTesting
+  public SymbolsRepository(Map<String, SymbolTable> symbols) {
+    programSymbols = symbols;
   }
 
   /**
@@ -57,8 +56,9 @@ public class SymbolsRepository {
    *
    * @param symbols updated symbols upon analysis
    */
+  @Synchronized
   public void updateSymbols(Map<String, SymbolTable> symbols) {
-    programSymbols = symbols;
+    programSymbols.putAll(symbols);
   }
 
   /**
@@ -111,6 +111,19 @@ public class SymbolsRepository {
         .map(this::constructElementsExcludingImplicits);
   }
 
+//  /**
+//   * Remove program related symbols
+//   *
+//   * @param documentUri the program uri
+//   */
+//  public void reset(String documentUri) {
+//    programSymbols.keySet().stream()
+//        .filter(k -> k.endsWith("%" + documentUri))
+//        .collect(Collectors.toList())
+//        .forEach(programSymbols::remove);
+//    programSymbols.remove(documentUri);
+//  }
+
   private Context constructElementsExcludingImplicits(Context ctx) {
     List<Location> definitions =
         ctx.getDefinitions().stream().filter(uriNotImplicit()).collect(Collectors.toList());
@@ -123,6 +136,7 @@ public class SymbolsRepository {
     return i -> !ImplicitCodeUtils.isImplicit(i.getUri());
   }
 
+  @Synchronized
   private SymbolTable getSymbolTable(ProgramNode program) {
     return programSymbols.computeIfAbsent(
         program.getProgramName() + "%" + program.getLocality().getUri(), p -> new SymbolTable());

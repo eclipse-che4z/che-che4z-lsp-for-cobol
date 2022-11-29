@@ -17,20 +17,24 @@ package org.eclipse.lsp.cobol.core.engine.symbols;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
-import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.*;
+import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.ProcedureSectionNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
-import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
+import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
-import org.eclipse.lsp.cobol.core.model.tree.*;
+import org.eclipse.lsp.cobol.core.model.tree.CodeBlockUsageNode;
+import org.eclipse.lsp.cobol.core.model.tree.ParagraphNameNode;
+import org.eclipse.lsp.cobol.core.model.tree.SectionNameNode;
 import org.eclipse.lsp4j.Location;
 
 import java.util.*;
@@ -40,16 +44,11 @@ import java.util.stream.Collectors;
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /** Service to handle symbol information and dependencies */
-@Singleton
 public class SymbolAccumulatorService implements VariableAccumulator {
   private final Map<String, SymbolTable> programSymbols;
 
   public SymbolAccumulatorService() {
     this.programSymbols = Collections.synchronizedMap(new HashMap<>());
-  }
-
-  public SymbolAccumulatorService(Map<String, SymbolTable> symbolTableMap) {
-    this.programSymbols = symbolTableMap;
   }
 
   /**
@@ -290,18 +289,5 @@ public class SymbolAccumulatorService implements VariableAccumulator {
         .filter(VariableNode::isGlobal)
         .forEach(variableNode -> result.put(variableNode.getName(), variableNode));
     return result;
-  }
-
-  /**
-   * Remove program related symbols
-   *
-   * @param documentUri the program uri
-   */
-  public void reset(String documentUri) {
-    programSymbols.keySet().stream()
-        .filter(k -> k.endsWith("%" + documentUri))
-        .collect(Collectors.toList())
-        .forEach(programSymbols::remove);
-    programSymbols.remove(documentUri);
   }
 }

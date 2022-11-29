@@ -25,7 +25,6 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 
@@ -41,14 +40,13 @@ public class DialectService {
   @Inject
   public DialectService(
       CopybookService copybookService,
-      SymbolAccumulatorService symbolAccumulatorService,
       MessageService messageService) {
     dialectSuppliers = new HashMap<>();
 
-    CobolDialect dialect = new IdmsDialect(copybookService, messageService, symbolAccumulatorService);
+    CobolDialect dialect = new IdmsDialect(copybookService, messageService);
     dialectSuppliers.put(dialect.getName(), dialect);
 
-    dialect = new DaCoDialect(copybookService, messageService, symbolAccumulatorService);
+    dialect = new DaCoDialect(copybookService, messageService);
     dialectSuppliers.put(dialect.getName(), dialect);
   }
 

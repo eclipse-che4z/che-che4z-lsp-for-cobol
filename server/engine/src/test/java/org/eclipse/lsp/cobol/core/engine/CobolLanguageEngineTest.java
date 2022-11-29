@@ -32,7 +32,6 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
@@ -77,13 +76,12 @@ class CobolLanguageEngineTest {
     cobolErrorStrategy.setMessageService(mockMessageService);
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     AstProcessor astProcessor = mock(AstProcessor.class);
-    SymbolAccumulatorService symbolAccumulatorService = mock(SymbolAccumulatorService.class);
     SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
 
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
             preprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-            dialectService, symbolAccumulatorService, astProcessor, symbolsRepository);
+            dialectService, astProcessor, symbolsRepository);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()
