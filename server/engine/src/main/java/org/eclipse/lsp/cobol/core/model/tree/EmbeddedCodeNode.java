@@ -21,6 +21,7 @@ import lombok.ToString;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.OldMapping;
@@ -38,10 +39,10 @@ import static org.eclipse.lsp.cobol.common.model.NodeType.EMBEDDED_CODE;
 public class EmbeddedCodeNode extends Node {
   TokenStream tokens;
   ParserRuleContext tree;
-  Language lang;
+  EmbeddedLanguage lang;
 
   public EmbeddedCodeNode(
-          Locality location, TokenStream tokens, ParserRuleContext tree, Language lang) {
+          Locality location, TokenStream tokens, ParserRuleContext tree, EmbeddedLanguage lang) {
     super(location, EMBEDDED_CODE);
     this.tokens = tokens;
     this.tree = tree;
@@ -65,20 +66,15 @@ public class EmbeddedCodeNode extends Node {
    * @param lang the languate
    * @return a visitor
    */
-  public ParseTreeVisitor<List<Node>> instanceVisitor(OldMapping positions, Language lang) {
-    if (Language.CICS == lang) {
+  public ParseTreeVisitor<List<Node>> instanceVisitor(OldMapping positions, EmbeddedLanguage lang) {
+    if (EmbeddedLanguage.CICS == lang) {
       return new CICSVisitor(positions);
     }
 
-    if (Language.SQL == lang) {
+    if (EmbeddedLanguage.SQL == lang) {
       return new Db2SqlVisitor(positions);
     }
     throw new RuntimeException("Unknown language " + lang);
   }
 
-  /** This enum holds all the supported embedded languages that require a separate parsing */
-  public enum Language {
-    SQL,
-    CICS
-  }
 }

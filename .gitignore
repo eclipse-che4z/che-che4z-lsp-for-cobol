@@ -105,6 +105,7 @@ local.properties
 /server/engine/gen
 /server/dialect-idms/gen
 /server/dialect-daco/gen
+/server/test/gen
 
 # TeXlipse plugin
 .texlipse

@@ -21,9 +21,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 
 import javax.inject.Inject;
 import java.util.Arrays;
@@ -67,7 +68,7 @@ public class CachingConfigurationService implements ConfigurationService {
   @SuppressWarnings("java:S2142")
   public AnalysisConfig getConfig(CopybookProcessingMode mode) {
     try {
-      return AnalysisConfig.fromConfigEntity(mode, config.get());
+      return AnalysisConfigHelper.fromConfigEntity(mode, config.get());
     } catch (InterruptedException e) {
       LOG.error("Issue while resolving analysis configuration", e);
       Thread.currentThread().interrupt();
@@ -127,14 +128,14 @@ public class CachingConfigurationService implements ConfigurationService {
     return providedDialects;
   }
 
-  private List<EmbeddedCodeNode.Language> parseFeatures(JsonElement features) {
+  private List<EmbeddedLanguage> parseFeatures(JsonElement features) {
     if (features.isJsonArray() && features.getAsJsonArray().size() > 0) {
       return Streams.stream((JsonArray) features)
           .map(JsonElement::getAsString)
-          .map(EmbeddedCodeNode.Language::valueOf)
+          .map(EmbeddedLanguage::valueOf)
           .collect(toList());
     }
-    return Arrays.asList(EmbeddedCodeNode.Language.values());
+    return Arrays.asList(EmbeddedLanguage.values());
   }
 
   private List<String> parsePredefinedParagraphs(JsonElement labels) {

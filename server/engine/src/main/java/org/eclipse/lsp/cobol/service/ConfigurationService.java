@@ -17,9 +17,10 @@ package org.eclipse.lsp.cobol.service;
 import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.Value;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 
 import java.util.List;
 
@@ -51,7 +52,7 @@ public interface ConfigurationService {
   @AllArgsConstructor
   class ConfigurationEntity {
     SQLBackend sqlBackend;
-    List<EmbeddedCodeNode.Language> features;
+    List<EmbeddedLanguage> features;
     List<String> dialects;
     List<String> predefinedParagraphs;
     List<String> subroutines;

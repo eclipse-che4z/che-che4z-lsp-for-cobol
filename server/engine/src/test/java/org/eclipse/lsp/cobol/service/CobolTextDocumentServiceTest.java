@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.awaitility.Awaitility;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
