@@ -25,7 +25,13 @@ import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
+import org.eclipse.lsp4j.ProgressParams;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.eclipse.lsp4j.WorkDoneProgressBegin;
+import org.eclipse.lsp4j.WorkDoneProgressCreateParams;
+import org.eclipse.lsp4j.WorkDoneProgressEnd;
+import org.eclipse.lsp4j.WorkDoneProgressReport;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 import java.util.*;
 import java.util.function.Function;
@@ -136,6 +142,60 @@ public class ServerCommunications implements Communications {
   @Override
   public void cancelProgressNotification(String uri) {
     uriInProgress.remove(files.decodeURI(uri));
+  }
+
+  @Override
+  public void notifyProgressBegin(String uri) {
+    handleDanglingProgressNotifications(uri);
+    createProgressWindow(uri);
+    notifyWorkProgressBegin(uri);
+    uriInProgress.add(uri);
+    notifyWorkProgress(uri);
+  }
+
+  private void handleDanglingProgressNotifications(String uri) {
+    if (uriInProgress.contains(uri)) {
+      notifyProgressEnd(uri);
+      uriInProgress.remove(uri);
+    }
+  }
+
+  private void notifyWorkProgress(String uri) {
+    WorkDoneProgressReport workDoneProgressReport = new WorkDoneProgressReport();
+    ProgressParams params = new ProgressParams(Either.forLeft(uri), Either.forLeft(workDoneProgressReport));
+    getClient().notifyProgress(params);
+  }
+
+  private void createProgressWindow(String uri) {
+    getClient().createProgress(new WorkDoneProgressCreateParams(Either.forLeft(uri)));
+  }
+
+  private void notifyWorkProgressBegin(String uri) {
+    ProgressParams params = new ProgressParams();
+    params.setToken(uri);
+    WorkDoneProgressBegin workDoneProgressBegin = new WorkDoneProgressBegin();
+    workDoneProgressBegin.setTitle(messageService.getMessage(
+            "Communications.syntaxAnalysisInProgressTitle",
+            files.getNameFromURI(uri)));
+    params.setValue(Either.forLeft(workDoneProgressBegin));
+    getClient().notifyProgress(params);
+  }
+
+  @Override
+  public void notifyProgressReport(String uri) {
+    ProgressParams params =
+        new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport()));
+    getClient().notifyProgress(params);
+  }
+
+  @Override
+  public void notifyProgressEnd(String uri) {
+    if (uriInProgress.contains(uri)) {
+      ProgressParams params =
+          new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressEnd()));
+      getClient().notifyProgress(params);
+      uriInProgress.remove(uri);
+    }
   }
 
   private void showMessage(MessageType type, String message) {

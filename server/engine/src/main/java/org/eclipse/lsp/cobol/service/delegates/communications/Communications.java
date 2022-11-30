@@ -30,4 +30,10 @@ public interface Communications {
   void notifyThatDocumentAnalysed(String uri);
 
   void notifyGeneralMessage(MessageType messageType, String errorMessage);
+
+  void notifyProgressBegin(String uri);
+
+  void notifyProgressReport(String uri);
+
+  void notifyProgressEnd(String uri);
 }

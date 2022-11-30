@@ -159,7 +159,7 @@ export function nativeServer(jarPath: string) {
     const executable: Executable = {
             args: ["pipeEnabled"],
             command: "",
-            options: { stdio: "pipe", detached: false },
+            options: { detached: false },
         };
     switch (os.type()) {
             case "Windows_NT":

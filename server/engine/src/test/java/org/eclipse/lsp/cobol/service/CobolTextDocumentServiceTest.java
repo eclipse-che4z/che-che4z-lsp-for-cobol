@@ -125,7 +125,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   }
 
   @Test
-  void testCompletion() throws ExecutionException, InterruptedException {
+  void testCompletion() {
     mockSettingServiceForCopybooks(Boolean.FALSE);
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
@@ -165,7 +165,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   }
 
   @Test
-  void testDidClose() throws ExecutionException, InterruptedException {
+  void testDidClose() {
     doNothing().when(communications).publishDiagnostics(anyMap());
     mockSettingServiceForCopybooks(Boolean.FALSE);
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
@@ -299,7 +299,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    * analysis disabled using {@link org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode#DISABLED}
    */
   @Test
-  void disableCopybookAnalysisOnExtendedDoc() throws ExecutionException, InterruptedException {
+  void disableCopybookAnalysisOnExtendedDoc() {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
     mockSettingServiceForCopybooks(Boolean.FALSE);
@@ -320,7 +320,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    * copybook analysis is enabled using {@link org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode#ENABLED}
    */
   @Test
-  void enableCopybooksOnDidOpenTest() throws ExecutionException, InterruptedException {
+  void enableCopybooksOnDidOpenTest() {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
     when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
@@ -349,7 +349,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    * copybook analysis enabled using {@link org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode#ENABLED}
    */
   @Test
-  void enableCopybooksOnDidChangeTest() throws ExecutionException, InterruptedException {
+  void enableCopybooksOnDidChangeTest() {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
     when(configurationService.getConfig(any())).thenReturn(AnalysisConfig.defaultConfig(SKIP));
@@ -575,7 +575,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
     waitFor(service, uri);
-    verify(communications).notifyThatLoadingInProgress(uri);
     verify(engine).analyze(uri, textToAnalyse, AnalysisConfig.defaultConfig(ENABLED));
     verify(dataBus)
         .postData(
@@ -584,7 +583,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
                 .copybookUris(emptyList())
                 .copybookProcessingMode(ENABLED)
                 .build());
-    verify(communications).cancelProgressNotification(uri);
     verify(communications).publishDiagnostics(diagnostics);
   }
 
@@ -820,7 +818,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     }
   }
 
-  private void openDocument(CobolTextDocumentService service) throws ExecutionException, InterruptedException {
+  private void openDocument(CobolTextDocumentService service) {
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
