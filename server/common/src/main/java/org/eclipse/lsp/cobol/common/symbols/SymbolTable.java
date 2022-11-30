@@ -18,6 +18,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 
 import java.util.ArrayList;
@@ -32,4 +33,13 @@ public class SymbolTable {
   Map<String, CodeBlockReference> paragraphMap = new HashMap<>();
   Map<String, CodeBlockReference> sectionMap = new HashMap<>();
   Multimap<String, VariableNode> variables = ArrayListMultimap.create();
+
+  /**
+   * Generates unique key for the prorgam
+   * @param program node
+   * @return string value of a generated key
+   */
+  public static String generateKey(ProgramNode program) {
+    return program.getProgramName() + "%" + program.getLocality().getUri();
+  }
 }

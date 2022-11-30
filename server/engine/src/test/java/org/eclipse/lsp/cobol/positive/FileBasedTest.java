@@ -19,10 +19,10 @@ import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
-import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
-import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp.cobol.utils.Fixtures;
@@ -187,7 +187,7 @@ public abstract class FileBasedTest extends ConfigurableTest {
     if (testDialectsLists.contains(IdmsDialect.NAME)) {
       return new AnalysisConfig(
           new CopybookConfig(ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of()),
-          Arrays.asList(EmbeddedCodeNode.Language.values()),
+          Arrays.asList(EmbeddedLanguage.values()),
           ImmutableList.of(IdmsDialect.NAME), true);
     }
     return AnalysisConfig.defaultConfig(ENABLED);

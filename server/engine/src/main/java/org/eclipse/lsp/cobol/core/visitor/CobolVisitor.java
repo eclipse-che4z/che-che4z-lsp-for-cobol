@@ -28,6 +28,7 @@ import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -50,7 +51,7 @@ import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp4j.Location;
@@ -416,8 +417,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitExecCicsStatement(ExecCicsStatementContext ctx) {
     areaBWarning(ctx);
-    if (analysisConfig.getFeatures().contains(EmbeddedCodeNode.Language.CICS)) {
-      return processEmbeddedNodes(ctx, ctx.cicsRules(), EmbeddedCodeNode.Language.CICS);
+    if (analysisConfig.getFeatures().contains(EmbeddedLanguage.CICS)) {
+      return processEmbeddedNodes(ctx, ctx.cicsRules(), EmbeddedLanguage.CICS);
     } else {
       return Collections.emptyList();
     }
@@ -426,15 +427,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitExecSqlStatement(ExecSqlStatementContext ctx) {
     areaBWarning(ctx);
-    if (analysisConfig.getFeatures().contains(EmbeddedCodeNode.Language.SQL)) {
-      return processEmbeddedNodes(ctx, ctx.sqlCode(), EmbeddedCodeNode.Language.SQL);
+    if (analysisConfig.getFeatures().contains(EmbeddedLanguage.SQL)) {
+      return processEmbeddedNodes(ctx, ctx.sqlCode(), EmbeddedLanguage.SQL);
     } else {
       return Collections.emptyList();
     }
   }
 
   private List<Node> processEmbeddedNodes(
-      ParserRuleContext parent, ParserRuleContext ctx, EmbeddedCodeNode.Language language) {
+      ParserRuleContext parent, ParserRuleContext ctx, EmbeddedLanguage language) {
     final Optional<EmbeddedCode> embeddedCode =
         ofNullable(ctx).map(ParserRuleContext::getStart).map(embeddedCodeParts::get);
     // apply area B check for tokens provided by a specific lexer

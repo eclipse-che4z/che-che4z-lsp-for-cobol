@@ -21,9 +21,9 @@ import lombok.Singular;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +46,7 @@ public class UseCase {
   /** SQL Backend for the analysis */
   @Builder.Default SQLBackend sqlBackend = SQLBackend.DB2_SERVER;
   /** Analysis features (SQL, CICS, etc.) */
-  @Builder.Default List<EmbeddedCodeNode.Language> features = Collections.emptyList();
+  @Builder.Default List<EmbeddedLanguage> features = Collections.emptyList();
   /** Analysis dialects */
   @Builder.Default List<String> dialects = Collections.emptyList();
   /** User predefined labels */

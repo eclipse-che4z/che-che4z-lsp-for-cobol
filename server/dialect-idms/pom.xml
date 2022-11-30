@@ -176,25 +176,6 @@
                 <version>${maven.antlr4.plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>build UseCasePreprocessor</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>antlr4</goal>
-                        </goals>
-                        <configuration>
-                            <generateTestSources>true</generateTestSources>
-                            <arguments>
-                                <argument>-package</argument>
-                                <argument>org.eclipse.usecase</argument>
-                                <argument>-o</argument>
-                                <argument>${basedir}/target/generated-sources/antlr4/org/eclipse/usecase</argument>
-                            </arguments>
-                            <sourceDirectory>src/test/antlr4/org/eclipse/usecase</sourceDirectory>
-                            <listener>true</listener>
-                            <visitor>false</visitor>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>run antlr</id>
                         <phase>generate-sources</phase>
                         <goals>

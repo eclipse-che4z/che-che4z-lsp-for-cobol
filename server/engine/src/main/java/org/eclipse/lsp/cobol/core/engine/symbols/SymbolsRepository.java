@@ -139,7 +139,7 @@ public class SymbolsRepository {
   @Synchronized
   private SymbolTable getSymbolTable(ProgramNode program) {
     return programSymbols.computeIfAbsent(
-        program.getProgramName() + "%" + program.getLocality().getUri(), p -> new SymbolTable());
+        SymbolTable.generateKey(program), p -> new SymbolTable());
   }
 
   @Value

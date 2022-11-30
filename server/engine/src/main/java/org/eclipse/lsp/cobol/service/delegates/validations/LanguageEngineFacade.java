@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.validations;
 
-import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 
 public interface LanguageEngineFacade {
   /**
