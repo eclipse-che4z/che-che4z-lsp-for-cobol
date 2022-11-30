@@ -93,7 +93,6 @@ public class CobolLanguageEngine {
   private final SubroutineService subroutineService;
   private final CachingConfigurationService cachingConfigurationService;
   private final DialectService dialectService;
-  private final SymbolAccumulatorService symbolAccumulatorService;
   private final AstProcessor astProcessor;
   private final SymbolsRepository symbolsRepository;
 
@@ -113,7 +112,6 @@ public class CobolLanguageEngine {
     this.subroutineService = subroutineService;
     this.cachingConfigurationService = cachingConfigurationService;
     this.dialectService = dialectService;
-    this.symbolAccumulatorService = new SymbolAccumulatorService();
     this.astProcessor = astProcessor;
     this.symbolsRepository = symbolsRepository;
   }
@@ -132,6 +130,8 @@ public class CobolLanguageEngine {
   @NonNull
   public ResultWithErrors<AnalysisResult> run(
       @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
+    SymbolAccumulatorService symbolAccumulatorService = new SymbolAccumulatorService();
+
     ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
 
@@ -254,7 +254,7 @@ public class CobolLanguageEngine {
 
     Node rootNode = syntaxTree.get(0);
     ProcessingContext ctx = new ProcessingContext(new ArrayList<>(), symbolAccumulatorService);
-    registerProcessors(analysisConfig, ctx);
+    registerProcessors(analysisConfig, ctx, symbolAccumulatorService);
     accumulatedErrors.addAll(astProcessor.processSyntaxTree(ctx, rootNode));
 
     timingBuilder.getSyntaxTreeTimer().stop();
@@ -290,7 +290,7 @@ public class CobolLanguageEngine {
         accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
-  private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx) {
+  private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx, SymbolAccumulatorService symbolAccumulatorService) {
     // Phase TRANSFORMATION
     ctx.register(
         new ProcessorDescription(
