@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.service.utils;
+package org.eclipse.lsp.cobol.common.file;
 
 import lombok.NonNull;
 

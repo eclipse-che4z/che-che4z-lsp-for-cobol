@@ -16,7 +16,7 @@
 package org.eclipse.lsp.cobol.usecases.engine;
 
 import lombok.Value;
-import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.test.engine.CobolText;
 
 import java.util.List;
 

@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.positive;
 
 import org.eclipse.lsp.cobol.service.mocks.CopybooksMock;
+import org.eclipse.lsp.cobol.test.engine.CobolText;
 
 import java.util.List;
 import java.util.Map;

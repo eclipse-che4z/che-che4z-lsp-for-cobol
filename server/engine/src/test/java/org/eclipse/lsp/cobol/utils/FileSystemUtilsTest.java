@@ -22,8 +22,8 @@ import static org.mockito.Mockito.mockStatic;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import org.eclipse.lsp.cobol.service.utils.FileSystemService;
-import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
+import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 

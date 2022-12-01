@@ -12,10 +12,11 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service.delegates.validations;
+package org.eclipse.lsp.cobol.common;
 
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
-
+/**
+ * Language Engine Facade interface
+ */
 public interface LanguageEngineFacade {
   /**
    * @param uri - URI of the processing document to define positions and errors properly
