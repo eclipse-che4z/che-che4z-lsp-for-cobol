@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.junit.jupiter.api.Test;

@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.usecases.engine;
+package org.eclipse.lsp.cobol.test.engine;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -25,7 +25,7 @@ import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
-import org.eclipse.lsp.cobol.test.engine.CobolText;
+import org.eclipse.lsp.cobol.test.CobolText;
 
 import java.util.List;
 import java.util.function.Function;

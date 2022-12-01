@@ -23,7 +23,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.utils.Fixtures;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;

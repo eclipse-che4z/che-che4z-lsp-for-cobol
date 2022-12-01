@@ -15,7 +15,7 @@
 
 package org.eclipse.lsp.cobol.service.delegates.communications;
 
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp4j.MessageType.Info;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;

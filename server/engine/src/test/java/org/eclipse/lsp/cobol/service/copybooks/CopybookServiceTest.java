@@ -41,7 +41,7 @@ import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABL
 import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.SKIP;
 import static org.eclipse.lsp.cobol.common.copybook.SQLBackend.DATACOM_SERVER;
 import static org.eclipse.lsp.cobol.common.copybook.SQLBackend.DB2_SERVER;
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;

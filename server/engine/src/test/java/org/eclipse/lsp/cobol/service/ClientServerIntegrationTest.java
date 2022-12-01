@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;

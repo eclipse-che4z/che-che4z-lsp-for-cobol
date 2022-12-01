@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.test.engine;
+package org.eclipse.lsp.cobol.test;
 
 import com.google.inject.Injector;
 

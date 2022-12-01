@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.test.engine.CobolText;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp.cobol.utils.Fixtures;
 import org.eclipse.lsp4j.Diagnostic;

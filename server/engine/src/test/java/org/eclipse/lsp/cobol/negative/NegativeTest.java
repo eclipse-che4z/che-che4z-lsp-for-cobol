@@ -15,9 +15,9 @@
 package org.eclipse.lsp.cobol.negative;
 
 import org.eclipse.lsp.cobol.ConfigurableTest;
-import org.eclipse.lsp.cobol.test.engine.CobolText;
-import org.eclipse.lsp.cobol.usecases.engine.UseCase;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
+import org.eclipse.lsp.cobol.test.CobolText;
+import org.eclipse.lsp.cobol.test.engine.UseCase;
+import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
 
 import java.util.List;

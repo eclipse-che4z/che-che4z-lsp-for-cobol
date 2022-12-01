@@ -13,15 +13,15 @@
  *
  */
 
-package org.eclipse.lsp.cobol.usecases.engine;
+package org.eclipse.lsp.cobol.test.engine;
 
 import com.google.common.collect.ImmutableList;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.test.engine.CobolText;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.usecase.UseCasePreprocessorLexer;
@@ -34,8 +34,8 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.CharStreams.fromString;
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.toURI;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.toURI;
 
 /**
  * This utility class cleans up annotated texts for use cases and prepares the text and expected

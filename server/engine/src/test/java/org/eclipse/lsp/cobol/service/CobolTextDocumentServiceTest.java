@@ -83,7 +83,7 @@ import java.util.stream.Stream;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.*;
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.*;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;

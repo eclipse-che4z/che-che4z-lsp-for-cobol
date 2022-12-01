@@ -20,9 +20,9 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
-import org.eclipse.lsp.cobol.test.engine.CobolText;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** Test for IDMS and regular copybook names collision handling */

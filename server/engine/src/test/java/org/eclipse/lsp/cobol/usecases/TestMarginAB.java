@@ -16,8 +16,8 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.usecases.engine.UseCase;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
+import org.eclipse.lsp.cobol.test.engine.UseCase;
+import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

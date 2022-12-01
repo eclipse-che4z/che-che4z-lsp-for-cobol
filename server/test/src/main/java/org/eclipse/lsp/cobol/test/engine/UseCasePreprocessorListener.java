@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.usecases.engine;
+package org.eclipse.lsp.cobol.test.engine;
 
 import com.google.common.collect.ImmutableList;
 import lombok.NonNull;

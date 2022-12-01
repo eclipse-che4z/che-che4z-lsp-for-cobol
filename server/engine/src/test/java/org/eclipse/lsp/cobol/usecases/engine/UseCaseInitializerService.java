@@ -35,7 +35,7 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.test.engine.UseCaseInitializer;
+import org.eclipse.lsp.cobol.test.UseCaseInitializer;
 
 import java.util.concurrent.CompletableFuture;
 

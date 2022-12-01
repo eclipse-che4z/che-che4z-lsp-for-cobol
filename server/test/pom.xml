@@ -191,25 +191,25 @@
                 <executions>
                     <execution>
                         <id>build UseCasePreprocessor</id>
-                        <phase>generate-test-sources</phase>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>antlr4</goal>
                         </goals>
                         <configuration>
-                            <generateTestSources>true</generateTestSources>
                             <arguments>
                                 <argument>-package</argument>
-                                <argument>org.eclipse.lsp.cobol.test.usecase</argument>
+                                <argument>org.eclipse.usecase</argument>
                                 <argument>-o</argument>
-                                <argument>${basedir}/target/generated-sources/antlr4/org/eclipse/lsp/cobol/test/usecase</argument>
+                                <argument>${basedir}/target/generated-sources/antlr4/org/eclipse/usecase</argument>
                             </arguments>
-                            <sourceDirectory>src/test/antlr4/org/eclipse/lsp/cobol/test/usecase</sourceDirectory>
+                            <sourceDirectory>src/main/antlr4/org/eclipse/usecase</sourceDirectory>
                             <listener>true</listener>
                             <visitor>false</visitor>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -262,7 +262,7 @@
                     <excludes>
                         <exclude>**/generated-sources/**/*</exclude>
                         <exclude>**/generated-test-sources/**/*</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/test/usecase/**/*</exclude>
+                        <exclude>**/org/eclipse/usecase/**/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

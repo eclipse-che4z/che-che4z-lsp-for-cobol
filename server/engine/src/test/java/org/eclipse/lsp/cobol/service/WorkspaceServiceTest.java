@@ -48,7 +48,7 @@ import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
+import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.ExecuteCommandParams;

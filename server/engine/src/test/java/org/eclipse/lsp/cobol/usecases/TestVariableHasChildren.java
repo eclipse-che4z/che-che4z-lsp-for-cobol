@@ -26,7 +26,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

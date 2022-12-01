@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.usecases.engine;
+package org.eclipse.lsp.cobol.test.engine;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
@@ -26,9 +26,9 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.test.engine.CobolText;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -46,8 +46,8 @@ import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
 import static org.eclipse.lsp.cobol.common.model.NodeType.*;
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.analyze;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.analyze;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**

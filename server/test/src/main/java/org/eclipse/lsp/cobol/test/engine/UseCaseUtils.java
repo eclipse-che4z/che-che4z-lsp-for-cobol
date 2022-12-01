@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.usecases.engine;
+package org.eclipse.lsp.cobol.test.engine;
 
 import com.google.inject.Injector;
 import lombok.experimental.UtilityClass;
@@ -24,8 +24,8 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.test.engine.CobolText;
-import org.eclipse.lsp.cobol.test.engine.UseCaseInitializer;
+import org.eclipse.lsp.cobol.test.CobolText;
+import org.eclipse.lsp.cobol.test.UseCaseInitializer;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 
