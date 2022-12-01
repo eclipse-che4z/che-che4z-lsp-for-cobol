@@ -19,14 +19,12 @@ import { join } from "path";
 import * as vscode from "vscode";
 
 import {
-    ConfigurationParams,
-    ConfigurationRequest,
+    ErrorCodes,
     Executable,
     LanguageClient,
     LanguageClientOptions,
     StreamInfo,
 } from "vscode-languageclient";
-import {ConfigurationWorkspaceMiddleware} from "vscode-languageclient/lib/configuration";
 import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
 import {LANGUAGE_ID} from "../constants";
 import {JavaCheck} from "./JavaCheck";
@@ -99,6 +97,8 @@ export class LanguageClientService {
                 "LSP extension for " + LANGUAGE_ID.toUpperCase() + " language",
                 this.createServerOptions(this.executablePath),
                 this.createClientOptions());
+            // hack to prevent notification for cancelled request.
+            (ErrorCodes as any).RequestCancelled = -32800;
         }
         return this.languageClient;
     }
