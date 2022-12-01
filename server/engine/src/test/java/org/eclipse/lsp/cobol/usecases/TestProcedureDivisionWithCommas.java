@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** Check that commas in the PROCEDURE DIVISION USING statement don't cause syntax errors */

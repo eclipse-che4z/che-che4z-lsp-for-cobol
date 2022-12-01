@@ -12,47 +12,30 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.usecases.engine;
+package org.eclipse.lsp.cobol.test.engine;
 
-import com.google.common.collect.ImmutableList;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
-import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
-import org.eclipse.lsp.cobol.domain.modules.EngineModule;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.SettingsService;
-import org.eclipse.lsp.cobol.service.SubroutineService;
-import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
-import org.eclipse.lsp.cobol.service.WatcherService;
-import org.eclipse.lsp.cobol.service.WatcherServiceImpl;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
-import org.eclipse.lsp.cobol.service.utils.FileSystemService;
-import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
+import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.test.CobolText;
+import org.eclipse.lsp.cobol.test.UseCaseInitializer;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.ServiceLoader;
+import java.util.stream.StreamSupport;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * This utility class provides methods to run use cases with COBOL code examples.
@@ -120,30 +103,13 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(UseCase useCase) {
-    SettingsService mockSettingsService = mock(SettingsService.class);
-    when(mockSettingsService.fetchConfiguration(any()))
-        .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
 
-    CobolLanguageClient languageClient = mock(CobolLanguageClient.class);
-    Injector injector =
-        Guice.createInjector(
-            new EngineModule(),
-            new DatabusModule(),
-            new AbstractModule() {
-              @Override
-              protected void configure() {
-                bind(CopybookService.class).to(CopybookServiceImpl.class);
-                bind(SettingsService.class).toInstance(mockSettingsService);
-                bind(FileSystemService.class).toInstance(new WorkspaceFileService());
-                bind(CobolLanguageClient.class).toInstance(languageClient);
-                bind(SubroutineService.class).to(SubroutineServiceImpl.class);
-                bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
-                bind(WatcherService.class).to(WatcherServiceImpl.class);
-                bind(CopybookReferenceRepo.class).toInstance(new CopybookReferenceRepoImpl());
-              }
-            });
+    ServiceLoader<UseCaseInitializer> loader = ServiceLoader.load(UseCaseInitializer.class);
+    Injector injector = StreamSupport.stream(loader.spliterator(), false).findFirst()
+        .map(UseCaseInitializer::createInjector)
+        .orElseThrow(() -> new RuntimeException("UseCase initializer not found"));
 
-    TextPreprocessor preprocessor = injector.getInstance(TextPreprocessor.class);
+    CleanerPreprocessor preprocessor = injector.getInstance(CleanerPreprocessor.class);
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
     PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.documentUri)
@@ -166,7 +132,7 @@ public class UseCaseUtils {
     useCase.getSubroutines().forEach(name -> subroutines.store(name, "URI:" + name));
 
     return injector
-        .getInstance(CobolLanguageEngineFacade.class)
+        .getInstance(LanguageEngineFacade.class)
         .analyze(useCase.getDocumentUri(), useCase.getText(), useCase.getAnalysisConfig());
   }
   /**

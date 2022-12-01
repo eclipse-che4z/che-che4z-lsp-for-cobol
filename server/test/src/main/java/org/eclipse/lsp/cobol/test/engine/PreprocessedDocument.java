@@ -13,10 +13,10 @@
  *
  */
 
-package org.eclipse.lsp.cobol.usecases.engine;
+package org.eclipse.lsp.cobol.test.engine;
 
 import lombok.Value;
-import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.test.CobolText;
 
 import java.util.List;
 

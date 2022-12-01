@@ -19,7 +19,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.service.utils.FileSystemService;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
 
 import java.util.Optional;
 

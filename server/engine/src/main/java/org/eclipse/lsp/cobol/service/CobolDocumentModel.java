@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import lombok.Data;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;

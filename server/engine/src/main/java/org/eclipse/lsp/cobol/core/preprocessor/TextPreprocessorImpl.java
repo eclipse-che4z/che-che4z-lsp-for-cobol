@@ -18,6 +18,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -41,7 +42,7 @@ import java.util.List;
  */
 @Slf4j
 @Singleton
-public class TextPreprocessorImpl implements TextPreprocessor {
+public class TextPreprocessorImpl implements TextPreprocessor, CleanerPreprocessor {
   private final GrammarPreprocessor grammarPreprocessor;
   private final CobolLineReader reader;
   private final CobolLineWriter writer;

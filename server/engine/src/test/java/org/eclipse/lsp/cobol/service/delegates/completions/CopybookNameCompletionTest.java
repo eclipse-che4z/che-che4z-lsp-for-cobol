@@ -19,7 +19,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 

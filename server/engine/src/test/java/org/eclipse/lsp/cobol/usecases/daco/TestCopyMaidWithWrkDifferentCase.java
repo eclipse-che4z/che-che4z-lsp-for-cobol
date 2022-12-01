@@ -17,9 +17,9 @@ package org.eclipse.lsp.cobol.usecases.daco;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** WRK qualifier should work when specified in any case. */

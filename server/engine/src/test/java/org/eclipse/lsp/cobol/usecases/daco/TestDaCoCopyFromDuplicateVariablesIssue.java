@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases.daco;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** Ignore predefine variables in case we have them explicitly defined. */
