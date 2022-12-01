@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector;
 
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysis;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.CopybookContentProvider;
 
 /**
  * Contains necessary information for injecting the copybook to a cobol document
@@ -25,5 +25,5 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.Cont
 public class InjectDescriptor {
   String injectedSourceName;
   InjectCodeAnalysis injectCodeAnalysis;
-  ContentProvider contentProvider;
+  CopybookContentProvider copybookContentProvider;
 }

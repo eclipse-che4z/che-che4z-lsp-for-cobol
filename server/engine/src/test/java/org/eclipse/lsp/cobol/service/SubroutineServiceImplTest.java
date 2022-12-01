@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.service;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.SubroutineService;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CompletableFuture;

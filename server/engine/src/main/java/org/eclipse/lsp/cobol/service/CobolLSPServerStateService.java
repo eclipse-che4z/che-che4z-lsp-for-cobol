@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 
 /** Manages the server shutdown states. */
 public class CobolLSPServerStateService implements DisposableLSPStateService {

@@ -84,8 +84,8 @@ class GrammarPreprocessorImplTest {
     DocumentMapping cpyMapping =
         new DocumentMapping(ImmutableList.of(RESULT_POS), ImmutableMap.of());
 
-    ExtendedDocument expectedDocument =
-        new ExtendedDocument(
+    OldExtendedDocument expectedDocument =
+        new OldExtendedDocument(
             "", RESULT, copybooks, ImmutableMap.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping));
 
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of());
@@ -102,7 +102,7 @@ class GrammarPreprocessorImplTest {
     GrammarPreprocessor preprocessor =
         new GrammarPreprocessorImpl(listenerFactory, replacingFactory);
 
-    ResultWithErrors<ExtendedDocument> extendedDocument =
+    ResultWithErrors<OldExtendedDocument> extendedDocument =
         preprocessor.buildExtendedDocument(DOCUMENT, TEXT, cpyConfig, hierarchy);
 
     verify(listenerFactory)

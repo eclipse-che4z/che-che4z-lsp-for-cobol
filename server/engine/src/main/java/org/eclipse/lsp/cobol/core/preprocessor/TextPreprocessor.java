@@ -17,8 +17,9 @@ package org.eclipse.lsp.cobol.core.preprocessor;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 
 /**
  * This interface describes the text preprocessor which prepares the given string for analysis by
@@ -47,7 +48,7 @@ public interface TextPreprocessor {
    * @param hierarchy the hierarchy of the copybooks
    * @return wrapped object containing extended document and related errors
    */
-  ResultWithErrors<ExtendedDocument> processCleanCode(
+  ResultWithErrors<OldExtendedDocument> processCleanCode(
       @NonNull String documentUri,
       @NonNull String cobolCode,
       @NonNull CopybookConfig copybookConfig,

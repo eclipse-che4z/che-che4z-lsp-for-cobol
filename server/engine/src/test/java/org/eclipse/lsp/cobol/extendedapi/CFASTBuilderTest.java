@@ -18,8 +18,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
-import org.eclipse.lsp.cobol.service.CFASTBuilder;
-import org.eclipse.lsp.cobol.service.CFASTBuilderImpl;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
@@ -36,7 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-/** Test for @link({@link org.eclipse.lsp.cobol.service.CFASTBuilderImpl}. */
+/** Test for @link({@link CFASTBuilderImpl}. */
 @Slf4j
 class CFASTBuilderTest {
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();

@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.jrpc;
+package org.eclipse.lsp.cobol.lsp.jrpc;
 
 import com.google.gson.JsonObject;
 import lombok.NonNull;

@@ -34,7 +34,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectDescriptor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
@@ -56,7 +56,7 @@ import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
  */
 @Slf4j
 public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListener
-    implements GrammarPreprocessorListener<ExtendedDocument> {
+    implements GrammarPreprocessorListener<OldExtendedDocument> {
   private static final int DEFAULT_TOKEN_SHIFT = 2;
   private static final int TOKEN_SHIFT_WITH_LINEBREAK = 3;
 
@@ -107,7 +107,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
    */
   @NonNull
   @Override
-  public ResultWithErrors<ExtendedDocument> getResult() {
+  public ResultWithErrors<OldExtendedDocument> getResult() {
     nestedMappings.put(
         documentUri,
         new DocumentMapping(
@@ -116,7 +116,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
                 .collect(toList()),
             shifts));
     return new ResultWithErrors<>(
-        new ExtendedDocument(documentUri, accumulate(), copybooks, nestedMappings), errors);
+        new OldExtendedDocument(documentUri, accumulate(), copybooks, nestedMappings), errors);
   }
 
   @Override
@@ -226,7 +226,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       ParserRuleContext copyContext) {
     descriptors.forEach(c -> c.getInjectCodeAnalysis()
         .injectCode(
-            c.getContentProvider(),
+            c.getCopybookContentProvider(),
             copybookNameService.findByName(c.getInjectedSourceName())
                 .orElse(new CopybookName(c.getInjectedSourceName())),
             context, copyContext, copybookConfig, documentUri)
