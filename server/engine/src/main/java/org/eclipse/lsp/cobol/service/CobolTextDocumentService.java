@@ -26,6 +26,7 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -34,7 +35,8 @@ import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
-import org.eclipse.lsp.cobol.jrpc.ExtendedApi;
+import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.lsp.jrpc.ExtendedApi;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
@@ -544,14 +546,16 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private void doAnalysis(String uri, String text, boolean userRequest, boolean firstTime) {
     synchronized (syncProvider.getSync(uri)) {
       try {
+        CopybookProcessingMode copybookProcessingMode = userRequest
+                ? CopybookProcessingMode.ENABLED_VERBOSE
+                : CopybookProcessingMode.ENABLED;
+
         CopybookProcessingMode processingMode =
-            CopybookProcessingMode.getCopybookProcessingMode(
-                uri,
-                firstTime
-                    ? (userRequest
-                        ? CopybookProcessingMode.ENABLED_VERBOSE
-                        : CopybookProcessingMode.ENABLED)
-                    : CopybookProcessingMode.SKIP);
+            CopybookProcessingMode.getCopybookProcessingMode(uri,
+                    firstTime
+                            ? copybookProcessingMode
+                            : CopybookProcessingMode.SKIP);
+
         if (firstTime) {
           if (copybookIdentificationService.isCopybook(uri, text, waitExtensionConfig())) {
             return;

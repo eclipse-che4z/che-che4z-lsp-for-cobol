@@ -30,18 +30,18 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 /**
- * This unit tests check the {@link CopybookContentProvider} class functionality
+ * This unit tests check the {@link CopybookCopybookContentProviderImpl} class functionality
  */
 @ExtendWith(MockitoExtension.class)
-class CopybookContentProviderTest {
+class CopybookCopybookContentProviderImplTest {
   @Mock private CopybookService copybookService;
   private CopybookConfig copybookConfig;
-  private CopybookContentProvider contentProvider;
+  private CopybookCopybookContentProviderImpl contentProvider;
   private CopybookName copybookName;
 
   @BeforeEach
   void init() {
-    contentProvider = new CopybookContentProvider(copybookService);
+    contentProvider = new CopybookCopybookContentProviderImpl(copybookService);
     copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of());
     copybookName = new CopybookName(UUID.randomUUID().toString());
   }

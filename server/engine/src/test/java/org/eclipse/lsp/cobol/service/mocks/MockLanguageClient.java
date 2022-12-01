@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.service.mocks;
 
 import com.google.inject.Singleton;
 import java.util.Collections;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp4j.*;
 
 import java.util.ArrayList;

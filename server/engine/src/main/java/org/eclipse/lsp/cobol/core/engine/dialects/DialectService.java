@@ -88,18 +88,18 @@ public class DialectService {
       CobolDialect dialect = getDialectByName(dialectsQueue.pop());
       if (dialect.runBefore().isEmpty()) {
         orderedDialects.add(dialect);
-      } else {
-        for (String name : dialect.runBefore()) {
-          CobolDialect d = getDialectByName(name);
-          int index = orderedDialects.indexOf(d);
-          if (index >= 0) {
-            orderedDialects.add(index, dialect);
-          } else {
-            if (!dialectsQueue.contains(d.getName())) {
-              dialectsQueue.add(d.getName());
-            }
-            dialectsQueue.add(dialect.getName());
+        continue;
+      }
+      for (String name : dialect.runBefore()) {
+        CobolDialect d = getDialectByName(name);
+        int index = orderedDialects.indexOf(d);
+        if (index >= 0) {
+          orderedDialects.add(index, dialect);
+        } else {
+          if (!dialectsQueue.contains(d.getName())) {
+            dialectsQueue.add(d.getName());
           }
+          dialectsQueue.add(dialect.getName());
         }
       }
     }

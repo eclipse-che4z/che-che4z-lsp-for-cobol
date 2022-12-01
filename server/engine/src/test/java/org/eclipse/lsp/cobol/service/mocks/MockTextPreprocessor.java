@@ -18,8 +18,9 @@ import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 
@@ -35,7 +36,7 @@ public class MockTextPreprocessor implements TextPreprocessor {
   }
 
   @Override
-  public ResultWithErrors<ExtendedDocument> processCleanCode(@NonNull String documentUri, @NonNull String cobolCode, @NonNull CopybookConfig copybookConfig, @NonNull CopybookHierarchy hierarchy) {
-    return new ResultWithErrors<>(mock(ExtendedDocument.class), ImmutableList.of());
+  public ResultWithErrors<OldExtendedDocument> processCleanCode(@NonNull String documentUri, @NonNull String cobolCode, @NonNull CopybookConfig copybookConfig, @NonNull CopybookHierarchy hierarchy) {
+    return new ResultWithErrors<>(mock(OldExtendedDocument.class), ImmutableList.of());
   }
 }

@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import lombok.NonNull;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 
 import java.util.Deque;
 import java.util.Objects;
@@ -25,7 +26,7 @@ import static java.util.Optional.ofNullable;
 
 /**
  * Provides a contract and default implementation of various stack operation. To be used while
- * assembling the {@link org.eclipse.lsp.cobol.core.model.ExtendedDocument} from pre-processors.
+ * assembling the {@link OldExtendedDocument} from pre-processors.
  */
 public interface PreprocessorStack {
 

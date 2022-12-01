@@ -31,9 +31,8 @@ import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
-
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -150,11 +149,12 @@ public class CopybookServiceImpl implements CopybookService {
         copybookName,
         programUri,
         copybookConfig);
-    return tryResolveCopybookFromWorkspace(copybookName, programUri)
-        .orElseGet(
-            () ->
-                tryResolvePredefinedCopybook(copybookName, copybookConfig)
-                    .orElseGet(() -> registerForDownloading(copybookName, programUri)));
+    Optional<CopybookModel> copybookModel = tryResolveCopybookFromWorkspace(copybookName, programUri);
+    if(copybookModel.isPresent()) {
+      return copybookModel.get();
+    }
+    Optional<CopybookModel> predefineCopybook = tryResolvePredefinedCopybook(copybookName, copybookConfig);
+    return predefineCopybook.orElseGet(() -> registerForDownloading(copybookName, programUri));
   }
 
   /**

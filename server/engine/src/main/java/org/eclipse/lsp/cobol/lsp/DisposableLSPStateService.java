@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.service;
+package org.eclipse.lsp.cobol.lsp;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -31,7 +31,7 @@ public interface DisposableLSPStateService {
    */
   int getExitCode();
 
-  /** Signals the server to shutdown by updating the server state to SHUTDOWN_EXIT_CODE */
+  /** Signals the server to shut down by updating the server state to SHUTDOWN_EXIT_CODE */
   void shutdown();
 
   /** Revoke shutdown for testing purpose. */
