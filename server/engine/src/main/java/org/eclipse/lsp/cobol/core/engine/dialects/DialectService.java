@@ -110,7 +110,12 @@ public class DialectService {
     return orderedDialects;
   }
 
-  private CobolDialect getDialectByName(String dialectName) {
+  /**
+   * Returns dialect object by name
+   * @param dialectName is a dialect name
+   * @return a dialect
+   */
+  public CobolDialect getDialectByName(String dialectName) {
     return dialectSuppliers.getOrDefault(dialectName, EMPTY_DIALECT);
   }
 
