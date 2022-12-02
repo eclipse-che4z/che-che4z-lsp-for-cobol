@@ -19,14 +19,11 @@ import { join } from "path";
 import * as vscode from "vscode";
 
 import {
-    ConfigurationParams,
-    ConfigurationRequest,
     Executable,
     LanguageClient,
     LanguageClientOptions,
     StreamInfo,
 } from "vscode-languageclient";
-import {ConfigurationWorkspaceMiddleware} from "vscode-languageclient/lib/configuration";
 import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
 import {LANGUAGE_ID} from "../constants";
 import {JavaCheck} from "./JavaCheck";
@@ -133,7 +130,7 @@ export class LanguageClientService {
         return {
             args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
             command: "java",
-            options: {stdio: "pipe", detached: false},
+            options: { detached: false },
         };
     }
 
@@ -159,7 +156,7 @@ export function nativeServer(jarPath: string) {
     const executable: Executable = {
             args: ["pipeEnabled"],
             command: "",
-            options: { stdio: "pipe", detached: false },
+            options: { detached: false },
         };
     switch (os.type()) {
             case "Windows_NT":

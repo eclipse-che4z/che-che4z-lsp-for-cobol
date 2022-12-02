@@ -12,10 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as os from "os";
 import * as fs from "fs";
-import * as vscode from "vscode";
+import * as os from "os";
 import { join } from "path";
+import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
 import { CopybookDownloadService } from "../../services/copybook/CopybookDownloadService";
 import { JavaCheck } from "../../services/JavaCheck";
@@ -109,7 +109,7 @@ describe("LanguageClientService positive scenario", () => {
         expect(LanguageClient).toHaveBeenCalledWith(SERVER_ID, SERVER_DESC, {
             args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", serverPath, "pipeEnabled"],
             command: "java",
-            options: { stdio: "pipe", detached: false },
+            options: { detached: false },
         }, {
             documentSelector: [SERVER_ID],
             outputChannel: expect.any(Function),
