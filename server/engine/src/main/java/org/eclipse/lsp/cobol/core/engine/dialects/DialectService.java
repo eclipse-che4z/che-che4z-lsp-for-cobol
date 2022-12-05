@@ -25,8 +25,6 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
-import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,15 +37,13 @@ public class DialectService {
 
   @Inject
   public DialectService(
+      DialectDiscoveryService discoveryService,
       CopybookService copybookService,
       MessageService messageService) {
     dialectSuppliers = new HashMap<>();
 
-    CobolDialect dialect = new IdmsDialect(copybookService, messageService);
-    dialectSuppliers.put(dialect.getName(), dialect);
-
-    dialect = new DaCoDialect(copybookService, messageService);
-    dialectSuppliers.put(dialect.getName(), dialect);
+    List<CobolDialect> dialects = discoveryService.loadDialects(copybookService, messageService);
+    dialects.forEach(dialect -> dialectSuppliers.put(dialect.getName(), dialect));
   }
 
   /**

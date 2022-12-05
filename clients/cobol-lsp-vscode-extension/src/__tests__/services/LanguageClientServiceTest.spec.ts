@@ -107,7 +107,7 @@ describe("LanguageClientService positive scenario", () => {
         expect(languageClientService.start()).toBe(SERVER_STARTED_MSG);
         expect(LanguageClient).toHaveBeenCalledTimes(1);
         expect(LanguageClient).toHaveBeenCalledWith(SERVER_ID, SERVER_DESC, {
-            args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", serverPath, "pipeEnabled"],
+            args: ["-Dline.separator=\r\n", "-Ddialect.path=/test/server/jar/dialects", "-Xmx768M", "-jar", serverPath, "pipeEnabled"],
             command: "java",
             options: { stdio: "pipe", detached: false },
         }, {
