@@ -25,7 +25,6 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
-import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,12 +37,13 @@ public class DialectService {
 
   @Inject
   public DialectService(
+      DialectDiscoveryService discoveryService,
       CopybookService copybookService,
       MessageService messageService) {
     dialectSuppliers = new HashMap<>();
 
-    CobolDialect dialect = new IdmsDialect(copybookService, messageService);
-    dialectSuppliers.put(dialect.getName(), dialect);
+    List<CobolDialect> dialects = discoveryService.loadDialects(copybookService, messageService);
+    dialects.forEach(dialect -> dialectSuppliers.put(dialect.getName(), dialect));
   }
 
   /**
@@ -88,18 +88,18 @@ public class DialectService {
       CobolDialect dialect = getDialectByName(dialectsQueue.pop());
       if (dialect.runBefore().isEmpty()) {
         orderedDialects.add(dialect);
-        continue;
-      }
-      for (String name : dialect.runBefore()) {
-        CobolDialect d = getDialectByName(name);
-        int index = orderedDialects.indexOf(d);
-        if (index >= 0) {
-          orderedDialects.add(index, dialect);
-        } else {
-          if (!dialectsQueue.contains(d.getName())) {
-            dialectsQueue.add(d.getName());
+      } else {
+        for (String name : dialect.runBefore()) {
+          CobolDialect d = getDialectByName(name);
+          int index = orderedDialects.indexOf(d);
+          if (index >= 0) {
+            orderedDialects.add(index, dialect);
+          } else {
+            if (!dialectsQueue.contains(d.getName())) {
+              dialectsQueue.add(d.getName());
+            }
+            dialectsQueue.add(dialect.getName());
           }
-          dialectsQueue.add(dialect.getName());
         }
       }
     }
