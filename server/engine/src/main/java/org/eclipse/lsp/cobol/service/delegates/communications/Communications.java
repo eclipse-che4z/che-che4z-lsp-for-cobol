@@ -21,11 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface Communications {
-  void notifyThatLoadingInProgress(String uri);
 
   void publishDiagnostics(Map<String, List<Diagnostic>> diagnostics);
-
-  void cancelProgressNotification(String uri);
 
   void notifyThatDocumentAnalysed(String uri);
 

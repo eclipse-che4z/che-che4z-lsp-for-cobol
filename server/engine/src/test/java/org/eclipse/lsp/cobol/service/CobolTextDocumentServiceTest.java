@@ -192,9 +192,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     service
         .diagnostic(documentDiagnosticParams)
         .whenComplete(
-            (result, b) -> {
-              Assertions.assertEquals(result.getRelatedFullDocumentDiagnosticReport().getKind(), "full");
-            });
+            (result, b) -> Assertions.assertEquals(result.getRelatedFullDocumentDiagnosticReport().getKind(), "full"));
 
   }
 
@@ -623,8 +621,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    * Check there were no NullPointerException thrown if a
    * {@link TextDocumentService#didClose(DidCloseTextDocumentParams)} is invoked when
    * {@link TextDocumentService#didOpen(DidOpenTextDocumentParams)} processing is not finished yet.
-   * If it was thrown then async task inside the service falls and
-   * {@link Communications#cancelProgressNotification(String)} is not called.
    */
   @Test
   void testImmediateClosingOfDocumentDoNotCauseNPE() {
@@ -650,8 +646,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
     assertThat(service.getDocs().entrySet(), hasSize(0));
     assertThat(service.getFutureMap().entrySet(), hasSize(0));
-
-    verify(communications, timeout(2000).atLeastOnce()).cancelProgressNotification(DOCUMENT_URI);
   }
 
   @Test

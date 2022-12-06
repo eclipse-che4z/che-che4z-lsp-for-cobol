@@ -460,7 +460,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                         diagnosticMap.computeIfPresent(k, (k1, v1) -> Collections.emptyList())));
 
     communications.publishDiagnostics(collectAllDiagnostics());
-    communications.cancelProgressNotification(uri);
     communications.notifyProgressEnd(uri);
     docs.remove(uri);
     clearAnalysedFutureObject(uri);
@@ -618,6 +617,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   private void notifyAnalysisFinished(
       String uri, List<String> copybooks, CopybookProcessingMode copybookProcessingMode) {
+    communications.notifyProgressEnd(uri);
     dataBus.postData(
         AnalysisFinishedEvent.builder()
             .documentUri(uri)
