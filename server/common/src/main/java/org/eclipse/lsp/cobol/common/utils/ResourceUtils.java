@@ -16,8 +16,6 @@ package org.eclipse.lsp.cobol.common.utils;
 
 import lombok.experimental.UtilityClass;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
