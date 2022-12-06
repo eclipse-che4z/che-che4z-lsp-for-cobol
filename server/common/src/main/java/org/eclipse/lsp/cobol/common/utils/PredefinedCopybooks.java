@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector;
+package org.eclipse.lsp.cobol.common.utils;
 
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.PredefinedCopybooks.Copybook.*;
+import static org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks.Copybook.*;
 
 /** This util class encapsulates the logic of resolving the predefined variable names. */
 @UtilityClass

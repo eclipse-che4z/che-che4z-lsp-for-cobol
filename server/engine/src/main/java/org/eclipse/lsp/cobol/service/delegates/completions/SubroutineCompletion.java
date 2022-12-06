@@ -18,7 +18,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp4j.CompletionItem;
 
 import javax.annotation.Nullable;

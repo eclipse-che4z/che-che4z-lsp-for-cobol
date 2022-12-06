@@ -19,10 +19,10 @@ import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
-import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.usecases.engine.UseCase;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
+import org.eclipse.lsp.cobol.test.CobolText;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.test.engine.UseCase;
+import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.DISABLED;
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.common.model.NodeType.COPY;
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** COPY MAID processing should follow usual disabling rules */

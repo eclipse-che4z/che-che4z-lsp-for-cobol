@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.copybook.*;
-import org.eclipse.lsp.cobol.service.utils.FileSystemService;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

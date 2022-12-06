@@ -16,6 +16,8 @@ package org.eclipse.lsp.cobol.service.delegates.validations;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;

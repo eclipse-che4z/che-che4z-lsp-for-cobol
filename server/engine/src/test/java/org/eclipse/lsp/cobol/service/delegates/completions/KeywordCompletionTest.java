@@ -16,12 +16,16 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.SettingsService;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.MarkupContent;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -29,7 +33,9 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * This test {@link KeywordCompletion} asserts that filtration and preparing the keyword completion
@@ -45,10 +51,15 @@ class KeywordCompletionTest {
           + "U.S. Government Users Restricted Rights - "
           + "Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.";
   private static final String LABEL = "ACCEPT";
-  private static SettingsService settingsService = mock(SettingsService.class);
 
-  private KeywordCompletion completion =
-      new KeywordCompletion(new Keywords(mock(SettingsService.class)));
+  private KeywordCompletion completion;
+
+  @BeforeEach
+  void init() {
+    DialectService dialectService = mock(DialectService.class);
+    when(dialectService.getDialectByName(any())).thenReturn(() -> "COBOL");
+    completion = new KeywordCompletion(new Keywords(mock(SettingsService.class), dialectService));
+  }
 
   @Test
   void testCompletionEmptyResult() {
@@ -60,15 +71,28 @@ class KeywordCompletionTest {
 
   @Test
   void testGetStreamDataMap() {
-    Keywords keywords = new Keywords(settingsService);
-    List<String> dialectType = ImmutableList.of("");
+    DialectService dialectService = mock(DialectService.class);
+
+    CobolDialect idmsDialect = mock(CobolDialect.class);
+    when(idmsDialect.getKeywords()).thenReturn(ImmutableMap.of("idms1", "desc1"));
+    when(dialectService.getDialectByName("IDMS")).thenReturn(idmsDialect);
+
+    CobolDialect dacoDialect = mock(CobolDialect.class);
+    when(dacoDialect.getKeywords()).thenReturn(ImmutableMap.of("daco1", "desc1", "daco2", "desc2"));
+    when(dialectService.getDialectByName("DaCo")).thenReturn(dacoDialect);
+
+    Keywords keywords = new Keywords(mock(SettingsService.class), dialectService);
+    List<String> dialectType = ImmutableList.of();
     assertEquals(2344, keywords.getDataMap(dialectType).size());
+
     dialectType = ImmutableList.of("IDMS");
-    assertEquals(2380, keywords.getDataMap(dialectType).size());
+    assertEquals(2345, keywords.getDataMap(dialectType).size());
+
     dialectType = ImmutableList.of("DaCo");
-    assertEquals(2419, keywords.getDataMap(dialectType).size());
+    assertEquals(2346, keywords.getDataMap(dialectType).size());
+
     dialectType = ImmutableList.of("DaCo", "IDMS");
-    assertEquals(2454, keywords.getDataMap(dialectType).size());
+    assertEquals(2347, keywords.getDataMap(dialectType).size());
   }
 
   @Test

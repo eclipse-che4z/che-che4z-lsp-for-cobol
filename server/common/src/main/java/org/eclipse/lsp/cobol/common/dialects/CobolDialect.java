@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.dialects;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -22,6 +23,7 @@ import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /** A COBOL dialect */
@@ -68,5 +70,13 @@ public interface CobolDialect {
    */
   default Set<String> runBefore() {
     return ImmutableSet.of();
+  }
+
+  /**
+   * Returns dialect keywords map where key is a keyword and a value is a description
+   * @return key/value map with keywords and descriptions
+   */
+  default Map<String, String> getKeywords() {
+    return ImmutableMap.of();
   }
 }

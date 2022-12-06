@@ -24,11 +24,11 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.tree.ParagraphNameNode;
-import org.eclipse.lsp.cobol.core.model.tree.RootNode;
+import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 
 /** This class stores a model to assert the completion providers */
 class MockCompletionModel {

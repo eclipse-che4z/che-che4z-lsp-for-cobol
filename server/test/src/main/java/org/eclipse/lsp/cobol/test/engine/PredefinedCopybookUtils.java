@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.usecases.engine;
+package org.eclipse.lsp.cobol.test.engine;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -22,10 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.PredefinedCopybooks;
-import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
+import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
+import org.eclipse.lsp.cobol.test.CobolText;
 
 import java.util.List;
 import java.util.function.Function;

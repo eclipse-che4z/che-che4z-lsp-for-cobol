@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.positive;
+package org.eclipse.lsp.cobol.test;
 
 import lombok.AllArgsConstructor;
 import lombok.Value;

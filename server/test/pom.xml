@@ -26,6 +26,8 @@
         <maven.coveralls.plugin.version>4.3.0</maven.coveralls.plugin.version>
         <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
         <maven.surefire.plugin.version>3.0.0-M3</maven.surefire.plugin.version>
+        <guice.version>4.2.2</guice.version>
+        <autoservice.version>1.0.1</autoservice.version>
     </properties>
 
     <dependencies>
@@ -66,24 +68,49 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>${guice.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>aopalliance</groupId>
+                    <artifactId>aopalliance</artifactId>
+                </exclusion>
+            </exclusions>
+            <classifier>no_aop</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assistedinject</artifactId>
+            <version>${guice.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>aopalliance</groupId>
+                    <artifactId>aopalliance</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <version>${autoservice.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
             <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-runner</artifactId>
             <version>${junit.platform.version}</version>
-            <scope>test</scope>
             <exclusions>
                 <exclusion>
                     <groupId>junit</groupId>
@@ -164,25 +191,25 @@
                 <executions>
                     <execution>
                         <id>build UseCasePreprocessor</id>
-                        <phase>generate-test-sources</phase>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>antlr4</goal>
                         </goals>
                         <configuration>
-                            <generateTestSources>true</generateTestSources>
                             <arguments>
                                 <argument>-package</argument>
-                                <argument>org.eclipse.lsp.cobol.test.usecase</argument>
+                                <argument>org.eclipse.usecase</argument>
                                 <argument>-o</argument>
-                                <argument>${basedir}/target/generated-sources/antlr4/org/eclipse/lsp/cobol/test/usecase</argument>
+                                <argument>${basedir}/target/generated-sources/antlr4/org/eclipse/usecase</argument>
                             </arguments>
-                            <sourceDirectory>src/test/antlr4/org/eclipse/lsp/cobol/test/usecase</sourceDirectory>
+                            <sourceDirectory>src/main/antlr4/org/eclipse/usecase</sourceDirectory>
                             <listener>true</listener>
                             <visitor>false</visitor>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -235,7 +262,7 @@
                     <excludes>
                         <exclude>**/generated-sources/**/*</exclude>
                         <exclude>**/generated-test-sources/**/*</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/test/usecase/**/*</exclude>
+                        <exclude>**/org/eclipse/usecase/**/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

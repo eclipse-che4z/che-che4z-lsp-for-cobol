@@ -18,7 +18,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysis;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp.cobol.service.utils.FileSystemService;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
 
 import java.util.HashMap;
 import java.util.Map;

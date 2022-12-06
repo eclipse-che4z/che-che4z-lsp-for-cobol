@@ -12,10 +12,9 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service.utils;
+package org.eclipse.lsp.cobol.common.file;
 
 import com.google.common.collect.ImmutableList;
-import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
@@ -41,7 +40,6 @@ import java.util.stream.Stream;
  * This service implements API for low-level file systems access. It mainly oriented to work with
  * copybooks, especially with .copybooks folder.
  */
-@Singleton
 @Slf4j
 public class WorkspaceFileService implements FileSystemService {
 
