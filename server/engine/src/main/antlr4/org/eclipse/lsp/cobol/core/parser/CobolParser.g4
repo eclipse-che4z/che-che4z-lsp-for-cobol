@@ -269,7 +269,7 @@ environmentDivision
    ;
 
 environmentDivisionBody
-   : configurationSection | inputOutputSection | dialectSection | dacoControlSection
+   : configurationSection | inputOutputSection | dialectSection
    ;
 
 // -- configuration section ----------------------------------
@@ -960,14 +960,6 @@ statement
 dialectStatement
    : dialectNodeFiller | dialectIfStatment
    ;
-
-// DAF DaCo Statements
-
-dacoControlSection
-    : DACO_CONTROL SECTION
-    ;
-
-// End of DaCo Statements
 
 // accept statement
 

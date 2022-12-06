@@ -17,15 +17,13 @@ package org.eclipse.lsp.cobol.positive;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.ConfigurableTest;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
-import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.test.CobolText;
-import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp.cobol.utils.Fixtures;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -180,10 +178,6 @@ public abstract class FileBasedTest extends ConfigurableTest {
         ofNullable(getProperty(SYS_ENV_VAR_TESTING_DIALECTS))
             .orElse(ofNullable(getenv("dialect")).orElse("default"));
     List<String> testDialectsLists = Arrays.asList(passedDialects.split(","));
-
-    if (testDialectsLists.contains(DaCoDialect.NAME)) {
-      return DialectConfigs.getDaCoAnalysisConfig();
-    }
 
     if (testDialectsLists.contains(IdmsDialect.NAME)) {
       return new AnalysisConfig(

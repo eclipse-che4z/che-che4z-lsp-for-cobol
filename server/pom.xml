@@ -12,7 +12,6 @@
         <module>engine</module>
         <module>common</module>
         <module>dialect-idms</module>
-        <module>dialect-daco</module>
         <module>test</module>
     </modules>
 
