@@ -34,7 +34,6 @@ public class ResourceUtils {
    */
   public InputStream getInputStream(String filename) throws FileNotFoundException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    File file = new File(classLoader.getResource(filename).getFile());
-    return new FileInputStream(file);
+    return classLoader.getResourceAsStream(filename);
   }
 }
