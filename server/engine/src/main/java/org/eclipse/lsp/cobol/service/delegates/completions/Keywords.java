@@ -27,7 +27,7 @@ import java.util.*;
 @Singleton
 @Slf4j
 public class Keywords extends CompletionStorage<String> {
-  private static final String KEYWORDS_FILE_PATH = "/LanguageKeywords.txt";
+  private static final String KEYWORDS_FILE_PATH = "LanguageKeywords.txt";
 
   private final DialectService dialectService;
 
