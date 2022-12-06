@@ -16,8 +16,6 @@ package org.eclipse.lsp.cobol.common.utils;
 
 import lombok.experimental.UtilityClass;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -34,7 +32,6 @@ public class ResourceUtils {
    */
   public InputStream getInputStream(String filename) throws FileNotFoundException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    File file = new File(classLoader.getResource(filename).getFile());
-    return new FileInputStream(file);
+    return classLoader.getResourceAsStream(filename);
   }
 }
