@@ -57,7 +57,7 @@ suite('Test snippets with different dialects settings', () => {
         await helper.sleep(1000);
         const text = editor.document.getText();
         const acceptedLine = text.split('\n')[4];
-        assert.strictEqual(text,'   COPY "SUBPROG.CPY"\r\n       REPLACING ==()== BY ==lnk-==.');
+       assert.strictEqual(text,"   COPY");
        helper.closeActiveEditor();
     }).timeout(10000).slow(4000);
 
