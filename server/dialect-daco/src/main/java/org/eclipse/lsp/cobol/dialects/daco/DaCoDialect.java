@@ -113,7 +113,7 @@ public final class DaCoDialect implements CobolDialect {
 
   @Override
   public Map<String, String> getKeywords() {
-    return KeywordsUtils.getKeywords("KeywordsDaCo.txt");
+    return KeywordsUtils.getKeywords("/KeywordsDaCo.txt");
   }
 
   private void removeDcDb(ExtendedSource extendedSource) {

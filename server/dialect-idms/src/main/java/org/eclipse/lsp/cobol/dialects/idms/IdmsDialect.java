@@ -207,7 +207,7 @@ public final class IdmsDialect implements CobolDialect {
 
   @Override
   public Map<String, String> getKeywords() {
-    return KeywordsUtils.getKeywords("KeywordsIdms.txt");
+    return KeywordsUtils.getKeywords("/KeywordsIdms.txt");
   }
 
   private IdmsCopyParser.StartRuleContext parseCopyIdms(String text, String programDocumentUri, List<SyntaxError> errors) {
