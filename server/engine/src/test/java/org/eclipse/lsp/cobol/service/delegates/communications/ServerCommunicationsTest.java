@@ -18,11 +18,15 @@ package org.eclipse.lsp.cobol.service.delegates.communications;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Provider;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
-import org.eclipse.lsp.cobol.service.utils.FileSystemService;
-import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.MessageParams;
+import org.eclipse.lsp4j.MessageType;
+import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -36,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp4j.MessageType.Info;
 import static org.mockito.Mockito.*;
 
