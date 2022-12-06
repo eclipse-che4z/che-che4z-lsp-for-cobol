@@ -777,7 +777,7 @@ dataOccursClause
    ;
 
 dataOccursTo
-   : TO integerLiteral
+   : TO (integerLiteral | UNBOUNDED)
    ;
 
 dataOccursSort
@@ -948,7 +948,7 @@ conditionalStatementCall
    ;
 
 statement
-   : acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
+   : acceptStatement | addStatement | allocateStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
     disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement |
     execSqlStatementInProcedureDivision | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
@@ -1030,6 +1030,10 @@ addGiving
 alteredGoTo
    : GO TO? DOT_FS
    ;
+
+allocateStatement
+    : ALLOCATE ((arithmeticExpression CHARACTERS) | qualifiedDataName) INITIALIZED? (LOC integerLiteral)? (RETURNING qualifiedDataName)?
+    ;
 
 // alter statement
 
