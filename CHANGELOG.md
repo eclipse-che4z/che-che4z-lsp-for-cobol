@@ -1,6 +1,48 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+# [1.1.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.0...1.1.0) (2022-12-07)
+
+### Bug Fixes
+* add COBOL and IDMS keywords in DaCo lexer ([f4665e4](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f4665e4ec0934edbd2a25e2d0733c6e0b23b790c))
+* Add Exit node for EXEC CICS RETURN statement ([#1603](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1603)) ([ac8e757](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ac8e757ade3ae52832075824cb1d6a6e7b4ed8e4))
+
+### Features
+* Add 'textDocument/diagnostic' support to LS ([583479b](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/583479bb6f89a67e2df865c729ed7a0cb47f5df2))
+* Add DaCo Debug and Exec statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([6a5e255](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/6a5e255d07226b07a03332fc5d1a25ab0b4bb738))
+* Add DaCo Debug statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([4235312](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/4235312aeb60e4a482ffbafae071567a14b67781))
+* Add DaCo DML File & String statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([8c980a5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/8c980a590995a28e8135a0f53604c289e0f80503))
+* Add DaCo DML FILE statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([cb535de](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/cb535de8a321b4dabb00c2c0ac09cdc158066318))
+* Add DaCo DML FILE statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([f8e993f](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f8e993f24d18e8735bff411b48f0d89a80addcd9))
+* Add DaCo DML FILE statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([ec684de](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ec684de4c2baa6d413ccb467acedf7b708e39f96))
+* Add DaCo DML FILE statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([e401eb1](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/e401eb132ce200322440a7ddeb1f9b7d9841a530))
+* Add DaCo DML Message handling statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([29ade95](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/29ade95013e807fa03856a08c8d6d0cd24548b62))
+* Add DaCo DML Message handling statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([a81d96e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a81d96e8c6562eb9222b074aefc74b23b49d686c))
+* Add DaCo DML Table Row retrieval statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([7ebdfd8](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/7ebdfd808dd59b0681b521a11f582931fe94f171))
+* Add DaCo DML Table Row retrieval statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([d84f7fb](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d84f7fb3727e350fb9689e7a889a78aea5c42c56))
+* Add DaCo DML Table Row retrieval statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([0030384](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/00303843afdb638417ef1e123a99f1b69466a5f1))
+* Add DaCo DML Table Row retrieval statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([8eec561](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/8eec561addcf477452f3d71d1bba56cf8d1f2ad2))
+* Add DaCo DML Table Row update statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([9496a54](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9496a541f9902d253bb0d8338c847fd4a6c5272b))
+* Add DaCo DML Table Row update statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([a705689](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a705689a3d55a276ca3e0be07b0ad04285aa05ae))
+* Add DaCo DML Table statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([0f86a28](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/0f86a28b4140aac5e49ad8364c95e6fe8c86ae20))
+* Add DaCo DML Table statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([0915b88](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/0915b88cf14e4860b97064b65a78665971d0f6be))
+* Add DaCo DML write report statement ([#1193](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1193)) ([80c388e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/80c388e1387c3b17e259a045fdaad7d0d3709de1))
+* Add DaCo DML write report statement ([#1193](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1193)) ([941555d](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/941555d24853ed3fd0b434672e1c8b59a3247f27))
+* Add DaCo Statement Prefix and Obsolete Statement support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([f55a8fd](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f55a8fd8b98012821988f23fd7731f05fb06fda0))
+* Add DaCo Statement Prefix and Obsolete Statement support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([fbd675f](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/fbd675f9b61022999c3a14d575b37c179af40b5c))
+* Add DaCo Statement Prefix and Obsolete Statement support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([01af96d](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/01af96d50290b0a3423b86ef9f629532f4bdcc0c))
+* Add DaCo Statement Prefix and Obsolete Statement support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([3fe67cc](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/3fe67ccec73e0f0f62c3371e67cfd125576b211f))
+* Add DaCo Statements to DaCo parser [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([9d57ecc](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9d57eccb3f316ad869b5f7560a4a399b3c6c3085))
+* Add DaCo Statements to DaCo parser [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([8d778a5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/8d778a5785972a47f69fa96be5468f29dc5e4749))
+* Add DaCo String DML statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([7d74864](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/7d74864f09b7c6b90920233b96621e2d8092731d))
+* Add DaCo String DML statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([25c7841](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/25c784188d5ae702985569128ae6a330d3c49e67))
+* Add DaCo String DML statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([d9abebc](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d9abebcf1da20a628cd3e0883d9ec41faaae3746))
+* Add DaCo Table Row Initialize statement in DaCo parser [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([0a1e64e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/0a1e64e7fa544fc96ef3ae9c4b93ffcb585a943b))
+* Add DaCo Table Row Initialize statement in DaCo parser [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([7ab15ab](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/7ab15ab3bce87991f5c04ffef25bf258e5e12fe5))
+* Add DaCo Table Row Retrieval statements support [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126)  ([fce23af](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/fce23af843b0f661683efed7519bade7887d1e7b))
+* Add DaCo Write Report and Transaction statements to DaCo parser [#1126](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1126) ([b8286aa](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/b8286aad9e568b694db1b9b8d5be4664aeb10e8d))
+
+
 ## [1.1.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.0...1.1.0) (2022-11-03)
 
 ### Bug Fixes
