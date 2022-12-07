@@ -22,11 +22,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.Builder;
+import lombok.Generated;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.copybook.*;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
@@ -112,8 +115,8 @@ import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.common.model.NodeType.COPY;
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -286,6 +289,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     return relatedFullDocumentDiagnosticReport;
   }
 
+  @Generated // do not include in test coverage. Used only for tests
   @SneakyThrows
   private void waitAnalysisToFinish(String uri) {
     int sleepCount = 0;
@@ -458,7 +462,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                         diagnosticMap.computeIfPresent(k, (k1, v1) -> Collections.emptyList())));
 
     communications.publishDiagnostics(collectAllDiagnostics());
-    communications.cancelProgressNotification(uri);
+    communications.notifyProgressEnd(uri);
     docs.remove(uri);
     clearAnalysedFutureObject(uri);
     watcherService.removeRuntimeWatchers(uri);
@@ -556,7 +560,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
           if (copybookIdentificationService.isCopybook(uri, text, waitExtensionConfig())) {
             return;
           }
-          communications.notifyThatLoadingInProgress(uri);
         }
         AnalysisConfig config = configurationService.getConfig(processingMode);
         AnalysisResult result = engine.analyze(uri, text, config);
@@ -566,7 +569,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
           ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
         }
         notifyAnalysisFinished(uri, extractCopybookUsages(result), processingMode);
-        communications.cancelProgressNotification(uri);
         errorsByFileForEachProgram.put(uri, result.getDiagnostics());
         communications.publishDiagnostics(collectAllDiagnostics());
         if (firstTime) {
@@ -617,6 +619,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   private void notifyAnalysisFinished(
       String uri, List<String> copybooks, CopybookProcessingMode copybookProcessingMode) {
+    communications.notifyProgressEnd(uri);
     dataBus.postData(
         AnalysisFinishedEvent.builder()
             .documentUri(uri)
@@ -642,6 +645,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> documentSymbol(
       DocumentSymbolParams params) {
     String uri = params.getTextDocument().getUri();
+    communications.notifyProgressBegin(uri);
     return outlineMap
         .get(uri)
         .thenApply(
@@ -649,8 +653,9 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                 documentSymbols.stream()
                     .map(Either::<SymbolInformation, DocumentSymbol>forRight)
                     .collect(toList()))
-        .whenComplete(
-            reportExceptionIfThrown(createDescriptiveErrorMessage("symbol analysis", uri)));
+            .whenComplete(
+            reportExceptionIfThrown(createDescriptiveErrorMessage("symbol analysis", uri)))
+            .whenComplete((res, ex) -> communications.notifyProgressEnd(uri));
   }
 
   @Override

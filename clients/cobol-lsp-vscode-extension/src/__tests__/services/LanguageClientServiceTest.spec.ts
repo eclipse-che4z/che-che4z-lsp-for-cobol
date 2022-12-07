@@ -16,7 +16,7 @@ import * as os from "os";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { join } from "path";
-import { LanguageClient } from "vscode-languageclient";
+import { LanguageClient, ErrorCodes } from "vscode-languageclient";
 import { CopybookDownloadService } from "../../services/copybook/CopybookDownloadService";
 import { JavaCheck } from "../../services/JavaCheck";
 import { LanguageClientService, nativeServer } from "../../services/LanguageClientService";
@@ -43,6 +43,7 @@ jest.mock("vscode-languageclient", () => ({
 jest.mock('fs', () => ({
     fs: jest.fn(),
 }));
+(ErrorCodes as any) = {};
 jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
     return {
       ZoweVsCodeExtension: jest.fn()
