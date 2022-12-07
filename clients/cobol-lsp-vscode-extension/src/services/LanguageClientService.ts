@@ -19,6 +19,7 @@ import { join } from "path";
 import * as vscode from "vscode";
 
 import {
+    ErrorCodes,
     Executable,
     LanguageClient,
     LanguageClientOptions,
