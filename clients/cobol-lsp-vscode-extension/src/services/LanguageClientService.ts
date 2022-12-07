@@ -34,6 +34,7 @@ const extensionId = "BroadcomMFD.cobol-language-support";
 
 export class LanguageClientService {
     private executablePath: string;
+    private dialectsPath: string;
     private languageClient: LanguageClient;
     private handlers: Array<(languageClient: LanguageClient) => void> = [];
     private isNativeBuildEnabled: boolean = false;
@@ -41,6 +42,7 @@ export class LanguageClientService {
     constructor(private outputChannel: vscode.OutputChannel) {
         const ext = vscode.extensions.getExtension(extensionId);
         this.executablePath = join(ext.extensionPath, "server", "jar", "server.jar");
+        this.dialectsPath = join(ext.extensionPath, "server", "jar", "dialects");
     }
 
     public enableNativeBuild() {
@@ -96,6 +98,8 @@ export class LanguageClientService {
                 "LSP extension for " + LANGUAGE_ID.toUpperCase() + " language",
                 this.createServerOptions(this.executablePath),
                 this.createClientOptions());
+            // hack to prevent notification for cancelled request.
+            (ErrorCodes as any).RequestCancelled = -32800;
         }
         return this.languageClient;
     }
@@ -128,7 +132,7 @@ export class LanguageClientService {
             };
         }
         return {
-            args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
+            args: ["-Dline.separator=\r\n", "-Ddialect.path=" + this.dialectsPath, "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
             command: "java",
             options: { detached: false },
         };

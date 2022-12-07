@@ -68,11 +68,13 @@
             <groupId>org.eclipse.lsp.cobol</groupId>
             <artifactId>dialect-idms</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.lsp.cobol</groupId>
             <artifactId>dialect-daco</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.lsp.cobol</groupId>

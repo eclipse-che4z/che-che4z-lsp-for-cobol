@@ -109,7 +109,9 @@ public class CobolLanguageServer implements LanguageServer {
     capabilities.setDocumentHighlightProvider(TRUE);
     capabilities.setCodeActionProvider(TRUE);
     capabilities.setExecuteCommandProvider(collectExecuteCommandList());
-    capabilities.setDocumentSymbolProvider(TRUE);
+    DocumentSymbolOptions documentSymbolOptions = new DocumentSymbolOptions();
+    documentSymbolOptions.setWorkDoneProgress(TRUE);
+    capabilities.setDocumentSymbolProvider(documentSymbolOptions);
     capabilities.setHoverProvider(TRUE);
     capabilities.setFoldingRangeProvider(TRUE);
     DiagnosticRegistrationOptions diagnosticRegistrationOptions = new DiagnosticRegistrationOptions();

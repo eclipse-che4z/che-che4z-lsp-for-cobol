@@ -43,6 +43,7 @@ jest.mock("vscode-languageclient", () => ({
 jest.mock('fs', () => ({
     fs: jest.fn(),
 }));
+(ErrorCodes as any) = {};
 jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
     return {
       ZoweVsCodeExtension: jest.fn()
@@ -107,7 +108,7 @@ describe("LanguageClientService positive scenario", () => {
         expect(languageClientService.start()).toBe(SERVER_STARTED_MSG);
         expect(LanguageClient).toHaveBeenCalledTimes(1);
         expect(LanguageClient).toHaveBeenCalledWith(SERVER_ID, SERVER_DESC, {
-            args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", serverPath, "pipeEnabled"],
+            args: ["-Dline.separator=\r\n", "-Ddialect.path=/test/server/jar/dialects", "-Xmx768M", "-jar", serverPath, "pipeEnabled"],
             command: "java",
             options: { detached: false },
         }, {
