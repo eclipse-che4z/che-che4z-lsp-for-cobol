@@ -33,7 +33,7 @@
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
         <junit-jupiter.version>5.6.0</junit-jupiter.version>
         <junit.platform.version>1.6.0</junit.platform.version>
-        <mockito.core.version>2.23.0</mockito.core.version>
+        <mockito.core.version>4.6.1</mockito.core.version>
         <maven.cobertura.plugin.version>2.7</maven.cobertura.plugin.version>
         <maven.coveralls.plugin.version>4.3.0</maven.coveralls.plugin.version>
         <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
@@ -45,6 +45,7 @@
             <groupId>org.eclipse.lsp.cobol</groupId>
             <artifactId>common</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -79,6 +80,18 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.eclipse.lsp.cobol</groupId>
+            <artifactId>engine</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.lsp.cobol</groupId>
+            <artifactId>test</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>

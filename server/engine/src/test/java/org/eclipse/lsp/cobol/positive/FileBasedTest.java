@@ -22,15 +22,13 @@ import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.test.CobolText;
-import org.eclipse.lsp.cobol.utils.Fixtures;
+import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -155,10 +153,8 @@ public abstract class FileBasedTest extends ConfigurableTest {
    */
   protected List<CobolText> getFileSpecificCopybooks(
       CobolTextRegistry cobolTextRegistry, String fileName) {
-    List<CobolText> copybooks = new ArrayList<>(getCopybooks(cobolTextRegistry));
-    copybooks.add(Fixtures.subschemaCopy(""));
     Stream<CobolText> cobolTextStream =
-        copybooks.stream()
+        getCopybooks(cobolTextRegistry).stream()
             .filter(
                 book ->
                     getCopybooks(cobolTextRegistry, fileName.split("\\.")[0]).stream()
@@ -179,11 +175,15 @@ public abstract class FileBasedTest extends ConfigurableTest {
             .orElse(ofNullable(getenv("dialect")).orElse("default"));
     List<String> testDialectsLists = Arrays.asList(passedDialects.split(","));
 
-    if (testDialectsLists.contains(IdmsDialect.NAME)) {
+    if (testDialectsLists.contains("DaCo")) {
+      return DialectConfigs.getDaCoAnalysisConfig();
+    }
+
+    if (testDialectsLists.contains("IDMS")) {
       return new AnalysisConfig(
           new CopybookConfig(ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of()),
           Arrays.asList(EmbeddedLanguage.values()),
-          ImmutableList.of(IdmsDialect.NAME), true);
+          ImmutableList.of("IDMS"), true);
     }
     return AnalysisConfig.defaultConfig(ENABLED);
   }

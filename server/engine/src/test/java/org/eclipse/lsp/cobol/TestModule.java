@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
@@ -102,7 +103,7 @@ public class TestModule extends AbstractModule {
     bind(CopybookIdentificationService.class)
             .annotatedWith(Names.named("combinedStrategy"))
             .to(CopybookIdentificationCombinedStrategy.class);
-    bind(DialectDiscoveryService.class).to(ExplicitDialectDiscoveryService.class);
+    bind(DialectDiscoveryService.class).toInstance((copybookService, messageService) -> ImmutableList.of());
 
     bindFormations();
     bindCompletions();
