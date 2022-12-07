@@ -18,20 +18,28 @@ package org.eclipse.lsp.cobol.service.delegates.communications;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
+import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
+import org.eclipse.lsp4j.ProgressParams;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.eclipse.lsp4j.WorkDoneProgressBegin;
+import org.eclipse.lsp4j.WorkDoneProgressCreateParams;
+import org.eclipse.lsp4j.WorkDoneProgressEnd;
+import org.eclipse.lsp4j.WorkDoneProgressReport;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp4j.MessageType.Info;
 
@@ -43,7 +51,6 @@ import static org.eclipse.lsp4j.MessageType.Info;
 @Slf4j
 public class ServerCommunications implements Communications {
 
-  private CustomThreadPoolExecutor customExecutor;
   private final Set<String> uriInProgress = new HashSet<>();
   private MessageService messageService;
   private Provider<CobolLanguageClient> provider;
@@ -51,41 +58,14 @@ public class ServerCommunications implements Communications {
 
   @Inject
   public ServerCommunications(
-      Provider<CobolLanguageClient> provider,
-      FileSystemService files,
-      MessageService messageService,
-      CustomThreadPoolExecutor customExecutor) {
+          Provider<CobolLanguageClient> provider,
+          FileSystemService files,
+          MessageService messageService) {
     this.provider = provider;
     this.files = files;
     this.messageService = messageService;
-    this.customExecutor = customExecutor;
   }
 
-  /**
-   * The "work in progress" message should be shown after 3 seconds if the analysis not finished
-   * yet. If cancelProgressNotification was invoked then the message won't be shown on the client.
-   *
-   * @param uri - uri of the document that is currently processed
-   */
-  @Override
-  public void notifyThatLoadingInProgress(String uri) {
-    String decodedUri = files.decodeURI(uri);
-    uriInProgress.add(decodedUri);
-    customExecutor
-        .getScheduledThreadPoolExecutor()
-        .schedule(
-            () -> {
-              if (uriInProgress.remove(decodedUri)) {
-                showMessage(
-                    Info,
-                    messageService.getMessage(
-                        "Communications.syntaxAnalysisInProgress",
-                        files.getNameFromURI(decodedUri)));
-              }
-            },
-            3,
-            SECONDS);
-  }
 
   /**
    * Show a message that analysis finished if there were no errors found
@@ -128,14 +108,63 @@ public class ServerCommunications implements Communications {
                     new PublishDiagnosticsParams(uri, clean(diagnostic))));
   }
 
-  /**
-   * Destroy the popup notification that alert the user that the cobol analysis is still ongoing
-   *
-   * @param uri document open in the client
-   */
+
   @Override
-  public void cancelProgressNotification(String uri) {
-    uriInProgress.remove(files.decodeURI(uri));
+  public void notifyProgressBegin(String uri) {
+    synchronized (uriInProgress) {
+      handleDanglingProgressNotifications(uri);
+      createProgressWindow(uri);
+      notifyWorkProgressBegin(uri);
+      uriInProgress.add(uri);
+      notifyWorkProgress(uri);
+    }
+  }
+
+  private void handleDanglingProgressNotifications(String uri) {
+    if (uriInProgress.contains(uri)) {
+      notifyProgressEnd(uri);
+      uriInProgress.remove(uri);
+    }
+  }
+
+  private void notifyWorkProgress(String uri) {
+    WorkDoneProgressReport workDoneProgressReport = new WorkDoneProgressReport();
+    ProgressParams params = new ProgressParams(Either.forLeft(uri), Either.forLeft(workDoneProgressReport));
+    getClient().notifyProgress(params);
+  }
+
+  private void createProgressWindow(String uri) {
+    getClient().createProgress(new WorkDoneProgressCreateParams(Either.forLeft(uri)));
+  }
+
+  private void notifyWorkProgressBegin(String uri) {
+    ProgressParams params = new ProgressParams();
+    params.setToken(uri);
+    WorkDoneProgressBegin workDoneProgressBegin = new WorkDoneProgressBegin();
+    workDoneProgressBegin.setTitle(messageService.getMessage(
+            "Communications.syntaxAnalysisInProgressTitle",
+            files.getNameFromURI(uri)));
+    params.setValue(Either.forLeft(workDoneProgressBegin));
+    getClient().notifyProgress(params);
+  }
+
+  @Override
+  public void notifyProgressReport(String uri) {
+    ProgressParams params =
+        new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport()));
+    getClient().notifyProgress(params);
+  }
+
+  @Override
+  public void notifyProgressEnd(String uri) {
+    synchronized (uriInProgress) {
+      if (uriInProgress.contains(uri)) {
+        ProgressParams params =
+            new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressEnd()));
+        getClient().notifyProgress(params);
+        uriInProgress.remove(uri);
+      }
+    }
   }
 
   private void showMessage(MessageType type, String message) {

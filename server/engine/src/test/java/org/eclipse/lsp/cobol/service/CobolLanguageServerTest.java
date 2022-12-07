@@ -226,7 +226,7 @@ class CobolLanguageServerTest {
     assertTrue(capabilities.getDocumentFormattingProvider().getLeft());
     assertTrue(capabilities.getDocumentHighlightProvider().getLeft());
     assertTrue(capabilities.getCodeActionProvider().getLeft());
-    assertTrue(capabilities.getDocumentSymbolProvider().getLeft());
+    assertTrue(capabilities.getDocumentSymbolProvider().getRight().getWorkDoneProgress());
     assertTrue(capabilities.getFoldingRangeProvider().getLeft());
     assertEquals(
         stream(ErrorCode.values()).map(ErrorCode::getLabel).collect(toList()),

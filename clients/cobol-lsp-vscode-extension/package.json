@@ -478,7 +478,7 @@
         "@zowe/zowe-explorer-api": "2.4.0",
         "iconv-lite": "^0.6.3",
         "vscode-extension-telemetry": "0.1.6",
-        "vscode-languageclient": "5.2.1"
+        "vscode-languageclient": "6.1.3"
     },
     "devDependencies": {
         "@types/fs-extra": "^9.0.13",
