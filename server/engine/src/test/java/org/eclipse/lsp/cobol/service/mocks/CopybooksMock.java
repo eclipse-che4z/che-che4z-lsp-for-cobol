@@ -15,7 +15,7 @@
 
 package org.eclipse.lsp.cobol.service.mocks;
 
-import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.test.CobolText;
 
 import java.util.List;
 

@@ -15,22 +15,18 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
 import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
-import org.eclipse.lsp.cobol.service.SQLBackend;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.utils.FileSystemService;
+import org.eclipse.lsp.cobol.common.copybook.*;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -50,15 +46,15 @@ class FileContentProviderTest {
   }
 
   @Test
-  void testReadReturnsContent() throws IOException {
-    when(files.readFromInputStream(any(), any())).thenReturn("content");
+  void testReadReturnsContent() {
+    when(files.readImplicitCode(any())).thenReturn("content");
     Optional<CopybookModel> model = contentProvider.read(copybookConfig, new CopybookName("copybook"), "uri", "uri");
-    assertEquals(model.get().getContent(), "content");
+    assertEquals("content", model.get().getContent());
   }
 
   @Test
-  void testReadFailed() throws IOException {
-    when(files.readFromInputStream(any(), any())).thenThrow(IOException.class);
+  void testReadFailed() {
+    when(files.readImplicitCode(any())).thenReturn(null);
     Optional<CopybookModel> model = contentProvider.read(copybookConfig, new CopybookName("copybook"), "uri", "uri");
     assertFalse(model.isPresent());
   }

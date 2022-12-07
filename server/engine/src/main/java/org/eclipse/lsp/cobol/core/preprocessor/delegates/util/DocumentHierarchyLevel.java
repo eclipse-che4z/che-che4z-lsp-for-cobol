@@ -16,8 +16,8 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
-import org.eclipse.lsp.cobol.core.model.Locality;
 
 import javax.annotation.Nullable;
 import java.util.Collections;

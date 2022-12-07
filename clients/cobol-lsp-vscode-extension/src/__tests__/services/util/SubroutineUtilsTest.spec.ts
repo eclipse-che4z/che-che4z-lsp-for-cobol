@@ -14,7 +14,7 @@
 
 import * as vscode from "vscode";
 import {resolveSubroutineURI} from "../../../services/util/SubroutineUtils";
-import {searchInWorkspace} from "../../../services/util/FSUtils";
+import {searchCopybookInWorkspace} from "../../../services/util/FSUtils";
 import {COBOL_EXT_ARRAY} from "../../../constants";
 
 describe("SubroutineUtils", () => {
@@ -23,10 +23,10 @@ describe("SubroutineUtils", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue(folders),
         });
-        (searchInWorkspace as any) = jest.fn().mockReturnValue("theURI");
+        (searchCopybookInWorkspace as any) = jest.fn().mockReturnValue("theURI");
 
         const uri = resolveSubroutineURI("name");
         expect(uri).toBe("theURI");
-        expect(searchInWorkspace).toBeCalledWith("name", folders, COBOL_EXT_ARRAY)
+        expect(searchCopybookInWorkspace).toBeCalledWith("name", folders, COBOL_EXT_ARRAY)
     });
 });

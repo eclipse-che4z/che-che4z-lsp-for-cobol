@@ -15,11 +15,11 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableSet;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 /** Test to check SubroutineCompletion */
 class CopybookNameCompletionTest {
   private static final String TEXT = "       COPYBOOK  \n";
-  private CopybookNameService copybookNameService = mock(CopybookNameServiceImpl.class);
+  private final CopybookNameService copybookNameService = mock(CopybookNameServiceImpl.class);
 
   @Test
   void testCopybookNameCompletion() {

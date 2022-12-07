@@ -45,10 +45,10 @@
         <maven.cobertura.plugin.version>2.7</maven.cobertura.plugin.version>
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
         <maven.coveralls.plugin.version>4.3.0</maven.coveralls.plugin.version>
-        <maven.jacoco.plugin.version>0.8.5</maven.jacoco.plugin.version>
+        <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
         <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
         <maven.surefire.plugin.version>3.0.0-M3</maven.surefire.plugin.version>
-        <mockito.core.version>2.23.0</mockito.core.version>
+        <mockito.core.version>4.6.1</mockito.core.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4j.api.version>1.7.25</slf4j.api.version>
@@ -59,6 +59,22 @@
         <listingSnap>${project.basedir}${file.separator}..${file.separator}..${file.separator}tests${file.separator}test_files${file.separator}Cobol85PositiveTestsSuite${file.separator}compileListing${file.separator}snapshot</listingSnap>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.eclipse.lsp.cobol</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.lsp.cobol</groupId>
+            <artifactId>dialect-idms</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.lsp.cobol</groupId>
+            <artifactId>test</artifactId>
+            <scope>test</scope>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId>
@@ -183,6 +199,12 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>${mockito.core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>${mockito.core.version}</version>
             <scope>test</scope>
@@ -294,6 +316,9 @@
                             <value>${listingSnap}</value>
                         </property>
                     </systemProperties>
+                    <excludes>
+                        <exclude>**/org/eclipse/lsp/cobol/dialects/daco/**/*</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 

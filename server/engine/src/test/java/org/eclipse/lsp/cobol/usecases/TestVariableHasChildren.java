@@ -17,16 +17,16 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableType;
-import org.eclipse.lsp.cobol.service.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -64,7 +64,7 @@ class TestVariableHasChildren {
             .filter(Node.hasType(NodeType.PROGRAM))
             .findFirst()
             .map(ProgramNode.class::cast)
-            .map(new SymbolService(result.getSymbolTableMap())::getVariables)
+            .map(new SymbolsRepository(result.getSymbolTableMap())::getVariables)
             .map(variableMap -> variableMap.get("TERMS-RECORD").iterator().next())
             .orElse(null);
 

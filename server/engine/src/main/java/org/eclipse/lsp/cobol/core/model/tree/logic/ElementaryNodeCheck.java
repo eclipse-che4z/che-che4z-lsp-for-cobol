@@ -16,13 +16,13 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.core.engine.processor.Processor;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.variables.ElementaryNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.UsageFormatUtils;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.common.processor.Processor;
+import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryNode;
+import org.eclipse.lsp.cobol.common.utils.UsageFormatUtils;
 
 import java.util.Collections;
 import java.util.List;

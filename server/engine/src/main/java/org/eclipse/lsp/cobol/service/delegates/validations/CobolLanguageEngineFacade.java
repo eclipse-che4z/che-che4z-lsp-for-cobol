@@ -16,15 +16,17 @@ package org.eclipse.lsp.cobol.service.delegates.validations;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.error.ErrorCode;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
-import org.eclipse.lsp.cobol.core.model.ErrorCode;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -42,12 +44,12 @@ import java.util.function.Function;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
-import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.COPY;
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.common.model.NodeType.COPY;
 
 /**
  * This class is a facade that maps the result of the syntax and semantic analysis to a model
- * consumed by the LSP, i.e. convert {@link SyntaxError} to {@link Diagnostic} and adjust semantic
+ * consumed by the LSP, i.e. convert {@link org.eclipse.lsp.cobol.common.error.SyntaxError} to {@link Diagnostic} and adjust semantic
  * context.
  */
 @Singleton
@@ -163,7 +165,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private List<String> filenameSpecificWatchFolders(String uri) {
     return new ArrayList<>(watcherService.getWatchingFolders()).stream()
             .filter(txt -> txt.contains("${fileBasenameNoExtension}"))
-            .map(txt -> txt.replaceAll("\\$\\{fileBasenameNoExtension\\}", getNameFromURI(uri)))
+            .map(txt -> txt.replace("\\$\\{fileBasenameNoExtension\\}", getNameFromURI(uri)))
             .collect(toList());
   }
 }

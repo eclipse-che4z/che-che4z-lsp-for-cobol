@@ -24,26 +24,31 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.DocumentMapping;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectDescriptor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 
 import java.util.*;
 import java.util.function.Consumer;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
-import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 
 /**
  * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
@@ -165,11 +170,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitLinkageSection(LinkageSectionContext ctx) {
-    injectCode(injectService.getInjectors(ctx), ctx, ctx);
-  }
-
-  @Override
-  public void exitProcedureDivision(ProcedureDivisionContext ctx) {
     injectCode(injectService.getInjectors(ctx), ctx, ctx);
   }
 

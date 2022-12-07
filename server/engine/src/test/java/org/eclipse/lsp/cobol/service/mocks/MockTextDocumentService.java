@@ -24,21 +24,23 @@ import org.eclipse.lsp.cobol.service.SyncProvider;
 import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
-import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.service.utils.TestThreadPoolExecutor;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 /** Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing. */
@@ -57,6 +59,7 @@ public class MockTextDocumentService {
   @Mock protected CopybookIdentificationService copybookIdentificationService;
   @Mock protected CopybookService copybookService;
   @Mock protected WatcherService watcherService;
+  @Mock protected FileSystemService fileSystemService;
 
   /**
    * Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing. All tasks run
@@ -81,6 +84,7 @@ public class MockTextDocumentService {
         .copybookReferenceRepo(new CopybookReferenceRepoImpl())
         .syncProvider(new SyncProvider())
         .watcherService(watcherService)
+        .fileSystemService(fileSystemService)
         .build();
   }
 
@@ -104,10 +108,12 @@ public class MockTextDocumentService {
         .configurationService(configurationService)
         .syncProvider(new SyncProvider())
         .watcherService(watcherService)
+        .fileSystemService(fileSystemService)
         .build();
   }
 
   protected void mockSettingServiceForCopybooks(boolean answer) {
+    reset(copybookIdentificationService);
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(answer);
   }
 }

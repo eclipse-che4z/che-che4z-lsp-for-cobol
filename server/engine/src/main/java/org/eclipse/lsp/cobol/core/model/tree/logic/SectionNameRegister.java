@@ -15,20 +15,20 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.core.engine.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.common.processor.Processor;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.SectionNameNode;
 
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROCEDURE_SECTION;
+import static org.eclipse.lsp.cobol.common.model.NodeType.PROCEDURE_SECTION;
 
 /** SectionNameNode processor */
 public class SectionNameRegister implements Processor<SectionNameNode> {
-  private final SymbolService symbolService;
+  private final SymbolAccumulatorService symbolAccumulatorService;
 
-  public SectionNameRegister(SymbolService symbolService) {
-    this.symbolService = symbolService;
+  public SectionNameRegister(SymbolAccumulatorService symbolAccumulatorService) {
+    this.symbolAccumulatorService = symbolAccumulatorService;
   }
 
   @Override
@@ -39,7 +39,7 @@ public class SectionNameRegister implements Processor<SectionNameNode> {
     }
     ImmutableList<SyntaxError> errors =
         node.getProgram()
-            .flatMap(program -> symbolService.registerSectionNameNode(program, node))
+            .flatMap(program -> symbolAccumulatorService.registerSectionNameNode(program, node))
             .map(ImmutableList::of)
             .orElseGet(ImmutableList::of);
 

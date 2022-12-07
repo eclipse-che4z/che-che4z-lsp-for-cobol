@@ -1,0 +1,90 @@
+[
+  {
+    "name": "M285552A",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 23,
+        "character": 8
+      },
+      "end": {
+        "line": 34,
+        "character": 17
+      }
+    },
+    "type": "program",
+    "children": [
+      {
+        "snippet": "P8000-READ-TABLE.\r\n       \r\n           READ TRAVCONV-FILE INTO TRAVELERS-CONV-RECORD\r\n             AT END GO TO P8000-EXIT.\r\n                    MOVE \u0027Y\u0027 TO OUT-REC-TYPE.\r\n                    PERFORM X1.",
+        "name": "P8000-READ-TABLE",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 24,
+            "character": 8
+          },
+          "end": {
+            "line": 29,
+            "character": 32
+          }
+        },
+        "type": "paragraph",
+        "children": [
+          {
+            "type": "atEnd"
+          },
+          {
+            "targetName": [
+              "P8000-EXIT"
+            ],
+            "type": "goto"
+          },
+          {
+            "type": "atEndExit"
+          },
+          {
+            "targetName": "X1",
+            "type": "perform"
+          }
+        ]
+      },
+      {
+        "snippet": "X1.\r\n           DISPLAY \u0027HAHAH\u0027.",
+        "name": "X1",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 30,
+            "character": 9
+          },
+          "end": {
+            "line": 31,
+            "character": 28
+          }
+        },
+        "type": "paragraph"
+      },
+      {
+        "snippet": "P8000-EXIT.\r\n           EXIT.",
+        "name": "P8000-EXIT",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 33.0,
+            "character": 8.0
+          },
+          "end": {
+            "line": 34.0,
+            "character": 17.0
+          }
+        },
+        "type": "paragraph",
+        "children": [
+          {
+            "type": "exit"
+          }
+        ]
+      }
+    ]
+  }
+]

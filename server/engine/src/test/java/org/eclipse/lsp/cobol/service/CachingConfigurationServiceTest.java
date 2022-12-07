@@ -18,9 +18,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
-import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -76,7 +78,7 @@ class CachingConfigurationServiceTest {
                 TARGET_SQL_BACKEND.label,
                 ANALYSIS_FEATURES.label,
                 DIALECTS.label,
-                DaCo_PREDEFINED_SECTIONS.label,
+                DACO_PREDEFINED_SECTIONS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
                 CICS_TRANSLATOR_ENABLED.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
@@ -88,7 +90,7 @@ class CachingConfigurationServiceTest {
         new AnalysisConfig(
             new CopybookConfig(
                 CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
-            ImmutableList.of(EmbeddedCodeNode.Language.SQL),
+            ImmutableList.of(EmbeddedLanguage.SQL),
             ImmutableList.of("Dialect"),
             true),
         configuration.getConfig(CopybookProcessingMode.DISABLED));
@@ -114,7 +116,7 @@ class CachingConfigurationServiceTest {
                 TARGET_SQL_BACKEND.label,
                 ANALYSIS_FEATURES.label,
                 DIALECTS.label,
-                DaCo_PREDEFINED_SECTIONS.label,
+                DACO_PREDEFINED_SECTIONS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
                 CICS_TRANSLATOR_ENABLED.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
@@ -126,7 +128,7 @@ class CachingConfigurationServiceTest {
         new AnalysisConfig(
             new CopybookConfig(
                 CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
-            ImmutableList.of(EmbeddedCodeNode.Language.SQL, EmbeddedCodeNode.Language.CICS),
+            ImmutableList.of(EmbeddedLanguage.SQL, EmbeddedLanguage.CICS),
             ImmutableList.of("Dialect"),
             false),
         configuration.getConfig(CopybookProcessingMode.DISABLED));

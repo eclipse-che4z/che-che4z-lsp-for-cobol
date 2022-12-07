@@ -16,8 +16,8 @@
 package org.eclipse.lsp.cobol.core;
 
 import org.antlr.v4.runtime.Parser;
-import org.eclipse.lsp.cobol.core.messages.LocaleStore;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.common.message.LocaleStore;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.junit.jupiter.api.Assertions;

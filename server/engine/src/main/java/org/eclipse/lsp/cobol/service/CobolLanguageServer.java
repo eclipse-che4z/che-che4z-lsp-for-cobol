@@ -16,14 +16,12 @@ package org.eclipse.lsp.cobol.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.messages.LocaleStore;
-import org.eclipse.lsp.cobol.core.messages.LogLevelUtils;
-import org.eclipse.lsp.cobol.core.model.ErrorCode;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
+import org.eclipse.lsp.cobol.common.error.ErrorCode;
+import org.eclipse.lsp.cobol.common.message.LocaleStore;
+import org.eclipse.lsp.cobol.common.utils.LogLevelUtils;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
@@ -62,7 +60,6 @@ public class CobolLanguageServer implements LanguageServer {
   private final ConfigurationService configurationService;
   private final CopybookNameService copybookNameService;
   private final Keywords keywords;
-  private final CopybookIdentificationService copybookIdentificationService;
 
   @Inject
   @SuppressWarnings("squid:S107")
@@ -76,8 +73,7 @@ public class CobolLanguageServer implements LanguageServer {
       DisposableLSPStateService disposableLSPStateService,
       ConfigurationService configurationService,
       CopybookNameService copybookNameService,
-      Keywords keywords,
-      @Named("suffixStrategy") CopybookIdentificationService copybookIdentificationService) {
+      Keywords keywords) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
@@ -88,7 +84,6 @@ public class CobolLanguageServer implements LanguageServer {
     this.configurationService = configurationService;
     this.copybookNameService = copybookNameService;
     this.keywords = keywords;
-    this.copybookIdentificationService = copybookIdentificationService;
   }
 
   @Override
@@ -117,7 +112,10 @@ public class CobolLanguageServer implements LanguageServer {
     capabilities.setDocumentSymbolProvider(TRUE);
     capabilities.setHoverProvider(TRUE);
     capabilities.setFoldingRangeProvider(TRUE);
-
+    DiagnosticRegistrationOptions diagnosticRegistrationOptions = new DiagnosticRegistrationOptions();
+    diagnosticRegistrationOptions.setWorkspaceDiagnostics(false);
+    diagnosticRegistrationOptions.setInterFileDependencies(true);
+    capabilities.setDiagnosticProvider(diagnosticRegistrationOptions);
     WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
     workspaceFoldersOptions.setSupported(TRUE);
     WorkspaceServerCapabilities workspaceServiceCapabilities =
@@ -218,11 +216,11 @@ public class CobolLanguageServer implements LanguageServer {
         .fetchTextConfiguration(CPY_LOCAL_PATHS.label)
         .thenAccept(watchingService::addWatchers);
     settingsService
-            .fetchTextConfiguration(DaCo_CPY_LOCAL_PATHS.label)
-            .thenAccept(watchingService::addWatchers);
+        .fetchTextConfiguration(DACO_CPY_LOCAL_PATHS.label)
+        .thenAccept(watchingService::addWatchers);
     settingsService
-            .fetchTextConfiguration(IDMS_CPY_LOCAL_PATHS.label)
-            .thenAccept(watchingService::addWatchers);
+        .fetchTextConfiguration(IDMS_CPY_LOCAL_PATHS.label)
+        .thenAccept(watchingService::addWatchers);
     settingsService
         .fetchTextConfiguration(SUBROUTINE_LOCAL_PATHS.label)
         .thenAccept(watchingService::addWatchers);

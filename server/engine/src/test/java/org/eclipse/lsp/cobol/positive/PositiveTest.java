@@ -15,11 +15,11 @@
 package org.eclipse.lsp.cobol.positive;
 
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.service.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.usecases.engine.UseCase;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.test.CobolText;
+import org.eclipse.lsp.cobol.test.engine.UseCase;
+import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,7 +29,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
 
 /**
  * This class provides capability to run the server for actual cobol files that are provided using
@@ -59,7 +59,7 @@ class PositiveTest extends FileBasedTest {
       AnalysisConfig analysisConfig = getAnalysisConfiguration();
       UseCase useCase =
           UseCase.builder()
-              .fileName(fileName)
+              .documentUri(fileName)
               .text(text.getFullText())
               .copybooks(getFileSpecificCopybooks(cobolTextRegistry, fileName))
               .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
@@ -69,8 +69,7 @@ class PositiveTest extends FileBasedTest {
               .predefinedSections(analysisConfig.getCopybookConfig().getPredefinedSections())
               .build();
       AnalysisResult analyze = UseCaseUtils.analyze(useCase);
-      PositiveTestUtility.assetDefinitionsNReferencesFromSnap(
-          new SymbolService(analyze.getSymbolTableMap()), dataNameRefs, analyze.getRootNode(), fileName);
+      PositiveTestUtility.assetDefinitionsNReferencesFromSnap(analyze.getSymbolTableMap(), dataNameRefs, analyze.getRootNode(), fileName);
       assertNoError(fileName, analyze);
     }
   }

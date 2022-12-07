@@ -16,26 +16,29 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.*;
+import com.google.common.collect.ImmutableMultimap;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
+import org.eclipse.lsp.cobol.core.model.tree.ParagraphNameNode;
+import org.eclipse.lsp.cobol.common.model.tree.RootNode;
+import org.eclipse.lsp.cobol.core.model.tree.SectionNameNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
-import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-
-import static org.mockito.Mockito.mock;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 
 /** This class stores a model to assert the completion providers */
 class MockCompletionModel {
   static final AnalysisResult RESULT =
       AnalysisResult.builder()
-          .rootNode(new RootNode(Locality.builder().build(), new CopybooksRepository()))
+          .rootNode(new RootNode(Locality.builder().build(), ImmutableMultimap.of()))
           .build();
   static final CobolDocumentModel MODEL = new CobolDocumentModel("some text", RESULT);
-  static final SymbolService SYMBOL_SERVICE = new SymbolService();
+  static final SymbolAccumulatorService SYMBOL_SERVICE = new SymbolAccumulatorService();
+  static final SymbolsRepository REPO = new SymbolsRepository();
 
   static {
     ProgramNode programNode = new ProgramNode(Locality.builder().build());
@@ -51,7 +54,7 @@ class MockCompletionModel {
         .forEach(
             name -> {
               ParagraphNameNode nameNode =
-                  new ParagraphNameNode(Locality.builder().build(), name, SYMBOL_SERVICE);
+                  new ParagraphNameNode(Locality.builder().build(), name);
               SYMBOL_SERVICE.registerParagraphNameNode(programNode, nameNode);
             });
     ImmutableList.of("secD1", "SecD2", "Not-secD")
@@ -59,11 +62,11 @@ class MockCompletionModel {
             name -> {
               SectionNameNode nameNode =
                   new SectionNameNode(
-                      Locality.builder().build(), name, mock(MessageService.class), SYMBOL_SERVICE);
+                      Locality.builder().build(), name);
               SYMBOL_SERVICE.registerSectionNameNode(programNode, nameNode);
             });
 
-    RootNode rootNode = new RootNode(Locality.builder().build(), new CopybooksRepository());
+    RootNode rootNode = new RootNode(Locality.builder().build(), ImmutableMultimap.of());
     RESULT.getRootNode().addChild(rootNode);
     ImmutableList.of("cpyU1", "CpyU2", "Not-cpyU")
         .forEach(
@@ -71,5 +74,6 @@ class MockCompletionModel {
               CopyNode nameNode = new CopyNode(Locality.builder().build(), name);
               rootNode.addChild(nameNode);
             });
+      REPO.updateSymbols(SYMBOL_SERVICE.getProgramSymbols());
   }
 }

@@ -14,20 +14,18 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
+import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
+import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
+import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,8 +39,6 @@ public class DialectService {
   @Inject
   public DialectService(
       CopybookService copybookService,
-      ParseTreeListener treeListener,
-      SymbolService symbolService,
       MessageService messageService) {
     dialectSuppliers = new HashMap<>();
 
@@ -110,7 +106,12 @@ public class DialectService {
     return orderedDialects;
   }
 
-  private CobolDialect getDialectByName(String dialectName) {
+  /**
+   * Returns dialect object by name
+   * @param dialectName is a dialect name
+   * @return a dialect
+   */
+  public CobolDialect getDialectByName(String dialectName) {
     return dialectSuppliers.getOrDefault(dialectName, EMPTY_DIALECT);
   }
 
@@ -119,15 +120,12 @@ public class DialectService {
       CobolDialect dialect,
       DialectProcessingContext context) {
     List<Node> nodes = new ArrayList<>(previousResult.getResult().getDialectNodes());
-    Multimap<String, Pair<String, String>> implicitCode =
-        LinkedListMultimap.create(previousResult.getResult().getImplicitCode());
 
     List<SyntaxError> errors = new ArrayList<>(previousResult.getErrors());
 
     DialectOutcome result = dialect.processText(context).unwrap(errors::addAll);
     nodes.addAll(result.getDialectNodes());
-    implicitCode.putAll(result.getImplicitCode());
-    return new ResultWithErrors<>(new DialectOutcome(nodes, implicitCode, context), errors);
+    return new ResultWithErrors<>(new DialectOutcome(nodes, context), errors);
   }
 
   /**

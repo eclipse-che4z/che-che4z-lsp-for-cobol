@@ -19,18 +19,18 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.core.engine.OldMapping;
 import org.eclipse.lsp.cobol.core.visitor.CICSVisitor;
 import org.eclipse.lsp.cobol.core.visitor.Db2SqlVisitor;
 
 import java.util.List;
-import java.util.Map;
 
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.EMBEDDED_CODE;
+import static org.eclipse.lsp.cobol.common.model.NodeType.EMBEDDED_CODE;
 
 /** This class represents embedded code parts in COBOL program, e.g. EXEC CICS and EXEC SQL */
 @Getter
@@ -39,16 +39,14 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.EMBEDDED_CODE;
 public class EmbeddedCodeNode extends Node {
   TokenStream tokens;
   ParserRuleContext tree;
-  Language lang;
-  private final SymbolService symbolService;
+  EmbeddedLanguage lang;
 
   public EmbeddedCodeNode(
-          Locality location, TokenStream tokens, ParserRuleContext tree, Language lang, SymbolService symbolService) {
+          Locality location, TokenStream tokens, ParserRuleContext tree, EmbeddedLanguage lang) {
     super(location, EMBEDDED_CODE);
     this.tokens = tokens;
     this.tree = tree;
     this.lang = lang;
-    this.symbolService = symbolService;
   }
 
   /**
@@ -57,7 +55,7 @@ public class EmbeddedCodeNode extends Node {
    *
    * @param mapping a map with actual token localities
    */
-  public void analyzeTree(Map<Token, Locality> mapping) {
+  public void analyzeTree(OldMapping mapping) {
     getParent().removeChild(this);
     instanceVisitor(mapping, lang).visit(tree).forEach(getParent()::addChild);
   }
@@ -68,20 +66,15 @@ public class EmbeddedCodeNode extends Node {
    * @param lang the languate
    * @return a visitor
    */
-  public ParseTreeVisitor<List<Node>> instanceVisitor(Map<Token, Locality> positions, Language lang) {
-    if (Language.CICS == lang) {
-      return new CICSVisitor(positions, symbolService);
+  public ParseTreeVisitor<List<Node>> instanceVisitor(OldMapping positions, EmbeddedLanguage lang) {
+    if (EmbeddedLanguage.CICS == lang) {
+      return new CICSVisitor(positions);
     }
 
-    if (Language.SQL == lang) {
+    if (EmbeddedLanguage.SQL == lang) {
       return new Db2SqlVisitor(positions);
     }
     throw new RuntimeException("Unknown language " + lang);
   }
 
-  /** This enum holds all the supported embedded languages that require a separate parsing */
-  public enum Language {
-    SQL,
-    CICS;
-  }
 }

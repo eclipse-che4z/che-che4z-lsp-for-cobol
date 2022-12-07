@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * completion suggestions works correctly
  */
 class ParagraphCompletionTest {
-  private final Completion completion = new ParagraphCompletion(MockCompletionModel.SYMBOL_SERVICE);
+  private final Completion completion = new ParagraphCompletion(MockCompletionModel.REPO);
 
   @Test
   void testCompletionEmptyResult() {

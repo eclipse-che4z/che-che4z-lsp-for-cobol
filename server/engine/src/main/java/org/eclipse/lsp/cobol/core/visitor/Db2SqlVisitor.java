@@ -19,17 +19,16 @@ import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.RuleNode;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.Db2SqlParser;
 import org.eclipse.lsp.cobol.core.Db2SqlParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.core.engine.OldMapping;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -44,7 +43,7 @@ import static org.eclipse.lsp.cobol.core.Db2SqlParser.Dbs_rs_locator_variableCon
 @Slf4j
 @AllArgsConstructor
 public class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
-  private final Map<Token, Locality> positions;
+  private final OldMapping positions;
 
   @Override
   public List<Node> visitDbs_host_variable(Dbs_host_variableContext ctx) {

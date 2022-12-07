@@ -15,7 +15,7 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 
 /**

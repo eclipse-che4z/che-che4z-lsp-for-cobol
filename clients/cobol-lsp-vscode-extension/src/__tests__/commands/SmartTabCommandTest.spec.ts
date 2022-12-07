@@ -16,6 +16,7 @@ import * as vscode from "../../__mocks__/vscode";
 import * as smartTab from "../../commands/SmartTabCommand";
 import {initSmartTab} from "../../commands/SmartTabCommand";
 import { TabRule, TabSettings } from "../../services/Settings";
+import { Position, Selection, TextEditor, TextEditorEdit } from "vscode";
 
 const editor: any = {
     document: {
@@ -47,6 +48,21 @@ test("Default rule was choosen for empty rule list", () => {
 
     expect(rule.stops[0]).toBe(5);
     expect(rule.regex).toBeUndefined();
+});
+
+test("SmartTabCommandProvider execution", async () => {
+    const stp: smartTab.SmartTabCommandProvider = new smartTab.SmartTabCommandProvider(context, "some name");
+    const active: Position = new Position(1, 2);
+    const mockSelection: Selection = new Selection(active, active);
+    const textLine = { text: "" };
+    const mockEditor: TextEditor = {
+        selections: [mockSelection],
+        document: {
+            lineAt: jest.fn().mockReturnValue(textLine),
+        }
+    } as any;
+    stp.execute(mockEditor, { insert: jest.fn() } as any);
+    expect(mockEditor.selections[0].active.character).toBe(6);
 });
 
 test("One of the rule was choosen", () => {

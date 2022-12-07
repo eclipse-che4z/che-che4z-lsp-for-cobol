@@ -26,11 +26,6 @@ const IDE = env === 'theia' ? Theia : VSCODE;
 const backspace3times = '{backspace}'.repeat(3);
 
 context('This is a F96117 spec', () => {
-  describe('TC247497 - Local Copybooks - check hidden folders under c4z', () => {
-    it(['smoke', 'CI'], 'Finds hidden folder .c4z', () => {
-      cy.openFolder('.c4z/.extsrcs');
-    });
-  });
 
   describe('TC247555 Check predefined structure in settings.json', () => {
     beforeEach(() => {

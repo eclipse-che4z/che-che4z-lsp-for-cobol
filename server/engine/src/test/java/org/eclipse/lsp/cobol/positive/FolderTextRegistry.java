@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.test.CobolText;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +39,7 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 /** Registry for Cobol source code files. */
 @Slf4j
 public class FolderTextRegistry implements CobolTextRegistry {
-  public static final List<String> SUPPORTED_DIALECTS = ImmutableList.of("IDMS", "DaCo", "CICSTranslator");
+  public static final List<String> SUPPORTED_DIALECTS = ImmutableList.of("IDMS", "CICSTranslator");
   private static final String POSITIVE_ENTRY = "positive";
   private static final String NEGATIVE_ENTRY = "negative";
   private static final String COPYBOOK_ENTRY = "copybooks";

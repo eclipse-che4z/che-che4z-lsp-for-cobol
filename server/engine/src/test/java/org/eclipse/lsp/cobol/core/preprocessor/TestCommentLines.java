@@ -15,8 +15,8 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.mock;
 
 /** This test checks multiple comment entries are parsed and cleaned up correctly */
 class TestCommentLines {
-  public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
+  public static final String DOCUMENT_URI = "file:///c:/workspace/document.cbl";
   private static final String TEXT =
       "      * Copyright (c) 2021 Broadcom.\n"
           + "      * The term Broadcom  refers to Broadcom Inc. and/or its subsidiaries.\n"

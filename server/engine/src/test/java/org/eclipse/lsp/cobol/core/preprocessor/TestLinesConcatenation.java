@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.mock;
 
 /** This test checks line concatenation */
 class TestLinesConcatenation {
-  public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
+  public static final String DOCUMENT_URI = "file:///c:/workspace/document.cbl";
   private static final String TEXT =
       "000100 IDENTIFICATION DIVISION.                                         NC2054.2\n"
           + "000200 PROGRAM-ID.                                                      NC2054.2\n"

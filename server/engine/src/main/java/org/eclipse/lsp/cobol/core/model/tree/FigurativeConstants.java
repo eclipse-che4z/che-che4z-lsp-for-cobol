@@ -39,6 +39,6 @@ public enum FigurativeConstants {
 
   public static final List<String> FIGURATIVE_CONSTANTS =
       Stream.of(FigurativeConstants.values())
-          .map(e -> e.toString().replaceAll("_", "-"))
+          .map(e -> e.toString().replace("_", "-"))
           .collect(Collectors.toList());
 }

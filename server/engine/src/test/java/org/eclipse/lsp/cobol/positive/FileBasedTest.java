@@ -17,14 +17,13 @@ package org.eclipse.lsp.cobol.positive;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.ConfigurableTest;
-import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
-import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
-import org.eclipse.lsp.cobol.service.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.SQLBackend;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.usecases.DialectConfigs;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.utils.Fixtures;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -42,9 +41,9 @@ import static java.lang.System.getenv;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
 import static org.eclipse.lsp.cobol.positive.FolderTextRegistry.DEFAULT_LISTING_PATH;
 import static org.eclipse.lsp.cobol.positive.FolderTextRegistry.PATH_TO_LISTING_SNAP;
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -180,14 +179,10 @@ public abstract class FileBasedTest extends ConfigurableTest {
             .orElse(ofNullable(getenv("dialect")).orElse("default"));
     List<String> testDialectsLists = Arrays.asList(passedDialects.split(","));
 
-    if (testDialectsLists.contains(DaCoDialect.NAME)) {
-      return DialectConfigs.getDaCoAnalysisConfig();
-    }
-
     if (testDialectsLists.contains(IdmsDialect.NAME)) {
       return new AnalysisConfig(
           new CopybookConfig(ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of()),
-          Arrays.asList(EmbeddedCodeNode.Language.values()),
+          Arrays.asList(EmbeddedLanguage.values()),
           ImmutableList.of(IdmsDialect.NAME), true);
     }
     return AnalysisConfig.defaultConfig(ENABLED);

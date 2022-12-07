@@ -16,13 +16,13 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.engine.symbols.Context;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.common.model.Context;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -64,17 +64,17 @@ class TestDefinitionOnLongCopybooks {
     AnalysisResult result =
         UseCaseEngine.runTest(
             TEXT, ImmutableList.of(new CobolText("ABCD", COPYBOOK_CONTENT)), ImmutableMap.of());
-    SymbolService symbolService = mock(SymbolService.class);
+    SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
     CobolDocumentModel document = new CobolDocumentModel(TEXT, result);
     TextDocumentPositionParams position = new TextDocumentPositionParams(
             new TextDocumentIdentifier(DOCUMENT_URI), new Position(4, 15));
     Location expectedDef = new Location(
-            "file:///c%3A/workspace/.c4z/.copybooks/ABCD.cpy",
+            "file:///c:/workspace/.c4z/.copybooks/ABCD.cpy",
             new Range(new Position(), new Position()));
     Context ctx = mock(Context.class);
     when(ctx.getDefinitions()).thenReturn(Collections.singletonList(expectedDef));
-    when(symbolService.findElementByPosition(eq(document), eq(position))).thenReturn(Optional.of(ctx));
-    List<Location> definitions = new ElementOccurrences(symbolService).findDefinitions(document, position);
+    when(symbolsRepository.findElementByPosition(eq(document), eq(position))).thenReturn(Optional.of(ctx));
+    List<Location> definitions = new ElementOccurrences(symbolsRepository).findDefinitions(document, position);
 
     assertEquals(1, definitions.size());
     assertEquals(expectedDef, definitions.get(0));

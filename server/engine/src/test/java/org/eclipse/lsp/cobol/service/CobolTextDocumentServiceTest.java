@@ -14,25 +14,79 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import org.awaitility.Awaitility;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.common.model.tree.RootNode;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
+import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
+import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
+import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
+import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.service.mocks.MockTextDocumentService;
+import org.eclipse.lsp4j.CodeAction;
+import org.eclipse.lsp4j.CodeActionContext;
+import org.eclipse.lsp4j.CodeActionParams;
+import org.eclipse.lsp4j.Command;
+import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.CompletionList;
+import org.eclipse.lsp4j.CompletionParams;
+import org.eclipse.lsp4j.DefinitionParams;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DidChangeTextDocumentParams;
+import org.eclipse.lsp4j.DidCloseTextDocumentParams;
+import org.eclipse.lsp4j.DidOpenTextDocumentParams;
+import org.eclipse.lsp4j.DidSaveTextDocumentParams;
+import org.eclipse.lsp4j.DocumentDiagnosticParams;
+import org.eclipse.lsp4j.DocumentFormattingParams;
+import org.eclipse.lsp4j.FormattingOptions;
+import org.eclipse.lsp4j.HoverParams;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.ReferenceContext;
+import org.eclipse.lsp4j.ReferenceParams;
+import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
+import org.eclipse.lsp4j.TextDocumentIdentifier;
+import org.eclipse.lsp4j.TextDocumentItem;
+import org.eclipse.lsp4j.TextDocumentPositionParams;
+import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.services.TextDocumentService;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.mockito.internal.stubbing.answers.AnswersWithDelay;
+
+import java.nio.file.Path;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.DISABLED;
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.SKIP;
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.COPYBOOK_URI;
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT2_URI;
-import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
+import static java.util.Collections.*;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.*;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
@@ -49,68 +103,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.awaitility.Awaitility;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
-import org.eclipse.lsp.cobol.core.engine.symbols.CopyDefinition;
-import org.eclipse.lsp.cobol.core.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.core.model.tree.RootNode;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
-import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
-import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
-import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.service.mocks.MockTextDocumentService;
-import org.eclipse.lsp4j.CodeAction;
-import org.eclipse.lsp4j.CodeActionContext;
-import org.eclipse.lsp4j.CodeActionParams;
-import org.eclipse.lsp4j.Command;
-import org.eclipse.lsp4j.CompletionItem;
-import org.eclipse.lsp4j.CompletionList;
-import org.eclipse.lsp4j.CompletionParams;
-import org.eclipse.lsp4j.DefinitionParams;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DidChangeTextDocumentParams;
-import org.eclipse.lsp4j.DidCloseTextDocumentParams;
-import org.eclipse.lsp4j.DidOpenTextDocumentParams;
-import org.eclipse.lsp4j.DidSaveTextDocumentParams;
-import org.eclipse.lsp4j.DocumentFormattingParams;
-import org.eclipse.lsp4j.FormattingOptions;
-import org.eclipse.lsp4j.HoverParams;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
-import org.eclipse.lsp4j.ReferenceContext;
-import org.eclipse.lsp4j.ReferenceParams;
-import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
-import org.eclipse.lsp4j.TextDocumentIdentifier;
-import org.eclipse.lsp4j.TextDocumentItem;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
-import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
-import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.internal.stubbing.answers.AnswersWithDelay;
-
 /**
  * This test checks the entry points of the {@link TextDocumentService} implementation.
  */
@@ -123,7 +115,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
   private static final String DOCUMENT_WITH_ERRORS_URI =
-      "file:///c%3A/workspace/incorrect_document.cbl";
+      "file:///c:/workspace/incorrect_document.cbl";
 
   private CobolTextDocumentService service;
 
@@ -187,6 +179,23 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     DidCloseTextDocumentParams closedDocument = new DidCloseTextDocumentParams(testDocument);
     service.didClose(closedDocument);
     assertEquals(Collections.EMPTY_MAP, closeGetter(service));
+  }
+
+  @Test
+  void testDiagnostic() {
+    when(fileSystemService.getContentByPath(any())).thenReturn("content");
+    Path mockPath = Mockito.mock(Path.class);
+    when(fileSystemService.getPathFromURI(any())).thenReturn(mockPath);
+    when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
+    DocumentDiagnosticParams documentDiagnosticParams = new DocumentDiagnosticParams(new TextDocumentIdentifier(DOCUMENT_URI));
+    service.getWaitConfig().countDown();
+    service
+        .diagnostic(documentDiagnosticParams)
+        .whenComplete(
+            (result, b) -> {
+              Assertions.assertEquals(result.getRelatedFullDocumentDiagnosticReport().getKind(), "full");
+            });
+
   }
 
   @SafeVarargs
@@ -287,7 +296,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
   /**
    * This test verifies that when an extended document opened, the code analyzed, and the copybook
-   * analysis disabled using {@link CopybookProcessingMode#DISABLED}
+   * analysis disabled using {@link org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode#DISABLED}
    */
   @Test
   void disableCopybookAnalysisOnExtendedDoc() throws ExecutionException, InterruptedException {
@@ -308,7 +317,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
   /**
    * This test verifies that when a document opened in DID_OPEN mode, the code analyzed, and the
-   * copybook analysis is enabled using {@link CopybookProcessingMode#ENABLED}
+   * copybook analysis is enabled using {@link org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode#ENABLED}
    */
   @Test
   void enableCopybooksOnDidOpenTest() throws ExecutionException, InterruptedException {
@@ -337,7 +346,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
   /**
    * This test verifies that when a document updated in DID_CHANGE mode, the code analyzed, and the
-   * copybook analysis enabled using {@link CopybookProcessingMode#ENABLED}
+   * copybook analysis enabled using {@link org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode#ENABLED}
    */
   @Test
   void enableCopybooksOnDidChangeTest() throws ExecutionException, InterruptedException {
@@ -681,13 +690,13 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    * document URIs that contain nested copybooks, including the main document
    */
   @Test
-  void testAnalysisFinishedNotification() throws ExecutionException, InterruptedException {
+  void testAnalysisFinishedNotification() {
     AnalysisResult analysisResult =
         AnalysisResult.builder()
-            .rootNode(new RootNode(Locality.builder().build(), new CopybooksRepository()))
+            .rootNode(new RootNode(Locality.builder().build(), ImmutableMultimap.of()))
             .build();
 
-    RootNode rootNode = new RootNode(Locality.builder().build(), new CopybooksRepository());
+    RootNode rootNode = new RootNode(Locality.builder().build(), ImmutableMultimap.of());
     analysisResult.getRootNode().addChild(rootNode);
     CopyNode parent = new CopyNode(Locality.builder().uri(DOCUMENT_URI).build(), "PARENT");
     CopyNode nested = new CopyNode(Locality.builder().uri(PARENT_CPY_URI).build(), "NESTED");

@@ -105,23 +105,6 @@ context('This is a LSP spec', () => {
     });
   });
 
-  describe('TC266094 Underline the entire incorrect variable structure', () => {
-    it(['smoke', 'CI'], 'This test checks that parser can find and underline an incorrect variable structure.', () => {
-      function underline(lineNumber, variable) {
-        return cy
-          .openFile('VAR.cbl')
-          .goToLine(lineNumber)
-          .wait(500)
-          .getCurrentLineErrors({ expectedLine: lineNumber })
-          .getHoverErrorMessage(variable)
-          .contains(`Variable ${variable} is not defined`);
-      }
-
-      underline(23, 'CHILD1');
-      underline(24, 'CHILD2');
-    });
-  });
-
   describe('TC314614 paragraph is not defined', () => {
     beforeEach(() => {
       cy.writeFile(

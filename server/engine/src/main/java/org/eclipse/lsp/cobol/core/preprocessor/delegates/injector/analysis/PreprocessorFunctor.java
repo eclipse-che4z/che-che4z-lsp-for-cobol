@@ -15,8 +15,8 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;

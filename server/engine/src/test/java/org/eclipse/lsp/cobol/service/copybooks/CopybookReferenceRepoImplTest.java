@@ -14,19 +14,18 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
-import org.junit.jupiter.api.Test;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.junit.jupiter.api.Test;
 
 /** Test @{@link CopybookReferenceRepo} */
 class CopybookReferenceRepoImplTest {
 
-  public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
-  private static final String CPY_URI = "file:///c%3A/workspace/.c4z/.copybooks/PARENT.CPY";
+  public static final String DOCUMENT_URI = "file:///c:/workspace/document.cbl";
+  private static final String CPY_URI = "file:///c:/workspace/.c4z/.copybooks/PARENT.CPY";
   public static final String COPYBOOK_CONTENT = "sample copybook text";
 
   @Test
@@ -42,8 +41,8 @@ class CopybookReferenceRepoImplTest {
     Set<CopybookModel> copybookUsageReference = setUpRepo();
     assertEquals(1, copybookUsageReference.size());
     CopybookModel referencedCopybookModels = copybookUsageReference.toArray(new CopybookModel[0])[0];
-    assertEquals(referencedCopybookModels.getContent(), COPYBOOK_CONTENT);
-    assertEquals(referencedCopybookModels.getUri(), DOCUMENT_URI);
+    assertEquals(COPYBOOK_CONTENT, referencedCopybookModels.getContent());
+    assertEquals(DOCUMENT_URI, referencedCopybookModels.getUri());
   }
 
   private Set<CopybookModel> setUpRepo() {
@@ -54,7 +53,7 @@ class CopybookReferenceRepoImplTest {
   private CopybookReferenceRepo storeReferences() {
     CopybookReferenceRepo repo = new CopybookReferenceRepoImpl();
     CopybookName copybookName = new CopybookName("COPYBOOK");
-    CopybookModel copybookModel = new CopybookModel(copybookName, CPY_URI, COPYBOOK_CONTENT);
+    CopybookModel copybookModel = new CopybookModel(copybookName.toCopybookId(DOCUMENT_URI), copybookName, CPY_URI, COPYBOOK_CONTENT);
     repo.storeCopybookUsageReference(copybookName, DOCUMENT_URI, copybookModel);
     return repo;
   }

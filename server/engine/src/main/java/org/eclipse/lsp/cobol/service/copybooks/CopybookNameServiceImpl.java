@@ -14,18 +14,17 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
+import static java.util.Collections.singleton;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.DIALECTS;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.SettingsService;
-import org.eclipse.lsp.cobol.service.utils.FileSystemService;
-import org.eclipse.lsp4j.WorkspaceFolder;
-
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,9 +34,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.Collections.singleton;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.service.SettingsService;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
+import org.eclipse.lsp4j.WorkspaceFolder;
 
 /**
  * This service processes all the copybook names present in the local directory. The service also
@@ -53,7 +55,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   private Set<CopybookName> listOfCopybookNames;
   private Set<String> listOfCopybookFolders;
 
-  private final String downloadedCopybooksFolders = ".c4z/.copybooks";
+  private static final String CPY_DOWNLOAD_FOLDER_PATH = ".c4z/.copybooks";
 
   @Inject
   public CopybookNameServiceImpl(
@@ -63,7 +65,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
     this.settingsService = settingsService;
     this.files = files;
     this.clientProvider = clientProvider;
-    this.listOfCopybookFolders = singleton(downloadedCopybooksFolders);
+    this.listOfCopybookFolders = singleton(CPY_DOWNLOAD_FOLDER_PATH);
     this.listOfCopybookNames = new HashSet<>();
   }
 
@@ -121,7 +123,8 @@ public class CopybookNameServiceImpl implements CopybookNameService {
         .map(extension -> extension.replaceFirst("\\.", ""))
         .collect(Collectors.toList());
     Set<String> copybookExtensionsWithoutDotAsSet = new HashSet<>(copybookExtensionsWithoutDot);
-    listOfCopybookFolders = Stream.concat(copybookFolders.stream(), Stream.of(downloadedCopybooksFolders))
+    listOfCopybookFolders = Stream.concat(copybookFolders.stream(),
+            Stream.of(CPY_DOWNLOAD_FOLDER_PATH))
         .collect(Collectors.toSet());
     listOfCopybookFolders.addAll(copybookFolders);
     listOfCopybookNames = ImmutableSet.copyOf(
@@ -148,16 +151,18 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   }
 
   private List<String> listExistedFiles(
-      final List<WorkspaceFolder> workspace,
-      final String fileName) {
-    return workspace.stream()
-        .map(
-            path ->
-                files
-                    .getPathFromURI(files.decodeURI(path.getUri()))
-                    .resolve(files.decodeURI(fileName)))
-        .filter(files::fileExists)
-        .map(files::listFilesInDirectory)
+      final List<WorkspaceFolder> workspaces,
+      final String copybookPath) {
+    return workspaces.stream()
+        .map(workspace -> files.getPathFromURI(workspace.getUri()))
+        .map(workspacePath -> {
+          String copybookFinalPath = Paths.get(copybookPath.replace("*", "tmp")).isAbsolute() ? copybookPath
+              : String.join("/",
+                  Optional.ofNullable(workspacePath)
+                      .orElseThrow(IllegalArgumentException::new)
+                          .toString(), copybookPath);
+          return files.listFilesInDirectory(copybookFinalPath);
+        })
         .flatMap(List::stream)
         .collect(Collectors.toList());
   }

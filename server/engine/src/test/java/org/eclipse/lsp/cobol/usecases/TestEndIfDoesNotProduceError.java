@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.core.model.ErrorSource;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
@@ -44,12 +44,11 @@ class TestEndIfDoesNotProduceError {
             "1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'END' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, COMPUTE, CONTINUE, "
-                    + "DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, "
-                    + "GENERATE, GO, GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, "
-                    + "PERFORM, PURGE, READ, READY, RECEIVE, RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, "
-                    + "SERVICE, SET, SORT, START, STOP, STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, "
-                    + "'.'}",
+                "Extraneous input 'END' expected {ACCEPT, ADD, ALLOCATE, ALTER, CALL, CANCEL, CLOSE, COMPUTE, "
+                    + "CONTINUE, DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, "
+                    + "GENERATE, GO, GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, "
+                    + "PURGE, READ, READY, RECEIVE, RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT,"
+                    + " START, STOP, STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, '.'}",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "2",

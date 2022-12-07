@@ -18,13 +18,16 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.variable.GroupItemNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 
 import java.util.Optional;
 
-import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_66;
+import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_66;
 
 /**
  * This value class represents a renaming data name entry, that has a level number 66. It may be one

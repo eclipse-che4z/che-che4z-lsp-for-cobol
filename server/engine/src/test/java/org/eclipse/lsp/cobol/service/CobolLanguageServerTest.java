@@ -18,9 +18,8 @@ package org.eclipse.lsp.cobol.service;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
-import org.eclipse.lsp.cobol.core.messages.LocaleStore;
-import org.eclipse.lsp.cobol.core.model.ErrorCode;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationBasedOnExtension;
+import org.eclipse.lsp.cobol.common.error.ErrorCode;
+import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
@@ -45,7 +44,6 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.values;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -55,8 +53,6 @@ class CobolLanguageServerTest {
 
   private static CustomThreadPoolExecutor customExecutor;
   private DisposableLSPStateService stateService;
-  private final CopybookIdentificationBasedOnExtension copybookIdentificationBasedOnExtension =
-      mock(CopybookIdentificationBasedOnExtension.class);
 
   @BeforeAll
   static void init() {
@@ -98,15 +94,14 @@ class CobolLanguageServerTest {
             stateService,
             configurationService,
             copybookNameService,
-            keywords,
-            copybookIdentificationBasedOnExtension);
+            keywords);
 
     server.initialized(new InitializedParams());
 
     verify(watchingService).watchConfigurationChange();
     verify(watchingService).watchPredefinedFolder();
     verify(settingsService).fetchConfiguration(CPY_LOCAL_PATHS.label);
-    verify(settingsService).fetchConfiguration(DaCo_CPY_LOCAL_PATHS.label);
+    verify(settingsService).fetchConfiguration(DACO_CPY_LOCAL_PATHS.label);
     verify(settingsService).fetchConfiguration(IDMS_CPY_LOCAL_PATHS.label);
     verify(settingsService).fetchConfiguration(LOCALE.label);
     verify(settingsService).fetchConfiguration(CPY_EXTENSIONS.label);
@@ -122,7 +117,7 @@ class CobolLanguageServerTest {
 
     when(settingsService.fetchConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.fetchConfiguration(DaCo_CPY_LOCAL_PATHS.label))
+    when(settingsService.fetchConfiguration(DACO_CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
     when(settingsService.fetchConfiguration(IDMS_CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
@@ -162,8 +157,7 @@ class CobolLanguageServerTest {
             stateService,
             configurationService,
             copybookNameService,
-            keywords,
-            copybookIdentificationBasedOnExtension);
+            keywords);
 
     server.initialized(new InitializedParams());
     verify(textService, times(1)).notifyExtensionConfig(any());
@@ -188,8 +182,7 @@ class CobolLanguageServerTest {
             stateService,
             null,
             null,
-            null,
-            copybookIdentificationBasedOnExtension);
+            null);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
@@ -218,8 +211,7 @@ class CobolLanguageServerTest {
             stateService,
             null,
             null,
-            null,
-            copybookIdentificationBasedOnExtension);
+            null);
     assertEquals(1, stateService.getExitCode());
     server.shutdown();
     assertEquals(0, stateService.getExitCode());
@@ -236,7 +228,7 @@ class CobolLanguageServerTest {
     assertTrue(capabilities.getDocumentSymbolProvider().getLeft());
     assertTrue(capabilities.getFoldingRangeProvider().getLeft());
     assertEquals(
-        stream(values()).map(ErrorCode::getLabel).collect(toList()),
+        stream(ErrorCode.values()).map(ErrorCode::getLabel).collect(toList()),
         capabilities.getExecuteCommandProvider().getCommands());
 
     assertFalse(capabilities.getCompletionProvider().getResolveProvider());

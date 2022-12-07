@@ -15,11 +15,11 @@
 
 package org.eclipse.lsp.cobol.domain.databus.model;
 
-import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 
 import java.util.List;
 

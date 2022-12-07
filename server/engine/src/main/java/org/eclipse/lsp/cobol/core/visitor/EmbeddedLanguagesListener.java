@@ -20,8 +20,9 @@ import lombok.Getter;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.*;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.CobolParserBaseListener;
 import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 

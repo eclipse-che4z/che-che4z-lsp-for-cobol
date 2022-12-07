@@ -11,6 +11,9 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+jest.mock('glob');
+
+import { sync } from 'glob';
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -26,7 +29,8 @@ const copybookNameWithExtension: string = "NSTCOPY2.CPY";
 const CPY_FOLDER_NAME = ".cobcopy";
 const RELATIVE_CPY_FOLDER_NAME = "../relativeCobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
-SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + __dirname]);
+
+SettingsUtils.getWorkspaceFoldersPath = jest.fn().mockReturnValue([__dirname]);
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
     get: jest.fn().mockReturnValue(undefined),
 });
@@ -48,8 +52,9 @@ function createDirectory(targetPath: string) {
 
 function removeFolder(targetPath: string) {
     if (fs.existsSync(targetPath)) {
-        fs.remove(targetPath);
+        return fs.remove(targetPath);
     }
+    return false;
 }
 
 function buildResultArrayFrom(settingsMockValue: string[], filename: string, profileName: string, ussPath: string[] = []): number {
@@ -77,38 +82,50 @@ afterAll(() => {
     return removeFolder(folderPath);
 });
 describe("Resolve local copybook against bad configuration of target folders", () => {
-    test("given an undefined value as list of folders, the copybook is not retrieved", () => {
-        expect(fsUtils.searchInWorkspace(copybookName, undefined, COPYBOOK_EXT_ARRAY)).toBe(undefined);
-    });
     test("given an empty list of folders, the copybook is not retrieved", () => {
-        expect(fsUtils.searchInWorkspace(copybookName, [], COPYBOOK_EXT_ARRAY)).toBe(undefined);
+        expect(fsUtils.searchCopybookInWorkspace(copybookName, [], COPYBOOK_EXT_ARRAY)).toBe(undefined);
+        sync.mockReturnValue(x => x);
     });
     test("given a folder that not contains copybooks, the target copybook is not retrieved", () => {
-        expect(fsUtils.searchInWorkspace(copybookName, [__dirname], COPYBOOK_EXT_ARRAY)).toBe(undefined);
+        sync.mockReturnValue([]);
+        expect(fsUtils.searchCopybookInWorkspace(copybookName, [__dirname], COPYBOOK_EXT_ARRAY)).toBe(undefined);
+        sync.mockReturnValue(x => x);
     });
     test("given a not empty folder, a copybook that is not present in that folder is not retrivied and the uri returned is undefined", () => {
-        expect(fsUtils.searchInWorkspace("NSTCPY2", [CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeUndefined();
+        sync.mockReturnValue([]);
+        expect(fsUtils.searchCopybookInWorkspace("NSTCPY2", [CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeUndefined();
+        sync.mockReturnValue(x => x);
     });
 });
 describe("Resolve local copybook present in one or more folders specified by the user", () => {
     test("given a folder that contains the target copybook, it is found and its uri is returned", () => {
-        expect(fsUtils.searchInWorkspace(copybookName, [CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
+        sync.mockReturnValue([copybookName]);
+        expect(fsUtils.searchCopybookInWorkspace(copybookName, [CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
+        sync.mockReturnValue(x => x);
     });
     test("given two times the same folder that contains the target copybook, one uri is still returned", () => {
-        expect(fsUtils.searchInWorkspace(copybookName, [CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
+        sync.mockReturnValue([copybookName]);
+        expect(fsUtils.searchCopybookInWorkspace(copybookName, [CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
+        sync.mockReturnValue(x => x);
     });
     test("Given a copybook with extension on filesystem, the uri is correctly returned", () => {
-        expect(fsUtils.searchInWorkspace("NSTCOPY2", [CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
+        sync.mockReturnValue(["NSTCOPY2"]);
+        expect(fsUtils.searchCopybookInWorkspace("NSTCOPY2", [CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
+        sync.mockReturnValue(x => x);
     });
     test("Given a valid relative path for copybook with extension on filesystem, the uri is correctly returned", () => {
+        sync.mockReturnValue(["NSTCOPY2"]);
         const dir = path.join(__dirname, RELATIVE_CPY_FOLDER_NAME);
         createDirectory(dir);
         createFile(copybookNameWithExtension, dir);
-        expect(fsUtils.searchInWorkspace("NSTCOPY2", [RELATIVE_CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
+        expect(fsUtils.searchCopybookInWorkspace("NSTCOPY2", [RELATIVE_CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
         removeFolder(dir);
+        sync.mockReturnValue(x => x);
     });
     test("Given a valid absolute path for copybook with extension on filesystem, the uri is correctly returned", () => {
-        expect(fsUtils.searchInWorkspace("NSTCOPY2", [path.normalize(folderPath)], COPYBOOK_EXT_ARRAY)).toBeDefined();
+        sync.mockReturnValue(["NSTCOPY2"]);
+        expect(fsUtils.searchCopybookInWorkspace("NSTCOPY2", [path.normalize(folderPath)], COPYBOOK_EXT_ARRAY)).toBeDefined();
+        sync.mockReturnValue(x => x);
     });
 });
 describe("With invalid input parameters, the list of URI that represent copybook downloaded are not generated", () => {
@@ -136,36 +153,44 @@ describe("Prioritize search criteria for copybooks test suite", () => {
         });
     }
 
-    const spySearchInWorkspace = jest.spyOn(fsUtils, "searchInWorkspace");
+    const spySearchInWorkspace = jest.spyOn(fsUtils, "searchCopybookInWorkspace");
     test("With only a local folder defined in the settings.json, the search is applied locally", async () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
         });
+        sync.mockReturnValue([CPY_FOLDER_NAME]);
         const uri: string = await CopybookURI.resolveCopybookURI(copybookName, "PRGNAME", "COBOL");
         expect(uri).toMatch(CPY_FOLDER_NAME);
         expect(spySearchInWorkspace).toBeCalledTimes(1);
+        sync.mockReturnValue(x => x);
     });
     test("With no settings provided, two search strategies are applied and function return an empty string", async () => {
+        sync.mockReturnValue([]);
         provideMockValueForLocalAndDSN("", "");
         ProfileUtils.getProfileNameForCopybook = jest.fn().mockReturnValue(undefined);
         const uri: string = await CopybookURI.resolveCopybookURI(copybookName, "PRGNAME", "COBOL");
         expect(uri).toBe("");
         expect(spySearchInWorkspace).toBeCalledTimes(2);
+        sync.mockReturnValue(x => x);
     });
     test("With both local and dsn references defined in the settings.json, the search is applied on local resources" +
         "first", async () => {
+            sync.mockReturnValue(["hi.cbl"]);
             provideMockValueForLocalAndDSN(CPY_FOLDER_NAME, "");
             const uri: string = await CopybookURI.resolveCopybookURI(copybookName, "PRGNAME", "COBOL");
             expect(uri).not.toBe("");
             expect(spySearchInWorkspace).toBeCalledTimes(1);
+            sync.mockReturnValue(x => x);
     });
     test("With only a local folder defined for the dialect in the settings.json, the search is applied locally", async () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
         });
+        sync.mockReturnValue([CPY_FOLDER_NAME]);
         const uri: string = await CopybookURI.resolveCopybookURI(copybookName, "PRGNAME", "DIALECT");
         expect(uri).toMatch(CPY_FOLDER_NAME);
         expect(spySearchInWorkspace).toBeCalledTimes(1);
+        sync.mockReturnValue(x => x);
     });
 
 });

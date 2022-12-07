@@ -14,21 +14,21 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.core.engine.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.common.processor.Processor;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.CodeBlockUsageNode;
-import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 
 import java.util.Optional;
 
 /** CodeBlockUsageNode processor */
 public class CodeBlockUsage implements Processor<CodeBlockUsageNode> {
-  private final SymbolService symbolService;
+  private final SymbolAccumulatorService symbolAccumulatorService;
 
-  public CodeBlockUsage(SymbolService symbolService) {
-    this.symbolService = symbolService;
+  public CodeBlockUsage(SymbolAccumulatorService symbolAccumulatorService) {
+    this.symbolAccumulatorService = symbolAccumulatorService;
   }
 
   @Override
@@ -39,7 +39,7 @@ public class CodeBlockUsage implements Processor<CodeBlockUsageNode> {
       return;
     }
     ProgramNode program = programOpt.get();
-    Optional<SyntaxError> syntaxError = symbolService.registerCodeBlockUsage(program, node);
+    Optional<SyntaxError> syntaxError = symbolAccumulatorService.registerCodeBlockUsage(program, node);
     syntaxError.ifPresent(error -> ctx.getErrors().add(error));
   }
 }

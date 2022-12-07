@@ -18,34 +18,38 @@ package org.eclipse.lsp.cobol.core.engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
+import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
-import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.*;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
+import org.eclipse.lsp.cobol.core.model.DocumentMapping;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
-import org.eclipse.lsp.cobol.service.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.SubroutineService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
+import static org.eclipse.lsp.cobol.common.copybook.SQLBackend.DB2_SERVER;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
@@ -69,16 +73,15 @@ class CobolLanguageEngineTest {
     CobolErrorStrategy cobolErrorStrategy = new CobolErrorStrategy();
     ParseTreeListener treeListener = mock(ParseTreeListener.class);
     DialectService dialectService = mock(DialectService.class);
-    InjectService injectService = mock(InjectService.class);
     cobolErrorStrategy.setMessageService(mockMessageService);
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     AstProcessor astProcessor = mock(AstProcessor.class);
-    SymbolService symbolService = mock(SymbolService.class);
+    SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
 
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
             preprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-            dialectService, symbolService, astProcessor, injectService);
+            dialectService, astProcessor, symbolsRepository);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()

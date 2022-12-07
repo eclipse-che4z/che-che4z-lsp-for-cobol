@@ -15,8 +15,9 @@
 
 package org.eclipse.lsp.cobol.positive;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCase;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
+import org.eclipse.lsp.cobol.test.CobolText;
+import org.eclipse.lsp.cobol.test.engine.UseCase;
+import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -52,7 +53,7 @@ class PerformanceTest extends FileBasedTest {
       long start = System.currentTimeMillis();
       List<Diagnostic> result =
           UseCaseUtils.analyzeForErrors(
-              UseCase.builder().fileName(name).text(fullText).copybooks(getCopybooks(cobolTextRegistry)).build());
+              UseCase.builder().documentUri(name).text(fullText).copybooks(getCopybooks(cobolTextRegistry)).build());
       long stop = System.currentTimeMillis();
 
       assertNoSyntaxErrorsFound(result, name);

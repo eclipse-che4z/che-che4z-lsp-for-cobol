@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.core.engine.processor.Processor;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableWithLevelNode;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.common.processor.Processor;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 
-import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
+import static org.eclipse.lsp.cobol.common.VariableConstants.*;
 
 /** VariableWithLevelNode processor */
 public class VariableWithLevelCheck implements Processor<VariableWithLevelNode> {

@@ -14,8 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.semantics;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
 import org.junit.jupiter.api.Test;
 

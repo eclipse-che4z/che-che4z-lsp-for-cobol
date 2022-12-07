@@ -14,82 +14,38 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.engine.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.core.engine.dialects.idms.IdmsDialect;
+import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.service.SettingsService;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.SequenceInputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /** This class is a provider for Cobol keywords and their descriptions */
 @Singleton
 @Slf4j
 public class Keywords extends CompletionStorage<String> {
   private static final String KEYWORDS_FILE_PATH = "LanguageKeywords.txt";
-  private static final String KEYWORDS_IDMS_FILE_PATH = "LanguageKeywordsIDMS.txt";
-  private static final String KEYWORDS_DACO_FILE_PATH = "LanguageKeywordsDaCo.txt";
+
+  private final DialectService dialectService;
 
   @Inject
-  Keywords(SettingsService settingsService) {
+  Keywords(SettingsService settingsService, DialectService dialectService) {
     super(settingsService);
+    this.dialectService = dialectService;
   }
 
   @Override
-  protected Map<String, String> getDataMap(List<String> dialectType) {
-    Properties props = new Properties();
-    try {
-      props.load(getDataStream(dialectType));
-      return props.entrySet().stream()
-          .collect(
-              Collectors.toMap(
-                  entry -> entry.getKey().toString(),
-                  entry -> processDescription(entry.getValue().toString())));
-    } catch (IOException e) {
-      LOG.error("Unable to load the Keywords file {}", e.getMessage());
-    }
-    return ImmutableMap.of();
+  protected Map<String, String> getDataMap(List<String> dialectTypes) {
+    Map<String, String> result = new HashMap<>(KeywordsUtils.getKeywords(KEYWORDS_FILE_PATH));
+
+    dialectTypes.forEach(
+        dialectType -> result.putAll(dialectService.getDialectByName(dialectType).getKeywords())
+    );
+
+    return result;
   }
 
-  private InputStream getDataStream(List<String> dialectType) {
-    InputStream cobolStream = getInputStream(KEYWORDS_FILE_PATH);
-    InputStream finalStream;
-    if (dialectType.contains(IdmsDialect.NAME)) {
-      InputStream idmsStream =
-          getSequenceStream(cobolStream, getInputStream(KEYWORDS_IDMS_FILE_PATH));
-      if (dialectType.contains(DaCoDialect.NAME))
-        finalStream = getSequenceStream(idmsStream, getInputStream(KEYWORDS_DACO_FILE_PATH));
-      else finalStream = idmsStream;
-    } else if (dialectType.contains(DaCoDialect.NAME)) {
-      finalStream = getSequenceStream(cobolStream, getInputStream(KEYWORDS_DACO_FILE_PATH));
-    } else finalStream = cobolStream;
-
-    return finalStream;
-  }
-
-  private InputStream getInputStream(String keywordFile) {
-    return Keywords.class.getResourceAsStream(keywordFile);
-  }
-
-  private InputStream getSequenceStream(InputStream first, InputStream second) {
-    return new SequenceInputStream(first, second);
-  }
-
-  /**
-   * Replace line break tags with actual line breaks
-   *
-   * @param desc - raw description retrieved from storage
-   * @return the description properly split in lines
-   */
-  private String processDescription(String desc) {
-    return desc.replace("<br>", "\r\n\r\n");
-  }
 }

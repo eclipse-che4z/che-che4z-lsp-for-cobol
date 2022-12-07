@@ -14,6 +14,9 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.ProcedureSectionNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.extendedapi.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.variables.DivisionType;
@@ -24,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.common.model.NodeType.PROGRAM;
 
 /** CF tree builder implementation */
 public class CFASTBuilderImpl implements CFASTBuilder {
@@ -100,6 +103,10 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       addChild(parent, new CFASTNode(CFASTNodeType.STOP.getValue()));
     } else if (node instanceof ParagraphsNode || node instanceof ProcedureDivisionBodyNode) {
       node.getChildren().forEach(child -> traverse(parent, child));
+    } else if (node instanceof AtEndNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.AT_END.getValue()));
+      node.getChildren().forEach(child -> traverse(parent, child));
+      addChild(parent, new CFASTNode(CFASTNodeType.AT_END_EXIT.getValue()));
     }
   }
 

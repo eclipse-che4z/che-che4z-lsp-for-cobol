@@ -14,18 +14,41 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.LOCALE;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.LOGGING_LEVEL;
+import static org.eclipse.lsp4j.FileChangeType.Changed;
+import static org.eclipse.lsp4j.FileChangeType.Created;
+import static org.eclipse.lsp4j.FileChangeType.Deleted;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.messages.LocaleStore;
+import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.impl.DefaultDataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
+import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.ExecuteCommandParams;
@@ -34,20 +57,6 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
-import static org.eclipse.lsp4j.FileChangeType.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.*;
 
 /**
  * This test checks the entry points of the {@link org.eclipse.lsp4j.services.WorkspaceService}
@@ -332,7 +341,7 @@ class WorkspaceServiceTest {
    */
   @Test
   void testDidChangeWatchedFilesExistingFileCreated() {
-    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks/CpyName.cpy", Created));
+    checkWatchers(new FileEvent("file:///c:/workspace/COBOL/.copybooks/CpyName.cpy", Created));
   }
 
   /**
@@ -340,7 +349,7 @@ class WorkspaceServiceTest {
    */
   @Test
   void testDidChangeWatchedFilesExistingFileChanged() {
-    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks/CpyName.cpy", Changed));
+    checkWatchers(new FileEvent("file:///c:/workspace/COBOL/.copybooks/CpyName.cpy", Changed));
   }
 
   /**
@@ -349,7 +358,7 @@ class WorkspaceServiceTest {
    */
   @Test
   void testDidChangeWatchedFilesExistingFileDeleted() {
-    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks/CpyName.cpy", Deleted));
+    checkWatchers(new FileEvent("file:///c:/workspace/COBOL/.copybooks/CpyName.cpy", Deleted));
   }
 
   /**
@@ -358,7 +367,7 @@ class WorkspaceServiceTest {
    */
   @Test
   void testDidChangeWatchedFilesFolderContentChanged() {
-    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks", Changed));
+    checkWatchers(new FileEvent("file:///c:/workspace/COBOL/.copybooks", Changed));
   }
 
   private void checkWatchers(FileEvent event) {

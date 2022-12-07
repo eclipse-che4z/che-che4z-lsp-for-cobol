@@ -11,18 +11,39 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import path = require("path");
 import * as url from "url";
 
 // tslint:disable: no-namespace no-empty
 export namespace workspace {
     export const workspaceFolders: [] = [];
-    export function getConfiguration() {}
+    export function getConfiguration() {
+        return {
+            get: key => {
+                if("cobol-lsp.smart-tab" === key) {
+                    return undefined;
+                }
+            }
+        }
+     }
+}
+
+export namespace extensions {
+    export function getExtension(id: string) {
+        return { 
+            extensionPath: path.join(__dirname, "../../"),
+            packageJSON: {
+                version: "123"
+            }
+        }
+    }
 }
 
 export namespace window {
-    export let showErrorMessage = () => {};
-    export let showInformationMessage = () => {};
+    export let showErrorMessage = () => { };
+    export let showInformationMessage = () => { };
     export let createStatusBarItem = () => { return { show: () => { } } };
+    export let createQuickPick = () => { return { show: jest.fn() } };
 }
 export enum StatusBarAlignment {
     Right,
@@ -53,11 +74,12 @@ export enum EndOfLine {
     CRLF = 2
 }
 
-export const Range = jest.fn().mockImplementation((start, end) => { return {start: start, end: end} })
-export const Position = jest.fn().mockImplementation((line, character) => { return {line: line, character: character} });
+export const Range = jest.fn().mockImplementation((start, end) => { return { start: start, end: end } })
+export const Position = jest.fn().mockImplementation((line, character) => { return { line: line, character: character } });
 
-export const commands = {
-    registerTextEditorCommand: jest.fn()
+export namespace commands {
+    export const registerTextEditorCommand = jest.fn();
+    export const executeCommand = jest.fn();
 };
 
 export const TextEditor = {
@@ -65,3 +87,15 @@ export const TextEditor = {
         lineAt: jest.fn()
     }
 }
+
+export class Selection {
+    anchor: any;
+    active: any;
+
+    constructor(anchor: any, active: any) {
+        this.anchor = anchor;
+        this.active = active;
+    }
+}
+
+

@@ -16,7 +16,8 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
 import org.antlr.v4.runtime.Token;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.core.engine.OldMapping;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -44,7 +45,7 @@ class LocalityUtilsTest {
     positions.put(placeholderToken, notExpected);
     positions.put(correctToken, expected);
 
-    Locality result = LocalityUtils.findPreviousVisibleLocality(correctToken, positions);
+    Locality result = new OldMapping(positions).findPreviousVisibleLocality(correctToken.getTokenIndex());
     assertEquals(expected, result);
   }
 
@@ -73,7 +74,7 @@ class LocalityUtilsTest {
     positions.put(hiddenToken1, notExpected);
     positions.put(hiddenToken2, notExpected);
 
-    Locality result = LocalityUtils.findPreviousVisibleLocality(tokenToCheck, positions);
+    Locality result = new OldMapping(positions).findPreviousVisibleLocality(tokenToCheck.getTokenIndex());
     assertEquals(expected, result);
   }
 
@@ -114,7 +115,7 @@ class LocalityUtilsTest {
     positions.put(hiddenToken4, notExpected);
     positions.put(hiddenToken5, notExpected);
 
-    Locality result = LocalityUtils.findPreviousVisibleLocality(tokenToCheck, positions);
+    Locality result = new OldMapping(positions).findPreviousVisibleLocality(tokenToCheck.getTokenIndex());
     assertNull(result);
   }
 
@@ -140,7 +141,7 @@ class LocalityUtilsTest {
     positions.put(correctToken, expected);
     positions.put(hiddenToken, notExpected);
 
-    Locality result = LocalityUtils.findPreviousVisibleLocality(tokenToCheck, positions);
+    Locality result = new OldMapping(positions).findPreviousVisibleLocality(tokenToCheck.getTokenIndex());
     assertNull(result);
   }
 }

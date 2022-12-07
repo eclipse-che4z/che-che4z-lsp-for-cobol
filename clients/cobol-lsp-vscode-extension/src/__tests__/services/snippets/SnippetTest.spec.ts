@@ -15,6 +15,7 @@
 import * as vscode from "vscode";
 import { SnippetCompletionProvider  } from "../../../services/snippetcompletion/SnippetCompletionProvider";
 
+
 describe("Test CompletionProvider", () => {
     const context = { triggerKind: {}, diagnostics: [], only: undefined };
     const snippetcompletion: SnippetCompletionProvider = new SnippetCompletionProvider();
@@ -89,5 +90,6 @@ test(" Test number of suggestions for WRITE when dialect is IDMS", async () => {
     });
     expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(1);
 })
+
 
 });

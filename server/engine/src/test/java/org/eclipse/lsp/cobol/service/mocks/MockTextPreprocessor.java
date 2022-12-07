@@ -16,12 +16,12 @@ package org.eclipse.lsp.cobol.service.mocks;
 
 import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
-import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 import static org.mockito.Mockito.mock;
 

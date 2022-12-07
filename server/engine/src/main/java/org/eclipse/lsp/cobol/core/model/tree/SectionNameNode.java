@@ -14,14 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
-import org.eclipse.lsp.cobol.core.engine.symbols.CodeBlockReference;
-import org.eclipse.lsp.cobol.core.engine.symbols.Context;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import lombok.Setter;
+import org.eclipse.lsp.cobol.common.model.Context;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;
@@ -30,25 +28,25 @@ import java.util.List;
 @Getter
 public class SectionNameNode extends Node implements Context {
   private final String name;
-  @EqualsAndHashCode.Exclude @ToString.Exclude private final MessageService messageService;
 
-  @EqualsAndHashCode.Exclude @ToString.Exclude private final SymbolService symbolService;
+  @Setter
+  private List<Location> definitions;
+  @Setter
+  private List<Location> usages;
 
   public SectionNameNode(
-      Locality location, String name, MessageService messageService, SymbolService symbolService) {
+      Locality location, String name) {
     super(location, NodeType.SECTION_NAME_NODE);
     this.name = name.toUpperCase();
-    this.messageService = messageService;
-    this.symbolService = symbolService;
   }
 
   @Override
   public List<Location> getDefinitions() {
-    return symbolService.getSectionLocations(this, CodeBlockReference::getDefinitions);
+    return definitions;
   }
 
   @Override
   public List<Location> getUsages() {
-    return symbolService.getSectionLocations(this, CodeBlockReference::getUsage);
+    return usages;
   }
 }

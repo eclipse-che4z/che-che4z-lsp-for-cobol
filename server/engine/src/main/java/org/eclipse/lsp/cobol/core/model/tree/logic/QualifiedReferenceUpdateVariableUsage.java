@@ -16,19 +16,19 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.core.engine.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.ErrorSource;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.common.processor.Processor;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.FigurativeConstants;
-import org.eclipse.lsp.cobol.core.model.tree.Node;
-import org.eclipse.lsp.cobol.core.model.tree.NodeType;
-import org.eclipse.lsp.cobol.core.model.tree.variables.QualifiedReferenceNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,10 +39,10 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
   private static final String NOT_DEFINED_ERROR = "semantics.notDefined";
   private static final String AMBIGUOUS_REFERENCE_ERROR = "semantics.ambiguous";
 
-  private final SymbolService symbolService;
+  private final SymbolAccumulatorService symbolAccumulatorService;
 
-  public QualifiedReferenceUpdateVariableUsage(SymbolService symbolService) {
-    this.symbolService = symbolService;
+  public QualifiedReferenceUpdateVariableUsage(SymbolAccumulatorService symbolAccumulatorService) {
+    this.symbolAccumulatorService = symbolAccumulatorService;
   }
 
   @Override
@@ -64,13 +64,13 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     List<VariableNode> foundDefinitions =
         node.getProgram()
             .map(
-                programNode -> symbolService.getVariableDefinition(programNode, variableUsageNodes))
+                programNode -> symbolAccumulatorService.getVariableDefinition(programNode, variableUsageNodes))
             .orElseGet(ImmutableList::of);
 
     for (VariableNode definitionNode : foundDefinitions) {
       node.setVariableDefinitionNode(definitionNode);
       for (VariableUsageNode usageNode : variableUsageNodes) {
-        while (definitionNode != null && !usageNode.getName().equals(definitionNode.getName())) {
+        while (definitionNode != null && !usageNode.getName().equalsIgnoreCase(definitionNode.getName())) {
           definitionNode =
               definitionNode
                   .getNearestParentByType(NodeType.VARIABLE)

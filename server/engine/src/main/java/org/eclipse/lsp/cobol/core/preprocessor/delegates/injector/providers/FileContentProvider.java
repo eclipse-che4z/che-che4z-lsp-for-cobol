@@ -15,11 +15,11 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.core.model.CopybookName;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.utils.FileSystemService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
 
 import java.util.Optional;
 
@@ -46,9 +46,11 @@ public class FileContentProvider implements ContentProvider {
   @Override
   public Optional<CopybookModel> read(CopybookConfig copybookConfig, CopybookName copybookName,
                                       String programDocumentUri, String documentUri) {
-    String content = ImplicitCodeUtils.readImplicitCode(files, copybookName.getQualifiedName());
+    String content = files.readImplicitCode(copybookName.getQualifiedName());
     return Optional.ofNullable(content)
-        .map(c -> new CopybookModel(copybookName, ImplicitCodeUtils.createFullUrl(copybookName.getQualifiedName()), c));
+        .map(c -> {
+          String fullUrl = ImplicitCodeUtils.createFullUrl(copybookName.getQualifiedName());
+          return new CopybookModel(copybookName.toCopybookId(programDocumentUri), copybookName, fullUrl, c);
+        });
   }
-
 }

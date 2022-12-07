@@ -23,40 +23,45 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
+import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.*;
+import org.eclipse.lsp.cobol.common.model.tree.variable.*;
+import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
+import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
+import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectOutcome;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.mapping.ExtendedSource;
-import org.eclipse.lsp.cobol.core.engine.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessingPhase;
-import org.eclipse.lsp.cobol.core.engine.processor.ProcessorDescription;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
+import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
+import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.logic.*;
-import org.eclipse.lsp.cobol.core.model.tree.statements.ObsoleteNode;
 import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.*;
+import org.eclipse.lsp.cobol.core.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.EmbeddedLanguagesListener;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
-import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CachingConfigurationService;
-import org.eclipse.lsp.cobol.service.SubroutineService;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,8 +72,8 @@ import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.core.model.tree.NodeType.EMBEDDED_CODE;
+import static org.eclipse.lsp.cobol.common.model.NodeType.EMBEDDED_CODE;
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
@@ -85,9 +90,8 @@ public class CobolLanguageEngine {
   private final SubroutineService subroutineService;
   private final CachingConfigurationService cachingConfigurationService;
   private final DialectService dialectService;
-  private final SymbolService symbolService;
   private final AstProcessor astProcessor;
-  private final InjectService injectService;
+  private final SymbolsRepository symbolsRepository;
 
   @Inject
   public CobolLanguageEngine(
@@ -97,18 +101,16 @@ public class CobolLanguageEngine {
       SubroutineService subroutineService,
       CachingConfigurationService cachingConfigurationService,
       DialectService dialectService,
-      SymbolService symbolService,
       AstProcessor astProcessor,
-      InjectService injectService) {
+      SymbolsRepository symbolsRepository) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.treeListener = treeListener;
     this.subroutineService = subroutineService;
     this.cachingConfigurationService = cachingConfigurationService;
     this.dialectService = dialectService;
-    this.symbolService = symbolService;
     this.astProcessor = astProcessor;
-    this.injectService = injectService;
+    this.symbolsRepository = symbolsRepository;
   }
 
   /**
@@ -125,11 +127,12 @@ public class CobolLanguageEngine {
   @NonNull
   public ResultWithErrors<AnalysisResult> run(
       @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
+    SymbolAccumulatorService symbolAccumulatorService = new SymbolAccumulatorService();
+
     ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
 
     timingBuilder.getDialectsTimer().start();
-    symbolService.reset(documentUri);
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     TextTransformations cleanText =
         preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
@@ -151,7 +154,6 @@ public class CobolLanguageEngine {
     timingBuilder.getDialectsTimer().stop();
 
     timingBuilder.getPreprocessorTimer().start();
-    injectService.setImplicitCode(dialectOutcome.getImplicitCode());
 
     List<SyntaxError> preprocessorErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =
@@ -223,13 +225,9 @@ public class CobolLanguageEngine {
     timingBuilder.getSplittingLanguageTimer().stop();
 
     timingBuilder.getMappingTimer().start();
-    Map<Token, Locality> positionMapping =
-        getPositionMapping(
-            documentUri,
-            extendedDocument,
-            tokens,
-            embeddedCodeParts,
+    OldMapping positionMapping = new OldMapping(documentUri, extendedDocument, tokens, embeddedCodeParts,
             dialectProcessingContext.getExtendedSource());
+
     timingBuilder.getMappingTimer().stop();
 
     timingBuilder.getVisitorTimer().start();
@@ -242,7 +240,6 @@ public class CobolLanguageEngine {
             embeddedCodeParts,
             messageService,
             subroutineService,
-            symbolService,
             dialectOutcome.getDialectNodes(),
             cachingConfigurationService);
     List<Node> syntaxTree = visitor.visit(tree);
@@ -253,8 +250,8 @@ public class CobolLanguageEngine {
     analyzeEmbeddedCode(syntaxTree, positionMapping);
 
     Node rootNode = syntaxTree.get(0);
-    ProcessingContext ctx = new ProcessingContext(new ArrayList<>());
-    registerProcessors(analysisConfig, ctx);
+    ProcessingContext ctx = new ProcessingContext(new ArrayList<>(), symbolAccumulatorService);
+    registerProcessors(analysisConfig, ctx, symbolAccumulatorService);
     accumulatedErrors.addAll(astProcessor.processSyntaxTree(ctx, rootNode));
 
     timingBuilder.getSyntaxTreeTimer().stop();
@@ -280,15 +277,17 @@ public class CobolLanguageEngine {
           timing.getLateErrorProcessingTime());
     }
 
+    symbolsRepository.updateSymbols(symbolAccumulatorService.getProgramSymbols());
+
     return new ResultWithErrors<>(
         AnalysisResult.builder()
             .rootNode(rootNode)
-            .symbolTableMap(symbolService.getProgramSymbols())
+            .symbolTableMap(symbolAccumulatorService.getProgramSymbols())
             .build(),
         accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
-  private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx) {
+  private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx, SymbolAccumulatorService symbolAccumulatorService) {
     // Phase TRANSFORMATION
     ctx.register(
         new ProcessorDescription(
@@ -297,7 +296,7 @@ public class CobolLanguageEngine {
         new ProcessorDescription(
             SectionNode.class,
             ProcessingPhase.TRANSFORMATION,
-            new ProcessNodeWithVariableDefinitions(symbolService)));
+            new ProcessNodeWithVariableDefinitions(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             FileEntryNode.class, ProcessingPhase.TRANSFORMATION, new FileEntryProcess()));
@@ -305,35 +304,35 @@ public class CobolLanguageEngine {
         new ProcessorDescription(
             FileDescriptionNode.class,
             ProcessingPhase.TRANSFORMATION,
-            new FileDescriptionProcess(symbolService)));
+            new FileDescriptionProcess(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             DeclarativeProcedureSectionNode.class,
             ProcessingPhase.TRANSFORMATION,
-            new DeclarativeProcedureSectionRegister(symbolService)));
+            new DeclarativeProcedureSectionRegister(symbolAccumulatorService)));
     // Phase DEFINITION
     ctx.register(
         new ProcessorDescription(
-            ParagraphsNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock(symbolService)));
+            ParagraphsNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             SectionNameNode.class,
             ProcessingPhase.DEFINITION,
-            new SectionNameRegister(symbolService)));
+            new SectionNameRegister(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             ParagraphNameNode.class,
             ProcessingPhase.DEFINITION,
-            new ParagraphNameRegister(symbolService)));
+            new ParagraphNameRegister(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             ProcedureDivisionBodyNode.class,
             ProcessingPhase.DEFINITION,
-            new DefineCodeBlock(symbolService)));
+            new DefineCodeBlock(symbolAccumulatorService)));
     // Phase USAGE
     ctx.register(
         new ProcessorDescription(
-            CodeBlockUsageNode.class, ProcessingPhase.USAGE, new CodeBlockUsage(symbolService)));
+            CodeBlockUsageNode.class, ProcessingPhase.USAGE, new CodeBlockUsage(symbolAccumulatorService)));
     ctx.register(
         new ProcessorDescription(
             RootNode.class, ProcessingPhase.USAGE, new RootNodeUpdateCopyNodesByPositionInTree()));
@@ -341,7 +340,24 @@ public class CobolLanguageEngine {
         new ProcessorDescription(
             QualifiedReferenceNode.class,
             ProcessingPhase.USAGE,
-            new QualifiedReferenceUpdateVariableUsage(symbolService)));
+            new QualifiedReferenceUpdateVariableUsage(symbolAccumulatorService)));
+
+    // ENRICHMENT
+    ctx.register(
+        new ProcessorDescription(
+            SectionNameNode.class,
+            ProcessingPhase.VALIDATION,
+            new SectionNameNodeEnricher(symbolAccumulatorService)));
+    ctx.register(
+        new ProcessorDescription(
+            ParagraphNameNode.class,
+            ProcessingPhase.VALIDATION,
+            new ParagraphNameNodeEnricher(symbolAccumulatorService)));
+    ctx.register(
+        new ProcessorDescription(
+            CodeBlockUsageNode.class,
+            ProcessingPhase.VALIDATION,
+            new CodeBlockUsageNodeEnricher(symbolAccumulatorService)));
 
     // Phase VALIDATION
     ctx.register(
@@ -402,38 +418,7 @@ public class CobolLanguageEngine {
     return new CobolParser(tokens);
   }
 
-  Map<Token, Locality> getPositionMapping(
-      String documentUri,
-      ExtendedDocument extendedDocument,
-      CommonTokenStream tokens,
-      Map<Token, EmbeddedCode> embeddedCodeParts,
-      ExtendedSource extendedSource) {
-    ThreadInterruptionUtil.checkThreadInterrupted();
-    Map<Token, Locality> mapping =
-        LocalityMappingUtils.createPositionMapping(
-            tokens.getTokens(),
-            extendedDocument.getDocumentMapping(),
-            documentUri,
-            embeddedCodeParts);
-    return updateMapping(documentUri, mapping, extendedSource);
-  }
-
-  private Map<Token, Locality> updateMapping(
-      String documentUri, Map<Token, Locality> mapping, ExtendedSource extendedSource) {
-    mapping.forEach(
-        (k, v) -> {
-          if (v.getUri().equals(documentUri)) {
-            Location l = extendedSource.mapLocation(v.getRange());
-
-            v.getRange().setStart(l.getRange().getStart());
-            v.getRange().setEnd(l.getRange().getEnd());
-            v.setUri(l.getUri());
-          }
-        });
-    return mapping;
-  }
-
-  private void analyzeEmbeddedCode(List<Node> syntaxTree, Map<Token, Locality> mapping) {
+  private void analyzeEmbeddedCode(List<Node> syntaxTree, OldMapping mapping) {
     syntaxTree.stream()
         .flatMap(Node::getDepthFirstStream)
         .filter(hasType(EMBEDDED_CODE))
@@ -444,19 +429,19 @@ public class CobolLanguageEngine {
 
   @NonNull
   private List<SyntaxError> finalizeErrors(
-      @NonNull List<SyntaxError> errors, @NonNull Map<Token, Locality> mapping) {
+      @NonNull List<SyntaxError> errors, @NonNull OldMapping mapping) {
     return errors.stream()
-        .filter(c -> c.getOffendedToken() != null)
+        .filter(c -> c.getTokenIndex() != -1)
         .map(convertError(mapping))
         .filter(it -> it.getLocality() != null)
         .collect(toList());
   }
 
   @NonNull
-  private Function<SyntaxError, SyntaxError> convertError(@NonNull Map<Token, Locality> mapping) {
+  private Function<SyntaxError, SyntaxError> convertError(@NonNull OldMapping mapping) {
     return err ->
         err.toBuilder()
-            .locality(LocalityUtils.findPreviousVisibleLocality(err.getOffendedToken(), mapping))
+            .locality(mapping.findPreviousVisibleLocality(err.getTokenIndex()))
             .suggestion(messageService.getMessage(err.getSuggestion()))
             .errorSource(ErrorSource.PARSING)
             .build();

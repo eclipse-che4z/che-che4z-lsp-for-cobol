@@ -28,26 +28,32 @@ import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.*;
+import org.eclipse.lsp.cobol.common.model.tree.*;
+import org.eclipse.lsp.cobol.common.model.tree.variable.*;
+import org.eclipse.lsp.cobol.common.utils.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolService;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.engine.OldMapping;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToOnOffStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetUpDownByStatement;
-import org.eclipse.lsp.cobol.core.model.tree.variables.*;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode.Builder;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode.Builder;
 import org.eclipse.lsp.cobol.core.model.variables.DivisionType;
-import org.eclipse.lsp.cobol.core.model.variables.SectionType;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.RangeUtils;
+import org.eclipse.lsp.cobol.common.model.SectionType;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-import org.eclipse.lsp.cobol.service.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.CachingConfigurationService;
-import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -60,9 +66,9 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Lexer.HIDDEN;
+import static org.eclipse.lsp.cobol.common.VariableConstants.*;
 import static org.eclipse.lsp.cobol.core.CobolParser.*;
-import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
-import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
+import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
 import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
 
 /**
@@ -77,13 +83,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
   private final CopybooksRepository copybooks;
   private final CommonTokenStream tokenStream;
-  private final Map<Token, Locality> positions;
+  private final OldMapping positions;
   private final Map<Token, EmbeddedCode> embeddedCodeParts;
   private final MessageService messageService;
   private final SubroutineService subroutineService;
   private final AnalysisConfig analysisConfig;
 
-  private final SymbolService symbolService;
   private final List<Node> dialectNodes;
   private Map<String, FileControlEntryContext> fileControls = null;
   private final Map<String, SubroutineDefinition> subroutineDefinitionMap = new HashMap<>();
@@ -92,12 +97,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public CobolVisitor(
           @NonNull CopybooksRepository copybooks,
           @NonNull CommonTokenStream tokenStream,
-          @NonNull Map<Token, Locality> positions,
+          @NonNull OldMapping positions,
           @NonNull AnalysisConfig analysisConfig,
           Map<Token, EmbeddedCode> embeddedCodeParts,
           MessageService messageService,
           SubroutineService subroutineService,
-          SymbolService symbolService, List<Node> dialectNodes,
+          List<Node> dialectNodes,
           CachingConfigurationService cachingConfigurationService) {
     this.copybooks = copybooks;
     this.positions = positions;
@@ -106,7 +111,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     this.messageService = messageService;
     this.subroutineService = subroutineService;
     this.analysisConfig = analysisConfig;
-    this.symbolService = symbolService;
     this.dialectNodes = dialectNodes;
     this.cachingConfigurationService = cachingConfigurationService;
   }
@@ -116,7 +120,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     // we can skip the other nodes, but not the root
     return ImmutableList.of(
         retrieveRangeLocality(ctx, positions)
-            .map(it -> new RootNode(it, copybooks))
+            .map(it -> new RootNode(it, copybooks.getDefinitions()))
             .map(
                 rootNode -> {
                   visitChildren(ctx).forEach(rootNode::addChild);
@@ -127,7 +131,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .orElseGet(
                 () -> {
                   LOG.warn("The root node for syntax tree was not constructed");
-                  return new RootNode(Locality.builder().build(), copybooks);
+                  return new RootNode(Locality.builder().build(), copybooks.getDefinitions());
                 }));
   }
 
@@ -400,7 +404,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitSectionName(SectionNameContext ctx) {
     return addTreeNode(
-        ctx, locality -> new SectionNameNode(locality, ctx.getText(), messageService, symbolService));
+        ctx, locality -> new SectionNameNode(locality, ctx.getText()));
   }
 
   @Override
@@ -413,8 +417,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitExecCicsStatement(ExecCicsStatementContext ctx) {
     areaBWarning(ctx);
-    if (analysisConfig.getFeatures().contains(EmbeddedCodeNode.Language.CICS)) {
-      return processEmbeddedNodes(ctx, ctx.cicsRules(), EmbeddedCodeNode.Language.CICS);
+    if (analysisConfig.getFeatures().contains(EmbeddedLanguage.CICS)) {
+      return processEmbeddedNodes(ctx, ctx.cicsRules(), EmbeddedLanguage.CICS);
     } else {
       return Collections.emptyList();
     }
@@ -423,15 +427,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitExecSqlStatement(ExecSqlStatementContext ctx) {
     areaBWarning(ctx);
-    if (analysisConfig.getFeatures().contains(EmbeddedCodeNode.Language.SQL)) {
-      return processEmbeddedNodes(ctx, ctx.sqlCode(), EmbeddedCodeNode.Language.SQL);
+    if (analysisConfig.getFeatures().contains(EmbeddedLanguage.SQL)) {
+      return processEmbeddedNodes(ctx, ctx.sqlCode(), EmbeddedLanguage.SQL);
     } else {
       return Collections.emptyList();
     }
   }
 
   private List<Node> processEmbeddedNodes(
-      ParserRuleContext parent, ParserRuleContext ctx, EmbeddedCodeNode.Language language) {
+      ParserRuleContext parent, ParserRuleContext ctx, EmbeddedLanguage language) {
     final Optional<EmbeddedCode> embeddedCode =
         ofNullable(ctx).map(ParserRuleContext::getStart).map(embeddedCodeParts::get);
     // apply area B check for tokens provided by a specific lexer
@@ -444,7 +448,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                         it ->
                             ImmutableList.of(
                                 new EmbeddedCodeNode(
-                                    it, code.getTokenStream(), code.getTree(), language, symbolService))))
+                                    it, code.getTokenStream(), code.getTree(), language))))
         .orElse(ImmutableList.of());
   }
 
@@ -491,7 +495,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitParagraphName(ParagraphNameContext ctx) {
     return addTreeNode(
-        ctx, locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx), symbolService));
+        ctx, locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx)));
   }
 
   @Override
@@ -742,7 +746,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitParagraphDefinitionName(ParagraphDefinitionNameContext ctx) {
-    return addTreeNode(ctx, locality -> new ParagraphNameNode(locality, ctx.getText(), symbolService));
+    return addTreeNode(ctx, locality -> new ParagraphNameNode(locality, ctx.getText()));
   }
 
   @Override
@@ -797,6 +801,19 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return result.stream().distinct().collect(toList());
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>The default implementation returns the result of calling
+   * {@link #visitChildren} on {@code ctx}.</p>
+   *
+   * @param ctx
+   */
+  @Override
+  public List<Node> visitAtEndPhrase(AtEndPhraseContext ctx) {
+    return addTreeNode(ctx, AtEndNode::new);
+  }
+
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {
     SyntaxError error =
         SyntaxError.syntaxError()
@@ -813,7 +830,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private Optional<Locality> getLocality(Token childToken) {
-    return ofNullable(positions.get(childToken));
+    return ofNullable(positions.map(childToken));
   }
 
   private void reportSubroutineNotDefined(String name, Locality locality) {
@@ -914,7 +931,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return ofNullable(ctx)
         .flatMap(
             context ->
-                ofNullable(positions.get(context.getStart()))
+                ofNullable(positions.map(context.getStart()))
                     .flatMap(
                         start ->
                             retrieveStopLocality(context.getStop().getTokenIndex(), start.getUri())
@@ -930,11 +947,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private Optional<Locality> retrieveStopLocality(int tokenIndex, String uri) {
     for (int index = tokenIndex; index < tokenStream.size(); index++) {
-      Locality locality = positions.get(tokenStream.get(index));
+      Locality locality = positions.map(tokenStream.get(index));
       if (locality != null && uri.equals(locality.getUri())) return Optional.of(locality);
     }
     for (int index = tokenIndex - 1; index >= 0; index--) {
-      Locality locality = positions.get(tokenStream.get(index));
+      Locality locality = positions.map(tokenStream.get(index));
       if (locality != null && uri.equals(locality.getUri())) return Optional.of(locality);
     }
     return Optional.empty();
@@ -992,11 +1009,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private ValueClause retrieveValue(DataValueClauseContext context) {
     return new ValueClause(
         retrieveValueIntervals(context.dataValueClauseLiteral().dataValueInterval()),
-        positions.get(context.getStart()));
+        positions.map(context.getStart()));
   }
 
   private Locality getLevelLocality(TerminalNode terminalNode) {
-    return positions.get(terminalNode.getSymbol());
+    return positions.map(terminalNode.getSymbol());
   }
 
   private void addCopyNodes(Node rootNode, Multimap<String, Location> copybookUsages) {

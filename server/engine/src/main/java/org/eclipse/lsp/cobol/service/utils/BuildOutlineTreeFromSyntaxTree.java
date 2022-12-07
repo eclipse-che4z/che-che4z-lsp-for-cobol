@@ -16,9 +16,10 @@ package org.eclipse.lsp.cobol.service.utils;
 
 import com.google.common.collect.ImmutableList;
 import lombok.experimental.UtilityClass;
+import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.*;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
-import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.common.model.NodeSymbolType;
 import org.eclipse.lsp4j.DocumentSymbol;
 
 import java.util.List;
@@ -80,56 +81,56 @@ public class BuildOutlineTreeFromSyntaxTree {
   }
 
   private DocumentSymbol covertCopyNode(CopyNode node) {
-    return createDocumentSymbol("COPY " + node.getName(), NodeType.COPYBOOK, node);
+    return createDocumentSymbol("COPY " + node.getName(), NodeSymbolType.COPYBOOK, node);
   }
 
   private DocumentSymbol convertSection(SectionNode node) {
     return createDocumentSymbol(
-        node.getSectionType().getType() + " SECTION", NodeType.SECTION, node);
+        node.getSectionType().getType() + " SECTION", NodeSymbolType.SECTION, node);
   }
 
   private DocumentSymbol convertFileEntry(FileEntryNode node) {
     node.getLocality().getUri();
-    return createDocumentSymbol(node.getFileName(), NodeType.FILE, node);
+    return createDocumentSymbol(node.getFileName(), NodeSymbolType.FILE, node);
   }
 
   private DocumentSymbol convertProcedureSection(ProcedureSectionNode node) {
-    return createDocumentSymbol(node.getName(), NodeType.PROCEDURE_SECTION, node);
+    return createDocumentSymbol(node.getName(), NodeSymbolType.PROCEDURE_SECTION, node);
   }
 
   private DocumentSymbol convertParagraph(ParagraphNode node) {
-    return createDocumentSymbol(node.getName(), NodeType.PROGRAM_ID, node);
+    return createDocumentSymbol(node.getName(), NodeSymbolType.PROGRAM_ID, node);
   }
 
   private DocumentSymbol convertProgramId(ProgramIdNode node) {
-    return createDocumentSymbol("PROGRAM-ID " + node.getProgramId(), NodeType.PROGRAM_ID, node);
+    return createDocumentSymbol("PROGRAM-ID " + node.getProgramId(), NodeSymbolType.PROGRAM_ID, node);
   }
 
   private DocumentSymbol convertDivision(DivisionNode node) {
-    return createDocumentSymbol(node.getDivisionType().getDivName(), NodeType.DIVISION, node);
+    return createDocumentSymbol(node.getDivisionType().getDivName(), NodeSymbolType.DIVISION, node);
   }
 
   private DocumentSymbol covertVariable(VariableNode node) {
     switch (node.getVariableType()) {
       case GROUP_ITEM:
       case MULTI_TABLE_DATA_NAME:
-        return createDocumentSymbol(node.getName(), NodeType.STRUCT, node);
+        return createDocumentSymbol(node.getName(), NodeSymbolType.STRUCT, node);
       case FD:
-        return createDocumentSymbol(node.getName(), NodeType.FILE, node);
+        return createDocumentSymbol(node.getName(), NodeSymbolType.FILE, node);
       case CONDITION_DATA_NAME:
-        return createDocumentSymbol(node.getName(), NodeType.FIELD_88, node);
+        return createDocumentSymbol(node.getName(), NodeSymbolType.FIELD_88, node);
       default:
-        return createDocumentSymbol(node.getName(), NodeType.FIELD, node);
+        return createDocumentSymbol(node.getName(), NodeSymbolType.FIELD, node);
     }
   }
 
   private DocumentSymbol convertProgram(ProgramNode node) {
     String programName = "PROGRAM";
     if (node.getProgramName() != null) programName += ": " + node.getProgramName();
-    return createDocumentSymbol(programName, NodeType.PROGRAM, node);
+    return createDocumentSymbol(programName, NodeSymbolType.PROGRAM, node);
   }
 
-  private DocumentSymbol createDocumentSymbol(String name, NodeType type, Node treeNode) {
+  private DocumentSymbol createDocumentSymbol(String name, NodeSymbolType type, Node treeNode) {
     return new DocumentSymbol(
         name,
         type.getSymbolKind(),

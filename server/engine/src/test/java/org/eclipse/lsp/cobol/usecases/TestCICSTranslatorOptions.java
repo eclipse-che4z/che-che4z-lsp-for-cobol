@@ -16,11 +16,11 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.SQLBackend;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp.cobol.usecases.engine.UseCase;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.test.engine.UseCase;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode.ENABLED;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
 
 /**
  * Tests CICS translator options. Refer <a
@@ -119,7 +119,7 @@ public class TestCICSTranslatorOptions {
   void testCompilerDirectivesMixedWithCICSTranslatorOptionsWhenDisabled() {
     UseCase useCase =
         UseCase.builder()
-            .fileName(UseCaseUtils.DOCUMENT_URI)
+            .documentUri(UseCaseUtils.DOCUMENT_URI)
             .text(MIXED_COMPILER_DIRECTIVE_CICS_TRANSLATOR)
             .copybooks(ImmutableList.of())
             .sqlBackend(SQLBackend.DB2_SERVER)
