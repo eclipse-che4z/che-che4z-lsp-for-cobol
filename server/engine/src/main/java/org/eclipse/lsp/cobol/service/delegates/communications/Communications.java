@@ -21,13 +21,16 @@ import java.util.List;
 import java.util.Map;
 
 public interface Communications {
-  void notifyThatLoadingInProgress(String uri);
 
   void publishDiagnostics(Map<String, List<Diagnostic>> diagnostics);
-
-  void cancelProgressNotification(String uri);
 
   void notifyThatDocumentAnalysed(String uri);
 
   void notifyGeneralMessage(MessageType messageType, String errorMessage);
+
+  void notifyProgressBegin(String uri);
+
+  void notifyProgressReport(String uri);
+
+  void notifyProgressEnd(String uri);
 }
