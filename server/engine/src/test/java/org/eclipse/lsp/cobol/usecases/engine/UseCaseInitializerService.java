@@ -19,8 +19,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.eclipse.lsp.cobol.ExplicitDialectDiscoveryService;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
@@ -31,12 +31,14 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.*;
+import org.eclipse.lsp.cobol.service.SettingsService;
+import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
+import org.eclipse.lsp.cobol.service.WatcherService;
+import org.eclipse.lsp.cobol.service.WatcherServiceImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
-import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.test.UseCaseInitializer;
 
 import java.util.concurrent.CompletableFuture;
@@ -79,7 +81,7 @@ public class UseCaseInitializerService implements UseCaseInitializer {
                 bind(CleanerPreprocessor.class).to(TextPreprocessorImpl.class);
                 bind(WatcherService.class).to(WatcherServiceImpl.class);
                 bind(CopybookReferenceRepo.class).toInstance(new CopybookReferenceRepoImpl());
-                bind(DialectDiscoveryService.class).to(ExplicitDialectDiscoveryService.class);
+                bind(DialectDiscoveryService.class).toInstance((copybookService, messageService) -> ImmutableList.of());
               }
             });
   }
