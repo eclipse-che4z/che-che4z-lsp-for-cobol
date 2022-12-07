@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-07)
+
+#### Added
+- Support `UTG8` pic clause.
+- Support `ALLOCATE` statements.
+- Support `UNBOUNDED` as `dataOccursTo` clause.
+- Automatic COBOL detection
+
+#### Fixed
+- Miscellaneous fixes for CCF support
+- Ambiguous reference for paragraphs
+
 ## [1.1.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.2...1.1.0) (2022-11-03)
 
 #### Added
