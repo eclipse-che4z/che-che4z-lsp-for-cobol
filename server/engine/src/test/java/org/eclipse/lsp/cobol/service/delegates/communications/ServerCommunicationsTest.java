@@ -22,11 +22,8 @@ import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.MessageParams;
-import org.eclipse.lsp4j.MessageType;
-import org.eclipse.lsp4j.PublishDiagnosticsParams;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -35,6 +32,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -121,6 +119,49 @@ class ServerCommunicationsTest {
     verify(client, times(1)).publishDiagnostics(eq(new PublishDiagnosticsParams(uri, diagnostics)));
   }
 
+  @Test
+  void testNotifyProgressBegin() throws NoSuchFieldException {
+    String uri = UUID.randomUUID().toString();
+    when(files.getNameFromURI(uri)).thenReturn(uri);
+    when(messageService.getMessage("Communications.syntaxAnalysisInProgressTitle", uri)).thenReturn("TITLE");
+    setUpProgressDataStructure(uri);
+    ProgressParams expectedNotifyBeginParams = new ProgressParams();
+    expectedNotifyBeginParams.setToken(uri);
+    WorkDoneProgressBegin workDoneProgressBegin = new WorkDoneProgressBegin();
+    workDoneProgressBegin.setTitle("TITLE");
+    expectedNotifyBeginParams.setValue(Either.forLeft(workDoneProgressBegin));
+
+    communications.notifyProgressBegin(uri);
+    verify(client).notifyProgress(expectedNotifyBeginParams);
+    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport())));
+  }
+
+  @Test
+  void testNotifyProgressEnd() throws NoSuchFieldException {
+    String uri = UUID.randomUUID().toString();
+    setUpProgressDataStructure(uri);
+    communications.notifyProgressEnd(uri);
+    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressEnd())));
+  }
+
+  @Test
+  void testNotifyProgressReport() {
+    String uri = UUID.randomUUID().toString();
+    communications.notifyProgressReport(uri);
+    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport())));
+  }
+
+  private void setUpProgressDataStructure(String data) throws NoSuchFieldException {
+    HashSet<String> uriInProgress = new HashSet<>();
+    uriInProgress.add(data);
+    Field f = communications.getClass().getDeclaredField("uriInProgress");
+    f.setAccessible(true);
+    try {
+      f.set(communications, uriInProgress);
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   private void assertDocumentAnalysedNotification(String uri, String fileName) {
     client = mock(CobolLanguageClient.class);

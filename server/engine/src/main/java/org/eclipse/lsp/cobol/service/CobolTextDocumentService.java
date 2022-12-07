@@ -22,6 +22,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.Builder;
+import lombok.Generated;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -288,6 +289,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     return relatedFullDocumentDiagnosticReport;
   }
 
+  @Generated // do not include in test coverage. Used only for tests
   @SneakyThrows
   private void waitAnalysisToFinish(String uri) {
     int sleepCount = 0;
