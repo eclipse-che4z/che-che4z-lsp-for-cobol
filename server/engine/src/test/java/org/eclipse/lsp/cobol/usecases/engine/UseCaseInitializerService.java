@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryFolderService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
@@ -81,7 +82,7 @@ public class UseCaseInitializerService implements UseCaseInitializer {
                 bind(CleanerPreprocessor.class).to(TextPreprocessorImpl.class);
                 bind(WatcherService.class).to(WatcherServiceImpl.class);
                 bind(CopybookReferenceRepo.class).toInstance(new CopybookReferenceRepoImpl());
-                bind(DialectDiscoveryService.class).toInstance((copybookService, messageService) -> ImmutableList.of());
+                bind(DialectDiscoveryService.class).to(DialectDiscoveryFolderService.class);
               }
             });
   }
