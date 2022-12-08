@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-# [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-07)
+# [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-08)
 
 ### Bug Fixes
 * Add Exit node for EXEC CICS RETURN statement ([#1603](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1603)) ([ac8e757](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ac8e757ade3ae52832075824cb1d6a6e7b4ed8e4))
