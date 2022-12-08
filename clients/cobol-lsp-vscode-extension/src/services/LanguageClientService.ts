@@ -135,7 +135,7 @@ export class LanguageClientService {
         return {
             args: ["-Dline.separator=\r\n", "-Ddialect.path=" + this.dialectsPath, "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
             command: "java",
-            options: {stdio: "pipe", detached: false},
+            options: { detached: false },
         };
     }
 
