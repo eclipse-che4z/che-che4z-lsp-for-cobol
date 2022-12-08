@@ -105,10 +105,11 @@ describe("LanguageClientService positive scenario", () => {
     test("Test LanguageClientService starts language client", () => {
         LanguageClient.prototype.start = jest.fn().mockReturnValue(SERVER_STARTED_MSG);
         const serverPath = join("/test", "server", "jar", "server.jar");
+        const expectedDialectPath = join("/test", "server", "jar", "dialects");
         expect(languageClientService.start()).toBe(SERVER_STARTED_MSG);
         expect(LanguageClient).toHaveBeenCalledTimes(1);
         expect(LanguageClient).toHaveBeenCalledWith(SERVER_ID, SERVER_DESC, {
-            args: ["-Dline.separator=\r\n", "-Ddialect.path=/test/server/jar/dialects", "-Xmx768M", "-jar", serverPath, "pipeEnabled"],
+            args: ["-Dline.separator=\r\n", `-Ddialect.path=${expectedDialectPath}`, "-Xmx768M", "-jar", serverPath, "pipeEnabled"],
             command: "java",
             options: { stdio: "pipe", detached: false },
         }, {
