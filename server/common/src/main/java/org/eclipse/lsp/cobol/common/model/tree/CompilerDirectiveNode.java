@@ -12,23 +12,20 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree;
+package org.eclipse.lsp.cobol.common.model.tree;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.core.CobolParser;
 
 /** Node describing compiler directive in a cobol document. */
 @Slf4j
 public class CompilerDirectiveNode extends Node {
-  @Getter private final CobolParser.CompilerOptionsContext directiveContext;
+  @Getter private final String directiveText;
 
-  public CompilerDirectiveNode(
-      Locality location, CobolParser.CompilerOptionsContext directiveContext) {
+  public CompilerDirectiveNode(Locality location, String directiveText) {
     super(location, NodeType.COMPILER_DIRECTIVE);
-    this.directiveContext = directiveContext;
+    this.directiveText = directiveText;
   }
 }

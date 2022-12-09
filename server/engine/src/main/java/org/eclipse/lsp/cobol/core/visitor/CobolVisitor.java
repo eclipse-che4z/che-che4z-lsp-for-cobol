@@ -157,7 +157,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
    */
   @Override
   public List<Node> visitCompilerOptions(CompilerOptionsContext ctx) {
-    return addTreeNode(ctx, location -> new CompilerDirectiveNode(location, ctx));
+    return addTreeNode(ctx, location -> new CompilerDirectiveNode(location, ctx.getText()));
   }
 
   @Override
