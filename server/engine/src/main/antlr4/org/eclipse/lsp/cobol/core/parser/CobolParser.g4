@@ -1327,7 +1327,7 @@ exhibitOperand
 // exit statement
 
 exitStatement
-   : EXIT (PROGRAM | SECTION | PARAGRAPH)?
+   : EXIT (PROGRAM | SECTION | PARAGRAPH | PERFORM CYCLE? | METHOD)?
    ;
 
 // generate statement
@@ -2398,6 +2398,7 @@ cicsTranslatorCompileDirectivedKeywords
 cobolKeywords
    : ADDRESS | BOTTOM | COUNT | CR | FIELD | FIRST | MMDDYYYY | PRINTER | DAY | TIME | DATE | DAY_OF_WEEK
    | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | TOP | YEAR | YYYYDDD | YYYYMMDD | WHEN_COMPILED
+   | METHOD
    ;
 
 cobolCompilerDirectivesKeywords
