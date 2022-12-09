@@ -290,6 +290,9 @@ public class CobolLanguageEngine {
   private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx, SymbolAccumulatorService symbolAccumulatorService) {
     // Phase TRANSFORMATION
     ctx.register(
+            new ProcessorDescription(
+                    CompilerDirectiveNode.class, ProcessingPhase.TRANSFORMATION, new CompilerDirectiveProcess()));
+    ctx.register(
         new ProcessorDescription(
             ProgramIdNode.class, ProcessingPhase.TRANSFORMATION, new ProgramIdProcess()));
     ctx.register(

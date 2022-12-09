@@ -147,6 +147,19 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>The default implementation returns the result of calling
+   * {@link #visitChildren} on {@code ctx}.</p>
+   *
+   * @param ctx
+   */
+  @Override
+  public List<Node> visitCompilerOptions(CompilerOptionsContext ctx) {
+    return addTreeNode(ctx, location -> new CompilerDirectiveNode(location, ctx));
+  }
+
   @Override
   public List<Node> visitIdentificationDivision(IdentificationDivisionContext ctx) {
     areaAWarning(ctx.getStart());
