@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
+/** Tests a single document can have multiple programs with same program id. */
 public class TestMultipleProgramInADocument {
   public static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
