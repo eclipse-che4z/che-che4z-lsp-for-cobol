@@ -2350,8 +2350,13 @@ cicsDfhValueLiteral
 cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN;
 
 literal
-   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | cicsDfhRespLiteral | cicsDfhValueLiteral
+   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | cicsDfhRespLiteral
+   | cicsDfhValueLiteral | utfLiteral | hexadecimalUtfLiteral
    ;
+
+utfLiteral: U_CHAR NONNUMERICLITERAL;
+
+hexadecimalUtfLiteral: U_CHAR HEX_NUMBERS;
 
 charString
    : FINALCHARSTRING
