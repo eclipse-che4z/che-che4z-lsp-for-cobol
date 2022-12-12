@@ -24,24 +24,22 @@ import java.util.Optional;
 public enum CompilerDirectiveName {
   ADATA {
     @Override
-    public Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText) {
+    public Optional<CompilerDirectiveOption<Boolean>> getDirectiveOption(String directiveText) {
       return Optional.empty();
     }
   },
   QUALIFY {
     @Override
-    public Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText) {
-      if (directiveText.contains("QUALIFY(EXTEND)"))
-        return Optional.of(new CompilerDirectiveOption<>(true, this));
-      return Optional.empty();
+    public Optional<CompilerDirectiveOption<Boolean>> getDirectiveOption(String directiveText) {
+      return Optional.of(new CompilerDirectiveOption<>(true, this))
+              .filter(cd -> directiveText.contains("QUALIFY(EXTEND)"));
     }
   },
   QUA {
     @Override
-    public Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText) {
-      if (directiveText.contains("QUA(EXTEND)"))
-        return Optional.of(new CompilerDirectiveOption<>(true, this));
-      return Optional.empty();
+    public Optional<CompilerDirectiveOption<Boolean>> getDirectiveOption(String directiveText) {
+      return Optional.of(new CompilerDirectiveOption<>(true, this))
+              .filter(cd -> directiveText.contains("QUA(EXTEND)"));
     }
   };
 
@@ -51,5 +49,5 @@ public enum CompilerDirectiveName {
    * @param directiveText is compiler directive text in the document
    * @return List of {@link CompilerDirectiveOption}
    */
-  public abstract Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText);
+  public abstract Optional<CompilerDirectiveOption<Boolean>> getDirectiveOption(String directiveText);
 }
