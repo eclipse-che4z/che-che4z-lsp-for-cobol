@@ -2409,7 +2409,6 @@ cicsTranslatorCompileDirectivedKeywords
 cobolKeywords
    : ADDRESS | BOTTOM | COUNT | CR | FIELD | FIRST | MMDDYYYY | PRINTER | DAY | TIME | DATE | DAY_OF_WEEK
    | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | TOP | YEAR | YYYYDDD | YYYYMMDD | WHEN_COMPILED
-   | METHOD | FREE
    ;
 
 cobolCompilerDirectivesKeywords
