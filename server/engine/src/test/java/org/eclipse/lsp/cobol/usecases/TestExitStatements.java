@@ -78,6 +78,38 @@ public class TestExitStatements {
           + "               END-PERFORM\n"
           + "            STOP RUN.";
 
+  public static final String TEXT7 =
+      "        IDENTIFICATION DIVISION.\n"
+          + "        PROGRAM-ID. test1.\n"
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        LOCAL-STORAGE SECTION.\n"
+          + "        1 {$*i} PIC S9(9) COMP-5.\n"
+          + "        1 {$*zltemp1} PIC S9(9) COMP-5.\n"
+          + "        PROCEDURE DIVISION.\n"
+          + "            IF {$i} <= {$zltemp1}\n"
+          + "               CONTINUE\n"
+          + "             ELSE\n"
+          + "               EXIT PERFORM\n"
+          + "             END-IF.\n"
+          + "        END PROGRAM test1.";
+
+  public static final String TEXT8 =
+          "        IDENTIFICATION DIVISION.\n"
+                  + "        PROGRAM-ID. test1.\n"
+                  + "        DATA DIVISION.\n"
+                  + "        WORKING-STORAGE SECTION.\n"
+                  + "        LOCAL-STORAGE SECTION.\n"
+                  + "        1 {$*i} PIC S9(9) COMP-5.\n"
+                  + "        1 {$*zltemp1} PIC S9(9) COMP-5.\n"
+                  + "        PROCEDURE DIVISION.\n"
+                  + "            IF {$i} <= {$zltemp1}\n"
+                  + "               CONTINUE\n"
+                  + "             ELSE\n"
+                  + "               EXIT METHOD\n"
+                  + "             END-IF.\n"
+                  + "        END PROGRAM test1.";
+
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
@@ -106,5 +138,15 @@ public class TestExitStatements {
   @Test
   void test6() {
     UseCaseEngine.runTest(TEXT6, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void test7() {
+    UseCaseEngine.runTest(TEXT7, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void test8() {
+    UseCaseEngine.runTest(TEXT8, ImmutableList.of(), ImmutableMap.of());
   }
 }
