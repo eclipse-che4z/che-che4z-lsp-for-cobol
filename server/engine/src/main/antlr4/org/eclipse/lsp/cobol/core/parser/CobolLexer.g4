@@ -300,6 +300,7 @@ FNC : F N C;
 FOOTING : F O O T I N G;
 FOR : F O R;
 FORCENUMCMP : F O R C E N U M C M P;
+FREE: F R E E;
 FROM : F R O M;
 FSRT : F S R T;
 FULL : F U L L;
