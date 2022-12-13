@@ -950,7 +950,7 @@ conditionalStatementCall
 statement
    : acceptStatement | addStatement | allocateStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
     disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement |
-    execSqlStatementInProcedureDivision | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
+    execSqlStatementInProcedureDivision | execSqlImsStatement | exitStatement | freeStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
     serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
@@ -1323,6 +1323,12 @@ exhibitStatement
 exhibitOperand
    : literal | generalIdentifier
    ;
+
+// free statement
+
+freeStatement
+    : FREE qualifiedDataName
+    ;
 
 // exit statement
 
@@ -2398,7 +2404,7 @@ cicsTranslatorCompileDirectivedKeywords
 cobolKeywords
    : ADDRESS | BOTTOM | COUNT | CR | FIELD | FIRST | MMDDYYYY | PRINTER | DAY | TIME | DATE | DAY_OF_WEEK
    | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | TOP | YEAR | YYYYDDD | YYYYMMDD | WHEN_COMPILED
-   | METHOD
+   | METHOD | FREE
    ;
 
 cobolCompilerDirectivesKeywords

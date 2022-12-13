@@ -56,5 +56,6 @@ public enum NodeType {
   SECTION_NAME_NODE,
   CUSTOM,
   OBSOLETE,
-  AT_END
+  AT_END,
+  COMPILER_DIRECTIVE
 }

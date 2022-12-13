@@ -36,6 +36,7 @@ public class ProcessingContext {
 
     final List<SyntaxError> errors;
     final VariableAccumulator variableAccumulator;
+    private final CompilerDirectiveContext compilerDirectiveContext = new CompilerDirectiveContext();
     /**
      * Register node type processor
      *
