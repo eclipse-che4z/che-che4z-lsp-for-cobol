@@ -40,6 +40,6 @@ public class SymbolTable {
    * @return string value of a generated key
    */
   public static String generateKey(ProgramNode program) {
-    return program.getProgramName() + "%" + program.getLocality().getUri();
+    return program.getProgramName() + "%" + program.getLocality().getUri() + "%" + program.getLocality().getRange();
   }
 }
