@@ -29,14 +29,14 @@ abstract class SmartCommandProvider {
      * @param cobolCommandName is a name for cobol extension command
      */
     public constructor(private context: vscode.ExtensionContext, private cobolCommandName: string) {
-        
+
     }
 
     /**
      * Initialize command provider
      */
     public init() {
-        this.context.subscriptions.push(vscode.commands.registerTextEditorCommand(this.cobolCommandName, 
+        this.context.subscriptions.push(vscode.commands.registerTextEditorCommand(this.cobolCommandName,
             (editor: vscode.TextEditor, edit: vscode.TextEditorEdit, ...args: any[]) => {
                 this.execute(editor, edit, args);
             }));
@@ -53,19 +53,19 @@ abstract class SmartCommandProvider {
 
 export class SmartTabCommandProvider extends SmartCommandProvider {
     public execute(editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
-        const newSelections: Selection[] = new Array();
-
-        for (let selection of editor.selections) {
+        let newSelections: Selection[] = new Array();
+        const selections = getActualSelectionForTab(editor);
+        for (let selection of selections.actualSelection) {
             const position = selection.active;
             let column = findNextSolidPosition(editor, position);
             if (column === -1) {
                 column = position.character;
                 const nextPosition = getNextPosition(editor, column, SettingsService.getTabSettings(), position.line);
-                const lineLen = getCurrentLine(editor, position.line).length;      
+                const lineLen = getCurrentLine(editor, position.line).length;
                 if (lineLen < nextPosition) {
                     const insertSize = nextPosition - lineLen;
                     edit.insert(position, ' '.repeat(insertSize));
-                }                    
+                }
                 column = nextPosition;
             } else {
                 const nextPosition = getNextPosition(editor, column, SettingsService.getTabSettings(), position.line);
@@ -76,8 +76,11 @@ export class SmartTabCommandProvider extends SmartCommandProvider {
                 }
             }
             const newPosition: vscode.Position = new vscode.Position(position.line, column);
-            newSelections.push(new vscode.Selection(newPosition, newPosition));
+            if (!checkRangeLiesBetweenSelection(selections.rangeSelection, newPosition)) {
+                newSelections.push(new vscode.Selection(newPosition, newPosition));
+            }
         }
+        newSelections = newSelections.concat(selections.rangeSelection);
         editor.selections = newSelections;
         vscode.commands.executeCommand('acceptSelectedSuggestion');
     }
@@ -85,11 +88,11 @@ export class SmartTabCommandProvider extends SmartCommandProvider {
 
 class SmartOutdentCommandProvider extends SmartCommandProvider {
     public execute(editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
-        const newSelections: Selection[] = new Array();
-
-        for (let selection of editor.selections) {
+        let newSelections: Selection[] = new Array();
+        const selections = getActualSelectionForTab(editor);
+        for (let selection of selections.actualSelection) {
             const position = selection.active;
-    
+
             let charPosition = this.findSolidCharPosition(editor, position);
             if (charPosition === 0) {
                 return;
@@ -104,9 +107,12 @@ class SmartOutdentCommandProvider extends SmartCommandProvider {
                 prevPosition = charPosition - removeSize;
             }
             const newPosition: vscode.Position = new vscode.Position(position.line, prevPosition);
-            newSelections.push(new vscode.Selection(newPosition, newPosition));
+            if (!checkRangeLiesBetweenSelection(selections.rangeSelection, newPosition)) {
+                newSelections.push(new vscode.Selection(newPosition, newPosition));
+            }
         }
-        editor.selections = newSelections;    
+        newSelections = newSelections.concat(selections.rangeSelection);
+        editor.selections = newSelections;
     }
 
     private findSolidCharPosition(editor: vscode.TextEditor, position: vscode.Position) {
@@ -138,7 +144,7 @@ class SmartOutdentCommandProvider extends SmartCommandProvider {
 
     private findPrevSolidPosition(editor: vscode.TextEditor, position: vscode.Position): number {
         const text = getCurrentLine(editor, position.line)
-        for (let i = position.character; i >=0; i--) {
+        for (let i = position.character; i >= 0; i--) {
             if (text[i] !== ' ') {
                 return i;
             }
@@ -149,7 +155,7 @@ class SmartOutdentCommandProvider extends SmartCommandProvider {
 
 /**
  * Initialize smart tab functionality
- * @param context 
+ * @param context
  */
 export function initSmartTab(context: vscode.ExtensionContext) {
     new SmartTabCommandProvider(context, SMART_TAB_COMMAND).init();
@@ -204,7 +210,7 @@ function getNextPosition(editor: vscode.TextEditor, character: number, tabSettin
 
 /**
  * Founds a tab rule for current line
- * @param editor 
+ * @param editor
  * @param line is a current line number for a cursor
  * @param tabSettings is a tab settings object
  * @returns the tab rule that needs to be appliend for this line
@@ -235,7 +241,7 @@ export function getRule(editor: vscode.TextEditor, line: number, tabSettings: Ta
  * @param character is the current cursor position in the line
  * @return previous predefined position
  */
- function getPrevPosition(editor: vscode.TextEditor, character: number, tabSettings: TabSettings, line: number): number {
+function getPrevPosition(editor: vscode.TextEditor, character: number, tabSettings: TabSettings, line: number): number {
     const rule = getRule(editor, line, tabSettings);
     let prev: number = rule.stops[0];
 
@@ -245,7 +251,7 @@ export function getRule(editor: vscode.TextEditor, line: number, tabSettings: Ta
         }
         prev = stop;
     }
-    if (prev === rule.stops[rule.stops.length - 1] && (prev > character - getTabSize() || character > rule.maxPosition) ) {
+    if (prev === rule.stops[rule.stops.length - 1] && (prev > character - getTabSize() || character > rule.maxPosition)) {
         return prev;
     }
     return Math.max(character - getTabSize(), rule.stops[0]);
@@ -267,3 +273,47 @@ function getTabSize(): number {
     }
     return +tabSize;
 }
+
+/**
+ *
+ * @param editor is a vscode text editor
+ * @returns array of selection for tabbing
+ */
+function getActualSelectionForTab(editor: vscode.TextEditor) {
+    const actualSelection: vscode.Selection[] = [];
+    const rangeSelection: vscode.Selection[] = [];
+    for (let selection of editor.selections) {
+        const selectionStartLine = selection.start?.line ? selection.start.line : selection.active.line;
+        const selectionEndLine = selection.end?.line ? selection.end.line : selection.active.line;
+        const selectionActiveLine = selection.active.line;
+        if (selectionActiveLine === selectionEndLine && selectionEndLine === selectionStartLine) {
+            actualSelection.push(selection);
+        } else {
+            rangeSelection.push(selection);
+            for (let lineNumber = selection.start.line; lineNumber <= selection.end.line; lineNumber++) {
+                const endCharPosition = lineNumber === selection.start.line ? selection.start.character : 0;
+                const characterPosition = findNextSolidPosition(editor, new vscode.Position(lineNumber, endCharPosition));
+                if (characterPosition !== -1) {
+                    const selection: vscode.Selection = new vscode.Selection(
+                        new vscode.Position(lineNumber, characterPosition),
+                        new vscode.Position(lineNumber, characterPosition));
+                    actualSelection.push(selection);
+                }
+            }
+        }
+    }
+    return { actualSelection, rangeSelection };
+}
+
+function checkRangeLiesBetweenSelection(rangeSelection: vscode.Selection[], newPosition: vscode.Position): boolean {
+    for (let se of rangeSelection) {
+        if (se.start.line <= newPosition.line && se.end.line >= newPosition.line) {
+            if (se.start.character > newPosition.character) {
+                se = new vscode.Selection(new vscode.Position(se.start.line, newPosition.character), se.end);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
