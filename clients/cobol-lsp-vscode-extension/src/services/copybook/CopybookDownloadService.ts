@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
+import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api";
 import * as fs from "fs";
 import * as iconv from "iconv-lite";
 import * as Path from "path";

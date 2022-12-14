@@ -1,4 +1,4 @@
-import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
+import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api";
 import * as path from "path";
 import * as vscode from "vscode";
 import { SettingsService } from "../Settings";

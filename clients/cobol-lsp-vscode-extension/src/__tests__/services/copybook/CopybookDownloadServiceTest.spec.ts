@@ -13,7 +13,7 @@
  */
 
 import anything = jasmine.anything;
-import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
+import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api";
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as Path from "path";
@@ -43,7 +43,7 @@ vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
 });
 (vscode.ProgressLocation as any) = { Notification: "notify" };
 
-jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
+jest.mock('@zowe/zowe-explorer-api', () => {
     return {
       ZoweVsCodeExtension: jest.fn()
     };

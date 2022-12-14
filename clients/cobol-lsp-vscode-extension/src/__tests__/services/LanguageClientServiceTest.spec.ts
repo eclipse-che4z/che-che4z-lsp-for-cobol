@@ -44,7 +44,7 @@ jest.mock('fs', () => ({
     fs: jest.fn(),
 }));
 (ErrorCodes as any) = {};
-jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
+jest.mock('@zowe/zowe-explorer-api', () => {
     return {
       ZoweVsCodeExtension: jest.fn()
     };

@@ -34,7 +34,7 @@ jest.mock("../services/Settings", () => ({
     createFileWithGivenPath: jest.fn(),
     initializeSettings: jest.fn(),
 }));
-jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
+jest.mock('@zowe/zowe-explorer-api', () => {
     return {
       ZoweVsCodeExtension: jest.fn()
     };

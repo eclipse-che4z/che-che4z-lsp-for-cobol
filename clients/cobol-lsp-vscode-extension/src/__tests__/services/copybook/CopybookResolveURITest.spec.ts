@@ -34,7 +34,7 @@ SettingsUtils.getWorkspaceFoldersPath = jest.fn().mockReturnValue([__dirname]);
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
     get: jest.fn().mockReturnValue(undefined),
 });
-jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
+jest.mock('@zowe/zowe-explorer-api', () => {
     return {
       ZoweVsCodeExtension: jest.fn()
     };

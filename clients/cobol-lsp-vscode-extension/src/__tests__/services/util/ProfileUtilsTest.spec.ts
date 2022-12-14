@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
+import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api";
 import * as path from "path";
 import * as vscode from "vscode";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
@@ -34,7 +34,7 @@ const getZoweExplorerMock = () => {
     },
     );
 };
-jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
+jest.mock('@zowe/zowe-explorer-api', () => {
     return {
       ZoweVsCodeExtension: jest.fn()
     };
