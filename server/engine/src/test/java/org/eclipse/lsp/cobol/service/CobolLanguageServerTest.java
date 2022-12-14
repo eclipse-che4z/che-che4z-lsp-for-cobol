@@ -23,11 +23,16 @@ import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import org.eclipse.lsp4j.ClientCapabilities;
+import org.eclipse.lsp4j.ClientInfo;
+import org.eclipse.lsp4j.GeneralClientCapabilities;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.InitializedParams;
 import org.eclipse.lsp4j.ServerCapabilities;
+import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.TextDocumentSyncKind;
+import org.eclipse.lsp4j.WorkspaceClientCapabilities;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.BeforeAll;
@@ -187,6 +192,15 @@ class CobolLanguageServerTest {
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
     initializeParams.setWorkspaceFolders(workspaceFolders);
+    initializeParams.setClientInfo(new ClientInfo("clientName", "Version-1.x"));
+    initializeParams.setLocale("en");
+    ClientCapabilities clientCapabilities = new ClientCapabilities();
+    clientCapabilities.setTextDocument(new TextDocumentClientCapabilities());
+    clientCapabilities.setExperimental(any());
+    clientCapabilities.setWorkspace(new WorkspaceClientCapabilities());
+    clientCapabilities.setGeneral(new GeneralClientCapabilities());
+    initializeParams.setCapabilities(clientCapabilities);
+    initializeParams.setInitializationOptions(any());
 
     try {
       InitializeResult result = server.initialize(initializeParams).get();
