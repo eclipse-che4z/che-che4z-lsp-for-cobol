@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -52,16 +53,18 @@ class WorkingFolderService {
    * @return a working folder path
    */
   @SneakyThrows
-  public URI getWorkingFolder() {
-    URI workdir;
-    String dialectPath = System.getProperty(DIALECTS_PATH_SYSTEM_PROPERTY);
+  public List<URI> getWorkingFolder() {
+    List<URI> workdirs = new LinkedList<>();
+    String dialectPaths = System.getProperty(DIALECTS_PATH_SYSTEM_PROPERTY);
 
-    if (dialectPath != null) {
-      workdir = new URL("file:" + dialectPath + "/").toURI();
+    if (dialectPaths != null) {
+      for (String dialectPath : dialectPaths.split(",")) {
+        workdirs.add(new URL("file:" + dialectPath + "/").toURI());
+      }
     } else {
-      workdir = getDefaultDir();
+      workdirs.add(getDefaultDir());
     }
-    return workdir;
+    return workdirs;
   }
 
   private URI getDefaultDir() throws URISyntaxException {

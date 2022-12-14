@@ -28,14 +28,14 @@ class WorkingFolderServiceTest {
   @Test
   void testWorkingFolder() {
     WorkingFolderService service = new WorkingFolderService();
-    URI workdir = service.getWorkingFolder();
-    assertTrue(workdir.toString().startsWith("file:/"));
+    List<URI> workdirs = service.getWorkingFolder();
+    assertTrue(workdirs.get(0).toString().startsWith("file:/"));
   }
 
   @Test
   void testGetFilenames() {
     WorkingFolderService service = new WorkingFolderService();
-    List<String> files = service.getFilenames(service.getWorkingFolder());
+    List<String> files = service.getFilenames(service.getWorkingFolder().get(0));
     assertTrue(files.size() > 0);
   }
 

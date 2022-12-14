@@ -17,7 +17,8 @@ module.exports = {
         "!**/node_modules/**",
         "!**/coverage/**",
         "!src/test/suite/**",
-        "!src/__tests__/*.ts"
+        "!src/__tests__/*.ts",
+        "!src/*.ts"
      ],
     "testRunner" : 'jasmine2',
     "testResultsProcessor": "jest-sonar-reporter",

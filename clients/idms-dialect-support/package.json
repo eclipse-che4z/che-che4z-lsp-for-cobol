@@ -21,8 +21,11 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onCommand:idms-dialect-support.helloWorld"
-  ],
+    "onCommand:cobol-lsp.smart-tab",
+    "onCommand:cobol-lsp.dialect.register",
+    "onLanguage:cobol",
+    "workspaceContains:/.c4z"
+],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [

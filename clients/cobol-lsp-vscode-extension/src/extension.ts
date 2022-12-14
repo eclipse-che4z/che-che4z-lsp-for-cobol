@@ -32,26 +32,38 @@ import {
     downloadCopybookHandler,
     resolveCopybookHandler
 } from "./services/copybook/CopybookMessageHandler";
+import { DialectActivator, DialectInfo, DialectRegistry } from "./services/DialectRegistry";
 
 let languageClientService: LanguageClientService;
 
-function initialize() {
+function initialize(dialects: DialectInfo[]) {
     // We need lazy initialization to be able to mock this for unit testing
     const copyBooksDownloader = new CopybookDownloadService();
-    const outputChannel = vscode.window.createOutputChannel( "COBOL Language Support");
-    languageClientService = new LanguageClientService(outputChannel);
+    const outputChannel = vscode.window.createOutputChannel("COBOL Language Support");
+    languageClientService = new LanguageClientService(outputChannel, dialects.map(d => d.path));
     return {copyBooksDownloader, outputChannel};
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-    const { copyBooksDownloader, outputChannel} = initialize();
-    initSmartTab(context);
-
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
+
+    // Commands
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.dialect.register",
+        (name, path, description, extensionId) => {
+        DialectRegistry.register(name, path, description, extensionId);
+    }));
+
+    // const error = await DialectActivator.waitForDialects(SettingsService.getDialects(), 5000);
+    // if (error.length > 0) {
+    //     vscode.window.showErrorMessage(error);
+    //     return;
+    // }
+
+    const { copyBooksDownloader, outputChannel} = initialize(DialectRegistry.getDialects());
+    initSmartTab(context);
 
     copyBooksDownloader.start();
 
-    // Commands
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook",
         (copybook, programName) => {
         fetchCopybookCommand(copybook, copyBooksDownloader, programName);

@@ -64,7 +64,7 @@ const SERVER_STARTED_MSG = "server started";
 const SERVER_STOPPED_MSG = "server stopped";
 describe("LanguageClientService positive scenario", () => {
     beforeEach(() => {
-        languageClientService = new LanguageClientService(jest.fn() as any);
+        languageClientService = new LanguageClientService(jest.fn() as any, []);
         new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(0);
         (fs.existsSync as any)= jest.fn().mockReturnValue(true);
@@ -105,7 +105,7 @@ describe("LanguageClientService positive scenario", () => {
     test("Test LanguageClientService starts language client", () => {
         LanguageClient.prototype.start = jest.fn().mockReturnValue(SERVER_STARTED_MSG);
         const serverPath = join("/test", "server", "jar", "server.jar");
-        const expectedDialectPath = join("/test", "server", "jar", "dialects");
+        const expectedDialectPath = "''";
         expect(languageClientService.start()).toBe(SERVER_STARTED_MSG);
         expect(LanguageClient).toHaveBeenCalledTimes(1);
         expect(LanguageClient).toHaveBeenCalledWith(SERVER_ID, SERVER_DESC, {
@@ -185,7 +185,7 @@ describe("LanguageClientService negative scenario.", () => {
     test("LSP port not defined and jar path doesn't exists", async () => {
         (fs.existsSync as any) = jest.fn().mockReturnValue(false);
         try {
-            await new LanguageClientService(jest.fn() as any).checkPrerequisites();
+            await new LanguageClientService(jest.fn() as any, []).checkPrerequisites();
         } catch (error) {
             expect(error.toString()).toBe("Error: LSP server for cobol not found");
         }

@@ -59,12 +59,13 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
    */
   public List<CobolDialect> loadDialects(CopybookService copybookService, MessageService messageService) {
     try {
-      URI workdir = workingFolderService.getWorkingFolder();
-      return workingFolderService.getFilenames(workdir).stream()
-          .filter(filename -> filename.startsWith("dialect-"))
-          .filter(filename -> filename.endsWith(".jar"))
-          .map(filename -> createDialect(workdir, filename, copybookService, messageService))
-          .filter(Objects::nonNull)
+      return workingFolderService.getWorkingFolder().stream()
+              .flatMap(workdir ->
+                  workingFolderService.getFilenames(workdir).stream()
+                      .filter(filename -> filename.startsWith("dialect-"))
+                      .filter(filename -> filename.endsWith(".jar"))
+                      .map(filename -> createDialect(workdir, filename, copybookService, messageService))
+                      .filter(Objects::nonNull))
           .collect(Collectors.toList());
     } catch (Exception e) {
       LOG.warn("Cannot load dialects: {}", e.getMessage());

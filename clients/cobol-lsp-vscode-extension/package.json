@@ -8,7 +8,7 @@
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
-        "vscode": "^1.71.0"
+        "vscode": "^1.50.0"
     },
     "repository": {
         "type": "git",
@@ -527,7 +527,7 @@
         "@types/jest": "^29.0.3",
         "@types/mocha": "^9.1.1",
         "@types/node": "^14.18.29",
-        "@types/vscode": "^1.71.0",
+        "@types/vscode": "^1.50.0",
         "@vscode/test-electron": "^2.1.5",
         "decache": "^4.6.1",
         "fs-extra": "10.1.0",

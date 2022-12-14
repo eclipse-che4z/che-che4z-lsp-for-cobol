@@ -194,6 +194,19 @@ export class SettingsService {
     }
 
     /**
+     * Gets dialect list
+     * @returns dialect list for the workspace
+     */
+    public static getDialects(): string[] {
+        const dialectList: string[] = vscode.workspace.getConfiguration()
+            .get(SETTINGS_DIALECT);
+        if (dialectList === undefined) {
+            return [];
+        }
+        return dialectList;
+    }
+
+    /**
      * Return the dialect type supplied by user
      * @returns Map of snippets
      */
