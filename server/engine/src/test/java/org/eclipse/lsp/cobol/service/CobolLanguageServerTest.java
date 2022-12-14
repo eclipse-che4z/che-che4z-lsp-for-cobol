@@ -196,11 +196,9 @@ class CobolLanguageServerTest {
     initializeParams.setLocale("en");
     ClientCapabilities clientCapabilities = new ClientCapabilities();
     clientCapabilities.setTextDocument(new TextDocumentClientCapabilities());
-    clientCapabilities.setExperimental(any());
     clientCapabilities.setWorkspace(new WorkspaceClientCapabilities());
     clientCapabilities.setGeneral(new GeneralClientCapabilities());
     initializeParams.setCapabilities(clientCapabilities);
-    initializeParams.setInitializationOptions(any());
 
     try {
       InitializeResult result = server.initialize(initializeParams).get();
