@@ -231,10 +231,7 @@ jobs:
           name: serverContent
           path: ./clients/cobol-lsp-vscode-extension/server
       - name: build client
-        run: npm ci --ignore-scripts
-        working-directory: clients/cobol-lsp-vscode-extension
-      - name: postinstall
-        run: npm run postinstall
+        run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
       - name: generate vsix
         working-directory: clients/cobol-lsp-vscode-extension

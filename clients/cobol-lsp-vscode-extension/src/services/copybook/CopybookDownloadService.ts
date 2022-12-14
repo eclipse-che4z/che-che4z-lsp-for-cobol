@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
 import * as fs from "fs";
 import * as iconv from "iconv-lite";
 import * as Path from "path";
@@ -23,11 +22,12 @@ import { DOWNLOAD_QUEUE_LOCKED_ERROR_MSG, INSTALL_ZOWE, INVALID_CREDENTIALS_ERRO
 import { TelemetryService } from "../reporter/TelemetryService";
 import { SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
+import { Utils } from "../util/Utils";
 import { CopybookURI } from "./CopybookURI";
 import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
 
 export class CopybookName {
-    public constructor(public name: string, public dialect: string) {};
+    public constructor(public name: string, public dialect: string) {}
 }
 
 const experimentTag = "experiment-tag";
@@ -101,7 +101,7 @@ export class CopybookDownloadService implements vscode.Disposable {
 
     private static async getAllMembers(dataset: string, profileName: string, isUSS: boolean) {
         let members: string[];
-        const zoweExplorerApi = ZoweVsCodeExtension.getZoweExplorerApi();
+        const zoweExplorerApi = Utils.getZoweExplorerAPI();
         const loadedProfile = zoweExplorerApi
             .getExplorerExtenderApi()
             .getProfilesCache()
@@ -130,7 +130,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     }
 
     private static async downloadCopybookContent(dataset: string, copybook: string, profileName: string, isUSS: boolean) {
-        const zoweExplorerApi = ZoweVsCodeExtension.getZoweExplorerApi();
+        const zoweExplorerApi = Utils.getZoweExplorerAPI();
         const loadedProfile = zoweExplorerApi
             .getExplorerExtenderApi()
             .getProfilesCache()
@@ -241,7 +241,7 @@ export class CopybookDownloadService implements vscode.Disposable {
             if (!quiet) { CopybookDownloadService.createErrorMessageForCopybooks(new Set<string>(copybookNames.map(c => c.name))); }
             return;
         }
-        if (CopybookDownloadService.isEligibleForCopybookDownload() && !ZoweVsCodeExtension.getZoweExplorerApi()) {
+        if (CopybookDownloadService.isEligibleForCopybookDownload() && !Utils.getZoweExplorerAPI()) {
             if (!quiet) {
                 vscode.window.showErrorMessage(ZOWE_EXT_MISSING_MSG, INSTALL_ZOWE)
                 .then(action => {

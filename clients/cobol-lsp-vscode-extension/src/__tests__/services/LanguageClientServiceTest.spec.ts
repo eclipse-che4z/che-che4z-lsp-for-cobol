@@ -19,9 +19,9 @@ import * as vscode from "vscode";
 import { LanguageClient, ErrorCodes } from "vscode-languageclient";
 import { CopybookDownloadService } from "../../services/copybook/CopybookDownloadService";
 import { JavaCheck } from "../../services/JavaCheck";
-import { LanguageClientService } from "../../services/LanguageClientService";
+import { LanguageClientService, nativeServer } from "../../services/LanguageClientService";
 import {TelemetryService} from "../../services/reporter/TelemetryService";
-import {NativeExecutableService} from "../../services/nativeLanguageClient/nativeExecutableService";
+import { Utils } from "../../services/util/Utils";
 
 jest.mock("../../services/reporter/TelemetryService");
 jest.mock("../../services/copybook/CopybookURI");
@@ -45,11 +45,7 @@ jest.mock('fs', () => ({
     fs: jest.fn(),
 }));
 (ErrorCodes as any) = {};
-jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
-    return {
-      ZoweVsCodeExtension: jest.fn()
-    };
-  });
+Utils.getZoweExplorerAPI = jest.fn();
 const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService();
 let languageClientService: LanguageClientService;
 
@@ -142,36 +138,41 @@ describe("LanguageClientService positive scenario", () => {
     test("LanguageClientServer detects executable path for windows", () => {
         const spy = jest.spyOn(os, "type");
         spy.mockReturnValue("Windows_NT");
-        (languageClientService as any).executableService = new NativeExecutableService("/test");
-        const executable = (languageClientService as any).executableService.getNativeLanguageClient();
-        expect(executable.command).toBe("engine.exe");
-        expect(executable.options.cwd).toBe(join("/test", "package-win"));
+        const executableName = nativeServer("/test");
+        expect(executableName.command).toBe("engine.exe");
+        (languageClientService as any).giveExecutePermission = jest.fn();
+        const executableLocation = (languageClientService as any).initializeExecutables("/test");
+        expect(executableLocation).toBe(join("/test", "package-win"));
     });
 
     test("LanguageClientServer detects executable path for Linux", () => {
         const spy = jest.spyOn(os, "type");
         spy.mockReturnValue("Linux");
-        (languageClientService as any).executableService = new NativeExecutableService("/test");
-        const executable = (languageClientService as any).executableService.getNativeLanguageClient();
-        expect(executable.command).toBe("./server");
-        expect(executable.options.cwd).toBe(join("/test", "package-linux"));
+        const executableName = nativeServer("/test");
+        expect(executableName.command).toBe("./server");
+        (languageClientService as any).giveExecutePermission = jest.fn();
+        const executableLocation = (languageClientService as any).initializeExecutables("/test");
+        expect(executableLocation).toBe(join("/test", "package-linux"));
     });
 
     test("LanguageClientServer detects executable path for Mac", () => {
         const spy = jest.spyOn(os, "type");
         spy.mockReturnValue("Darwin");
-        (languageClientService as any).executableService = new NativeExecutableService("/test");
-        const executable = (languageClientService as any).executableService.getNativeLanguageClient();
-        expect(executable.command).toBe("./server-mac-amd64");
-        expect(executable.options.cwd).toBe(join("/test", "package-macos"));
+        const executableName = nativeServer("/test");
+        expect(executableName.command).toBe("./server-mac-amd64");
+        (languageClientService as any).giveExecutePermission = jest.fn();
+        const executableLocation = (languageClientService as any).initializeExecutables("/test");
+        expect(executableLocation).toBe(join("/test", "package-macos"));
     });
 
     test("LanguageClientServer detects executable path for unKnown OS", () => {
         const spy = jest.spyOn(os, "type");
         spy.mockReturnValue("Android");
-        (languageClientService as any).executableService = new NativeExecutableService("/test");
-        const executable = (languageClientService as any).executableService.getNativeLanguageClient();
-        expect(executable).toBeFalsy();
+        const executableName = nativeServer("/test");
+        expect(executableName.command).toBe("");
+        (languageClientService as any).giveExecutePermission = jest.fn();
+        const executableLocation = (languageClientService as any).initializeExecutables("/test");
+        expect(executableLocation).toBe(undefined);
     });
 
 });

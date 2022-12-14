@@ -15,6 +15,7 @@
 import * as vscode from "vscode";
 import { CopybooksCodeActionProvider } from "../../../services/copybook/CopybooksCodeActionProvider";
 import { TelemetryService } from "../../../services/reporter/TelemetryService";
+import { Utils } from "../../../services/util/Utils";
 
 describe("Test Copybook code action provider", () => {
     const copybooksCodeAction = new CopybooksCodeActionProvider();
@@ -36,11 +37,7 @@ describe("Test Copybook code action provider", () => {
         };
         (vscode.CodeAction as any) = jest.fn();
         TelemetryService.registerEvent = jest.fn();
-        jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
-            return {
-              ZoweVsCodeExtension: jest.fn()
-            };
-          });
+        Utils.getZoweExplorerAPI = jest.fn();
     });
 
     afterAll(() => {
