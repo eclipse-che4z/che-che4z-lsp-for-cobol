@@ -21,6 +21,7 @@ import { CopybookDownloadService } from "../../services/copybook/CopybookDownloa
 import { JavaCheck } from "../../services/JavaCheck";
 import { LanguageClientService, nativeServer } from "../../services/LanguageClientService";
 import {TelemetryService} from "../../services/reporter/TelemetryService";
+import { Utils } from "../../services/util/Utils";
 
 jest.mock("../../services/reporter/TelemetryService");
 jest.mock("../../services/copybook/CopybookURI");
@@ -44,11 +45,7 @@ jest.mock('fs', () => ({
     fs: jest.fn(),
 }));
 (ErrorCodes as any) = {};
-jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
-    return {
-      ZoweVsCodeExtension: jest.fn()
-    };
-  });
+Utils.getZoweExplorerAPI = jest.fn();
 const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService();
 let languageClientService: LanguageClientService;
 
