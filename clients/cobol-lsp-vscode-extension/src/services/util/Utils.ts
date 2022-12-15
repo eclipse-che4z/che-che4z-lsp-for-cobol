@@ -31,6 +31,6 @@ export class Utils {
     public static getZoweExplorerAPI(): IApiRegisterClient {
         return vscode.extensions.getExtension(
             "Zowe.vscode-extension-for-zowe",
-        ) as any;
+        ).exports as any;
     }
 }
