@@ -48,7 +48,7 @@ class WorkingFolderService {
   }
 
   /**
-   * Returns a working folder path
+   * Returns a working folder uri
    * @return a working folder path
    */
   @SneakyThrows
@@ -57,11 +57,20 @@ class WorkingFolderService {
     String dialectPath = System.getProperty(DIALECTS_PATH_SYSTEM_PROPERTY);
 
     if (dialectPath != null) {
-      workdir = new URL("file:" + dialectPath + "/").toURI();
+      workdir = getWorkingFolder(dialectPath);
     } else {
       workdir = getDefaultDir();
     }
     return workdir;
+  }
+
+  /**
+   * Returns a working folder uri
+   * @return a working folder uri
+   */
+  @SneakyThrows
+  public URI getWorkingFolder(String path) {
+    return new URL("file:" + path + "/").toURI();
   }
 
   private URI getDefaultDir() throws URISyntaxException {

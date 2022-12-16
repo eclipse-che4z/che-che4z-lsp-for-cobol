@@ -12,14 +12,16 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 export const SETTINGS_CPY_SECTION: string = "cobol-lsp.cpy-manager";
+export const SETTINGS_DIALECT_REGISTRY: string = "cobol-lsp.dialect.registry";
+export const SETTINGS_DIALECT = "cobol-lsp.dialects";
+export const SETTINGS_SUBROUTINE_LOCAL_KEY = "cobol-lsp.subroutine-manager.paths-local";
+export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";
 
 export const SERVER_PORT = "cobol-lsp.server.port";
 export const SERVER_TYPE = "cobol-lsp.serverType";
-export const SETTINGS_DIALECT = "cobol-lsp.dialects";
 export const PATHS_LOCAL_KEY = "paths-local";
 export const PATHS_ZOWE = "paths-dsn";
 export const PATHS_USS = "paths-uss";
-export const SETTINGS_SUBROUTINE_LOCAL_KEY = "cobol-lsp.subroutine-manager.paths-local";
 export const C4Z_FOLDER: string = ".c4z";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
 export const GITIGNORE_FILE: string = ".gitignore";
@@ -50,7 +52,6 @@ export const INSTALL_ZOWE = "Install Zowe Explorer";
 export const DACO_DIALECT = "DaCo";
 export const IDMS_DIALECT = "IDMS";
 export const DEFAULT_DIALECT = "COBOL";
-export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";
 export const CLEARING_COPYBOOK_CACHE = "Clearing downloaded copybook cache";
 export const COPYBOOK_CACHE_CLEARED_INFO = "Downloaded copybooks removed";
 

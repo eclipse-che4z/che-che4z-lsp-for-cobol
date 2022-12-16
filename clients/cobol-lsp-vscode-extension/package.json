@@ -108,6 +108,28 @@
         "configuration": {
             "title": "COBOL Language Support",
             "properties": {
+                "cobol-lsp.dialect.registry": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "path": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            },
+                            "extensionId": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "uniqueItems": true,
+                    "default": []
+                },
                 "cobol-lsp.smart-tab": {
                     "oneOf": [
                         {
