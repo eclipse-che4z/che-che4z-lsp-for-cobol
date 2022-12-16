@@ -117,7 +117,8 @@ class TestIdmsControlSectionAll {
         new AnalysisConfig(
             new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(),
-            ImmutableList.of(IdmsDialect.NAME), true));
+            ImmutableList.of(IdmsDialect.NAME), true,
+            ImmutableList.of()));
   }
 
 }

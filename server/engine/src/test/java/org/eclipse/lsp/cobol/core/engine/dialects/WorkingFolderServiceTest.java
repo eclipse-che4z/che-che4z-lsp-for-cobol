@@ -33,6 +33,13 @@ class WorkingFolderServiceTest {
   }
 
   @Test
+  void testWorkingFolder_specifiedPath() {
+    WorkingFolderService service = new WorkingFolderService();
+    URI workdir = service.getWorkingFolder("path");
+    assertTrue(workdir.toString().startsWith("file:path"));
+  }
+
+  @Test
   void testGetFilenames() {
     WorkingFolderService service = new WorkingFolderService();
     List<String> files = service.getFilenames(service.getWorkingFolder());

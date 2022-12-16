@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
@@ -34,13 +35,19 @@ import java.util.stream.Collectors;
 public class DialectService {
   private static final CobolDialect EMPTY_DIALECT = () -> "COBOL";
   private final Map<String, CobolDialect> dialectSuppliers;
+  private final DialectDiscoveryService discoveryService;
+  private final CopybookService copybookService;
+  private final MessageService messageService;
 
   @Inject
   public DialectService(
       DialectDiscoveryService discoveryService,
       CopybookService copybookService,
       MessageService messageService) {
-    dialectSuppliers = new HashMap<>();
+    this.dialectSuppliers = new HashMap<>();
+    this.discoveryService = discoveryService;
+    this.copybookService = copybookService;
+    this.messageService = messageService;
 
     List<CobolDialect> dialects = discoveryService.loadDialects(copybookService, messageService);
     dialects.forEach(dialect -> dialectSuppliers.put(dialect.getName(), dialect));
@@ -140,5 +147,19 @@ public class DialectService {
         .map(dialectSuppliers::get)
         .flatMap(d -> d.getProcessors().stream())
         .collect(Collectors.toList());
+  }
+
+  /**
+   * Updates available dialect list based on dialect registry
+   * @param dialectRegistry is a dialect registry items list
+   */
+  public void updateDialects(List<DialectRegistryItem> dialectRegistry) {
+    dialectRegistry.forEach(r ->
+      dialectSuppliers.computeIfAbsent(r.getName(), name ->
+          discoveryService.loadDialects(r.getPath(), copybookService, messageService).stream()
+          .filter(d -> d.getName().equals(name))
+          .findFirst()
+          .orElse(null))
+    );
   }
 }

@@ -12,13 +12,9 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service;
-
-import com.google.gson.JsonPrimitive;
-import org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum;
+package org.eclipse.lsp.cobol.service.settings;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -53,17 +49,4 @@ public interface SettingsService {
    */
   CompletableFuture<List<Object>> fetchConfigurations(List<String> sections);
 
-  /**
-   * Get config data as optional string
-   *
-   * @param data config response
-   * @return optional string value
-   */
-  static Optional<String> getValueAsString(List<Object> data) {
-    if (data == null || data.isEmpty()) return Optional.empty();
-    Object obj = data.get(0);
-    if (!(obj instanceof JsonPrimitive)) return Optional.empty();
-
-    return Optional.of(((JsonPrimitive) obj).getAsString()).filter(it -> !it.isEmpty());
-  }
 }

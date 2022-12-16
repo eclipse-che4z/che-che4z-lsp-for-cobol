@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service;
+package org.eclipse.lsp.cobol.service.settings;
 
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import com.google.common.base.Joiner;
@@ -30,7 +30,7 @@ import org.eclipse.lsp4j.ConfigurationParams;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LSP_PREFIX;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 

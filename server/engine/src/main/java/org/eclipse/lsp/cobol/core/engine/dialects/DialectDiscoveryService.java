@@ -31,4 +31,13 @@ public interface DialectDiscoveryService {
    * @return a list of loaded dialects
    */
   List<CobolDialect> loadDialects(CopybookService copybookService, MessageService messageService);
+
+  /**
+   * Load cobol dialects from the given path
+   * @param path is a path to the dialect
+   * @param copybookService a copybook service
+   * @param messageService a message service
+   * @return a list of loaded dialects
+   */
+  List<CobolDialect> loadDialects(String path, CopybookService copybookService, MessageService messageService);
 }

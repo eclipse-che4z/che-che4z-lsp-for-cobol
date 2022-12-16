@@ -15,9 +15,9 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import static java.util.Collections.singleton;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_EXTENSIONS;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.CPY_LOCAL_PATHS;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.DIALECTS;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.CPY_EXTENSIONS;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.CPY_LOCAL_PATHS;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECTS;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -37,7 +37,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.SettingsService;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp4j.WorkspaceFolder;
 

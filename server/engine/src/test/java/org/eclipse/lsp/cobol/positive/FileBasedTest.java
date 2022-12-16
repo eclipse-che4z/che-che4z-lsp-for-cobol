@@ -183,7 +183,7 @@ public abstract class FileBasedTest extends ConfigurableTest {
       return new AnalysisConfig(
           new CopybookConfig(ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of()),
           Arrays.asList(EmbeddedLanguage.values()),
-          ImmutableList.of("IDMS"), true);
+          ImmutableList.of("IDMS"), true, ImmutableList.of());
     }
     return AnalysisConfig.defaultConfig(ENABLED);
   }

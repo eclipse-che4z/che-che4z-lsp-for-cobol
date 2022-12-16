@@ -75,7 +75,8 @@ class TestUserDefinedSections {
   @Test
   void testGoTo() {
     CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of("USERLABEL"));
-    AnalysisConfig analysisConfig = new AnalysisConfig(copybookConfig, ImmutableList.of(), ImmutableList.of("DaCo", "IDMS"), true);
+    AnalysisConfig analysisConfig = new AnalysisConfig(copybookConfig, ImmutableList.of(), ImmutableList.of("DaCo", "IDMS"),
+        true, ImmutableList.of());
     UseCaseEngine.runTestForDiagnostics(TEXT_GOTO, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
   }
 

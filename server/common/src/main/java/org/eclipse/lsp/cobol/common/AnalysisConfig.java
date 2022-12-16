@@ -34,6 +34,7 @@ public class AnalysisConfig {
   List<EmbeddedLanguage> features;
   List<String> dialects;
   boolean isCicsTranslatorEnabled;
+  List<DialectRegistryItem> dialectRegistry;
 
   /**
    * Create the default language features config, containing all features and the given copybook
@@ -46,7 +47,7 @@ public class AnalysisConfig {
     return new AnalysisConfig(
         new CopybookConfig(mode, SQLBackend.DB2_SERVER, ImmutableList.of()),
         Arrays.asList(EmbeddedLanguage.values()),
-        ImmutableList.of(), true);
+        ImmutableList.of(), true, ImmutableList.of());
   }
 
 }
