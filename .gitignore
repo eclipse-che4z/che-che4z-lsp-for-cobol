@@ -131,4 +131,3 @@ logs/app.log
 dist
 clients/cobol-lsp-vscode-extensiontest-report
 clients/cobol-lsp-vscode-extension/test-report.xml
-clients/idms-dialect-support/package-lock.json

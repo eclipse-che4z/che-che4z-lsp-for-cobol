@@ -34,6 +34,13 @@ describe("DialectRegistry test", () => {
         expect(spy).toBeCalled();
     });
 
+    it("unregister new dialect from the registry", () => {
+        let spy = jest.spyOn(config, "update");
+
+        DialectRegistry.unregister("new");
+        expect(spy).toBeCalled();
+    });
+
     it("retrieve dialects from the registry", () => {
         let spy = jest.spyOn(config, "get");
 
