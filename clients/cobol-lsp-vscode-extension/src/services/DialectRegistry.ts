@@ -42,16 +42,43 @@ export type DialectInfo = {
         return result;
     }
 
+    /**
+     * Clears the registry
+     */
+    public static clear() {
+        vscode.workspace.getConfiguration().update(SETTINGS_DIALECT_REGISTRY, []);
+    }
+
+    /**
+     * Registers dialect in the system
+     * @param name of a dialect
+     * @param path to jar file
+     * @param description of a dialect
+     * @param extensionId is an extension id
+     */
     public static register(name: string, path: string, description: string, extensionId: string) {
         let dialects: DialectInfo[] = this.getDialects();
+        dialects = dialects.filter(d => d.name !== name);
+
         const dialectInfo: DialectInfo = {
             name: name,
             path: path,
             description: description,
             extensionId: extensionId
         };
-        dialects = dialects.filter(d => d.name !== name);
         dialects.push(dialectInfo);
         vscode.workspace.getConfiguration().update(SETTINGS_DIALECT_REGISTRY, dialects);
     }
+
+    /**
+     * Unregisters dialect from the system
+     * @param name of a dialect
+     */
+    public static unregister(name: string) {
+        let dialects: DialectInfo[] = this.getDialects();
+
+        dialects = dialects.filter(d => d.name !== name);
+        vscode.workspace.getConfiguration().update(SETTINGS_DIALECT_REGISTRY, dialects);        
+    }
+
  }
