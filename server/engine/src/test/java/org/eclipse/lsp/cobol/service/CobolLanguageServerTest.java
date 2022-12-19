@@ -24,11 +24,23 @@ import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import org.eclipse.lsp4j.ClientCapabilities;
+import org.eclipse.lsp4j.ClientInfo;
+import org.eclipse.lsp4j.CompletionCapabilities;
+import org.eclipse.lsp4j.CompletionItemCapabilities;
+import org.eclipse.lsp4j.CompletionItemTag;
+import org.eclipse.lsp4j.CompletionItemTagSupportCapabilities;
+import org.eclipse.lsp4j.DiagnosticTag;
+import org.eclipse.lsp4j.DiagnosticsTagSupport;
+import org.eclipse.lsp4j.GeneralClientCapabilities;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.InitializedParams;
+import org.eclipse.lsp4j.PublishDiagnosticsCapabilities;
 import org.eclipse.lsp4j.ServerCapabilities;
+import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.TextDocumentSyncKind;
+import org.eclipse.lsp4j.WorkspaceClientCapabilities;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.BeforeAll;
@@ -46,6 +58,7 @@ import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
+import static org.eclipse.lsp4j.DiagnosticTag.Unnecessary;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -184,10 +197,7 @@ class CobolLanguageServerTest {
             null,
             null,
             null);
-    InitializeParams initializeParams = new InitializeParams();
-
-    List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
-    initializeParams.setWorkspaceFolders(workspaceFolders);
+    InitializeParams initializeParams = getInitializeParams();
 
     try {
       InitializeResult result = server.initialize(initializeParams).get();
@@ -195,6 +205,30 @@ class CobolLanguageServerTest {
     } catch (InterruptedException | ExecutionException e) {
       fail(e.getMessage());
     }
+  }
+
+  private InitializeParams getInitializeParams() {
+    InitializeParams initializeParams = new InitializeParams();
+
+    List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
+    initializeParams.setWorkspaceFolders(workspaceFolders);
+    initializeParams.setClientInfo(new ClientInfo("clientName", "Version-1.x"));
+    initializeParams.setLocale("en");
+    ClientCapabilities clientCapabilities = new ClientCapabilities();
+    TextDocumentClientCapabilities textDocumentClientCapabilities = new TextDocumentClientCapabilities();
+    PublishDiagnosticsCapabilities publishDiagnosticsCapabilities = new PublishDiagnosticsCapabilities();
+    publishDiagnosticsCapabilities.setTagSupport(new DiagnosticsTagSupport(ImmutableList.of(Unnecessary, DiagnosticTag.Deprecated)));
+    textDocumentClientCapabilities.setPublishDiagnostics(publishDiagnosticsCapabilities);
+    CompletionCapabilities completionCapabilities = new CompletionCapabilities();
+    CompletionItemCapabilities completionItemCapabilities = new CompletionItemCapabilities();
+    completionItemCapabilities.setTagSupport(new CompletionItemTagSupportCapabilities(ImmutableList.of(CompletionItemTag.Deprecated)));
+    completionCapabilities.setCompletionItem(completionItemCapabilities);
+    textDocumentClientCapabilities.setCompletion(completionCapabilities);
+    clientCapabilities.setTextDocument(textDocumentClientCapabilities);
+    clientCapabilities.setWorkspace(new WorkspaceClientCapabilities());
+    clientCapabilities.setGeneral(new GeneralClientCapabilities());
+    initializeParams.setCapabilities(clientCapabilities);
+    return initializeParams;
   }
 
   /** Test change in server exit status upon shutdown call. */
