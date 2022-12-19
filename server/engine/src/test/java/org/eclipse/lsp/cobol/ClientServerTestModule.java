@@ -22,6 +22,8 @@ import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryFolderService;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
@@ -107,6 +109,7 @@ public class ClientServerTestModule extends AbstractModule {
     bind(CopybookIdentificationService.class)
             .annotatedWith(Names.named("combinedStrategy"))
             .to(CopybookIdentificationCombinedStrategy.class);
+    bind(DialectDiscoveryService.class).to(DialectDiscoveryFolderService.class);
 
     bindFormations();
     bindCompletions();

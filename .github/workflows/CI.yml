@@ -245,6 +245,46 @@ jobs:
         with:
           name: vsix-package
           path: '*.vsix'
+  native-build-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macOS-latest, ubuntu-latest, ubuntu-22.04, windows-2019, macos-12]
+    needs: [buildOnWindows, buildOnMac, buildOnLinux]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+         node-version: 14
+      - name: Retrieve native images
+        uses: actions/download-artifact@v3
+        with:
+         path: staging
+      - name: configure windows executable
+        working-directory: tests/native-executable-tests
+        if: startsWith( matrix.os, 'windows')
+        run: |
+          cp ../../staging/package-win/engine.build_artifacts.txt ./server/windows
+          cp ../../staging/package-win/engine.exe ./server/windows
+          cp ../../staging/package-win/sunmscapi.dll ./server/windows
+      - name: configure mac executable
+        working-directory: tests/native-executable-tests
+        if: startsWith( matrix.os, 'mac')
+        run: |
+          cp -p ../../staging/package-macos/server-mac-amd64 ./server/mac
+          chmod +x ./server/mac/server-mac-amd64
+      - name: configure linux executable
+        working-directory: tests/native-executable-tests
+        if: startsWith( matrix.os, 'ubuntu')
+        run: |
+          cp -p ../../staging/package-linux/server ./server/linux
+          chmod +x ./server/linux/server
+      - name: build native executable test code
+        working-directory: tests/native-executable-tests
+        run: npm ci
+      - name: run native executable test code
+        working-directory: tests/native-executable-tests
+        run: npm run test
   cypress-run:
     runs-on: ubuntu-latest
     needs: [build]

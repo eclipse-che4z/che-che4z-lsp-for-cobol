@@ -31,16 +31,14 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
+import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
 import org.eclipse.lsp.cobol.dialects.daco.nodes.DaCoCopyFromNode;
 import org.eclipse.lsp.cobol.dialects.daco.processors.DaCoCopyFromProcessor;
 import org.eclipse.lsp.cobol.dialects.daco.processors.implicit.DaCoImplicitCodeProcessor;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -111,6 +109,11 @@ public final class DaCoDialect implements CobolDialect {
     DialectOutcome result = new DialectOutcome(nodes, context);
     copybookConfig = context.getCopybookConfig();
     return new ResultWithErrors<>(result, errors);
+  }
+
+  @Override
+  public Map<String, String> getKeywords() {
+    return KeywordsUtils.getKeywords("KeywordsDaCo.txt");
   }
 
   private void removeDcDb(ExtendedSource extendedSource) {

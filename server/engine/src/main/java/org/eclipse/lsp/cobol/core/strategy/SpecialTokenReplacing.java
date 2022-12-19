@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.strategy;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.utils.ResourceUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,8 +44,7 @@ class SpecialTokenReplacing {
    */
   Map<String, String> loadSpecialTokenMapping() {
     Properties props = new Properties();
-    try (InputStream ins =
-        SpecialTokenReplacing.class.getResourceAsStream(SPECIAL_TOKEN_HANDLING_FILEPATH)) {
+    try (InputStream ins = ResourceUtils.getInputStream(SPECIAL_TOKEN_HANDLING_FILEPATH)) {
       props.load(new InputStreamReader(ins, StandardCharsets.UTF_8));
     } catch (IOException exception) {
       LOG.error("SpecialTokenHandling didn't load.", exception);

@@ -1,6 +1,30 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+# [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-07)
+
+### Bug Fixes
+* Add Exit node for EXEC CICS RETURN statement ([#1603](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1603)) ([ac8e757](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ac8e757ade3ae52832075824cb1d6a6e7b4ed8e4))
+* Allow SPACE and literal in DaCo ROW ADD stmt ([80778fe](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/80778fe1efa36857a96e6e2a47eaf202f38a5858))
+* Create symbolic accumulator on stack ([c939afd](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/c939afda23ccb6483a777154d3d2a8aafab36ff5))
+* Exclude DaCo from test coverage ([7487839](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/7487839288102dc549b9f4446792a548cac61989))
+* Exclude DaCo from test coverage ([872583a](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/872583abc4ad9f2a7d59ce76cbb8a62624f84b09))
+* Fix dialect's interface ([03ab46b](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/03ab46b912d96894b2813076b80b964f2df2f0c0))
+* Fix lost changes after formatting document ([#1634](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1634)) ([9acede8](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9acede80871abf9a2f874221ef25a9b7fe025d10))
+* Fix module coverage ([6743043](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/67430430fb13686c46d548d2b9253464986af2e3))
+* Increase product version ([6b8701e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/6b8701ea5cd531f1ee7997671f5006ef61780ac7))
+* Increase test coverage ([cf65107](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/cf65107d4d89eba633fab1468e29c4e9bd0c06d3))
+* Move logic from code block and section name node classes ([9a77df6](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9a77df6467bd30b15c7fd9ed83583da516738cfc))
+* Store symbols in a repository ([466a6df](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/466a6df64f4c5d59eca9a2c77e1583d307d2f5c4))
+* Support AT END for CFAST graph ([#1613](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1613)) ([c325bf9](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/c325bf99041e1d4b940f30882344a75fb4011c6d))
+* Update copybook identification regex to support  all use cases ([#1618](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1618)) ([49d74aa](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/49d74aa85799e7f4d68bae09b3ff33491fa3f586))
+
+### Features
+* Add 'textDocument/diagnostic' support to LS ([583479b](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/583479bb6f89a67e2df865c729ed7a0cb47f5df2))
+* Automatic Cobol Detection ([00954df](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/00954df4ab450ca0a9235baddbc172d8f1e1639f))
+* Normalize model classes ([22fb5b3](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/22fb5b31c7f29ca98e2d37b18721900a8c154e94))
+* Update grammar ([baad971](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/baad971e4feb670a67a9e85deb03bdcbfc817978))
+
 ## [1.1.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.0.0...1.1.0) (2022-11-03)
 
 ### Bug Fixes

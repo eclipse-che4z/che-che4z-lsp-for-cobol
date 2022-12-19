@@ -20,25 +20,10 @@
         "pattern":"\\Qlogback.xml\\E"
       },
       {
-        "pattern":"\\Qorg/eclipse/lsp/cobol/core/strategy/SpecialTokenHandling.properties\\E"
+        "pattern":"\\Q/SpecialTokenHandling.properties\\E"
       },
       {
-        "pattern":"\\Qorg/eclipse/lsp/cobol/service/delegates/completions/LanguageKeywords.txt\\E"
-      },
-      {
-        "pattern":"\\Qorg/eclipse/lsp/cobol/service/delegates/completions/LanguageKeywordsDaCo.txt\\E"
-      },
-      {
-        "pattern":"\\Qorg/eclipse/lsp/cobol/service/delegates/completions/LanguageKeywordsIDMS.txt\\E"
-      },
-      {
-        "pattern":"\\Qorg/eclipse/lsp/cobol/service/delegates/completions/LanguageSnippetsCobol.json\\E"
-      },
-      {
-        "pattern":"\\Qorg/eclipse/lsp/cobol/service/delegates/completions/LanguageSnippetsDaCo.json\\"
-      },
-      {
-        "pattern":"\\Qorg/eclipse/lsp/cobol/service/delegates/completions/LanguageSnippetsIDMS.json\\E"
+        "pattern":"\\Q/LanguageKeywords.txt\\E"
       },
       {
         "pattern":"\\Qorg/slf4j/impl/StaticLoggerBinder.class\\E"

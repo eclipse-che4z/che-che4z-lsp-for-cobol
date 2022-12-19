@@ -777,7 +777,7 @@ dataOccursClause
    ;
 
 dataOccursTo
-   : TO integerLiteral
+   : TO (integerLiteral | UNBOUNDED)
    ;
 
 dataOccursSort
@@ -948,9 +948,9 @@ conditionalStatementCall
    ;
 
 statement
-   : acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
+   : acceptStatement | addStatement | allocateStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
     disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement |
-    execSqlStatementInProcedureDivision | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
+    execSqlStatementInProcedureDivision | execSqlImsStatement | exitStatement | freeStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
     serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
@@ -1030,6 +1030,10 @@ addGiving
 alteredGoTo
    : GO TO? DOT_FS
    ;
+
+allocateStatement
+    : ALLOCATE ((arithmeticExpression CHARACTERS) | qualifiedDataName) INITIALIZED? (LOC integerLiteral)? (RETURNING qualifiedDataName)?
+    ;
 
 // alter statement
 
@@ -1320,10 +1324,16 @@ exhibitOperand
    : literal | generalIdentifier
    ;
 
+// free statement
+
+freeStatement
+    : FREE qualifiedDataName
+    ;
+
 // exit statement
 
 exitStatement
-   : EXIT (PROGRAM | SECTION | PARAGRAPH)?
+   : EXIT (PROGRAM | SECTION | PARAGRAPH | PERFORM CYCLE? | METHOD)?
    ;
 
 // generate statement
@@ -2346,8 +2356,13 @@ cicsDfhValueLiteral
 cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN;
 
 literal
-   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | cicsDfhRespLiteral | cicsDfhValueLiteral
+   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | cicsDfhRespLiteral
+   | cicsDfhValueLiteral | utfLiteral | hexadecimalUtfLiteral
    ;
+
+utfLiteral: U_CHAR NONNUMERICLITERAL;
+
+hexadecimalUtfLiteral: U_CHAR HEX_NUMBERS;
 
 charString
    : FINALCHARSTRING

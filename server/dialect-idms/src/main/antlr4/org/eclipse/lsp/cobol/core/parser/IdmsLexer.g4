@@ -15,7 +15,7 @@
 lexer grammar IdmsLexer;
 
 channels{COMMENTS}
-import TechnicalLexer;
+import IdmsTechnicalLexer;
 
 ABEND : A B E N D;
 ABORT : A B O R T;
