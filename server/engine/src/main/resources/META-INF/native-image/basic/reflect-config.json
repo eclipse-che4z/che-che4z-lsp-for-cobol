@@ -753,6 +753,11 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
+    "name":"org.eclipse.lsp4j.ClientInfo",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
     "name":"org.eclipse.lsp4j.CodeActionDisabled",
     "allDeclaredFields":true,
     "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
@@ -877,7 +882,7 @@
   {
     "name":"org.eclipse.lsp4j.CompletionItemTagSupportCapabilities",
     "allDeclaredFields":true,
-    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+    "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
     "name":"org.eclipse.lsp4j.CompletionList",
@@ -999,7 +1004,7 @@
   {
     "name":"org.eclipse.lsp4j.DiagnosticsTagSupport",
     "allDeclaredFields":true,
-    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+    "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
     "name":"org.eclipse.lsp4j.DidChangeConfigurationCapabilities",
@@ -1491,7 +1496,7 @@
   {
     "name":"org.eclipse.lsp4j.SelectionRangeCapabilities",
     "allDeclaredFields":true,
-    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+    "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
     "name":"org.eclipse.lsp4j.SelectionRangeRegistrationOptions",
@@ -1685,7 +1690,7 @@
   {
     "name":"org.eclipse.lsp4j.WindowClientCapabilities",
     "allDeclaredFields":true,
-    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+    "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
     "name":"org.eclipse.lsp4j.WindowShowMessageRequestActionItemCapabilities",
