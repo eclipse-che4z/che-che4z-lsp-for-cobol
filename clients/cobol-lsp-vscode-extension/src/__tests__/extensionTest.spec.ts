@@ -74,6 +74,10 @@ jest.mock("vscode-languageclient", () => ({
     LanguageClient: jest.fn(),
 }));
 jest.mock("../services/reporter/TelemetryService");
+jest.mock("../services/copybook/CopybookMessageHandler", () => ({
+    resolveCopybookHandler: jest.fn(),
+    downloadCopybookHandler: jest.fn(),
+}));
 
 const context: any = {
     subscriptions: [],
