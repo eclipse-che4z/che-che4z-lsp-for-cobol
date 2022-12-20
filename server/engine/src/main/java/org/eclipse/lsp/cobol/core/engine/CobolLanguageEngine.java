@@ -488,6 +488,9 @@ public class CobolLanguageEngine {
   }
 }
 
+/**
+ * Contains related to analysis state
+ */
 @RequiredArgsConstructor
 @Value
 @Slf4j
@@ -564,5 +567,5 @@ class AnalysisContext {
             timing.getVisitorTime(),
             timing.getSyntaxTreeTime(),
             timing.getLateErrorProcessingTime());
-
-  }}
+  }
+}

@@ -150,7 +150,7 @@ public class CopybookServiceImpl implements CopybookService {
         programUri,
         copybookConfig);
     Optional<CopybookModel> copybookModel = tryResolveCopybookFromWorkspace(copybookName, programUri);
-    if(copybookModel.isPresent()) {
+    if (copybookModel.isPresent()) {
       return copybookModel.get();
     }
     Optional<CopybookModel> predefineCopybook = tryResolvePredefinedCopybook(copybookName, copybookConfig);
