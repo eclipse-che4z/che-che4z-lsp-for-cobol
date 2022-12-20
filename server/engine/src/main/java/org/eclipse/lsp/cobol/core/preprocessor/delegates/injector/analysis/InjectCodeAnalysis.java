@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.CopybookContentProvider;
 
 /** This interface defines a common API for all the implementation of the copybook analysis logic */
