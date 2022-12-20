@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.dialects.idms;
+package org.eclipse.lsp.cobol.dialects.daco;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

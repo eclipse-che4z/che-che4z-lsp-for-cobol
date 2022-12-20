@@ -43,7 +43,7 @@ public class CICSTranslatorProcessor implements Processor<CICSTranslatorNode> {
           .getErrors()
           .add(
               SyntaxError.syntaxError()
-                  .locality(cicsTranslatorNode.getLocality())
+                  .location(cicsTranslatorNode.getLocality().toOriginalLocation())
                   .severity(ErrorSeverity.ERROR)
                   .errorSource(ErrorSource.PARSING)
                   .suggestion(messageService.getMessage("cics.enableTranslator"))

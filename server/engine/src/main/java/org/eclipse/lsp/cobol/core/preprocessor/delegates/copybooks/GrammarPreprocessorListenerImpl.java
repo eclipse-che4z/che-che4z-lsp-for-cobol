@@ -143,7 +143,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       final SyntaxError error =
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.EXTENDED_DOCUMENT)
-              .locality(retrieveLocality(ctx))
+              .location(retrieveLocality(ctx).toOriginalLocation())
               .severity(ERROR)
               .suggestion(
                   messageService.getMessage(
@@ -324,7 +324,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             .suggestion(
                 messageService.getMessage(
                     "GrammarPreprocessorListener.controlDirectiveWrongArgs", ctx.getText()))
-            .locality(retrieveLocality(ctx))
+            .location(retrieveLocality(ctx).toOriginalLocation())
             .build();
     errors.add(error);
     LOG.debug("Syntax error by reportInvalidArgument: {}", error.toString());

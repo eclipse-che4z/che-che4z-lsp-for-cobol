@@ -31,7 +31,7 @@ public class ObsoleteNodeCheck implements Processor<ObsoleteNode> {
             SyntaxError.syntaxError()
                 .errorSource(ErrorSource.PARSING)
                 .severity(ErrorSeverity.WARNING)
-                .locality(node.getLocality())
+                .location(node.getLocality().toOriginalLocation())
                 .messageTemplate(MessageTemplate.of("cobolParser.ObsoleteCode"))
                 .build());
   }

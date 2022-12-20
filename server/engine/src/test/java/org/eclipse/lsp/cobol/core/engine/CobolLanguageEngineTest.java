@@ -91,19 +91,19 @@ class CobolLanguageEngineTest {
     SyntaxError error =
         SyntaxError.syntaxError()
                 .errorSource(ErrorSource.PARSING)
-            .locality(locality)
+            .location(locality.toOriginalLocation())
             .suggestion("suggestion")
             .severity(ERROR)
             .build();
     SyntaxError eofError =
         SyntaxError.syntaxError()
                 .errorSource(ErrorSource.PARSING)
-            .locality(
+            .location(
                 Locality.builder()
                     .uri(URI)
                     .range(new Range(new Position(0, 31), new Position(0, 31)))
                     .token("<EOF>")
-                    .build())
+                    .build().toOriginalLocation())
             .severity(ERROR)
             .build();
 

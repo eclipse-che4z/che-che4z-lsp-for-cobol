@@ -290,7 +290,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.COPYBOOK)
-            .locality(metaData.getNameLocality())
+            .location(metaData.getNameLocality().toOriginalLocation())
             .suggestion(
                 messageService.getMessage(
                     "GrammarPreprocessorListener.errorSuggestion",
@@ -318,7 +318,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
         SyntaxError.syntaxError().errorSource(ErrorSource.COPYBOOK)
             .severity(info)
             .suggestion(messageService.getMessage(messageID, copybookName.getDisplayName()))
-            .locality(locality)
+            .location(locality.toOriginalLocation())
             .build();
     LOG.debug(logMessage, error.toString());
     return error;
@@ -335,7 +335,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
         SyntaxError.syntaxError().errorSource(ErrorSource.COPYBOOK)
             .severity(info)
             .suggestion(messageService.getMessage(messageID, maxNameLength, copybookName))
-            .locality(locality)
+            .location(locality.toOriginalLocation())
             .build();
     LOG.debug(logMessage, error.toString());
     return error;

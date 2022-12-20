@@ -239,12 +239,8 @@ public class CobolLanguageEngine {
                             ctx.getConfig().getCopybookConfig(),
                             new CopybookHierarchy())
                     .unwrap(preprocessorErrors::addAll);
-    preprocessorErrors.forEach(
-            e ->
-                    e.getLocality()
-                            .setRange(
-                                    extendedSource
-                                            .mapLocation(e.getLocality().getRange())
+    preprocessorErrors.forEach(e -> e.getLocation().getLocation().setRange(extendedSource
+                                            .mapLocation(e.getLocation().getLocation().getRange())
                                             .getRange()));
     ctx.getAccumulatedErrors().addAll(preprocessorErrors);
     // Update copybook usages with proper positions
@@ -440,18 +436,20 @@ public class CobolLanguageEngine {
     return errors.stream()
         .filter(c -> c.getTokenIndex() != -1)
         .map(convertError(mapping))
-        .filter(it -> it.getLocality() != null)
+        .filter(it -> it.getLocation() != null)
         .collect(toList());
   }
 
   @NonNull
   private Function<SyntaxError, SyntaxError> convertError(@NonNull OldMapping mapping) {
-    return err ->
-        err.toBuilder()
-            .locality(mapping.findPreviousVisibleLocality(err.getTokenIndex()))
-            .suggestion(messageService.getMessage(err.getSuggestion()))
-            .errorSource(ErrorSource.PARSING)
-            .build();
+    return err -> {
+      Locality previousVisibleLocality = mapping.findPreviousVisibleLocality(err.getTokenIndex());
+      return err.toBuilder()
+          .location(previousVisibleLocality == null ? null : previousVisibleLocality.toOriginalLocation())
+          .suggestion(messageService.getMessage(err.getSuggestion()))
+          .errorSource(ErrorSource.PARSING)
+          .build();
+    };
   }
 
   private List<SyntaxError> collectErrorsForCopybooks(
@@ -469,7 +467,7 @@ public class CobolLanguageEngine {
         .map(
             err ->
                 err.toBuilder()
-                    .locality(copyStatements.get(err.getLocality().getCopybookId()))
+                    .location(copyStatements.get(err.getLocation().getCopybookId()).toOriginalLocation())
                     .errorSource(ErrorSource.COPYBOOK))
         .map(SyntaxError.SyntaxErrorBuilder::build)
         .flatMap(err -> Stream.concat(raiseError(err, copyStatements).stream(), Stream.of(err)))
@@ -477,7 +475,7 @@ public class CobolLanguageEngine {
   }
 
   private Predicate<SyntaxError> shouldRaise() {
-    return err -> (err.getLocality() != null && err.getLocality().getCopybookId() != null);
+    return err -> (err.getLocation() != null && err.getLocation().getCopybookId() != null);
   }
 
   private SyntaxError constructErrorMessage(SyntaxError syntaxError) {
