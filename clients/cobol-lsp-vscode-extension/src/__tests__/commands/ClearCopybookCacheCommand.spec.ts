@@ -33,14 +33,15 @@ jest.mock("vscode", () => ({
     workspace: {
         fs: {
             delete: jest.fn().mockReturnValue(true),
+            readDirectory: jest.fn().mockResolvedValue([['fileName', 2]])
         },
         workspaceFolders: [{
             uri: {
                 fsPath: "tmp-ws",
                 with: jest.fn().mockImplementation((change: { scheme?: string; authority?: string; path?: string; query?: string; fragment?: string }) => {
-                    return change.path;
-                })
-            }
+                    return {path: change.path, fsPath: change.path, with: jest.fn().mockReturnValue({path: change.path})};
+                }),
+            },
         } as any],
     },
 }));
