@@ -101,8 +101,8 @@ public final class DaCoDialect implements CobolDialect {
     parserErrors.addAll(listener.getErrors());
     parserErrors.addAll(visitor.getErrors());
 
-    parserErrors.forEach(error -> error.getLocality().setRange(
-            context.getExtendedSource().mapLocationUnsafe(error.getLocality().getRange()).getRange()));
+    parserErrors.forEach(error -> error.getLocation().getLocation().setRange(
+            context.getExtendedSource().mapLocationUnsafe(error.getLocation().getLocation().getRange()).getRange()));
 
     errors.addAll(parserErrors);
 

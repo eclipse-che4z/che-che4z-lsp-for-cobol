@@ -57,8 +57,8 @@ class ErrorHelperTest {
 
   private void checkSyntaxError(SyntaxError result, String message, Locality locality) {
     assertEquals(ErrorSource.DIALECT, result.getErrorSource());
-    assertEquals(locality, result.getLocality());
-    assertEquals(locality, result.getLocality());
+    assertEquals(locality.toOriginalLocation(), result.getLocation());
+    assertEquals(locality.toOriginalLocation(), result.getLocation());
     assertEquals(ErrorSeverity.ERROR, result.getSeverity());
     assertEquals(ErrorCode.MISSING_COPYBOOK, result.getErrorCode());
     assertEquals(message, result.getSuggestion());

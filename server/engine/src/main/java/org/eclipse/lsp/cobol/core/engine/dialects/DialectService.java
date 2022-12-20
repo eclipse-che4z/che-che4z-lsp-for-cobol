@@ -61,12 +61,12 @@ public class DialectService {
       List<SyntaxError> dialectErrors = orderedDialect.extend(context);
       dialectErrors.forEach(
           e ->
-              e.getLocality()
+              e.getLocation().getLocation()
                   .setRange(
                       context
                           .getExtendedSource()
                           .getMainMap()
-                          .mapLocation(e.getLocality().getRange(), false)
+                          .mapLocation(e.getLocation().getLocation().getRange(), false)
                           .getRange()));
 
       errors.addAll(dialectErrors);

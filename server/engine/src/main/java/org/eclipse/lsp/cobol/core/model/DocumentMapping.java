@@ -28,6 +28,7 @@ import java.util.Map;
  * positions that should be skipped while building a full mapping of the extended document.
  */
 @Value
+@Deprecated
 public class DocumentMapping {
   List<Locality> localities;
   Map<Integer, Integer> shifts;

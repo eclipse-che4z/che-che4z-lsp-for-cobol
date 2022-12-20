@@ -16,13 +16,14 @@ package org.eclipse.lsp.cobol.common.error;
 
 import lombok.Builder;
 import lombok.Value;
+import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 
 /**
  * This value class represents a syntax or semantic error found during the analysis. The finalized
  * version should always contain a non-null {@link Locality}. If it has only the offended token
- * after the {@link org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine} finishes analysis, then
+ * after the CobolLanguageEngine finishes analysis, then
  * this error is invalid.
  */
 // Please, don't use static imports for this method:
@@ -30,7 +31,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 @Builder(builderMethodName = "syntaxError", toBuilder = true)
 @Value
 public class SyntaxError {
-  Locality locality;
+  OriginalLocation location;
   MessageTemplate messageTemplate;
   @Builder.Default int tokenIndex = -1;
   String suggestion;

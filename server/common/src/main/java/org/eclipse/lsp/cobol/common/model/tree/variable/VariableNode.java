@@ -88,7 +88,7 @@ public abstract class VariableNode extends Node implements Context {
     return SyntaxError.syntaxError()
         .errorSource(ErrorSource.PARSING)
         .severity(severity)
-        .locality(getLocalityForError())
+        .location(getLocalityForError().toOriginalLocation())
         .messageTemplate(messageTemplate)
         .build();
   }
