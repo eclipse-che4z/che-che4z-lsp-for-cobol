@@ -17,8 +17,6 @@ package org.eclipse.lsp.cobol.core.engine;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -44,6 +42,8 @@ import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
+import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
+import org.eclipse.lsp.cobol.core.engine.analysis.EmbeddedCodeUtils;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
@@ -153,7 +153,7 @@ public class CobolLanguageEngine {
     ctx.parserDone();
 
     ctx.splittingLanguageStart();
-    Map<Token, EmbeddedCode> embeddedCodeParts = extractEmbeddedCode(listener, tree);
+    Map<Token, EmbeddedCode> embeddedCodeParts = EmbeddedCodeUtils.extractEmbeddedCode(listener, tree, messageService, treeListener);
     ctx.splittingLanguageDone();
 
     OldMapping positionMapping = new OldMapping(documentUri, oldExtendedDocument, tokens, embeddedCodeParts, extendedSource);
@@ -247,23 +247,13 @@ public class CobolLanguageEngine {
     oldExtendedDocument
             .getCopybooks()
             .getUsages()
-            .forEach(
-                    (k, v) ->
-                            v.setRange(
-                                    extendedSource
-                                            .mapLocation(v.getRange())
-                                            .getRange()));
+            .forEach((k, v) -> v.setRange(extendedSource.mapLocation(v.getRange()).getRange()));
 
     // Update copybook definition statements with proper positions
     oldExtendedDocument
             .getCopybooks()
             .getDefinitionStatements()
-            .forEach(
-                    (k, v) ->
-                            v.setRange(
-                                    extendedSource
-                                            .mapLocation(v.getRange())
-                                            .getRange()));
+            .forEach((k, v) -> v.setRange(extendedSource.mapLocation(v.getRange()).getRange()));
 
     return oldExtendedDocument;
   }
@@ -289,121 +279,56 @@ public class CobolLanguageEngine {
 
   private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx, SymbolAccumulatorService symbolAccumulatorService) {
     // Phase TRANSFORMATION
-    ctx.register(
-            new ProcessorDescription(
-                    CompilerDirectiveNode.class, ProcessingPhase.TRANSFORMATION, new CompilerDirectiveProcess()));
-    ctx.register(
-        new ProcessorDescription(
-            ProgramIdNode.class, ProcessingPhase.TRANSFORMATION, new ProgramIdProcess()));
-    ctx.register(
-        new ProcessorDescription(
-            SectionNode.class,
-            ProcessingPhase.TRANSFORMATION,
-            new ProcessNodeWithVariableDefinitions(symbolAccumulatorService)));
-    ctx.register(
-        new ProcessorDescription(
-            FileEntryNode.class, ProcessingPhase.TRANSFORMATION, new FileEntryProcess()));
-    ctx.register(
-        new ProcessorDescription(
-            FileDescriptionNode.class,
-            ProcessingPhase.TRANSFORMATION,
-            new FileDescriptionProcess(symbolAccumulatorService)));
-    ctx.register(
-        new ProcessorDescription(
-            DeclarativeProcedureSectionNode.class,
-            ProcessingPhase.TRANSFORMATION,
-            new DeclarativeProcedureSectionRegister(symbolAccumulatorService)));
+    ProcessingPhase t = ProcessingPhase.TRANSFORMATION;
+    ctx.register(t, CompilerDirectiveNode.class, new CompilerDirectiveProcess());
+    ctx.register(t, ProgramIdNode.class, new ProgramIdProcess());
+    ctx.register(t, SectionNode.class, new ProcessNodeWithVariableDefinitions(symbolAccumulatorService));
+    ctx.register(t, FileEntryNode.class,new FileEntryProcess());
+    ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess(symbolAccumulatorService));
+    ctx.register(t, DeclarativeProcedureSectionNode.class, new DeclarativeProcedureSectionRegister(symbolAccumulatorService));
+
     // Phase DEFINITION
-    ctx.register(
-        new ProcessorDescription(
-            ParagraphsNode.class, ProcessingPhase.DEFINITION, new DefineCodeBlock(symbolAccumulatorService)));
-    ctx.register(
-        new ProcessorDescription(
-            SectionNameNode.class,
-            ProcessingPhase.DEFINITION,
-            new SectionNameRegister(symbolAccumulatorService)));
-    ctx.register(
-        new ProcessorDescription(
-            ParagraphNameNode.class,
-            ProcessingPhase.DEFINITION,
-            new ParagraphNameRegister(symbolAccumulatorService)));
-    ctx.register(
-        new ProcessorDescription(
-            ProcedureDivisionBodyNode.class,
-            ProcessingPhase.DEFINITION,
-            new DefineCodeBlock(symbolAccumulatorService)));
+    ProcessingPhase d = ProcessingPhase.DEFINITION;
+    ctx.register(d, ParagraphsNode.class, new DefineCodeBlock(symbolAccumulatorService));
+    ctx.register(d, SectionNameNode.class, new SectionNameRegister(symbolAccumulatorService));
+    ctx.register(d, ParagraphNameNode.class, new ParagraphNameRegister(symbolAccumulatorService));
+    ctx.register(d, ProcedureDivisionBodyNode.class, new DefineCodeBlock(symbolAccumulatorService));
+
     // Phase USAGE
-    ctx.register(
-        new ProcessorDescription(
-            CodeBlockUsageNode.class, ProcessingPhase.USAGE, new CodeBlockUsage(symbolAccumulatorService)));
-    ctx.register(
-        new ProcessorDescription(
-            RootNode.class, ProcessingPhase.USAGE, new RootNodeUpdateCopyNodesByPositionInTree()));
-    ctx.register(
-        new ProcessorDescription(
-            QualifiedReferenceNode.class,
-            ProcessingPhase.USAGE,
-            new QualifiedReferenceUpdateVariableUsage(symbolAccumulatorService)));
+    ProcessingPhase u = ProcessingPhase.USAGE;
+    ctx.register(u, CodeBlockUsageNode.class, new CodeBlockUsage(symbolAccumulatorService));
+    ctx.register(u, RootNode.class, new RootNodeUpdateCopyNodesByPositionInTree());
+    ctx.register(u, QualifiedReferenceNode.class, new QualifiedReferenceUpdateVariableUsage(symbolAccumulatorService));
 
     // ENRICHMENT
-    ctx.register(
-        new ProcessorDescription(
-            SectionNameNode.class,
-            ProcessingPhase.VALIDATION,
-            new SectionNameNodeEnricher(symbolAccumulatorService)));
-    ctx.register(
-        new ProcessorDescription(
-            ParagraphNameNode.class,
-            ProcessingPhase.VALIDATION,
-            new ParagraphNameNodeEnricher(symbolAccumulatorService)));
-    ctx.register(
-        new ProcessorDescription(
-            CodeBlockUsageNode.class,
-            ProcessingPhase.VALIDATION,
-            new CodeBlockUsageNodeEnricher(symbolAccumulatorService)));
+    ProcessingPhase e = ProcessingPhase.ENRICHMENT;
+    ctx.register(e, SectionNameNode.class, new SectionNameNodeEnricher(symbolAccumulatorService));
+    ctx.register(e, ParagraphNameNode.class, new ParagraphNameNodeEnricher(symbolAccumulatorService));
+    ctx.register(e, CodeBlockUsageNode.class, new CodeBlockUsageNodeEnricher(symbolAccumulatorService));
 
     // Phase VALIDATION
-    ctx.register(
-        new ProcessorDescription(
-            VariableWithLevelNode.class, ProcessingPhase.VALIDATION, new VariableWithLevelCheck()));
-    ctx.register(
-        new ProcessorDescription(
-            StatementNode.class, ProcessingPhase.VALIDATION, new StatementValidate()));
-    ctx.register(
-        new ProcessorDescription(
-            ElementaryNode.class, ProcessingPhase.VALIDATION, new ElementaryNodeCheck()));
-    ctx.register(
-        new ProcessorDescription(
-            GroupItemNode.class, ProcessingPhase.VALIDATION, new GroupItemCheck()));
-    ctx.register(
-        new ProcessorDescription(
-            ObsoleteNode.class, ProcessingPhase.VALIDATION, new ObsoleteNodeCheck()));
-    ctx.register(
-        new ProcessorDescription(
-            StandAloneDataItemNode.class,
-            ProcessingPhase.VALIDATION,
-            new StandAloneDataItemCheck()));
-    ctx.register(
-            new ProcessorDescription(
-                    ProgramEndNode.class, ProcessingPhase.VALIDATION, new ProgramEndCheck()));
-    ctx.register(
-        new ProcessorDescription(
-            CICSTranslatorNode.class, ProcessingPhase.VALIDATION, new CICSTranslatorProcessor(analysisConfig, messageService)));
+    ProcessingPhase v = ProcessingPhase.VALIDATION;
+    ctx.register(v, VariableWithLevelNode.class, new VariableWithLevelCheck());
+    ctx.register(v, StatementNode.class, new StatementValidate());
+    ctx.register(v, ElementaryNode.class, new ElementaryNodeCheck());
+    ctx.register(v, GroupItemNode.class, new GroupItemCheck());
+    ctx.register(v, ObsoleteNode.class, new ObsoleteNodeCheck());
+    ctx.register(v, StandAloneDataItemNode.class, new StandAloneDataItemCheck());
+    ctx.register(v, ProgramEndNode.class, new ProgramEndCheck());
+    ctx.register(v, CICSTranslatorNode.class, new CICSTranslatorProcessor(analysisConfig, messageService));
 
     // Dialects
     List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());
     pds.forEach(ctx::register);
   }
 
-  private CopybooksRepository applyDialectCopybooks(
-      CopybooksRepository copybooks, DialectOutcome dialectOutcome) {
+  private CopybooksRepository applyDialectCopybooks(CopybooksRepository copybooks, DialectOutcome dialectOutcome) {
     dialectOutcome.getDialectNodes().stream()
         .flatMap(Node::getDepthFirstStream)
         .filter(n -> n.getNodeType().equals(NodeType.COPY))
         .map(CopyNode.class::cast)
         .filter(n -> n.getDefinition() != null)
-        .forEach(
-            n -> copybooks.define(n.getName(), n.getDialect(), n.getDefinition().getLocation()));
+        .forEach(n -> copybooks.define(n.getName(), n.getDialect(), n.getDefinition().getLocation()));
     return copybooks;
   }
 
@@ -483,87 +408,5 @@ public class CobolLanguageEngine {
         .map(messageService::localizeTemplate)
         .map(message -> syntaxError.toBuilder().messageTemplate(null).suggestion(message).build())
         .orElse(syntaxError);
-  }
-}
-
-/**
- * Contains related to analysis state
- */
-@RequiredArgsConstructor
-@Value
-@Slf4j
-class AnalysisContext {
-  String documentUri;
-  AnalysisConfig config;
-  Timing.Builder timingBuilder = Timing.builder();
-  List<SyntaxError> accumulatedErrors = new ArrayList<>();
-  public void dialectsStart() {
-    timingBuilder.getDialectsTimer().start();
-  }
-  public void dialectsDone() {
-    timingBuilder.getDialectsTimer().stop();
-  }
-
-  public void preprocessorStart() {
-    timingBuilder.getPreprocessorTimer().start();
-  }
-
-  public void preprocessorDone() {
-    timingBuilder.getPreprocessorTimer().stop();
-  }
-
-  public void parserStart() {
-    timingBuilder.getParserTimer().start();
-  }
-
-  public void parserDone() {
-    timingBuilder.getParserTimer().stop();
-  }
-
-  public void splittingLanguageStart() {
-    timingBuilder.getSplittingLanguageTimer().start();
-  }
-
-  public void splittingLanguageDone() {
-    timingBuilder.getSplittingLanguageTimer().stop();
-  }
-
-  public void visitorStart() {
-    timingBuilder.getVisitorTimer().start();
-  }
-
-  public void visitorDone() {
-    timingBuilder.getVisitorTimer().stop();
-  }
-
-  public void syntaxTreeStart() {
-    timingBuilder.getSyntaxTreeTimer().start();
-  }
-
-  public void syntaxTreeDone() {
-    timingBuilder.getSyntaxTreeTimer().stop();
-  }
-
-  public void lateErrorProcessingStart() {
-    timingBuilder.getLateErrorProcessingTimer().start();
-  }
-
-  public void lateErrorProcessingDone() {
-    timingBuilder.getLateErrorProcessingTimer().stop();
-  }
-
-  public void logTiming() {
-    Timing timing = timingBuilder.build();
-    LOG.debug(
-            "Timing for parsing {}. Dialects: {}, preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
-                    + "late error processing: {}",
-            documentUri,
-            timing.getDialectsTime(),
-            timing.getPreprocessorTime(),
-            timing.getParserTime(),
-            timing.getMappingTime(),
-            timing.getVisitorTime(),
-            timing.getSyntaxTreeTime(),
-            timing.getLateErrorProcessingTime());
   }
 }
