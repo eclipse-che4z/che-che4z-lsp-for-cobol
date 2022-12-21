@@ -96,7 +96,6 @@ pipeline {
                                     sh 'mvn -version'
                                     sh 'mvn clean verify --no-transfer-progress'
                                     sh 'cp engine/target/server.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/jar/'
-                                    sh 'cp dialect-daco/target/dialect-daco.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/jar/dialects/'
                                     sh 'cp dialect-idms/target/dialect-idms.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/jar/dialects/'
                                 }
                             }
