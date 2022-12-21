@@ -14,6 +14,7 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
+import { FileType } from "vscode";
 import { C4Z_FOLDER, CLEARING_COPYBOOK_CACHE, COPYBOOK_CACHE_CLEARED_INFO, COPYBOOKS_FOLDER } from "../constants";
 
 /**
@@ -24,8 +25,16 @@ export function clearCache() {
     vscode.window.setStatusBarMessage(CLEARING_COPYBOOK_CACHE, Promise.resolve().then(()=>{
         const folderUri = vscode.workspace.workspaceFolders[0].uri;
         const fileUri = folderUri.with({ path: path.join(folderUri.fsPath, C4Z_FOLDER, COPYBOOKS_FOLDER) });
-        vscode.workspace.fs.delete(fileUri, { recursive: true});
+        deleteFolderContent(fileUri);
         vscode.window.showInformationMessage(COPYBOOK_CACHE_CLEARED_INFO);
     }, ()=>vscode.window.showInformationMessage("Encountered problem while clearing copybook cache")))
+ }
+
+ function deleteFolderContent(fileUri: vscode.Uri) {
+  return  vscode.workspace.fs.readDirectory(fileUri).then((value: [string, FileType][]) => {
+        value.forEach(val => {
+            vscode.workspace.fs.delete(fileUri.with({path: path.join(fileUri.fsPath, val[0])}), { recursive: true});
+        })
+    });
  }
 
