@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine;
+package org.eclipse.lsp.cobol.core.engine.analysis;
 
 import lombok.Value;
 
@@ -20,7 +20,7 @@ import lombok.Value;
  * The collection of timing data.
  */
 @Value
-class Timing {
+public class Timing {
   long preprocessorTime;
   long dialectsTime;
   long parserTime;
@@ -31,7 +31,7 @@ class Timing {
   long syntaxTreeTime;
   long lateErrorProcessingTime;
 
-  static Builder builder() {
+  public static Builder builder() {
     return new Builder();
   }
 
@@ -39,7 +39,7 @@ class Timing {
    * The collection of timers.
    */
   @Value
-  static class Builder {
+  public static class Builder {
     Timer preprocessorTimer = new Timer();
     Timer dialectsTimer = new Timer();
     Timer parserTimer = new Timer();
@@ -49,7 +49,7 @@ class Timing {
     Timer syntaxTreeTimer = new Timer();
     Timer lateErrorProcessingTimer = new Timer();
 
-    Timing build() {
+    public Timing build() {
       return new Timing(
               preprocessorTimer.getTotalTime(),
               dialectsTimer.getTotalTime(),
@@ -65,16 +65,16 @@ class Timing {
   /**
    * The stop watch timer.
    */
-  static class Timer {
+  public static class Timer {
     long startTime = 0;
     long totalTime = 0;
 
-    void start() {
+    public void start() {
       if (startTime != 0) throw new IllegalStateException("The timer must start only once");
       startTime = System.currentTimeMillis();
     }
 
-    void stop() {
+    public void stop() {
       if (totalTime != 0) throw new IllegalStateException("The timer must stop only once");
       totalTime = System.currentTimeMillis() - startTime;
     }
