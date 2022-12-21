@@ -6,13 +6,12 @@ All notable changes to the COBOL Language Support extension are documented in th
 #### Fixed
 - Fix copybook download and clear downloaded copybook cache command
 
-## [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-07)
+## [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-08)
 
 #### Added
-- Support `UTG8` pic clause.
-- Support `ALLOCATE` statements.
-- Support `UNBOUNDED` as `dataOccursTo` clause.
-- Automatic COBOL detection
+- Support for miscellaneous COBOL statements
+- Automatic COBOL detection improvement
+- Support of Glob wildcards in copybook path
 
 #### Fixed
 - Miscellaneous fixes for CCF support
