@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [1.1.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.1.2) (2022-12-21)
+
+### Fixed
+- Fix copybook download and clear downloaded copybook cache
+- Reference name even if not unique, provided it has only one 01 level as per QUALIFY(EXTEND) directive option
+- Support same program id for multiple programs in same document
+- support utf literal
+- update exit statement grammar
+
+### Added
+- Support free statements
+
 ## [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-07)
 
 #### Added

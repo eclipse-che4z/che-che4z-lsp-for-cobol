@@ -1,6 +1,20 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+# [1.1.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.1.2) (2022-12-21)
+
+### Bug Fixes
+* Fix copybook download and clear ([44c7aa3](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/44c7aa368c84051aac2fba6f3abffc5bebdd29d9))
+* Reference name even if not unique, provided it has only one 01 l… ([#1664](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1664)) ([80cf948](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/80cf948c8c99c4f5f6a76526293250b5bc453414))
+* Remove unnecessary keywords from cobolword ([#1670](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1670)) ([2f65768](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/2f65768dbcf36fe74e8c166620c968e5d3378af1))
+* Support same program id for multiple programs in same document ([#1668](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1668)) ([5e4c53a](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/5e4c53a6c78b2e03eb146772123f65152ad73fdb))
+* support utf literal. ([#1667](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1667)) ([de6e548](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/de6e5489624c4a114ce20f85328d2a1339a07f0c))
+* update exit statement grammar ([#1666](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1666)) ([a7881d3](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a7881d33158d3f81dfc18c2ab18c1207b59f7617))
+* update native build configuration ([#1675](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1675)) ([fd63e59](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/fd63e594a3d1338f31afe5afb7ffcf0f77056bf9))
+
+### Features
+* Support free statements ([#1665](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1665)) ([04bb399](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/04bb3999d1ec141f13d0c1ca173b541fdccd827c))
+
 # [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-07)
 
 ### Bug Fixes
