@@ -26,8 +26,19 @@ import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 
 import java.util.Map;
 
+/**
+ * Utilities for embedded code handling
+ */
 @UtilityClass
 public class EmbeddedCodeUtils {
+  /**
+   * Extract Embedded Code
+   * @param listener a parser listener
+   * @param tree a CST root
+   * @param messageService a Message service
+   * @param treeListener a Parse Tree Listener
+   * @return a map of embedded code tokens
+   */
   public Map<Token, EmbeddedCode> extractEmbeddedCode(
           ParserListener listener,
           CobolParser.StartRuleContext tree,
