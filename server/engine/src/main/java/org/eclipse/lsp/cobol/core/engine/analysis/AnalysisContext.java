@@ -19,10 +19,12 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.core.engine.analysis.Timing;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Contains related to analysis state
@@ -31,79 +33,56 @@ import java.util.List;
 @Value
 @Slf4j
 public class AnalysisContext {
+  /**
+   * Type of activities we want to measure time for
+   */
+  public enum Activity {
+    DIALECTS,
+    PREPROCESSOR,
+    PARSER,
+    VISITOR,
+    SYNTAX_TREE,
+    LATE_ERROR_PROCESSING
+  }
+
+  Map<Activity, Timing> timing = new HashMap<>();
   String documentUri;
   AnalysisConfig config;
-  Timing.Builder timingBuilder = Timing.builder();
   List<SyntaxError> accumulatedErrors = new ArrayList<>();
 
-  public void dialectsStart() {
-    timingBuilder.getDialectsTimer().start();
+  /**
+   * Measure run time of supplier
+   * @param activity current activity
+   * @param supplier execution logic
+   * @return result of execution
+   * @param <T> type of execution result
+   */
+  public <T> T measure(Activity activity, Supplier<T> supplier) {
+    return timing.computeIfAbsent(activity, a -> new Timing()).measure(supplier);
   }
 
-  public void dialectsDone() {
-    timingBuilder.getDialectsTimer().stop();
+  /**
+   * Measure run time of runnable
+   * @param activity current activity
+   * @param runnable execution logic
+   */
+  public void measure(Activity activity, Runnable runnable) {
+    timing.computeIfAbsent(activity, a -> new Timing()).measure(runnable);
   }
 
-  public void preprocessorStart() {
-    timingBuilder.getPreprocessorTimer().start();
-  }
-
-  public void preprocessorDone() {
-    timingBuilder.getPreprocessorTimer().stop();
-  }
-
-  public void parserStart() {
-    timingBuilder.getParserTimer().start();
-  }
-
-  public void parserDone() {
-    timingBuilder.getParserTimer().stop();
-  }
-
-  public void splittingLanguageStart() {
-    timingBuilder.getSplittingLanguageTimer().start();
-  }
-
-  public void splittingLanguageDone() {
-    timingBuilder.getSplittingLanguageTimer().stop();
-  }
-
-  public void visitorStart() {
-    timingBuilder.getVisitorTimer().start();
-  }
-
-  public void visitorDone() {
-    timingBuilder.getVisitorTimer().stop();
-  }
-
-  public void syntaxTreeStart() {
-    timingBuilder.getSyntaxTreeTimer().start();
-  }
-
-  public void syntaxTreeDone() {
-    timingBuilder.getSyntaxTreeTimer().stop();
-  }
-
-  public void lateErrorProcessingStart() {
-    timingBuilder.getLateErrorProcessingTimer().start();
-  }
-
-  public void lateErrorProcessingDone() {
-    timingBuilder.getLateErrorProcessingTimer().stop();
-  }
-
+  /**
+   * Log the timing of analysis
+   */
   public void logTiming() {
-    Timing timing = timingBuilder.build();
     LOG.debug(
-            "Timing for parsing {}. Dialects: {}, preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
+            "Timing for parsing {}. Dialects: {}, preprocessor: {}, parser: {}, visitor: {}, syntaxTree: {}, "
                     + "late error processing: {}",
             documentUri,
-            timing.getDialectsTime(),
-            timing.getPreprocessorTime(),
-            timing.getParserTime(),
-            timing.getMappingTime(),
-            timing.getVisitorTime(),
-            timing.getSyntaxTreeTime(),
-            timing.getLateErrorProcessingTime());
+            timing.get(Activity.DIALECTS).getTime(),
+            timing.get(Activity.PREPROCESSOR).getTime(),
+            timing.get(Activity.PARSER).getTime(),
+            timing.get(Activity.VISITOR).getTime(),
+            timing.get(Activity.SYNTAX_TREE).getTime(),
+            timing.get(Activity.LATE_ERROR_PROCESSING).getTime());
   }
 }

@@ -14,73 +14,70 @@
  */
 package org.eclipse.lsp.cobol.core.engine.analysis;
 
-import lombok.Value;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * The collection of timing data.
  */
-@Value
 public class Timing {
-  long preprocessorTime;
-  long dialectsTime;
-  long parserTime;
-  @Deprecated
-  long mappingTime;
-  long splittingLanguageTimer;
-  long visitorTime;
-  long syntaxTreeTime;
-  long lateErrorProcessingTime;
-
-  public static Builder builder() {
-    return new Builder();
-  }
+  Timer timer = new Timer();
 
   /**
-   * The collection of timers.
+   * Measure run time of supplier
+   * @param supplier execution logic
+   * @return result of execution
+   * @param <T> type of execution result
    */
-  @Value
-  public static class Builder {
-    Timer preprocessorTimer = new Timer();
-    Timer dialectsTimer = new Timer();
-    Timer parserTimer = new Timer();
-    Timer mappingTimer = new Timer();
-    Timer splittingLanguageTimer = new Timer();
-    Timer visitorTimer = new Timer();
-    Timer syntaxTreeTimer = new Timer();
-    Timer lateErrorProcessingTimer = new Timer();
-
-    public Timing build() {
-      return new Timing(
-              preprocessorTimer.getTotalTime(),
-              dialectsTimer.getTotalTime(),
-              parserTimer.getTotalTime(),
-              mappingTimer.getTotalTime(),
-              splittingLanguageTimer.getTotalTime(),
-              visitorTimer.getTotalTime(),
-              syntaxTreeTimer.getTotalTime(),
-              lateErrorProcessingTimer.getTotalTime());
+  public <T> T measure(Supplier<T> supplier) {
+    try {
+      timer.start();
+      return supplier.get();
+    } finally {
+      timer.stop();
     }
   }
-
   /**
-   * The stop watch timer.
+   * Measure run time of runnable
+   * @param runnable execution logic
    */
-  public static class Timer {
-    long startTime = 0;
-    long totalTime = 0;
-
-    public void start() {
-      if (startTime != 0) throw new IllegalStateException("The timer must start only once");
-      startTime = System.currentTimeMillis();
+  public void measure(Runnable runnable) {
+    try {
+      timer.start();
+      runnable.run();
+    } finally {
+      timer.stop();
     }
+  }
+  public long getTime() {
+    return  timer.getTotalTime();
+  }
+}
 
-    public void stop() {
-      if (totalTime != 0) throw new IllegalStateException("The timer must stop only once");
-      totalTime = System.currentTimeMillis() - startTime;
-    }
+/**
+ * The stop watch timer.
+ */
+class Timer {
+  private List<Long> measurements = new ArrayList<>();
+  private long startTime = 0;
 
-    long getTotalTime() {
-      return totalTime;
+  public void start() {
+    if (startTime != 0) {
+      throw new IllegalStateException("The timer is running");
     }
+    startTime = System.currentTimeMillis();
+  }
+
+  public void stop() {
+    if (startTime == 0) {
+      throw new IllegalStateException("The timer is not running");
+    }
+    measurements.add(System.currentTimeMillis() - startTime);
+    startTime = 0;
+  }
+
+  long getTotalTime() {
+      return measurements.stream().mapToLong(l -> l).sum();
   }
 }

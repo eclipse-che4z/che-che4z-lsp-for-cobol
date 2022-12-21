@@ -75,6 +75,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.common.model.NodeType.EMBEDDED_CODE;
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext.Activity.*;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
@@ -133,44 +134,36 @@ public class CobolLanguageEngine {
     AnalysisContext ctx = new AnalysisContext(documentUri, analysisConfig);
     TextTransformations cleanText = preprocessor.cleanUpCode(documentUri, text).unwrap(ctx.getAccumulatedErrors()::addAll);
 
-    ctx.dialectsStart();
-    DialectOutcome dialectOutcome = processDialects(ctx, cleanText);
-    ctx.dialectsDone();
+    DialectOutcome dialectOutcome = ctx.measure(DIALECTS, () -> processDialects(ctx, cleanText));
 
-    ctx.preprocessorStart();
     ExtendedSource extendedSource = dialectOutcome.getContext().getExtendedSource();
-    OldExtendedDocument oldExtendedDocument = runPreprocessor(ctx, extendedSource);
-    ctx.preprocessorDone();
+
+    OldExtendedDocument oldExtendedDocument = ctx.measure(PREPROCESSOR, () -> runPreprocessor(ctx, extendedSource));
 
     ParserListener listener = new ParserListener();
 
-    ctx.parserStart();
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(oldExtendedDocument.getText()));
     lexer.removeErrorListeners();
-
     CommonTokenStream tokens = new CommonTokenStream(lexer);
-    CobolParser.StartRuleContext tree = runParser(listener, lexer, tokens);
-    ctx.parserDone();
 
-    ctx.splittingLanguageStart();
-    Map<Token, EmbeddedCode> embeddedCodeParts = EmbeddedCodeUtils.extractEmbeddedCode(listener, tree, messageService, treeListener);
-    ctx.splittingLanguageDone();
+    CobolParser.StartRuleContext tree = ctx.measure(PARSER, () -> runParser(listener, lexer, tokens));
+
+    Map<Token, EmbeddedCode> embeddedCodeParts = ctx.measure(PREPROCESSOR, () ->
+            EmbeddedCodeUtils.extractEmbeddedCode(listener, tree, messageService, treeListener));
 
     OldMapping positionMapping = new OldMapping(documentUri, oldExtendedDocument, tokens, embeddedCodeParts, extendedSource);
 
-    ctx.visitorStart();
-    List<Node> syntaxTree = runVisitor(analysisConfig, ctx, dialectOutcome, oldExtendedDocument, tokens, tree, embeddedCodeParts, positionMapping);
-    ctx.visitorDone();
+    List<Node> syntaxTree = ctx.measure(VISITOR, () ->
+            runVisitor(analysisConfig, ctx, dialectOutcome, oldExtendedDocument, tokens, tree, embeddedCodeParts, positionMapping));
 
-    ctx.syntaxTreeStart();
     SymbolAccumulatorService symbolAccumulatorService = new SymbolAccumulatorService();
-    Node rootNode = processSyntaxTree(analysisConfig, symbolAccumulatorService, ctx, positionMapping, syntaxTree);
-    symbolsRepository.updateSymbols(symbolAccumulatorService.getProgramSymbols());
-    ctx.syntaxTreeDone();
+    Node rootNode = ctx.measure(SYNTAX_TREE, () -> {
+      Node root = processSyntaxTree(analysisConfig, symbolAccumulatorService, ctx, positionMapping, syntaxTree);
+      symbolsRepository.updateSymbols(symbolAccumulatorService.getProgramSymbols());
+      return root;
+    });
 
-    ctx.lateErrorProcessingStart();
-    processLateErrors(ctx, oldExtendedDocument, listener, positionMapping);
-    ctx.lateErrorProcessingDone();
+    ctx.measure(LATE_ERROR_PROCESSING, () -> processLateErrors(ctx, oldExtendedDocument, listener, positionMapping));
 
     if (LOG.isDebugEnabled()) {
       ctx.logTiming();
@@ -283,7 +276,7 @@ public class CobolLanguageEngine {
     ctx.register(t, CompilerDirectiveNode.class, new CompilerDirectiveProcess());
     ctx.register(t, ProgramIdNode.class, new ProgramIdProcess());
     ctx.register(t, SectionNode.class, new ProcessNodeWithVariableDefinitions(symbolAccumulatorService));
-    ctx.register(t, FileEntryNode.class,new FileEntryProcess());
+    ctx.register(t, FileEntryNode.class, new FileEntryProcess());
     ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess(symbolAccumulatorService));
     ctx.register(t, DeclarativeProcedureSectionNode.class, new DeclarativeProcedureSectionRegister(symbolAccumulatorService));
 
