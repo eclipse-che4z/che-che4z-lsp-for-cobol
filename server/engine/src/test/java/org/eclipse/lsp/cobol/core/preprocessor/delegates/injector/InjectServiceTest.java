@@ -46,48 +46,6 @@ class InjectServiceTest {
   }
 
   @Test
-  void testLinkageSectionPickUpDialectInjectors_true() {
-    CobolPreprocessor.LinkageSectionContext context = mock(CobolPreprocessor.LinkageSectionContext.class);
-    List<InjectDescriptor> descriptorList = injectService.getInjectors(context);
-
-    assertEquals(1, descriptorList.size());
-    assertEquals("DFHEIBLC", descriptorList.get(0).getInjectedSourceName());
-  }
-
-  @Test
-  void testLinkageSectionPickUpDialectInjectors_false() {
-    CobolPreprocessor.LinkageSectionContext context = mock(CobolPreprocessor.LinkageSectionContext.class);
-
-    List<InjectDescriptor> descriptorList = injectService.getInjectors(context);
-    assertEquals(1, descriptorList.size());
-  }
-
-  @Test
-  void testProcedureDivisionPickUpDialectInjectors_false() {
-    CobolPreprocessor.LinkageSectionContext context = mock(CobolPreprocessor.LinkageSectionContext.class);
-
-    List<InjectDescriptor> descriptorList = injectService.getInjectors(context);
-    assertEquals(1, descriptorList.size());
-  }
-
-  @Test
-  void testWorkingStoragePickUpDialectInjectors_true() {
-    CobolPreprocessor.WorkingStorageSectionContext context = mock(CobolPreprocessor.WorkingStorageSectionContext.class);
-    List<InjectDescriptor> descriptorList = injectService.getInjectors(context);
-
-    assertEquals(1, descriptorList.size());
-    assertEquals("SPECIALREGISTERS", descriptorList.get(0).getInjectedSourceName());
-  }
-
-  @Test
-  void testWorkingStoragePickUpDialectInjectors_false() {
-    CobolPreprocessor.WorkingStorageSectionContext context = mock(CobolPreprocessor.WorkingStorageSectionContext.class);
-
-    List<InjectDescriptor> descriptorList = injectService.getInjectors(context);
-    assertEquals(1, descriptorList.size());
-  }
-
-  @Test
   void testPlusPlusReturnsInjectors() {
     CobolPreprocessor.PlusplusIncludeStatementContext context = mock(CobolPreprocessor.PlusplusIncludeStatementContext.class);
     CobolPreprocessor.CopySourceContext copySource = mock(CobolPreprocessor.CopySourceContext.class);
