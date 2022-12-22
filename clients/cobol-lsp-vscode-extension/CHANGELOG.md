@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [1.1.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.1.2) (2022-12-21)
+## [1.1.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.1.2) (2022-12-22)
 
 #### Fixed
 - Fix copybook download and clear downloaded copybook cache commands
