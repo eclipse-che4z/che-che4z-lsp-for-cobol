@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service;
+package org.eclipse.lsp.cobol.service.settings;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
@@ -25,16 +25,18 @@ import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
+import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 
 /** This service fetches configuration settings from the client. */
 @Slf4j
@@ -60,7 +62,8 @@ public class CachingConfigurationService implements ConfigurationService {
                     DIALECTS.label,
                     DACO_PREDEFINED_SECTIONS.label,
                     SUBROUTINE_LOCAL_PATHS.label,
-                    CICS_TRANSLATOR_ENABLED.label))
+                    CICS_TRANSLATOR_ENABLED.label,
+                    DIALECT_REGISTRY.label))
             .thenApply(this::parseConfig);
   }
 
@@ -105,11 +108,24 @@ public class CachingConfigurationService implements ConfigurationService {
         parseDialects((JsonArray) clientConfig.get(2)),
         parsePredefinedParagraphs((JsonElement) clientConfig.get(3)),
         parseSubroutineFolder((JsonElement) clientConfig.get(4)),
-        parseCicsTranslatorOption((JsonElement) clientConfig.get(5)));
+        parseCicsTranslatorOption((JsonElement) clientConfig.get(5)),
+        parseDialectRegistry((JsonArray) clientConfig.get(6)));
+  }
+
+  private List<DialectRegistryItem> parseDialectRegistry(JsonArray jsonArray) {
+    return Streams.stream(jsonArray)
+        .map(JsonElement::getAsJsonObject)
+        .filter(Objects::nonNull)
+        .map(o -> new DialectRegistryItem(
+            o.get("name").getAsString(),
+            o.get("path").getAsString(),
+            o.get("description").getAsString(),
+            o.get("extensionId").getAsString())
+        ).collect(toList());
   }
 
   private SQLBackend parseSQLBackend(List<Object> objects) {
-    return SettingsService.getValueAsString(objects)
+    return ConfigHelper.getValueAsString(objects)
         .map(SQLBackend::valueOf)
         .orElse(SQLBackend.DB2_SERVER);
   }
@@ -123,9 +139,7 @@ public class CachingConfigurationService implements ConfigurationService {
   }
 
   private List<String> parseDialects(JsonArray dialects) {
-    List<String> providedDialects =
-        Streams.stream(dialects).map(JsonElement::getAsString).collect(toList());
-    return providedDialects;
+    return Streams.stream(dialects).map(JsonElement::getAsString).collect(toList());
   }
 
   private List<EmbeddedLanguage> parseFeatures(JsonElement features) {

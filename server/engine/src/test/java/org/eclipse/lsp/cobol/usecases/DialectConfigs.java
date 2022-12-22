@@ -28,7 +28,8 @@ public class DialectConfigs {
     return new AnalysisConfig(
         new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
         ImmutableList.of(),
-        ImmutableList.of("IDMS"), true);
+        ImmutableList.of("IDMS"), true,
+        ImmutableList.of());
   }
 
   /**
@@ -40,6 +41,7 @@ public class DialectConfigs {
             new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of("S930", "S940", "S950",
                     "S990", "S991", "S997", "S999")),
             ImmutableList.of(),
-            ImmutableList.of("DaCo"), true);
+            ImmutableList.of("DaCo"), true,
+            ImmutableList.of());
   }
 }

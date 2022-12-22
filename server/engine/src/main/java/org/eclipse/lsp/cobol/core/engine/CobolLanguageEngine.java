@@ -63,7 +63,7 @@ import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.EmbeddedLanguagesListener;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.CachingConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 
@@ -135,6 +135,7 @@ public class CobolLanguageEngine {
     TextTransformations cleanText = preprocessor.cleanUpCode(documentUri, text).unwrap(ctx.getAccumulatedErrors()::addAll);
 
     ctx.dialectsStart();
+    dialectService.updateDialects(analysisConfig.getDialectRegistry());
     DialectOutcome dialectOutcome = processDialects(ctx, cleanText);
     ctx.dialectsDone();
 

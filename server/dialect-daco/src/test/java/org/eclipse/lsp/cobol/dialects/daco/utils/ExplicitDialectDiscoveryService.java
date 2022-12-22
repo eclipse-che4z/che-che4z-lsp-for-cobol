@@ -32,4 +32,9 @@ public class ExplicitDialectDiscoveryService implements DialectDiscoveryService 
   public List<CobolDialect> loadDialects(CopybookService copybookService, MessageService messageService) {
     return ImmutableList.of(new DaCoDialect(copybookService, messageService), new IdmsDialect(copybookService, messageService));
   }
+
+  @Override
+  public List<CobolDialect> loadDialects(String path, CopybookService copybookService, MessageService messageService) {
+    return ImmutableList.of();
+  }
 }

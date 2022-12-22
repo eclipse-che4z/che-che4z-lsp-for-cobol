@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
  */
 class DialectDiscoveryFolderServiceTest {
   @Test
-  void test() {
+  void testLoadDialects() {
     WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     when(workingFolderService.getFilenames(any())).thenReturn(ImmutableList.of("dialect-test.jar"));
 
@@ -40,4 +40,35 @@ class DialectDiscoveryFolderServiceTest {
     List<CobolDialect> dialectList = service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
     assertEquals(0, dialectList.size());
   }
+
+  @Test
+  void testLoadDialects_working_folder_failed() {
+    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+    when(workingFolderService.getWorkingFolder()).thenThrow(new RuntimeException());
+
+    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService);
+    List<CobolDialect> dialectList = service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
+    assertEquals(0, dialectList.size());
+  }
+
+  @Test
+  void testLoadDialects_get_filenames_failed() {
+    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+    when(workingFolderService.getFilenames(any())).thenThrow(new RuntimeException());
+
+    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService);
+    List<CobolDialect> dialectList = service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
+    assertEquals(0, dialectList.size());
+  }
+
+  @Test
+  void testLoadDialects_specifiedPath() {
+    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+    when(workingFolderService.getFilenames(any())).thenReturn(ImmutableList.of("dialect-test.jar"));
+
+    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService);
+    List<CobolDialect> dialectList = service.loadDialects("path", mock(CopybookService.class), mock(MessageService.class));
+    assertEquals(0, dialectList.size());
+  }
+
 }

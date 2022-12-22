@@ -624,7 +624,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    * {@link TextDocumentService#didOpen(DidOpenTextDocumentParams)} processing is not finished yet.
    */
   @Test
-  @Disabled("unstable")
+  @Disabled("Unstable")
   void testImmediateClosingOfDocumentDoNotCauseNPE() {
     service = getMockedTextDocumentServiceUsingSeparateThread();
     lenient()

@@ -29,6 +29,7 @@ public class DialectConfigs {
     return new AnalysisConfig(
         new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
         ImmutableList.of(),
-        ImmutableList.of(IdmsDialect.NAME), true);
+        ImmutableList.of(IdmsDialect.NAME), true,
+        ImmutableList.of());
   }
 }
