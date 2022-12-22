@@ -14,12 +14,9 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { CopybookURI } from "../../../services/copybook/CopybookURI";
+import { Utils } from "../../../services/util/Utils";
 
-jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
-    return {
-      ZoweVsCodeExtension: jest.fn()
-    };
-  });
+Utils.getZoweExplorerAPI = jest.fn();
 
 describe("CopybooksPathGenerator tests", () => {
     const fsPath = "/projects";

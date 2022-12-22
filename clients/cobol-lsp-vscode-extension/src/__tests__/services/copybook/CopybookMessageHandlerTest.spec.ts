@@ -17,16 +17,13 @@ import { CopybookURI } from "../../../services/copybook/CopybookURI";
 import { SettingsService } from "../../../services/Settings";
 import { searchCopybookInWorkspace } from "../../../services/util/FSUtils";
 import * as vscode from "vscode";
+import { Utils } from "../../../services/util/Utils";
 
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
     get: jest.fn().mockReturnValue("testProfile"),
 });
 
-jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
-    return {
-      ZoweVsCodeExtension: jest.fn()
-    };
-  });
+Utils.getZoweExplorerAPI = jest.fn();
 
 describe("Test the copybook message handler", () => {
     it("checks local present copybooks are resolved", () => {
