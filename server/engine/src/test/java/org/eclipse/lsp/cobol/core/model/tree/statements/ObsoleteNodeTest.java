@@ -59,7 +59,7 @@ class ObsoleteNodeTest {
             SyntaxError.syntaxError()
                 .errorSource(ErrorSource.PARSING)
                 .severity(ErrorSeverity.WARNING)
-                .locality(locality)
+                .location(locality.toOriginalLocation())
                 .messageTemplate(MessageTemplate.of("cobolParser.ObsoleteCode"))
                 .build()));
   }

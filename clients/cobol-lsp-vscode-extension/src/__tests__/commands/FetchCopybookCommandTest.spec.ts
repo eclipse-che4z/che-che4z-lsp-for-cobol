@@ -15,15 +15,12 @@
 import { fetchCopybookCommand } from "../../commands/FetchCopybookCommand";
 import { CopybookDownloadService, CopybookName } from "../../services/copybook/CopybookDownloadService";
 import { TelemetryService } from "../../services/reporter/TelemetryService";
+import { Utils } from "../../services/util/Utils";
 
 jest.mock("../../services/reporter/TelemetryService");
 jest.mock("../../services/copybook/CopybookDownloadService");
-jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
-    return {
-      ZoweVsCodeExtension: jest.fn()
-    };
-  });
-  
+Utils.getZoweExplorerAPI = jest.fn();
+
 const copybookDownloadService: CopybookDownloadService = new CopybookDownloadService();
 const copybook: string = "cobyBookTest";
 const progName: string = "progNameTest";

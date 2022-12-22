@@ -60,7 +60,7 @@ class DialectParserListener extends BaseErrorListener {
                 .map(CommonToken::getTokenIndex)
                 .orElse(-1))
             .suggestion(msg)
-            .locality(
+            .location(
                 Locality.builder()
                     .uri(uri)
                     .range(
@@ -69,7 +69,7 @@ class DialectParserListener extends BaseErrorListener {
                             new Position(
                                 errorLine,
                                 charPositionInLine + getOffendingSymbolSize(offendingSymbol))))
-                    .build())
+                    .build().toOriginalLocation())
             .severity(getSeverity(msg))
             .build();
     LOG.debug("Syntax error by DialectParserListener " + error.toString());

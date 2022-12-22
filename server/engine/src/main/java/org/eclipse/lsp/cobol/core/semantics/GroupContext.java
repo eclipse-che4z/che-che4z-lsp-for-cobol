@@ -159,7 +159,7 @@ public class GroupContext {
                                     messageService.getMessage(
                                         "CobolVisitor.paragraphNotDefined", name))
                                 .severity(ErrorSeverity.ERROR)
-                                .locality(locality)
+                                .location(locality.toOriginalLocation())
                                 .build()))
         .collect(Collectors.toList());
   }

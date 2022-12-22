@@ -24,6 +24,7 @@ class Timing {
   long preprocessorTime;
   long dialectsTime;
   long parserTime;
+  @Deprecated
   long mappingTime;
   long splittingLanguageTimer;
   long visitorTime;

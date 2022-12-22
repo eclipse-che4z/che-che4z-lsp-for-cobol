@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * This class re-writes the content of the analyzing file to simplify the processing by the grammar,
  * e.g. removes comments or cleans-up the comment and sequence areas. See the delegates for more
- * details. As a result it returns the {@link ExtendedDocument}, e.g. one that has all the copybook
+ * details. As a result it returns the {@link OldExtendedDocument}, e.g. one that has all the copybook
  * content built inside the document text.
  */
 @Slf4j
@@ -75,7 +75,7 @@ public class TextPreprocessorImpl implements TextPreprocessor, CleanerPreprocess
   }
 
   @Override
-  public ResultWithErrors<ExtendedDocument> processCleanCode(
+  public ResultWithErrors<OldExtendedDocument> processCleanCode(
       @NonNull String documentUri,
       @NonNull String cobolCode,
       @NonNull CopybookConfig copybookConfig,

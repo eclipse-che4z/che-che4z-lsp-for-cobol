@@ -43,7 +43,7 @@ public class VariableHover implements HoverProvider {
             root ->
                 RangeUtils.findNodeByPosition(
                     root, position.getTextDocument().getUri(), position.getPosition()))
-        .filter(element -> element instanceof Describable)
+        .filter(Describable.class::isInstance)
         .map(Describable.class::cast)
         .map(VariableHover::createHoverInfo)
         .orElse(null);

@@ -230,7 +230,7 @@ public class VariableDefinitionUtil {
               SyntaxError.syntaxError()
                   .errorSource(ErrorSource.PARSING)
                   .severity(ERROR)
-                  .locality(definitionNode.getLocality())
+                  .location(definitionNode.getLocality().toOriginalLocation())
                   .messageTemplate(MessageTemplate.of(UNKNOWN_VARIABLE_DEFINITION))
                   .build();
           errors.add(error);
@@ -619,7 +619,7 @@ public class VariableDefinitionUtil {
               .errorSource(ErrorSource.PARSING)
               .severity(ERROR)
               .messageTemplate(MessageTemplate.of(REDEFINE_IMMEDIATELY_FOLLOW, redefinesName))
-              .locality(redefinesLocality)
+              .location(redefinesLocality.toOriginalLocation())
               .build());
     } else {
       allowedRedefinedNode.get().addUsage(redefineUsage);
@@ -629,7 +629,7 @@ public class VariableDefinitionUtil {
                 .errorSource(ErrorSource.PARSING)
                 .severity(ERROR)
                 .messageTemplate(MessageTemplate.of(LEVELS_MUST_MATCH, redefinesName))
-                .locality(definitionNode.getLevelLocality())
+                .location(definitionNode.getLevelLocality().toOriginalLocation())
                 .build());
       }
     }
@@ -639,7 +639,7 @@ public class VariableDefinitionUtil {
         errors.add(
             SyntaxError.syntaxError()
                 .errorSource(ErrorSource.PARSING)
-                .locality(valueLocality)
+                .location(valueLocality.toOriginalLocation())
                 .severity(ERROR)
                 .messageTemplate(
                     MessageTemplate.of(REDEFINED_CONTAIN_VALUE, variableNode.getName()))

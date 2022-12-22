@@ -18,8 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
-import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 
 import java.util.Optional;
 
@@ -27,11 +27,11 @@ import java.util.Optional;
  * Predefined copybook's content provider that reads content from a file
  */
 @Slf4j
-public class FileContentProvider implements ContentProvider {
+public class FileCopybookContentProvider implements CopybookContentProvider {
 
   private final FileSystemService files;
 
-  public FileContentProvider(FileSystemService files) {
+  public FileCopybookContentProvider(FileSystemService files) {
     this.files = files;
   }
 

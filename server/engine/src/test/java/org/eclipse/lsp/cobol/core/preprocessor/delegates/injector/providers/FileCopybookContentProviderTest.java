@@ -31,18 +31,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
- * This unit tests check the {@link FileContentProvider} class functionality
+ * This unit tests check the {@link FileCopybookContentProvider} class functionality
  */
 @ExtendWith(MockitoExtension.class)
-class FileContentProviderTest {
-  private FileContentProvider contentProvider;
+class FileCopybookContentProviderTest {
+  private FileCopybookContentProvider contentProvider;
   private CopybookConfig copybookConfig;
   @Mock private FileSystemService files;
 
   @BeforeEach
   void setupMocks() {
     copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of());
-    contentProvider = new FileContentProvider(files);
+    contentProvider = new FileCopybookContentProvider(files);
   }
 
   @Test

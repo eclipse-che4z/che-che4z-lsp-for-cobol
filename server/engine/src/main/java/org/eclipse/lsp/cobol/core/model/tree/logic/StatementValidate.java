@@ -115,7 +115,7 @@ public class StatementValidate implements Processor<StatementNode> {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
-            .locality(locality)
+            .location(locality.toOriginalLocation())
             .severity(ERROR)
             .messageTemplate(MessageTemplate.concatenatingArgs(message, ", ", types))
             .build();

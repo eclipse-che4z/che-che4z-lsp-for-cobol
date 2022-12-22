@@ -14,31 +14,24 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
-import lombok.AllArgsConstructor;
-import org.eclipse.lsp.cobol.common.copybook.*;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 
 import java.util.Optional;
 
 /**
- * Provides a content of a copybook for injecting
+ * Interface for predefined copybook's content providers
  */
-@AllArgsConstructor
-public class CopybookContentProvider implements ContentProvider {
-
-  private final CopybookService copybookService;
-
-  @Override
-  public Optional<CopybookModel> read(CopybookConfig copybookConfig, CopybookName copybookName, String programDocumentUri, String documentUri) {
-    CopybookModel copybookModel = copybookService.resolve(
-        copybookName.toCopybookId(programDocumentUri),
-        copybookName,
-        programDocumentUri,
-        documentUri,
-        copybookConfig,
-        false);
-    if (copybookModel.getContent() == null) {
-      return Optional.empty();
-    }
-    return Optional.of(copybookModel);
-  }
+public interface CopybookContentProvider {
+  /**
+   * Read injected code content
+   * @param copybookConfig is a copybook config
+   * @param copybookName for injected code name
+   * @param programDocumentUri for program document uri
+   * @param documentUri for current document uri
+   * @return an optional copybook model
+   */
+  Optional<CopybookModel> read(CopybookConfig copybookConfig, CopybookName copybookName,
+                               String programDocumentUri, String documentUri);
 }

@@ -389,7 +389,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                         .suggestion(
                             messageService.getMessage("CobolVisitor.duplicateFileName", filename))
                         .severity(ErrorSeverity.ERROR)
-                        .locality(locality)
+                        .location(locality.toOriginalLocation())
                         .build();
                 errors.add(error);
                 LOG.debug("Syntax error by CobolVisitor#visitSelectClause: {}", error);
@@ -831,7 +831,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
-            .locality(locality)
+            .location(locality.toOriginalLocation())
             .suggestion(message + wrongToken)
             .severity(ErrorSeverity.WARNING)
             .build();
@@ -852,7 +852,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .errorSource(ErrorSource.PARSING)
             .suggestion(messageService.getMessage("CobolVisitor.subroutineNotFound", name))
             .severity(ErrorSeverity.INFO)
-            .locality(getIntervalPosition(locality, locality))
+            .location(getIntervalPosition(locality, locality).toOriginalLocation())
             .build();
     LOG.debug("Syntax error by CobolVisitor#reportSubroutineNotDefined: {}", error);
     errors.add(error);
@@ -875,7 +875,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .errorSource(ErrorSource.PARSING)
             .suggestion(messageService.getMessage("CobolVisitor.misspelledWord", suggestion))
             .severity(ErrorSeverity.WARNING)
-            .locality(locality)
+            .location(locality.toOriginalLocation())
             .build();
     LOG.debug("Syntax error by CobolVisitor#reportMisspelledKeyword: {}", error);
     errors.add(error);
