@@ -22,9 +22,12 @@ import java.util.Map;
 /**
  * This value class represents the extended document, i.e. the original file where all the COPY
  * statements are replaced by the actual copybooks content.
+ *
+ * @deprecated we should switch to the new mapping
  */
 @Value
-public class ExtendedDocument {
+@Deprecated
+public class OldExtendedDocument {
   String uri;
   String text;
   CopybooksRepository copybooks;

@@ -124,7 +124,7 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
             .severity(ErrorSeverity.ERROR)
-            .locality(node.getLocality())
+            .location(node.getLocality().toOriginalLocation())
             .messageTemplate(
                 MessageTemplate.of(
                     foundDefinitions.isEmpty() ? NOT_DEFINED_ERROR : AMBIGUOUS_REFERENCE_ERROR,

@@ -19,7 +19,7 @@ import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp4j.Location;
 
@@ -42,14 +42,14 @@ public class OldMapping {
   }
   public OldMapping(
           String documentUri,
-          ExtendedDocument extendedDocument,
+          OldExtendedDocument oldExtendedDocument,
           CommonTokenStream tokens,
           Map<Token, EmbeddedCode> embeddedCodeParts,
           ExtendedSource extendedSource) {
     Map<org.antlr.v4.runtime.Token, Locality> mapping =
             LocalityMappingUtils.createPositionMapping(
                     tokens.getTokens(),
-                    extendedDocument.getDocumentMapping(),
+                    oldExtendedDocument.getDocumentMapping(),
                     documentUri,
                     embeddedCodeParts);
     mapping.forEach(

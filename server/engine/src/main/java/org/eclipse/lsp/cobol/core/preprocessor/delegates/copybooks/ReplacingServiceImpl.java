@@ -120,7 +120,7 @@ public class ReplacingServiceImpl implements ReplacingService {
             SyntaxError.syntaxError()
                     .errorSource(ErrorSource.EXTENDED_DOCUMENT)
                 .severity(ErrorSeverity.ERROR)
-                .locality(locality)
+                .location(locality.toOriginalLocation())
                 .suggestion(
                     messageService.getMessage("ReplacingServiceImpl.pseudoTxtInvalidLength"))
                 .build())
@@ -136,7 +136,7 @@ public class ReplacingServiceImpl implements ReplacingService {
                     .errorSource(ErrorSource.EXTENDED_DOCUMENT)
                 .severity(ErrorSeverity.ERROR)
                 .suggestion(messageService.getMessage("ReplacingServiceImpl.invalidWord"))
-                .locality(locality)
+                .location(locality.toOriginalLocation())
                 .build())
         : Optional.empty();
   }

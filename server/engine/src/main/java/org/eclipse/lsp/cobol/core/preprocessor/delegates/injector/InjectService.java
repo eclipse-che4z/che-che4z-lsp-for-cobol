@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.common.utils.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysis;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysisFactory;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.CopybookContentProvider;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory;
 
 import java.util.List;
@@ -53,8 +53,8 @@ public class InjectService {
   @SuppressWarnings("unused")
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.LinkageSectionContext ctx) {
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
-    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(FILE);
-    return ImmutableList.of(new InjectDescriptor("DFHEIBLC", analysis, contentProvider));
+    CopybookContentProvider copybookContentProvider = contentProviderFactory.getInstanceFor(FILE);
+    return ImmutableList.of(new InjectDescriptor("DFHEIBLC", analysis, copybookContentProvider));
   }
 
   /**
@@ -65,8 +65,8 @@ public class InjectService {
   @SuppressWarnings("unused")
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.WorkingStorageSectionContext ctx) {
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
-    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(FILE);
-    return ImmutableList.of(new InjectDescriptor("SPECIALREGISTERS", analysis, contentProvider));
+    CopybookContentProvider copybookContentProvider = contentProviderFactory.getInstanceFor(FILE);
+    return ImmutableList.of(new InjectDescriptor("SPECIALREGISTERS", analysis, copybookContentProvider));
   }
 
   /**
@@ -76,8 +76,8 @@ public class InjectService {
    */
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.PlusplusIncludeStatementContext ctx) {
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(PANVALET);
-    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
-    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, contentProvider));
+    CopybookContentProvider copybookContentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
+    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, copybookContentProvider));
   }
 
   /**
@@ -87,8 +87,8 @@ public class InjectService {
    */
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.CopyStatementContext ctx) {
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(COPYBOOK);
-    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
-    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, contentProvider));
+    CopybookContentProvider copybookContentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
+    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, copybookContentProvider));
   }
 
   /**
@@ -98,8 +98,8 @@ public class InjectService {
    */
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.IncludeStatementContext ctx) {
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(COPYBOOK);
-    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
-    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, contentProvider));
+    CopybookContentProvider copybookContentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
+    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, copybookContentProvider));
   }
 
   private String retrieveCopybookName(ParserRuleContext ctx) {

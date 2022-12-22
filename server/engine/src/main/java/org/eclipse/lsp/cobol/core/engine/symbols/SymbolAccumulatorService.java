@@ -114,7 +114,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
               .messageTemplate(
                   MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
               .severity(ErrorSeverity.ERROR)
-              .locality(node.getLocality())
+              .location(node.getLocality().toOriginalLocation())
               .build());
     }
 
@@ -135,7 +135,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
                         .messageTemplate(
                                 MessageTemplate.of("semantics.ambiguous", node.getName()))
                         .severity(ErrorSeverity.ERROR)
-                        .locality(node.getLocality())
+                        .location(node.getLocality().toOriginalLocation())
                         .build());
       }
     }

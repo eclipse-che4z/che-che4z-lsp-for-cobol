@@ -17,6 +17,8 @@ package org.eclipse.lsp.cobol.core.engine;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -24,6 +26,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -46,7 +49,7 @@ import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.logic.*;
 import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
@@ -63,9 +66,7 @@ import org.eclipse.lsp.cobol.service.CachingConfigurationService;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -127,88 +128,96 @@ public class CobolLanguageEngine {
   @NonNull
   public ResultWithErrors<AnalysisResult> run(
       @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
-    SymbolAccumulatorService symbolAccumulatorService = new SymbolAccumulatorService();
 
     ThreadInterruptionUtil.checkThreadInterrupted();
-    Timing.Builder timingBuilder = Timing.builder();
+    AnalysisContext ctx = new AnalysisContext(documentUri, analysisConfig);
+    TextTransformations cleanText = preprocessor.cleanUpCode(documentUri, text).unwrap(ctx.getAccumulatedErrors()::addAll);
 
-    timingBuilder.getDialectsTimer().start();
-    List<SyntaxError> accumulatedErrors = new ArrayList<>();
-    TextTransformations cleanText =
-        preprocessor.cleanUpCode(documentUri, text).unwrap(accumulatedErrors::addAll);
+    ctx.dialectsStart();
+    DialectOutcome dialectOutcome = processDialects(ctx, cleanText);
+    ctx.dialectsDone();
 
-    DialectProcessingContext dialectProcessingContext =
-        DialectProcessingContext.builder()
-            .copybookConfig(analysisConfig.getCopybookConfig())
-            .programDocumentUri(documentUri)
-            .extendedSource(new ExtendedSource(cleanText))
-            .build();
-    dialectProcessingContext.getExtendedSource().commitTransformations();
+    ctx.preprocessorStart();
+    ExtendedSource extendedSource = dialectOutcome.getContext().getExtendedSource();
+    OldExtendedDocument oldExtendedDocument = runPreprocessor(ctx, extendedSource);
+    ctx.preprocessorDone();
 
-    DialectOutcome dialectOutcome =
-        dialectService
-            .process(analysisConfig.getDialects(), dialectProcessingContext)
-            .unwrap(accumulatedErrors::addAll);
+    ParserListener listener = new ParserListener();
 
-    accumulatedErrors = accumulatedErrors.stream().distinct().collect(toList());
-    timingBuilder.getDialectsTimer().stop();
-
-    timingBuilder.getPreprocessorTimer().start();
-
-    List<SyntaxError> preprocessorErrors = new ArrayList<>();
-    ExtendedDocument extendedDocument =
-        preprocessor
-            .processCleanCode(
-                documentUri,
-                dialectOutcome.getContext().getExtendedSource().extendedText(),
-                analysisConfig.getCopybookConfig(),
-                new CopybookHierarchy())
-            .unwrap(preprocessorErrors::addAll);
-    timingBuilder.getPreprocessorTimer().stop();
-
-    // Update copybook usages with proper positions
-    extendedDocument
-        .getCopybooks()
-        .getUsages()
-        .forEach(
-            (k, v) ->
-                v.setRange(
-                    dialectOutcome
-                        .getContext()
-                        .getExtendedSource()
-                        .mapLocation(v.getRange())
-                        .getRange()));
-
-    // Update copybook definition statements with proper positions
-    extendedDocument
-        .getCopybooks()
-        .getDefinitionStatements()
-        .forEach(
-            (k, v) ->
-                v.setRange(
-                    dialectOutcome
-                        .getContext()
-                        .getExtendedSource()
-                        .mapLocation(v.getRange())
-                        .getRange()));
-
-    preprocessorErrors.forEach(
-        e ->
-            e.getLocality()
-                .setRange(
-                    dialectOutcome
-                        .getContext()
-                        .getExtendedSource()
-                        .mapLocation(e.getLocality().getRange())
-                        .getRange()));
-    accumulatedErrors.addAll(preprocessorErrors);
-
-    timingBuilder.getParserTimer().start();
-    CobolLexer lexer = new CobolLexer(CharStreams.fromString(extendedDocument.getText()));
+    ctx.parserStart();
+    CobolLexer lexer = new CobolLexer(CharStreams.fromString(oldExtendedDocument.getText()));
     lexer.removeErrorListeners();
 
     CommonTokenStream tokens = new CommonTokenStream(lexer);
-    ParserListener listener = new ParserListener();
+    CobolParser.StartRuleContext tree = runParser(listener, lexer, tokens);
+    ctx.parserDone();
+
+    ctx.splittingLanguageStart();
+    Map<Token, EmbeddedCode> embeddedCodeParts = extractEmbeddedCode(listener, tree);
+    ctx.splittingLanguageDone();
+
+    OldMapping positionMapping = new OldMapping(documentUri, oldExtendedDocument, tokens, embeddedCodeParts, extendedSource);
+
+    ctx.visitorStart();
+    List<Node> syntaxTree = runVisitor(analysisConfig, ctx, dialectOutcome, oldExtendedDocument, tokens, tree, embeddedCodeParts, positionMapping);
+    ctx.visitorDone();
+
+    ctx.syntaxTreeStart();
+    SymbolAccumulatorService symbolAccumulatorService = new SymbolAccumulatorService();
+    Node rootNode = processSyntaxTree(analysisConfig, symbolAccumulatorService, ctx, positionMapping, syntaxTree);
+    symbolsRepository.updateSymbols(symbolAccumulatorService.getProgramSymbols());
+    ctx.syntaxTreeDone();
+
+    ctx.lateErrorProcessingStart();
+    processLateErrors(ctx, oldExtendedDocument, listener, positionMapping);
+    ctx.lateErrorProcessingDone();
+
+    if (LOG.isDebugEnabled()) {
+      ctx.logTiming();
+    }
+
+    return new ResultWithErrors<>(
+        AnalysisResult.builder()
+            .rootNode(rootNode)
+            .symbolTableMap(symbolAccumulatorService.getProgramSymbols())
+            .build(),
+            ctx.getAccumulatedErrors().stream().map(this::constructErrorMessage).collect(toList()));
+  }
+
+  private void processLateErrors(AnalysisContext ctx, OldExtendedDocument oldExtendedDocument, ParserListener listener, OldMapping positionMapping) {
+    ctx.getAccumulatedErrors().addAll(finalizeErrors(listener.getErrors(), positionMapping));
+    ctx.getAccumulatedErrors().addAll(
+        collectErrorsForCopybooks(
+                ctx.getAccumulatedErrors(), oldExtendedDocument.getCopybooks().getDefinitionStatements()));
+  }
+
+  private Node processSyntaxTree(AnalysisConfig analysisConfig, SymbolAccumulatorService symbolAccumulatorService, AnalysisContext ctx, OldMapping positionMapping, List<Node> syntaxTree) {
+    analyzeEmbeddedCode(syntaxTree, positionMapping);
+    Node rootNode = syntaxTree.get(0);
+    ProcessingContext processingContext = new ProcessingContext(new ArrayList<>(), symbolAccumulatorService);
+    registerProcessors(analysisConfig, processingContext, symbolAccumulatorService);
+    ctx.getAccumulatedErrors().addAll(astProcessor.processSyntaxTree(processingContext, rootNode));
+    return rootNode;
+  }
+
+  private List<Node> runVisitor(AnalysisConfig analysisConfig, AnalysisContext ctx, DialectOutcome dialectOutcome, OldExtendedDocument oldExtendedDocument, CommonTokenStream tokens, CobolParser.StartRuleContext tree, Map<Token, EmbeddedCode> embeddedCodeParts, OldMapping positionMapping) {
+    CobolVisitor visitor =
+        new CobolVisitor(
+            applyDialectCopybooks(oldExtendedDocument.getCopybooks(), dialectOutcome),
+                tokens,
+                positionMapping,
+                analysisConfig,
+                embeddedCodeParts,
+            messageService,
+            subroutineService,
+            dialectOutcome.getDialectNodes(),
+            cachingConfigurationService);
+    List<Node> syntaxTree = visitor.visit(tree);
+    ctx.getAccumulatedErrors().addAll(visitor.getErrors());
+    return syntaxTree;
+  }
+
+  private CobolParser.StartRuleContext runParser(ParserListener listener, CobolLexer lexer, CommonTokenStream tokens) {
     lexer.addErrorListener(listener);
 
     CobolParser parser = getCobolParser(tokens);
@@ -217,74 +226,65 @@ public class CobolLanguageEngine {
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
     parser.addParseListener(treeListener);
 
-    CobolParser.StartRuleContext tree = parser.startRule();
-    timingBuilder.getParserTimer().stop();
+    return parser.startRule();
+  }
 
-    timingBuilder.getSplittingLanguageTimer().start();
-    Map<Token, EmbeddedCode> embeddedCodeParts = extractEmbeddedCode(listener, tree);
-    timingBuilder.getSplittingLanguageTimer().stop();
+  private OldExtendedDocument runPreprocessor(AnalysisContext ctx, ExtendedSource extendedSource) {
+    List<SyntaxError> preprocessorErrors = new ArrayList<>();
+    OldExtendedDocument oldExtendedDocument =
+            preprocessor
+                    .processCleanCode(
+                            ctx.getDocumentUri(),
+                            extendedSource.extendedText(),
+                            ctx.getConfig().getCopybookConfig(),
+                            new CopybookHierarchy())
+                    .unwrap(preprocessorErrors::addAll);
+    preprocessorErrors.forEach(e -> e.getLocation().getLocation().setRange(extendedSource
+                                            .mapLocation(e.getLocation().getLocation().getRange())
+                                            .getRange()));
+    ctx.getAccumulatedErrors().addAll(preprocessorErrors);
+    // Update copybook usages with proper positions
+    oldExtendedDocument
+            .getCopybooks()
+            .getUsages()
+            .forEach(
+                    (k, v) ->
+                            v.setRange(
+                                    extendedSource
+                                            .mapLocation(v.getRange())
+                                            .getRange()));
 
-    timingBuilder.getMappingTimer().start();
-    OldMapping positionMapping = new OldMapping(documentUri, extendedDocument, tokens, embeddedCodeParts,
-            dialectProcessingContext.getExtendedSource());
+    // Update copybook definition statements with proper positions
+    oldExtendedDocument
+            .getCopybooks()
+            .getDefinitionStatements()
+            .forEach(
+                    (k, v) ->
+                            v.setRange(
+                                    extendedSource
+                                            .mapLocation(v.getRange())
+                                            .getRange()));
 
-    timingBuilder.getMappingTimer().stop();
+    return oldExtendedDocument;
+  }
 
-    timingBuilder.getVisitorTimer().start();
-    CobolVisitor visitor =
-        new CobolVisitor(
-            applyDialectCopybooks(extendedDocument.getCopybooks(), dialectOutcome),
-            tokens,
-            positionMapping,
-            analysisConfig,
-            embeddedCodeParts,
-            messageService,
-            subroutineService,
-            dialectOutcome.getDialectNodes(),
-            cachingConfigurationService);
-    List<Node> syntaxTree = visitor.visit(tree);
-    accumulatedErrors.addAll(visitor.getErrors());
-    timingBuilder.getVisitorTimer().stop();
+  private DialectOutcome processDialects(AnalysisContext ctx, TextTransformations cleanText) {
+    CopybookConfig copybookConfig = ctx.getConfig().getCopybookConfig();
+    DialectProcessingContext dialectProcessingContext =
+            DialectProcessingContext.builder()
+                    .copybookConfig(copybookConfig)
+                    .programDocumentUri(ctx.getDocumentUri())
+                    .extendedSource(new ExtendedSource(cleanText))
+                    .build();
+    dialectProcessingContext.getExtendedSource().commitTransformations();
 
-    timingBuilder.getSyntaxTreeTimer().start();
-    analyzeEmbeddedCode(syntaxTree, positionMapping);
-
-    Node rootNode = syntaxTree.get(0);
-    ProcessingContext ctx = new ProcessingContext(new ArrayList<>(), symbolAccumulatorService);
-    registerProcessors(analysisConfig, ctx, symbolAccumulatorService);
-    accumulatedErrors.addAll(astProcessor.processSyntaxTree(ctx, rootNode));
-
-    timingBuilder.getSyntaxTreeTimer().stop();
-    timingBuilder.getLateErrorProcessingTimer().start();
-    accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
-    accumulatedErrors.addAll(
-        collectErrorsForCopybooks(
-            accumulatedErrors, extendedDocument.getCopybooks().getDefinitionStatements()));
-    timingBuilder.getLateErrorProcessingTimer().stop();
-
-    if (LOG.isDebugEnabled()) {
-      Timing timing = timingBuilder.build();
-      LOG.debug(
-          "Timing for parsing {}. Dialects: {}, preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
-              + "late error processing: {}",
-          documentUri,
-          timing.getDialectsTime(),
-          timing.getPreprocessorTime(),
-          timing.getParserTime(),
-          timing.getMappingTime(),
-          timing.getVisitorTime(),
-          timing.getSyntaxTreeTime(),
-          timing.getLateErrorProcessingTime());
-    }
-
-    symbolsRepository.updateSymbols(symbolAccumulatorService.getProgramSymbols());
-
-    return new ResultWithErrors<>(
-        AnalysisResult.builder()
-            .rootNode(rootNode)
-            .symbolTableMap(symbolAccumulatorService.getProgramSymbols())
-            .build(),
-        accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
+    DialectOutcome dialectOutcome = dialectService
+                    .process(ctx.getConfig().getDialects(), dialectProcessingContext)
+                    .unwrap(ctx.getAccumulatedErrors()::addAll);
+    Set<SyntaxError> errors = new HashSet<>(ctx.getAccumulatedErrors());
+    ctx.getAccumulatedErrors().clear();
+    ctx.getAccumulatedErrors().addAll(errors);
+    return dialectOutcome;
   }
 
   private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx, SymbolAccumulatorService symbolAccumulatorService) {
@@ -436,18 +436,20 @@ public class CobolLanguageEngine {
     return errors.stream()
         .filter(c -> c.getTokenIndex() != -1)
         .map(convertError(mapping))
-        .filter(it -> it.getLocality() != null)
+        .filter(it -> it.getLocation() != null)
         .collect(toList());
   }
 
   @NonNull
   private Function<SyntaxError, SyntaxError> convertError(@NonNull OldMapping mapping) {
-    return err ->
-        err.toBuilder()
-            .locality(mapping.findPreviousVisibleLocality(err.getTokenIndex()))
-            .suggestion(messageService.getMessage(err.getSuggestion()))
-            .errorSource(ErrorSource.PARSING)
-            .build();
+    return err -> {
+      Locality previousVisibleLocality = mapping.findPreviousVisibleLocality(err.getTokenIndex());
+      return err.toBuilder()
+          .location(previousVisibleLocality == null ? null : previousVisibleLocality.toOriginalLocation())
+          .suggestion(messageService.getMessage(err.getSuggestion()))
+          .errorSource(ErrorSource.PARSING)
+          .build();
+    };
   }
 
   private List<SyntaxError> collectErrorsForCopybooks(
@@ -465,7 +467,7 @@ public class CobolLanguageEngine {
         .map(
             err ->
                 err.toBuilder()
-                    .locality(copyStatements.get(err.getLocality().getCopybookId()))
+                    .location(copyStatements.get(err.getLocation().getCopybookId()).toOriginalLocation())
                     .errorSource(ErrorSource.COPYBOOK))
         .map(SyntaxError.SyntaxErrorBuilder::build)
         .flatMap(err -> Stream.concat(raiseError(err, copyStatements).stream(), Stream.of(err)))
@@ -473,7 +475,7 @@ public class CobolLanguageEngine {
   }
 
   private Predicate<SyntaxError> shouldRaise() {
-    return err -> (err.getLocality() != null && err.getLocality().getCopybookId() != null);
+    return err -> (err.getLocation() != null && err.getLocation().getCopybookId() != null);
   }
 
   private SyntaxError constructErrorMessage(SyntaxError syntaxError) {
@@ -481,5 +483,87 @@ public class CobolLanguageEngine {
         .map(messageService::localizeTemplate)
         .map(message -> syntaxError.toBuilder().messageTemplate(null).suggestion(message).build())
         .orElse(syntaxError);
+  }
+}
+
+/**
+ * Contains related to analysis state
+ */
+@RequiredArgsConstructor
+@Value
+@Slf4j
+class AnalysisContext {
+  String documentUri;
+  AnalysisConfig config;
+  Timing.Builder timingBuilder = Timing.builder();
+  List<SyntaxError> accumulatedErrors = new ArrayList<>();
+  public void dialectsStart() {
+    timingBuilder.getDialectsTimer().start();
+  }
+  public void dialectsDone() {
+    timingBuilder.getDialectsTimer().stop();
+  }
+
+  public void preprocessorStart() {
+    timingBuilder.getPreprocessorTimer().start();
+  }
+
+  public void preprocessorDone() {
+    timingBuilder.getPreprocessorTimer().stop();
+  }
+
+  public void parserStart() {
+    timingBuilder.getParserTimer().start();
+  }
+
+  public void parserDone() {
+    timingBuilder.getParserTimer().stop();
+  }
+
+  public void splittingLanguageStart() {
+    timingBuilder.getSplittingLanguageTimer().start();
+  }
+
+  public void splittingLanguageDone() {
+    timingBuilder.getSplittingLanguageTimer().stop();
+  }
+
+  public void visitorStart() {
+    timingBuilder.getVisitorTimer().start();
+  }
+
+  public void visitorDone() {
+    timingBuilder.getVisitorTimer().stop();
+  }
+
+  public void syntaxTreeStart() {
+    timingBuilder.getSyntaxTreeTimer().start();
+  }
+
+  public void syntaxTreeDone() {
+    timingBuilder.getSyntaxTreeTimer().stop();
+  }
+
+  public void lateErrorProcessingStart() {
+    timingBuilder.getLateErrorProcessingTimer().start();
+  }
+
+  public void lateErrorProcessingDone() {
+    timingBuilder.getLateErrorProcessingTimer().stop();
+  }
+
+  public void logTiming() {
+    Timing timing = timingBuilder.build();
+    LOG.debug(
+            "Timing for parsing {}. Dialects: {}, preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
+                    + "late error processing: {}",
+            documentUri,
+            timing.getDialectsTime(),
+            timing.getPreprocessorTime(),
+            timing.getParserTime(),
+            timing.getMappingTime(),
+            timing.getVisitorTime(),
+            timing.getSyntaxTreeTime(),
+            timing.getLateErrorProcessingTime());
   }
 }

@@ -36,22 +36,22 @@ public class ContentProviderFactory {
     RESOLVE_COPYBOOK
   }
 
-  private final Map<InjectContentType, ContentProvider> instances;
+  private final Map<InjectContentType, CopybookContentProvider> instances;
 
   @Inject
   public ContentProviderFactory(FileSystemService files, CopybookService copybookService) {
     this.instances = new HashMap<>();
-    instances.put(InjectContentType.FILE, new FileContentProvider(files));
-    instances.put(InjectContentType.RESOLVE_COPYBOOK, new CopybookContentProvider(copybookService));
+    instances.put(InjectContentType.FILE, new FileCopybookContentProvider(files));
+    instances.put(InjectContentType.RESOLVE_COPYBOOK, new CopybookCopybookContentProviderImpl(copybookService));
   }
 
   /**
-   * Get an instance of {@link ContentProvider} bound to the provided {@link InjectContentType}
+   * Get an instance of {@link CopybookContentProvider} bound to the provided {@link InjectContentType}
    *
    * @param contentType the type of the required instance
    * @return a specific extension of the {@link InjectCodeAnalysis}
    */
-  public ContentProvider getInstanceFor(InjectContentType contentType) {
+  public CopybookContentProvider getInstanceFor(InjectContentType contentType) {
     return instances.get(contentType);
   }
 }

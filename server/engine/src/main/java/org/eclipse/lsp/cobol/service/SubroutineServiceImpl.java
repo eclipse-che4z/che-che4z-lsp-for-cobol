@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.service;
 
 import org.eclipse.lsp.cobol.common.SubroutineService;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;

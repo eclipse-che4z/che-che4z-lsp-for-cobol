@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListener;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory;
@@ -53,7 +53,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
 
   @NonNull
   @Override
-  public ResultWithErrors<ExtendedDocument> buildExtendedDocument(
+  public ResultWithErrors<OldExtendedDocument> buildExtendedDocument(
       @NonNull String uri,
       @NonNull String code,
       @NonNull CopybookConfig copybookConfig,

@@ -106,7 +106,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
       return SyntaxError.syntaxError()
           .errorSource(ErrorSource.PREPROCESSING)
           .severity(ERROR)
-          .locality(
+          .location(
               Locality.builder()
                   .uri(uri)
                   .range(
@@ -114,7 +114,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
                           new Position(lineNumber, ProcessingConstants.INDICATOR_AREA),
                           new Position(lineNumber, cobolLine.toString().length())))
                   .recognizer(ContinuationLineTransformation.class)
-                  .build())
+                  .build().toOriginalLocation())
           .suggestion(
               messageService.getMessage(
                   "ContinuationLineTransformation.compilerDirectiveContinued"))
@@ -254,7 +254,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
       String uri, int lineNumber, int cobolLineTrimmedLength) {
     SyntaxError error =
         SyntaxError.syntaxError().errorSource(ErrorSource.PREPROCESSING)
-            .locality(
+            .location(
                 Locality.builder()
                     .uri(uri)
                     .range(
@@ -262,7 +262,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
                             new Position(lineNumber - 1, cobolLineTrimmedLength),
                             new Position(lineNumber - 1, cobolLineTrimmedLength + 1)))
                     .recognizer(ContinuationLineTransformation.class)
-                    .build())
+                    .build().toOriginalLocation())
             .suggestion(messageService.getMessage("ContinuationLineTransformation.periodRequired"))
             .severity(ERROR)
             .build();
@@ -277,7 +277,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
     int startPosition = ProcessingConstants.INDICATOR_AREA + countingSpace;
     SyntaxError error =
         SyntaxError.syntaxError().errorSource(ErrorSource.PREPROCESSING)
-            .locality(
+            .location(
                 Locality.builder()
                     .uri(uri)
                     .range(
@@ -286,7 +286,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
                             new Position(
                                 lineNumber, ProcessingConstants.START_INDEX_AREA_B)))
                     .recognizer(ContinuationLineTransformation.class)
-                    .build())
+                    .build().toOriginalLocation())
             .suggestion(
                 messageService.getMessage(
                     "ContinuationLineTransformation.continuationLineContentAreaA"))

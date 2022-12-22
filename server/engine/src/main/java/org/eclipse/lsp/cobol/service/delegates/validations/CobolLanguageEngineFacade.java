@@ -138,8 +138,8 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private static Map<String, List<Diagnostic>> convertErrors(List<SyntaxError> errors) {
     return errors.stream()
-        .filter(e -> Objects.nonNull(e.getLocality()))
-        .collect(groupingBy(err -> err.getLocality().getUri(), mapping(toDiagnostic(), toList())));
+        .filter(e -> Objects.nonNull(e.getLocation()))
+        .collect(groupingBy(err -> err.getLocation().getLocation().getUri(), mapping(toDiagnostic(), toList())));
   }
 
   private static Function<SyntaxError, Diagnostic> toDiagnostic() {
@@ -148,7 +148,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
       diagnostic.setSeverity(checkSeverity(err.getSeverity()));
       diagnostic.setSource(err.getErrorSource().getText());
       diagnostic.setMessage(err.getSuggestion());
-      diagnostic.setRange(err.getLocality().getRange());
+      diagnostic.setRange(err.getLocation().getLocation().getRange());
       diagnostic.setCode(ofNullable(err.getErrorCode()).map(ErrorCode::getLabel).orElse(null));
       return diagnostic;
     };

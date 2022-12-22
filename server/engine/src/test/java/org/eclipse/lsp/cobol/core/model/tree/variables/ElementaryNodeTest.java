@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.EffectiveDataType;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryItemNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryNode;
@@ -40,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ElementaryNodeTest {
   ElementaryItemNode getNode(String picClause, UsageFormat usageClause) {
     return new ElementaryItemNode(
-        null, 2, "TEST-NODE", false, picClause, "", usageClause, false, false, false);
+        Locality.builder().build(), 2, "TEST-NODE", false, picClause, "", usageClause, false, false, false);
   }
 
   @Test
@@ -93,7 +94,7 @@ class ElementaryNodeTest {
   void testValidatePicAndUsageClauseWhenUsageInCompatibleWithOtherClauses() {
     ElementaryItemNode elementNode =
         new ElementaryItemNode(
-            null, 2, "TEST-NODE", false, "PIC X", "", UsageFormat.UTF_8, false, true, false);
+            Locality.builder().build(), 2, "TEST-NODE", false, "PIC X", "", UsageFormat.UTF_8, false, true, false);
     ArrayList<SyntaxError> errors = new ArrayList<>();
     ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService());
     AstProcessor astProcessor = new AstProcessor();

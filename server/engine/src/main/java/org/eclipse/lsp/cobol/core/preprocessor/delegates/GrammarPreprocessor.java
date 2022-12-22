@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 
 /** This interface represents service to build the extended document */
@@ -35,7 +35,7 @@ public interface GrammarPreprocessor {
    * @return extended document with copybooks and related errors
    */
   @NonNull
-  ResultWithErrors<ExtendedDocument> buildExtendedDocument(
+  ResultWithErrors<OldExtendedDocument> buildExtendedDocument(
       @NonNull String uri,
       @NonNull String code,
       @NonNull CopybookConfig copybookConfig,

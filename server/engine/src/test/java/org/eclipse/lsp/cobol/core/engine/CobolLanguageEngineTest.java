@@ -34,7 +34,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
@@ -91,24 +91,24 @@ class CobolLanguageEngineTest {
     SyntaxError error =
         SyntaxError.syntaxError()
                 .errorSource(ErrorSource.PARSING)
-            .locality(locality)
+            .location(locality.toOriginalLocation())
             .suggestion("suggestion")
             .severity(ERROR)
             .build();
     SyntaxError eofError =
         SyntaxError.syntaxError()
                 .errorSource(ErrorSource.PARSING)
-            .locality(
+            .location(
                 Locality.builder()
                     .uri(URI)
                     .range(new Range(new Position(0, 31), new Position(0, 31)))
                     .token("<EOF>")
-                    .build())
+                    .build().toOriginalLocation())
             .severity(ERROR)
             .build();
 
-    ExtendedDocument extendedDocument =
-        new ExtendedDocument(
+    OldExtendedDocument oldExtendedDocument =
+        new OldExtendedDocument(
             "",
             TEXT,
             new CopybooksRepository(),
@@ -160,10 +160,10 @@ class CobolLanguageEngineTest {
         .thenReturn(new ResultWithErrors<>(TextTransformations.of(TEXT, URI), ImmutableList.of()));
     when(preprocessor.processCleanCode(
             eq(URI), eq(TEXT), eq(cpyConfig), any(CopybookHierarchy.class)))
-            .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));
+            .thenReturn(new ResultWithErrors<>(oldExtendedDocument, ImmutableList.of(error)));
     when(preprocessor.processCleanCode(
             anyString(), anyString(), any(CopybookConfig.class), any(CopybookHierarchy.class)))
-            .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of()));
+            .thenReturn(new ResultWithErrors<>(oldExtendedDocument, ImmutableList.of()));
 
     Range programRange = new Range(new Position(0, 7), new Position(0, 31));
     ResultWithErrors<AnalysisResult> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));

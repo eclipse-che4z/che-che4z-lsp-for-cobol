@@ -55,7 +55,7 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
       errors.add(
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.DIALECT)
-              .locality(node.getLocality())
+              .location(node.getLocality().toOriginalLocation())
               .suggestion("Can't find source for " + node.getPrototypeName())
               .severity(ErrorSeverity.ERROR)
               .build());

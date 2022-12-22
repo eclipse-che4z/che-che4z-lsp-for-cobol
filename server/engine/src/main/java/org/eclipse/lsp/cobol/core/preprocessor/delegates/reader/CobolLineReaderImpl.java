@@ -230,13 +230,13 @@ public class CobolLineReaderImpl implements CobolLineReader {
             .errorSource(ErrorSource.PREPROCESSING)
             .suggestion(message)
             .severity(ERROR)
-            .locality(
+            .location(
                 Locality.builder()
                     .uri(uri)
                     .range(
                         new Range(new Position(lineNumber, start), new Position(lineNumber, stop)))
                     .recognizer(getClass())
-                    .build())
+                    .build().toOriginalLocation())
             .build();
 
     LOG.debug("Syntax error by CobolLineReaderImpl: {}", error.toString());

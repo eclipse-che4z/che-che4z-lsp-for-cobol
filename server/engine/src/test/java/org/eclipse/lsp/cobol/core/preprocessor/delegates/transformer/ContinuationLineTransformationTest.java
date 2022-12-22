@@ -106,7 +106,7 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
     List<CobolLine> lines = convertToCobolLines(text);
     MessageService mockMessageService = mock(MessageService.class);
     ContinuationLineTransformation transformation = new ContinuationLineTransformation(mockMessageService);
-    return transformation.transformLines(null, lines).getErrors();
+    return transformation.transformLines("", lines).getErrors();
   }
 
   private List<CobolLine> convertToCobolLines(String text) {
