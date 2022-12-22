@@ -6,7 +6,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 ### Bug Fixes
 * Fix copybook download and clear ([44dff94](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/44dff946fabb0089b3c61e95cb6b1464c0167db5))
 
-## [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-08)
+## [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-07)
 
 ### Bug Fixes
 * Add Exit node for EXEC CICS RETURN statement ([#1603](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1603)) ([ac8e757](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ac8e757ade3ae52832075824cb1d6a6e7b4ed8e4))
