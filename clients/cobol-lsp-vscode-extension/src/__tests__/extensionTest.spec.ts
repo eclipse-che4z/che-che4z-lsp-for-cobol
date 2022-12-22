@@ -22,6 +22,7 @@ import { LanguageClientService } from "../services/LanguageClientService";
 import { TelemetryService } from "../services/reporter/TelemetryService";
 import { createFileWithGivenPath } from "../services/Settings";
 import { SnippetCompletionProvider } from "../services/snippetcompletion/SnippetCompletionProvider";
+import { Utils } from "../services/util/Utils";
 
 jest.mock("../commands/SmartTabCommand");
 jest.mock("../commands/FetchCopybookCommand");
@@ -34,11 +35,7 @@ jest.mock("../services/Settings", () => ({
     createFileWithGivenPath: jest.fn(),
     initializeSettings: jest.fn(),
 }));
-jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
-    return {
-      ZoweVsCodeExtension: jest.fn()
-    };
-  });
+Utils.getZoweExplorerAPI = jest.fn();
 jest.mock("vscode", () => ({
     commands: {
         registerCommand: jest.fn().mockImplementation((command, callback) => callback()),
@@ -144,7 +141,7 @@ describe.only("Check recognition of COBOL from first line", () => {
   const cobol = expect.stringMatching(firstLine)
 
   test("Comment Line", () => {
-    const pgm = `000010*REALLY ANYTHING`;      
+    const pgm = `000010*REALLY ANYTHING`;
     expect(pgm).toEqual(cobol)
   })
 
@@ -154,7 +151,7 @@ describe.only("Check recognition of COBOL from first line", () => {
   })
 
   test("Data Definition (copybook)", () => {
-    const pgm = `000010 01 ABC-XYZ.`;      
+    const pgm = `000010 01 ABC-XYZ.`;
     expect(pgm).toEqual(cobol)
   })
 
