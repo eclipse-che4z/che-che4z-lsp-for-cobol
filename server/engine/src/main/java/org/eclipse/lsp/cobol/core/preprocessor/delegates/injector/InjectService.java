@@ -28,7 +28,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.Cont
 import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysisFactory.AnalysisTypes.*;
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory.InjectContentType.FILE;
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory.InjectContentType.RESOLVE_COPYBOOK;
 
 /**
@@ -43,30 +42,6 @@ public class InjectService {
   public InjectService(InjectCodeAnalysisFactory analysisFactory, ContentProviderFactory contentProviderFactory) {
     this.analysisFactory = analysisFactory;
     this.contentProviderFactory = contentProviderFactory;
-  }
-
-  /**
-   * Returns list of injectors that needs to be applied after the parsing context
-   * @param ctx the parsing context
-   * @return list of injectors
-   */
-  @SuppressWarnings("unused")
-  public List<InjectDescriptor> getInjectors(CobolPreprocessor.LinkageSectionContext ctx) {
-    InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
-    CopybookContentProvider copybookContentProvider = contentProviderFactory.getInstanceFor(FILE);
-    return ImmutableList.of(new InjectDescriptor("DFHEIBLC", analysis, copybookContentProvider));
-  }
-
-  /**
-   * Returns list of injectors that needs to be applied after the parsing context
-   * @param ctx the parsing context
-   * @return list of injectors
-   */
-  @SuppressWarnings("unused")
-  public List<InjectDescriptor> getInjectors(CobolPreprocessor.WorkingStorageSectionContext ctx) {
-    InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
-    CopybookContentProvider copybookContentProvider = contentProviderFactory.getInstanceFor(FILE);
-    return ImmutableList.of(new InjectDescriptor("SPECIALREGISTERS", analysis, copybookContentProvider));
   }
 
   /**

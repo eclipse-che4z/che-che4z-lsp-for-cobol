@@ -52,6 +52,7 @@ import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
 import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.logic.*;
+import org.eclipse.lsp.cobol.core.model.tree.logic.implicit.ImplicitVariablesProcessor;
 import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
@@ -332,6 +333,14 @@ public class CobolLanguageEngine {
             ProcedureDivisionBodyNode.class,
             ProcessingPhase.DEFINITION,
             new DefineCodeBlock(symbolAccumulatorService)));
+
+    // Phase POST DEFINITION
+    ctx.register(
+        new ProcessorDescription(
+            SectionNode.class,
+            ProcessingPhase.POST_DEFINITION,
+            new ImplicitVariablesProcessor()));
+
     // Phase USAGE
     ctx.register(
         new ProcessorDescription(
