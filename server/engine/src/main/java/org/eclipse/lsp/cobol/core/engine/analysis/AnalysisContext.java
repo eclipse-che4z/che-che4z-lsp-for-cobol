@@ -19,11 +19,9 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -33,20 +31,8 @@ import java.util.function.Supplier;
 @Value
 @Slf4j
 public class AnalysisContext {
-  /**
-   * Type of activities we want to measure time for
-   */
-  public enum Activity {
-    DIALECTS,
-    PREPROCESSOR,
-    PARSER,
-    VISITOR,
-    SYNTAX_TREE,
-    LATE_ERROR_PROCESSING
-  }
-
-  Map<Activity, Timing> timing = new HashMap<>();
-  String documentUri;
+  ExtendedSource extendedSource;
+  Map<Activity, Timing> timing = new EnumMap<>(Activity.class);
   AnalysisConfig config;
   List<SyntaxError> accumulatedErrors = new ArrayList<>();
 
@@ -77,12 +63,23 @@ public class AnalysisContext {
     LOG.debug(
             "Timing for parsing {}. Dialects: {}, preprocessor: {}, parser: {}, visitor: {}, syntaxTree: {}, "
                     + "late error processing: {}",
-            documentUri,
+            getExtendedSource().getUri(),
             timing.get(Activity.DIALECTS).getTime(),
             timing.get(Activity.PREPROCESSOR).getTime(),
             timing.get(Activity.PARSER).getTime(),
             timing.get(Activity.VISITOR).getTime(),
             timing.get(Activity.SYNTAX_TREE).getTime(),
             timing.get(Activity.LATE_ERROR_PROCESSING).getTime());
+  }
+  /**
+   * Type of activities we want to measure time for
+   */
+  public enum Activity {
+    DIALECTS,
+    PREPROCESSOR,
+    PARSER,
+    VISITOR,
+    SYNTAX_TREE,
+    LATE_ERROR_PROCESSING
   }
 }

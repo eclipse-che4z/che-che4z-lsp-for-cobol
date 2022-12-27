@@ -108,13 +108,11 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @NonNull
   @Override
   public ResultWithErrors<OldExtendedDocument> getResult() {
-    nestedMappings.put(
-        documentUri,
-        new DocumentMapping(
-            tokens.getTokens().stream()
-                .map(LocalityUtils.toLocality(documentUri, hierarchy.getCurrentCopybookId()))
-                .collect(toList()),
-            shifts));
+    List<Locality> localities = tokens.getTokens().stream()
+            .map(LocalityUtils.toLocality(documentUri, hierarchy.getCurrentCopybookId()))
+            .collect(toList());
+    nestedMappings.put(documentUri, new DocumentMapping(localities, shifts));
+
     return new ResultWithErrors<>(
         new OldExtendedDocument(documentUri, accumulate(), copybooks, nestedMappings), errors);
   }
