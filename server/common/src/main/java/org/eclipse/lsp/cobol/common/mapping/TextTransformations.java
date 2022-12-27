@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.common.mapping;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -35,7 +34,6 @@ public class TextTransformations {
   private final Map<Range, TextTransformations> extensions = new HashMap<>();
   private final Set<Integer> inserts = new HashSet<>();
   private final Map<Range, String> replacements = new HashMap<>();
-  private final List<CopyNode> copyNodes = new ArrayList<>();
 
   /**
    * Apply all transformations and form resulting text
@@ -107,12 +105,10 @@ public class TextTransformations {
   /**
    * Replace copy statement with result of copybook substitution
    *
-   * @param copyNode node representation of copybook
    * @param range a range in the original document
    * @param textTransformations Copybook's transformations
    */
-  public void extend(CopyNode copyNode, Range range, TextTransformations textTransformations) {
-    copyNodes.add(copyNode);
+  public void extend(Range range, TextTransformations textTransformations) {
     Range extRange =
         new Range(
             new Position(range.getStart().getLine(), 0),
@@ -123,12 +119,10 @@ public class TextTransformations {
   /**
    * Insert copybook content as a text document after defined line
    *
-   * @param copyNode node representation of copybook
    * @param line a line number to insert after
    * @param textTransformations Copybook's transformations
    */
-  public void insert(CopyNode copyNode, int line, TextTransformations textTransformations) {
-    copyNodes.add(copyNode);
+  public void insert(int line, TextTransformations textTransformations) {
     Range extRange =
         new Range(
             new Position(line, 0),
@@ -156,18 +150,6 @@ public class TextTransformations {
    */
   public static TextTransformations of(String text, String uri) {
     return new TextTransformations(text, uri);
-  }
-
-  /**
-   * Calculates a list of all copy nodes include nested
-   *
-   * @return a list of all copy nodes
-   */
-  public List<CopyNode> calculateCopyNodes() {
-    List<CopyNode> result = new LinkedList<>();
-    extensions.values().forEach(v -> result.addAll(v.calculateCopyNodes()));
-    result.addAll(copyNodes);
-    return result;
   }
 
   /**
