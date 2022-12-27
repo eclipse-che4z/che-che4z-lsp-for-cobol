@@ -39,8 +39,7 @@ class InjectCodeImplicitAnalysis extends AbstractInjectCodeAnalysis {
   }
 
   @Override
-  protected Consumer<CopybooksRepository> storeCopyStatementSemantics(
-      CopybookMetaData metaData, OldExtendedDocument copybookDocument) {
+  protected Consumer<CopybooksRepository> storeCopyStatementSemantics(CopybookMetaData metaData, OldExtendedDocument copybookDocument) {
     return it -> {};
   }
 

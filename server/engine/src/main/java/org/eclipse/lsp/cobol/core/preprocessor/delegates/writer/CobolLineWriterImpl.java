@@ -16,8 +16,8 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
-import org.eclipse.lsp.cobol.core.model.CobolLine;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 import org.eclipse.lsp4j.Position;
@@ -99,11 +99,12 @@ public class CobolLineWriterImpl implements CobolLineWriter {
   /**
    * We need to remove the opening quote from a continuation line to concatenate string correctly
    */
-  private String removeStartingQuote(final CobolLine line) {
+  private String removeStartingQuote(CobolLine line) {
     String continuation = StringUtils.stripStart(line.getContentArea(), null);
     if (CobolLineReWriter.checkStringStartsWithQuoteMark(continuation)
-        && !isContinuedLineQuoted(line))
+        && !isContinuedLineQuoted(line)) {
       continuation = continuation.substring(1);
+    }
     return continuation;
   }
 

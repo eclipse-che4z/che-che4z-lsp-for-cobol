@@ -81,11 +81,9 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
     CobolPreprocessor parser = new CobolPreprocessor(tokens);
     parser.removeErrorListeners();
 
-    RuleContext startRule = parser.startRule();
-
     ParseTreeWalker walker = new ParseTreeWalker();
     GrammarPreprocessorListener<T> listener = listenerBuilder.apply(tokens);
-    walker.walk(listener, startRule);
+    walker.walk(listener, parser.startRule());
     return listener.getResult();
   }
 }

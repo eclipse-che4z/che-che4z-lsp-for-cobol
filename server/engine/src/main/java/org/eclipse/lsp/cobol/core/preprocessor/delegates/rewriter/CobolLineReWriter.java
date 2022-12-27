@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter;
 
-import org.eclipse.lsp.cobol.core.model.CobolLine;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 
 import java.util.List;
 
