@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service;
+package org.eclipse.lsp.cobol.service.settings;
 
 import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
+import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 
 import java.util.List;
 
@@ -57,6 +58,7 @@ public interface ConfigurationService {
     List<String> predefinedParagraphs;
     List<String> subroutines;
     boolean cicsTranslatorEnabled;
+    List<DialectRegistryItem> dialectRegistry;
 
     public ConfigurationEntity() {
       sqlBackend = SQLBackend.DB2_SERVER;
@@ -65,6 +67,7 @@ public interface ConfigurationService {
       predefinedParagraphs = ImmutableList.of();
       subroutines = ImmutableList.of();
       cicsTranslatorEnabled = true;
+      dialectRegistry = ImmutableList.of();
     }
   }
 }

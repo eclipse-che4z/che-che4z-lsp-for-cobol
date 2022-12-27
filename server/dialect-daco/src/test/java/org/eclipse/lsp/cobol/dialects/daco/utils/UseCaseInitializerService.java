@@ -31,7 +31,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.SettingsService;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
 import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.WatcherServiceImpl;

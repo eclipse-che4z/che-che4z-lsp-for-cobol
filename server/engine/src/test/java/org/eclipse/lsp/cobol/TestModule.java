@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
@@ -50,11 +51,15 @@ import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageServer;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
+import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
+
+import java.util.List;
 
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 import static com.google.inject.name.Names.named;
@@ -103,7 +108,17 @@ public class TestModule extends AbstractModule {
     bind(CopybookIdentificationService.class)
             .annotatedWith(Names.named("combinedStrategy"))
             .to(CopybookIdentificationCombinedStrategy.class);
-    bind(DialectDiscoveryService.class).toInstance((copybookService, messageService) -> ImmutableList.of());
+    bind(DialectDiscoveryService.class).toInstance(new DialectDiscoveryService() {
+      @Override
+      public List<CobolDialect> loadDialects(CopybookService copybookService, MessageService messageService) {
+        return ImmutableList.of();
+      }
+
+      @Override
+      public List<CobolDialect> loadDialects(String path, CopybookService copybookService, MessageService messageService) {
+        return ImmutableList.of();
+      }
+    });
 
     bindFormations();
     bindCompletions();

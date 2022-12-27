@@ -51,6 +51,7 @@ import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
 import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.logic.*;
+import org.eclipse.lsp.cobol.core.model.tree.logic.implicit.ImplicitVariablesProcessor;
 import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
@@ -60,7 +61,7 @@ import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.CachingConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 
@@ -133,6 +134,7 @@ public class CobolLanguageEngine {
     AnalysisContext ctx = new AnalysisContext(new ExtendedSource(resultWithErrors.getResult()), analysisConfig);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
 
+    dialectService.updateDialects(analysisConfig.getDialectRegistry());
     DialectOutcome dialectOutcome = ctx.measure(DIALECTS,
             () -> processDialects(ctx));
 
@@ -293,6 +295,9 @@ public class CobolLanguageEngine {
     ctx.register(d, SectionNameNode.class, new SectionNameRegister(symbolAccumulatorService));
     ctx.register(d, ParagraphNameNode.class, new ParagraphNameRegister(symbolAccumulatorService));
     ctx.register(d, ProcedureDivisionBodyNode.class, new DefineCodeBlock(symbolAccumulatorService));
+
+    // Phase POST DEFINITION
+    ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor());
 
     // Phase USAGE
     ProcessingPhase u = ProcessingPhase.USAGE;

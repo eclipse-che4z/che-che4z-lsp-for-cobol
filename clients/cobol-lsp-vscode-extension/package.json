@@ -108,6 +108,28 @@
         "configuration": {
             "title": "COBOL Language Support",
             "properties": {
+                "cobol-lsp.dialect.registry": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "path": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            },
+                            "extensionId": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "uniqueItems": true,
+                    "default": []
+                },
                 "cobol-lsp.smart-tab": {
                     "oneOf": [
                         {
@@ -195,30 +217,6 @@
                         "type": "string"
                     },
                     "description": "Default list of USS paths to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.idms.paths-local": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of local paths to search for IDMS copybooks",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.idms.paths-dsn": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of datasets to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.idms.paths-uss": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of USS paths to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
                     "uniqueItems": true
                 },
                 "cobol-lsp.cpy-manager.copybook-extensions": {

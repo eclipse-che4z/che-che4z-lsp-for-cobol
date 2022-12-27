@@ -66,6 +66,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -623,6 +624,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    * {@link TextDocumentService#didOpen(DidOpenTextDocumentParams)} processing is not finished yet.
    */
   @Test
+  @Disabled("Unstable")
   void testImmediateClosingOfDocumentDoNotCauseNPE() {
     service = getMockedTextDocumentServiceUsingSeparateThread();
     lenient()

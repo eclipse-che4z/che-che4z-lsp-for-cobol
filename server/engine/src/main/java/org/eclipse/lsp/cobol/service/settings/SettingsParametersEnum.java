@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.service.utils;
+package org.eclipse.lsp.cobol.service.settings;
 
 /**
  * This enum contains the structure of the settings.json that contains the MF related settings to
@@ -37,7 +37,8 @@ public enum SettingsParametersEnum {
   ANALYSIS_FEATURES("analysis.features"),
   DIALECTS("dialects"),
   DACO_PREDEFINED_SECTIONS("daco.predefined-sections"),
-  CICS_TRANSLATOR_ENABLED("cics.translator");
+  CICS_TRANSLATOR_ENABLED("cics.translator"),
+  DIALECT_REGISTRY("dialect.registry");
 
 
   public final String label;

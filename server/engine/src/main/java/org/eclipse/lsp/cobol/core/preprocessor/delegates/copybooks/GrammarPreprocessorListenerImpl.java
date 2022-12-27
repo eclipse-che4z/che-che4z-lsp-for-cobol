@@ -167,16 +167,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void exitLinkageSection(LinkageSectionContext ctx) {
-    injectCode(injectService.getInjectors(ctx), ctx, ctx);
-  }
-
-  @Override
-  public void exitWorkingStorageSection(WorkingStorageSectionContext ctx) {
-    injectCode(injectService.getInjectors(ctx), ctx, ctx);
-  }
-
-  @Override
   public void enterPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
     push();
   }

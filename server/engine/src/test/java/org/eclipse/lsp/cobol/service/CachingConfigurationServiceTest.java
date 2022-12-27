@@ -23,13 +23,15 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
+import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -48,7 +50,7 @@ class CachingConfigurationServiceTest {
                 CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of()),
             ImmutableList.of(),
             ImmutableList.of(),
-            true),
+            true, ImmutableList.of()),
         configuration.getConfig(CopybookProcessingMode.ENABLED));
   }
 
@@ -71,7 +73,8 @@ class CachingConfigurationServiceTest {
             dialectSettings,
             predefinedParagraphs,
             subroutines,
-            new JsonPrimitive("true"));
+            new JsonPrimitive("true"),
+            new JsonArray());
 
     when(settingsService.fetchConfigurations(
             Arrays.asList(
@@ -80,7 +83,8 @@ class CachingConfigurationServiceTest {
                 DIALECTS.label,
                 DACO_PREDEFINED_SECTIONS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
-                CICS_TRANSLATOR_ENABLED.label)))
+                CICS_TRANSLATOR_ENABLED.label,
+                DIALECT_REGISTRY.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration = new CachingConfigurationService(settingsService);
@@ -92,7 +96,7 @@ class CachingConfigurationServiceTest {
                 CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(EmbeddedLanguage.SQL),
             ImmutableList.of("Dialect"),
-            true),
+            true, ImmutableList.of()),
         configuration.getConfig(CopybookProcessingMode.DISABLED));
   }
 
@@ -110,7 +114,8 @@ class CachingConfigurationServiceTest {
             dialectSettings,
             new JsonNull(),
             subroutineSettings,
-            new JsonNull());
+            new JsonNull(),
+            new JsonArray());
     when(settingsService.fetchConfigurations(
             Arrays.asList(
                 TARGET_SQL_BACKEND.label,
@@ -118,7 +123,8 @@ class CachingConfigurationServiceTest {
                 DIALECTS.label,
                 DACO_PREDEFINED_SECTIONS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
-                CICS_TRANSLATOR_ENABLED.label)))
+                CICS_TRANSLATOR_ENABLED.label,
+                DIALECT_REGISTRY.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration = new CachingConfigurationService(settingsService);
@@ -130,7 +136,8 @@ class CachingConfigurationServiceTest {
                 CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(EmbeddedLanguage.SQL, EmbeddedLanguage.CICS),
             ImmutableList.of("Dialect"),
-            false),
+            false,
+            ImmutableList.of()),
         configuration.getConfig(CopybookProcessingMode.DISABLED));
   }
 }

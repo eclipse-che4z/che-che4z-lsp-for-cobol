@@ -60,6 +60,33 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
   public List<CobolDialect> loadDialects(CopybookService copybookService, MessageService messageService) {
     try {
       URI workdir = workingFolderService.getWorkingFolder();
+      return loadDialects(workdir, copybookService, messageService);
+    } catch (Exception e) {
+      warningCannotLoadDialects(e.getMessage());
+    }
+    return ImmutableList.of();
+  }
+
+  /**
+   * Load cobol dialects from the given path
+   * @param path is a path to the dialect
+   * @param copybookService a copybook service
+   * @param messageService a message service
+   * @return a list of loaded dialects
+   */
+  @Override
+  public List<CobolDialect> loadDialects(String path, CopybookService copybookService, MessageService messageService) {
+    try {
+      URI workdir = workingFolderService.getWorkingFolder(path);
+      return loadDialects(workdir, copybookService, messageService);
+    } catch (Exception e) {
+      warningCannotLoadDialects(e.getMessage());
+    }
+    return ImmutableList.of();
+  }
+
+  private List<CobolDialect> loadDialects(URI workdir, CopybookService copybookService, MessageService messageService) {
+    try {
       return workingFolderService.getFilenames(workdir).stream()
           .filter(filename -> filename.startsWith("dialect-"))
           .filter(filename -> filename.endsWith(".jar"))
@@ -67,9 +94,13 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
           .filter(Objects::nonNull)
           .collect(Collectors.toList());
     } catch (Exception e) {
-      LOG.warn("Cannot load dialects: {}", e.getMessage());
+      warningCannotLoadDialects(e.getMessage());
     }
     return ImmutableList.of();
+  }
+
+  private void warningCannotLoadDialects(String message) {
+    LOG.warn("Cannot load dialects: {}", message);
   }
 
   private CobolDialect createDialect(URI currentUri, String filename, CopybookService copybookService, MessageService messageService) {
@@ -87,7 +118,7 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
       Constructor<CobolDialect> constructor = clazz.getConstructor(CopybookService.class, MessageService.class);
       return constructor.newInstance(copybookService, messageService);
     } catch (Exception e) {
-      LOG.warn("Cannot create dialect: {}", e.getMessage());
+      LOG.warn("Cannot create dialect {}: {}", filename, e.getMessage());
     }
     return null;
   }

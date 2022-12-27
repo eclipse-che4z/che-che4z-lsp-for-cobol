@@ -18,7 +18,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysis;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp.cobol.common.file.FileSystemService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,17 +30,14 @@ public class ContentProviderFactory {
 
   /** Enumeration of predefined copybook content types */
   public enum InjectContentType {
-    FILE,
-    GENERATED,
     RESOLVE_COPYBOOK
   }
 
   private final Map<InjectContentType, CopybookContentProvider> instances;
 
   @Inject
-  public ContentProviderFactory(FileSystemService files, CopybookService copybookService) {
+  public ContentProviderFactory(CopybookService copybookService) {
     this.instances = new HashMap<>();
-    instances.put(InjectContentType.FILE, new FileCopybookContentProvider(files));
     instances.put(InjectContentType.RESOLVE_COPYBOOK, new CopybookCopybookContentProviderImpl(copybookService));
   }
 

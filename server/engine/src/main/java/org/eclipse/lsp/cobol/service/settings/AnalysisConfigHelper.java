@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service;
+package org.eclipse.lsp.cobol.service.settings;
 
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
@@ -36,6 +36,8 @@ class AnalysisConfigHelper {
       CopybookProcessingMode mode, ConfigurationService.ConfigurationEntity entity) {
     CopybookConfig copybookConfig = new CopybookConfig(mode, entity.getSqlBackend(), entity.getPredefinedParagraphs());
 
-    return new AnalysisConfig(copybookConfig, entity.getFeatures(), entity.getDialects(), entity.isCicsTranslatorEnabled());
+    return new AnalysisConfig(copybookConfig, entity.getFeatures(), entity.getDialects(),
+        entity.isCicsTranslatorEnabled(),
+        entity.getDialectRegistry());
   }
 }
