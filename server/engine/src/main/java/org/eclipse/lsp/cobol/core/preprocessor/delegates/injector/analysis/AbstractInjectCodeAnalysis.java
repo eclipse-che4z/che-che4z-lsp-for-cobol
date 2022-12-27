@@ -180,18 +180,12 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
     List<SyntaxError> errors = new ArrayList<>();
     return hierarchy -> {
       CopybookModel model = getCopyBookContent(copybookContentProvider, metaData, hierarchy).unwrap(errors::addAll);
-      return processCopybook(
-              metaData,
-              hierarchy,
-              model.getUri(),
-              handleReplacing(
-                      metaData,
-                      hierarchy,
-                      preprocessor
-                          .cleanUpCode(model.getUri(), model.getContent())
-                          .unwrap(errors::addAll).calculateExtendedText())
-                  .unwrap(errors::addAll))
-          .accumulateErrors(errors);
+      String text = preprocessor.cleanUpCode(model.getUri(), model.getContent())
+              .unwrap(errors::addAll).calculateExtendedText();
+      String replaced = handleReplacing(metaData, hierarchy, text)
+              .unwrap(errors::addAll);
+      ResultWithErrors<OldExtendedDocument> oldExtendedDocumentResultWithErrors = processCopybook(metaData, hierarchy, model.getUri(), replaced).accumulateErrors(errors);
+      return oldExtendedDocumentResultWithErrors;
     };
   }
 
@@ -210,7 +204,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
       CopybookMetaData metaData, CopybookHierarchy hierarchy, String uri, String content) {
     hierarchy.push(metaData.toCopybookUsage());
     final ResultWithErrors<OldExtendedDocument> result =
-        preprocessor.processCleanCode(uri, content, metaData.getConfig(), hierarchy);
+            preprocessor.processCleanCode(uri, content, metaData.getConfig(), hierarchy);
     hierarchy.pop();
     return result;
   }

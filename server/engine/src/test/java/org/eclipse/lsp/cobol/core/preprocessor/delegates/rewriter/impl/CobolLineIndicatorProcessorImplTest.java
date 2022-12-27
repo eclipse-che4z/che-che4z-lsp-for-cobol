@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.impl;
 
 import com.google.common.collect.ImmutableList;
 import lombok.val;
-import org.eclipse.lsp.cobol.core.model.CobolLine;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
 import org.junit.jupiter.api.Test;
