@@ -37,6 +37,16 @@ describe("Test CompletionProvider", () => {
     jest.clearAllMocks();
     });
 
+    test("Suggest all DaCo Snippets", async () => {
+    const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: ""})} as any;
+    const position = jest.fn().mockImplementation((line, character) => ({line: line, character: character}));
+    const token = { isCancellationRequested: false, onCancellationRequested: jest.fn() };
+
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+        get: jest.fn().mockReturnValue(["DaCo"]),
+    });
+    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(301);
+    });
     test("Suggest all IDMS Snippets", async () => {
     const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: ""})} as any;
     const position = jest.fn().mockImplementation((line, character) => ({line: line, character: character}));
@@ -45,7 +55,7 @@ describe("Test CompletionProvider", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
         get: jest.fn().mockReturnValue(["IDMS"]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(232);
+    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(222);
 });
     test("Suggest all Cobol only Snippets", async () => {
     const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: ""})} as any;
@@ -56,6 +66,17 @@ describe("Test CompletionProvider", () => {
         get: jest.fn().mockReturnValue([""]),
     });
     expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(222);
+});
+
+    test("Suggest Snippets when both IDMS and DaCo is set", async () => {
+    const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: ""})} as any;
+    const position = jest.fn().mockImplementation((line, character) => ({line: line, character: character}));
+    const token = { isCancellationRequested: false, onCancellationRequested: jest.fn() };
+
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+        get: jest.fn().mockReturnValue(["DaCo", "IDMS"]),
+    });
+    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(301);
 });
 
     test(" Test number of suggestions for COPY when no dialect is selected", async () => {
@@ -77,7 +98,7 @@ describe("Test CompletionProvider", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
         get: jest.fn().mockReturnValue(["IDMS"]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(7);
+    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(1);
 })
 
 test(" Test number of suggestions for WRITE when dialect is IDMS", async () => {
@@ -91,5 +112,15 @@ test(" Test number of suggestions for WRITE when dialect is IDMS", async () => {
     expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(1);
 })
 
+    test(" Test number of suggestions for WRITE when dialect is Daco", async () => {
+    const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: "WRITE"})} as any;
+    const position = jest.fn().mockImplementation((line, character) => ({line: 0, character: 4}));
+    const token = { isCancellationRequested: false, onCancellationRequested: jest.fn() };
+
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+        get: jest.fn().mockReturnValue(["DaCo", "IDMS"]),
+    });
+    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(10);
+});
 
 });
