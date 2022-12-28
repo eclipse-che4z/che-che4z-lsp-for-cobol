@@ -57,62 +57,71 @@ export class SmartTabCommandProvider extends SmartCommandProvider {
         const selections = getActualSelectionForTab(editor);
         for (let selection of selections.actualSelection) {
             const position = selection.active;
-            let column = findNextSolidPosition(editor, position);
-            if (column === -1) {
-                column = position.character;
-                const nextPosition = getNextPosition(editor, column, SettingsService.getTabSettings(), position.line);
-                const lineLen = getCurrentLine(editor, position.line).length;
-                if (lineLen < nextPosition) {
-                    const insertSize = nextPosition - lineLen;
-                    edit.insert(position, ' '.repeat(insertSize));
-                }
-                column = nextPosition;
-            } else {
-                const nextPosition = getNextPosition(editor, column, SettingsService.getTabSettings(), position.line);
-                const insertSize = nextPosition - column;
-                if (insertSize > 0) {
-                    edit.insert(position, ' '.repeat(insertSize));
-                    column = nextPosition - insertSize;
-                }
-            }
-            const newPosition: vscode.Position = new vscode.Position(position.line, column);
-            if (!checkRangeLiesBetweenSelection(selections.rangeSelection, newPosition)) {
-                newSelections.push(new vscode.Selection(newPosition, newPosition));
+            if(!checkRangeLiesBetweenSelection(selections.rangeSelection, position)) {
+                handleIndividualTab(editor, position, edit, newSelections);
             }
         }
-        newSelections = newSelections.concat(selections.rangeSelection);
+        const updatedRange = handleRangeSelection(selections.rangeSelection, editor, edit);
+        newSelections = newSelections.concat(updatedRange);
         editor.selections = newSelections;
         vscode.commands.executeCommand('acceptSelectedSuggestion');
     }
 }
 
-class SmartOutdentCommandProvider extends SmartCommandProvider {
+export class SmartOutdentCommandProvider extends SmartCommandProvider {
     public execute(editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
         let newSelections: Selection[] = new Array();
         const selections = getActualSelectionForTab(editor);
         for (let selection of selections.actualSelection) {
             const position = selection.active;
-
-            let charPosition = this.findSolidCharPosition(editor, position);
-            if (charPosition === 0) {
-                return;
-            }
-            let prevPosition = getPrevPosition(editor, charPosition, SettingsService.getTabSettings(), position.line);
-            if (this.onlySpaces(getCurrentLine(editor, position.line), prevPosition, charPosition)) {
-                edit.delete(new vscode.Range(new vscode.Position(position.line, prevPosition), new vscode.Position(position.line, charPosition)));
-            } else {
-                let prevSolidPosition = this.findPrevSolidPosition(editor, new vscode.Position(position.line, charPosition - 1));
-                let removeSize = Math.max(0, Math.min(charPosition - prevSolidPosition - 1, getTabSize()));
-                edit.delete(new vscode.Range(new vscode.Position(position.line, charPosition - removeSize), new vscode.Position(position.line, charPosition)));
-                prevPosition = charPosition - removeSize;
-            }
-            const newPosition: vscode.Position = new vscode.Position(position.line, prevPosition);
-            if (!checkRangeLiesBetweenSelection(selections.rangeSelection, newPosition)) {
-                newSelections.push(new vscode.Selection(newPosition, newPosition));
+            if (!checkRangeLiesBetweenSelection(selections.rangeSelection, position)) {
+                this.handleIndividualSmartOutCommand(editor, edit, position, newSelections);
             }
         }
-        newSelections = newSelections.concat(selections.rangeSelection);
-        editor.selections = newSelections;
+        const updatedRange = this.handleRangeSelectionSmartOutCommand(editor, edit, selections.rangeSelection);
+        newSelections = newSelections.concat(updatedRange);
+        editor.selections = newSelections; 
+    }
+
+    private  handleIndividualSmartOutCommand(editor: vscode.TextEditor, edit: vscode.TextEditorEdit, position: vscode.Position, newSelections: vscode.Selection[]) {
+        let charPosition = this.findSolidCharPosition(editor, position);
+                if (charPosition === 0) {
+                    return;
+                }
+                let prevPosition = getPrevPosition(editor, charPosition, SettingsService.getTabSettings(), position.line);
+                if (this.onlySpaces(getCurrentLine(editor, position.line), prevPosition, charPosition)) {
+                    edit.delete(new vscode.Range(new vscode.Position(position.line, prevPosition), new vscode.Position(position.line, charPosition)));
+                } else {
+                    let prevSolidPosition = this.findPrevSolidPosition(editor, new vscode.Position(position.line, charPosition - 1));
+                    let removeSize = Math.max(0, Math.min(charPosition - prevSolidPosition - 1, getTabSize()));
+                    edit.delete(new vscode.Range(new vscode.Position(position.line, charPosition - removeSize), new vscode.Position(position.line, charPosition)));
+                    prevPosition = charPosition - removeSize;
+                }
+                const newPosition: vscode.Position = new vscode.Position(position.line, prevPosition);
+                newSelections.push(new vscode.Selection(newPosition, newPosition));
+    }
+
+    private handleRangeSelectionSmartOutCommand(editor: vscode.TextEditor, edit: vscode.TextEditorEdit, rangeSelection: vscode.Selection[]) {
+        const result: Selection[] = new Array();
+        for(let selection of rangeSelection) {
+            const lastShifts = RangeTabShiftStore.getCachedShifts(editor.document.uri);
+            const lastShift = lastShifts && lastShifts.pop();
+            for (let lineNumber = selection.start.line; lineNumber <= selection.end.line; lineNumber++) {
+                const currentLine = editor.document.lineAt(lineNumber);
+                if(lastShift) {
+                    const shift = lastShift.get(currentLine.lineNumber) || 0;
+                    edit.delete(new vscode.Range(new vscode.Position(currentLine.lineNumber, currentLine.firstNonWhitespaceCharacterIndex - shift), 
+                    new vscode.Position(currentLine.lineNumber, currentLine.firstNonWhitespaceCharacterIndex)));
+                } else {
+                    this.handleIndividualSmartOutCommand(editor, edit, new vscode.Position(currentLine.lineNumber, currentLine.firstNonWhitespaceCharacterIndex), result);
+                }
+            } 
+            if(!lastShifts || lastShifts.length === 0) {
+                RangeTabShiftStore.clearCache(editor.document.uri);
+            }
+            result.push(selection);
+        }
+        return result;
     }
 
     private findSolidCharPosition(editor: vscode.TextEditor, position: vscode.Position) {
@@ -151,6 +160,54 @@ class SmartOutdentCommandProvider extends SmartCommandProvider {
         }
         return 0;
     }
+}
+
+export class RangeTabShiftStore {
+    private static store :Map<vscode.Uri, Map<number, number>[]> = new Map();
+    static storeValue(key:vscode.Uri, val: Map<vscode.TextLine, number>) {
+        const currentVal = this.store.get(key);
+        const modifiedVal = new Map(Array.from(val).map(([key, val]) => [key.lineNumber, val]));
+        if( currentVal) {
+            currentVal.push(modifiedVal);
+        } else {
+            this.store.set(key, [modifiedVal]);
+        }
+    }
+
+    static clearCache(key) {
+        this.store.delete(key);
+    }
+
+    static getCachedShifts(key) {
+        return this.store.get(key);
+    }
+
+    static reset() {
+        this.store = new Map();
+    }
+}
+
+function handleIndividualTab(editor: vscode.TextEditor, position: vscode.Position, edit: vscode.TextEditorEdit, newSelections: vscode.Selection[]) {
+    let column = findNextSolidPosition(editor, position);
+    if (column === -1) {
+        column = position.character;
+        const nextPosition = getNextPosition(editor, column, SettingsService.getTabSettings(), position.line);
+        const lineLen = getCurrentLine(editor, position.line).length;
+        if (lineLen < nextPosition) {
+            const insertSize = nextPosition - lineLen;
+            edit.insert(position, ' '.repeat(insertSize));
+        }
+        column = nextPosition;
+    } else {
+        const nextPosition = getNextPosition(editor, column, SettingsService.getTabSettings(), position.line);
+        const insertSize = nextPosition - column;
+        if (insertSize > 0) {
+            edit.insert(position, ' '.repeat(insertSize));
+            column = nextPosition - insertSize;
+        }
+    }
+    const newPosition: vscode.Position = new vscode.Position(position.line, column);
+    newSelections.push(new vscode.Selection(newPosition, newPosition));
 }
 
 /**
@@ -315,5 +372,51 @@ function checkRangeLiesBetweenSelection(rangeSelection: vscode.Selection[], newP
         }
     }
     return false;
+}
+
+function handleRangeSelection(rangeSelection: vscode.Selection[], editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
+    const result: Selection[] = new Array();
+    for(let selection of rangeSelection) {
+        const expectedShiftMap = getCurrentPositionToNextPositionMap(selection, editor);
+        let shift = 0;
+        let prevKey: vscode.TextLine;
+        const finalShiftMap: Map<vscode.TextLine, number> = new Map();
+        for (const key of expectedShiftMap.keys()) {
+           if (prevKey && expectedShiftMap.get(prevKey) === expectedShiftMap.get(key)) {
+                shift = prevKey.firstNonWhitespaceCharacterIndex < key.firstNonWhitespaceCharacterIndex ? 
+                expectedShiftMap.get(prevKey) - prevKey.firstNonWhitespaceCharacterIndex 
+                : expectedShiftMap.get(key) - key.firstNonWhitespaceCharacterIndex;
+                shift = shift > finalShiftMap.get(prevKey) ? shift : finalShiftMap.get(prevKey);
+                updateShiftMap(finalShiftMap, prevKey, shift);
+                updateShiftMap(finalShiftMap, key, shift);
+           } else {
+                shift =  expectedShiftMap.get(key) - key.firstNonWhitespaceCharacterIndex;
+                updateShiftMap(finalShiftMap, key, shift);
+           }
+            prevKey = key;
+          }
+          finalShiftMap.forEach((val, key) => {
+            edit.insert(new vscode.Position(key.lineNumber, key.firstNonWhitespaceCharacterIndex), ' '.repeat(val))
+          })
+          RangeTabShiftStore.storeValue(editor.document.uri, finalShiftMap);
+          result.push(selection);
+    }
+    return result;
+}
+
+function getCurrentPositionToNextPositionMap(selection: vscode.Selection, editor: vscode.TextEditor) {
+    const result: Map<vscode.TextLine, number> = new Map();
+    for (let lineNumber = selection.start.line; lineNumber <= selection.end.line; lineNumber++) {
+        const currentLine = editor.document.lineAt(lineNumber);
+        const column  = currentLine.firstNonWhitespaceCharacterIndex;
+        result.set(currentLine, getNextPosition(editor, column, SettingsService.getTabSettings(), currentLine.lineNumber));
+    }
+    return result;
+}
+
+function updateShiftMap(finalShiftMap: Map<vscode.TextLine, number>, line: vscode.TextLine, shift: number) {
+    if(line.firstNonWhitespaceCharacterIndex !== 71) {
+        finalShiftMap.set(line, shift);
+    }
 }
 
