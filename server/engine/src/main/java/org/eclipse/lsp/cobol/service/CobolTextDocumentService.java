@@ -648,7 +648,11 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> documentSymbol(
       DocumentSymbolParams params) {
     String uri = params.getTextDocument().getUri();
-    communications.notifyProgressBegin(uri);
+    Path file = fileSystemService.getPathFromURI(uri);
+    String text = fileSystemService.getContentByPath(Objects.requireNonNull(file));
+    if (!copybookIdentificationService.isCopybook(uri, text, copybookExtensions)) {
+      communications.notifyProgressBegin(uri);
+    }
     return outlineMap
         .get(uri)
         .thenApply(
