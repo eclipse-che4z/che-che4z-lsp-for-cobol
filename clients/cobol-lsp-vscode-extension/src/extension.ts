@@ -22,7 +22,7 @@ import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeAc
 
 import { clearCache } from "./commands/ClearCopybookCacheCommand";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
-import { initSmartTab } from "./commands/SmartTabCommand";
+import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { TelemetryService } from "./services/reporter/TelemetryService";
 import { createFileWithGivenPath, SettingsService } from "./services/Settings";
@@ -74,6 +74,7 @@ export async function activate(context: vscode.ExtensionContext) {
         () => {
         gotoCopybookSettings();
     }));
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor((e) => RangeTabShiftStore.reset()));
 
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.clear.downloaded.copybooks", () => { clearCache() }));
 
