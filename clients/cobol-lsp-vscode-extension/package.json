@@ -221,16 +221,18 @@
                 },
                 "cobol-lsp.cpy-manager.copybook-extensions": {
                     "type": "array",
+                    "$comment": "Items is converted to an array instead of simple string, to disable the vscode rendering the form for extensions setting, instead shows an hyper link to settings.xml for editing.This is done as empty string is not supported by vscode yet",
                     "items": {
-                        "type": "string"
+                        "type": ["string"] 
                     },
                     "default": [
                         ".CPY",
                         ".COPY",
                         ".cpy",
-                        ".copy"
+                        ".copy",
+                        ""
                     ],
-                    "description": "List of copybook extensions",
+                    "description": "List of copybook extensions. Empty string specifies no file extension.",
                     "uniqueItems": true
                 },
                 "cobol-lsp.cpy-manager.copybook-file-encoding": {
