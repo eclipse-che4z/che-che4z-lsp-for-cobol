@@ -1712,6 +1712,20 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
+    "name":"org.eclipse.lsp4j.WorkDoneProgressCreateParams",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.adapters.ProgressNotificationAdapter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.ProgressParams",
+    "allDeclaredFields":true,
+    "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
     "name":"org.eclipse.lsp4j.WorkspaceEdit",
     "allDeclaredFields":true,
     "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
