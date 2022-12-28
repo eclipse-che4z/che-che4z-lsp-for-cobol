@@ -30,7 +30,7 @@ describe("DialectRegistry test", () => {
     it("register new dialect in the registry", () => {
         let spy = jest.spyOn(config, "update");
 
-        DialectRegistry.register("new", "path", "desc", "dialectId");
+        DialectRegistry.register("new", "path", "desc", "dialectId", "path");
         expect(spy).toBeCalled();
     });
 
