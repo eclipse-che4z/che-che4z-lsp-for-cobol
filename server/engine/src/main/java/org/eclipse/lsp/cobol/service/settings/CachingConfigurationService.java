@@ -26,12 +26,10 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 
 import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -44,27 +42,29 @@ import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 public class CachingConfigurationService implements ConfigurationService {
   private final SettingsService settingsService;
   private CompletableFuture<ConfigurationEntity> config;
+  private final DialectService dialectService;
 
   @Inject
-  public CachingConfigurationService(SettingsService settingsService) {
+  public CachingConfigurationService(SettingsService settingsService, DialectService dialectService) {
     this.settingsService = settingsService;
+    this.dialectService = dialectService;
     config = CompletableFuture.completedFuture(new ConfigurationEntity());
   }
 
   @Override
   public void updateConfigurationFromSettings() {
-    config =
-        settingsService
-            .fetchConfigurations(
-                Arrays.asList(
-                    TARGET_SQL_BACKEND.label,
-                    ANALYSIS_FEATURES.label,
-                    DIALECTS.label,
-                    DACO_PREDEFINED_SECTIONS.label,
-                    SUBROUTINE_LOCAL_PATHS.label,
-                    CICS_TRANSLATOR_ENABLED.label,
-                    DIALECT_REGISTRY.label))
-            .thenApply(this::parseConfig);
+    List<String> settingsList = new LinkedList<>(Arrays.asList(
+        TARGET_SQL_BACKEND.label,
+        ANALYSIS_FEATURES.label,
+        DIALECTS.label,
+        SUBROUTINE_LOCAL_PATHS.label,
+        CICS_TRANSLATOR_ENABLED.label,
+        DIALECT_REGISTRY.label));
+
+    List<String> dialectsSections = dialectService.getSettingsSections();
+    settingsList.addAll(dialectsSections);
+    config = settingsService.fetchConfigurations(settingsList)
+        .thenApply(c -> parseConfig(c, dialectsSections));
   }
 
   @Override
@@ -94,22 +94,34 @@ public class CachingConfigurationService implements ConfigurationService {
     return ImmutableList.of();
   }
 
-  private ConfigurationEntity parseConfig(List<Object> clientConfig) {
+  private ConfigurationEntity parseConfig(List<Object> clientConfig, List<String> dialectsSections) {
     return Optional.ofNullable(clientConfig)
-        .map(this::parseSettings)
+        .map(cc -> this.parseSettings(cc, dialectsSections))
         .orElseGet(ConfigurationEntity::new);
   }
 
-  private ConfigurationEntity parseSettings(List<Object> clientConfig) {
+  private ConfigurationEntity parseSettings(List<Object> clientConfig, List<String> dialectsSections) {
 
     return new ConfigurationEntity(
         parseSQLBackend(clientConfig.subList(0, 1)),
         parseFeatures((JsonElement) clientConfig.get(1)),
         parseDialects((JsonArray) clientConfig.get(2)),
-        parsePredefinedParagraphs((JsonElement) clientConfig.get(3)),
-        parseSubroutineFolder((JsonElement) clientConfig.get(4)),
-        parseCicsTranslatorOption((JsonElement) clientConfig.get(5)),
-        parseDialectRegistry((JsonArray) clientConfig.get(6)));
+        parseSubroutineFolder((JsonElement) clientConfig.get(3)),
+        parseCicsTranslatorOption((JsonElement) clientConfig.get(4)),
+        parseDialectRegistry((JsonArray) clientConfig.get(5)),
+        getDialectsSettings(clientConfig.subList(6, 6 + dialectsSections.size()).toArray(), dialectsSections.toArray())
+        );
+  }
+
+  private Map<String, JsonElement> getDialectsSettings(Object[] config, Object[] dialectsSections) {
+    if (config.length != dialectsSections.length) {
+      throw new RuntimeException("Dialect configuration is invalid");
+    }
+    Map<String, JsonElement> result = new HashMap<>();
+    for (int i = 0; i < dialectsSections.length; i++) {
+      result.put(dialectsSections[i].toString(), (JsonElement) config[i]);
+    }
+    return result;
   }
 
   private List<DialectRegistryItem> parseDialectRegistry(JsonArray jsonArray) {
@@ -150,13 +162,6 @@ public class CachingConfigurationService implements ConfigurationService {
           .collect(toList());
     }
     return Arrays.asList(EmbeddedLanguage.values());
-  }
-
-  private List<String> parsePredefinedParagraphs(JsonElement labels) {
-    if (labels.isJsonArray()) {
-      return Streams.stream((JsonArray) labels).map(JsonElement::getAsString).collect(toList());
-    }
-    return ImmutableList.of();
   }
 
   private List<String> parseSubroutineFolder(JsonElement subroutine) {

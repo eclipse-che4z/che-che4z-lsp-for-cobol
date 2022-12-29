@@ -14,8 +14,11 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco.processors.implicit;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Streams;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProcedureSectionNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
@@ -25,15 +28,18 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.dialects.daco.DaCoDialect.DACO_PREDEFINED_SECTIONS;
 
 /**
  * Adds necessary variables that corresponds to the DaCo implicit code
  */
 @RequiredArgsConstructor
 public class DaCoImplicitCodeProcessor implements Processor<ProgramNode> {
-  private final CopybookConfig copybookConfig;
 
   @Override
   public void accept(ProgramNode programNode, ProcessingContext processingContext) {
@@ -44,13 +50,23 @@ public class DaCoImplicitCodeProcessor implements Processor<ProgramNode> {
     List<VariableNode> children = variables.stream().flatMap(Node::getDepthFirstStream)
         .filter(n -> n instanceof VariableNode)
         .map(VariableNode.class::cast)
-        .collect(Collectors.toList());
+        .collect(toList());
     variables.addAll(children);
 
     variables.forEach(node -> processingContext.getVariableAccumulator().addVariableDefinition(programNode, node));
 
-    SectionsGenerator.generate(copybookConfig.getPredefinedSections(), getExistingSections(programNode))
+    SectionsGenerator.generate(getPredefinedSections(processingContext), getExistingSections(programNode))
         .forEach(node -> processingContext.getVariableAccumulator().registerCodeBlock(programNode, node));
+  }
+
+  private List<String> getPredefinedSections(ProcessingContext processingContext) {
+    Map<String, JsonElement> config = processingContext.getDialectsConfig();
+    JsonElement labels = config.get(DACO_PREDEFINED_SECTIONS);
+
+    if (labels != null && labels.isJsonArray()) {
+      return Streams.stream((JsonArray) labels).map(JsonElement::getAsString).collect(toList());
+    }
+    return ImmutableList.of();
   }
 
   private Set<String> getExistingSections(ProgramNode programNode) {

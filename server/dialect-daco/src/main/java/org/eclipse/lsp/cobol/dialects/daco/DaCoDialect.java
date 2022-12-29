@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableSet;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
@@ -46,20 +45,19 @@ import java.util.regex.Pattern;
 public final class DaCoDialect implements CobolDialect {
   public static final String NAME = "DaCo";
   private final Pattern dcdbPattern = Pattern.compile("^[\\s\\d]{7}D-[BC]", Pattern.MULTILINE);
+  private static final String DACO_CPY_LOCAL_PATHS = "cpy-manager.daco.paths-local";
+  public static final String DACO_PREDEFINED_SECTIONS = "daco.predefined-sections";
+  private static final String IDMS_DIALECT_NAME = "IDMS";
 
   private final MessageService messageService;
 
   private final DaCoMaidProcessor maidProcessor;
-
-  private CopybookConfig copybookConfig;
 
   public DaCoDialect(CopybookService copybookService, MessageService messageService) {
     this.messageService = messageService;
     this.maidProcessor = new DaCoMaidProcessor(copybookService,
         new InterruptingTreeListener(), messageService);
   }
-
-  public static final String IDMS_DIALECT_NAME = "IDMS";
 
   /**
    * Gets the name of the dialect
@@ -107,7 +105,6 @@ public final class DaCoDialect implements CobolDialect {
     errors.addAll(parserErrors);
 
     DialectOutcome result = new DialectOutcome(nodes, context);
-    copybookConfig = context.getCopybookConfig();
     return new ResultWithErrors<>(result, errors);
   }
 
@@ -144,7 +141,17 @@ public final class DaCoDialect implements CobolDialect {
             DaCoCopyFromNode.class, ProcessingPhase.POST_DEFINITION,
                 new DaCoCopyFromProcessor()),
         new ProcessorDescription(ProgramNode.class, ProcessingPhase.POST_DEFINITION,
-                new DaCoImplicitCodeProcessor(copybookConfig))
+                new DaCoImplicitCodeProcessor())
     );
+  }
+
+  @Override
+  public List<String> getSettingsSections() {
+    return ImmutableList.of(DACO_PREDEFINED_SECTIONS);
+  }
+
+  @Override
+  public List<String> getWatchingFolderSettings() {
+    return ImmutableList.of(DACO_CPY_LOCAL_PATHS);
   }
 }

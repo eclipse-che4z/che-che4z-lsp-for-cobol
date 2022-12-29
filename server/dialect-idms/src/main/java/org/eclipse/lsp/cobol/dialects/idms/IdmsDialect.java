@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.lang3.tuple.Pair;
@@ -42,6 +43,8 @@ import java.util.*;
 /** Process the text according to the IDMS rules */
 public final class IdmsDialect implements CobolDialect {
   public static final String NAME = "IDMS";
+  private static final String IDMS_CPY_LOCAL_PATHS = "cpy-manager.idms.paths-local";
+
   private final CopybookService copybookService;
   private final MessageService messageService;
 
@@ -208,6 +211,11 @@ public final class IdmsDialect implements CobolDialect {
   @Override
   public Map<String, String> getKeywords() {
     return KeywordsUtils.getKeywords("KeywordsIdms.txt");
+  }
+
+  @Override
+  public List<String> getWatchingFolderSettings() {
+    return ImmutableList.of(IDMS_CPY_LOCAL_PATHS);
   }
 
   private IdmsCopyParser.StartRuleContext parseCopyIdms(String text, String programDocumentUri, List<SyntaxError> errors) {

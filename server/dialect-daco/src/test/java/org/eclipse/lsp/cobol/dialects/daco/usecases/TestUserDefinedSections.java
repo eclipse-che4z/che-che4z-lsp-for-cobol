@@ -16,13 +16,18 @@ package org.eclipse.lsp.cobol.dialects.daco.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 /**
  * If user has user defined labels they should be resolved without errors
@@ -68,15 +73,15 @@ class TestUserDefinedSections {
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DB2_SERVER,
-                ImmutableList.of("USERLABEL"))));
+            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DB2_SERVER), ImmutableList.of("USERLABEL")));
   }
 
   @Test
   void testGoTo() {
-    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of("USERLABEL"));
+    Map<String, JsonElement> dialectConfig = ImmutableMap.of(DaCoDialect.DACO_PREDEFINED_SECTIONS, new Gson().toJsonTree(ImmutableList.of("USERLABEL")));
+    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER);
     AnalysisConfig analysisConfig = new AnalysisConfig(copybookConfig, ImmutableList.of(), ImmutableList.of("DaCo", "IDMS"),
-        true, ImmutableList.of());
+        true, ImmutableList.of(), dialectConfig);
     UseCaseEngine.runTestForDiagnostics(TEXT_GOTO, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
   }
 
@@ -87,8 +92,8 @@ class TestUserDefinedSections {
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DB2_SERVER,
-                ImmutableList.of("USERLABEL"))));
+            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DB2_SERVER),
+            ImmutableList.of("USERLABEL")));
   }
 
 }
