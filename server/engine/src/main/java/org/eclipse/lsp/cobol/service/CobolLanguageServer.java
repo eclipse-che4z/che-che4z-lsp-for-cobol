@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.utils.LogLevelUtils;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
@@ -63,6 +64,7 @@ public class CobolLanguageServer implements LanguageServer {
   private final ConfigurationService configurationService;
   private final CopybookNameService copybookNameService;
   private final Keywords keywords;
+  private final DialectService dialectService;
 
   @Inject
   @SuppressWarnings("squid:S107")
@@ -76,7 +78,8 @@ public class CobolLanguageServer implements LanguageServer {
       DisposableLSPStateService disposableLSPStateService,
       ConfigurationService configurationService,
       CopybookNameService copybookNameService,
-      Keywords keywords) {
+      Keywords keywords,
+      DialectService dialectService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
@@ -87,6 +90,7 @@ public class CobolLanguageServer implements LanguageServer {
     this.configurationService = configurationService;
     this.copybookNameService = copybookNameService;
     this.keywords = keywords;
+    this.dialectService = dialectService;
   }
 
   @Override
@@ -220,12 +224,12 @@ public class CobolLanguageServer implements LanguageServer {
     settingsService
         .fetchTextConfiguration(CPY_LOCAL_PATHS.label)
         .thenAccept(watchingService::addWatchers);
-    settingsService
-        .fetchTextConfiguration(DACO_CPY_LOCAL_PATHS.label)
-        .thenAccept(watchingService::addWatchers);
-    settingsService
-        .fetchTextConfiguration(IDMS_CPY_LOCAL_PATHS.label)
-        .thenAccept(watchingService::addWatchers);
+
+    dialectService.getWatchingFolderSettings()
+            .forEach(s -> settingsService
+                .fetchTextConfiguration(s)
+                .thenAccept(watchingService::addWatchers));
+
     settingsService
         .fetchTextConfiguration(SUBROUTINE_LOCAL_PATHS.label)
         .thenAccept(watchingService::addWatchers);

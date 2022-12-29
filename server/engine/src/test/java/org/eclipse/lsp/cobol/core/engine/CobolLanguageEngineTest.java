@@ -150,7 +150,7 @@ class CobolLanguageEngineTest {
                             .build()),
                     ImmutableMap.of())));
 
-    CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of());
+    CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER);
 
     DialectProcessingContext context = DialectProcessingContext.builder()
             .extendedSource(new ExtendedSource(TEXT, URI))

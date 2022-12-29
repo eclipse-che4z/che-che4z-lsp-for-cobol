@@ -53,9 +53,10 @@ public class TestMixedCopybookNavigation {
                     new CobolText("CBOOK", IdmsDialect.NAME, CBOOK_IDMS)),
             ImmutableMap.of(), ImmutableList.of(),
             new AnalysisConfig(
-                    new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
+                    new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
                     ImmutableList.of(),
                     ImmutableList.of(IdmsDialect.NAME), true,
-                    ImmutableList.of()));
+                    ImmutableList.of(),
+                    ImmutableMap.of()));
   }
 }

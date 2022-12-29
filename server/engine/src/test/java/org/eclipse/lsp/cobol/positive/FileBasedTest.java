@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.positive;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
@@ -181,9 +182,9 @@ public abstract class FileBasedTest extends ConfigurableTest {
 
     if (testDialectsLists.contains("IDMS")) {
       return new AnalysisConfig(
-          new CopybookConfig(ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of()),
+          new CopybookConfig(ENABLED, SQLBackend.DB2_SERVER),
           Arrays.asList(EmbeddedLanguage.values()),
-          ImmutableList.of("IDMS"), true, ImmutableList.of());
+          ImmutableList.of("IDMS"), true, ImmutableList.of(), ImmutableMap.of());
     }
     return AnalysisConfig.defaultConfig(ENABLED);
   }
