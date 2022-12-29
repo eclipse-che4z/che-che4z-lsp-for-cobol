@@ -67,6 +67,7 @@ test("SmartTabCommandProvider execution", async () => {
 
 test("Multitab SmartTabCommandProvider execution", async () => {
     const stp: smartTab.SmartTabCommandProvider = new smartTab.SmartTabCommandProvider(context, "some name");
+    const smartOut: smartTab.SmartTabCommandProvider = new smartTab.SmartOutdentCommandProvider(context, "some name");
     const active: Position = new Position(1, 2);
     const mockSelection: Selection = new Selection(active, active);
     (mockSelection as any).start = {line : 1};
@@ -79,6 +80,7 @@ test("Multitab SmartTabCommandProvider execution", async () => {
         },
     } as any;
     stp.execute(mockEditor, { insert: jest.fn() } as any);
+    smartOut.execute(mockEditor, { insert: jest.fn(), delete: jest.fn() } as any)
     expect(mockEditor.selections.length).toBe(1);
     expect(mockEditor.selections[0].start.line).toBe(1);
     expect(mockEditor.selections[0].end.line).toBe(3);
