@@ -56,6 +56,7 @@ import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
@@ -86,6 +87,7 @@ import static org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext.Activit
 public class CobolLanguageEngine {
 
   private final TextPreprocessor preprocessor;
+  private final GrammarPreprocessor grammarPreprocessor;
   private final MessageService messageService;
   private final ParseTreeListener treeListener;
   private final SubroutineService subroutineService;
@@ -97,6 +99,7 @@ public class CobolLanguageEngine {
   @Inject
   public CobolLanguageEngine(
       TextPreprocessor preprocessor,
+      GrammarPreprocessor grammarPreprocessor,
       MessageService messageService,
       ParseTreeListener treeListener,
       SubroutineService subroutineService,
@@ -105,6 +108,7 @@ public class CobolLanguageEngine {
       AstProcessor astProcessor,
       SymbolsRepository symbolsRepository) {
     this.preprocessor = preprocessor;
+    this.grammarPreprocessor = grammarPreprocessor;
     this.messageService = messageService;
     this.treeListener = treeListener;
     this.subroutineService = subroutineService;
@@ -233,29 +237,24 @@ public class CobolLanguageEngine {
 
   private OldExtendedDocument runPreprocessor(AnalysisContext ctx) {
     List<SyntaxError> preprocessorErrors = new ArrayList<>();
+    ExtendedSource extendedSource = ctx.getExtendedSource();
     OldExtendedDocument oldExtendedDocument =
-            preprocessor
-                    .processCleanCode(
-                            ctx.getExtendedSource().getUri(),
-                            ctx.getExtendedSource().extendedText(),
-                            ctx.getConfig().getCopybookConfig(),
-                            new CopybookHierarchy())
+            grammarPreprocessor.buildExtendedDocument(extendedSource,
+                            ctx.getConfig().getCopybookConfig(), new CopybookHierarchy())
                     .unwrap(preprocessorErrors::addAll);
-    preprocessorErrors.forEach(e -> e.getLocation().getLocation().setRange(ctx.getExtendedSource()
+    preprocessorErrors.forEach(e -> e.getLocation().getLocation().setRange(extendedSource
                                             .mapLocation(e.getLocation().getLocation().getRange())
                                             .getRange()));
     ctx.getAccumulatedErrors().addAll(preprocessorErrors);
+    CopybooksRepository copybooks = oldExtendedDocument.getCopybooks();
+
     // Update copybook usages with proper positions
-    oldExtendedDocument
-            .getCopybooks()
-            .getUsages()
-            .forEach((k, v) -> v.setRange(ctx.getExtendedSource().mapLocation(v.getRange()).getRange()));
+    copybooks.getUsages()
+            .forEach((k, v) -> v.setRange(extendedSource.mapLocation(v.getRange()).getRange()));
 
     // Update copybook definition statements with proper positions
-    oldExtendedDocument
-            .getCopybooks()
-            .getDefinitionStatements()
-            .forEach((k, v) -> v.setRange(ctx.getExtendedSource().mapLocation(v.getRange()).getRange()));
+    copybooks.getDefinitionStatements()
+            .forEach((k, v) -> v.setRange(extendedSource.mapLocation(v.getRange()).getRange()));
 
     return oldExtendedDocument;
   }

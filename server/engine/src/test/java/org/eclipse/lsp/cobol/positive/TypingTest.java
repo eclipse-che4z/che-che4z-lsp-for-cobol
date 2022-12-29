@@ -77,7 +77,6 @@ class TypingTest extends FileBasedTest {
   private String getCleanText(CobolText cobolText) {
     TextPreprocessor preprocessor =
         new TextPreprocessorImpl(
-            null,
             new CobolLineReaderImpl(null),
             new CobolLineWriterImpl(),
             new ContinuationLineTransformation(null),

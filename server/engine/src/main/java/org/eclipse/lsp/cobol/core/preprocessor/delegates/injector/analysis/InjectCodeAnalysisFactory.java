@@ -19,6 +19,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
 
 import java.util.EnumMap;
@@ -36,17 +37,18 @@ public class InjectCodeAnalysisFactory {
   @Inject
   public InjectCodeAnalysisFactory(
       TextPreprocessor preprocessor,
+      GrammarPreprocessor grammarPreprocessor,
       MessageService messageService,
       ReplacingService replacingService) {
     analysisInstances.put(
         AnalysisTypes.COPYBOOK,
-        new CopybookAnalysis(preprocessor, messageService, replacingService));
+        new CopybookAnalysis(preprocessor, grammarPreprocessor, messageService, replacingService));
     analysisInstances.put(
         AnalysisTypes.PANVALET,
-        new PanvaletAnalysis(preprocessor, messageService));
+        new PanvaletAnalysis(preprocessor, grammarPreprocessor, messageService));
     analysisInstances.put(
         AnalysisTypes.IMPLICIT,
-        new InjectCodeImplicitAnalysis(preprocessor, messageService));
+        new InjectCodeImplicitAnalysis(preprocessor, grammarPreprocessor, messageService));
   }
 
   /**
