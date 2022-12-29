@@ -23,6 +23,7 @@ export type DialectInfo = {
     path: string;
     description: string;
     extensionId: string;
+    snippetPath: string;
 };
 
 /**
@@ -55,8 +56,9 @@ export type DialectInfo = {
      * @param path to jar file
      * @param description of a dialect
      * @param extensionId is an extension id
+     * @param snippets is a spippet map for a dialect
      */
-    public static register(name: string, path: string, description: string, extensionId: string) {
+    public static register(name: string, path: string, description: string, extensionId: string, snippetPath: string) {
         let dialects: DialectInfo[] = this.getDialects();
         dialects = dialects.filter(d => d.name !== name);
 
@@ -64,7 +66,8 @@ export type DialectInfo = {
             name: name,
             path: path,
             description: description,
-            extensionId: extensionId
+            extensionId: extensionId,
+            snippetPath: snippetPath
         };
         dialects.push(dialectInfo);
         vscode.workspace.getConfiguration().update(SETTINGS_DIALECT_REGISTRY, dialects);

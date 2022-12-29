@@ -13,7 +13,12 @@
  */
 import * as vscode from "vscode";
 import { LANGUAGE_ID } from "../../constants";
+import { DialectRegistry } from "../DialectRegistry";
 import { SettingsService } from "../Settings";
+import { readFileSync } from 'fs';
+
+const SNIPPETS: Map<string, Map<any, any>> = new Map();
+
 export class SnippetCompletionProvider implements vscode.CompletionItemProvider {
     private matchingWordsList: vscode.CompletionItem[] = new Array();
     private otherList: vscode.CompletionItem[] = new Array();
@@ -27,7 +32,8 @@ export class SnippetCompletionProvider implements vscode.CompletionItemProvider 
             const wordsUptoCursor = fetchWordsList(textUptoCursor);
 
             this.resetList();
-            getSnippetsMapForUserDialect().forEach((value,key) => {
+            const snippets: Map<any, any> = await getSnippets();
+            snippets.forEach((value,key) => {
                 const prefixList: string[] = fetchWordsList(value.prefix);
                     const matchedWords = getMatchedWords(prefixList, wordsUptoCursor);
                     matchedWords.length > 0 ? this.matchingWordsList.push(createCompletionItem(value,key, position, document)):
@@ -40,6 +46,37 @@ export class SnippetCompletionProvider implements vscode.CompletionItemProvider 
         this.otherList = [];
     }
 }
+
+async function getSnippets(): Promise<Map<any, any>> {
+    const map = await SettingsService.getSnippetsForCobol();
+    const dialectList = SettingsService.getDialects();
+
+    const registeredDialects = DialectRegistry.getDialects();
+    registeredDialects.filter(d => dialectList.includes(d.name)).forEach(d => {
+        var snippets = importSnippet(d.snippetPath);
+        if (snippets !== undefined) {
+            Object.entries(snippets).forEach(value => map.set(value[0], value[1]));
+        }
+    });
+
+    return map;
+}
+
+function importSnippet(snippetPath: string): Map<any, any> {
+    var result = SNIPPETS.get(snippetPath);
+    if (result === undefined) {
+        try {
+            const json = readFileSync(snippetPath, 'utf-8')
+            var snippet = JSON.parse(json);
+            SNIPPETS.set(snippetPath, snippet);
+            result = snippet;
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    return result;
+}
+
 function createCompletionItem(value: any, key:string, position: vscode.Position, document?: vscode.TextDocument): vscode.CompletionItem {
 
     const itemLabel: vscode.CompletionItemLabel = {label: value.prefix, description: key};
@@ -54,9 +91,6 @@ function createCompletionItem(value: any, key:string, position: vscode.Position,
     const replaceRange = new vscode.Position(position.line, position.character);
     completionItem.range = new vscode.Range(insertingRange,replaceRange);
     return completionItem;
-}
-function getSnippetsMapForUserDialect() {
-   return SettingsService.getSnippetsForUserDialect();
 }
 
 function fetchWordsList(text: string) {
@@ -87,12 +121,12 @@ function formatString(arg: string) {
    return arg.replace(/(\$\{*\d*\/*:*|\/\(.*\)|\\\.\.\+|\$\/|\})/g,"");
 }
 
-export function pickSnippet() {
-      try{
+export async function pickSnippet() {
+      try {
         const editor = vscode.window.activeTextEditor;
         const snippetList = new Array();
         const mapKeyForSelectedSnippet = new Map<string, any>();
-        const snippetMapsFromSettings = getSnippetsMapForUserDialect();
+        const snippetMapsFromSettings = await getSnippets();
         const input = vscode.window.createQuickPick<vscode.QuickPickItem>();
         input.matchOnDetail = true;
         input.matchOnDescription = true;

@@ -12,8 +12,8 @@ export function activate(context: vscode.ExtensionContext) {
 		throw new Error("Cannot find extension");
 	}
 	const executablePath = join(ext.extensionPath, "server", "jar");
-
-	vscode.commands.executeCommand("cobol-lsp.dialect.register", "IDMS", executablePath, "IDMS dialect support", extensionId);
+	const snippetPath = join(ext.extensionPath, "snippets.json");
+	vscode.commands.executeCommand("cobol-lsp.dialect.register", "IDMS", executablePath, "IDMS dialect support", extensionId, snippetPath);
 }
 
 // This method is called when your extension is deactivated

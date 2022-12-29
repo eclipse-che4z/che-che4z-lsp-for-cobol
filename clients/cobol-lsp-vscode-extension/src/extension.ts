@@ -52,8 +52,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.dialect.register", 
-        (name: string, path: string, description: string, extensionId: string) => { 
-            DialectRegistry.register(name, path, description, extensionId);
+        (name: string, path: string, description: string, extensionId: string, snippetPath: string) => { 
+            DialectRegistry.register(name, path, description, extensionId, snippetPath);
     }));
 
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
