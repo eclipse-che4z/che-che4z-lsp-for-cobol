@@ -14,11 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor;
 
-import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
-import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 
 /**
  * This interface describes the text preprocessor which prepares the given string for analysis by
@@ -35,22 +32,4 @@ public interface TextPreprocessor {
    *     client
    */
   ResultWithErrors<TextTransformations> cleanUpCode(String documentUri, String cobolCode);
-
-  /**
-   * Process the given source code by removing all the unnecessary tokens and building in the nested
-   * copybook content with tracking the hierarchy of the text documents
-   *
-   * @param documentUri unique resource identifier of the processed document
-   * @param cobolCode cleaned code derived from the content of the document that should be processed
-   * @param copybookConfig contains config info like: copybook processing mode, target backend sql
-   *     server
-   * @param hierarchy the hierarchy of the copybooks
-   * @return wrapped object containing extended document and related errors
-   */
-  ResultWithErrors<OldExtendedDocument> processCleanCode(
-      @NonNull String documentUri,
-      @NonNull String cobolCode,
-      @NonNull CopybookConfig copybookConfig,
-      @NonNull CopybookHierarchy hierarchy);
-
 }

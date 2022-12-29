@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
 
 import java.util.ArrayList;
@@ -38,9 +39,10 @@ class CopybookAnalysis extends AbstractInjectCodeAnalysis {
 
   CopybookAnalysis(
       TextPreprocessor preprocessor,
+      GrammarPreprocessor grammarPreprocessor,
       MessageService messageService,
       ReplacingService replacingService) {
-    super(preprocessor, messageService, MAX_COPYBOOK_NAME_LENGTH_DATASET);
+    super(preprocessor, grammarPreprocessor, messageService, MAX_COPYBOOK_NAME_LENGTH_DATASET);
     this.replacingService = replacingService;
   }
 

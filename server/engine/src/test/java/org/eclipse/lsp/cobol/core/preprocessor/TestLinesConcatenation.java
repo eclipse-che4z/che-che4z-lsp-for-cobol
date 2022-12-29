@@ -73,7 +73,7 @@ class TestLinesConcatenation {
     CobolLinesTransformation transformation = new ContinuationLineTransformation(messageService);
     CobolLineReWriter indicatorProcessor = new CobolLineIndicatorProcessorImpl();
 
-    TextPreprocessor textPreprocessor = new TextPreprocessorImpl(grammarPreprocessor, reader, writer, transformation, indicatorProcessor);
+    TextPreprocessor textPreprocessor = new TextPreprocessorImpl(reader, writer, transformation, indicatorProcessor);
     TextTransformations textTransformations = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
     assertEquals(EXPECTED, textTransformations.calculateExtendedText());
     assertTrue(accumulatedErrors.isEmpty());

@@ -16,15 +16,12 @@ package org.eclipse.lsp.cobol.core.preprocessor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
@@ -42,7 +39,6 @@ import java.util.List;
 @Slf4j
 @Singleton
 public class TextPreprocessorImpl implements TextPreprocessor, CleanerPreprocessor {
-  private final GrammarPreprocessor grammarPreprocessor;
   private final CobolLineReader reader;
   private final CobolLineWriter writer;
   private final CobolLinesTransformation transformation;
@@ -50,12 +46,10 @@ public class TextPreprocessorImpl implements TextPreprocessor, CleanerPreprocess
 
   @Inject
   public TextPreprocessorImpl(
-      GrammarPreprocessor grammarPreprocessor,
       CobolLineReader reader,
       CobolLineWriter writer,
       CobolLinesTransformation transformation,
       CobolLineReWriter indicatorProcessor) {
-    this.grammarPreprocessor = grammarPreprocessor;
     this.reader = reader;
     this.writer = writer;
     this.transformation = transformation;
@@ -71,14 +65,5 @@ public class TextPreprocessorImpl implements TextPreprocessor, CleanerPreprocess
 
     TextTransformations code = writer.serialize(rewrittenLines, documentUri);
     return new ResultWithErrors<>(code, errors);
-  }
-
-  @Override
-  public ResultWithErrors<OldExtendedDocument> processCleanCode(
-      @NonNull String documentUri,
-      @NonNull String cobolCode,
-      @NonNull CopybookConfig copybookConfig,
-      @NonNull CopybookHierarchy hierarchy) {
-    return grammarPreprocessor.buildExtendedDocument(documentUri, cobolCode, copybookConfig, hierarchy);
   }
 }
