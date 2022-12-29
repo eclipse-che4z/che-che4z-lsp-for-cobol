@@ -113,7 +113,7 @@ export class SmartOutdentCommandProvider extends SmartCommandProvider {
                         lastShift = this.getlastShift(editor).lastShift;
                         shift = lastShift.get(currentLine.lineNumber) || 0;
                     }
-                edit.delete(new vscode.Range(new vscode.Position(currentLine.lineNumber, currentLine.firstNonWhitespaceCharacterIndex - shift),
+                edit.delete(new vscode.Range(new vscode.Position(currentLine.lineNumber, shift > currentLine.firstNonWhitespaceCharacterIndex ? 0 : currentLine.firstNonWhitespaceCharacterIndex - shift),
                     new vscode.Position(currentLine.lineNumber, currentLine.firstNonWhitespaceCharacterIndex)));
                 } else {
                     this.handleIndividualSmartOutCommand(editor, edit, new vscode.Position(currentLine.lineNumber, currentLine.firstNonWhitespaceCharacterIndex), result);
@@ -399,7 +399,7 @@ function handleRangeSelection(rangeSelection: vscode.Selection[], editor: vscode
                 updateShiftMap(finalShiftMap, prevKey, shift);
                 updateShiftMap(finalShiftMap, key, shift);
            } else {
-                shift =  expectedShiftMap.get(key) - key.firstNonWhitespaceCharacterIndex;
+                shift =  key.firstNonWhitespaceCharacterIndex > expectedShiftMap.get(key) ? 0 : expectedShiftMap.get(key) - key.firstNonWhitespaceCharacterIndex;
                 updateShiftMap(finalShiftMap, key, shift);
            }
             prevKey = key;
