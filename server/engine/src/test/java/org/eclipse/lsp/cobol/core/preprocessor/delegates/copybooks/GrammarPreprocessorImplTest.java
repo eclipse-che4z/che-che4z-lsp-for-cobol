@@ -21,6 +21,8 @@ import org.antlr.v4.runtime.BufferedTokenStream;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
@@ -103,7 +105,8 @@ class GrammarPreprocessorImplTest {
         new GrammarPreprocessorImpl(listenerFactory, replacingFactory);
 
     ResultWithErrors<OldExtendedDocument> extendedDocument =
-        preprocessor.buildExtendedDocument(DOCUMENT, TEXT, cpyConfig, hierarchy);
+        preprocessor.buildExtendedDocument(new ExtendedSource(TextTransformations.of(TEXT, DOCUMENT)),
+                cpyConfig, hierarchy);
 
     verify(listenerFactory)
         .create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(cpyConfig), eq(hierarchy));

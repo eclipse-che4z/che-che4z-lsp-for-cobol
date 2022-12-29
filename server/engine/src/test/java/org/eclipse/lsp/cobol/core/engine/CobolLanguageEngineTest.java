@@ -37,6 +37,7 @@ import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
@@ -68,6 +69,7 @@ class CobolLanguageEngineTest {
   @Test
   void testLanguageEngineRun() {
     TextPreprocessor preprocessor = mock(TextPreprocessor.class);
+    GrammarPreprocessor grammarPreprocessor = mock(GrammarPreprocessor.class);
     MessageService mockMessageService = mock(MessageService.class);
     ErrorMessageHelper mockErrUtil = mock(ErrorMessageHelper.class);
     CobolErrorStrategy cobolErrorStrategy = new CobolErrorStrategy();
@@ -80,7 +82,7 @@ class CobolLanguageEngineTest {
 
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
-            preprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
+            preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
             dialectService, astProcessor, symbolsRepository);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
@@ -158,11 +160,10 @@ class CobolLanguageEngineTest {
         .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
     when(preprocessor.cleanUpCode(URI, TEXT))
         .thenReturn(new ResultWithErrors<>(TextTransformations.of(TEXT, URI), ImmutableList.of()));
-    when(preprocessor.processCleanCode(
-            eq(URI), eq(TEXT), eq(cpyConfig), any(CopybookHierarchy.class)))
+    when(grammarPreprocessor.buildExtendedDocument(
+            eq(new ExtendedSource(TextTransformations.of(TEXT, URI))), eq(cpyConfig), any(CopybookHierarchy.class)))
             .thenReturn(new ResultWithErrors<>(oldExtendedDocument, ImmutableList.of(error)));
-    when(preprocessor.processCleanCode(
-            anyString(), anyString(), any(CopybookConfig.class), any(CopybookHierarchy.class)))
+    when(grammarPreprocessor.buildExtendedDocument(any(ExtendedSource.class), any(CopybookConfig.class), any(CopybookHierarchy.class)))
             .thenReturn(new ResultWithErrors<>(oldExtendedDocument, ImmutableList.of()));
 
     Range programRange = new Range(new Position(0, 7), new Position(0, 31));

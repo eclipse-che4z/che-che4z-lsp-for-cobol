@@ -38,6 +38,7 @@ import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectDescriptor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysis;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
@@ -212,17 +213,18 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       List<InjectDescriptor> descriptors,
       ParserRuleContext context,
       ParserRuleContext copyContext) {
-    descriptors.forEach(c -> c.getInjectCodeAnalysis()
-        .injectCode(
-            c.getCopybookContentProvider(),
-            copybookNameService.findByName(c.getInjectedSourceName())
-                .orElse(new CopybookName(c.getInjectedSourceName())),
-            context, copyContext, copybookConfig, documentUri)
-        .apply(hierarchy)
-        .apply(this)
-        .apply(copybooks)
-        .apply(nestedMappings)
-        .accept(errors));
+    for (InjectDescriptor c : descriptors) {
+      InjectCodeAnalysis injectCodeAnalysis = c.getInjectCodeAnalysis();
+      CopybookName injectedSourceName = copybookNameService.findByName(c.getInjectedSourceName())
+              .orElse(new CopybookName(c.getInjectedSourceName()));
+      injectCodeAnalysis.injectCode(
+              c.getCopybookContentProvider(),
+              injectedSourceName,
+              context, copyContext, copybookConfig, documentUri,
+              hierarchy, this, copybooks, nestedMappings,
+              errors
+      );
+    }
   }
 
   @Override
