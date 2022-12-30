@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
-import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +41,7 @@ class CopybookCopybookContentProviderImplTest {
   @BeforeEach
   void init() {
     contentProvider = new CopybookCopybookContentProviderImpl(copybookService);
-    copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of());
+    copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER);
     copybookName = new CopybookName(UUID.randomUUID().toString());
   }
 

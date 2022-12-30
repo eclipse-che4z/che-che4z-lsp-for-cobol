@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.statements;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -46,7 +47,7 @@ class ObsoleteNodeTest {
     RemarksNode remarksNode = new RemarksNode(locality);
     AstProcessor astProcessor = new AstProcessor();
     List<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService());
+    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
     ctx.register(
         new ProcessorDescription(
             ObsoleteNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteNodeCheck()));

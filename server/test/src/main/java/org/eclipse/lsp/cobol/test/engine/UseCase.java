@@ -16,6 +16,8 @@
 package org.eclipse.lsp.cobol.test.engine;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonElement;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
@@ -28,6 +30,7 @@ import org.eclipse.lsp.cobol.test.CobolText;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /** Defines all the required data for the test */
 @Getter
@@ -50,8 +53,8 @@ public class UseCase {
   @Builder.Default List<EmbeddedLanguage> features = Collections.emptyList();
   /** Analysis dialects */
   @Builder.Default List<String> dialects = Collections.emptyList();
-  /** User predefined labels */
-  @Builder.Default List<String> predefinedSections = Collections.emptyList();
+  /** Dialects config */
+  @Builder.Default Map<String, JsonElement> dialectsSettings = ImmutableMap.of();
 
   @Builder.Default boolean cicsTranslator = true;
   /**
@@ -62,10 +65,11 @@ public class UseCase {
    */
   public AnalysisConfig getAnalysisConfig() {
     return new AnalysisConfig(
-        new CopybookConfig(copybookProcessingMode, sqlBackend, predefinedSections),
+        new CopybookConfig(copybookProcessingMode, sqlBackend),
         features,
         dialects,
         cicsTranslator,
-        ImmutableList.of());
+        ImmutableList.of(),
+        dialectsSettings);
   }
 }

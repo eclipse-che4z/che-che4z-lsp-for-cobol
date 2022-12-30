@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -54,7 +55,7 @@ class NodeProcessingTest {
         .process(
             ProcessingPhase.TRANSFORMATION,
             node,
-            new ProcessingContext(errors, new SymbolAccumulatorService()));
+            new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of()));
     assertTrue(errors.isEmpty());
   }
 
@@ -70,7 +71,7 @@ class NodeProcessingTest {
     ErrorNode node = new ErrorNode();
     List<SyntaxError> errors = new ArrayList<>();
     AstProcessor astProcessor = new AstProcessor();
-    ProcessingContext processingContext = new ProcessingContext(errors, new SymbolAccumulatorService());
+    ProcessingContext processingContext = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
     processingContext.register(
         new ProcessorDescription(
             ErrorNode.class, ProcessingPhase.VALIDATION, (n, ctx) -> ctx.getErrors().add(ERROR_1)));
@@ -89,7 +90,7 @@ class NodeProcessingTest {
 
     ErrorNode node = new ErrorNode();
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService());
+    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
     AstProcessor astProcessor = new AstProcessor();
     ctx.register(
         new ProcessorDescription(
@@ -118,7 +119,7 @@ class NodeProcessingTest {
 
     LeafNode node = new LeafNode();
     List<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService());
+    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
     AstProcessor astProcessor = new AstProcessor();
     ctx.register(
         new ProcessorDescription(
@@ -157,7 +158,7 @@ class NodeProcessingTest {
     }
     LeafNode node = new LeafNode();
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService());
+    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
     AstProcessor astProcessor = new AstProcessor();
     ctx.register(
         new ProcessorDescription(
@@ -192,7 +193,7 @@ class NodeProcessingTest {
 
     LeafNode node = new LeafNode();
     List<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService());
+    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
     AstProcessor astProcessor = new AstProcessor();
     ctx.register(
         new ProcessorDescription(

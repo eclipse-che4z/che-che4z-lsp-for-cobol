@@ -49,7 +49,7 @@ class IdmsCopybookVisitorTest {
 
   @BeforeEach
   void init() {
-    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of());
+    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER);
     Set<CopybookName> processedCopybooks = new HashSet<>();
 
     visitor = new IdmsCopybookVisitor(copybookService, copybookConfig,

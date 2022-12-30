@@ -90,7 +90,7 @@ class GrammarPreprocessorImplTest {
         new OldExtendedDocument(
             "", RESULT, copybooks, ImmutableMap.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping));
 
-    CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of());
+    CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER);
     CopybookHierarchy hierarchy = new CopybookHierarchy();
 
     when(listenerFactory.create(

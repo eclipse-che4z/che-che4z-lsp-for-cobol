@@ -95,7 +95,7 @@ class CopybookServiceTest {
     when(files.fileExists(parentPath)).thenReturn(true);
     when(files.readFromInputStream(any(), any())).thenReturn(CONTENT);
 
-    cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of());
+    cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER);
   }
 
   /**
@@ -156,7 +156,7 @@ class CopybookServiceTest {
     CopybookModel copybookModelEnabled =
         copybookService.resolve(CopybookId.fromString(copybookName.getDisplayName()), copybookName, DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
     CopybookModel copybookModelSkipped =
-        copybookService.resolve(CopybookId.fromString(copybookName.getDisplayName()), copybookName, DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(SKIP, DB2_SERVER, ImmutableList.of()), false);
+        copybookService.resolve(CopybookId.fromString(copybookName.getDisplayName()), copybookName, DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(SKIP, DB2_SERVER), false);
 
     verify(files, times(1)).getContentByPath(cpyPath);
     verify(files, times(3)).getNameFromURI(DOCUMENT_URI);
@@ -316,7 +316,7 @@ class CopybookServiceTest {
         .thenReturn(supplyAsync(() -> null));
     CopybookModel cpy =
         copybookService.resolve(CopybookId.fromString(copybookName.getDisplayName()),
-                copybookName, DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DATACOM_SERVER, ImmutableList.of()), false);
+                copybookName, DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DATACOM_SERVER), false);
 
     assertEquals(
         new CopybookModel(copybookName.toCopybookId("implicit:///implicitCopybooks/SQLCA_DATACOM.cpy"), copybookName,
@@ -335,8 +335,8 @@ class CopybookServiceTest {
         .thenReturn(supplyAsync(() -> null));
 
     assertEquals(
-        copybookService.resolve(CopybookId.fromString(copybookName.getDisplayName()), copybookName, DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DATACOM_SERVER, ImmutableList.of()), false),
-        copybookService.resolve(CopybookId.fromString(copybookName.getDisplayName()), copybookName, DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of()), false));
+        copybookService.resolve(CopybookId.fromString(copybookName.getDisplayName()), copybookName, DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DATACOM_SERVER), false),
+        copybookService.resolve(CopybookId.fromString(copybookName.getDisplayName()), copybookName, DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DB2_SERVER), false));
   }
 
   /**
@@ -396,7 +396,7 @@ class CopybookServiceTest {
         .thenReturn(supplyAsync(() -> null));
     final CopybookModel model =
         copybookService.resolve(CopybookId.fromString(copybookName),
-            new CopybookName(copybookName), DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of()), false);
+            new CopybookName(copybookName), DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DB2_SERVER), false);
 
     assertEquals("implicit:///implicitCopybooks/SQLCA_DB2.cpy", model.getUri());
     verify(client, times(1))
@@ -419,7 +419,7 @@ class CopybookServiceTest {
     // Assert the copybook was resolved from the workspace
     final CopybookModel model =
         copybookService.resolve(CopybookId.fromString(copybookName),
-            new CopybookName(copybookName), DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of()), false);
+            new CopybookName(copybookName), DOCUMENT_URI, DOCUMENT_URI, new CopybookConfig(ENABLED, DB2_SERVER), false);
 
     // Assert the copybook was resolved from the workspace
     assertEquals(copybookUri, model.getUri());
