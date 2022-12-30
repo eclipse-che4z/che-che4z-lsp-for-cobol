@@ -42,10 +42,8 @@ describe("DialectRegistry test", () => {
     });
 
     it("retrieve dialects from the registry", () => {
-        let spy = jest.spyOn(config, "get");
-
+        DialectRegistry.register("dialect", "path", "", "id", "path");
         const result = DialectRegistry.getDialects();
-        expect(spy).toBeCalled();
         
         expect(result.length).toBe(1);
         expect(result[0].name).toBe("dialect");

@@ -26,6 +26,8 @@ export type DialectInfo = {
     snippetPath: string;
 };
 
+const dialectInfoes: Map<string, DialectInfo> = new Map();
+
 /**
  * DialectRegistry provides read/write dialect settings functionality
  */
@@ -36,17 +38,14 @@ export type DialectInfo = {
      * @returns list of dialect info structures
      */
     public static getDialects(): DialectInfo[] {
-        const result: DialectInfo[] = vscode.workspace.getConfiguration().get(SETTINGS_DIALECT_REGISTRY);
-        if (result === undefined) {
-            return [];
-        }
-        return result;
+        return Array.from(dialectInfoes.values());
     }
 
     /**
      * Clears the registry
      */
     public static clear() {
+        dialectInfoes.clear();
         vscode.workspace.getConfiguration().update(SETTINGS_DIALECT_REGISTRY, []);
     }
 
@@ -59,9 +58,6 @@ export type DialectInfo = {
      * @param snippets is a spippet map for a dialect
      */
     public static register(name: string, path: string, description: string, extensionId: string, snippetPath: string) {
-        let dialects: DialectInfo[] = this.getDialects();
-        dialects = dialects.filter(d => d.name !== name);
-
         const dialectInfo: DialectInfo = {
             name: name,
             path: path,
@@ -69,8 +65,8 @@ export type DialectInfo = {
             extensionId: extensionId,
             snippetPath: snippetPath
         };
-        dialects.push(dialectInfo);
-        vscode.workspace.getConfiguration().update(SETTINGS_DIALECT_REGISTRY, dialects);
+        dialectInfoes.set(dialectInfo.name, dialectInfo);
+        vscode.workspace.getConfiguration().update(SETTINGS_DIALECT_REGISTRY, Array.from(dialectInfoes.values()));
     }
 
     /**
@@ -78,10 +74,8 @@ export type DialectInfo = {
      * @param name of a dialect
      */
     public static unregister(name: string) {
-        let dialects: DialectInfo[] = this.getDialects();
-
-        dialects = dialects.filter(d => d.name !== name);
-        vscode.workspace.getConfiguration().update(SETTINGS_DIALECT_REGISTRY, dialects);        
+        dialectInfoes.delete(name);
+        vscode.workspace.getConfiguration().update(SETTINGS_DIALECT_REGISTRY, Array.from(dialectInfoes.values()));
     }
 
  }
