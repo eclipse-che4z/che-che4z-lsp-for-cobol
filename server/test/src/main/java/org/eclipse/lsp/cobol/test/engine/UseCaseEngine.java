@@ -214,7 +214,7 @@ public class UseCaseEngine {
                     analysisConfig.getCopybookConfig().getCopybookProcessingMode())
                 .features(analysisConfig.getFeatures())
                 .dialects(analysisConfig.getDialects())
-                .predefinedSections(analysisConfig.getCopybookConfig().getPredefinedSections())
+                .dialectsSettings(analysisConfig.getDialectsSettings())
                 .build());
     assertResultEquals(actual, document.getTestData());
     return actual;
@@ -257,7 +257,7 @@ public class UseCaseEngine {
                     analysisConfig.getCopybookConfig().getCopybookProcessingMode())
                 .features(analysisConfig.getFeatures())
                 .dialects(analysisConfig.getDialects())
-                .predefinedSections(analysisConfig.getCopybookConfig().getPredefinedSections())
+                .dialectsSettings(analysisConfig.getDialectsSettings())
                 .build());
 
     assertDiagnostics(document.getTestData().getDiagnostics(), actual.getDiagnostics());

@@ -162,4 +162,24 @@ public class DialectService {
           .orElse(null))
     );
   }
+
+  /**
+   * Return a list of settings sections for provided dialects.
+   *
+   * @return a list of settings sections
+   */
+  public List<String> getSettingsSections() {
+    return dialectSuppliers.values().stream()
+        .flatMap(d -> d.getSettingsSections().stream()).collect(Collectors.toList());
+  }
+
+  /**
+   * Return a list of settings sections that hold dialect folders
+   *
+   * @return a list of settings sections
+   */
+  public List<String> getWatchingFolderSettings() {
+    return dialectSuppliers.values().stream()
+        .flatMap(d -> d.getWatchingFolderSettings().stream()).collect(Collectors.toList());
+  }
 }

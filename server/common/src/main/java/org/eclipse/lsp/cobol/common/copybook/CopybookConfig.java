@@ -16,8 +16,6 @@ package org.eclipse.lsp.cobol.common.copybook;
 
 import lombok.Value;
 
-import java.util.List;
-
 /**
  * This dto class is used to hold config data for copybook like: copybook procassing mode, and which
  * backend database server is planned to be used
@@ -26,5 +24,4 @@ import java.util.List;
 public class CopybookConfig {
   CopybookProcessingMode copybookProcessingMode;
   SQLBackend sqlBackend;
-  List<String> predefinedSections;
 }

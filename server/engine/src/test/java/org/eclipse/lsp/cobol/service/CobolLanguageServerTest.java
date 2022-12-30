@@ -20,6 +20,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
@@ -97,6 +98,9 @@ class CobolLanguageServerTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
 
+    DialectService dialectService = mock(DialectService.class);
+    when(dialectService.getWatchingFolderSettings()).thenReturn(ImmutableList.of("dialect"));
+
     when(settingsService.fetchTextConfiguration(anyString())).thenCallRealMethod();
     prepareSettingsService(settingsService, localeStore);
 
@@ -111,18 +115,18 @@ class CobolLanguageServerTest {
             stateService,
             configurationService,
             copybookNameService,
-            keywords);
+            keywords,
+            dialectService);
 
     server.initialized(new InitializedParams());
 
     verify(watchingService).watchConfigurationChange();
     verify(watchingService).watchPredefinedFolder();
     verify(settingsService).fetchConfiguration(CPY_LOCAL_PATHS.label);
-    verify(settingsService).fetchConfiguration(DACO_CPY_LOCAL_PATHS.label);
-    verify(settingsService).fetchConfiguration(IDMS_CPY_LOCAL_PATHS.label);
     verify(settingsService).fetchConfiguration(LOCALE.label);
     verify(settingsService).fetchConfiguration(CPY_EXTENSIONS.label);
-    verify(watchingService, new Times(3)).addWatchers(singletonList("foo/bar"));
+    verify(settingsService).fetchConfiguration("dialect");
+    verify(watchingService, new Times(2)).addWatchers(singletonList("foo/bar"));
     verify(localeStore).notifyLocaleStore();
     verify(configurationService).updateConfigurationFromSettings();
   }
@@ -134,10 +138,6 @@ class CobolLanguageServerTest {
 
     when(settingsService.fetchConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.fetchConfiguration(DACO_CPY_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.fetchConfiguration(IDMS_CPY_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
     when(localeStore.notifyLocaleStore()).thenReturn(System.out::println);
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList(arr)));
@@ -147,6 +147,8 @@ class CobolLanguageServerTest {
         .thenReturn(completedFuture(ImmutableList.of("INFO")));
     when(settingsService.fetchConfiguration(CPY_EXTENSIONS.label))
         .thenReturn(completedFuture(ImmutableList.of("cpy")));
+    when(settingsService.fetchConfiguration("dialect"))
+        .thenReturn(completedFuture(singletonList(arr)));
   }
 
   @Test
@@ -158,6 +160,9 @@ class CobolLanguageServerTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
     CobolTextDocumentService textService = mock(CobolTextDocumentService.class);
+
+    DialectService dialectService = mock(DialectService.class);
+    when(dialectService.getSettingsSections()).thenReturn(ImmutableList.of("daco"));
 
     when(settingsService.fetchTextConfiguration(anyString()))
         .thenReturn(CompletableFuture.supplyAsync(ImmutableList::of));
@@ -174,7 +179,8 @@ class CobolLanguageServerTest {
             stateService,
             configurationService,
             copybookNameService,
-            keywords);
+            keywords,
+            dialectService);
 
     server.initialized(new InitializedParams());
     verify(textService, times(1)).notifyExtensionConfig(any());
@@ -197,6 +203,7 @@ class CobolLanguageServerTest {
             null,
             customExecutor,
             stateService,
+            null,
             null,
             null,
             null);
@@ -247,6 +254,7 @@ class CobolLanguageServerTest {
             null,
             customExecutor,
             stateService,
+            null,
             null,
             null,
             null);

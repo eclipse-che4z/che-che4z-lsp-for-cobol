@@ -44,6 +44,7 @@ import java.util.*;
 public final class IdmsDialect implements CobolDialect {
   public static final String NAME = "IDMS";
   private static final List<Integer> LEVELS_WITH_NO_ADJUSTMENT = ImmutableList.of(66, 77, 88);
+  private static final String IDMS_CPY_LOCAL_PATHS = "cpy-manager.idms.paths-local";
   private final CopybookService copybookService;
   private final MessageService messageService;
 
@@ -211,6 +212,11 @@ public final class IdmsDialect implements CobolDialect {
   @Override
   public Map<String, String> getKeywords() {
     return KeywordsUtils.getKeywords("KeywordsIdms.txt");
+  }
+
+  @Override
+  public List<String> getWatchingFolderSettings() {
+    return ImmutableList.of(IDMS_CPY_LOCAL_PATHS);
   }
 
   private IdmsCopyParser.StartRuleContext parseCopyIdms(String text, String programDocumentUri, List<SyntaxError> errors) {
