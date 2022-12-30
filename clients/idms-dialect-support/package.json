@@ -1,12 +1,18 @@
 {
-  "name": "idms-dialect-support",
-  "displayName": "IDMS Dialect Support",
-  "description": "Autocomplete, highlighting and diagnostics for IDMS dialect code and copybooks",
+  "name": "idms-dialect-for-cobol",
+  "displayName": "IDMS Dialect for COBOL",
+  "description": "Autocomplete, highlighting and diagnostics for IDMS COBOL code and copybooks",
   "author": "Broadcom",
   "license": "EPL-2.0",
   "version": "0.0.1",
   "preview": false,
   "publisher": "BroadcomMFD",
+  "keywords" : [
+    "idms",
+    "cobol",
+    "mainframe",
+    "zowe"
+  ],
   "engines": {
     "vscode": "^1.74.0"
   },
