@@ -35,6 +35,7 @@ import org.eclipse.lsp4j.Location;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -150,6 +151,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
       diagnostic.setMessage(err.getSuggestion());
       diagnostic.setRange(err.getLocation().getLocation().getRange());
       diagnostic.setCode(ofNullable(err.getErrorCode()).map(ErrorCode::getLabel).orElse(null));
+      diagnostic.setRelatedInformation(ofNullable(err.getRelatedInformation()).map(Collections::singletonList).orElse(null));
       return diagnostic;
     };
   }

@@ -500,16 +500,17 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
 
   private Consumer<Diagnostic> registerDiagnostic(Range range) {
     return it -> {
-            diagnostics
+      Diagnostic diagnostic = new Diagnostic(
+              // honour the range provided by tester.
+              Objects.nonNull(it.getRange().getStart()) ? it.getRange() : range,
+              it.getMessage(),
+              it.getSeverity(),
+              it.getSource(),
+              ofNullable(it.getCode()).map(Either::getLeft).orElse(null));
+      diagnostic.setRelatedInformation(it.getRelatedInformation());
+      diagnostics
                     .get(documentUri)
-                    .add(
-                            new Diagnostic(
-                                    // honour the range provided by tester.
-                                    Objects.nonNull(it.getRange().getStart()) ? it.getRange() : range,
-                                    it.getMessage(),
-                                    it.getSeverity(),
-                                    it.getSource(),
-                                    Optional.ofNullable(it.getCode()).map(Either::getLeft).orElse(null)));
+                    .add(diagnostic);
     };
   }
 
