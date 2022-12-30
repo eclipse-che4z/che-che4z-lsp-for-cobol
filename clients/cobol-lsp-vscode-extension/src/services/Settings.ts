@@ -29,7 +29,6 @@ import {
     SETTINGS_TAB_CONFIG,
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
-import dacoSnippets = require("../services/snippetcompletion/dacoSnippets.json");
 
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
@@ -196,7 +195,7 @@ export class SettingsService {
      * @returns Map of snippets
      */
     public static async getSnippetsForCobol(): Promise<Map<any, any>> {
-        const map: Map<any, any> = new Map<any, any>([...Object.entries(cobolSnippets), ...SettingsService.getDialects().includes(DACO_DIALECT) ? Object.entries(dacoSnippets) : []]);        
+        const map: Map<any, any> = new Map<any, any>([...Object.entries(cobolSnippets)]);        
         return map;
     }
 
