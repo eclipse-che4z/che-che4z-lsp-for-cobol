@@ -3,7 +3,7 @@
 import { join } from 'path';
 import * as vscode from 'vscode';
 
-const extensionId: string = "BroadcomMFD.idms-dialect-for-cobol";
+const extensionId: string = "DaCo.daco-dialect-for-cobol";
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -13,10 +13,10 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 	const executablePath = join(ext.extensionPath, "server", "jar");
 	const snippetPath = join(ext.extensionPath, "snippets.json");
-	vscode.commands.executeCommand("cobol-lsp.dialect.register", "IDMS", executablePath, "IDMS dialect support", extensionId, snippetPath);
+	vscode.commands.executeCommand("cobol-lsp.dialect.register", "DaCo", executablePath, "DaCo dialect support", extensionId, snippetPath);
 }
 
 // This method is called when your extension is deactivated
 export function deactivate() {
-	vscode.commands.executeCommand("cobol-lsp.dialect.unregister", "IDMS", extensionId);
+	vscode.commands.executeCommand("cobol-lsp.dialect.unregister", "DaCo", extensionId);
 }
