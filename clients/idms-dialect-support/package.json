@@ -13,6 +13,7 @@
     "mainframe",
     "zowe"
   ],
+  "icon": "resources/logo.png",
   "engines": {
     "vscode": "^1.74.0"
   },
