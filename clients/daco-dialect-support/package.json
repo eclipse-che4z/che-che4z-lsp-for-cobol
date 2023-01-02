@@ -7,6 +7,13 @@
   "version": "0.0.1",
   "preview": false,
   "publisher": "DaCo",
+  "keywords" : [
+    "DaCo",
+    "cobol",
+    "mainframe",
+    "zowe"
+  ],
+  "icon": "resources/logo.png",
   "engines": {
     "vscode": "^1.74.0"
   },
