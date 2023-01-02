@@ -43,14 +43,12 @@ import java.util.*;
 /** Process the text according to the IDMS rules */
 public final class IdmsDialect implements CobolDialect {
   public static final String NAME = "IDMS";
+  private static final List<Integer> LEVELS_WITH_NO_ADJUSTMENT = ImmutableList.of(66, 77, 88);
   private static final String IDMS_CPY_LOCAL_PATHS = "cpy-manager.idms.paths-local";
-
   private final CopybookService copybookService;
   private final MessageService messageService;
 
-  public IdmsDialect(
-      CopybookService copybookService,
-      MessageService messageService) {
+  public IdmsDialect(CopybookService copybookService, MessageService messageService) {
     this.copybookService = copybookService;
     this.messageService = messageService;
   }
@@ -172,6 +170,9 @@ public final class IdmsDialect implements CobolDialect {
   }
 
   private int calculateLevel(int copybookLevel, int firstLevel, int level) {
+    if (LEVELS_WITH_NO_ADJUSTMENT.contains(level)) {
+      return level;
+    }
     int delta = copybookLevel - firstLevel;
     return level + delta;
   }
