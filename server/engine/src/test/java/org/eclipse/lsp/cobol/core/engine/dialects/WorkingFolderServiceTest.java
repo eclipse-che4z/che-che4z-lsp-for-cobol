@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import java.net.URI;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -36,7 +37,8 @@ class WorkingFolderServiceTest {
   void testWorkingFolder_specifiedPath() {
     WorkingFolderService service = new WorkingFolderService();
     URI workdir = service.getWorkingFolder("path");
-    assertTrue(workdir.toString().startsWith("file:path"));
+    String[] segments = workdir.getPath().split("/");
+    assertEquals(segments[segments.length - 1], "path");
   }
 
   @Test
