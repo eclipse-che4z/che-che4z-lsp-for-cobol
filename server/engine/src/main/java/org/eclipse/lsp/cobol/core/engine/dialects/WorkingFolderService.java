@@ -21,7 +21,6 @@ import lombok.SneakyThrows;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -70,7 +69,7 @@ class WorkingFolderService {
    */
   @SneakyThrows
   public URI getWorkingFolder(String path) {
-    return new URL("file:" + path + "/").toURI();
+    return new File(path).getAbsoluteFile().toURI();
   }
 
   private URI getDefaultDir() throws URISyntaxException {
