@@ -223,7 +223,9 @@
                     "type": "array",
                     "$comment": "Items is converted to an array instead of simple string, to disable the vscode rendering the form for extensions setting, instead shows an hyper link to settings.xml for editing.This is done as empty string is not supported by vscode yet",
                     "items": {
-                        "type": ["string"] 
+                        "type": [
+                            "string"
+                        ]
                     },
                     "default": [
                         ".CPY",
@@ -526,24 +528,24 @@
     },
     "devDependencies": {
         "@types/fs-extra": "^9.0.13",
-        "@types/jest": "^29.0.3",
-        "@types/mocha": "^9.1.1",
-        "@types/node": "^14.18.29",
-        "@types/vscode": "^1.71.0",
-        "@vscode/test-electron": "^2.1.5",
+        "@types/jest": "^29.2.5",
+        "@types/mocha": "^10.0.1",
+        "@types/node": "^16.11.7",
+        "@types/vscode": "1.74.0",
+        "@vscode/test-electron": "^2.2.1",
         "decache": "^4.6.1",
-        "esbuild": "^0.16.6",
-        "eslint-plugin-sonarjs": "^0.15.0",
-        "fs-extra": "10.1.0",
-        "jest": "^29.0.3",
-        "jest-jasmine2": "^29.0.3",
+        "esbuild": "^0.16.13",
+        "eslint-plugin-sonarjs": "^0.17.0",
+        "fs-extra": "11.1.0",
+        "jest": "^29.3.1",
+        "jest-jasmine2": "^29.3.1",
         "jest-sonar-reporter": "^2.0.0",
-        "mocha": "^10.0.0",
+        "mocha": "^10.2.0",
         "nyc": "^15.1.0",
-        "patch-package": "^6.4.7",
-        "ts-jest": "^29.0.1",
-        "tslint": "^5.18.0",
-        "typescript": "^4.8.3",
+        "patch-package": "^6.5.1",
+        "ts-jest": "^29.0.3",
+        "tslint": "^5.20.1",
+        "typescript": "^4.9.4",
         "vsce": "^2.11.0"
     }
 }
