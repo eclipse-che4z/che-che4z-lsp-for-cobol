@@ -26,25 +26,31 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
+import org.eclipse.lsp4j.DiagnosticRelatedInformation;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.WARNING;
+
 /** Process the text according to the IDMS rules */
 public final class IdmsDialect implements CobolDialect {
   public static final String NAME = "IDMS";
-  private static final List<Integer> LEVELS_WITH_NO_ADJUSTMENT = ImmutableList.of(66, 77, 88);
   private static final String IDMS_CPY_LOCAL_PATHS = "cpy-manager.idms.paths-local";
+  private static final int HIGHEST_LEVEL_FOR_ADJUSTMENT = 49;
+  public static final String IDMS_DIALECT_MAX_ADJUSTMENT_EXCEED_MSG = "IdmsDialect.maxAdjustmentExceed";
   private final CopybookService copybookService;
   private final MessageService messageService;
 
@@ -125,7 +131,7 @@ public final class IdmsDialect implements CobolDialect {
 
     DocumentMap copybookMap = new DocumentMap(copybookModel.getUri(), copybookModel.getContent());
     processTextTransformation(extendedSource, copybookMap,
-            errors, copybookConfig, programDocumentUri, cb.getLevel(), copybookStack);
+            errors, copybookConfig, programDocumentUri, cb.getLevel(), copybookStack, copyNode.getLocality());
     copybookMap.commitTransformations();
     if (cb.isInsert()) {
       extendedSource.insert(currentMap, copyNode, copybookMap);
@@ -143,36 +149,100 @@ public final class IdmsDialect implements CobolDialect {
     return copybookStack.contains(name);
   }
 
-  private void processTextTransformation(ExtendedSource extendedSource,
-                                         DocumentMap currentDocumentMap,
-                                         List<SyntaxError> errors,
-                                         CopybookConfig copybookConfig,
-                                         String programDocumentUri,
-                                         int copybookLevel,
-                                         Deque<String> copybookStack) {
+  private void processTextTransformation(
+      ExtendedSource extendedSource,
+      DocumentMap currentDocumentMap,
+      List<SyntaxError> errors,
+      CopybookConfig copybookConfig,
+      String programDocumentUri,
+      int copybookLevel,
+      Deque<String> copybookStack,
+      Locality sourceLocality) {
     IdmsCopyVisitor copyVisitor = new IdmsCopyVisitor(currentDocumentMap);
-    IdmsCopyParser.StartRuleContext context = parseCopyIdms(currentDocumentMap.extendedText(), programDocumentUri, errors);
+    IdmsCopyParser.StartRuleContext context =
+        parseCopyIdms(currentDocumentMap.extendedText(), programDocumentUri, errors);
 
     List<IdmsCopybookDescriptor> cbs = copyVisitor.visitStartRule(context);
-    int firstLevel = copyVisitor.getVariableLevels().stream().findFirst().map(Pair::getRight).orElse(0);
-    copyVisitor.getVariableLevels().forEach(p -> {
-      if (copybookLevel > 0 && p.getRight() != null) {
-        currentDocumentMap.replace(p.getLeft(), String.format("%02d", calculateLevel(copybookLevel, firstLevel, p.getRight())));
-      }
-    });
-    cbs.forEach(cb -> {
-      if (copybookLevel > 0) {
-        cb.setLevel(copybookLevel);
-      }
+    int firstLevel =
+        copyVisitor.getVariableLevels().stream().findFirst().map(Pair::getRight).orElse(0);
+    copyVisitor
+        .getVariableLevels()
+        .forEach(
+            p -> {
+              if (copybookLevel > 0 && p.getRight() != null) {
+                currentDocumentMap.replace(
+                    p.getLeft(),
+                    String.format("%02d", calculateLevel(copybookLevel, firstLevel, p.getRight())));
+                errors.addAll(
+                    getWarningForNoAdjustment(
+                        copybookLevel,
+                        firstLevel,
+                        p,
+                        currentDocumentMap.getUri(),
+                            sourceLocality));
+              }
+            });
+    cbs.forEach(
+        cb -> {
+          if (copybookLevel > 0) {
+            cb.setLevel(copybookLevel);
+          }
 
-      insertIdmsCopybook(extendedSource, currentDocumentMap, errors, cb, programDocumentUri, currentDocumentMap.getUri(), copybookConfig, copybookStack);
-    });
+          insertIdmsCopybook(
+              extendedSource,
+              currentDocumentMap,
+              errors,
+              cb,
+              programDocumentUri,
+              currentDocumentMap.getUri(),
+              copybookConfig,
+              copybookStack);
+        });
+  }
+
+  private Collection<SyntaxError> getWarningForNoAdjustment(
+      int copybookLevel,
+      int firstLevel,
+      Pair<Range, Integer> rangeIntegerPair,
+      String uri,
+      Locality sourceLocality) {
+    if (shouldLevelNotBeAdjusted(copybookLevel, firstLevel, rangeIntegerPair.getRight())) {
+      int delta = copybookLevel - firstLevel;
+      return getWarningAtARange(
+          rangeIntegerPair.getLeft(),
+          uri,
+          messageService.getMessage(
+              IDMS_DIALECT_MAX_ADJUSTMENT_EXCEED_MSG,
+              delta + rangeIntegerPair.getRight(),
+              delta,
+              rangeIntegerPair.getRight()),
+              sourceLocality);
+    }
+    return Collections.emptyList();
+  }
+
+  private boolean shouldLevelNotBeAdjusted(int copybookLevel, int firstLevel, Integer level) {
+    int delta = copybookLevel - firstLevel;
+    return level + delta > HIGHEST_LEVEL_FOR_ADJUSTMENT;
+  }
+
+  private List<SyntaxError> getWarningAtARange(
+      Range rangeForError, String uri, String message, Locality sourceLocality) {
+    return Collections.singletonList(
+        SyntaxError.syntaxError()
+            .location(Locality.builder().uri(uri).range(rangeForError).build().toOriginalLocation())
+            .suggestion(messageService.getMessage(message))
+            .severity(WARNING)
+            .errorSource(ErrorSource.DIALECT)
+            .relatedInformation(
+                new DiagnosticRelatedInformation(sourceLocality.toLocation(), "Copy IDMS source"))
+            .build());
   }
 
   private int calculateLevel(int copybookLevel, int firstLevel, int level) {
-    if (LEVELS_WITH_NO_ADJUSTMENT.contains(level)) {
+    if (shouldLevelNotBeAdjusted(copybookLevel, firstLevel, level)) {
       return level;
-    }
+      }
     int delta = copybookLevel - firstLevel;
     return level + delta;
   }

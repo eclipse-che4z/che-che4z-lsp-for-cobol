@@ -19,6 +19,7 @@ import lombok.Value;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp4j.DiagnosticRelatedInformation;
 
 /**
  * This value class represents a syntax or semantic error found during the analysis. The finalized
@@ -38,4 +39,5 @@ public class SyntaxError {
   ErrorSeverity severity;
   ErrorCode errorCode;
   ErrorSource errorSource;
+  DiagnosticRelatedInformation relatedInformation;
 }
