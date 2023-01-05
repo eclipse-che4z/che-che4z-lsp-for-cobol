@@ -28,6 +28,9 @@ import { TelemetryService } from "./services/reporter/TelemetryService";
 import { createFileWithGivenPath, SettingsService } from "./services/Settings";
 import { pickSnippet, SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
+import { CompileTaskProvider } from "./task/providers/CompileTaskProvider";
+import SpoolContentProvider from "./task/providers/SpoolContentProvider";
+import TerminalLinkProvider from "./task/providers/TerminalLinkProvider";
 import {
     downloadCopybookHandler,
     resolveCopybookHandler
@@ -36,6 +39,7 @@ import { DialectRegistry } from "./services/DialectRegistry";
 
 let languageClientService: LanguageClientService;
 
+export const taskType = "cobolCompileJob";
 function initialize() {
     // We need lazy initialization to be able to mock this for unit testing
     const copyBooksDownloader = new CopybookDownloadService();
@@ -46,22 +50,22 @@ function initialize() {
 
 export async function activate(context: vscode.ExtensionContext) {
     DialectRegistry.clear();
-    
+
     const { copyBooksDownloader, outputChannel} = initialize();
     initSmartTab(context);
 
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.dialect.register", 
-        (name: string, path: string, description: string, extensionId: string, snippetPath: string) => { 
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.dialect.register",
+        (name: string, path: string, description: string, extensionId: string, snippetPath: string) => {
             DialectRegistry.register(name, path, description, extensionId, snippetPath);
     }));
 
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.dialect.unregister", 
-        (name: string, extensionId: string) => { 
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.dialect.unregister",
+        (name: string, extensionId: string) => {
             DialectRegistry.unregister(name);
     }));
-    
+
     copyBooksDownloader.start();
 
     // Commands
@@ -82,6 +86,8 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.snippets.insertSnippets", () => { pickSnippet(); }));
+    registerTask(context);
+
     // create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
@@ -134,6 +140,17 @@ export async function activate(context: vscode.ExtensionContext) {
             return languageClientService.retrieveAnalysis(uri, text);
         },
     };
+}
+function registerTask(context: vscode.ExtensionContext) {
+    const taskProvider = new CompileTaskProvider();
+    // register task
+    context.subscriptions.push(vscode.tasks.registerTaskProvider(taskType, taskProvider));
+
+    // register terminal link provider
+    vscode.window.registerTerminalLinkProvider(new TerminalLinkProvider(taskProvider));
+
+    // register registerTextDocumentContentProvider
+    context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(SpoolContentProvider.scheme, new SpoolContentProvider()));
 }
 
 export function deactivate() {

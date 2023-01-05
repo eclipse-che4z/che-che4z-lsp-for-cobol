@@ -30,6 +30,18 @@ jest.mock("../commands/OpenSettingsCommand");
 jest.mock("../services/LanguageClientService");
 jest.mock("../services/copybook/CopybookDownloadService");
 jest.mock("../commands/ClearCopybookCacheCommand");
+jest.mock("../task/providers/CompileTaskProvider", () => {
+    return {
+        CompileTaskProvider: jest.fn().mockImplementation(() => {
+            return {
+                provideTasks: jest.fn(),
+                resolveTask :  jest.fn(),
+            };
+        }),
+    };
+});
+jest.mock("../task/providers/TerminalLinkProvider");
+jest.mock("../task/providers/SpoolContentProvider");
 
 jest.mock("../services/Settings", () => ({
     createFileWithGivenPath: jest.fn(),
@@ -47,11 +59,16 @@ jest.mock("vscode", () => ({
         registerCodeActionsProvider: jest.fn(),
         registerCompletionItemProvider: jest.fn(),
     },
+    tasks: {
+        registerTaskProvider: jest.fn(),
+        registerCompletionItemProvider: jest.fn(),
+    },
     window: {
         setStatusBarMessage: jest.fn().mockImplementation(async (_text: string, _hideWhenDone: Thenable<any>) => {
             return Promise.resolve(true);
         }),
         showErrorMessage: jest.fn().mockReturnValue("test"),
+        registerTerminalLinkProvider: jest.fn(),
         showInformationMessage: jest.fn().mockImplementation((message: string) => Promise.resolve(message)),
         createOutputChannel: jest.fn().mockReturnValue({
             appendLine: jest.fn(),
@@ -63,6 +80,7 @@ jest.mock("vscode", () => ({
         }),
         getWorkspaceFolder: jest.fn().mockReturnValue({ name: "workspaceFolder1" }),
         onDidChangeConfiguration: jest.fn().mockReturnValue("onDidChangeConfiguration"),
+        registerTextDocumentContentProvider: jest.fn(),
         workspaceFolders: [{ uri: { fsPath: "ws-path" } } as any],
     },
 }));

@@ -30,7 +30,7 @@ export namespace workspace {
 
 export namespace extensions {
     export function getExtension(id: string) {
-        return { 
+        return {
             extensionPath: path.join(__dirname, "../../"),
             packageJSON: {
                 version: "123"
@@ -40,6 +40,17 @@ export namespace extensions {
 }
 
 export namespace window {
+    export let showErrorMessage = () => {};
+    export let showInformationMessage = () => {};
+    export let createStatusBarItem = () => { return { show: () => { } }; };
+    export let activeTextEditor = {document: {}};
+    export let withProgress = async (options: any, task: (progress: any, token?: any) => any) => {
+        return await task({report: jest.fn()});
+    };
+}
+
+export namespace TaskScope {
+    export const Workspace = 2;
     export let showErrorMessage = () => { };
     export let showInformationMessage = () => { };
     export let createStatusBarItem = () => { return { show: () => { } } };
@@ -60,7 +71,7 @@ export class Uri {
 export enum ConfigurationTarget {
     Global = 1,
     Workspace = 2,
-    WorkspaceFolder = 3
+    WorkspaceFolder = 3,
 }
 
 export enum EndOfLine {
@@ -71,22 +82,48 @@ export enum EndOfLine {
     /**
      * The carriage return line feed `\r\n` sequence.
      */
-    CRLF = 2
+    CRLF = 2,
 }
 
 export const Range = jest.fn().mockImplementation((start, end) => { return { start: start, end: end } })
-export const Position = jest.fn().mockImplementation((line, character) => { return { line: line, character: character } });
+export const Position = jest.fn().mockImplementation((line, character) => {
+    return ({ line: line, character: character });
+});
 
-export namespace commands {
-    export const registerTextEditorCommand = jest.fn();
-    export const executeCommand = jest.fn();
+export interface TaskProvider {
+    provideTasks(token: any): any;
+    resolveTask(task: any, token: any): any;
+}
+export class CompletionItem {}
+export class CodeLens { }
+export class DocumentLink { }
+export class TreeItem { }
+export class CustomExecution {
+    // @ts-ignore
+    constructor(callback: (resolvedDefinition: any) => Thenable<any>);
+}
+
+export class Task {
+    // @ts-ignore
+    constructor(taskDefinition: any, scope: any, name: string, source: string, execution?: any,
+                problemMatchers?: string | string[]);
+}
+export class EventEmitter {
+    event: any;
+    fire = (data: any) => {};
+    public dispose =() => {};
+}
+
+export const commands = {
+    registerTextEditorCommand: jest.fn(),
+    executeCommand: jest.fn(),
 };
 
 export const TextEditor = {
     document: {
-        lineAt: jest.fn()
-    }
-}
+        lineAt: jest.fn(),
+    },
+};
 
 export class Selection {
     anchor: any;
