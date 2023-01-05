@@ -1,6 +1,20 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+# [1.2.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.2...1.2.0) (2023-01-05)
+
+### Bug Fixes
+* Add empty sting as default for copybook extensions
+* Discovery of dialects on windows
+* Do not adjust IDMS level numbers if the resulting level is greater than 49
+* Do not adjust level numbers  66/77/88 for copy IDMS variables
+* do not show progress notification for copybooks
+* Update dialect name and keywords
+* Update native build configuration
+
+### Features
+* Preserve alignment while multiselect smart tab
+
 ## [1.1.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.1.2) (2022-12-22)
 
 #### Fixed
