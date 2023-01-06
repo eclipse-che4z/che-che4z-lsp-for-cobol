@@ -1,0 +1,76 @@
+/*
+ * Copyright (c) 2022 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ *
+ */
+
+package org.eclipse.lsp.cobol.core.messages;
+
+import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
+import java.util.Locale;
+
+import static org.mockito.Mockito.*;
+
+/** Tests @{@link CobolLSPropertiesResourceBundle} */
+class CobolLSPropertiesResourceBundleTest {
+
+  @Test
+  void updateMessageResourceBundle() throws IOException, URISyntaxException {
+    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+
+    CobolLSPropertiesResourceBundle bundle =
+        new CobolLSPropertiesResourceBundle(
+            "resourceBundles/test", Locale.FRENCH, workingFolderService);
+    when(workingFolderService.getWorkingFolder()).thenReturn(new URI("file:test/"));
+    CobolLSPropertiesResourceBundle spyBundle = spy(bundle);
+
+    doReturn(
+            org.apache.commons.io.IOUtils.toInputStream(
+                "test.test: flip flop", StandardCharsets.UTF_8))
+        .when(spyBundle)
+        .getDialectResources(any(), any(), any());
+    spyBundle.updateMessageResourceBundle("dummyDialect");
+    Assertions.assertEquals(spyBundle.handleGetObject("test.test"), "flip flop");
+    Assertions.assertEquals(spyBundle.handleGetObject("1"), "French test selected.");
+    ImmutableList<String> expectedKeySet = ImmutableList.of("1", "2", "test.test");
+    Enumeration<String> keys = spyBundle.getKeys();
+    int count = 0;
+    while (keys.hasMoreElements()) {
+      count++;
+      Assertions.assertTrue(expectedKeySet.contains(keys.nextElement()));
+    }
+    Assertions.assertEquals(expectedKeySet.size(), count);
+  }
+
+  @Test
+  void updateMessageResourceBundleWhenResourcesNotFound() throws IOException, URISyntaxException {
+    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+
+    CobolLSPropertiesResourceBundle bundle =
+        new CobolLSPropertiesResourceBundle(
+            "resourceBundles/test", Locale.FRENCH, workingFolderService);
+    when(workingFolderService.getWorkingFolder()).thenReturn(new URI("file:test/"));
+
+    bundle.updateMessageResourceBundle("dummyDialect");
+    Assertions.assertEquals(bundle.handleGetObject("test.test"), "test.test");
+    Assertions.assertEquals(bundle.handleGetObject("1"), "French test selected.");
+  }
+}

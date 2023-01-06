@@ -21,6 +21,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.utils.LogLevelUtils;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
@@ -65,6 +66,7 @@ public class CobolLanguageServer implements LanguageServer {
   private final CopybookNameService copybookNameService;
   private final Keywords keywords;
   private final DialectService dialectService;
+  private final MessageService messageService;
 
   @Inject
   @SuppressWarnings("squid:S107")
@@ -79,7 +81,8 @@ public class CobolLanguageServer implements LanguageServer {
       ConfigurationService configurationService,
       CopybookNameService copybookNameService,
       Keywords keywords,
-      DialectService dialectService) {
+      DialectService dialectService,
+      MessageService messageService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
@@ -91,6 +94,7 @@ public class CobolLanguageServer implements LanguageServer {
     this.copybookNameService = copybookNameService;
     this.keywords = keywords;
     this.dialectService = dialectService;
+    this.messageService = messageService;
   }
 
   @Override
@@ -150,6 +154,7 @@ public class CobolLanguageServer implements LanguageServer {
     getLogLevelFromClient();
     copybookNameService.collectLocalCopybookNames();
     keywords.updateStorage();
+    messageService.reloadMessages();
     notifyConfiguredCopybookExtensions();
   }
 

@@ -17,11 +17,16 @@ package org.eclipse.lsp.cobol.core.messages;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -29,24 +34,35 @@ import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECTS;
 
 /**
  * This class is an properties file implementation of {@link MessageService} . It loads messages
  * from a properties file into memory to be used latter on for logging or messaging.
  */
 @Singleton
+@Slf4j
 public class PropertiesMessageService implements MessageService {
 
   private final String baseName;
   private final LocaleStore localeStore;
-  private ResourceBundle resourceBundle;
+  private CobolLSPropertiesResourceBundle resourceBundle;
+  private final SettingsService settingsService;
+  private final WorkingFolderService workingFolderService;
 
   @Inject
   public PropertiesMessageService(
-      @Named("resourceFileLocation") String baseName, LocaleStore localeStore) {
+      @Named("resourceFileLocation") String baseName,
+      LocaleStore localeStore,
+      SettingsService settingsService,
+      WorkingFolderService workingFolderService) {
     this.baseName = baseName;
     this.localeStore = localeStore;
-    resourceBundle = ResourceBundle.getBundle(baseName, localeStore.getApplicationLocale());
+    this.settingsService = settingsService;
+    this.workingFolderService = workingFolderService;
+    resourceBundle =
+        new CobolLSPropertiesResourceBundle(
+            baseName, localeStore.getApplicationLocale(), workingFolderService);
     subscribeToLocaleStore();
   }
 
@@ -54,15 +70,25 @@ public class PropertiesMessageService implements MessageService {
     localeStore.subscribeToLocaleChange(this::reloadResourceBundle);
   }
 
+  @Override
+  public void reloadMessages() {
+    reloadResourceBundle(this.localeStore.getApplicationLocale());
+  }
+
   private void reloadResourceBundle(Locale locale) {
     ResourceBundle.clearCache();
-    resourceBundle = ResourceBundle.getBundle(baseName, locale);
+    resourceBundle =
+        new CobolLSPropertiesResourceBundle(
+            baseName,
+            localeStore.getApplicationLocale(),
+            this.workingFolderService);
+    updateResourceBundle();
   }
 
   @Override
   public String getMessage(String key, Object... parameters) {
     try {
-      return String.format(resourceBundle.getString(key), parameters);
+      return String.format((String) resourceBundle.handleGetObject(key), parameters);
     } catch (MissingResourceException e) {
       return key;
     }
@@ -79,6 +105,23 @@ public class PropertiesMessageService implements MessageService {
                     Arrays.stream(parameters).map(Object::toString).collect(joining(delimiter)))
             .map(it -> new Object[] {it})
             .orElse(parameters));
+  }
+
+  private void updateResourceBundle() {
+    reloadResourceBundle(this.localeStore.getApplicationLocale());
+    this.settingsService
+        .fetchTextConfiguration(DIALECTS.label)
+        .thenAccept(this::updateResourceBundle);
+  }
+
+  private void updateResourceBundle(List<String> dialects) {
+    for (String dialectName : dialects) {
+      try {
+        this.resourceBundle.updateMessageResourceBundle(dialectName);
+      } catch (IOException e) {
+        LOG.error("Issue while loading resource bundle for " + dialectName);
+      }
+    }
   }
 
   private Object[] processArgs(Object[] args) {

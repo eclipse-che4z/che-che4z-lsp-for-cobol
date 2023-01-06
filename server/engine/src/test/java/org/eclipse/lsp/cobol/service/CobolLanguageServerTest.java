@@ -20,6 +20,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
@@ -96,6 +97,7 @@ class CobolLanguageServerTest {
     LocaleStore localeStore = mock(LocaleStore.class);
     ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
+    MessageService messageService = mock(MessageService.class);
     Keywords keywords = mock(Keywords.class);
 
     DialectService dialectService = mock(DialectService.class);
@@ -116,7 +118,8 @@ class CobolLanguageServerTest {
             configurationService,
             copybookNameService,
             keywords,
-            dialectService);
+            dialectService,
+            messageService);
 
     server.initialized(new InitializedParams());
 
@@ -160,6 +163,7 @@ class CobolLanguageServerTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
     CobolTextDocumentService textService = mock(CobolTextDocumentService.class);
+    MessageService messageService = mock(MessageService.class);
 
     DialectService dialectService = mock(DialectService.class);
     when(dialectService.getSettingsSections()).thenReturn(ImmutableList.of("daco"));
@@ -180,11 +184,11 @@ class CobolLanguageServerTest {
             configurationService,
             copybookNameService,
             keywords,
-            dialectService);
+            dialectService,
+            messageService);
 
     server.initialized(new InitializedParams());
     verify(textService, times(1)).notifyExtensionConfig(any());
-
   }
 
   /**
@@ -203,6 +207,7 @@ class CobolLanguageServerTest {
             null,
             customExecutor,
             stateService,
+            null,
             null,
             null,
             null,
@@ -225,13 +230,17 @@ class CobolLanguageServerTest {
     initializeParams.setClientInfo(new ClientInfo("clientName", "Version-1.x"));
     initializeParams.setLocale("en");
     ClientCapabilities clientCapabilities = new ClientCapabilities();
-    TextDocumentClientCapabilities textDocumentClientCapabilities = new TextDocumentClientCapabilities();
-    PublishDiagnosticsCapabilities publishDiagnosticsCapabilities = new PublishDiagnosticsCapabilities();
-    publishDiagnosticsCapabilities.setTagSupport(new DiagnosticsTagSupport(ImmutableList.of(Unnecessary, DiagnosticTag.Deprecated)));
+    TextDocumentClientCapabilities textDocumentClientCapabilities =
+        new TextDocumentClientCapabilities();
+    PublishDiagnosticsCapabilities publishDiagnosticsCapabilities =
+        new PublishDiagnosticsCapabilities();
+    publishDiagnosticsCapabilities.setTagSupport(
+        new DiagnosticsTagSupport(ImmutableList.of(Unnecessary, DiagnosticTag.Deprecated)));
     textDocumentClientCapabilities.setPublishDiagnostics(publishDiagnosticsCapabilities);
     CompletionCapabilities completionCapabilities = new CompletionCapabilities();
     CompletionItemCapabilities completionItemCapabilities = new CompletionItemCapabilities();
-    completionItemCapabilities.setTagSupport(new CompletionItemTagSupportCapabilities(ImmutableList.of(CompletionItemTag.Deprecated)));
+    completionItemCapabilities.setTagSupport(
+        new CompletionItemTagSupportCapabilities(ImmutableList.of(CompletionItemTag.Deprecated)));
     completionCapabilities.setCompletionItem(completionItemCapabilities);
     textDocumentClientCapabilities.setCompletion(completionCapabilities);
     clientCapabilities.setTextDocument(textDocumentClientCapabilities);
@@ -254,6 +263,7 @@ class CobolLanguageServerTest {
             null,
             customExecutor,
             stateService,
+            null,
             null,
             null,
             null,

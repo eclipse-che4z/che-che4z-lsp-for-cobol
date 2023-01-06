@@ -42,6 +42,7 @@ import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.impl.DefaultDataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
@@ -85,6 +86,7 @@ class WorkspaceServiceTest {
     SubroutineService subroutineService = mock(SubroutineService.class);
     ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
+    MessageService messageService = mock(MessageService.class);
 
     WorkspaceService service =
         new CobolWorkspaceServiceImpl(
@@ -97,7 +99,7 @@ class WorkspaceServiceTest {
             configurationService,
             stateService,
             copybookNameService,
-            null);
+            null, messageService);
 
     CompletableFuture<Object> result =
         service.executeCommand(
@@ -136,7 +138,7 @@ class WorkspaceServiceTest {
             configurationService,
             stateService,
             copybookNameService,
-            null);
+            null, null);
 
     CompletableFuture<Object> result =
         service.executeCommand(new ExecuteCommandParams("Missing command name", emptyList()));
@@ -161,6 +163,7 @@ class WorkspaceServiceTest {
     ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
+    MessageService messageService = mock(MessageService.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
@@ -173,7 +176,7 @@ class WorkspaceServiceTest {
             configurationService,
             stateService,
             copybookNameService,
-                keywords);
+                keywords, messageService);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     String path = "foo/bar";
@@ -213,6 +216,7 @@ class WorkspaceServiceTest {
     ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
+    MessageService messageService = mock(MessageService.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
@@ -225,7 +229,7 @@ class WorkspaceServiceTest {
             configurationService,
             stateService,
             copybookNameService,
-                keywords);
+                keywords, messageService);
 
     String path = "foo/bar";
 
@@ -259,6 +263,7 @@ class WorkspaceServiceTest {
     ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
+    MessageService messageService = mock(MessageService.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
@@ -270,7 +275,7 @@ class WorkspaceServiceTest {
             subroutineService,
             configurationService,
             stateService,
-            copybookNameService, keywords);
+            copybookNameService, keywords, messageService);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     JsonArray arr = new JsonArray();
@@ -309,6 +314,7 @@ class WorkspaceServiceTest {
     ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
+    MessageService messageService = mock(MessageService.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
@@ -320,7 +326,7 @@ class WorkspaceServiceTest {
             subroutineService,
             configurationService,
             stateService,
-            copybookNameService, keywords);
+            copybookNameService, keywords, messageService);
 
     when(copybookNameService.copybookLocalFolders())
         .thenReturn(completedFuture(emptyList()));
@@ -391,7 +397,7 @@ class WorkspaceServiceTest {
             subroutineService,
             configurationService,
             stateService,
-            copybookNameService, null);
+            copybookNameService, null, null);
 
     DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));
     service.didChangeWatchedFiles(params);
