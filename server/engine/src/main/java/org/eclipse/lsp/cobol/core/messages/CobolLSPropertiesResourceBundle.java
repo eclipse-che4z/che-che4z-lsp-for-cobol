@@ -75,6 +75,16 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
     return "dialect-" + dialectName + ".jar";
   }
 
+  /**
+   * Returns an input stream based on the most appropriate resource bundle based on locale for a
+   * dialect
+   *
+   * @param resourceName Ordered list of resources to search based on locale
+   * @param workingFolder URI for dialect jar
+   * @param jarName dialect jar name
+   * @return an {@link InputStream} for found resource
+   * @throws IOException when no resource is found or jar not found
+   */
   @VisibleForTesting
   public InputStream getDialectResources(
       List<String> resourceName, URI workingFolder, String jarName) throws IOException {
@@ -196,7 +206,8 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
   @Override
   public Enumeration<String> getKeys() {
     Set<String> parentKeys = parent.keySet();
-    Set<String> propKeys = properties.keySet().stream().map(o -> (String) o).collect(Collectors.toSet());
+    Set<String> propKeys =
+        properties.keySet().stream().map(o -> (String) o).collect(Collectors.toSet());
     parentKeys.addAll(propKeys);
     return Collections.enumeration(parentKeys);
   }
