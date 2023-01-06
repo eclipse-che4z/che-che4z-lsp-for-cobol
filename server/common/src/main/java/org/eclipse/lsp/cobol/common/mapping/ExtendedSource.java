@@ -15,7 +15,6 @@
 
 package org.eclipse.lsp.cobol.common.mapping;
 
-import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
@@ -39,17 +38,6 @@ public class ExtendedSource {
 
   public String getUri() {
     return mainUri;
-  }
-
-  /**
-   * Calculates a list of all copy nodes include nested
-   *
-   * @return a list of all copy nodes
-   */
-  public List<CopyNode> calculateCopyNodes() {
-    List<CopyNode> result = new ArrayList<>();
-    documents.values().forEach(doc -> result.addAll(doc.calculateCopyNodes()));
-    return result;
   }
 
   /**
@@ -116,12 +104,12 @@ public class ExtendedSource {
    * Replace copy statement with result of copybook substitution
    *
    * @param document document to extend
-   * @param copyNode node representation of copybook
+   * @param extendRange copybook position in the document
    * @param copybookMap a map of a copybook
    */
-  public void extend(DocumentMap document, CopyNode copyNode, DocumentMap copybookMap) {
+  public void extend(DocumentMap document, Range extendRange, DocumentMap copybookMap) {
     documents.computeIfAbsent(document.getUri(), uri -> document)
-            .extend(copyNode, TextTransformations.of(copybookMap.extendedText(), copybookMap.getUri()));
+            .extend(extendRange, TextTransformations.of(copybookMap.extendedText(), copybookMap.getUri()));
     documents.put(copybookMap.getUri(), copybookMap);
   }
 
@@ -137,12 +125,12 @@ public class ExtendedSource {
    * Insert copybook content as a text document after defined line
    *
    * @param document document to extend
-   * @param copyNode node representation of copybook
+   * @param line copybook line position in the document
    * @param copybookMap a map of a copybook
    */
-  public void insert(DocumentMap document, CopyNode copyNode, DocumentMap copybookMap) {
+  public void insert(DocumentMap document, int line, DocumentMap copybookMap) {
     documents.computeIfAbsent(document.getUri(), uri -> document)
-        .insert(copyNode, TextTransformations.of(copybookMap.extendedText(), copybookMap.getUri()));
+        .insert(line, TextTransformations.of(copybookMap.extendedText(), copybookMap.getUri()));
     documents.put(copybookMap.getUri(), copybookMap);
   }
 }

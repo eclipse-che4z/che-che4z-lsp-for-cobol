@@ -15,9 +15,6 @@
 
 package org.eclipse.lsp.cobol.common.mapping;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
@@ -30,7 +27,6 @@ public class DocumentMap {
   private final String uri;
   private final LinkedList<TextTransformations> transformations = new LinkedList<>();
   private final LinkedList<MappingService> mappings = new LinkedList<>();
-  private final Multimap<TextTransformations, CopyNode> copyNodeMap = ArrayListMultimap.create();
 
   public DocumentMap(String uri, String text) {
     this.uri = uri;
@@ -45,23 +41,21 @@ public class DocumentMap {
   /**
    * Replace copy statement with result of copybook substitution
    *
-   * @param copyNode node representation of copybook
+   * @param extendRange copybook position in the document
    * @param copyTransform Copybook's transformations
    */
-  public void extend(CopyNode copyNode, TextTransformations copyTransform) {
-    copyNodeMap.put(copyTransform, copyNode);
-    topTransformations().extend(copyNode.getLocality().getRange(), copyTransform);
+  public void extend(Range extendRange, TextTransformations copyTransform) {
+    topTransformations().extend(extendRange, copyTransform);
   }
 
   /**
    * Insert copybook as a text after defined line
    *
-   * @param copyNode node representation of copybook
+   * @param line copybook line position in the document
    * @param copyTransform Copybook's transformations
    */
-  public void insert(CopyNode copyNode, TextTransformations copyTransform) {
-    copyNodeMap.put(copyTransform, copyNode);
-    topTransformations().insert(copyNode.getLocality().getRange().getStart().getLine(), copyTransform);
+  public void insert(int line, TextTransformations copyTransform) {
+    topTransformations().insert(line, copyTransform);
   }
 
   /**
@@ -81,15 +75,6 @@ public class DocumentMap {
    */
   public String extendedText() {
     return topTransformations().calculateExtendedText();
-  }
-
-  /**
-   * Calculates a list of all copy nodes include nested
-   *
-   * @return a list of all copy nodes
-   */
-  public List<CopyNode> calculateCopyNodes() {
-    return new LinkedList<>(copyNodeMap.values());
   }
 
   /**
