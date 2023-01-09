@@ -16,11 +16,11 @@ import * as fs from "fs";
 import * as iconv from "iconv-lite";
 import * as Path from "path";
 import * as vscode from "vscode";
-import { DOWNLOAD_QUEUE_LOCKED_ERROR_MSG, INSTALL_ZOWE, INVALID_CREDENTIALS_ERROR_MSG, PATHS_USS, PATHS_ZOWE,
+import { C4Z_FOLDER, DOWNLOAD_QUEUE_LOCKED_ERROR_MSG, GITIGNORE_FILE, INSTALL_ZOWE, INVALID_CREDENTIALS_ERROR_MSG, PATHS_USS, PATHS_ZOWE,
     PROCESS_DOWNLOAD_ERROR_MSG, PROFILE_NAME_PLACEHOLDER, PROVIDE_PROFILE_MSG, SETTINGS_CPY_SECTION,
     UNLOCK_DOWNLOAD_QUEUE_MSG, ZOWE_EXT_MISSING_MSG } from "../../constants";
 import { TelemetryService } from "../reporter/TelemetryService";
-import { SettingsService } from "../Settings";
+import { createFileWithGivenPath, SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { Utils } from "../util/Utils";
 import { CopybookURI } from "./CopybookURI";
@@ -120,6 +120,8 @@ export class CopybookDownloadService implements vscode.Disposable {
         const copybookPath = CopybookURI.createCopybookPath(copybookprofile.profile, dataset, copybookprofile.getCopybook());
         if (!fs.existsSync(copybookPath)) {
             try {
+                // create .gitignore file within .c4z folder
+                createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
                 await CopybookDownloadService.downloadCopybookContent(dataset, copybookprofile.getCopybook(), copybookprofile.profile, isUSS);
             } catch (err) {
                 if (CopybookDownloadService.needsUserNotification([copybookprofile])) {
