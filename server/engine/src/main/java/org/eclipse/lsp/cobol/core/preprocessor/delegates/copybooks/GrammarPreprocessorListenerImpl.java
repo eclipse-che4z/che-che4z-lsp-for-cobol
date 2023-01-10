@@ -29,6 +29,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
@@ -67,7 +68,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
   private final Map<Integer, Integer> shifts = new HashMap<>();
 
-  private final String documentUri;
+  private final DocumentMap documentMap;
   private final BufferedTokenStream tokens;
   private final CopybookConfig copybookConfig;
   private final ReplacingService replacingService;
@@ -78,7 +79,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Inject
   GrammarPreprocessorListenerImpl(
-      @Assisted String documentUri,
+      @Assisted DocumentMap documentMap,
       @Assisted BufferedTokenStream tokens,
       @Assisted CopybookConfig copybookConfig,
       @Assisted CopybookHierarchy hierarchy,
@@ -86,7 +87,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       MessageService messageService,
       CopybookNameService copybookNameService,
       InjectService injectService) {
-    this.documentUri = documentUri;
+    this.documentMap = documentMap;
     this.tokens = tokens;
     this.copybookConfig = copybookConfig;
     this.replacingService = replacingService;
@@ -109,13 +110,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @NonNull
   @Override
   public ResultWithErrors<OldExtendedDocument> getResult() {
+    String uri = documentMap.getUri();
     List<Locality> localities = tokens.getTokens().stream()
-            .map(LocalityUtils.toLocality(documentUri, hierarchy.getCurrentCopybookId()))
+            .map(LocalityUtils.toLocality(uri, hierarchy.getCurrentCopybookId()))
             .collect(toList());
-    nestedMappings.put(documentUri, new DocumentMapping(localities, shifts));
+    nestedMappings.put(uri, new DocumentMapping(localities, shifts));
 
-    return new ResultWithErrors<>(
-        new OldExtendedDocument(documentUri, accumulate(), copybooks, nestedMappings), errors);
+    return new ResultWithErrors<>(new OldExtendedDocument(uri, accumulate(), copybooks, nestedMappings), errors);
   }
 
   @Override
@@ -220,8 +221,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       injectCodeAnalysis.injectCode(
               c.getCopybookContentProvider(),
               injectedSourceName,
-              context, copyContext, copybookConfig, documentUri,
+              context, copyContext, copybookConfig, documentMap.getUri(),
               hierarchy, this, copybooks, nestedMappings,
+              documentMap,
               errors
       );
     }
@@ -321,6 +323,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private Locality retrieveLocality(ParserRuleContext ctx) {
-    return LocalityUtils.buildLocality(ctx, documentUri, hierarchy.getCurrentCopybookId());
+    return LocalityUtils.buildLocality(ctx, documentMap.getUri(), hierarchy.getCurrentCopybookId());
   }
 }

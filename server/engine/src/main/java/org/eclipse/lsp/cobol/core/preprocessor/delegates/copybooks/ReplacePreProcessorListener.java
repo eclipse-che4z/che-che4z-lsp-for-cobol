@@ -23,6 +23,8 @@ import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
+import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
@@ -110,14 +112,18 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
   @Override
   public void exitReplaceOffStatement(ReplaceOffStatementContext ctx) {
     String replaceOffStmt = pop();
-    String content = hierarchy.replaceText(pop(), replacingService::applyReplacing);
-    write(content + replaceOffStmt);
+    DocumentMap doc = new DocumentMap(TextTransformations.of(pop(), documentUri));
+    hierarchy.replaceText(doc, replacingService::applyReplacing);
+    write(doc.extendedText() + replaceOffStmt);
   }
 
   private void replace() {
-    String content = hierarchy.replaceText(pop(), replacingService::applyReplacing);
+    String replaceOffStmt = pop();
+    DocumentMap doc = new DocumentMap(TextTransformations.of(replaceOffStmt, documentUri));
+
+    hierarchy.replaceText(doc, replacingService::applyReplacing);
     if (getTextAccumulator().isEmpty()) push();
-    write(content);
+    write(doc.extendedText());
   }
 
   @Override

@@ -26,7 +26,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -47,8 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -96,6 +94,7 @@ public abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
                          PreprocessorStack stack,
                          CopybooksRepository copybooksRepository,
                          Map<String, DocumentMapping> nestedMappings,
+                         DocumentMap documentMap,
                          List<SyntaxError> errors) {
     Locality nameLocality = LocalityUtils.buildLocality(copySource, documentUri, hierarchy.getCurrentCopybookId());
     Locality contextLocality = LocalityUtils.buildLocality(context, documentUri, hierarchy.getCurrentCopybookId());
@@ -109,11 +108,14 @@ public abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
             .contextLocality(contextLocality)
             .build();
     CopybookMetaData metaData = validateMetaData(copybookMetaData).unwrap(errors::addAll);
-    OldExtendedDocument copybookDocument =
-            buildExtendedDocumentForCopybook(copybookContentProvider, metaData).apply(hierarchy).unwrap(errors::addAll);
-    writeText(metaData, copybookDocument).accept(stack);
-    storeCopyStatementSemantics(metaData, copybookDocument).accept(copybooksRepository);
-    collectNestedSemanticData(metaData, copybookDocument).accept(nestedMappings);
+
+    OldExtendedDocument copybookDocument = buildExtendedDocumentForCopybook(documentMap,
+            copybookContentProvider, metaData, hierarchy)
+                    .unwrap(errors::addAll);
+    writeText(metaData, copybookDocument, stack);
+
+    storeCopyStatementSemantics(metaData, copybookDocument, copybooksRepository);
+    collectNestedSemanticData(metaData, copybookDocument, nestedMappings);
   }
 
   private ResultWithErrors<CopybookMetaData> validateMetaData(CopybookMetaData metaData) {
@@ -154,55 +156,47 @@ public abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
     return new ResultWithErrors<>(metaData, errors);
   }
 
-  private Consumer<PreprocessorStack> writeText(
-      CopybookMetaData metaData, OldExtendedDocument copybookDocument) {
-    return beforeWriting()
-        .andThen(writeCopybook(metaData.getCopybookId(), copybookDocument.getText()))
-        .andThen(afterWriting(metaData.getContext()));
+  private void writeText(CopybookMetaData metaData, OldExtendedDocument copybookDocument, PreprocessorStack stack) {
+    String text = CPY_ENTER_TAG + metaData.getCopybookId() + CPY_URI_CLOSE + copybookDocument.getText() + CPY_EXIT_TAG;
+    beforeWriting(stack);
+    stack.write(text);
+    afterWriting(metaData.getContext(), stack);
   }
 
-  protected Consumer<CopybooksRepository> storeCopyStatementSemantics(
-      CopybookMetaData metaData, OldExtendedDocument copybookDocument) {
-    return addCopybookUsage(metaData)
-        .andThen(addCopybookDefinition(metaData, copybookDocument.getUri()))
-        .andThen(collectCopybookStatement(metaData))
-        .andThen(addNestedCopybook(copybookDocument));
+  protected void storeCopyStatementSemantics(
+      CopybookMetaData metaData, OldExtendedDocument copybookDocument, CopybooksRepository copybooksRepository) {
+    addCopybookUsage(metaData, copybooksRepository);
+    addCopybookDefinition(metaData, copybookDocument.getUri(), copybooksRepository);
+    collectCopybookStatement(metaData, copybooksRepository);
+    addNestedCopybook(copybookDocument, copybooksRepository);
   }
 
-  private Function<CopybookHierarchy, ResultWithErrors<OldExtendedDocument>>
-      buildExtendedDocumentForCopybook(CopybookContentProvider copybookContentProvider,
-                                       CopybookMetaData metaData) {
+  private ResultWithErrors<OldExtendedDocument>
+      buildExtendedDocumentForCopybook(DocumentMap documentMap, CopybookContentProvider copybookContentProvider,
+                                       CopybookMetaData metaData, CopybookHierarchy hierarchy) {
     List<SyntaxError> errors = new ArrayList<>();
-    return hierarchy -> {
-      CopybookModel model = getCopyBookContent(copybookContentProvider, metaData, hierarchy).unwrap(errors::addAll);
-      String text = preprocessor.cleanUpCode(model.getUri(), model.getContent())
-              .unwrap(errors::addAll).calculateExtendedText();
-      String replaced = handleReplacing(metaData, hierarchy, text)
-              .unwrap(errors::addAll);
-      ResultWithErrors<OldExtendedDocument> oldExtendedDocumentResultWithErrors =
-              processCopybook(metaData, hierarchy, model.getUri(), replaced).accumulateErrors(errors);
-      return oldExtendedDocumentResultWithErrors;
-    };
+    CopybookModel model = getCopyBookContent(copybookContentProvider, metaData, hierarchy).unwrap(errors::addAll);
+    TextTransformations tt = preprocessor.cleanUpCode(model.getUri(), model.getContent())
+            .unwrap(errors::addAll);
+    DocumentMap copybookMap = new DocumentMap(tt);
+    handleReplacing(metaData, hierarchy, copybookMap, errors);
+    return processCopybook(metaData, hierarchy, model.getUri(), copybookMap).accumulateErrors(errors);
   }
 
-  private Consumer<Map<String, DocumentMapping>> collectNestedSemanticData(
-      CopybookMetaData metaData, OldExtendedDocument copybookDocument) {
-    return nestedMapping -> {
-      nestedMapping.putAll(copybookDocument.getDocumentMapping());
-      nestedMapping.putIfAbsent(
-          metaData.getCopybookId(),
+  private void collectNestedSemanticData(CopybookMetaData metaData,
+                                         OldExtendedDocument copybookDocument,
+                                         Map<String, DocumentMapping> nestedMapping) {
+  nestedMapping.putAll(copybookDocument.getDocumentMapping());
+  nestedMapping.putIfAbsent(metaData.getCopybookId(),
           Optional.ofNullable(nestedMapping.get(copybookDocument.getUri()))
-              .orElseGet(() -> new DocumentMapping(ImmutableList.of(), ImmutableMap.of())));
-    };
+                  .orElseGet(() -> new DocumentMapping(ImmutableList.of(), ImmutableMap.of())));
   }
 
   protected ResultWithErrors<OldExtendedDocument> processCopybook(
-      CopybookMetaData metaData, CopybookHierarchy hierarchy, String uri, String content) {
+          CopybookMetaData metaData, CopybookHierarchy hierarchy, String uri, DocumentMap copybookMap) {
     hierarchy.push(metaData.toCopybookUsage());
-    // FIXME ExtendedSource here is a temporary container to pass compilation
     final ResultWithErrors<OldExtendedDocument> result =
-            grammarPreprocessor.buildExtendedDocument(new ExtendedSource(TextTransformations.of(content, uri)),
-                    metaData.getConfig(), hierarchy);
+            grammarPreprocessor.buildExtendedDocument(copybookMap, metaData.getConfig(), hierarchy);
     hierarchy.pop();
     return result;
   }
@@ -231,51 +225,48 @@ public abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
             copybookMetaData.getCopybookName(), ImmutableList.of(reportMissingCopybooks(copybookMetaData)));
   }
 
-  protected Consumer<PreprocessorStack> beforeWriting() {
-    return PreprocessorStack::pop;
+  protected void beforeWriting(PreprocessorStack stack) {
+    stack.pop();
   }
 
-  protected Consumer<PreprocessorStack> afterWriting(ParserRuleContext context) {
-    return it -> it.accumulateTokenShift(context);
+  protected void afterWriting(ParserRuleContext context, PreprocessorStack stack) {
+    stack.accumulateTokenShift(context);
   }
 
-  private Consumer<CopybooksRepository> collectCopybookStatement(CopybookMetaData metaData) {
-    return it -> it.addStatement(metaData.getCopybookId(), metaData.getCopybookName().getDialectType(), metaData.getContextLocality());
+  private void collectCopybookStatement(CopybookMetaData metaData, CopybooksRepository copybooks) {
+    copybooks.addStatement(metaData.getCopybookId(),
+            metaData.getCopybookName().getDialectType(),
+            metaData.getContextLocality());
   }
 
-  protected Consumer<CopybooksRepository> addCopybookUsage(CopybookMetaData metaData) {
-    return copybooks ->
-        copybooks.addUsage(
-            metaData.getCopybookName().getQualifiedName(),
-                metaData.getCopybookName().getDialectType(),
-                metaData.getNameLocality().toLocation());
+  protected void addCopybookUsage(CopybookMetaData metaData, CopybooksRepository copybooks) {
+    copybooks.addUsage(
+      metaData.getCopybookName().getQualifiedName(),
+      metaData.getCopybookName().getDialectType(),
+      metaData.getNameLocality().toLocation());
   }
 
-  protected Consumer<CopybooksRepository> addCopybookDefinition(CopybookMetaData metaData, String uri) {
-    return copybooks -> {
-      if (!(metaData.getCopybookName() == null
-          || isEmpty(metaData.getCopybookName().getQualifiedName())
-          || isEmpty(uri)
-          || ImplicitCodeUtils.isImplicit(uri)))
-        copybooks.define(
-            metaData.getCopybookName().getQualifiedName(),
-                metaData.getCopybookName().getDialectType(), new Location(uri, new Range(new Position(), new Position())));
-    };
+  protected void addCopybookDefinition(CopybookMetaData metaData, String uri,
+                                                                CopybooksRepository copybooks) {
+    if (!(metaData.getCopybookName() == null
+            || isEmpty(metaData.getCopybookName().getQualifiedName())
+            || isEmpty(uri)
+            || ImplicitCodeUtils.isImplicit(uri))) {
+      copybooks.define(
+              metaData.getCopybookName().getQualifiedName(),
+              metaData.getCopybookName().getDialectType(),
+              new Location(uri, new Range(new Position(), new Position())));
+    }
   }
 
-  protected Consumer<CopybooksRepository> addNestedCopybook(OldExtendedDocument copybookDocument) {
-    return copybooks -> copybooks.merge(copybookDocument.getCopybooks());
+  protected void addNestedCopybook(OldExtendedDocument copybookDocument, CopybooksRepository copybooks) {
+    copybooks.merge(copybookDocument.getCopybooks());
   }
 
   @SuppressWarnings("unused")
-  protected ResultWithErrors<String> handleReplacing(
-      CopybookMetaData metaData, CopybookHierarchy hierarchy, String text) {
-    return new ResultWithErrors<>(text, ImmutableList.of());
-  }
-
-  private Consumer<PreprocessorStack> writeCopybook(String copybookId, String copybookContent) {
-    return it ->
-        it.write(CPY_ENTER_TAG + copybookId + CPY_URI_CLOSE + copybookContent + CPY_EXIT_TAG);
+  protected void handleReplacing(
+          CopybookMetaData metaData, CopybookHierarchy hierarchy, DocumentMap copybookMap, List<SyntaxError> errors) {
+    // no-op
   }
 
   private SyntaxError reportMissingCopybooks(CopybookMetaData metaData) {

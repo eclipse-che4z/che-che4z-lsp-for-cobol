@@ -18,6 +18,8 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.util.impl;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
+import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
@@ -44,16 +46,15 @@ class ReplacingServiceImplTest {
   @Test
   void testApplyReplacing() {
     ReplacingService replacingService = new ReplacingServiceImpl(messageService);
-    assertEquals(
-        "   05\n\r.   .CHILD201\r\n.",
-        replacingService.applyReplacing(
-            "   01\n\r.   .CHILD101\r\n.",
-            ImmutableList.of(
-                Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"), // .
-                Pair.of("CHILD1", "CHILD2"))));
+    DocumentMap dm1 = new DocumentMap(TextTransformations.of("   01\n\r.   .CHILD101\r\n.", ""));
+    replacingService.applyReplacing(dm1, ImmutableList.of(
+            Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"), // .
+            Pair.of("CHILD1", "CHILD2")));
+    assertEquals("   05\n\r.   .CHILD201\r\n.", dm1.extendedText());
 
-    assertEquals(
-        "01 ABC.", replacingService.applyReplacing("01 ABC.", ImmutableList.of(Pair.of("", ""))));
+    DocumentMap dm2 = new DocumentMap(TextTransformations.of("01 ABC.", ""));
+    replacingService.applyReplacing(dm2, ImmutableList.of(Pair.of("", "")));
+    assertEquals("01 ABC.", dm2.extendedText());
   }
 
   /**

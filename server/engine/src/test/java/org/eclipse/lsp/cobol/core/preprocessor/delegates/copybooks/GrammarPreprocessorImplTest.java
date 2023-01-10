@@ -21,7 +21,7 @@ import org.antlr.v4.runtime.BufferedTokenStream;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.*;
@@ -94,7 +94,7 @@ class GrammarPreprocessorImplTest {
     CopybookHierarchy hierarchy = new CopybookHierarchy();
 
     when(listenerFactory.create(
-            eq(DOCUMENT), any(BufferedTokenStream.class), eq(cpyConfig), eq(hierarchy)))
+            any(DocumentMap.class), any(BufferedTokenStream.class), eq(cpyConfig), eq(hierarchy)))
         .thenReturn(listener);
     when(replacingFactory.create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(hierarchy)))
         .thenReturn(replaceListener);
@@ -105,11 +105,11 @@ class GrammarPreprocessorImplTest {
         new GrammarPreprocessorImpl(listenerFactory, replacingFactory);
 
     ResultWithErrors<OldExtendedDocument> extendedDocument =
-        preprocessor.buildExtendedDocument(new ExtendedSource(TextTransformations.of(TEXT, DOCUMENT)),
+        preprocessor.buildExtendedDocument(new DocumentMap(TextTransformations.of(TEXT, DOCUMENT)),
                 cpyConfig, hierarchy);
 
     verify(listenerFactory)
-        .create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(cpyConfig), eq(hierarchy));
+        .create(any(DocumentMap.class), any(BufferedTokenStream.class), eq(cpyConfig), eq(hierarchy));
     verify(replacingFactory).create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(hierarchy));
     assertEquals(RESULT, extendedDocument.getResult().getText());
     assertEquals(copybooks, extendedDocument.getResult().getCopybooks());

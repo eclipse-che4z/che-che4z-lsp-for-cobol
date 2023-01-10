@@ -19,12 +19,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 
 import java.util.*;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
@@ -140,26 +142,26 @@ public class CopybookHierarchy {
   /**
    * Replace the copybook text using the internal state of the hierarchy
    *
-   * @param copybookText text to replace
+   * @param copybookMap copybook replacements map
    * @param accumulator a function for applying the replacing
-   * @return replaced text
+   * @param errors errors collection
    */
-  public String replaceCopybook(
-      String copybookText, BiFunction<String, List<Pair<String, String>>, String> accumulator) {
-    return recursiveReplaceStmtStack.stream().reduce(copybookText, accumulator, (raw, res) -> res);
+  public void replaceCopybook(
+          DocumentMap copybookMap, BiConsumer<DocumentMap, List<Pair<String, String>>> accumulator,
+          List<SyntaxError> errors) {
+    for (List<Pair<String, String>> pairs : recursiveReplaceStmtStack) {
+      accumulator.accept(copybookMap, pairs);
+    }
   }
 
   /**
-   * Replace the text using the internal state of the hierarchy
+   * Apply replacements the documentMap using the internal state of the hierarchy
    *
-   * @param text text to replace
-   * @param accumulator a function for applying the replacing
-   * @return replaced text
+   * @param documentMap documentMap to replace
+   * @param accumulator a consumer for applying the replacing
    */
-  public String replaceText(
-      String text, BiFunction<String, List<Pair<String, String>>, String> accumulator) {
-    String result = accumulator.apply(text, textReplacingClauses);
+  public void replaceText(DocumentMap documentMap, BiConsumer<DocumentMap, List<Pair<String, String>>> accumulator) {
+    accumulator.accept(documentMap, textReplacingClauses);
     textReplacingClauses.clear();
-    return result;
   }
 }

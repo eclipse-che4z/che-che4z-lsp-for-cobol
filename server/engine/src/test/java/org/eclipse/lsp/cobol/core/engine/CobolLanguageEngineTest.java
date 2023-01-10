@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -161,9 +162,9 @@ class CobolLanguageEngineTest {
     when(preprocessor.cleanUpCode(URI, TEXT))
         .thenReturn(new ResultWithErrors<>(TextTransformations.of(TEXT, URI), ImmutableList.of()));
     when(grammarPreprocessor.buildExtendedDocument(
-            eq(new ExtendedSource(TextTransformations.of(TEXT, URI))), eq(cpyConfig), any(CopybookHierarchy.class)))
+            eq(new DocumentMap(TextTransformations.of(TEXT, URI))), eq(cpyConfig), any(CopybookHierarchy.class)))
             .thenReturn(new ResultWithErrors<>(oldExtendedDocument, ImmutableList.of(error)));
-    when(grammarPreprocessor.buildExtendedDocument(any(ExtendedSource.class), any(CopybookConfig.class), any(CopybookHierarchy.class)))
+    when(grammarPreprocessor.buildExtendedDocument(any(DocumentMap.class), any(CopybookConfig.class), any(CopybookHierarchy.class)))
             .thenReturn(new ResultWithErrors<>(oldExtendedDocument, ImmutableList.of()));
 
     Range programRange = new Range(new Position(0, 7), new Position(0, 31));

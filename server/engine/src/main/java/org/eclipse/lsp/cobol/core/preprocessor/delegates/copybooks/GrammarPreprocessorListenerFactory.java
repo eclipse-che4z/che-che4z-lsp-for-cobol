@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 import lombok.NonNull;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 
 /** A factory for {@link GrammarPreprocessorListener} */
@@ -26,7 +27,7 @@ public interface GrammarPreprocessorListenerFactory {
    * Create a new {@link GrammarPreprocessorListenerImpl} for pre-processing of a COBOL text with
    * the grammar
    *
-   * @param uri URI of the document
+   * @param documentMap current document map
    * @param tokens a stream of tokens
    * @param copybookConfig contains config info like: copybook processing mode, target backend sql
    *     server
@@ -34,7 +35,7 @@ public interface GrammarPreprocessorListenerFactory {
    * @return a new listener
    */
   GrammarPreprocessorListenerImpl create(
-      @NonNull String uri,
+      @NonNull DocumentMap documentMap,
       @NonNull BufferedTokenStream tokens,
       @NonNull CopybookConfig copybookConfig,
       @NonNull CopybookHierarchy hierarchy);
