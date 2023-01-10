@@ -37,23 +37,47 @@ public class VariableUsageUtils {
    */
   public static List<VariableNode> findVariablesForUsage(
       Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usageNodes) {
-    return definedVariables.get(usageNodes.get(0).getName()).stream()
-        .distinct()
-        .filter(it -> checkParents(it, usageNodes.subList(1, usageNodes.size())))
-        .collect(Collectors.toList());
+    List<VariableNode> foundVariables = definedVariables.get(usageNodes.get(0).getName()).stream()
+            .distinct()
+            .filter(it -> checkParents(it, usageNodes.subList(1, usageNodes.size())))
+            .collect(Collectors.toList());
+    List<VariableNode> exactMatch = findExactHierarchyMatch(foundVariables, usageNodes);
+    return exactMatch.isEmpty() ? foundVariables : exactMatch;
+  }
+
+  private static List<VariableNode> findExactHierarchyMatch(List<VariableNode> foundVariables, List<VariableUsageNode> usageNodes) {
+    List<VariableNode> result = new ArrayList<>();
+    for (VariableNode foundVariable : foundVariables) {
+      VariableNode ref = foundVariable;
+      boolean isMatch = true;
+    for (VariableUsageNode usageNode : usageNodes) {
+      if (ref != null && usageNode.getName().equals(ref.getName())) {
+        ref = getNearestParentVariable(ref);
+      } else {
+        isMatch = false;
+        break;
+      }
+    }
+    if (isMatch) result.add(foundVariable);
+    }
+    return result;
   }
 
   private static boolean checkParents(VariableNode variable, List<VariableUsageNode> parents) {
     for (VariableUsageNode parent : parents) {
       String parentName = parent.getName();
       do {
-        variable = variable.getNearestParentByType(NodeType.VARIABLE)
-            .map(VariableNode.class::cast)
-            .orElse(null);
+        variable = getNearestParentVariable(variable);
         if (variable == null)
           return false;
       } while (!variable.getName().equals(parentName));
     }
     return true;
+  }
+
+  private static VariableNode getNearestParentVariable(VariableNode variable) {
+    return variable.getNearestParentByType(NodeType.VARIABLE)
+            .map(VariableNode.class::cast)
+            .orElse(null);
   }
 }
