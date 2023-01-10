@@ -405,7 +405,6 @@ LXPRF : L X P R F;
 LXRDF : L X R D F;
 MAP: M A P;
 MAPFAIL : M A P F A I L;
-MATCH : M A T C H;
 MAX : M A X;
 MAXPCF : M A X P C F;
 MD : M D;
