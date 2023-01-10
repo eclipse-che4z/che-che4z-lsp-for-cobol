@@ -62,7 +62,7 @@ public class TestCopyIdmsVariablesForNotAllowedLevels {
       "       01  {$*VAR1}.                                                      \n"
           + "            03  {$*VAR2}           PIC X(8)                                 \n"
           + "                                       VALUE  SPACES .                          \n"
-          + "             {88|1}  {$*VAR3}          VALUE  '0000' . ";
+          + "             88  {$*VAR3}          VALUE  '0000' . ";
 
   private static final String COPY2 =
       "       01  {$*VAR1}.                                                      \n"
@@ -72,26 +72,12 @@ public class TestCopyIdmsVariablesForNotAllowedLevels {
 
   @Test
   void testNoAdjustmentForSpecialLevelNumbers() {
-    Diagnostic expectedDiagnostics =
-        new Diagnostic(
-            new Range(),
-            "IDMS level not adjusted. 90 (2 + 88) exceeds maximum level adjustment of 49",
-            Warning,
-            ErrorSource.DIALECT.getText());
-
-    expectedDiagnostics.setRelatedInformation(
-        Collections.singletonList(
-            new DiagnosticRelatedInformation(
-                new Location(
-                    "file:///c:/workspace/document.cbl",
-                    new Range(new Position(9, 11), new Position(9, 30))),
-                "Copy IDMS source")));
 
     AnalysisResult result =
         UseCaseEngine.runTest(
             TEXT_IDMS,
             ImmutableList.of(new CobolText("COPY1", IdmsDialect.NAME, COPY1)),
-            ImmutableMap.of("1", expectedDiagnostics),
+            ImmutableMap.of(),
             ImmutableList.of(),
             DialectConfigs.getIDMSAnalysisConfig());
 
@@ -129,7 +115,7 @@ public class TestCopyIdmsVariablesForNotAllowedLevels {
             new DiagnosticRelatedInformation(
                 new Location(
                     "file:///c:/workspace/document.cbl",
-                    new Range(new Position(9, 11), new Position(9, 30))),
+                    new Range(new Position(9, 24), new Position(9, 29))),
                 "Copy IDMS source")));
 
     AnalysisResult result =
