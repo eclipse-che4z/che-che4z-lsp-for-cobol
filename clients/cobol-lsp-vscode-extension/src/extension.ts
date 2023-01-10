@@ -82,8 +82,6 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.snippets.insertSnippets", () => { pickSnippet(); }));
-    // create .gitignore file within .c4z folder
-    createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
     context.subscriptions.push(copyBooksDownloader);
 
