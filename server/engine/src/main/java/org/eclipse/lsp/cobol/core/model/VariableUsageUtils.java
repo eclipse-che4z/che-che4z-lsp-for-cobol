@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
@@ -23,9 +24,7 @@ import lombok.experimental.UtilityClass;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * The class take all defined variables and search through them by partial qualifier
- */
+/** The class take all defined variables and search through them by partial qualifier */
 @UtilityClass
 public class VariableUsageUtils {
   /**
@@ -37,42 +36,47 @@ public class VariableUsageUtils {
    */
   public static List<VariableNode> findVariablesForUsage(
       Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usageNodes) {
-    List<VariableNode> foundVariables = definedVariables.get(usageNodes.get(0).getName()).stream()
+    Map<VariableNode, Integer> variableToStepCountsToMatchParentsMap =
+        definedVariables.get(usageNodes.get(0).getName()).stream()
             .distinct()
-            .filter(it -> checkParents(it, usageNodes.subList(1, usageNodes.size())))
+            .map(
+                it ->
+                    mapVariableToStepCountsToMatchParents(
+                        it, usageNodes.subList(1, usageNodes.size())))
+            .reduce(
+                (firstMap, secondMap) -> {
+                  firstMap.putAll(secondMap);
+                  return firstMap;
+                })
+            .orElse(Collections.emptyMap());
+
+    List<VariableNode> exactHierarchyMatchedVariables =
+        variableToStepCountsToMatchParentsMap.entrySet().stream()
+            .filter(entry -> entry.getValue().equals(usageNodes.size() - 1))
+            .map(Map.Entry::getKey)
             .collect(Collectors.toList());
-    List<VariableNode> exactMatch = findExactHierarchyMatch(foundVariables, usageNodes);
-    return exactMatch.isEmpty() ? foundVariables : exactMatch;
+
+    return exactHierarchyMatchedVariables.isEmpty()
+        ? new ArrayList<>(variableToStepCountsToMatchParentsMap.keySet())
+        : exactHierarchyMatchedVariables;
   }
 
-  private static List<VariableNode> findExactHierarchyMatch(List<VariableNode> foundVariables, List<VariableUsageNode> usageNodes) {
-    List<VariableNode> result = new ArrayList<>();
-    for (VariableNode foundVariable : foundVariables) {
-      VariableNode ref = foundVariable;
-      boolean isMatch = true;
-    for (VariableUsageNode usageNode : usageNodes) {
-      if (ref != null && usageNode.getName().equals(ref.getName())) {
-        ref = getNearestParentVariable(ref);
-      } else {
-        isMatch = false;
-        break;
-      }
-    }
-    if (isMatch) result.add(foundVariable);
-    }
-    return result;
-  }
-
-  private static boolean checkParents(VariableNode variable, List<VariableUsageNode> parents) {
+  private static Map<VariableNode, Integer> mapVariableToStepCountsToMatchParents(
+      VariableNode variable, List<VariableUsageNode> parents) {
+    VariableNode referredVariable = variable;
+    int count = 0;
     for (VariableUsageNode parent : parents) {
       String parentName = parent.getName();
       do {
+
         variable = getNearestParentVariable(variable);
-        if (variable == null)
-          return false;
+        if (variable == null) {
+          return new HashMap<>();
+        }
+        count++;
       } while (!variable.getName().equals(parentName));
     }
-    return true;
+    return Maps.newHashMap(Collections.singletonMap(referredVariable, count));
   }
 
   private static VariableNode getNearestParentVariable(VariableNode variable) {
