@@ -24,7 +24,6 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
-import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 
 import java.io.IOException;
@@ -50,21 +49,18 @@ public class PropertiesMessageService implements MessageService {
   private final LocaleStore localeStore;
   private CobolLSPropertiesResourceBundle resourceBundle;
   private final ConfigurationService configurationService;
-  private final WorkingFolderService workingFolderService;
 
   @Inject
   public PropertiesMessageService(
-      @Named("resourceFileLocation") String baseName,
-      LocaleStore localeStore,
-      ConfigurationService configurationService,
-      WorkingFolderService workingFolderService) {
+          @Named("resourceFileLocation") String baseName,
+          LocaleStore localeStore,
+          ConfigurationService configurationService) {
     this.baseName = baseName;
     this.localeStore = localeStore;
     this.configurationService = configurationService;
-    this.workingFolderService = workingFolderService;
     resourceBundle =
         new CobolLSPropertiesResourceBundle(
-            baseName, localeStore.getApplicationLocale(), workingFolderService);
+            baseName, localeStore.getApplicationLocale());
     subscribeToLocaleStore();
   }
 
@@ -81,7 +77,7 @@ public class PropertiesMessageService implements MessageService {
     ResourceBundle.clearCache();
     resourceBundle =
         new CobolLSPropertiesResourceBundle(
-            baseName, localeStore.getApplicationLocale(), this.workingFolderService);
+            baseName, localeStore.getApplicationLocale());
     updateResourceBundle();
   }
 

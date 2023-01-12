@@ -39,7 +39,7 @@ class CobolLSPropertiesResourceBundleTest {
 
     CobolLSPropertiesResourceBundle bundle =
         new CobolLSPropertiesResourceBundle(
-            "resourceBundles/test", Locale.FRENCH, workingFolderService);
+            "resourceBundles/test", Locale.FRENCH);
     when(workingFolderService.getWorkingFolder()).thenReturn(new URI("file:test/"));
     CobolLSPropertiesResourceBundle spyBundle = spy(bundle);
 
@@ -68,7 +68,7 @@ class CobolLSPropertiesResourceBundleTest {
     DialectRegistryItem dialectRegistryItem = new DialectRegistryItem("dummyDialect", "/path", "dummy dialect", "dummyDialect");
     CobolLSPropertiesResourceBundle bundle =
         new CobolLSPropertiesResourceBundle(
-            "resourceBundles/test", Locale.FRENCH, workingFolderService);
+            "resourceBundles/test", Locale.FRENCH);
     when(workingFolderService.getWorkingFolder(anyString())).thenReturn(new URI("file:test/"));
 
     bundle.updateMessageResourceBundle(dialectRegistryItem);

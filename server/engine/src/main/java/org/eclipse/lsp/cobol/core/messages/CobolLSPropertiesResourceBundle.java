@@ -19,8 +19,8 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
-import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -39,12 +39,10 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
   private final String baseName;
   public static final char BUNDLE_SEPARATOR = '_';
   private final Properties properties;
-  private final WorkingFolderService workingFolderService;
   private final Locale locale;
 
   public CobolLSPropertiesResourceBundle(
-      String basename, Locale locale, WorkingFolderService workingFolderService) {
-    this.workingFolderService = workingFolderService;
+          String basename, Locale locale) {
     this.baseName = basename;
     this.properties = new Properties();
     this.locale = locale;
@@ -65,7 +63,7 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
     Properties properties = new Properties();
     List<String> resourceName = toSuspectedBundleNames(locale);
     Collections.reverse(resourceName);
-    URI workingFolder = this.workingFolderService.getWorkingFolder(dialectRegistryItem.getPath());
+    URI workingFolder = new File(dialectRegistryItem.getPath()).getAbsoluteFile().toURI();
     InputStream validResources =
         getDialectResources(resourceName, workingFolder, getJarName(dialectRegistryItem.getName()));
     properties.load(validResources);

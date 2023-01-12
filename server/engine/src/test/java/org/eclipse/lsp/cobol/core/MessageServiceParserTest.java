@@ -48,7 +48,7 @@ class MessageServiceParserTest {
     when(localeMock.getApplicationLocale()).thenReturn(Locale.ENGLISH);
     WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     MessageService messageService =
-        new PropertiesMessageService("resourceBundles/test", localeMock, configurationService, workingFolderService);
+        new PropertiesMessageService("resourceBundles/test", localeMock, configurationService);
     CobolErrorStrategy errorStrategy = mock(CobolErrorStrategy.class);
     when(mockParser.getErrorHandler()).thenReturn(errorStrategy);
     when(errorStrategy.getMessageService()).thenReturn(messageService);
