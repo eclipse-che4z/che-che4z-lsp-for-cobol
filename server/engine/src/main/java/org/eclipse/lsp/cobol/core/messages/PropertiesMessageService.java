@@ -14,17 +14,18 @@
  */
 package org.eclipse.lsp.cobol.core.messages;
 
+import com.google.gson.JsonArray;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
-import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
-import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
+import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
+import org.eclipse.lsp.cobol.service.settings.ConfigHelper;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -36,6 +37,8 @@ import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECTS;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECT_REGISTRY;
 
 /**
  * This class is an properties file implementation of {@link MessageService} . It loads messages
@@ -48,19 +51,21 @@ public class PropertiesMessageService implements MessageService {
   private final String baseName;
   private final LocaleStore localeStore;
   private CobolLSPropertiesResourceBundle resourceBundle;
-  private final ConfigurationService configurationService;
+  private final SettingsService settingsService;
+  private final WorkingFolderService workingFolderService;
 
   @Inject
   public PropertiesMessageService(
-          @Named("resourceFileLocation") String baseName,
-          LocaleStore localeStore,
-          ConfigurationService configurationService) {
+      @Named("resourceFileLocation") String baseName,
+      LocaleStore localeStore,
+      SettingsService settingsService,
+      WorkingFolderService workingFolderService) {
     this.baseName = baseName;
     this.localeStore = localeStore;
-    this.configurationService = configurationService;
+    this.settingsService = settingsService;
+    this.workingFolderService = workingFolderService;
     resourceBundle =
-        new CobolLSPropertiesResourceBundle(
-            baseName, localeStore.getApplicationLocale());
+        new CobolLSPropertiesResourceBundle(baseName, localeStore.getApplicationLocale());
     subscribeToLocaleStore();
   }
 
@@ -76,8 +81,7 @@ public class PropertiesMessageService implements MessageService {
   private void reloadResourceBundle(Locale locale) {
     ResourceBundle.clearCache();
     resourceBundle =
-        new CobolLSPropertiesResourceBundle(
-            baseName, localeStore.getApplicationLocale());
+        new CobolLSPropertiesResourceBundle(baseName, localeStore.getApplicationLocale());
     updateResourceBundle();
   }
 
@@ -104,18 +108,51 @@ public class PropertiesMessageService implements MessageService {
   }
 
   private void updateResourceBundle() {
-    reloadResourceBundle(this.localeStore.getApplicationLocale());
-    AnalysisConfig config = configurationService.getConfig(CopybookProcessingMode.ENABLED);
-    List<String> configuredDialects = config.getDialects();
-    LOG.debug("Configured dialects : " + String.join(",", configuredDialects));
-    config.getDialectRegistry().stream()
-        .filter(registeredDialects -> configuredDialects.contains(registeredDialects.getName()))
+    this.settingsService
+        .fetchTextConfiguration(DIALECTS.label)
+        .thenAccept(
+            dialects ->
+                this.settingsService
+                    .fetchConfiguration(DIALECT_REGISTRY.label)
+                    .thenAccept(
+                        registry -> {
+                          List<DialectRegistryItem> dialectRegistryItems =
+                              ConfigHelper.parseDialectRegistry((JsonArray) registry.get(0));
+                          handleRegisteredDialects(dialects, dialectRegistryItems);
+                          handleImplicitDialects(dialects, dialectRegistryItems);
+                        }));
+  }
+
+  private void handleRegisteredDialects(List<String> dialects, List<DialectRegistryItem> dialectRegistryItems) {
+    dialectRegistryItems.stream()
+        .filter(
+            registeredDialects ->
+                dialects.contains(registeredDialects.getName()))
         .forEach(this::updateResourceBundle);
+  }
+
+  private void handleImplicitDialects(List<String> dialects, List<DialectRegistryItem> dialectRegistryItems) {
+    if (dialectRegistryItems.isEmpty()) {
+      dialects.forEach(this::updateResourceBundle);
+    }
+  }
+
+  private void updateResourceBundle(String dialect) {
+    updateResourceBundle(
+        new DialectRegistryItem(
+            dialect,
+            this.workingFolderService.getWorkingFolder().getPath(),
+            "implicit found dialects",
+            "implicit-dialects"));
   }
 
   private void updateResourceBundle(DialectRegistryItem dialectRegistryItem) {
     try {
-      LOG.debug("update resource for - " + dialectRegistryItem.getName() + " ," + dialectRegistryItem.getPath());
+      LOG.debug(
+          "update resource for - "
+              + dialectRegistryItem.getName()
+              + " ,"
+              + dialectRegistryItem.getPath());
       this.resourceBundle.updateMessageResourceBundle(dialectRegistryItem);
     } catch (IOException e) {
       LOG.error("Issue while loading resource bundle for " + dialectRegistryItem.getName());

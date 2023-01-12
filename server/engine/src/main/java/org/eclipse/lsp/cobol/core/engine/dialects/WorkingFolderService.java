@@ -28,8 +28,7 @@ import java.util.List;
  * Provides files in the working folder
  */
 @Singleton
-public
-class WorkingFolderService {
+public class WorkingFolderService {
 
   private static final String DIALECTS_PATH_SYSTEM_PROPERTY = "dialect.path";
 
