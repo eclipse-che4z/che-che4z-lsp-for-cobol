@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.core;
 import org.antlr.v4.runtime.Parser;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
@@ -46,7 +45,6 @@ class MessageServiceParserTest {
     LocaleStore localeMock = mock(LocaleStore.class);
     ConfigurationService configurationService = mock(ConfigurationService.class);
     when(localeMock.getApplicationLocale()).thenReturn(Locale.ENGLISH);
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     MessageService messageService =
         new PropertiesMessageService("resourceBundles/test", localeMock, configurationService);
     CobolErrorStrategy errorStrategy = mock(CobolErrorStrategy.class);

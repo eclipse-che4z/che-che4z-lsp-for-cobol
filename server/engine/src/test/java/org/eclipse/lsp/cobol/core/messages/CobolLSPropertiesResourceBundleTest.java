@@ -17,12 +17,10 @@ package org.eclipse.lsp.cobol.core.messages;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
-import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
@@ -34,13 +32,11 @@ import static org.mockito.Mockito.*;
 class CobolLSPropertiesResourceBundleTest {
 
   @Test
-  void updateMessageResourceBundle() throws IOException, URISyntaxException {
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+  void updateMessageResourceBundle() throws IOException {
 
     CobolLSPropertiesResourceBundle bundle =
         new CobolLSPropertiesResourceBundle(
             "resourceBundles/test", Locale.FRENCH);
-    when(workingFolderService.getWorkingFolder()).thenReturn(new URI("file:test/"));
     CobolLSPropertiesResourceBundle spyBundle = spy(bundle);
 
     doReturn(
@@ -63,13 +59,11 @@ class CobolLSPropertiesResourceBundleTest {
   }
 
   @Test
-  void updateMessageResourceBundleWhenResourcesNotFound() throws IOException, URISyntaxException {
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+  void updateMessageResourceBundleWhenResourcesNotFound() throws IOException {
     DialectRegistryItem dialectRegistryItem = new DialectRegistryItem("dummyDialect", "/path", "dummy dialect", "dummyDialect");
     CobolLSPropertiesResourceBundle bundle =
         new CobolLSPropertiesResourceBundle(
             "resourceBundles/test", Locale.FRENCH);
-    when(workingFolderService.getWorkingFolder(anyString())).thenReturn(new URI("file:test/"));
 
     bundle.updateMessageResourceBundle(dialectRegistryItem);
     Assertions.assertEquals(bundle.handleGetObject("test.test"), "test.test");

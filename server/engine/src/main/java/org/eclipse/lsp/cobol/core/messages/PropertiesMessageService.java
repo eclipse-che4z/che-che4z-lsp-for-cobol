@@ -107,7 +107,7 @@ public class PropertiesMessageService implements MessageService {
     reloadResourceBundle(this.localeStore.getApplicationLocale());
     AnalysisConfig config = configurationService.getConfig(CopybookProcessingMode.ENABLED);
     List<String> configuredDialects = config.getDialects();
-
+    LOG.debug("Configured dialects : "+ String.join(",", configuredDialects));
     config.getDialectRegistry().stream()
         .filter(registeredDialects -> configuredDialects.contains(registeredDialects.getName()))
         .forEach(this::updateResourceBundle);
@@ -115,6 +115,7 @@ public class PropertiesMessageService implements MessageService {
 
   private void updateResourceBundle(DialectRegistryItem dialectRegistryItem) {
     try {
+      LOG.debug("update resource for - "+ dialectRegistryItem.getName()+" ,"+ dialectRegistryItem.getPath());
       this.resourceBundle.updateMessageResourceBundle(dialectRegistryItem);
     } catch (IOException e) {
       LOG.error("Issue while loading resource bundle for " + dialectRegistryItem.getName());
