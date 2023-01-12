@@ -66,6 +66,7 @@ class WorkingFolderService {
 
   /**
    * Returns a working folder uri
+   * @param path path string
    * @return a working folder uri
    */
   @SneakyThrows

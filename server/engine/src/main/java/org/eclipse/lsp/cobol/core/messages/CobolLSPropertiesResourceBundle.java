@@ -64,7 +64,7 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
     List<String> resourceName = toSuspectedBundleNames(locale);
     Collections.reverse(resourceName);
     URI workingFolder = new File(dialectRegistryItem.getPath()).getAbsoluteFile().toURI();
-    LOG.debug("working URI for dialect resource :"+ workingFolder);
+    LOG.debug("working URI for dialect resource :" + workingFolder);
     InputStream validResources =
         getDialectResources(resourceName, workingFolder, getJarName(dialectRegistryItem.getName()));
     properties.load(validResources);
