@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.messages;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,8 @@ class CobolLSPropertiesResourceBundleTest {
                 "test.test: flip flop", StandardCharsets.UTF_8))
         .when(spyBundle)
         .getDialectResources(any(), any(), any());
-    spyBundle.updateMessageResourceBundle("dummyDialect");
+    DialectRegistryItem dialectRegistryItem = new DialectRegistryItem("dummyDialect", "/path", "dummy dialect", "dummyDialect");
+    spyBundle.updateMessageResourceBundle(dialectRegistryItem);
     Assertions.assertEquals(spyBundle.handleGetObject("test.test"), "flip flop");
     Assertions.assertEquals(spyBundle.handleGetObject("1"), "French test selected.");
     ImmutableList<String> expectedKeySet = ImmutableList.of("1", "2", "test.test");
@@ -63,13 +65,13 @@ class CobolLSPropertiesResourceBundleTest {
   @Test
   void updateMessageResourceBundleWhenResourcesNotFound() throws IOException, URISyntaxException {
     WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
-
+    DialectRegistryItem dialectRegistryItem = new DialectRegistryItem("dummyDialect", "/path", "dummy dialect", "dummyDialect");
     CobolLSPropertiesResourceBundle bundle =
         new CobolLSPropertiesResourceBundle(
             "resourceBundles/test", Locale.FRENCH, workingFolderService);
-    when(workingFolderService.getWorkingFolder()).thenReturn(new URI("file:test/"));
+    when(workingFolderService.getWorkingFolder(anyString())).thenReturn(new URI("file:test/"));
 
-    bundle.updateMessageResourceBundle("dummyDialect");
+    bundle.updateMessageResourceBundle(dialectRegistryItem);
     Assertions.assertEquals(bundle.handleGetObject("test.test"), "test.test");
     Assertions.assertEquals(bundle.handleGetObject("1"), "French test selected.");
   }

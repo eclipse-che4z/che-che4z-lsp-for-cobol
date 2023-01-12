@@ -18,11 +18,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.DialectRegistryItem;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
-import org.eclipse.lsp.cobol.service.settings.SettingsService;
+import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -34,7 +37,6 @@ import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECTS;
 
 /**
  * This class is an properties file implementation of {@link MessageService} . It loads messages
@@ -47,18 +49,18 @@ public class PropertiesMessageService implements MessageService {
   private final String baseName;
   private final LocaleStore localeStore;
   private CobolLSPropertiesResourceBundle resourceBundle;
-  private final SettingsService settingsService;
+  private final ConfigurationService configurationService;
   private final WorkingFolderService workingFolderService;
 
   @Inject
   public PropertiesMessageService(
       @Named("resourceFileLocation") String baseName,
       LocaleStore localeStore,
-      SettingsService settingsService,
+      ConfigurationService configurationService,
       WorkingFolderService workingFolderService) {
     this.baseName = baseName;
     this.localeStore = localeStore;
-    this.settingsService = settingsService;
+    this.configurationService = configurationService;
     this.workingFolderService = workingFolderService;
     resourceBundle =
         new CobolLSPropertiesResourceBundle(
@@ -79,9 +81,7 @@ public class PropertiesMessageService implements MessageService {
     ResourceBundle.clearCache();
     resourceBundle =
         new CobolLSPropertiesResourceBundle(
-            baseName,
-            localeStore.getApplicationLocale(),
-            this.workingFolderService);
+            baseName, localeStore.getApplicationLocale(), this.workingFolderService);
     updateResourceBundle();
   }
 
@@ -109,18 +109,19 @@ public class PropertiesMessageService implements MessageService {
 
   private void updateResourceBundle() {
     reloadResourceBundle(this.localeStore.getApplicationLocale());
-    this.settingsService
-        .fetchTextConfiguration(DIALECTS.label)
-        .thenAccept(this::updateResourceBundle);
+    AnalysisConfig config = configurationService.getConfig(CopybookProcessingMode.ENABLED);
+    List<String> configuredDialects = config.getDialects();
+
+    config.getDialectRegistry().stream()
+        .filter(registeredDialects -> configuredDialects.contains(registeredDialects.getName()))
+        .forEach(this::updateResourceBundle);
   }
 
-  private void updateResourceBundle(List<String> dialects) {
-    for (String dialectName : dialects) {
-      try {
-        this.resourceBundle.updateMessageResourceBundle(dialectName);
-      } catch (IOException e) {
-        LOG.error("Issue while loading resource bundle for " + dialectName);
-      }
+  private void updateResourceBundle(DialectRegistryItem dialectRegistryItem) {
+    try {
+      this.resourceBundle.updateMessageResourceBundle(dialectRegistryItem);
+    } catch (IOException e) {
+      LOG.error("Issue while loading resource bundle for " + dialectRegistryItem.getName());
     }
   }
 

@@ -18,6 +18,7 @@ import com.google.common.annotations.VisibleForTesting;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
 
 import java.io.IOException;
@@ -53,20 +54,20 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
   /**
    * Updates resource bundle for a supplied dialect.
    *
-   * @param dialectName dialect for which resource needs to be updated
+   * @param dialectRegistryItem dialect registry for which resource needs to be updated
    * @throws IOException when resources for a dialect is not found
    */
-  public void updateMessageResourceBundle(String dialectName) throws IOException {
-    properties.putAll(load(dialectName, locale));
+  public void updateMessageResourceBundle(DialectRegistryItem dialectRegistryItem) throws IOException {
+    properties.putAll(load(dialectRegistryItem, locale));
   }
 
-  private Properties load(String dialectName, Locale locale) throws IOException {
+  private Properties load(DialectRegistryItem dialectRegistryItem, Locale locale) throws IOException {
     Properties properties = new Properties();
     List<String> resourceName = toSuspectedBundleNames(locale);
     Collections.reverse(resourceName);
-    URI workingFolder = this.workingFolderService.getWorkingFolder();
+    URI workingFolder = this.workingFolderService.getWorkingFolder(dialectRegistryItem.getPath());
     InputStream validResources =
-        getDialectResources(resourceName, workingFolder, getJarName(dialectName));
+        getDialectResources(resourceName, workingFolder, getJarName(dialectRegistryItem.getName()));
     properties.load(validResources);
     return properties;
   }
