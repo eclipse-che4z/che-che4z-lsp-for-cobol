@@ -151,7 +151,10 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: jar
-          path: server/engine/target/server.jar
+          path: |
+            server/engine/target/server.jar
+            server/dialect-idms/target/dialect-idms.jar
+            server/dialect-daco/target/dialect-daco.jar
       - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
@@ -209,7 +212,10 @@ jobs:
             path: staging
       - name: configure server jar
         working-directory: clients/cobol-lsp-vscode-extension
-        run: "cp -R ../../staging/jar/* ./server/jar"
+        run: |
+          cp -R ../../staging/jar/server.jar ./server/jar
+          cp -R ../../staging/jar/dialect-idms.jar ./server/jar/dialects
+          cp -R ../../staging/jar/dialect-daco.jar ./server/jar/dialects
       - name: configure windows executable
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
