@@ -41,18 +41,15 @@ import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 @Singleton
 public class CachingConfigurationService implements ConfigurationService {
   private final SettingsService settingsService;
-  private CompletableFuture<ConfigurationEntity> config;
   private final DialectService dialectService;
 
   @Inject
   public CachingConfigurationService(SettingsService settingsService, DialectService dialectService) {
     this.settingsService = settingsService;
     this.dialectService = dialectService;
-    config = CompletableFuture.completedFuture(new ConfigurationEntity());
   }
 
-  @Override
-  public void updateConfigurationFromSettings() {
+  private CompletableFuture<ConfigurationEntity> createConfigFuture() {
     List<String> settingsList = new LinkedList<>(Arrays.asList(
         TARGET_SQL_BACKEND.label,
         ANALYSIS_FEATURES.label,
@@ -63,15 +60,25 @@ public class CachingConfigurationService implements ConfigurationService {
 
     List<String> dialectsSections = dialectService.getSettingsSections();
     settingsList.addAll(dialectsSections);
-    config = settingsService.fetchConfigurations(settingsList)
-        .thenApply(c -> parseConfig(c, dialectsSections));
+
+    return Optional.ofNullable(settingsService.fetchConfigurations(settingsList))
+        .map(c -> c.thenApply(future ->
+            Optional.ofNullable(future)
+                .map(list -> parseConfig(list, dialectsSections))
+                .orElse(new ConfigurationEntity()))
+        ).orElse(CompletableFuture.completedFuture(new ConfigurationEntity()));
   }
 
   @Override
   @SuppressWarnings("java:S2142")
   public AnalysisConfig getConfig(CopybookProcessingMode mode) {
     try {
-      return AnalysisConfigHelper.fromConfigEntity(mode, config.get());
+      AnalysisConfig config = AnalysisConfigHelper.fromConfigEntity(mode, createConfigFuture().get());
+      if (dialectService.updateDialects(config.getDialectRegistry())) {
+        // if list of dialects were changed - request config one more time
+        config = AnalysisConfigHelper.fromConfigEntity(mode, createConfigFuture().get());
+      }
+      return config;
     } catch (InterruptedException e) {
       LOG.error("Issue while resolving analysis configuration", e);
       Thread.currentThread().interrupt();
@@ -84,7 +91,7 @@ public class CachingConfigurationService implements ConfigurationService {
   @Override
   public List<String> getSubroutineDirectories() {
     try {
-      return config.get().getSubroutines();
+      return createConfigFuture().get().getSubroutines();
     } catch (InterruptedException e) {
       LOG.error("Issue while resolving subroutine configuration", e);
       Thread.currentThread().interrupt();

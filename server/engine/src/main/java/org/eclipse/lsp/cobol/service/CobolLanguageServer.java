@@ -142,7 +142,6 @@ public class CobolLanguageServer implements LanguageServer {
    */
   @Override
   public void initialized(@Nullable InitializedParams params) {
-    configurationService.updateConfigurationFromSettings();
     watchingService.watchConfigurationChange();
     watchingService.watchPredefinedFolder();
     addLocalFilesWatcher();

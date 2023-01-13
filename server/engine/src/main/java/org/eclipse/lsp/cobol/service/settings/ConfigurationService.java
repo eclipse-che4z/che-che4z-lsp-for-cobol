@@ -30,8 +30,6 @@ import java.util.Map;
 
 /** This interface handles the request for configurations from the client settings */
 public interface ConfigurationService {
-  /** Update all the configurations from the client Settings */
-  void updateConfigurationFromSettings();
 
   /**
    * Get a configuration for the analysis using the settings file and the given copybook processing
