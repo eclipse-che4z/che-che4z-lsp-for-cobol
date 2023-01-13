@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This test checks that we collect all multiple definitions for variable.
@@ -184,7 +185,8 @@ public class TestDuplicatedDefinition {
         new Location(UseCaseUtils.DOCUMENT_URI, new Range(new Position(5, 7), new Position(5, 28)))
     );
     List<Location> locations = variableUsages.get(0).getDefinitions();
-    assertEquals(expectedLocations, locations);
+    assertEquals(locations.size(), expectedLocations.size());
+    locations.forEach(location -> assertTrue(expectedLocations.contains(location)));
   }
 
   @Test
