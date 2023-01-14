@@ -38,7 +38,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -81,14 +80,13 @@ public class LangServerBootstrap {
       if (isPipeEnabled(args)) {
         launchServerWithPipes(server, provider);
       } else {
-          // Enable logging
-          ch.qos.logback.classic.Logger rootLogger =
-              (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-          ConsoleAppender<ILoggingEvent> ca = new ConsoleAppender<>();
-          ca.setContext(rootLogger.getLoggerContext());
-          ca.setName("console");
-          rootLogger.addAppender(ca);
-          rootLogger.setLevel(Level.ALL);
+        // Enable logging
+        ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        ConsoleAppender<ILoggingEvent> ca = new ConsoleAppender<>();
+        ca.setContext(rootLogger.getLoggerContext());
+        ca.setName("console");
+        rootLogger.addAppender(ca);
+        rootLogger.setLevel(Level.ALL);
         launchServerWithSocket(server, provider);
       }
     } catch (ExecutionException e) {
@@ -127,7 +125,7 @@ public class LangServerBootstrap {
   }
 
   boolean isPipeEnabled(@NonNull String[] args) {
-    return args.length > 0 && Arrays.asList(args).contains(PIPE_ARG);
+    return args.length > 0 && PIPE_ARG.equals(args[0]);
   }
 
   Launcher<CobolLanguageClient> createServerLauncher(
