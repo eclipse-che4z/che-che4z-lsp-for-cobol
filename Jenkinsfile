@@ -164,8 +164,8 @@ pipeline {
                     }
                     steps {
                         container('node') {
-                            dir('clients/cobol-lsp-vscode-extension') {
-                                sh 'sed -i "s/\\"version\\": \\"\\(.*\\)\\"/\\"version\\": \\"\\1+$buildIdentifier\\"/g" package.json'
+                            dir('clients') {
+                                sh 'sed -i "s/\\"version\\": \\"\\(.*\\)\\"/\\"version\\": \\"\\1+$buildIdentifier\\"/g" */package.json'
                             }
                         }
                     }
