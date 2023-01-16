@@ -29,7 +29,7 @@ export class MacosLanguageClient implements NativeLanguageClient {
 
     public getServer(): Executable {
         return {
-            args: ["pipeEnabled"],
+            args: ["pipeEnabled", "-Dline.separator=\r\n", "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"],
             command: this.command,
             options: { detached: false, cwd: this.executablePath },
         };
