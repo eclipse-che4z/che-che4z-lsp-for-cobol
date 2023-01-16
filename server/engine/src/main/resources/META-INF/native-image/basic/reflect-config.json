@@ -19,6 +19,15 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
+    "name":"ch.qos.logback.core.status.NopStatusListener",
+    "queryAllPublicMethods":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name": "NopStatusListener","parameterTypes":[]},
+      {"name": "addStatusEvent","parameterTypes":["ch.qos.logback.core.status.Status"]}
+    ]
+  },
+  {
     "name":"ch.qos.logback.classic.pattern.LineSeparatorConverter",
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
