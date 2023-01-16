@@ -20,6 +20,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.utils.LogLevelUtils;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
@@ -63,6 +64,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private final DisposableLSPStateService disposableLSPStateService;
   private final CopybookNameService copybookNameService;
   private final Keywords keywords;
+  private final MessageService messageService;
 
   @Inject
   public CobolWorkspaceServiceImpl(
@@ -75,7 +77,8 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
       ConfigurationService configurationService,
       DisposableLSPStateService disposableLSPStateService,
       CopybookNameService copybookNameService,
-      Keywords keywords) {
+      Keywords keywords,
+      MessageService messageService) {
     this.dataBus = dataBus;
     this.settingsService = settingsService;
     this.watchingService = watchingService;
@@ -86,6 +89,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     this.disposableLSPStateService = disposableLSPStateService;
     this.copybookNameService = copybookNameService;
     this.keywords = keywords;
+    this.messageService = messageService;
   }
 
   /**
@@ -124,6 +128,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
     if (!disposableLSPStateService.isServerShutdown()) {
+      messageService.reloadMessages();
       copybookNameService.copybookLocalFolders().thenAccept(this::acceptSettingsChange);
 
       settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());

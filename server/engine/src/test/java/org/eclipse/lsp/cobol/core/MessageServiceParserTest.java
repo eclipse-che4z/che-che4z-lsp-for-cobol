@@ -18,8 +18,10 @@ package org.eclipse.lsp.cobol.core;
 import org.antlr.v4.runtime.Parser;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,9 +44,11 @@ class MessageServiceParserTest {
     mockParser = mock(MessageServiceParser.class);
     doCallRealMethod().when((MessageServiceParser) mockParser).notifyError(anyString());
     LocaleStore localeMock = mock(LocaleStore.class);
+    SettingsService settingsService = mock(SettingsService.class);
+    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     when(localeMock.getApplicationLocale()).thenReturn(Locale.ENGLISH);
     MessageService messageService =
-        new PropertiesMessageService("resourceBundles/test", localeMock);
+        new PropertiesMessageService("resourceBundles/test", localeMock, settingsService, workingFolderService);
     CobolErrorStrategy errorStrategy = mock(CobolErrorStrategy.class);
     when(mockParser.getErrorHandler()).thenReturn(errorStrategy);
     when(errorStrategy.getMessageService()).thenReturn(messageService);
