@@ -16,11 +16,10 @@ import { Logger } from "vscode-languageserver-protocol";
 import * as cp from "child_process";
 import * as net from "net";
 import { StreamMessageReader, StreamMessageWriter } from "vscode-languageserver-protocol/node";
-import { Readable } from "stream";
 import * as os from "os";
 
 const serverExecutable = {
-    args: ["pipeEnabled"],
+    args: ["pipeEnabled","-Dline.separator=\r\n", "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"],
     command: "",
     options: { stdio: "pipe", detached: false, cwd: "" },
 };
@@ -70,7 +69,7 @@ export class ServerLaucher {
             logger.log(typeof data === "string" ? data : data.toString(utf8));
         });
         return Promise.resolve({
-            reader: this.getStreamReader(serverProcess.stdout!),
+            reader: new StreamMessageReader(serverProcess.stdout!),
             writer: new StreamMessageWriter(serverProcess.stdin!),
         });
     }
@@ -82,23 +81,5 @@ export class ServerLaucher {
             reader: new StreamMessageReader(socket),
             writer: new StreamMessageWriter(socket),
         });
-    }
-
-    private getStreamReader(readable: Readable) {
-        let streamMessageReader = new StreamMessageReader(readable);
-        const actualOnDataCall = (StreamMessageReader.prototype as any).onData.bind(
-            streamMessageReader
-        );
-        (StreamMessageReader.prototype as any).onData = function (
-            data: Uint8Array
-        ) {
-            if (/\d{2}:\d{2}:\d{2},\d{3}\s+\|-(INFO|ERROR|WARN|TRACE|DEBUG|FATAL)\s+in(?<class>[^\]]+)/.test(Buffer.from(data).toString(utf8))) {
-                console.log("** IGNORING: ", Buffer.from(data).toString(utf8))
-                return;
-            }
-            // console.log(Buffer.from(data).toString(utf8));
-            actualOnDataCall(data);
-        };
-        return streamMessageReader;
     }
 }
