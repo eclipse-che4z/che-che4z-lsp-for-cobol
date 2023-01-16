@@ -194,7 +194,6 @@ class WorkspaceServiceTest {
     verify(copybookService).invalidateCache();
     verify(subroutineService).invalidateCache();
     verify(localeStore).notifyLocaleStore();
-    verify(configurationService).updateConfigurationFromSettings();
 
     assertEquals(path, watcherCaptor.getValue().get(0));
 

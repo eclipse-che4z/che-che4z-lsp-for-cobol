@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
-import { C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID, SERVER_TYPE } from "./constants";
+import { LANGUAGE_ID, SERVER_TYPE } from "./constants";
 import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
@@ -25,7 +25,7 @@ import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { TelemetryService } from "./services/reporter/TelemetryService";
-import { createFileWithGivenPath, SettingsService } from "./services/Settings";
+import { configHandler, SettingsService } from "./services/Settings";
 import { pickSnippet, SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 import {
@@ -35,33 +35,23 @@ import {
 import { DialectRegistry } from "./services/DialectRegistry";
 
 let languageClientService: LanguageClientService;
+let outputChannel: vscode.OutputChannel;
 
 function initialize() {
     // We need lazy initialization to be able to mock this for unit testing
     const copyBooksDownloader = new CopybookDownloadService();
-    const outputChannel = vscode.window.createOutputChannel( "COBOL Language Support");
+    outputChannel = vscode.window.createOutputChannel( "COBOL Language Support");
     languageClientService = new LanguageClientService(outputChannel);
-    return {copyBooksDownloader, outputChannel};
+    return copyBooksDownloader;
 }
 
 export async function activate(context: vscode.ExtensionContext) {
     DialectRegistry.clear();
     
-    const { copyBooksDownloader, outputChannel} = initialize();
+    const copyBooksDownloader = initialize();
     initSmartTab(context);
 
-    TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.dialect.register", 
-        (name: string, path: string, description: string, extensionId: string, snippetPath: string) => { 
-            DialectRegistry.register(name, path, description, extensionId, snippetPath);
-    }));
-
-    TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.dialect.unregister", 
-        (name: string, extensionId: string) => { 
-            DialectRegistry.unregister(name);
-    }));
-    
+    TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");    
     copyBooksDownloader.start();
 
     // Commands
@@ -123,17 +113,36 @@ export async function activate(context: vscode.ExtensionContext) {
     languageClientService.addRequestHandler("cobol/resolveSubroutine", resolveSubroutineURI);
     languageClientService.addRequestHandler("copybook/resolve", resolveCopybookHandler);
     languageClientService.addRequestHandler("copybook/download", downloadCopybookHandler.bind(copyBooksDownloader));
+    languageClientService.addRequestHandler("workspace/configuration", configHandler);
 
     context.subscriptions.push(languageClientService.start());
 
     // 'export' public api-surface
-    return {
-        analysis(uri: string, text: string): Promise<any> {
-            return languageClientService.retrieveAnalysis(uri, text);
-        },
-    };
+    return openApi();
 }
 
 export function deactivate() {
     return Promise.resolve(languageClientService.stop());
+}
+
+function openApi() {
+    return {
+        analysis(uri: string, text: string): Promise<any> {
+            return languageClientService.retrieveAnalysis(uri, text);
+        },
+        //name: extensionId: string, string, path: string, description: string, snippetPath: string
+        async registerDialect(dialect) {
+            outputChannel.appendLine("Register new dialect: \r\n" + JSON.stringify(dialect));
+            const dialectExtension = vscode.extensions.getExtension(dialect.extensionId);
+            await dialectExtension.activate();
+
+            DialectRegistry.register(dialect.extensionId, dialect.name, dialect.path, dialect.description, dialect.snippetPath);
+            outputChannel.appendLine("Restart analysis");
+            await languageClientService.invalidateConfiguration();
+        },
+        async unregisterDialect(extensionId, dialectName) {
+            DialectRegistry.unregister(dialectName);
+            await languageClientService.invalidateConfiguration();
+        }
+    };
 }

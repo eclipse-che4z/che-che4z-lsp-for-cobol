@@ -18,6 +18,7 @@ import { join } from "path";
 import * as vscode from "vscode";
 
 import {
+    DidChangeConfigurationNotification,
     ErrorCodes,
     LanguageClient,
     LanguageClientOptions,
@@ -72,6 +73,12 @@ export class LanguageClientService {
         const languageClient = this.getLanguageClient();
         await languageClient.onReady();
         return languageClient.sendRequest("extended/analysis", { uri, text });
+    }
+
+    public async invalidateConfiguration() {
+        const languageClient = this.getLanguageClient();
+        await languageClient.onReady();
+        languageClient.sendNotification(DidChangeConfigurationNotification.type, { settings: null });
     }
 
     public start(): vscode.Disposable {

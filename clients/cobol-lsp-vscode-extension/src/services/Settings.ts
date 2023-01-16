@@ -17,7 +17,6 @@ import * as path from "path";
 import * as vscode from "vscode";
 import {
     COPYBOOK_EXTENSIONS,
-    DACO_DIALECT,
     PATHS_LOCAL_KEY,
     PATHS_USS,
     PATHS_ZOWE,
@@ -29,6 +28,7 @@ import {
     SETTINGS_TAB_CONFIG,
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
+import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
@@ -70,6 +70,24 @@ export class TabRule {
 
 export class TabSettings {
     public constructor(public rules: TabRule[], public defaultRule: TabRule) {}
+}
+
+export function configHandler(request : any): Array<any> {
+    const result = new Array<any>();
+    for (let item of request.items) {
+        try {
+            if (item.section === DIALECT_REGISTRY_SECTION) {
+                const object = DialectRegistry.getDialects();
+                result.push(object);
+            } else {
+                const object = vscode.workspace.getConfiguration().get(item.section)
+                result.push(object);
+                }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    return result;
 }
 
 /**

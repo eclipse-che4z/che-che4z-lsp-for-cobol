@@ -12,40 +12,30 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as vscode from "../../__mocks__/vscode";
 import { DialectRegistry } from "../../services/DialectRegistry";
 
 describe("DialectRegistry test", () => {
-    const config = {
-        get: function(path: string) {
-            return [{ name: "dialect", path: "path", description: "" }];
-        },
-        update: jest.fn().mockReturnValue("")
-    };
-
     beforeEach(() => {
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue(config);
+        DialectRegistry.clear();
     });
 
-    it("register new dialect in the registry", () => {
-        let spy = jest.spyOn(config, "update");
-
-        DialectRegistry.register("new", "path", "desc", "dialectId", "path");
-        expect(spy).toBeCalled();
-    });
-
-    it("unregister new dialect from the registry", () => {
-        let spy = jest.spyOn(config, "update");
+    it("register/unregister new dialect in the registry", () => {
+        DialectRegistry.register("dialectId", "new", "path", "desc", "path");
+        expect(DialectRegistry.getDialects().length).toBe(1);
 
         DialectRegistry.unregister("new");
-        expect(spy).toBeCalled();
+        expect(DialectRegistry.getDialects().length).toBe(0);
     });
 
     it("retrieve dialects from the registry", () => {
-        DialectRegistry.register("dialect", "path", "", "id", "path");
+        DialectRegistry.register("id", "dialect", "path", "desc", "snippetPath");
         const result = DialectRegistry.getDialects();
         
         expect(result.length).toBe(1);
         expect(result[0].name).toBe("dialect");
+        expect(result[0].description).toBe("desc");
+        expect(result[0].extensionId).toBe("id");
+        expect(result[0].path).toBe("path");
+        expect(result[0].snippetPath).toBe("snippetPath");
     });
 });

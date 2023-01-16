@@ -13,7 +13,8 @@
  */
 
 import * as vscode from "vscode";
-import { SETTINGS_DIALECT_REGISTRY } from "../constants";
+
+export const DIALECT_REGISTRY_SECTION: string = "cobol-lsp.dialect.registry";
 
 /**
  * Holds information about registered dialect
@@ -46,7 +47,6 @@ const dialectInfoes: Map<string, DialectInfo> = new Map();
      */
     public static clear() {
         dialectInfoes.clear();
-        vscode.workspace.getConfiguration().update(SETTINGS_DIALECT_REGISTRY, []);
     }
 
     /**
@@ -57,7 +57,7 @@ const dialectInfoes: Map<string, DialectInfo> = new Map();
      * @param extensionId is an extension id
      * @param snippets is a spippet map for a dialect
      */
-    public static register(name: string, path: string, description: string, extensionId: string, snippetPath: string) {
+    public static register(extensionId: string, name: string, path: string, description: string, snippetPath: string) {
         const dialectInfo: DialectInfo = {
             name: name,
             path: path,
@@ -66,7 +66,6 @@ const dialectInfoes: Map<string, DialectInfo> = new Map();
             snippetPath: snippetPath
         };
         dialectInfoes.set(dialectInfo.name, dialectInfo);
-        vscode.workspace.getConfiguration().update(SETTINGS_DIALECT_REGISTRY, Array.from(dialectInfoes.values()));
     }
 
     /**
@@ -75,7 +74,6 @@ const dialectInfoes: Map<string, DialectInfo> = new Map();
      */
     public static unregister(name: string) {
         dialectInfoes.delete(name);
-        vscode.workspace.getConfiguration().update(SETTINGS_DIALECT_REGISTRY, Array.from(dialectInfoes.values()));
     }
 
  }

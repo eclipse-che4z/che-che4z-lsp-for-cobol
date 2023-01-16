@@ -130,7 +130,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
       settingsService
           .fetchConfiguration(LOGGING_LEVEL.label)
           .thenAccept(LogLevelUtils.updateLogLevel());
-      configurationService.updateConfigurationFromSettings();
       copybookNameService.collectLocalCopybookNames();
       keywords.updateStorage();
     }

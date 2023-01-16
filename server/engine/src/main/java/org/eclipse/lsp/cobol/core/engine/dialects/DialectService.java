@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /** Dialect utility class */
@@ -152,15 +153,22 @@ public class DialectService {
   /**
    * Updates available dialect list based on dialect registry
    * @param dialectRegistry is a dialect registry items list
+   * @return true if list of dialects were changed or false otherwise
    */
-  public void updateDialects(List<DialectRegistryItem> dialectRegistry) {
+  public boolean updateDialects(List<DialectRegistryItem> dialectRegistry) {
+    AtomicBoolean changed = new AtomicBoolean(false);
     dialectRegistry.forEach(r ->
       dialectSuppliers.computeIfAbsent(r.getName(), name ->
           discoveryService.loadDialects(r.getPath(), copybookService, messageService).stream()
           .filter(d -> d.getName().equals(name))
           .findFirst()
+              .map(dialect -> {
+                changed.set(true);
+                return dialect;
+              })
           .orElse(null))
     );
+    return changed.get();
   }
 
   /**

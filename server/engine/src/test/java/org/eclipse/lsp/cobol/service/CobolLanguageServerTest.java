@@ -128,7 +128,6 @@ class CobolLanguageServerTest {
     verify(settingsService).fetchConfiguration("dialect");
     verify(watchingService, new Times(2)).addWatchers(singletonList("foo/bar"));
     verify(localeStore).notifyLocaleStore();
-    verify(configurationService).updateConfigurationFromSettings();
   }
 
   private void prepareSettingsService(SettingsService settingsService, LocaleStore localeStore) {

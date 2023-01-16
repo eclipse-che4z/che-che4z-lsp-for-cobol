@@ -4,19 +4,41 @@ import { join } from 'path';
 import * as vscode from 'vscode';
 
 const extensionId: string = "DaCo.daco-dialect-for-cobol";
+const mainExtension: string = "BroadcomMFD.cobol-language-support";
 
-export function activate(context: vscode.ExtensionContext) {
+let mainApi: any = undefined;
+
+export async function activate(context: vscode.ExtensionContext) {
 
 	const ext = vscode.extensions.getExtension(extensionId);
 	if (ext === undefined) {
 		throw new Error("Cannot find extension");
 	}
+
+    const main = vscode.extensions.getExtension(mainExtension);
+	if (main === undefined) {
+		throw new Error("Cannot find COBOL LS extension");
+	}
+
+    mainApi = await main.activate();	
+	if (mainApi === undefined) {
+		throw new Error("COBOL LS API is invalid");
+	}
+
 	const executablePath = join(ext.extensionPath, "server", "jar");
 	const snippetPath = join(ext.extensionPath, "snippets.json");
-	vscode.commands.executeCommand("cobol-lsp.dialect.register", "DaCo", executablePath, "DaCo dialect support", extensionId, snippetPath);
+	
+	mainApi.registerDialect({
+		extensionId: extensionId, 
+		name: "DaCo", 
+		path: executablePath, 
+		description: "DaCo dialect support", 
+		snippetPath: snippetPath
+	});
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() {
-	vscode.commands.executeCommand("cobol-lsp.dialect.unregister", "DaCo", extensionId);
+export async function deactivate() {
+	if (mainApi !== undefined) {
+		mainApi.unregister(extensionId, "DaCo");
+	}
 }
