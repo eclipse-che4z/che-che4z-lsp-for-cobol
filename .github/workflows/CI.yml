@@ -190,7 +190,7 @@ jobs:
           path: staging
       - name: configure server jar
         working-directory: clients/cobol-lsp-vscode-extension
-        run: "cp -R ../../staging/jar/* ./server/jar"
+        run: "cp -R ../../staging/jar/engine/target/server.jar ./server/jar"
       - name: coverage
         run: npm run coverage
         working-directory: clients/cobol-lsp-vscode-extension
@@ -213,9 +213,9 @@ jobs:
       - name: configure server jar
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
-          cp -R ../../staging/jar/server.jar ./server/jar
-          cp -R ../../staging/jar/dialect-idms.jar ./server/jar/dialects
-          cp -R ../../staging/jar/dialect-daco.jar ./server/jar/dialects
+          cp -R ../../staging/jar/engine/target/server.jar ./server/jar
+          cp -R ../../staging/jar/target/dialect-idms.jar ./server/jar/dialects
+          cp -R ../../staging/jar/target/dialect-daco.jar ./server/jar/dialects
       - name: configure windows executable
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
