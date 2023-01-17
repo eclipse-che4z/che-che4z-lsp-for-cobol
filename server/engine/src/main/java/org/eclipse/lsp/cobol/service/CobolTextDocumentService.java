@@ -26,9 +26,14 @@ import lombok.Generated;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
-import org.eclipse.lsp.cobol.common.copybook.*;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
@@ -46,12 +51,9 @@ import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
-import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
@@ -80,7 +82,7 @@ import org.eclipse.lsp4j.HoverParams;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.ReferenceParams;
-import org.eclipse.lsp4j.RelatedFullDocumentDiagnosticReport;
+import org.eclipse.lsp4j.RelatedUnchangedDocumentDiagnosticReport;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.TextEdit;
@@ -110,7 +112,6 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static java.lang.Thread.sleep;
 import static java.net.URLDecoder.decode;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
@@ -261,7 +262,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                   .map(t -> t.getAnalysisResult().getDiagnostics())
                   .orElse(emptyMap());
           return new DocumentDiagnosticReport(
-              getRelatedFullDocumentDiagnosticReport(uri, diagnosticsMap));
+              getRelatedUnchangedDocumentDiagnosticReport(uri, diagnosticsMap));
         };
 
     return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
@@ -269,10 +270,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("diagnostic ", uri)));
   }
 
-  private RelatedFullDocumentDiagnosticReport getRelatedFullDocumentDiagnosticReport(
+  private RelatedUnchangedDocumentDiagnosticReport getRelatedUnchangedDocumentDiagnosticReport(
       String uri, Map<String, List<Diagnostic>> diagnosticsMap) {
-    RelatedFullDocumentDiagnosticReport relatedFullDocumentDiagnosticReport =
-        new RelatedFullDocumentDiagnosticReport(diagnosticsMap.getOrDefault(uri, emptyList()));
     Map<String, Either<FullDocumentDiagnosticReport, UnchangedDocumentDiagnosticReport>>
         relatedDocDiagnostics =
             diagnosticsMap.entrySet().stream()
@@ -286,8 +285,9 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                                     forLeft(new FullDocumentDiagnosticReport(entry.getValue()))))
                 .flatMap(map -> map.entrySet().stream())
                 .collect(toMap(Entry::getKey, Entry::getValue));
-    relatedFullDocumentDiagnosticReport.setRelatedDocuments(relatedDocDiagnostics);
-    return relatedFullDocumentDiagnosticReport;
+    RelatedUnchangedDocumentDiagnosticReport relatedUnchangedDocumentDiagnosticReport = new RelatedUnchangedDocumentDiagnosticReport();
+    relatedUnchangedDocumentDiagnosticReport.setRelatedDocuments(relatedDocDiagnostics);
+    return relatedUnchangedDocumentDiagnosticReport;
   }
 
   @Generated // do not include in test coverage. Used only for tests
