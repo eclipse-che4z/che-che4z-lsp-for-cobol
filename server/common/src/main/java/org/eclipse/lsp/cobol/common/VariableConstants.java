@@ -47,4 +47,5 @@ public class VariableConstants {
   public static final String LEVELS_MUST_MATCH = "semantics.levelsMustMatch";
   public static final String REDEFINED_CONTAIN_VALUE = "semantics.redefinedContainValue";
   public static final String UNKNOWN_VARIABLE_DEFINITION = "semantics.unknownVariableDefinition";
+  public static final String PICTURE_NOT_ALLOWED = "semantic.picNotAllowed";
 }

@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
@@ -43,6 +44,7 @@ class CachingConfigurationServiceTest {
   @Test
   void testInitialLoading() {
     SettingsService settingsService = spy(SettingsService.class);
+    when(settingsService.fetchConfigurations(anyList())).thenReturn(CompletableFuture.completedFuture(null));
 
     DialectService dialectService = mock(DialectService.class);
     when(dialectService.getSettingsSections()).thenReturn(ImmutableList.of("dialect"));
@@ -96,7 +98,6 @@ class CachingConfigurationServiceTest {
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration = new CachingConfigurationService(settingsService, dialectService);
-    configuration.updateConfigurationFromSettings();
 
     assertEquals(
         new AnalysisConfig(
@@ -142,7 +143,6 @@ class CachingConfigurationServiceTest {
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration = new CachingConfigurationService(settingsService, dialectService);
-    configuration.updateConfigurationFromSettings();
 
     assertEquals(
         new AnalysisConfig(

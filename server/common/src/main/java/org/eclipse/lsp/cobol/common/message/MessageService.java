@@ -35,4 +35,7 @@ public interface MessageService {
    * @return localized string
    */
   String localizeTemplate(MessageTemplate template);
+
+  /** Reload and updates the messages for Cobol and its dialect. */
+  void reloadMessages();
 }

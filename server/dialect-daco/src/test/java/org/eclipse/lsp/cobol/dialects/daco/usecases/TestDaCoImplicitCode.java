@@ -76,7 +76,7 @@ class TestDaCoImplicitCode {
           + "        DATA DIVISION. \n"
           + "        WORKING-STORAGE SECTION. \n"
           + "       01  {$*AREA-XAA}.\n"
-          + "           03 {$*TBLNAM-XAA} PIC X(6).\n"
+          + "           03 {$*TBLNAM-XAA}.\n"
           + "             05 {$*RUSNAM-BAA} PIC X(6).\n"
           + "        PROCEDURE DIVISION. \n"
           + "               MOVE 6 to {$RUSNAM-BAA}.\n";

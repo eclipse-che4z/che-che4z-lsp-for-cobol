@@ -66,8 +66,7 @@ public class TestCopyIdmsVariablesForNotAllowedLevels {
 
   private static final String COPY2 =
       "       01  {$*VAR1}.                                                      \n"
-          + "            03  {$*VAR2}           PIC X(8)                                 \n"
-          + "                                       VALUE  SPACES .                          \n"
+          + "            03  {$*VAR2}.\n"
           + "             {48|1}  {$*VAR3}     PIC X(8)     VALUE  '0000' . ";
 
   @Test
@@ -115,7 +114,7 @@ public class TestCopyIdmsVariablesForNotAllowedLevels {
             new DiagnosticRelatedInformation(
                 new Location(
                     "file:///c:/workspace/document.cbl",
-                    new Range(new Position(9, 24), new Position(9, 29))),
+                    new Range(new Position(9, 11), new Position(9, 30))),
                 "Copy IDMS source")));
 
     AnalysisResult result =

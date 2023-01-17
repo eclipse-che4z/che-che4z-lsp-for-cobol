@@ -23,8 +23,6 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp4j.DiagnosticRelatedInformation;
 import org.eclipse.lsp4j.Range;
 
@@ -39,8 +37,9 @@ import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.WARNING;
  * Processor for the text adjustment in the copy IDMS statements.
  */
 @AllArgsConstructor
-public class CopyIdmsAdjustmentProcessor implements Processor<CopyNode> {
+public class CopyIdmsAdjustmentProcessor {
 
+  private final CopyNode copyNode;
   private final String uri;
   private final int copybookLevel;
   private final int firstLevel;
@@ -52,15 +51,12 @@ public class CopyIdmsAdjustmentProcessor implements Processor<CopyNode> {
   public static final String IDMS_DIALECT_MAX_ADJUSTMENT_EXCEED_MSG = "IdmsDialect.maxAdjustmentExceed";
 
   /**
-   * Performs this operation on the given arguments.
+   * Add adjustment warnings to existing error list.
    *
-   * @param copyNode the first input argument
-   * @param processingContext the second input argument
+   * @param errors Existing {@link SyntaxError} list
    */
-  @Override
-  public void accept(CopyNode copyNode, ProcessingContext processingContext) {
-    processingContext
-        .getErrors()
+  public void processError(List<SyntaxError> errors) {
+    errors
         .addAll(
             getWarningForNoAdjustment(
                 copybookLevel, firstLevel, variable, uri, copyNode.getLocality()));

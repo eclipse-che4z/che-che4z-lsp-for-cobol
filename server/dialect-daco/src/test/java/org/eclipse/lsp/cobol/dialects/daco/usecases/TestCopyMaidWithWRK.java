@@ -46,7 +46,7 @@ class TestCopyMaidWithWRK {
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-XW8} OF {$BHTTAB-XW7}.";
 
-  private static final String COPYBOOK_CONTENT =
+  private static final String COPYBOOK_CONTENT_PURE =
       "1           09 {$*BHTRGL-X`BHTRGL-XW8}.\n"
           + "2             11 {$*BHTRGLVLG-X`BHTRGLVLG-XW8}.\n"
           + "3               13 {$*FABLYN-X`FABLYN-XW8}.\n"
@@ -54,12 +54,30 @@ class TestCopyMaidWithWRK {
           + "5                 15 {$*LYNKOD-X`LYNKOD-XW8} PIC X(2).\n"
           + "6               13 {$*BHTORSKOD-X`BHTORSKOD-XW8} PIC X(2).";
 
+  private static final String COPYBOOK_CONTENT_PREPROCESSED =
+      "            09 {$*BHTRGL-X`BHTRGL-XW8}.\n"
+          + "              11 {$*BHTRGLVLG-X`BHTRGLVLG-XW8}.\n"
+          + "                13 {$*FABLYN-X`FABLYN-XW8}.\n"
+          + "                  15 {$*FABLYNPOSEEN-X`FABLYNPOSEEN-XW8} PIC X.\n"
+          + "                  15 {$*LYNKOD-X`LYNKOD-XW8} PIC X(2).\n"
+          + "                13 {$*BHTORSKOD-X`BHTORSKOD-XW8} PIC X(2).";
+
   @Test
-  void test() {
+  void testPreprocessedText() {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT_PREPROCESSED)),
         ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
   }
+
+  @Test
+  void testPureText() {
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(
+            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT_PURE)),
+        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+  }
+
 }
