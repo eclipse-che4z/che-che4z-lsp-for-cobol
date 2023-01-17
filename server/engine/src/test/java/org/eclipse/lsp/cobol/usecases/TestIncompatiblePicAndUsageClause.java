@@ -37,7 +37,7 @@ class TestIncompatiblePicAndUsageClause {
           + "            02  {$*Payroll-WEEK2|3}   PIC X COMP-3.\n"
           + "            02  {$*Payroll-WEEK3|4}   PIC X UTF-8 BLANK WHEN ZERO.\n"
           + "            02  {$*Payroll-GROSS-PAY}   COMP-2 BLANK WHEN ZERO.\n"
-          + "            02  {$*Payroll-HOURS}     PIC S999  OCCURS 1 TO 52 TIMES.\n"
+          + "            02  {$*Payroll-HOURS} OCCURS 1 TO 52 TIMES.\n"
           + "            05  {$*A} COMP-1.\n"
           + "                10 {$*B-1|5} PICTURE X(2).\n"
           + "                10 {$*B-2} PICTURE 9(4) COMP-5.";

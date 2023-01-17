@@ -84,7 +84,7 @@ public class TestDuplicatedDefinition {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*ROOT}.\n"
-          + "           02 {$*VARNAME} PIC X(2).\n"
+          + "           02 {$*VARNAME}.\n"
           + "             03 {$*CHILD} PIC X(2).\n"
           + "       66 {$*RENAME} RENAMES {$VARNAME} THRU {$CHILD} OF {$ROOT}.\n"
           + "       66 {$*RENAME} RENAMES {$CHILD} OF {$ROOT}.\n";
