@@ -30,6 +30,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.SearchPattern;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -81,9 +82,9 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   @NonNull
   @Override
-  public void applyReplacing(@NonNull DocumentMap documentMap, @NonNull List<Pair<String, String>> replacePatterns) {
-    for (Pair<String, String> replacePattern : replacePatterns) {
-      replace(documentMap, replacePattern);
+  public void applyReplacing(@NonNull DocumentMap documentMap, @NonNull ReplacePreProcessorListener.ReplaceData replaceData) {
+    for (Pair<String, String> replacePattern : replaceData.getReplacePatterns()) {
+      replace(documentMap, replacePattern, replaceData.getRange(documentMap.getUri()));
     }
   }
 
@@ -229,17 +230,20 @@ public class ReplacingServiceImpl implements ReplacingService {
     return trim.replace(", ", " ").replace("; ", " ");
   }
 
-  private void replace(@NonNull DocumentMap documentMap, @NonNull Pair<String, String> pattern) {
+  private void replace(@NonNull DocumentMap documentMap, @NonNull Pair<String, String> pattern, @NonNull Range scope) {
     if (StringUtils.isBlank(documentMap.extendedText())) {
       return;
     }
-    documentMap.commitTransformations();
     String text = documentMap.getText();
     try {
       Matcher matcher = Pattern.compile(pattern.getLeft()).matcher(text);
       while (matcher.find()) {
-        documentMap.replace(getRange(text, matcher), pattern.getRight());
+        Range range = getRange(text, matcher);
+        if (RangeUtils.isInside(range, scope)) {
+          documentMap.replace(range, pattern.getRight());
+        }
       }
+      documentMap.commitTransformations();
     } catch (IndexOutOfBoundsException e) {
       LOG.error(format(ERROR_REPLACING, text, pattern), e);
     }

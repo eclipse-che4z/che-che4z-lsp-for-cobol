@@ -49,7 +49,7 @@ class CopybookAnalysis extends AbstractInjectCodeAnalysis {
   protected void handleReplacing(
           CopybookMetaData metaData, CopybookHierarchy hierarchy, DocumentMap copybookMap, List<SyntaxError> errors) {
     // In a chain of copy statement, there could be only one replacing phrase
-    hierarchy.prepareCopybookReplacement();
+    hierarchy.prepareCopybookReplacement(copybookMap.getUri());
     if (hierarchy.containsRecursiveReplacement())
       errors.add(
           addCopybookError(

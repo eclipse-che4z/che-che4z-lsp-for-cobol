@@ -44,6 +44,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
+import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -262,7 +263,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private Consumer<Pair<String, String>> consumeReplacePattern(ReplacePseudoTextContext ctx) {
     return ctx.getParent() instanceof ReplaceClauseContext
         ? hierarchy::addCopyReplacing
-        : hierarchy::addTextReplacing;
+        : pattern -> hierarchy.addTextReplacing(pattern, documentMap.getUri(), new Range());
   }
 
   @Override

@@ -18,23 +18,21 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.BufferedTokenStream;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.antlr.v4.runtime.Token;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
-import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
 
@@ -44,94 +42,120 @@ import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
  * in order to replace all the subsequent statements.
  */
 @Slf4j
-public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
-    implements GrammarPreprocessorListener<String> {
+public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
   private final List<SyntaxError> errors = new ArrayList<>();
   private final ReplacingService replacingService;
-  private final String documentUri;
-  private final BufferedTokenStream tokens;
+  private final DocumentMap documentMap;
   private final CopybookHierarchy hierarchy;
-  Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
 
+  private ReplaceData currentTextReplaceData;
   @Inject
   public ReplacePreProcessorListener(
-      @Assisted String documentUri,
-      @Assisted BufferedTokenStream tokens,
+      @Assisted DocumentMap documentMap,
       @Assisted CopybookHierarchy hierarchy,
       ReplacingService replacingService) {
     this.replacingService = replacingService;
-    this.tokens = tokens;
-    this.documentUri = documentUri;
+    this.documentMap = documentMap;
     this.hierarchy = hierarchy;
-    textAccumulator.push(new StringBuilder());
   }
 
-  @Override
-  public Deque<StringBuilder> getTextAccumulator() {
-    return textAccumulator;
-  }
-
-  @Override
-  public ResultWithErrors<String> getResult() {
+  /**
+   * Apply pending replacing
+   */
+  public void applyReplacing() {
     if (hierarchy.requiresReplacing()) {
       replace();
     }
-    return new ResultWithErrors<>(accumulate(), errors);
+  }
+
+  public List<SyntaxError> getErrors() {
+    return errors;
   }
 
   @Override
   public void enterReplaceAreaStart(@NonNull ReplaceAreaStartContext ctx) {
-    if (hierarchy.requiresReplacing()) {
-      replace();
-    }
-    push();
-  }
-
-  @Override
-  public void enterReplacePseudoText(ReplacePseudoTextContext ctx) {
-    push();
+    restartReplace(ctx.getStart());
+    applyReplacing();
+    currentTextReplaceData = new ReplaceData(new ArrayList<>(), documentMap.getUri(), new Range());
   }
 
   @Override
   public void exitReplacePseudoText(ReplacePseudoTextContext ctx) {
     if ((ctx.getParent() instanceof ReplaceAreaStartContext)) {
+      currentTextReplaceData.getRange(documentMap.getUri()).setStart(new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine()));
       replacingService
-          .retrievePseudoTextReplacingPattern(read(), retrieveLocality(ctx))
-          .processIfNoErrorsFound(hierarchy::addTextReplacing, errors::addAll);
-      push();
-    } else {
-      write(pop());
+          .retrievePseudoTextReplacingPattern(createClause(ctx), retrieveLocality(ctx))
+          .processIfNoErrorsFound(pattern -> currentTextReplaceData.getReplacePatterns().add(pattern), errors::addAll);
     }
   }
 
   @Override
   public void enterReplaceOffStatement(ReplaceOffStatementContext ctx) {
-    push();
-  }
-
-  @Override
-  public void exitReplaceOffStatement(ReplaceOffStatementContext ctx) {
-    String replaceOffStmt = pop();
-    DocumentMap doc = new DocumentMap(TextTransformations.of(pop(), documentUri));
-    hierarchy.replaceText(doc, replacingService::applyReplacing);
-    write(doc.extendedText() + replaceOffStmt);
+    restartReplace(ctx.getStart());
   }
 
   private void replace() {
-    String replaceOffStmt = pop();
-    DocumentMap doc = new DocumentMap(TextTransformations.of(replaceOffStmt, documentUri));
-
-    hierarchy.replaceText(doc, replacingService::applyReplacing);
-    if (getTextAccumulator().isEmpty()) push();
-    write(doc.extendedText());
-  }
-
-  @Override
-  public void visitTerminal(TerminalNode node) {
-    TokenUtils.writeHiddenTokens(tokens, this::write).accept(node);
+    hierarchy.replaceText(documentMap, replacingService::applyReplacing);
   }
 
   private Locality retrieveLocality(ReplacePseudoTextContext ctx) {
-    return LocalityUtils.buildLocality(ctx, documentUri, null);
+    return LocalityUtils.buildLocality(ctx, documentMap.getUri(), null);
+  }
+
+  @Override
+  public void exitStartRule(StartRuleContext ctx) {
+    if (currentTextReplaceData != null) {
+      currentTextReplaceData.getReplacePatterns().forEach(p ->
+              hierarchy.addTextReplacing(p, documentMap.getUri(), currentTextReplaceData.getRange(documentMap.getUri())));
+      currentTextReplaceData = null;
+    }
+    if (hierarchy.getLastTextReplacing() != null) {
+      Range range = hierarchy.getLastTextReplacing().getRange(documentMap.getUri());
+      range.setEnd(new Position(ctx.getStop().getLine(), ctx.getStop().getCharPositionInLine()));
+    }
+    applyReplacing();
+  }
+
+  private void restartReplace(Token start) {
+    if (currentTextReplaceData != null) {
+      currentTextReplaceData.getReplacePatterns().forEach(p ->
+              hierarchy.addTextReplacing(p, documentMap.getUri(), currentTextReplaceData.getRange(documentMap.getUri())));
+      currentTextReplaceData = null;
+    }
+    if (hierarchy.getLastTextReplacing() != null) {
+      Range range = hierarchy.getLastTextReplacing().getRange(documentMap.getUri());
+      range.setEnd(new Position(start.getLine(), start.getCharPositionInLine()));
+    }
+  }
+  private static String createClause(ReplacePseudoTextContext ctx) {
+    String[] children = new String[ctx.getChildCount()];
+    for (int i = 0; i < ctx.getChildCount(); i++) {
+      children[i] = ctx.getChild(i).getText();
+    }
+    return String.join(" ", children);
+  }
+
+  /**
+   * Replacement data storage
+   */
+  @Value
+  @RequiredArgsConstructor
+  public static class ReplaceData {
+    List<Pair<String, String>> replacePatterns = new ArrayList<>();
+    Map<String, Range> ranges = new HashMap<>();
+
+    public ReplaceData(List<Pair<String, String>> replacePatterns, String url, Range range) {
+      this.replacePatterns.addAll(replacePatterns);
+      this.ranges.put(url, range);
+    }
+
+    /**
+     * Get range in specific document by URI
+     * @param url a document URI
+     * @return the replacement range
+     */
+    public Range getRange(String url) {
+      return ranges.computeIfAbsent(url, u -> new Range());
+    }
   }
 }

@@ -19,6 +19,7 @@ import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import java.util.Optional;
 
@@ -74,6 +75,23 @@ public class RangeUtils {
    */
   public boolean isBefore(Position after, Position before) {
     return compareTo(after, before) < 0;
+  }
+
+
+  /**
+   * Check if a range is in a scope
+   * @param range range that should be in scope
+   * @param scope a scope
+   * @return is range in scope
+   */
+  public boolean isInside(Range range, Range scope) {
+    if (scope.getStart() != null && compareTo(range.getStart(), scope.getStart()) < 0) {
+      return false;
+    }
+    if (scope.getEnd() != null && compareTo(range.getEnd(), scope.getEnd()) > 0) {
+      return false;
+    }
+    return true;
   }
 
   /**

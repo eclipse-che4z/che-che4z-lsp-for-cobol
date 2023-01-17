@@ -96,13 +96,13 @@ class GrammarPreprocessorImplTest {
     when(listenerFactory.create(
             any(DocumentMap.class), any(BufferedTokenStream.class), eq(cpyConfig), eq(hierarchy)))
         .thenReturn(listener);
-    when(replacingFactory.create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(hierarchy)))
+    when(replacingFactory.create(any(DocumentMap.class), eq(hierarchy)))
         .thenReturn(replaceListener);
     when(listener.getResult()).thenReturn(new ResultWithErrors<>(expectedDocument, errors));
-    when(replaceListener.getResult()).thenReturn(new ResultWithErrors<>(RESULT, errors));
+    when(replaceListener.getErrors()).thenReturn(errors);
 
     GrammarPreprocessor preprocessor =
-        new GrammarPreprocessorImpl(listenerFactory, replacingFactory);
+        new GrammarPreprocessorImpl(listenerFactory, replacingFactory, mock(ReplacingServiceImpl.class));
 
     ResultWithErrors<OldExtendedDocument> extendedDocument =
         preprocessor.buildExtendedDocument(new DocumentMap(TextTransformations.of(TEXT, DOCUMENT)),
@@ -110,7 +110,7 @@ class GrammarPreprocessorImplTest {
 
     verify(listenerFactory)
         .create(any(DocumentMap.class), any(BufferedTokenStream.class), eq(cpyConfig), eq(hierarchy));
-    verify(replacingFactory).create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(hierarchy));
+    verify(replacingFactory).create(any(DocumentMap.class), eq(hierarchy));
     assertEquals(RESULT, extendedDocument.getResult().getText());
     assertEquals(copybooks, extendedDocument.getResult().getCopybooks());
     assertEquals(mainMapping, expectedDocument.getDocumentMapping().get(DOCUMENT));

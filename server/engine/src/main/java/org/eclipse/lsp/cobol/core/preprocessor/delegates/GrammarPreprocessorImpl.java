@@ -30,9 +30,7 @@ import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListener;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacePreprocessorFactory;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,13 +43,15 @@ import java.util.List;
 public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   private final GrammarPreprocessorListenerFactory listenerFactory;
   private final ReplacePreprocessorFactory replacingFactory;
+  private final ReplacingService replacingService;
 
   @Inject
   public GrammarPreprocessorImpl(
-      GrammarPreprocessorListenerFactory listenerFactory,
-      ReplacePreprocessorFactory replacingFactory) {
+          GrammarPreprocessorListenerFactory listenerFactory,
+          ReplacePreprocessorFactory replacingFactory, ReplacingService replacingService) {
     this.listenerFactory = listenerFactory;
     this.replacingFactory = replacingFactory;
+    this.replacingService = replacingService;
   }
 
   @NonNull
@@ -68,18 +68,15 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
         .accumulateErrors(errors);
   }
 
-  private ResultWithErrors<String> replace(
-          DocumentMap documentMap, CopybookHierarchy hierarchy) {
+  private ResultWithErrors<String> replace(DocumentMap documentMap, CopybookHierarchy hierarchy) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    BufferedTokenStream tokens = makeTokens(documentMap.extendedText());
-    GrammarPreprocessorListener<String> listener = replacingFactory
-            .create(documentMap.getUri(), tokens, hierarchy);
+    CobolPreprocessor preprocessorParser = new CobolPreprocessor(makeTokens(documentMap.extendedText()));
+    preprocessorParser.removeErrorListeners();
 
-    CobolPreprocessor parser = new CobolPreprocessor(tokens);
-    parser.removeErrorListeners();
-
-    new ParseTreeWalker().walk(listener, parser.startRule());
-    return listener.getResult();
+    ReplacePreProcessorListener listener = replacingFactory.create(documentMap, hierarchy);
+    new ParseTreeWalker().walk(listener, preprocessorParser.startRule());
+    listener.applyReplacing();
+    return new ResultWithErrors<>(documentMap.extendedText(), listener.getErrors());
   }
 
   private ResultWithErrors<OldExtendedDocument> createOldExtendedDocument(
