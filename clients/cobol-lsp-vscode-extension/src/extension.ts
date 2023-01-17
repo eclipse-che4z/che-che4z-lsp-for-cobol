@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
-import { LANGUAGE_ID, SERVER_TYPE } from "./constants";
+import { LANGUAGE_ID } from "./constants";
 import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
@@ -33,6 +33,7 @@ import {
     resolveCopybookHandler
 } from "./services/copybook/CopybookMessageHandler";
 import { DialectRegistry } from "./services/DialectRegistry";
+import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 
 let languageClientService: LanguageClientService;
 let outputChannel: vscode.OutputChannel;
@@ -47,11 +48,11 @@ function initialize() {
 
 export async function activate(context: vscode.ExtensionContext) {
     DialectRegistry.clear();
-    
+
     const copyBooksDownloader = initialize();
     initSmartTab(context);
 
-    TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");    
+    TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
     copyBooksDownloader.start();
 
     // Commands
@@ -83,22 +84,11 @@ export async function activate(context: vscode.ExtensionContext) {
             { scheme: "file", language: LANGUAGE_ID },
             new SnippetCompletionProvider()));
 
-    vscode.workspace.onDidChangeConfiguration(async event => {
-        if (event.affectsConfiguration(SERVER_TYPE)) {
-            const selection = await vscode.window.showInformationMessage("Restart the vscode to enforce native build settings change", "Ok", "Later");
-            if (typeof selection === "undefined" || selection === "Later") {
-                return;
-            }
-            if (selection === "Ok") {
-                TelemetryService.registerEvent("Native Build enabled", ["COBOL", "native build enabled", "settings"],
-                    "Native build enabled by user");
-                await vscode.commands.executeCommand("workbench.action.reloadWindow");
-            }
-        }
-    });
+    await ConfigurationWatcher.validateDialectAndServerTypeCompatibility();
+    ConfigurationWatcher.watchConfigurationChanges();
 
     try {
-        if (SettingsService.serverType() === "NATIVE") {
+        if (SettingsService.isNativeServerTypeConfigured()) {
             languageClientService.enableNativeBuild();
         } else {
             await languageClientService.checkPrerequisites();

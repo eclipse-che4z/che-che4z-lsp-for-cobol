@@ -38,7 +38,11 @@ export class LanguageClientService {
     private dialectsPath: string;
     private languageClient: LanguageClient;
     private handlers: Array<(languageClient: LanguageClient) => void> = [];
-    private isNativeBuildEnabled: boolean = false;
+    private _isNativeBuildEnabled: boolean = false;
+    public get isNativeBuildEnabled(): boolean {
+        return this._isNativeBuildEnabled;
+    }
+
     private executableService: NativeExecutableService;
 
     constructor(private outputChannel: vscode.OutputChannel) {
@@ -49,7 +53,7 @@ export class LanguageClientService {
     }
 
     public enableNativeBuild() {
-        this.isNativeBuildEnabled = true;
+        this._isNativeBuildEnabled = true;
         TelemetryService.registerEvent("Native Build enabled", ["COBOL", "native build enabled", "settings"],
             "Native build enabled");
     }

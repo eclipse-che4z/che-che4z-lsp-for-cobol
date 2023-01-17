@@ -123,7 +123,7 @@ describe("SettingsService evaluate variables", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: tracking,
         });
-        SettingsService.serverType();
+        SettingsService.isNativeServerTypeConfigured();
         expect(tracking).toBeCalledWith("cobol-lsp.serverType");
     });
 });

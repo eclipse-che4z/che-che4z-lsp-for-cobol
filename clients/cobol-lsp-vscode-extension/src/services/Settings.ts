@@ -242,8 +242,8 @@ export class SettingsService {
     *
     * @returns is native build enabled
     */
-    public static serverType(): string {
-        return vscode.workspace.getConfiguration().get(SERVER_TYPE);
+    public static isNativeServerTypeConfigured() {
+        return vscode.workspace.getConfiguration().get(SERVER_TYPE) === "NATIVE";
     }
 
 }
