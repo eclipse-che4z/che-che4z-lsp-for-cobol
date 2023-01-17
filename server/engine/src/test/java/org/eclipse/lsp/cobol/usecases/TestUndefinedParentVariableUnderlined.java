@@ -41,7 +41,7 @@ class TestUndefinedParentVariableUnderlined {
           + "2       DATA DIVISION.\r\n"
           + "3       WORKING-STORAGE SECTION.\r\n"
           + "4       01   {$*BORROWER}.\r\n"
-          + "5          05 {$*AGE}                   PIC 9(3).\r\n"
+          + "5          05 {$*AGE}.\r\n"
           + "6              10 {$*MAMA} PIC 99 VALUE 3.\r\n"
           + "7       PROCEDURE DIVISION.\r\n"
           + "8       {#*PROCB}.\r\n"

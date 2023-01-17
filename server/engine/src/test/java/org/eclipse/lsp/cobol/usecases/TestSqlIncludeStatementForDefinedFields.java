@@ -64,7 +64,7 @@ class TestSqlIncludeStatementForDefinedFields {
   private static final String STRUCT2 =
       "       01  {$*SQLDA}.\n"
           + "            05 {$*SQLN}      PIC S9(4) BINARY.\n"
-          + "            05 {$*SQLD}      PIC S9(4) BINARY.\n"
+          + "            05 {$*SQLD} BINARY.\n"
           + "                10 {$*SQLVAR1}.\n"
           + "                   15 {$*SQLLEN}   PIC S9(4) BINARY.\n"
           + "                   15 {$*SQLTYPE}  PIC S9(4) BINARY.\n"

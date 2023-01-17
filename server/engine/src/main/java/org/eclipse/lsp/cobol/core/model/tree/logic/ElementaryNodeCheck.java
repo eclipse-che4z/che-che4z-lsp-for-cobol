@@ -14,19 +14,26 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.common.VariableConstants;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryNode;
 import org.eclipse.lsp.cobol.common.utils.UsageFormatUtils;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+
+import static org.eclipse.lsp.cobol.common.VariableConstants.PICTURE_NOT_ALLOWED;
 
 /** Validate proper use of PIC and USAGE clause for elementary nodes */
 public class ElementaryNodeCheck implements Processor<ElementaryNode> {
@@ -40,6 +47,7 @@ public class ElementaryNodeCheck implements Processor<ElementaryNode> {
   public void accept(ElementaryNode node, ProcessingContext ctx) {
     ctx.getErrors().addAll(validatePicClauseUsage(node));
     ctx.getErrors().addAll(validateCompatibleUsageClause(node));
+    ctx.getErrors().addAll(validatePictureClauseAllowed(node));
   }
 
   private List<SyntaxError> validatePicClauseUsage(ElementaryNode node) {
@@ -56,6 +64,39 @@ public class ElementaryNodeCheck implements Processor<ElementaryNode> {
     return UsageFormatUtils.picAndUsageClauseValidator
         .getOrDefault(node.getEffectiveDataType(), n -> ImmutableList.of())
         .apply(node);
+  }
+
+  private List<SyntaxError> validatePictureClauseAllowed(ElementaryNode node) {
+    List<SyntaxError> result = new LinkedList<>();
+    if (!Strings.isNullOrEmpty(node.getPicClause()) && hasChildrenVariables(node)) {
+      result.add(node.getError(MessageTemplate.of(PICTURE_NOT_ALLOWED, node.getName())));
+    }
+    return result;
+  }
+
+  private boolean hasChildrenVariables(ElementaryNode node) {
+    if (!(node.getParent() instanceof GroupItemNode)) {
+      return false;
+    }
+
+    GroupItemNode parent = (GroupItemNode) node.getParent();
+    int nodeIndex = parent.getChildren().indexOf(node);
+    int level = node.getLevel();
+    nodeIndex++;
+
+    if (nodeIndex < parent.getChildren().size()) {
+      Node nextNode = parent.getChildren().get(nodeIndex);
+      if (nextNode.getNodeType() == NodeType.VARIABLE && nextNode instanceof VariableWithLevelNode) {
+        int nextVariableLevel = VariableWithLevelNode.class.cast(nextNode).getLevel();
+        if (nextVariableLevel != VariableConstants.LEVEL_66
+            && nextVariableLevel != VariableConstants.LEVEL_77
+            && nextVariableLevel != VariableConstants.LEVEL_88
+            && level < nextVariableLevel) {
+          return !Strings.isNullOrEmpty(node.getPicClause());
+        }
+      }
+    }
+    return false;
   }
 
   private MessageTemplate getInCompatibleClause(ElementaryNode node) {

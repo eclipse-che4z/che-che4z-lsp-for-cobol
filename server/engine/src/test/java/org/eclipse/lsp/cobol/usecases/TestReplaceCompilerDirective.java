@@ -117,13 +117,13 @@ class TestReplaceCompilerDirective {
           + " \n";
 
   private static final String REPL =
-      "       05 {$*:ABC:-ID^XYZ-ID} PIC 9.\n" + "       COPY {~CPYNAME^STRUCT1}.";
+      "       05 {$*:ABC:-ID^XYZ-ID}.\n" + "       COPY {~CPYNAME^STRUCT1}.";
   private static final String REPL_NAME = "REPL";
 
   private static final String REPL2 =
       "       05 {$*:ABC:-ID^XYZ-ID} PIC 9.\n"
           + "       REPLACE ==:ABC:== BY ==ACC==.\n"
-          + "       05 {$*:ABC:-ID^ACC-ID} PIC 9.\n"
+          + "       05 {$*:ABC:-ID^ACC-ID}.\n"
           + "       REPLACE OFF.\n"
           + "       COPY {~CPYNAME^STRUCT1}.";
 

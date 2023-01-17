@@ -267,7 +267,9 @@ public class DaCoMaidProcessor {
     if (copybookModel.getContent() == null) {
       return ImmutableList.of();
     }
-    VariableLexer lexer = new VariableLexer(CharStreams.fromString(copybookModel.getContent()));
+    String text = DaCoPreprocessor.run(copybookModel.getContent());
+
+    VariableLexer lexer = new VariableLexer(CharStreams.fromString(text));
     lexer.removeErrorListeners();
     ParserListener listener = new ParserListener();
     lexer.addErrorListener(listener);

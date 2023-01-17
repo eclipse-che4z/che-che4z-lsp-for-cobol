@@ -63,7 +63,7 @@
                 05  SQLCA-WRN-AREA.
                     10  SQLCA-WARNING  PIC X OCCURS 8 TIMES.
                 
-                05  SQLWARN REDEFINES  SQLCA-WRN-AREA PIC X.
+                05  SQLWARN REDEFINES  SQLCA-WRN-AREA.
                     10  SQLWARN0             PIC X.
                     10  SQLWARN1             PIC X.
                     10  SQLWARN2             PIC X.

@@ -53,7 +53,6 @@ class TestCopyMaidWithKmkRequestsCorrectFile {
           + "4                 15 {$*FABLYNPOSEEN-XB4`FABLYNPOSEEN-XW8} PIC X.\n"
           + "5                 15 {$*LYNKOD-XB4`LYNKOD-XW8} PIC X(2).\n"
           + "6               13 {$*BHTORSKOD-XB4`BHTORSKOD-XW8} PIC X(2).";
-
   @Test
   void test() {
     UseCaseEngine.runTest(
