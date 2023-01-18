@@ -24,8 +24,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
-import java.util.function.Consumer;
-
 /**
  * This implementation of the {@link AbstractInjectCodeAnalysis} resolves the DFHEIBLC and SPECIALREGISTERS copybook
  * under the LINKAGE and WORKING_STORAGE SECTION respectively.
@@ -41,17 +39,19 @@ class InjectCodeImplicitAnalysis extends AbstractInjectCodeAnalysis {
   }
 
   @Override
-  protected Consumer<CopybooksRepository> storeCopyStatementSemantics(CopybookMetaData metaData, OldExtendedDocument copybookDocument) {
-    return it -> {};
+  protected void storeCopyStatementSemantics(CopybookMetaData metaData,
+                                             OldExtendedDocument copybookDocument,
+                                             CopybooksRepository copybooksRepository) {
+    // no-op
   }
 
   @Override
-  protected Consumer<PreprocessorStack> beforeWriting() {
-    return it -> {};
+  protected void beforeWriting(PreprocessorStack stack) {
+    // no-op
   }
 
   @Override
-  protected Consumer<PreprocessorStack> afterWriting(ParserRuleContext context) {
-    return it -> {};
+  protected void afterWriting(ParserRuleContext context, PreprocessorStack stack) {
+    // no-op
   }
 }

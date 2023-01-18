@@ -15,15 +15,14 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 
-import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
@@ -47,11 +46,10 @@ class CopybookAnalysis extends AbstractInjectCodeAnalysis {
   }
 
   @Override
-  protected ResultWithErrors<String> handleReplacing(
-      CopybookMetaData metaData, CopybookHierarchy hierarchy, String text) {
+  protected void handleReplacing(
+          CopybookMetaData metaData, CopybookHierarchy hierarchy, DocumentMap copybookMap, List<SyntaxError> errors) {
     // In a chain of copy statement, there could be only one replacing phrase
-    List<SyntaxError> errors = new ArrayList<>();
-    hierarchy.prepareCopybookReplacement();
+    hierarchy.prepareCopybookReplacement(copybookMap.getUri());
     if (hierarchy.containsRecursiveReplacement())
       errors.add(
           addCopybookError(
@@ -61,7 +59,6 @@ class CopybookAnalysis extends AbstractInjectCodeAnalysis {
               "GrammarPreprocessorListener.copyBkNestedReplaceStmt",
               "Syntax error by handleReplacing: {}"));
 
-    return new ResultWithErrors<>(
-        hierarchy.replaceCopybook(text, replacingService::applyReplacing), errors);
+    hierarchy.replaceCopybook(copybookMap, replacingService::applyReplacing, errors);
   }
 }

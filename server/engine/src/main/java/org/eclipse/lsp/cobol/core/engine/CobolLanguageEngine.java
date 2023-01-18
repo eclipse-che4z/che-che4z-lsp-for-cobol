@@ -239,7 +239,7 @@ public class CobolLanguageEngine {
     List<SyntaxError> preprocessorErrors = new ArrayList<>();
     ExtendedSource extendedSource = ctx.getExtendedSource();
     OldExtendedDocument oldExtendedDocument =
-            grammarPreprocessor.buildExtendedDocument(extendedSource,
+            grammarPreprocessor.buildExtendedDocument(extendedSource.getMainMap(),
                             ctx.getConfig().getCopybookConfig(), new CopybookHierarchy())
                     .unwrap(preprocessorErrors::addAll);
     preprocessorErrors.forEach(e -> e.getLocation().getLocation().setRange(extendedSource

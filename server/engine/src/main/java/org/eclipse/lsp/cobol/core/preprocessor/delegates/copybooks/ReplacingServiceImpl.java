@@ -27,9 +27,13 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.SearchPattern;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,9 +82,10 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   @NonNull
   @Override
-  public String applyReplacing(
-      @NonNull String text, @NonNull List<Pair<String, String>> replacePatterns) {
-    return replacePatterns.stream().reduce(text, this::replace, (str1, str2) -> str2);
+  public void applyReplacing(@NonNull DocumentMap documentMap, @NonNull ReplacePreProcessorListener.ReplaceData replaceData) {
+    for (Pair<String, String> replacePattern : replaceData.getReplacePatterns()) {
+      replace(documentMap, replacePattern, replaceData.getRange(documentMap.getUri()));
+    }
   }
 
   @NonNull
@@ -225,16 +230,36 @@ public class ReplacingServiceImpl implements ReplacingService {
     return trim.replace(", ", " ").replace("; ", " ");
   }
 
-  @NonNull
-  private String replace(@NonNull String text, @NonNull Pair<String, String> pattern) {
-    if (StringUtils.isBlank(text)) return text;
-    String result = text;
+  private void replace(@NonNull DocumentMap documentMap, @NonNull Pair<String, String> pattern, @NonNull Range scope) {
+    if (StringUtils.isBlank(documentMap.extendedText())) {
+      return;
+    }
+    String text = documentMap.getText();
     try {
-      result = Pattern.compile(pattern.getLeft()).matcher(text).replaceAll(pattern.getRight());
+      Matcher matcher = Pattern.compile(pattern.getLeft()).matcher(text);
+      while (matcher.find()) {
+        Range range = getRange(text, matcher);
+        if (RangeUtils.isInside(range, scope)) {
+          documentMap.replace(range, pattern.getRight());
+        }
+      }
+      documentMap.commitTransformations();
     } catch (IndexOutOfBoundsException e) {
       LOG.error(format(ERROR_REPLACING, text, pattern), e);
     }
-    return result;
+  }
+
+  private Range getRange(String text, Matcher matcher) {
+    Position start = getPosition(text, matcher.start());
+    Position end = getPosition(text, matcher.end());
+    return new Range(start, end);
+  }
+
+  private Position getPosition(String text, int positionInFile) {
+    String prefix = text.substring(0, positionInFile);
+    int character = positionInFile - prefix.lastIndexOf("\n") - 1;
+    int line = StringUtils.countMatches(prefix, "\n");
+    return new Position(line, character);
   }
 
   private Function<String, Boolean> checkContainWord(String check) {

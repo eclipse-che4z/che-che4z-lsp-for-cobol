@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
@@ -43,6 +44,7 @@ public interface InjectCodeAnalysis {
    * @param stack processing stack
    * @param copybooksRepository a copybook repository
    * @param nestedMappings mapping data
+   * @param documentMap current document map
    * @param errors a collection to accumulate errors
    */
    void injectCode(CopybookContentProvider copybookContentProvider,
@@ -55,5 +57,6 @@ public interface InjectCodeAnalysis {
                          PreprocessorStack stack,
                          CopybooksRepository copybooksRepository,
                          Map<String, DocumentMapping> nestedMappings,
+                         DocumentMap documentMap,
                          List<SyntaxError> errors);
 }

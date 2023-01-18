@@ -19,12 +19,16 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacePreProcessorListener.ReplaceData;
+import org.eclipse.lsp4j.Range;
 
 import java.util.*;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
@@ -35,9 +39,9 @@ import static java.util.stream.Collectors.toList;
  */
 public class CopybookHierarchy {
   private final List<Pair<String, String>> copyReplacingClauses = new ArrayList<>();
-  private final List<Pair<String, String>> textReplacingClauses = new ArrayList<>();
+  private final Deque<ReplaceData> textReplacing = new ArrayDeque<>();
   private final Deque<CopybookUsage> copybookStack = new ArrayDeque<>();
-  private final Deque<List<Pair<String, String>>> recursiveReplaceStmtStack = new ArrayDeque<>();
+  private final Deque<ReplaceData> recursiveReplaceStmtStack = new ArrayDeque<>();
 
   @Setter @Getter private CopyStatementModifier modifier = null;
 
@@ -47,7 +51,7 @@ public class CopybookHierarchy {
    * @return true if there are not applied replacing patterns
    */
   public boolean requiresReplacing() {
-    return !textReplacingClauses.isEmpty();
+    return !textReplacing.isEmpty() && !textReplacing.peek().getReplacePatterns().isEmpty();
   }
 
   /**
@@ -93,9 +97,18 @@ public class CopybookHierarchy {
    * Add a pattern for replacing from REPLACE statement
    *
    * @param pattern a pattern to be applied to the document content
+   * @param uri The url of original document
+   * @param range   a range to replace text in
    */
-  public void addTextReplacing(Pair<String, String> pattern) {
-    textReplacingClauses.add(pattern);
+  public void addTextReplacing(Pair<String, String> pattern, String uri, Range range) {
+    ReplaceData data = textReplacing.peek();
+    if (data != null && getLastTextReplacing().getRange(uri) == range) {
+      data.getReplacePatterns().add(pattern);
+    } else {
+      List<Pair<String, String>> replacePatterns = new ArrayList<>();
+      replacePatterns.add(pattern);
+      textReplacing.add(new ReplaceData(replacePatterns, uri, range));
+    }
   }
 
   /**
@@ -120,10 +133,12 @@ public class CopybookHierarchy {
     return copybookStack.stream().map(function).collect(toList());
   }
 
-  /** Move all the copy replacing clauses to the recursive replacement stack */
-  public void prepareCopybookReplacement() {
+  /** Move all the copy replacing clauses to the recursive replacement stack
+   * @param uri document uri
+   */
+  public void prepareCopybookReplacement(String uri) {
     if (!copyReplacingClauses.isEmpty()) {
-      recursiveReplaceStmtStack.add(new ArrayList<>(copyReplacingClauses));
+      recursiveReplaceStmtStack.add(new ReplaceData(new ArrayList<>(copyReplacingClauses), uri, new Range()));
       copyReplacingClauses.clear();
     }
   }
@@ -140,26 +155,35 @@ public class CopybookHierarchy {
   /**
    * Replace the copybook text using the internal state of the hierarchy
    *
-   * @param copybookText text to replace
+   * @param copybookMap copybook replacements map
    * @param accumulator a function for applying the replacing
-   * @return replaced text
+   * @param errors errors collection
    */
-  public String replaceCopybook(
-      String copybookText, BiFunction<String, List<Pair<String, String>>, String> accumulator) {
-    return recursiveReplaceStmtStack.stream().reduce(copybookText, accumulator, (raw, res) -> res);
+  public void replaceCopybook(
+          DocumentMap copybookMap, BiConsumer<DocumentMap, ReplaceData> accumulator,
+          List<SyntaxError> errors) {
+    for (ReplaceData replaceData : recursiveReplaceStmtStack) {
+      accumulator.accept(copybookMap, replaceData);
+    }
   }
 
   /**
-   * Replace the text using the internal state of the hierarchy
+   * Apply replacements the documentMap using the internal state of the hierarchy
    *
-   * @param text text to replace
-   * @param accumulator a function for applying the replacing
-   * @return replaced text
+   * @param documentMap documentMap to replace
+   * @param accumulator a consumer for applying the replacing
    */
-  public String replaceText(
-      String text, BiFunction<String, List<Pair<String, String>>, String> accumulator) {
-    String result = accumulator.apply(text, textReplacingClauses);
-    textReplacingClauses.clear();
-    return result;
+  public void replaceText(DocumentMap documentMap, BiConsumer<DocumentMap, ReplaceData> accumulator) {
+    textReplacing.forEach(tr -> accumulator.accept(documentMap, tr));
+    textReplacing.clear();
+  }
+
+  /**
+   * Get last text replacing data.
+   *
+   * @return Last text replacing data
+   */
+  public ReplaceData getLastTextReplacing() {
+    return textReplacing.peek();
   }
 }

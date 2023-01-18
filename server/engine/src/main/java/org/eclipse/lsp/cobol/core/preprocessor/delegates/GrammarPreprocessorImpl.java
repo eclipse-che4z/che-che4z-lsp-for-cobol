@@ -24,15 +24,13 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListener;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacePreprocessorFactory;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,53 +43,52 @@ import java.util.List;
 public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   private final GrammarPreprocessorListenerFactory listenerFactory;
   private final ReplacePreprocessorFactory replacingFactory;
+  private final ReplacingService replacingService;
 
   @Inject
   public GrammarPreprocessorImpl(
-      GrammarPreprocessorListenerFactory listenerFactory,
-      ReplacePreprocessorFactory replacingFactory) {
+          GrammarPreprocessorListenerFactory listenerFactory,
+          ReplacePreprocessorFactory replacingFactory, ReplacingService replacingService) {
     this.listenerFactory = listenerFactory;
     this.replacingFactory = replacingFactory;
+    this.replacingService = replacingService;
   }
 
   @NonNull
   @Override
   public ResultWithErrors<OldExtendedDocument> buildExtendedDocument(
-      @NonNull ExtendedSource extendedSource,
+      @NonNull DocumentMap documentMap,
       @NonNull CopybookConfig copybookConfig,
       @NonNull CopybookHierarchy hierarchy) {
     List<SyntaxError> errors = new ArrayList<>();
 
-    String replacedCode = replace(extendedSource, hierarchy).unwrap(errors::addAll);
+    String replacedCode = replace(documentMap, hierarchy).unwrap(errors::addAll);
 
-    return createOldExtendedDocument(replacedCode, extendedSource.getUri(), copybookConfig, hierarchy)
+    return createOldExtendedDocument(replacedCode, documentMap, copybookConfig, hierarchy)
         .accumulateErrors(errors);
   }
 
-  private ResultWithErrors<String> replace(
-          ExtendedSource extendedSource, CopybookHierarchy hierarchy) {
+  private ResultWithErrors<String> replace(DocumentMap documentMap, CopybookHierarchy hierarchy) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    BufferedTokenStream tokens = makeTokens(extendedSource.extendedText());
-    GrammarPreprocessorListener<String> listener = replacingFactory
-            .create(extendedSource.getUri(), tokens, hierarchy);
+    CobolPreprocessor preprocessorParser = new CobolPreprocessor(makeTokens(documentMap.extendedText()));
+    preprocessorParser.removeErrorListeners();
 
-    CobolPreprocessor parser = new CobolPreprocessor(tokens);
-    parser.removeErrorListeners();
-
-    ParseTreeWalker walker = new ParseTreeWalker();
-    walker.walk(listener, parser.startRule());
-    return listener.getResult();
+    ReplacePreProcessorListener listener = replacingFactory.create(documentMap, hierarchy);
+    new ParseTreeWalker().walk(listener, preprocessorParser.startRule());
+    listener.applyReplacing();
+    return new ResultWithErrors<>(documentMap.extendedText(), listener.getErrors());
   }
 
   private ResultWithErrors<OldExtendedDocument> createOldExtendedDocument(
-          String code, String uri,
+          String code,
+          DocumentMap documentMap,
           CopybookConfig copybookConfig,
           CopybookHierarchy hierarchy) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     BufferedTokenStream tokens = makeTokens(code);
 
     GrammarPreprocessorListener<OldExtendedDocument> listener =
-            listenerFactory.create(uri, tokens, copybookConfig, hierarchy);
+            listenerFactory.create(documentMap, tokens, copybookConfig, hierarchy);
 
     CobolPreprocessor parser = new CobolPreprocessor(tokens);
     parser.removeErrorListeners();
