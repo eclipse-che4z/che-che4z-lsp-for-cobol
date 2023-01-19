@@ -70,7 +70,7 @@ jobs:
           path: engine/target/*.log
 
   buildOnMac:
-    runs-on: macos-12
+    runs-on: macos-11
     needs: [generateNativeConfig]
     steps:
       - uses: actions/checkout@v2
