@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.service.utils.ServerTypeUtil;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -68,6 +69,9 @@ public class CachingConfigurationService implements ConfigurationService {
   public AnalysisConfig getConfig(CopybookProcessingMode mode) {
     try {
       AnalysisConfig config = AnalysisConfigHelper.fromConfigEntity(mode, createConfigFuture().get());
+      if (ServerTypeUtil.isNativeServerType()) {
+        return config;
+      }
       if (dialectService.updateDialects(config.getDialectRegistry())) {
         // if list of dialects were changed - request config one more time
         config = AnalysisConfigHelper.fromConfigEntity(mode, createConfigFuture().get());

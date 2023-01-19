@@ -29,7 +29,7 @@ export class LinuxlanguageClient implements NativeLanguageClient {
 
     public getServer(): Executable {
         return {
-            args: ["pipeEnabled","-Dline.separator=\r\n", "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"],
+            args: ["pipeEnabled","-Dline.separator=\r\n", "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener", "-DserverType=NATIVE"],
             command: this.command,
             options: {detached: false, cwd: this.executablePath},
         };
