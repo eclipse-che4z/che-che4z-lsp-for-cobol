@@ -77,11 +77,13 @@ export class LanguageClientService {
 
     public async start() {
         const languageClient = this.getLanguageClient();
-        await languageClient.start().then(() => {
-            for (const handler of this.handlers) {
-                handler(languageClient);
-            }
-        });
+        await languageClient.start();
+        this.initHandlers();
+    }
+
+    private initHandlers() {
+        const languageClient = this.getLanguageClient();
+        this.handlers.forEach(handler => handler(languageClient));
     }
 
     public stop(): Thenable<void> {
@@ -134,3 +136,5 @@ export class LanguageClientService {
         };
     }
 }
+
+
