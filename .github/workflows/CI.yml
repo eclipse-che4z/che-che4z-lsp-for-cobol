@@ -100,11 +100,6 @@ jobs:
       - name: Build with Maven
         working-directory: server
         run: mvn -e -B -Pnative -DskipTests clean package
-      - name: Run UPX
-        uses: svenstaro/upx-action@v2
-        with:
-          file: server/engine/target/engine
-          args: '-7'
       - name: Upload artifacts
         run: mkdir staging && cp server/engine/target/engine staging/server-mac-amd64
       - uses: actions/upload-artifact@v3
