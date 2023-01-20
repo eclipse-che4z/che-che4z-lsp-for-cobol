@@ -14,7 +14,7 @@ jobs:
         - uses: ayltai/setup-graalvm@v1
           with:
             java-version: 11
-            graalvm-version: 22.2.0
+            graalvm-version: 22.3.0
             native-image: true
         - name: Generate assisted configuration for GraalVM native build
           working-directory: server
@@ -49,7 +49,7 @@ jobs:
       - uses: ayltai/setup-graalvm@v1
         with:
           java-version: 11
-          graalvm-version: 22.2.0
+          graalvm-version: 22.3.0
           native-image: true
       - name: Build with Maven
         working-directory: server
@@ -81,7 +81,7 @@ jobs:
       - uses: ayltai/setup-graalvm@v1
         with:
           java-version: 11
-          graalvm-version: 22.2.0
+          graalvm-version: 22.3.0
           native-image: true
       - name: Check cli version
         run: pkgutil --pkg-info=com.apple.pkg.CLTools_Executables
@@ -120,7 +120,7 @@ jobs:
       - uses: ayltai/setup-graalvm@v1
         with:
           java-version: 11
-          graalvm-version: 22.2.0
+          graalvm-version: 22.3.0
           native-image: true
       - name: Retrieve native build configurations
         uses: actions/download-artifact@v3
