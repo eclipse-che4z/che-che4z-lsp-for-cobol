@@ -73,6 +73,9 @@ jobs:
     runs-on: macos-11
     needs: [generateNativeConfig]
     steps:
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '12.5.1'
       - uses: actions/checkout@v2
       - uses: ayltai/setup-graalvm@v1
         with:
