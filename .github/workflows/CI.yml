@@ -70,21 +70,15 @@ jobs:
           path: engine/target/*.log
 
   buildOnMac:
-    runs-on: macos-11
+    runs-on: macos-latest
     needs: [generateNativeConfig]
     steps:
-      - name: switch xcode to 12.5.1
-        run: |
-          sudo xcode-select -s /Applications/Xcode_12.5.1.app/Contents/Developer
-          xcodebuild -version
       - uses: actions/checkout@v2
       - uses: ayltai/setup-graalvm@v1
         with:
           java-version: 11
           graalvm-version: 22.3.0
           native-image: true
-      - name: Check cli version
-        run: pkgutil --pkg-info=com.apple.pkg.CLTools_Executables
       - name: Retrieve native build configurations
         uses: actions/download-artifact@v3
         with:
@@ -100,6 +94,11 @@ jobs:
       - name: Build with Maven
         working-directory: server
         run: mvn -e -B -Pnative -DskipTests clean package
+      - name: Run UPX
+        uses: svenstaro/upx-action@v2
+        with:
+          file: server/engine/target/engine
+          args: '-7'
       - name: Upload artifacts
         run: mkdir staging && cp server/engine/target/engine staging/server-mac-amd64
       - uses: actions/upload-artifact@v3
