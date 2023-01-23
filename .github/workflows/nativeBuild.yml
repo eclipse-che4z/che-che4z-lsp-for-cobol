@@ -71,7 +71,7 @@ jobs:
         shell: powershell
       - name: Upload artifacts
         run: |
-          mkdir staging/${{ env.target }}
+          mkdir -p staging/${{ env.target }}
           cp server/engine/target/*.exe staging/${{ env.target }}/
           cp server/engine/target/*.dll staging/${{ env.target }}/
           cp server/engine/target/*.txt staging/${{ env.target }}/
@@ -296,8 +296,6 @@ jobs:
       - name: configure server jar
         working-directory: clients/cobol-lsp-vscode-extension
         run: "cp -R ../../staging/jar/* ./server/jar"
-      - name: fetch os based executables
-        run: $(find ./package-* -iname ${{ matrix.platform }}-${{ matrix.arch }})
       - name: configure windows executable
         working-directory: clients/cobol-lsp-vscode-extension
         if: startsWith( matrix.os, 'windows')
