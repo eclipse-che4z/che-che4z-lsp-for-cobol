@@ -321,7 +321,7 @@ jobs:
       - name: generate vsix for ${{ env.target }}
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
-          npm run package  --target ${{ env.target }}
+          npm run package  -- --target ${{ env.target }}
           cp *.vsix ../../.
       - uses: actions/upload-artifact@v3
         with:
