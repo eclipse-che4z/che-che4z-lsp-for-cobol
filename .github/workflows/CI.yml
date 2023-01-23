@@ -73,6 +73,10 @@ jobs:
     runs-on: macos-latest
     needs: [generateNativeConfig]
     steps:
+      - name: switch xcode to 12.5.1
+        run: |
+          sudo xcode-select -s /Applications/Xcode_12.5.1.app/Contents/Developer
+          xcodebuild -version
       - uses: actions/checkout@v2
       - uses: ayltai/setup-graalvm@v1
         with:
