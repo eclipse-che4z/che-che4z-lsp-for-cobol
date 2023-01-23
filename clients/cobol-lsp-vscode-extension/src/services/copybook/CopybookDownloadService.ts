@@ -96,7 +96,7 @@ export class CopybookDownloadService implements vscode.Disposable {
 
     private static getRemoteCopybookName(members: string[], copybookName: string) {
       return  members.find(ele => ele.substring(0, ele.lastIndexOf(".") !== -1 ?
-        ele.lastIndexOf(".") : ele.length) === copybookName);
+        ele.lastIndexOf(".") : ele.length).toUpperCase() === copybookName.toUpperCase());
     }
 
     private static async getAllMembers(dataset: string, profileName: string, isUSS: boolean) {

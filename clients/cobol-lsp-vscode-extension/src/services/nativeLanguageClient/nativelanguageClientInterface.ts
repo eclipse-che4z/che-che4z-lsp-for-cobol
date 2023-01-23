@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {Executable} from "vscode-languageclient";
+import { Executable } from "vscode-languageclient/node";
 
 export interface NativeLanguageClient {
     getServer(): Executable;

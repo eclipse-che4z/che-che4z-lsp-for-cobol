@@ -23,16 +23,16 @@ import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeAc
 import { clearCache } from "./commands/ClearCopybookCacheCommand";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
+import {
+    downloadCopybookHandler,
+    resolveCopybookHandler,
+} from "./services/copybook/CopybookMessageHandler";
+import { DialectRegistry } from "./services/DialectRegistry";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { TelemetryService } from "./services/reporter/TelemetryService";
 import { configHandler, SettingsService } from "./services/Settings";
 import { pickSnippet, SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
-import {
-    downloadCopybookHandler,
-    resolveCopybookHandler
-} from "./services/copybook/CopybookMessageHandler";
-import { DialectRegistry } from "./services/DialectRegistry";
 
 let languageClientService: LanguageClientService;
 let outputChannel: vscode.OutputChannel;
@@ -47,11 +47,11 @@ function initialize() {
 
 export async function activate(context: vscode.ExtensionContext) {
     DialectRegistry.clear();
-    
+
     const copyBooksDownloader = initialize();
     initSmartTab(context);
 
-    TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");    
+    TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
     copyBooksDownloader.start();
 
     // Commands
@@ -64,7 +64,7 @@ export async function activate(context: vscode.ExtensionContext) {
         () => {
         gotoCopybookSettings();
     }));
-    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor((e) => RangeTabShiftStore.reset()));
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(_e => RangeTabShiftStore.reset()));
 
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.clear.downloaded.copybooks", () => { clearCache() }));
 
@@ -115,14 +115,14 @@ export async function activate(context: vscode.ExtensionContext) {
     languageClientService.addRequestHandler("copybook/download", downloadCopybookHandler.bind(copyBooksDownloader));
     languageClientService.addRequestHandler("workspace/configuration", configHandler);
 
-    context.subscriptions.push(languageClientService.start());
+    await languageClientService.start();
 
     // 'export' public api-surface
     return openApi();
 }
 
 export function deactivate() {
-    return Promise.resolve(languageClientService.stop());
+    return languageClientService.stop();
 }
 
 function openApi() {
