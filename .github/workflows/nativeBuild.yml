@@ -271,10 +271,6 @@ jobs:
         run: |
           cp -p ../../staging/package-linux/server ./server/package-linux
           chmod +x ./server/package-linux/server
-      - uses: actions/upload-artifact@v3
-        with:
-          name: serverContent
-          path: ./clients/cobol-lsp-vscode-extension/server
       - name: build client
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
