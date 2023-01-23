@@ -13,7 +13,7 @@
  */
 
 import { join } from "path";
-import { Executable } from "vscode-languageclient";
+import { Executable } from "vscode-languageclient/node";
 import {NativeLanguageClient} from "./nativelanguageClientInterface";
 
 export class MacosLanguageClient implements NativeLanguageClient {
@@ -29,7 +29,7 @@ export class MacosLanguageClient implements NativeLanguageClient {
 
     public getServer(): Executable {
         return {
-            args: ["pipeEnabled","-Dline.separator=\r\n", "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"],
+            args: ["pipeEnabled", "-Dline.separator=\r\n", "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"],
             command: this.command,
             options: { detached: false, cwd: this.executablePath },
         };
