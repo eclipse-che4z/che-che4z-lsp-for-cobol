@@ -23,7 +23,7 @@ export class LinuxlanguageClient implements NativeLanguageClient {
 
     constructor(serverPath) {
         this.serverPath = serverPath;
-        this.executablePath = join(serverPath, "package-linux");
+        this.executablePath = join(serverPath, "native");
         this.command = `./server`;
     }
 

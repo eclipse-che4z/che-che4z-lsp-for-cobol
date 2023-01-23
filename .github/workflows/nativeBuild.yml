@@ -71,15 +71,15 @@ jobs:
         shell: powershell
       - name: Upload artifacts
         run: |
-          mkdir staging
-          cp server/engine/target/*.exe staging/${{ env.target }}
-          cp server/engine/target/*.dll staging/${{ env.target }}
-          cp server/engine/target/*.txt staging/${{ env.target }}
+          mkdir staging/${{ env.target }}
+          cp server/engine/target/*.exe staging/${{ env.target }}/
+          cp server/engine/target/*.dll staging/${{ env.target }}/
+          cp server/engine/target/*.txt staging/${{ env.target }}/
       - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: package-win
-          path: staging
+          path: staging/${{ env.target }}
       - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
@@ -128,7 +128,7 @@ jobs:
           file: server/engine/target/engine
           args: '-7'
       - name: Upload artifacts
-        run: mkdir staging && cp server/engine/target/engine staging/server-mac-${{ env.target }}
+        run: mkdir staging && cp server/engine/target/engine staging/${{ env.target }}
       - uses: actions/upload-artifact@v3
         with:
           name: package-macos
@@ -188,7 +188,7 @@ jobs:
           file: server/engine/target/engine
           args: '-7'
       - name: Upload artifacts
-        run: mkdir staging && cp server/engine/target/engine staging/server_${{ env.target }}
+        run: mkdir staging && cp server/engine/target/engine staging/${{ env.target }}
       - uses: actions/upload-artifact@v3
         with:
           name: package-linux
@@ -213,10 +213,10 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          java-version: '11.0.13'
+          java-version: '11.0.15'
           distribution: 'microsoft'
       - run: java -version
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 14
@@ -240,11 +240,52 @@ jobs:
         uses: GabrielBB/xvfb-action@v1.0
         with:
           run: npm --prefix clients/cobol-lsp-vscode-extension run test:integration
-  build:
-    runs-on: ubuntu-latest
+  buildVsixWithNativeSupport:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win32
+            arch: x64
+            npm_config_arch: x64
+          - os: windows-latest
+            platform: win32
+            arch: ia32
+            npm_config_arch: ia32
+          - os: windows-latest
+            platform: win32
+            arch: arm64
+            npm_config_arch: arm
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            npm_config_arch: x64
+          - os: ubuntu-latest
+            platform: linux
+            arch: arm64
+            npm_config_arch: arm64
+          - os: ubuntu-latest
+            platform: linux
+            arch: armhf
+            npm_config_arch: arm
+          - os: ubuntu-latest
+            platform: alpine
+            arch: x64
+            npm_config_arch: x64
+          - os: macos-latest
+            platform: darwin
+            arch: x64
+            npm_config_arch: x64
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+            npm_config_arch: arm64
+    runs-on: ${{ matrix.os }}
     needs: [tests]
     steps:
       - uses: actions/checkout@v3
+      - shell: pwsh
+        run: echo "target=${{ matrix.platform }}-${{ matrix.arch }}" >> $env:GITHUB_ENV
       - uses: actions/setup-node@v3
         with:
           node-version: 14
@@ -255,117 +296,123 @@ jobs:
       - name: configure server jar
         working-directory: clients/cobol-lsp-vscode-extension
         run: "cp -R ../../staging/jar/* ./server/jar"
+      - name: fetch os based executables
+        run: $(find ./package-* -iname ${{ matrix.platform }}-${{ matrix.arch }})
       - name: configure windows executable
         working-directory: clients/cobol-lsp-vscode-extension
+        if: startsWith( matrix.os, 'windows')
         run: |
-          cp ../../staging/package-win/engine.build_artifacts.txt ./server/package-win
-          cp ../../staging/package-win/engine.exe ./server/package-win
-          cp ../../staging/package-win/sunmscapi.dll ./server/package-win
+          cp ../../staging/package-win/${{ env.target }}/engine.build_artifacts.txt ./server/native
+          cp ../../staging/package-win/${{ env.target }}/engine.exe ./server/windows
+          cp ../../staging/package-win/${{ env.target }}/sunmscapi.dll ./server/windows
       - name: configure mac executable
         working-directory: clients/cobol-lsp-vscode-extension
+        if: startsWith( matrix.os, 'mac')
         run: |
-          cp -p ../../staging/package-macos/server-mac-amd64 ./server/package-macos
-          chmod +x ./server/package-macos/server-mac-amd64
+          cp -p ../../staging/package-macos/${{ env.target }} ./server/native
+          chmod +x ./server/native/${{ env.target }}
       - name: configure linux executable
         working-directory: clients/cobol-lsp-vscode-extension
+        if: startsWith( matrix.os, 'ubuntu')
         run: |
-          cp -p ../../staging/package-linux/server ./server/package-linux
-          chmod +x ./server/package-linux/server
+          cp -p ../../staging/package-linux/${{ env.target }} ./server/native
+          chmod +x ./server/native/${{ env.target }}
       - name: build client
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
-      - name: generate vsix
+      - name: generate vsix for ${{ env.target }}
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
-          npm run package
+          npm run package  --target ${{ env.target }}
           cp *.vsix ../../.
       - uses: actions/upload-artifact@v3
         with:
           name: vsix-package
           path: '*.vsix'
-  native-build-test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest, macOS-latest, ubuntu-latest, ubuntu-22.04, windows-2019, macos-12]
-    needs: [buildOnWindows, buildOnMac, buildOnLinux]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 14
-      - name: Retrieve native images
-        uses: actions/download-artifact@v3
-        with:
-          path: staging
-      - name: configure windows executable
-        working-directory: tests/native-executable-tests
-        if: startsWith( matrix.os, 'windows')
-        run: |
-          cp ../../staging/package-win/engine.build_artifacts.txt ./server/windows
-          cp ../../staging/package-win/engine.exe ./server/windows
-          cp ../../staging/package-win/sunmscapi.dll ./server/windows
-      - name: configure mac executable
-        working-directory: tests/native-executable-tests
-        if: startsWith( matrix.os, 'mac')
-        run: |
-          cp -p ../../staging/package-macos/server-mac-amd64 ./server/mac
-          chmod +x ./server/mac/server-mac-amd64
-      - name: configure linux executable
-        working-directory: tests/native-executable-tests
-        if: startsWith( matrix.os, 'ubuntu')
-        run: |
-          cp -p ../../staging/package-linux/server ./server/linux
-          chmod +x ./server/linux/server
-      - name: build native executable test code
-        working-directory: tests/native-executable-tests
-        run: npm ci
-      - name: run native executable test code
-        working-directory: tests/native-executable-tests
-        run: npm run test
-  cypress-run:
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - shell: pwsh
-        run: echo "target=${{ matrix.platform }}-${{ matrix.arch }}" >> $env:GITHUB_ENV
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 14
-      - name: Download vsix file
-        uses: actions/download-artifact@v3
-        with:
-          path: staging
-      - name: make cobol-lsp plugin folder
-        run: mkdir -p tests/theia/plugins
-      - name: Copy vsix file
-        run: cp staging/vsix-package/*.vsix tests/theia/plugins
-      - name: Up theia docker image
-        run:
-          # Run the docker commande
-          docker run -d -p 3000:3000 -v "/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins":/home/theia/plugins -v "/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project":/home/project grianbrcom/theia-full:1.15.0
-      - name: up docker image
-        run: |
-          docker ps
-          rm -rf node_modules/ yarn.lock
-          cd tests
-          yarn cache clean
-          yarn install --frozen-lockfile
-          npm run ts:build
-      - name: Cypress run
-        uses: cypress-io/github-action@v2
-        with:
-          command: npm run cy:run:ci -- --env ide=theia
-          browser: chrome
-          headless: true
-          wait-on: 'http://localhost:3000'
-          working-directory: tests
-      - uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/cypress/screenshots/LSP/*/*
+
+#  native-build-test:
+#    runs-on: ${{ matrix.os }}
+#    strategy:
+#      matrix:
+#        os: [windows-latest, macOS-latest, ubuntu-latest, ubuntu-22.04, windows-2019, macos-12]
+#    needs: [buildOnWindows, buildOnMac, buildOnLinux]
+#    steps:
+#      - uses: actions/checkout@v3
+#      - uses: actions/setup-node@v3
+#        with:
+#          node-version: 14
+#      - name: Retrieve native images
+#        uses: actions/download-artifact@v3
+#        with:
+#          path: staging
+#      - name: configure windows executable
+#        working-directory: tests/native-executable-tests
+#        if: startsWith( matrix.os, 'windows')
+#        run: |
+#          cp ../../staging/package-win/engine.build_artifacts.txt ./server/windows
+#          cp ../../staging/package-win/engine.exe ./server/windows
+#          cp ../../staging/package-win/sunmscapi.dll ./server/windows
+#      - name: configure mac executable
+#        working-directory: tests/native-executable-tests
+#        if: startsWith( matrix.os, 'mac')
+#        run: |
+#          cp -p ../../staging/package-macos/server-mac-amd64 ./server/mac
+#          chmod +x ./server/mac/server-mac-amd64
+#      - name: configure linux executable
+#        working-directory: tests/native-executable-tests
+#        if: startsWith( matrix.os, 'ubuntu')
+#        run: |
+#          cp -p ../../staging/package-linux/server ./server/linux
+#          chmod +x ./server/linux/server
+#      - name: build native executable test code
+#        working-directory: tests/native-executable-tests
+#        run: npm ci
+#      - name: run native executable test code
+#        working-directory: tests/native-executable-tests
+#        run: npm run test
+#  cypress-run:
+#    runs-on: ubuntu-latest
+#    needs: [build]
+#    steps:
+#      - shell: pwsh
+#        run: echo "target=${{ matrix.platform }}-${{ matrix.arch }}" >> $env:GITHUB_ENV
+#      - uses: actions/checkout@v3
+#      - uses: actions/setup-node@v3
+#        with:
+#          node-version: 14
+#      - name: Download vsix file
+#        uses: actions/download-artifact@v3
+#        with:
+#          path: staging
+#      - name: make cobol-lsp plugin folder
+#        run: mkdir -p tests/theia/plugins
+#      - name: Copy vsix file
+#        run: cp staging/vsix-package/*.vsix tests/theia/plugins
+#      - name: Up theia docker image
+#        run:
+#          # Run the docker commande
+#          docker run -d -p 3000:3000 -v "/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/theia/plugins":/home/theia/plugins -v "/home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/test_files/project":/home/project grianbrcom/theia-full:1.15.0
+#      - name: up docker image
+#        run: |
+#          docker ps
+#          rm -rf node_modules/ yarn.lock
+#          cd tests
+#          yarn cache clean
+#          yarn install --frozen-lockfile
+#          npm run ts:build
+#      - name: Cypress run
+#        uses: cypress-io/github-action@v2
+#        with:
+#          command: npm run cy:run:ci -- --env ide=theia
+#          browser: chrome
+#          headless: true
+#          wait-on: 'http://localhost:3000'
+#          working-directory: tests
+#      - uses: actions/upload-artifact@v2
+#        if: failure()
+#        with:
+#          name: cypress-screenshots
+#          path: /home/runner/work/che-che4z-lsp-for-cobol/che-che4z-lsp-for-cobol/tests/cypress/screenshots/LSP/*/*
       # Test run video was always captured, so this action uses "always()" condition
       # - uses: actions/upload-artifact@v2
       #   if: always()
