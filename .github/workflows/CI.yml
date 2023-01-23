@@ -70,7 +70,7 @@ jobs:
           path: engine/target/*.log
 
   buildOnMac:
-    runs-on: macos-latest
+    runs-on: macos-12
     needs: [generateNativeConfig]
     steps:
       - name: switch xcode to 12.5.1
