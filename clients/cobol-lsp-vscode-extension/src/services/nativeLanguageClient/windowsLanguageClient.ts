@@ -23,7 +23,7 @@ export class WindowsLanguageClient implements NativeLanguageClient {
 
     constructor(serverPath) {
         this.serverPath = serverPath;
-        this.executablePath = join(serverPath, "package-win");
+        this.executablePath = join(serverPath, "native");
         this.command = `engine.exe`;
     }
 
