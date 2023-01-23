@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'microsoft'
-          java-version: '11.0.17'
+          java-version: '11.0.15'
           cache: 'maven'
       - name: Build with Maven
         working-directory: server
@@ -48,7 +48,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          java-version: '11.0.17'
+          java-version: '11.0.15'
           distribution: 'microsoft'
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
