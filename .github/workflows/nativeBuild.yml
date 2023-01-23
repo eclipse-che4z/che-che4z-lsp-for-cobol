@@ -79,7 +79,7 @@ jobs:
         with:
           if-no-files-found: warn
           name: package-win
-          path: staging/${{ env.target }}
+          path: staging
       - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
