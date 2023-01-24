@@ -14,7 +14,7 @@
 -->
 
 # COBOL LSP server running information
-This folder contains native executable "COBOL LSP server" for linux.
+This folder contains native executable "COBOL LSP server".
 
-Ensure the server folder has read/write permission
+Ensure the server folder has execute permission
 

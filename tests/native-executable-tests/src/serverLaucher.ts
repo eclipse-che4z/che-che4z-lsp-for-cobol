@@ -41,11 +41,11 @@ export class ServerLaucher {
                 serverExecutable.options.cwd = "server/windows";
                 break;
             case "Darwin":
-                serverExecutable.command = "./server-mac-amd64";
+                serverExecutable.command = "./server-mac";
                 serverExecutable.options.cwd = "server/mac";
                 break;
             case "Linux":
-                serverExecutable.command = "./server";
+                serverExecutable.command = "./server-linux";
                 serverExecutable.options.cwd = "server/linux";
                 break;
             default:
