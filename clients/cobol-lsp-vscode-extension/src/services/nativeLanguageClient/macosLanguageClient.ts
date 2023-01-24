@@ -13,7 +13,7 @@
  */
 
 import { join } from "path";
-import { Executable } from "vscode-languageclient";
+import { Executable } from "vscode-languageclient/node";
 import {NativeLanguageClient} from "./nativelanguageClientInterface";
 
 export class MacosLanguageClient implements NativeLanguageClient {

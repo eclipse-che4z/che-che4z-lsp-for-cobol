@@ -18,17 +18,13 @@ import { join } from "path";
 import * as vscode from "vscode";
 
 import {
-    DidChangeConfigurationNotification,
-    ErrorCodes,
-    LanguageClient,
-    LanguageClientOptions,
-    StreamInfo,
-} from "vscode-languageclient";
-import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
-import {LANGUAGE_ID} from "../constants";
-import {JavaCheck} from "./JavaCheck";
-import {NativeExecutableService} from "./nativeLanguageClient/nativeExecutableService";
-import {TelemetryService} from "./reporter/TelemetryService";
+    DidChangeConfigurationNotification, GenericNotificationHandler, GenericRequestHandler, LanguageClient,
+    LanguageClientOptions, StreamInfo,
+} from "vscode-languageclient/node";
+import { LANGUAGE_ID } from "../constants";
+import { JavaCheck } from "./JavaCheck";
+import { NativeExecutableService } from "./nativeLanguageClient/nativeExecutableService";
+import { TelemetryService } from "./reporter/TelemetryService";
 import { SettingsService } from "./Settings";
 
 const extensionId = "BroadcomMFD.cobol-language-support";
@@ -71,31 +67,28 @@ export class LanguageClientService {
 
     public async retrieveAnalysis(uri: string, text: string): Promise<any> {
         const languageClient = this.getLanguageClient();
-        await languageClient.onReady();
         return languageClient.sendRequest("extended/analysis", { uri, text });
     }
 
     public async invalidateConfiguration() {
         const languageClient = this.getLanguageClient();
-        await languageClient.onReady();
         languageClient.sendNotification(DidChangeConfigurationNotification.type, { settings: null });
     }
 
-    public start(): vscode.Disposable {
+    public async start() {
+        const languageClient = this.getLanguageClient();
+        await languageClient.start();
         this.initHandlers();
-        return this.getLanguageClient().start();
-    }
-
-    public stop(): Thenable<void> {
-        if (this.languageClient) {
-            return Promise.resolve(this.getLanguageClient().stop());
-        }
     }
 
     private initHandlers() {
         const languageClient = this.getLanguageClient();
-        for (const handler of this.handlers) {
-            languageClient.onReady().then(() => handler(languageClient));
+        this.handlers.forEach(handler => handler(languageClient));
+    }
+
+    public stop(): Thenable<void> {
+        if (this.languageClient) {
+            return this.getLanguageClient().stop();
         }
     }
 
@@ -105,8 +98,6 @@ export class LanguageClientService {
                 "LSP extension for " + LANGUAGE_ID.toUpperCase() + " language",
                 this.createServerOptions(this.executablePath),
                 this.createClientOptions());
-            // hack to prevent notification for cancelled request.
-            (ErrorCodes as any).RequestCancelled = -32800;
         }
         return this.languageClient;
     }
@@ -145,3 +136,5 @@ export class LanguageClientService {
         };
     }
 }
+
+
