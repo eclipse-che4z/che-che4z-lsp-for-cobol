@@ -151,7 +151,7 @@ describe("LanguageClientService positive scenario", () => {
         spy.mockReturnValue("Linux");
         (languageClientService as any).executableService = new NativeExecutableService("/test");
         const executable = (languageClientService as any).executableService.getNativeLanguageClient();
-        expect(executable.command).toBe("./server");
+        expect(executable.command).toBe("./server-linux");
         expect(executable.options.cwd).toBe(join("/test", "native"));
     });
 
@@ -160,7 +160,7 @@ describe("LanguageClientService positive scenario", () => {
         spy.mockReturnValue("Darwin");
         (languageClientService as any).executableService = new NativeExecutableService("/test");
         const executable = (languageClientService as any).executableService.getNativeLanguageClient();
-        expect(executable.command).toBe("./server-mac-amd64");
+        expect(executable.command).toBe("./server-mac");
         expect(executable.options.cwd).toBe(join("/test", "native"));
     });
 
