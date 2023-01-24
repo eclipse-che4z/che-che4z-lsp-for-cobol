@@ -23,8 +23,8 @@ export class MacosLanguageClient implements NativeLanguageClient {
 
     constructor(serverPath) {
         this.serverPath = serverPath;
-        this.executablePath = join(serverPath, "package-macos");
-        this.command = `./server-mac-amd64`;
+        this.executablePath = join(serverPath, "native");
+        this.command = `./server-mac`;
     }
 
     public getServer(): Executable {
