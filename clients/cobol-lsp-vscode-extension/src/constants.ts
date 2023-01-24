@@ -49,6 +49,7 @@ export const TELEMETRY_DEFAULT_CONTENT = "INVALID_INSTRUMENTATION_KEY";
 export const ZOWE_EXT_MISSING_MSG = "Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe.";
 export const INSTALL_ZOWE = "Install Zowe Explorer";
 export const DACO_DIALECT = "DaCo";
+export const IDMS_DIALECT = "IDMS";
 export const DEFAULT_DIALECT = "COBOL";
 export const CLEARING_COPYBOOK_CACHE = "Clearing downloaded copybook cache";
 export const COPYBOOK_CACHE_CLEARED_INFO = "Downloaded copybooks removed";

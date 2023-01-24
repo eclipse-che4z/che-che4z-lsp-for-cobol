@@ -13,7 +13,6 @@
  */
 import * as vscode from "vscode";
 import { LANGUAGE_ID } from "../../constants";
-import { DialectRegistry } from "../DialectRegistry";
 import { SettingsService } from "../Settings";
 import { readFileSync } from 'fs';
 
@@ -32,8 +31,7 @@ export class SnippetCompletionProvider implements vscode.CompletionItemProvider 
             const wordsUptoCursor = fetchWordsList(textUptoCursor);
 
             this.resetList();
-            const snippets: Map<any, any> = await getSnippets();
-            snippets.forEach((value,key) => {
+            getSnippetsMapForUserDialect().forEach((value,key) => {
                 const prefixList: string[] = fetchWordsList(value.prefix);
                     const matchedWords = getMatchedWords(prefixList, wordsUptoCursor);
                     matchedWords.length > 0 ? this.matchingWordsList.push(createCompletionItem(value,key, position, document)):
@@ -47,20 +45,9 @@ export class SnippetCompletionProvider implements vscode.CompletionItemProvider 
     }
 }
 
-async function getSnippets(): Promise<Map<any, any>> {
-    const map = await SettingsService.getSnippetsForCobol();
-    const dialectList = SettingsService.getDialects();
-
-    const registeredDialects = DialectRegistry.getDialects();
-    registeredDialects.filter(d => dialectList.includes(d.name)).forEach(d => {
-        var snippets = importSnippet(d.snippetPath);
-        if (snippets !== undefined) {
-            Object.entries(snippets).forEach(value => map.set(value[0], value[1]));
-        }
-    });
-
-    return map;
-}
+function getSnippetsMapForUserDialect() {
+    return SettingsService.getSnippetsForUserDialect();
+ }
 
 function importSnippet(snippetPath: string): Map<any, any> {
     var result = SNIPPETS.get(snippetPath);
@@ -126,7 +113,7 @@ export async function pickSnippet() {
         const editor = vscode.window.activeTextEditor;
         const snippetList = new Array();
         const mapKeyForSelectedSnippet = new Map<string, any>();
-        const snippetMapsFromSettings = await getSnippets();
+        const snippetMapsFromSettings = getSnippetsMapForUserDialect();
         const input = vscode.window.createQuickPick<vscode.QuickPickItem>();
         input.matchOnDetail = true;
         input.matchOnDescription = true;
