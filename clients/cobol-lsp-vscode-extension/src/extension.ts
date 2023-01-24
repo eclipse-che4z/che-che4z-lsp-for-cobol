@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
-import { C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID, SERVER_TYPE } from "./constants";
+import { LANGUAGE_ID, SERVER_TYPE } from "./constants";
 import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
@@ -25,14 +25,13 @@ import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { TelemetryService } from "./services/reporter/TelemetryService";
-import { createFileWithGivenPath, SettingsService } from "./services/Settings";
+import { SettingsService } from "./services/Settings";
 import { pickSnippet, SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 import {
     downloadCopybookHandler,
     resolveCopybookHandler
 } from "./services/copybook/CopybookMessageHandler";
-import { DialectRegistry } from "./services/DialectRegistry";
 
 let languageClientService: LanguageClientService;
 
@@ -44,24 +43,13 @@ function initialize() {
     return {copyBooksDownloader, outputChannel};
 }
 
-export async function activate(context: vscode.ExtensionContext) {
-    DialectRegistry.clear();
-    
+export async function activate(context: vscode.ExtensionContext) {    
     const { copyBooksDownloader, outputChannel} = initialize();
     initSmartTab(context);
 
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.dialect.register", 
-        (name: string, path: string, description: string, extensionId: string, snippetPath: string) => { 
-            DialectRegistry.register(name, path, description, extensionId, snippetPath);
-    }));
 
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.dialect.unregister", 
-        (name: string, extensionId: string) => { 
-            DialectRegistry.unregister(name);
-    }));
-    
     copyBooksDownloader.start();
 
     // Commands

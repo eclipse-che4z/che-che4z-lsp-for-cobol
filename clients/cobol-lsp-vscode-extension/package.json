@@ -173,28 +173,6 @@
                     "description": "Default list of USS paths to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
                     "uniqueItems": true
                 },
-                "cobol-lsp.dialect.registry": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "path": {
-                                "type": "string"
-                            },
-                            "description": {
-                                "type": "string"
-                            },
-                            "extensionId": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "uniqueItems": true,
-                    "default": []
-                },
                 "cobol-lsp.smart-tab": {
                     "oneOf": [
                         {
