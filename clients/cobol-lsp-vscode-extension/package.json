@@ -53,6 +53,14 @@
                 "title": "Open Copybook location settings"
             },
             {
+                "command": "cobol-lsp.serverType.goto-settings",
+                "title": "Open Server Type settings"
+            },
+            {
+                "command": "cobol-lsp.dialects.goto-settings",
+                "title": "Open Dialects settings"
+            },
+            {
                 "command": "cobol-lsp.commentLine.toggle",
                 "title": "Toggle COBOL Line Comment"
             },
