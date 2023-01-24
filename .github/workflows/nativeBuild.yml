@@ -228,7 +228,7 @@ jobs:
           path: staging
       - name: configure server jar
         working-directory: clients/cobol-lsp-vscode-extension
-        run: "cp -R ../../staging/jar/* ./server/jar"
+        run: "cp -R ../../staging/jar/engine/target/server.jar ./server/jar"
       - name: coverage
         run: npm run coverage
         working-directory: clients/cobol-lsp-vscode-extension
