@@ -6,7 +6,7 @@ on:
   schedule:
     # Runs at 3.30 AM UTC i.e. 10.30 PM EST
     - cron: '30 3 * * *'
-  workflow_dispatch
+  workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
