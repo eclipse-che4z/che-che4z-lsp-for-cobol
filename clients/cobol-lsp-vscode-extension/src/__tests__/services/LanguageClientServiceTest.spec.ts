@@ -143,7 +143,7 @@ describe("LanguageClientService positive scenario", () => {
         (languageClientService as any).executableService = new NativeExecutableService("/test");
         const executable = (languageClientService as any).executableService.getNativeLanguageClient();
         expect(executable.command).toBe("engine.exe");
-        expect(executable.options.cwd).toBe(join("/test", "package-win"));
+        expect(executable.options.cwd).toBe(join("/test", "native"));
     });
 
     test("LanguageClientServer detects executable path for Linux", () => {
@@ -152,7 +152,7 @@ describe("LanguageClientService positive scenario", () => {
         (languageClientService as any).executableService = new NativeExecutableService("/test");
         const executable = (languageClientService as any).executableService.getNativeLanguageClient();
         expect(executable.command).toBe("./server");
-        expect(executable.options.cwd).toBe(join("/test", "package-linux"));
+        expect(executable.options.cwd).toBe(join("/test", "native"));
     });
 
     test("LanguageClientServer detects executable path for Mac", () => {
@@ -161,7 +161,7 @@ describe("LanguageClientService positive scenario", () => {
         (languageClientService as any).executableService = new NativeExecutableService("/test");
         const executable = (languageClientService as any).executableService.getNativeLanguageClient();
         expect(executable.command).toBe("./server-mac-amd64");
-        expect(executable.options.cwd).toBe(join("/test", "package-macos"));
+        expect(executable.options.cwd).toBe(join("/test", "native"));
     });
 
     test("LanguageClientServer detects executable path for unKnown OS", () => {

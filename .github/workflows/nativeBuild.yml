@@ -1,0 +1,405 @@
+
+name: NativeBuild
+
+# Controls when the workflow will run
+on:
+  schedule:
+    # Runs at 3.30 AM UTC i.e. 10.30 PM EST
+    - cron: '30 3 * * *'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  generateConfigForNativeBuilds:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ayltai/setup-graalvm@v1
+        with:
+          java-version: 11
+          graalvm-version: 22.3.0
+          native-image: true
+      - name: Generate assisted configuration for GraalVM native build
+        working-directory: server
+        run: mvn -e -B -Pnative -Dagent=true test
+      - uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: warn
+          name: configuration
+          path: server/engine/target/native/agent-output/test/*
+
+  nativeBuildOnWindows:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win32
+            arch: x64
+          - os: windows-latest
+            platform: win32
+            arch: ia32
+          - os: windows-latest
+            platform: win32
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    needs: [generateConfigForNativeBuilds]
+    steps:
+      - shell: pwsh
+        run: echo "target=${{ matrix.platform }}-${{ matrix.arch }}" >> $env:GITHUB_ENV
+      - uses: al-cheb/configure-pagefile-action@v1.2
+        with:
+          minimum-size: 16GB
+          maximum-size: 16GB
+          disk-root: "C:"
+      - uses: actions/checkout@v3
+      - name: Retrieve native build configurations
+        uses: actions/download-artifact@v3
+        with:
+          path: configuration
+          name: configuration
+      - name: Add graalVM configuration to server
+        run: |
+          cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
+          rm server/engine/src/main/resources/META-INF/native-image/session-*/jni-config.json
+        shell: bash
+      - uses: ilammy/msvc-dev-cmd@v1.5.0
+      - uses: microsoft/setup-msbuild@v1
+      - uses: ayltai/setup-graalvm@v1
+        with:
+          java-version: 11
+          graalvm-version: 22.3.0
+          native-image: true
+      - name: Build with Maven
+        working-directory: server
+        run: mvn -e -B -Pnative -DskipTests clean package
+        shell: powershell
+      - name: Upload artifacts
+        run: |
+          mkdir -p staging/${{ env.target }}
+          cp server/engine/target/*.exe staging/${{ env.target }}/
+          cp server/engine/target/*.dll staging/${{ env.target }}/
+          cp server/engine/target/*.txt staging/${{ env.target }}/
+      - uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: warn
+          name: package-win
+          path: staging
+
+  nativeBuildOnMac:
+    strategy:
+      matrix:
+        include:
+          - os: macos-11
+            platform: darwin
+            arch: x64
+          - os: macos-11
+            platform: darwin
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    needs: [generateConfigForNativeBuilds]
+    steps:
+      - name: switch xcode to 12.5.1
+        run: |
+          sudo xcode-select -s /Applications/Xcode_12.5.1.app/Contents/Developer
+          xcodebuild -version
+      - uses: actions/checkout@v3
+      - shell: pwsh
+        run: echo "target=${{ matrix.platform }}-${{ matrix.arch }}" >> $env:GITHUB_ENV
+      - uses: ayltai/setup-graalvm@v1
+        with:
+          java-version: 11
+          graalvm-version: 22.3.0
+          native-image: true
+      - name: Retrieve native build configurations
+        uses: actions/download-artifact@v3
+        with:
+          path: configuration
+          name: configuration
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: configuration
+      - name: Add graalVM configuration to server
+        run: |
+          cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
+          rm server/engine/src/main/resources/META-INF/native-image/jni-config.json
+      - name: Build with Maven
+        working-directory: server
+        run: mvn -e -B -Pnative -DskipTests clean package
+      - name: Upload artifacts
+        run: mkdir staging && cp server/engine/target/engine staging/${{ env.target }}
+      - uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: warn
+          name: package-macos
+          path: staging
+
+  nativeBuildOnLinux:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+          - os: ubuntu-latest
+            platform: linux
+            arch: arm64
+          - os: ubuntu-latest
+            platform: linux
+            arch: armhf
+          - os: ubuntu-latest
+            platform: alpine
+            arch: x64
+    runs-on: ${{ matrix.os }}
+    needs: [generateConfigForNativeBuilds]
+    steps:
+      - shell: pwsh
+        run: echo "target=${{ matrix.platform }}-${{ matrix.arch }}" >> $env:GITHUB_ENV
+      - uses: actions/checkout@v3
+      - uses: ayltai/setup-graalvm@v1
+        with:
+          java-version: 11
+          graalvm-version: 22.3.0
+          native-image: true
+      - name: Retrieve native build configurations
+        uses: actions/download-artifact@v3
+        with:
+          path: configuration
+          name: configuration
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: configuration
+      - name: Add graalVM configuration to server
+        run: |
+          cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
+          rm server/engine/src/main/resources/META-INF/native-image/session-*/jni-config.json
+      - name: Build with Maven
+        working-directory: server
+        run: mvn -e -B -Pnative -Dagent=true -DskipTests clean package
+      - name: Upload artifacts
+        run: mkdir staging && cp server/engine/target/engine staging/${{ env.target }}
+      - uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: warn
+          name: package-linux
+          path: staging
+      - uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: warn
+          name: jar
+          path: |
+            server/engine/target/server.jar
+            server/dialect-idms/target/dialect-idms.jar
+            server/dialect-daco/target/dialect-daco.jar
+
+  testClient:
+    runs-on: windows-latest
+    needs: [nativeBuildOnLinux, nativeBuildOnMac, nativeBuildOnWindows]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11.0.15'
+          distribution: 'microsoft'
+      - run: java -version
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+      - name: build client
+        run: npm ci --ignore-scripts
+        working-directory: clients/cobol-lsp-vscode-extension
+      - name: postinstall
+        run: npm run postinstall
+        working-directory: clients/cobol-lsp-vscode-extension
+      - name: Retrieve server jar
+        uses: actions/download-artifact@v3
+        with:
+          path: staging
+      - name: configure server jar
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: "cp -R ../../staging/jar/* ./server/jar"
+      - name: coverage
+        run: npm run coverage
+        working-directory: clients/cobol-lsp-vscode-extension
+      - name: integration-test
+        uses: GabrielBB/xvfb-action@v1.0
+        with:
+          run: npm --prefix clients/cobol-lsp-vscode-extension run test:integration
+  buildVsixWithNativeSupport:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win32
+            arch: x64
+            npm_config_arch: x64
+          - os: windows-latest
+            platform: win32
+            arch: ia32
+            npm_config_arch: ia32
+          - os: windows-latest
+            platform: win32
+            arch: arm64
+            npm_config_arch: arm
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            npm_config_arch: x64
+          - os: ubuntu-latest
+            platform: linux
+            arch: arm64
+            npm_config_arch: arm64
+          - os: ubuntu-latest
+            platform: linux
+            arch: armhf
+            npm_config_arch: arm
+          - os: ubuntu-latest
+            platform: alpine
+            arch: x64
+            npm_config_arch: x64
+          - os: macos-latest
+            platform: darwin
+            arch: x64
+            npm_config_arch: x64
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+            npm_config_arch: arm64
+    runs-on: ${{ matrix.os }}
+    needs: [testClient]
+    steps:
+      - uses: actions/checkout@v3
+      - shell: pwsh
+        run: echo "target=${{ matrix.platform }}-${{ matrix.arch }}" >> $env:GITHUB_ENV
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+      - name: Retrieve native images
+        uses: actions/download-artifact@v3
+        with:
+          path: staging
+      - name: configure server jar
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          cp -R ../../staging/jar/engine/target/server.jar ./server/jar
+          cp -R ../../staging/jar/dialect-idms/target/dialect-idms.jar ./server/jar/dialects
+          cp -R ../../staging/jar/dialect-daco/target/dialect-daco.jar ./server/jar/dialects
+      - name: configure windows executable
+        working-directory: clients/cobol-lsp-vscode-extension
+        if: startsWith( matrix.os, 'windows')
+        run: |
+          cp ../../staging/package-win/${{ env.target }}/engine.build_artifacts.txt ./server/native
+          cp ../../staging/package-win/${{ env.target }}/engine.exe ./server/native
+          cp ../../staging/package-win/${{ env.target }}/sunmscapi.dll ./server/native
+      - name: configure mac executable
+        working-directory: clients/cobol-lsp-vscode-extension
+        if: startsWith( matrix.os, 'mac')
+        run: |
+          cp -p ../../staging/package-macos/${{ env.target }} ./server/native
+          mv ./server/native/${{ env.target }} ./server/native/server-mac
+          chmod +x ./server/native/server-mac
+      - name: configure linux executable
+        working-directory: clients/cobol-lsp-vscode-extension
+        if: startsWith( matrix.os, 'ubuntu')
+        run: |
+          cp -p ../../staging/package-linux/${{ env.target }} ./server/native
+          mv ./server/native/${{ env.target }} ./server/native/server-linux
+          chmod +x ./server/native/server-linux
+      - name: build client
+        run: npm ci
+        working-directory: clients/cobol-lsp-vscode-extension
+      - name: generate vsix for ${{ env.target }}
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          npm run package  -- --target ${{ env.target }}
+          cp *.vsix ../../.
+      - uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: warn
+          name: ${{ env.target }}
+          path: '*.vsix'
+
+  native-build-test:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win32
+            arch: x64
+            npm_config_arch: x64
+          - os: windows-latest
+            platform: win32
+            arch: ia32
+            npm_config_arch: ia32
+          - os: windows-latest
+            platform: win32
+            arch: arm64
+            npm_config_arch: arm
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            npm_config_arch: x64
+          - os: ubuntu-latest
+            platform: linux
+            arch: arm64
+            npm_config_arch: arm64
+          - os: ubuntu-latest
+            platform: linux
+            arch: armhf
+            npm_config_arch: arm
+          - os: ubuntu-latest
+            platform: alpine
+            arch: x64
+            npm_config_arch: x64
+          - os: macos-latest
+            platform: darwin
+            arch: x64
+            npm_config_arch: x64
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+            npm_config_arch: arm64
+    runs-on: ${{ matrix.os }}
+    needs: [testClient]
+    steps:
+      - shell: pwsh
+        run: echo "target=${{ matrix.platform }}-${{ matrix.arch }}" >> $env:GITHUB_ENV
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+      - name: Retrieve native images
+        uses: actions/download-artifact@v3
+        with:
+          path: staging
+      - name: configure windows executable
+        working-directory: tests/native-executable-tests
+        if: startsWith( matrix.os, 'windows')
+        run: |
+          cp ../../staging/package-win/${{ env.target }}/engine.build_artifacts.txt ./server/windows
+          cp ../../staging/package-win/${{ env.target }}/engine.exe ./server/windows
+          cp ../../staging/package-win/${{ env.target }}/sunmscapi.dll ./server/windows
+      - name: configure mac executable
+        working-directory: tests/native-executable-tests
+        if: startsWith( matrix.os, 'mac')
+        run: |
+          cp -p ../../staging/package-macos/${{ env.target }} ./server/mac
+          mv ./server/mac/${{ env.target }} ./server/mac/server-mac
+          chmod +x ./server/mac/server-mac
+      - name: configure linux executable
+        working-directory: tests/native-executable-tests
+        if: startsWith( matrix.os, 'ubuntu')
+        run: |
+          cp -p ../../staging/package-linux/${{ env.target }} ./server/linux
+          mv ./server/linux/${{ env.target }} ./server/linux/server-linux
+          chmod +x ./server/linux/server-linux
+      - name: build native executable test code
+        working-directory: tests/native-executable-tests
+        run: npm ci
+      - name: run native executable test code
+        working-directory: tests/native-executable-tests
+        run: npm run test
+
+
