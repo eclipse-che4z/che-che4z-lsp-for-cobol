@@ -22,13 +22,18 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -61,10 +66,11 @@ import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
-import org.eclipse.lsp.cobol.common.SubroutineService;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.service.utils.ServerTypeUtil;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 import java.util.function.Function;
@@ -73,6 +79,8 @@ import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.common.error.ErrorCode.INCOMPATIBLE_SERVER_TYPE;
+import static org.eclipse.lsp.cobol.common.error.ErrorSource.WORKSPACE_SETTINGS;
 import static org.eclipse.lsp.cobol.common.model.NodeType.EMBEDDED_CODE;
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext.Activity.*;
@@ -134,6 +142,10 @@ public class CobolLanguageEngine {
       @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
 
+    if (ServerTypeUtil.isInCompatibleServerTypeRegistered(analysisConfig)) {
+      return getErrorForIncompatibleServerTypeAndDialects(documentUri);
+    }
+
     ResultWithErrors<TextTransformations> resultWithErrors = preprocessor.cleanUpCode(documentUri, text);
     AnalysisContext ctx = new AnalysisContext(new ExtendedSource(resultWithErrors.getResult()), analysisConfig);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
@@ -190,6 +202,20 @@ public class CobolLanguageEngine {
             .symbolTableMap(symbolAccumulatorService.getProgramSymbols())
             .build(),
             ctx.getAccumulatedErrors().stream().map(this::localizeErrorMessage).collect(toList()));
+  }
+
+  private ResultWithErrors<AnalysisResult> getErrorForIncompatibleServerTypeAndDialects(String documentUri) {
+    return new ResultWithErrors<>(AnalysisResult.builder().build(),
+            Collections.singletonList(SyntaxError.syntaxError()
+                    .severity(ErrorSeverity.ERROR)
+                    .suggestion(messageService.getMessage("workspaceError.ServerType"))
+                    .errorSource(WORKSPACE_SETTINGS)
+                    .errorCode(INCOMPATIBLE_SERVER_TYPE)
+                    .location(new OriginalLocation(
+                            new Location(documentUri,
+                                    new Range(new Position(0, 0), new Position(0, 6))),
+                            null)).build()
+            ));
   }
 
   private void processLateErrors(AnalysisContext ctx, OldExtendedDocument oldExtendedDocument, ParserListener listener, OldMapping positionMapping) {
