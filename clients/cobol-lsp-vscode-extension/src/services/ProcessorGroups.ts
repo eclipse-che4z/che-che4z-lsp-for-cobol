@@ -53,10 +53,21 @@ export function loadProcessorGroupConfig(item: { scopeUri: string, section: any 
             return configObject;
         }
 
-        let dialects: Preprocessor[] | undefined;
+        const dialects: Preprocessor[] = [];
         procCfg.pgroups.forEach(p => {
             if(pgroup == p.name) {
-                dialects = Array.isArray(p.preprocessor) ? p.preprocessor :  [p.preprocessor];
+                if (!Array.isArray(p.preprocessor)) {
+                    dialects.push(p.preprocessor);
+                } else {
+                    for (const pp of p.preprocessor) {
+                        if(typeof pp === 'object') {
+                            dialects.push(pp["name"]);
+                        }
+                        if(typeof pp === 'string') {
+                            dialects.push(pp);
+                        }
+                    }
+                }
             }
         });
 
