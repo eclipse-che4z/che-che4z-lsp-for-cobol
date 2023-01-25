@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.*;
@@ -54,7 +55,7 @@ class IdmsCopybookServiceTest {
   @BeforeEach
   void init() {
     processedCopybooks = new HashSet<>();
-    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER);
+    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of());
 
     service = new IdmsCopybookService("uri", copybookService, copybookConfig,
         treeListener, messageService, processedCopybooks);

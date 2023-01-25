@@ -15,15 +15,14 @@
 package org.eclipse.lsp.cobol.service;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
@@ -47,15 +46,16 @@ class CachingConfigurationServiceTest {
     DialectService dialectService = mock(DialectService.class);
     when(dialectService.getSettingsSections()).thenReturn(ImmutableList.of("dialect"));
 
-    CachingConfigurationService configuration = new CachingConfigurationService(settingsService, dialectService);
+    CachingConfigurationService configuration =
+        new CachingConfigurationService(settingsService, dialectService);
 
     assertEquals(
         new AnalysisConfig(
             new CopybookConfig(
-                CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
+                CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of()),
             ImmutableList.of(),
             ImmutableList.of(),
-            true, ImmutableList.of(), ImmutableMap.of()),
+            true),
         configuration.getConfig(CopybookProcessingMode.ENABLED));
   }
 
@@ -79,33 +79,31 @@ class CachingConfigurationServiceTest {
             new JsonPrimitive("DATACOM_SERVER"),
             featuresArray,
             dialectSettings,
+            predefinedParagraphs,
             subroutines,
-            new JsonPrimitive("true"),
-            new JsonArray(),
-            predefinedParagraphs);
+            new JsonPrimitive("true"));
 
     when(settingsService.fetchConfigurations(
             Arrays.asList(
                 TARGET_SQL_BACKEND.label,
                 ANALYSIS_FEATURES.label,
                 DIALECTS.label,
+                DACO_PREDEFINED_SECTIONS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
-                CICS_TRANSLATOR_ENABLED.label,
-                DIALECT_REGISTRY.label,
-                "dialect")))
+                CICS_TRANSLATOR_ENABLED.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
 
-    CachingConfigurationService configuration = new CachingConfigurationService(settingsService, dialectService);
+    CachingConfigurationService configuration =
+        new CachingConfigurationService(settingsService, dialectService);
     configuration.updateConfigurationFromSettings();
 
     assertEquals(
         new AnalysisConfig(
             new CopybookConfig(
-                CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
+                CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(EmbeddedLanguage.SQL),
             ImmutableList.of("Dialect"),
-            true, ImmutableList.of(),
-            ImmutableMap.of("dialect", predefinedParagraphs)),
+            true),
         configuration.getConfig(CopybookProcessingMode.DISABLED));
   }
 
@@ -126,33 +124,30 @@ class CachingConfigurationServiceTest {
             new JsonPrimitive("DATACOM_SERVER"),
             new JsonNull(),
             dialectSettings,
-            subroutineSettings,
-            new JsonNull(),
             new JsonArray(),
-            dialectsSettings);
+            subroutineSettings,
+            new JsonNull());
     when(settingsService.fetchConfigurations(
             Arrays.asList(
                 TARGET_SQL_BACKEND.label,
                 ANALYSIS_FEATURES.label,
                 DIALECTS.label,
+                DACO_PREDEFINED_SECTIONS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
-                CICS_TRANSLATOR_ENABLED.label,
-                DIALECT_REGISTRY.label,
-                "dialect")))
+                CICS_TRANSLATOR_ENABLED.label)))
         .thenReturn(supplyAsync(() -> clientConfig));
 
-    CachingConfigurationService configuration = new CachingConfigurationService(settingsService, dialectService);
+    CachingConfigurationService configuration =
+        new CachingConfigurationService(settingsService, dialectService);
     configuration.updateConfigurationFromSettings();
 
     assertEquals(
         new AnalysisConfig(
             new CopybookConfig(
-                CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
+                CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
             ImmutableList.of(EmbeddedLanguage.SQL, EmbeddedLanguage.CICS),
             ImmutableList.of("Dialect"),
-            false,
-            ImmutableList.of(),
-            ImmutableMap.of("dialect", dialectsSettings)),
+            false),
         configuration.getConfig(CopybookProcessingMode.DISABLED));
   }
 }

@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.core.model.tree.statements;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -23,13 +22,13 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.ObsoleteNode;
+import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.RemarksNode;
-import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.model.tree.logic.ObsoleteNodeCheck;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +46,7 @@ class ObsoleteNodeTest {
     RemarksNode remarksNode = new RemarksNode(locality);
     AstProcessor astProcessor = new AstProcessor();
     List<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
+    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService());
     ctx.register(
         new ProcessorDescription(
             ObsoleteNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteNodeCheck()));

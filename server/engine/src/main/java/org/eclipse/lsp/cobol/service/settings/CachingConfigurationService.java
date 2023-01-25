@@ -57,14 +57,12 @@ public class CachingConfigurationService implements ConfigurationService {
         TARGET_SQL_BACKEND.label,
         ANALYSIS_FEATURES.label,
         DIALECTS.label,
+        DACO_PREDEFINED_SECTIONS.label,
         SUBROUTINE_LOCAL_PATHS.label,
-        CICS_TRANSLATOR_ENABLED.label,
-        DIALECT_REGISTRY.label));
+        CICS_TRANSLATOR_ENABLED.label));
 
-    List<String> dialectsSections = dialectService.getSettingsSections();
-    settingsList.addAll(dialectsSections);
     config = settingsService.fetchConfigurations(settingsList)
-        .thenApply(c -> parseConfig(c, dialectsSections));
+        .thenApply(this::parseConfig);
   }
 
   @Override
@@ -94,23 +92,29 @@ public class CachingConfigurationService implements ConfigurationService {
     return ImmutableList.of();
   }
 
-  private ConfigurationEntity parseConfig(List<Object> clientConfig, List<String> dialectsSections) {
+  private ConfigurationEntity parseConfig(List<Object> clientConfig) {
     return Optional.ofNullable(clientConfig)
-        .map(cc -> this.parseSettings(cc, dialectsSections))
+        .map(this::parseSettings)
         .orElseGet(ConfigurationEntity::new);
   }
 
-  private ConfigurationEntity parseSettings(List<Object> clientConfig, List<String> dialectsSections) {
+  private ConfigurationEntity parseSettings(List<Object> clientConfig) {
 
     return new ConfigurationEntity(
         parseSQLBackend(clientConfig.subList(0, 1)),
         parseFeatures((JsonElement) clientConfig.get(1)),
         parseDialects((JsonArray) clientConfig.get(2)),
-        parseSubroutineFolder((JsonElement) clientConfig.get(3)),
-        parseCicsTranslatorOption((JsonElement) clientConfig.get(4)),
-        parseDialectRegistry((JsonArray) clientConfig.get(5)),
-        getDialectsSettings(clientConfig.subList(6, 6 + dialectsSections.size()).toArray(), dialectsSections.toArray())
+        parsePredefinedParagraphs((JsonElement) clientConfig.get(3)),
+        parseSubroutineFolder((JsonElement) clientConfig.get(4)),
+        parseCicsTranslatorOption((JsonElement) clientConfig.get(5))
         );
+  }
+
+  private List<String> parsePredefinedParagraphs(JsonElement labels) {
+    if (labels.isJsonArray()) {
+      return Streams.stream((JsonArray) labels).map(JsonElement::getAsString).collect(toList());
+    }
+    return ImmutableList.of();
   }
 
   private Map<String, JsonElement> getDialectsSettings(Object[] config, Object[] dialectsSections) {

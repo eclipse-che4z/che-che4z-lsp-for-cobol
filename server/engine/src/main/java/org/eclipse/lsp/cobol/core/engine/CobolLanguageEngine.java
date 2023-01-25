@@ -138,7 +138,6 @@ public class CobolLanguageEngine {
     AnalysisContext ctx = new AnalysisContext(new ExtendedSource(resultWithErrors.getResult()), analysisConfig);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
 
-    dialectService.updateDialects(analysisConfig.getDialectRegistry());
     DialectOutcome dialectOutcome = ctx.measure(DIALECTS,
             () -> processDialects(ctx));
 
@@ -202,7 +201,7 @@ public class CobolLanguageEngine {
   private Node processSyntaxTree(AnalysisConfig analysisConfig, SymbolAccumulatorService symbolAccumulatorService, AnalysisContext ctx, OldMapping positionMapping, List<Node> syntaxTree) {
     analyzeEmbeddedCode(syntaxTree, positionMapping);
     Node rootNode = syntaxTree.get(0);
-    ProcessingContext processingContext = new ProcessingContext(new ArrayList<>(), symbolAccumulatorService, ctx.getConfig().getDialectsSettings());
+    ProcessingContext processingContext = new ProcessingContext(new ArrayList<>(), symbolAccumulatorService);
     registerProcessors(analysisConfig, processingContext, symbolAccumulatorService);
     ctx.getAccumulatedErrors().addAll(astProcessor.processSyntaxTree(processingContext, rootNode));
     return rootNode;

@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableSet;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
@@ -52,6 +53,7 @@ public final class DaCoDialect implements CobolDialect {
   private final MessageService messageService;
 
   private final DaCoMaidProcessor maidProcessor;
+  private CopybookConfig copybookConfig;
 
   public DaCoDialect(CopybookService copybookService, MessageService messageService) {
     this.messageService = messageService;
@@ -105,6 +107,7 @@ public final class DaCoDialect implements CobolDialect {
     errors.addAll(parserErrors);
 
     DialectOutcome result = new DialectOutcome(nodes, context);
+    copybookConfig = context.getCopybookConfig();
     return new ResultWithErrors<>(result, errors);
   }
 
@@ -141,7 +144,7 @@ public final class DaCoDialect implements CobolDialect {
             DaCoCopyFromNode.class, ProcessingPhase.POST_DEFINITION,
                 new DaCoCopyFromProcessor()),
         new ProcessorDescription(ProgramNode.class, ProcessingPhase.POST_DEFINITION,
-                new DaCoImplicitCodeProcessor())
+                new DaCoImplicitCodeProcessor(copybookConfig))
     );
   }
 
