@@ -535,7 +535,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   }
 
   private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
-    registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.builder().build()));
     FutureTask<Void> task =
         registerToFutureMap(
             uri,
@@ -559,12 +558,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                             ? copybookProcessingMode
                             : CopybookProcessingMode.SKIP);
 
-        if (firstTime) {
-          if (copybookIdentificationService.isCopybook(uri, text, waitExtensionConfig())) {
+        if (firstTime && copybookIdentificationService.isCopybook(uri, text, waitExtensionConfig())) {
             return;
-          }
         }
-        AnalysisConfig config = configurationService.getConfig(processingMode);
+        AnalysisConfig config = configurationService.getConfig(uri, processingMode);
         AnalysisResult result = engine.analyze(uri, text, config);
         if (firstTime) {
           registerDocument(uri, new CobolDocumentModel(text, result));

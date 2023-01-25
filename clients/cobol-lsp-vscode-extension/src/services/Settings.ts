@@ -29,6 +29,7 @@ import {
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
+import { loadProcessorGroupConfig } from "./ProcessorGroups";
 
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
@@ -80,9 +81,9 @@ export function configHandler(request : any): Array<any> {
                 const object = DialectRegistry.getDialects();
                 result.push(object);
             } else {
-                const object = vscode.workspace.getConfiguration().get(item.section)
+                const object = loadProcessorGroupConfig(item, vscode.workspace.getConfiguration().get(item.section));
                 result.push(object);
-                }
+            }
         } catch (error) {
             console.log(error);
         }

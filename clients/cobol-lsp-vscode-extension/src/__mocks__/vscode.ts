@@ -25,7 +25,8 @@ export namespace workspace {
                 }
             }
         }
-     }
+    }
+    export function createFileSystemWatcher(a: string) {}
 }
 
 export namespace extensions {
@@ -55,6 +56,7 @@ export class Uri {
         result.toString = () => url.pathToFileURL(path).toString();
         return result;
     }
+    static parse = jest.fn()
 }
 
 export enum ConfigurationTarget {

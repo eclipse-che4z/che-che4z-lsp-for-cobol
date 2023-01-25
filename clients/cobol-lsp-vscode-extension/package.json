@@ -442,7 +442,17 @@
                 "command": "cobol-lsp.commentLine.toggle",
                 "when": "editorLangId =~ /^cobol$/i && editorTextFocus && !editorReadonly"
             }
-        ]
+        ],
+        "jsonValidation": [
+            {
+              "fileMatch": "/.cobolplugin/pgm_conf.json",
+              "url": "./schema/pgm_conf.schema.json"
+            },
+            {
+              "fileMatch": "/.cobolplugin/proc_grps.json",
+              "url": "./schema/proc_grps.schema.json"
+            }
+          ]
     },
     "scripts": {
         "vscode:prepublish": "npm run -S esbuild-base -- --minify",

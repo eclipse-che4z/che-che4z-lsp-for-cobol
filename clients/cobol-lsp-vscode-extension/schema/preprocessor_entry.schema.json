@@ -1,0 +1,9 @@
+{
+    "description": "Defines a preprocessor pass.",
+    "anyOf": [
+        {
+            "type": "string",
+            "description": "Name of the preprocessor."
+        }
+    ]
+}

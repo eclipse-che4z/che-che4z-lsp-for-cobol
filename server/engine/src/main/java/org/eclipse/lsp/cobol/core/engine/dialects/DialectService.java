@@ -22,10 +22,17 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -63,8 +70,22 @@ public class DialectService {
    */
   public ResultWithErrors<DialectOutcome> process(
       List<String> dialects, DialectProcessingContext context) {
-    List<CobolDialect> orderedDialects = sortDialects(dialects);
     List<SyntaxError> errors = new LinkedList<>();
+    List<CobolDialect> orderedDialects;
+    try {
+      orderedDialects = sortDialects(dialects);
+    } catch (NoSuchElementException e) {
+      errors.add(SyntaxError.syntaxError()
+              .messageTemplate(MessageTemplate.of("dialects.missingDialect",
+                      e.getMessage(),
+                      context.getExtendedSource().getUri()))
+              .severity(ErrorSeverity.ERROR)
+              .location(new OriginalLocation(new Location(context.getProgramDocumentUri(),
+                      new Range(new Position(0, 0), new Position(0, 0))), null))
+              .errorSource(ErrorSource.DIALECT)
+              .build());
+      return new ResultWithErrors<>(new DialectOutcome(context), errors);
+    }
     for (CobolDialect orderedDialect : orderedDialects) {
       List<SyntaxError> dialectErrors = orderedDialect.extend(context);
       dialectErrors.forEach(
@@ -93,13 +114,14 @@ public class DialectService {
     LinkedList<CobolDialect> orderedDialects = new LinkedList<>();
     LinkedList<String> dialectsQueue = new LinkedList<>(dialects);
     while (!dialectsQueue.isEmpty()) {
-      CobolDialect dialect = getDialectByName(dialectsQueue.pop());
+      String dialectName = dialectsQueue.pop();
+      CobolDialect dialect = getDialectByName(dialectName).orElseThrow(() -> new NoSuchElementException(dialectName));
       if (dialect.runBefore().isEmpty()) {
         orderedDialects.add(dialect);
         continue;
       }
       for (String name : dialect.runBefore()) {
-        CobolDialect d = getDialectByName(name);
+        CobolDialect d = getDialectByName(name).orElseThrow(() -> new NoSuchElementException(name));
         int index = orderedDialects.indexOf(d);
         if (index >= 0) {
           orderedDialects.add(index, dialect);
@@ -117,10 +139,10 @@ public class DialectService {
   /**
    * Returns dialect object by name
    * @param dialectName is a dialect name
-   * @return a dialect
+   * @return a dialect is it's possible
    */
-  public CobolDialect getDialectByName(String dialectName) {
-    return dialectSuppliers.getOrDefault(dialectName, EMPTY_DIALECT);
+  public Optional<CobolDialect> getDialectByName(String dialectName) {
+    return Optional.ofNullable(dialectSuppliers.get(dialectName));
   }
 
   private static ResultWithErrors<DialectOutcome> processDialect(
