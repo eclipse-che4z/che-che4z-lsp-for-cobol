@@ -62,11 +62,9 @@ class TestMapDefinition {
             ImmutableMap.of(),
             ImmutableList.of(),
             new AnalysisConfig(
-                new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
+                new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of()),
                 ImmutableList.of(),
-                ImmutableList.of(IdmsDialect.NAME), true,
-                ImmutableList.of(),
-                ImmutableMap.of()));
+                ImmutableList.of(IdmsDialect.NAME), true));
     final Hover mapHover =
         new VariableHover()
             .getHover(

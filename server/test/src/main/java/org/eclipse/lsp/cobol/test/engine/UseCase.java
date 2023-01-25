@@ -15,17 +15,16 @@
 
 package org.eclipse.lsp.cobol.test.engine;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.test.CobolText;
 
 import java.util.Collections;
@@ -55,6 +54,8 @@ public class UseCase {
   @Builder.Default List<String> dialects = Collections.emptyList();
   /** Dialects config */
   @Builder.Default Map<String, JsonElement> dialectsSettings = ImmutableMap.of();
+  /** User predefined labels */
+  @Builder.Default List<String> predefinedSections = Collections.emptyList();
 
   @Builder.Default boolean cicsTranslator = true;
   /**
@@ -65,11 +66,9 @@ public class UseCase {
    */
   public AnalysisConfig getAnalysisConfig() {
     return new AnalysisConfig(
-        new CopybookConfig(copybookProcessingMode, sqlBackend),
+        new CopybookConfig(copybookProcessingMode, sqlBackend, predefinedSections),
         features,
         dialects,
-        cicsTranslator,
-        ImmutableList.of(),
-        dialectsSettings);
+        cicsTranslator);
   }
 }

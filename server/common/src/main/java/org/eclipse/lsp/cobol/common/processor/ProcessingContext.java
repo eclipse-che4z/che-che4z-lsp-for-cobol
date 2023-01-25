@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.common.processor;
 
-import com.google.gson.JsonElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -38,7 +37,6 @@ public class ProcessingContext {
     final List<SyntaxError> errors;
     final VariableAccumulator variableAccumulator;
     private final CompilerDirectiveContext compilerDirectiveContext = new CompilerDirectiveContext();
-    private final Map<String, JsonElement> dialectsConfig;
 
     /**
      * Register node type processor

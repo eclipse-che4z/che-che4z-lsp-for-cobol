@@ -66,7 +66,6 @@ class PositiveTest extends FileBasedTest {
               .copybookProcessingMode(ENABLED)
               .features(analysisConfig.getFeatures())
               .dialects(analysisConfig.getDialects())
-              .dialectsSettings(analysisConfig.getDialectsSettings())
               .build();
       AnalysisResult analyze = UseCaseUtils.analyze(useCase);
       PositiveTestUtility.assetDefinitionsNReferencesFromSnap(analyze.getSymbolTableMap(), dataNameRefs, analyze.getRootNode(), fileName);

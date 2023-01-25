@@ -15,7 +15,6 @@
 
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
-import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -49,7 +48,7 @@ class ElementaryNodeTest {
   void testValidatePicAndUsageClauseWhenPicAndUsageAreInCompatible() {
     ElementaryItemNode node = getNode("PIC 9", UsageFormat.COMPUTATIONAL_1);
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
+    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService());
     AstProcessor astProcessor = new AstProcessor();
     ctx.register(
         new ProcessorDescription(
@@ -65,7 +64,7 @@ class ElementaryNodeTest {
     ElementaryItemNode node = getNode("PIC X", UsageFormat.COMPUTATIONAL_5);
     ArrayList<SyntaxError> errors = new ArrayList<>();
     AstProcessor astProcessor = new AstProcessor();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
+    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService());
     ctx.register(
         new ProcessorDescription(
             ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryNodeCheck()));
@@ -79,7 +78,7 @@ class ElementaryNodeTest {
   void testValidatePicAndUsageClauseWhenPicAndUsageAreCompatible() {
     ElementaryItemNode node = getNode("PIC 9", UsageFormat.DISPLAY);
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    new AstProcessor().process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of()));
+    new AstProcessor().process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors, new SymbolAccumulatorService()));
     assertEquals(0, errors.size());
 
     // TODO:
@@ -87,7 +86,7 @@ class ElementaryNodeTest {
     node = getNode("PIC 9", UsageFormat.UTF_8);
     ArrayList<SyntaxError> errors2 = new ArrayList<>();
     new AstProcessor()
-        .process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors2, new SymbolAccumulatorService(), ImmutableMap.of()));
+        .process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors2, new SymbolAccumulatorService()));
     assertEquals(0, errors2.size());
   }
 
@@ -97,7 +96,7 @@ class ElementaryNodeTest {
         new ElementaryItemNode(
             Locality.builder().build(), 2, "TEST-NODE", false, "PIC X", "", UsageFormat.UTF_8, false, true, false);
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
+    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService());
     AstProcessor astProcessor = new AstProcessor();
     ctx.register(
         new ProcessorDescription(
