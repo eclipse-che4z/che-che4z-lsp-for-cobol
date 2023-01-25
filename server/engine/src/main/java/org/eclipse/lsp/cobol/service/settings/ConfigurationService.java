@@ -15,18 +15,14 @@
 package org.eclipse.lsp.cobol.service.settings;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonElement;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
-import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 
 import java.util.List;
-import java.util.Map;
 
 /** This interface handles the request for configurations from the client settings */
 public interface ConfigurationService {
@@ -58,19 +54,17 @@ public interface ConfigurationService {
     SQLBackend sqlBackend;
     List<EmbeddedLanguage> features;
     List<String> dialects;
+    List<String> predefinedParagraphs;
     List<String> subroutines;
     boolean cicsTranslatorEnabled;
-    List<DialectRegistryItem> dialectRegistry;
-    Map<String, JsonElement> dialectsSettings;
 
     public ConfigurationEntity() {
       sqlBackend = SQLBackend.DB2_SERVER;
       features = ImmutableList.of();
       dialects = ImmutableList.of();
+      predefinedParagraphs = ImmutableList.of();
       subroutines = ImmutableList.of();
       cicsTranslatorEnabled = true;
-      dialectRegistry = ImmutableList.of();
-      dialectsSettings = ImmutableMap.of();
     }
   }
 }

@@ -16,8 +16,6 @@
 package org.eclipse.lsp.cobol.common;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonElement;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
@@ -25,7 +23,6 @@ import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This dto class is used to hold config data for analysis, such as supported features, dialects and
@@ -37,8 +34,6 @@ public class AnalysisConfig {
   List<EmbeddedLanguage> features;
   List<String> dialects;
   boolean isCicsTranslatorEnabled;
-  List<DialectRegistryItem> dialectRegistry;
-  Map<String, JsonElement> dialectsSettings;
 
   /**
    * Create the default language features config, containing all features and the given copybook
@@ -49,9 +44,9 @@ public class AnalysisConfig {
    */
   public static AnalysisConfig defaultConfig(CopybookProcessingMode mode) {
     return new AnalysisConfig(
-        new CopybookConfig(mode, SQLBackend.DB2_SERVER),
+        new CopybookConfig(mode, SQLBackend.DB2_SERVER, ImmutableList.of()),
         Arrays.asList(EmbeddedLanguage.values()),
-        ImmutableList.of(), true, ImmutableList.of(), ImmutableMap.of());
+        ImmutableList.of(),
+        true);
   }
-
 }

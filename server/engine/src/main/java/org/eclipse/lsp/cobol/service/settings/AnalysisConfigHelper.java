@@ -19,9 +19,7 @@ import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 
-/**
- * AnalysisConfig Helper class
- */
+/** AnalysisConfig Helper class */
 @UtilityClass
 class AnalysisConfigHelper {
   /**
@@ -34,11 +32,12 @@ class AnalysisConfigHelper {
    */
   public AnalysisConfig fromConfigEntity(
       CopybookProcessingMode mode, ConfigurationService.ConfigurationEntity entity) {
-    CopybookConfig copybookConfig = new CopybookConfig(mode, entity.getSqlBackend());
+    CopybookConfig copybookConfig = new CopybookConfig(mode, entity.getSqlBackend(), entity.getPredefinedParagraphs());
 
-    return new AnalysisConfig(copybookConfig, entity.getFeatures(), entity.getDialects(),
-        entity.isCicsTranslatorEnabled(),
-        entity.getDialectRegistry(),
-        entity.getDialectsSettings());
+    return new AnalysisConfig(
+        copybookConfig,
+        entity.getFeatures(),
+        entity.getDialects(),
+        entity.isCicsTranslatorEnabled());
   }
 }

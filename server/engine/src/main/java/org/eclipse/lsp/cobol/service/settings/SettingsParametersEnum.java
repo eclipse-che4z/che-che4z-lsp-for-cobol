@@ -35,7 +35,8 @@ public enum SettingsParametersEnum {
   ANALYSIS_FEATURES("analysis.features"),
   DIALECTS("dialects"),
   CICS_TRANSLATOR_ENABLED("cics.translator"),
-  DIALECT_REGISTRY("dialect.registry");
+  DIALECT_REGISTRY("dialect.registry"),
+  DACO_PREDEFINED_SECTIONS("daco.predefined-sections"),;
 
   public final String label;
 
