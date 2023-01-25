@@ -43,7 +43,7 @@ function searchCopybook(cobolFileName: string, copybookName: string, dialectType
         const targetFolder = getTargetFolderForCopybook(folderKind, cobolFileName, dialectType);
         const allowedExtensions = resolveAllowedExtensions(folderKind);
         result = searchCopybookInWorkspace(copybookName, targetFolder, allowedExtensions);
-        if (result) {
+         if (result) {
             return result;
         }
     }

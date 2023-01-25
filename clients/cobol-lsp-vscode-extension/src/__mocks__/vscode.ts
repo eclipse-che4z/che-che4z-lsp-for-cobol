@@ -16,7 +16,7 @@ import * as url from "url";
 
 // tslint:disable: no-namespace no-empty
 export namespace workspace {
-    export const workspaceFolders: [] = [];
+    export const workspaceFolders: any[] = [{}];
     export function getConfiguration() {
         return {
             get: key => {

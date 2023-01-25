@@ -18,6 +18,7 @@ jest.mock("vscode", () => ({
     },
     workspace: {
         getWorkspaceFolder: jest.fn().mockReturnValue({uri: {fsPath: "some path"}}),
+        workspaceFolders: [{uri: {fsPath: "some path"}}],
     }
 }));
 jest.mock("path", () => ({

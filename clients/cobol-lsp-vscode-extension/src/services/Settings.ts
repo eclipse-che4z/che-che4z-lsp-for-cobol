@@ -29,7 +29,7 @@ import {
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
-import { loadProcessorGroupConfig } from "./ProcessorGroups";
+import { loadProcessorGroupConfig, loadProcessorGroupCopybookPaths } from "./ProcessorGroups";
 
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
@@ -112,7 +112,8 @@ export class SettingsService {
      * @returns a list of local path
      */
     public static getCopybookLocalPath(cobolFileName: string, dialectType: string): string[] {
-        return SettingsService.getCopybookConfigValues(PATHS_LOCAL_KEY, cobolFileName, dialectType);
+        const pgPaths = loadProcessorGroupCopybookPaths(cobolFileName, dialectType);
+        return [...pgPaths, ...SettingsService.getCopybookConfigValues(PATHS_LOCAL_KEY, cobolFileName, dialectType)];
     }
 
     public static getCopybookExtension(): string[] {

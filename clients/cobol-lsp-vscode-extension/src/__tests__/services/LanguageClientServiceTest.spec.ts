@@ -110,7 +110,7 @@ describe("LanguageClientService positive scenario", () => {
             documentSelector: [SERVER_ID],
             outputChannel: expect.any(Function),
             synchronize: {
-                fileEvents: undefined,
+                fileEvents: [undefined, undefined],
             }
         });
     });
@@ -126,7 +126,7 @@ describe("LanguageClientService positive scenario", () => {
                 
                 outputChannel: expect.any(Function),
                 synchronize: {
-                    fileEvents: undefined,
+                    fileEvents: [undefined, undefined],
                 }
             });
     });
