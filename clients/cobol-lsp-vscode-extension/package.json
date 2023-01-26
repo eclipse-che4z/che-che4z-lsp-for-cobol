@@ -53,8 +53,8 @@
                 "title": "Open Copybook location settings"
             },
             {
-                "command": "cobol-lsp.serverType.goto-settings",
-                "title": "Open Server Type settings"
+                "command": "cobol-lsp.serverRuntime.goto-settings",
+                "title": "Open serverRuntime settings"
             },
             {
                 "command": "cobol-lsp.dialects.goto-settings",
@@ -250,7 +250,7 @@
                     "type": "array",
                     "$comment": "Items is converted to an array instead of simple string, to disable the vscode rendering the form for extensions setting, instead shows an hyper link to settings.xml for editing.This is done as empty string is not supported by vscode yet",
                     "items": {
-                        "type": ["string"] 
+                        "type": ["string"]
                     },
                     "default": [
                         ".CPY",
@@ -459,7 +459,7 @@
                     "default": "true",
                     "description": "Enable CICS translator"
                 },
-                "cobol-lsp.serverType": {
+                "cobol-lsp.serverRuntime": {
                     "type": "string",
                     "enum": [
                         "JAVA",
@@ -467,10 +467,10 @@
                     ],
                     "default": "JAVA",
                     "enumDescriptions": [
-                        "JAVA  - Run java Server",
-                        "NATIVE - Run native Server"
+                        "JAVA  - Run from a Java ARchive (jar). Requires java runtime to be installed",
+                        "NATIVE - Use platform binary"
                     ],
-                    "description": "COBOL LS server type."
+                    "description": "COBOL LS server Runtime."
                 }
             }
         },

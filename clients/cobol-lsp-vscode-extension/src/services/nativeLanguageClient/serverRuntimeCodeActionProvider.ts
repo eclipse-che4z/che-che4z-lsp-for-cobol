@@ -15,7 +15,7 @@ import * as vscode from "vscode";
 import { QUICKFIX_UPDATE_DIALECTSSETTINGS, QUICKFIX_UPDATE_SERVER_TO_JAVA } from "../../constants";
 import { TelemetryService } from "../reporter/TelemetryService";
 
-export class ServerTypeCodeActionProvider implements vscode.CodeActionProvider {
+export class ServerRuntimeCodeActionProvider implements vscode.CodeActionProvider {
 
     public async provideCodeActions(_doc: vscode.TextDocument,
                                     _range: vscode.Range | vscode.Selection,
