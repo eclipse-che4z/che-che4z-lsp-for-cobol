@@ -19,10 +19,10 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 
-import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 
 /**
@@ -41,7 +41,7 @@ class ErrorHelper {
                     "GrammarPreprocessorListener.errorSuggestion",
                     copybookName))
             .severity(ERROR)
-            .errorCode(MISSING_COPYBOOK)
+            .errorCode(ErrorCodes.MISSING_COPYBOOK)
             .build();
     LOG.debug("Syntax error by reportMissingCopybooks: {}", error.toString());
     return error;
@@ -57,7 +57,7 @@ class ErrorHelper {
                     "IdmsCopybookVisitor.errorCircularDependency",
                     copybookName))
             .severity(ERROR)
-            .errorCode(MISSING_COPYBOOK)
+            .errorCode(ErrorCodes.MISSING_COPYBOOK)
             .build();
     LOG.debug("Syntax error by reportCircularDependency: {}", error.toString());
     return error;

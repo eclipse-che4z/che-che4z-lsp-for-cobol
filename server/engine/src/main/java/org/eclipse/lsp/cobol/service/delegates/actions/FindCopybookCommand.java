@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service.delegates.actions;
 
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
@@ -28,7 +29,6 @@ import java.util.function.Function;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp4j.CodeActionKind.QuickFix;
 
 /**
@@ -44,7 +44,7 @@ public class FindCopybookCommand implements CodeActionProvider {
       @NonNull CodeActionParams params) {
     return params.getContext().getDiagnostics().stream()
         .filter(it -> it.getCode() != null)
-        .filter(it -> MISSING_COPYBOOK.getLabel().equalsIgnoreCase(it.getCode().getLeft()))
+        .filter(it -> ErrorCodes.MISSING_COPYBOOK.getLabel().equalsIgnoreCase(it.getCode().getLeft()))
         .map(toCodeAction(params))
         .map(Either::<Command, CodeAction>forRight)
         .collect(toList());
@@ -65,7 +65,7 @@ public class FindCopybookCommand implements CodeActionProvider {
   private Command createCommand(@NonNull CodeActionParams params, @NonNull Diagnostic it) {
     return new Command(
         TITLE,
-        MISSING_COPYBOOK.getLabel(),
+            ErrorCodes.MISSING_COPYBOOK.getLabel(),
         asList(retrieveCopybookName(it), params.getTextDocument().getUri()));
   }
 

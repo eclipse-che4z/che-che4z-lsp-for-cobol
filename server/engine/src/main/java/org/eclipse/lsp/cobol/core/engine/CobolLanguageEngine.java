@@ -30,6 +30,7 @@ import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
@@ -73,7 +74,6 @@ import org.eclipse.lsp4j.Range;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.common.error.ErrorCode.INCOMPATIBLE_SERVER_TYPE;
 import static org.eclipse.lsp.cobol.common.error.ErrorSource.WORKSPACE_SETTINGS;
 import static org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext.Activity.*;
 
@@ -213,7 +213,7 @@ public class CobolLanguageEngine {
                     .severity(ErrorSeverity.ERROR)
                     .suggestion(messageService.getMessage("workspaceError.ServerType"))
                     .errorSource(WORKSPACE_SETTINGS)
-                    .errorCode(INCOMPATIBLE_SERVER_TYPE)
+                    .errorCode(ErrorCodes.INCOMPATIBLE_SERVER_TYPE)
                     .location(new OriginalLocation(
                             new Location(documentUri,
                                     new Range(new Position(0, 0), new Position(0, 6))),

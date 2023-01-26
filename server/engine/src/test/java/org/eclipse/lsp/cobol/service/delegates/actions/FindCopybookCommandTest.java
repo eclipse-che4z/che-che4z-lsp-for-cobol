@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service.delegates.actions;
 
 import com.google.common.collect.Lists;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
-import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp4j.CodeActionKind.QuickFix;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
@@ -44,7 +44,7 @@ class FindCopybookCommandTest {
       new Diagnostic(RANGE, "Syntax error", Error, null, null);
   private static final Diagnostic COPYBOOK_ERROR =
       new Diagnostic(
-          RANGE, COPYBOOK_NAME + ": Copybook not found", Error, null, MISSING_COPYBOOK.getLabel());
+          RANGE, COPYBOOK_NAME + ": Copybook not found", Error, null, ErrorCodes.MISSING_COPYBOOK.getLabel());
 
   /** Test a code action to resolve the required copybook created for the missing copybook error. */
   @Test
@@ -106,7 +106,7 @@ class FindCopybookCommandTest {
 
     Command command = action.getCommand();
     assertEquals(TITLE, command.getTitle());
-    assertEquals(MISSING_COPYBOOK.getLabel(), command.getCommand());
+    assertEquals(ErrorCodes.MISSING_COPYBOOK.getLabel(), command.getCommand());
 
     List<Object> arguments = command.getArguments();
     assertEquals(2, arguments.size());
