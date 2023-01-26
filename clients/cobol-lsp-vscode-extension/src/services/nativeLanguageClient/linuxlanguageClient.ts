@@ -17,12 +17,10 @@ import {Executable} from "vscode-languageclient";
 import {NativeLanguageClient} from "./nativelanguageClientInterface";
 
 export class LinuxlanguageClient implements NativeLanguageClient {
-    private serverPath: string;
     private readonly executablePath: string;
     private readonly command: string;
 
     constructor(serverPath) {
-        this.serverPath = serverPath;
         this.executablePath = join(serverPath, "native");
         this.command = `./server-linux`;
     }
