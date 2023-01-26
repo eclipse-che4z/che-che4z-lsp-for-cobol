@@ -53,8 +53,8 @@
                 "title": "Open Copybook location settings"
             },
             {
-                "command": "cobol-lsp.serverType.goto-settings",
-                "title": "Open Server Type settings"
+                "command": "cobol-lsp.serverRuntime.goto-settings",
+                "title": "Open serverRuntime settings"
             },
             {
                 "command": "cobol-lsp.dialects.goto-settings",
@@ -396,7 +396,7 @@
                     "default": "true",
                     "description": "Enable CICS translator"
                 },
-                "cobol-lsp.serverType": {
+                "cobol-lsp.serverRuntime": {
                     "type": "string",
                     "enum": [
                         "JAVA",
@@ -404,10 +404,10 @@
                     ],
                     "default": "JAVA",
                     "enumDescriptions": [
-                        "JAVA  - Run java Server",
-                        "NATIVE - Run native Server"
+                        "JAVA  - Run from a Java Archive (jar). Requires java runtime to be installed",
+                        "NATIVE - Use platform binary"
                     ],
-                    "description": "COBOL LS server type."
+                    "description": "COBOL LS server runtime."
                 }
             }
         },

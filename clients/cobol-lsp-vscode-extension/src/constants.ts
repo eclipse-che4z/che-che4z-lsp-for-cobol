@@ -17,7 +17,7 @@ export const SETTINGS_SUBROUTINE_LOCAL_KEY = "cobol-lsp.subroutine-manager.paths
 export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";
 
 export const SERVER_PORT = "cobol-lsp.server.port";
-export const SERVER_TYPE = "cobol-lsp.serverType";
+export const SERVER_RUNTIME = "cobol-lsp.serverRuntime";
 export const PATHS_LOCAL_KEY = "paths-local";
 export const PATHS_ZOWE = "paths-dsn";
 export const PATHS_USS = "paths-uss";
@@ -38,7 +38,7 @@ export const DSN_START_PROHIBITED_CHAR = `Dataset name segment: ${SEGMENT_PLACEH
 export const DSN_CONTAINS_PROHIBITED_CHAR = `Dataset name segment: ${SEGMENT_PLACEHOLDER} contains a prohibited character.`;
 export const QUICKFIX_GOTOSETTINGS = "Open settings";
 export const QUICKFIX_UPDATE_DIALECTSSETTINGS = "Update dialects";
-export const QUICKFIX_UPDATE_SERVER_TO_JAVA = "Update server type"
+export const QUICKFIX_UPDATE_SERVER_TO_JAVA = "Update server type";
 export const COBOL_CBL_EXT = ".CBL";
 export const COBOL_COB_EXT = ".COB";
 export const COBOL_COBOL_EXT = ".COBOL";
