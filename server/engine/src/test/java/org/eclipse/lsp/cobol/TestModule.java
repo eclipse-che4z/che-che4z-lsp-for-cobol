@@ -110,6 +110,12 @@ public class TestModule extends AbstractModule {
             .to(CopybookIdentificationCombinedStrategy.class);
     bind(DialectDiscoveryService.class).toInstance(new DialectDiscoveryService() {
       @Override
+      public void registerExecuteCommandCapabilities(List<String> capabilities, String id) {}
+
+      @Override
+      public void unregisterExecuteCommandCapabilities(String id) {}
+
+      @Override
       public List<CobolDialect> loadDialects(CopybookService copybookService, MessageService messageService) {
         return ImmutableList.of();
       }

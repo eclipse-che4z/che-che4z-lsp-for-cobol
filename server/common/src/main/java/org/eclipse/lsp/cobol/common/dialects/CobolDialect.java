@@ -39,8 +39,7 @@ public interface CobolDialect {
    * @return the dialect processing result
    */
   default ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    return new ResultWithErrors<>(new DialectOutcome(context),
-            ImmutableList.of());
+    return new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of());
   }
 
   /**
@@ -95,4 +94,15 @@ public interface CobolDialect {
     return ImmutableList.of();
   }
 
+  /**
+   * Return a list of dialect specific server execute command capabilities.
+   *
+   * <p>These capabilities correspond to workspace/executeCommand request which is sent from the
+   * client to the server to trigger command execution on the server.
+   *
+   * @return a list of server execute command capabilities
+   */
+  default List<String> getDialectExecuteCommandCapabilities() {
+    return ImmutableList.of();
+  }
 }

@@ -36,4 +36,14 @@ public class ExplicitDialectDiscoveryService implements DialectDiscoveryService 
   public List<CobolDialect> loadDialects(String path, CopybookService copybookService, MessageService messageService) {
     return ImmutableList.of();
   }
+
+  @Override
+  public void registerExecuteCommandCapabilities(List<String> capabilities, String id) {
+
+  }
+
+  @Override
+  public void unregisterExecuteCommandCapabilities(String id) {
+
+  }
 }

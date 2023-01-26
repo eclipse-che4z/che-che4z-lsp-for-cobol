@@ -163,6 +163,8 @@ public class DialectService {
           .filter(d -> d.getName().equals(name))
           .findFirst()
               .map(dialect -> {
+                discoveryService.registerExecuteCommandCapabilities(
+                        dialect.getDialectExecuteCommandCapabilities(), dialect.getName());
                 changed.set(true);
                 return dialect;
               })
