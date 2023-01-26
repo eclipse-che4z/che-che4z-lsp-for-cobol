@@ -23,7 +23,7 @@ import {
     PATHS_USS,
     PATHS_ZOWE,
     SERVER_PORT,
-    SERVER_TYPE,
+    SERVER_RUNTIME,
     SETTINGS_CPY_SECTION,
     SETTINGS_DIALECT,
     SETTINGS_SUBROUTINE_LOCAL_KEY,
@@ -177,14 +177,6 @@ export class SettingsService {
         return settings;
     }
 
-    private static evaluateVariable(dataList: string[], variable: string, value: string): string[] {
-        const result: string[] = [];
-        if (dataList) {
-            dataList.forEach(d => result.push(d.replace(`$\{${variable}\}`, value)))
-        }
-        return result;
-    }
-
     /**
      * Return the code page for the copybook file encoding supplied by user
      * @returns string
@@ -214,6 +206,23 @@ export class SettingsService {
         return vscode.workspace.getConfiguration().get(SETTINGS_DIALECT);
     }
 
+   /**
+    * Gives the configured runtime from settings.
+    *
+    * @returns returns configured runtime
+    */
+    public static serverRuntime(): string {
+        return vscode.workspace.getConfiguration().get(SERVER_RUNTIME);
+    }
+
+    private static evaluateVariable(dataList: string[], variable: string, value: string): string[] {
+        const result: string[] = [];
+        if (dataList) {
+            dataList.forEach(d => result.push(d.replace(`$\{${variable}\}`, value)))
+        }
+        return result;
+    }
+
     private static getCopybookConfigValues(section: string, cobolFileName: string, dialectType: string) {
         const programFile = cobolFileName.replace(/\.[^/.]+$/, "");
         if (dialectType !== SettingsService.DEFAULT_DIALECT) {
@@ -224,15 +233,6 @@ export class SettingsService {
         }
         const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(section);
         return SettingsService.evaluateVariable(pathList, "fileBasenameNoExtension", programFile);
-    }
-
-   /**
-    * Checks if native build is enabled.
-    *
-    * @returns is native build enabled
-    */
-    public static serverType(): string {
-        return vscode.workspace.getConfiguration().get(SERVER_TYPE);
     }
 
 }
