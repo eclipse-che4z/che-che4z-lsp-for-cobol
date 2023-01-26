@@ -467,10 +467,10 @@
                     ],
                     "default": "JAVA",
                     "enumDescriptions": [
-                        "JAVA  - Run from a Java ARchive (jar). Requires java runtime to be installed",
+                        "JAVA  - Run from a Java Archive (jar). Requires java runtime to be installed",
                         "NATIVE - Use platform binary"
                     ],
-                    "description": "COBOL LS server Runtime."
+                    "description": "COBOL LS server runtime."
                 }
             }
         },
