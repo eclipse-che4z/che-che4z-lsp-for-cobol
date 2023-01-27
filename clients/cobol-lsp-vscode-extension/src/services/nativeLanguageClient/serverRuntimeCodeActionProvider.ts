@@ -37,7 +37,7 @@ export class ServerRuntimeCodeActionProvider implements vscode.CodeActionProvide
         };
 
         goToServerTypeSettings.command = {
-            command: "cobol-lsp.serverType.goto-settings",
+            command: "cobol-lsp.serverRuntime.goto-settings",
             title: QUICKFIX_UPDATE_SERVER_TO_JAVA,
         }
         return [goToDialectsSettings, goToServerTypeSettings];
