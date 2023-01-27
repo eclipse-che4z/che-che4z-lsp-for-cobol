@@ -20,7 +20,7 @@ import { SettingsService } from "../Settings";
 export class ConfigurationWatcher {
 
     private static async restartVsCode() {
-        const selection = await vscode.window.showInformationMessage("Restart the vscode to enforce serverRuntime settings change", "Ok", "Later");
+        const selection = await vscode.window.showInformationMessage("Reload vscode for serverRuntime settings change to take effect", "Ok", "Later");
         if (typeof selection === "undefined" || selection === "Later") {
             return;
         }
