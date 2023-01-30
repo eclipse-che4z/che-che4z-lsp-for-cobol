@@ -19,8 +19,8 @@ import * as Path from "path";
 import * as vscode from "vscode";
 import {
     C4Z_FOLDER,
-    COPYBOOKS_FOLDER, DOWNLOAD_QUEUE_LOCKED_ERROR_MSG,
-    PROFILE_NAME_PLACEHOLDER, PROVIDE_PROFILE_MSG, UNLOCK_DOWNLOAD_QUEUE_MSG,
+    COPYBOOKS_FOLDER, DOWNLOAD_QUEUE_LOCKED_ERROR_MSG, INSTALL_ZOWE,
+    PROFILE_NAME_PLACEHOLDER, PROVIDE_PROFILE_MSG, UNLOCK_DOWNLOAD_QUEUE_MSG, ZOWE_EXT_MISSING_MSG,
 } from "../../../constants";
 import { CopybookDownloadService, CopybookName } from "../../../services/copybook/CopybookDownloadService";
 import { CopybookProfile } from "../../../services/copybook/DownloadQueue";
@@ -260,6 +260,15 @@ describe("Test downloadCopybook user interaction", () => {
         (CopybookDownloadService as any).isEligibleForCopybookDownload = jest.fn().mockReturnValue(false);
         await copybooksDownloadService.downloadCopybooks("fileName", [new CopybookName("copybook", "dialect")], false);
         expect(vscode.window.showErrorMessage).toBeCalledWith("Some copybooks could not be located. Ensure your configuration contains correct paths to copybooks, including nested copybooks. Missing copybooks: copybook", "Change settings");
+        expect(queuePush).not.toBeCalled();
+    });
+
+    it("test zowe install is required for copybook download", async () => {
+        Utils.getZoweExplorerAPI = jest.fn().mockResolvedValue(undefined);
+        (CopybookDownloadService as any).checkWorkspace = jest.fn().mockReturnValue(false);
+        (CopybookDownloadService as any).isEligibleForCopybookDownload = jest.fn().mockReturnValue(true);
+        await copybooksDownloadService.downloadCopybooks("fileName", [new CopybookName("copybook", "dialect")], false);
+        expect(vscode.window.showErrorMessage).toBeCalledWith(ZOWE_EXT_MISSING_MSG, INSTALL_ZOWE);
         expect(queuePush).not.toBeCalled();
     });
 
