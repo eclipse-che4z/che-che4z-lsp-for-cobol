@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.communications.ServerCommunications;
 import org.junit.jupiter.api.Test;
@@ -37,9 +38,10 @@ class DialectDiscoveryFolderServiceTest {
   void testLoadDialects() {
     WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     Communications communications = mock(ServerCommunications.class);
+    CodeActions actions = mock(CodeActions.class);
     when(workingFolderService.getFilenames(any())).thenReturn(ImmutableList.of("dialect-test.jar"));
 
-    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications);
+    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
     List<CobolDialect> dialectList = service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
     assertEquals(0, dialectList.size());
   }
@@ -48,9 +50,10 @@ class DialectDiscoveryFolderServiceTest {
   void testLoadDialects_working_folder_failed() {
     WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     Communications communications = mock(ServerCommunications.class);
+    CodeActions actions = mock(CodeActions.class);
     when(workingFolderService.getWorkingFolder()).thenThrow(new RuntimeException());
 
-    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications);
+    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
     List<CobolDialect> dialectList = service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
     assertEquals(0, dialectList.size());
   }
@@ -59,9 +62,10 @@ class DialectDiscoveryFolderServiceTest {
   void testLoadDialects_get_filenames_failed() {
     WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     Communications communications = mock(ServerCommunications.class);
+    CodeActions actions = mock(CodeActions.class);
     when(workingFolderService.getFilenames(any())).thenThrow(new RuntimeException());
 
-    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications);
+    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
     List<CobolDialect> dialectList = service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
     assertEquals(0, dialectList.size());
   }
@@ -70,9 +74,10 @@ class DialectDiscoveryFolderServiceTest {
   void testLoadDialects_specifiedPath() {
     WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     Communications communications = mock(ServerCommunications.class);
+    CodeActions actions = mock(CodeActions.class);
     when(workingFolderService.getFilenames(any())).thenReturn(ImmutableList.of("dialect-test.jar"));
 
-    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications);
+    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
     List<CobolDialect> dialectList = service.loadDialects("path", mock(CopybookService.class), mock(MessageService.class));
     assertEquals(0, dialectList.size());
   }

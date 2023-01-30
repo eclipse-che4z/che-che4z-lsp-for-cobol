@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service.delegates.actions;
 
 import com.google.inject.Inject;
+import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
@@ -38,6 +39,13 @@ public class CodeActions {
     this.providers = providers;
   }
 
+  /**
+   * Registers a new provider for code Actions
+   * @param providers  list of {@link CodeActionProvider}
+   */
+  public void registerNewProviders(List<CodeActionProvider> providers) {
+    this.providers.addAll(providers);
+  }
   /**
    * Collect a list of either commands or code actions according to the given params. May return an
    * empty list if the diagnostics cannot be processed with the existing providers.

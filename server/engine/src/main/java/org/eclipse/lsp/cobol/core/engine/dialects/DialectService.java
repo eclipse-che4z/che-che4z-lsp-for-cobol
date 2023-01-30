@@ -163,14 +163,19 @@ public class DialectService {
           .filter(d -> d.getName().equals(name))
           .findFirst()
               .map(dialect -> {
-                discoveryService.registerExecuteCommandCapabilities(
-                        dialect.getDialectExecuteCommandCapabilities(), dialect.getName());
+                registerDialectCodeActions(dialect);
                 changed.set(true);
                 return dialect;
               })
           .orElse(null))
     );
     return changed.get();
+  }
+
+  private void registerDialectCodeActions(CobolDialect dialect) {
+    discoveryService.registerExecuteCommandCapabilities(
+            dialect.getDialectExecuteCommandCapabilities(), dialect.getName());
+    discoveryService.registerDialectCodeActionProviders(dialect.getDialectCodeActionProviders());
   }
 
   /**

@@ -18,9 +18,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 
 import java.io.FileInputStream;
@@ -47,11 +49,13 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
   private final WorkingFolderService workingFolderService;
   private final Communications communications;
   private final List<URLClassLoader> classLoaderHolder = new LinkedList<>();
+  private final CodeActions actions;
 
   @Inject
-  public DialectDiscoveryFolderService(WorkingFolderService workingFolderService, Communications communications) {
+  public DialectDiscoveryFolderService(WorkingFolderService workingFolderService, Communications communications, CodeActions actions) {
     this.workingFolderService = workingFolderService;
     this.communications = communications;
+    this.actions = actions;
   }
 
   /**
@@ -166,5 +170,10 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
   @Override
   public void unregisterExecuteCommandCapabilities(String id) {
     communications.unregisterExecuteCommandCapability(id);
+  }
+
+  @Override
+  public void registerDialectCodeActionProviders(List<CodeActionProvider> providers) {
+      actions.registerNewProviders(providers);
   }
 }
