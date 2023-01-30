@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service.delegates.actions;
 
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;

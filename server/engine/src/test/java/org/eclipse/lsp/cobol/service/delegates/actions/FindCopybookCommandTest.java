@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service.delegates.actions;
 
 import com.google.common.collect.Lists;
+import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
