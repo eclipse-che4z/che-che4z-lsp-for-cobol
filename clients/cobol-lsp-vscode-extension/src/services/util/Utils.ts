@@ -30,6 +30,9 @@ export class Utils {
 
     public static async getZoweExplorerAPI(): Promise<IApiRegisterClient> {
         const ext = vscode.extensions.getExtension("Zowe.vscode-extension-for-zowe");
+        if (!ext) {
+          return  Promise.resolve(undefined);
+        }
         await ext.activate();
         return ext.exports as any;
     }

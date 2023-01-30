@@ -243,7 +243,8 @@ export class CopybookDownloadService implements vscode.Disposable {
             if (!quiet) { CopybookDownloadService.createErrorMessageForCopybooks(new Set<string>(copybookNames.map(c => c.name))); }
             return;
         }
-        if (CopybookDownloadService.isEligibleForCopybookDownload() && !Utils.getZoweExplorerAPI()) {
+        const explorerAPI = await Utils.getZoweExplorerAPI();
+        if (CopybookDownloadService.isEligibleForCopybookDownload() && !explorerAPI) {
             if (!quiet) {
                 vscode.window.showErrorMessage(ZOWE_EXT_MISSING_MSG, INSTALL_ZOWE)
                 .then(action => {
