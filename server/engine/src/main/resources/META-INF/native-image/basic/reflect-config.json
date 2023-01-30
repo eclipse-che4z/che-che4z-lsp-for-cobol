@@ -2039,5 +2039,37 @@
   {
     "name":"sun.security.provider.SHA2$SHA256",
     "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.CFASTNode",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.GoTo",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.Location",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.Paragraph",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.Perform",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.Program",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.Section",
+    "allDeclaredFields":true
   }
 ]
