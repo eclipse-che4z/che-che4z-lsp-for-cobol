@@ -146,9 +146,6 @@ jobs:
           - os: ubuntu-latest
             platform: linux
             arch: arm64
-          - os: ubuntu-latest
-            platform: alpine
-            arch: x64
     runs-on: ${{ matrix.os }}
     needs: [generateConfigForNativeBuilds]
     steps:
@@ -250,10 +247,6 @@ jobs:
             platform: linux
             arch: arm64
             npm_config_arch: arm64
-          - os: ubuntu-latest
-            platform: alpine
-            arch: x64
-            npm_config_arch: x64
           - os: macos-latest
             platform: darwin
             arch: x64
@@ -336,10 +329,6 @@ jobs:
             platform: linux
             arch: arm64
             npm_config_arch: arm64
-          - os: ubuntu-latest
-            platform: alpine
-            arch: x64
-            npm_config_arch: x64
           - os: macos-latest
             platform: darwin
             arch: x64
