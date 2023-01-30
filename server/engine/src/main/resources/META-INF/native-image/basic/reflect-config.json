@@ -586,6 +586,11 @@
     "queryAllDeclaredMethods":true
   },
   {
+    "name":"org.eclipse.lsp.cobol.lsp.jrpc.ExtendedApi",
+    "queryAllDeclaredMethods":true,
+    "methods":[{"name":"analysis","parameterTypes":["com.google.gson.JsonObject"] }]
+  },
+  {
     "name":"org.eclipse.lsp.cobol.service.CFASTBuilderImpl",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
