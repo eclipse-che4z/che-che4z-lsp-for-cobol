@@ -19,9 +19,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.multibindings.Multibinder;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
@@ -31,18 +33,21 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
 import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.WatcherServiceImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
+import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
+import org.eclipse.lsp.cobol.service.delegates.actions.FindCopybookCommand;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.test.UseCaseInitializer;
 
 import java.util.concurrent.CompletableFuture;
 
+import static com.google.inject.multibindings.Multibinder.newSetBinder;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -82,6 +87,10 @@ public class UseCaseInitializerService implements UseCaseInitializer {
                 bind(WatcherService.class).to(WatcherServiceImpl.class);
                 bind(CopybookReferenceRepo.class).toInstance(new CopybookReferenceRepoImpl());
                 bind(DialectDiscoveryService.class).to(ExplicitDialectDiscoveryService.class);
+                bind(CodeActions.class);
+                Multibinder<CodeActionProvider> codeActionBinding =
+                        newSetBinder(binder(), CodeActionProvider.class);
+                codeActionBinding.addBinding().to(FindCopybookCommand.class);
               }
             });
   }
