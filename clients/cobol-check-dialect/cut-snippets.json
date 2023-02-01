@@ -1,0 +1,77 @@
+{
+	"AFTER EACH Block": {
+		"prefix": "AFTER EACH",
+		"description": "Instantiates an AFTER EACH block and places the curso in its body",
+		"body": [
+			"AFTER EACH",
+			"   ${0}",
+		 	"END-AFTER"
+		],
+		"scope": "cut"
+	},
+	"BEFORE EACH Block": {
+		"prefix": "BEFORE EACH",
+		"description": "Instantiates an BEFORE EACH block and places the curso in its body",
+		"body": [
+			"BEFORE EACH",
+			"   ${0}",
+		 	"END-BEFORE"
+		],
+		"scope": "cut"
+	},
+	"EXPECT": {
+		"prefix": "EXPECT",
+		"description": "EXPECT statement with options",
+		"body": [
+			"EXPECT ${1:var}${2: NOT} TO BE ${3|FALSE,NUMERIC,TRUE|} ${4:value}"
+		],
+		"scope": "cut"
+	},
+	"MOCK CALL Block": {
+		"prefix": "MOCK CALL",
+		"description": "Instantiates an MOCK CALL block",
+		"body": [
+			"MOCK CALL ${1:called-prog}",
+			"   ${0}",
+		 	"END-MOCK"
+		],
+		"scope": "cut"
+	},
+	"MOCK SECTION Block": {
+		"prefix": "MOCK SECTION",
+		"description": "Instantiates an MOCK block",
+		"body": [
+			"MOCK SECTION ${1:section}",
+			"   ${0}",
+		 	"END-MOCK"
+		],
+		"scope": "cut"
+	},
+	"TESTCASE": {
+		"prefix": "TESTCASE",
+		"description": "Open a testcase and name it",
+		"body": [
+			"TESTCASE ${1:testcase-name}",
+			"   ${0}"
+		],
+		"scope": "cut"
+	},
+	"TESTSUITE": {
+		"prefix": "TESTSUITE",
+		"description": "Open a testsuite and name it",
+		"body": [
+			"TESTSUITE ${1:testsuite-name}",
+			"   ${0}"
+		],
+		"scope": "cut"
+	},
+	"VERIFY SECTION/CALL NEVER": {
+		"prefix": "VERIFY",
+		"description": "Verify statement with options",
+		"body": [
+			"VERIFY ${1|SECTION,CALL|} ${2:section-call-name}${3: NEVER} HAPPENED ${4| ,AT LEAST,NO MORE THAN,ONCE|}"
+		],
+		"scope": "cut"
+	}
+	
+}
