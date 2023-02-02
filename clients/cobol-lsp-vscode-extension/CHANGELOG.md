@@ -3,21 +3,18 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ## [1.2.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.2...1.2.0) (2023-01-11)
 
-#### Fixed
-* An empty sting as a default for copybook extensions
-* Create .c4z only when it is needed
-* Discovery of dialects on windows
-* Do not adjust IDMS level numbers if the resulting level is greater than 49
-* Do not adjust level numbers  66/77/88 for copy IDMS variables
-* do not show progress notification for copybooks
-* Do not throw message for no adjustment associated with special levels.
-* Update dialect name and keywords
-* Update native build configuration
-* update variables usage which is fully qualified to a single location
-
 #### Added
-* preserve alignment while multiselect smart tab
-* support platform binary for darwin-arm64, darwin-x64, linux-arm64, linux-x64, win32-arm64 and win32-x64.
+* Support platform binary for darwin-arm64, darwin-x64, linux-arm64, linux-x64, win32-arm64 and win32-x64.
+* Discovery of dialects on Windows
+
+#### Changed
+* Preserve alignment while using multiselect smart tab
+* An empty string as a default for copybook extensions
+* Create .c4z only when it is needed
+* Readme update
+
+#### Fixed
+* Miscellaneous bug fixes
 
 ## [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-07)
 
