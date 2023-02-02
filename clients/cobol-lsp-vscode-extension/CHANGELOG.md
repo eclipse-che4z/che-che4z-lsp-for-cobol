@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [1.2.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.2...1.2.0) (2023-01-11)
+## [1.2.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.2.0) (2023-01-11)
 
 #### Added
 * Support platform binary for darwin-arm64, darwin-x64, linux-arm64, linux-x64, win32-arm64 and win32-x64.

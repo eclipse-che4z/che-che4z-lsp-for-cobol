@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [1.2.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.2...1.2.0) (2023-01-11)
+## [1.2.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.2.0) (2023-01-11)
 
 ### Bug Fixes
 * Add empty string as default for copybook extensions ([836eccc](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/836ecccf4c9145992e3fb5afa971342ac71afcb4))
