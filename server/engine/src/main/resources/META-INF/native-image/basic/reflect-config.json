@@ -578,11 +578,11 @@
     "queryAllDeclaredMethods":true
   },
   {
-    "name":"org.eclipse.lsp.cobol.jrpc.CobolLanguageClient",
+    "name":"org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient",
     "queryAllDeclaredMethods":true
   },
   {
-    "name":"org.eclipse.lsp.cobol.jrpc.ExtendedApi",
+    "name":"org.eclipse.lsp.cobol.lsp.jrpc.ExtendedApi",
     "queryAllDeclaredMethods":true
   },
   {
