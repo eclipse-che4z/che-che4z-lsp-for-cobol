@@ -16,12 +16,8 @@ All notable changes to the COBOL Language Support extension are documented in th
 * update variables usage which is fully qualified to a single location
 
 #### Added
-* preserve alignment while multiselect smart tab 
-
-## [1.1.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.1.2) (2022-12-22)
-
-#### Fixed
-- Fix copybook download and clear downloaded copybook cache commands
+* preserve alignment while multiselect smart tab
+* support platform binary for darwin-arm64, darwin-x64, linux-arm64, linux-x64, win32-arm64 and win32-x64.
 
 ## [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-07)
 
