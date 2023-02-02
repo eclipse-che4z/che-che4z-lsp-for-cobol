@@ -4,21 +4,19 @@ All notable changes to the COBOL Language Support extension are documented in th
 ## [1.2.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.2...1.2.0) (2023-01-11)
 
 ### Bug Fixes
-* Add empty sting as default for copybook extensions ([836eccc](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/836ecccf4c9145992e3fb5afa971342ac71afcb4))
+* Add empty string as default for copybook extensions ([836eccc](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/836ecccf4c9145992e3fb5afa971342ac71afcb4))
 * Create .c4z only when it is needed ([5334807](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/533480748c0d2e564ccc0e750179be5b3dd1ff54))
-* Discovery of dialects on windows ([fd195e9](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/fd195e93525008ff24b20ce75c80d9c0ae2c8c6f))
+* Discovery of dialects on Windows ([fd195e9](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/fd195e93525008ff24b20ce75c80d9c0ae2c8c6f))
 * Do not adjust IDMS level numbers if the resulting level is greater than 49 ([dca665a](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/dca665a3f21d84adb9842a5fcc704b9ef41703a4))
 * Do not adjust level numbers  66/77/88 for copy IDMS variables ([3e21015](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/3e2101579636bb14397830e1ec3d68562e30bb93))
-* do not show progress notification for copybooks ([d6ff9f5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d6ff9f5811d8237b383cfe799b650952fa84a5db))
-* Do not throw message for no adjustment associated with special levels. ([#1714](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1714)) ([3e12226](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/3e12226c42011f30554168981c5088bc72220057))
+* Do not show progress notification for copybooks ([d6ff9f5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d6ff9f5811d8237b383cfe799b650952fa84a5db))
+* Do not throw message for no adjustment associated with special levels ([#1714](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1714)) ([3e12226](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/3e12226c42011f30554168981c5088bc72220057))
 * Update dialect name and keywords ([a1b9419](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a1b9419c062c7a632be63fe406f226939005896f))
 * Update native build configuration ([fe1ba84](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/fe1ba8427c781fb05d38463a155d6b009a8a2bf4))
-* update variables usage which is fully qualified to a single loca… ([#1724](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1724)) ([6c8b6a1](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/6c8b6a172130a4e4f7a370317075c7d020b7f7b6))
+* Update variables usage ([#1724](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1724)) ([6c8b6a1](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/6c8b6a172130a4e4f7a370317075c7d020b7f7b6))
 
 ### Features
-* preserve alignment while multiselect smart tab ([783ef58](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/783ef58c096a27561dcb27476303175e99e9c254))
-* preserve alignment while multiselect smart tab ([03f2988](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/03f298820f32dda3afc2e95e896c477e11d22294))
-* preserve alignment while multiselect smart tab ([ba96808](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ba96808c8cafc94968768bfdbeb991bf39e24718))
+* Preserve alignment while using multiselect smart tab ([783ef58](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/783ef58c096a27561dcb27476303175e99e9c254)), ([03f2988](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/03f298820f32dda3afc2e95e896c477e11d22294)), ([ba96808](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ba96808c8cafc94968768bfdbeb991bf39e24718))
 
 ## [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-07)
 
