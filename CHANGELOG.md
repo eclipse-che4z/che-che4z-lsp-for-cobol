@@ -20,11 +20,6 @@ All notable changes to the COBOL Language Support extension are documented in th
 * preserve alignment while multiselect smart tab ([03f2988](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/03f298820f32dda3afc2e95e896c477e11d22294))
 * preserve alignment while multiselect smart tab ([ba96808](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ba96808c8cafc94968768bfdbeb991bf39e24718))
 
-## [1.1.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.1.2) (2022-12-22)
-
-### Bug Fixes
-* Fix copybook download and clear ([44dff94](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/44dff946fabb0089b3c61e95cb6b1464c0167db5))
-
 ## [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-07)
 
 ### Bug Fixes
