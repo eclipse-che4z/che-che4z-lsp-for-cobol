@@ -5,7 +5,6 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 #### Added
 * Support platform binary for darwin-arm64, darwin-x64, linux-arm64, linux-x64, win32-arm64 and win32-x64.
-* Discovery of dialects on Windows
 
 #### Changed
 * Preserve alignment while using multiselect smart tab
@@ -15,6 +14,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 #### Fixed
 * Miscellaneous bug fixes
+* Discovery of dialects on Windows
 
 ## [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-07)
 
