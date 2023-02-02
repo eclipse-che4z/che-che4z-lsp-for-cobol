@@ -66,11 +66,6 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.lsp.cobol</groupId>
-            <artifactId>dialect-idms</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.lsp.cobol</groupId>
             <artifactId>test</artifactId>
             <scope>test</scope>
             <version>1.0-SNAPSHOT</version>
@@ -167,48 +162,6 @@
             <version>${lombok.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-runner</artifactId>
-            <version>${junit.platform.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${mockito.core.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <version>${mockito.core.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${mockito.core.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>net.jodah</groupId>
             <artifactId>concurrentunit</artifactId>
@@ -485,7 +438,7 @@
                             <execution>
                                 <id>build-native</id>
                                 <goals>
-                                    <goal>build</goal>
+                                    <goal>compile-no-fork</goal>
                                 </goals>
                                 <phase>package</phase>
                             </execution>

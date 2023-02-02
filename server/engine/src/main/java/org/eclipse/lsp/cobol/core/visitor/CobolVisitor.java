@@ -52,7 +52,7 @@ import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.service.CachingConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -145,6 +145,19 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
       nodeByPosition.orElse(rootNode).addChild(dialectNode);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>The default implementation returns the result of calling
+   * {@link #visitChildren} on {@code ctx}.</p>
+   *
+   * @param ctx
+   */
+  @Override
+  public List<Node> visitCompilerOptions(CompilerOptionsContext ctx) {
+    return addTreeNode(ctx, location -> new CompilerDirectiveNode(location, ctx.getText()));
   }
 
   @Override
@@ -376,7 +389,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                         .suggestion(
                             messageService.getMessage("CobolVisitor.duplicateFileName", filename))
                         .severity(ErrorSeverity.ERROR)
-                        .locality(locality)
+                        .location(locality.toOriginalLocation())
                         .build();
                 errors.add(error);
                 LOG.debug("Syntax error by CobolVisitor#visitSelectClause: {}", error);
@@ -818,7 +831,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
-            .locality(locality)
+            .location(locality.toOriginalLocation())
             .suggestion(message + wrongToken)
             .severity(ErrorSeverity.WARNING)
             .build();
@@ -839,7 +852,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .errorSource(ErrorSource.PARSING)
             .suggestion(messageService.getMessage("CobolVisitor.subroutineNotFound", name))
             .severity(ErrorSeverity.INFO)
-            .locality(getIntervalPosition(locality, locality))
+            .location(getIntervalPosition(locality, locality).toOriginalLocation())
             .build();
     LOG.debug("Syntax error by CobolVisitor#reportSubroutineNotDefined: {}", error);
     errors.add(error);
@@ -862,7 +875,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .errorSource(ErrorSource.PARSING)
             .suggestion(messageService.getMessage("CobolVisitor.misspelledWord", suggestion))
             .severity(ErrorSeverity.WARNING)
-            .locality(locality)
+            .location(locality.toOriginalLocation())
             .build();
     LOG.debug("Syntax error by CobolVisitor#reportMisspelledKeyword: {}", error);
     errors.add(error);

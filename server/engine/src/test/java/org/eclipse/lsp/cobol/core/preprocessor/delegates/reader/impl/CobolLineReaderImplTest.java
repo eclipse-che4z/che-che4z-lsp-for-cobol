@@ -18,7 +18,7 @@ import com.google.common.collect.Lists;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.core.AbstractCobolLinePreprocessorTest;
-import org.eclipse.lsp.cobol.core.model.CobolLine;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
 
     SyntaxError error = processed.getErrors().get(0);
     assertThat(
-        error.getLocality().getRange(),
+        error.getLocation().getLocation().getRange(),
         is(new Range(new Position(10, 6), new Position(10, 7))));
   }
 
@@ -127,7 +127,7 @@ class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
 
     assertThat(processed.getErrors(), hasSize(1));
     SyntaxError error = processed.getErrors().get(0);
-    assertThat(error.getLocality().getRange().getStart().getCharacter(), is(80));
+    assertThat(error.getLocation().getLocation().getRange().getStart().getCharacter(), is(80));
   }
 
   // END @Test methods

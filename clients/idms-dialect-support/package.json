@@ -1,0 +1,98 @@
+{
+  "name": "idms-dialect-for-cobol",
+  "displayName": "IDMS Dialect for COBOL",
+  "description": "Autocomplete, highlighting and diagnostics for IDMS COBOL code and copybooks",
+  "author": "Broadcom",
+  "license": "EPL-2.0",
+  "version": "0.0.1",
+  "preview": false,
+  "publisher": "BroadcomMFD",
+  "keywords" : [
+    "idms",
+    "cobol",
+    "mainframe",
+    "zowe"
+  ],
+  "icon": "resources/logo.png",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eclipse/che-che4z-lsp-for-cobol.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eclipse/che-che4z-lsp-for-cobol/issues"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onCommand:cobol-lsp.smart-tab",
+    "onCommand:cobol-lsp.dialect.register",
+    "onLanguage:cobol",
+    "workspaceContains:/.c4z"
+],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [],
+    "configuration": {
+      "title": "IDMS Dialect Support",
+      "properties": {
+        "cobol-lsp.cpy-manager.idms.paths-local": {
+          "type": "array",
+          "items": {
+              "type": "string"
+          },
+          "description": "Default list of local paths to search for IDMS copybooks",
+          "uniqueItems": true
+          },
+          "cobol-lsp.cpy-manager.idms.paths-dsn": {
+              "type": "array",
+              "items": {
+                  "type": "string"
+              },
+              "description": "Default list of datasets to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+              "uniqueItems": true
+          },
+          "cobol-lsp.cpy-manager.idms.paths-uss": {
+              "type": "array",
+              "items": {
+                  "type": "string"
+              },
+              "description": "Default list of USS paths to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+              "uniqueItems": true
+          }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "postinstall": "patch-package",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/glob": "^8.0.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.1.0",
+    "patch-package": "^6.4.7",
+    "ts-jest": "^29.0.1",
+    "tslint": "^5.18.0",
+    "eslint-plugin-sonarjs": "^0.15.0",
+    "vsce": "^2.11.0",
+    "typescript": "^4.9.3",
+    "@vscode/test-electron": "^2.2.0"
+  },
+  "extensionDependencies": ["BroadcomMFD.cobol-language-support"]
+}

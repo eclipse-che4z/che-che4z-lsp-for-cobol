@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 
 /**
  * This implementation of the {@link AbstractInjectCodeAnalysis} provides the logic and the default
@@ -27,8 +28,9 @@ class PanvaletAnalysis extends AbstractInjectCodeAnalysis {
 
   PanvaletAnalysis(
       TextPreprocessor preprocessor,
+      GrammarPreprocessor grammarPreprocessor,
       MessageService messageService) {
-    super(preprocessor, messageService, MAX_COPYBOOK_NAME_LENGTH_PANVALET);
+    super(preprocessor, grammarPreprocessor, messageService, MAX_COPYBOOK_NAME_LENGTH_PANVALET);
   }
 
 }

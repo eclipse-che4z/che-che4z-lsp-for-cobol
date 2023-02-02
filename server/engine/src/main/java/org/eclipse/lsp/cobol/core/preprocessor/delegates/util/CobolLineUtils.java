@@ -15,7 +15,7 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
-import org.eclipse.lsp.cobol.core.model.CobolLine;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import lombok.experimental.UtilityClass;
 
 import lombok.NonNull;

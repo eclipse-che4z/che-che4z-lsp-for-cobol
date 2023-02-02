@@ -12,6 +12,8 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import * as vscode from "vscode";
+
 /**
  * This class collects utility methods for general purpose activities
  */
@@ -24,5 +26,14 @@ export class Utils {
      */
     public static isNullOrUndefined(content: string): boolean {
         return content === null || content === undefined;
+    }
+
+    public static async getZoweExplorerAPI(): Promise<IApiRegisterClient> {
+        const ext = vscode.extensions.getExtension("Zowe.vscode-extension-for-zowe");
+        if (!ext) {
+          return  Promise.resolve(undefined);
+        }
+        await ext.activate();
+        return ext.exports as any;
     }
 }

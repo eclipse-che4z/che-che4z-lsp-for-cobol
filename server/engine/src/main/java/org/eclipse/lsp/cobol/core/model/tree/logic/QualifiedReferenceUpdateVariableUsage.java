@@ -22,6 +22,9 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
+import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
+import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveOption;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
@@ -56,6 +59,17 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
             .filter(Node.hasType(NodeType.VARIABLE_USAGE))
             .map(VariableUsageNode.class::cast)
             .collect(Collectors.toList());
+
+    boolean isQualifyExtendedDirectiveEnabled =
+        ctx
+            .getCompilerDirectiveContext()
+            .filterDirectiveList(
+                ImmutableList.of(CompilerDirectiveName.QUALIFY, CompilerDirectiveName.QUA))
+            .stream()
+            .findFirst()
+            .map(CompilerDirectiveOption<Boolean>::getValue)
+            .orElse(false);
+
     if (variableUsageNodes.isEmpty()) {
       LOG.warn("Qualified reference node don't have any variable usages. {}", node);
       return;
@@ -64,13 +78,18 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     List<VariableNode> foundDefinitions =
         node.getProgram()
             .map(
-                programNode -> symbolAccumulatorService.getVariableDefinition(programNode, variableUsageNodes))
+                programNode ->
+                    symbolAccumulatorService.getVariableDefinition(programNode, variableUsageNodes))
             .orElseGet(ImmutableList::of);
 
+    if (isQualifyExtendedDirectiveEnabled && foundDefinitions.size() > 1) {
+      foundDefinitions = updateDefinitionForQualifyExtended(node, foundDefinitions);
+    }
     for (VariableNode definitionNode : foundDefinitions) {
       node.setVariableDefinitionNode(definitionNode);
       for (VariableUsageNode usageNode : variableUsageNodes) {
-        while (definitionNode != null && !usageNode.getName().equalsIgnoreCase(definitionNode.getName())) {
+        while (definitionNode != null
+            && !usageNode.getName().equalsIgnoreCase(definitionNode.getName())) {
           definitionNode =
               definitionNode
                   .getNearestParentByType(NodeType.VARIABLE)
@@ -105,7 +124,7 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
             .severity(ErrorSeverity.ERROR)
-            .locality(node.getLocality())
+            .location(node.getLocality().toOriginalLocation())
             .messageTemplate(
                 MessageTemplate.of(
                     foundDefinitions.isEmpty() ? NOT_DEFINED_ERROR : AMBIGUOUS_REFERENCE_ERROR,
@@ -113,5 +132,19 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
             .build();
     ctx.getErrors().add(error);
     LOG.debug("Syntax error by QualifiedReferenceNode " + error.toString());
+  }
+
+  private List<VariableNode> updateDefinitionForQualifyExtended(QualifiedReferenceNode node, List<VariableNode> foundDefinitions) {
+    List<VariableNode> definitionWithLevel01 =
+        foundDefinitions.stream()
+            .filter(VariableWithLevelNode.class::isInstance)
+            .map(VariableWithLevelNode.class::cast)
+            .filter(n -> n.getLevel() == 1)
+            .collect(Collectors.toList());
+    if (definitionWithLevel01.size() == 1) {
+      foundDefinitions = definitionWithLevel01;
+      node.setVariableDefinitionNode(definitionWithLevel01.get(0));
+    }
+    return foundDefinitions;
   }
 }

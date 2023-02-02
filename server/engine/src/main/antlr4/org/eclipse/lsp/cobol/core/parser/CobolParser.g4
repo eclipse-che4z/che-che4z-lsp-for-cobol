@@ -950,7 +950,7 @@ conditionalStatementCall
 statement
    : acceptStatement | addStatement | allocateStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
     disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement |
-    execSqlStatementInProcedureDivision | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
+    execSqlStatementInProcedureDivision | execSqlImsStatement | exitStatement | freeStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
     serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
@@ -1316,10 +1316,16 @@ exhibitOperand
    : literal | generalIdentifier
    ;
 
+// free statement
+
+freeStatement
+    : FREE qualifiedDataName
+    ;
+
 // exit statement
 
 exitStatement
-   : EXIT (PROGRAM | SECTION | PARAGRAPH)?
+   : EXIT (PROGRAM | SECTION | PARAGRAPH | PERFORM CYCLE? | METHOD)?
    ;
 
 // generate statement
@@ -2342,8 +2348,13 @@ cicsDfhValueLiteral
 cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN;
 
 literal
-   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | cicsDfhRespLiteral | cicsDfhValueLiteral
+   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | cicsDfhRespLiteral
+   | cicsDfhValueLiteral | utfLiteral | hexadecimalUtfLiteral
    ;
+
+utfLiteral: U_CHAR NONNUMERICLITERAL;
+
+hexadecimalUtfLiteral: U_CHAR HEX_NUMBERS;
 
 charString
    : FINALCHARSTRING
@@ -2396,7 +2407,7 @@ cobolCompilerDirectivesKeywords
     : ABD | ADATA | ADEXIT | ADV | ADX | AFP | ALIAS | ALPHNUM | ANSI | ANY | APOST | AR | ARCH | ARITH | AUTO | AWO
     | BIN | BLOCK0 | BUF | BUFSIZE
     | C_CHAR | CICS | CLEANSIGN | CO | CODEPAGE | COMPAT | COMPILE | COPYLOC | COPYRIGHT | CP | CPLC | CPYR | CS | CURR | CURRENCY
-    | D_CHAR | DATA | DBCS | DEC | DECK | DEF | DEFINE | DIAGTRUNC | DISPSIGN | DLL | DN | DS | DSN | DSNAME | DTR | DU | DUMP | DWARF | DYN | DYNAM
+    | D_CHAR | DATA | DBCS | DEBUG | DEC | DECK | DEF | DEFINE | DIAGTRUNC | DISPSIGN | DLL | DN | DS | DSN | DSNAME | DTR | DU | DUMP | DWARF | DYN | DYNAM
     | E_CHAR | EJPD | EN | ENDP | ENDPERIOD | ENGLISH | EVENP | EVENPACK | EX | EXIT | EXP | EXPORTALL | EXTEND
     | F_CHAR | FASTSRT | FLAG | FLAGSTD | FNC | FORCENUMCMP | FSRT | FULL
     | H_CHAR | HEX | HGPR

@@ -18,16 +18,18 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.CFASTBuilder;
-import org.eclipse.lsp.cobol.service.CFASTBuilderImpl;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryFolderService;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
+import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.CobolLSPServerStateService;
 import org.eclipse.lsp.cobol.service.CobolLanguageServer;
 import org.eclipse.lsp.cobol.service.CobolTextDocumentService;
 import org.eclipse.lsp.cobol.service.CobolWorkspaceServiceImpl;
-import org.eclipse.lsp.cobol.service.DisposableLSPStateService;
-import org.eclipse.lsp.cobol.service.SettingsService;
-import org.eclipse.lsp.cobol.service.SettingsServiceImpl;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
+import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
 import org.eclipse.lsp.cobol.service.WatcherService;
@@ -98,6 +100,7 @@ public class ServiceModule extends AbstractModule {
         .annotatedWith(Names.named("combinedStrategy"))
         .to(CopybookIdentificationCombinedStrategy.class);
     bind(TextDocumentService.class).to(CobolTextDocumentService.class);
+    bind(DialectDiscoveryService.class).to(DialectDiscoveryFolderService.class);
 
     bindFormations();
     bindCompletions();

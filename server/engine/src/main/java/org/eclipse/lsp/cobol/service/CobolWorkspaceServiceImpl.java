@@ -23,9 +23,12 @@ import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.utils.LogLevelUtils;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
+import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
+import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
@@ -41,7 +44,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 
 /**
  * This class is responsible to watch for any changes into the copybook folder and to fetch updated

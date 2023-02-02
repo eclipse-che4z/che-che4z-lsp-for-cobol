@@ -15,17 +15,18 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.core.model.CobolLine;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.CobolLineUtils;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum.*;
 import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.WS;
 
 /**
@@ -46,57 +47,33 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
    */
   @Override
   public List<CobolLine> processLines(final List<CobolLine> lines) {
-    List<CobolLine> result = new ArrayList<>();
-    if (!lines.isEmpty()) {
-      result =
-          StreamSupport.stream(lines.get(0).spliterator(), false)
-              .map(this::processLine)
-              .collect(Collectors.toList());
+    if (lines.isEmpty()) {
+      return Collections.emptyList();
     }
-    return result;
+    return StreamSupport.stream(lines.get(0).spliterator(), false)
+            .map(line -> line.getType() == PREPROCESSED ? line : processLine(line))
+            .collect(Collectors.toList());
   }
 
   private CobolLine processLine(final CobolLine line) {
-    final String conditionalRightTrimmedContentArea = conditionalRightTrimContentArea(line);
-    final CobolLine result;
-
-    switch (line.getType()) {
-      case PREPROCESSED:
-        result = line;
-        break;
-      case CONTINUATION:
-        result = processContinuationLine(line, conditionalRightTrimmedContentArea);
-        break;
-      case COMMENT:
-      case COMPILER_DIRECTIVE:
-        result = CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, EMPTY_STRING, line);
-        break;
-      case NORMAL:
-      case DEBUG:
-      default:
-        result = processLineWithFloatingComment(line, conditionalRightTrimmedContentArea);
-        break;
+    CobolLineTypeEnum type = line.getType();
+    if (type == COMMENT || type == COMPILER_DIRECTIVE) {
+      return CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, EMPTY_STRING, line);
     }
 
-    return result;
-  }
-
-  private CobolLine processLineWithFloatingComment(
-      CobolLine line, String conditionalRightTrimmedContentArea) {
-    Matcher matchedLine = FLOATING_COMMENT_LINE.matcher(conditionalRightTrimmedContentArea);
-
-    if (matchedLine.matches()) {
-      String trimmedResult = matchedLine.group("validText");
-      return CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, trimmedResult, line);
+    String trimmedContentArea = conditionalRightTrimContentArea(line);
+    if (type == CONTINUATION) {
+      return processContinuationLine(line, trimmedContentArea);
     }
-    return CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-        WS, conditionalRightTrimmedContentArea, line);
+
+    Matcher matchedLine = FLOATING_COMMENT_LINE.matcher(trimmedContentArea);
+    return matchedLine.matches()
+            ? CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, matchedLine.group("validText"), line)
+            : CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, trimmedContentArea, line);
   }
 
-  private CobolLine processContinuationLine(
-      CobolLine line, String conditionalRightTrimmedContentArea) {
+  private CobolLine processContinuationLine(CobolLine line, String conditionalRightTrimmedContentArea) {
     CobolLine result;
-
     final String trimmedContentArea = trimLeadingWhitespace(conditionalRightTrimmedContentArea);
     if (StringUtils.isBlank(conditionalRightTrimmedContentArea)) {
       result = CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, EMPTY_STRING, line);

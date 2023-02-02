@@ -18,26 +18,42 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.DocumentMapping;
+import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.CopybookContentProvider;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+
+import java.util.List;
+import java.util.Map;
 
 /** This interface defines a common API for all the implementation of the copybook analysis logic */
 public interface InjectCodeAnalysis {
   /**
    * Inject cobol code to the specified place
    *
-   * @param contentProvider the provider that reads an injected code source for injection
+   * @param copybookContentProvider the provider that reads an injected code source for injection
    * @param injectedSourceName the name of the injected object
    * @param context the context of the statement
    * @param copySource the context of the copybook name
    * @param config the configuration required for the copybook analysis
    * @param documentUri uri of the current document
-   * @return the functions that should be applied to the preprocessor
+   * @param hierarchy copybook hierarchy
+   * @param stack processing stack
+   * @param copybooksRepository a copybook repository
+   * @param nestedMappings mapping data
+   * @param errors a collection to accumulate errors
    */
-  PreprocessorFunctor injectCode(
-      ContentProvider contentProvider,
-      CopybookName injectedSourceName,
-      ParserRuleContext context,
-      ParserRuleContext copySource,
-      CopybookConfig config,
-      String documentUri);
+   void injectCode(CopybookContentProvider copybookContentProvider,
+                         CopybookName injectedSourceName,
+                         ParserRuleContext context,
+                         ParserRuleContext copySource,
+                         CopybookConfig config,
+                         String documentUri,
+                         CopybookHierarchy hierarchy,
+                         PreprocessorStack stack,
+                         CopybooksRepository copybooksRepository,
+                         Map<String, DocumentMapping> nestedMappings,
+                         List<SyntaxError> errors);
 }

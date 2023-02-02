@@ -18,8 +18,9 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
@@ -33,14 +34,14 @@ import java.util.function.Consumer;
 class InjectCodeImplicitAnalysis extends AbstractInjectCodeAnalysis {
   InjectCodeImplicitAnalysis(
       TextPreprocessor preprocessor,
+      GrammarPreprocessor grammarPreprocessor,
       MessageService messageService) {
 
-    super(preprocessor, messageService, MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
+    super(preprocessor, grammarPreprocessor, messageService, MAX_COPYBOOK_NAME_LENGTH_DEFAULT);
   }
 
   @Override
-  protected Consumer<CopybooksRepository> storeCopyStatementSemantics(
-      CopybookMetaData metaData, ExtendedDocument copybookDocument) {
+  protected Consumer<CopybooksRepository> storeCopyStatementSemantics(CopybookMetaData metaData, OldExtendedDocument copybookDocument) {
     return it -> {};
   }
 

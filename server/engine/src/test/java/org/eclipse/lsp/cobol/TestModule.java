@@ -14,16 +14,25 @@
  */
 package org.eclipse.lsp.cobol;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
+import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.*;
 import org.eclipse.lsp.cobol.service.copybooks.*;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActionProvider;
@@ -40,16 +49,17 @@ import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
-import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageServer;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
+import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
-import org.eclipse.lsp.cobol.common.file.FileSystemService;
-import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
+
+import java.util.List;
 
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 import static com.google.inject.name.Names.named;
@@ -98,6 +108,17 @@ public class TestModule extends AbstractModule {
     bind(CopybookIdentificationService.class)
             .annotatedWith(Names.named("combinedStrategy"))
             .to(CopybookIdentificationCombinedStrategy.class);
+    bind(DialectDiscoveryService.class).toInstance(new DialectDiscoveryService() {
+      @Override
+      public List<CobolDialect> loadDialects(CopybookService copybookService, MessageService messageService) {
+        return ImmutableList.of();
+      }
+
+      @Override
+      public List<CobolDialect> loadDialects(String path, CopybookService copybookService, MessageService messageService) {
+        return ImmutableList.of();
+      }
+    });
 
     bindFormations();
     bindCompletions();

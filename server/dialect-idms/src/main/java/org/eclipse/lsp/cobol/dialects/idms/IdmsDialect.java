@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.lang3.tuple.Pair;
@@ -32,6 +33,8 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
+import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -42,14 +45,24 @@ import java.util.*;
 /** Process the text according to the IDMS rules */
 public final class IdmsDialect implements CobolDialect {
   public static final String NAME = "IDMS";
+  private static final String IDMS_CPY_LOCAL_PATHS = "cpy-manager.idms.paths-local";
   private final CopybookService copybookService;
   private final MessageService messageService;
+  private final List<ProcessorDescription> processors = new ArrayList<>();
 
-  public IdmsDialect(
-      CopybookService copybookService,
-      MessageService messageService) {
+  public IdmsDialect(CopybookService copybookService, MessageService messageService) {
     this.copybookService = copybookService;
     this.messageService = messageService;
+  }
+
+  /**
+   * Return a list of processor descriptors.
+   *
+   * @return a list of processor descriptors for the dialect
+   */
+  @Override
+  public List<ProcessorDescription> getProcessors() {
+    return processors;
   }
 
   /**
@@ -142,35 +155,50 @@ public final class IdmsDialect implements CobolDialect {
     return copybookStack.contains(name);
   }
 
-  private void processTextTransformation(ExtendedSource extendedSource,
-                                         DocumentMap currentDocumentMap,
-                                         List<SyntaxError> errors,
-                                         CopybookConfig copybookConfig,
-                                         String programDocumentUri,
-                                         int copybookLevel,
-                                         Deque<String> copybookStack) {
+  private void processTextTransformation(
+          ExtendedSource extendedSource,
+          DocumentMap currentDocumentMap,
+          List<SyntaxError> errors,
+          CopybookConfig copybookConfig,
+          String programDocumentUri,
+          int copybookLevel,
+          Deque<String> copybookStack) {
     IdmsCopyVisitor copyVisitor = new IdmsCopyVisitor(currentDocumentMap);
-    IdmsCopyParser.StartRuleContext context = parseCopyIdms(currentDocumentMap.extendedText(), programDocumentUri, errors);
+    IdmsCopyParser.StartRuleContext context =
+        parseCopyIdms(currentDocumentMap.extendedText(), programDocumentUri, errors);
 
     List<IdmsCopybookDescriptor> cbs = copyVisitor.visitStartRule(context);
-    int firstLevel = copyVisitor.getVariableLevels().stream().findFirst().map(Pair::getRight).orElse(0);
-    copyVisitor.getVariableLevels().forEach(p -> {
-      if (copybookLevel > 0 && p.getRight() != null) {
-        currentDocumentMap.replace(p.getLeft(), String.format("%02d", calculateLevel(copybookLevel, firstLevel, p.getRight())));
-      }
-    });
-    cbs.forEach(cb -> {
-      if (copybookLevel > 0) {
-        cb.setLevel(copybookLevel);
-      }
+    int firstLevel =
+        copyVisitor.getVariableLevels().stream().findFirst().map(Pair::getRight).orElse(0);
+    copyVisitor
+        .getVariableLevels()
+        .forEach(
+            p -> {
+              if (copybookLevel > 0 && p.getRight() != null) {
+                CopyIdmsAdjustmentProcessor copyIdmsAdjustmentProcessor = new CopyIdmsAdjustmentProcessor(
+                        currentDocumentMap.getUri(), copybookLevel, firstLevel, p, messageService);
+                processors.add(new ProcessorDescription(CopyNode.class, ProcessingPhase.TRANSFORMATION, copyIdmsAdjustmentProcessor));
+                currentDocumentMap.replace(
+                        p.getLeft(),
+                        String.format("%02d", copyIdmsAdjustmentProcessor.calculateLevel(copybookLevel, firstLevel, p.getRight())));
+              }
+            });
+    cbs.forEach(
+        cb -> {
+          if (copybookLevel > 0) {
+            cb.setLevel(copybookLevel);
+          }
 
-      insertIdmsCopybook(extendedSource, currentDocumentMap, errors, cb, programDocumentUri, currentDocumentMap.getUri(), copybookConfig, copybookStack);
-    });
-  }
-
-  private int calculateLevel(int copybookLevel, int firstLevel, int level) {
-    int delta = copybookLevel - firstLevel;
-    return level + delta;
+          insertIdmsCopybook(
+              extendedSource,
+              currentDocumentMap,
+              errors,
+              cb,
+              programDocumentUri,
+              currentDocumentMap.getUri(),
+              copybookConfig,
+              copybookStack);
+        });
   }
 
   /**
@@ -208,6 +236,11 @@ public final class IdmsDialect implements CobolDialect {
   @Override
   public Map<String, String> getKeywords() {
     return KeywordsUtils.getKeywords("KeywordsIdms.txt");
+  }
+
+  @Override
+  public List<String> getWatchingFolderSettings() {
+    return ImmutableList.of(IDMS_CPY_LOCAL_PATHS);
   }
 
   private IdmsCopyParser.StartRuleContext parseCopyIdms(String text, String programDocumentUri, List<SyntaxError> errors) {

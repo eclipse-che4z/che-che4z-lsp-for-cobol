@@ -36,7 +36,7 @@ beforeEach(() => {
     context.subscriptions = [];
 });
 
-test("Test initSmartTab calls registerTextEditorCommand to bind 'tab button functionality' keys", () => {    
+test("Test initSmartTab calls registerTextEditorCommand to bind 'tab button functionality' keys", () => {
     expect(initSmartTab).toBeTruthy();
     initSmartTab(context)
     expect(vscode.commands.registerTextEditorCommand).toBeCalledTimes(2);
@@ -65,14 +65,35 @@ test("SmartTabCommandProvider execution", async () => {
     expect(mockEditor.selections[0].active.character).toBe(6);
 });
 
+test("Multitab SmartTabCommandProvider execution", async () => {
+    const stp: smartTab.SmartTabCommandProvider = new smartTab.SmartTabCommandProvider(context, "some name");
+    const smartOut: smartTab.SmartTabCommandProvider = new smartTab.SmartOutdentCommandProvider(context, "some name");
+    const active: Position = new Position(1, 2);
+    const mockSelection: Selection = new Selection(active, active);
+    (mockSelection as any).start = {line : 1};
+    (mockSelection as any).end = {line :3};
+    const textLine = { text: "TEST" };
+    const mockEditor: TextEditor = {
+        selections: [mockSelection],
+        document: {
+            lineAt: jest.fn().mockReturnValue(textLine),
+        },
+    } as any;
+    stp.execute(mockEditor, { insert: jest.fn() } as any);
+    smartOut.execute(mockEditor, { insert: jest.fn(), delete: jest.fn() } as any)
+    expect(mockEditor.selections.length).toBe(1);
+    expect(mockEditor.selections[0].start.line).toBe(1);
+    expect(mockEditor.selections[0].end.line).toBe(3);
+});
+
 test("One of the rule was choosen", () => {
     const rule1 = new TabRule([11, 12, 13, 14], 14, "MATCHED");
     const rule2 = new TabRule([15, 16, 17, 18],18,  "TEST");
 
-    vscode.TextEditor.document.lineAt = jest.fn().mockImplementation(line => { 
+    vscode.TextEditor.document.lineAt = jest.fn().mockImplementation(line => {
         if (line >= 9)
             return { text: "line9" }
-        
+
         return { text: "MATCHED" }
     })
 

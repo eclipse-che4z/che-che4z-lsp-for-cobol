@@ -96,6 +96,8 @@ pipeline {
                                     sh 'mvn -version'
                                     sh 'mvn clean verify --no-transfer-progress'
                                     sh 'cp engine/target/server.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/jar/'
+                                    sh 'cp dialect-idms/target/dialect-idms.jar $WORKSPACE/clients/idms-dialect-support/server/jar/'
+                                    sh 'cp dialect-idms/target/dialect-idms.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/jar/dialects'
                                 }
                             }
                         }
@@ -193,6 +195,12 @@ pipeline {
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
+                                sh 'npm run package'
+                                archiveArtifacts "*.vsix"
+                            }
+                            dir('clients/idms-dialect-support') {
+                                sh 'npm ci --ignore-scripts'
+                                sh 'npm run postinstall'
                                 sh 'npm run package'
                                 archiveArtifacts "*.vsix"
                             }

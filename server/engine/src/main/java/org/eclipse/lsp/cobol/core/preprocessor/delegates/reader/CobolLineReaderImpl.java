@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
 import org.eclipse.lsp4j.Position;
@@ -230,13 +231,13 @@ public class CobolLineReaderImpl implements CobolLineReader {
             .errorSource(ErrorSource.PREPROCESSING)
             .suggestion(message)
             .severity(ERROR)
-            .locality(
+            .location(
                 Locality.builder()
                     .uri(uri)
                     .range(
                         new Range(new Position(lineNumber, start), new Position(lineNumber, stop)))
                     .recognizer(getClass())
-                    .build())
+                    .build().toOriginalLocation())
             .build();
 
     LOG.debug("Syntax error by CobolLineReaderImpl: {}", error.toString());

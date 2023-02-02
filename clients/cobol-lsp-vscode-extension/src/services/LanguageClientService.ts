@@ -14,22 +14,19 @@
 
 import * as fs from "fs";
 import * as net from "net";
-import * as os from "os";
 import { join } from "path";
 import * as vscode from "vscode";
 
 import {
-    ConfigurationParams,
-    ConfigurationRequest,
-    Executable,
+    ErrorCodes,
     LanguageClient,
     LanguageClientOptions,
     StreamInfo,
 } from "vscode-languageclient";
-import {ConfigurationWorkspaceMiddleware} from "vscode-languageclient/lib/configuration";
 import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
 import {LANGUAGE_ID} from "../constants";
 import {JavaCheck} from "./JavaCheck";
+import {NativeExecutableService} from "./nativeLanguageClient/nativeExecutableService";
 import {TelemetryService} from "./reporter/TelemetryService";
 import { SettingsService } from "./Settings";
 
@@ -37,19 +34,21 @@ const extensionId = "BroadcomMFD.cobol-language-support";
 
 export class LanguageClientService {
     private executablePath: string;
+    private dialectsPath: string;
     private languageClient: LanguageClient;
     private handlers: Array<(languageClient: LanguageClient) => void> = [];
     private isNativeBuildEnabled: boolean = false;
+    private executableService: NativeExecutableService;
 
     constructor(private outputChannel: vscode.OutputChannel) {
         const ext = vscode.extensions.getExtension(extensionId);
         this.executablePath = join(ext.extensionPath, "server", "jar", "server.jar");
+        this.executableService = new NativeExecutableService(join(ext.extensionPath, "server"));
+        this.dialectsPath = join(ext.extensionPath, "server", "jar", "dialects");
     }
 
     public enableNativeBuild() {
-        const ext = vscode.extensions.getExtension(extensionId);
         this.isNativeBuildEnabled = true;
-        this.executablePath = this.initializeExecutables(`${ext.extensionPath}/server`);
         TelemetryService.registerEvent("Native Build enabled", ["COBOL", "native build enabled", "settings"],
             "Native build enabled");
     }
@@ -99,6 +98,8 @@ export class LanguageClientService {
                 "LSP extension for " + LANGUAGE_ID.toUpperCase() + " language",
                 this.createServerOptions(this.executablePath),
                 this.createClientOptions());
+            // hack to prevent notification for cancelled request.
+            (ErrorCodes as any).RequestCancelled = -32800;
         }
         return this.languageClient;
     }
@@ -112,7 +113,7 @@ export class LanguageClientService {
 
     private createServerOptions(jarPath: string) {
         if (this.isNativeBuildEnabled) {
-            return nativeServer(jarPath);
+            return this.executableService.getNativeLanguageClient();
         }
         const port = SettingsService.getLspPort();
         if (port) {
@@ -131,51 +132,9 @@ export class LanguageClientService {
             };
         }
         return {
-            args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
+            args: ["-Dline.separator=\r\n", "-Ddialect.path=" + this.dialectsPath, "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
             command: "java",
-            options: {stdio: "pipe", detached: false},
+            options: { detached: false },
         };
     }
-
-    private initializeExecutables(serverPath: string) {
-        let executablePath;
-        switch (os.type()) {
-            case "Windows_NT":
-                executablePath = join(serverPath, "package-win");
-                break;
-            case "Darwin":
-                executablePath = join(serverPath, "package-macos");
-                break;
-            case "Linux":
-                executablePath = join(serverPath, "package-linux");
-                break;
-            default:
-                break;
-        }
-        return executablePath;
-    }
-}
-export function nativeServer(jarPath: string) {
-    const executable: Executable = {
-            args: ["pipeEnabled"],
-            command: "",
-            options: { stdio: "pipe", detached: false },
-        };
-    switch (os.type()) {
-            case "Windows_NT":
-                executable.options.cwd = `${jarPath}`;
-                executable.command = `engine.exe`;
-                break;
-            case "Darwin":
-                executable.options.cwd = `${jarPath}`;
-                executable.command = `./server-mac-amd64`;
-                break;
-            case "Linux":
-                executable.options.cwd = `${jarPath}`;
-                executable.command = `./server`;
-                break;
-            default:
-                break;
-        }
-    return executable;
 }

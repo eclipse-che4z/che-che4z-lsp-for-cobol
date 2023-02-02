@@ -22,5 +22,6 @@ public enum ProcessingPhase {
     DEFINITION,
     POST_DEFINITION,
     USAGE,
+    ENRICHMENT,
     VALIDATION
 }

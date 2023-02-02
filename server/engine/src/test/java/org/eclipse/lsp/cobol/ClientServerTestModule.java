@@ -18,12 +18,17 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryFolderService;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.*;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationBasedOnExtension;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationCombinedStrategy;
@@ -49,6 +54,10 @@ import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageServer;
 import org.eclipse.lsp.cobol.service.mocks.MockTextPreprocessor;
+import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
+import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.service.utils.TestThreadPoolExecutor;
@@ -104,6 +113,7 @@ public class ClientServerTestModule extends AbstractModule {
     bind(CopybookIdentificationService.class)
             .annotatedWith(Names.named("combinedStrategy"))
             .to(CopybookIdentificationCombinedStrategy.class);
+    bind(DialectDiscoveryService.class).to(DialectDiscoveryFolderService.class);
 
     bindFormations();
     bindCompletions();

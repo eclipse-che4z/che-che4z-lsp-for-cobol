@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.service.utils;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.service.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;

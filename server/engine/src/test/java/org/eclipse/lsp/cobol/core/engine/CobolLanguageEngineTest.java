@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
@@ -34,17 +35,21 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
@@ -64,23 +69,24 @@ class CobolLanguageEngineTest {
 
   private static final String TEXT = "       IDENTIFICATION DIVISION.";
   private static final String URI = "document.cbl";
+  private final TextPreprocessor preprocessor = mock(TextPreprocessor.class);
+  private final GrammarPreprocessor grammarPreprocessor = mock(GrammarPreprocessor.class);
+  private final MessageService mockMessageService = mock(MessageService.class);
+  private final ErrorMessageHelper mockErrUtil = mock(ErrorMessageHelper.class);
+  private final CobolErrorStrategy cobolErrorStrategy = new CobolErrorStrategy();
+  private final ParseTreeListener treeListener = mock(ParseTreeListener.class);
+  private final DialectService dialectService = mock(DialectService.class);
+  private final AstProcessor astProcessor = mock(AstProcessor.class);
+  private final SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
 
   @Test
   void testLanguageEngineRun() {
-    TextPreprocessor preprocessor = mock(TextPreprocessor.class);
-    MessageService mockMessageService = mock(MessageService.class);
-    ErrorMessageHelper mockErrUtil = mock(ErrorMessageHelper.class);
-    CobolErrorStrategy cobolErrorStrategy = new CobolErrorStrategy();
-    ParseTreeListener treeListener = mock(ParseTreeListener.class);
-    DialectService dialectService = mock(DialectService.class);
     cobolErrorStrategy.setMessageService(mockMessageService);
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
-    AstProcessor astProcessor = mock(AstProcessor.class);
-    SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
 
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
-            preprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
+            preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
             dialectService, astProcessor, symbolsRepository);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
@@ -91,24 +97,24 @@ class CobolLanguageEngineTest {
     SyntaxError error =
         SyntaxError.syntaxError()
                 .errorSource(ErrorSource.PARSING)
-            .locality(locality)
+            .location(locality.toOriginalLocation())
             .suggestion("suggestion")
             .severity(ERROR)
             .build();
     SyntaxError eofError =
         SyntaxError.syntaxError()
                 .errorSource(ErrorSource.PARSING)
-            .locality(
+            .location(
                 Locality.builder()
                     .uri(URI)
                     .range(new Range(new Position(0, 31), new Position(0, 31)))
                     .token("<EOF>")
-                    .build())
+                    .build().toOriginalLocation())
             .severity(ERROR)
             .build();
 
-    ExtendedDocument extendedDocument =
-        new ExtendedDocument(
+    OldExtendedDocument oldExtendedDocument =
+        new OldExtendedDocument(
             "",
             TEXT,
             new CopybooksRepository(),
@@ -158,12 +164,11 @@ class CobolLanguageEngineTest {
         .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
     when(preprocessor.cleanUpCode(URI, TEXT))
         .thenReturn(new ResultWithErrors<>(TextTransformations.of(TEXT, URI), ImmutableList.of()));
-    when(preprocessor.processCleanCode(
-            eq(URI), eq(TEXT), eq(cpyConfig), any(CopybookHierarchy.class)))
-            .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));
-    when(preprocessor.processCleanCode(
-            anyString(), anyString(), any(CopybookConfig.class), any(CopybookHierarchy.class)))
-            .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of()));
+    when(grammarPreprocessor.buildExtendedDocument(
+            eq(new ExtendedSource(TextTransformations.of(TEXT, URI))), eq(cpyConfig), any(CopybookHierarchy.class)))
+            .thenReturn(new ResultWithErrors<>(oldExtendedDocument, ImmutableList.of(error)));
+    when(grammarPreprocessor.buildExtendedDocument(any(ExtendedSource.class), any(CopybookConfig.class), any(CopybookHierarchy.class)))
+            .thenReturn(new ResultWithErrors<>(oldExtendedDocument, ImmutableList.of()));
 
     Range programRange = new Range(new Position(0, 7), new Position(0, 31));
     ResultWithErrors<AnalysisResult> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
@@ -178,5 +183,25 @@ class CobolLanguageEngineTest {
     assertEquals(NodeType.DIVISION, division.getNodeType());
     assertEquals(programRange, division.getLocality().getRange());
     assertEquals(0, division.getChildren().size());
+  }
+
+  @Test
+  void testLanguageEngineRunWhenNativeServerWithDialects() {
+    cobolErrorStrategy.setMessageService(mockMessageService);
+    cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
+    System.setProperty("serverType", "NATIVE");
+    CobolLanguageEngine engine =
+            new CobolLanguageEngine(
+                    preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
+                    dialectService, astProcessor, symbolsRepository);
+
+    ResultWithErrors<AnalysisResult> actual = engine.run(URI, TEXT, DialectConfigs.getDaCoAnalysisConfig());
+    Assertions.assertEquals(actual.getErrors().size(), 1);
+    Assertions.assertEquals(actual.getErrors().get(0).getErrorCode(), ErrorCode.INCOMPATIBLE_SERVER_TYPE);
+  }
+
+  @AfterAll
+  static void unsetSystemProperty() {
+    System.setProperty("serverType", "JAVA");
   }
 }

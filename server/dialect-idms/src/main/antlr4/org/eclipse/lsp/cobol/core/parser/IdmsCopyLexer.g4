@@ -15,7 +15,7 @@
 lexer grammar IdmsCopyLexer;
 
 channels{COMMENTS, TECHNICAL}
-import TechnicalLexer;
+import IdmsTechnicalLexer;
 @lexer::members {
    boolean enableCobolSpecialSeparators = true;
 }

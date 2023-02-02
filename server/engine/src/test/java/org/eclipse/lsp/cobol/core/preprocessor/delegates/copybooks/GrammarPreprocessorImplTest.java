@@ -21,6 +21,8 @@ import org.antlr.v4.runtime.BufferedTokenStream;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
@@ -84,8 +86,8 @@ class GrammarPreprocessorImplTest {
     DocumentMapping cpyMapping =
         new DocumentMapping(ImmutableList.of(RESULT_POS), ImmutableMap.of());
 
-    ExtendedDocument expectedDocument =
-        new ExtendedDocument(
+    OldExtendedDocument expectedDocument =
+        new OldExtendedDocument(
             "", RESULT, copybooks, ImmutableMap.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping));
 
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER, ImmutableList.of());
@@ -102,8 +104,9 @@ class GrammarPreprocessorImplTest {
     GrammarPreprocessor preprocessor =
         new GrammarPreprocessorImpl(listenerFactory, replacingFactory);
 
-    ResultWithErrors<ExtendedDocument> extendedDocument =
-        preprocessor.buildExtendedDocument(DOCUMENT, TEXT, cpyConfig, hierarchy);
+    ResultWithErrors<OldExtendedDocument> extendedDocument =
+        preprocessor.buildExtendedDocument(new ExtendedSource(TextTransformations.of(TEXT, DOCUMENT)),
+                cpyConfig, hierarchy);
 
     verify(listenerFactory)
         .create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(cpyConfig), eq(hierarchy));

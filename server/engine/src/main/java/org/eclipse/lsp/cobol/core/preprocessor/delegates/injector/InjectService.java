@@ -22,13 +22,12 @@ import org.eclipse.lsp.cobol.common.utils.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysis;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysisFactory;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.CopybookContentProvider;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory;
 
 import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysisFactory.AnalysisTypes.*;
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory.InjectContentType.FILE;
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProviderFactory.InjectContentType.RESOLVE_COPYBOOK;
 
 /**
@@ -50,34 +49,10 @@ public class InjectService {
    * @param ctx the parsing context
    * @return list of injectors
    */
-  @SuppressWarnings("unused")
-  public List<InjectDescriptor> getInjectors(CobolPreprocessor.LinkageSectionContext ctx) {
-    InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
-    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(FILE);
-    return ImmutableList.of(new InjectDescriptor("DFHEIBLC", analysis, contentProvider));
-  }
-
-  /**
-   * Returns list of injectors that needs to be applied after the parsing context
-   * @param ctx the parsing context
-   * @return list of injectors
-   */
-  @SuppressWarnings("unused")
-  public List<InjectDescriptor> getInjectors(CobolPreprocessor.WorkingStorageSectionContext ctx) {
-    InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(IMPLICIT);
-    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(FILE);
-    return ImmutableList.of(new InjectDescriptor("SPECIALREGISTERS", analysis, contentProvider));
-  }
-
-  /**
-   * Returns list of injectors that needs to be applied after the parsing context
-   * @param ctx the parsing context
-   * @return list of injectors
-   */
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.PlusplusIncludeStatementContext ctx) {
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(PANVALET);
-    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
-    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, contentProvider));
+    CopybookContentProvider copybookContentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
+    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, copybookContentProvider));
   }
 
   /**
@@ -87,8 +62,8 @@ public class InjectService {
    */
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.CopyStatementContext ctx) {
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(COPYBOOK);
-    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
-    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, contentProvider));
+    CopybookContentProvider copybookContentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
+    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, copybookContentProvider));
   }
 
   /**
@@ -98,8 +73,8 @@ public class InjectService {
    */
   public List<InjectDescriptor> getInjectors(CobolPreprocessor.IncludeStatementContext ctx) {
     InjectCodeAnalysis analysis = analysisFactory.getInstanceFor(COPYBOOK);
-    ContentProvider contentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
-    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, contentProvider));
+    CopybookContentProvider copybookContentProvider = contentProviderFactory.getInstanceFor(RESOLVE_COPYBOOK);
+    return ImmutableList.of(new InjectDescriptor(retrieveCopybookName(ctx.copySource()), analysis, copybookContentProvider));
   }
 
   private String retrieveCopybookName(ParserRuleContext ctx) {

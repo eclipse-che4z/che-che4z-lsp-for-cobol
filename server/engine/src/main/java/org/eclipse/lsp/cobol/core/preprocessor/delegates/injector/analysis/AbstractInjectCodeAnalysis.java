@@ -26,14 +26,17 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.PreprocessorStack;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.ContentProvider;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers.CopybookContentProvider;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Location;
@@ -59,7 +62,7 @@ import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.*;
  * behavior overriding the methods.
  */
 @Slf4j
-abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
+public abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
   protected static final int MAX_COPYBOOK_NAME_LENGTH_DEFAULT = Integer.MAX_VALUE;
   private static final String HYPHEN = "-";
   private static final String UNDERSCORE = "_";
@@ -67,58 +70,50 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
       "Syntax error by checkCopybookName: {}";
 
   private final TextPreprocessor preprocessor;
+  private final GrammarPreprocessor grammarPreprocessor;
   private final MessageService messageService;
   private final int maxCopybookNameLength;
 
   AbstractInjectCodeAnalysis(
       TextPreprocessor preprocessor,
+      GrammarPreprocessor grammarPreprocessor,
       MessageService messageService,
       int maxCopybookNameLength) {
     this.preprocessor = preprocessor;
+    this.grammarPreprocessor = grammarPreprocessor;
     this.messageService = messageService;
     this.maxCopybookNameLength = maxCopybookNameLength;
   }
 
   @Override
-  public PreprocessorFunctor injectCode(
-      ContentProvider contentProvider,
-      CopybookName injectedSourceName,
-      ParserRuleContext context,
-      ParserRuleContext copySource,
-      CopybookConfig config,
-      String documentUri) {
-    return hierarchy -> {
-      List<SyntaxError> errors = new ArrayList<>();
-      CopybookMetaData metaData =
-          validateMetaData(
-                  CopybookMetaData.builder()
-                      .copybookName(injectedSourceName)
-                      .context(context)
-                      .documentUri(documentUri)
-                      .copybookId(randomUUID().toString())
-                      .config(config)
-                      .nameLocality(
-                          LocalityUtils.buildLocality(
-                              copySource, documentUri, hierarchy.getCurrentCopybookId()))
-                      .contextLocality(
-                          LocalityUtils.buildLocality(
-                              context, documentUri, hierarchy.getCurrentCopybookId()))
-                      .build())
-              .unwrap(errors::addAll);
-
-      ExtendedDocument copybookDocument =
-          buildExtendedDocumentForCopybook(contentProvider, metaData).apply(hierarchy).unwrap(errors::addAll);
-      return stack -> {
-        writeText(metaData, copybookDocument).accept(stack);
-        return subContext -> {
-          storeCopyStatementSemantics(metaData, copybookDocument).accept(subContext);
-          return nestedMappings -> {
-            collectNestedSemanticData(metaData, copybookDocument).accept(nestedMappings);
-            return allErrors -> allErrors.addAll(errors);
-          };
-        };
-      };
-    };
+  public void injectCode(CopybookContentProvider copybookContentProvider,
+                         CopybookName injectedSourceName,
+                         ParserRuleContext context,
+                         ParserRuleContext copySource,
+                         CopybookConfig config,
+                         String documentUri,
+                         CopybookHierarchy hierarchy,
+                         PreprocessorStack stack,
+                         CopybooksRepository copybooksRepository,
+                         Map<String, DocumentMapping> nestedMappings,
+                         List<SyntaxError> errors) {
+    Locality nameLocality = LocalityUtils.buildLocality(copySource, documentUri, hierarchy.getCurrentCopybookId());
+    Locality contextLocality = LocalityUtils.buildLocality(context, documentUri, hierarchy.getCurrentCopybookId());
+    CopybookMetaData copybookMetaData = CopybookMetaData.builder()
+            .copybookName(injectedSourceName)
+            .context(context)
+            .documentUri(documentUri)
+            .copybookId(randomUUID().toString())
+            .config(config)
+            .nameLocality(nameLocality)
+            .contextLocality(contextLocality)
+            .build();
+    CopybookMetaData metaData = validateMetaData(copybookMetaData).unwrap(errors::addAll);
+    OldExtendedDocument copybookDocument =
+            buildExtendedDocumentForCopybook(copybookContentProvider, metaData).apply(hierarchy).unwrap(errors::addAll);
+    writeText(metaData, copybookDocument).accept(stack);
+    storeCopyStatementSemantics(metaData, copybookDocument).accept(copybooksRepository);
+    collectNestedSemanticData(metaData, copybookDocument).accept(nestedMappings);
   }
 
   private ResultWithErrors<CopybookMetaData> validateMetaData(CopybookMetaData metaData) {
@@ -160,42 +155,38 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
   }
 
   private Consumer<PreprocessorStack> writeText(
-      CopybookMetaData metaData, ExtendedDocument copybookDocument) {
+      CopybookMetaData metaData, OldExtendedDocument copybookDocument) {
     return beforeWriting()
         .andThen(writeCopybook(metaData.getCopybookId(), copybookDocument.getText()))
         .andThen(afterWriting(metaData.getContext()));
   }
 
   protected Consumer<CopybooksRepository> storeCopyStatementSemantics(
-      CopybookMetaData metaData, ExtendedDocument copybookDocument) {
+      CopybookMetaData metaData, OldExtendedDocument copybookDocument) {
     return addCopybookUsage(metaData)
         .andThen(addCopybookDefinition(metaData, copybookDocument.getUri()))
         .andThen(collectCopybookStatement(metaData))
         .andThen(addNestedCopybook(copybookDocument));
   }
 
-  private Function<CopybookHierarchy, ResultWithErrors<ExtendedDocument>>
-      buildExtendedDocumentForCopybook(ContentProvider contentProvider, CopybookMetaData metaData) {
+  private Function<CopybookHierarchy, ResultWithErrors<OldExtendedDocument>>
+      buildExtendedDocumentForCopybook(CopybookContentProvider copybookContentProvider,
+                                       CopybookMetaData metaData) {
     List<SyntaxError> errors = new ArrayList<>();
     return hierarchy -> {
-      CopybookModel model = getCopyBookContent(contentProvider, metaData, hierarchy).unwrap(errors::addAll);
-      return processCopybook(
-              metaData,
-              hierarchy,
-              model.getUri(),
-              handleReplacing(
-                      metaData,
-                      hierarchy,
-                      preprocessor
-                          .cleanUpCode(model.getUri(), model.getContent())
-                          .unwrap(errors::addAll).calculateExtendedText())
-                  .unwrap(errors::addAll))
-          .accumulateErrors(errors);
+      CopybookModel model = getCopyBookContent(copybookContentProvider, metaData, hierarchy).unwrap(errors::addAll);
+      String text = preprocessor.cleanUpCode(model.getUri(), model.getContent())
+              .unwrap(errors::addAll).calculateExtendedText();
+      String replaced = handleReplacing(metaData, hierarchy, text)
+              .unwrap(errors::addAll);
+      ResultWithErrors<OldExtendedDocument> oldExtendedDocumentResultWithErrors =
+              processCopybook(metaData, hierarchy, model.getUri(), replaced).accumulateErrors(errors);
+      return oldExtendedDocumentResultWithErrors;
     };
   }
 
   private Consumer<Map<String, DocumentMapping>> collectNestedSemanticData(
-      CopybookMetaData metaData, ExtendedDocument copybookDocument) {
+      CopybookMetaData metaData, OldExtendedDocument copybookDocument) {
     return nestedMapping -> {
       nestedMapping.putAll(copybookDocument.getDocumentMapping());
       nestedMapping.putIfAbsent(
@@ -205,17 +196,19 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
     };
   }
 
-  protected ResultWithErrors<ExtendedDocument> processCopybook(
+  protected ResultWithErrors<OldExtendedDocument> processCopybook(
       CopybookMetaData metaData, CopybookHierarchy hierarchy, String uri, String content) {
     hierarchy.push(metaData.toCopybookUsage());
-    final ResultWithErrors<ExtendedDocument> result =
-        preprocessor.processCleanCode(uri, content, metaData.getConfig(), hierarchy);
+    // FIXME ExtendedSource here is a temporary container to pass compilation
+    final ResultWithErrors<OldExtendedDocument> result =
+            grammarPreprocessor.buildExtendedDocument(new ExtendedSource(TextTransformations.of(content, uri)),
+                    metaData.getConfig(), hierarchy);
     hierarchy.pop();
     return result;
   }
 
   protected ResultWithErrors<CopybookModel> getCopyBookContent(
-      ContentProvider contentProvider,
+      CopybookContentProvider copybookContentProvider,
       CopybookMetaData copybookMetaData, CopybookHierarchy hierarchy) {
     if (copybookMetaData.getCopybookName().getDisplayName().isEmpty())
       return emptyModel(copybookMetaData.getCopybookName(), ImmutableList.of());
@@ -226,7 +219,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
 
     String programDocumentUri = hierarchy.getRootDocumentUri().orElse(copybookMetaData.getDocumentUri());
 
-    CopybookModel copybookModel = contentProvider
+    CopybookModel copybookModel = copybookContentProvider
         .read(copybookMetaData.getConfig(), copybookMetaData.getCopybookName(), programDocumentUri, copybookMetaData.getDocumentUri())
         .orElse(null);
 
@@ -270,7 +263,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
     };
   }
 
-  protected Consumer<CopybooksRepository> addNestedCopybook(ExtendedDocument copybookDocument) {
+  protected Consumer<CopybooksRepository> addNestedCopybook(OldExtendedDocument copybookDocument) {
     return copybooks -> copybooks.merge(copybookDocument.getCopybooks());
   }
 
@@ -289,7 +282,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.COPYBOOK)
-            .locality(metaData.getNameLocality())
+            .location(metaData.getNameLocality().toOriginalLocation())
             .suggestion(
                 messageService.getMessage(
                     "GrammarPreprocessorListener.errorSuggestion",
@@ -317,7 +310,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
         SyntaxError.syntaxError().errorSource(ErrorSource.COPYBOOK)
             .severity(info)
             .suggestion(messageService.getMessage(messageID, copybookName.getDisplayName()))
-            .locality(locality)
+            .location(locality.toOriginalLocation())
             .build();
     LOG.debug(logMessage, error.toString());
     return error;
@@ -334,7 +327,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
         SyntaxError.syntaxError().errorSource(ErrorSource.COPYBOOK)
             .severity(info)
             .suggestion(messageService.getMessage(messageID, maxNameLength, copybookName))
-            .locality(locality)
+            .location(locality.toOriginalLocation())
             .build();
     LOG.debug(logMessage, error.toString());
     return error;

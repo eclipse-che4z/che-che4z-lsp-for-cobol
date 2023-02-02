@@ -69,8 +69,7 @@ class TestCommentLines {
     CobolLineReWriter indicatorProcessor = new CobolLineIndicatorProcessorImpl();
 
     TextPreprocessor textPreprocessor =
-        new TextPreprocessorImpl(
-            grammarPreprocessor, reader, writer, transformation, indicatorProcessor);
+        new TextPreprocessorImpl(reader, writer, transformation, indicatorProcessor);
     String actual =
         textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll).calculateExtendedText();
     assertEquals(EXPECTED, actual);

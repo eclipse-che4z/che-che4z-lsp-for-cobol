@@ -21,12 +21,6 @@ enum CopybookFolderKind {
     "local", "downloaded-dsn", "downloaded-uss"
 }
 
-const copybookFolderKindWithAllowedExtension = new Map<number, string[]>([
-    [CopybookFolderKind.local, SettingsService.getCopybookExtension()],
-    [CopybookFolderKind["downloaded-dsn"], [""]],
-    [CopybookFolderKind["downloaded-uss"], [""]],
-]);
-
 export function resolveCopybookHandler(cobolFileName: string, copybookName: string, dialectType: string): string {
     let result: string;
     result = searchCopybook(cobolFileName, copybookName, dialectType);
@@ -47,7 +41,7 @@ function searchCopybook(cobolFileName: string, copybookName: string, dialectType
     for (let i = 0; i < Object.values(CopybookFolderKind).length; i++) {
         const folderKind = Object.values(CopybookFolderKind)[i];
         const targetFolder = getTargetFolderForCopybook(folderKind, cobolFileName, dialectType);
-        const allowedExtensions = copybookFolderKindWithAllowedExtension.get(i);
+        const allowedExtensions = resolveAllowedExtensions(folderKind);
         result = searchCopybookInWorkspace(copybookName, targetFolder, allowedExtensions);
         if (result) {
             return result;
@@ -72,6 +66,16 @@ function getTargetFolderForCopybook(folderKind: string | CopybookFolderKind, cob
     return result || [];
 }
 
+function resolveAllowedExtensions(folderKind: string | CopybookFolderKind) {
+    switch(folderKind) {
+        case "downloaded-dsn":
+        case "downloaded-uss":
+            return [""];
+        default:
+            return SettingsService.getCopybookExtension();
+    }
+
+}
 export function downloadCopybookHandler(cobolFileName: string, copybookNames: string[], dialectType: string, quietMode: boolean): string {
 
     return this.downloadCopybooks(

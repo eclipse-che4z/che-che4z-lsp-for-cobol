@@ -12,22 +12,22 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
 import * as fs from "fs";
 import * as iconv from "iconv-lite";
 import * as Path from "path";
 import * as vscode from "vscode";
-import { DOWNLOAD_QUEUE_LOCKED_ERROR_MSG, INSTALL_ZOWE, INVALID_CREDENTIALS_ERROR_MSG, PATHS_USS, PATHS_ZOWE,
+import { C4Z_FOLDER, DOWNLOAD_QUEUE_LOCKED_ERROR_MSG, GITIGNORE_FILE, INSTALL_ZOWE, INVALID_CREDENTIALS_ERROR_MSG, PATHS_USS, PATHS_ZOWE,
     PROCESS_DOWNLOAD_ERROR_MSG, PROFILE_NAME_PLACEHOLDER, PROVIDE_PROFILE_MSG, SETTINGS_CPY_SECTION,
     UNLOCK_DOWNLOAD_QUEUE_MSG, ZOWE_EXT_MISSING_MSG } from "../../constants";
 import { TelemetryService } from "../reporter/TelemetryService";
-import { SettingsService } from "../Settings";
+import { createFileWithGivenPath, SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
+import { Utils } from "../util/Utils";
 import { CopybookURI } from "./CopybookURI";
 import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
 
 export class CopybookName {
-    public constructor(public name: string, public dialect: string) {};
+    public constructor(public name: string, public dialect: string) {}
 }
 
 const experimentTag = "experiment-tag";
@@ -96,12 +96,12 @@ export class CopybookDownloadService implements vscode.Disposable {
 
     private static getRemoteCopybookName(members: string[], copybookName: string) {
       return  members.find(ele => ele.substring(0, ele.lastIndexOf(".") !== -1 ?
-        ele.lastIndexOf(".") : ele.length) === copybookName);
+        ele.lastIndexOf(".") : ele.length).toUpperCase() === copybookName.toUpperCase());
     }
 
     private static async getAllMembers(dataset: string, profileName: string, isUSS: boolean) {
         let members: string[];
-        const zoweExplorerApi = ZoweVsCodeExtension.getZoweExplorerApi();
+        const zoweExplorerApi = await Utils.getZoweExplorerAPI();
         const loadedProfile = zoweExplorerApi
             .getExplorerExtenderApi()
             .getProfilesCache()
@@ -120,6 +120,8 @@ export class CopybookDownloadService implements vscode.Disposable {
         const copybookPath = CopybookURI.createCopybookPath(copybookprofile.profile, dataset, copybookprofile.getCopybook());
         if (!fs.existsSync(copybookPath)) {
             try {
+                // create .gitignore file within .c4z folder
+                createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
                 await CopybookDownloadService.downloadCopybookContent(dataset, copybookprofile.getCopybook(), copybookprofile.profile, isUSS);
             } catch (err) {
                 if (CopybookDownloadService.needsUserNotification([copybookprofile])) {
@@ -130,7 +132,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     }
 
     private static async downloadCopybookContent(dataset: string, copybook: string, profileName: string, isUSS: boolean) {
-        const zoweExplorerApi = ZoweVsCodeExtension.getZoweExplorerApi();
+        const zoweExplorerApi = await Utils.getZoweExplorerAPI();
         const loadedProfile = zoweExplorerApi
             .getExplorerExtenderApi()
             .getProfilesCache()
@@ -241,7 +243,8 @@ export class CopybookDownloadService implements vscode.Disposable {
             if (!quiet) { CopybookDownloadService.createErrorMessageForCopybooks(new Set<string>(copybookNames.map(c => c.name))); }
             return;
         }
-        if (CopybookDownloadService.isEligibleForCopybookDownload() && !ZoweVsCodeExtension.getZoweExplorerApi()) {
+        const explorerAPI = await Utils.getZoweExplorerAPI();
+        if (CopybookDownloadService.isEligibleForCopybookDownload() && !explorerAPI) {
             if (!quiet) {
                 vscode.window.showErrorMessage(ZOWE_EXT_MISSING_MSG, INSTALL_ZOWE)
                 .then(action => {
@@ -256,7 +259,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         if (!CopybookDownloadService.checkWorkspace()) {
             return;
         }
-        const profile = ProfileUtils.getProfileNameForCopybook(cobolFileName);
+        const profile = await ProfileUtils.getProfileNameForCopybook(cobolFileName);
 
         if (!profile) {
             if (!quiet) {

@@ -12,10 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
 import * as path from "path";
 import * as vscode from "vscode";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
+import { Utils } from "../../../services/util/Utils";
 
 const getZoweExplorerMock = () => {
     return jest.fn().mockReturnValue({
@@ -34,31 +34,27 @@ const getZoweExplorerMock = () => {
     },
     );
 };
-jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
-    return {
-      ZoweVsCodeExtension: jest.fn()
-    };
-  });
+Utils.getZoweExplorerAPI = jest.fn();
 describe("Test profile Utils", () => {
     const programName = "COBOLFILE.cbl";
     const profile = "profile";
-    it("checks that profile is fetched from the file path as 1st strategy", () => {
-        ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
+    it("checks that profile is fetched from the file path as 1st strategy", async () => {
+        Utils.getZoweExplorerAPI = getZoweExplorerMock();
         (vscode.workspace.textDocuments as any) = [];
         (vscode.workspace.textDocuments as any).push({ fileName: path.join(profile, programName) } as any);
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue([]),
         });
-        expect(ProfileUtils.getProfileNameForCopybook(programName)).toBe(profile);
+        expect(await ProfileUtils.getProfileNameForCopybook(programName)).toBe(profile);
     });
 
-    it("checks that profile is fetched from the settings if not a ZE downloaded file", () => {
-        ZoweVsCodeExtension.getZoweExplorerApi = getZoweExplorerMock();
+    it("checks that profile is fetched from the settings if not a ZE downloaded file", async () => {
+        Utils.getZoweExplorerAPI = getZoweExplorerMock();
         (vscode.workspace.textDocuments as any) = [];
         (vscode.workspace.textDocuments as any).push({ fileName: path.join("profileX", programName) } as any);
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue("profile2"),
         });
-        expect(ProfileUtils.getProfileNameForCopybook(programName)).toBe("profile2");
+        expect(await ProfileUtils.getProfileNameForCopybook(programName)).toBe("profile2");
     });
 });

@@ -21,10 +21,7 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /** A COBOL dialect */
 public interface CobolDialect {
@@ -79,4 +76,23 @@ public interface CobolDialect {
   default Map<String, String> getKeywords() {
     return ImmutableMap.of();
   }
+
+  /**
+   * Return a list of settings sections for dialect.
+   *
+   * @return a list of settings sections
+   */
+  default List<String> getSettingsSections() {
+    return ImmutableList.of();
+  }
+
+  /**
+   * Return a list of settings sections that hold dialect folders
+   *
+   * @return a list of settings sections
+   */
+  default List<String> getWatchingFolderSettings() {
+    return ImmutableList.of();
+  }
+
 }

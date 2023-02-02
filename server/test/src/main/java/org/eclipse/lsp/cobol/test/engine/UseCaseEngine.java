@@ -214,7 +214,6 @@ public class UseCaseEngine {
                     analysisConfig.getCopybookConfig().getCopybookProcessingMode())
                 .features(analysisConfig.getFeatures())
                 .dialects(analysisConfig.getDialects())
-                .predefinedSections(analysisConfig.getCopybookConfig().getPredefinedSections())
                 .build());
     assertResultEquals(actual, document.getTestData());
     return actual;
@@ -222,6 +221,7 @@ public class UseCaseEngine {
 
   /**
    * Run test and check only diagnostic, other errors will be ignored
+   *
    * @param text - COBOL text to analyse. It will be cleaned up before analysis to exclude all the
    *     technical tokens and collect syntax and semantic elements
    * @param copybooks - list of the copybooks used in the document
@@ -323,18 +323,18 @@ public class UseCaseEngine {
       Function<Context, List<Location>> extractor) {
 
     return result
-            .getRootNode()
-            .getDepthFirstStream()
-            .filter(hasType(PROGRAM))
-            .map(ProgramNode.class::cast)
-            .map(p -> result.getSymbolTableMap().get(SymbolTable.generateKey(p)))
-            .filter(Objects::nonNull)
-            .map(SymbolTable::getVariables)
-            .map(Multimap::values)
-            .flatMap(Collection::stream)
-            .filter(it -> !FILLER_NAME.equals(it.getName()))
-            .filter(predicate)
-            .collect(toMap(extractor, PROGRAM));
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(PROGRAM))
+        .map(ProgramNode.class::cast)
+        .map(p -> result.getSymbolTableMap().get(SymbolTable.generateKey(p)))
+        .filter(Objects::nonNull)
+        .map(SymbolTable::getVariables)
+        .map(Multimap::values)
+        .flatMap(Collection::stream)
+        .filter(it -> !FILLER_NAME.equals(it.getName()))
+        .filter(predicate)
+        .collect(toMap(extractor, PROGRAM));
   }
 
   private Map<String, List<Location>> extractDefinitions(AnalysisResult result, NodeType nodeType) {
@@ -366,7 +366,7 @@ public class UseCaseEngine {
   }
 
   private Collector<Context, ?, Map<String, List<Location>>> toMap(
-          Function<Context, List<Location>> extractor, NodeType nodeType) {
+      Function<Context, List<Location>> extractor, NodeType nodeType) {
     return Collectors.toMap(
         ctx -> {
           if (nodeType != COPY) {

@@ -69,7 +69,7 @@ class TestTextTransformations {
     // extend starts with 0
     Range range = new Range(new Position(1, 0), new Position(1, 7));
     CopyNode copyNode = new CopyNode(Locality.builder().range(range).build(), "BOOM");
-    tt.extend(copyNode, copyNode.getLocality().getRange(), TextTransformations.of("123\n", ""));
+    tt.extend(copyNode.getLocality().getRange(), TextTransformations.of("123\n", ""));
     tt.replace(new Range(new Position(0, 3), new Position(0, 7)), "4321");
     assertEquals("0: 4321\n123\n\n", tt.calculateExtendedText());
   }
@@ -105,7 +105,7 @@ class TestTextTransformations {
     String boomUri = "BOOM.cpy";
     TextTransformations boom = TextTransformations.of("Line 1\nLine 2\n", boomUri);
     boom.replace(new Range(new Position(1, 2), new Position(1, 3)), "M");
-    tt.extend(copyNode, copyNode.getLocality().getRange(), boom);
+    tt.extend(copyNode.getLocality().getRange(), boom);
     assertEquals("Hi!\nLine 1\nLiMe 2\n\n1: TEST\n", tt.calculateExtendedText());
 //    Map<Range, Location> map = tt.getExtendedDocumentMap();
 //    assertEquals(2, map.size());
@@ -124,7 +124,7 @@ class TestTextTransformations {
     String boomUri = "BOOM.cpy";
     TextTransformations boom = TextTransformations.of("Line 1\nLine 2\n", boomUri);
 
-    tt.insert(copyNode, 0, boom);
+    tt.insert(0, boom);
     assertEquals("0: abcd\n"
         + "Line 1\n"
         + "Line 2\n"

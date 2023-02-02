@@ -12,15 +12,18 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as os from "os";
 import * as fs from "fs";
-import * as vscode from "vscode";
+import * as os from "os";
 import { join } from "path";
-import { LanguageClient } from "vscode-languageclient";
+import * as vscode from "vscode";
+import { LanguageClient, ErrorCodes } from "vscode-languageclient";
 import { CopybookDownloadService } from "../../services/copybook/CopybookDownloadService";
 import { JavaCheck } from "../../services/JavaCheck";
-import { LanguageClientService, nativeServer } from "../../services/LanguageClientService";
-import {TelemetryService} from "../../services/reporter/TelemetryService";
+import { LanguageClientService } from "../../services/LanguageClientService";
+import { TelemetryService } from "../../services/reporter/TelemetryService";
+import { Utils } from "../../services/util/Utils";
+import { NativeExecutableService } from "../../services/nativeLanguageClient/nativeExecutableService";
+
 
 jest.mock("../../services/reporter/TelemetryService");
 jest.mock("../../services/copybook/CopybookURI");
@@ -43,11 +46,8 @@ jest.mock("vscode-languageclient", () => ({
 jest.mock('fs', () => ({
     fs: jest.fn(),
 }));
-jest.mock('@zowe/zowe-explorer-api/lib/vscode', () => {
-    return {
-      ZoweVsCodeExtension: jest.fn()
-    };
-  });
+(ErrorCodes as any) = {};
+Utils.getZoweExplorerAPI = jest.fn();
 const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService();
 let languageClientService: LanguageClientService;
 
@@ -104,12 +104,13 @@ describe("LanguageClientService positive scenario", () => {
     test("Test LanguageClientService starts language client", () => {
         LanguageClient.prototype.start = jest.fn().mockReturnValue(SERVER_STARTED_MSG);
         const serverPath = join("/test", "server", "jar", "server.jar");
+        const expectedDialectPath = join("/test", "server", "jar", "dialects");
         expect(languageClientService.start()).toBe(SERVER_STARTED_MSG);
         expect(LanguageClient).toHaveBeenCalledTimes(1);
         expect(LanguageClient).toHaveBeenCalledWith(SERVER_ID, SERVER_DESC, {
-            args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", serverPath, "pipeEnabled"],
+            args: ["-Dline.separator=\r\n", `-Ddialect.path=${expectedDialectPath}`, "-Xmx768M", "-jar", serverPath, "pipeEnabled"],
             command: "java",
-            options: { stdio: "pipe", detached: false },
+            options: { detached: false },
         }, {
             documentSelector: [SERVER_ID],
             outputChannel: expect.any(Function),
@@ -139,41 +140,36 @@ describe("LanguageClientService positive scenario", () => {
     test("LanguageClientServer detects executable path for windows", () => {
         const spy = jest.spyOn(os, "type");
         spy.mockReturnValue("Windows_NT");
-        const executableName = nativeServer("/test");
-        expect(executableName.command).toBe("engine.exe");
-        (languageClientService as any).giveExecutePermission = jest.fn();
-        const executableLocation = (languageClientService as any).initializeExecutables("/test");
-        expect(executableLocation).toBe(join("/test", "package-win"));
+        (languageClientService as any).executableService = new NativeExecutableService("/test");
+        const executable = (languageClientService as any).executableService.getNativeLanguageClient();
+        expect(executable.command).toBe("engine.exe");
+        expect(executable.options.cwd).toBe(join("/test", "native"));
     });
 
     test("LanguageClientServer detects executable path for Linux", () => {
         const spy = jest.spyOn(os, "type");
         spy.mockReturnValue("Linux");
-        const executableName = nativeServer("/test");
-        expect(executableName.command).toBe("./server");
-        (languageClientService as any).giveExecutePermission = jest.fn();
-        const executableLocation = (languageClientService as any).initializeExecutables("/test");
-        expect(executableLocation).toBe(join("/test", "package-linux"));
+        (languageClientService as any).executableService = new NativeExecutableService("/test");
+        const executable = (languageClientService as any).executableService.getNativeLanguageClient();
+        expect(executable.command).toBe("./server-linux");
+        expect(executable.options.cwd).toBe(join("/test", "native"));
     });
 
     test("LanguageClientServer detects executable path for Mac", () => {
         const spy = jest.spyOn(os, "type");
         spy.mockReturnValue("Darwin");
-        const executableName = nativeServer("/test");
-        expect(executableName.command).toBe("./server-mac-amd64");
-        (languageClientService as any).giveExecutePermission = jest.fn();
-        const executableLocation = (languageClientService as any).initializeExecutables("/test");
-        expect(executableLocation).toBe(join("/test", "package-macos"));
+        (languageClientService as any).executableService = new NativeExecutableService("/test");
+        const executable = (languageClientService as any).executableService.getNativeLanguageClient();
+        expect(executable.command).toBe("./server-mac");
+        expect(executable.options.cwd).toBe(join("/test", "native"));
     });
 
     test("LanguageClientServer detects executable path for unKnown OS", () => {
         const spy = jest.spyOn(os, "type");
         spy.mockReturnValue("Android");
-        const executableName = nativeServer("/test");
-        expect(executableName.command).toBe("");
-        (languageClientService as any).giveExecutePermission = jest.fn();
-        const executableLocation = (languageClientService as any).initializeExecutables("/test");
-        expect(executableLocation).toBe(undefined);
+        (languageClientService as any).executableService = new NativeExecutableService("/test");
+        const executable = (languageClientService as any).executableService.getNativeLanguageClient();
+        expect(executable).toBeFalsy();
     });
 
 });

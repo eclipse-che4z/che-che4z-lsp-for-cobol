@@ -1,11 +1,11 @@
-import { ZoweVsCodeExtension } from "@zowe/zowe-explorer-api/lib/vscode";
 import * as path from "path";
 import * as vscode from "vscode";
 import { SettingsService } from "../Settings";
+import { Utils } from "./Utils";
 
 export class ProfileUtils {
-    public static getProfileNameForCopybook(cobolFileName: string): (string | undefined) {
-        const zoweExplorerApi = ZoweVsCodeExtension.getZoweExplorerApi();
+    public static async getProfileNameForCopybook(cobolFileName: string): Promise<(string | undefined)> {
+        const zoweExplorerApi = await Utils.getZoweExplorerAPI();
         let availableProfiles: string[] = [];
         zoweExplorerApi.registeredApiTypes().forEach(profileType => {
             availableProfiles = availableProfiles

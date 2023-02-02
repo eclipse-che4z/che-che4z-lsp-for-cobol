@@ -15,35 +15,15 @@
 
 package org.eclipse.lsp.cobol.service.delegates.communications;
 
-import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
-import static org.eclipse.lsp4j.MessageType.Info;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Provider;
-import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.Executors;
-
-import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.MessageParams;
-import org.eclipse.lsp4j.MessageType;
-import org.eclipse.lsp4j.PublishDiagnosticsParams;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -51,6 +31,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp4j.MessageType.Info;
+import static org.mockito.Mockito.*;
 
 /** This unit tests verifies the capabilities of {@link ServerCommunications} */
 @ExtendWith(MockitoExtension.class)
@@ -90,29 +80,6 @@ class ServerCommunicationsTest {
     assertDocumentAnalysedNotification("", "");
   }
 
-  /**
-   * Method {@link ServerCommunications#notifyThatLoadingInProgress(String)} should asynchronously
-   * populate message with an URI on the client
-   */
-  @Test
-  void testNotifyThatLoadingInProgress() {
-    String data = UUID.randomUUID().toString();
-    when(files.decodeURI(data)).thenReturn(data);
-    when(files.getNameFromURI(data)).thenReturn(data);
-    when(customExecutor.getScheduledThreadPoolExecutor())
-        .thenReturn(Executors.newScheduledThreadPool(5));
-
-    when(messageService.getMessage(anyString(), anyString()))
-        .thenReturn("%s : Syntax analysis in progress");
-
-    communications.notifyThatLoadingInProgress(data);
-    verify(client, timeout(TEST_TIMEOUT))
-        .showMessage(
-            eq(
-                new MessageParams(
-                    Info,
-                    messageService.getMessage("Communications.syntaxAnalysisInProgress", data))));
-  }
 
   /**
    * Method {@link ServerCommunications#notifyThatDocumentAnalysed(String)} should asynchronously
@@ -152,16 +119,41 @@ class ServerCommunicationsTest {
     verify(client, times(1)).publishDiagnostics(eq(new PublishDiagnosticsParams(uri, diagnostics)));
   }
 
-  /**
-   * Method {@link ServerCommunications#cancelProgressNotification(String)} should destroy the popup
-   * notification that alert the user that the cobol analysis is still ongoing
-   */
   @Test
-  void testCancelProgressNotification() throws NoSuchFieldException {
+  void testNotifyProgressBegin() throws NoSuchFieldException {
     String uri = UUID.randomUUID().toString();
-    when(files.decodeURI(uri)).thenReturn(uri);
+    when(files.getNameFromURI(uri)).thenReturn(uri);
+    when(messageService.getMessage("Communications.syntaxAnalysisInProgressTitle", uri)).thenReturn("TITLE");
+    setUpProgressDataStructure(uri);
+    ProgressParams expectedNotifyBeginParams = new ProgressParams();
+    expectedNotifyBeginParams.setToken(uri);
+    WorkDoneProgressBegin workDoneProgressBegin = new WorkDoneProgressBegin();
+    workDoneProgressBegin.setTitle("TITLE");
+    expectedNotifyBeginParams.setValue(Either.forLeft(workDoneProgressBegin));
 
+    communications.notifyProgressBegin(uri);
+    verify(client).notifyProgress(expectedNotifyBeginParams);
+    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport())));
+  }
 
+  @Test
+  void testNotifyProgressEnd() throws NoSuchFieldException {
+    String uri = UUID.randomUUID().toString();
+    setUpProgressDataStructure(uri);
+    communications.notifyProgressEnd(uri);
+    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressEnd())));
+  }
+
+  @Test
+  void testNotifyProgressReport() {
+    String uri = UUID.randomUUID().toString();
+    communications.notifyProgressReport(uri);
+    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport())));
+  }
+
+  private void setUpProgressDataStructure(String data) throws NoSuchFieldException {
+    HashSet<String> uriInProgress = new HashSet<>();
+    uriInProgress.add(data);
     Field f = communications.getClass().getDeclaredField("uriInProgress");
     f.setAccessible(true);
     try {
@@ -169,9 +161,6 @@ class ServerCommunicationsTest {
     } catch (IllegalAccessException e) {
       throw new RuntimeException(e);
     }
-
-    communications.cancelProgressNotification(uri);
-    verify(uriInProgress, times(1)).remove(uri);
   }
 
   private void assertDocumentAnalysedNotification(String uri, String fileName) {

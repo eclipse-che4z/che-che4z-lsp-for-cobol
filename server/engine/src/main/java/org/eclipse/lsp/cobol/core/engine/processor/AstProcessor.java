@@ -53,13 +53,13 @@ public class AstProcessor {
    */
   public void process(ProcessingPhase phase, Node node, ProcessingContext ctx) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    findProcessors(ctx, phase, node.getClass()).forEach(p -> p.accept(node, ctx));
+    findProcessors(ctx, phase, node.getClass()).forEach(p -> ((Processor<Node>) p).accept(node, ctx));
     node.getChildren().forEach(n -> process(phase, n, ctx));
   }
 
-  private List<Processor<Node>> findProcessors(ProcessingContext ctx,
+  private List<Processor<? extends Node>> findProcessors(ProcessingContext ctx,
                                                ProcessingPhase phase, Class<? extends Node> nodeClass) {
-    List<Processor<Node>> result = new ArrayList<>();
+    List<Processor<? extends Node>> result = new ArrayList<>();
     if (!ctx.getProcessors().containsKey(phase)) {
       return result;
     }
@@ -68,7 +68,7 @@ public class AstProcessor {
         .forEach(
             (key, value) -> {
               if (key.isAssignableFrom(nodeClass)) {
-                value.forEach(v -> result.add((Processor<Node>) v));
+                value.forEach(v -> result.add((Processor<? extends Node>) v));
               }
             });
     return result;

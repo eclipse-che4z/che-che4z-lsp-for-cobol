@@ -20,7 +20,6 @@ import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 
 /** IDMS and MAID related getter */
 @UtilityClass
@@ -29,6 +28,22 @@ public class DialectConfigs {
     return new AnalysisConfig(
         new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER, ImmutableList.of()),
         ImmutableList.of(),
-        ImmutableList.of(IdmsDialect.NAME), true);
+        ImmutableList.of("IDMS"), true);
+  }
+
+  /**
+   * Provides DaCo dialect configuration
+   * @return DaCo dialect configuration
+   */
+  public AnalysisConfig getDaCoAnalysisConfig() {
+
+    return new AnalysisConfig(
+        new CopybookConfig(
+            CopybookProcessingMode.DISABLED,
+            SQLBackend.DATACOM_SERVER,
+            ImmutableList.of("S930", "S940", "S950", "S990", "S991", "S997", "S999")),
+        ImmutableList.of(),
+        ImmutableList.of("DaCo"),
+        true);
   }
 }

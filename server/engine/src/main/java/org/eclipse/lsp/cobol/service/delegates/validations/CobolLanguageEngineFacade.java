@@ -35,6 +35,7 @@ import org.eclipse.lsp4j.Location;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -138,8 +139,8 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private static Map<String, List<Diagnostic>> convertErrors(List<SyntaxError> errors) {
     return errors.stream()
-        .filter(e -> Objects.nonNull(e.getLocality()))
-        .collect(groupingBy(err -> err.getLocality().getUri(), mapping(toDiagnostic(), toList())));
+        .filter(e -> Objects.nonNull(e.getLocation()))
+        .collect(groupingBy(err -> err.getLocation().getLocation().getUri(), mapping(toDiagnostic(), toList())));
   }
 
   private static Function<SyntaxError, Diagnostic> toDiagnostic() {
@@ -148,8 +149,9 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
       diagnostic.setSeverity(checkSeverity(err.getSeverity()));
       diagnostic.setSource(err.getErrorSource().getText());
       diagnostic.setMessage(err.getSuggestion());
-      diagnostic.setRange(err.getLocality().getRange());
+      diagnostic.setRange(err.getLocation().getLocation().getRange());
       diagnostic.setCode(ofNullable(err.getErrorCode()).map(ErrorCode::getLabel).orElse(null));
+      diagnostic.setRelatedInformation(ofNullable(err.getRelatedInformation()).map(Collections::singletonList).orElse(null));
       return diagnostic;
     };
   }

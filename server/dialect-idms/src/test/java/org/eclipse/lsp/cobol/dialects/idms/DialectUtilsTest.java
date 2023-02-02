@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.dialects.idms;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.eclipse.lsp.cobol.dialects.idms.utils.TestUtils;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

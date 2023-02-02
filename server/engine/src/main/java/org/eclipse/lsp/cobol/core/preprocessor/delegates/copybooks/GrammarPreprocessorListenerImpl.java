@@ -34,10 +34,11 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
-import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectDescriptor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysis;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
@@ -56,7 +57,7 @@ import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
  */
 @Slf4j
 public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListener
-    implements GrammarPreprocessorListener<ExtendedDocument> {
+    implements GrammarPreprocessorListener<OldExtendedDocument> {
   private static final int DEFAULT_TOKEN_SHIFT = 2;
   private static final int TOKEN_SHIFT_WITH_LINEBREAK = 3;
 
@@ -107,16 +108,14 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
    */
   @NonNull
   @Override
-  public ResultWithErrors<ExtendedDocument> getResult() {
-    nestedMappings.put(
-        documentUri,
-        new DocumentMapping(
-            tokens.getTokens().stream()
-                .map(LocalityUtils.toLocality(documentUri, hierarchy.getCurrentCopybookId()))
-                .collect(toList()),
-            shifts));
+  public ResultWithErrors<OldExtendedDocument> getResult() {
+    List<Locality> localities = tokens.getTokens().stream()
+            .map(LocalityUtils.toLocality(documentUri, hierarchy.getCurrentCopybookId()))
+            .collect(toList());
+    nestedMappings.put(documentUri, new DocumentMapping(localities, shifts));
+
     return new ResultWithErrors<>(
-        new ExtendedDocument(documentUri, accumulate(), copybooks, nestedMappings), errors);
+        new OldExtendedDocument(documentUri, accumulate(), copybooks, nestedMappings), errors);
   }
 
   @Override
@@ -143,7 +142,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       final SyntaxError error =
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.EXTENDED_DOCUMENT)
-              .locality(retrieveLocality(ctx))
+              .location(retrieveLocality(ctx).toOriginalLocation())
               .severity(ERROR)
               .suggestion(
                   messageService.getMessage(
@@ -166,16 +165,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     pop();
     if (ctx.controlOptions().isEmpty()) reportInvalidArgument(ctx.controlCbl());
     accumulateTokenShift(ctx);
-  }
-
-  @Override
-  public void exitLinkageSection(LinkageSectionContext ctx) {
-    injectCode(injectService.getInjectors(ctx), ctx, ctx);
-  }
-
-  @Override
-  public void exitWorkingStorageSection(WorkingStorageSectionContext ctx) {
-    injectCode(injectService.getInjectors(ctx), ctx, ctx);
   }
 
   @Override
@@ -224,17 +213,18 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       List<InjectDescriptor> descriptors,
       ParserRuleContext context,
       ParserRuleContext copyContext) {
-    descriptors.forEach(c -> c.getInjectCodeAnalysis()
-        .injectCode(
-            c.getContentProvider(),
-            copybookNameService.findByName(c.getInjectedSourceName())
-                .orElse(new CopybookName(c.getInjectedSourceName())),
-            context, copyContext, copybookConfig, documentUri)
-        .apply(hierarchy)
-        .apply(this)
-        .apply(copybooks)
-        .apply(nestedMappings)
-        .accept(errors));
+    for (InjectDescriptor c : descriptors) {
+      InjectCodeAnalysis injectCodeAnalysis = c.getInjectCodeAnalysis();
+      CopybookName injectedSourceName = copybookNameService.findByName(c.getInjectedSourceName())
+              .orElse(new CopybookName(c.getInjectedSourceName()));
+      injectCodeAnalysis.injectCode(
+              c.getCopybookContentProvider(),
+              injectedSourceName,
+              context, copyContext, copybookConfig, documentUri,
+              hierarchy, this, copybooks, nestedMappings,
+              errors
+      );
+    }
   }
 
   @Override
@@ -324,7 +314,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             .suggestion(
                 messageService.getMessage(
                     "GrammarPreprocessorListener.controlDirectiveWrongArgs", ctx.getText()))
-            .locality(retrieveLocality(ctx))
+            .location(retrieveLocality(ctx).toOriginalLocation())
             .build();
     errors.add(error);
     LOG.debug("Syntax error by reportInvalidArgument: {}", error.toString());

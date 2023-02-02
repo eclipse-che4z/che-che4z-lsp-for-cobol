@@ -30,6 +30,7 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.usecase.UseCasePreprocessorBaseListener;
+import org.eclipse.usecase.UseCasePreprocessorParser.*;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -40,7 +41,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 import static org.antlr.v4.runtime.Lexer.HIDDEN;
-import static org.eclipse.usecase.UseCasePreprocessorParser.*;
+import static org.antlr.v4.runtime.Lexer.EOF;
 
 /**
  * This ANTLR listener removes all the technical tokens from the given text, extracts semantic
@@ -499,16 +500,17 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
 
   private Consumer<Diagnostic> registerDiagnostic(Range range) {
     return it -> {
-            diagnostics
+      Diagnostic diagnostic = new Diagnostic(
+              // honour the range provided by tester.
+              Objects.nonNull(it.getRange().getStart()) ? it.getRange() : range,
+              it.getMessage(),
+              it.getSeverity(),
+              it.getSource(),
+              ofNullable(it.getCode()).map(Either::getLeft).orElse(null));
+      diagnostic.setRelatedInformation(it.getRelatedInformation());
+      diagnostics
                     .get(documentUri)
-                    .add(
-                            new Diagnostic(
-                                    // honour the range provided by tester.
-                                    Objects.nonNull(it.getRange().getStart()) ? it.getRange() : range,
-                                    it.getMessage(),
-                                    it.getSeverity(),
-                                    it.getSource(),
-                                    Optional.ofNullable(it.getCode()).map(Either::getLeft).orElse(null)));
+                    .add(diagnostic);
     };
   }
 

@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.common.model;
 
 import lombok.Builder;
 import lombok.Data;
+import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -51,5 +52,14 @@ public class Locality {
    */
   public Location toLocation() {
     return new Location(uri, range);
+  }
+
+  /**
+   * Convert this Locality instance to Location using its URI and Range
+   *
+   * @return a Location from this locality
+   */
+  public OriginalLocation toOriginalLocation() {
+    return new OriginalLocation(toLocation(), copybookId);
   }
 }

@@ -36,7 +36,7 @@ public class ProgramEndCheck implements Processor<ProgramEndNode> {
           .add(
               SyntaxError.syntaxError()
                   .errorSource(ErrorSource.PARSING)
-                  .locality(programEndNode.getLocality())
+                  .location(programEndNode.getLocality().toOriginalLocation())
                   .severity(ErrorSeverity.WARNING)
                   .messageTemplate(MessageTemplate.of("CobolVisitor.progIDIssueMsg"))
                   .build());
@@ -49,7 +49,7 @@ public class ProgramEndCheck implements Processor<ProgramEndNode> {
           .add(
               SyntaxError.syntaxError()
                   .errorSource(ErrorSource.PARSING)
-                  .locality(programEndNode.getLocality())
+                  .location(programEndNode.getLocality().toOriginalLocation())
                   .severity(ErrorSeverity.WARNING)
                   .messageTemplate(
                       MessageTemplate.of("CobolVisitor.identicalProgMsg", node.getProgramName()))

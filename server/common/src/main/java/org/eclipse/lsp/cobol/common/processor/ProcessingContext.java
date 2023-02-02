@@ -36,6 +36,8 @@ public class ProcessingContext {
 
     final List<SyntaxError> errors;
     final VariableAccumulator variableAccumulator;
+    private final CompilerDirectiveContext compilerDirectiveContext = new CompilerDirectiveContext();
+
     /**
      * Register node type processor
      *
@@ -46,5 +48,14 @@ public class ProcessingContext {
                 .computeIfAbsent(processorDesc.getPhase(), v -> new LinkedHashMap<>())
                 .computeIfAbsent(processorDesc.getNodeClass(), v -> new ArrayList<>())
                 .add(processorDesc.getProcessor());
+    }
+    /**
+     * Register node type processor
+     * @param phase processing phase
+     * @param nodeClass nodes of this class will be processed by the processor
+     * @param processor processor instance to use
+     */
+    public void register(ProcessingPhase phase, Class<? extends Node> nodeClass, Processor<? extends Node> processor) {
+        register(new ProcessorDescription(nodeClass, phase, processor));
     }
 }

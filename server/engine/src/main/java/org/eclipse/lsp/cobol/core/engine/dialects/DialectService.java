@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
@@ -25,7 +26,6 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
-import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,15 +35,22 @@ import java.util.stream.Collectors;
 public class DialectService {
   private static final CobolDialect EMPTY_DIALECT = () -> "COBOL";
   private final Map<String, CobolDialect> dialectSuppliers;
+  private final DialectDiscoveryService discoveryService;
+  private final CopybookService copybookService;
+  private final MessageService messageService;
 
   @Inject
   public DialectService(
+      DialectDiscoveryService discoveryService,
       CopybookService copybookService,
       MessageService messageService) {
-    dialectSuppliers = new HashMap<>();
+    this.dialectSuppliers = new HashMap<>();
+    this.discoveryService = discoveryService;
+    this.copybookService = copybookService;
+    this.messageService = messageService;
 
-    CobolDialect dialect = new IdmsDialect(copybookService, messageService);
-    dialectSuppliers.put(dialect.getName(), dialect);
+    List<CobolDialect> dialects = discoveryService.loadDialects(copybookService, messageService);
+    dialects.forEach(dialect -> dialectSuppliers.put(dialect.getName(), dialect));
   }
 
   /**
@@ -61,12 +68,12 @@ public class DialectService {
       List<SyntaxError> dialectErrors = orderedDialect.extend(context);
       dialectErrors.forEach(
           e ->
-              e.getLocality()
+              e.getLocation().getLocation()
                   .setRange(
                       context
                           .getExtendedSource()
                           .getMainMap()
-                          .mapLocation(e.getLocality().getRange(), false)
+                          .mapLocation(e.getLocation().getLocation().getRange(), false)
                           .getRange()));
 
       errors.addAll(dialectErrors);
@@ -140,5 +147,39 @@ public class DialectService {
         .map(dialectSuppliers::get)
         .flatMap(d -> d.getProcessors().stream())
         .collect(Collectors.toList());
+  }
+
+  /**
+   * Updates available dialect list based on dialect registry
+   * @param dialectRegistry is a dialect registry items list
+   */
+  public void updateDialects(List<DialectRegistryItem> dialectRegistry) {
+    dialectRegistry.forEach(r ->
+      dialectSuppliers.computeIfAbsent(r.getName(), name ->
+          discoveryService.loadDialects(r.getPath(), copybookService, messageService).stream()
+          .filter(d -> d.getName().equals(name))
+          .findFirst()
+          .orElse(null))
+    );
+  }
+
+  /**
+   * Return a list of settings sections for provided dialects.
+   *
+   * @return a list of settings sections
+   */
+  public List<String> getSettingsSections() {
+    return dialectSuppliers.values().stream()
+        .flatMap(d -> d.getSettingsSections().stream()).collect(Collectors.toList());
+  }
+
+  /**
+   * Return a list of settings sections that hold dialect folders
+   *
+   * @return a list of settings sections
+   */
+  public List<String> getWatchingFolderSettings() {
+    return dialectSuppliers.values().stream()
+        .flatMap(d -> d.getWatchingFolderSettings().stream()).collect(Collectors.toList());
   }
 }

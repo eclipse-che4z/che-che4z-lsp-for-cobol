@@ -1,0 +1,28 @@
+{
+  "cobol-lsp.target-sql-backend": "DB2_SERVER",
+  "cobol-lsp.analysis.features": [],
+  "cobol-lsp.dialects": [],
+  "cobol-lsp.daco.predefined-sections": [
+    "S930",
+    "S940",
+    "S950",
+    "S990",
+    "S991",
+    "S997",
+    "S999"
+  ],
+  "cobol-lsp.cics.translator": true,
+  "cobol-lsp.cpy-manager.paths-local": ["../copybooks"],
+  "remote-copyboooks": ["../test_files/Cobol85PositiveTestsSuite/copybooks"],
+  "cobol-lsp.cpy-manager.daco.paths-local": [],
+  "cobol-lsp.cpy-manager.idms.paths-local": [],
+  "cobol-lsp.subroutine-manager.paths-local": [],
+  "cobol-lsp.locale": "en",
+  "cobol-lsp.logging.level.root": "ALL",
+  "cobol-lsp.cpy-manager.copybook-extensions": [
+    ".CPY",
+    ".COPY",
+    ".cpy",
+    ".copy",""
+  ]
+}

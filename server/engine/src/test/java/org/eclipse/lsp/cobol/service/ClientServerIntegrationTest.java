@@ -23,6 +23,7 @@ import com.google.inject.Injector;
 import org.eclipse.lsp.cobol.ClientServerTestModule;
 import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
+import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
@@ -82,7 +83,8 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
           + "       End program ProgramId.";
   @Inject TextDocumentService service;
   @Inject MockLanguageClient client;
-  @Inject DisposableLSPStateService stateService;
+  @Inject
+  DisposableLSPStateService stateService;
 
   /**
    * This method tests that after a shutdown request, {@link TextDocumentService} always return

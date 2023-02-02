@@ -20,14 +20,31 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
+import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
+import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import org.eclipse.lsp4j.ClientCapabilities;
+import org.eclipse.lsp4j.ClientInfo;
+import org.eclipse.lsp4j.CompletionCapabilities;
+import org.eclipse.lsp4j.CompletionItemCapabilities;
+import org.eclipse.lsp4j.CompletionItemTag;
+import org.eclipse.lsp4j.CompletionItemTagSupportCapabilities;
+import org.eclipse.lsp4j.DiagnosticTag;
+import org.eclipse.lsp4j.DiagnosticsTagSupport;
+import org.eclipse.lsp4j.GeneralClientCapabilities;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.InitializedParams;
+import org.eclipse.lsp4j.PublishDiagnosticsCapabilities;
 import org.eclipse.lsp4j.ServerCapabilities;
+import org.eclipse.lsp4j.TextDocumentClientCapabilities;
 import org.eclipse.lsp4j.TextDocumentSyncKind;
+import org.eclipse.lsp4j.WorkspaceClientCapabilities;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.BeforeAll;
@@ -44,7 +61,8 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
+import static org.eclipse.lsp4j.DiagnosticTag.Unnecessary;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -80,6 +98,9 @@ class CobolLanguageServerTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
 
+    DialectService dialectService = mock(DialectService.class);
+    when(dialectService.getWatchingFolderSettings()).thenReturn(ImmutableList.of("dialect"));
+
     when(settingsService.fetchTextConfiguration(anyString())).thenCallRealMethod();
     prepareSettingsService(settingsService, localeStore);
 
@@ -94,18 +115,18 @@ class CobolLanguageServerTest {
             stateService,
             configurationService,
             copybookNameService,
-            keywords);
+            keywords,
+            dialectService);
 
     server.initialized(new InitializedParams());
 
     verify(watchingService).watchConfigurationChange();
     verify(watchingService).watchPredefinedFolder();
     verify(settingsService).fetchConfiguration(CPY_LOCAL_PATHS.label);
-    verify(settingsService).fetchConfiguration(DACO_CPY_LOCAL_PATHS.label);
-    verify(settingsService).fetchConfiguration(IDMS_CPY_LOCAL_PATHS.label);
     verify(settingsService).fetchConfiguration(LOCALE.label);
     verify(settingsService).fetchConfiguration(CPY_EXTENSIONS.label);
-    verify(watchingService, new Times(3)).addWatchers(singletonList("foo/bar"));
+    verify(settingsService).fetchConfiguration("dialect");
+    verify(watchingService, new Times(2)).addWatchers(singletonList("foo/bar"));
     verify(localeStore).notifyLocaleStore();
     verify(configurationService).updateConfigurationFromSettings();
   }
@@ -117,10 +138,6 @@ class CobolLanguageServerTest {
 
     when(settingsService.fetchConfiguration(CPY_LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.fetchConfiguration(DACO_CPY_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.fetchConfiguration(IDMS_CPY_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
     when(localeStore.notifyLocaleStore()).thenReturn(System.out::println);
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList(arr)));
@@ -130,6 +147,8 @@ class CobolLanguageServerTest {
         .thenReturn(completedFuture(ImmutableList.of("INFO")));
     when(settingsService.fetchConfiguration(CPY_EXTENSIONS.label))
         .thenReturn(completedFuture(ImmutableList.of("cpy")));
+    when(settingsService.fetchConfiguration("dialect"))
+        .thenReturn(completedFuture(singletonList(arr)));
   }
 
   @Test
@@ -141,6 +160,9 @@ class CobolLanguageServerTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
     CobolTextDocumentService textService = mock(CobolTextDocumentService.class);
+
+    DialectService dialectService = mock(DialectService.class);
+    when(dialectService.getSettingsSections()).thenReturn(ImmutableList.of("daco"));
 
     when(settingsService.fetchTextConfiguration(anyString()))
         .thenReturn(CompletableFuture.supplyAsync(ImmutableList::of));
@@ -157,7 +179,8 @@ class CobolLanguageServerTest {
             stateService,
             configurationService,
             copybookNameService,
-            keywords);
+            keywords,
+            dialectService);
 
     server.initialized(new InitializedParams());
     verify(textService, times(1)).notifyExtensionConfig(any());
@@ -182,11 +205,9 @@ class CobolLanguageServerTest {
             stateService,
             null,
             null,
+            null,
             null);
-    InitializeParams initializeParams = new InitializeParams();
-
-    List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
-    initializeParams.setWorkspaceFolders(workspaceFolders);
+    InitializeParams initializeParams = getInitializeParams();
 
     try {
       InitializeResult result = server.initialize(initializeParams).get();
@@ -194,6 +215,30 @@ class CobolLanguageServerTest {
     } catch (InterruptedException | ExecutionException e) {
       fail(e.getMessage());
     }
+  }
+
+  private InitializeParams getInitializeParams() {
+    InitializeParams initializeParams = new InitializeParams();
+
+    List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
+    initializeParams.setWorkspaceFolders(workspaceFolders);
+    initializeParams.setClientInfo(new ClientInfo("clientName", "Version-1.x"));
+    initializeParams.setLocale("en");
+    ClientCapabilities clientCapabilities = new ClientCapabilities();
+    TextDocumentClientCapabilities textDocumentClientCapabilities = new TextDocumentClientCapabilities();
+    PublishDiagnosticsCapabilities publishDiagnosticsCapabilities = new PublishDiagnosticsCapabilities();
+    publishDiagnosticsCapabilities.setTagSupport(new DiagnosticsTagSupport(ImmutableList.of(Unnecessary, DiagnosticTag.Deprecated)));
+    textDocumentClientCapabilities.setPublishDiagnostics(publishDiagnosticsCapabilities);
+    CompletionCapabilities completionCapabilities = new CompletionCapabilities();
+    CompletionItemCapabilities completionItemCapabilities = new CompletionItemCapabilities();
+    completionItemCapabilities.setTagSupport(new CompletionItemTagSupportCapabilities(ImmutableList.of(CompletionItemTag.Deprecated)));
+    completionCapabilities.setCompletionItem(completionItemCapabilities);
+    textDocumentClientCapabilities.setCompletion(completionCapabilities);
+    clientCapabilities.setTextDocument(textDocumentClientCapabilities);
+    clientCapabilities.setWorkspace(new WorkspaceClientCapabilities());
+    clientCapabilities.setGeneral(new GeneralClientCapabilities());
+    initializeParams.setCapabilities(clientCapabilities);
+    return initializeParams;
   }
 
   /** Test change in server exit status upon shutdown call. */
@@ -211,6 +256,7 @@ class CobolLanguageServerTest {
             stateService,
             null,
             null,
+            null,
             null);
     assertEquals(1, stateService.getExitCode());
     server.shutdown();
@@ -225,7 +271,7 @@ class CobolLanguageServerTest {
     assertTrue(capabilities.getDocumentFormattingProvider().getLeft());
     assertTrue(capabilities.getDocumentHighlightProvider().getLeft());
     assertTrue(capabilities.getCodeActionProvider().getLeft());
-    assertTrue(capabilities.getDocumentSymbolProvider().getLeft());
+    assertTrue(capabilities.getDocumentSymbolProvider().getRight().getWorkDoneProgress());
     assertTrue(capabilities.getFoldingRangeProvider().getLeft());
     assertEquals(
         stream(ErrorCode.values()).map(ErrorCode::getLabel).collect(toList()),

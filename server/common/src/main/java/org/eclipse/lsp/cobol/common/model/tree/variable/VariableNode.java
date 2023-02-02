@@ -88,7 +88,7 @@ public abstract class VariableNode extends Node implements Context {
     return SyntaxError.syntaxError()
         .errorSource(ErrorSource.PARSING)
         .severity(severity)
-        .locality(getLocalityForError())
+        .location(getLocalityForError().toOriginalLocation())
         .messageTemplate(messageTemplate)
         .build();
   }
@@ -100,8 +100,10 @@ public abstract class VariableNode extends Node implements Context {
    * @param usageNode a variable usage node
    */
   public void addUsage(VariableUsageNode usageNode) {
-    usages.add(usageNode.getLocality().toLocation());
-    usageNode.addDefinition(this);
+    if (!usages.contains(usageNode.getLocality().toLocation())) {
+      usages.add(usageNode.getLocality().toLocation());
+      usageNode.addDefinition(this);
+    }
   }
 
   public List<Location> getDefinitions() {
