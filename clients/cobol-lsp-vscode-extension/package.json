@@ -116,47 +116,6 @@
         "configuration": {
             "title": "COBOL Language Support",
             "properties": {
-                "cobol-lsp.cpy-manager.daco.paths-local": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                },
-                "description": "Default list of local paths to search for MAID copybooks",
-                "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.daco.paths-dsn": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of datasets to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.cpy-manager.daco.paths-uss": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of USS paths to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-                    "uniqueItems": true
-                },
-                "cobol-lsp.daco.predefined-sections": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "List of predefined sections",
-                    "default": [
-                        "S930",
-                        "S940",
-                        "S950",
-                        "S990",
-                        "S991",
-                        "S997",
-                        "S999"
-                    ],
-                    "uniqueItems": true
-                },
                 "cobol-lsp.cpy-manager.idms.paths-local": {
                 "type": "array",
                 "items": {
@@ -447,7 +406,6 @@
                     "items": {
                         "type": "string",
                         "enum": [
-                            "DaCo",
                             "IDMS"
                         ]
                     },
