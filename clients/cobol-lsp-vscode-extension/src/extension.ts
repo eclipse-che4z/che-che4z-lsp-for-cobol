@@ -33,6 +33,8 @@ import { TelemetryService } from "./services/reporter/TelemetryService";
 import { configHandler, SettingsService } from "./services/Settings";
 import { pickSnippet, SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
+import { serverTypeCodeActionProvider } from "./services/nativeLanguageClient/serverTypeCodeActionProvider";
+
 
 let languageClientService: LanguageClientService;
 let outputChannel: vscode.OutputChannel;
@@ -40,7 +42,7 @@ let outputChannel: vscode.OutputChannel;
 function initialize() {
     // We need lazy initialization to be able to mock this for unit testing
     const copyBooksDownloader = new CopybookDownloadService();
-    outputChannel = vscode.window.createOutputChannel( "COBOL Language Support");
+    outputChannel = vscode.window.createOutputChannel("COBOL Language Support");
     languageClientService = new LanguageClientService(outputChannel);
     return copyBooksDownloader;
 }
@@ -54,34 +56,16 @@ export async function activate(context: vscode.ExtensionContext) {
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
     copyBooksDownloader.start();
 
-    // Commands
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook",
-        (copybook, programName) => {
-        fetchCopybookCommand(copybook, copyBooksDownloader, programName);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings",
-        () => {
-        gotoCopybookSettings();
-    }));
-    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(_e => RangeTabShiftStore.reset()));
-
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.clear.downloaded.copybooks", () => { clearCache() }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE) }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.snippets.insertSnippets", () => { pickSnippet(); }));
+    // Register Commands
+    registerCommands(context, copyBooksDownloader);
 
     context.subscriptions.push(copyBooksDownloader);
 
-    context.subscriptions.push(
-        vscode.languages.registerCodeActionsProvider(
-            { scheme: "file", language: LANGUAGE_ID },
-            new CopybooksCodeActionProvider()));
+    registerCodeActions(context);
+
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
-            { scheme: "file", language: LANGUAGE_ID },
-            new SnippetCompletionProvider()));
+        { scheme: "file", language: LANGUAGE_ID },
+        new SnippetCompletionProvider()));
 
     vscode.workspace.onDidChangeConfiguration(async event => {
         if (event.affectsConfiguration(SERVER_TYPE)) {
@@ -146,3 +130,39 @@ function openApi() {
         }
     };
 }
+
+function registerCommands(context: vscode.ExtensionContext, copyBooksDownloader: CopybookDownloadService) {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook",
+        (copybook, programName) => {
+            fetchCopybookCommand(copybook, copyBooksDownloader, programName);
+        }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings",
+        () => {
+            gotoCopybookSettings();
+        }));
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(_e => RangeTabShiftStore.reset()));
+
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.clear.downloaded.copybooks", () => { clearCache() }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.snippets.insertSnippets", () => { pickSnippet(); }));
+    context.subscriptions.push(
+        vscode.commands.registerCommand("cobol-lsp.dialects.goto-settings", () => vscode.commands.executeCommand("workbench.action.openSettings", "cobol-lsp.dialects")));
+    context.subscriptions.push(
+        vscode.commands.registerCommand("cobol-lsp.serverType.goto-settings", () => vscode.commands.executeCommand("workbench.action.openSettings", "cobol-lsp.serverType")));
+}
+
+function registerCodeActions(context: vscode.ExtensionContext) {
+    context.subscriptions.push(
+        vscode.languages.registerCodeActionsProvider(
+            { scheme: "file", language: LANGUAGE_ID },
+            new CopybooksCodeActionProvider()));
+    context.subscriptions.push(
+        vscode.languages.registerCodeActionsProvider(
+            { scheme: "file", language: LANGUAGE_ID },
+            new serverTypeCodeActionProvider()));
+}
+

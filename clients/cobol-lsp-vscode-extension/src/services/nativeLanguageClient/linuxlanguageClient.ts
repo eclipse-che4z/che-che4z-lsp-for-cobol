@@ -23,13 +23,13 @@ export class LinuxlanguageClient implements NativeLanguageClient {
 
     constructor(serverPath) {
         this.serverPath = serverPath;
-        this.executablePath = join(serverPath, "package-linux");
-        this.command = `./server`;
+        this.executablePath = join(serverPath, "native");
+        this.command = `./server-linux`;
     }
 
     public getServer(): Executable {
         return {
-            args: ["pipeEnabled", "-Dline.separator=\r\n", "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"],
+            args: ["pipeEnabled","-Dline.separator=\r\n", "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener", "-DserverType=NATIVE"],
             command: this.command,
             options: {detached: false, cwd: this.executablePath},
         };
