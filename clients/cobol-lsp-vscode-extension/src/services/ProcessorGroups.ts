@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as vscode from "vscode";
+import { Minimatch } from "minimatch";
 import { SETTINGS_DIALECT } from "../constants";
 import { SettingsUtils } from "./util/SettingsUtils";
 
@@ -42,15 +42,24 @@ function loadProcessorsConfig(programName: string): ProcessorConfig | undefined 
     const procCfg: ProcessorsConfig = JSON.parse(fs.readFileSync(procCfgPath).toString());
     const pgmCfg: ProgramsConfig = JSON.parse(fs.readFileSync(pgmCfgPath).toString());
     let pgroup: string | undefined;
+
+    const candidates = [];
     pgmCfg.pgms.forEach(v => {
+        // exact match
         if (v.program === programName) {
             pgroup = v.pgroup
             return;
         }
+        const m = new Minimatch(v.program, { nocase: true });
+        if (m.match(programName)) {
+            candidates.push(v.pgroup);
+        }
     });
-
     if (!pgroup) {
-        return undefined;
+        if (candidates.length === 0) {
+            return undefined;
+        }
+        pgroup = candidates[0];
     }
     let result = undefined;
     procCfg.pgroups.forEach(p => {
@@ -70,8 +79,8 @@ export function loadProcessorGroupCopybookPaths(cobolFileName: string, dialectTy
     }
 
     if (dialectType && dialectType != 'COBOL') {
-        for(const pp of pgCfg.preprocessor) {
-            if(pp && typeof pp === 'object' && pp['name'] === dialectType && pp['libs']) {
+        for (const pp of pgCfg.preprocessor) {
+            if (pp && typeof pp === 'object' && pp['name'] === dialectType && pp['libs']) {
                 return pp['libs'];
             }
         }
@@ -94,10 +103,9 @@ export function loadProcessorGroupConfig(item: { scopeUri: string, section: any 
     try {
         const programName = path.basename(item.scopeUri.replace(/\.[^/.]+$/, ""));
         const pgCfg = loadProcessorsConfig(programName);
-        if (pgCfg == undefined) {
+        if (pgCfg === undefined) {
             return configObject;
         }
-
         const dialects: Preprocessor[] = [];
         if (!Array.isArray(pgCfg.preprocessor)) {
             dialects.push(pgCfg.preprocessor);

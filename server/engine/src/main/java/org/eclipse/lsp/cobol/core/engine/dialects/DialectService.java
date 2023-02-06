@@ -75,9 +75,10 @@ public class DialectService {
     try {
       orderedDialects = sortDialects(dialects);
     } catch (NoSuchElementException e) {
+      Optional<String> originalDialectName = findOriginalDialect(e.getMessage());
       errors.add(SyntaxError.syntaxError()
               .messageTemplate(MessageTemplate.of("dialects.missingDialect",
-                      e.getMessage(),
+                      originalDialectName.map(name -> e.getMessage() + " (needed for " + name + ")").orElse(e.getMessage()),
                       context.getExtendedSource().getUri()))
               .severity(ErrorSeverity.ERROR)
               .location(new OriginalLocation(new Location(context.getProgramDocumentUri(),
@@ -108,6 +109,15 @@ public class DialectService {
       context.getExtendedSource().commitTransformations();
     }
     return acc;
+  }
+
+  private Optional<String> findOriginalDialect(String name) {
+    for (CobolDialect dialect: dialectSuppliers.values()) {
+      if (dialect.runBefore().contains(name)) {
+        return Optional.of(dialect.getName());
+      }
+    }
+    return Optional.empty();
   }
 
   private LinkedList<CobolDialect> sortDialects(List<String> dialects) {
