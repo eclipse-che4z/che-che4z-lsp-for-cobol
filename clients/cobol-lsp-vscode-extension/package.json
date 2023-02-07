@@ -476,10 +476,10 @@
         "package": "vsce package"
     },
     "dependencies": {
-        "glob": "^8.0.3",
+        "glob": "8.1.0",
         "iconv-lite": "^0.6.3",
         "micromatch": "4.0.5",
-        "vscode-extension-telemetry": "0.1.6",
+        "@vscode/extension-telemetry": "0.7.5",
         "vscode-languageclient": "8.0.2"
     },
     "devDependencies": {
@@ -503,6 +503,6 @@
         "ts-jest": "^29.0.1",
         "tslint": "^5.18.0",
         "typescript": "^4.9.4",
-        "vsce": "^2.11.0"
+        "@vscode/vsce": "^2.11.0"
     }
 }
