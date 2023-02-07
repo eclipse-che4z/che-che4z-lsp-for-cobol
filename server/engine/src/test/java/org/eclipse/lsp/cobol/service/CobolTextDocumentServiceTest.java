@@ -21,47 +21,21 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.awaitility.Awaitility;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.mocks.MockTextDocumentService;
-import org.eclipse.lsp4j.CodeAction;
-import org.eclipse.lsp4j.CodeActionContext;
-import org.eclipse.lsp4j.CodeActionParams;
-import org.eclipse.lsp4j.Command;
-import org.eclipse.lsp4j.CompletionItem;
-import org.eclipse.lsp4j.CompletionList;
-import org.eclipse.lsp4j.CompletionParams;
-import org.eclipse.lsp4j.DefinitionParams;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DidChangeTextDocumentParams;
-import org.eclipse.lsp4j.DidCloseTextDocumentParams;
-import org.eclipse.lsp4j.DidOpenTextDocumentParams;
-import org.eclipse.lsp4j.DidSaveTextDocumentParams;
-import org.eclipse.lsp4j.DocumentDiagnosticParams;
-import org.eclipse.lsp4j.DocumentFormattingParams;
-import org.eclipse.lsp4j.FormattingOptions;
-import org.eclipse.lsp4j.HoverParams;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
-import org.eclipse.lsp4j.ReferenceContext;
-import org.eclipse.lsp4j.ReferenceParams;
-import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
-import org.eclipse.lsp4j.TextDocumentIdentifier;
-import org.eclipse.lsp4j.TextDocumentItem;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
-import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
+import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.Assertions;
@@ -69,10 +43,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.mockito.internal.stubbing.answers.AnswersWithDelay;
 
-import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
@@ -89,20 +61,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.atMost;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * This test checks the entry points of the {@link TextDocumentService} implementation.
@@ -184,10 +143,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
   @Test
   void testDiagnostic() {
-    when(fileSystemService.getContentByPath(any())).thenReturn("content");
-    Path mockPath = Mockito.mock(Path.class);
-    when(fileSystemService.getPathFromURI(any())).thenReturn(mockPath);
-    when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
     DocumentDiagnosticParams documentDiagnosticParams = new DocumentDiagnosticParams(new TextDocumentIdentifier(DOCUMENT_URI));
     service.getWaitConfig().countDown();
     service

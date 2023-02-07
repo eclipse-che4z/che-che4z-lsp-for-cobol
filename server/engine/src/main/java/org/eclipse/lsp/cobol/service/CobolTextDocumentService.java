@@ -26,9 +26,13 @@ import lombok.Generated;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
-import org.eclipse.lsp.cobol.common.copybook.*;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
@@ -46,12 +50,9 @@ import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
-import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
@@ -80,7 +81,7 @@ import org.eclipse.lsp4j.HoverParams;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.ReferenceParams;
-import org.eclipse.lsp4j.RelatedFullDocumentDiagnosticReport;
+import org.eclipse.lsp4j.RelatedUnchangedDocumentDiagnosticReport;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.TextEdit;
@@ -90,7 +91,6 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -98,7 +98,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -110,7 +109,6 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static java.lang.Thread.sleep;
 import static java.net.URLDecoder.decode;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
@@ -152,7 +150,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final HoverProvider hoverProvider;
   private final CFASTBuilder cfastBuilder;
   private final ConfigurationService configurationService;
-  private final FileSystemService fileSystemService;
   private DisposableLSPStateService disposableLSPStateService;
   private final CopybookIdentificationService copybookIdentificationService;
   private final CopybookService copybookService;
@@ -190,8 +187,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       CopybookService copybookService,
       CopybookReferenceRepo copybookReferenceRepo,
       SyncProvider syncProvider,
-      WatcherService watcherService,
-      FileSystemService fileSystemService) {
+      WatcherService watcherService) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -210,7 +206,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.copybookReferenceRepo = copybookReferenceRepo;
     this.syncProvider = syncProvider;
     this.watcherService = watcherService;
-    this.fileSystemService = fileSystemService;
     dataBus.subscribe(this);
   }
 
@@ -251,17 +246,15 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         () -> {
           waitAnalysisToFinish(uri);
           if (!docs.containsKey(uri)) {
-            Path file = fileSystemService.getPathFromURI(uri);
-            String text = fileSystemService.getContentByPath(Objects.requireNonNull(file));
-            doAnalysis(uri, text, false, true);
-            waitAnalysisToFinish(uri);
+            return new DocumentDiagnosticReport(
+                    getRelatedUnchangedDocumentDiagnosticReport(uri, emptyMap()));
           }
           Map<String, List<Diagnostic>> diagnosticsMap =
               ofNullable(docs.get(uri))
                   .map(t -> t.getAnalysisResult().getDiagnostics())
                   .orElse(emptyMap());
           return new DocumentDiagnosticReport(
-              getRelatedFullDocumentDiagnosticReport(uri, diagnosticsMap));
+              getRelatedUnchangedDocumentDiagnosticReport(uri, diagnosticsMap));
         };
 
     return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
@@ -269,10 +262,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("diagnostic ", uri)));
   }
 
-  private RelatedFullDocumentDiagnosticReport getRelatedFullDocumentDiagnosticReport(
+  private RelatedUnchangedDocumentDiagnosticReport getRelatedUnchangedDocumentDiagnosticReport(
       String uri, Map<String, List<Diagnostic>> diagnosticsMap) {
-    RelatedFullDocumentDiagnosticReport relatedFullDocumentDiagnosticReport =
-        new RelatedFullDocumentDiagnosticReport(diagnosticsMap.getOrDefault(uri, emptyList()));
     Map<String, Either<FullDocumentDiagnosticReport, UnchangedDocumentDiagnosticReport>>
         relatedDocDiagnostics =
             diagnosticsMap.entrySet().stream()
@@ -286,8 +277,9 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                                     forLeft(new FullDocumentDiagnosticReport(entry.getValue()))))
                 .flatMap(map -> map.entrySet().stream())
                 .collect(toMap(Entry::getKey, Entry::getValue));
-    relatedFullDocumentDiagnosticReport.setRelatedDocuments(relatedDocDiagnostics);
-    return relatedFullDocumentDiagnosticReport;
+    RelatedUnchangedDocumentDiagnosticReport relatedUnchangedDocumentDiagnosticReport = new RelatedUnchangedDocumentDiagnosticReport();
+    relatedUnchangedDocumentDiagnosticReport.setRelatedDocuments(relatedDocDiagnostics);
+    return relatedUnchangedDocumentDiagnosticReport;
   }
 
   @Generated // do not include in test coverage. Used only for tests
@@ -648,9 +640,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> documentSymbol(
       DocumentSymbolParams params) {
     String uri = params.getTextDocument().getUri();
-    Path file = fileSystemService.getPathFromURI(uri);
-    String text = fileSystemService.getContentByPath(Objects.requireNonNull(file));
-    if (!copybookIdentificationService.isCopybook(uri, text, copybookExtensions)) {
+    if (docs.containsKey(uri) && !copybookIdentificationService.isCopybook(uri, docs.get(uri).getText(), copybookExtensions)) {
       communications.notifyProgressBegin(uri);
     }
     return outlineMap
