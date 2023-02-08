@@ -28,9 +28,12 @@ export class Utils {
         return content === null || content === undefined;
     }
 
-    public static getZoweExplorerAPI(): IApiRegisterClient {
-        return vscode.extensions.getExtension(
-            "Zowe.vscode-extension-for-zowe",
-        ).exports as any;
+    public static async getZoweExplorerAPI(): Promise<IApiRegisterClient> {
+        const ext = vscode.extensions.getExtension("Zowe.vscode-extension-for-zowe");
+        if (!ext) {
+          return  Promise.resolve(undefined);
+        }
+        await ext.activate();
+        return ext.exports as any;
     }
 }
