@@ -21,7 +21,9 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 ## Prerequisites
 
-- Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
+For dialect support:
+- Java version 8 or higher with the PATH variable correctly configured.  
+For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
 
 ## Compatibility
 
@@ -120,7 +122,13 @@ The following example sets tab stops after columns 1, 2, 3 and 4 after the line 
 
 ### Dialects
 
-The dialects setting lets you include specific language analysis in your COBOL files. For now you can include IDMS as a language of choice. The dialects setting is not enabled by default. To enable the setting, go to **VS Code Settings** > **User** > **Extensions** > **COBOL Language Support** > **Cobol-lsp: Dialects**.
+The dialects setting lets you include specific language analysis in your COBOL files. For now you can include IDMS as a language of choice. The dialects setting currently requires Java to work.
+
+The dialects setting is not enabled by default. To enable the setting, follow these steps: 
+
+1. Go to **VS Code Settings** > **User** > **Extensions** > **COBOL Language Support** 
+2. Set **Cobol-lsp: serverRuntime** to **JAVA**
+3. Under **Cobol-lsp: Dialects**, select **Add Item**, select your dialect and click **OK**. 
 
 **Note:** If you disable the setting, your IDMS bits of code are highlighted as errors.
 
