@@ -39,9 +39,6 @@ jobs:
             arch: x64
           - os: windows-latest
             platform: win32
-            arch: ia32
-          - os: windows-latest
-            platform: win32
             arch: arm64
     runs-on: ${{ matrix.os }}
     needs: [generateConfigForNativeBuilds]
@@ -149,12 +146,6 @@ jobs:
           - os: ubuntu-latest
             platform: linux
             arch: arm64
-          - os: ubuntu-latest
-            platform: linux
-            arch: armhf
-          - os: ubuntu-latest
-            platform: alpine
-            arch: x64
     runs-on: ${{ matrix.os }}
     needs: [generateConfigForNativeBuilds]
     steps:
@@ -243,10 +234,6 @@ jobs:
             npm_config_arch: x64
           - os: windows-latest
             platform: win32
-            arch: ia32
-            npm_config_arch: ia32
-          - os: windows-latest
-            platform: win32
             arch: arm64
             npm_config_arch: arm
           - os: ubuntu-latest
@@ -257,14 +244,6 @@ jobs:
             platform: linux
             arch: arm64
             npm_config_arch: arm64
-          - os: ubuntu-latest
-            platform: linux
-            arch: armhf
-            npm_config_arch: arm
-          - os: ubuntu-latest
-            platform: alpine
-            arch: x64
-            npm_config_arch: x64
           - os: macos-latest
             platform: darwin
             arch: x64
@@ -334,10 +313,6 @@ jobs:
             npm_config_arch: x64
           - os: windows-latest
             platform: win32
-            arch: ia32
-            npm_config_arch: ia32
-          - os: windows-latest
-            platform: win32
             arch: arm64
             npm_config_arch: arm
           - os: ubuntu-latest
@@ -348,14 +323,6 @@ jobs:
             platform: linux
             arch: arm64
             npm_config_arch: arm64
-          - os: ubuntu-latest
-            platform: linux
-            arch: armhf
-            npm_config_arch: arm
-          - os: ubuntu-latest
-            platform: alpine
-            arch: x64
-            npm_config_arch: x64
           - os: macos-latest
             platform: darwin
             arch: x64

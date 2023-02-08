@@ -101,7 +101,7 @@ export class CopybookDownloadService implements vscode.Disposable {
 
     private static async getAllMembers(dataset: string, profileName: string, isUSS: boolean) {
         let members: string[];
-        const zoweExplorerApi = Utils.getZoweExplorerAPI();
+        const zoweExplorerApi = await Utils.getZoweExplorerAPI();
         const loadedProfile = zoweExplorerApi
             .getExplorerExtenderApi()
             .getProfilesCache()
@@ -132,7 +132,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     }
 
     private static async downloadCopybookContent(dataset: string, copybook: string, profileName: string, isUSS: boolean) {
-        const zoweExplorerApi = Utils.getZoweExplorerAPI();
+        const zoweExplorerApi = await Utils.getZoweExplorerAPI();
         const loadedProfile = zoweExplorerApi
             .getExplorerExtenderApi()
             .getProfilesCache()
@@ -243,7 +243,8 @@ export class CopybookDownloadService implements vscode.Disposable {
             if (!quiet) { CopybookDownloadService.createErrorMessageForCopybooks(new Set<string>(copybookNames.map(c => c.name))); }
             return;
         }
-        if (CopybookDownloadService.isEligibleForCopybookDownload() && !Utils.getZoweExplorerAPI()) {
+        const explorerAPI = await Utils.getZoweExplorerAPI();
+        if (CopybookDownloadService.isEligibleForCopybookDownload() && !explorerAPI) {
             if (!quiet) {
                 vscode.window.showErrorMessage(ZOWE_EXT_MISSING_MSG, INSTALL_ZOWE)
                 .then(action => {
@@ -258,7 +259,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         if (!CopybookDownloadService.checkWorkspace()) {
             return;
         }
-        const profile = ProfileUtils.getProfileNameForCopybook(cobolFileName);
+        const profile = await ProfileUtils.getProfileNameForCopybook(cobolFileName);
 
         if (!profile) {
             if (!quiet) {

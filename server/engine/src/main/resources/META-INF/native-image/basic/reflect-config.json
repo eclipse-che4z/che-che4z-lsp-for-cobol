@@ -28,7 +28,124 @@
     ]
   },
   {
+    "name":"org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.engine.processor.AstProcessor",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryFolderService",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationBasedOnExtension",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationCombinedStrategy",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService","org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationServiceBasedOnContent",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.engine.processor.AstProcessor",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryFolderService",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationBasedOnExtension",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationCombinedStrategy",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService","org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService"] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationServiceBasedOnContent",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
     "name":"ch.qos.logback.classic.pattern.LineSeparatorConverter",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FileEvent",
+    "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
@@ -469,6 +586,11 @@
     "queryAllDeclaredMethods":true
   },
   {
+    "name":"org.eclipse.lsp.cobol.lsp.jrpc.ExtendedApi",
+    "queryAllDeclaredMethods":true,
+    "methods":[{"name":"analysis","parameterTypes":["com.google.gson.JsonObject"] }]
+  },
+  {
     "name":"org.eclipse.lsp.cobol.service.CFASTBuilderImpl",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
@@ -536,6 +658,11 @@
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.FileEvent",
+    "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
@@ -639,14 +766,14 @@
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository"] }]
   },
   {
     "name":"org.eclipse.lsp.cobol.service.delegates.completions.SectionCompletion",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository"] }]
   },
   {
     "name":"org.eclipse.lsp.cobol.service.delegates.completions.SubroutineCompletion",
@@ -660,7 +787,7 @@
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository"]  }]
   },
   {
     "name":"org.eclipse.lsp.cobol.service.delegates.formations.Formations",
@@ -688,7 +815,7 @@
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]
+    "methods":[{"name":"<init>","parameterTypes":["org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository"] }]
   },
   {
     "name":"org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade",
@@ -747,6 +874,11 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
+    "name":"org.eclipse.lsp4j.DidChangeWatchedFilesParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
     "name":"org.eclipse.lsp4j.CodeAction",
     "allDeclaredFields":true,
     "queriedMethods":[{"name":"<init>","parameterTypes":[] }]
@@ -788,6 +920,11 @@
   },
   {
     "name":"org.eclipse.lsp4j.CodeActionParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DidChangeWatchedFilesParams",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
@@ -1852,6 +1989,7 @@
       {"name":"getTextDocumentService","parameterTypes":[] },
       {"name":"getWorkspaceService","parameterTypes":[] },
       {"name":"initialize","parameterTypes":["org.eclipse.lsp4j.InitializeParams"] },
+      {"name":"didChangeWatchedFiles","parameterTypes":["org.eclipse.lsp4j.DidChangeWatchedFilesParams"] },
       {"name":"initialized","parameterTypes":["org.eclipse.lsp4j.InitializedParams"] },
       {"name":"shutdown","parameterTypes":[] }
     ]
@@ -1881,7 +2019,8 @@
     "queryAllDeclaredMethods":true,
     "methods":[
       {"name":"didChangeConfiguration","parameterTypes":["org.eclipse.lsp4j.DidChangeConfigurationParams"] },
-      {"name":"executeCommand","parameterTypes":["org.eclipse.lsp4j.ExecuteCommandParams"] }
+      {"name":"executeCommand","parameterTypes":["org.eclipse.lsp4j.ExecuteCommandParams"] },
+      {"name":"didChangeWatchedFiles","parameterTypes":["org.eclipse.lsp4j.DidChangeWatchedFilesParams"] }
     ]
   },
   {
@@ -1905,5 +2044,37 @@
   {
     "name":"sun.security.provider.SHA2$SHA256",
     "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.CFASTNode",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.GoTo",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.Location",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.Paragraph",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.Perform",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.Program",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"org.eclipse.lsp.cobol.core.model.extendedapi.Section",
+    "allDeclaredFields":true
   }
 ]
