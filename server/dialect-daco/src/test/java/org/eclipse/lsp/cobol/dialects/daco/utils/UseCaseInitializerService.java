@@ -1,0 +1,88 @@
+/*
+ * Copyright (c) 2022 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ *
+ */
+package org.eclipse.lsp.cobol.dialects.daco.utils;
+
+import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
+import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
+import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
+import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
+import org.eclipse.lsp.cobol.domain.modules.EngineModule;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
+import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
+import org.eclipse.lsp.cobol.service.WatcherService;
+import org.eclipse.lsp.cobol.service.WatcherServiceImpl;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
+import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
+import org.eclipse.lsp.cobol.test.UseCaseInitializer;
+
+import java.util.concurrent.CompletableFuture;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+/**
+ * Initializer for use case engine
+ */
+@AutoService(UseCaseInitializer.class)
+public class UseCaseInitializerService implements UseCaseInitializer {
+
+  /**
+   * Creates injector for testing purposes
+   * @return injector object
+   */
+  @Override
+  public Injector createInjector() {
+    CobolLanguageClient languageClient = mock(CobolLanguageClient.class);
+    SettingsService mockSettingsService = mock(SettingsService.class);
+    when(mockSettingsService.fetchConfiguration(any()))
+        .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
+
+    return
+        Guice.createInjector(
+            new EngineModule(),
+            new DatabusModule(),
+            new AbstractModule() {
+              @Override
+              protected void configure() {
+                bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
+                bind(CopybookService.class).to(CopybookServiceImpl.class);
+                bind(SettingsService.class).toInstance(mockSettingsService);
+                bind(FileSystemService.class).toInstance(new WorkspaceFileService());
+                bind(CobolLanguageClient.class).toInstance(languageClient);
+                bind(SubroutineService.class).to(SubroutineServiceImpl.class);
+                bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
+                bind(CleanerPreprocessor.class).to(TextPreprocessorImpl.class);
+                bind(WatcherService.class).to(WatcherServiceImpl.class);
+                bind(CopybookReferenceRepo.class).toInstance(new CopybookReferenceRepoImpl());
+                bind(DialectDiscoveryService.class).to(ExplicitDialectDiscoveryService.class);
+              }
+            });
+  }
+}
