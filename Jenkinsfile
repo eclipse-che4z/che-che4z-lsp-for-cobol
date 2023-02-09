@@ -98,6 +98,8 @@ pipeline {
                                     sh 'cp engine/target/server.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/jar/'
                                     sh 'cp dialect-idms/target/dialect-idms.jar $WORKSPACE/clients/idms-dialect-support/server/jar/'
                                     sh 'cp dialect-idms/target/dialect-idms.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/jar/dialects'
+                                    sh 'cp dialect-daco/target/dialect-daco.jar $WORKSPACE/clients/daco-dialect-support/server/jar/'
+                                    sh 'cp dialect-daco/target/dialect-daco.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/jar/dialects'
                                 }
                             }
                         }
@@ -203,6 +205,12 @@ pipeline {
                                 sh 'npm run postinstall'
                                 sh 'npm run package'
                                 archiveArtifacts "*.vsix"
+                            }
+                            dir('clients/daco-dialect-support') {
+                                 sh 'npm ci --ignore-scripts'
+                                 sh 'npm run postinstall'
+                                 sh 'npm run package'
+                                 archiveArtifacts "*.vsix"
                             }
                         }
                     }
