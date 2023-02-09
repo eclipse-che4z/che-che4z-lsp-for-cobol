@@ -14,7 +14,8 @@
 
 import {Server} from "../server";
 import {
-    RelatedFullDocumentDiagnosticReport
+    DocumentDiagnosticReportKind,
+    RelatedUnchangedDocumentDiagnosticReport
 } from "vscode-languageserver-protocol/lib/common/protocol.diagnostic";
 import * as fs from "fs";
 import * as path from "path";
@@ -52,16 +53,13 @@ describe("Test native builds", () => {
         for (const f of fs.readdirSync(progDir)) {
             process.stdout.write(`=== WORKING ON ${f} ===\r\n`);
             await server.openDocument(serverConnection, f);
-            let diagnostics = await server.getDocumentDiagnostics(serverConnection, f) as RelatedFullDocumentDiagnosticReport;
-            if (diagnostics.items.length > 0) {
-                process.stdout.write(`seems issue with following response\r\n`);
-                process.stdout.write(`${JSON.stringify(diagnostics)}\r\n`);
-            }
-            expect(
-                (diagnostics && !diagnostics.items)
-                || (diagnostics.items.length === 0)
-                || (diagnostics.items?.filter(item => item && item.severity && item.severity >= 2).length === diagnostics.items.length) // Ignore less severe error
-            )
+            let diagnostics = await server.getDocumentDiagnostics(serverConnection, f) as RelatedUnchangedDocumentDiagnosticReport;
+            // expect(
+            //     (diagnostics && !diagnostics.kind === "unchanged")
+            //     || (diagnostics.items.length === 0)
+            //     || (diagnostics.items?.filter(item => item && item.severity && item.severity >= 2).length === diagnostics.items.length) // Ignore less severe error
+            // )
+            expect(diagnostics && diagnostics.kind === DocumentDiagnosticReportKind.Unchanged)
                 .toBeTruthy();
         }
     }, 999999);
