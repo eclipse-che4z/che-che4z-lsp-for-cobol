@@ -80,7 +80,9 @@ export function searchCopybookInWorkspace(copybookName: string, copybookFolders:
             for (const ext of extensions) {
                 const searchResult = globSearch(workspaceFolder, p, copybookName, ext);
                 if (searchResult) {
-                    return new urlUtil.URL("file://" + searchResult).href;
+                    const root = path.parse(searchResult).root;
+                    const urlPath = searchResult.substring(root.length).split(path.sep).map(s => encodeURIComponent(s)).join(path.sep);
+                    return new urlUtil.URL("file://" + root + urlPath).href;
                 }
             }
         }
