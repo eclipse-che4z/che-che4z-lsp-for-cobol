@@ -50,7 +50,6 @@ import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
-import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
@@ -84,7 +83,6 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     String copybookName = "COPYBOOK";
     SubroutineService subroutineService = mock(SubroutineService.class);
-    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     MessageService messageService = mock(MessageService.class);
 
@@ -96,7 +94,6 @@ class WorkspaceServiceTest {
             copybookService,
             null,
             subroutineService,
-            configurationService,
             stateService,
             copybookNameService,
             null, messageService);
@@ -125,7 +122,6 @@ class WorkspaceServiceTest {
   void testExecuteNonExistingCommand() {
     DataBusBroker broker = mock(DataBusBroker.class);
     CopybookService copybookService = mock(CopybookService.class);
-    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     WorkspaceService service =
         new CobolWorkspaceServiceImpl(
@@ -135,7 +131,6 @@ class WorkspaceServiceTest {
             copybookService,
             null,
             null,
-            configurationService,
             stateService,
             copybookNameService,
             null, null);
@@ -160,7 +155,6 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
-    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
     MessageService messageService = mock(MessageService.class);
@@ -173,7 +167,6 @@ class WorkspaceServiceTest {
             copybookService,
             localeStore,
             subroutineService,
-            configurationService,
             stateService,
             copybookNameService,
                 keywords, messageService);
@@ -212,7 +205,6 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
-    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
     MessageService messageService = mock(MessageService.class);
@@ -225,7 +217,6 @@ class WorkspaceServiceTest {
             copybookService,
             localeStore,
             subroutineService,
-            configurationService,
             stateService,
             copybookNameService,
                 keywords, messageService);
@@ -259,7 +250,6 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
-    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
     MessageService messageService = mock(MessageService.class);
@@ -272,7 +262,6 @@ class WorkspaceServiceTest {
             copybookService,
             localeStore,
             subroutineService,
-            configurationService,
             stateService,
             copybookNameService, keywords, messageService);
 
@@ -310,7 +299,6 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
-    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
     MessageService messageService = mock(MessageService.class);
@@ -323,7 +311,6 @@ class WorkspaceServiceTest {
             copybookService,
             localeStore,
             subroutineService,
-            configurationService,
             stateService,
             copybookNameService, keywords, messageService);
 
@@ -383,7 +370,6 @@ class WorkspaceServiceTest {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     CopybookService copybookService = mock(CopybookService.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
-    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
 
     WorkspaceService service =
@@ -394,7 +380,6 @@ class WorkspaceServiceTest {
             copybookService,
             null,
             subroutineService,
-            configurationService,
             stateService,
             copybookNameService, null, null);
 

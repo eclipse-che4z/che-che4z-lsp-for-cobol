@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
 import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
@@ -30,7 +30,7 @@ public interface ReplacingService {
    * @param replaceData - Necessary data to apply the replacements
    */
   @NonNull
-  void applyReplacing(@NonNull DocumentMap documentMap, @NonNull ReplacePreProcessorListener.ReplaceData replaceData);
+  void applyReplacing(@NonNull DocumentMap documentMap, @NonNull ReplaceData replaceData);
 
   /**
    * Retrieve pseudo-text replacing pattern from the given string. If the pseudo text consist of

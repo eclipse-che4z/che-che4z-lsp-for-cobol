@@ -32,8 +32,8 @@ import org.eclipse.lsp4j.Range;
 public class ClientServerIntegrationTestImpl implements LanguageEngineFacade {
   @Override
   public AnalysisResult analyze(String uri, String text, AnalysisConfig analysisConfig) {
-    final String copybook1 = "       COPY {~CPYBK1}.";
-    final String copybook2 = "       COPY {~CPYBK2}.";
+    final String copybook1 = "       {_COPY {~CPYBK1}.|1_}";
+    final String copybook2 = "       {_COPY {~CPYBK2}.|2_}";
 
     return UseCaseEngine.runTest(
         text,

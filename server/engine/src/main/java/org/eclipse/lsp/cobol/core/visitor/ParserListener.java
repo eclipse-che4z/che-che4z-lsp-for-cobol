@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.visitor;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonToken;
@@ -23,6 +24,12 @@ import org.antlr.v4.runtime.Recognizer;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +37,11 @@ import java.util.Optional;
 
 /** This error listener registers syntax errors found by the COBOL parser. */
 @Slf4j
+@RequiredArgsConstructor
 public class ParserListener extends BaseErrorListener {
 
+  private final ExtendedSource extendedSource;
+  private final CopybooksRepository copybooksRepository;
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
   @Override
@@ -43,18 +53,36 @@ public class ParserListener extends BaseErrorListener {
       String msg,
       RecognitionException e) {
 
+    Range range = new Range(
+        new Position(line - 1, charPositionInLine), new Position(line - 1,
+        charPositionInLine + getOffendingSymbolSize(offendingSymbol)));
+
+    if ("token recognition error at: '\\n'".equals(msg)) {
+      return;
+    }
+
+    Location location = extendedSource.mapLocation(range);
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
-            .tokenIndex(Optional.ofNullable(offendingSymbol)
-                .filter(t -> t instanceof CommonToken)
-                .map(CommonToken.class::cast)
-                .map(CommonToken::getTokenIndex)
-                .orElse(-1))
+            .location(
+                Locality.builder()
+                    .uri(location.getUri())
+                    .range(location.getRange())
+                    .copybookId(copybooksRepository.getCopybookIdByUri(location.getUri()))
+                    .build().toOriginalLocation())
             .suggestion(msg)
             .severity(ErrorSeverity.ERROR)
             .build();
     LOG.debug("Syntax error by ParserListener " + error.toString());
     errors.add(error);
+  }
+
+  private int getOffendingSymbolSize(Object offendingSymbol) {
+    return Optional.ofNullable(offendingSymbol)
+        .filter(t -> t instanceof CommonToken)
+        .map(CommonToken.class::cast)
+        .map(token -> token.getStopIndex() - token.getStartIndex() + 1)
+        .orElse(0);
   }
 }

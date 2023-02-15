@@ -69,6 +69,16 @@ public class DocumentMap {
   }
 
   /**
+   * Substitute location of original document with a new document.
+   *
+   * @param range location
+   * @param copyTransform Copybook's transformations
+   */
+  public void replace(Range range, TextTransformations copyTransform) {
+    topTransformations().replace(range, copyTransform);
+  }
+
+  /**
    * Apply all transformations and form resulting text
    *
    * @return text with all transformations
@@ -96,7 +106,7 @@ public class DocumentMap {
   /**
    * Map a range in an extended to its original location
    *
-   * @param range in the extended documetn
+   * @param range in the extended document
    * @param checkCommitted check if all changes were committed
    * @return a location of original source
    */

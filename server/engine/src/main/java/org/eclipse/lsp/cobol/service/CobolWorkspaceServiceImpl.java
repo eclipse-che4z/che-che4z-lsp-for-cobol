@@ -28,7 +28,6 @@ import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
-import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
 import org.eclipse.lsp4j.CodeActionParams;
@@ -60,7 +59,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private final CopybookService copybookService;
   private final LocaleStore localeStore;
   private final SubroutineService subroutineService;
-  private final ConfigurationService configurationService;
   private final DisposableLSPStateService disposableLSPStateService;
   private final CopybookNameService copybookNameService;
   private final Keywords keywords;
@@ -74,7 +72,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
       CopybookService copybookService,
       LocaleStore localeStore,
       SubroutineService subroutineService,
-      ConfigurationService configurationService,
       DisposableLSPStateService disposableLSPStateService,
       CopybookNameService copybookNameService,
       Keywords keywords,
@@ -85,7 +82,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     this.copybookService = copybookService;
     this.localeStore = localeStore;
     this.subroutineService = subroutineService;
-    this.configurationService = configurationService;
     this.disposableLSPStateService = disposableLSPStateService;
     this.copybookNameService = copybookNameService;
     this.keywords = keywords;

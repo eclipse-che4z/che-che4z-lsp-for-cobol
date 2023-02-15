@@ -21,7 +21,6 @@ import lombok.Value;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,7 +31,7 @@ import java.util.Map;
 public class CopybooksRepository {
   Multimap<String, Location> definitions = HashMultimap.create();
   Multimap<String, Location> usages = HashMultimap.create();
-  Map<String, Locality> definitionStatements = new HashMap<>();
+  Multimap<String, Locality> definitionStatements = HashMultimap.create();
 
   /**
    * Add defined language element to the context
@@ -79,17 +78,25 @@ public class CopybooksRepository {
   }
 
   /**
-   * Copy the content of the given subContext into this one.
-   *
-   * @param subContext a subContext that should be merged into this one
+   * Creates copybook id
+   * @param name - name of the copybook
+   * @param dialect - copybook dialect
+   * @return the copybook id string value
    */
-  public void merge(CopybooksRepository subContext) {
-    definitions.putAll(subContext.getDefinitions());
-    usages.putAll(subContext.getUsages());
-    definitionStatements.putAll(subContext.getDefinitionStatements());
+  public static String toId(String name, String dialect) {
+    return dialect == null ? name : String.format("%s!%s", name, dialect);
   }
 
-  private static String toId(String name, String dialect) {
-    return dialect == null ? name : String.format("%s!%s", name, dialect);
+  /**
+   * Returns copybook id (if exists) by copybook uri
+   * @param uri - the uri of a copybook
+   * @return a copybook id
+   */
+  public String getCopybookIdByUri(String uri) {
+    return definitions.asMap().entrySet().stream()
+        .filter(e -> e.getValue().stream().anyMatch(l -> l.getUri().equals(uri)))
+        .findFirst()
+        .map(Map.Entry::getKey)
+        .orElse(null);
   }
 }

@@ -22,15 +22,16 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
-import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.*;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacePreProcessorListener;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacePreprocessorFactory;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,29 +44,23 @@ import java.util.List;
 public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   private final GrammarPreprocessorListenerFactory listenerFactory;
   private final ReplacePreprocessorFactory replacingFactory;
-  private final ReplacingService replacingService;
 
   @Inject
   public GrammarPreprocessorImpl(
           GrammarPreprocessorListenerFactory listenerFactory,
-          ReplacePreprocessorFactory replacingFactory, ReplacingService replacingService) {
+          ReplacePreprocessorFactory replacingFactory) {
     this.listenerFactory = listenerFactory;
     this.replacingFactory = replacingFactory;
-    this.replacingService = replacingService;
   }
 
   @NonNull
   @Override
-  public ResultWithErrors<OldExtendedDocument> buildExtendedDocument(
-      @NonNull DocumentMap documentMap,
-      @NonNull CopybookConfig copybookConfig,
-      @NonNull CopybookHierarchy hierarchy) {
+  public ResultWithErrors<CopybooksRepository> preprocess(@NonNull PreprocessorContext context) {
     List<SyntaxError> errors = new ArrayList<>();
 
-    String replacedCode = replace(documentMap, hierarchy).unwrap(errors::addAll);
+    String replacedCode = replace(context.getCurrentDocument(), context.getHierarchy()).unwrap(errors::addAll);
 
-    return createOldExtendedDocument(replacedCode, documentMap, copybookConfig, hierarchy)
-        .accumulateErrors(errors);
+    return preprocess(context, replacedCode).accumulateErrors(errors);
   }
 
   private ResultWithErrors<String> replace(DocumentMap documentMap, CopybookHierarchy hierarchy) {
@@ -79,16 +74,13 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
     return new ResultWithErrors<>(documentMap.extendedText(), listener.getErrors());
   }
 
-  private ResultWithErrors<OldExtendedDocument> createOldExtendedDocument(
-          String code,
-          DocumentMap documentMap,
-          CopybookConfig copybookConfig,
-          CopybookHierarchy hierarchy) {
+  private ResultWithErrors<CopybooksRepository> preprocess(
+          PreprocessorContext context,
+          String code) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     BufferedTokenStream tokens = makeTokens(code);
 
-    GrammarPreprocessorListener<OldExtendedDocument> listener =
-            listenerFactory.create(documentMap, tokens, copybookConfig, hierarchy);
+    GrammarPreprocessorListener<CopybooksRepository> listener = listenerFactory.create(context);
 
     CobolPreprocessor parser = new CobolPreprocessor(tokens);
     parser.removeErrorListeners();

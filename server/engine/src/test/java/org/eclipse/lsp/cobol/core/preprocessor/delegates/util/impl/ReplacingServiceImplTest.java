@@ -22,9 +22,9 @@ import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacePreProcessorListener;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacingServiceImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplaceData;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingServiceImpl;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -49,14 +49,14 @@ class ReplacingServiceImplTest {
   void testApplyReplacing() {
     ReplacingService replacingService = new ReplacingServiceImpl(messageService);
     DocumentMap dm1 = new DocumentMap(TextTransformations.of("   01\n\r.   .CHILD101\r\n.", ""));
-    replacingService.applyReplacing(dm1, new ReplacePreProcessorListener.ReplaceData(ImmutableList.of(
+    replacingService.applyReplacing(dm1, new ReplaceData(ImmutableList.of(
             Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"), // .
             Pair.of("CHILD1", "CHILD2")), "", new Range()));
     assertEquals("   05\n\r.   .CHILD201\r\n.", dm1.extendedText());
 
     DocumentMap dm2 = new DocumentMap(TextTransformations.of("01 ABC.", ""));
     replacingService.applyReplacing(dm2,
-            new ReplacePreProcessorListener.ReplaceData(ImmutableList.of(Pair.of("", "")), "", new Range()));
+            new ReplaceData(ImmutableList.of(Pair.of("", "")), "", new Range()));
     assertEquals("01 ABC.", dm2.extendedText());
   }
 
