@@ -236,7 +236,7 @@ public class ReplacingServiceImpl implements ReplacingService {
     }
     String text = documentMap.getText();
     try {
-      Matcher matcher = Pattern.compile(pattern.getLeft()).matcher(text);
+      Matcher matcher = Pattern.compile(pattern.getLeft(), Pattern.CASE_INSENSITIVE).matcher(text);
       while (matcher.find()) {
         Range range = getRange(text, matcher);
         if (RangeUtils.isInside(range, scope)) {
