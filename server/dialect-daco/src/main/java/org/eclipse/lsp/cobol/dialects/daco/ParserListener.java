@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.dialects.daco;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BaseErrorListener;
-import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -26,7 +25,6 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /** This error listener registers syntax errors found by the COBOL parser. */
 @Slf4j
@@ -46,11 +44,6 @@ public class ParserListener extends BaseErrorListener {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
-            .tokenIndex(Optional.ofNullable(offendingSymbol)
-                .filter(t -> t instanceof CommonToken)
-                .map(CommonToken.class::cast)
-                .map(CommonToken::getTokenIndex)
-                .orElse(-1))
             .suggestion(msg)
             .severity(ErrorSeverity.ERROR)
             .build();

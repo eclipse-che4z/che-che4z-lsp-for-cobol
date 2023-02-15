@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.ReplacePreProcessorListener.ReplaceData;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplaceData;
 import org.eclipse.lsp4j.Range;
 
 import java.util.*;

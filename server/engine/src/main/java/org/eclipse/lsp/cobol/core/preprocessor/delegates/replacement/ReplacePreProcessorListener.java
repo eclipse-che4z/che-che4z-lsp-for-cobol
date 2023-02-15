@@ -13,16 +13,13 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.Token;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -49,6 +46,7 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
   private final CopybookHierarchy hierarchy;
 
   private ReplaceData currentTextReplaceData;
+
   @Inject
   public ReplacePreProcessorListener(
       @Assisted DocumentMap documentMap,
@@ -84,7 +82,7 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
     if ((ctx.getParent() instanceof ReplaceAreaStartContext)) {
       currentTextReplaceData.getRange(documentMap.getUri()).setStart(new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine()));
       replacingService
-          .retrievePseudoTextReplacingPattern(createClause(ctx), retrieveLocality(ctx))
+          .retrievePseudoTextReplacingPattern(ReplacementHelper.createClause(ctx), retrieveLocality(ctx))
           .processIfNoErrorsFound(pattern -> currentTextReplaceData.getReplacePatterns().add(pattern), errors::addAll);
     }
   }
@@ -127,35 +125,5 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
       range.setEnd(new Position(start.getLine(), start.getCharPositionInLine()));
     }
   }
-  private static String createClause(ReplacePseudoTextContext ctx) {
-    String[] children = new String[ctx.getChildCount()];
-    for (int i = 0; i < ctx.getChildCount(); i++) {
-      children[i] = ctx.getChild(i).getText();
-    }
-    return String.join(" ", children);
-  }
 
-  /**
-   * Replacement data storage
-   */
-  @Value
-  @RequiredArgsConstructor
-  public static class ReplaceData {
-    List<Pair<String, String>> replacePatterns = new ArrayList<>();
-    Map<String, Range> ranges = new HashMap<>();
-
-    public ReplaceData(List<Pair<String, String>> replacePatterns, String url, Range range) {
-      this.replacePatterns.addAll(replacePatterns);
-      this.ranges.put(url, range);
-    }
-
-    /**
-     * Get range in specific document by URI
-     * @param url a document URI
-     * @return the replacement range
-     */
-    public Range getRange(String url) {
-      return ranges.computeIfAbsent(url, u -> new Range());
-    }
-  }
 }

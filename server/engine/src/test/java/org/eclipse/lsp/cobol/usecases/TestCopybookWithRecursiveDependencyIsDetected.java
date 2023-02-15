@@ -36,10 +36,10 @@ class TestCopybookWithRecursiveDependencyIsDetected {
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
-          + "        COPY {~REC-CPY|1}.\n\n"
+          + "        {_COPY {~REC-CPY}.|1_}\n\n"
           + "        PROCEDURE DIVISION.\n\n";
 
-  private static final String REC_CPY = "        COPY {~REC-CPY}.";
+  private static final String REC_CPY = "        {_COPY {~REC-CPY}.|1_}";
   private static final String REC_CPY_NAME = "REC-CPY";
   private static final String MESSAGE = "Recursive copybook declaration for: " + REC_CPY_NAME;
 

@@ -58,8 +58,12 @@ class TestSqlAnalysisDisabled {
           + "           END-EXEC.\n";
 
   @Test
-  void test() {
+  void testEnabled() {
     UseCaseEngine.runTest(UPDATE_SQL_ENABLED, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testDisabled() {
     UseCaseEngine.runTest(
         UPDATE_SQL_DISABLED,
         ImmutableList.of(),

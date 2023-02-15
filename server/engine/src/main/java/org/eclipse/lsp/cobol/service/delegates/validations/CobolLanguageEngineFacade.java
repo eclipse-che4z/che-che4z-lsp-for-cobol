@@ -100,20 +100,23 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private AnalysisResult toAnalysisResult(ResultWithErrors<AnalysisResult> result, String uri) {
     Node rootNode = result.getResult().getRootNode();
+
+    List<String> copyUriList = rootNode
+        .getDepthFirstStream()
+        .filter(hasType(COPY))
+        .map(CopyNode.class::cast)
+        .map(CopyNode::getDefinitions)
+        .flatMap(Collection::stream)
+        .map(Location::getUri)
+        .filter(it -> !ImplicitCodeUtils.isImplicit(it))
+        .collect(toList());
+
     return AnalysisResult.builder()
         .symbolTableMap(result.getResult().getSymbolTableMap())
         .diagnostics(
             collectDiagnosticsForAffectedDocuments(
                 convertErrors(result.getErrors()),
-                rootNode
-                    .getDepthFirstStream()
-                    .filter(hasType(COPY))
-                    .map(CopyNode.class::cast)
-                    .map(CopyNode::getDefinitions)
-                    .flatMap(Collection::stream)
-                    .map(Location::getUri)
-                    .filter(it -> !ImplicitCodeUtils.isImplicit(it))
-                    .collect(toList()),
+                copyUriList,
                 uri))
         .rootNode(rootNode)
         .build();

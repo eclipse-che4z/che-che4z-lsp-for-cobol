@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2022 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,20 +13,24 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.visitor;
+package org.eclipse.lsp.cobol.core.engine.analysis;
 
 import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.RuleNode;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.core.Db2SqlParser;
-import org.eclipse.lsp.cobol.core.Db2SqlParserBaseVisitor;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
-import org.eclipse.lsp.cobol.core.engine.OldMapping;
+import org.eclipse.lsp.cobol.common.utils.RangeUtils;
+import org.eclipse.lsp.cobol.core.Db2SqlParser;
+import org.eclipse.lsp.cobol.core.Db2SqlParserBaseVisitor;
+import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
 
 import java.util.List;
 import java.util.function.Function;
@@ -42,8 +46,11 @@ import static org.eclipse.lsp.cobol.core.Db2SqlParser.Dbs_rs_locator_variableCon
  */
 @Slf4j
 @AllArgsConstructor
-public class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
-  private final OldMapping positions;
+class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
+
+  private final Position position;
+  private final String programUri;
+  private final ExtendedSource extendedSource;
 
   @Override
   public List<Node> visitDbs_host_variable(Dbs_host_variableContext ctx) {
@@ -94,6 +101,16 @@ public class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
   }
 
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
-    return VisitorHelper.createTreeNode(positions, visitChildren(ctx), ctx, nodeConstructor);
+    Locality locality = VisitorHelper.buildNameRangeLocality(ctx, VisitorHelper.getName(ctx), programUri);
+    locality.setRange(RangeUtils.shiftRangeWithPosition(position, locality.getRange()));
+
+    Location location = extendedSource.mapLocation(locality.getRange());
+
+    Node node = nodeConstructor.apply(Locality.builder()
+        .range(location.getRange())
+        .uri(location.getUri())
+        .build());
+    visitChildren(ctx).forEach(node::addChild);
+    return ImmutableList.of(node);
   }
 }

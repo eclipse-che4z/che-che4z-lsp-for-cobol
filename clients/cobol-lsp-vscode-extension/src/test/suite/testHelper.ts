@@ -15,6 +15,7 @@ import * as assert from 'assert';
 import * as vscode from "vscode";
 import * as path from 'path';
 import * as fs from 'fs';
+import { format } from 'path';
 
 export async function activate() {
 	// The extensionId is `publisher.name` from package.json
@@ -113,10 +114,18 @@ export function recursiveCopySync(origin, dest) {
 }
 
 export function assertRangeIsEqual(providedRange: vscode.Range, expectedRange: vscode.Range) {
-   assert.strictEqual(providedRange.start.line, expectedRange.start.line);
-   assert.strictEqual(providedRange.start.character, expectedRange.start.character);
-   assert.strictEqual(providedRange.end.line, expectedRange.end.line);
-   assert.strictEqual(providedRange.end.character, expectedRange.end.character);
+   assert.strictEqual(providedRange.start.line, expectedRange.start.line, rangesMessage(providedRange, expectedRange));
+   assert.strictEqual(providedRange.start.character, expectedRange.start.character, rangesMessage(providedRange, expectedRange));
+   assert.strictEqual(providedRange.end.line, expectedRange.end.line, rangesMessage(providedRange, expectedRange));
+   assert.strictEqual(providedRange.end.character, expectedRange.end.character, rangesMessage(providedRange, expectedRange));
+}
+
+function rangesMessage(providedRange: vscode.Range, expectedRange: vscode.Range): string {
+    return "\r\nActual range: " + rangeToString(providedRange) + "\r\nExpected range: " + rangeToString(expectedRange)
+}
+
+function rangeToString(range: vscode.Range): string {
+    return "(" + range.start.line + "," + range.start.character + "), (" + range.end.line + "," + range.end.character + ")";
 }
 
 export function printDocument(editor : vscode.TextEditor) {

@@ -34,7 +34,6 @@ import org.eclipse.lsp4j.DiagnosticRelatedInformation;
 public class SyntaxError {
   OriginalLocation location;
   MessageTemplate messageTemplate;
-  @Builder.Default int tokenIndex = -1;
   String suggestion;
   ErrorSeverity severity;
   ErrorCode errorCode;

@@ -19,7 +19,7 @@ import org.eclipse.lsp.cobol.core.CobolPreprocessorListener;
 
 /** A listener that processes the text of the COBOL document */
 public interface GrammarPreprocessorListener<T>
-    extends CobolPreprocessorListener, PreprocessorStack {
+    extends CobolPreprocessorListener {
 
   /**
    * Get the result of the processing

@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.mapping.DocumentMap;

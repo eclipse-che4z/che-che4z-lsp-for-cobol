@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
+package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -82,7 +82,7 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   @NonNull
   @Override
-  public void applyReplacing(@NonNull DocumentMap documentMap, @NonNull ReplacePreProcessorListener.ReplaceData replaceData) {
+  public void applyReplacing(@NonNull DocumentMap documentMap, @NonNull ReplaceData replaceData) {
     for (Pair<String, String> replacePattern : replaceData.getReplacePatterns()) {
       replace(documentMap, replacePattern, replaceData.getRange(documentMap.getUri()));
     }
