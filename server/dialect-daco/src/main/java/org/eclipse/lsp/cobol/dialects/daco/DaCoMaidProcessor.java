@@ -136,8 +136,9 @@ public class DaCoMaidProcessor {
     String newString = String.join("", Collections.nCopies(len, " "));
     context.getExtendedSource().replace(range, newString);
 
+    Location originalLocation = context.getExtendedSource().mapLocationUnsafe(range);
     Locality locality =
-        Locality.builder().uri(context.getExtendedSource().getUri()).range(range).build();
+        Locality.builder().uri(originalLocation.getUri()).range(originalLocation.getRange()).build();
 
     return new DaCoCopyFromNode(
         locality, prototypeName, newSuffix.orElse(""), Integer.parseInt(copyFrom.group("lvl")));
