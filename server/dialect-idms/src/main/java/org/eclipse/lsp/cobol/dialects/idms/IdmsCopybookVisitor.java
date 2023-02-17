@@ -276,7 +276,7 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
   }
 
   private VariableNameAndLocality extractNameAndLocality(IdmsCopyParser.CobolWordContext context) {
-    String name = IdmsParserHelper.getName(context);
+    String name = VisitorHelper.getName(context);
     return new VariableNameAndLocality(name, buildNameRangeLocality(context, name, documentUri));
   }
 
