@@ -31,7 +31,6 @@ import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.SearchPattern;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 

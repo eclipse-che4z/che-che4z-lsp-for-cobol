@@ -50,7 +50,7 @@ public class ReplacementHelper {
         children.add(child.getText());
       }
     }
-    return String.join(" ", children).replace(" : ", ":");
+    return String.join(" ", children);
   }
 
   /**
@@ -68,7 +68,9 @@ public class ReplacementHelper {
             CobolPreprocessor.ReplaceLiteralContext literalContext = ((CobolPreprocessor.ReplaceClauseContext) clause).replaceLiteral();
             ParserRuleContext context = Optional.ofNullable((ParserRuleContext) pseudoTextContext).orElse(literalContext);
 
-            String clauseString = createClause(context);
+            String clauseString = createClause(context)
+                .replace(" : ", ":")
+                .replace(" .", ".");
             clauses.add(ImmutablePair.of(clauseString, VisitorHelper.constructRange(context)));
           }
         }
