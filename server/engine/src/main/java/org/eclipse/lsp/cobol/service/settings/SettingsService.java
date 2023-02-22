@@ -53,10 +53,10 @@ public interface SettingsService {
    * Fetch the required configuration sections from the client.The {@link SettingsParametersEnum#LSP_PREFIX LSP prefix}
    * will be added to each specified section.
    *
-   * @param scopeUri the scope URI.
+   * @param documentUri We use document Uri as configuration scope URI.
    * @param sections the required sections.
    * @return a list of configuration objects.
    */
-  CompletableFuture<List<Object>> fetchConfigurations(String scopeUri, List<String> sections);
+  CompletableFuture<List<Object>> fetchConfigurations(String documentUri, List<String> sections);
 
 }
