@@ -9,4 +9,24 @@
 
 # IDMS Dialect Support
 
-COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using the Zowe Explorer extension to automatically retrieve copybooks used in your programs and store them in your workspace. COBOL Language Support also supports COBOL programs which interact with IDMS, Datacom, CICS, and DB2 SQL.
+IDMS Dialect Support is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension which enables language server protocol features for the IDMS dialect of COBOL, and support for IDMS copybooks.
+
+## Prerequisites
+
+- COBOL Language Support extension
+- Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.html).
+
+## LSP Features
+
+IDMS Dialect Support enables the following LSP features:
+- Autocomplete for IDMS DML keywords
+- Syntax and semantic check for IDMS DML keywords and variables
+- Syntax highlighting and coloring for IDMS DML keywords and variables
+
+## Copybook Support
+
+IDMS Dialect Support enables copybook support features of the COBOL Language Support extension for copybooks called by the `COPY IDMS` statement. 
+
+To enable copybook support, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. 
+
+Specify your IDMS copybooks in the COBOL Language Support extension settings under **Cpy-manager: Paths-local: Idms**.
