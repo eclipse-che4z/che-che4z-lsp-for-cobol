@@ -17,7 +17,6 @@ import * as path from "path";
 import * as vscode from "vscode";
 import {
     COPYBOOK_EXTENSIONS,
-    DACO_DIALECT,
     IDMS_DIALECT,
     PATHS_LOCAL_KEY,
     PATHS_USS,
@@ -30,7 +29,6 @@ import {
     SETTINGS_TAB_CONFIG,
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
-import dacoSnippets = require("../services/snippetcompletion/dacoSnippets.json");
 import idmsSnippets = require("../services/snippetcompletion/idmsSnippets.json");
 
 /**
@@ -193,8 +191,7 @@ export class SettingsService {
         const dialectList: string[] = vscode.workspace.getConfiguration()
             .get(SETTINGS_DIALECT);
         return new Map<any, any>([...Object.entries(cobolSnippets),
-            ...dialectList.includes(IDMS_DIALECT) ? Object.entries(idmsSnippets) : [],
-            ...dialectList.includes(DACO_DIALECT) ? Object.entries(dacoSnippets) : []]);
+            ...dialectList.includes(IDMS_DIALECT) ? Object.entries(idmsSnippets) : []]);
 
     }
 
