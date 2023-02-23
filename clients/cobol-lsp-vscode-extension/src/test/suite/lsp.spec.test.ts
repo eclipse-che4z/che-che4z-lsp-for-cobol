@@ -156,9 +156,9 @@ suite('Integration Test Suite', () => {
         let editor = helper.get_editor("USERC1R.cbl");
         await helper.sleep(1000);
         const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-        assert.strictEqual(diagnostics.length, 5);
+        assert.strictEqual(diagnostics.length, 4);
         helper.assertRangeIsEqual(diagnostics[0].range,
-            new vscode.Range(new vscode.Position(18, 12), new vscode.Position(18, 18)));
+            new vscode.Range(new vscode.Position(18, 7), new vscode.Position(18, 19)));
         assert.strictEqual(diagnostics[0].message, "Recursive copybook declaration for: BOOK1R");
 
     }).timeout(2000).slow(1000);
@@ -168,10 +168,10 @@ suite('Integration Test Suite', () => {
         let editor = helper.get_editor("USERC1N2.cbl");
         await helper.sleep(1000);
         const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-        assert.strictEqual(diagnostics.length, 8);
-        helper.assertRangeIsEqual(diagnostics[1].range,
+        assert.strictEqual(diagnostics.length, 7);
+        helper.assertRangeIsEqual(diagnostics[0].range,
             new vscode.Range(new vscode.Position(51, 38), new vscode.Position(51, 56)));
-        assert.strictEqual(diagnostics[1].message, "Variable USER-PHONE-MOBILE1 is not defined");
+        assert.strictEqual(diagnostics[0].message, "Variable USER-PHONE-MOBILE1 is not defined");
 
     }).timeout(2000).slow(1000);
 
@@ -186,9 +186,9 @@ suite('Integration Test Suite', () => {
 
         const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         assert.strictEqual(diagnostics.length, 2);
-        helper.assertRangeIsEqual(diagnostics[0].range,
+        helper.assertRangeIsEqual(diagnostics[1].range,
             new vscode.Range(new vscode.Position(34, 11), new vscode.Position(34, 15)));
-        assert.strictEqual(diagnostics[0].message, "Missing token SQL at execSqlStatement");
+        assert.strictEqual(diagnostics[1].message, "Missing token SQL at execSqlStatement");
     }).timeout(8000).slow(1000);
 
     test("TC266094 Underline the entire incorrect variable structure", async () => {

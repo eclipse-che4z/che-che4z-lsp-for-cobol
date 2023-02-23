@@ -80,7 +80,7 @@ class TestPseudoTextContentConstraint {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(new Position(4, 27), new Position(4, 469)),
+                new Range(new Position(4, 27), new Position(13, 21)),
                 "Max 322 chars allowed for each individual word in pseudo text",
                 DiagnosticSeverity.Error,
                 ErrorSource.EXTENDED_DOCUMENT.getText())));

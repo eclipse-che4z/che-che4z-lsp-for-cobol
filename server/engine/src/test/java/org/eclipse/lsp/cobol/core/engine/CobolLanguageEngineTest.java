@@ -25,19 +25,19 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.core.engine.analysis.EmbeddedCodeService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
-import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
@@ -84,11 +84,14 @@ class CobolLanguageEngineTest {
   void testLanguageEngineRun() {
     cobolErrorStrategy.setMessageService(mockMessageService);
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
+    AstProcessor astProcessor = mock(AstProcessor.class);
+    EmbeddedCodeService embeddedCodeService = mock(EmbeddedCodeService.class);
+    SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
 
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
             preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-            dialectService, astProcessor, symbolsRepository);
+            dialectService, astProcessor, symbolsRepository, embeddedCodeService, mock(ErrorFinalizerService.class));
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()
@@ -165,11 +168,11 @@ class CobolLanguageEngineTest {
         .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
     when(preprocessor.cleanUpCode(URI, TEXT))
         .thenReturn(new ResultWithErrors<>(TextTransformations.of(TEXT, URI), ImmutableList.of()));
-    when(grammarPreprocessor.buildExtendedDocument(
-            eq(new DocumentMap(TextTransformations.of(TEXT, URI))), eq(cpyConfig), any(CopybookHierarchy.class)))
-            .thenReturn(new ResultWithErrors<>(oldExtendedDocument, ImmutableList.of(error)));
-    when(grammarPreprocessor.buildExtendedDocument(any(DocumentMap.class), any(CopybookConfig.class), any(CopybookHierarchy.class)))
-            .thenReturn(new ResultWithErrors<>(oldExtendedDocument, ImmutableList.of()));
+
+    when(embeddedCodeService.generateNodes(any(), any(), any(), any(), anyString(), anyList()))
+        .thenReturn(new ResultWithErrors<>(ImmutableList.of(), ImmutableList.of()));
+
+    when(grammarPreprocessor.preprocess(any())).thenReturn(new ResultWithErrors<>(new CopybooksRepository(), ImmutableList.of()));
 
     Range programRange = new Range(new Position(0, 7), new Position(0, 31));
     ResultWithErrors<AnalysisResult> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
@@ -188,13 +191,15 @@ class CobolLanguageEngineTest {
 
   @Test
   void testLanguageEngineRunWhenNativeServerWithDialects() {
+    EmbeddedCodeService embeddedCodeService = mock(EmbeddedCodeService.class);
+
     cobolErrorStrategy.setMessageService(mockMessageService);
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     System.setProperty("serverType", "NATIVE");
     CobolLanguageEngine engine =
             new CobolLanguageEngine(
                     preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-                    dialectService, astProcessor, symbolsRepository);
+                    dialectService, astProcessor, symbolsRepository, embeddedCodeService, mock(ErrorFinalizerService.class));
 
     ResultWithErrors<AnalysisResult> actual = engine.run(URI, TEXT, DialectConfigs.getDaCoAnalysisConfig());
     Assertions.assertEquals(actual.getErrors().size(), 1);

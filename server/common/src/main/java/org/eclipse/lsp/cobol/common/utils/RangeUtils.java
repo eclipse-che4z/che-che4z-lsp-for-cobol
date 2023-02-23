@@ -114,4 +114,18 @@ public class RangeUtils {
         ? Integer.compare(first.getCharacter(), second.getCharacter())
         : lineComparison;
   }
+
+  /**
+   * Shifts range with a given position
+   * @param position a starting position
+   * @param range is an original range
+   * @return shifted range
+   */
+  public Range shiftRangeWithPosition(Position position, Range range) {
+    int shift = range.getStart().getLine() == 0 ? position.getCharacter() : 0;
+    return new Range(
+        new Position(position.getLine() + range.getStart().getLine(), range.getStart().getCharacter() + shift),
+        new Position(position.getLine() + range.getEnd().getLine(), range.getEnd().getCharacter() + shift)
+    );
+  }
 }

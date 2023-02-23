@@ -38,7 +38,6 @@ public class VariableUsageUtils {
       Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usageNodes) {
     Map<VariableNode, Integer> variableToStepCountsToMatchParentsMap =
         definedVariables.get(usageNodes.get(0).getName()).stream()
-            .distinct()
             .map(
                 it ->
                     mapVariableToStepCountsToMatchParents(

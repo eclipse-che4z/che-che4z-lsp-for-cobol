@@ -16,10 +16,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates;
 
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
-import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
-import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
-import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
 /** This interface represents service to build the extended document */
 public interface GrammarPreprocessor {
@@ -28,15 +25,9 @@ public interface GrammarPreprocessor {
    * Build extended document using its COPY statements, excluding non-processable statements,
    * applying related semantic analysis
    *
-   * @param documentMap - current document map
-   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql
-   *     server
-   * @param hierarchy the hierarchy of the copybooks
+   * @param context - preprocessor context
    * @return extended document with copybooks and related errors
    */
   @NonNull
-  ResultWithErrors<OldExtendedDocument> buildExtendedDocument(
-      @NonNull DocumentMap documentMap,
-      @NonNull CopybookConfig copybookConfig,
-      @NonNull CopybookHierarchy hierarchy);
+  ResultWithErrors<CopybooksRepository> preprocess(@NonNull PreprocessorContext context);
 }

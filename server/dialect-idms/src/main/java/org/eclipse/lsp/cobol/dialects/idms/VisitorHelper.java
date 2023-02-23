@@ -18,11 +18,8 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsCopyParser.*;
-
-import javax.annotation.Nonnull;
 
 import static java.util.Optional.ofNullable;
 import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
@@ -65,22 +62,4 @@ class VisitorHelper {
   public String getName(ParserRuleContext context) {
     return ofNullable(context).map(RuleContext::getText).map(String::toUpperCase).orElse("");
   }
-
-  /**
-   * Retrieve the text in the initial representation including the hidden tokens from the start to
-   * the end of the context rule.
-   *
-   * @param ctx the rule context that contains the required tokens
-   * @return a string representation of the given context
-   */
-  public String getIntervalText(ParserRuleContext ctx) {
-    return ofNullable(ctx).map(VisitorHelper::retrieveIntervalText).orElse("");
-  }
-
-  private String retrieveIntervalText(@Nonnull ParserRuleContext ctx) {
-    int start = ctx.getStart().getStartIndex();
-    int stop = ctx.getStop().getStopIndex();
-    return stop < start ? "" : ctx.getStart().getInputStream().getText(new Interval(start, stop));
-  }
-
 }

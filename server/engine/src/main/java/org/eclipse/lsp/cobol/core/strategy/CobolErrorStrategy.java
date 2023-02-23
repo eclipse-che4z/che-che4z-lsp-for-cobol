@@ -110,7 +110,22 @@ public class CobolErrorStrategy extends DefaultErrorStrategy implements MessageS
             REPORT_MISSING_TOKEN,
             errorMessageHelper.getExpectedText(recognizer),
             ErrorMessageHelper.getRule(recognizer));
-    recognizer.notifyErrorListeners(recognizer.getCurrentToken(), msg, null);
+    recognizer.notifyErrorListeners(getPreviousToken(recognizer), msg, null);
+  }
+
+  private Token getPreviousToken(Parser recognizer) {
+    if (recognizer.getCurrentToken().getText().trim().length() == 1) {
+      return recognizer.getCurrentToken();
+    }
+    int index = recognizer.getCurrentToken().getTokenIndex();
+    while (index > 0) {
+      index--;
+      Token token = recognizer.getTokenStream().get(index);
+      if (!token.getText().trim().isEmpty()) {
+        return token;
+      }
+    }
+    return recognizer.getCurrentToken();
   }
 
   private String getOffendingToken(InputMismatchException e) {

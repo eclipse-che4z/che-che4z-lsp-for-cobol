@@ -28,7 +28,6 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
-import org.eclipse.lsp.cobol.core.engine.OldMapping;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -185,24 +184,38 @@ public class VisitorHelper {
    * Retrieve a locality from the given context with a range from the start to the end
    *
    * @param ctx ParserRuleContext to extract locality
-   * @param positions map of exact positions
    * @return locality which has a range from the start to the end of the rule
    */
-  Optional<Locality> retrieveRangeLocality(ParserRuleContext ctx, OldMapping positions) {
+  Optional<Range> retrieveRangeLocality(ParserRuleContext ctx) {
     if (ctx == null) {
       return Optional.empty();
     }
-    Locality start = positions.map(ctx.getStart());
-    Locality stop = positions.map(ctx.getStop());
-    if (start == null || stop == null) {
-      return Optional.empty();
+    return Optional.of(constructRange(ctx));
+  }
+
+  /**
+   * Construct the range from ANTLR context
+   *
+   * @param ctx the ANTLR context
+   * @return the range
+   */
+  public Range constructRange(ParserRuleContext ctx) {
+    Token start = ctx.start;
+    Token end = ctx.stop;
+
+    if (start.getLine() > end.getLine()) {
+      start = ctx.stop;
+      end = ctx.start;
     }
-    return Optional.of(
-            start.toBuilder().range(
-                    new Range(
-                            start.getRange().getStart(),
-                            stop.getRange().getEnd()
-                    )).build());
+
+    return new Range(
+        new Position(
+            start.getLine() - 1,
+            start.getCharPositionInLine()),
+        new Position(
+            end.getLine() - 1,
+            end.getCharPositionInLine() + end.getStopIndex() - end.getStartIndex() + 1)
+    );
   }
 
   /**
@@ -225,27 +238,11 @@ public class VisitorHelper {
    * Check if the current thread was interrupted and stop the further analysis by throwing a
    * specific exception
    */
-  void checkInterruption() {
+  public void checkInterruption() {
     if (Thread.interrupted()) {
       LOG.debug("Parsing interrupted by user");
       throw new ParseCancellationException("Parsing interrupted by user");
     }
-  }
-
-  /**
-   * Create a tree node from the given context
-   *
-   * @param positions map of localities
-   * @param children children nodes
-   * @param ctx to retrieve the locality range
-   * @param nodeConstructor function to create the node
-   * @return list of nodes
-   */
-  List<Node> createTreeNode(OldMapping positions, List<Node> children, ParserRuleContext ctx,
-                            Function<Locality, Node> nodeConstructor) {
-    return retrieveRangeLocality(ctx, positions)
-        .map(constructNode(nodeConstructor, children))
-        .orElse(children);
   }
 
   /**
@@ -289,6 +286,17 @@ public class VisitorHelper {
         .uri(uri)
         .range(range)
         .build();
+  }
+
+  /**
+   * Builds context name locality based on the name and uri of the document
+   * @param token is a token
+   * @return range object
+   */
+  public Range buildTokenRange(Token token) {
+    return new Range(
+        new Position(token.getLine() - 1, token.getCharPositionInLine()),
+        new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getText().length()));
   }
 
 }
