@@ -28,7 +28,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	const executablePath = join(ext.extensionPath, "server", "jar");
 	const snippetPath = join(ext.extensionPath, "snippets.json");
 	
-	mainApi.registerDialect({
+	mainApi.dialectAPI_1_0().registerDialect({
 		extensionId: extensionId, 
 		name: "DaCo", 
 		path: executablePath, 
@@ -39,6 +39,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
 export async function deactivate() {
 	if (mainApi !== undefined) {
-		mainApi.unregister(extensionId, "DaCo");
+		mainApi.dialectAPI_1_0().unregister(extensionId, "DaCo");
 	}
 }
