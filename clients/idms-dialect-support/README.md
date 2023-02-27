@@ -9,7 +9,7 @@
 
 # IDMS Dialect Support
 
-IDMS Dialect Support is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension which enables language server protocol features for the IDMS dialect of COBOL, and support for IDMS copybooks.
+IDMS Dialect Support is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension which enables language server protocol features for the [IDMS](https://techdocs.broadcom/com/idms) dialect of COBOL, and support for IDMS copybooks.
 
 ## Prerequisites
 
@@ -22,11 +22,12 @@ IDMS Dialect Support enables the following LSP features:
 - Autocomplete for IDMS DML keywords
 - Syntax and semantic check for IDMS DML keywords and variables
 - Syntax highlighting and coloring for IDMS DML keywords and variables
+- IDMS code snippets
 
 ## Copybook Support
 
-IDMS Dialect Support enables copybook support features of the COBOL Language Support extension for copybooks called by the `COPY IDMS` statement. 
+IDMS Dialect Support enables copybook support features of the COBOL Language Support extension for copybooks named in `COPY IDMS` statements. 
 
 To enable copybook support, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. 
 
-Specify your IDMS copybooks in the COBOL Language Support extension settings under **Cpy-manager: Paths-local: Idms**.
+Specify your local IDMS copybook paths in the COBOL Language Support extension settings under **Cpy-manager: Paths-local: Idms**. Automatic retrieval of IDMS copybooks from the mainframe is also supported.
