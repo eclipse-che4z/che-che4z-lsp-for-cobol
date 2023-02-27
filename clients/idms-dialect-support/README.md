@@ -9,7 +9,7 @@
 
 # IDMS Dialect Support
 
-IDMS Dialect Support is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension which enables language server protocol features for the [IDMS](https://techdocs.broadcom/com/idms) dialect of COBOL, and support for IDMS copybooks.
+IDMS Dialect Support is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension which enables language server protocol features for the [IDMS](https://techdocs.broadcom.com/idms) dialect of COBOL, and support for IDMS copybooks.
 
 ## Prerequisites
 
