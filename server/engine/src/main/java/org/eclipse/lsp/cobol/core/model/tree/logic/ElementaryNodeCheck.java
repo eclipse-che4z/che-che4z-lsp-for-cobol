@@ -86,7 +86,8 @@ public class ElementaryNodeCheck implements Processor<ElementaryNode> {
 
     if (nodeIndex < parent.getChildren().size()) {
       Node nextNode = parent.getChildren().get(nodeIndex);
-      if (nextNode.getNodeType() == NodeType.VARIABLE && nextNode instanceof VariableWithLevelNode) {
+      if (nextNode.getNodeType() == NodeType.VARIABLE && nextNode instanceof VariableWithLevelNode
+          && !(nextNode instanceof MultiTableDataNameNode)) {
         int nextVariableLevel = VariableWithLevelNode.class.cast(nextNode).getLevel();
         if (nextVariableLevel != VariableConstants.LEVEL_66
             && nextVariableLevel != VariableConstants.LEVEL_77
