@@ -35,7 +35,6 @@ jobs:
           path: |
             server/engine/target/server.jar
             server/dialect-idms/target/dialect-idms.jar
-            server/dialect-daco/target/dialect-daco.jar
 
 
   buildAndTestClient:
@@ -91,7 +90,6 @@ jobs:
         run: |
           cp -R ../../staging/jar/engine/target/server.jar ./server/jar
           cp -R ../../staging/jar/dialect-idms/target/dialect-idms.jar ./server/jar/dialects
-          cp -R ../../staging/jar/dialect-daco/target/dialect-daco.jar ./server/jar/dialects
       - name: build client
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
