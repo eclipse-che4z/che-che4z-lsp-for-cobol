@@ -117,7 +117,7 @@ The following example sets tab stops after columns 1, 2, 3 and 4 after the line 
     }
     ```
 
-### Dialect add-ons
+### Dialect Add-ons
 
 Dialect add-ons are available to add support for specific language analysis in your COBOL files. Currently an add-on for the IDMS dialect is available.
 
@@ -202,7 +202,41 @@ We recommend that you refresh your copybooks from time to time. To refresh your 
 
 ### Configure Processor Groups
 
-Use processor groups to specify copybook folders and data sets containing copybooks to use with specific programs. You define processor groups in a `proc_grps.json` file and associate them with programs in a `pgm_conf.json` file. Create both of these files in the `/.cobolplugin` folder in your workspace root.
+Use processor groups to specify copybook folders and data sets containing copybooks to use with specific programs. You define processor groups in a `proc_grps.json` file and associate them with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
+
+The `proc_grps.json` file has the following format:
+```
+{
+    "pgroups": [
+        {
+            "name": "DAF",
+            "libs": [
+                "LIB"
+            ],
+            "preprocessor": [
+                {
+                    "name": "IDMS"
+                },
+                {
+                    "name": "DaCo",
+                    "libs": [
+                        "DACO-LIB"
+                    ]
+                }
+            ]
+        }
+    ]
+}
+```
+
+The `pgm_conf.json` file has the following format:
+```
+{
+    "pgms": [
+        { "program": "TEST", "pgroup": "DAF" }
+    ]
+}
+```
 
 ### Copybook Support Features
 
