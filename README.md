@@ -200,7 +200,9 @@ Copybooks that you retrieve from mainframe data sets are stored in the **.c4z/.c
 
 We recommend that you refresh your copybooks from time to time. To refresh your copybooks, press **F1** and run the command **Clear downloaded copybooks**. This command clears the **.c4z/.copybooks** directory so that copybooks are downloaded again from the mainframe.
 
-### Configuring processor groups
+### Configure Processor Groups
+
+Use processor groups to specify copybook folders and data sets containing copybooks to use with specific programs. You define processor groups in a `proc_grps.json` file and associate them with programs in a `pgm_conf.json` file.
 
 ### Copybook Support Features
 
