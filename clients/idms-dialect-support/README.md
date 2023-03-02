@@ -30,4 +30,7 @@ IDMS Dialect Support enables copybook support features of the COBOL Language Sup
 
 To enable copybook support, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. 
 
-Specify your local IDMS copybook paths in the COBOL Language Support extension settings under **Cpy-manager: Paths-local: Idms**. Automatic retrieval of IDMS copybooks from the mainframe is also supported.
+Specify paths to your IDMS copybooks in the IDMS Dialect Support extension settings as follows:
+* Specify mainframe data sets under **Idms: Paths-dsn**
+* Specify USS paths under **Idms: Paths-uss**
+* Specify local paths under **Idms: Paths-local**
