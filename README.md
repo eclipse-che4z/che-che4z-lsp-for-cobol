@@ -200,6 +200,8 @@ Copybooks that you retrieve from mainframe data sets are stored in the **.c4z/.c
 
 We recommend that you refresh your copybooks from time to time. To refresh your copybooks, press **F1** and run the command **Clear downloaded copybooks**. This command clears the **.c4z/.copybooks** directory so that copybooks are downloaded again from the mainframe.
 
+### Configuring processor groups
+
 ### Copybook Support Features
 
 The extension includes the following copybook support features:
