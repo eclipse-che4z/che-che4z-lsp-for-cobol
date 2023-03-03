@@ -209,21 +209,16 @@ The `proc_grps.json` file has the following format:
 {
     "pgroups": [
         {
-            "name": "DAF",
+            "name": "GROUP1",
             "libs": [
-                "LIB"
+                "LIB1", "LIB2"
             ],
-            "preprocessor": [
-                {
-                    "name": "IDMS"
-                },
-                {
-                    "name": "DaCo",
-                    "libs": [
-                        "DACO-LIB"
-                    ]
-                }
-            ]
+        },
+        {
+            "name": "GROUP2",
+            "libs": [
+                "LIB3", "LIB4"
+            ],
         }
     ]
 }
@@ -233,10 +228,15 @@ The `pgm_conf.json` file has the following format:
 ```
 {
     "pgms": [
-        { "program": "TEST", "pgroup": "DAF" }
+        { "program": "PROGRAM1", "pgroup": "GROUP1" },
+        { "program": "PROGRAM2", "pgroup": "GROUP2" },
     ]
 }
 ```
+
+In the above example, copybooks for PROGRAM1 are used from the libraries LIB1 and LIB2, and copybooks for PROGRAM2 are used from the libraries LIB3 and LIB4.
+
+You can specify mainframe data sets, USS data sets or local paths in the `libs` array. Libraries that you specify here take priority over those specified in the extension settings.
 
 ### Copybook Support Features
 
