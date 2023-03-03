@@ -30,3 +30,28 @@ IDMS Dialect Support enables copybook support features of the COBOL Language Sup
 To enable copybook support, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. 
 
 Specify your IDMS copybooks in the COBOL Language Support extension settings under **Cpy-manager: Paths-local: Idms**.
+
+### Using Processor Groups
+
+To use processor groups with IDMS copybooks, add the `preprocessor` array to individual groups within your `proc_grps.json` file. 
+
+#### Example
+```
+{
+    "pgroups": [
+        {
+            "name": "GROUP1",
+            "libs": [
+                "LIB1", "LIB2"
+            ],
+             "preprocessor": [
+                {
+                    "name": "IDMS"
+                },
+            ],
+        },
+    ]
+}
+```
+
+In the above example, the IDMS preprocessor is enabled on the processor group GROUP1. This enables the use of IDMS copybooks with the programs linked to it in `pgm_conf.json`.
