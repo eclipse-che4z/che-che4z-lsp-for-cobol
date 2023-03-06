@@ -98,6 +98,16 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
+    "name":"org.eclipse.lsp4j.SetTraceParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"org.eclipse.lsp4j.DidChangeWatchedFilesParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
     "name":"org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
@@ -1991,7 +2001,8 @@
       {"name":"initialize","parameterTypes":["org.eclipse.lsp4j.InitializeParams"] },
       {"name":"didChangeWatchedFiles","parameterTypes":["org.eclipse.lsp4j.DidChangeWatchedFilesParams"] },
       {"name":"initialized","parameterTypes":["org.eclipse.lsp4j.InitializedParams"] },
-      {"name":"shutdown","parameterTypes":[] }
+      {"name":"shutdown","parameterTypes":[] },
+      {"name":"setTrace","parameterTypes":["org.eclipse.lsp4j.SetTraceParams"] }
     ]
   },
   {
