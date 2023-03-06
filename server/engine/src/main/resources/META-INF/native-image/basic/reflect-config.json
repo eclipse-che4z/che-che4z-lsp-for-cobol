@@ -2001,7 +2001,8 @@
       {"name":"initialize","parameterTypes":["org.eclipse.lsp4j.InitializeParams"] },
       {"name":"didChangeWatchedFiles","parameterTypes":["org.eclipse.lsp4j.DidChangeWatchedFilesParams"] },
       {"name":"initialized","parameterTypes":["org.eclipse.lsp4j.InitializedParams"] },
-      {"name":"shutdown","parameterTypes":[] }
+      {"name":"shutdown","parameterTypes":[] },
+      {"name":"setTrace","parameterTypes":["org.eclipse.lsp4j.SetTraceParams"] }
     ]
   },
   {
