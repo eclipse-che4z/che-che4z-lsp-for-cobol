@@ -188,7 +188,6 @@ jobs:
           path: |
             server/engine/target/server.jar
             server/dialect-idms/target/dialect-idms.jar
-
   testClient:
     runs-on: windows-latest
     needs: [nativeBuildOnLinux, nativeBuildOnMac, nativeBuildOnWindows]

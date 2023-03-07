@@ -104,6 +104,11 @@ public class CobolLanguageServer implements LanguageServer {
   }
 
   @Override
+  public void setTrace(SetTraceParams params) {
+    // TODO: support trace setting
+  }
+
+  @Override
   @NonNull
   public CompletableFuture<InitializeResult> initialize(@NonNull InitializeParams params) {
     ServerCapabilities capabilities = new ServerCapabilities();
