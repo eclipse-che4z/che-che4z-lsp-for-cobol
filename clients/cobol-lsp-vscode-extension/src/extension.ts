@@ -38,6 +38,7 @@ import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 
 let languageClientService: LanguageClientService;
 let outputChannel: vscode.OutputChannel;
+const API_VERSION: string = "1.0";
 
 function initialize() {
     // We need lazy initialization to be able to mock this for unit testing
@@ -102,6 +103,17 @@ function openApi() {
         analysis(uri: string, text: string): Promise<any> {
             return languageClientService.retrieveAnalysis(uri, text);
         },
+        dialectAPI_1_0() {
+            return getDialectAPI_v_1_0()
+        },
+        version(): string {
+            return API_VERSION;
+        }
+    };
+}
+
+function getDialectAPI_v_1_0() {
+    return {
         //name: extensionId: string, string, path: string, description: string, snippetPath: string
         async registerDialect(dialect) {
             outputChannel.appendLine("Register new dialect: \r\n" + JSON.stringify(dialect));
@@ -115,8 +127,8 @@ function openApi() {
         async unregisterDialect(extensionId, dialectName) {
             DialectRegistry.unregister(dialectName);
             await languageClientService.invalidateConfiguration();
-        }
-    };
+        },
+    }
 }
 
 function registerCommands(context: vscode.ExtensionContext, copyBooksDownloader: CopybookDownloadService) {

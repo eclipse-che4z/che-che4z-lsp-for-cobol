@@ -140,23 +140,49 @@ describe.only("Check recognition of COBOL from first line", () => {
   const firstLine = manifest.contributes.languages[0].firstLine;
   const cobol = expect.stringMatching(firstLine)
 
-  test("Comment Line", () => {
+  test("Comment Line SEQ", () => {
     const pgm = `000010*REALLY ANYTHING`;
     expect(pgm).toEqual(cobol)
   })
 
-  test("Identification Division", () => {
+  test("Comment Line NOSEQ", () => {
+    const pgm = `      *REALLY ANYTHING`;
+    expect(pgm).toEqual(cobol)
+  })
+
+  test("Identification Division SEQ", () => {
     const pgm = `000010 IDENTIFICATION DIVISION.`
     expect(pgm).toEqual(cobol)
   })
 
-  test("Data Definition (copybook)", () => {
+  test("Identification Division NOSEQ", () => {
+    const pgm = `       IDENTIFICATION DIVISION.`
+    expect(pgm).toEqual(cobol)
+  })
+
+  test("ID Division", () => {
+    const pgm = `000010 ID DIVISION.`
+    expect(pgm).toEqual(cobol)
+  })
+
+
+  test("Data Definition (copybook) SEQ", () => {
     const pgm = `000010 01 ABC-XYZ.`;
     expect(pgm).toEqual(cobol)
   })
 
-  test("CICS Translator Directive", () => {
+  test("Data Definition (copybook) NOSEQ", () => {
+    const pgm = `       01 ABC-XYZ.`;
+    expect(pgm).toEqual(cobol)
+  })
+
+  test("CICS Translator Directive SEQ", () => {
     const pgm = `000010 CBL XOPTS(COBOL2)`;
+    expect(pgm).toEqual(cobol)
+  })
+
+  test("CICS Translator Directive NOSEQ", () => {
+    const pgm = `       CBL XOPTS(COBOL2)`;
     expect(pgm).toEqual(cobol)
   })
 });

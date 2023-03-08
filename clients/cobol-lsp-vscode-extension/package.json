@@ -4,7 +4,7 @@
     "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
@@ -95,11 +95,8 @@
                 "aliases": [
                     "COBOL"
                 ],
-                "filenamePatterns": [
-                    "**/*copybook*/**"
-                ],
                 "configuration": "./syntaxes/lang-config.json",
-                "firstLine": "^[0-9 ]{6}([*].*|[ ] *([Ii][Dd][Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn] +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ].*|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ].*|(CBL|PROCESS) +XOPTS\\b.*))$"
+                "firstLine": "^[0-9 ]{6}([*].*|[ ] *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ].*|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ].*|(CBL|PROCESS) +XOPTS\\b.*))$"
             }
         ],
         "grammars": [
@@ -382,11 +379,7 @@
                 "cobol-lsp.dialects": {
                     "type": "array",
                     "items": {
-                        "type": "string",
-                        "enum": [
-                            "DaCo",
-                            "IDMS"
-                        ]
+                        "type": "string"
                     },
                     "description": "List of enabled dialects",
                     "uniqueItems": true
