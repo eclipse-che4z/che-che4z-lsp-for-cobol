@@ -21,7 +21,9 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 ## Prerequisites
 
-- Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
+For dialect support:
+- Java version 8 or higher with the PATH variable correctly configured.  
+For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
 
 ## Compatibility
 
