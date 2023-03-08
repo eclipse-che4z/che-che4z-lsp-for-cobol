@@ -72,7 +72,7 @@ public class DialectService {
     List<SyntaxError> errors = new LinkedList<>();
     List<CobolDialect> orderedDialects;
     try {
-      orderedDialects = sortDialects(dialects);
+      orderedDialects = sortDialects(filterMissing(dialects, errors, context));
     } catch (NoSuchElementException e) {
       return handleMissingDialect(context, errors, e);
     }
@@ -99,18 +99,35 @@ public class DialectService {
     return acc;
   }
 
-  private ResultWithErrors<DialectOutcome> handleMissingDialect(DialectProcessingContext context,
-                                                                List<SyntaxError> errors, NoSuchElementException e) {
-    Optional<String> originalDialectName = findOriginalDialect(e.getMessage());
-    errors.add(SyntaxError.syntaxError()
+  private List<String> filterMissing(List<String> dialects, List<SyntaxError> errors, DialectProcessingContext context) {
+    List<String> result = new ArrayList<>();
+    for (String dialectName: dialects) {
+      if (!dialectSuppliers.containsKey(dialectName)) {
+        errors.add(errorMissingDialect(context, dialectName));
+      } else {
+        result.add(dialectName);
+      }
+    }
+    return result;
+  }
+
+  private static SyntaxError errorMissingDialect(DialectProcessingContext context, String dialectName) {
+    return SyntaxError.syntaxError()
             .messageTemplate(MessageTemplate.of("dialects.missingDialect",
-                    originalDialectName.map(name -> e.getMessage() + " (needed for " + name + ")").orElse(e.getMessage()),
-                    context.getExtendedSource().getUri()))
+                    dialectName, context.getExtendedSource().getUri()))
             .severity(ErrorSeverity.ERROR)
             .location(new OriginalLocation(new Location(context.getProgramDocumentUri(),
                     new Range(new Position(0, 0), new Position(0, 0))), null))
             .errorSource(ErrorSource.DIALECT)
-            .build());
+            .build();
+  }
+
+  private ResultWithErrors<DialectOutcome> handleMissingDialect(DialectProcessingContext context,
+                                                                List<SyntaxError> errors, NoSuchElementException e) {
+    Optional<String> originalDialectName = findOriginalDialect(e.getMessage());
+    String errorMsg = originalDialectName.map(name -> e.getMessage() + " (needed for " + name + ")")
+            .orElse(e.getMessage());
+    errors.add(errorMissingDialect(context, errorMsg));
     return new ResultWithErrors<>(new DialectOutcome(context), errors);
   }
 
