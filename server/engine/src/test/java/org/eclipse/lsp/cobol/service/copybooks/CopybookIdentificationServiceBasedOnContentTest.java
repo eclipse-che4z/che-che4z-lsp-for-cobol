@@ -28,7 +28,6 @@ class CopybookIdentificationServiceBasedOnContentTest {
         "      *RETRIEVAL                                                        00340200\n"
             + "      *DMLIST                                                           00340301\n"
             + "       IDENTIFICATION DIVISION.                                         00340401\n"
-            + "      /PROGRAM-ID.    EMPRPT.                                           00340501\n"
             + "       PROGRAM-ID.    EMPRPT.                                           00340501\n"
             + "      * REMARKS.      THIS PROGRAM PRODUCES A REPORT OF INFO            00340601";
     CopybookIdentificationService service = new CopybookIdentificationServiceBasedOnContent();
@@ -38,7 +37,21 @@ class CopybookIdentificationServiceBasedOnContentTest {
   }
 
   @Test
-  void WhenProgramIDCommentedThenReturnTrue() {
+  void WhenCobolWithErrorThenReturnFalse() {
+    String content =
+        "      *RETRIEVAL                                                        00340200\n"
+            + "      *DMLIST                                                           00340301\n"
+            + "       IDENTIFICATION DIVISION.                                         00340401\n"
+            + "       PROGRAM1-ID.    EMPRPT.                                          00340501\n"
+            + "      * REMARKS.      THIS PROGRAM PRODUCES A REPORT OF INFO            00340601";
+    CopybookIdentificationService service = new CopybookIdentificationServiceBasedOnContent();
+    TextDocumentItem doc = new TextDocumentItem();
+    doc.setText(content);
+    Assertions.assertFalse(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of()));
+  }
+
+  @Test
+  void WhenProgramIDCommentedThenReturnFalse() {
     String content =
         "      *RETRIEVAL                                                        00340200\n"
             + "      *DMLIST                                                           00340301\n"
@@ -49,15 +62,28 @@ class CopybookIdentificationServiceBasedOnContentTest {
     CopybookIdentificationService service = new CopybookIdentificationServiceBasedOnContent();
     TextDocumentItem doc = new TextDocumentItem();
     doc.setText(content);
-    Assertions.assertTrue(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of()));
+    Assertions.assertFalse(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of()));
   }
 
   @Test
-  void WhenNoProgramIDCommentedThenReturnTrue() {
+  void WhenNoProgramIDCommentedThenReturnFalse() {
     String content =
         "      *RETRIEVAL                                                        00340200\n"
             + "      *DMLIST                                                           00340301\n"
             + "       IDENTIFICATION DIVISION.                                         00340401\n"
+            + "      * REMARKS.      THIS PROGRAM PRODUCES A REPORT OF INFO            00340601";
+    CopybookIdentificationService service = new CopybookIdentificationServiceBasedOnContent();
+    TextDocumentItem doc = new TextDocumentItem();
+    doc.setText(content);
+    Assertions.assertFalse(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of()));
+  }
+
+  @Test
+  void WhenAllCommentedThenReturnTrue() {
+    String content =
+        "      *RETRIEVAL                                                        00340200\n"
+            + "      *DMLIST                                                           00340301\n"
+            + "      * IDENTIFICATION DIVISION.                                        00340401\n"
             + "      * REMARKS.      THIS PROGRAM PRODUCES A REPORT OF INFO            00340601";
     CopybookIdentificationService service = new CopybookIdentificationServiceBasedOnContent();
     TextDocumentItem doc = new TextDocumentItem();
