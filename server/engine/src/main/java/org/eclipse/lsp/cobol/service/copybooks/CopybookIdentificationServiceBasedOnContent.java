@@ -32,7 +32,7 @@ public class CopybookIdentificationServiceBasedOnContent implements CopybookIden
     patterns.add(Pattern.compile(
         "(?i)^(?<sequence>.{0,6})(?<indicator>.?)\\s*(PROGRAM-ID)\\s*\\.\\s*(?<programName>.{1,30})\\s*\\.",
         Pattern.MULTILINE | Pattern.CASE_INSENSITIVE));
-    patterns.add(Pattern.compile("(?i)^(?<sequence>.{0,6})(?<indicator>.?)\\s*(IDENTIFICATION\\s+DIVISION)\\s*\\.",
+    patterns.add(Pattern.compile("(?i)^(?<sequence>.{0,6})(?<indicator>.?)\\s*((IDENTIFICATION|ID)\\s+DIVISION)\\s*\\.",
         Pattern.MULTILINE | Pattern.CASE_INSENSITIVE));
   }
   /**

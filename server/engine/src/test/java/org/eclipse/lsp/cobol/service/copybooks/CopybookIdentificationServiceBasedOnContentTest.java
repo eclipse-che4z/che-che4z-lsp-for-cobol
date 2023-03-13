@@ -79,6 +79,19 @@ class CopybookIdentificationServiceBasedOnContentTest {
   }
 
   @Test
+  void WhenIDDivisionThenReturnFalse() {
+    String content =
+        "      *RETRIEVAL                                                        00340200\n"
+            + "      *DMLIST                                                           00340301\n"
+            + "       ID DIVISION.\n"
+            + "      * REMARKS.      THIS PROGRAM PRODUCES A REPORT OF INFO            00340601";
+    CopybookIdentificationService service = new CopybookIdentificationServiceBasedOnContent();
+    TextDocumentItem doc = new TextDocumentItem();
+    doc.setText(content);
+    Assertions.assertFalse(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of()));
+  }
+
+  @Test
   void WhenAllCommentedThenReturnTrue() {
     String content =
         "      *RETRIEVAL                                                        00340200\n"
