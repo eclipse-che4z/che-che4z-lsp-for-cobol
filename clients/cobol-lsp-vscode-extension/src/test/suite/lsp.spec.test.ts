@@ -82,15 +82,18 @@ suite('Integration Test Suite', () => {
         const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         assert.strictEqual(diagnostics.length, 3);
         assert.ok(diagnostics.length === 3);
-        assert.strictEqual(diagnostics[0].message, "Variable USER-CITY1 is not defined");
-        helper.assertRangeIsEqual(diagnostics[0].range, new vscode.Range(new vscode.Position(39, 28), new vscode.Position(39, 38)));
-        assert.strictEqual(diagnostics[1].message, "There is an issue with PROGRAM-ID paragraph");
-        assert.strictEqual(diagnostics[1].severity, vscode.DiagnosticSeverity.Warning);
-        helper.assertRangeIsEqual(diagnostics[1].range, new vscode.Range(new vscode.Position(49, 19), new vscode.Position(49, 30)));
-        assert.strictEqual(diagnostics[2].message, "Syntax error on 'Program1-id' expected PROGRAM-ID");
-        helper.assertRangeIsEqual(diagnostics[2].range, new vscode.Range(new vscode.Position(14, 7), new vscode.Position(14, 18)));
-        assert.strictEqual(diagnostics[0].severity, diagnostics[2].severity);
-        assert.strictEqual(diagnostics[2].severity, vscode.DiagnosticSeverity.Error, 'No syntax errors detected in USER2.cbl');
+
+        assert.strictEqual(diagnostics[0].message, "Syntax error on 'Program1-id' expected PROGRAM-ID");
+        helper.assertRangeIsEqual(diagnostics[0].range, new vscode.Range(new vscode.Position(14, 7), new vscode.Position(14, 18)));
+        assert.strictEqual(diagnostics[0].severity, diagnostics[1].severity);
+        assert.strictEqual(diagnostics[0].severity, vscode.DiagnosticSeverity.Error, 'No syntax errors detected in USER2.cbl');
+
+        assert.strictEqual(diagnostics[1].message, "Variable USER-CITY1 is not defined");
+        helper.assertRangeIsEqual(diagnostics[1].range, new vscode.Range(new vscode.Position(39, 28), new vscode.Position(39, 38)));
+
+        assert.strictEqual(diagnostics[2].message, "There is an issue with PROGRAM-ID paragraph");
+        assert.strictEqual(diagnostics[2].severity, vscode.DiagnosticSeverity.Warning);
+        helper.assertRangeIsEqual(diagnostics[2].range, new vscode.Range(new vscode.Position(49, 19), new vscode.Position(49, 30)));
     }).timeout(5000).slow(1000);
 
     test('TC152054 Auto format of right trailing spaces', async () => {
@@ -112,8 +115,8 @@ suite('Integration Test Suite', () => {
         console.log(JSON.stringify(diagnostics));
         for (const d of diagnostics) {
             if (d.range.start.line == 22) {
-                assert.strictEqual(diagnostics[0].message, "Source text cannot go past column 80");
-                helper.assertRangeIsEqual(diagnostics[0].range,
+                assert.strictEqual(d.message, "Source text cannot go past column 80");
+                helper.assertRangeIsEqual(d.range,
                     new vscode.Range(new vscode.Position(22, 80), new vscode.Position(22, 131)));
                 return;
             }
@@ -169,9 +172,9 @@ suite('Integration Test Suite', () => {
         await helper.sleep(1000);
         const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
         assert.strictEqual(diagnostics.length, 7);
-        helper.assertRangeIsEqual(diagnostics[0].range,
+        helper.assertRangeIsEqual(diagnostics[6].range,
             new vscode.Range(new vscode.Position(51, 38), new vscode.Position(51, 56)));
-        assert.strictEqual(diagnostics[0].message, "Variable USER-PHONE-MOBILE1 is not defined");
+        assert.strictEqual(diagnostics[6].message, "Variable USER-PHONE-MOBILE1 is not defined");
 
     }).timeout(2000).slow(1000);
 
@@ -238,9 +241,9 @@ suite('Integration Test Suite', () => {
         let editor = helper.get_editor("USERC1F.cbl");
         await helper.sleep(3000);
         let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-        helper.assertRangeIsEqual(diagnostics[1].range,
+        helper.assertRangeIsEqual(diagnostics[2].range,
             new vscode.Range(new vscode.Position(41, 29), new vscode.Position(41, 46)));
-        assert.strictEqual(diagnostics[1].message, "Variable USER-PHONE-MOBILE is not defined");
+        assert.strictEqual(diagnostics[2].message, "Variable USER-PHONE-MOBILE is not defined");
 
         await editor.edit(edit => {
             edit.replace(
