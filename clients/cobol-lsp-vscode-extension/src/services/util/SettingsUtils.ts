@@ -18,21 +18,10 @@ export class SettingsUtils {
         return (json !== undefined) ? JSON.parse(json) : false;
     }
 
-    /**From a configuration of single/multi workspace folders, their URIs are collected and returned in a util method.
-     * @returns list of resolved URI in FS style
-     */
-    public static getWorkspacesURI(): string[] {
-        const result: string[] = [];
-        vscode.workspace.workspaceFolders.forEach(workspace => {
-            result.push(workspace.uri.scheme + "://" + workspace.uri.path);
-        });
-        return result;
-    }
-
-    public static getWorkspaceFoldersPath(): string[] {
+    public static getWorkspaceFoldersPath(fsPath: boolean | undefined = undefined): string[] {
         const result: string[] = [];
         vscode.workspace.workspaceFolders.forEach(workspaceFolder => {
-            result.push(workspaceFolder.uri.path);
+            result.push(fsPath === undefined ? workspaceFolder.uri.path : workspaceFolder.uri.fsPath);
         });
         return result;
     }

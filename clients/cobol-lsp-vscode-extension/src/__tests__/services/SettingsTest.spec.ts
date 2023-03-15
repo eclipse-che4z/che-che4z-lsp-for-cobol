@@ -14,18 +14,17 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
-import {C4Z_FOLDER, GITIGNORE_FILE} from "../../constants";
-import {createFileWithGivenPath, SettingsService} from "../../services/Settings";
-import {SettingsUtils} from "../../services/util/SettingsUtils";
+import { C4Z_FOLDER, GITIGNORE_FILE } from "../../constants";
+import { createFileWithGivenPath, SettingsService } from "../../services/Settings";
+import { SettingsUtils } from "../../services/util/SettingsUtils";
 
 const fsPath = "tmp-ws";
-const scheme = "file";
 let wsPath: string;
 let c4zPath: string;
 let filePath: string;
 
 beforeAll(() => {
-    (vscode.workspace.workspaceFolders as any) = [{uri: {fsPath}} as any];
+    (vscode.workspace.workspaceFolders as any) = [{ uri: { fsPath, path: fsPath } } as any];
     wsPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath);
     c4zPath = path.join(wsPath, C4Z_FOLDER);
     filePath = path.join(c4zPath, GITIGNORE_FILE);
@@ -64,14 +63,6 @@ describe(".gitignore file in .c4z folder tests", () => {
 
         expect(createFile).toHaveBeenCalledTimes(0);
         expect(vscode.workspace.workspaceFolders[0]).toBe(undefined);
-    });
-});
-
-describe("Validate URI generation for a given workspace folder", () => {
-    test("With a valid workspace folder, the method return a valid URI representation", () => {
-        const path = "/ws-vscode";
-        (vscode.workspace.workspaceFolders as any) = [{uri: {path, scheme}} as any];
-        expect(SettingsUtils.getWorkspacesURI()[0]).toBe("file:///ws-vscode");
     });
 });
 
@@ -129,6 +120,7 @@ describe("SettingsService evaluate variables", () => {
 });
 
 test("getWorkspaceFoldersPath return an array of paths", () => {
+    (vscode.workspace.workspaceFolders as any) = [{ uri: { path: "/ws-vscode" } } as any];
     const paths = SettingsUtils.getWorkspaceFoldersPath();
     expect(paths).toStrictEqual(["/ws-vscode"])
 });
@@ -161,9 +153,9 @@ describe("SettingsService returns correct tab settings", () => {
     test("Different rules for different divisions with default rule", () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue({
-                default: [1, 2 , 3, 40],
+                default: [1, 2, 3, 40],
                 anchors: {
-                    "DATA +DIVISON": [1, 7, 8 , 15, 40, 52],
+                    "DATA +DIVISON": [1, 7, 8, 15, 40, 52],
                     "PROCEDURE +DIVISON": [1, 7, 8, 15, 40, 45, 50],
                 },
             }),

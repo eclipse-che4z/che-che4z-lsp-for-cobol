@@ -29,7 +29,7 @@ type ProcessorsConfig = {
 }
 
 function loadProcessorsConfig(programName: string): ProcessorConfig | undefined {
-    const ws = SettingsUtils.getWorkspaceFoldersPath();
+    const ws = SettingsUtils.getWorkspaceFoldersPath(true);
     if (ws.length < 1) {
         return undefined;
     }
