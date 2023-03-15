@@ -23,12 +23,12 @@ import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.communications.ServerCommunications;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Test for DialectDiscoveryFolderService
@@ -82,4 +82,33 @@ class DialectDiscoveryFolderServiceTest {
     assertEquals(0, dialectList.size());
   }
 
+  @Test
+  void testRegisterExecuteCommandCapabilities() {
+    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+    Communications communications = mock(ServerCommunications.class);
+    CodeActions actions = mock(CodeActions.class);
+    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+    service.registerExecuteCommandCapabilities(Collections.emptyList(), "test");
+    verify(communications).registerExecuteCommandCapability(Collections.emptyList(), "test");
+  }
+
+  @Test
+  void testUnRegisterExecuteCommandCapabilities() {
+    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+    Communications communications = mock(ServerCommunications.class);
+    CodeActions actions = mock(CodeActions.class);
+    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+    service.unregisterExecuteCommandCapabilities("test");
+    verify(communications).unregisterExecuteCommandCapability("test");
+  }
+
+  @Test
+  void testRegisterDialectCodeActionProviders() {
+    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+    Communications communications = mock(ServerCommunications.class);
+    CodeActions actions = mock(CodeActions.class);
+    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+    service.registerDialectCodeActionProviders(Collections.emptyList());
+    verify(actions).registerNewProviders(Collections.emptyList());
+  }
 }

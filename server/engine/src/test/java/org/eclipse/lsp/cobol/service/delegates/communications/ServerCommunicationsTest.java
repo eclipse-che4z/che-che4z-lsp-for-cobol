@@ -33,10 +33,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp4j.MessageType.Info;
@@ -149,6 +146,26 @@ class ServerCommunicationsTest {
     String uri = UUID.randomUUID().toString();
     communications.notifyProgressReport(uri);
     verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport())));
+  }
+
+  @Test
+  void testRegisterExecuteCommandCapability() {
+    String capabilityID = "test";
+    communications.registerExecuteCommandCapability(Collections.emptyList(), capabilityID);
+    Registration registrations =
+            new Registration(capabilityID, "workspace/executeCommand", new ExecuteCommandOptions(Collections.emptyList()));
+    RegistrationParams params = new RegistrationParams(ImmutableList.of(registrations));
+    verify(client).registerCapability(params);
+  }
+
+  @Test
+  void testUnregisterExecuteCommandCapability() {
+    String capabilityID = "test";
+    UnregistrationParams unregistrationParams =
+            new UnregistrationParams(
+                    ImmutableList.of(new Unregistration(capabilityID, "workspace/executeCommand")));
+    communications.unregisterExecuteCommandCapability(capabilityID);
+    verify(client).unregisterCapability(unregistrationParams);
   }
 
   private void setUpProgressDataStructure(String data) throws NoSuchFieldException {
