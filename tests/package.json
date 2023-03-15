@@ -28,7 +28,7 @@
     "mocha-junit-reporter": "^2.0.0",
     "prettier": "^2.0.5",
     "ts-loader": "^8.0.6",
-    "webpack": "^5.44.0"
+    "webpack": "^5.76.0"
   },
   "dependencies": {
     "@eclipse/che-che4z": "https://github.com/eclipse/che-che4z.git",
