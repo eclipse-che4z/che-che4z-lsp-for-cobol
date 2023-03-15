@@ -22,6 +22,7 @@ import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,11 +33,11 @@ import static java.util.stream.Collectors.toList;
  * commands.
  */
 public class CodeActions {
-  private Set<CodeActionProvider> providers;
+  private final Set<CodeActionProvider> providers = new HashSet<>();
 
   @Inject
   CodeActions(Set<CodeActionProvider> providers) {
-    this.providers = providers;
+    this.providers.addAll(providers);
   }
 
   /**
