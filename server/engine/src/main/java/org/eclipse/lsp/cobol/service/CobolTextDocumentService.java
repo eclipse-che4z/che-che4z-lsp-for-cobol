@@ -438,12 +438,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public void didClose(DidCloseTextDocumentParams params) {
     if (disposableLSPStateService.isServerShutdown()) return;
     String uri = params.getTextDocument().getUri();
+    String docText = docs.getOrDefault(uri, new CobolDocumentModel("")).getText();
     LOG.info(format("Document closing invoked on URI %s", uri));
     interruptAnalysis(uri);
-    TextDocumentItem docIdentifier = new TextDocumentItem();
-    docIdentifier.setUri(uri);
-    if (copybookIdentificationService.isCopybook(
-        docIdentifier.getUri(), docIdentifier.getText(), copybookExtensions)) {
+    if (copybookIdentificationService.isCopybook(uri, docText, copybookExtensions)) {
       return;
     }
 
