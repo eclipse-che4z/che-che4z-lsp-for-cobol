@@ -29,6 +29,7 @@ import {
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
+import { loadProcessorGroupConfig, loadProcessorGroupCopybookPaths } from "./ProcessorGroups";
 
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
@@ -65,14 +66,14 @@ export function createFileWithGivenPath(folderPath: string, fileName: string, pa
 
 export class TabRule {
     // tslint:disable-next-line:no-unnecessary-initializer
-    public constructor(public stops: number[], public maxPosition: number, public regex: string | undefined = undefined) {}
+    public constructor(public stops: number[], public maxPosition: number, public regex: string | undefined = undefined) { }
 }
 
 export class TabSettings {
-    public constructor(public rules: TabRule[], public defaultRule: TabRule) {}
+    public constructor(public rules: TabRule[], public defaultRule: TabRule) { }
 }
 
-export function configHandler(request : any): Array<any> {
+export function configHandler(request: any): Array<any> {
     const result = new Array<any>();
     for (let item of request.items) {
         try {
@@ -80,9 +81,9 @@ export function configHandler(request : any): Array<any> {
                 const object = DialectRegistry.getDialects();
                 result.push(object);
             } else {
-                const object = vscode.workspace.getConfiguration().get(item.section)
+                const object = loadProcessorGroupConfig(item, vscode.workspace.getConfiguration().get(item.section));
                 result.push(object);
-                }
+            }
         } catch (error) {
             console.log(error);
         }
@@ -111,7 +112,11 @@ export class SettingsService {
      * @returns a list of local path
      */
     public static getCopybookLocalPath(cobolFileName: string, dialectType: string): string[] {
-        return SettingsService.getCopybookConfigValues(PATHS_LOCAL_KEY, cobolFileName, dialectType);
+        const pgPaths = loadProcessorGroupCopybookPaths(cobolFileName, dialectType);
+        return [
+            ...SettingsService.evaluateVariable(pgPaths, "fileBasenameNoExtension", cobolFileName),
+            ...SettingsService.getCopybookConfigValues(PATHS_LOCAL_KEY, cobolFileName, dialectType)
+        ];
     }
 
     public static getCopybookExtension(): string[] {
@@ -165,10 +170,10 @@ export class SettingsService {
             const stops = config as number[];
             if (stops !== undefined && stops.length > 0) {
                 const tabRule = new TabRule(stops, stops[stops.length - 1]);
-                settings = new TabSettings( [], tabRule);
+                settings = new TabSettings([], tabRule);
             }
         } else if (typeof config === "object") {
-            const obj = config as {default, anchors};
+            const obj = config as { default, anchors };
             let defaultRule = new TabRule([0, 6, 7, 11], 72);
             const stops = obj.default as number[];
             if (stops !== undefined && stops.length > 0) {
@@ -217,11 +222,11 @@ export class SettingsService {
         return vscode.workspace.getConfiguration().get(SETTINGS_DIALECT);
     }
 
-   /**
-    * Gives the configured runtime from settings.
-    *
-    * @returns returns configured runtime
-    */
+    /**
+     * Gives the configured runtime from settings.
+     *
+     * @returns returns configured runtime
+     */
     public static serverRuntime(): string {
         return vscode.workspace.getConfiguration().get(SERVER_RUNTIME);
     }

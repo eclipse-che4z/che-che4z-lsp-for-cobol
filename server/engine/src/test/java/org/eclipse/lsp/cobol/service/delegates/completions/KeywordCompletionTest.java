@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -57,7 +58,8 @@ class KeywordCompletionTest {
   @BeforeEach
   void init() {
     DialectService dialectService = mock(DialectService.class);
-    when(dialectService.getDialectByName(any())).thenReturn(() -> "COBOL");
+    Optional<CobolDialect> result = Optional.of(() -> "COBOL");
+    when(dialectService.getDialectByName(any())).thenReturn(result);
     completion = new KeywordCompletion(new Keywords(mock(SettingsService.class), dialectService));
   }
 
@@ -75,11 +77,11 @@ class KeywordCompletionTest {
 
     CobolDialect idmsDialect = mock(CobolDialect.class);
     when(idmsDialect.getKeywords()).thenReturn(ImmutableMap.of("idms1", "desc1"));
-    when(dialectService.getDialectByName("IDMS")).thenReturn(idmsDialect);
+    when(dialectService.getDialectByName("IDMS")).thenReturn(Optional.of(idmsDialect));
 
     CobolDialect dacoDialect = mock(CobolDialect.class);
     when(dacoDialect.getKeywords()).thenReturn(ImmutableMap.of("daco1", "desc1", "daco2", "desc2"));
-    when(dialectService.getDialectByName("DaCo")).thenReturn(dacoDialect);
+    when(dialectService.getDialectByName("DaCo")).thenReturn(Optional.of(dacoDialect));
 
     Keywords keywords = new Keywords(mock(SettingsService.class), dialectService);
     List<String> dialectType = ImmutableList.of();

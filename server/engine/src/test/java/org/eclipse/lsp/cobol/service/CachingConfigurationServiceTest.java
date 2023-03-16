@@ -58,7 +58,7 @@ class CachingConfigurationServiceTest {
             ImmutableList.of(),
             ImmutableList.of(),
             true, ImmutableList.of(), ImmutableMap.of()),
-        configuration.getConfig(CopybookProcessingMode.ENABLED));
+        configuration.getConfig(null, CopybookProcessingMode.ENABLED));
   }
 
   @Test
@@ -86,7 +86,7 @@ class CachingConfigurationServiceTest {
             new JsonArray(),
             predefinedParagraphs);
 
-    when(settingsService.fetchConfigurations(
+    when(settingsService.fetchConfigurations("",
             Arrays.asList(
                 TARGET_SQL_BACKEND.label,
                 ANALYSIS_FEATURES.label,
@@ -107,7 +107,7 @@ class CachingConfigurationServiceTest {
             ImmutableList.of("Dialect"),
             true, ImmutableList.of(),
             ImmutableMap.of("dialect", predefinedParagraphs)),
-        configuration.getConfig(CopybookProcessingMode.DISABLED));
+        configuration.getConfig("", CopybookProcessingMode.DISABLED));
   }
 
   @Test
@@ -131,7 +131,7 @@ class CachingConfigurationServiceTest {
             new JsonNull(),
             new JsonArray(),
             dialectsSettings);
-    when(settingsService.fetchConfigurations(
+    when(settingsService.fetchConfigurations("",
             Arrays.asList(
                 TARGET_SQL_BACKEND.label,
                 ANALYSIS_FEATURES.label,
@@ -153,6 +153,6 @@ class CachingConfigurationServiceTest {
             false,
             ImmutableList.of(),
             ImmutableMap.of("dialect", dialectsSettings)),
-        configuration.getConfig(CopybookProcessingMode.DISABLED));
+        configuration.getConfig("", CopybookProcessingMode.DISABLED));
   }
 }

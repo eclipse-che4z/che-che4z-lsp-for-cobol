@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
@@ -42,7 +43,8 @@ public class Keywords extends CompletionStorage<String> {
     Map<String, String> result = new HashMap<>(KeywordsUtils.getKeywords(KEYWORDS_FILE_PATH));
 
     dialectTypes.forEach(
-        dialectType -> result.putAll(dialectService.getDialectByName(dialectType).getKeywords())
+        dialectType -> result.putAll(dialectService.getDialectByName(dialectType)
+                .map(CobolDialect::getKeywords).orElse(Collections.emptyMap()))
     );
 
     return result;

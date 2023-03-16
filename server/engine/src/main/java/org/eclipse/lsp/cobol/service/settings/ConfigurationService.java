@@ -35,10 +35,11 @@ public interface ConfigurationService {
    * Get a configuration for the analysis using the settings file and the given copybook processing
    * mode. Blocks the execution until the configuration is resolved.
    *
+   * @param scopeURI scope URI
    * @param mode the mode of copybook processing for this analysis
    * @return the analysis configuration
    */
-  AnalysisConfig getConfig(CopybookProcessingMode mode);
+  AnalysisConfig getConfig(String scopeURI, CopybookProcessingMode mode);
 
   /**
    *Get a Subroutine configuration for the analysis using the settings file
