@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -46,7 +46,7 @@ class TestCpyNameWithSpecialChar {
   private static final String MESSAGE = "@SPE#-$: Copybook not found";
   private static final String MESSAGE_1 = "@SPE#_$: Copybook not found";
   private static final String MESSAGE_2 = "Copybook declaration has '_' characters for: @SPE#_$";
-  private static final String CODE = ErrorCode.MISSING_COPYBOOK.getLabel();
+  private static final String CODE = ErrorCodes.MISSING_COPYBOOK.getLabel();
 
   @Test
   void test() {

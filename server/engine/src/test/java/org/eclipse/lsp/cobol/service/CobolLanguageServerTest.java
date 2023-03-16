@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.service;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
-import org.eclipse.lsp.cobol.common.error.ErrorCode;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
@@ -58,12 +58,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
-import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp4j.DiagnosticTag.Unnecessary;
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
+import static org.eclipse.lsp4j.DiagnosticTag.Unnecessary;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -282,8 +280,7 @@ class CobolLanguageServerTest {
     assertTrue(capabilities.getCodeActionProvider().getLeft());
     assertTrue(capabilities.getDocumentSymbolProvider().getRight().getWorkDoneProgress());
     assertTrue(capabilities.getFoldingRangeProvider().getLeft());
-    assertEquals(
-        stream(ErrorCode.values()).map(ErrorCode::getLabel).collect(toList()),
+    assertEquals(ImmutableList.of(ErrorCodes.MISSING_COPYBOOK.getLabel()),
         capabilities.getExecuteCommandProvider().getCommands());
 
     assertFalse(capabilities.getCompletionProvider().getResolveProvider());

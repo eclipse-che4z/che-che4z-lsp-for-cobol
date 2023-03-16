@@ -18,9 +18,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
+import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -44,11 +47,15 @@ import java.util.zip.ZipInputStream;
 public class DialectDiscoveryFolderService implements DialectDiscoveryService {
 
   private final WorkingFolderService workingFolderService;
+  private final Communications communications;
   private final List<URLClassLoader> classLoaderHolder = new LinkedList<>();
+  private final CodeActions actions;
 
   @Inject
-  public DialectDiscoveryFolderService(WorkingFolderService workingFolderService) {
+  public DialectDiscoveryFolderService(WorkingFolderService workingFolderService, Communications communications, CodeActions actions) {
     this.workingFolderService = workingFolderService;
+    this.communications = communications;
+    this.actions = actions;
   }
 
   /**
@@ -143,5 +150,30 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
       }
     }
     return classNames;
+  }
+
+  /**
+   * Registers dialect server side capabilities.
+   *
+   * @param capabilities List of String capabilities. Normally seen as code actions.
+   */
+  @Override
+  public void registerExecuteCommandCapabilities(List<String> capabilities, String id) {
+    communications.registerExecuteCommandCapability(capabilities, id);
+  }
+
+  /**
+   * Unregisters dialect specific server side execute command capabilities.
+   *
+   * @param id unique id used for the registration of command
+   */
+  @Override
+  public void unregisterExecuteCommandCapabilities(String id) {
+    communications.unregisterExecuteCommandCapability(id);
+  }
+
+  @Override
+  public void registerDialectCodeActionProviders(List<CodeActionProvider> providers) {
+      actions.registerNewProviders(providers);
   }
 }

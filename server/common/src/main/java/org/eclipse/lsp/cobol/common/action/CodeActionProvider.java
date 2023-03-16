@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.service.delegates.actions;
+package org.eclipse.lsp.cobol.common.action;
 
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
@@ -25,7 +25,8 @@ import java.util.List;
 
 /**
  * Code action provider that may resolve the actions request and return a list of commands or code
- * actions according to the diagnostic's type. See {@link ErrorCode} for a list of types.
+ * actions according to the diagnostic's type. See {@link
+ * org.eclipse.lsp.cobol.common.error.ErrorCode} for a list of types.
  */
 public interface CodeActionProvider {
   /**

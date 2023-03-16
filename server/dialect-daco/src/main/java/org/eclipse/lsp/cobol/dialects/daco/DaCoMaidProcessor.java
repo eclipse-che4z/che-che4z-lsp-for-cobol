@@ -24,20 +24,21 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.VariableConstants;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.dialects.daco.nodes.DaCoCopyFromNode;
 import org.eclipse.lsp.cobol.dialects.daco.nodes.DaCoCopyNode;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -46,7 +47,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 
 /** Handles copy maid logic */
@@ -230,7 +230,7 @@ public class DaCoMaidProcessor {
                       "GrammarPreprocessorListener.errorSuggestion",
                       copybookName.getQualifiedName()))
               .severity(ERROR)
-              .errorCode(MISSING_COPYBOOK)
+              .errorCode(ErrorCodes.MISSING_COPYBOOK)
               .build();
       errors.add(error);
       LOG.debug("Syntax error by reportMissingCopybooks: {}", error.toString());

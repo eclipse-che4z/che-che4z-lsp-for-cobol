@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.service.delegates.communications;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +23,15 @@ import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.ExecuteCommandOptions;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.ProgressParams;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.eclipse.lsp4j.Registration;
+import org.eclipse.lsp4j.RegistrationParams;
+import org.eclipse.lsp4j.Unregistration;
+import org.eclipse.lsp4j.UnregistrationParams;
 import org.eclipse.lsp4j.WorkDoneProgressBegin;
 import org.eclipse.lsp4j.WorkDoneProgressCreateParams;
 import org.eclipse.lsp4j.WorkDoneProgressEnd;
@@ -165,6 +171,22 @@ public class ServerCommunications implements Communications {
         uriInProgress.remove(uri);
       }
     }
+  }
+
+  @Override
+  public void registerExecuteCommandCapability(List<String> capabilities, String id) {
+    Registration registrations =
+        new Registration(id, "workspace/executeCommand", new ExecuteCommandOptions(capabilities));
+    RegistrationParams params = new RegistrationParams(ImmutableList.of(registrations));
+    getClient().registerCapability(params);
+  }
+
+  @Override
+  public void unregisterExecuteCommandCapability(String id) {
+    UnregistrationParams unregistrationParams =
+        new UnregistrationParams(
+            ImmutableList.of(new Unregistration(id, "workspace/executeCommand")));
+    getClient().unregisterCapability(unregistrationParams);
   }
 
   private void showMessage(MessageType type, String message) {

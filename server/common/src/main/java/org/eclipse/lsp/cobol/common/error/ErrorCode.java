@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2023 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,24 +12,15 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-
 package org.eclipse.lsp.cobol.common.error;
 
-import lombok.AllArgsConstructor;
-
-/**
- * This enum represents the error codes that are used to determine some special type of errors. See
- * the instance documentation for more details. This is specifiaclly used to trigger codeActions.
- */
-@AllArgsConstructor
-public enum ErrorCode {
-  /** This copybook does not present in the copybook folder */
-  MISSING_COPYBOOK("missing copybook"),
-  INCOMPATIBLE_SERVER_TYPE("incompatible server type");
-
-  private String label;
-
-  public String getLabel() {
-    return label;
-  }
+/** Functional interface for the ErrorCodes used by {@link SyntaxError} */
+@FunctionalInterface
+public interface ErrorCode {
+  /**
+   * Gives label of the Error Code. This is used by client to show errors.
+   *
+   * @return label of the Error Code
+   */
+  String getLabel();
 }
