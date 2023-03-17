@@ -25,11 +25,14 @@ IDMS Dialect Support enables the following LSP features:
 
 ## Copybook Support
 
-IDMS Dialect Support enables copybook support features of the COBOL Language Support extension for copybooks called by the `COPY IDMS` statement. 
+IDMS Dialect Support enables copybook support features of the COBOL Language Support extension for copybooks named in `COPY IDMS` statements. 
 
 To enable copybook support, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. 
 
-Specify your IDMS copybooks in the COBOL Language Support extension settings under **Cpy-manager: Paths-local: Idms**.
+Specify paths to your IDMS copybooks in the IDMS Dialect Support extension settings as follows:
+* Specify mainframe data sets under **Idms: Paths-dsn**
+* Specify USS paths under **Idms: Paths-uss**
+* Specify local paths under **Idms: Paths-local**
 
 ### Using Processor Groups
 
