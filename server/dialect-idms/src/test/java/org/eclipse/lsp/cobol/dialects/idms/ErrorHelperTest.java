@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
-import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -60,7 +60,7 @@ class ErrorHelperTest {
     assertEquals(locality.toOriginalLocation(), result.getLocation());
     assertEquals(locality.toOriginalLocation(), result.getLocation());
     assertEquals(ErrorSeverity.ERROR, result.getSeverity());
-    assertEquals(ErrorCode.MISSING_COPYBOOK, result.getErrorCode());
+    assertEquals(ErrorCodes.MISSING_COPYBOOK.getLabel(), result.getErrorCode().getLabel());
     assertEquals(message, result.getSuggestion());
   }
 

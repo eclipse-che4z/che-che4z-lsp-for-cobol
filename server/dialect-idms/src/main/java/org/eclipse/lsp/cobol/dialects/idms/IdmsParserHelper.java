@@ -17,10 +17,8 @@ package org.eclipse.lsp.cobol.dialects.idms;
 
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
-import org.eclipse.lsp.cobol.common.OutlineNodeNames;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
@@ -62,7 +60,9 @@ class IdmsParserHelper {
         .map(
             context ->
                 new ValueInterval(
-                    context.dataValueIntervalFrom().getText(),
+                    ofNullable(context.dataValueIntervalFrom().getText())
+                        .map(String::toUpperCase)
+                        .orElse(null),
                     ofNullable(context.dataValueIntervalTo())
                         .map(IdmsCopyParser.DataValueIntervalToContext::literal)
                         .map(ParserRuleContext::getText)
@@ -90,29 +90,6 @@ class IdmsParserHelper {
         .map(Token::getText)
         .map(UsageFormat::of)
         .collect(toList());
-  }
-
-  /**
-   * Get name of the EntryNameContext
-   *
-   * @param context is a statement context object
-   * @return a text of the statement
-   */
-  public String getName(IdmsCopyParser.EntryNameContext context) {
-    return ofNullable(context)
-        .map(IdmsCopyParser.EntryNameContext::dataName)
-        .map(VisitorHelper::getName)
-        .orElse(OutlineNodeNames.FILLER_NAME);
-  }
-
-  /**
-   * Get name of the ParserRuleContext
-   *
-   * @param context is a statement context
-   * @return a text of statement context
-   */
-  public String getName(ParserRuleContext context) {
-    return ofNullable(context).map(RuleContext::getText).map(String::toUpperCase).orElse("");
   }
 
   /**

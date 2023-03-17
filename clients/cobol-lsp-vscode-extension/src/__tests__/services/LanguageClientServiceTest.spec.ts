@@ -53,6 +53,7 @@ const SERVER_ID = "cobol";
 beforeEach(() => {
     jest.clearAllMocks();
     vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(0);
+    vscode.workspace.createFileSystemWatcher = jest.fn();
 });
 
 const SERVER_STOPPED_MSG = "server stopped";
@@ -108,6 +109,9 @@ describe("LanguageClientService positive scenario", () => {
         }, {
             documentSelector: [SERVER_ID],
             outputChannel: expect.any(Function),
+            synchronize: {
+                fileEvents: [undefined, undefined],
+            }
         });
     });
 
@@ -119,7 +123,11 @@ describe("LanguageClientService positive scenario", () => {
         expect(LanguageClient).toHaveBeenLastCalledWith(SERVER_ID, SERVER_DESC,
             expect.any(Function), {
                 documentSelector: [SERVER_ID],
+                
                 outputChannel: expect.any(Function),
+                synchronize: {
+                    fileEvents: [undefined, undefined],
+                }
             });
     });
 
@@ -145,7 +153,7 @@ describe("LanguageClientService positive scenario", () => {
         spy.mockReturnValue("Linux");
         (languageClientService as any).executableService = new NativeExecutableService("/test");
         const executable = (languageClientService as any).executableService.getNativeLanguageClient();
-        expect(executable.command).toBe("./server");
+        expect(executable.command).toBe("./server-linux");
         expect(executable.options.cwd).toBe(join("/test", "native"));
     });
 
@@ -154,7 +162,7 @@ describe("LanguageClientService positive scenario", () => {
         spy.mockReturnValue("Darwin");
         (languageClientService as any).executableService = new NativeExecutableService("/test");
         const executable = (languageClientService as any).executableService.getNativeLanguageClient();
-        expect(executable.command).toBe("./server-mac-amd64");
+        expect(executable.command).toBe("./server-mac");
         expect(executable.options.cwd).toBe(join("/test", "native"));
     });
 

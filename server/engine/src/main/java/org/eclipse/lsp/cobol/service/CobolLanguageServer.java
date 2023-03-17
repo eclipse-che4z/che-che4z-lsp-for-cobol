@@ -14,12 +14,13 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.error.ErrorCode;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.utils.LogLevelUtils;
@@ -40,10 +41,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 
 import static java.lang.Boolean.TRUE;
-import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
 
@@ -105,6 +104,11 @@ public class CobolLanguageServer implements LanguageServer {
   @Override
   public WorkspaceService getWorkspaceService() {
     return workspaceService;
+  }
+
+  @Override
+  public void setTrace(SetTraceParams params) {
+    // TODO: implement me
   }
 
   @Override
@@ -242,7 +246,7 @@ public class CobolLanguageServer implements LanguageServer {
   @NonNull
   private ExecuteCommandOptions collectExecuteCommandList() {
     return new ExecuteCommandOptions(
-        stream(ErrorCode.values()).map(ErrorCode::getLabel).collect(toList()));
+            ImmutableList.of(ErrorCodes.MISSING_COPYBOOK.getLabel()));
   }
 
   /** Represents the JSON RPC response structure for shutdown command as per LSP specification */

@@ -19,6 +19,8 @@ import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.utils.LogLevelUtils;
@@ -26,9 +28,7 @@ import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
-import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
 import org.eclipse.lsp4j.CodeActionParams;
@@ -44,8 +44,8 @@ import java.util.function.BiConsumer;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOCALE;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOGGING_LEVEL;
 
 /**
  * This class is responsible to watch for any changes into the copybook folder and to fetch updated
@@ -60,7 +60,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private final CopybookService copybookService;
   private final LocaleStore localeStore;
   private final SubroutineService subroutineService;
-  private final ConfigurationService configurationService;
   private final DisposableLSPStateService disposableLSPStateService;
   private final CopybookNameService copybookNameService;
   private final Keywords keywords;
@@ -74,7 +73,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
       CopybookService copybookService,
       LocaleStore localeStore,
       SubroutineService subroutineService,
-      ConfigurationService configurationService,
       DisposableLSPStateService disposableLSPStateService,
       CopybookNameService copybookNameService,
       Keywords keywords,
@@ -85,7 +83,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     this.copybookService = copybookService;
     this.localeStore = localeStore;
     this.subroutineService = subroutineService;
-    this.configurationService = configurationService;
     this.disposableLSPStateService = disposableLSPStateService;
     this.copybookNameService = copybookNameService;
     this.keywords = keywords;
@@ -112,7 +109,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
 
   private Runnable executeCopybookFix(@NonNull ExecuteCommandParams params) {
     return () -> {
-      if (MISSING_COPYBOOK.getLabel().equals(params.getCommand())) {
+      if (ErrorCodes.MISSING_COPYBOOK.getLabel().equals(params.getCommand())) {
         rerunAnalysis(true);
       }
     };

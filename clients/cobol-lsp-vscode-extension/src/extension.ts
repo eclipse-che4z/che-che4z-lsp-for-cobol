@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
-import { LANGUAGE_ID, SERVER_TYPE } from "./constants";
+import { LANGUAGE_ID } from "./constants";
 import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
@@ -33,72 +33,45 @@ import { TelemetryService } from "./services/reporter/TelemetryService";
 import { configHandler, SettingsService } from "./services/Settings";
 import { pickSnippet, SnippetCompletionProvider } from "./services/snippetcompletion/SnippetCompletionProvider";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
+import { ServerRuntimeCodeActionProvider } from "./services/nativeLanguageClient/serverRuntimeCodeActionProvider";
+import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 
 let languageClientService: LanguageClientService;
 let outputChannel: vscode.OutputChannel;
+const API_VERSION: string = "1.0";
 
 function initialize() {
     // We need lazy initialization to be able to mock this for unit testing
     const copyBooksDownloader = new CopybookDownloadService();
-    outputChannel = vscode.window.createOutputChannel( "COBOL Language Support");
+    outputChannel = vscode.window.createOutputChannel("COBOL Language Support");
     languageClientService = new LanguageClientService(outputChannel);
-    return copyBooksDownloader;
+    const configurationWatcher = new  ConfigurationWatcher();
+    return {copyBooksDownloader, configurationWatcher};
 }
 
 export async function activate(context: vscode.ExtensionContext) {
     DialectRegistry.clear();
-
-    const copyBooksDownloader = initialize();
+    const {copyBooksDownloader, configurationWatcher} = initialize();
     initSmartTab(context);
 
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
     copyBooksDownloader.start();
 
-    // Commands
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook",
-        (copybook, programName) => {
-        fetchCopybookCommand(copybook, copyBooksDownloader, programName);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings",
-        () => {
-        gotoCopybookSettings();
-    }));
-    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(_e => RangeTabShiftStore.reset()));
-
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.clear.downloaded.copybooks", () => { clearCache() }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE) }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.snippets.insertSnippets", () => { pickSnippet(); }));
+    // Register Commands
+    registerCommands(context, copyBooksDownloader);
 
     context.subscriptions.push(copyBooksDownloader);
 
-    context.subscriptions.push(
-        vscode.languages.registerCodeActionsProvider(
-            { scheme: "file", language: LANGUAGE_ID },
-            new CopybooksCodeActionProvider()));
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
-            { scheme: "file", language: LANGUAGE_ID },
-            new SnippetCompletionProvider()));
+    registerCodeActions(context);
 
-    vscode.workspace.onDidChangeConfiguration(async event => {
-        if (event.affectsConfiguration(SERVER_TYPE)) {
-            const selection = await vscode.window.showInformationMessage("Restart the vscode to enforce native build settings change", "Ok", "Later");
-            if (typeof selection === "undefined" || selection === "Later") {
-                return;
-            }
-            if (selection === "Ok") {
-                TelemetryService.registerEvent("Native Build enabled", ["COBOL", "native build enabled", "settings"],
-                    "Native build enabled by user");
-                await vscode.commands.executeCommand("workbench.action.reloadWindow");
-            }
-        }
-    });
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
+        { scheme: "file", language: LANGUAGE_ID },
+        new SnippetCompletionProvider()));
+
+    configurationWatcher.watchConfigurationChanges();
 
     try {
-        if (SettingsService.serverType() === "NATIVE") {
+        if (SettingsService.serverRuntime() === "NATIVE") {
             languageClientService.enableNativeBuild();
         } else {
             await languageClientService.checkPrerequisites();
@@ -130,6 +103,17 @@ function openApi() {
         analysis(uri: string, text: string): Promise<any> {
             return languageClientService.retrieveAnalysis(uri, text);
         },
+        dialectAPI_1_0() {
+            return getDialectAPI_v_1_0()
+        },
+        version(): string {
+            return API_VERSION;
+        }
+    };
+}
+
+function getDialectAPI_v_1_0() {
+    return {
         //name: extensionId: string, string, path: string, description: string, snippetPath: string
         async registerDialect(dialect) {
             outputChannel.appendLine("Register new dialect: \r\n" + JSON.stringify(dialect));
@@ -143,6 +127,42 @@ function openApi() {
         async unregisterDialect(extensionId, dialectName) {
             DialectRegistry.unregister(dialectName);
             await languageClientService.invalidateConfiguration();
-        }
-    };
+        },
+    }
 }
+
+function registerCommands(context: vscode.ExtensionContext, copyBooksDownloader: CopybookDownloadService) {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook",
+        (copybook, programName) => {
+            fetchCopybookCommand(copybook, copyBooksDownloader, programName);
+        }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings",
+        () => {
+            gotoCopybookSettings();
+        }));
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(_e => RangeTabShiftStore.reset()));
+
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.clear.downloaded.copybooks", () => { clearCache() }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => { commentCommand(CommentAction.TOGGLE) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.comment", () => { commentCommand(CommentAction.COMMENT) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.commentLine.uncomment", () => { commentCommand(CommentAction.UNCOMMENT) }));
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.snippets.insertSnippets", () => { pickSnippet(); }));
+    context.subscriptions.push(
+        vscode.commands.registerCommand("cobol-lsp.dialects.goto-settings", () => vscode.commands.executeCommand("workbench.action.openSettings", "cobol-lsp.dialects")));
+    context.subscriptions.push(
+        vscode.commands.registerCommand("cobol-lsp.serverRuntime.goto-settings", () => vscode.commands.executeCommand("workbench.action.openSettings", "cobol-lsp.serverRuntime")));
+}
+
+function registerCodeActions(context: vscode.ExtensionContext) {
+    context.subscriptions.push(
+        vscode.languages.registerCodeActionsProvider(
+            { scheme: "file", language: LANGUAGE_ID },
+            new CopybooksCodeActionProvider()));
+    context.subscriptions.push(
+        vscode.languages.registerCodeActionsProvider(
+            { scheme: "file", language: LANGUAGE_ID },
+            new ServerRuntimeCodeActionProvider()));
+}
+

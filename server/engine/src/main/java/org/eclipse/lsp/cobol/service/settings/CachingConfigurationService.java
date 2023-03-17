@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.service.utils.ServerTypeUtil;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -43,7 +44,7 @@ public class CachingConfigurationService implements ConfigurationService {
     this.dialectService = dialectService;
   }
 
-  private CompletableFuture<ConfigurationEntity> createConfigFuture() {
+  private CompletableFuture<ConfigurationEntity> createConfigFuture(String documentURI) {
     List<String> settingsList = new LinkedList<>(Arrays.asList(
         TARGET_SQL_BACKEND.label,
         ANALYSIS_FEATURES.label,
@@ -55,7 +56,7 @@ public class CachingConfigurationService implements ConfigurationService {
     List<String> dialectsSections = dialectService.getSettingsSections();
     settingsList.addAll(dialectsSections);
 
-    return Optional.ofNullable(settingsService.fetchConfigurations(settingsList))
+    return Optional.ofNullable(settingsService.fetchConfigurations(documentURI, settingsList))
         .map(c -> c.thenApply(future ->
             Optional.ofNullable(future)
                 .map(list -> parseConfig(list, dialectsSections))
@@ -65,12 +66,15 @@ public class CachingConfigurationService implements ConfigurationService {
 
   @Override
   @SuppressWarnings("java:S2142")
-  public AnalysisConfig getConfig(CopybookProcessingMode mode) {
+  public AnalysisConfig getConfig(String scopeURI, CopybookProcessingMode mode) {
     try {
-      AnalysisConfig config = AnalysisConfigHelper.fromConfigEntity(mode, createConfigFuture().get());
+      AnalysisConfig config = AnalysisConfigHelper.fromConfigEntity(mode, createConfigFuture(scopeURI).get());
+      if (ServerTypeUtil.isNativeServerType()) {
+        return config;
+      }
       if (dialectService.updateDialects(config.getDialectRegistry())) {
         // if list of dialects were changed - request config one more time
-        config = AnalysisConfigHelper.fromConfigEntity(mode, createConfigFuture().get());
+        config = AnalysisConfigHelper.fromConfigEntity(mode, createConfigFuture(scopeURI).get());
       }
       return config;
     } catch (InterruptedException e) {
@@ -85,7 +89,7 @@ public class CachingConfigurationService implements ConfigurationService {
   @Override
   public List<String> getSubroutineDirectories() {
     try {
-      return createConfigFuture().get().getSubroutines();
+      return createConfigFuture(null).get().getSubroutines();
     } catch (InterruptedException e) {
       LOG.error("Issue while resolving subroutine configuration", e);
       Thread.currentThread().interrupt();

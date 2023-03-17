@@ -22,10 +22,17 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -34,7 +41,6 @@ import java.util.stream.Collectors;
 /** Dialect utility class */
 @Singleton
 public class DialectService {
-  private static final CobolDialect EMPTY_DIALECT = () -> "COBOL";
   private final Map<String, CobolDialect> dialectSuppliers;
   private final DialectDiscoveryService discoveryService;
   private final CopybookService copybookService;
@@ -63,8 +69,13 @@ public class DialectService {
    */
   public ResultWithErrors<DialectOutcome> process(
       List<String> dialects, DialectProcessingContext context) {
-    List<CobolDialect> orderedDialects = sortDialects(dialects);
     List<SyntaxError> errors = new LinkedList<>();
+    List<CobolDialect> orderedDialects;
+    try {
+      orderedDialects = sortDialects(filterMissing(dialects, errors, context));
+    } catch (NoSuchElementException e) {
+      return handleMissingDialect(context, errors, e);
+    }
     for (CobolDialect orderedDialect : orderedDialects) {
       List<SyntaxError> dialectErrors = orderedDialect.extend(context);
       dialectErrors.forEach(
@@ -80,8 +91,7 @@ public class DialectService {
       errors.addAll(dialectErrors);
       context.getExtendedSource().commitTransformations();
     }
-    ResultWithErrors<DialectOutcome> acc =
-        new ResultWithErrors<>(new DialectOutcome(context), errors);
+    ResultWithErrors<DialectOutcome> acc = new ResultWithErrors<>(new DialectOutcome(context), errors);
     for (CobolDialect orderedDialect : orderedDialects) {
       acc = processDialect(acc, orderedDialect, context);
       context.getExtendedSource().commitTransformations();
@@ -89,17 +99,59 @@ public class DialectService {
     return acc;
   }
 
+  private List<String> filterMissing(List<String> dialects, List<SyntaxError> errors, DialectProcessingContext context) {
+    List<String> result = new ArrayList<>();
+    for (String dialectName: dialects) {
+      if (!dialectSuppliers.containsKey(dialectName)) {
+        errors.add(errorMissingDialect(context, dialectName));
+      } else {
+        result.add(dialectName);
+      }
+    }
+    return result;
+  }
+
+  private static SyntaxError errorMissingDialect(DialectProcessingContext context, String dialectName) {
+    return SyntaxError.syntaxError()
+            .messageTemplate(MessageTemplate.of("dialects.missingDialect",
+                    dialectName, context.getExtendedSource().getUri()))
+            .severity(ErrorSeverity.ERROR)
+            .location(new OriginalLocation(new Location(context.getProgramDocumentUri(),
+                    new Range(new Position(0, 0), new Position(0, 0))), null))
+            .errorSource(ErrorSource.DIALECT)
+            .build();
+  }
+
+  private ResultWithErrors<DialectOutcome> handleMissingDialect(DialectProcessingContext context,
+                                                                List<SyntaxError> errors, NoSuchElementException e) {
+    Optional<String> originalDialectName = findOriginalDialect(e.getMessage());
+    String errorMsg = originalDialectName.map(name -> e.getMessage() + " (needed for " + name + ")")
+            .orElse(e.getMessage());
+    errors.add(errorMissingDialect(context, errorMsg));
+    return new ResultWithErrors<>(new DialectOutcome(context), errors);
+  }
+
+  private Optional<String> findOriginalDialect(String name) {
+    for (CobolDialect dialect: dialectSuppliers.values()) {
+      if (dialect.runBefore().contains(name)) {
+        return Optional.of(dialect.getName());
+      }
+    }
+    return Optional.empty();
+  }
+
   private LinkedList<CobolDialect> sortDialects(List<String> dialects) {
     LinkedList<CobolDialect> orderedDialects = new LinkedList<>();
     LinkedList<String> dialectsQueue = new LinkedList<>(dialects);
     while (!dialectsQueue.isEmpty()) {
-      CobolDialect dialect = getDialectByName(dialectsQueue.pop());
+      String dialectName = dialectsQueue.pop();
+      CobolDialect dialect = getDialectByName(dialectName).orElseThrow(() -> new NoSuchElementException(dialectName));
       if (dialect.runBefore().isEmpty()) {
         orderedDialects.add(dialect);
         continue;
       }
       for (String name : dialect.runBefore()) {
-        CobolDialect d = getDialectByName(name);
+        CobolDialect d = getDialectByName(name).orElseThrow(() -> new NoSuchElementException(name));
         int index = orderedDialects.indexOf(d);
         if (index >= 0) {
           orderedDialects.add(index, dialect);
@@ -117,10 +169,10 @@ public class DialectService {
   /**
    * Returns dialect object by name
    * @param dialectName is a dialect name
-   * @return a dialect
+   * @return a dialect is it's possible
    */
-  public CobolDialect getDialectByName(String dialectName) {
-    return dialectSuppliers.getOrDefault(dialectName, EMPTY_DIALECT);
+  public Optional<CobolDialect> getDialectByName(String dialectName) {
+    return Optional.ofNullable(dialectSuppliers.get(dialectName));
   }
 
   private static ResultWithErrors<DialectOutcome> processDialect(
@@ -163,12 +215,19 @@ public class DialectService {
           .filter(d -> d.getName().equals(name))
           .findFirst()
               .map(dialect -> {
+                registerDialectCodeActions(dialect);
                 changed.set(true);
                 return dialect;
               })
           .orElse(null))
     );
     return changed.get();
+  }
+
+  private void registerDialectCodeActions(CobolDialect dialect) {
+    discoveryService.registerExecuteCommandCapabilities(
+            dialect.getDialectExecuteCommandCapabilities(), dialect.getName());
+    discoveryService.registerDialectCodeActionProviders(dialect.getDialectCodeActionProviders());
   }
 
   /**

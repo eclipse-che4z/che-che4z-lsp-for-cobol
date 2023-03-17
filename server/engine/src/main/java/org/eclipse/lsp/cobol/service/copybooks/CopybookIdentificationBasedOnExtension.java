@@ -33,7 +33,7 @@ public class CopybookIdentificationBasedOnExtension implements CopybookIdentific
    * @return True if it's a copybook. False otherwise
    */
   @Override
-  public boolean isCopybook(String uri, String text, List<String> config) throws UndeterminedDocumentException {
+  public boolean isCopybook(String uri, String text, List<String> config) {
     String[] uriAsArray = uri.split("/");
     String fileNameWithExtension = uriAsArray[uriAsArray.length - 1];
     String[] split = fileNameWithExtension.split("\\.");
@@ -41,7 +41,7 @@ public class CopybookIdentificationBasedOnExtension implements CopybookIdentific
     if (Objects.isNull(config)
         || config.size() == 0
         || StringUtils.isBlank(extension)) {
-      throw new UndeterminedDocumentException();
+      return false;
     }
     return config.size() > 0
         && config.contains(extension);

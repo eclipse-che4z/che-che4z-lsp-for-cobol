@@ -167,11 +167,10 @@ public class VariableDefinitionUtil {
               .flatMap(Node::getDepthFirstStream)
               .filter(hasType(NodeType.VARIABLE_DEFINITION))
               .map(VariableDefinitionNode.class::cast)
-              .distinct()
               .forEach(
                   copyNodeVariable -> variables.add(index.getAndIncrement(), copyNodeVariable));
         });
-    return variables.stream().distinct().collect(Collectors.toList());
+    return variables;
   }
 
   /**

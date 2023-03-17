@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Discover cobol dialects registered in the system
  */
-public interface DialectDiscoveryService {
+public interface DialectDiscoveryService extends DialectExecuteCommandCapabilityService {
   /**
    * Load cobol dialects
    * @param copybookService a copybook service

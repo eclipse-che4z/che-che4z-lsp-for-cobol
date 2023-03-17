@@ -26,7 +26,8 @@ public enum ErrorSource {
   PREPROCESSING("(preprocessing)"),
   DIALECT("(dialect)"),
   EXTENDED_DOCUMENT("(extended document)"),
-  COPYBOOK("(copybook)");
+  COPYBOOK("(copybook)"),
+  WORKSPACE_SETTINGS("(workspace setting)");
 
   private static final String COBOL_LANG_SUPPORT_LABEL = "COBOL Language Support";
 

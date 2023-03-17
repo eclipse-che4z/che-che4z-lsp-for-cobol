@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.dialects.daco;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -36,4 +37,13 @@ public class ExplicitDialectDiscoveryService implements DialectDiscoveryService 
   public List<CobolDialect> loadDialects(String path, CopybookService copybookService, MessageService messageService) {
     return ImmutableList.of();
   }
+
+  @Override
+  public void registerExecuteCommandCapabilities(List<String> capabilities, String id) {}
+
+  @Override
+  public void unregisterExecuteCommandCapabilities(String id) {}
+
+  @Override
+  public void registerDialectCodeActionProviders(List<CodeActionProvider> providers) {}
 }

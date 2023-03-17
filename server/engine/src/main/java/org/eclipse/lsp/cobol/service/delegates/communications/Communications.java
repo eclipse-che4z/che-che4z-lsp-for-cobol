@@ -33,4 +33,8 @@ public interface Communications {
   void notifyProgressReport(String uri);
 
   void notifyProgressEnd(String uri);
+
+  void registerExecuteCommandCapability(List<String> capabilities, String id);
+
+  void unregisterExecuteCommandCapability(String id);
 }

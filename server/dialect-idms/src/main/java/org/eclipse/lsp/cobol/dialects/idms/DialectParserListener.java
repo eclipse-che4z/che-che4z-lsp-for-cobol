@@ -54,11 +54,6 @@ class DialectParserListener extends BaseErrorListener {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.DIALECT)
-            .tokenIndex(Optional.ofNullable(offendingSymbol)
-                .filter(t -> t instanceof CommonToken)
-                .map(CommonToken.class::cast)
-                .map(CommonToken::getTokenIndex)
-                .orElse(-1))
             .suggestion(msg)
             .location(
                 Locality.builder()

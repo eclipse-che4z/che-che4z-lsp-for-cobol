@@ -4,7 +4,7 @@
     "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
@@ -53,6 +53,14 @@
                 "title": "Open Copybook location settings"
             },
             {
+                "command": "cobol-lsp.serverRuntime.goto-settings",
+                "title": "Open serverRuntime settings"
+            },
+            {
+                "command": "cobol-lsp.dialects.goto-settings",
+                "title": "Open Dialects settings"
+            },
+            {
                 "command": "cobol-lsp.commentLine.toggle",
                 "title": "Toggle COBOL Line Comment"
             },
@@ -87,11 +95,8 @@
                 "aliases": [
                     "COBOL"
                 ],
-                "filenamePatterns": [
-                    "**/*copybook*/**"
-                ],
                 "configuration": "./syntaxes/lang-config.json",
-                "firstLine": "^[0-9 ]{6}([*].*|[ ] *([Ii][Dd][Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn] +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ].*|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ].*|(CBL|PROCESS) +XOPTS\\b.*))$"
+                "firstLine": "^[0-9 ]{6}([*].*|[ ] *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ].*|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ].*|(CBL|PROCESS) +XOPTS\\b.*))$"
             }
         ],
         "grammars": [
@@ -374,11 +379,7 @@
                 "cobol-lsp.dialects": {
                     "type": "array",
                     "items": {
-                        "type": "string",
-                        "enum": [
-                            "DaCo",
-                            "IDMS"
-                        ]
+                        "type": "string"
                     },
                     "description": "List of enabled dialects",
                     "uniqueItems": true
@@ -388,7 +389,7 @@
                     "default": "true",
                     "description": "Enable CICS translator"
                 },
-                "cobol-lsp.serverType": {
+                "cobol-lsp.serverRuntime": {
                     "type": "string",
                     "enum": [
                         "JAVA",
@@ -396,10 +397,10 @@
                     ],
                     "default": "JAVA",
                     "enumDescriptions": [
-                        "JAVA  - Run java Server",
-                        "NATIVE - Run native Server"
+                        "JAVA  - Run from a Java Archive (jar). Requires java runtime to be installed",
+                        "NATIVE - Use platform binary"
                     ],
-                    "description": "COBOL LS server type."
+                    "description": "COBOL LS server runtime."
                 }
             }
         },
@@ -442,7 +443,17 @@
                 "command": "cobol-lsp.commentLine.toggle",
                 "when": "editorLangId =~ /^cobol$/i && editorTextFocus && !editorReadonly"
             }
-        ]
+        ],
+        "jsonValidation": [
+            {
+              "fileMatch": "/.cobolplugin/pgm_conf.json",
+              "url": "./schema/pgm_conf.schema.json"
+            },
+            {
+              "fileMatch": "/.cobolplugin/proc_grps.json",
+              "url": "./schema/proc_grps.schema.json"
+            }
+          ]
     },
     "scripts": {
         "vscode:prepublish": "npm run -S esbuild-base -- --minify",
@@ -458,14 +469,16 @@
         "package": "vsce package"
     },
     "dependencies": {
-        "glob": "^8.0.3",
+        "glob": "8.1.0",
         "iconv-lite": "^0.6.3",
-        "vscode-extension-telemetry": "0.1.6",
+        "micromatch": "4.0.5",
+        "@vscode/extension-telemetry": "0.7.5",
         "vscode-languageclient": "8.0.2"
     },
     "devDependencies": {
         "@types/fs-extra": "^9.0.13",
         "@types/jest": "^29.0.3",
+        "@types/minimatch": "5.1.2",
         "@types/mocha": "^9.1.1",
         "@types/node": "^14.18.29",
         "@types/vscode": "^1.71.0",

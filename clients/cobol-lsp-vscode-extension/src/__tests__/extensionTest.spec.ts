@@ -34,11 +34,18 @@ jest.mock("../commands/ClearCopybookCacheCommand");
 jest.mock("../services/Settings", () => ({
     createFileWithGivenPath: jest.fn(),
     initializeSettings: jest.fn(),
+    SettingsService: {
+        serverRuntime: jest.fn().mockReturnValueOnce(undefined).mockReturnValue("JAVA"),
+        getSnippetsForCobol: jest.fn().mockReturnValue([]),
+        getDialects: jest.fn().mockReturnValue([]),
+    },
 }));
+
 Utils.getZoweExplorerAPI = jest.fn();
 jest.mock("vscode", () => ({
     commands: {
         registerCommand: jest.fn().mockImplementation((command, callback) => callback()),
+        executeCommand: jest.fn(),
     },
     extensions: {
         getExtension: jest.fn().mockReturnValue({ extensionPath: "/test" }),
@@ -53,6 +60,8 @@ jest.mock("vscode", () => ({
         }),
         showErrorMessage: jest.fn().mockReturnValue("test"),
         showInformationMessage: jest.fn().mockImplementation((message: string) => Promise.resolve(message)),
+        onDidChangeActiveTextEditor: jest.fn(),
+        createQuickPick: jest.fn().mockReturnValue({onDidChangeSelection: jest.fn(), show: jest.fn()}),
         createOutputChannel: jest.fn().mockReturnValue({
             appendLine: jest.fn(),
         }),
@@ -91,13 +100,11 @@ describe("Check plugin extension for cobol starts successfully.", () => {
         await activate(context);
         expect(TelemetryService.registerEvent).toHaveBeenCalledWith("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
 
-        expect(vscode.commands.registerCommand).toBeCalledTimes(7);
+        expect(vscode.commands.registerCommand).toBeCalledTimes(9);
 
         expect(fetchCopybookCommand).toHaveBeenCalled();
         expect(gotoCopybookSettings).toHaveBeenCalled();
         expect(initSmartTab).toHaveBeenCalled();
-
-        expect(createFileWithGivenPath).toHaveBeenCalledTimes(1);
 
         expect(vscode.languages.registerCodeActionsProvider)
             .toBeCalledWith({ scheme: "file", language: "cobol" }, expect.any(CopybooksCodeActionProvider));
@@ -135,28 +142,54 @@ describe("Check plugin extension for cobol fails.", () => {
     });
 });
 
-describe.only("Check recognition of COBOL from first line", () => {
+describe("Check recognition of COBOL from first line", () => {
   const manifest = require('../../package.json')
   const firstLine = manifest.contributes.languages[0].firstLine;
   const cobol = expect.stringMatching(firstLine)
 
-  test("Comment Line", () => {
+  test("Comment Line SEQ", () => {
     const pgm = `000010*REALLY ANYTHING`;
     expect(pgm).toEqual(cobol)
   })
 
-  test("Identification Division", () => {
+  test("Comment Line NOSEQ", () => {
+    const pgm = `      *REALLY ANYTHING`;
+    expect(pgm).toEqual(cobol)
+  })
+
+  test("Identification Division SEQ", () => {
     const pgm = `000010 IDENTIFICATION DIVISION.`
     expect(pgm).toEqual(cobol)
   })
 
-  test("Data Definition (copybook)", () => {
+  test("Identification Division NOSEQ", () => {
+    const pgm = `       IDENTIFICATION DIVISION.`
+    expect(pgm).toEqual(cobol)
+  })
+
+  test("ID Division", () => {
+    const pgm = `000010 ID DIVISION.`
+    expect(pgm).toEqual(cobol)
+  })
+
+
+  test("Data Definition (copybook) SEQ", () => {
     const pgm = `000010 01 ABC-XYZ.`;
     expect(pgm).toEqual(cobol)
   })
 
-  test("CICS Translator Directive", () => {
+  test("Data Definition (copybook) NOSEQ", () => {
+    const pgm = `       01 ABC-XYZ.`;
+    expect(pgm).toEqual(cobol)
+  })
+
+  test("CICS Translator Directive SEQ", () => {
     const pgm = `000010 CBL XOPTS(COBOL2)`;
+    expect(pgm).toEqual(cobol)
+  })
+
+  test("CICS Translator Directive NOSEQ", () => {
+    const pgm = `       CBL XOPTS(COBOL2)`;
     expect(pgm).toEqual(cobol)
   })
 });

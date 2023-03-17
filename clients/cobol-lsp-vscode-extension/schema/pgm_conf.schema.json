@@ -1,0 +1,29 @@
+{
+    "type": "object",
+    "properties": {
+        "pgms": {
+            "description": "List of main programs",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "program": {
+                        "type": "string",
+                        "description": "Name/Wildcard of file to be considered as main program (open code)"
+                    },
+                    "pgroup": {
+                        "type": "string",
+                        "description": "Name of processor group as defined in proc_grps.json"
+                    }
+                },
+                "required": [
+                    "program",
+                    "pgroup"
+                ]
+            }
+        }
+    },
+    "required": [
+        "pgms"
+    ]
+}

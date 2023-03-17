@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.common.mapping;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
@@ -38,6 +39,21 @@ public class ExtendedSource {
 
   public String getUri() {
     return mainUri;
+  }
+
+
+  /**
+   * Substitute location of original document with a new final copybook document.
+   *
+   * @param document document to extend
+   * @param replaceRange location to replace
+   * @param copybookMap copybook document to extend main document,
+   *                    should be final (already extended with other documents)
+   */
+  public void replace(DocumentMap document, Range replaceRange, DocumentMap copybookMap) {
+    documents.computeIfAbsent(document.getUri(), uri -> document)
+        .replace(replaceRange, TextTransformations.of(copybookMap.extendedText(), copybookMap.getUri()));
+    documents.put(copybookMap.getUri(), copybookMap);
   }
 
   /**
@@ -99,7 +115,6 @@ public class ExtendedSource {
     return lastLocation;
   }
 
-
   /**
    * Replace copy statement with result of copybook substitution
    *
@@ -129,8 +144,12 @@ public class ExtendedSource {
    * @param copybookMap a map of a copybook
    */
   public void insert(DocumentMap document, int line, DocumentMap copybookMap) {
+    String copybookText = copybookMap.extendedText();
+    if (!StringUtils.isEmpty(copybookText)) {
+      copybookText += "\n";
+    }
     documents.computeIfAbsent(document.getUri(), uri -> document)
-        .insert(line, TextTransformations.of(copybookMap.extendedText(), copybookMap.getUri()));
+        .insert(line, TextTransformations.of(copybookText, copybookMap.getUri()));
     documents.put(copybookMap.getUri(), copybookMap);
   }
 }

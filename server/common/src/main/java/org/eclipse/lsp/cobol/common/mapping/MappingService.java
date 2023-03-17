@@ -14,14 +14,11 @@
  */
 package org.eclipse.lsp.cobol.common.mapping;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
 import lombok.Getter;
 import lombok.Value;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -66,27 +63,94 @@ public class MappingService {
    * @return a Location object
    */
   public Optional<Location> getOriginalLocation(Range range) {
+    Optional<Pair<Position, String>> start = getOriginalPosition(range.getStart());
+    List<Optional<Pair<Position, String>>> optionalEnds = new LinkedList<>();
+
+    optionalEnds.add(getOriginalPosition(range.getEnd()));
+    optionalEnds.add(getOriginalPosition(new Position(range.getEnd().getLine() + 1, 0)));
+    optionalEnds.add(getOriginalPosition(new Position(range.getEnd().getLine(), 80)));
+
+    List<Pair<Position, String>> ends = optionalEnds.stream()
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(Collectors.toList());
+
+    if (!start.isPresent() || ends.isEmpty()) {
+      return getUncheckedOriginalLocation(range);
+    }
+
+    Optional<Pair<Position, String>> end = ends.stream().filter(e -> e.getValue().equals(start.get().getValue())).findFirst();
+    Optional<Location> result = end.map(endPair -> new Location(start.get().getValue(), new Range(start.get().getKey(), endPair.getKey())));
+    if (!result.isPresent()) {
+      result = getUncheckedOriginalLocation(range);
+    }
+
+    // Adjust for lines more than 80
+    if (result.isPresent()
+        && MappingHelper.size(range) == 1
+        && MappingHelper.size(result.get().getRange()) == 1
+        && MappingHelper.charSize(range) > MappingHelper.charSize(result.get().getRange())) {
+      Range oldRange = result.get().getRange();
+      Range newRange = new Range(oldRange.getStart(), new Position(oldRange.getEnd().getLine(), range.getEnd().getCharacter()));
+      result.get().setRange(newRange);
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns a original location with document's uri
+   * @param range is a range from extendes source
+   * @return a Location object
+   */
+  private Optional<Location> getUncheckedOriginalLocation(Range range) {
     return
         findRangeAndLocation(range)
-        .map(mappingItem -> {
-          int lineShift = range.getStart().getLine() - mappingItem.extendedRange.getStart().getLine();
-          int charShift = mappingItem.originalLocation.getRange().getStart().getCharacter() - mappingItem.extendedRange.getStart().getCharacter();
+            .map(mappingItem -> {
 
-          int originalLine = mappingItem.originalLocation.getRange().getStart().getLine() + lineShift;
-          int originalCharacter = range.getStart().getCharacter() + charShift;
-          Position startPos = new Position(originalLine, originalCharacter);
+              int lineShift = range.getStart().getLine() - mappingItem.extendedRange.getStart().getLine();
+              int charShift = mappingItem.originalLocation.getRange().getStart().getCharacter() - mappingItem.extendedRange.getStart().getCharacter();
+              if (lineShift != 0 && lineShift != (range.getEnd().getLine() - range.getStart().getLine())) {
+                charShift = 0;
+              }
 
-          originalLine = originalLine + range.getEnd().getLine() - range.getStart().getLine();
-          originalCharacter = originalCharacter + MappingHelper.charSize(range);
-          Position endPos = new Position(originalLine, originalCharacter);
+              int originalLine = mappingItem.originalLocation.getRange().getStart().getLine() + lineShift;
+              int originalCharacter = range.getStart().getCharacter() + charShift;
+              Position startPos = new Position(originalLine, originalCharacter);
 
-          Range newRange = new Range(startPos, endPos);
-          return new Location(mappingItem.originalLocation.getUri(), newRange);
-        });
+              originalLine = originalLine + range.getEnd().getLine() - range.getStart().getLine();
+              originalCharacter = originalCharacter + MappingHelper.charSize(range);
+              Position endPos = new Position(originalLine, originalCharacter);
+
+              Range newRange = new Range(startPos, endPos);
+              return new Location(mappingItem.originalLocation.getUri(), newRange);
+            });
+  }
+
+  private Optional<Pair<Position, String>> getOriginalPosition(Position position) {
+    return
+        findRangeAndLocation(new Range(position, position))
+            .map(mappingItem -> {
+              int lineShift = position.getLine() - mappingItem.extendedRange.getStart().getLine();
+              int charShift = mappingItem.originalLocation.getRange().getStart().getCharacter() - mappingItem.extendedRange.getStart().getCharacter();
+              if (lineShift != 0) {
+                charShift = 0;
+              }
+
+              int originalLine = mappingItem.originalLocation.getRange().getStart().getLine() + lineShift;
+              int originalCharacter = position.getCharacter() + charShift;
+              Position originalPosition = new Position(originalLine, originalCharacter);
+
+              return Pair.of(originalPosition, mappingItem.originalLocation.getUri());
+            });
   }
 
   private Optional<MappingItem> findRangeAndLocation(Range range) {
-    return localityMap.stream().filter(p -> MappingHelper.rangeIn(range, p.extendedRange)).findFirst();
+    List<MappingItem> list = localityMap.stream().filter(p -> MappingHelper.rangeIn(range, p.extendedRange)).collect(Collectors.toList());
+    if (list.size() == 0) {
+      return Optional.empty();
+    }
+    return Optional.of(list.get(list.size() - 1));
   }
 
   /**
@@ -114,7 +178,7 @@ public class MappingService {
         result.add(mappingItem);
       }
 
-      extendedDocumentLine += (range.getEnd().getLine() - originalDocumentLine);
+      extendedDocumentLine += (range.getEnd().getLine() - originalDocumentLine - MappingHelper.size(range) + 1);
       originalDocumentLine = range.getEnd().getLine() + 1;
 
       if (textTransformations.isInsert(range.getStart().getLine())) {
@@ -141,7 +205,7 @@ public class MappingService {
       result.addAll(map);
     }
 
-    String[] originalLines = textTransformations.getText().split("\r?\n", -1);
+    String[] originalLines = textTransformations.getText().split("\\r?\\n", -1);
     int size = originalLines.length;
 
     MappingItem last = new MappingItem(new Range(new Position(extendedDocumentLine, 0), new Position(extendedDocumentLine + size - 1, LINE_LEN)),
@@ -219,7 +283,9 @@ public class MappingService {
                 if (newRange.getStart().getCharacter() > 0) {
                   shift = new CharShift(newRange.getStart().getLine(), MappingHelper.charSize(range));
                 }
-                localityMap.add(new MappingItem(newRange, newLocations.get(i), shift));
+                if (newRange.getStart().getLine() <= newRange.getEnd().getLine()) {
+                  localityMap.add(new MappingItem(newRange, newLocations.get(i), shift));
+                }
               }
             }
           }

@@ -142,6 +142,17 @@ public class TextTransformations {
   }
 
   /**
+   * Substitute location of original document with a new document.
+   *
+   * @param range location
+   * @param textTransformations Copybook's transformations
+   */
+  public void replace(Range range, TextTransformations textTransformations) {
+    extensions.put(range, textTransformations);
+  }
+
+
+  /**
    * Static constructor for transformations
    *
    * @param text original text

@@ -33,7 +33,6 @@ import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
@@ -92,7 +91,6 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,7 +98,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -153,7 +150,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final HoverProvider hoverProvider;
   private final CFASTBuilder cfastBuilder;
   private final ConfigurationService configurationService;
-  private final FileSystemService fileSystemService;
   private DisposableLSPStateService disposableLSPStateService;
   private final CopybookIdentificationService copybookIdentificationService;
   private final CopybookService copybookService;
@@ -191,8 +187,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       CopybookService copybookService,
       CopybookReferenceRepo copybookReferenceRepo,
       SyncProvider syncProvider,
-      WatcherService watcherService,
-      FileSystemService fileSystemService) {
+      WatcherService watcherService) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -211,7 +206,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.copybookReferenceRepo = copybookReferenceRepo;
     this.syncProvider = syncProvider;
     this.watcherService = watcherService;
-    this.fileSystemService = fileSystemService;
     dataBus.subscribe(this);
   }
 
@@ -252,10 +246,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         () -> {
           waitAnalysisToFinish(uri);
           if (!docs.containsKey(uri)) {
-            Path file = fileSystemService.getPathFromURI(uri);
-            String text = fileSystemService.getContentByPath(Objects.requireNonNull(file));
-            doAnalysis(uri, text, false, true);
-            waitAnalysisToFinish(uri);
+            return new DocumentDiagnosticReport(
+                    getRelatedUnchangedDocumentDiagnosticReport(uri, emptyMap()));
           }
           Map<String, List<Diagnostic>> diagnosticsMap =
               ofNullable(docs.get(uri))
@@ -446,12 +438,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public void didClose(DidCloseTextDocumentParams params) {
     if (disposableLSPStateService.isServerShutdown()) return;
     String uri = params.getTextDocument().getUri();
+    String docText = docs.getOrDefault(uri, new CobolDocumentModel("")).getText();
     LOG.info(format("Document closing invoked on URI %s", uri));
     interruptAnalysis(uri);
-    TextDocumentItem docIdentifier = new TextDocumentItem();
-    docIdentifier.setUri(uri);
-    if (copybookIdentificationService.isCopybook(
-        docIdentifier.getUri(), docIdentifier.getText(), copybookExtensions)) {
+    if (copybookIdentificationService.isCopybook(uri, docText, copybookExtensions)) {
       return;
     }
 
@@ -535,7 +525,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   }
 
   private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
-    registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.builder().build()));
     FutureTask<Void> task =
         registerToFutureMap(
             uri,
@@ -559,12 +548,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                             ? copybookProcessingMode
                             : CopybookProcessingMode.SKIP);
 
-        if (firstTime) {
-          if (copybookIdentificationService.isCopybook(uri, text, waitExtensionConfig())) {
+        if (firstTime && copybookIdentificationService.isCopybook(uri, text, waitExtensionConfig())) {
             return;
-          }
         }
-        AnalysisConfig config = configurationService.getConfig(processingMode);
+        AnalysisConfig config = configurationService.getConfig(uri, processingMode);
         AnalysisResult result = engine.analyze(uri, text, config);
         if (firstTime) {
           registerDocument(uri, new CobolDocumentModel(text, result));
@@ -648,9 +635,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> documentSymbol(
       DocumentSymbolParams params) {
     String uri = params.getTextDocument().getUri();
-    Path file = fileSystemService.getPathFromURI(uri);
-    String text = fileSystemService.getContentByPath(Objects.requireNonNull(file));
-    if (!copybookIdentificationService.isCopybook(uri, text, copybookExtensions)) {
+    if (docs.containsKey(uri) && !copybookIdentificationService.isCopybook(uri, docs.get(uri).getText(), copybookExtensions)) {
       communications.notifyProgressBegin(uri);
     }
     return outlineMap

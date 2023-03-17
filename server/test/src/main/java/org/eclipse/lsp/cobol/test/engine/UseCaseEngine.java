@@ -400,7 +400,7 @@ public class UseCaseEngine {
             assertEquals(
                 value.stream().sorted(getLocationComparator()).collect(toList()),
                 actual.get(key).stream().sorted(getLocationComparator()).collect(toList()),
-                message));
+                message + " for " + key));
   }
 
   private Comparator<Location> getLocationComparator() {

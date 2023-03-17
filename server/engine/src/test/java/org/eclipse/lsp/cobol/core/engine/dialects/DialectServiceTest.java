@@ -75,5 +75,10 @@ class DialectServiceTest {
 
     verify(dialect, times(1)).extend(context);
     verify(dialect, times(1)).processText(context);
+    verify(ddService, times(1))
+        .registerExecuteCommandCapabilities(
+            dialect.getDialectExecuteCommandCapabilities(), dialect.getName());
+    verify(ddService, times(1))
+        .registerDialectCodeActionProviders(dialect.getDialectCodeActionProviders());
   }
 }

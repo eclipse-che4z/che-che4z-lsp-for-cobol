@@ -18,38 +18,25 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
-import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
-import org.eclipse.lsp.cobol.core.model.DocumentMapping;
-import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
-import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectDescriptor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.InjectService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.analysis.InjectCodeAnalysis;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.PreprocessorContext;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacementContext;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacementHelper;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
-import org.eclipse.lsp4j.Range;
 
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
 
@@ -59,50 +46,41 @@ import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
  */
 @Slf4j
 public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListener
-    implements GrammarPreprocessorListener<OldExtendedDocument> {
-  private static final int DEFAULT_TOKEN_SHIFT = 2;
-  private static final int TOKEN_SHIFT_WITH_LINEBREAK = 3;
+    implements GrammarPreprocessorListener<CopybooksRepository> {
+  private static final int MAX_COPYBOOK_NAME_LENGTH_10 = 10;
+  private static final int MAX_COPYBOOK_NAME_LENGTH_8 = 8;
 
   private final List<SyntaxError> errors = new ArrayList<>();
-  private final Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
-  private final CopybooksRepository copybooks = new CopybooksRepository();
-  private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
-  private final Map<Integer, Integer> shifts = new HashMap<>();
 
-  private final DocumentMap documentMap;
-  private final BufferedTokenStream tokens;
   private final CopybookConfig copybookConfig;
-  private final ReplacingService replacingService;
   private final MessageService messageService;
-  private final CopybookHierarchy hierarchy;
-  private final InjectService injectService;
-  private final CopybookNameService copybookNameService;
+  private final CopybookPreprocessorService preprocessorService;
+  private final ReplacingService replacingService;
+
+  private List<ReplacementContext> replacementContext;
 
   @Inject
   GrammarPreprocessorListenerImpl(
-      @Assisted DocumentMap documentMap,
-      @Assisted BufferedTokenStream tokens,
-      @Assisted CopybookConfig copybookConfig,
-      @Assisted CopybookHierarchy hierarchy,
-      ReplacingService replacingService,
+      @Assisted PreprocessorContext context,
+      GrammarPreprocessor grammarPreprocessor,
+      CopybookService copybookService,
       MessageService messageService,
-      CopybookNameService copybookNameService,
-      InjectService injectService) {
-    this.documentMap = documentMap;
-    this.tokens = tokens;
-    this.copybookConfig = copybookConfig;
-    this.replacingService = replacingService;
+      ReplacingService replacingService) {
+    this.copybookConfig = context.getCopybookConfig();
     this.messageService = messageService;
-    this.injectService = injectService;
-    this.hierarchy = hierarchy;
-    this.copybookNameService = copybookNameService;
-    textAccumulator.push(new StringBuilder());
+    this.preprocessorService = new CopybookPreprocessorService(context.getProgramDocumentUri(),
+        grammarPreprocessor,
+        context.getExtendedSource(),
+        context.getCurrentDocument(),
+        copybookService,
+        copybookConfig,
+        context.getCopybooksRepository(),
+        context.getHierarchy(),
+        messageService,
+        replacingService);
+    this.replacingService = replacingService;
   }
 
-  @Override
-  public Deque<StringBuilder> getTextAccumulator() {
-    return textAccumulator;
-  }
   /**
    * Get the extended document of the COBOL file and the used copybooks.
    *
@@ -110,41 +88,35 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
    */
   @NonNull
   @Override
-  public ResultWithErrors<OldExtendedDocument> getResult() {
-    String uri = documentMap.getUri();
-    List<Locality> localities = tokens.getTokens().stream()
-            .map(LocalityUtils.toLocality(uri, hierarchy.getCurrentCopybookId()))
-            .collect(toList());
-    nestedMappings.put(uri, new DocumentMapping(localities, shifts));
-
-    return new ResultWithErrors<>(new OldExtendedDocument(uri, accumulate(), copybooks, nestedMappings), errors);
+  public ResultWithErrors<CopybooksRepository> getResult() {
+    List<SyntaxError> result = new ArrayList<>(preprocessorService.getErrors());
+    result.addAll(errors);
+    return new ResultWithErrors<>(preprocessorService.getCopybooks(), result);
   }
 
   @Override
   public void enterTitleDirective(TitleDirectiveContext ctx) {
-    push();
+    preprocessorService.replaceWithSpaces(ctx);
   }
 
   @Override
   public void exitTitleDirective(TitleDirectiveContext ctx) {
-    pop();
-    accumulateTokenShift(ctx);
+    preprocessorService.replaceWithSpaces(ctx);
   }
 
   @Override
   public void enterEnterDirective(EnterDirectiveContext ctx) {
-    push();
+    preprocessorService.replaceWithSpaces(ctx);
   }
 
   @Override
   public void exitEnterDirective(EnterDirectiveContext ctx) {
-    pop();
     final LanguageNameContext languageNameContext = ctx.languageName();
     if (languageNameContext == null) {
       final SyntaxError error =
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.EXTENDED_DOCUMENT)
-              .location(retrieveLocality(ctx).toOriginalLocation())
+              .location(preprocessorService.retrieveLocality(ctx).toOriginalLocation())
               .severity(ERROR)
               .suggestion(
                   messageService.getMessage(
@@ -153,177 +125,70 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       LOG.debug("Syntax error by exitEnterDirective: {}", error);
       errors.add(error);
     }
-
-    accumulateTokenShift(ctx);
   }
 
   @Override
   public void enterControlDirective(ControlDirectiveContext ctx) {
-    push();
+    preprocessorService.replaceWithSpaces(ctx);
   }
 
   @Override
   public void exitControlDirective(ControlDirectiveContext ctx) {
-    pop();
-    if (ctx.controlOptions().isEmpty()) reportInvalidArgument(ctx.controlCbl());
-    accumulateTokenShift(ctx);
-  }
-
-  @Override
-  public void enterPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
-    push();
+    if (ctx.controlOptions().isEmpty()) preprocessorService.reportInvalidArgument(ctx.controlCbl());
   }
 
   @Override
   public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    injectCode(injectService.getInjectors(ctx), ctx, ctx.copySource());
+    preprocessorService.addCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_10, replacementContext);
   }
 
   @Override
   public void enterCopyStatement(@NonNull CopyStatementContext ctx) {
-    push();
+
   }
 
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    injectCode(injectService.getInjectors(ctx), ctx, ctx.copySource());
+    preprocessorService.addCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_8, replacementContext);
   }
 
   @Override
   public void enterIncludeStatement(@NonNull IncludeStatementContext ctx) {
-    push();
+
   }
 
   @Override
   public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    injectCode(injectService.getInjectors(ctx), ctx, ctx.copySource());
+    preprocessorService.addCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_8, replacementContext);
   }
 
-  private boolean requiresEarlyReturn(ParserRuleContext context) {
+  private boolean requiresEarlyReturn(ParserRuleContext ctx) {
     if (!copybookConfig.getCopybookProcessingMode().analyze) {
-      accumulateTokenShift(context);
-      pop();
+      preprocessorService.replaceWithSpaces(ctx);
       return true;
     }
     return false;
   }
 
-  private void injectCode(
-      List<InjectDescriptor> descriptors,
-      ParserRuleContext context,
-      ParserRuleContext copyContext) {
-    for (InjectDescriptor c : descriptors) {
-      InjectCodeAnalysis injectCodeAnalysis = c.getInjectCodeAnalysis();
-      CopybookName injectedSourceName = copybookNameService.findByName(c.getInjectedSourceName())
-              .orElse(new CopybookName(c.getInjectedSourceName()));
-      injectCodeAnalysis.injectCode(
-              c.getCopybookContentProvider(),
-              injectedSourceName,
-              context, copyContext, copybookConfig, documentMap.getUri(),
-              hierarchy, this, copybooks, nestedMappings,
-              documentMap,
-              errors
-      );
-    }
-  }
-
-  @Override
-  public void enterReplaceLiteral(ReplaceLiteralContext ctx) {
-    push();
-  }
-
-  @Override
-  public void exitReplaceLiteral(ReplaceLiteralContext ctx) {
-    if (ctx.replaceable().pseudoReplaceable() != null) {
-      replacingService
-              .retrievePseudoTextReplacingPattern(read(), retrieveLocality(ctx.replaceable().pseudoReplaceable()))
-              .processIfNoErrorsFound(hierarchy::addCopyReplacing, errors::addAll);
-    } else {
-      hierarchy.addCopyReplacing(replacingService.retrieveTokenReplacingPattern(read()));
-    }
-    pop();
-  }
-
-  @Override
-  public void enterReplacePseudoText(ReplacePseudoTextContext ctx) {
-    push();
-  }
-
-  @Override
-  public void exitReplacePseudoText(ReplacePseudoTextContext ctx) {
-    replacingService
-        .retrievePseudoTextReplacingPattern(read(), retrieveLocality(ctx))
-        .processIfNoErrorsFound(consumeReplacePattern(ctx), errors::addAll);
-    pop();
-  }
-
-  private Consumer<Pair<String, String>> consumeReplacePattern(ReplacePseudoTextContext ctx) {
-    return ctx.getParent() instanceof ReplaceClauseContext
-        ? hierarchy::addCopyReplacing
-        : pattern -> hierarchy.addTextReplacing(pattern, documentMap.getUri(), new Range());
-  }
-
   @Override
   public void enterReplaceAreaStart(ReplaceAreaStartContext ctx) {
-    push();
-  }
+    Locality locality = preprocessorService.retrieveLocality(ctx);
+    replacementContext = ctx.replacePseudoText().stream()
+        .map(ReplacementHelper::createClause)
+        .map(c -> replacingService.retrievePseudoTextReplacingPattern(c, locality))
+        .map(r -> r.unwrap(errors::addAll))
+        .map(r -> new ReplacementContext(r, locality))
+        .collect(Collectors.toList());
 
-  @Override
-  public void exitReplaceAreaStart(ReplaceAreaStartContext ctx) {
-    pop();
-    accumulateTokenShift(ctx);
+    preprocessorService.replaceWithSpaces(ctx);
   }
 
   @Override
   public void enterReplaceOffStatement(ReplaceOffStatementContext ctx) {
-    push();
-  }
-
-  @Override
-  public void exitReplaceOffStatement(ReplaceOffStatementContext ctx) {
-    pop();
-    accumulateTokenShift(ctx);
-  }
-
-  @Override
-  public void visitTerminal(@NonNull TerminalNode node) {
-    TokenUtils.writeHiddenTokens(tokens, this::write).accept(node);
-  }
-
-  @Override
-  public void accumulateTokenShift(ParserRuleContext context) {
-    final Interval sourceInterval = context.getSourceInterval();
-    shifts.put(
-        sourceInterval.a - 1, sourceInterval.b - sourceInterval.a + calculateTokenShift(context));
-  }
-
-  private int calculateTokenShift(ParserRuleContext context) {
-    return tokens.getHiddenTokensToLeft(context.start.getTokenIndex()).stream()
-        .map(Token::getType)
-        .filter(it -> it == CobolPreprocessorLexer.NEWLINE)
-        .findAny()
-        .map(it -> TOKEN_SHIFT_WITH_LINEBREAK)
-        .orElse(DEFAULT_TOKEN_SHIFT);
-  }
-
-  private void reportInvalidArgument(ControlCblContext ctx) {
-    SyntaxError error =
-        SyntaxError.syntaxError()
-            .errorSource(ErrorSource.PREPROCESSING)
-            .severity(ERROR)
-            .suggestion(
-                messageService.getMessage(
-                    "GrammarPreprocessorListener.controlDirectiveWrongArgs", ctx.getText()))
-            .location(retrieveLocality(ctx).toOriginalLocation())
-            .build();
-    errors.add(error);
-    LOG.debug("Syntax error by reportInvalidArgument: {}", error.toString());
-  }
-
-  private Locality retrieveLocality(ParserRuleContext ctx) {
-    return LocalityUtils.buildLocality(ctx, documentMap.getUri(), hierarchy.getCurrentCopybookId());
+    preprocessorService.replaceWithSpaces(ctx);
+    replacementContext = null;
   }
 }

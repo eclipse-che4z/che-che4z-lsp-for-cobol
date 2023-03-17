@@ -34,7 +34,7 @@ class TestSameCopybookStatementsInDifferentPlacesTreatedAsDifferentEntries {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TESTREPL.\n"
-          + "       COPY {~REPL}.\n"
+          + "       {_COPY {~REPL}.|1_}\n"
           + "       {_COPY {~REPL}.|1_}\n";
   private static final String REPL = "       {DATA|2} DIVISION.\n";
   private static final String REPL_NAME = "REPL";
