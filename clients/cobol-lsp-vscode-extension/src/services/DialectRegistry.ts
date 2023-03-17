@@ -12,8 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as vscode from "vscode";
-
 export const DIALECT_REGISTRY_SECTION: string = "cobol-lsp.dialect.registry";
 
 /**

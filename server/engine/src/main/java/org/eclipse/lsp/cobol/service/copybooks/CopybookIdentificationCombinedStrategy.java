@@ -18,6 +18,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -27,15 +28,14 @@ import java.util.List;
 @Singleton
 public class CopybookIdentificationCombinedStrategy implements CopybookIdentificationService {
 
-  private final CopybookIdentificationService service1;
-  private final CopybookIdentificationService service2;
+  private final List<CopybookIdentificationService> strategies = new LinkedList<>();
 
   @Inject
   public CopybookIdentificationCombinedStrategy(
-      @Named("suffixStrategy") CopybookIdentificationService service1,
-      @Named("contentStrategy") CopybookIdentificationService service2) {
-    this.service1 = service1;
-    this.service2 = service2;
+      @Named("suffixStrategy") CopybookIdentificationService strategy1,
+      @Named("contentStrategy") CopybookIdentificationService strategy2) {
+    strategies.add(strategy1);
+    strategies.add(strategy2);
   }
 
   /**
@@ -47,12 +47,12 @@ public class CopybookIdentificationCombinedStrategy implements CopybookIdentific
    * @return True if it's a copybook. False otherwise
    */
   @Override
-  public boolean isCopybook(String uri, String text, List<String> config)
-      throws UndeterminedDocumentException {
-    try {
-      return service1.isCopybook(uri, text, config);
-    } catch (UndeterminedDocumentException ex) {
-      return service2.isCopybook(uri, text, config);
+  public boolean isCopybook(String uri, String text, List<String> config) {
+    for (CopybookIdentificationService strategy : strategies) {
+      if (strategy.isCopybook(uri, text, config)) {
+        return true;
+      }
     }
+    return false;
   }
 }

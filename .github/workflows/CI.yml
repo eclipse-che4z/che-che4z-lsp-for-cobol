@@ -53,7 +53,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version-file: 'clients/cobol-lsp-vscode-extension/.nvmrc'
       - name: build client
         run: npm ci --ignore-scripts
         working-directory: clients/cobol-lsp-vscode-extension
@@ -81,7 +81,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version-file: 'clients/cobol-lsp-vscode-extension/.nvmrc'
       - name: Retrieve native images
         uses: actions/download-artifact@v3
         with:
@@ -109,7 +109,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version-file: 'clients/cobol-lsp-vscode-extension/.nvmrc'
       - name: Download vsix file
         uses: actions/download-artifact@v3
         with:

@@ -43,7 +43,7 @@ function searchCopybook(cobolFileName: string, copybookName: string, dialectType
         const targetFolder = getTargetFolderForCopybook(folderKind, cobolFileName, dialectType);
         const allowedExtensions = resolveAllowedExtensions(folderKind);
         result = searchCopybookInWorkspace(copybookName, targetFolder, allowedExtensions);
-        if (result) {
+         if (result) {
             return result;
         }
     }
@@ -54,7 +54,7 @@ function getTargetFolderForCopybook(folderKind: string | CopybookFolderKind, cob
     let result: string[];
     switch (folderKind) {
         case CopybookFolderKind[CopybookFolderKind.local]:
-            result = SettingsService.getCopybookLocalPath(cobolFileName, dialectType);
+            result = SettingsService.getCopybookLocalPath(cobolFileName.replace(/\.[^/.]+$/, ""), dialectType);
             break;
         case CopybookFolderKind[CopybookFolderKind["downloaded-dsn"]]:
             result = SettingsService.getDsnPath(cobolFileName, dialectType).map(dnsPath => CopybookURI.createDatasetPath(SettingsService.getProfileName(), dnsPath));

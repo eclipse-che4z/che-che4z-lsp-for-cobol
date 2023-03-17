@@ -17,13 +17,13 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 
-import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.INFO;
 
@@ -127,7 +127,7 @@ class CopybookErrorService {
             .errorSource(ErrorSource.COPYBOOK)
             .location(locality.toOriginalLocation())
             .severity(ERROR)
-            .errorCode(MISSING_COPYBOOK)
+            .errorCode(ErrorCodes.MISSING_COPYBOOK)
             .suggestion(
                 messageService.getMessage(
                     "GrammarPreprocessorListener.errorSuggestion", copybookName))

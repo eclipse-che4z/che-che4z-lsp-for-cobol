@@ -33,13 +33,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Location;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 
 import static java.util.Collections.emptyList;
@@ -141,9 +135,11 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   }
 
   private static Map<String, List<Diagnostic>> convertErrors(List<SyntaxError> errors) {
-    return errors.stream()
+    Map<String, List<Diagnostic>> result = errors.stream()
         .filter(e -> Objects.nonNull(e.getLocation()))
         .collect(groupingBy(err -> err.getLocation().getLocation().getUri(), mapping(toDiagnostic(), toList())));
+    result.values().forEach(l -> l.sort(Comparator.comparingInt(a -> a.getRange().getStart().getLine())));
+    return result;
   }
 
   private static Function<SyntaxError, Diagnostic> toDiagnostic() {

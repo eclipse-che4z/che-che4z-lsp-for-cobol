@@ -24,6 +24,7 @@ import lombok.Synchronized;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,7 +49,9 @@ public class WatcherServiceImpl implements WatcherService {
    */
   private static final int WATCH_ALL_KIND = 7;
 
-  /** Glob patterns to watch the copybooks folder and copybook files */
+  /**
+   * Glob patterns to watch the copybooks folder and copybook files
+   */
   private static final String COPYBOOKS_FOLDER_GLOB = "**/.copybooks/**/*";
 
   private static final String WATCH_FILES = "workspace/didChangeWatchedFiles";
@@ -80,60 +83,60 @@ public class WatcherServiceImpl implements WatcherService {
   @Override
   public void watchPredefinedFolder() {
     register(
-        singletonList(
-            new Registration(
-                PREDEFINED_FOLDER_WATCHER,
-                WATCH_FILES,
-                new DidChangeWatchedFilesRegistrationOptions(
-                    singletonList(
-                        new FileSystemWatcher(
-                            Either.forLeft(COPYBOOKS_FOLDER_GLOB), WATCH_ALL_KIND))))));
+            singletonList(
+                    new Registration(
+                            PREDEFINED_FOLDER_WATCHER,
+                            WATCH_FILES,
+                            new DidChangeWatchedFilesRegistrationOptions(
+                                    singletonList(
+                                            new FileSystemWatcher(
+                                                    Either.forLeft(COPYBOOKS_FOLDER_GLOB), WATCH_ALL_KIND))))));
   }
 
   @Override
   @Synchronized
   public void addWatchers(@NonNull List<String> paths) {
     register(
-        paths.stream()
-            .map(
-                folder -> {
-                  folderWatchers.add(folder);
-                  return new Registration(
-                      folder,
-                      WATCH_FILES,
-                      new DidChangeWatchedFilesRegistrationOptions(
-                          asList(
-                              new FileSystemWatcher(createFileWatcher(folder), WATCH_ALL_KIND),
-                              new FileSystemWatcher(createFolderWatcher(folder), WATCH_ALL_KIND))));
-                })
-            .collect(toList()));
+            paths.stream()
+                    .map(
+                            folder -> {
+                              folderWatchers.add(folder);
+                              return new Registration(
+                                      folder,
+                                      WATCH_FILES,
+                                      new DidChangeWatchedFilesRegistrationOptions(
+                                              asList(
+                                                      new FileSystemWatcher(createFileWatcher(folder), WATCH_ALL_KIND),
+                                                      new FileSystemWatcher(createFolderWatcher(folder), WATCH_ALL_KIND))));
+                            })
+                    .collect(toList()));
   }
 
   /**
    * Watch all types of file system changes in folders with given paths relative to workspace folder
    *
-   * @param paths - folders inside workspace to watch
+   * @param paths       - folders inside workspace to watch
    * @param documentUri - documents for which specified path need to be watched.
    */
   @Override
   public void addRuntimeWatchers(@NonNull List<String> paths, String documentUri) {
     List<String> watchedFolders =
-        runtimeSpecifiedFolderWatchers.getOrDefault(documentUri, new ArrayList<>());
+            runtimeSpecifiedFolderWatchers.getOrDefault(documentUri, new ArrayList<>());
     watchedFolders.addAll(paths);
     runtimeSpecifiedFolderWatchers.put(documentUri, watchedFolders);
     register(
-        watchedFolders.stream()
-            .map(
-                folder ->
-                    new Registration(
-                        folder,
-                        WATCH_FILES,
-                        new DidChangeWatchedFilesRegistrationOptions(
-                            asList(
-                                new FileSystemWatcher(createFileWatcher(folder), WATCH_ALL_KIND),
-                                new FileSystemWatcher(
-                                    createFolderWatcher(folder), WATCH_ALL_KIND)))))
-            .collect(toList()));
+            watchedFolders.stream()
+                    .map(
+                            folder ->
+                                    new Registration(
+                                            folder,
+                                            WATCH_FILES,
+                                            new DidChangeWatchedFilesRegistrationOptions(
+                                                    asList(
+                                                            new FileSystemWatcher(createFileWatcher(folder), WATCH_ALL_KIND),
+                                                            new FileSystemWatcher(
+                                                                    createFolderWatcher(folder), WATCH_ALL_KIND)))))
+                    .collect(toList()));
   }
 
   @Override
@@ -142,12 +145,12 @@ public class WatcherServiceImpl implements WatcherService {
     List<String> removedWatchers = paths.stream().filter(folderWatchers::remove).collect(toList());
     if (!removedWatchers.isEmpty()) {
       clientProvider
-          .get()
-          .unregisterCapability(
-              new UnregistrationParams(
-                  removedWatchers.stream()
-                      .map(it -> new Unregistration(it, WATCH_FILES))
-                      .collect(toList())));
+              .get()
+              .unregisterCapability(
+                      new UnregistrationParams(
+                              removedWatchers.stream()
+                                      .map(it -> new Unregistration(it, WATCH_FILES))
+                                      .collect(toList())));
     }
   }
 
@@ -159,25 +162,27 @@ public class WatcherServiceImpl implements WatcherService {
   @Override
   public void removeRuntimeWatchers(@NonNull String documentUri) {
     List<String> removedWatchers =
-        runtimeSpecifiedFolderWatchers.getOrDefault(documentUri, Collections.emptyList());
+            runtimeSpecifiedFolderWatchers.getOrDefault(documentUri, Collections.emptyList());
     runtimeSpecifiedFolderWatchers.remove(documentUri);
     if (!removedWatchers.isEmpty()) {
       clientProvider
-          .get()
-          .unregisterCapability(
-              new UnregistrationParams(
-                  removedWatchers.stream()
-                      .map(it -> new Unregistration(it, WATCH_FILES))
-                      .collect(toList())));
+              .get()
+              .unregisterCapability(
+                      new UnregistrationParams(
+                              removedWatchers.stream()
+                                      .map(it -> new Unregistration(it, WATCH_FILES))
+                                      .collect(toList())));
     }
   }
 
   private Either<String, RelativePattern> createFileWatcher(String folder) {
-    return Either.forLeft("**/" + folder.replace(FILE_BASENAME_VARIABLE, "**") + "/**/*");
+    return Either.forLeft((new File(folder).isAbsolute() ? "" : "**/")
+            + folder.replace(FILE_BASENAME_VARIABLE, "**") + "/**/*");
   }
 
   private Either<String, RelativePattern> createFolderWatcher(String folder) {
-    return Either.forLeft("**/" + folder.replace(FILE_BASENAME_VARIABLE, "**"));
+    return Either.forLeft((new File(folder).isAbsolute() ? "" : "**/")
+            + folder.replace(FILE_BASENAME_VARIABLE, "**"));
   }
 
   private void register(List<Registration> registrations) {

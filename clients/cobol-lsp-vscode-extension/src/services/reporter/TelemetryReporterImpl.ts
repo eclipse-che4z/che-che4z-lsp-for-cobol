@@ -14,7 +14,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import TelemetryReporter from "vscode-extension-telemetry";
+import TelemetryReporter from "@vscode/extension-telemetry";
 import {EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT} from "../../constants";
 
 import {TelemetryEvent} from "./model/TelemetryEvent";
@@ -76,8 +76,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
     private reporter: TelemetryReporter;
 
     constructor(private telemetryKeyId: string) {
-        const version = vscode.extensions.getExtension(EXTENSION_ID).packageJSON.version;
-        this.reporter = new TelemetryReporter(EXTENSION_ID, version, this.telemetryKeyId);
+        this.reporter = new TelemetryReporter(this.telemetryKeyId);
     }
 
     public reportEvent(content: TelemetryEvent): void {

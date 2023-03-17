@@ -1,0 +1,25 @@
+{
+    "description": "Defines a preprocessor pass.",
+    "anyOf": [
+        {
+            "type": "string",
+            "description": "Name of the preprocessor."
+        },
+        {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of the preprocessor."
+                },
+                "libs": {
+                    "type": "array",
+                    "description": "List of folders that contain copybooks.",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    ]
+}

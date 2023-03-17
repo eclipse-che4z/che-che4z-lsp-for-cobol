@@ -443,7 +443,17 @@
                 "command": "cobol-lsp.commentLine.toggle",
                 "when": "editorLangId =~ /^cobol$/i && editorTextFocus && !editorReadonly"
             }
-        ]
+        ],
+        "jsonValidation": [
+            {
+              "fileMatch": "/.cobolplugin/pgm_conf.json",
+              "url": "./schema/pgm_conf.schema.json"
+            },
+            {
+              "fileMatch": "/.cobolplugin/proc_grps.json",
+              "url": "./schema/proc_grps.schema.json"
+            }
+          ]
     },
     "scripts": {
         "vscode:prepublish": "npm run -S esbuild-base -- --minify",
@@ -459,14 +469,16 @@
         "package": "vsce package"
     },
     "dependencies": {
-        "glob": "^8.0.3",
+        "glob": "8.1.0",
         "iconv-lite": "^0.6.3",
-        "vscode-extension-telemetry": "0.1.6",
+        "micromatch": "4.0.5",
+        "@vscode/extension-telemetry": "0.7.5",
         "vscode-languageclient": "8.0.2"
     },
     "devDependencies": {
         "@types/fs-extra": "^9.0.13",
         "@types/jest": "^29.0.3",
+        "@types/minimatch": "5.1.2",
         "@types/mocha": "^9.1.1",
         "@types/node": "^14.18.29",
         "@types/vscode": "^1.71.0",

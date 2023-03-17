@@ -63,14 +63,22 @@ public class SettingsServiceImpl implements SettingsService {
   @NonNull
   @Override
   public CompletableFuture<List<Object>> fetchConfigurations(@NonNull List<String> sections) {
-    return clientProvider
-        .get()
-        .configuration(
-            new ConfigurationParams(
-                sections.stream()
-                    .map(section -> LSP_PREFIX.label + "." + section)
-                    .map(SettingsServiceImpl::buildConfigurationItem)
-                    .collect(toList())));
+    return fetchConfigurations(null, sections);
+  }
+
+  @NonNull
+  @Override
+  public CompletableFuture<List<Object>> fetchConfigurations(String documentUri, List<String> sections) {
+    List<ConfigurationItem> configurationItems = sections.stream()
+            .map(section -> LSP_PREFIX.label + "." + section)
+            .map(SettingsServiceImpl::buildConfigurationItem)
+            .collect(toList());
+
+    if (documentUri != null) {
+      configurationItems.forEach(ci -> ci.setScopeUri(documentUri));
+    }
+
+    return clientProvider.get().configuration(new ConfigurationParams(configurationItems));
   }
 
   @NonNull

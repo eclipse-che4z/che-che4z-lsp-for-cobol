@@ -106,6 +106,12 @@ export class LanguageClientService {
         return {
             documentSelector: [LANGUAGE_ID],
             outputChannel: this.outputChannel,
+            synchronize: {
+                fileEvents: [
+                    vscode.workspace.createFileSystemWatcher("**/pgm_conf.json"),
+                    vscode.workspace.createFileSystemWatcher("**/proc_grps.json"),
+                ]
+            }
         };
     }
 
