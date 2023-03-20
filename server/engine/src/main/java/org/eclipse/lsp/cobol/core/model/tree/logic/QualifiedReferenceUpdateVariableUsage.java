@@ -120,6 +120,10 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
       return;
     }
 
+    if(!variableUsageNodes.get(0).isDefinitionMandatory()) {
+      return;
+    }
+
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)

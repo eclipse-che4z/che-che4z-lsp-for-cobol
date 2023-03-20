@@ -39,12 +39,23 @@ import java.util.stream.Collectors;
 public class VariableUsageNode extends Node implements Context, Describable {
   private final String name;
   @EqualsAndHashCode.Exclude @ToString.Exclude private final List<VariableNode> definitions = new ArrayList<>();
+  private final boolean isDefinitionMandatory;
 
   public VariableUsageNode(
       String dataName,
       Locality locality) {
     super(locality, NodeType.VARIABLE_USAGE);
     this.name = dataName;
+    this.isDefinitionMandatory = true;
+  }
+
+  public VariableUsageNode(
+          String dataName,
+          Locality locality,
+          boolean isDefinitionMandatory) {
+    super(locality, NodeType.VARIABLE_USAGE);
+    this.name = dataName;
+    this.isDefinitionMandatory = isDefinitionMandatory;
   }
 
   @Override

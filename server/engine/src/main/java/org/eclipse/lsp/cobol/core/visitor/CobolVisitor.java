@@ -643,7 +643,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitVariableUsageName(VariableUsageNameContext ctx) {
-    return addTreeNode(ctx, locality -> new VariableUsageNode(getName(ctx), locality));
+    return addTreeNode(ctx, locality -> new VariableUsageNode(getName(ctx), locality, isVariableDefinitionMandatory(ctx)));
+  }
+
+  private boolean isVariableDefinitionMandatory(VariableUsageNameContext ctx) {
+    Boolean isDataRecordClause = ofNullable(ctx.getParent())
+            .map(ParserRuleContext::getParent)
+            .map(DataRecordsClauseContext.class::isInstance)
+            .orElse(false);
+    return !isDataRecordClause;
   }
 
   @Override
