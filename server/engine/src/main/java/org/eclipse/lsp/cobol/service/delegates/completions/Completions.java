@@ -74,15 +74,16 @@ public class Completions {
   @NonNull
   private List<CompletionItem> collectCompletions(
       @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
+    String token = retrieveToken(document, params);
     return providers
         .parallelStream()
-        .map(it -> it.getCompletionItems(retrieveToken(document, params), document))
+        .map(it -> it.getCompletionItems(token, document))
         .flatMap(Collection::stream)
         .collect(toList());
   }
 
   @NonNull
-  private String retrieveToken(
+  private static String retrieveToken(
       @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
     return Optional.ofNullable(document)
         .map(it -> it.getTokenBeforePosition(params.getPosition()))

@@ -36,7 +36,7 @@ class MockCompletionModel {
       AnalysisResult.builder()
           .rootNode(new RootNode(Locality.builder().build(), ImmutableMultimap.of()))
           .build();
-  static final CobolDocumentModel MODEL = new CobolDocumentModel("some text", RESULT);
+  static final CobolDocumentModel MODEL = new CobolDocumentModel("", "some text", RESULT);
   static final SymbolAccumulatorService SYMBOL_SERVICE = new SymbolAccumulatorService();
   static final SymbolsRepository REPO = new SymbolsRepository();
 

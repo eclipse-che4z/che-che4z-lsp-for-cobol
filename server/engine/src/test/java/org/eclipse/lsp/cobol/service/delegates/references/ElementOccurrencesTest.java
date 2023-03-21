@@ -173,7 +173,7 @@ class ElementOccurrencesTest {
     rootNode.addChild(definitionNode);
     rootNode.addChild(usageNode);
     AnalysisResult analysisResult = AnalysisResult.builder().rootNode(rootNode).build();
-    CobolDocumentModel cobolDocumentModel = new CobolDocumentModel("", analysisResult);
+    CobolDocumentModel cobolDocumentModel = new CobolDocumentModel(URI, "", analysisResult);
     TextDocumentPositionParams textDocumentPositionParams =
         new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage);
     SymbolsRepository symbolsRepository = new SymbolsRepository();
@@ -216,7 +216,7 @@ class ElementOccurrencesTest {
     List<DocumentHighlight> highlights =
         new ElementOccurrences(symbolsRepository)
             .findHighlights(
-                new CobolDocumentModel("", analysisResult),
+                new CobolDocumentModel(URI, "", analysisResult),
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage));
     List<DocumentHighlight> expectedHighlights =
         ImmutableList.of(
@@ -233,7 +233,7 @@ class ElementOccurrencesTest {
     List<Location> actualLocations =
         new ElementOccurrences(symbolsRepository)
             .findReferences(
-                new CobolDocumentModel("", analysisResult),
+                new CobolDocumentModel(URI, "", analysisResult),
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), position),
                 new ReferenceContext(false));
     assertEquals(expectedLocations, actualLocations);

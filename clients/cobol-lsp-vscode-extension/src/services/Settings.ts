@@ -22,6 +22,7 @@ import {
     PATHS_ZOWE,
     SERVER_PORT,
     SERVER_RUNTIME,
+    SETTINGS_CPY_LOCAL_PATH,
     SETTINGS_CPY_SECTION,
     SETTINGS_DIALECT,
     SETTINGS_SUBROUTINE_LOCAL_KEY,
@@ -29,7 +30,7 @@ import {
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
-import { loadProcessorGroupConfig, loadProcessorGroupCopybookPaths } from "./ProcessorGroups";
+import { loadProcessorGroupCopybookPaths, loadProcessorGroupCopybookPathsConfig, loadProcessorGroupDialectConfig } from "./ProcessorGroups";
 
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
@@ -80,9 +81,14 @@ export function configHandler(request: any): Array<any> {
             if (item.section === DIALECT_REGISTRY_SECTION) {
                 const object = DialectRegistry.getDialects();
                 result.push(object);
-            } else {
-                const object = loadProcessorGroupConfig(item, vscode.workspace.getConfiguration().get(item.section));
+            } else if (item.section === SETTINGS_DIALECT) {
+                const object = loadProcessorGroupDialectConfig(item, vscode.workspace.getConfiguration().get(item.section));
                 result.push(object);
+            } else if (item.section === SETTINGS_CPY_LOCAL_PATH) {
+                const object = loadProcessorGroupCopybookPathsConfig(item, vscode.workspace.getConfiguration().get(item.section));
+                result.push(object);
+            } else {
+                result.push(vscode.workspace.getConfiguration().get(item.section));
             }
         } catch (error) {
             console.log(error);

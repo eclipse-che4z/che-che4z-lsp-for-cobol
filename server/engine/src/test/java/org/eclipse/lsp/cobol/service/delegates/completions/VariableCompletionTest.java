@@ -86,7 +86,7 @@ class VariableCompletionTest {
   }
 
   private CobolDocumentModel getModel(String text) {
-    return new CobolDocumentModel(
+    return new CobolDocumentModel("",
         text, UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of()));
   }
 }

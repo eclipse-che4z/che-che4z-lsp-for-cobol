@@ -405,7 +405,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     }
     String uri = params.getTextDocument().getUri();
     String text = params.getContentChanges().get(0).getText();
-    docs.computeIfPresent(uri, (k, v) -> new CobolDocumentModel(text, v.getAnalysisResult()));
+    docs.computeIfPresent(uri, (k, v) -> new CobolDocumentModel(uri, text, v.getAnalysisResult()));
     outlineMap.put(uri, new CompletableFuture<>());
     cfAstMap.put(uri, new CompletableFuture<>());
     TextDocumentItem docIdentifier = new TextDocumentItem();
@@ -438,7 +438,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public void didClose(DidCloseTextDocumentParams params) {
     if (disposableLSPStateService.isServerShutdown()) return;
     String uri = params.getTextDocument().getUri();
-    String docText = docs.getOrDefault(uri, new CobolDocumentModel("")).getText();
+    String docText = docs.getOrDefault(uri, new CobolDocumentModel("", uri)).getText();
     LOG.info(format("Document closing invoked on URI %s", uri));
     interruptAnalysis(uri);
     if (copybookIdentificationService.isCopybook(uri, docText, copybookExtensions)) {
@@ -554,7 +554,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         AnalysisConfig config = configurationService.getConfig(uri, processingMode);
         AnalysisResult result = engine.analyze(uri, text, config);
         if (firstTime) {
-          registerDocument(uri, new CobolDocumentModel(text, result));
+          registerDocument(uri, new CobolDocumentModel(uri, text, result));
         } else {
           ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
         }

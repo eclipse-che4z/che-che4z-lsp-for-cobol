@@ -48,14 +48,14 @@ public class CopybookNameCompletion implements Completion {
   public @NonNull Collection<CompletionItem> getCompletionItems(
       @NonNull String token, @Nullable CobolDocumentModel document) {
 
-    return copybookNameService.getNames().stream()
+    return copybookNameService.getNames(document == null ? null : document.getUri()).stream()
         .map(CopybookName::getQualifiedName)
         .filter(DocumentationUtils.startsWithIgnoreCase(token))
-        .map(this::toCopybookCompletion)
+        .map(CopybookNameCompletion::toCopybookCompletion)
         .collect(toList());
   }
 
-  private CompletionItem toCopybookCompletion(String name) {
+  private static CompletionItem toCopybookCompletion(String name) {
     CompletionItem item = new CompletionItem(name);
     item.setLabel(name);
     item.setInsertText(name);

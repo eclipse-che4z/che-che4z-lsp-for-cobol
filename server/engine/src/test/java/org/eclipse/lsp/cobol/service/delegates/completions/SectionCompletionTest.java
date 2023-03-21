@@ -39,7 +39,7 @@ class SectionCompletionTest {
   void testCompletionEmptyResult() {
     assertThat(
         completion.getCompletionItems(
-            "smth", new CobolDocumentModel("", AnalysisResult.builder().build())),
+            "smth", new CobolDocumentModel("", "", AnalysisResult.builder().build())),
         is(empty()));
   }
 

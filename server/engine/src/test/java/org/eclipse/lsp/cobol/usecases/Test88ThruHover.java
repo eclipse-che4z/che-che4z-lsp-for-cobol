@@ -72,7 +72,7 @@ class Test88ThruHover {
 
     final Hover actual =
         provider.getHover(
-            new CobolDocumentModel("", result),
+            new CobolDocumentModel("", "", result),
             new TextDocumentPositionParams(
                 new TextDocumentIdentifier(DOCUMENT_URI), new Position(4, 15)));
 
