@@ -9,7 +9,7 @@
 
 # DaCo Dialect Support
 
-DaCo Dialect Support is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension which enables language server protocol features for the DaCo dialect of COBOL, and support for MAID copybooks.
+DaCo Dialect Support is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension. This add-on enables language server protocol features for the DaCo dialect of COBOL, and support for MAID copybooks.
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ DaCo Dialect Support enables copybook support features of the COBOL Language Sup
 
 To enable copybook support, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. 
 
-Specify paths to your IDMS copybooks in the IDMS Dialect Support extension settings as follows:
+Specify paths to your MAID copybooks in the DaCo Dialect Support extension settings as follows:
 * Specify mainframe data sets under **Daco: Paths-dsn**
 * Specify USS paths under **Daco: Paths-uss**
 * Specify local paths under **Daco: Paths-local**
@@ -50,7 +50,7 @@ To use processor groups with MAID copybooks, add the `preprocessor` array to ind
             ],
              "preprocessor": [
                 {
-                    "name": "DaCo"
+                    "name": "DACO"
                 },
             ],
         },
@@ -58,4 +58,4 @@ To use processor groups with MAID copybooks, add the `preprocessor` array to ind
 }
 ```
 
-In the above example, the IDMS preprocessor is enabled on the processor group GROUP1. This enables the use of MAID copybooks with the programs linked to it in `pgm_conf.json`.
+The above example adds the DaCo preprocessor to the processor group GROUP1 and enables the use of MAID copybooks with the programs that are linked to GROUP1 in the `pgm_conf.json` file.
