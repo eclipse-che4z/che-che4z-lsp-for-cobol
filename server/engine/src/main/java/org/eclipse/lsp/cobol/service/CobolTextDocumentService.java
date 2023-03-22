@@ -490,7 +490,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         AnalysisResult result = engine.analyze(uri, text, config);
         ThreadInterruptionUtil.checkThreadInterrupted();
         ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
-        notifyAnalysisFinished(uri, extractCopybookUsages(result), processingMode);
+        notifyAnalysisFinished(uri, extractCopybookUris(result), processingMode);
         if (!docs.containsKey(uri)) {
           return;
         }
