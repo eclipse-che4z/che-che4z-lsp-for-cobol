@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultimap;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
@@ -38,7 +37,7 @@ class NodeTest {
 
   @Test
   void getDepthFirstStream() {
-    Node rootNode = new RootNode(LOCALITY, ImmutableMultimap.of());
+    Node rootNode = new RootNode(LOCALITY);
     Node firstProg = new ProgramNode(LOCALITY);
     Node sectionNode = new SectionNode(LOCALITY, SectionType.WORKING_STORAGE);
     Node definition = VariableDefinitionNode.builder().build();
@@ -67,7 +66,7 @@ class NodeTest {
 
   @Test
   void getParentByType() {
-    Node rootNode = new RootNode(LOCALITY, ImmutableMultimap.of());
+    Node rootNode = new RootNode(LOCALITY);
     Node program = new ProgramNode(LOCALITY);
     rootNode.addChild(program);
     Node nestedProgram = new ProgramNode(LOCALITY);

@@ -80,7 +80,9 @@ export class SmartOutdentCommandProvider extends SmartCommandProvider {
         }
         const updatedRange = this.handleRangeSelectionSmartOutCommand(editor, edit, selections.rangeSelection);
         newSelections = newSelections.concat(updatedRange);
-        editor.selections = newSelections;
+        if (newSelections.length > 0) {
+            editor.selections = newSelections;
+        }
     }
 
     private  handleIndividualSmartOutCommand(editor: vscode.TextEditor, edit: vscode.TextEditorEdit, position: vscode.Position, newSelections: vscode.Selection[]) {

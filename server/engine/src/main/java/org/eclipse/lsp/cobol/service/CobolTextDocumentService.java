@@ -25,6 +25,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
@@ -552,16 +553,14 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
             .build());
   }
 
-  private List<String> extractCopybookUsages(AnalysisResult result) {
+  private List<String> extractCopybookUris(AnalysisResult result) {
     return result
         .getRootNode()
         .getDepthFirstStream()
         .filter(hasType(COPY))
         .map(CopyNode.class::cast)
-        .map(CopyNode::getUsages)
-        .filter(usages -> !usages.isEmpty())
-        .flatMap(List::stream)
-        .map(Location::getUri)
+        .map(CopyNode::getUri)
+        .filter(def -> !StringUtils.isEmpty(def))
         .collect(toList());
   }
 

@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.service;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.awaitility.Awaitility;
@@ -24,10 +23,8 @@ import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
-import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
@@ -634,28 +631,24 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testAnalysisFinishedNotification() {
     AnalysisResult analysisResult =
         AnalysisResult.builder()
-            .rootNode(new RootNode(Locality.builder().build(), ImmutableMultimap.of()))
+            .rootNode(new RootNode(Locality.builder().build()))
             .build();
 
-    RootNode rootNode = new RootNode(Locality.builder().build(), ImmutableMultimap.of());
+    RootNode rootNode = new RootNode(Locality.builder().build());
     analysisResult.getRootNode().addChild(rootNode);
-    CopyNode parent = new CopyNode(Locality.builder().uri(DOCUMENT_URI).build(), "PARENT");
-    CopyNode nested = new CopyNode(Locality.builder().uri(PARENT_CPY_URI).build(), "NESTED");
+    CopyNode parent = new CopyNode(Locality.builder().uri(DOCUMENT_URI).build(),
+        Locality.builder().uri(DOCUMENT_URI).build().toLocation(),
+        "PARENT", DOCUMENT_URI);
+
+    CopyNode nested = new CopyNode(Locality.builder().uri(PARENT_CPY_URI).build(),
+        Locality.builder().uri(PARENT_CPY_URI).build().toLocation(),
+        "NESTED", PARENT_CPY_URI);
+
     CopyNode nested2 =
-        new CopyNode(Locality.builder().uri(NESTED_CPY_URI).build(), "NESTED_CPY_URI");
-    CopyDefinition parentDefinition =
-        new CopyDefinition(new Location(ImplicitCodeUtils.createLocation(), new Range()), "PARENT");
-    parentDefinition.addUsages(parent);
-    parent.setDefinition(parentDefinition);
-    CopyDefinition nestedDefinition =
-        new CopyDefinition(new Location(ImplicitCodeUtils.createLocation(), new Range()), "NESTED");
-    nestedDefinition.addUsages(nested);
-    nested.setDefinition(nestedDefinition);
-    CopyDefinition nested2Definition =
-        new CopyDefinition(
-            new Location(ImplicitCodeUtils.createLocation(), new Range()), "NESTED_CPY_URI");
-    nested2Definition.addUsages(nested2);
-    nested2.setDefinition(nested2Definition);
+        new CopyNode(Locality.builder().uri(NESTED_CPY_URI).build(),
+            Locality.builder().uri(NESTED_CPY_URI).build().toLocation(),
+            "NESTED_CPY_URI", NESTED_CPY_URI);
+
     rootNode.addChild(parent);
     rootNode.addChild(nested);
     rootNode.addChild(nested2);

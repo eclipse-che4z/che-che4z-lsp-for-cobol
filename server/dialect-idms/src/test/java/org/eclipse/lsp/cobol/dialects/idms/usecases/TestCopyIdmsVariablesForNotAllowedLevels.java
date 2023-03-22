@@ -114,7 +114,7 @@ public class TestCopyIdmsVariablesForNotAllowedLevels {
             new DiagnosticRelatedInformation(
                 new Location(
                     "file:///c:/workspace/document.cbl",
-                    new Range(new Position(9, 11), new Position(9, 30))),
+                    new Range(new Position(9, 11), new Position(9, 29))),
                 "Copy IDMS source")));
 
     AnalysisResult result =

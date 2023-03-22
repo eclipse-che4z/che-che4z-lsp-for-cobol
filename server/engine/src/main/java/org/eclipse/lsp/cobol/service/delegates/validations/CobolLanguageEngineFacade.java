@@ -103,6 +103,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
         .flatMap(Collection::stream)
         .map(Location::getUri)
         .filter(it -> !ImplicitCodeUtils.isImplicit(it))
+        .distinct()
         .collect(toList());
 
     return AnalysisResult.builder()

@@ -34,7 +34,6 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.dialects.daco.nodes.DaCoCopyFromNode;
@@ -165,11 +164,17 @@ public class DaCoMaidProcessor {
       String layoutId = matcher.group("layoutId");
       String layoutUsage = matcher.group("layoutUsage");
       if (level != null) {
-        Range range =
+        Range statementRange =
+            new Range(
+                new Position(lineNumber, matcher.start("level")),
+                new Position(lineNumber, matcher.end("layoutId")));
+        statementRange = context.getExtendedSource().mapLocationUnsafe(statementRange).getRange();
+
+        Range nameRange =
             new Range(
                 new Position(lineNumber, matcher.start("layoutId")),
                 new Position(lineNumber, matcher.end("layoutId")));
-        range = context.getExtendedSource().mapLocationUnsafe(range).getRange();
+        nameRange = context.getExtendedSource().mapLocationUnsafe(nameRange).getRange();
         copyMaidNodes.add(
             createMaidCopybookNode(
                 context,
@@ -177,7 +182,8 @@ public class DaCoMaidProcessor {
                 layoutId,
                 layoutUsage,
                 lastSuffix,
-                range,
+                statementRange,
+                nameRange,
                 errors));
       }
     }
@@ -189,17 +195,13 @@ public class DaCoMaidProcessor {
       String layoutId,
       String layoutUsage,
       String lastSuffix,
-      Range range,
+      Range statementRange,
+      Range nameRange,
       List<SyntaxError> errors) {
-    Locality locality =
-        Locality.builder().uri(context.getExtendedSource().getUri()).range(range).build();
-    DaCoCopyNode cbNode =
-        new DaCoCopyNode(
-            locality,
-            makeCopybookFileName(startingLevel, layoutId, layoutUsage),
-            layoutUsage,
-            startingLevel,
-            lastSuffix);
+    Locality statementLocality =
+        Locality.builder().uri(context.getExtendedSource().getUri()).range(statementRange).build();
+
+    Locality nameLocality = Locality.builder().uri(context.getExtendedSource().getUri()).range(nameRange).build();
 
     CopybookName copybookName =
         new CopybookName(
@@ -212,19 +214,27 @@ public class DaCoMaidProcessor {
             context.getExtendedSource().getUri(),
             context.getCopybookConfig(),
             true);
+
+    DaCoCopyNode cbNode =
+        new DaCoCopyNode(
+            statementLocality,
+            nameLocality.toLocation(),
+            makeCopybookFileName(startingLevel, layoutId, layoutUsage),
+            layoutUsage,
+            startingLevel,
+            lastSuffix,
+            copybookModel.getUri());
+
     if (copybookModel.getContent() != null) {
-      Location location =
-          new Location(copybookModel.getUri(), new Range(new Position(), new Position()));
-      CopyDefinition definition = new CopyDefinition(location, copybookModel.getUri());
-      cbNode.setDefinition(definition);
       checkWrkSuffix(cbNode, layoutUsage, errors);
       String suffix = calculateSuffix(layoutUsage, cbNode);
-      parseCopybookContent(copybookModel, startingLevel, suffix).forEach(cbNode::addChild);
+      parseCopybookContent(copybookModel, startingLevel, suffix)
+          .forEach(cbNode::addChild);
     } else {
       SyntaxError error =
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.DIALECT)
-              .location(cbNode.getLocality().toOriginalLocation())
+              .location(nameLocality.toOriginalLocation())
               .suggestion(
                   messageService.getMessage(
                       "GrammarPreprocessorListener.errorSuggestion",
@@ -282,7 +292,7 @@ public class DaCoMaidProcessor {
     parser.addParseListener(treeListener);
 
     DaCoCopybookVisitor visitor =
-        new DaCoCopybookVisitor(copybookModel.getUri(), startingLevel, suffix);
+        new DaCoCopybookVisitor(copybookModel.getUri(), startingLevel, suffix, copybookModel.getCopybookId().toString());
     ParserRuleContext ctx = parser.dataDescriptionEntries();
     return visitor.visit(ctx);
   }

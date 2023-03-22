@@ -128,8 +128,7 @@ public class VariableDefinitionUtil {
             .collect(Collectors.toList());
 
     allCopybooks.stream()
-        .filter(c -> c.getDefinition() != null)
-        .filter(c -> c.getDefinition().getLocation() != null)
+        .filter(c -> c.getUri() != null)
         .forEach(
             c ->
                 new ArrayList<>(variables)
@@ -141,7 +140,7 @@ public class VariableDefinitionUtil {
                             v ->
                                 v.getLocality()
                                     .getUri()
-                                    .equals(c.getDefinition().getLocation().getUri()))
+                                    .equals(c.getUri()))
                         .forEach(
                             v -> {
                               variables.remove(v);
