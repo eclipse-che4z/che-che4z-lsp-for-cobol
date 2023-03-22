@@ -117,7 +117,7 @@ class CopybookPreprocessorService {
       if (hierarchy.hasRecursion(name)) {
         errors.add(copybookErrorService.addRecursionError(name.getQualifiedName(), statementLocality.toBuilder().copybookId(null).build()));
         currentDocument.replace(VisitorHelper.constructRange(ctx), "");
-        copybooks.define(copybookName, null, new Location(copybook.getUri(), new Range(new Position(0, 0), new Position(0, 0))));
+        copybooks.define(copybookName, null, currentDocument.getUri(), copybook.getUri());
         return;
       }
       copybooks.addStatement(copybookName, null, statementLocality);
@@ -130,7 +130,7 @@ class CopybookPreprocessorService {
       } else {
         extendedSource.replace(currentDocument, range, copybookDocument);
       }
-      copybooks.define(copybookName, null, new Location(copybook.getUri(), new Range(new Position(0, 0), new Position(0, 0))));
+      copybooks.define(copybookName, null, currentDocument.getUri(), copybook.getUri());
     } else {
       currentDocument.replace(VisitorHelper.constructRange(ctx), "");
       errors.add(copybookErrorService.addMissingCopybook(name.getQualifiedName(), nameLocality));
@@ -153,7 +153,7 @@ class CopybookPreprocessorService {
   private DocumentMap processCopybookWithReplacement(List<ReplacementContext> replacementContext, CopybookModel copybook,
                                                         Locality nameLocality,
                                                         Locality statementLocality) {
-    hierarchy.push(new CopybookUsage(copybook.getCopybookName(), CopybooksRepository.toId(copybook.getCopybookName().getQualifiedName(), null), nameLocality));
+    hierarchy.push(new CopybookUsage(copybook.getCopybookName(), CopybooksRepository.toId(copybook.getCopybookName().getQualifiedName(), null, nameLocality.getUri()), nameLocality));
     if (replacementContext != null) {
       replacementContext.forEach(h -> hierarchy.addTextReplacing(h.getReplacement(), h.getLocality().getUri(), h.getLocality().getRange()));
     }

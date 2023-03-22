@@ -38,7 +38,7 @@ class TestCopyMaidWithWrkShowsErrorOnShortVariableName {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "        01 {$*A}.\n"
-          + "            05 COPY MAID {_{~BHTRGL-XBG!DaCo}|1_} WRK.\n"
+          + "            {_05 COPY MAID {~BHTRGL-XBG!DaCo}|1_} WRK.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-X}.";
 

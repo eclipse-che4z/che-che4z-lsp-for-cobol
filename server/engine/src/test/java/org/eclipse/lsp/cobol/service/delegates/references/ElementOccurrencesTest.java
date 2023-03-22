@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.service.delegates.references;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNameNode;
@@ -58,12 +57,12 @@ class ElementOccurrencesTest {
     CopybooksRepository copyBook = new CopybooksRepository();
     copyBook.addUsage(
         ELEMENT_NAME, null, new Location(URI, new Range(new Position(3, 0), new Position(3, 5))));
-    copyBook.define(ELEMENT_NAME, null, definition);
+    copyBook.define(ELEMENT_NAME, null, URI, "copybookUri");
     VariableNode variableNodeInOneFile =
         createDefinitionNode(ELEMENT_NAME, definition.getUri(), definition.getRange());
     VariableUsageNode variableUsageNodeInOneFile =
         createUsageNode(variableNodeInOneFile, usage.getUri(), usage.getRange());
-    RootNode rootNodeForOneFile = new RootNode(rootLocality, copyBook.getDefinitions());
+    RootNode rootNodeForOneFile = new RootNode(rootLocality);
     rootNodeForOneFile.addChild(variableNodeInOneFile);
     rootNodeForOneFile.addChild(variableUsageNodeInOneFile);
     VariableNode variableNodeInTwoFiles =
@@ -71,7 +70,7 @@ class ElementOccurrencesTest {
     VariableUsageNode variableUsageNodeInTwoFiles =
         createUsageNode(
             variableNodeInTwoFiles, usageInOtherFile.getUri(), usageInOtherFile.getRange());
-    RootNode rootNodeForTwoFiles = new RootNode(rootLocality, copyBook.getDefinitions());
+    RootNode rootNodeForTwoFiles = new RootNode(rootLocality);
     rootNodeForTwoFiles.addChild(variableNodeInTwoFiles);
     rootNodeForTwoFiles.addChild(variableUsageNodeInTwoFiles);
     VariableNode variableNodeWithTwoUsages =
@@ -81,7 +80,7 @@ class ElementOccurrencesTest {
     VariableUsageNode variableUsageNode2 =
         createUsageNode(
             variableNodeWithTwoUsages, usageInOtherFile.getUri(), usageInOtherFile.getRange());
-    RootNode rootNodeWithTwoUsages = new RootNode(rootLocality, copyBook.getDefinitions());
+    RootNode rootNodeWithTwoUsages = new RootNode(rootLocality);
     rootNodeWithTwoUsages.addChild(variableNodeWithTwoUsages);
     rootNodeWithTwoUsages.addChild(variableUsageNode1);
     rootNodeWithTwoUsages.addChild(variableUsageNode2);
@@ -168,16 +167,14 @@ class ElementOccurrencesTest {
             Locality.builder()
                 .uri(URI)
                 .range(new Range(new Position(1, 1), new Position(5, 1)))
-                .build(),
-            copyBook.getDefinitions());
+                .build());
     rootNode.addChild(definitionNode);
     rootNode.addChild(usageNode);
     AnalysisResult analysisResult = AnalysisResult.builder().rootNode(rootNode).build();
     CobolDocumentModel cobolDocumentModel = new CobolDocumentModel("", analysisResult);
     TextDocumentPositionParams textDocumentPositionParams =
         new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage);
-    SymbolsRepository symbolsRepository = new SymbolsRepository();
-    ElementOccurrences elementOccurrences = new ElementOccurrences(symbolsRepository);
+    ElementOccurrences elementOccurrences = new ElementOccurrences();
     assertEquals(
         ImmutableList.of(definition),
         elementOccurrences.findDefinitions(cobolDocumentModel, textDocumentPositionParams));
@@ -206,15 +203,13 @@ class ElementOccurrencesTest {
             Locality.builder()
                 .uri(URI)
                 .range(new Range(new Position(1, 1), new Position(5, 1)))
-                .build(),
-            copybook.getDefinitions());
+                .build());
     rootNode.addChild(definitionNode);
     rootNode.addChild(variableUsageNode);
     rootNode.addChild(variableUsageNodeInOtherFile);
     AnalysisResult analysisResult = AnalysisResult.builder().rootNode(rootNode).build();
-    SymbolsRepository symbolsRepository = new SymbolsRepository();
     List<DocumentHighlight> highlights =
-        new ElementOccurrences(symbolsRepository)
+        new ElementOccurrences()
             .findHighlights(
                 new CobolDocumentModel("", analysisResult),
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage));
@@ -229,9 +224,8 @@ class ElementOccurrencesTest {
   @MethodSource("variousData")
   void variousCases(
       AnalysisResult analysisResult, Position position, List<Location> expectedLocations) {
-    SymbolsRepository symbolsRepository = new SymbolsRepository();
     List<Location> actualLocations =
-        new ElementOccurrences(symbolsRepository)
+        new ElementOccurrences()
             .findReferences(
                 new CobolDocumentModel("", analysisResult),
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), position),

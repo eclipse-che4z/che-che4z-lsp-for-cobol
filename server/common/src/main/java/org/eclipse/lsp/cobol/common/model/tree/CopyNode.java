@@ -17,11 +17,13 @@ package org.eclipse.lsp.cobol.common.model.tree;
 import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.*;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,32 +32,47 @@ import java.util.Optional;
 @Getter
 public class CopyNode extends Node implements Context {
   private final String name;
-  @Setter @EqualsAndHashCode.Exclude @ToString.Exclude private CopyDefinition definition;
+  @EqualsAndHashCode.Exclude @ToString.Exclude private final Location nameLocation;
+  private final String uri;
+  private final List<Location> usages = new LinkedList<>();
 
-  public CopyNode(Locality locality, String copyBookName) {
-    super(locality, NodeType.COPY);
+  public CopyNode(Locality statementLocality, Location nameLocation, String copyBookName, String uri) {
+    super(statementLocality, NodeType.COPY);
     this.name = copyBookName;
+    this.nameLocation = nameLocation;
+    this.uri = uri;
+    usages.add(nameLocation);
   }
 
-  public CopyNode(Locality locality, String copyBookName, String dialect) {
-    super(locality, NodeType.COPY, dialect);
+  public CopyNode(Locality statementLocality, Location nameLocation, String copyBookName, String dialect, String uri) {
+    super(statementLocality, NodeType.COPY, dialect);
     this.name = copyBookName;
+    this.nameLocation = nameLocation;
+    this.uri = uri;
+    usages.add(nameLocation);
   }
 
   @Override
   public List<Location> getDefinitions() {
-    return Optional.ofNullable(definition).map(CopyDefinition::getDefinitions).orElse(ImmutableList.of());
+    return Optional.ofNullable(uri).map(u -> ImmutableList.of(new Location(u, new Range(new Position(), new Position()))))
+        .orElse(ImmutableList.of());
   }
 
   @Override
   public List<Location> getUsages() {
-    return Optional.ofNullable(definition)
-        .map(CopyDefinition::getUsages)
-        .orElseGet(ImmutableList::of);
+    return ImmutableList.copyOf(usages);
   }
 
   @Override
   public String getDialect() {
     return super.getDialect();
+  }
+
+  /**
+   * Add a copybook usage
+   * @param nameLocation is the copybook name location
+   */
+  public void addUsage(Location nameLocation) {
+    usages.add(nameLocation);
   }
 }
