@@ -202,7 +202,7 @@ We recommend that you refresh your copybooks from time to time. To refresh your 
 
 ### Configure Processor Groups
 
-Use processor groups to specify copybook folders and data sets containing copybooks to use with specific programs. You define processor groups in a `proc_grps.json` file and associate them with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
+Use processor groups to specify copybook folders and data sets that contain copybooks to use with specific programs. You define processor groups in a `proc_grps.json` file and associate them with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
 
 The `proc_grps.json` file has the following format:
 ```
@@ -234,9 +234,9 @@ The `pgm_conf.json` file has the following format:
 }
 ```
 
-In the above example, copybooks for PROGRAM1 are used from the libraries LIB1 and LIB2, and copybooks for PROGRAM2 are used from the libraries LIB3 and LIB4.
+The above example uses copybooks from libraries LIB1 and LIB2 for PROGRAM1, and copybooks from libraries LIB3 and LIB4 for PROGRAM2.
 
-You can specify mainframe data sets, USS data sets or local paths in the `libs` array. Libraries that you specify here take priority over those specified in the extension settings.
+You can specify libraries as mainframe data sets, USS data sets or local paths in the `libs` array. These libraries take priority over the libraries specified in the extension settings.
 
 ### Copybook Support Features
 
