@@ -112,6 +112,7 @@ public class CopybookServiceImpl implements CopybookService {
       @NonNull CopybookConfig copybookConfig,
       boolean preprocess) {
     try {
+      ThreadInterruptionUtil.checkThreadInterrupted();
       return copybookCache.get(copybookId, programDocumentUri, () -> {
         CopybookModel copybookModel = resolveSync(copybookName, programDocumentUri, copybookConfig);
         if (preprocess && copybookModel.getUri() != null) {

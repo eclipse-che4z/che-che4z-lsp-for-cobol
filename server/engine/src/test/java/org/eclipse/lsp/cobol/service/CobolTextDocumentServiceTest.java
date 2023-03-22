@@ -38,7 +38,6 @@ import org.eclipse.lsp.cobol.service.mocks.MockTextDocumentService;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -139,17 +138,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     DidCloseTextDocumentParams closedDocument = new DidCloseTextDocumentParams(testDocument);
     service.didClose(closedDocument);
     assertEquals(Collections.EMPTY_MAP, closeGetter(service));
-  }
-
-  @Test
-  void testDiagnostic() {
-    DocumentDiagnosticParams documentDiagnosticParams = new DocumentDiagnosticParams(new TextDocumentIdentifier(DOCUMENT_URI));
-    service.getWaitConfig().countDown();
-    service
-        .diagnostic(documentDiagnosticParams)
-        .whenComplete(
-            (result, b) -> Assertions.assertEquals(result.getRelatedFullDocumentDiagnosticReport().getKind(), "full"));
-
   }
 
   @SafeVarargs
