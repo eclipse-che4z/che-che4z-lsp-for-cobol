@@ -112,6 +112,11 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
     when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
+    service.notifyExtensionConfig(ImmutableList.of());
+    service.didOpen(
+            new DidOpenTextDocumentParams(
+                    new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
+
     service.didChange(
         new DidChangeTextDocumentParams(
             new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0), textEdits));
@@ -119,8 +124,8 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     if (opt.isPresent()) {
       opt.get().get();
     }
-    verify(engine).analyze(anyString(), anyString(), any(AnalysisConfig.class));
-    verify(communications).publishDiagnostics(anyMap());
+    verify(engine, times(2)).analyze(anyString(), anyString(), any(AnalysisConfig.class));
+    verify(communications, times(2)).publishDiagnostics(anyMap());
   }
 
   @Test
@@ -295,7 +300,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
         .thenReturn(AnalysisResult.builder().build());
     when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(SKIP));
-    doNothing().when(communications).publishDiagnostics(anyMap());
 
     //tests when copybook dir is configured, shouldn't be analyzed
     mockSettingServiceForCopybooks(Boolean.TRUE);

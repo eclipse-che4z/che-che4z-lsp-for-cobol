@@ -271,7 +271,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     Supplier<List<? extends DocumentHighlight>> listSupplier =
         () ->
             docs.containsKey(uri)
-                ? occurrences.findHighlights(docs.get(uri), params)
+                ? occurrences.findHighlights(docs.getOrDefault(uri, new CobolDocumentModel("")), params)
                 : Collections.emptyList();
     return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
             disposableLSPStateService, listSupplier, executors.getThreadPoolExecutor())
@@ -315,7 +315,14 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       LOG.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
       return;
     }
+    if (!isCopybook(uri, text, copybookExtensions)) {
+      registerDocument(uri, new CobolDocumentModel(text));
+    }
     analyzeDocumentFirstTime(uri, text, false);
+  }
+
+  private boolean isCopybook(String uri, String text, List<String> copybookExtensions) {
+    return copybookIdentificationService.isCopybook(uri, text, copybookExtensions);
   }
 
   @SneakyThrows
@@ -332,8 +339,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     TextDocumentItem docIdentifier = new TextDocumentItem();
     docIdentifier.setText(text);
     docIdentifier.setUri(uri);
-    if (copybookIdentificationService.isCopybook(
-        docIdentifier.getUri(), docIdentifier.getText(), copybookExtensions)) {
+    if (isCopybook(docIdentifier.getUri(), docIdentifier.getText(), copybookExtensions)) {
       reanalyseOpenedPrograms(params, uri);
       return;
     }
@@ -367,7 +373,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     String docText = ofNullable(docs.remove(uri)).map(CobolDocumentModel::getText).orElse("");
     LOG.info(format("Document closing invoked on URI %s", uri));
     interruptAnalysis(uri);
-    if (copybookIdentificationService.isCopybook(uri, docText, copybookExtensions)) {
+    if (isCopybook(uri, docText, copybookExtensions)) {
       return;
     }
 
@@ -456,7 +462,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
               doAnalysis(uri, text, userRequest, true);
               return null;
             });
-    if (!copybookIdentificationService.isCopybook(uri, text, copybookExtensions)) {
+    if (!isCopybook(uri, text, copybookExtensions)) {
       communications.notifyProgressBegin(uri);
     }
     executors.getThreadPoolExecutor().submit(task);
@@ -475,19 +481,18 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                             ? copybookProcessingMode
                             : CopybookProcessingMode.SKIP);
 
-        if (firstTime && copybookIdentificationService.isCopybook(uri, text, waitExtensionConfig())) {
+        if (firstTime && isCopybook(uri, text, waitExtensionConfig())) {
             outlineMap.get(uri).complete(Collections.emptyList());
             return;
         }
         AnalysisConfig config = configurationService.getConfig(uri, processingMode);
         AnalysisResult result = engine.analyze(uri, text, config);
         ThreadInterruptionUtil.checkThreadInterrupted();
-        if (firstTime) {
-          registerDocument(uri, new CobolDocumentModel(text, result));
-        } else {
-          ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
-        }
+        ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
         notifyAnalysisFinished(uri, extractCopybookUsages(result), processingMode);
+        if (!docs.containsKey(uri)) {
+          return;
+        }
         errorsByFileForEachProgram.put(uri, result.getDiagnostics());
         communications.publishDiagnostics(collectAllDiagnostics());
         if (firstTime) {
@@ -596,7 +601,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   }
 
   private void registerDocument(String uri, CobolDocumentModel document) {
-    docs.put(uri, document);
+      docs.put(uri, document);
   }
 
   private String createDescriptiveErrorMessage(String action, String uri) {
