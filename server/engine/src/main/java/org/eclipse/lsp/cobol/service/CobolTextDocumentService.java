@@ -476,6 +476,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                             : CopybookProcessingMode.SKIP);
 
         if (firstTime && copybookIdentificationService.isCopybook(uri, text, waitExtensionConfig())) {
+            outlineMap.get(uri).complete(Collections.emptyList());
             return;
         }
         AnalysisConfig config = configurationService.getConfig(uri, processingMode);
