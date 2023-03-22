@@ -31,9 +31,9 @@ DaCo Dialect Support enables copybook support features of the COBOL Language Sup
 To enable copybook support, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. 
 
 Specify paths to your IDMS copybooks in the IDMS Dialect Support extension settings as follows:
-* Specify mainframe data sets under **Maid: Paths-dsn**
-* Specify USS paths under **Maid: Paths-uss**
-* Specify local paths under **Maid: Paths-local**
+* Specify mainframe data sets under **Daco: Paths-dsn**
+* Specify USS paths under **Daco: Paths-uss**
+* Specify local paths under **Daco: Paths-local**
 
 ### Using Processor Groups
 
