@@ -60,33 +60,34 @@ public class Completions {
    * on the server yet.
    *
    * @param document - document model that should be used to retrieve the required token. May be
-   *     null.
-   * @param params - request parameters that contain the position of the required token in the
-   *     document
+   *                 null.
+   * @param params   - request parameters that contain the position of the required token in the
+   *                 document
    * @return a CompletionList with completion suggestions that do not contain documentation
    */
   @NonNull
   public CompletionList collectFor(
-      @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
+          @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
     return new CompletionList(false, collectCompletions(document, params));
   }
 
   @NonNull
   private List<CompletionItem> collectCompletions(
-      @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
+          @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
     String token = retrieveToken(document, params);
     return providers
-        .parallelStream()
-        .map(it -> it.getCompletionItems(token, document))
-        .flatMap(Collection::stream)
-        .collect(toList());
+            .parallelStream()
+            .map(it -> it.getCompletionItems(token, document))
+            .flatMap(Collection::stream)
+            .distinct()
+            .collect(toList());
   }
 
   @NonNull
   private static String retrieveToken(
-      @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
+          @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
     return Optional.ofNullable(document)
-        .map(it -> it.getTokenBeforePosition(params.getPosition()))
-        .orElse("");
+            .map(it -> it.getTokenBeforePosition(params.getPosition()))
+            .orElse("");
   }
 }
