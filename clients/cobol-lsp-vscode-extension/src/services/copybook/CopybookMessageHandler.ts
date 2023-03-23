@@ -54,7 +54,7 @@ function getTargetFolderForCopybook(folderKind: string | CopybookFolderKind, cob
     let result: string[];
     switch (folderKind) {
         case CopybookFolderKind[CopybookFolderKind.local]:
-            result = SettingsService.getCopybookLocalPath(cobolFileName.replace(/\.[^/.]+$/, ""), dialectType);
+            result = SettingsService.getCopybookLocalPath(cobolFileName, dialectType);
             break;
         case CopybookFolderKind[CopybookFolderKind["downloaded-dsn"]]:
             result = SettingsService.getDsnPath(cobolFileName, dialectType).map(dnsPath => CopybookURI.createDatasetPath(SettingsService.getProfileName(), dnsPath));

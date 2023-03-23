@@ -28,7 +28,38 @@ type ProcessorsConfig = {
     pgroups: ProcessorConfig[];
 }
 
-function loadProcessorsConfig(programName: string): ProcessorConfig | undefined {
+function matchProcessorGroup(pgmCfg: ProgramsConfig, documentPath: string, workspacePath: string): string | undefined {
+    if (!documentPath.startsWith(workspacePath)) {
+        return undefined;
+    }
+    let relativeDocPath = documentPath.substring(workspacePath.length);
+    if (relativeDocPath.startsWith("/")) {
+        relativeDocPath = relativeDocPath.substring(1);
+    }
+
+    const candidates = [];
+    let result = undefined;
+    pgmCfg.pgms.forEach(v => {
+        // exact match
+        if (relativeDocPath.endsWith(v.program)) {
+            result = v.pgroup
+            return;
+        }
+        const m = new Minimatch(v.program, { nocase: true });
+        if (m.match(relativeDocPath)) {
+            candidates.push(v.pgroup);
+        }
+    });
+    if (!result) {
+        if (candidates.length === 0) {
+            return undefined;
+        }
+        result = candidates[0];
+    }
+    return result;
+}
+
+function loadProcessorsConfig(documentPath: string): ProcessorConfig | undefined {
     const ws = SettingsUtils.getWorkspaceFoldersPath(true);
     if (ws.length < 1) {
         return undefined;
@@ -41,26 +72,8 @@ function loadProcessorsConfig(programName: string): ProcessorConfig | undefined 
     }
     const procCfg: ProcessorsConfig = JSON.parse(fs.readFileSync(procCfgPath).toString());
     const pgmCfg: ProgramsConfig = JSON.parse(fs.readFileSync(pgmCfgPath).toString());
-    let pgroup: string | undefined;
+    const pgroup = matchProcessorGroup(pgmCfg, documentPath, ws[0]);
 
-    const candidates = [];
-    pgmCfg.pgms.forEach(v => {
-        // exact match
-        if (v.program === programName) {
-            pgroup = v.pgroup
-            return;
-        }
-        const m = new Minimatch(v.program, { nocase: true });
-        if (m.match(programName)) {
-            candidates.push(v.pgroup);
-        }
-    });
-    if (!pgroup) {
-        if (candidates.length === 0) {
-            return undefined;
-        }
-        pgroup = candidates[0];
-    }
     let result = undefined;
     procCfg.pgroups.forEach(p => {
         if (pgroup == p.name) {
@@ -71,9 +84,8 @@ function loadProcessorsConfig(programName: string): ProcessorConfig | undefined 
     return result;
 }
 
-export function loadProcessorGroupCopybookPaths(cobolFileName: string, dialectType: string): string[] {
-    const programName = cobolFileName.replace(/\.[^/.]+$/, "");
-    const pgCfg = loadProcessorsConfig(programName);
+export function loadProcessorGroupCopybookPaths(documentPath: string, dialectType: string): string[] {
+    const pgCfg = loadProcessorsConfig(documentPath);
     if (pgCfg == undefined) {
         return [];
     }
@@ -98,7 +110,7 @@ export function loadProcessorGroupCopybookPathsConfig(item: { scopeUri: string, 
         return configObject;
     }
     try {
-        const programName = path.basename(item.scopeUri.replace(/\.[^/.]+$/, ""));
+        const programName = path.basename(item.scopeUri);
         const pgCfg = loadProcessorsConfig(programName);
         if (pgCfg === undefined) {
             return configObject;
@@ -111,11 +123,11 @@ export function loadProcessorGroupCopybookPathsConfig(item: { scopeUri: string, 
 }
 
 export function loadProcessorGroupDialectConfig(item: { scopeUri: string, section: any }, configObject: unknown): unknown {
-    if (!item.  scopeUri) {
+    if (!item.scopeUri) {
         return configObject;
     }
     try {
-        const programName = path.basename(item.scopeUri.replace(/\.[^/.]+$/, ""));
+        const programName = path.basename(item.scopeUri);
         const pgCfg = loadProcessorsConfig(programName);
         if (pgCfg === undefined) {
             return configObject;
