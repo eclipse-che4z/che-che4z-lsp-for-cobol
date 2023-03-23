@@ -33,7 +33,7 @@ public class ThreadInterruptionUtil {
    * @throws UserInterruptException in case thread is interrupted.
    */
   public void checkThreadInterrupted() {
-    if (Thread.interrupted()) {
+    if (Thread.currentThread().isInterrupted()) {
       throw new UserInterruptException("Parsing interrupted by user.");
     }
   }

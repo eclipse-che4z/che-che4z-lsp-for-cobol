@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 
@@ -57,7 +58,7 @@ public class EmbeddedCodeService {
       ParseTreeListener treeListener,
       String programUri,
       List<EmbeddedLanguage> features) {
-
+    ThreadInterruptionUtil.checkThreadInterrupted();
     EmbeddedCodeListener embeddedLanguagesListener = new EmbeddedCodeListener(messageService, treeListener, listener, programUri, features, extendedSource);
     new ParseTreeWalker().walk(embeddedLanguagesListener, tree);
     return new ResultWithErrors<>(embeddedLanguagesListener.getResultNodes(), embeddedLanguagesListener.getErrors());
