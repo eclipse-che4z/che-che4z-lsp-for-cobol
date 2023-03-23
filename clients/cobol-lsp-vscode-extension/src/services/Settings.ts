@@ -22,6 +22,8 @@ import {
     PATHS_ZOWE,
     SERVER_PORT,
     SERVER_RUNTIME,
+    SETTINGS_CPY_EXTENSIONS,
+    SETTINGS_CPY_FILE_ENCODING,
     SETTINGS_CPY_LOCAL_PATH,
     SETTINGS_CPY_SECTION,
     SETTINGS_DIALECT,
@@ -30,7 +32,7 @@ import {
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
-import { loadProcessorGroupCopybookPaths, loadProcessorGroupCopybookPathsConfig, loadProcessorGroupDialectConfig } from "./ProcessorGroups";
+import { loadProcessorGroupCopybookEncodingConfig, loadProcessorGroupCopybookExtensionsConfig, loadProcessorGroupCopybookPaths, loadProcessorGroupCopybookPathsConfig, loadProcessorGroupDialectConfig } from "./ProcessorGroups";
 
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
@@ -81,12 +83,23 @@ export function configHandler(request: any): Array<any> {
             if (item.section === DIALECT_REGISTRY_SECTION) {
                 const object = DialectRegistry.getDialects();
                 result.push(object);
-            } else if (item.section === SETTINGS_DIALECT) {
-                const object = loadProcessorGroupDialectConfig(item, vscode.workspace.getConfiguration().get(item.section));
-                result.push(object);
-            } else if (item.section === SETTINGS_CPY_LOCAL_PATH) {
-                const object = loadProcessorGroupCopybookPathsConfig(item, vscode.workspace.getConfiguration().get(item.section));
-                result.push(object);
+            } else if (item.scopeUri) {
+                const cfg = vscode.workspace.getConfiguration().get(item.section);
+                if (item.section === SETTINGS_DIALECT) {
+                    const object = loadProcessorGroupDialectConfig(item, cfg);
+                    result.push(object);
+                } else if (item.section === SETTINGS_CPY_LOCAL_PATH) {
+                    const object = loadProcessorGroupCopybookPathsConfig(item, cfg as string[]);
+                    result.push(object);
+                } else if (item.section === SETTINGS_CPY_EXTENSIONS) {
+                    const object = loadProcessorGroupCopybookExtensionsConfig(item, cfg as string[]);
+                    result.push(object);
+                } else if (item.section === SETTINGS_CPY_FILE_ENCODING) {
+                    const object = loadProcessorGroupCopybookEncodingConfig(item, cfg as string);
+                    result.push(object);
+                } else {
+                    result.push(cfg);
+                }
             } else {
                 result.push(vscode.workspace.getConfiguration().get(item.section));
             }

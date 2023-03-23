@@ -1,12 +1,55 @@
 import * as fs from "fs";
 import * as path from "path";
 import { Minimatch } from "minimatch";
-import { SETTINGS_DIALECT } from "../constants";
 import { SettingsUtils } from "./util/SettingsUtils";
+import { Uri } from "vscode";
 
 const PROCESSOR_GROUP_FOLDER = ".cobolplugin";
 const PROCESSOR_GROUP_PGM = "pgm_conf.json";
 const PROCESSOR_GROUP_PROC = "proc_grps.json";
+
+export function loadProcessorGroupCopybookPaths(documentUri: string, dialectType: string): string[] {
+    return loadProcessorGroupSettings(documentUri, "libs", [] as string[], dialectType);
+}
+
+export function loadProcessorGroupCopybookPathsConfig(item: { scopeUri: string }, configObject: string[]): string [] {
+    return [...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]), ...configObject];
+}
+
+export function loadProcessorGroupCopybookExtensionsConfig(item: { scopeUri: string }, configObject: string[]): string[] {
+    return loadProcessorGroupSettings(item.scopeUri, "copybook-extensions", configObject);
+}
+
+export function loadProcessorGroupCopybookEncodingConfig(item: { scopeUri: string }, configObject: string): string {
+    return loadProcessorGroupSettings(item.scopeUri, "copybook-file-encoding", configObject);
+}
+
+export function loadProcessorGroupDialectConfig(item: { scopeUri: string, section: string }, configObject: unknown): unknown {
+    try {
+        const pgCfg = loadProcessorsConfig(item.scopeUri);
+        if (pgCfg === undefined) {
+            return configObject;
+        }
+        const dialects: Preprocessor[] = [];
+        if (!Array.isArray(pgCfg.preprocessor)) {
+            dialects.push(pgCfg.preprocessor);
+        } else {
+            for (const pp of pgCfg.preprocessor) {
+                if (typeof pp === 'object' && pp) {
+                    dialects.push(pp["name"]);
+                }
+                if (typeof pp === 'string' && pp) {
+                    dialects.push(pp);
+                }
+            }
+        }
+
+        return dialects || configObject;
+    } catch (e) {
+        console.error(JSON.stringify(e));
+        return configObject;
+    }
+}
 
 
 type ProgramsConfig = {
@@ -59,7 +102,8 @@ function matchProcessorGroup(pgmCfg: ProgramsConfig, documentPath: string, works
     return result;
 }
 
-function loadProcessorsConfig(documentPath: string): ProcessorConfig | undefined {
+function loadProcessorsConfig(documentUri: string): ProcessorConfig | undefined {
+    const documentPath = Uri.parse(documentUri).fsPath;
     const ws = SettingsUtils.getWorkspaceFoldersPath(true);
     if (ws.length < 1) {
         return undefined;
@@ -84,69 +128,26 @@ function loadProcessorsConfig(documentPath: string): ProcessorConfig | undefined
     return result;
 }
 
-export function loadProcessorGroupCopybookPaths(documentPath: string, dialectType: string): string[] {
-    const pgCfg = loadProcessorsConfig(documentPath);
-    if (pgCfg == undefined) {
-        return [];
-    }
-
-    if (dialectType && dialectType != 'COBOL') {
-        for (const pp of pgCfg.preprocessor) {
-            if (pp && typeof pp === 'object' && pp['name'] === dialectType && pp['libs']) {
-                return pp['libs'];
-            }
-        }
-    } else {
-        if (pgCfg.libs) {
-            return pgCfg.libs;
-        }
-    }
-
-    return [];
-}
-
-export function loadProcessorGroupCopybookPathsConfig(item: { scopeUri: string, section: any }, configObject: unknown): unknown {
-    if (!item.scopeUri) {
-        return configObject;
-    }
+function loadProcessorGroupSettings<T>(scopeUri: string, atrtibute: string, configObject: T, dialect: string = "COBOL"): T | undefined {
     try {
-        const programName = path.basename(item.scopeUri);
-        const pgCfg = loadProcessorsConfig(programName);
-        if (pgCfg === undefined) {
+        const pgCfg = loadProcessorsConfig(scopeUri);
+        if (pgCfg == undefined) {
             return configObject;
         }
-        return [...pgCfg.libs, ...configObject as []] || configObject;
-    } catch (e) {
-        console.error(JSON.stringify(e));
-        return configObject;
-    }
-}
 
-export function loadProcessorGroupDialectConfig(item: { scopeUri: string, section: any }, configObject: unknown): unknown {
-    if (!item.scopeUri) {
-        return configObject;
-    }
-    try {
-        const programName = path.basename(item.scopeUri);
-        const pgCfg = loadProcessorsConfig(programName);
-        if (pgCfg === undefined) {
-            return configObject;
-        }
-        const dialects: Preprocessor[] = [];
-        if (!Array.isArray(pgCfg.preprocessor)) {
-            dialects.push(pgCfg.preprocessor);
-        } else {
+        if (dialect && dialect !== 'COBOL') {
             for (const pp of pgCfg.preprocessor) {
-                if (typeof pp === 'object' && pp) {
-                    dialects.push(pp["name"]);
+                if (pp && typeof pp === 'object' && pp['name'] === dialect && pp[atrtibute]) {
+                    return pp[atrtibute];
                 }
-                if (typeof pp === 'string' && pp) {
-                    dialects.push(pp);
-                }
+            }
+        } else {
+            if (pgCfg[atrtibute]) {
+                return pgCfg[atrtibute];
             }
         }
 
-        return dialects || configObject;
+        return configObject;
     } catch (e) {
         console.error(JSON.stringify(e));
         return configObject;
