@@ -14,33 +14,13 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOCALE;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOGGING_LEVEL;
-import static org.eclipse.lsp4j.FileChangeType.Changed;
-import static org.eclipse.lsp4j.FileChangeType.Created;
-import static org.eclipse.lsp4j.FileChangeType.Deleted;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
@@ -48,7 +28,6 @@ import org.eclipse.lsp.cobol.domain.databus.impl.DefaultDataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
@@ -61,6 +40,20 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOCALE;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOGGING_LEVEL;
+import static org.eclipse.lsp4j.FileChangeType.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.*;
 
 /**
  * This test checks the entry points of the {@link org.eclipse.lsp4j.services.WorkspaceService}
@@ -101,7 +94,7 @@ class WorkspaceServiceTest {
     CompletableFuture<Object> result =
         service.executeCommand(
             new ExecuteCommandParams(
-                MISSING_COPYBOOK.getLabel(),
+                    ErrorCodes.MISSING_COPYBOOK.getLabel(),
                 ImmutableList.of(
                     new JsonPrimitive(copybookName),
                     new JsonPrimitive(UseCaseUtils.DOCUMENT_URI))));

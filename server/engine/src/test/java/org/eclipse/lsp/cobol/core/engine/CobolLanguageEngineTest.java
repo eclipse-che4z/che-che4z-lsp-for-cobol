@@ -18,11 +18,14 @@ package org.eclipse.lsp.cobol.core.engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
-import org.eclipse.lsp.cobol.common.error.ErrorCode;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
@@ -43,9 +46,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.SubroutineService;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -203,7 +203,7 @@ class CobolLanguageEngineTest {
 
     ResultWithErrors<AnalysisResult> actual = engine.run(URI, TEXT, DialectConfigs.getDaCoAnalysisConfig());
     Assertions.assertEquals(actual.getErrors().size(), 1);
-    Assertions.assertEquals(actual.getErrors().get(0).getErrorCode(), ErrorCode.INCOMPATIBLE_SERVER_TYPE);
+    Assertions.assertEquals(actual.getErrors().get(0).getErrorCode(), ErrorCodes.INCOMPATIBLE_SERVER_TYPE);
   }
 
   @AfterAll

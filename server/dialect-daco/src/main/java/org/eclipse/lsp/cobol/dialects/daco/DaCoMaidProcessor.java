@@ -24,20 +24,20 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.VariableConstants;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
-import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.dialects.daco.nodes.DaCoCopyFromNode;
 import org.eclipse.lsp.cobol.dialects.daco.nodes.DaCoCopyNode;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -46,7 +46,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.eclipse.lsp.cobol.common.error.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 
 /** Handles copy maid logic */
@@ -165,11 +164,17 @@ public class DaCoMaidProcessor {
       String layoutId = matcher.group("layoutId");
       String layoutUsage = matcher.group("layoutUsage");
       if (level != null) {
-        Range range =
+        Range statementRange =
+            new Range(
+                new Position(lineNumber, matcher.start("level")),
+                new Position(lineNumber, matcher.end("layoutId")));
+        statementRange = context.getExtendedSource().mapLocationUnsafe(statementRange).getRange();
+
+        Range nameRange =
             new Range(
                 new Position(lineNumber, matcher.start("layoutId")),
                 new Position(lineNumber, matcher.end("layoutId")));
-        range = context.getExtendedSource().mapLocationUnsafe(range).getRange();
+        nameRange = context.getExtendedSource().mapLocationUnsafe(nameRange).getRange();
         copyMaidNodes.add(
             createMaidCopybookNode(
                 context,
@@ -177,7 +182,8 @@ public class DaCoMaidProcessor {
                 layoutId,
                 layoutUsage,
                 lastSuffix,
-                range,
+                statementRange,
+                nameRange,
                 errors));
       }
     }
@@ -189,17 +195,13 @@ public class DaCoMaidProcessor {
       String layoutId,
       String layoutUsage,
       String lastSuffix,
-      Range range,
+      Range statementRange,
+      Range nameRange,
       List<SyntaxError> errors) {
-    Locality locality =
-        Locality.builder().uri(context.getExtendedSource().getUri()).range(range).build();
-    DaCoCopyNode cbNode =
-        new DaCoCopyNode(
-            locality,
-            makeCopybookFileName(startingLevel, layoutId, layoutUsage),
-            layoutUsage,
-            startingLevel,
-            lastSuffix);
+    Locality statementLocality =
+        Locality.builder().uri(context.getExtendedSource().getUri()).range(statementRange).build();
+
+    Locality nameLocality = Locality.builder().uri(context.getExtendedSource().getUri()).range(nameRange).build();
 
     CopybookName copybookName =
         new CopybookName(
@@ -212,25 +214,33 @@ public class DaCoMaidProcessor {
             context.getExtendedSource().getUri(),
             context.getCopybookConfig(),
             true);
+
+    DaCoCopyNode cbNode =
+        new DaCoCopyNode(
+            statementLocality,
+            nameLocality.toLocation(),
+            makeCopybookFileName(startingLevel, layoutId, layoutUsage),
+            layoutUsage,
+            startingLevel,
+            lastSuffix,
+            copybookModel.getUri());
+
     if (copybookModel.getContent() != null) {
-      Location location =
-          new Location(copybookModel.getUri(), new Range(new Position(), new Position()));
-      CopyDefinition definition = new CopyDefinition(location, copybookModel.getUri());
-      cbNode.setDefinition(definition);
       checkWrkSuffix(cbNode, layoutUsage, errors);
       String suffix = calculateSuffix(layoutUsage, cbNode);
-      parseCopybookContent(copybookModel, startingLevel, suffix).forEach(cbNode::addChild);
+      parseCopybookContent(copybookModel, startingLevel, suffix)
+          .forEach(cbNode::addChild);
     } else {
       SyntaxError error =
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.DIALECT)
-              .location(cbNode.getLocality().toOriginalLocation())
+              .location(nameLocality.toOriginalLocation())
               .suggestion(
                   messageService.getMessage(
                       "GrammarPreprocessorListener.errorSuggestion",
                       copybookName.getQualifiedName()))
               .severity(ERROR)
-              .errorCode(MISSING_COPYBOOK)
+              .errorCode(ErrorCodes.MISSING_COPYBOOK)
               .build();
       errors.add(error);
       LOG.debug("Syntax error by reportMissingCopybooks: {}", error.toString());
@@ -282,7 +292,7 @@ public class DaCoMaidProcessor {
     parser.addParseListener(treeListener);
 
     DaCoCopybookVisitor visitor =
-        new DaCoCopybookVisitor(copybookModel.getUri(), startingLevel, suffix);
+        new DaCoCopybookVisitor(copybookModel.getUri(), startingLevel, suffix, copybookModel.getCopybookId().toString());
     ParserRuleContext ctx = parser.dataDescriptionEntries();
     return visitor.visit(ctx);
   }

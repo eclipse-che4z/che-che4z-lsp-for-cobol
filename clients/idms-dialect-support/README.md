@@ -34,3 +34,28 @@ Specify paths to your IDMS copybooks in the IDMS Dialect Support extension setti
 * Specify mainframe data sets under **Idms: Paths-dsn**
 * Specify USS paths under **Idms: Paths-uss**
 * Specify local paths under **Idms: Paths-local**
+
+### Using Processor Groups
+
+To use processor groups with IDMS copybooks, add the `preprocessor` array to individual groups within your `proc_grps.json` file. 
+
+#### Example
+```
+{
+    "pgroups": [
+        {
+            "name": "GROUP1",
+            "libs": [
+                "LIB1", "LIB2"
+            ],
+             "preprocessor": [
+                {
+                    "name": "IDMS"
+                },
+            ],
+        },
+    ]
+}
+```
+
+In the above example, the IDMS preprocessor is enabled on the processor group GROUP1. This enables the use of IDMS copybooks with the programs linked to it in `pgm_conf.json`.

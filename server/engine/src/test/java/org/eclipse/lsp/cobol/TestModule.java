@@ -35,7 +35,7 @@ import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.*;
 import org.eclipse.lsp.cobol.service.copybooks.*;
-import org.eclipse.lsp.cobol.service.delegates.actions.CodeActionProvider;
+import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.actions.FindCopybookCommand;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
@@ -109,6 +109,15 @@ public class TestModule extends AbstractModule {
             .annotatedWith(Names.named("combinedStrategy"))
             .to(CopybookIdentificationCombinedStrategy.class);
     bind(DialectDiscoveryService.class).toInstance(new DialectDiscoveryService() {
+      @Override
+      public void registerExecuteCommandCapabilities(List<String> capabilities, String id) {}
+
+      @Override
+      public void unregisterExecuteCommandCapabilities(String id) {}
+
+      @Override
+      public void registerDialectCodeActionProviders(List<CodeActionProvider> providers) {}
+
       @Override
       public List<CobolDialect> loadDialects(CopybookService copybookService, MessageService messageService) {
         return ImmutableList.of();

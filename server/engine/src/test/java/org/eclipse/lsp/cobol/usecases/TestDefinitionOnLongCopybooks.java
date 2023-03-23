@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 import java.util.Collections;
 import java.util.List;
@@ -33,8 +34,7 @@ import java.util.Optional;
 import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Test Go to Definition works on a COPY statement that is at the end of a file, and the copybook
@@ -73,10 +73,13 @@ class TestDefinitionOnLongCopybooks {
             new Range(new Position(), new Position()));
     Context ctx = mock(Context.class);
     when(ctx.getDefinitions()).thenReturn(Collections.singletonList(expectedDef));
-    when(symbolsRepository.findElementByPosition(eq(document), eq(position))).thenReturn(Optional.of(ctx));
-    List<Location> definitions = new ElementOccurrences(symbolsRepository).findDefinitions(document, position);
 
-    assertEquals(1, definitions.size());
-    assertEquals(expectedDef, definitions.get(0));
+    try (MockedStatic mocked = mockStatic(SymbolsRepository.class)) {
+      mocked.when(() -> SymbolsRepository.findElementByPosition(eq(document), eq(position))).thenReturn(Optional.of(ctx));
+      List<Location> definitions = new ElementOccurrences().findDefinitions(document, position);
+
+      assertEquals(1, definitions.size());
+      assertEquals(expectedDef, definitions.get(0));
+    }
   }
 }

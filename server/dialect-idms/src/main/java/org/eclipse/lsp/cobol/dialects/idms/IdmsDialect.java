@@ -28,11 +28,10 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
-import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -97,32 +96,45 @@ public final class IdmsDialect implements CobolDialect {
       return;
     }
 
-    CopyNode copyNode = new CopyNode(cb.getStatement(), cb.getName(), IdmsDialect.NAME);
+    CopyNode copyNode = new CopyNode(removeDotAtEnd(cb.getStatement()), cb.getUsage().toLocation(), cb.getName(), IdmsDialect.NAME, copybookModel.getUri());
     if (recursiveCall(copybookStack, copyNode.getName())) {
-      currentMap.replace(copyNode.getLocality().getRange(), "");
+      currentMap.replace(cb.getStatement().getRange(), "");
       errors.add(ErrorHelper.circularDependency(messageService, cb.getUsage(), cb.getName()));
       return;
     }
-    copybookStack.push(copyNode.getName());
+    Range range = ctx.getExtendedSource().mapLocationUnsafe(copyNode.getLocality().getRange()).getRange();
+    copyNode.getLocality().setRange(range);
 
-    Location cbLocation = new Location(copybookModel.getUri(), new Range(new Position(), new Position()));
-    CopyDefinition copyDefinition = new CopyDefinition(cbLocation, cb.getName());
-    copyNode.setDefinition(copyDefinition);
+    range = ctx.getExtendedSource().mapLocationUnsafe(copyNode.getNameLocation().getRange()).getRange();
+    copyNode.getNameLocation().setRange(range);
+
+    copybookStack.push(copyNode.getName());
 
     DocumentMap copybookMap = new DocumentMap(copybookModel.getUri(), copybookModel.getContent());
     processTextTransformation(ctx, copybookMap,
             errors, programDocumentUri, cb.getLevel(), copybookStack, copyNode);
     copybookMap.commitTransformations();
     if (cb.isInsert()) {
-      ctx.getExtendedSource().insert(currentMap, copyNode.getLocality().getRange().getStart().getLine(), copybookMap);
+      ctx.getExtendedSource().insert(currentMap, cb.getStatement().getRange().getStart().getLine(), copybookMap);
     } else {
-      ctx.getExtendedSource().extend(currentMap, copyNode.getLocality().getRange(), copybookMap);
+      ctx.getExtendedSource().extend(currentMap, cb.getStatement().getRange(), copybookMap);
     }
-    copyNode.setLocality(cb.getUsage());
-    Range range = ctx.getExtendedSource().mapLocationUnsafe(copyNode.getLocality().getRange()).getRange();
-    copyNode.getLocality().setRange(range);
+
     ctx.getDialectNodes().add(copyNode);
     copybookStack.pop();
+  }
+
+  private Locality removeDotAtEnd(Locality locality) {
+    int startLine = locality.getRange().getStart().getLine();
+    int startChar = locality.getRange().getStart().getCharacter();
+    int endLine = locality.getRange().getEnd().getLine();
+    int endChar = locality.getRange().getEnd().getCharacter() - 1;
+
+    return Locality.builder()
+        .uri(locality.getUri())
+        .copybookId(locality.getCopybookId())
+        .range(new Range(new Position(startLine, startChar), new Position(endLine, endChar)))
+        .build();
   }
 
   private boolean recursiveCall(Deque<String> copybookStack, String name) {
@@ -188,7 +200,7 @@ public final class IdmsDialect implements CobolDialect {
         .filter(cn -> cn != n)
         .filter(CopyNode.class::isInstance)
         .map(CopyNode.class::cast)
-        .filter(cn -> cn.getDefinition().getLocation().getUri().equals(n.getLocality().getUri()))
+        .filter(cn -> cn.getUri().equals(n.getLocality().getUri()))
         .forEach(cn -> {
           nodes.remove(n);
           cn.addChild(n);

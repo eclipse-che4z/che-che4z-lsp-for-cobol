@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.common.mapping;
 
-import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
@@ -68,8 +66,7 @@ class TestTextTransformations {
     TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
     // extend starts with 0
     Range range = new Range(new Position(1, 0), new Position(1, 7));
-    CopyNode copyNode = new CopyNode(Locality.builder().range(range).build(), "BOOM");
-    tt.extend(copyNode.getLocality().getRange(), TextTransformations.of("123\n", ""));
+    tt.extend(range, TextTransformations.of("123\n", ""));
     tt.replace(new Range(new Position(0, 3), new Position(0, 7)), "4321");
     assertEquals("0: 4321\n123\n\n", tt.calculateExtendedText());
   }
@@ -101,11 +98,10 @@ class TestTextTransformations {
   void extRegionsTestRecursive() {
     TextTransformations tt = new TextTransformations("Hi!\n" + TEST, "https://example.com/text1.txt");
     Range range = new Range(new Position(1, 0), new Position(1, 7));
-    CopyNode copyNode = new CopyNode(Locality.builder().range(range).build(), "BOOM");
     String boomUri = "BOOM.cpy";
     TextTransformations boom = TextTransformations.of("Line 1\nLine 2\n", boomUri);
     boom.replace(new Range(new Position(1, 2), new Position(1, 3)), "M");
-    tt.extend(copyNode.getLocality().getRange(), boom);
+    tt.extend(range, boom);
     assertEquals("Hi!\nLine 1\nLiMe 2\n\n1: TEST\n", tt.calculateExtendedText());
 //    Map<Range, Location> map = tt.getExtendedDocumentMap();
 //    assertEquals(2, map.size());
@@ -119,8 +115,6 @@ class TestTextTransformations {
   void insert() {
     TextTransformations tt = new TextTransformations(TEST, "https://example.com/text1.txt");
 
-    Range range = new Range(new Position(1, 0), new Position(1, 7));
-    CopyNode copyNode = new CopyNode(Locality.builder().range(range).build(), "BOOM");
     String boomUri = "BOOM.cpy";
     TextTransformations boom = TextTransformations.of("Line 1\nLine 2\n", boomUri);
 

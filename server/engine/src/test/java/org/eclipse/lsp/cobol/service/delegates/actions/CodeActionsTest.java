@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.service.delegates.actions;
 
+import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.junit.jupiter.api.Test;

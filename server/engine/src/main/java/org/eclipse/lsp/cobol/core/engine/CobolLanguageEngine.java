@@ -30,11 +30,11 @@ import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
@@ -73,7 +73,6 @@ import org.eclipse.lsp4j.Range;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.common.error.ErrorCode.INCOMPATIBLE_SERVER_TYPE;
 import static org.eclipse.lsp.cobol.common.error.ErrorSource.WORKSPACE_SETTINGS;
 import static org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext.Activity.*;
 
@@ -156,6 +155,7 @@ public class CobolLanguageEngine {
 
     // Preprocessor (replacement, copybooks)
     CopybooksRepository copybooksRepository = ctx.measure(PREPROCESSOR, () -> runPreprocessor(documentUri, ctx));
+    applyDialectCopybooks(copybooksRepository, dialectOutcome.getDialectNodes());
 
     // Run parser
     ParserListener listener = new ParserListener(ctx.getExtendedSource(), copybooksRepository);
@@ -213,7 +213,7 @@ public class CobolLanguageEngine {
                     .severity(ErrorSeverity.ERROR)
                     .suggestion(messageService.getMessage("workspaceError.ServerType"))
                     .errorSource(WORKSPACE_SETTINGS)
-                    .errorCode(INCOMPATIBLE_SERVER_TYPE)
+                    .errorCode(ErrorCodes.INCOMPATIBLE_SERVER_TYPE)
                     .location(new OriginalLocation(
                             new Location(documentUri,
                                     new Range(new Position(0, 0), new Position(0, 6))),
@@ -244,8 +244,6 @@ public class CobolLanguageEngine {
   private List<Node> transformAST(AnalysisContext ctx, List<Node> dialectNodes,
                                   CopybooksRepository copybooksRepository, CommonTokenStream tokens,
                                   CobolParser.StartRuleContext tree) {
-    applyDialectCopybooks(copybooksRepository, dialectNodes);
-
     CobolVisitor visitor =
         new CobolVisitor(copybooksRepository, tokens, ctx.getExtendedSource(),
             messageService, subroutineService, dialectNodes, cachingConfigurationService);
@@ -345,12 +343,14 @@ public class CobolLanguageEngine {
     pds.forEach(ctx::register);
   }
 
-  private void applyDialectCopybooks(CopybooksRepository copybooks, List<Node> dialectNodes) {
+  private void applyDialectCopybooks(CopybooksRepository copybooksRepository, List<Node> dialectNodes) {
     dialectNodes.stream()
-        .flatMap(Node::getDepthFirstStream)
-        .filter(n -> n.getNodeType().equals(NodeType.COPY))
+        .filter(n -> n instanceof CopyNode)
         .map(CopyNode.class::cast)
-        .filter(n -> n.getDefinition() != null)
-        .forEach(n -> copybooks.define(n.getName(), n.getDialect(), n.getDefinition().getLocation()));
+        .filter(n -> n.getUri() != null)
+        .forEach(n -> {
+          copybooksRepository.addStatement(n.getName(), n.getDialect(), n.getLocality());
+          copybooksRepository.define(n.getName(), n.getDialect(), n.getNameLocation().getUri(), n.getUri());
+        });
   }
 }
