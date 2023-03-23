@@ -93,11 +93,25 @@ export function loadProcessorGroupCopybookPaths(cobolFileName: string, dialectTy
     return [];
 }
 
-export function loadProcessorGroupConfig(item: { scopeUri: string, section: any }, configObject: unknown): unknown {
+export function loadProcessorGroupCopybookPathsConfig(item: { scopeUri: string, section: any }, configObject: unknown): unknown {
     if (!item.scopeUri) {
         return configObject;
     }
-    if (item.section !== SETTINGS_DIALECT) {
+    try {
+        const programName = path.basename(item.scopeUri.replace(/\.[^/.]+$/, ""));
+        const pgCfg = loadProcessorsConfig(programName);
+        if (pgCfg === undefined) {
+            return configObject;
+        }
+        return [...pgCfg.libs, ...configObject as []] || configObject;
+    } catch (e) {
+        console.error(JSON.stringify(e));
+        return configObject;
+    }
+}
+
+export function loadProcessorGroupDialectConfig(item: { scopeUri: string, section: any }, configObject: unknown): unknown {
+    if (!item.  scopeUri) {
         return configObject;
     }
     try {

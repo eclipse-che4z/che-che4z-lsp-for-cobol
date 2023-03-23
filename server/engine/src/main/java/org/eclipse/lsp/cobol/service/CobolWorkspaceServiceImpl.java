@@ -126,7 +126,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
     if (!disposableLSPStateService.isServerShutdown()) {
       messageService.reloadMessages();
-      copybookNameService.copybookLocalFolders().thenAccept(this::acceptSettingsChange);
+      copybookNameService.copybookLocalFolders(null).thenAccept(this::acceptSettingsChange);
 
       settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
       settingsService

@@ -620,7 +620,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     service.hover(testHoverPositionParams);
 
     verify(hoverProvider, timeout(2000))
-        .getHover(new CobolDocumentModel(TEXT_EXAMPLE, analysisResult), testHoverPositionParams);
+        .getHover(new CobolDocumentModel(DOCUMENT_URI, TEXT_EXAMPLE, analysisResult), testHoverPositionParams);
   }
 
   /**

@@ -96,7 +96,7 @@ class VariableHoverTest {
   }
 
   private CobolDocumentModel getModel(String text) {
-    return new CobolDocumentModel(text, UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of()));
+    return new CobolDocumentModel(DOCUMENT_URI, text, UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of()));
   }
 
   private TextDocumentPositionParams getPosition(int line, int character) {

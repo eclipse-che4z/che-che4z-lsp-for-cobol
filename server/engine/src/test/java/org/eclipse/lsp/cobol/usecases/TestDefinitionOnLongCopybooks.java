@@ -64,7 +64,8 @@ class TestDefinitionOnLongCopybooks {
     AnalysisResult result =
         UseCaseEngine.runTest(
             TEXT, ImmutableList.of(new CobolText("ABCD", COPYBOOK_CONTENT)), ImmutableMap.of());
-    CobolDocumentModel document = new CobolDocumentModel(TEXT, result);
+    SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
+    CobolDocumentModel document = new CobolDocumentModel(DOCUMENT_URI, TEXT, result);
     TextDocumentPositionParams position = new TextDocumentPositionParams(
             new TextDocumentIdentifier(DOCUMENT_URI), new Position(4, 15));
     Location expectedDef = new Location(

@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 export const SETTINGS_CPY_SECTION: string = "cobol-lsp.cpy-manager";
+export const SETTINGS_CPY_LOCAL_PATH: string = "cobol-lsp.cpy-manager.paths-local";
 export const SETTINGS_DIALECT = "cobol-lsp.dialects";
 export const SETTINGS_SUBROUTINE_LOCAL_KEY = "cobol-lsp.subroutine-manager.paths-local";
 export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";

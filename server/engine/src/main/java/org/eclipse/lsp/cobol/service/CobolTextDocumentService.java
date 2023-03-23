@@ -272,7 +272,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     Supplier<List<? extends DocumentHighlight>> listSupplier =
         () ->
             docs.containsKey(uri)
-                ? occurrences.findHighlights(docs.getOrDefault(uri, new CobolDocumentModel("")), params)
+                ? occurrences.findHighlights(docs.getOrDefault(uri, new CobolDocumentModel("", "")), params)
                 : Collections.emptyList();
     return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
             disposableLSPStateService, listSupplier, executors.getThreadPoolExecutor())
@@ -317,7 +317,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       return;
     }
     if (!isCopybook(uri, text, copybookExtensions)) {
-      registerDocument(uri, new CobolDocumentModel(text));
+      registerDocument(uri, new CobolDocumentModel(uri, text));
     }
     analyzeDocumentFirstTime(uri, text, false);
   }
@@ -334,7 +334,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     }
     String uri = params.getTextDocument().getUri();
     String text = params.getContentChanges().get(0).getText();
-    docs.computeIfPresent(uri, (k, v) -> new CobolDocumentModel(text, v.getAnalysisResult()));
+    docs.computeIfPresent(uri, (k, v) -> new CobolDocumentModel(uri, text, v.getAnalysisResult()));
     outlineMap.put(uri, new CompletableFuture<>());
     cfAstMap.put(uri, new CompletableFuture<>());
     TextDocumentItem docIdentifier = new TextDocumentItem();
