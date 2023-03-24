@@ -67,9 +67,9 @@ jest.mock("path", () => ({
         }
         return strs.join("/");
     }),
-    Uri: {
-        join: jest.fn().mockReturnValue("some path"),
-    },
+    relative: jest.fn().mockImplementation((...strs: string[]) => {
+        return strs[1].substring(strs[0].length + 1);
+    }),
 }));
 
 it("Processor groups configuration provides lib path", () => {

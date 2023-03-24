@@ -4,7 +4,7 @@ import { SettingsService } from "../Settings";
 import { Utils } from "./Utils";
 
 export class ProfileUtils {
-    public static async getProfileNameForCopybook(cobolFileName: string): Promise<(string | undefined)> {
+    public static async getProfileNameForCopybook(documentUri: string): Promise<(string | undefined)> {
         const zoweExplorerApi = await Utils.getZoweExplorerAPI();
         let availableProfiles: string[] = [];
         zoweExplorerApi.registeredApiTypes().forEach(profileType => {
@@ -12,11 +12,11 @@ export class ProfileUtils {
                 .concat(zoweExplorerApi.getExplorerExtenderApi().getProfilesCache()
                     .getProfiles(profileType)?.map(ele => ele.name));
         });
-        return ProfileUtils.getValidProfileForCopybookDownload(cobolFileName, availableProfiles);
+        return ProfileUtils.getValidProfileForCopybookDownload(documentUri, availableProfiles);
     }
 
-    private static getValidProfileForCopybookDownload(programName: string, availableProfiles: string[]): string {
-        const profileFromDoc = ProfileUtils.getProfileFromDocument(programName, availableProfiles);
+    private static getValidProfileForCopybookDownload(documentUri: string, availableProfiles: string[]): string {
+        const profileFromDoc = ProfileUtils.getProfileFromDocument(documentUri, availableProfiles);
         const passedProfile = SettingsService.getProfileName();
         if (!profileFromDoc && availableProfiles.indexOf(passedProfile) >= 0) {
             return passedProfile;
@@ -24,10 +24,9 @@ export class ProfileUtils {
         return profileFromDoc;
     }
 
-    private static getProfileFromDocument(programName: string, availableProfiles: string[]): (string | undefined) {
+    private static getProfileFromDocument(documentUri: string, availableProfiles: string[]): (string | undefined) {
         for (const doc of vscode.workspace.textDocuments) {
-            const openName = path.basename(doc.fileName);
-            if (unescape(programName) === openName) {
+            if (documentUri === doc.uri.toString()) {
                 const profile = ProfileUtils.tryGetProfileFromDocumentPath(doc.fileName, availableProfiles);
                 if (profile) {
                     return profile;

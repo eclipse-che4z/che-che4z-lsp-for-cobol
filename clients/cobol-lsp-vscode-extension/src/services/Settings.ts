@@ -33,6 +33,7 @@ import {
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import { loadProcessorGroupCopybookEncodingConfig, loadProcessorGroupCopybookExtensionsConfig, loadProcessorGroupCopybookPaths, loadProcessorGroupCopybookPathsConfig, loadProcessorGroupDialectConfig } from "./ProcessorGroups";
+import { getProgramNameFromUri } from "./util/FSUtils";
 
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
@@ -126,15 +127,16 @@ export class SettingsService {
 
     /**
      * Get copybook local path based on program file name
-     * @param cobolFileName is a program file name
+     * @param documentUri is a program file URI
      * @param dialectType name of the cobol dialect type
      * @returns a list of local path
      */
-    public static getCopybookLocalPath(cobolFileName: string, dialectType: string): string[] {
-        const pgPaths = loadProcessorGroupCopybookPaths(cobolFileName, dialectType);
+    public static getCopybookLocalPath(documentUri: string, dialectType: string): string[] {
+        const pgPaths = loadProcessorGroupCopybookPaths(documentUri, dialectType);
+        const cobolFileName = getProgramNameFromUri(documentUri);
         return [
             ...SettingsService.evaluateVariable(pgPaths, "fileBasenameNoExtension", cobolFileName),
-            ...SettingsService.getCopybookConfigValues(PATHS_LOCAL_KEY, cobolFileName, dialectType)
+            ...SettingsService.getCopybookConfigValues(PATHS_LOCAL_KEY, documentUri, dialectType)
         ];
     }
 
@@ -152,12 +154,12 @@ export class SettingsService {
 
     /**
      * Get list of dsn path
-     * @param cobolFileName is a program file name
+     * @param documentUri is a program URI
      * @param dialectType name of the cobol dialect type
      * @returns a list of dsn path
      */
-    public static getDsnPath(cobolFileName: string, dialectType: string): string[] {
-        return SettingsService.getCopybookConfigValues(PATHS_ZOWE, cobolFileName, dialectType);
+    public static getDsnPath(documentUri: string, dialectType: string): string[] {
+        return SettingsService.getCopybookConfigValues(PATHS_ZOWE, documentUri, dialectType);
     }
 
     /**
@@ -166,8 +168,8 @@ export class SettingsService {
      * @param dialectType name of the cobol dialect type
      * @returns a list of uss path
      */
-    public static getUssPath(cobolFileName: string, dialectType: string): string[] {
-        return SettingsService.getCopybookConfigValues(PATHS_USS, cobolFileName, dialectType);
+    public static getUssPath(documentUri: string, dialectType: string): string[] {
+        return SettingsService.getCopybookConfigValues(PATHS_USS, documentUri, dialectType);
     }
 
     /**
@@ -258,8 +260,8 @@ export class SettingsService {
         return result;
     }
 
-    private static getCopybookConfigValues(section: string, cobolFileName: string, dialectType: string) {
-        const programFile = cobolFileName.replace(/\.[^/.]+$/, "");
+    private static getCopybookConfigValues(section: string, documentUri: string, dialectType: string) {
+        const programFile = getProgramNameFromUri(documentUri);
         if (dialectType !== SettingsService.DEFAULT_DIALECT) {
             const pathList: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(`${dialectType.toLowerCase()}.${section}`);
             if (pathList && pathList.length > 0) {

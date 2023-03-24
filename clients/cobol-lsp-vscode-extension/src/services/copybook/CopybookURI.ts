@@ -30,18 +30,18 @@ export class CopybookURI {
      * If it's not found in the previous steps than the user is notified and needs to download it from MF
      * or update the setting.json with an additional folder on the workspace where to search this missed copybook.
      * @param copybookName Name of the required copybook
-     * @param cobolFileName name of the cobol file opened in the IDE
+     * @param documentUri URI of the cobol file opened in the IDE
      * @param dialectType name of the cobol dialect type
      */
-    public static async resolveCopybookURI(copybookName: string, cobolFileName: string, dialectType: string): Promise<string> {
+    public static async resolveCopybookURI(copybookName: string, documentUri: string, dialectType: string): Promise<string> {
         // check on local paths provided by the user
         let result: string;
-        result = searchCopybookInWorkspace(copybookName,
-            SettingsService.getCopybookLocalPath(cobolFileName, dialectType), SettingsService.getCopybookExtension());
+        const copybookFolders: string[] = SettingsService.getCopybookLocalPath(documentUri, dialectType);
+        result = searchCopybookInWorkspace(copybookName, copybookFolders, SettingsService.getCopybookExtension());
         // check in subfolders under .copybooks (copybook downloaded from MF)
         if (!result) {
             result = searchCopybookInWorkspace(copybookName,
-                CopybookURI.createPathForCopybookDownloaded(cobolFileName, dialectType), SettingsService.getCopybookExtension());
+                CopybookURI.createPathForCopybookDownloaded(documentUri, dialectType), SettingsService.getCopybookExtension());
         }
         return result || "";
     }
@@ -63,18 +63,18 @@ export class CopybookURI {
      * @param profile represent a name of a folder within the .copybooks folder that have the same name as the
      * connection name needed to download copybooks from mainframe.
      */
-    public static createPathForCopybookDownloaded(filename: string, dialectType: string): string[] {
-        const profile = ProfileUtils.getProfileNameForCopybook(filename);
+    public static createPathForCopybookDownloaded(documentUri: string, dialectType: string): string[] {
+        const profile = ProfileUtils.getProfileNameForCopybook(documentUri);
 
         let result: string[] = [];
-        const datasets: string[] = SettingsService.getDsnPath(filename, dialectType);
+        const datasets: string[] = SettingsService.getDsnPath(documentUri, dialectType);
         if (profile && datasets) {
             result = Object.assign([], datasets);
             result.forEach((value, index) => result[index] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" +
                 profile + "/" + value);
         }
 
-        const ussPaths: string[] = SettingsService.getUssPath(filename, dialectType);
+        const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialectType);
         const baseIndex = result.length;
         if (profile && ussPaths) {
             Object.assign([], ussPaths).forEach((value, index) => result[index + baseIndex] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" +

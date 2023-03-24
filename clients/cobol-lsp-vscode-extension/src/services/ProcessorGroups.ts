@@ -72,13 +72,9 @@ type ProcessorsConfig = {
 }
 
 function matchProcessorGroup(pgmCfg: ProgramsConfig, documentPath: string, workspacePath: string): string | undefined {
-    if (!documentPath.startsWith(workspacePath)) {
-        return undefined;
-    }
-    let relativeDocPath = documentPath.substring(workspacePath.length);
-    if (relativeDocPath.startsWith("/")) {
-        relativeDocPath = relativeDocPath.substring(1);
-    }
+    documentPath = path.sep === "/" ? documentPath.replace("\\", path.sep) :  documentPath.replace("/", path.sep);
+    workspacePath = path.sep === "/" ? workspacePath.replace("\\", path.sep) :  workspacePath.replace("/", path.sep);
+    const relativeDocPath = path.relative(workspacePath, documentPath);
 
     const candidates = [];
     let result = undefined;
