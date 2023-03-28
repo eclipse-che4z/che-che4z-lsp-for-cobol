@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 class TestSemicolonNotAllowedInIdentificationDivision {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION;\n"
-          + "       {PROGRAM-ID|1}. {TEST1|2}.\n"
+          + "       {PROGRAM-ID|1}{.|2} TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       working-storage section.\n"
           + "       01 {$*LINE-SPACING} PIC 9.\n"
@@ -50,7 +50,7 @@ class TestSemicolonNotAllowedInIdentificationDivision {
             "2",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'TEST1' expected PROGRAM-ID",
+                "Missing token PROGRAM-ID at programIdParagraph",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
