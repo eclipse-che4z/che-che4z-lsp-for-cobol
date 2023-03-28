@@ -65,9 +65,9 @@ class TestControlCompilerDirective {
             "2",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'MAP1' expected {AUTHOR, CBL, COMMON, DATA, DATE-COMPILED, DATE-WRITTEN, " +
-                        "DEFINITION, END, ENVIRONMENT, ID, IDENTIFICATION, INITIAL, INSTALLATION, IS, LIBRARY, " +
-                        "PROCEDURE, PROCESS, RECURSIVE, SECURITY, '.'}",
+                "Syntax error on 'MAP1' expected {AUTHOR, CBL, COMMON, DATA, DATE-COMPILED, DATE-WRITTEN, "
+                    + "DEFINITION, END, ENVIRONMENT, ID, IDENTIFICATION, INITIAL, INSTALLATION, IS, LIBRARY, "
+                    + "PROCEDURE, PROCESS, RECURSIVE, SECURITY, '.'}",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "3",
