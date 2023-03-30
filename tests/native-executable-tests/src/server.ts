@@ -19,10 +19,9 @@ import {
     setTimeout,
 } from 'timers/promises';
 import {
-    ConfigurationRequest,
     createProtocolConnection, DidCloseTextDocumentNotification,
     DidOpenTextDocumentNotification,
-    DocumentDiagnosticRequest, DocumentSymbolRequest,
+    DocumentSymbolRequest,
     ExitNotification,
     InitializedNotification,
     InitializeRequest,
@@ -37,7 +36,6 @@ import { ClientConfiguration } from "./clientConfiguration";
 import { getCopybooks, getRootUri } from "./util/util";
 import { getInitializeParams } from "./util/initializeParams";
 import * as path from "path";
-import {DocumentDiagnosticReport} from "vscode-languageserver-protocol/lib/common/protocol.diagnostic";
 import {StreamMessageReader, StreamMessageWriter} from "vscode-languageserver-protocol/node";
 
 export class Server {
@@ -90,7 +88,9 @@ export class Server {
         serverConnection.onNotification(ShowMessageNotification.type, (_params) => {});
 
         serverConnection.onNotification(PublishDiagnosticsNotification.type, _params => {
-            this.diagnostics = _params;
+            if((serverConnection as any).syncedDoc && _params.uri.endsWith((serverConnection as any).syncedDoc)) {
+                this.diagnostics = _params;
+            }
         });
 
         serverConnection.onRequest(RegistrationRequest.type, _params => {
@@ -155,15 +155,6 @@ export class Server {
         }) ;
     }
 
-    public async getDocumentDiagnostics(serverConnection: ProtocolConnection, ...programRelativePath: string[]){
-      const uri = getRootUri(this.rootPath, ...programRelativePath);
-      return  await serverConnection.sendRequest(DocumentDiagnosticRequest.type, {
-            textDocument: {
-                uri,
-            }
-        }) as DocumentDiagnosticReport;
-    }
-
     public async closeDocument(serverConnection: ProtocolConnection, ...programRelativePath: string[]){
         const uri = getRootUri(this.rootPath, ...programRelativePath);
         return  await serverConnection.sendNotification(DidCloseTextDocumentNotification.type, {
@@ -173,10 +164,12 @@ export class Server {
         }) ;
     }
 
-    public async checkForDiagnosticsNotification(): Promise<any> {
-        let diag = await setTimeout(600, this.diagnostics);
-        if (diag === null) {
-            return this.checkForDiagnosticsNotification();
+    public async checkForDiagnosticsNotification(fileName: string): Promise<any> {
+        await setTimeout(600, this.diagnostics);
+        if (this.diagnostics === null) {
+            return this.checkForDiagnosticsNotification(fileName);
+        } else if( !this.diagnostics!.uri.endsWith(fileName)) {
+            return this.checkForDiagnosticsNotification(fileName);
         } else {
             return this.diagnostics;
         }

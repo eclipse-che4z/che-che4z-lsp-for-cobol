@@ -48,9 +48,9 @@ describe("Test native builds", () => {
     test("tests diagnostic error for cobol85 test suite", async () => {
         for (const f of fs.readdirSync(progDir)) {
             process.stdout.write(`=== WORKING ON ${f} ===\r\n`);
+            (serverConnection as any).syncedDoc = f;
             await server.openDocument(serverConnection, f);
-            const response = await server.checkForDiagnosticsNotification();
-            server.resetDiagnosticsResponse();
+            const response = await server.checkForDiagnosticsNotification(f);
             if (response.diagnostics.length > 0) {
                 process.stdout.write(`seems issue with following response\r\n`);
                 process.stdout.write(`${JSON.stringify(response.diagnostics)}\r\n`);
@@ -62,6 +62,8 @@ describe("Test native builds", () => {
                     .length === response.diagnostics.length) // Ignore less severe error
             )
                 .toBeTruthy();
+            server.resetDiagnosticsResponse();
+            await server.closeDocument(serverConnection, f);
         }
     }, 999999);
 });
