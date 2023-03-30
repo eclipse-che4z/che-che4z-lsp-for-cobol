@@ -50,7 +50,7 @@ To use processor groups with MAID copybooks, add the `preprocessor` array to ind
             ],
              "preprocessor": [
                 {
-                    "name": "DACO"
+                    "name": "DaCo"
                 },
             ],
         },
