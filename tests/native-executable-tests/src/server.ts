@@ -16,6 +16,9 @@ import { ServerLaucher } from "./serverLaucher";
 import * as fs from "fs";
 import { ConsoleLogger } from "./util/consoleLogger";
 import {
+    setTimeout,
+} from 'timers/promises';
+import {
     ConfigurationRequest,
     createProtocolConnection, DidCloseTextDocumentNotification,
     DidOpenTextDocumentNotification,
@@ -24,7 +27,7 @@ import {
     InitializedNotification,
     InitializeRequest,
     ProtocolConnection,
-    PublishDiagnosticsNotification,
+    PublishDiagnosticsNotification, PublishDiagnosticsParams,
     RegistrationRequest,
     ShutdownRequest,
     WorkspaceFoldersRequest
@@ -45,6 +48,7 @@ export class Server {
     private reader:  StreamMessageReader | null = null;
     private writer: StreamMessageWriter | null = null;
     private logger: ConsoleLogger;
+    private diagnostics: PublishDiagnosticsParams | null = null;
 
     constructor(rootPath: string, name: string, configLoc: string, port?: number) {
         this.rootPath = rootPath;
@@ -75,18 +79,24 @@ export class Server {
     private registerClientResponseToServer(serverConnection: ProtocolConnection) {
         const clientConfiguration = new ClientConfiguration(this.configLoc);
         const copybooks = getCopybooks(clientConfiguration);
-        serverConnection.onRequest(PublishDiagnosticsNotification.type, _params => {});
+
         serverConnection.onNotification(ShowMessageNotification.type, (_param) => {});
-        serverConnection.onRequest(ConfigurationRequest.type, (params, _token) => {
-            return params.items.map((item) =>
+
+        serverConnection.onRequest('workspace/configuration', (params, _token) => {
+            return params.items.map((item: any) =>
                 clientConfiguration.getConfiguration(item.section!.toString())
             );
         });
         serverConnection.onNotification(ShowMessageNotification.type, (_params) => {});
-        serverConnection.onNotification(PublishDiagnosticsNotification.type, _params => {});
+
+        serverConnection.onNotification(PublishDiagnosticsNotification.type, _params => {
+            this.diagnostics = _params;
+        });
+
         serverConnection.onRequest(RegistrationRequest.type, _params => {
             return;
         });
+
         serverConnection.onRequest(WorkspaceFoldersRequest.type, () => {
             return [
                 {
@@ -101,8 +111,9 @@ export class Server {
             return copybooks.find(t => t.includes(copybookName));
         });
 
-        serverConnection.onRequest("cobol/resolveSubroutine", _params => { });
-
+        serverConnection.onRequest("cobol/resolveSubroutine", _params => {return; });
+        serverConnection.onRequest("window/workDoneProgress/create", (_param) => {return;} );
+        serverConnection.onNotification("$/progress", (_param) => {} );
     }
 
     public async shutdownServer(serverConnection: ProtocolConnection) {
@@ -113,7 +124,7 @@ export class Server {
     }
 
     private async handshake(serverConnection: ProtocolConnection) {
-        await serverConnection.sendRequest(
+       await serverConnection.sendRequest(
             InitializeRequest.type,
             getInitializeParams(this.rootPath, this.name)
         );
@@ -160,5 +171,18 @@ export class Server {
                 uri,
             },
         }) ;
+    }
+
+    public async checkForDiagnosticsNotification(): Promise<any> {
+        let diag = await setTimeout(600, this.diagnostics);
+        if (diag === null) {
+            return this.checkForDiagnosticsNotification();
+        } else {
+            return this.diagnostics;
+        }
+    }
+
+    public resetDiagnosticsResponse() {
+        this.diagnostics = null;
     }
 }
