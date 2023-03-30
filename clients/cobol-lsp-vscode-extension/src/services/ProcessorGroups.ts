@@ -24,6 +24,10 @@ export function loadProcessorGroupCopybookEncodingConfig(item: { scopeUri: strin
     return loadProcessorGroupSettings(item.scopeUri, "copybook-file-encoding", configObject);
 }
 
+export function loadProcessorGroupSqlBackendConfig(item: { scopeUri: string }, configObject: string): string {
+    return loadProcessorGroupSettings(item.scopeUri, "target-sql-backend", configObject, "DB2/DATACOM");
+}
+
 export function loadProcessorGroupDialectConfig(item: { scopeUri: string, section: string }, configObject: unknown): unknown {
     try {
         const pgCfg = loadProcessorsConfig(item.scopeUri);
@@ -44,7 +48,8 @@ export function loadProcessorGroupDialectConfig(item: { scopeUri: string, sectio
             }
         }
 
-        return dialects || configObject;
+        // "DB2/DATACOM" is not a real dialect, we will use it only to set up sql backend for now
+        return dialects.filter(name => name != "DB2/DATACOM") || configObject;
     } catch (e) {
         console.error(JSON.stringify(e));
         return configObject;

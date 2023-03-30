@@ -27,12 +27,13 @@ import {
     SETTINGS_CPY_LOCAL_PATH,
     SETTINGS_CPY_SECTION,
     SETTINGS_DIALECT,
+    SETTINGS_SQL_BACKEND,
     SETTINGS_SUBROUTINE_LOCAL_KEY,
     SETTINGS_TAB_CONFIG,
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
-import { loadProcessorGroupCopybookEncodingConfig, loadProcessorGroupCopybookExtensionsConfig, loadProcessorGroupCopybookPaths, loadProcessorGroupCopybookPathsConfig, loadProcessorGroupDialectConfig } from "./ProcessorGroups";
+import { loadProcessorGroupCopybookEncodingConfig, loadProcessorGroupCopybookExtensionsConfig, loadProcessorGroupCopybookPaths, loadProcessorGroupCopybookPathsConfig, loadProcessorGroupDialectConfig, loadProcessorGroupSqlBackendConfig } from "./ProcessorGroups";
 import { getProgramNameFromUri } from "./util/FSUtils";
 
 /**
@@ -97,6 +98,9 @@ export function configHandler(request: any): Array<any> {
                     result.push(object);
                 } else if (item.section === SETTINGS_CPY_FILE_ENCODING) {
                     const object = loadProcessorGroupCopybookEncodingConfig(item, cfg as string);
+                    result.push(object);
+                } else if (item.section === SETTINGS_SQL_BACKEND) {
+                    const object = loadProcessorGroupSqlBackendConfig(item, cfg as string);
                     result.push(object);
                 } else {
                     result.push(cfg);
