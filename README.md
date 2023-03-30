@@ -236,7 +236,7 @@ The `pgm_conf.json` file has the following format:
 
 The above example uses copybooks from libraries LIB1 and LIB2 for PROGRAM1, and copybooks from libraries LIB3 and LIB4 for PROGRAM2.
 
-You can specify libraries as mainframe data sets, USS data sets or local paths in the `libs` array. These libraries take priority over the libraries specified in the extension settings.
+Specify libraries as absolute or relative local paths in the `libs` array. These libraries take priority over the libraries specified in the extension settings.
 
 ### Copybook Support Features
 
