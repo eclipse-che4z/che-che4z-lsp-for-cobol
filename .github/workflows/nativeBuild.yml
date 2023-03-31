@@ -142,9 +142,11 @@ jobs:
         include:
           - os: ubuntu-latest
             platform: linux
+            container: alpine:3.17
             arch: x64
           - os: ubuntu-latest
             platform: linux
+            container: alpine:3.17
             arch: arm64
     runs-on: ${{ matrix.os }}
     needs: [generateConfigForNativeBuilds]
@@ -157,6 +159,7 @@ jobs:
           version: '22.3.0'
           java-version: '11'
           components: 'native-image'
+          native-image-musl: 'true'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           native-image-job-reports: 'true'
       - name: Retrieve native build configurations
@@ -173,7 +176,7 @@ jobs:
           rm server/engine/src/main/resources/META-INF/native-image/session-*/jni-config.json
       - name: Build with Maven
         working-directory: server
-        run: mvn -e -B -Pnative -Dagent=true -DskipTests clean package
+        run: mvn -e -B -Plinux-native -Dagent=true -DskipTests clean package
       - name: Upload artifacts
         run: mkdir staging && cp server/engine/target/engine staging/${{ env.target }}
       - uses: actions/upload-artifact@v3
