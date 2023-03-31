@@ -172,7 +172,7 @@ jobs:
         working-directory: configuration
       - name: verify musl setup
         run: ./.github/scripts/verify_musl_setup.sh
-        shell: bash
+        shell: bash {0}
       - name: Add graalVM configuration to server
         run: |
           cp -rp configuration/session-*/ server/engine/src/main/resources/META-INF/native-image/
