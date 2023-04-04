@@ -78,6 +78,7 @@ import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.HoverParams;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
+import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.ReferenceParams;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.TextDocumentItem;
@@ -129,7 +130,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final Map<String, CompletableFuture<List<DocumentSymbol>>> outlineMap =
       new ConcurrentHashMap<>();
   private final Map<String, CompletableFuture<Node>> cfAstMap = new ConcurrentHashMap<>();
-  private final Map<String, Future<?>> futureMap = new ConcurrentHashMap<>();
+  private final Map<String, CompletableFuture<Void>> futureMap = new ConcurrentHashMap<>();
   private final Communications communications;
   private final LanguageEngineFacade engine;
   private final Formations formations;
@@ -220,12 +221,16 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
       CompletionParams params) {
     String uri = params.getTextDocument().getUri();
-    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
-            disposableLSPStateService,
-            () ->
-                Either.<List<CompletionItem>, CompletionList>forRight(
-                    completions.collectFor(docs.get(uri), params)),
-            executors.getThreadPoolExecutor())
+    return futureMap
+        .getOrDefault(uri, CompletableFuture.completedFuture(null))
+        .thenCompose(
+            res ->
+                ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
+                    disposableLSPStateService,
+                    () ->
+                        Either.<List<CompletionItem>, CompletionList>forRight(
+                            completions.collectFor(docs.get(uri), params)),
+                    executors.getThreadPoolExecutor()))
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("completion lookup", uri)));
   }
@@ -235,15 +240,20 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>>
       definition(DefinitionParams params) {
     String uri = params.getTextDocument().getUri();
-    List<Location> definitions =
-        docs.containsKey(uri)
-            ? occurrences.findDefinitions(docs.get(uri), params)
-            : Collections.emptyList();
-    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
-            disposableLSPStateService,
-            (Supplier<Either<List<? extends Location>, List<? extends LocationLink>>>)
-                () -> Either.forLeft(definitions),
-            executors.getThreadPoolExecutor())
+    return futureMap
+        .getOrDefault(uri, CompletableFuture.completedFuture(null))
+        .thenCompose(
+            res -> {
+              List<Location> definitions =
+                  docs.containsKey(uri)
+                      ? occurrences.findDefinitions(docs.get(uri), params)
+                      : Collections.emptyList();
+              return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
+                  disposableLSPStateService,
+                  (Supplier<Either<List<? extends Location>, List<? extends LocationLink>>>)
+                      () -> Either.forLeft(definitions),
+                  executors.getThreadPoolExecutor());
+            })
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("definitions resolving", uri)));
   }
@@ -252,14 +262,19 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   @SuppressWarnings("cast")
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
     String uri = params.getTextDocument().getUri();
-    List<Location> references =
-        docs.containsKey(uri)
-            ? occurrences.findReferences(docs.get(uri), params, params.getContext())
-            : Collections.emptyList();
-    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
-            disposableLSPStateService,
-            (Supplier<List<? extends Location>>) () -> references,
-            executors.getThreadPoolExecutor())
+    return futureMap
+        .getOrDefault(uri, CompletableFuture.completedFuture(null))
+        .thenCompose(
+            res -> {
+              List<Location> references =
+                  docs.containsKey(uri)
+                      ? occurrences.findReferences(docs.get(uri), params, params.getContext())
+                      : Collections.emptyList();
+              return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
+                  disposableLSPStateService,
+                  (Supplier<List<? extends Location>>) () -> references,
+                  executors.getThreadPoolExecutor());
+            })
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("references resolving", uri)));
   }
@@ -269,13 +284,19 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
       DocumentHighlightParams params) {
     String uri = params.getTextDocument().getUri();
-    Supplier<List<? extends DocumentHighlight>> listSupplier =
-        () ->
-            docs.containsKey(uri)
-                ? occurrences.findHighlights(docs.getOrDefault(uri, new CobolDocumentModel("", "")), params)
-                : Collections.emptyList();
-    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
-            disposableLSPStateService, listSupplier, executors.getThreadPoolExecutor())
+    return futureMap
+        .getOrDefault(uri, CompletableFuture.completedFuture(null))
+        .thenCompose(
+            res -> {
+              Supplier<List<? extends DocumentHighlight>> listSupplier =
+                  () ->
+                      docs.containsKey(uri)
+                          ? occurrences.findHighlights(
+                              docs.getOrDefault(uri, new CobolDocumentModel("", "")), params)
+                          : Collections.emptyList();
+              return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
+                  disposableLSPStateService, listSupplier, executors.getThreadPoolExecutor());
+            })
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("document highlighting", uri)));
   }
@@ -346,7 +367,12 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     }
     interruptAnalysis(uri);
     communications.notifyProgressBegin(uri);
-    analyzeChanges(uri, text);
+    registerFutureTask(
+        uri,
+        () -> {
+          doAnalysis(uri, text, false, false);
+          return null;
+        });
   }
 
   private void reanalyseOpenedPrograms(DidChangeTextDocumentParams params, String uri)
@@ -452,39 +478,33 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   }
 
   private void clearAnalysedFutureObject(String uri) {
-    futureMap.remove(uri);
+    futureMap.get(uri).complete(null);
   }
 
   private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
-    FutureTask<Void> task =
-        registerToFutureMap(
-            uri,
-            () -> {
-              doAnalysis(uri, text, userRequest, true);
-              return null;
-            });
+    registerFutureTask(
+        uri,
+        () -> {
+          doAnalysis(uri, text, userRequest, true);
+          return null;
+        });
     if (!isCopybook(uri, text, copybookExtensions)) {
       communications.notifyProgressBegin(uri);
     }
-    executors.getThreadPoolExecutor().submit(task);
   }
 
   private void doAnalysis(String uri, String text, boolean userRequest, boolean firstTime) {
     synchronized (syncProvider.getSync(uri)) {
       try {
-        CopybookProcessingMode copybookProcessingMode = userRequest
-                ? CopybookProcessingMode.ENABLED_VERBOSE
-                : CopybookProcessingMode.ENABLED;
+        CopybookProcessingMode copybookProcessingMode =
+                userRequest ? CopybookProcessingMode.ENABLED_VERBOSE : CopybookProcessingMode.ENABLED;
 
         CopybookProcessingMode processingMode =
-            CopybookProcessingMode.getCopybookProcessingMode(uri,
-                    firstTime
-                            ? copybookProcessingMode
-                            : CopybookProcessingMode.SKIP);
-
+                CopybookProcessingMode.getCopybookProcessingMode(
+                        uri, firstTime ? copybookProcessingMode : CopybookProcessingMode.SKIP);
         if (firstTime && isCopybook(uri, text, waitExtensionConfig())) {
-            outlineMap.get(uri).complete(Collections.emptyList());
-            return;
+          outlineMap.get(uri).complete(Collections.emptyList());
+          return;
         }
         AnalysisConfig config = configurationService.getConfig(uri, processingMode);
         AnalysisResult result = engine.analyze(uri, text, config);
@@ -514,37 +534,29 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         cfAstMap.get(uri).complete(result.getRootNode());
       } catch (Exception ex) {
         cfAstMap.get(uri).completeExceptionally(ex);
+        futureMap.get(uri).completeExceptionally(ex);
+        communications.logGeneralMessage(MessageType.Error, createDescriptiveErrorMessage("analysis", uri));
         LOG.error(createDescriptiveErrorMessage("analysis", uri), ex);
         throw ex;
       } finally {
+        communications.notifyProgressEnd(uri);
         clearAnalysedFutureObject(uri);
       }
     }
   }
 
-  private FutureTask<Void> registerToFutureMap(String uri, Callable<Void> task) {
+  private CompletableFuture<Void> registerFutureTask(String uri, Supplier<Void> task) {
     synchronized (futureMap) {
       Optional.ofNullable(futureMap.get(uri)).ifPresent(f -> f.cancel(true));
-      FutureTask<Void> future = new FutureTask<>(task);
+      CompletableFuture<Void> future = new CompletableFuture<>();
       futureMap.put(uri, future);
+      future = CompletableFuture.supplyAsync(task, executors.getThreadPoolExecutor());
       return future;
     }
   }
 
-  void analyzeChanges(String uri, String text) {
-    FutureTask<Void> task =
-        registerToFutureMap(
-            uri,
-            () -> {
-              doAnalysis(uri, text, false, false);
-              return null;
-            });
-    executors.getThreadPoolExecutor().submit(task);
-  }
-
   private void notifyAnalysisFinished(
       String uri, List<String> copybooks, CopybookProcessingMode copybookProcessingMode) {
-    communications.notifyProgressEnd(uri);
     dataBus.postData(
         AnalysisFinishedEvent.builder()
             .documentUri(uri)
