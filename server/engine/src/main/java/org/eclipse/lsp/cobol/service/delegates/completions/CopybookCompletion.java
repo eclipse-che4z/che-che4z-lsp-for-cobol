@@ -37,7 +37,7 @@ public class CopybookCompletion implements Completion {
   @Override
   public @NonNull Collection<CompletionItem> getCompletionItems(
       @NonNull String token, @Nullable CobolDocumentModel document) {
-    if (document == null) return emptyList();
+    if (!isDocumentReadyForSemanticCollection(document)) return emptyList();
     return document
         .getAnalysisResult()
         .getRootNode()
