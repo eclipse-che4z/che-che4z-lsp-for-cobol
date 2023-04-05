@@ -11,8 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-{
-  // See http://go.microsoft.com/fwlink/?LinkId=827846
-  // for the documentation about the extensions.json format
-  "recommendations": ["esbenp.prettier-vscode"]
-}
+
+module.exports = {
+  trailingComma: "all",
+};
