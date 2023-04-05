@@ -94,6 +94,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -221,18 +222,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
       CompletionParams params) {
     String uri = params.getTextDocument().getUri();
-    return futureMap
-        .getOrDefault(uri, CompletableFuture.completedFuture(null))
-        .thenCompose(
-            res ->
-                ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
-                    disposableLSPStateService,
-                    () ->
-                        Either.<List<CompletionItem>, CompletionList>forRight(
-                            completions.collectFor(docs.get(uri), params)),
-                    executors.getThreadPoolExecutor()))
-        .whenComplete(
-            reportExceptionIfThrown(createDescriptiveErrorMessage("completion lookup", uri)));
+    return handleResponse(
+        () -> Either.forRight(completions.collectFor(docs.get(uri), params)),
+        uri,
+        createDescriptiveErrorMessage("completion lookup", uri));
   }
 
   @Override
@@ -240,43 +233,33 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>>
       definition(DefinitionParams params) {
     String uri = params.getTextDocument().getUri();
-    return futureMap
-        .getOrDefault(uri, CompletableFuture.completedFuture(null))
-        .thenCompose(
-            res -> {
-              List<Location> definitions =
-                  docs.containsKey(uri)
-                      ? occurrences.findDefinitions(docs.get(uri), params)
-                      : Collections.emptyList();
-              return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
-                  disposableLSPStateService,
-                  (Supplier<Either<List<? extends Location>, List<? extends LocationLink>>>)
-                      () -> Either.forLeft(definitions),
-                  executors.getThreadPoolExecutor());
-            })
-        .whenComplete(
-            reportExceptionIfThrown(createDescriptiveErrorMessage("definitions resolving", uri)));
+    Supplier<Either<List<? extends Location>, List<? extends LocationLink>>> definitionSupplier =
+        () -> {
+          List<Location> definitions =
+              isDocumentSynced(uri)
+                  ? occurrences.findDefinitions(docs.get(uri), params)
+                  : Collections.emptyList();
+          return Either.forLeft(definitions);
+        };
+    return handleResponse(
+        definitionSupplier, uri, createDescriptiveErrorMessage("definitions resolving", uri));
+  }
+
+  private boolean isDocumentSynced(String uri) {
+    return docs.containsKey(uri) && Objects.nonNull(docs.get(uri).getAnalysisResult());
   }
 
   @Override
   @SuppressWarnings("cast")
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
     String uri = params.getTextDocument().getUri();
-    return futureMap
-        .getOrDefault(uri, CompletableFuture.completedFuture(null))
-        .thenCompose(
-            res -> {
-              List<Location> references =
-                  docs.containsKey(uri)
-                      ? occurrences.findReferences(docs.get(uri), params, params.getContext())
-                      : Collections.emptyList();
-              return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
-                  disposableLSPStateService,
-                  (Supplier<List<? extends Location>>) () -> references,
-                  executors.getThreadPoolExecutor());
-            })
-        .whenComplete(
-            reportExceptionIfThrown(createDescriptiveErrorMessage("references resolving", uri)));
+    Supplier<List<? extends Location>> referenceSupplier =
+        () ->
+            isDocumentSynced(uri)
+                ? occurrences.findReferences(docs.get(uri), params, params.getContext())
+                : Collections.emptyList();
+    return handleResponse(
+        referenceSupplier, uri, createDescriptiveErrorMessage("references resolving", uri));
   }
 
   @Override
@@ -284,21 +267,33 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
       DocumentHighlightParams params) {
     String uri = params.getTextDocument().getUri();
+    Supplier<List<? extends DocumentHighlight>> listSupplier =
+        () ->
+            isDocumentSynced(uri)
+                ? occurrences.findHighlights(
+                    docs.getOrDefault(uri, new CobolDocumentModel("", "")), params)
+                : Collections.emptyList();
+    return handleResponse(
+        listSupplier, uri, createDescriptiveErrorMessage("document highlighting", uri));
+  }
+
+  private <U> CompletableFuture<U> handleResponse(
+      Supplier<U> supplier, String uri, String exceptionMessage) {
     return futureMap
         .getOrDefault(uri, CompletableFuture.completedFuture(null))
-        .thenCompose(
-            res -> {
-              Supplier<List<? extends DocumentHighlight>> listSupplier =
-                  () ->
-                      docs.containsKey(uri)
-                          ? occurrences.findHighlights(
-                              docs.getOrDefault(uri, new CobolDocumentModel("", "")), params)
-                          : Collections.emptyList();
-              return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
-                  disposableLSPStateService, listSupplier, executors.getThreadPoolExecutor());
+        .handle(
+            (result, error) -> {
+              if (error != null) {
+                return new CompletableFuture<>().completeExceptionally(error);
+              } else {
+                return new CompletableFuture<>().complete(result);
+              }
             })
-        .whenComplete(
-            reportExceptionIfThrown(createDescriptiveErrorMessage("document highlighting", uri)));
+        .thenCompose(
+            res ->
+                ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
+                    disposableLSPStateService, supplier, executors.getThreadPoolExecutor()))
+        .whenComplete(reportExceptionIfThrown(exceptionMessage));
   }
 
   @Override
@@ -479,7 +474,9 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   }
 
   private void clearAnalysedFutureObject(String uri) {
-    futureMap.get(uri).complete(null);
+    if (!futureMap.get(uri).isCompletedExceptionally()) {
+      futureMap.get(uri).complete(null);
+    }
   }
 
   private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
