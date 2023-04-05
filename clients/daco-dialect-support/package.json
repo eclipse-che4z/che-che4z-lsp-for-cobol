@@ -89,7 +89,8 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
+    "lint": "prettier -c src && eslint src --ext ts",
+    "pretty": "prettier -w .",
     "test": "node ./out/test/runTest.js",
     "package": "vsce package"
   },
@@ -104,6 +105,7 @@
     "glob": "^8.0.3",
     "mocha": "^10.1.0",
     "patch-package": "^6.4.7",
+    "prettier": "2.8.7",
     "ts-jest": "^29.0.1",
     "tslint": "^5.18.0",
     "eslint-plugin-sonarjs": "^0.15.0",
