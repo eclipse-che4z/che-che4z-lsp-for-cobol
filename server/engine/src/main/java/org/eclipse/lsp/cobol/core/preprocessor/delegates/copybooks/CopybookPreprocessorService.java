@@ -116,7 +116,7 @@ class CopybookPreprocessorService {
     if (copybook != null) {
       if (hierarchy.hasRecursion(name)) {
         errors.add(copybookErrorService.addRecursionError(name.getQualifiedName(), statementLocality.toBuilder().copybookId(null).build()));
-        currentDocument.replace(VisitorHelper.constructRange(ctx), "");
+        currentDocument.erase(VisitorHelper.constructRange(ctx));
         copybooks.define(copybookName, null, currentDocument.getUri(), copybook.getUri());
         return;
       }
@@ -132,7 +132,7 @@ class CopybookPreprocessorService {
       }
       copybooks.define(copybookName, null, currentDocument.getUri(), copybook.getUri());
     } else {
-      currentDocument.replace(VisitorHelper.constructRange(ctx), "");
+      currentDocument.erase(VisitorHelper.constructRange(ctx));
       errors.add(copybookErrorService.addMissingCopybook(name.getQualifiedName(), nameLocality));
     }
   }
