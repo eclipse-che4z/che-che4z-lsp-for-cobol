@@ -151,6 +151,14 @@ public class TextTransformations {
     extensions.put(range, textTransformations);
   }
 
+  /**
+   * Static constructor for empty transformations opbect
+   *
+   * @return an empty transformations object
+   */
+  public static TextTransformations empty() {
+    return new TextTransformations("", "");
+  }
 
   /**
    * Static constructor for transformations
