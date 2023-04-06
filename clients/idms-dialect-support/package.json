@@ -7,7 +7,7 @@
   "version": "0.0.1",
   "preview": false,
   "publisher": "BroadcomMFD",
-  "keywords" : [
+  "keywords": [
     "idms",
     "cobol",
     "mainframe",
@@ -32,7 +32,7 @@
     "onCommand:cobol-lsp.dialect.register",
     "onLanguage:cobol",
     "workspaceContains:/.c4z"
-],
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [],
@@ -42,27 +42,27 @@
         "cobol-lsp.cpy-manager.idms.paths-local": {
           "type": "array",
           "items": {
-              "type": "string"
+            "type": "string"
           },
           "description": "Default list of local paths to search for IDMS copybooks",
           "uniqueItems": true
+        },
+        "cobol-lsp.cpy-manager.idms.paths-dsn": {
+          "type": "array",
+          "items": {
+            "type": "string"
           },
-          "cobol-lsp.cpy-manager.idms.paths-dsn": {
-              "type": "array",
-              "items": {
-                  "type": "string"
-              },
-              "description": "Default list of datasets to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-              "uniqueItems": true
+          "description": "Default list of datasets to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+          "uniqueItems": true
+        },
+        "cobol-lsp.cpy-manager.idms.paths-uss": {
+          "type": "array",
+          "items": {
+            "type": "string"
           },
-          "cobol-lsp.cpy-manager.idms.paths-uss": {
-              "type": "array",
-              "items": {
-                  "type": "string"
-              },
-              "description": "Default list of USS paths to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-              "uniqueItems": true
-          }
+          "description": "Default list of USS paths to search for IDMS copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+          "uniqueItems": true
+        }
       }
     }
   },
@@ -72,7 +72,8 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
+    "pretty": "prettier -w .",
+    "lint": "prettier -c . && eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
     "package": "vsce package"
   },
@@ -87,6 +88,7 @@
     "glob": "^8.0.3",
     "mocha": "^10.1.0",
     "patch-package": "^6.4.7",
+    "prettier": "2.8.7",
     "ts-jest": "^29.0.1",
     "tslint": "^5.18.0",
     "eslint-plugin-sonarjs": "^0.15.0",
@@ -94,5 +96,7 @@
     "typescript": "^4.9.3",
     "@vscode/test-electron": "^2.2.0"
   },
-  "extensionDependencies": ["BroadcomMFD.cobol-language-support"]
+  "extensionDependencies": [
+    "BroadcomMFD.cobol-language-support"
+  ]
 }

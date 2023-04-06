@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2022 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,11 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { Disposable } from "vscode";
-import { TelemetryEvent } from "./model/TelemetryEvent";
-
-export interface TelemetryReport extends Disposable {
-  reportEvent(content: TelemetryEvent): void;
-
-  reportExceptionEvent(content: TelemetryEvent): void;
-}
+module.exports = {
+  trailingComma: "all",
+};

@@ -20,78 +20,97 @@ import * as vscode from "vscode";
  * @param actionType an item from CommentAction
  */
 export function commentCommand(actionType: CommentAction) {
-    const activeEditor = vscode.window.activeTextEditor;
-    if (!activeEditor) {
-        return;
-    }
-    new ToggleComments(activeEditor, actionType).doIt();
+  const activeEditor = vscode.window.activeTextEditor;
+  if (!activeEditor) {
+    return;
+  }
+  new ToggleComments(activeEditor, actionType).doIt();
 }
 
 /**
  * Toggles comments in the active text editor based on selection and action type.
  */
 export class ToggleComments {
-    constructor(private textEditor: vscode.TextEditor, private actionType: CommentAction) { }
+  constructor(
+    private textEditor: vscode.TextEditor,
+    private actionType: CommentAction,
+  ) {}
 
-    /**
-     * Do commenting/uncommenting.
-     */
-    public doIt() {
-        const replacingList = [];
-        for (const selection of this.textEditor.selections)
-            replacingList.push(this.handleSelection(selection));
-        if (replacingList.length === 0) return;
-        this.textEditor.edit(editBuilder => {
-            for (const replacing of replacingList)
-                editBuilder.replace(replacing.selection, replacing.text)
-        });
-    }
+  /**
+   * Do commenting/uncommenting.
+   */
+  public doIt() {
+    const replacingList = [];
+    for (const selection of this.textEditor.selections)
+      replacingList.push(this.handleSelection(selection));
+    if (replacingList.length === 0) return;
+    this.textEditor.edit((editBuilder) => {
+      for (const replacing of replacingList)
+        editBuilder.replace(replacing.selection, replacing.text);
+    });
+  }
 
-    private handleSelection(selection: vscode.Selection) {
-        const selectedLines = this.getSelectedLines(selection)
-        const textLines = selectedLines.map(it => it.text).map(ensureIndicatorArea);
-        const processedLines = textLines.map(this.evaluateAction(textLines));
-        const lineSeparator = this.textEditor.document.eol === vscode.EndOfLine.LF ? '\n' : '\r\n';
-        const selectionRange = new vscode.Range(
-            new vscode.Position(selectedLines[0].range.start.line, 0),
-            new vscode.Position(selectedLines[selectedLines.length - 1].range.end.line, selectedLines[selectedLines.length - 1].range.end.character));
-        return {selection: selectionRange, text: processedLines.join(lineSeparator)}
-    }
+  private handleSelection(selection: vscode.Selection) {
+    const selectedLines = this.getSelectedLines(selection);
+    const textLines = selectedLines
+      .map((it) => it.text)
+      .map(ensureIndicatorArea);
+    const processedLines = textLines.map(this.evaluateAction(textLines));
+    const lineSeparator =
+      this.textEditor.document.eol === vscode.EndOfLine.LF ? "\n" : "\r\n";
+    const selectionRange = new vscode.Range(
+      new vscode.Position(selectedLines[0].range.start.line, 0),
+      new vscode.Position(
+        selectedLines[selectedLines.length - 1].range.end.line,
+        selectedLines[selectedLines.length - 1].range.end.character,
+      ),
+    );
+    return {
+      selection: selectionRange,
+      text: processedLines.join(lineSeparator),
+    };
+  }
 
-    private evaluateAction(textLines: string[]) {
-        switch (this.actionType) {
-            case CommentAction.COMMENT: return commentLine;
-            case CommentAction.UNCOMMENT: return uncommentLine;
-            case CommentAction.TOGGLE:
-                const allIsComment = textLines
-                    .map(getLineCommentStatus)
-                    .every(it => it === LineCommentStatus.COMMENT || it === LineCommentStatus.COMMENTED_TWICE);
-                return allIsComment ? uncommentLine : commentLine;
-        }
+  private evaluateAction(textLines: string[]) {
+    switch (this.actionType) {
+      case CommentAction.COMMENT:
+        return commentLine;
+      case CommentAction.UNCOMMENT:
+        return uncommentLine;
+      case CommentAction.TOGGLE:
+        const allIsComment = textLines
+          .map(getLineCommentStatus)
+          .every(
+            (it) =>
+              it === LineCommentStatus.COMMENT ||
+              it === LineCommentStatus.COMMENTED_TWICE,
+          );
+        return allIsComment ? uncommentLine : commentLine;
     }
+  }
 
-    private getSelectedLines(selection: vscode.Selection): vscode.TextLine[] {
-        const selectedLines = [];
-        for (let i = selection.start.line; i <= selection.end.line; i++)
-            selectedLines.push(this.textEditor.document.lineAt(i));
-        return selectedLines;
-    }
+  private getSelectedLines(selection: vscode.Selection): vscode.TextLine[] {
+    const selectedLines = [];
+    for (let i = selection.start.line; i <= selection.end.line; i++)
+      selectedLines.push(this.textEditor.document.lineAt(i));
+    return selectedLines;
+  }
 }
 
 export enum CommentAction {
-    COMMENT,
-    UNCOMMENT,
-    TOGGLE
+  COMMENT,
+  UNCOMMENT,
+  TOGGLE,
 }
 
 export enum LineCommentStatus {
-    COMMENT,
-    COMMENTED_TWICE,
-    OTHER_TYPE, // the other type is used when we have something other than a comment in indicator area
-    NON_COMMENT
+  COMMENT,
+  COMMENTED_TWICE,
+  OTHER_TYPE, // the other type is used when we have something other than a comment in indicator area
+  NON_COMMENT,
 }
 
-const CBL_REGEXP = new RegExp('^\\s{0,6}((CBL|PROCESS)\\s+.*)$', 'i')
+const CBL_REGEXP = new RegExp("^\\s{0,6}((CBL|PROCESS)\\s+.*)$", "i");
 
 /**
  * Shift CBL/PROCESS to right if it is in sequence or indicator area.
@@ -99,9 +118,9 @@ const CBL_REGEXP = new RegExp('^\\s{0,6}((CBL|PROCESS)\\s+.*)$', 'i')
  * @param line a COBOL line
  */
 export function ensureIndicatorArea(line: string): string {
-    const match = CBL_REGEXP.exec(line);
-    if (match) return '       ' + match[1];
-    return line;
+  const match = CBL_REGEXP.exec(line);
+  if (match) return "       " + match[1];
+  return line;
 }
 
 /**
@@ -110,14 +129,15 @@ export function ensureIndicatorArea(line: string): string {
  * @param line a COBOL line
  */
 export function getLineCommentStatus(line: string): LineCommentStatus {
-    const indicatorArea = line.charAt(6);
-    if (indicatorArea === '*' || indicatorArea === '/') {
-        const afterIndicator = line.charAt(7);
-        if (afterIndicator === '*' || afterIndicator === '/') return LineCommentStatus.COMMENTED_TWICE;
-        return LineCommentStatus.COMMENT;
-    }
-    if (indicatorArea === ' ') return LineCommentStatus.NON_COMMENT;
-    return LineCommentStatus.OTHER_TYPE;
+  const indicatorArea = line.charAt(6);
+  if (indicatorArea === "*" || indicatorArea === "/") {
+    const afterIndicator = line.charAt(7);
+    if (afterIndicator === "*" || afterIndicator === "/")
+      return LineCommentStatus.COMMENTED_TWICE;
+    return LineCommentStatus.COMMENT;
+  }
+  if (indicatorArea === " ") return LineCommentStatus.NON_COMMENT;
+  return LineCommentStatus.OTHER_TYPE;
 }
 
 /**
@@ -126,10 +146,13 @@ export function getLineCommentStatus(line: string): LineCommentStatus {
  * @param line a COBOL line
  */
 export function commentLine(line: string): string {
-    const status = getLineCommentStatus(line);
-    if (status === LineCommentStatus.COMMENT || status === LineCommentStatus.COMMENTED_TWICE)
-        return line.substring(0, 6) + '*' + line.substring(6);
-    return setIndicatorTo(line, '*');
+  const status = getLineCommentStatus(line);
+  if (
+    status === LineCommentStatus.COMMENT ||
+    status === LineCommentStatus.COMMENTED_TWICE
+  )
+    return line.substring(0, 6) + "*" + line.substring(6);
+  return setIndicatorTo(line, "*");
 }
 
 /**
@@ -138,12 +161,11 @@ export function commentLine(line: string): string {
  * @param line a COBOL line
  */
 export function uncommentLine(line: string): string {
-    const status = getLineCommentStatus(line);
-    if (status === LineCommentStatus.COMMENT)
-        return setIndicatorTo(line, ' ');
-    if (status === LineCommentStatus.COMMENTED_TWICE)
-        return line.substring(0, 6) + line.substring(7);
-    return line;
+  const status = getLineCommentStatus(line);
+  if (status === LineCommentStatus.COMMENT) return setIndicatorTo(line, " ");
+  if (status === LineCommentStatus.COMMENTED_TWICE)
+    return line.substring(0, 6) + line.substring(7);
+  return line;
 }
 
 /**
@@ -153,7 +175,7 @@ export function uncommentLine(line: string): string {
  * @param indicator a desired indicator
  */
 export function setIndicatorTo(line: string, indicator: string): string {
-    const sequenceArea = line.substring(0, 6);
-    const tail = line.substring(7);
-    return sequenceArea + ' '.repeat(6 - sequenceArea.length) + indicator + tail;
+  const sequenceArea = line.substring(0, 6);
+  const tail = line.substring(7);
+  return sequenceArea + " ".repeat(6 - sequenceArea.length) + indicator + tail;
 }
