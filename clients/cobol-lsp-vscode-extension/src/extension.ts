@@ -139,10 +139,6 @@ function getDialectAPI_v_1_0() {
       outputChannel.appendLine(
         "Register new dialect: \r\n" + JSON.stringify(dialect),
       );
-      const dialectExtension = vscode.extensions.getExtension(
-        dialect.extensionId,
-      );
-      await dialectExtension.activate();
 
       DialectRegistry.register(
         dialect.extensionId,
