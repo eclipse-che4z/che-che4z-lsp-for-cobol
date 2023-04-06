@@ -115,14 +115,6 @@ export async function activate(context: vscode.ExtensionContext) {
   await languageClientService.start();
 
   // 'export' public api-surface
-  return openApi();
-}
-
-export function deactivate() {
-  return languageClientService.stop();
-}
-
-function openApi() {
   return {
     analysis(uri: string, text: string): Promise<any> {
       return languageClientService.retrieveAnalysis(uri, text);
@@ -134,6 +126,10 @@ function openApi() {
       return API_VERSION;
     },
   };
+}
+
+export function deactivate() {
+  return languageClientService.stop();
 }
 
 function getDialectAPI_v_1_0() {
