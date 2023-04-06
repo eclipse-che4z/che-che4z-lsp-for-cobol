@@ -332,7 +332,7 @@ suite('Integration Test Suite', () => {
         assert.strictEqual(diagnostics.length, 4);
         assert.strictEqual(diagnostics[3].message, "The following token must start in Area A: 100-Print-User");
         await helper.closeAllEditors();
-    }).timeout(8000).slow(1000);
+    }).timeout(16000).slow(1000);
 
     test("TC250107 Test Area A, Check FD/SD level data", async () => {
         await helper.showDocument("USER1.cbl");

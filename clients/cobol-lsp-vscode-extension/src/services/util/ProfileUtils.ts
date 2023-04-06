@@ -6,6 +6,9 @@ import { Utils } from "./Utils";
 export class ProfileUtils {
     public static async getProfileNameForCopybook(cobolFileName: string): Promise<(string | undefined)> {
         const zoweExplorerApi = await Utils.getZoweExplorerAPI();
+        if(!zoweExplorerApi) {
+            return undefined;
+        }
         let availableProfiles: string[] = [];
         zoweExplorerApi.registeredApiTypes().forEach(profileType => {
             availableProfiles = availableProfiles
