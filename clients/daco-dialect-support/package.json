@@ -1,6 +1,6 @@
 {
   "name": "daco-dialect-for-cobol",
-  "displayName": "DaCo Dialect for COBOL",
+  "displayName": "COBOL Dialect Support for DaCo",
   "description": "Autocomplete, highlighting and diagnostics for DaCo COBOL code and copybooks",
   "author": "Broadcom",
   "license": "EPL-2.0",
