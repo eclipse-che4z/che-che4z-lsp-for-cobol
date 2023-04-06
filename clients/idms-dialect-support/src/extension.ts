@@ -11,7 +11,7 @@ let unregisterDialect: () => void;
 
 export async function activate(context: vscode.ExtensionContext) {
   const extensionUri = context.extensionUri;
-  const executablePath = join(extensionUri.path, "server", "jar");
+  const jarFolder = join(extensionUri.path, "server", "jar");
   const snippetPath = join(extensionUri.path, "snippets.json");
 
   const main = vscode.extensions.getExtension(mainExtension);
@@ -27,7 +27,7 @@ export async function activate(context: vscode.ExtensionContext) {
   unregisterDialect = mainApi.dialectAPI_1_0().registerDialect({
     extensionId: extensionId,
     name: dialectName,
-    path: executablePath,
+    path: jarFolder,
     description: "IDMS dialect support",
     snippetPath: snippetPath,
   });
