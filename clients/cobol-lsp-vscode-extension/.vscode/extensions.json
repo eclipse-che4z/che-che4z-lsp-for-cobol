@@ -12,9 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 {
-    "recommendations": [
-        "ms-vscode.vscode-typescript-tslint-plugin",
-        "esbenp.prettier-vscode",
-        "editorconfig.editorconfig"
-    ]
+  // See http://go.microsoft.com/fwlink/?LinkId=827846
+  // for the documentation about the extensions.json format
+  "recommendations": ["esbenp.prettier-vscode"]
 }
