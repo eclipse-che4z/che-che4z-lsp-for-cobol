@@ -2,13 +2,13 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 
-const extensionId: string = "BroadcomMFD.idms-dialect-for-cobol";
 const mainExtension: string = "BroadcomMFD.cobol-language-support";
-
 const dialectName = "IDMS";
+
 let unregisterDialect: () => void;
 
 export async function activate(context: vscode.ExtensionContext) {
+  const extensionId = context.extension.id;
   const extensionUri = context.extensionUri;
   const jarFolderUri = vscode.Uri.joinPath(extensionUri, "server", "jar");
   const snippetPathUri = vscode.Uri.joinPath(extensionUri, "snippets.json");
