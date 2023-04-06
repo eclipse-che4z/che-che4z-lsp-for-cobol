@@ -10,7 +10,12 @@ let unregisterDialect: () => void;
 export async function activate(context: vscode.ExtensionContext) {
   const extensionId = context.extension.id;
   const extensionUri = context.extensionUri;
-  const jarFolderUri = vscode.Uri.joinPath(extensionUri, "server", "jar");
+  const jarFolderUri = vscode.Uri.joinPath(
+    extensionUri,
+    "server",
+    "jar",
+    /* TODO: "dialect-jar.jar" */
+  );
   const snippetPathUri = vscode.Uri.joinPath(extensionUri, "snippets.json");
 
   const main = vscode.extensions.getExtension(mainExtension);
