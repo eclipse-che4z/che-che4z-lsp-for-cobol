@@ -1,6 +1,5 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { join } from "path";
 import * as vscode from "vscode";
 
 const extensionId: string = "BroadcomMFD.idms-dialect-for-cobol";
@@ -11,8 +10,8 @@ let unregisterDialect: () => void;
 
 export async function activate(context: vscode.ExtensionContext) {
   const extensionUri = context.extensionUri;
-  const jarFolder = join(extensionUri.path, "server", "jar");
-  const snippetPath = join(extensionUri.path, "snippets.json");
+  const jarFolderUri = vscode.Uri.joinPath(extensionUri, "server", "jar");
+  const snippetPathUri = vscode.Uri.joinPath(extensionUri, "snippets.json");
 
   const main = vscode.extensions.getExtension(mainExtension);
   if (main === undefined) {
@@ -27,9 +26,9 @@ export async function activate(context: vscode.ExtensionContext) {
   unregisterDialect = mainApi.dialectAPI_1_0().registerDialect({
     extensionId: extensionId,
     name: dialectName,
-    path: jarFolder,
+    path: jarFolderUri.path,
     description: "IDMS dialect support",
-    snippetPath: snippetPath,
+    snippetPath: snippetPathUri.path,
   });
 }
 
