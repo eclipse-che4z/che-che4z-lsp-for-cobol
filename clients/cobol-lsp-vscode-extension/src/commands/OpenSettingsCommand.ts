@@ -12,9 +12,16 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import {TelemetryService} from "../services/reporter/TelemetryService";
+import { TelemetryService } from "../services/reporter/TelemetryService";
 
 export function gotoCopybookSettings(): void {
-    TelemetryService.registerEvent("Open copybook settings", ["COBOL", "copybook", "settings"], "The user invokes the open settings quick fix to see the copybook locations stored in the settings file");
-    vscode.commands.executeCommand("workbench.action.openSettings", "cobol-lsp.cpy-manager");
+  TelemetryService.registerEvent(
+    "Open copybook settings",
+    ["COBOL", "copybook", "settings"],
+    "The user invokes the open settings quick fix to see the copybook locations stored in the settings file",
+  );
+  vscode.commands.executeCommand(
+    "workbench.action.openSettings",
+    "cobol-lsp.cpy-manager",
+  );
 }

@@ -15,27 +15,27 @@
 import { DialectRegistry } from "../../services/DialectRegistry";
 
 describe("DialectRegistry test", () => {
-    beforeEach(() => {
-        DialectRegistry.clear();
-    });
+  beforeEach(() => {
+    DialectRegistry.clear();
+  });
 
-    it("register/unregister new dialect in the registry", () => {
-        DialectRegistry.register("dialectId", "new", "path", "desc", "path");
-        expect(DialectRegistry.getDialects().length).toBe(1);
+  it("register/unregister new dialect in the registry", () => {
+    DialectRegistry.register("dialectId", "new", "path", "desc", "path");
+    expect(DialectRegistry.getDialects().length).toBe(1);
 
-        DialectRegistry.unregister("new");
-        expect(DialectRegistry.getDialects().length).toBe(0);
-    });
+    DialectRegistry.unregister("new");
+    expect(DialectRegistry.getDialects().length).toBe(0);
+  });
 
-    it("retrieve dialects from the registry", () => {
-        DialectRegistry.register("id", "dialect", "path", "desc", "snippetPath");
-        const result = DialectRegistry.getDialects();
-        
-        expect(result.length).toBe(1);
-        expect(result[0].name).toBe("dialect");
-        expect(result[0].description).toBe("desc");
-        expect(result[0].extensionId).toBe("id");
-        expect(result[0].path).toBe("path");
-        expect(result[0].snippetPath).toBe("snippetPath");
-    });
+  it("retrieve dialects from the registry", () => {
+    DialectRegistry.register("id", "dialect", "path", "desc", "snippetPath");
+    const result = DialectRegistry.getDialects();
+
+    expect(result.length).toBe(1);
+    expect(result[0].name).toBe("dialect");
+    expect(result[0].description).toBe("desc");
+    expect(result[0].extensionId).toBe("id");
+    expect(result[0].path).toBe("path");
+    expect(result[0].snippetPath).toBe("snippetPath");
+  });
 });

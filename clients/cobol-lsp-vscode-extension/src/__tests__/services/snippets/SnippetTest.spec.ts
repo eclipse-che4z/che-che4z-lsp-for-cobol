@@ -13,114 +13,277 @@
  */
 
 import * as vscode from "vscode";
-import { SnippetCompletionProvider  } from "../../../services/snippetcompletion/SnippetCompletionProvider";
-
+import { SnippetCompletionProvider } from "../../../services/snippetcompletion/SnippetCompletionProvider";
 
 describe("Test CompletionProvider", () => {
-    const context = { triggerKind: {}, diagnostics: [], only: undefined };
-    const snippetcompletion: SnippetCompletionProvider = new SnippetCompletionProvider();
-    const SNIPPET_CBL = "SNIPPET.cbl";
-    beforeAll(() => {
-        (vscode.extensions as any) = {
-            getExtension: jest.fn().mockReturnValue({
-                extensionPath: "/test", packageJSON: {
-                    version: 1,
-                },
-            }),
-        };
-        (vscode.CompletionItem as any) = jest.fn();
-        (vscode.SnippetString as any) = jest.fn();
-        (vscode.MarkdownString as any) = jest.fn().mockReturnValue({string: "", appendCodeblock: jest.fn().mockReturnValue({ value : "", language: "COBOL"}) });
-        (vscode.CompletionItemKind as any) = jest.fn();
-    });
-    afterAll(() => {
+  const context = { triggerKind: {}, diagnostics: [], only: undefined };
+  const snippetcompletion: SnippetCompletionProvider =
+    new SnippetCompletionProvider();
+  const SNIPPET_CBL = "SNIPPET.cbl";
+  beforeAll(() => {
+    (vscode.extensions as any) = {
+      getExtension: jest.fn().mockReturnValue({
+        extensionPath: "/test",
+        packageJSON: {
+          version: 1,
+        },
+      }),
+    };
+    (vscode.CompletionItem as any) = jest.fn();
+    (vscode.SnippetString as any) = jest.fn();
+    (vscode.MarkdownString as any) = jest
+      .fn()
+      .mockReturnValue({
+        string: "",
+        appendCodeblock: jest
+          .fn()
+          .mockReturnValue({ value: "", language: "COBOL" }),
+      });
+    (vscode.CompletionItemKind as any) = jest.fn();
+  });
+  afterAll(() => {
     jest.clearAllMocks();
-    });
+  });
 
-    test("Suggest all DaCo Snippets", async () => {
-    const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: ""})} as any;
-    const position = jest.fn().mockImplementation((line, character) => ({line: line, character: character}));
-    const token = { isCancellationRequested: false, onCancellationRequested: jest.fn() };
-
-    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-        get: jest.fn().mockReturnValue(["DaCo"]),
-    });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(222);
-    });
-    test("Suggest all IDMS Snippets", async () => {
-    const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: ""})} as any;
-    const position = jest.fn().mockImplementation((line, character) => ({line: line, character: character}));
-    const token = { isCancellationRequested: false, onCancellationRequested: jest.fn() };
-
-    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-        get: jest.fn().mockReturnValue(["IDMS"]),
-    });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(222);
-});
-    test("Suggest all Cobol only Snippets", async () => {
-    const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: ""})} as any;
-    const position = jest.fn().mockImplementation((line, character) => ({line: line, character: character}));
-    const token = { isCancellationRequested: false, onCancellationRequested: jest.fn() };
+  test("Suggest all DaCo Snippets", async () => {
+    const doc = {
+      uri: { fsPath: "ws-path" },
+      fileName: SNIPPET_CBL,
+      lineAt: jest.fn().mockReturnValue({ text: "" }),
+    } as any;
+    const position = jest
+      .fn()
+      .mockImplementation((line, character) => ({
+        line: line,
+        character: character,
+      }));
+    const token = {
+      isCancellationRequested: false,
+      onCancellationRequested: jest.fn(),
+    };
 
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-        get: jest.fn().mockReturnValue([""]),
+      get: jest.fn().mockReturnValue(["DaCo"]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(222);
-});
-
-    test("Suggest Snippets when both IDMS and DaCo is set", async () => {
-    const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: ""})} as any;
-    const position = jest.fn().mockImplementation((line, character) => ({line: line, character: character}));
-    const token = { isCancellationRequested: false, onCancellationRequested: jest.fn() };
+    expect(
+      (
+        await snippetcompletion.provideCompletionItems(
+          doc,
+          position as any,
+          token,
+          context as any,
+        )
+      ).length,
+    ).toBe(222);
+  });
+  test("Suggest all IDMS Snippets", async () => {
+    const doc = {
+      uri: { fsPath: "ws-path" },
+      fileName: SNIPPET_CBL,
+      lineAt: jest.fn().mockReturnValue({ text: "" }),
+    } as any;
+    const position = jest
+      .fn()
+      .mockImplementation((line, character) => ({
+        line: line,
+        character: character,
+      }));
+    const token = {
+      isCancellationRequested: false,
+      onCancellationRequested: jest.fn(),
+    };
 
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-        get: jest.fn().mockReturnValue(["DaCo", "IDMS"]),
+      get: jest.fn().mockReturnValue(["IDMS"]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(222);
-});
-
-    test(" Test number of suggestions for COPY when no dialect is selected", async () => {
-    const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: "COPY"})} as any;
-    const position = jest.fn().mockImplementation((line, character) => ({line: 0, character: 4}));
-    const token = { isCancellationRequested: false, onCancellationRequested: jest.fn() };
+    expect(
+      (
+        await snippetcompletion.provideCompletionItems(
+          doc,
+          position as any,
+          token,
+          context as any,
+        )
+      ).length,
+    ).toBe(222);
+  });
+  test("Suggest all Cobol only Snippets", async () => {
+    const doc = {
+      uri: { fsPath: "ws-path" },
+      fileName: SNIPPET_CBL,
+      lineAt: jest.fn().mockReturnValue({ text: "" }),
+    } as any;
+    const position = jest
+      .fn()
+      .mockImplementation((line, character) => ({
+        line: line,
+        character: character,
+      }));
+    const token = {
+      isCancellationRequested: false,
+      onCancellationRequested: jest.fn(),
+    };
 
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-        get: jest.fn().mockReturnValue([""]),
+      get: jest.fn().mockReturnValue([""]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(1);
-});
+    expect(
+      (
+        await snippetcompletion.provideCompletionItems(
+          doc,
+          position as any,
+          token,
+          context as any,
+        )
+      ).length,
+    ).toBe(222);
+  });
 
-    test(" Test number of suggestions for COPY when dialect is IDMS", async () => {
-    const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: "COPY"})} as any;
-    const position = jest.fn().mockImplementation((line, character) => ({line: 0, character: 4}));
-    const token = { isCancellationRequested: false, onCancellationRequested: jest.fn() };
+  test("Suggest Snippets when both IDMS and DaCo is set", async () => {
+    const doc = {
+      uri: { fsPath: "ws-path" },
+      fileName: SNIPPET_CBL,
+      lineAt: jest.fn().mockReturnValue({ text: "" }),
+    } as any;
+    const position = jest
+      .fn()
+      .mockImplementation((line, character) => ({
+        line: line,
+        character: character,
+      }));
+    const token = {
+      isCancellationRequested: false,
+      onCancellationRequested: jest.fn(),
+    };
 
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-        get: jest.fn().mockReturnValue(["IDMS"]),
+      get: jest.fn().mockReturnValue(["DaCo", "IDMS"]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(1);
-})
+    expect(
+      (
+        await snippetcompletion.provideCompletionItems(
+          doc,
+          position as any,
+          token,
+          context as any,
+        )
+      ).length,
+    ).toBe(222);
+  });
 
-test(" Test number of suggestions for WRITE when dialect is IDMS", async () => {
-    const doc = { uri: { fsPath: "ws-path" }, fileName: "SNIPPET.cbl", lineAt: jest.fn().mockReturnValue({text: "WRITE"})} as any;
-    const position = jest.fn().mockImplementation((line, character) => { return {line: 0, character: 4} });
-    const token = { isCancellationRequested: false, onCancellationRequested: jest.fn() };
+  test(" Test number of suggestions for COPY when no dialect is selected", async () => {
+    const doc = {
+      uri: { fsPath: "ws-path" },
+      fileName: SNIPPET_CBL,
+      lineAt: jest.fn().mockReturnValue({ text: "COPY" }),
+    } as any;
+    const position = jest
+      .fn()
+      .mockImplementation((line, character) => ({ line: 0, character: 4 }));
+    const token = {
+      isCancellationRequested: false,
+      onCancellationRequested: jest.fn(),
+    };
 
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-        get: jest.fn().mockReturnValue(["IDMS"]),
+      get: jest.fn().mockReturnValue([""]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(1);
-})
+    expect(
+      (
+        await snippetcompletion.provideCompletionItems(
+          doc,
+          position as any,
+          token,
+          context as any,
+        )
+      ).length,
+    ).toBe(1);
+  });
 
-    test(" Test number of suggestions for WRITE when dialect is Daco", async () => {
-    const doc = { uri: { fsPath: "ws-path" }, fileName: SNIPPET_CBL, lineAt: jest.fn().mockReturnValue({text: "WRITE"})} as any;
-    const position = jest.fn().mockImplementation((line, character) => ({line: 0, character: 4}));
-    const token = { isCancellationRequested: false, onCancellationRequested: jest.fn() };
+  test(" Test number of suggestions for COPY when dialect is IDMS", async () => {
+    const doc = {
+      uri: { fsPath: "ws-path" },
+      fileName: SNIPPET_CBL,
+      lineAt: jest.fn().mockReturnValue({ text: "COPY" }),
+    } as any;
+    const position = jest
+      .fn()
+      .mockImplementation((line, character) => ({ line: 0, character: 4 }));
+    const token = {
+      isCancellationRequested: false,
+      onCancellationRequested: jest.fn(),
+    };
 
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-        get: jest.fn().mockReturnValue(["DaCo", "IDMS"]),
+      get: jest.fn().mockReturnValue(["IDMS"]),
     });
-    expect((await snippetcompletion.provideCompletionItems(doc, position as any, token, context as any)).length).toBe(1);
-});
+    expect(
+      (
+        await snippetcompletion.provideCompletionItems(
+          doc,
+          position as any,
+          token,
+          context as any,
+        )
+      ).length,
+    ).toBe(1);
+  });
 
+  test(" Test number of suggestions for WRITE when dialect is IDMS", async () => {
+    const doc = {
+      uri: { fsPath: "ws-path" },
+      fileName: "SNIPPET.cbl",
+      lineAt: jest.fn().mockReturnValue({ text: "WRITE" }),
+    } as any;
+    const position = jest.fn().mockImplementation((line, character) => {
+      return { line: 0, character: 4 };
+    });
+    const token = {
+      isCancellationRequested: false,
+      onCancellationRequested: jest.fn(),
+    };
+
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(["IDMS"]),
+    });
+    expect(
+      (
+        await snippetcompletion.provideCompletionItems(
+          doc,
+          position as any,
+          token,
+          context as any,
+        )
+      ).length,
+    ).toBe(1);
+  });
+
+  test(" Test number of suggestions for WRITE when dialect is Daco", async () => {
+    const doc = {
+      uri: { fsPath: "ws-path" },
+      fileName: SNIPPET_CBL,
+      lineAt: jest.fn().mockReturnValue({ text: "WRITE" }),
+    } as any;
+    const position = jest
+      .fn()
+      .mockImplementation((line, character) => ({ line: 0, character: 4 }));
+    const token = {
+      isCancellationRequested: false,
+      onCancellationRequested: jest.fn(),
+    };
+
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(["DaCo", "IDMS"]),
+    });
+    expect(
+      (
+        await snippetcompletion.provideCompletionItems(
+          doc,
+          position as any,
+          token,
+          context as any,
+        )
+      ).length,
+    ).toBe(1);
+  });
 });

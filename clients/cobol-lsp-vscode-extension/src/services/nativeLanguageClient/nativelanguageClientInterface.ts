@@ -15,5 +15,5 @@
 import { Executable } from "vscode-languageclient/node";
 
 export interface NativeLanguageClient {
-    getServer(): Executable;
+  getServer(): Executable;
 }
