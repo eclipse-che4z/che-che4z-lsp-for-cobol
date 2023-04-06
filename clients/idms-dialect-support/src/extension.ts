@@ -10,10 +10,9 @@ const dialectName = "IDMS";
 let unregisterDialect: () => void;
 
 export async function activate(context: vscode.ExtensionContext) {
-  const ext = vscode.extensions.getExtension(extensionId);
-  if (ext === undefined) {
-    throw new Error("Cannot find extension");
-  }
+  const extensionUri = context.extensionUri;
+  const executablePath = join(extensionUri.path, "server", "jar");
+  const snippetPath = join(extensionUri.path, "snippets.json");
 
   const main = vscode.extensions.getExtension(mainExtension);
   if (main === undefined) {
@@ -24,9 +23,6 @@ export async function activate(context: vscode.ExtensionContext) {
   if (mainApi === undefined) {
     throw new Error("COBOL LS API is invalid");
   }
-
-  const executablePath = join(ext.extensionPath, "server", "jar");
-  const snippetPath = join(ext.extensionPath, "snippets.json");
 
   unregisterDialect = mainApi.dialectAPI_1_0().registerDialect({
     extensionId: extensionId,
