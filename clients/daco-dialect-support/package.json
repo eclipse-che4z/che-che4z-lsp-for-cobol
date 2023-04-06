@@ -7,7 +7,7 @@
   "version": "0.0.1",
   "preview": false,
   "publisher": "DaCo",
-  "keywords" : [
+  "keywords": [
     "DaCo",
     "cobol",
     "mainframe",
@@ -32,7 +32,7 @@
     "onCommand:cobol-lsp.dialect.register",
     "onLanguage:cobol",
     "workspaceContains:/.c4z"
-],
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [],
@@ -42,43 +42,43 @@
         "cobol-lsp.cpy-manager.daco.paths-local": {
           "type": "array",
           "items": {
-              "type": "string"
+            "type": "string"
           },
           "description": "Default list of local paths to search for MAID copybooks",
           "uniqueItems": true
         },
         "cobol-lsp.cpy-manager.daco.paths-dsn": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            },
-            "description": "Default list of datasets to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-            "uniqueItems": true
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Default list of datasets to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+          "uniqueItems": true
         },
         "cobol-lsp.cpy-manager.daco.paths-uss": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            },
-            "description": "Default list of USS paths to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
-            "uniqueItems": true
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Default list of USS paths to search for MAID copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+          "uniqueItems": true
         },
         "cobol-lsp.daco.predefined-sections": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            },
-            "description": "List of predefined sections",
-            "default": [
-                "S930",
-                "S940",
-                "S950",
-                "S990",
-                "S991",
-                "S997",
-                "S999"
-            ],
-            "uniqueItems": true
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of predefined sections",
+          "default": [
+            "S930",
+            "S940",
+            "S950",
+            "S990",
+            "S991",
+            "S997",
+            "S999"
+          ],
+          "uniqueItems": true
         }
       }
     }
@@ -89,7 +89,7 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
-    "lint": "prettier -c src && eslint src --ext ts",
+    "lint": "prettier -c . && eslint src --ext ts",
     "pretty": "prettier -w .",
     "test": "node ./out/test/runTest.js",
     "package": "vsce package"
@@ -113,5 +113,8 @@
     "typescript": "^4.9.3",
     "@vscode/test-electron": "^2.2.0"
   },
-  "extensionDependencies": ["BroadcomMFD.cobol-language-support", "BroadcomMFD.idms-dialect-for-cobol"]
+  "extensionDependencies": [
+    "BroadcomMFD.cobol-language-support",
+    "BroadcomMFD.idms-dialect-for-cobol"
+  ]
 }
