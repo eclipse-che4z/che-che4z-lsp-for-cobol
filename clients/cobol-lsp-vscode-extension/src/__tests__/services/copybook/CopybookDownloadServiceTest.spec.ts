@@ -100,11 +100,9 @@ const getZoweExplorerMock = (
   return jest.fn().mockReturnValue({
     getExplorerExtenderApi: jest.fn().mockReturnValue({
       getProfilesCache: jest.fn().mockReturnValue({
-        loadNamedProfile: jest
-          .fn()
-          .mockReturnValue({
-            profile: { encoding: undefined, name: "profile" },
-          }),
+        loadNamedProfile: jest.fn().mockReturnValue({
+          profile: { encoding: undefined, name: "profile" },
+        }),
       }),
     }),
     getMvsApi: jest.fn().mockReturnValue({

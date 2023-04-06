@@ -8,6 +8,9 @@ export class ProfileUtils {
     cobolFileName: string,
   ): Promise<string | undefined> {
     const zoweExplorerApi = await Utils.getZoweExplorerAPI();
+    if (!zoweExplorerApi) {
+      return undefined;
+    }
     let availableProfiles: string[] = [];
     zoweExplorerApi.registeredApiTypes().forEach((profileType) => {
       availableProfiles = availableProfiles.concat(

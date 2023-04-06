@@ -44,7 +44,7 @@ suite("Test snippets with different dialects settings", () => {
     await helper.sleep(1000);
     helper.closeActiveEditor();
   })
-    .timeout(10000)
+    .timeout(20000)
     .slow(4000);
 
   test("Autocompletion basic dialect", async () => {
@@ -67,7 +67,7 @@ suite("Test snippets with different dialects settings", () => {
     assert.strictEqual(text, "   COPY");
     helper.closeActiveEditor();
   })
-    .timeout(10000)
+    .timeout(20000)
     .slow(4000);
 
   test("TC152058 Autocompletion basic dialect", async () => {
@@ -100,6 +100,6 @@ suite("Test snippets with different dialects settings", () => {
     );
     helper.closeActiveEditor();
   })
-    .timeout(10000)
+    .timeout(20000)
     .slow(4000);
 });

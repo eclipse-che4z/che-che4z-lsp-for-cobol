@@ -31,14 +31,12 @@ describe("Test CompletionProvider", () => {
     };
     (vscode.CompletionItem as any) = jest.fn();
     (vscode.SnippetString as any) = jest.fn();
-    (vscode.MarkdownString as any) = jest
-      .fn()
-      .mockReturnValue({
-        string: "",
-        appendCodeblock: jest
-          .fn()
-          .mockReturnValue({ value: "", language: "COBOL" }),
-      });
+    (vscode.MarkdownString as any) = jest.fn().mockReturnValue({
+      string: "",
+      appendCodeblock: jest
+        .fn()
+        .mockReturnValue({ value: "", language: "COBOL" }),
+    });
     (vscode.CompletionItemKind as any) = jest.fn();
   });
   afterAll(() => {
@@ -51,12 +49,10 @@ describe("Test CompletionProvider", () => {
       fileName: SNIPPET_CBL,
       lineAt: jest.fn().mockReturnValue({ text: "" }),
     } as any;
-    const position = jest
-      .fn()
-      .mockImplementation((line, character) => ({
-        line: line,
-        character: character,
-      }));
+    const position = jest.fn().mockImplementation((line, character) => ({
+      line: line,
+      character: character,
+    }));
     const token = {
       isCancellationRequested: false,
       onCancellationRequested: jest.fn(),
@@ -82,12 +78,10 @@ describe("Test CompletionProvider", () => {
       fileName: SNIPPET_CBL,
       lineAt: jest.fn().mockReturnValue({ text: "" }),
     } as any;
-    const position = jest
-      .fn()
-      .mockImplementation((line, character) => ({
-        line: line,
-        character: character,
-      }));
+    const position = jest.fn().mockImplementation((line, character) => ({
+      line: line,
+      character: character,
+    }));
     const token = {
       isCancellationRequested: false,
       onCancellationRequested: jest.fn(),
@@ -113,12 +107,10 @@ describe("Test CompletionProvider", () => {
       fileName: SNIPPET_CBL,
       lineAt: jest.fn().mockReturnValue({ text: "" }),
     } as any;
-    const position = jest
-      .fn()
-      .mockImplementation((line, character) => ({
-        line: line,
-        character: character,
-      }));
+    const position = jest.fn().mockImplementation((line, character) => ({
+      line: line,
+      character: character,
+    }));
     const token = {
       isCancellationRequested: false,
       onCancellationRequested: jest.fn(),
@@ -145,12 +137,10 @@ describe("Test CompletionProvider", () => {
       fileName: SNIPPET_CBL,
       lineAt: jest.fn().mockReturnValue({ text: "" }),
     } as any;
-    const position = jest
-      .fn()
-      .mockImplementation((line, character) => ({
-        line: line,
-        character: character,
-      }));
+    const position = jest.fn().mockImplementation((line, character) => ({
+      line: line,
+      character: character,
+    }));
     const token = {
       isCancellationRequested: false,
       onCancellationRequested: jest.fn(),

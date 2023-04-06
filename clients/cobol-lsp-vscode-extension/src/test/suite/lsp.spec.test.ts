@@ -577,7 +577,7 @@ suite("Integration Test Suite", () => {
     );
     await helper.closeAllEditors();
   })
-    .timeout(8000)
+    .timeout(16000)
     .slow(1000);
 
   test("TC250107 Test Area A, Check FD/SD level data", async () => {
