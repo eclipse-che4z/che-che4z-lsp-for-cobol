@@ -6,7 +6,8 @@ import * as vscode from "vscode";
 const extensionId: string = "BroadcomMFD.idms-dialect-for-cobol";
 const mainExtension: string = "BroadcomMFD.cobol-language-support";
 
-let mainApi: any = undefined;
+const dialectName = "IDMS";
+let unregisterDialect: () => void;
 
 export async function activate(context: vscode.ExtensionContext) {
   const ext = vscode.extensions.getExtension(extensionId);
@@ -19,7 +20,7 @@ export async function activate(context: vscode.ExtensionContext) {
     throw new Error("Cannot find COBOL LS extension");
   }
 
-  mainApi = await main.activate();
+  const mainApi = await main.activate();
   if (mainApi === undefined) {
     throw new Error("COBOL LS API is invalid");
   }
@@ -27,17 +28,15 @@ export async function activate(context: vscode.ExtensionContext) {
   const executablePath = join(ext.extensionPath, "server", "jar");
   const snippetPath = join(ext.extensionPath, "snippets.json");
 
-  mainApi.dialectAPI_1_0().registerDialect({
+  unregisterDialect = mainApi.dialectAPI_1_0().registerDialect({
     extensionId: extensionId,
-    name: "IDMS",
+    name: dialectName,
     path: executablePath,
     description: "IDMS dialect support",
     snippetPath: snippetPath,
   });
 }
 
-export async function deactivate() {
-  if (mainApi !== undefined) {
-    mainApi.dialectAPI_1_0().unregister(extensionId, "IDMS");
-  }
+export function deactivate() {
+  unregisterDialect();
 }
