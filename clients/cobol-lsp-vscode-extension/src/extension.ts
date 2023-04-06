@@ -134,7 +134,7 @@ export function deactivate() {
 
 function getDialectAPI_v_1_0() {
   return {
-    //name: extensionId: string, string, path: string, description: string, snippetPath: string
+    //name: extensionId: string, string, jar: string, description: string, snippets: string
     registerDialect(dialect) {
       outputChannel.appendLine(
         "Register new dialect: \r\n" + JSON.stringify(dialect),
@@ -143,9 +143,9 @@ function getDialectAPI_v_1_0() {
       DialectRegistry.register(
         dialect.extensionId,
         dialect.name,
-        dialect.path,
+        dialect.jar.path,
         dialect.description,
-        dialect.snippetPath,
+        dialect.snippets.path,
       );
       outputChannel.appendLine("Restart analysis");
       languageClientService.invalidateConfiguration();
