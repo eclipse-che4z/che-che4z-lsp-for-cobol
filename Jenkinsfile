@@ -104,6 +104,7 @@ pipeline {
                     }
                 }
 
+                /* Disable SonarCloud until issue with project move is not resolved. https://gitlab.eclipse.org/eclipsefdn/helpdesk/-/issues/2849
                 stage('SonarCloud analysis-Server') {
                     steps {
                         container('maven') {
@@ -115,6 +116,7 @@ pipeline {
                         }
                     }
                 }
+                */
                 stage('Client - Install dependencies') {
                     environment {
                         npm_config_cache = "$env.WORKSPACE"
@@ -215,6 +217,7 @@ pipeline {
                         }
                     }
                 }
+                /* Disable SonarCloud until issue with project move is not resolved. https://gitlab.eclipse.org/eclipsefdn/helpdesk/-/issues/2849
                 stage('SonarCloud analysis-Client') {
                     environment {
                         npm_config_cache = "$env.WORKSPACE"
@@ -231,6 +234,7 @@ pipeline {
                         }
                     }
                 }
+                */
 
             }
         }        
