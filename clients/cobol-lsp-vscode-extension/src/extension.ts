@@ -135,7 +135,7 @@ export function deactivate() {
 function getDialectAPI_v_1_0() {
   return {
     //name: extensionId: string, string, path: string, description: string, snippetPath: string
-    async registerDialect(dialect) {
+    registerDialect(dialect) {
       outputChannel.appendLine(
         "Register new dialect: \r\n" + JSON.stringify(dialect),
       );
@@ -148,11 +148,12 @@ function getDialectAPI_v_1_0() {
         dialect.snippetPath,
       );
       outputChannel.appendLine("Restart analysis");
-      await languageClientService.invalidateConfiguration();
-    },
-    async unregisterDialect(extensionId, dialectName) {
-      DialectRegistry.unregister(dialectName);
-      await languageClientService.invalidateConfiguration();
+      languageClientService.invalidateConfiguration();
+
+      return function unregisterDialect() {
+        DialectRegistry.unregister(dialect.name);
+        languageClientService.invalidateConfiguration();
+      };
     },
   };
 }
