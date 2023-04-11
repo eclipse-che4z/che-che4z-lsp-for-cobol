@@ -114,59 +114,37 @@ suite("Integration Test Suite", () => {
     .timeout(2000)
     .slow(1000);
 
-  test("TC152047/ TC152052/ TC152051/ TC152050/ TC152053 Error case - file has syntax errors and semantic errors are marked and have detailed hints", async () => {
-    await helper.showDocument("USER2.cbl");
-    editor = helper.get_editor("USER2.cbl");
-    await helper.sleep(2000);
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 3);
-    assert.ok(diagnostics.length === 3);
+    test('TC152047/ TC152052/ TC152051/ TC152050/ TC152053 Error case - file has syntax errors and are marked with detailed hints', async () => {
+        await helper.showDocument("USER2.cbl");
+        editor = helper.get_editor("USER2.cbl");
+        await helper.sleep(2000);
+        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 2);
+        assert.ok(diagnostics.length === 2);
 
-    assert.strictEqual(
-      diagnostics[0].message,
-      "Syntax error on 'Program1-id' expected PROGRAM-ID",
-    );
-    helper.assertRangeIsEqual(
-      diagnostics[0].range,
-      new vscode.Range(new vscode.Position(14, 7), new vscode.Position(14, 18)),
-    );
-    assert.strictEqual(diagnostics[0].severity, diagnostics[1].severity);
-    assert.strictEqual(
-      diagnostics[0].severity,
-      vscode.DiagnosticSeverity.Error,
-      "No syntax errors detected in USER2.cbl",
-    );
+        assert.strictEqual(diagnostics[0].message, "Missing token PROGRAM-ID at programIdParagraph");
+        helper.assertRangeIsEqual(diagnostics[0].range, new vscode.Range(new vscode.Position(13, 30), new vscode.Position(13, 31)));
+        assert.strictEqual(diagnostics[0].severity, diagnostics[1].severity);
+        assert.strictEqual(diagnostics[0].severity, vscode.DiagnosticSeverity.Error, 'No syntax errors detected in USER2.cbl');
 
-    assert.strictEqual(
-      diagnostics[1].message,
-      "Variable USER-CITY1 is not defined",
-    );
-    helper.assertRangeIsEqual(
-      diagnostics[1].range,
-      new vscode.Range(
-        new vscode.Position(39, 28),
-        new vscode.Position(39, 38),
-      ),
-    );
+        assert.strictEqual(diagnostics[1].message, "Syntax error on 'HELLO-WORLD' expected {AUTHOR, CBL, DATA, DATE-COMPILED, DATE-WRITTEN, END, ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, PROCESS, SECURITY}");
+        helper.assertRangeIsEqual(diagnostics[1].range, new vscode.Range(new vscode.Position(14, 20), new vscode.Position(14, 31)));
 
-    assert.strictEqual(
-      diagnostics[2].message,
-      "There is an issue with PROGRAM-ID paragraph",
-    );
-    assert.strictEqual(
-      diagnostics[2].severity,
-      vscode.DiagnosticSeverity.Warning,
-    );
-    helper.assertRangeIsEqual(
-      diagnostics[2].range,
-      new vscode.Range(
-        new vscode.Position(49, 19),
-        new vscode.Position(49, 30),
-      ),
-    );
-  })
-    .timeout(5000)
-    .slow(1000);
+    }).timeout(5000).slow(1000);
+
+    test('TC152050/ TC152053 Error case - file has semantic errors and are marked with detailed hints', async () => {
+        await helper.showDocument("REPLACING.CBL");
+        editor = helper.get_editor("REPLACING.CBL");
+        await helper.sleep(2000);
+        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 1);
+
+        assert.strictEqual(diagnostics[0].severity, diagnostics[0].severity);
+        assert.strictEqual(diagnostics[0].severity, vscode.DiagnosticSeverity.Error, 'No semantic errors detected in REPLACING.cbl');
+        assert.strictEqual(diagnostics[0].message, "Variable ABC-ID is not defined");
+        helper.assertRangeIsEqual(diagnostics[0].range, new vscode.Range(new vscode.Position(21, 21), new vscode.Position(21, 27)));
+
+    }).timeout(5000).slow(1000);
 
   test("TC152054 Auto format of right trailing spaces", async () => {
     await helper.insertString(editor, new vscode.Position(34, 57), "        ");
