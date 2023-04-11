@@ -69,7 +69,7 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "postinstall": "patch-package",
-    "compile": "tsc -p ./",
+    "compile": "tsc -p tsconfig.json",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "pretty": "prettier -w .",
@@ -98,5 +98,8 @@
   },
   "extensionDependencies": [
     "BroadcomMFD.cobol-language-support"
-  ]
+  ],
+  "dependencies": {
+    "@code4z/cobol-dialect-api": "file:../cobol-dialect-api"
+  }
 }

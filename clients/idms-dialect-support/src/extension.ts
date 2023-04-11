@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import { registerDialect } from "./api";
+import { registerDialect } from "@code4z/cobol-dialect-api";
 
 let unregisterDialect: () => void;
 

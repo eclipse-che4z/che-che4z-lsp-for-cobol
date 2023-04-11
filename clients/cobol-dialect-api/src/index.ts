@@ -9,10 +9,14 @@ interface DialectV1 {
 }
 const mainExtensionId = "BroadcomMFD.cobol-language-support";
 
+interface unregister {
+  (): void;
+}
+
 export const registerDialect = async (
   extensionId: string,
   dialect: DialectV1,
-) => {
+): Promise<unregister> => {
   const main = vscode.extensions.getExtension(mainExtensionId);
   if (main === undefined) {
     throw new Error("Cannot find COBOL LS extension");
