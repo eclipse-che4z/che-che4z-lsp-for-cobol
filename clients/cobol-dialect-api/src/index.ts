@@ -26,6 +26,7 @@ export const registerDialect = async (
   if (mainApi === undefined) {
     throw new Error("COBOL LS API is invalid");
   }
+  // TODO: add more runtime checks (for api version, ...)
 
   return mainApi.dialectAPI_1_0().registerDialect(extensionId, dialect);
 };
