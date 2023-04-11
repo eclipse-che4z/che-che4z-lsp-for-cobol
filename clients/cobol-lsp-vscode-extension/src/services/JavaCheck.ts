@@ -13,37 +13,42 @@
  */
 import * as cp from "child_process";
 
-const versionPattern = new RegExp('(java|openjdk) (version)? ?"?((9|[0-9][0-9])|(1|9|[0-9][0-9])\.(1|8|[0-9][0-9]).*).*');
+const versionPattern = new RegExp(
+  '(java|openjdk) (version)? ?"?((9|[0-9][0-9])|(1|9|[0-9][0-9]).(1|8|[0-9][0-9]).*).*',
+);
 
 export class JavaCheck {
-    public static isJavaVersionSupported(versionString: string) {
-        return versionPattern.test(versionString);
-    }
-    public async isJavaInstalled() {
-        return new Promise<any>((resolve, reject) => {
-            let resolved = false;
-            const ls = cp.spawn("java", ["-version"]);
-            ls.stderr.on("data", (data: any) => {
-                if (JavaCheck.isJavaVersionSupported(data.toString())) {
-                    resolved = true;
-                    resolve(resolved);
-                }
-
-            });
-            ls.on("error", (code: any) => {
-                if ("Error: spawn java ENOENT" === code.toString()) {
-                    reject("Java 8 not found. Switching to native builds");
-                }
-                reject(code);
-            });
-            ls.on("close", (code: number) => {
-                if (code !== 0) {
-                    reject("An error occurred when checking if Java was installed. Switching to native build.");
-                }
-                if (!resolved) {
-                    reject("Minimum expected Java version is 8. Switching to native builds");
-                }
-            });
-        });
-    }
+  public static isJavaVersionSupported(versionString: string) {
+    return versionPattern.test(versionString);
+  }
+  public async isJavaInstalled() {
+    return new Promise<any>((resolve, reject) => {
+      let resolved = false;
+      const ls = cp.spawn("java", ["-version"]);
+      ls.stderr.on("data", (data: any) => {
+        if (JavaCheck.isJavaVersionSupported(data.toString())) {
+          resolved = true;
+          resolve(resolved);
+        }
+      });
+      ls.on("error", (code: any) => {
+        if ("Error: spawn java ENOENT" === code.toString()) {
+          reject("Java 8 not found. Switching to native builds");
+        }
+        reject(code);
+      });
+      ls.on("close", (code: number) => {
+        if (code !== 0) {
+          reject(
+            "An error occurred when checking if Java was installed. Switching to native build.",
+          );
+        }
+        if (!resolved) {
+          reject(
+            "Minimum expected Java version is 8. Switching to native builds",
+          );
+        }
+      });
+    });
+  }
 }

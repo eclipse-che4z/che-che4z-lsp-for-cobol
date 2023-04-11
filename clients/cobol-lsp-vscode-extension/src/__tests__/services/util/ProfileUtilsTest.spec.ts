@@ -18,46 +18,52 @@ import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { Utils } from "../../../services/util/Utils";
 
 const getZoweExplorerMock = () => {
-    return jest.fn().mockReturnValue({
-        getExplorerExtenderApi: jest.fn().mockReturnValue({
-            getProfilesCache: jest.fn().mockReturnValue({
-                getProfiles: jest.fn().mockReturnValue([{
-                    name: "profile",
-                },
-                {
-                    name: "profile2",
-                }]),
-                loadNamedProfile: jest.fn().mockReturnValue("profile"),
-            }),
-        }),
-        registeredApiTypes: jest.fn().mockReturnValue(["zosmf"]),
-    },
-    );
+  return jest.fn().mockReturnValue({
+    getExplorerExtenderApi: jest.fn().mockReturnValue({
+      getProfilesCache: jest.fn().mockReturnValue({
+        getProfiles: jest.fn().mockReturnValue([
+          {
+            name: "profile",
+          },
+          {
+            name: "profile2",
+          },
+        ]),
+        loadNamedProfile: jest.fn().mockReturnValue("profile"),
+      }),
+    }),
+    registeredApiTypes: jest.fn().mockReturnValue(["zosmf"]),
+  });
 };
 Utils.getZoweExplorerAPI = jest.fn();
 describe("Test profile Utils", () => {
-    const programName = "COBOLFILE.cbl";
-    const profile = "profile";
-
-    it("checks that profile is fetched from the file path as 1st strategy", async () => {
-        const uri = "file://" + path.join(profile, programName);
-        Utils.getZoweExplorerAPI = getZoweExplorerMock();
-        (vscode.workspace.textDocuments as any) = [];
-        (vscode.workspace.textDocuments as any).push({ uri, fileName: path.join(profile, programName)} as any);
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue([]),
-        });
-        expect(await ProfileUtils.getProfileNameForCopybook(uri)).toBe(profile);
+  const programName = "COBOLFILE.cbl";
+  const profile = "profile";
+  it("checks that profile is fetched from the file path as 1st strategy", async () => {
+    Utils.getZoweExplorerAPI = getZoweExplorerMock();
+    (vscode.workspace.textDocuments as any) = [];
+    (vscode.workspace.textDocuments as any).push({
+      fileName: path.join(profile, programName),
+    } as any);
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue([]),
     });
+    expect(await ProfileUtils.getProfileNameForCopybook(programName)).toBe(
+      profile,
+    );
+  });
 
-    it("checks that profile is fetched from the settings if not a ZE downloaded file", async () => {
-        const uri = "file://" + path.join("profileX", programName);
-        Utils.getZoweExplorerAPI = getZoweExplorerMock();
-        (vscode.workspace.textDocuments as any) = [];
-        (vscode.workspace.textDocuments as any).push({ uri, fileName: path.join("profileX", programName) } as any);
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue("profile2"),
-        });
-        expect(await ProfileUtils.getProfileNameForCopybook(uri)).toBe("profile2");
+  it("checks that profile is fetched from the settings if not a ZE downloaded file", async () => {
+    Utils.getZoweExplorerAPI = getZoweExplorerMock();
+    (vscode.workspace.textDocuments as any) = [];
+    (vscode.workspace.textDocuments as any).push({
+      fileName: path.join("profileX", programName),
+    } as any);
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue("profile2"),
     });
+    expect(await ProfileUtils.getProfileNameForCopybook(programName)).toBe(
+      "profile2",
+    );
+  });
 });

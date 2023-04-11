@@ -975,8 +975,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private Locality getLevelLocality(TerminalNode terminalNode) {
-    Location location = extendedSource.mapLocationUnsafe(buildTokenRange(terminalNode.getSymbol()));
-    return locationToLocality(location);
+    try {
+      Location location = extendedSource.mapLocationUnsafe(buildTokenRange(terminalNode.getSymbol()));
+      return locationToLocality(location);
+    } catch (IllegalStateException e) {
+      LOG.debug("Node: {} with range: {} has issue with the mapping", terminalNode, buildTokenRange(terminalNode.getSymbol()));
+      throw e;
+    }
   }
 
   private Locality locationToLocality(Location location) {

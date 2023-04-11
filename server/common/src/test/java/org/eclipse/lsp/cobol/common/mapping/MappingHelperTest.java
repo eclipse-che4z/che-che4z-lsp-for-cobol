@@ -51,6 +51,25 @@ class MappingHelperTest {
   }
 
   @Test
+  void testSplitMiddleToBottom() {
+    Range bigRange = new Range(new Position(), new Position(10, 80));
+    Range splitter = new Range(new Position(7, 5), new Position(10, 4));
+    List<Range> ranges = MappingHelper.split(splitter, bigRange);
+
+    assertEquals(2, ranges.size());
+
+    assertEquals(0, ranges.get(0).getStart().getLine());
+    assertEquals(0, ranges.get(0).getStart().getCharacter());
+    assertEquals(7, ranges.get(0).getEnd().getLine());
+    assertEquals(4, ranges.get(0).getEnd().getCharacter());
+
+    assertEquals(10, ranges.get(1).getStart().getLine());
+    assertEquals(5, ranges.get(1).getStart().getCharacter());
+    assertEquals(10, ranges.get(1).getEnd().getLine());
+    assertEquals(80, ranges.get(1).getEnd().getCharacter());
+  }
+
+  @Test
   void testConcatMiddle() {
     Range bigRange = new Range(new Position(), new Position(10, 80));
     Range splitter = new Range(new Position(5, 5), new Position(6, 4));
@@ -120,6 +139,51 @@ class MappingHelperTest {
     assertEquals(0, ranges.get(2).getStart().getCharacter());
     assertEquals(9, ranges.get(2).getEnd().getLine());
     assertEquals(80, ranges.get(2).getEnd().getCharacter());
+  }
+
+  @Test
+  void testConcatFromMiddleToBottom() {
+    Range bigRange = new Range(new Position(), new Position(6, 80));
+    Range splitter = new Range(new Position(4, 11), new Position(6, 18));
+    List<Range> ranges = MappingHelper.concat(splitter, bigRange);
+
+    assertEquals(2, ranges.size());
+
+    assertEquals(0, ranges.get(0).getStart().getLine());
+    assertEquals(0, ranges.get(0).getStart().getCharacter());
+    assertEquals(4, ranges.get(0).getEnd().getLine());
+    assertEquals(10, ranges.get(0).getEnd().getCharacter());
+
+    assertEquals(4, ranges.get(1).getStart().getLine());
+    assertEquals(11, ranges.get(1).getStart().getCharacter());
+    assertEquals(4, ranges.get(1).getEnd().getLine());
+    assertEquals(80, ranges.get(1).getEnd().getCharacter());
+
+  }
+
+  @Test
+  void testConcatMiddleWithBigSplit() {
+    Range bigRange = new Range(new Position(), new Position(10, 80));
+    Range splitter = new Range(new Position(3, 11), new Position(6, 18));
+    List<Range> ranges = MappingHelper.concat(splitter, bigRange);
+
+    assertEquals(3, ranges.size());
+
+    assertEquals(0, ranges.get(0).getStart().getLine());
+    assertEquals(0, ranges.get(0).getStart().getCharacter());
+    assertEquals(3, ranges.get(0).getEnd().getLine());
+    assertEquals(10, ranges.get(0).getEnd().getCharacter());
+
+    assertEquals(3, ranges.get(1).getStart().getLine());
+    assertEquals(11, ranges.get(1).getStart().getCharacter());
+    assertEquals(3, ranges.get(1).getEnd().getLine());
+    assertEquals(80, ranges.get(1).getEnd().getCharacter());
+
+    assertEquals(4, ranges.get(2).getStart().getLine());
+    assertEquals(0, ranges.get(2).getStart().getCharacter());
+    assertEquals(7, ranges.get(2).getEnd().getLine());
+    assertEquals(80, ranges.get(2).getEnd().getCharacter());
+
   }
 
 }

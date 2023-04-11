@@ -13,47 +13,46 @@
  */
 
 import {
-    DSN_CONTAINS_PROHIBITED_CHAR,
-    DSN_MUSTBE_NOT_EMPTY,
-    DSN_NOMORE_8CHARS,
-    DSN_START_PROHIBITED_CHAR,
-    SEGMENT_PLACEHOLDER,
+  DSN_CONTAINS_PROHIBITED_CHAR,
+  DSN_MUSTBE_NOT_EMPTY,
+  DSN_NOMORE_8CHARS,
+  DSN_START_PROHIBITED_CHAR,
+  SEGMENT_PLACEHOLDER,
 } from "../../constants";
 
 export function validateDatasetNames(inputValue: string): string | undefined {
-    const datasets: string[] = inputValue.split(",").map(e => e.trim());
-    for (const dataset of datasets) {
-        const result = validateDatasetName(dataset);
-        if (result) {
-            return result;
-        }
+  const datasets: string[] = inputValue.split(",").map((e) => e.trim());
+  for (const dataset of datasets) {
+    const result = validateDatasetName(dataset);
+    if (result) {
+      return result;
     }
-    return undefined;
+  }
+  return undefined;
 }
 
 function validateDatasetName(inputValue: string): string | undefined {
-    const nameSegments = inputValue.split(".");
+  const nameSegments = inputValue.split(".");
 
-    const segmentHlqFirstCharRegex = new RegExp("^([@#$A-Za-z])$");
+  const segmentHlqFirstCharRegex = new RegExp("^([@#$A-Za-z])$");
 
-    const segmentHlqSegmentRegex = new RegExp("^([@#$A-Za-z0-9-]{1,8})$");
-    for (const segment of nameSegments) {
-        if (segment.length === 0) {
-            return DSN_MUSTBE_NOT_EMPTY;
-        }
-
-        if (segment.length > 8) {
-            return DSN_NOMORE_8CHARS;
-        }
-
-        if (!segmentHlqFirstCharRegex.test(segment.charAt(0))) {
-
-            return DSN_START_PROHIBITED_CHAR.replace(SEGMENT_PLACEHOLDER, segment);
-        }
-
-        if (!segmentHlqSegmentRegex.test(segment)) {
-            return DSN_CONTAINS_PROHIBITED_CHAR.replace(SEGMENT_PLACEHOLDER, segment);
-        }
+  const segmentHlqSegmentRegex = new RegExp("^([@#$A-Za-z0-9-]{1,8})$");
+  for (const segment of nameSegments) {
+    if (segment.length === 0) {
+      return DSN_MUSTBE_NOT_EMPTY;
     }
-    return undefined;
+
+    if (segment.length > 8) {
+      return DSN_NOMORE_8CHARS;
+    }
+
+    if (!segmentHlqFirstCharRegex.test(segment.charAt(0))) {
+      return DSN_START_PROHIBITED_CHAR.replace(SEGMENT_PLACEHOLDER, segment);
+    }
+
+    if (!segmentHlqSegmentRegex.test(segment)) {
+      return DSN_CONTAINS_PROHIBITED_CHAR.replace(SEGMENT_PLACEHOLDER, segment);
+    }
+  }
+  return undefined;
 }

@@ -12,11 +12,11 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {Disposable} from "vscode";
-import {TelemetryEvent} from "./model/TelemetryEvent";
+import { Disposable } from "vscode";
+import { TelemetryEvent } from "./model/TelemetryEvent";
 
 export interface TelemetryReport extends Disposable {
-    reportEvent(content: TelemetryEvent): void;
+  reportEvent(content: TelemetryEvent): void;
 
-    reportExceptionEvent(content: TelemetryEvent): void;
+  reportExceptionEvent(content: TelemetryEvent): void;
 }

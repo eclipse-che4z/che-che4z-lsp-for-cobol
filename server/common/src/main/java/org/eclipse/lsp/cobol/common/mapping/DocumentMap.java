@@ -79,6 +79,14 @@ public class DocumentMap {
   }
 
   /**
+   * Erases given range from the document
+   * @param range to erase
+   */
+  public void erase(Range range) {
+    topTransformations().replace(range, TextTransformations.empty());
+  }
+
+  /**
    * Apply all transformations and form resulting text
    *
    * @return text with all transformations

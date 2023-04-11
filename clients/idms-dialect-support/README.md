@@ -9,7 +9,7 @@
 
 # IDMS Dialect Support
 
-IDMS Dialect Support is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension which enables language server protocol features for the [IDMS](https://techdocs.broadcom.com/idms) dialect of COBOL, and support for IDMS copybooks.
+IDMS Dialect Support is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension. This add-on enables language server protocol features for the [IDMS](https://techdocs.broadcom.com/idms) dialect of COBOL, and support for IDMS copybooks.
 
 ## Prerequisites
 
@@ -58,4 +58,4 @@ To use processor groups with IDMS copybooks, add the `preprocessor` array to ind
 }
 ```
 
-In the above example, the IDMS preprocessor is enabled on the processor group GROUP1. This enables the use of IDMS copybooks with the programs linked to it in `pgm_conf.json`.
+The above example adds the IDMS preprocessor to the processor group GROUP1 and enables the use of IDMS copybooks with the programs that are linked to GROUP1 in the `pgm_conf.json` file.
