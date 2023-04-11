@@ -100,7 +100,7 @@ public class SymbolsRepository {
   public static Optional<Context> findElementByPosition(
       CobolDocumentModel document, TextDocumentPositionParams position) {
     AnalysisResult result = document.getAnalysisResult();
-    if (result.getRootNode() == null) {
+    if (result == null || result.getRootNode() == null) {
       return Optional.empty();
     }
     Optional<Node> node =
