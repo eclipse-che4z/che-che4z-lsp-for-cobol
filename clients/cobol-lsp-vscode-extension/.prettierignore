@@ -18,3 +18,6 @@ out
 **/*.md
 # Ignore npm package lock
 package-lock.json
+
+# Test coverage reports
+coverage

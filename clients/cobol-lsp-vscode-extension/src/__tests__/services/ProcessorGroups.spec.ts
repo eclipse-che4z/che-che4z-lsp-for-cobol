@@ -30,6 +30,10 @@ jest.mock("fs", () => ({
                     {
                         "name": "IDMSPG",
                         "preprocessor": [ "IDMS" ]
+                    }, 
+                    {
+                        "name": "ABS",
+                        "libs": ["/abs"]
                     }
                 ]
             }`;
@@ -37,6 +41,7 @@ jest.mock("fs", () => ({
     if (f == "pgmCfgPath") {
       return `{
                 "pgms": [ 
+                    { "program": "/my/workspace/abs/TEST.cob", "pgroup": "ABS" },
                     { "program": "TEST.cob", "pgroup": "DAF" }, 
                     { "program": "*DAF.cob", "pgroup": "DAF" },
                     { "program": "IDMS/TEST.cob", "pgroup": "IDMSPG" }
@@ -76,6 +81,10 @@ jest.mock("path", () => ({
   relative: jest.fn().mockImplementation((...strs: string[]) => {
     return strs[1].substring(strs[0].length + 1);
   }),
+  isAbsolute: jest.fn().mockImplementation((...strs: string[]) => {
+    return strs[0].startsWith("/");
+  }),
+  sep: "/",
 }));
 
 it("Processor groups configuration provides lib path", () => {
@@ -85,6 +94,15 @@ it("Processor groups configuration provides lib path", () => {
   };
   const result = loadProcessorGroupCopybookPathsConfig(item, []);
   expect(result).toStrictEqual(["/copy"]);
+});
+
+it("Processor groups configuration understend absolute paths", () => {
+  const item = {
+    scopeUri: WORKSPACE_URI + "/abs/TEST.cob",
+    section: "cobol-lsp.cpy-manager.paths-local",
+  };
+  const result = loadProcessorGroupCopybookPathsConfig(item, []);
+  expect(result).toStrictEqual(["/abs"]);
 });
 
 it("Processor groups configuration provides copybook-extensions", () => {

@@ -118,17 +118,27 @@ function matchProcessorGroup(
 
   const candidates = [];
   let result = undefined;
-  pgmCfg.pgms.forEach((v) => {
+  for (const v of pgmCfg.pgms) {
     // exact match
-    if (relativeDocPath.endsWith(v.program)) {
-      result = v.pgroup;
-      return;
+    if (path.isAbsolute(v.program)) {
+      if (
+        (path.sep === "/"
+          ? v.program.replace("\\", path.sep)
+          : v.program.replace("/", path.sep)) === documentPath
+      ) {
+        return v.pgroup;
+      }
+    } else {
+      if (relativeDocPath === v.program) {
+        candidates.push(v.pgroup);
+      }
     }
+
     const m = new Minimatch(v.program, { nocase: true });
     if (m.match(relativeDocPath)) {
       candidates.push(v.pgroup);
     }
-  });
+  }
   if (!result) {
     if (candidates.length === 0) {
       return undefined;
