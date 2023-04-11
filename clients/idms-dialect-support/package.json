@@ -37,7 +37,7 @@
   "contributes": {
     "commands": [],
     "configuration": {
-      "title": "IDMS Dialect Support",
+      "title": "COBOL Dialect Support for IDMS",
       "properties": {
         "cobol-lsp.cpy-manager.idms.paths-local": {
           "type": "array",

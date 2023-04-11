@@ -37,7 +37,7 @@
   "contributes": {
     "commands": [],
     "configuration": {
-      "title": "DaCo Dialect Support",
+      "title": "COBOL Dialect Support for DaCo",
       "properties": {
         "cobol-lsp.cpy-manager.daco.paths-local": {
           "type": "array",
