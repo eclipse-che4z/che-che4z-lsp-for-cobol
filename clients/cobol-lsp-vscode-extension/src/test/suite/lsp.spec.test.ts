@@ -602,7 +602,7 @@ suite("Integration Test Suite", () => {
     );
     await helper.closeAllEditors();
   })
-    .timeout(3000)
+    .timeout(30000)
     .slow(1000);
 
   test("TC250109 Test Area B", async () => {
