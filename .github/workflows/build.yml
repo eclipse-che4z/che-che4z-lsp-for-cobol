@@ -41,6 +41,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - name: Build VS Code extension dialect API
+        working-directory: clients/cobol-dialect-api
+        run: |
+          npm ci
+          npm run compile
+      - uses: actions/upload-artifact@v3
+        with:
+          name: lib
+          path: clients/cobol-dialect-api/lib/*         
       - name: Package IDMS vsix
         working-directory: clients/idms-dialect-support
         run: |
@@ -186,6 +195,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - name: Download VS Code extension dialect API
+        uses: actions/download-artifact@v3
+        with:
+          name: lib
+          path: clients/cobol-dialect-api
       - name: Build COBOL LS extension 
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
