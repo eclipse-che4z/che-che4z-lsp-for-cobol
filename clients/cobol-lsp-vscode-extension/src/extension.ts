@@ -132,16 +132,22 @@ export function deactivate() {
   return languageClientService.stop();
 }
 
+interface Dialect {
+  name: string;
+  description: string;
+  jar: vscode.Uri;
+  snippets: vscode.Uri;
+}
+
 function getDialectAPI_v_1_0() {
   return {
-    //name: extensionId: string, string, jar: string, description: string, snippets: string
-    registerDialect(dialect) {
+    registerDialect(extensionId: string, dialect: Dialect) {
       outputChannel.appendLine(
         "Register new dialect: \r\n" + JSON.stringify(dialect),
       );
 
       DialectRegistry.register(
-        dialect.extensionId,
+        extensionId,
         dialect.name,
         dialect.jar.path,
         dialect.description,
