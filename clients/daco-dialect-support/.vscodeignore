@@ -17,7 +17,7 @@
 # ** dialect snippets
 !snippets.json
 # ** dialect implementation
-!server/jar/dialect-idms.jar
+!server/jar/dialect-daco.jar
 
 # * dialect registration VS Code API
 !node_modules/@code4z/cobol-dialect-api/package.json
