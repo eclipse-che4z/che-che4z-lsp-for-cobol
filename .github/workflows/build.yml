@@ -59,12 +59,12 @@ jobs:
         with:
           if-no-files-found: warn
           name: vsix-idms-dialect
-          path: 'idms-dialect-for-cobol*.vsix'
+          path: 'cobol-dialect-support-for-idms*.vsix'
       - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: vsix-daco-dialect
-          path: 'daco-dialect-for-cobol*.vsix'
+          path: 'cobol-dialect-support-for-daco*.vsix'
   buildNative:
     strategy:
       matrix:
