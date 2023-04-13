@@ -121,11 +121,7 @@ function matchProcessorGroup(
   for (const v of pgmCfg.pgms) {
     // exact match
     if (path.isAbsolute(v.program)) {
-      if (
-        (path.sep === "/"
-          ? v.program.replace("\\", path.sep)
-          : v.program.replace("/", path.sep)) === documentPath
-      ) {
+      if (pathMatches(v.program, documentPath)) {
         return v.pgroup;
       }
     } else {
@@ -146,6 +142,12 @@ function matchProcessorGroup(
     result = candidates[0];
   }
   return result;
+}
+
+function pathMatches(program: string, documentPath: string) {
+  return path.sep === "/"
+    ? program.split("\\").join(path.sep) === documentPath
+    : program.split("/").join(path.sep).toUpperCase() === documentPath.toUpperCase();
 }
 
 function loadProcessorsConfig(
