@@ -1,5 +1,5 @@
 {
-  "name": "daco-dialect-for-cobol",
+  "name": "cobol-dialect-support-for-daco",
   "displayName": "COBOL Dialect Support for DaCo",
   "description": "Autocomplete, highlighting and diagnostics for DaCo COBOL code and copybooks",
   "author": "Broadcom",
