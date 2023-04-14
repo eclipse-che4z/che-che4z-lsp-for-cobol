@@ -450,6 +450,9 @@
                                 <buildArg>--allow-incomplete-classpath</buildArg>
                                 <buildArg>--report-unsupported-elements-at-runtime</buildArg>
                                 <buildArg>--verbose</buildArg>
+                                <buildArg>--trace-class-initialization=ch.qos.logback.classic.Logger</buildArg>
+                                <buildArg>--trace-object-instantiation=ch.qos.logback.core.AsyncAppenderBase$Worker</buildArg>
+                                <buildArg>--initialize-at-build-time=org.slf4j.LoggerFactory,ch.qos.logback</buildArg>
                                 <buildArg>--no-fallback</buildArg>
                             </buildArgs>
                             <agent>
