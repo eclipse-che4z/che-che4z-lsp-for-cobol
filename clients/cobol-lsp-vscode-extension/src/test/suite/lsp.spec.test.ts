@@ -19,6 +19,7 @@ import { getWorkspacePath, moveCursor, recursiveCopySync } from "./testHelper";
 import * as path from "path";
 
 const TEST_TIMEOUT = 30000;
+const OPEN_DELAY = 2000;
 
 suite("Integration Test Suite", () => {
   const workspace_file = "USER1.cbl";
@@ -35,14 +36,14 @@ suite("Integration Test Suite", () => {
   // open 'open' file, should be recognized as hlasm
   test("TC152048 Cobol file is recognized by LSP", async () => {
     // setting a language takes a while but shouldn't take longer than a second
-    await helper.sleep(1000);
+    await helper.sleep(OPEN_DELAY);
     assert.ok(editor.document.languageId === "cobol");
   })
     .timeout(TEST_TIMEOUT)
     .slow(1000);
 
   test("TC152046 Nominal - check syntax Ok message", async () => {
-    await helper.sleep(1000);
+    await helper.sleep(OPEN_DELAY);
     const uri = vscode.window.activeTextEditor.document.uri;
     const diagnostics = vscode.languages.getDiagnostics(uri);
     assert.strictEqual(
@@ -116,37 +117,74 @@ suite("Integration Test Suite", () => {
     .timeout(TEST_TIMEOUT)
     .slow(1000);
 
-    test('TC152047/ TC152052/ TC152051/ TC152050/ TC152053 Error case - file has syntax errors and are marked with detailed hints', async () => {
-        await helper.showDocument("USER2.cbl");
-        editor = helper.get_editor("USER2.cbl");
-        await helper.sleep(2000);
-        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-        assert.strictEqual(diagnostics.length, 2);
-        assert.ok(diagnostics.length === 2);
+  test("TC152047/ TC152052/ TC152051/ TC152050/ TC152053 Error case - file has syntax errors and are marked with detailed hints", async () => {
+    await helper.showDocument("USER2.cbl");
+    editor = helper.get_editor("USER2.cbl");
+    await helper.sleep(2000);
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 2);
+    assert.ok(diagnostics.length === 2);
 
-        assert.strictEqual(diagnostics[0].message, "Missing token PROGRAM-ID at programIdParagraph");
-        helper.assertRangeIsEqual(diagnostics[0].range, new vscode.Range(new vscode.Position(13, 30), new vscode.Position(13, 31)));
-        assert.strictEqual(diagnostics[0].severity, diagnostics[1].severity);
-        assert.strictEqual(diagnostics[0].severity, vscode.DiagnosticSeverity.Error, 'No syntax errors detected in USER2.cbl');
+    assert.strictEqual(
+      diagnostics[0].message,
+      "Missing token PROGRAM-ID at programIdParagraph",
+    );
+    helper.assertRangeIsEqual(
+      diagnostics[0].range,
+      new vscode.Range(
+        new vscode.Position(13, 30),
+        new vscode.Position(13, 31),
+      ),
+    );
+    assert.strictEqual(diagnostics[0].severity, diagnostics[1].severity);
+    assert.strictEqual(
+      diagnostics[0].severity,
+      vscode.DiagnosticSeverity.Error,
+      "No syntax errors detected in USER2.cbl",
+    );
 
-        assert.strictEqual(diagnostics[1].message, "Syntax error on 'HELLO-WORLD' expected {AUTHOR, CBL, DATA, DATE-COMPILED, DATE-WRITTEN, END, ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, PROCESS, SECURITY}");
-        helper.assertRangeIsEqual(diagnostics[1].range, new vscode.Range(new vscode.Position(14, 20), new vscode.Position(14, 31)));
+    assert.strictEqual(
+      diagnostics[1].message,
+      "Syntax error on 'HELLO-WORLD' expected {AUTHOR, CBL, DATA, DATE-COMPILED, DATE-WRITTEN, END, ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, PROCESS, SECURITY}",
+    );
+    helper.assertRangeIsEqual(
+      diagnostics[1].range,
+      new vscode.Range(
+        new vscode.Position(14, 20),
+        new vscode.Position(14, 31),
+      ),
+    );
+  })
+    .timeout(TEST_TIMEOUT)
+    .slow(1000);
 
-    }).timeout(TEST_TIMEOUT).slow(1000);
+  test("TC152050/ TC152053 Error case - file has semantic errors and are marked with detailed hints", async () => {
+    await helper.showDocument("REPLACING.CBL");
+    editor = helper.get_editor("REPLACING.CBL");
+    await helper.sleep(2000);
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 1);
 
-    test('TC152050/ TC152053 Error case - file has semantic errors and are marked with detailed hints', async () => {
-        await helper.showDocument("REPLACING.CBL");
-        editor = helper.get_editor("REPLACING.CBL");
-        await helper.sleep(2000);
-        const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-        assert.strictEqual(diagnostics.length, 1);
-
-        assert.strictEqual(diagnostics[0].severity, diagnostics[0].severity);
-        assert.strictEqual(diagnostics[0].severity, vscode.DiagnosticSeverity.Error, 'No semantic errors detected in REPLACING.cbl');
-        assert.strictEqual(diagnostics[0].message, "Variable ABC-ID is not defined");
-        helper.assertRangeIsEqual(diagnostics[0].range, new vscode.Range(new vscode.Position(21, 21), new vscode.Position(21, 27)));
-
-    }).timeout(TEST_TIMEOUT).slow(1000);
+    assert.strictEqual(diagnostics[0].severity, diagnostics[0].severity);
+    assert.strictEqual(
+      diagnostics[0].severity,
+      vscode.DiagnosticSeverity.Error,
+      "No semantic errors detected in REPLACING.cbl",
+    );
+    assert.strictEqual(
+      diagnostics[0].message,
+      "Variable ABC-ID is not defined",
+    );
+    helper.assertRangeIsEqual(
+      diagnostics[0].range,
+      new vscode.Range(
+        new vscode.Position(21, 21),
+        new vscode.Position(21, 27),
+      ),
+    );
+  })
+    .timeout(TEST_TIMEOUT)
+    .slow(1000);
 
   test("TC152054 Auto format of right trailing spaces", async () => {
     await helper.insertString(editor, new vscode.Position(34, 57), "        ");
@@ -202,7 +240,7 @@ suite("Integration Test Suite", () => {
   test("TC174655 Copybook - Nominal", async () => {
     await helper.showDocument("USERC1N1.cbl");
     let editor = helper.get_editor("USERC1N1.cbl");
-    await helper.sleep(1000);
+    await helper.sleep(OPEN_DELAY);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(
       diagnostics[0].severity,
@@ -216,7 +254,7 @@ suite("Integration Test Suite", () => {
   test("TC174657: Copybook - not exist: no syntax ok message", async () => {
     await helper.showDocument("USERC1F.cbl");
     let editor = helper.get_editor("USERC1F.cbl");
-    await helper.sleep(1000);
+    await helper.sleep(OPEN_DELAY);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(
       diagnostics[0].severity,
@@ -230,7 +268,7 @@ suite("Integration Test Suite", () => {
   test("TC174658/TC174658 Copybook - not exist: error underlying and detailed hint", async () => {
     await helper.showDocument("USERC1F.cbl");
     let editor = helper.get_editor("USERC1F.cbl");
-    await helper.sleep(1000);
+    await helper.sleep(OPEN_DELAY);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 3);
     helper.assertRangeIsEqual(
@@ -248,7 +286,7 @@ suite("Integration Test Suite", () => {
   test("TC174916/TC174917 Copybook - recursive error and detailed hint", async () => {
     await helper.showDocument("USERC1R.cbl");
     let editor = helper.get_editor("USERC1R.cbl");
-    await helper.sleep(1000);
+    await helper.sleep(OPEN_DELAY);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 4);
     helper.assertRangeIsEqual(
@@ -266,7 +304,7 @@ suite("Integration Test Suite", () => {
   test("TC174932/TC174933 Copybook - invalid definition and hint", async () => {
     await helper.showDocument("USERC1N2.cbl");
     let editor = helper.get_editor("USERC1N2.cbl");
-    await helper.sleep(1000);
+    await helper.sleep(OPEN_DELAY);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 7);
     helper.assertRangeIsEqual(
@@ -287,7 +325,7 @@ suite("Integration Test Suite", () => {
   test("TC312735 Check EXEC CICS is in Procedure Division", async () => {
     await helper.showDocument("ADSORT.cbl");
     let editor = helper.get_editor("ADSORT.cbl");
-    await helper.sleep(1000);
+    await helper.sleep(OPEN_DELAY);
 
     await helper.deleteLine(editor, 58);
     await helper.insertString(
