@@ -1,0 +1,33 @@
+{
+  "name": "@code4z/cobol-dialect-api",
+  "version": "1.0.0",
+  "description": "COBOL Dialect API for extending COBOL LS extension for Visual Studio Code",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "lint": "prettier -c . && eslint src --ext ts",
+    "pretty": "prettier -w .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol.git"
+  },
+  "keywords": [
+    "COBOL",
+    "API"
+  ],
+  "author": "Broadcom",
+  "license": "EPL-2.0",
+  "bugs": {
+    "url": "https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues"
+  },
+  "homepage": "https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol#readme",
+  "devDependencies": {
+    "@types/vscode": "1.74.0",
+    "typescript": "4.9.5",
+    "prettier": "2.8.7"
+  }
+}
