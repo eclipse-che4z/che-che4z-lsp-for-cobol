@@ -1,5 +1,5 @@
 {
-  "name": "daco-dialect-for-cobol",
+  "name": "cobol-dialect-support-for-daco",
   "displayName": "COBOL Dialect Support for DaCo",
   "description": "Autocomplete, highlighting and diagnostics for DaCo COBOL code and copybooks",
   "author": "Broadcom",
@@ -37,7 +37,7 @@
   "contributes": {
     "commands": [],
     "configuration": {
-      "title": "DaCo Dialect Support",
+      "title": "COBOL Dialect Support for DaCo",
       "properties": {
         "cobol-lsp.cpy-manager.daco.paths-local": {
           "type": "array",
@@ -95,26 +95,29 @@
     "package": "vsce package"
   },
   "devDependencies": {
-    "@types/vscode": "^1.74.0",
     "@types/glob": "^8.0.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
+    "@types/vscode": "1.74.0",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
+    "@vscode/test-electron": "^2.2.0",
+    "@vscode/vsce": "2.18.0",
     "eslint": "^8.28.0",
+    "eslint-plugin-sonarjs": "^0.15.0",
     "glob": "^8.0.3",
     "mocha": "^10.1.0",
     "patch-package": "^6.4.7",
     "prettier": "2.8.7",
     "ts-jest": "^29.0.1",
     "tslint": "^5.18.0",
-    "eslint-plugin-sonarjs": "^0.15.0",
-    "vsce": "^2.11.0",
-    "typescript": "^4.9.3",
-    "@vscode/test-electron": "^2.2.0"
+    "typescript": "4.9.5"
   },
   "extensionDependencies": [
     "BroadcomMFD.cobol-language-support",
-    "BroadcomMFD.idms-dialect-for-cobol"
-  ]
+    "BroadcomMFD.cobol-dialect-support-for-idms"
+  ],
+  "dependencies": {
+    "@code4z/cobol-dialect-api": "file:../cobol-dialect-api"
+  }
 }

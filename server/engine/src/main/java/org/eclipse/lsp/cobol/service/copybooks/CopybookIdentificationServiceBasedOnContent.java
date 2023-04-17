@@ -30,7 +30,7 @@ public class CopybookIdentificationServiceBasedOnContent implements CopybookIden
   private final List<Pattern> patterns = new LinkedList<>();
   public CopybookIdentificationServiceBasedOnContent() {
     patterns.add(Pattern.compile(
-        "(?i)^(?<sequence>.{0,6})(?<indicator>.?)\\s*(PROGRAM-ID)\\s*\\.\\s*(?<programName>.{1,30})\\s*\\.",
+        "(?i)^(?<sequence>.{0,6})(?<indicator>.?)\\s*(PROGRAM-ID)\\s*\\.?\\s*(?<programName>.{1,30})\\s*\\.?$",
         Pattern.MULTILINE | Pattern.CASE_INSENSITIVE));
     patterns.add(Pattern.compile("(?i)^(?<sequence>.{0,6})(?<indicator>.?)\\s*((IDENTIFICATION|ID)\\s+DIVISION)\\s*\\.",
         Pattern.MULTILINE | Pattern.CASE_INSENSITIVE));

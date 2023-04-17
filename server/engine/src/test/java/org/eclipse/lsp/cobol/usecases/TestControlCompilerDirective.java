@@ -34,9 +34,9 @@ class TestControlCompilerDirective {
           + "       Program-Id. control-dir.";
 
   private static final String TEXT_WRONG_ARG =
-      "       Identification Division.\n"
-          + "       *{CONTROL|1} {MAP1|2}\n"
-          + "       *{CBL|3} MAP1\n"
+      "       Identification Division{.|4}\n"
+          + "       *{CONTROL|1} MAP1\n"
+          + "       *{CBL|3} {MAP1|2}\n"
           + "       Program-Id. control-dir.";
 
   private static final String TEXT_CONTINUATION_FOR_COMPILER_DIR =
@@ -49,6 +49,7 @@ class TestControlCompilerDirective {
   void testNoErrorOnControlCompilerDirective() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
+
   @Test
   void testErrorOnWrongArgumentToControlDirective() {
     UseCaseEngine.runTest(
@@ -64,12 +65,23 @@ class TestControlCompilerDirective {
             "2",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'MAP1' expected PROGRAM-ID",
+                "Syntax error on 'MAP1' expected {AUTHOR, CBL, COMMON, DATA, DATE-COMPILED, DATE-WRITTEN, "
+                    + "DEFINITION, END, ENVIRONMENT, ID, IDENTIFICATION, INITIAL, INSTALLATION, IS, LIBRARY, "
+                    + "PROCEDURE, PROCESS, RECURSIVE, SECURITY, '.'}",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "3",
             new Diagnostic(
-                new Range(), "No arguments found for *CBL", DiagnosticSeverity.Error, ErrorSource.PREPROCESSING.getText())));
+                new Range(),
+                "No arguments found for *CBL",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText()),
+            "4",
+            new Diagnostic(
+                new Range(),
+                "Missing token PROGRAM-ID at programIdParagraph",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
