@@ -161,7 +161,8 @@ function matchProcessorGroup(
 function pathMatches(program: string, documentPath: string) {
   return path.sep === "/"
     ? program.split("\\").join(path.sep) === documentPath
-    : program.split("/").join(path.sep).toUpperCase() === documentPath.toUpperCase();
+    : program.split("/").join(path.sep).toUpperCase() ===
+        documentPath.toUpperCase();
 }
 
 function loadProcessorsConfig(

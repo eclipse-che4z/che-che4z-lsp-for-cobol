@@ -14,6 +14,8 @@
 
 # Ignore build output
 out
+.nyc_output
+.vscode-test
 # Ignore markdown files
 **/*.md
 # Ignore npm package lock
