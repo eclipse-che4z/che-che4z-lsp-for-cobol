@@ -115,7 +115,7 @@
   },
   "extensionDependencies": [
     "BroadcomMFD.cobol-language-support",
-    "BroadcomMFD.idms-dialect-for-cobol"
+    "BroadcomMFD.cobol-dialect-support-for-idms"
   ],
   "dependencies": {
     "@code4z/cobol-dialect-api": "file:../cobol-dialect-api"
