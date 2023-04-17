@@ -4,7 +4,7 @@
   "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
   "author": "Broadcom",
   "license": "EPL-2.0",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "preview": false,
   "publisher": "BroadcomMFD",
   "engines": {
@@ -483,6 +483,7 @@
     "@types/node": "^14.18.29",
     "@types/vscode": "^1.71.0",
     "@vscode/test-electron": "^2.1.5",
+    "@vscode/vsce": "2.18.0",
     "decache": "^4.6.1",
     "esbuild": "^0.16.6",
     "eslint-plugin-sonarjs": "^0.15.0",
@@ -496,7 +497,6 @@
     "prettier": "2.8.7",
     "ts-jest": "^29.0.1",
     "tslint": "^5.18.0",
-    "typescript": "^4.9.4",
-    "vsce": "^2.11.0"
+    "typescript": "^4.9.4"
   }
 }

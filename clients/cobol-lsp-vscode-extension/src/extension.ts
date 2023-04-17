@@ -115,14 +115,6 @@ export async function activate(context: vscode.ExtensionContext) {
   await languageClientService.start();
 
   // 'export' public api-surface
-  return openApi();
-}
-
-export function deactivate() {
-  return languageClientService.stop();
-}
-
-function openApi() {
   return {
     analysis(uri: string, text: string): Promise<any> {
       return languageClientService.retrieveAnalysis(uri, text);
@@ -136,31 +128,38 @@ function openApi() {
   };
 }
 
+export function deactivate() {
+  return languageClientService.stop();
+}
+
+interface Dialect {
+  name: string;
+  description: string;
+  jar: vscode.Uri;
+  snippets: vscode.Uri;
+}
+
 function getDialectAPI_v_1_0() {
   return {
-    //name: extensionId: string, string, path: string, description: string, snippetPath: string
-    async registerDialect(dialect) {
+    registerDialect(extensionId: string, dialect: Dialect) {
       outputChannel.appendLine(
         "Register new dialect: \r\n" + JSON.stringify(dialect),
       );
-      const dialectExtension = vscode.extensions.getExtension(
-        dialect.extensionId,
-      );
-      await dialectExtension.activate();
 
       DialectRegistry.register(
-        dialect.extensionId,
+        extensionId,
         dialect.name,
-        dialect.path,
+        dialect.jar.path,
         dialect.description,
-        dialect.snippetPath,
+        dialect.snippets.path,
       );
       outputChannel.appendLine("Restart analysis");
-      await languageClientService.invalidateConfiguration();
-    },
-    async unregisterDialect(extensionId, dialectName) {
-      DialectRegistry.unregister(dialectName);
-      await languageClientService.invalidateConfiguration();
+      languageClientService.invalidateConfiguration();
+
+      return function unregisterDialect() {
+        DialectRegistry.unregister(dialect.name);
+        languageClientService.invalidateConfiguration();
+      };
     },
   };
 }
