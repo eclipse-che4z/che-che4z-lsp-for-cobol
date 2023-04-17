@@ -94,7 +94,7 @@ export class LanguageClientService {
     return languageClient.sendRequest("extended/analysis", { uri, text });
   }
 
-  public async invalidateConfiguration() {
+  public invalidateConfiguration() {
     const languageClient = this.getLanguageClient();
     languageClient.sendNotification(DidChangeConfigurationNotification.type, {
       settings: null,
