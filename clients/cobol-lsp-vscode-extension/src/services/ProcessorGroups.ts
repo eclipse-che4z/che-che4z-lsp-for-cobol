@@ -144,7 +144,7 @@ function matchProcessorGroup(
       }
     }
 
-    const m = new Minimatch(v.program, { nocase: true });
+    const m = new Minimatch(v.program, { nocase: true, dot: true });
     if (m.match(relativeDocPath)) {
       candidates.push(v.pgroup);
     }
