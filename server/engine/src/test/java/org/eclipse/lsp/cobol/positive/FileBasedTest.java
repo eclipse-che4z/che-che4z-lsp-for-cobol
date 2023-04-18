@@ -32,7 +32,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.lang.System.getProperty;
@@ -87,11 +86,6 @@ public abstract class FileBasedTest extends ConfigurableTest {
    */
   protected static List<CobolText> getCopybooks(CobolTextRegistry textRegistry, String filename) {
     return textRegistry.getCopybooks(filename);
-  }
-
-  protected static Map<ReportSection, List<SysprintSnap>> getDataNameRefs(
-      String filename, CobolTextRegistry textRegistry) {
-    return textRegistry.getSnapForFile(filename);
   }
 
   /**

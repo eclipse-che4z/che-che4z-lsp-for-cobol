@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 /** This util class allows retrieving and processing the predefined copybooks for syntax analysis */
 @Slf4j
 @UtilityClass
-class PredefinedCopybookUtils {
+public class PredefinedCopybookUtils {
 
   private final WorkspaceFileService files = new WorkspaceFileService();
   /**
@@ -55,10 +55,11 @@ class PredefinedCopybookUtils {
    * Load and clean up all the predefined copybooks
    *
    * @param sqlBackend backend for the copybooks
+   * @param copybooks list of copybooks
    * @param programUri uri of the program
    * @return list of models for predefined copybooks
    */
-  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks, String programUri) {
+  public List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks, String programUri) {
     return PredefinedCopybooks.getNames().stream()
         .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), programUri, sqlBackend))
         .collect(Collectors.toList());

@@ -257,6 +257,7 @@
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
                     <parallel>all</parallel>
+                    <forkCount>1C</forkCount>
                     <systemProperties>
                         <property>
                             <name>filesToTestPath</name>

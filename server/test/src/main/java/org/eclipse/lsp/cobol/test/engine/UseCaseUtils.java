@@ -135,6 +135,7 @@ public class UseCaseUtils {
         .getInstance(LanguageEngineFacade.class)
         .analyze(useCase.getDocumentUri(), useCase.getText(), useCase.getAnalysisConfig());
   }
+
   /**
    * Convert CobolText to CopybookModel
    *
