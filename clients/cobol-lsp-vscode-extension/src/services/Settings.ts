@@ -102,7 +102,7 @@ export function configHandler(request: any): Array<any> {
       } else if (item.section === SETTINGS_DIALECT) {
         const object = loadProcessorGroupDialectConfig(
           item,
-          vscode.workspace.getConfiguration().get(item.section),
+          SettingsService.getDialects(),
         );
         result.push(object);
       } else if (item.section === SETTINGS_CPY_LOCAL_PATH) {

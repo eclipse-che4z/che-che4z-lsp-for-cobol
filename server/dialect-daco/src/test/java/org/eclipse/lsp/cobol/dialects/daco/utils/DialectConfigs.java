@@ -41,7 +41,7 @@ public class DialectConfigs {
     return new AnalysisConfig(
             new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
             ImmutableList.of(),
-            ImmutableList.of(DaCoDialect.NAME), true,
+            ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME), true,
             ImmutableList.of(),
             createPredefinedSectionsConfig(ImmutableList.of("S930", "S940", "S950",
                 "S990", "S991", "S997", "S999")));
