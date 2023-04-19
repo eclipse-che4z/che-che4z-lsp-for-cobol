@@ -125,9 +125,9 @@ Dialect add-ons must be enabled in the COBOL Language Support extension settings
 
 1. Ensure that you meet the Java prerequisite described in the add-on readme. 
 2. Set **Cobol-lsp: serverRuntime** to **JAVA** in the your extension settings.
-3. Add the dialect to the **Cobol-lsp: dialects** array in your workspace extension settings.
+3. Add the dialect to the **Cobol-lsp: dialects** array in your workspace extension settings, or to the `preprocessor` parameter in a processor group. For more information, see [Processor Groups](#Processor-Groups).
 
-By default, COBOL Language Support processes dialects in the order you list them in the **Cobol-lsp: dialects** setting. If you list dialects in the wrong order, some pieces of code might be incorrectly processed using the wrong dialect parser and marked as errors. 
+COBOL Language Support processes dialects in the order you list them in the **Cobol-lsp: dialects** setting or within the `preprocessor` parameter of a processor group. If you list dialects in the wrong order, some pieces of code might be incorrectly processed using the wrong dialect parser and marked as errors. 
 
 ### SQL Backend Server
 
@@ -206,44 +206,6 @@ Copybooks that you retrieve from mainframe data sets are stored in the **.c4z/.c
 
 We recommend that you refresh your copybooks from time to time. To refresh your copybooks, press **F1** and run the command **Clear downloaded copybooks**. This command clears the **.c4z/.copybooks** directory so that copybooks are downloaded again from the mainframe.
 
-### Configure Processor Groups
-
-Use processor groups to specify copybook folders and data sets that contain copybooks to use with specific programs. You define processor groups in a `proc_grps.json` file and associate them with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
-
-The `proc_grps.json` file has the following format:
-```
-{
-    "pgroups": [
-        {
-            "name": "GROUP1",
-            "libs": [
-                "LIB1", "LIB2"
-            ],
-        },
-        {
-            "name": "GROUP2",
-            "libs": [
-                "LIB3", "LIB4"
-            ],
-        }
-    ]
-}
-```
-
-The `pgm_conf.json` file has the following format:
-```
-{
-    "pgms": [
-        { "program": "PROGRAM1", "pgroup": "GROUP1" },
-        { "program": "PROGRAM2", "pgroup": "GROUP2" },
-    ]
-}
-```
-
-The above example uses copybooks from libraries LIB1 and LIB2 for PROGRAM1, and copybooks from libraries LIB3 and LIB4 for PROGRAM2.
-
-Specify libraries as absolute or relative local paths in the `libs` array. These libraries take priority over the libraries specified in the extension settings.
-
 ### Copybook Support Features
 
 The extension includes the following copybook support features:
@@ -272,6 +234,49 @@ The Find All References and Go To Definition functionalities are extended to wor
 * Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.
 * Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code.
 * Functionality to skip variable levels when called, reducing call time.
+
+## Processor Groups
+
+Use processor groups to link programs with specific dialects and specific folders and data sets containing copybooks. You define processor groups in a `proc_grps.json` file and associate them with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
+
+In the `proc_grps.json` file, specify your copybook folders and data sets in a `libs` array, and specify dialects within a `preprocessor` JSON element. Use the following format:
+```
+{
+    "pgroups": [
+        {
+            "name": "GROUP1",
+            "libs": [
+                "LIB1", "LIB2"
+            ],
+        },
+        {
+            "name": "GROUP2",
+            "libs": [
+                "LIB3", "LIB4"
+            ],
+            "preprocessor": [
+                {
+                    "name": "IDMS"
+                },
+            ],
+        }
+    ]
+}
+```
+
+The `pgm_conf.json` file has the following format:
+```
+{
+    "pgms": [
+        { "program": "PROGRAM1", "pgroup": "GROUP1" },
+        { "program": "PROGRAM2", "pgroup": "GROUP2" },
+    ]
+}
+```
+
+The two examples above use copybooks from libraries LIB1 and LIB2 for PROGRAM1, and copybooks from libraries LIB3 and LIB4 for PROGRAM2. The processor groups file also enables the IDMS dialect for PROGRAM2.
+
+Specify libraries as absolute or relative local paths in the `libs` array. These libraries take priority over the libraries that you specify in the extension settings. Dialects that you specify in processor groups also take priority over those in the workspace extension settings.
 
 ## Troubleshooting
 
