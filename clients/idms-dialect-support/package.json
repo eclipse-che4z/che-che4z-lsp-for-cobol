@@ -9,9 +9,15 @@
   "publisher": "BroadcomMFD",
   "keywords": [
     "idms",
+    "dml",
+    "idms-dml",
+    "ibm",
     "cobol",
     "mainframe",
-    "zowe"
+    "zowe",
+    "lsp",
+    "zos",
+    "z/os"
   ],
   "icon": "resources/logo.png",
   "engines": {
