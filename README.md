@@ -119,9 +119,15 @@ The following example sets tab stops after columns 1, 2, 3 and 4 after the line 
 
 ### Dialect Add-ons
 
-Dialect add-ons are available to add support for specific language analysis in your COBOL files. Currently an add-on for the IDMS dialect is available.
+Dialect add-ons are available to add support for specific language analysis in your COBOL files. Currently an add-on for the IDMS dialect is available on the Visual Studio Code Marketplace. 
 
-To enable dialect add-ons, ensure that you meet the Java prerequisite described in the add-on readme and set **Cobol-lsp: serverRuntime** to **JAVA** in the extension settings.
+Dialect add-ons must be enabled in the COBOL Language Support extension settings. To enable dialect add-ons that you install, complete the following tasks:
+
+1. Ensure that you meet the Java prerequisite described in the add-on readme. 
+2. Set **Cobol-lsp: serverRuntime** to **JAVA** in the your extension settings.
+3. Add the dialect to the **Cobol-lsp: dialects** array in your workspace extension settings.
+
+By default, COBOL Language Support processes dialects in the order you list them in the **Cobol-lsp: dialects** setting. If you list dialects in the wrong order, some pieces of code might be incorrectly processed using the wrong dialect parser and marked as errors. 
 
 ### SQL Backend Server
 
