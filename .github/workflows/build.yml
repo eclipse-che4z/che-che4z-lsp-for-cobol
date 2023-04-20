@@ -27,12 +27,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Install dependencies for COBOL LS API
+        working-directory: clients/cobol-dialect-api
+        run: npm ci
+      - name: Install dependencies for COBOL LS
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: npm ci
+      - name: Install dependencies for IDMS
+        working-directory: clients/idms-dialect-support
+        run: npm ci
+      - name: Install dependencies for DaCo
+        working-directory: clients/daco-dialect-support
+        run: npm ci
       - uses: actions/upload-artifact@v3
         with:
-          name: src
-          path: |
-            server/**
-            client/**
+          name: clients-for-bd-scan
+          path: clients/**
           if-no-files-found: error
   buildPlatformIndependedPart:
     runs-on: ubuntu-latest
