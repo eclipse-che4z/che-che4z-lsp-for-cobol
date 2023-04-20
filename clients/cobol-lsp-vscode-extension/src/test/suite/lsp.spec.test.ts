@@ -36,16 +36,17 @@ suite("Integration Test Suite", () => {
   // open 'open' file, should be recognized as hlasm
   test("TC152048 Cobol file is recognized by LSP", async () => {
     // setting a language takes a while but shouldn't take longer than a second
-    await helper.sleep(OPEN_DELAY);
+    await helper.waitFor(() => editor.document.languageId === "cobol");
     assert.ok(editor.document.languageId === "cobol");
   })
     .timeout(TEST_TIMEOUT)
     .slow(1000);
 
   test("TC152046 Nominal - check syntax Ok message", async () => {
-    await helper.sleep(OPEN_DELAY);
-    const uri = vscode.window.activeTextEditor.document.uri;
-    const diagnostics = vscode.languages.getDiagnostics(uri);
+    await helper.waitFor(() => vscode.window.activeTextEditor !== undefined);
+    const diagnostics = vscode.languages.getDiagnostics(
+      vscode.window.activeTextEditor.document.uri,
+    );
     assert.strictEqual(
       diagnostics.length,
       0,
@@ -120,7 +121,9 @@ suite("Integration Test Suite", () => {
   test("TC152047/ TC152052/ TC152051/ TC152050/ TC152053 Error case - file has syntax errors and are marked with detailed hints", async () => {
     await helper.showDocument("USER2.cbl");
     editor = helper.get_editor("USER2.cbl");
-    await helper.sleep(2000);
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+    );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 2);
     assert.ok(diagnostics.length === 2);
@@ -286,7 +289,9 @@ suite("Integration Test Suite", () => {
   test("TC174916/TC174917 Copybook - recursive error and detailed hint", async () => {
     await helper.showDocument("USERC1R.cbl");
     let editor = helper.get_editor("USERC1R.cbl");
-    await helper.sleep(OPEN_DELAY);
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+    );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 4);
     helper.assertRangeIsEqual(
@@ -305,6 +310,9 @@ suite("Integration Test Suite", () => {
     await helper.showDocument("USERC1N2.cbl");
     let editor = helper.get_editor("USERC1N2.cbl");
     await helper.sleep(OPEN_DELAY);
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+    );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 7);
     helper.assertRangeIsEqual(
@@ -439,7 +447,9 @@ suite("Integration Test Suite", () => {
   test("TC174952 / TC174953 Copybook - definition not exist, but dynamically appears", async () => {
     await helper.showDocument("USERC1F.cbl");
     let editor = helper.get_editor("USERC1F.cbl");
-    await helper.sleep(3000);
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+    );
     let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     helper.assertRangeIsEqual(
       diagnostics[2].range,
