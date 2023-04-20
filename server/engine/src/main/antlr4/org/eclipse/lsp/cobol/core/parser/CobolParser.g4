@@ -281,27 +281,9 @@ configurationSection
 // - configuration section paragraph ----------------------------------
 
 configurationSectionParagraph
-   : sourceComputerParagraph | objectComputerParagraph | specialNamesParagraph | repositoryParagraph
+   : sourceComputerParagraph | objectComputerParagraph | specialNamesParagraph
    // strictly, specialNamesParagraph does not belong into configurationSectionParagraph, but IBM-COBOL allows this
    ;
-
-// - repository paragraph ----------------------------------
-
-repositoryParagraph
-    : REPOSITORY DOT_FS (classRepositoryClause | functionRepositoryClause)* DOT_FS?
-    ;
-
-classRepositoryClause
-    : CLASS className IS? literal
-    ;
-
-functionRepositoryClause
-    : FUNCTION functionName | intrinsicClause
-    ;
-
-intrinsicClause
-    : (functionName* | ALL) INTRINSIC
-    ;
 
 // - source computer paragraph ----------------------------------
 
