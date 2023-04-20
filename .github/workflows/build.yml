@@ -181,6 +181,10 @@ jobs:
       - name: Deploy server jar
         working-directory: clients/cobol-lsp-vscode-extension
         run: cp ../../jar/jar/server.jar ./server/jar
+      - name: Setup telemetry key
+        working-directory: clients/cobol-lsp-vscode-extension
+        if: github.ref == 'refs/heads/master'
+        run: echo ${{ secrets.TELEMETRY_INSTRUMENTATION_KEY }} > resources/TELEMETRY_KEY
       - name: Deploy windows executable
         working-directory: clients/cobol-lsp-vscode-extension
         if: startsWith( matrix.os, 'windows')
