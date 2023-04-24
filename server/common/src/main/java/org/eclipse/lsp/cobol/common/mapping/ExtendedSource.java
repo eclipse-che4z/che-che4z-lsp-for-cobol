@@ -131,6 +131,9 @@ public class ExtendedSource {
    * @param copybookMap a map of a copybook
    */
   public void extend(DocumentMap document, Range extendRange, DocumentMap copybookMap) {
+    if (documents.containsKey(document.getUri())) {
+      document.extend(extendRange, TextTransformations.of(copybookMap.extendedText(), copybookMap.getUri()));
+    }
     documents.computeIfAbsent(document.getUri(), uri -> document)
             .extend(extendRange, TextTransformations.of(copybookMap.extendedText(), copybookMap.getUri()));
     documents.put(copybookMap.getUri(), copybookMap);
