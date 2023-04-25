@@ -1322,7 +1322,7 @@ dbs_like_predicate: dbs_sql_identifier NOT? LIKE dbs_expressions (ESCAPE dbs_exp
 dbs_null_predicate: dbs_expression IS NOT? NULL;
 dbs_predicate: (dbs_basic_predicate | dbs_quantified_predicate | dbs_array_exists_predicate | dbs_between_predicate |
  dbs_distinct_predicate | dbs_exist_predicate | dbs_in_predicate | dbs_like_predicate | dbs_null_predicate ) ;
-dbs_searched_when_clause : (WHEN LPARENCHAR dbs_predicate RPARENCHAR THEN (dbs_result_expression1 | NULL))+;
+dbs_searched_when_clause : (WHEN ((LPARENCHAR dbs_predicate RPARENCHAR) | dbs_predicate) THEN (dbs_result_expression1 | NULL))+;
 
 dbs_function_invocation : dbs_function_name LPARENCHAR (ALL | DISTINCT)? (TABLE dbs_transition_table_name |
 (dbs_expressions | DATELITERAL) (dbs_comma_separator (dbs_expressions | DATELITERAL) | NUMERICLITERAL)*)? RPARENCHAR;
@@ -1454,7 +1454,7 @@ dbs_aux_table_name: T=dbs_sql_identifier {validateLength($T.text, "auxiliary tab
 dbs_begin_column_name: dbs_generic_name;
 dbs_binary_string_constant: BINARY_STRING_CONSTANT;
 dbs_bp_name: T=dbs_sql_identifier {validateLength($T.text, "buffer pool name", 8);};
-dbs_case_expression : CASE (dbs_simple_when_clause | dbs_searched_when_clause) (ELSE NULL | ELSE dbs_result_expression1)? END ;
+dbs_case_expression : CASE (dbs_searched_when_clause | dbs_simple_when_clause) (ELSE NULL | ELSE dbs_result_expression1)? END ;
 dbs_cast_function_name: dbs_sql_identifier;
 dbs_catalog_name: T=dbs_sql_identifier {validateLength($T.text, "catalog name", 8);};
 dbs_ccsid_value: INTEGERLITERAL;
@@ -1552,7 +1552,7 @@ dbs_special_name: ABSOLUTE | ACCELERATION | ACCELERATOR | ACCESS | ACCESSCTRL | 
                   | TRUNCATE | TRUSTED | TYPE | TYPES| UNBOUNDED | UNICODE | UNION | UNIQUE | UNNEST | UNPACK | UNTIL
                   | UPDATE | UPON | UPPER | UR | URL | USA | USAGE | USE | USER | USERID | USING | V1 | VALIDATE
                   | VALIDPROC| VALUE | VALUES | VARBINARY | VARCHAR | VARGRAPHIC | VARIABLE | VARIANCE| VARYING
-                  | VCAT | VERSION | VERSIONING | VERSIONS | VIEW | VOLATILE | VOLUMES | WAIT | WAITFORDATA | WHEN
+                  | VCAT | VERSION | VERSIONING | VERSIONS | VIEW | VOLATILE | VOLUMES | WAIT | WAITFORDATA
                   | WHENEVER | WHERE | WHILE | WITH | WITHOUT | WLM | WORK | WORKFILE | WRAPPED | WRITE | WRKSTNNAME
                   | XML | XMLCAST| XMLNAMESPACES| XMLPATTERN| XMLQUERY| XMLSCHEMA| XMLTABLE | YEAR | YEARS | YES
                   | ZONE;
@@ -1641,7 +1641,7 @@ dbs_search_condition: (NOT? dbs_predicate (SELECTIVITY dbs_integer_constant)? | 
 dbs_seclabel_name: IDENTIFIER {validateLength($IDENTIFIER.text, "security label", 8);};
 dbs_sequence_name: T=dbs_sql_identifier {validateLength($T.text, "sequence name", 128);};
 dbs_servauth_value: NONNUMERICLITERAL;
-dbs_simple_when_clause: (WHEN (dbs_basic_predicate | dbs_expressions) THEN (dbs_result_expression1 | NULL))+;
+dbs_simple_when_clause: (dbs_expressions) (WHEN (dbs_basic_predicate | dbs_expressions) THEN (dbs_result_expression1 | NULL))+;
 dbs_smallint: T=dbs_integer_constant {validateTextInRange($T.text, -2, 100);};//MINUSCHAR? SINGLEDIGITLITERAL SINGLEDIGITLITERAL?;// java ref - -1 to 99
 dbs_specific_name: T=dbs_sql_identifier {validateLength($T.text, "specific name", 128);};
 dbs_sql_condition_name: T=dbs_generic_name {validateLength($T.text, "SQL condition name", 128);}; // No particular spec found in doc. Specifies the name of the condition.
