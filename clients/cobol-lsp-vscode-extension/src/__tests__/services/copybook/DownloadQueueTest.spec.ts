@@ -15,59 +15,131 @@ import { DownloadQueue } from "../../../services/copybook/DownloadQueue";
 import { SettingsService } from "../../../services/Settings";
 
 describe("Check download queue", () => {
-    const documentUri = "filename";
-    const element = "Test";
-    const profile = "profile";
-    const elementExtra = "Test_Extra";
-    it("can add elements to queue", async () => {
-        const queue: DownloadQueue = new DownloadQueue();
-        queue.push(documentUri, element, SettingsService.DEFAULT_DIALECT, profile, false);
-        const e = await queue.pop();
-        expect(e).toEqual({ copybook: element, dialectType: SettingsService.DEFAULT_DIALECT, documentUri, profile, quiet:false });
-        expect(0).toEqual(queue.length);
+  const documentUri = "filename";
+  const element = "Test";
+  const profile = "profile";
+  const elementExtra = "Test_Extra";
+  it("can add elements to queue", async () => {
+    const queue: DownloadQueue = new DownloadQueue();
+    queue.push(
+      documentUri,
+      element,
+      SettingsService.DEFAULT_DIALECT,
+      profile,
+      false,
+    );
+    const e = await queue.pop();
+    expect(e).toEqual({
+      copybook: element,
+      dialectType: SettingsService.DEFAULT_DIALECT,
+      documentUri,
+      profile,
+      quiet: false,
     });
-    it("can wait", async () => {
-        const queue: DownloadQueue = new DownloadQueue();
-        const result = queue.pop().then(e => {
-            expect(e).toEqual({ copybook: element, dialectType: SettingsService.DEFAULT_DIALECT, documentUri, profile, quiet: true });
-        });
-        queue.push(documentUri, element, SettingsService.DEFAULT_DIALECT, profile, true);
-        await result;
-        expect(0).toEqual(queue.length);
+    expect(0).toEqual(queue.length);
+  });
+  it("can wait", async () => {
+    const queue: DownloadQueue = new DownloadQueue();
+    const result = queue.pop().then((e) => {
+      expect(e).toEqual({
+        copybook: element,
+        dialectType: SettingsService.DEFAULT_DIALECT,
+        documentUri,
+        profile,
+        quiet: true,
+      });
     });
-    it("can have more then one element", async () => {
-        const queue: DownloadQueue = new DownloadQueue();
-        queue.push(documentUri, element, SettingsService.DEFAULT_DIALECT, profile, true);
-        queue.push(documentUri, elementExtra, SettingsService.DEFAULT_DIALECT, profile, false);
-        expect(await queue.pop()).toEqual({ copybook: elementExtra, dialectType: SettingsService.DEFAULT_DIALECT, documentUri, profile, quiet: false});
-        expect(1).toEqual(queue.length);
-        expect(await queue.pop()).toEqual({ copybook: element, dialectType: SettingsService.DEFAULT_DIALECT, documentUri, profile, quiet: true });
-        expect(0).toEqual(queue.length);
+    queue.push(
+      documentUri,
+      element,
+      SettingsService.DEFAULT_DIALECT,
+      profile,
+      true,
+    );
+    await result;
+    expect(0).toEqual(queue.length);
+  });
+  it("can have more then one element", async () => {
+    const queue: DownloadQueue = new DownloadQueue();
+    queue.push(
+      documentUri,
+      element,
+      SettingsService.DEFAULT_DIALECT,
+      profile,
+      true,
+    );
+    queue.push(
+      documentUri,
+      elementExtra,
+      SettingsService.DEFAULT_DIALECT,
+      profile,
+      false,
+    );
+    expect(await queue.pop()).toEqual({
+      copybook: elementExtra,
+      dialectType: SettingsService.DEFAULT_DIALECT,
+      documentUri,
+      profile,
+      quiet: false,
     });
-    it("can ignore duplicates", async () => {
-        const queue: DownloadQueue = new DownloadQueue();
-        queue.push(documentUri, element, SettingsService.DEFAULT_DIALECT, profile, false);
-        queue.push(documentUri, element, SettingsService.DEFAULT_DIALECT, profile, false);
-        expect(1).toEqual(queue.length);
+    expect(1).toEqual(queue.length);
+    expect(await queue.pop()).toEqual({
+      copybook: element,
+      dialectType: SettingsService.DEFAULT_DIALECT,
+      documentUri,
+      profile,
+      quiet: true,
     });
-    it("saves both elements with different quiet flag", async () => {
-        const queue: DownloadQueue = new DownloadQueue();
-        queue.push(documentUri, element, SettingsService.DEFAULT_DIALECT, profile, false);
-        queue.push(documentUri, element, SettingsService.DEFAULT_DIALECT, profile, true);
-        expect(2).toEqual(queue.length);
+    expect(0).toEqual(queue.length);
+  });
+  it("can ignore duplicates", async () => {
+    const queue: DownloadQueue = new DownloadQueue();
+    queue.push(
+      documentUri,
+      element,
+      SettingsService.DEFAULT_DIALECT,
+      profile,
+      false,
+    );
+    queue.push(
+      documentUri,
+      element,
+      SettingsService.DEFAULT_DIALECT,
+      profile,
+      false,
+    );
+    expect(1).toEqual(queue.length);
+  });
+  it("saves both elements with different quiet flag", async () => {
+    const queue: DownloadQueue = new DownloadQueue();
+    queue.push(
+      documentUri,
+      element,
+      SettingsService.DEFAULT_DIALECT,
+      profile,
+      false,
+    );
+    queue.push(
+      documentUri,
+      element,
+      SettingsService.DEFAULT_DIALECT,
+      profile,
+      true,
+    );
+    expect(2).toEqual(queue.length);
+  });
+  it("can stop", async () => {
+    const queue: DownloadQueue = new DownloadQueue();
+    queue.stop();
+    expect(0).toEqual(queue.length);
+  });
+  it("can stop async", async () => {
+    const queue: DownloadQueue = new DownloadQueue();
+    const result = queue.pop().then((e) => {
+      expect(e).toEqual(undefined);
     });
-    it("can stop", async () => {
-        const queue: DownloadQueue = new DownloadQueue();
-        queue.stop();
-        expect(0).toEqual(queue.length);
-    });
-    it("can stop async", async () => {
-        const queue: DownloadQueue = new DownloadQueue();
-        const result = queue.pop().then(e => {
-            expect(e).toEqual(undefined);
-        });
-        queue.stop();
-        await result;
-        expect(0).toEqual(queue.length);
-    });
+    queue.stop();
+    await result;
+    expect(0).toEqual(queue.length);
+  });
 });

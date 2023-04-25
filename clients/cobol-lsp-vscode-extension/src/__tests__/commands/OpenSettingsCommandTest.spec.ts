@@ -13,19 +13,27 @@
  */
 
 import * as vscode from "vscode";
-import {gotoCopybookSettings} from "../../commands/OpenSettingsCommand";
-import {TelemetryService} from "../../services/reporter/TelemetryService";
+import { gotoCopybookSettings } from "../../commands/OpenSettingsCommand";
+import { TelemetryService } from "../../services/reporter/TelemetryService";
 
 jest.mock("../../services/reporter/TelemetryService");
 jest.mock("vscode", () => ({
-    commands: {
-        executeCommand: jest.fn(),
-    }}));
+  commands: {
+    executeCommand: jest.fn(),
+  },
+}));
 
 test("check gotoCopybookSettings calls telemetry services and vscode execute command with right parameters.", () => {
-    expect(gotoCopybookSettings).toBeTruthy();
-    gotoCopybookSettings();
+  expect(gotoCopybookSettings).toBeTruthy();
+  gotoCopybookSettings();
 
-    expect(TelemetryService.registerEvent).toBeCalledWith("Open copybook settings", ["COBOL", "copybook", "settings"], "The user invokes the open settings quick fix to see the copybook locations stored in the settings file");
-    expect(vscode.commands.executeCommand).toBeCalledWith("workbench.action.openSettings", "cobol-lsp.cpy-manager");
+  expect(TelemetryService.registerEvent).toBeCalledWith(
+    "Open copybook settings",
+    ["COBOL", "copybook", "settings"],
+    "The user invokes the open settings quick fix to see the copybook locations stored in the settings file",
+  );
+  expect(vscode.commands.executeCommand).toBeCalledWith(
+    "workbench.action.openSettings",
+    "cobol-lsp.cpy-manager",
+  );
 });

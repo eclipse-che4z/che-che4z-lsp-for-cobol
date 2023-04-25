@@ -12,41 +12,48 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import {QUICKFIX_GOTOSETTINGS} from "../../constants";
-import {TelemetryService} from "../reporter/TelemetryService";
+import { QUICKFIX_GOTOSETTINGS } from "../../constants";
+import { TelemetryService } from "../reporter/TelemetryService";
 
 export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
+  public async provideCodeActions(
+    doc: vscode.TextDocument,
+    range: vscode.Range | vscode.Selection,
+    context: vscode.CodeActionContext,
+    token: vscode.CancellationToken,
+  ): Promise<Array<vscode.Command | vscode.CodeAction>> {
+    if (!this.shouldHaveCodeAction(context)) {
+      return [];
+    }
+    // Telemetry should be collected only if shouldHaveCodeAction is true
+    TelemetryService.registerEvent(
+      "QuickFix for copybook activation",
+      ["COBOL", "hover", "copybook", "quickfix"],
+      "User try to understand the syntax error for a missing copybook",
+    );
 
-    public async provideCodeActions(doc: vscode.TextDocument,
-                                    range: vscode.Range | vscode.Selection,
-                                    context: vscode.CodeActionContext,
-                                    token: vscode.CancellationToken,
-    ): Promise<Array<vscode.Command | vscode.CodeAction>> {
-        if (!this.shouldHaveCodeAction(context)) {
-            return [];
-        }
-        // Telemetry should be collected only if shouldHaveCodeAction is true
-        TelemetryService.registerEvent("QuickFix for copybook activation", ["COBOL", "hover", "copybook", "quickfix"], "User try to understand the syntax error for a missing copybook");
+    const goToSettings = new vscode.CodeAction(
+      QUICKFIX_GOTOSETTINGS,
+      vscode.CodeActionKind.QuickFix,
+    );
 
-        const goToSettings = new vscode.CodeAction(QUICKFIX_GOTOSETTINGS, vscode.CodeActionKind.QuickFix);
+    goToSettings.command = {
+      command: "cobol-lsp.cpy-manager.goto-settings",
+      title: QUICKFIX_GOTOSETTINGS,
+    };
+    return [goToSettings];
+  }
 
-        goToSettings.command = {
-            command: "cobol-lsp.cpy-manager.goto-settings",
-            title: QUICKFIX_GOTOSETTINGS,
-        };
-        return [goToSettings];
+  private shouldHaveCodeAction(context: vscode.CodeActionContext): boolean {
+    if (!context.diagnostics || context.diagnostics.length < 1) {
+      return false;
     }
 
-    private shouldHaveCodeAction(context: vscode.CodeActionContext): boolean {
-        if (!context.diagnostics || context.diagnostics.length < 1) {
-            return false;
-        }
-
-        for (const d of context.diagnostics) {
-            if (d.code === "missing copybook") {
-                return true;
-            }
-        }
-        return false;
+    for (const d of context.diagnostics) {
+      if (d.code === "missing copybook") {
+        return true;
+      }
     }
+    return false;
+  }
 }

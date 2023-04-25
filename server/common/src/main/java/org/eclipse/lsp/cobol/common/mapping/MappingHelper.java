@@ -85,7 +85,7 @@ public class MappingHelper {
     Position startPoint = new Position(line, charPos);
     Position endPoint = new Position(line, MappingService.LINE_LEN);
     Range secondRange = new Range(startPoint, endPoint);
-    if (size(secondRange) > 0 || charSize(secondRange) > 0) {
+    if (size(secondRange) > 0) {
       result.add(secondRange);
     }
 
@@ -93,7 +93,7 @@ public class MappingHelper {
     endPoint = new Position(range.getEnd().getLine(), range.getEnd().getCharacter());
 
     secondRange = new Range(startPoint, endPoint);
-    if (size(secondRange) > 0 || charSize(secondRange) > 0) {
+    if (size(secondRange) > 0) {
       result.add(secondRange);
     }
     return result;
@@ -111,7 +111,7 @@ public class MappingHelper {
     Position startPoint = new Position(split.getStart().getLine(), split.getStart().getCharacter());
     Position endPoint = new Position(split.getStart().getLine(), 80);
     Range secondRange = new Range(startPoint, endPoint);
-    if (size(secondRange) > 0 || charSize(secondRange) > 0) {
+    if (size(secondRange) > 0) {
       result.add(secondRange);
     }
 
@@ -119,7 +119,7 @@ public class MappingHelper {
     endPoint = new Position(range.getEnd().getLine() - size(split) + (split.getEnd().getCharacter() < 80 ? 1 : 0), range.getEnd().getCharacter());
     secondRange = new Range(startPoint, endPoint);
 
-    if (size(secondRange) > 0 || charSize(secondRange) > 0) {
+    if (size(secondRange) > 0) {
       result.add(secondRange);
     }
 

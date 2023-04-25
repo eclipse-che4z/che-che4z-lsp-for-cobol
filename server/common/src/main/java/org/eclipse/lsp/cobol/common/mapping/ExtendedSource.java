@@ -94,7 +94,11 @@ public class ExtendedSource {
     Location lastLocation = documents.get(lastUri).mapLocation(range, true);
     while (!Objects.equals(lastLocation.getUri(), lastUri)) {
       lastUri = lastLocation.getUri();
-      lastLocation = documents.get(lastUri).mapLocation(lastLocation.getRange(), true);
+      DocumentMap documentMap = documents.get(lastUri);
+      if (documentMap == null) {
+        continue;
+      }
+      lastLocation = documentMap.mapLocation(lastLocation.getRange(), true);
     }
     return lastLocation;
   }
@@ -110,7 +114,11 @@ public class ExtendedSource {
     Location lastLocation = documents.get(lastUri).mapLocation(range, false);
     while (!Objects.equals(lastLocation.getUri(), lastUri)) {
       lastUri = lastLocation.getUri();
-      lastLocation = documents.get(lastUri).mapLocation(lastLocation.getRange(), false);
+      DocumentMap documentMap = documents.get(lastUri);
+      if (documentMap == null) {
+        continue;
+      }
+      lastLocation = documentMap.mapLocation(lastLocation.getRange(), false);
     }
     return lastLocation;
   }

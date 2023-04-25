@@ -484,7 +484,8 @@
                         <configuration>
                             <mainClass>org.eclipse.lsp.cobol.LangServerBootstrap</mainClass>
                             <buildArgs>
-                                <buildArg>-H:+StaticExecutableWithDynamicLibC</buildArg>
+                                <buildArg>--static</buildArg>
+                                <buildArg>--libc=musl</buildArg>
                                 <buildArg>-H:+ReportExceptionStackTraces</buildArg>
                                 <buildArg>--allow-incomplete-classpath</buildArg>
                                 <buildArg>--report-unsupported-elements-at-runtime</buildArg>

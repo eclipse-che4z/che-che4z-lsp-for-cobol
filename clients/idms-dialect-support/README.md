@@ -7,9 +7,9 @@
 
 </div>
 
-# IDMS Dialect Support
+# COBOL Dialect Support for IDMS
 
-IDMS Dialect Support is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension which enables language server protocol features for the [IDMS](https://techdocs.broadcom.com/idms) dialect of COBOL, and support for IDMS copybooks.
+COBOL Dialect Support for IDMS is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension. This add-on enables language server protocol features for the [IDMS](https://techdocs.broadcom.com/idms) dialect of COBOL, and support for IDMS copybooks.
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ IDMS Dialect Support is an add-on for the [COBOL Language Support](https://marke
 
 ## LSP Features
 
-IDMS Dialect Support enables the following LSP features:
+COBOL Dialect Support for IDMS enables the following LSP features:
 - Autocomplete for IDMS DML keywords
 - Syntax and semantic check for IDMS DML keywords and variables
 - Syntax highlighting and coloring for IDMS DML keywords and variables
@@ -26,11 +26,11 @@ IDMS Dialect Support enables the following LSP features:
 
 ## Copybook Support
 
-IDMS Dialect Support enables copybook support features of the COBOL Language Support extension for copybooks named in `COPY IDMS` statements. 
+COBOL Dialect Support for IDMS enables copybook support features of the COBOL Language Support extension for copybooks named in `COPY IDMS` statements. 
 
 To enable copybook support, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. 
 
-Specify paths to your IDMS copybooks in the IDMS Dialect Support extension settings as follows:
+Specify paths to your IDMS copybooks in the COBOL Dialect Support for IDMS extension settings as follows:
 * Specify mainframe data sets under **Idms: Paths-dsn**
 * Specify USS paths under **Idms: Paths-uss**
 * Specify local paths under **Idms: Paths-local**
@@ -58,4 +58,4 @@ To use processor groups with IDMS copybooks, add the `preprocessor` array to ind
 }
 ```
 
-In the above example, the IDMS preprocessor is enabled on the processor group GROUP1. This enables the use of IDMS copybooks with the programs linked to it in `pgm_conf.json`.
+The above example adds the IDMS preprocessor to the processor group GROUP1 and enables the use of IDMS copybooks with the programs that are linked to GROUP1 in the `pgm_conf.json` file.
