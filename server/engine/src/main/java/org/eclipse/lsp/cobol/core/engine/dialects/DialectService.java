@@ -194,7 +194,7 @@ public class DialectService {
     AtomicBoolean changed = new AtomicBoolean(false);
     dialectRegistry.forEach(r ->
       dialectSuppliers.computeIfAbsent(r.getName(), name ->
-          discoveryService.loadDialects(r.getPath(), copybookService, messageService).stream()
+          discoveryService.loadDialects(r.getUri(), copybookService, messageService).stream()
           .filter(d -> d.getName().equals(name))
           .findFirst()
               .map(dialect -> {

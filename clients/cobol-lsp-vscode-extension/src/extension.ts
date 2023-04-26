@@ -152,7 +152,7 @@ function getDialectAPI_v_1_0() {
       DialectRegistry.register(
         extensionId,
         dialect.name,
-        dialect.jar.path,
+        dialect.jar,
         dialect.description,
         dialect.snippets.path,
       );
