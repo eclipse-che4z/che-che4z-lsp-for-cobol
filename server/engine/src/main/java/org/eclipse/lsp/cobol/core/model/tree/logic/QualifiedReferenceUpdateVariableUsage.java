@@ -50,10 +50,6 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
 
   @Override
   public void accept(QualifiedReferenceNode node, ProcessingContext ctx) {
-    updateVariableUsage(node, ctx);
-  }
-
-  private void updateVariableUsage(QualifiedReferenceNode node, ProcessingContext ctx) {
     List<VariableUsageNode> variableUsageNodes =
         node.getChildren().stream()
             .filter(Node.hasType(NodeType.VARIABLE_USAGE))

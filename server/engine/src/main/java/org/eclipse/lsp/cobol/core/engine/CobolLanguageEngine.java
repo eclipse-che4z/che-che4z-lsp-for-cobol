@@ -300,7 +300,7 @@ public class CobolLanguageEngine {
     ProcessingPhase t = ProcessingPhase.TRANSFORMATION;
     ctx.register(t, CompilerDirectiveNode.class, new CompilerDirectiveProcess());
     ctx.register(t, ProgramIdNode.class, new ProgramIdProcess());
-    ctx.register(t, SectionNode.class, new ProcessNodeWithVariableDefinitions(symbolAccumulatorService));
+    ctx.register(t, SectionNode.class, new SectionNodeProcessor(symbolAccumulatorService));
     ctx.register(t, FileEntryNode.class, new FileEntryProcess());
     ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess(symbolAccumulatorService));
     ctx.register(t, DeclarativeProcedureSectionNode.class, new DeclarativeProcedureSectionRegister(symbolAccumulatorService));
