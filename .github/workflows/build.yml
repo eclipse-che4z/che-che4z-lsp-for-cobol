@@ -29,16 +29,16 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install dependencies for COBOL LS API
         working-directory: clients/cobol-dialect-api
-        run: npm ci
+        run: NODE_ENV=production npm ci
       - name: Install dependencies for COBOL LS
         working-directory: clients/cobol-lsp-vscode-extension
-        run: npm ci
+        run: NODE_ENV=production npm ci
       - name: Install dependencies for IDMS
         working-directory: clients/idms-dialect-support
-        run: npm ci
+        run: NODE_ENV=production npm ci
       - name: Install dependencies for DaCo
         working-directory: clients/daco-dialect-support
-        run: npm ci
+        run: NODE_ENV=production npm ci
       - uses: actions/upload-artifact@v3
         with:
           name: clients-for-bd-scan
