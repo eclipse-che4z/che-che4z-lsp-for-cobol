@@ -15,14 +15,14 @@ import { DownloadQueue } from "../../../services/copybook/DownloadQueue";
 import { SettingsService } from "../../../services/Settings";
 
 describe("Check download queue", () => {
-  const filename = "filename";
+  const documentUri = "filename";
   const element = "Test";
   const profile = "profile";
   const elementExtra = "Test_Extra";
   it("can add elements to queue", async () => {
     const queue: DownloadQueue = new DownloadQueue();
     queue.push(
-      filename,
+      documentUri,
       element,
       SettingsService.DEFAULT_DIALECT,
       profile,
@@ -32,7 +32,7 @@ describe("Check download queue", () => {
     expect(e).toEqual({
       copybook: element,
       dialectType: SettingsService.DEFAULT_DIALECT,
-      filename: filename,
+      documentUri,
       profile,
       quiet: false,
     });
@@ -44,13 +44,13 @@ describe("Check download queue", () => {
       expect(e).toEqual({
         copybook: element,
         dialectType: SettingsService.DEFAULT_DIALECT,
-        filename: filename,
+        documentUri,
         profile,
         quiet: true,
       });
     });
     queue.push(
-      filename,
+      documentUri,
       element,
       SettingsService.DEFAULT_DIALECT,
       profile,
@@ -62,14 +62,14 @@ describe("Check download queue", () => {
   it("can have more then one element", async () => {
     const queue: DownloadQueue = new DownloadQueue();
     queue.push(
-      filename,
+      documentUri,
       element,
       SettingsService.DEFAULT_DIALECT,
       profile,
       true,
     );
     queue.push(
-      filename,
+      documentUri,
       elementExtra,
       SettingsService.DEFAULT_DIALECT,
       profile,
@@ -78,7 +78,7 @@ describe("Check download queue", () => {
     expect(await queue.pop()).toEqual({
       copybook: elementExtra,
       dialectType: SettingsService.DEFAULT_DIALECT,
-      filename: filename,
+      documentUri,
       profile,
       quiet: false,
     });
@@ -86,7 +86,7 @@ describe("Check download queue", () => {
     expect(await queue.pop()).toEqual({
       copybook: element,
       dialectType: SettingsService.DEFAULT_DIALECT,
-      filename: filename,
+      documentUri,
       profile,
       quiet: true,
     });
@@ -95,14 +95,14 @@ describe("Check download queue", () => {
   it("can ignore duplicates", async () => {
     const queue: DownloadQueue = new DownloadQueue();
     queue.push(
-      filename,
+      documentUri,
       element,
       SettingsService.DEFAULT_DIALECT,
       profile,
       false,
     );
     queue.push(
-      filename,
+      documentUri,
       element,
       SettingsService.DEFAULT_DIALECT,
       profile,
@@ -113,14 +113,14 @@ describe("Check download queue", () => {
   it("saves both elements with different quiet flag", async () => {
     const queue: DownloadQueue = new DownloadQueue();
     queue.push(
-      filename,
+      documentUri,
       element,
       SettingsService.DEFAULT_DIALECT,
       profile,
       false,
     );
     queue.push(
-      filename,
+      documentUri,
       element,
       SettingsService.DEFAULT_DIALECT,
       profile,

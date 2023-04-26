@@ -31,10 +31,21 @@
             "items": {
               "type": "string"
             }
+          },
+          "copybook-extensions": {
+            "type": "array",
+            "description": "List of possible copybook file extensions.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "copybook-file-encoding": {
+            "type": "string",
+            "description": "Copybook file encoding."
           }
-        },
-        "required": ["name"]
-      }
+        }
+      },
+      "required": ["name"]
     }
   },
   "required": ["pgroups"]

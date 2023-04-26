@@ -71,9 +71,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
   registerCodeActions(context);
 
-  context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
-        { language: LANGUAGE_ID },
-        new SnippetCompletionProvider()));
+  context.subscriptions.push(
+    vscode.languages.registerCompletionItemProvider(
+      { language: LANGUAGE_ID },
+      new SnippetCompletionProvider(),
+    ),
+  );
 
   configurationWatcher.watchConfigurationChanges();
 
@@ -241,12 +244,16 @@ function registerCommands(
 }
 
 function registerCodeActions(context: vscode.ExtensionContext) {
-    context.subscriptions.push(
-        vscode.languages.registerCodeActionsProvider(
-            { language: LANGUAGE_ID },
-            new CopybooksCodeActionProvider()));
-    context.subscriptions.push(
-        vscode.languages.registerCodeActionsProvider(
-            { language: LANGUAGE_ID },
-            new ServerRuntimeCodeActionProvider()));
+  context.subscriptions.push(
+    vscode.languages.registerCodeActionsProvider(
+      { language: LANGUAGE_ID },
+      new CopybooksCodeActionProvider(),
+    ),
+  );
+  context.subscriptions.push(
+    vscode.languages.registerCodeActionsProvider(
+      { language: LANGUAGE_ID },
+      new ServerRuntimeCodeActionProvider(),
+    ),
+  );
 }

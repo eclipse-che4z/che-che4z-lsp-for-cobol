@@ -259,8 +259,8 @@ export class CopybookDownloadService implements vscode.Disposable {
     try {
       for (const cp of toDownload) {
         const datasets = isUSS
-          ? SettingsService.getUssPath(cp.filename, cp.dialectType)
-          : SettingsService.getDsnPath(cp.filename, cp.dialectType);
+          ? SettingsService.getUssPath(cp.documentUri, cp.dialectType)
+          : SettingsService.getDsnPath(cp.documentUri, cp.dialectType);
         for (const dataset of datasets) {
           if (CopybookDownloadService.needsUserNotification(toDownload)) {
             progress.report({
@@ -358,12 +358,12 @@ export class CopybookDownloadService implements vscode.Disposable {
    * This method is invoked by {@link CopybookURI#resolveCopybookURI} when the target copybbok is not found on
    * local workspaces and should be added in the download queue for copybooks that the LSP client will try
    * to download from MF
-   * @param cobolFileName name of the document open in workspace
+   * @param documentUri URI of the document open in workspace
    * @param copybookNames list of names of the copybooks required by the LSP server
    * @param quiet flag described that interaction with a user is not allowed
    */
   public async downloadCopybooks(
-    cobolFileName: string,
+    documentUri: string,
     copybookNames: CopybookName[],
     quiet: boolean = true,
   ): Promise<void> {
@@ -398,7 +398,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     if (!CopybookDownloadService.checkWorkspace()) {
       return;
     }
-    const profile = await ProfileUtils.getProfileNameForCopybook(cobolFileName);
+    const profile = await ProfileUtils.getProfileNameForCopybook(documentUri);
 
     if (!profile) {
       if (!quiet) {
@@ -424,7 +424,7 @@ export class CopybookDownloadService implements vscode.Disposable {
 
     copybookNames.forEach((copybook) => {
       this.queue.push(
-        cobolFileName,
+        documentUri,
         copybook.name,
         copybook.dialect,
         profile,

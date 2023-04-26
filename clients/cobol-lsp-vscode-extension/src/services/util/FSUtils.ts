@@ -18,6 +18,7 @@ import * as path from "path";
 import * as glob from "glob";
 import * as urlUtil from "url";
 import { SettingsUtils } from "./SettingsUtils";
+import { Uri } from "vscode";
 
 /**
  * This method is responsible to return a valid URI without extension if the extension is not provided or an URI
@@ -143,6 +144,11 @@ function globSearch(
   const result = glob.sync(pattern, { cwd, dot: true });
   // TODO report the case with more then one copybook fit the pattern.
   return result[0] ? path.join(cwd, result[0]) : undefined;
+}
+
+export function getProgramNameFromUri(uri: string): string {
+  const fullPath = Uri.parse(uri).fsPath;
+  return path.basename(fullPath, path.extname(fullPath));
 }
 
 function isAbsolute(resource: string): boolean {

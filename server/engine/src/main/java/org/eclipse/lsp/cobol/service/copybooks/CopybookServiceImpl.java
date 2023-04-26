@@ -208,7 +208,7 @@ public class CopybookServiceImpl implements CopybookService {
   private Optional<String> resolveCopybookFromWorkspace(CopybookName copybookName, String programUri) {
     try {
       CompletableFuture<String> future = clientProvider.get().resolveCopybook(
-          files.getNameFromURI(programUri),
+          programUri,
           copybookName.getDisplayName(),
           Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL));
 

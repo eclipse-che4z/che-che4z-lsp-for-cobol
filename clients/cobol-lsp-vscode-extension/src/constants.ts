@@ -14,6 +14,10 @@
 export const SETTINGS_CPY_SECTION: string = "cobol-lsp.cpy-manager";
 export const SETTINGS_CPY_LOCAL_PATH: string =
   "cobol-lsp.cpy-manager.paths-local";
+export const SETTINGS_CPY_EXTENSIONS: string =
+  "cobol-lsp.cpy-manager.copybook-extensions";
+export const SETTINGS_CPY_FILE_ENCODING: string =
+  "cobol-lsp.cpy-manager.copybook-file-encoding";
 export const SETTINGS_DIALECT = "cobol-lsp.dialects";
 export const SETTINGS_SUBROUTINE_LOCAL_KEY =
   "cobol-lsp.subroutine-manager.paths-local";
