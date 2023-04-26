@@ -16,6 +16,10 @@ COBOL Dialect Support for IDMS is an add-on for the [COBOL Language Support](htt
 - COBOL Language Support extension
 - Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.html).
 
+## Getting Started
+
+To enable COBOL Dialect Support for IDMS, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. Use the string "IDMS" to enable the IDMS dialect in your workspace extension settings or in a processor group.
+
 ## LSP Features
 
 COBOL Dialect Support for IDMS enables the following LSP features:
@@ -34,28 +38,3 @@ Specify paths to your IDMS copybooks in the COBOL Dialect Support for IDMS exten
 * Specify mainframe data sets under **Idms: Paths-dsn**
 * Specify USS paths under **Idms: Paths-uss**
 * Specify local paths under **Idms: Paths-local**
-
-### Using Processor Groups
-
-To use processor groups with IDMS copybooks, add the `preprocessor` array to individual groups within your `proc_grps.json` file. 
-
-#### Example
-```
-{
-    "pgroups": [
-        {
-            "name": "GROUP1",
-            "libs": [
-                "LIB1", "LIB2"
-            ],
-             "preprocessor": [
-                {
-                    "name": "IDMS"
-                },
-            ],
-        },
-    ]
-}
-```
-
-The above example adds the IDMS preprocessor to the processor group GROUP1 and enables the use of IDMS copybooks with the programs that are linked to GROUP1 in the `pgm_conf.json` file.

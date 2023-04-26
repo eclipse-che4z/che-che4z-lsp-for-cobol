@@ -106,6 +106,12 @@ export async function insertString(
   return movePosition;
 }
 
+export async function waitFor(doneFunc: () => boolean) {
+  while (!doneFunc()) {
+    await sleep(100);
+  }
+}
+
 export function sleep(ms: number): Promise<unknown> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);

@@ -23,6 +23,27 @@ on:
       - master
 
 jobs:
+  zipSources:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies for COBOL LS API
+        working-directory: clients/cobol-dialect-api
+        run: npm ci
+      - name: Install dependencies for COBOL LS
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: npm ci
+      - name: Install dependencies for IDMS
+        working-directory: clients/idms-dialect-support
+        run: npm ci
+      - name: Install dependencies for DaCo
+        working-directory: clients/daco-dialect-support
+        run: npm ci
+      - uses: actions/upload-artifact@v3
+        with:
+          name: clients-for-bd-scan
+          path: clients/**
+          if-no-files-found: error
   buildPlatformIndependedPart:
     runs-on: ubuntu-latest
     steps:
@@ -181,6 +202,10 @@ jobs:
       - name: Deploy server jar
         working-directory: clients/cobol-lsp-vscode-extension
         run: cp ../../jar/jar/server.jar ./server/jar
+      - name: Setup telemetry key
+        working-directory: clients/cobol-lsp-vscode-extension
+        if: github.ref == 'refs/heads/master'
+        run: echo ${{ secrets.TELEMETRY_INSTRUMENTATION_KEY }} > resources/TELEMETRY_KEY
       - name: Deploy windows executable
         working-directory: clients/cobol-lsp-vscode-extension
         if: startsWith( matrix.os, 'windows')
