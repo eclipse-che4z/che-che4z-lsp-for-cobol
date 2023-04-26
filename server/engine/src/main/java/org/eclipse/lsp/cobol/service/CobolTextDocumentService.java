@@ -358,6 +358,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     docIdentifier.setText(text);
     docIdentifier.setUri(uri);
     if (isCopybook(docIdentifier.getUri(), docIdentifier.getText(), copybookExtensions)) {
+      clearDiagnostics(uri);
+      communications.publishDiagnostics(collectAllDiagnostics());
       reanalyseOpenedPrograms(params, uri);
       return;
     }
@@ -369,6 +371,15 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
           doAnalysis(uri, text, false, false);
           return null;
         });
+  }
+
+  private void clearDiagnostics(String uri) {
+    Optional.ofNullable(errorsByFileForEachProgram.get(uri))
+            .ifPresent(
+                    diagnosticMap ->
+                            diagnosticMap.forEach(
+                                    (k, v) ->
+                                            diagnosticMap.computeIfPresent(k, (k1, v1) -> Collections.emptyList())));
   }
 
   private void reanalyseOpenedPrograms(DidChangeTextDocumentParams params, String uri)
@@ -399,14 +410,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     if (isCopybook(uri, docText, copybookExtensions)) {
       return;
     }
-
-    Optional.ofNullable(errorsByFileForEachProgram.get(uri))
-        .ifPresent(
-            diagnosticMap ->
-                diagnosticMap.forEach(
-                    (k, v) ->
-                        diagnosticMap.computeIfPresent(k, (k1, v1) -> Collections.emptyList())));
-
+    clearDiagnostics(uri);
     communications.publishDiagnostics(collectAllDiagnostics());
     clearAnalysedFutureObject(uri);
     watcherService.removeRuntimeWatchers(uri);
