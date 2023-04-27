@@ -15,7 +15,7 @@
 export class CopybookProfile {
   private copybook: any;
   constructor(
-    readonly filename: string,
+    readonly documentUri: string,
     copybook: string,
     readonly dialectType: string,
     readonly profile: string,
@@ -26,7 +26,7 @@ export class CopybookProfile {
 
   public equals(other: CopybookProfile): boolean {
     return (
-      this.filename == other.filename &&
+      this.documentUri == other.documentUri &&
       this.copybook == other.copybook &&
       this.dialectType == other.dialectType &&
       this.profile == other.profile &&
@@ -48,7 +48,7 @@ export class DownloadQueue {
   private resolve: any;
 
   public push(
-    filename: string,
+    documentUri: string,
     copybook: string,
     dialectType: string,
     profile: string,
@@ -56,12 +56,12 @@ export class DownloadQueue {
   ): void {
     if (this.resolve) {
       this.resolve(
-        new CopybookProfile(filename, copybook, dialectType, profile, quiet),
+        new CopybookProfile(documentUri, copybook, dialectType, profile, quiet),
       );
       this.resolve = undefined;
     } else {
       const copybookProfile = new CopybookProfile(
-        filename,
+        documentUri,
         copybook,
         dialectType,
         profile,

@@ -18,19 +18,18 @@ import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 
 /** SectionNode processor */
-public class ProcessNodeWithVariableDefinitions implements Processor<SectionNode> {
+public class SectionNodeProcessor implements Processor<SectionNode> {
   private final SymbolAccumulatorService symbolAccumulatorService;
 
-  public ProcessNodeWithVariableDefinitions(SymbolAccumulatorService symbolAccumulatorService) {
+  public SectionNodeProcessor(SymbolAccumulatorService symbolAccumulatorService) {
     this.symbolAccumulatorService = symbolAccumulatorService;
   }
 
   @Override
   public void accept(SectionNode node, ProcessingContext ctx) {
-    ctx.getErrors().addAll(VariableDefinitionUtil.processNodeWithVariableDefinitions(node));
+    ctx.getErrors().addAll(SectionNodeProcessorHelper.processNodeWithVariableDefinitions(node));
     symbolAccumulatorService.registerVariablesInProgram(node);
   }
 }

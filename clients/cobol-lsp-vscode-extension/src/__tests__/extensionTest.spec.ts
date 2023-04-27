@@ -20,7 +20,6 @@ import { activate } from "../extension";
 import { CopybooksCodeActionProvider } from "../services/copybook/CopybooksCodeActionProvider";
 import { LanguageClientService } from "../services/LanguageClientService";
 import { TelemetryService } from "../services/reporter/TelemetryService";
-import { createFileWithGivenPath } from "../services/Settings";
 import { SnippetCompletionProvider } from "../services/snippetcompletion/SnippetCompletionProvider";
 import { Utils } from "../services/util/Utils";
 
@@ -124,13 +123,16 @@ describe("Check plugin extension for cobol starts successfully.", () => {
     expect(gotoCopybookSettings).toHaveBeenCalled();
     expect(initSmartTab).toHaveBeenCalled();
 
-        expect(vscode.languages.registerCodeActionsProvider)
-            .toBeCalledWith({ language: "cobol" }, expect.any(CopybooksCodeActionProvider));
+    expect(vscode.languages.registerCodeActionsProvider).toBeCalledWith(
+      { language: "cobol" },
+      expect.any(CopybooksCodeActionProvider),
+    );
 
-        expect(vscode.languages.registerCompletionItemProvider)
-             .toBeCalledWith({ language: "cobol" }, expect.any(SnippetCompletionProvider));
-
-    });
+    expect(vscode.languages.registerCompletionItemProvider).toBeCalledWith(
+      { language: "cobol" },
+      expect.any(SnippetCompletionProvider),
+    );
+  });
 
   test("extension reruns extended API surface", async () => {
     const extendedApi = await activate(context);

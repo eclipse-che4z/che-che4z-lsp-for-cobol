@@ -11,6 +11,7 @@
 #   Broadcom, Inc. - initial API and implementation
 target/
 coverage/
+.nyc_output/
 bin/
 .settings/
 .mvn/

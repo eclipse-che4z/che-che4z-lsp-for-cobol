@@ -6,7 +6,7 @@
   "license": "EPL-2.0",
   "version": "0.0.1",
   "preview": false,
-  "publisher": "DaCo",
+  "publisher": "BroadcomMFD",
   "keywords": [
     "DaCo",
     "cobol",
@@ -85,7 +85,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "postinstall": "patch-package",
+    "postinstall": "node -e \"if (process.env.NODE_ENV === 'production'){process.exit(1)} \" && patch-package || echo skip patching",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",

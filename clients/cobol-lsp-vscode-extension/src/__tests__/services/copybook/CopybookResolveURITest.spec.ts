@@ -31,6 +31,17 @@ const CPY_FOLDER_NAME = ".cobcopy";
 const RELATIVE_CPY_FOLDER_NAME = "../relativeCobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
 
+jest.mock("vscode", () => ({
+  Uri: {
+    parse: jest.fn().mockImplementation((str: string) => {
+      return {
+        fsPath: str.substring("file://".length),
+      };
+    }),
+  },
+  workspace: {},
+}));
+
 SettingsUtils.getWorkspaceFoldersPath = jest.fn().mockReturnValue([__dirname]);
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue(undefined),

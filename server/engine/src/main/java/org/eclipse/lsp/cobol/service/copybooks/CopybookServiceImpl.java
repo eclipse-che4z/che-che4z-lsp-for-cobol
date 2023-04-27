@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ExecutionError;
@@ -185,7 +186,7 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private CopybookModel cleanupCopybook(CopybookModel dirtyCopybook) {
-    String cleanText = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent()).getResult().calculateExtendedText();
+    String cleanText = CharMatcher.whitespace().trimTrailingFrom(preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent()).getResult().calculateExtendedText());
     return new CopybookModel(dirtyCopybook.getCopybookId(), dirtyCopybook.getCopybookName(), dirtyCopybook.getUri(), cleanText);
   }
 
@@ -207,7 +208,7 @@ public class CopybookServiceImpl implements CopybookService {
   private Optional<String> resolveCopybookFromWorkspace(CopybookName copybookName, String programUri) {
     try {
       CompletableFuture<String> future = clientProvider.get().resolveCopybook(
-          files.getNameFromURI(programUri),
+          programUri,
           copybookName.getDisplayName(),
           Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL));
 

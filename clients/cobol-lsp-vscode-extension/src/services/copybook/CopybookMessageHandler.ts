@@ -16,6 +16,8 @@ import { SettingsService } from "../Settings";
 import { searchCopybookInWorkspace } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import { CopybookName } from "./CopybookDownloadService";
+import { Uri } from "vscode";
+import * as path from "path";
 
 enum CopybookFolderKind {
   "local",
@@ -24,17 +26,17 @@ enum CopybookFolderKind {
 }
 
 export function resolveCopybookHandler(
-  cobolFileName: string,
+  documentUri: string,
   copybookName: string,
   dialectType: string,
 ): string {
   let result: string;
-  result = searchCopybook(cobolFileName, copybookName, dialectType);
+  result = searchCopybook(documentUri, copybookName, dialectType);
   // check in subfolders under .copybooks (copybook downloaded from MF)
   if (!result) {
     result = searchCopybookInWorkspace(
       copybookName,
-      CopybookURI.createPathForCopybookDownloaded(cobolFileName, dialectType),
+      CopybookURI.createPathForCopybookDownloaded(documentUri, dialectType),
       SettingsService.getCopybookExtension(),
     );
   }
@@ -42,7 +44,7 @@ export function resolveCopybookHandler(
 }
 
 function searchCopybook(
-  cobolFileName: string,
+  documentUri: string,
   copybookName: string,
   dialectType: string,
 ) {
@@ -51,7 +53,7 @@ function searchCopybook(
     const folderKind = Object.values(CopybookFolderKind)[i];
     const targetFolder = getTargetFolderForCopybook(
       folderKind,
-      cobolFileName,
+      documentUri,
       dialectType,
     );
     const allowedExtensions = resolveAllowedExtensions(folderKind);
@@ -69,19 +71,16 @@ function searchCopybook(
 
 function getTargetFolderForCopybook(
   folderKind: string | CopybookFolderKind,
-  cobolFileName: string,
+  documentUri: string,
   dialectType: string,
 ) {
   let result: string[];
   switch (folderKind) {
     case CopybookFolderKind[CopybookFolderKind.local]:
-      result = SettingsService.getCopybookLocalPath(
-        cobolFileName.replace(/\.[^/.]+$/, ""),
-        dialectType,
-      );
+      result = SettingsService.getCopybookLocalPath(documentUri, dialectType);
       break;
     case CopybookFolderKind[CopybookFolderKind["downloaded-dsn"]]:
-      result = SettingsService.getDsnPath(cobolFileName, dialectType).map(
+      result = SettingsService.getDsnPath(documentUri, dialectType).map(
         (dnsPath) =>
           CopybookURI.createDatasetPath(
             SettingsService.getProfileName(),
@@ -90,7 +89,7 @@ function getTargetFolderForCopybook(
       );
       break;
     case CopybookFolderKind[CopybookFolderKind["downloaded-uss"]]:
-      result = SettingsService.getUssPath(cobolFileName, dialectType).map(
+      result = SettingsService.getUssPath(documentUri, dialectType).map(
         (dnsPath) =>
           CopybookURI.createDatasetPath(
             SettingsService.getProfileName(),

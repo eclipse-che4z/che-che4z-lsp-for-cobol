@@ -60,6 +60,15 @@ public class SettingsServiceImpl implements SettingsService {
             .collect(toList()));
   }
 
+  @Override
+  public CompletableFuture<List<String>> fetchTextConfigurationWithScope(String scopeUri, String section) {
+    return fetchConfiguration(scopeUri, section).thenApply(objects -> objects.stream()
+            .map(JsonArray.class::cast)
+            .flatMap(Streams::stream)
+            .map(JsonElement::getAsString)
+            .collect(toList()));
+  }
+
   @NonNull
   @Override
   public CompletableFuture<List<Object>> fetchConfigurations(@NonNull List<String> sections) {

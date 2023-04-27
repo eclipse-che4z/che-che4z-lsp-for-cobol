@@ -41,6 +41,17 @@ afterAll(() => {
   }
 });
 
+jest.mock("vscode", () => ({
+  Uri: {
+    parse: jest.fn().mockImplementation((str: string) => {
+      return {
+        fsPath: str.substring("file://".length),
+      };
+    }),
+  },
+  workspace: {},
+}));
+
 describe(".gitignore file in .c4z folder tests", () => {
   it("Create .gitignore file if not exists", () => {
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
@@ -79,7 +90,10 @@ describe("SettingsService evaluate variables", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue(["copybook/${fileBasenameNoExtension}"]),
     });
-    const paths = SettingsService.getCopybookLocalPath("program", "COBOL");
+    const paths = SettingsService.getCopybookLocalPath(
+      "file:///program",
+      "COBOL",
+    );
     expect(paths[0]).toEqual("copybook/program");
   });
 
@@ -87,7 +101,10 @@ describe("SettingsService evaluate variables", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue(["copybook/${fileBasenameNoExtension}"]),
     });
-    const paths = SettingsService.getCopybookLocalPath("program.cbl", "COBOL");
+    const paths = SettingsService.getCopybookLocalPath(
+      "file:///program.cbl",
+      "COBOL",
+    );
     expect(paths[0]).toEqual("copybook/program");
   });
 
@@ -96,7 +113,7 @@ describe("SettingsService evaluate variables", () => {
       get: jest.fn().mockReturnValue(["copybook/${fileBasenameNoExtension}"]),
     });
     const paths = SettingsService.getCopybookLocalPath(
-      "program.file.cbl",
+      "file:///program.file.cbl",
       "COBOL",
     );
     expect(paths[0]).toEqual("copybook/program.file");
