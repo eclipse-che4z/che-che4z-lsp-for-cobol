@@ -66,6 +66,18 @@ export function loadProcessorGroupCopybookEncodingConfig(
   );
 }
 
+export function loadProcessorGroupSqlBackendConfig(
+  item: { scopeUri: string },
+  configObject: string,
+): string {
+  return loadProcessorGroupSettings(
+    item.scopeUri,
+    "target-sql-backend",
+    configObject,
+    "DB2/DATACOM",
+  );
+}
+
 export function loadProcessorGroupDialectConfig(
   item: { scopeUri: string; section: string },
   configObject: unknown,
@@ -89,7 +101,8 @@ export function loadProcessorGroupDialectConfig(
       }
     }
 
-    return dialects || configObject;
+    // "DB2/DATACOM" is not a real dialect, we will use it only to set up sql backend for now
+    return dialects.filter((name) => name != "DB2/DATACOM") || configObject;
   } catch (e) {
     console.error(JSON.stringify(e));
     return configObject;

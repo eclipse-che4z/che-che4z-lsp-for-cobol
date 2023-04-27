@@ -18,6 +18,7 @@ import {
   loadProcessorGroupCopybookPaths,
   loadProcessorGroupCopybookPathsConfig,
   loadProcessorGroupDialectConfig,
+  loadProcessorGroupSqlBackendConfig,
 } from "../../services/ProcessorGroups";
 
 const WORKSPACE_URI = "file:///my/workspace";
@@ -37,6 +38,10 @@ jest.mock("fs", () => ({
                             { 
                                 "name": "DaCo", 
                                 "libs": ["/daco"]
+                            },
+                            {
+                                "name": "DB2/DATACOM",
+                                "target-sql-backend": "DATACOM_SERVER"
                             }
                         ], 
                         "libs": ["/copy"]
@@ -135,6 +140,15 @@ it("Processor groups configuration provides copybook-file-encoding", () => {
   };
   const result = loadProcessorGroupCopybookEncodingConfig(item, "");
   expect(result).toStrictEqual("UTF-8");
+});
+
+it("Processor groups configuration provides cobol-lsp.target-sql-backend", () => {
+  const item = {
+    scopeUri: WORKSPACE_URI + "/TEST.cob",
+    section: "cobol-lsp.target-sql-backend",
+  };
+  const result = loadProcessorGroupSqlBackendConfig(item, "");
+  expect(result).toStrictEqual("DATACOM_SERVER");
 });
 
 it("Processor groups configuration provides dialect lib path", () => {

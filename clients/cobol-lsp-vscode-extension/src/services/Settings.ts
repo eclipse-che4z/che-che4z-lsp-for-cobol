@@ -29,6 +29,7 @@ import {
   SETTINGS_DIALECT,
   SETTINGS_SUBROUTINE_LOCAL_KEY,
   SETTINGS_TAB_CONFIG,
+  SETTINGS_SQL_BACKEND,
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
@@ -38,6 +39,7 @@ import {
   loadProcessorGroupCopybookPaths,
   loadProcessorGroupCopybookPathsConfig,
   loadProcessorGroupDialectConfig,
+  loadProcessorGroupSqlBackendConfig,
 } from "./ProcessorGroups";
 import { getProgramNameFromUri } from "./util/FSUtils";
 
@@ -119,6 +121,12 @@ export function configHandler(request: any): Array<any> {
           const object = loadProcessorGroupCopybookExtensionsConfig(
             item,
             cfg as string[],
+          );
+          result.push(object);
+        } else if (item.section === SETTINGS_SQL_BACKEND) {
+          const object = loadProcessorGroupSqlBackendConfig(
+            item,
+            cfg as string,
           );
           result.push(object);
         } else if (item.section === SETTINGS_CPY_FILE_ENCODING) {
