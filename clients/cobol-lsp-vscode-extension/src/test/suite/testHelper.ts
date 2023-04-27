@@ -15,13 +15,17 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
-import { format } from "path";
+
+export const TEST_TIMEOUT = 30000;
 
 export async function activate() {
   // The extensionId is `publisher.name` from package.json
   const ext = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support",
   )!;
+  if (ext.isActive) {
+    return;
+  }
   await ext.activate();
 }
 
@@ -58,8 +62,7 @@ export async function closeActiveEditor() {
 
 export async function closeAllEditors() {
   while (vscode.window.activeTextEditor !== undefined) {
-    await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-    await sleep(500);
+    closeActiveEditor();
   }
 }
 

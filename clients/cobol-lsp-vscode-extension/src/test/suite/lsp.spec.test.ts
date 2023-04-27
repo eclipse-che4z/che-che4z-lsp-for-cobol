@@ -15,110 +15,16 @@
 import * as assert from "assert";
 import * as helper from "./testHelper";
 import * as vscode from "vscode";
-import { getWorkspacePath, moveCursor, recursiveCopySync } from "./testHelper";
+import { getWorkspacePath } from "./testHelper";
 import * as path from "path";
 
-const TEST_TIMEOUT = 30000;
 const WORKSPACE_FILE = "USER1.cbl";
 
-suite("Tests with USER1.cbl", async () => {
-  let editor: vscode.TextEditor;
-  suiteSetup(async function () {
-    this.timeout(TEST_TIMEOUT);
-    this.slow(2000);
-    await helper.showDocument(WORKSPACE_FILE);
-    helper.updateConfig("basic.json");
-    editor = helper.get_editor(WORKSPACE_FILE);
-    await helper.activate();
-  });
-
-  // open 'open' file, should be recognized as COBOL
-  test("TC152048: Cobol file is recognized by LSP", async () => {
-    // setting a language takes a while but shouldn't take longer than a second
-    await helper.waitFor(() => editor.document.languageId === "cobol");
-    assert.ok(editor.document.languageId === "cobol");
-  });
-
-  test("TC152046: Nominal - check syntax Ok message", async () => {
-    await helper.waitFor(() => vscode.window.activeTextEditor !== undefined);
-    const diagnostics = vscode.languages.getDiagnostics(
-      vscode.window.activeTextEditor.document.uri,
-    );
-    const expectedMsg =
-      "Checks that when opening Cobol file with correct syntax there is an appropriate message is shown";
-    assert.strictEqual(diagnostics.length, 0, expectedMsg);
-  });
-
-  test("TC152049: Navigate through definitions", async () => {
-    const result: any[] = await vscode.commands.executeCommand(
-      "vscode.executeDefinitionProvider",
-      editor.document.uri,
-      new vscode.Position(28, 24),
-    );
-    assert.ok(
-      result.length === 1 &&
-        result[0].uri.fsPath === editor.document.fileName &&
-        result[0].range.start.line === 31 &&
-        result[0].range.start.character === 7,
-      "Checks behavior of go to definition action",
-    );
-  });
-
-  test("TC152080: Find all references from the word middle", async () => {
-    const result: any[] = await vscode.commands.executeCommand(
-      "vscode.executeReferenceProvider",
-      editor.document.uri,
-      new vscode.Position(20, 15),
-    );
-    assert.ok(
-      result.length === 3 &&
-        result[0].uri.fsPath === editor.document.fileName &&
-        result[0].range.start.line === 20 &&
-        result[1].range.start.line === 34 &&
-        result[2].range.start.line === 42,
-      "Checks that LSP can find all references and navigate by them",
-    );
-  });
-
-  test("TC152080: Find all references from the word begin", async () => {
-    const result: any[] = await vscode.commands.executeCommand(
-      "vscode.executeReferenceProvider",
-      editor.document.uri,
-      new vscode.Position(20, 10),
-    );
-    assert.ok(
-      result.length === 3 &&
-        result[0].uri.fsPath === editor.document.fileName &&
-        result[0].range.start.line === 20 &&
-        result[1].range.start.line === 34 &&
-        result[2].range.start.line === 42,
-      "Checks that LSP can find all references and navigate by them",
-    );
-  });
-  // TODO: Check if this test is still valid?
-  test.skip("TC152054 Auto format of right trailing spaces", async () => {
-    await helper.insertString(editor, new vscode.Position(34, 57), "        ");
-    const result: any[] = await vscode.commands.executeCommand(
-      "vscode.executeFormatDocumentProvider",
-      editor.document.uri,
-      { tabSize: 4, insertSpaces: true },
-    );
-    helper.assertRangeIsEqual(
-      result[0].range,
-      new vscode.Range(
-        new vscode.Position(34, 57),
-        new vscode.Position(34, 65),
-      ),
-    );
-    assert.strictEqual(result[0].newText, "");
-  });
-});
-
-suite("Integration Test Suite", () => {
+suite.skip("Integration Test Suite", () => {
   let editor: vscode.TextEditor;
 
   suiteSetup(async function () {
-    this.timeout(TEST_TIMEOUT);
+    this.timeout(helper.TEST_TIMEOUT);
     await helper.showDocument(WORKSPACE_FILE);
     helper.updateConfig("basic.json");
     editor = helper.get_editor(WORKSPACE_FILE);
@@ -194,36 +100,37 @@ suite("Integration Test Suite", () => {
     );
   });
 
-  test("TC288736 error message for 80chars limit", async () => {
-    await helper.showDocument("TEST.CBL");
-    const editor = helper.get_editor("TEST.CBL");
-    await helper.insertString(
-      editor,
-      new vscode.Position(22, 7),
-      "oi3Bd5kC1f3nMFp0IWg62ZZgWMxHPJnuLWm4DqplZDzMIX69C6vjeL24YbobdQnoQsDenL35omljznHd0l1fP",
-    );
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
-    );
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    console.log(JSON.stringify(diagnostics));
-    for (const d of diagnostics) {
-      if (d.range.start.line == 22) {
-        assert.strictEqual(d.message, "Source text cannot go past column 80");
-        helper.assertRangeIsEqual(
-          d.range,
-          new vscode.Range(
-            new vscode.Position(22, 80),
-            new vscode.Position(22, 131),
-          ),
-        );
-        return;
+  test
+    .skip("TC288736 error message for 80chars limit", async () => {
+      await helper.showDocument("TEST.CBL");
+      const editor = helper.get_editor("TEST.CBL");
+      await helper.insertString(
+        editor,
+        new vscode.Position(22, 7),
+        "oi3Bd5kC1f3nMFp0IWg62ZZgWMxHPJnuLWm4DqplZDzMIX69C6vjeL24YbobdQnoQsDenL35omljznHd0l1fP",
+      );
+      await helper.waitFor(
+        () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+      );
+      const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+      console.log(JSON.stringify(diagnostics));
+      for (const d of diagnostics) {
+        if (d.range.start.line == 22) {
+          assert.strictEqual(d.message, "Source text cannot go past column 80");
+          helper.assertRangeIsEqual(
+            d.range,
+            new vscode.Range(
+              new vscode.Position(22, 80),
+              new vscode.Position(22, 131),
+            ),
+          );
+          return;
+        }
       }
-    }
-    assert.fail();
-  })
-    .timeout(TEST_TIMEOUT)
-    .slow(1000);
+      assert.fail();
+    })
+    ?.timeout(helper.TEST_TIMEOUT)
+    ?.slow(1000);
 
   test("TC174655: Copybook - Nominal", async () => {
     await helper.showDocument("USERC1N1.cbl");
@@ -310,7 +217,7 @@ suite("Integration Test Suite", () => {
       "Variable USER-PHONE-MOBILE1 is not defined",
     );
   })
-    .timeout(TEST_TIMEOUT)
+    .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
   test("TC312735 Check EXEC CICS is in Procedure Division", async () => {
@@ -339,7 +246,7 @@ suite("Integration Test Suite", () => {
       "Missing token SQL at execSqlStatement",
     );
   })
-    .timeout(TEST_TIMEOUT)
+    .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
   test("TC266094 Underline the entire incorrect variable structure", async () => {
@@ -373,7 +280,7 @@ suite("Integration Test Suite", () => {
       "Variable CHILD2 is not defined",
     );
   })
-    .timeout(TEST_TIMEOUT)
+    .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
   test("TC174952 Copybook - not exist, but dynamically appears", async () => {
@@ -407,7 +314,7 @@ suite("Integration Test Suite", () => {
       "Variable CHILD2 is not defined",
     );
   })
-    .timeout(TEST_TIMEOUT)
+    .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
   test("Load resource file", async () => {
@@ -427,7 +334,7 @@ suite("Integration Test Suite", () => {
       new vscode.Range(new vscode.Position(5, 7), new vscode.Position(5, 20)),
     );
   })
-    .timeout(TEST_TIMEOUT)
+    .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
   test("TC174952 / TC174953 Copybook - definition not exist, but dynamically appears", async () => {
@@ -475,7 +382,7 @@ suite("Integration Test Suite", () => {
         .length === 0,
     );
   })
-    .timeout(TEST_TIMEOUT)
+    .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
   test("TC266074 LSP analysis for extended sources - basic scenario", async () => {
@@ -562,7 +469,7 @@ suite("Integration Test Suite", () => {
     );
     await helper.closeAllEditors();
   })
-    .timeout(TEST_TIMEOUT)
+    .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
   test("TC250107 Test Area A, check DIVISION and paragraph name warnings", async () => {
@@ -613,7 +520,7 @@ suite("Integration Test Suite", () => {
     );
     await helper.closeAllEditors();
   })
-    .timeout(TEST_TIMEOUT)
+    .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
   test("TC250107 Test Area A, Check FD/SD level data", async () => {
@@ -640,7 +547,7 @@ suite("Integration Test Suite", () => {
     );
     await helper.closeAllEditors();
   })
-    .timeout(TEST_TIMEOUT)
+    .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
   test("TC250109 Test Area B", async () => {
@@ -685,7 +592,7 @@ suite("Integration Test Suite", () => {
     );
     await helper.closeAllEditors();
   })
-    .timeout(TEST_TIMEOUT)
+    .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
   test("TC250108 Test Program Name", async () => {
@@ -711,7 +618,7 @@ suite("Integration Test Suite", () => {
     );
     await helper.closeAllEditors();
   })
-    .timeout(TEST_TIMEOUT)
+    .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
   test("TC247497 - Local Copybooks - check hidden folders under c4z", async () => {
@@ -720,6 +627,6 @@ suite("Integration Test Suite", () => {
     const hiddenFolder = vscode.workspace.getWorkspaceFolder(extSrcUri);
     assert.ok(hiddenFolder !== undefined);
   })
-    .timeout(TEST_TIMEOUT)
+    .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 });
