@@ -75,69 +75,69 @@ class BlkImplicitVariablesGenerator {
 
     VariableNode variable = new GroupItemNode(locality, 1, "DFHEIBLK", false, false, UsageFormat.UNDEFINED);
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBTIME", false, "S9(7)",
-        null, UsageFormat.COMP_3, false, false, false));
+        null, UsageFormat.COMP_3, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBDATE", false, "S9(7)",
-        null, UsageFormat.COMP_3, false, false, false));
+        null, UsageFormat.COMP_3, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBTRNID", false, "X(4)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBTASKN", false, "S9(7)",
-        null, UsageFormat.COMP_3, false, false, false));
+        null, UsageFormat.COMP_3, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBTRMID", false, "X(4)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "DFHEIGDI", false, "S9(4)",
-        null, UsageFormat.COMP, false, false, false));
+        null, UsageFormat.COMP, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBCPOSN", false, "S9(4)",
-        null, UsageFormat.COMP, false, false, false));
+        null, UsageFormat.COMP, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBCALEN", false, "S9(4)",
-        null, UsageFormat.COMP, false, false, false));
+        null, UsageFormat.COMP, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBAID", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBFN", false, "X(2)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBRCODE", false, "X(6)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBDS", false, "X(8)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBREQID", false, "X(8)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBRSRCE", false, "X(8)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBSYNC", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBSYNC", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBFREE", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBRECV", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBFIL01", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBATT", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBEOC", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBFMH", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBCOMPL", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBSIG", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBCONF", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBERR", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBERRCD", false, "X(4)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBSYNRB", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBNODAT", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBRESP", false, "S9(8)",
-        null, UsageFormat.COMP, false, false, false));
+        null, UsageFormat.COMP, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBRESP2", false, "S9(8)",
-        null, UsageFormat.COMP, false, false, false));
+        null, UsageFormat.COMP, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "EIBRLDBK", false, "X(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
 
     return variable;
   }

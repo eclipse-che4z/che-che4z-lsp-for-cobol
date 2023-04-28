@@ -359,7 +359,10 @@ class SectionNodeProcessorHelper {
             definitionNode.hasRedefines(),
             definitionNode.getUsage(),
             definitionNode.isBlankWhenZeroPresent(),
-            definitionNode.isSignClausePresent());
+            definitionNode.isSignClausePresent(),
+            definitionNode.isDynamicLength(),
+            definitionNode.isJustified(),
+            definitionNode.isUnBounded());
 
     createVariableNameNode(variable, definitionNode.getVariableName());
     return new ResultWithErrors<>(variable, ImmutableList.of());
@@ -430,7 +433,10 @@ class SectionNodeProcessorHelper {
               definitionNode.getOccursNumber(),
               definitionNode.getUsage(),
               definitionNode.isBlankWhenZeroPresent(),
-              definitionNode.isSignClausePresent());
+              definitionNode.isSignClausePresent(),
+              definitionNode.isDynamicLength(),
+              definitionNode.isJustified(),
+              definitionNode.isUnBounded());
       createVariableNameNode(variable, definitionNode.getVariableName());
       for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes())
         variable.addChild(
@@ -457,7 +463,10 @@ class SectionNodeProcessorHelper {
               definitionNode.getUsage(),
               definitionNode.hasRedefines(),
               definitionNode.isBlankWhenZeroPresent(),
-              definitionNode.isSignClausePresent());
+              definitionNode.isSignClausePresent(),
+              definitionNode.isDynamicLength(),
+              definitionNode.isJustified(),
+              definitionNode.isUnBounded());
       createVariableNameNode(variable, definitionNode.getVariableName());
       return new ResultWithErrors<>(variable, errors);
     }

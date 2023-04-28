@@ -91,99 +91,99 @@ class SRImplicitVariablesGenerator {
     VariableNode variable = new GroupItemNode(locality, 1, "DEBUG-ITEM", false, false, UsageFormat.UNDEFINED);
 
     variable.addChild(new ElementaryItemNode(locality, 2, "DEBUG-LINE", false, "X(6)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "FILLER", false, "X",
-        "SPACE", UsageFormat.UNDEFINED, false, false, false));
+        "SPACE", UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "DEBUG-NAME", false, "X(30)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "FILLER", false, "X",
-        "SPACE", UsageFormat.UNDEFINED, false, false, false));
+        "SPACE", UsageFormat.UNDEFINED, false, false, false, false, false, false));
 
     //TODO: what is "IS LEADING SEPARATE CHARACTER"?
     variable.addChild(new ElementaryItemNode(locality, 2, "DEBUG-SUB-1", false, "S9999",
-        null, UsageFormat.UNDEFINED, false, false, true));
+        null, UsageFormat.UNDEFINED, false, false, true, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "FILLER", false, "X",
-        "SPACE", UsageFormat.UNDEFINED, false, false, false));
+        "SPACE", UsageFormat.UNDEFINED, false, false, false, false, false, false));
 
     //TODO: what is "IS LEADING SEPARATE CHARACTER"?
     variable.addChild(new ElementaryItemNode(locality, 2, "DEBUG-SUB-2", false, "S9999",
-        null, UsageFormat.UNDEFINED, false, false, true));
+        null, UsageFormat.UNDEFINED, false, false, true, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "FILLER", false, "X",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
 
     //TODO: what is "IS LEADING SEPARATE CHARACTER"?
     variable.addChild(new ElementaryItemNode(locality, 2, "DEBUG-SUB-3", false, "S9999",
-        null, UsageFormat.UNDEFINED, false, false, true));
+        null, UsageFormat.UNDEFINED, false, false, true, false, false, false));
     variable.addChild(new ElementaryItemNode(locality, 2, "FILLER", false, "X",
-        "SPACE", UsageFormat.UNDEFINED, false, false, false));
+        "SPACE", UsageFormat.UNDEFINED, false, false, false, false, false, false));
 
     variable.addChild(new ElementaryItemNode(locality, 2, "DEBUG-CONTENTS", false, "X(999)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
 
     result.add(variable);
     result.add(new ElementaryItemNode(locality, 1, "JNIENVPTR", false, null,
-            null, UsageFormat.POINTER, false, false, false));
+            null, UsageFormat.POINTER, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "JSON-CODE", false, "S9(9)",
-        null, UsageFormat.BINARY, false, false, false));
+        null, UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "JSON-STATUS", false, "S9(9)",
-        null, UsageFormat.BINARY, false, false, false));
+        null, UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "XML-INFORMATION", false, "S9(9)",
-        null, UsageFormat.BINARY, false, false, false));
+        null, UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "XML-NAMESPACE", false, "S9(9)",
-        null, UsageFormat.BINARY, false, false, false));
+        null, UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "XML-NNAMESPACE", false, "S9(9)",
-        null, UsageFormat.BINARY, false, false, false));
+        null, UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "XML-NAMESPACE-PREFIX", false, "S9(9)",
-        null, UsageFormat.BINARY, false, false, false));
+        null, UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "XML-NNAMESPACE-PREFIX", false, "S9(9)",
-        null, UsageFormat.BINARY, false, false, false));
+        null, UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "XML-CODE", false, "S9(9)",
-        null, UsageFormat.BINARY, false, false, false));
+        null, UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "XML-TEXT", false, "X(30)",
-        "SPACE", UsageFormat.BINARY, false, false, false));
+        "SPACE", UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "XML-NTEXT", false, "X(30)",
-        "SPACE", UsageFormat.DISPLAY, false, false, false));
+        "SPACE", UsageFormat.DISPLAY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "XML-EVENT", false, "X(30)",
-        "SPACE", UsageFormat.DISPLAY, false, false, false));
+        "SPACE", UsageFormat.DISPLAY, false, false, false, false, false, false));
 
-    //TODO: COMP SYNC?
+    //TODO: COMP SYNC?, false
     result.add(new ElementaryItemNode(locality, 1, "LINE-COUNTER", false, "S9(9)",
-        null, UsageFormat.COMP, false, false, false));
+        null, UsageFormat.COMP, false, false, false, false, false, false));
     //TODO: COMP SYNC?
     result.add(new ElementaryItemNode(locality, 1, "PAGE-COUNTER", false, "S9(9)",
-        null, UsageFormat.COMP, false, false, false));
+        null, UsageFormat.COMP, false, false, false, false, false, false));
 
     result.add(new ElementaryItemNode(locality, 1, "RETURN-CODE", true, "S9(4)",
-        null, UsageFormat.BINARY, false, false, false));
+        null, UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "SHIFT-OUT", true, "X(1)",
-        "X\"0E\"", UsageFormat.DISPLAY, false, false, false));
+        "X\"0E\"", UsageFormat.DISPLAY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "SHIFT-IN", true, "X(1)",
-        "X\"0F\"", UsageFormat.DISPLAY, false, false, false));
+        "X\"0F\"", UsageFormat.DISPLAY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "SORT-CONTROL", true, "X(8)",
-        "X\"IGZSRTCD\"", UsageFormat.DISPLAY, false, false, false));
+        "X\"IGZSRTCD\"", UsageFormat.DISPLAY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "SORT-CORE-SIZE", true, "S9(8)",
-        "X\"ZERO\"", UsageFormat.BINARY, false, false, false));
+        "X\"ZERO\"", UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "SORT-FILE-SIZE", true, "S9(8)",
-        "X\"ZERO\"", UsageFormat.BINARY, false, false, false));
+        "X\"ZERO\"", UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "SORT-MESSAGE", true, "X(8)",
-        "X\"SYSOUT\"", UsageFormat.DISPLAY, false, false, false));
+        "X\"SYSOUT\"", UsageFormat.DISPLAY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "SORT-MODE-SIZE", true, "S9(5)",
-        "ZERO", UsageFormat.BINARY, false, false, false));
+        "ZERO", UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "SORT-RETURN", true, "S9(4)",
-        "ZERO", UsageFormat.BINARY, false, false, false));
+        "ZERO", UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "TALLY", true, "9(5)",
-        "ZERO", UsageFormat.BINARY, false, false, false));
+        "ZERO", UsageFormat.BINARY, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "WHEN-COMPILED", true, "X(16)",
-        "ZERO", UsageFormat.DISPLAY, false, false, false));
+        "ZERO", UsageFormat.DISPLAY, false, false, false, false, false, false));
 
     result.add(new ElementaryItemNode(locality, 1, "DAY", false, "9(7)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "DATE", false, "9(8)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "DAY-OF-WEEK", false, "9(1)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
     result.add(new ElementaryItemNode(locality, 1, "TIME", false, "9(8)",
-        null, UsageFormat.UNDEFINED, false, false, false));
+        null, UsageFormat.UNDEFINED, false, false, false, false, false, false));
 
     return result;
   }

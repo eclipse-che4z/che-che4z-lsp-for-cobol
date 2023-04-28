@@ -43,7 +43,10 @@ public class ElementaryItemNode extends ElementaryNode {
       UsageFormat usageFormat,
       boolean redefines,
       boolean isBlankWhenZeroPresent,
-      boolean isSignClausePresent) {
+      boolean isSignClausePresent,
+      boolean isDynamicLength,
+      boolean isJustified,
+      boolean isUnBounded) {
     super(
         location,
         level,
@@ -53,7 +56,8 @@ public class ElementaryItemNode extends ElementaryNode {
         global,
         isBlankWhenZeroPresent,
         isSignClausePresent,
-        picClause,
+        isDynamicLength,
+        isJustified, isUnBounded, picClause,
         usageFormat);
     this.value = value;
   }

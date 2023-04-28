@@ -118,6 +118,8 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
                     .collect(toList()))
             .blankWhenZero(!ctx.dataBlankWhenZeroClause().isEmpty())
             .signClause(!ctx.dataSignClause().isEmpty())
+            .isDynamicLength(!ctx.dataDynamicLengthClause().isEmpty())
+            .isJustified(!ctx.dataJustifiedClause().isEmpty())
             .build(),
         visitChildren(ctx));
   }
@@ -167,6 +169,8 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
                     .collect(toList()))
             .blankWhenZero(!ctx.dataBlankWhenZeroClause().isEmpty())
             .signClause(!ctx.dataSignClause().isEmpty())
+            .isDynamicLength(!ctx.dataDynamicLengthClause().isEmpty())
+            .isJustified(!ctx.dataJustifiedClause().isEmpty())
             .build(),
         visitChildren(ctx));
   }

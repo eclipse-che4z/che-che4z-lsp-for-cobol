@@ -42,6 +42,7 @@ public enum NodeType {
   EVALUATE_WHEN_OTHER,
   IF,
   IF_ELSE,
+  JSON_PARSE,
   SENTENCE,
   STATEMENT,
   EMBEDDED_CODE,
