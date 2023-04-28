@@ -38,8 +38,9 @@ import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /** Apply all the validation for the JSON Parse statement and return found errors. */
 public class JsonParseProcess implements Processor<JsonParseNode> {
+  // TODO: remove undetermined once effective data type calculation is corrected
   public static final ImmutableList<EffectiveDataType> ALPHANUMERIC_DATA_TYPES =
-      ImmutableList.of(EffectiveDataType.STRING, EffectiveDataType.INTEGER);
+      ImmutableList.of(EffectiveDataType.STRING, EffectiveDataType.INTEGER, EffectiveDataType.UNDETERMINED);
   private final SymbolAccumulatorService symbolAccumulatorService;
 
   public JsonParseProcess(SymbolAccumulatorService symbolAccumulatorService) {
@@ -206,8 +207,8 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
         foundDefinitionsForIdentifier2
             .get(0)
             .getDepthFirstStream()
-            .filter(ElementaryItemNode.class::isInstance)
-            .map(ElementaryItemNode.class::cast)
+            .filter(ElementaryNode.class::isInstance)
+            .map(ElementaryNode.class::cast)
             .anyMatch(node -> ALPHANUMERIC_DATA_TYPES.contains(node.getEffectiveDataType()));
 
     boolean isGroupItemUnbounded =
