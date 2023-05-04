@@ -12,5 +12,5 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 export interface TelemetryMeasurement {
-    [key: string]: number;
+  [key: string]: number;
 }

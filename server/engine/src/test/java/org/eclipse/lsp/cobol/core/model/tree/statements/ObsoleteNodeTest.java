@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.model.tree.statements;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -43,7 +42,7 @@ class ObsoleteNodeTest {
   @Test
   public void testObsoleteNodeWarning() {
     Locality locality = Locality.builder().build();
-    RootNode rootNode = new RootNode(locality, ImmutableMultimap.of());
+    RootNode rootNode = new RootNode(locality);
     RemarksNode remarksNode = new RemarksNode(locality);
     AstProcessor astProcessor = new AstProcessor();
     List<SyntaxError> errors = new ArrayList<>();

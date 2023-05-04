@@ -31,7 +31,7 @@ workingStorageSection
 
 // copy statement
 copyStatement
-   : COPY copySource (replacingPhrase | SUPPRESS)? DOT_FS
+   : COPY copySource SUPPRESS? replacingPhrase? DOT_FS
    ;
 
 // sql include statement

@@ -13,20 +13,24 @@
  */
 
 import * as vscode from "vscode";
-import {resolveSubroutineURI} from "../../../services/util/SubroutineUtils";
-import {searchCopybookInWorkspace} from "../../../services/util/FSUtils";
-import {COBOL_EXT_ARRAY} from "../../../constants";
+import { resolveSubroutineURI } from "../../../services/util/SubroutineUtils";
+import { searchCopybookInWorkspace } from "../../../services/util/FSUtils";
+import { COBOL_EXT_ARRAY } from "../../../constants";
 
 describe("SubroutineUtils", () => {
-    it("search in workspace by name", () => {
-        const folders = ['folder'];
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue(folders),
-        });
-        (searchCopybookInWorkspace as any) = jest.fn().mockReturnValue("theURI");
-
-        const uri = resolveSubroutineURI("name");
-        expect(uri).toBe("theURI");
-        expect(searchCopybookInWorkspace).toBeCalledWith("name", folders, COBOL_EXT_ARRAY)
+  it("search in workspace by name", () => {
+    const folders = ["folder"];
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(folders),
     });
+    (searchCopybookInWorkspace as any) = jest.fn().mockReturnValue("theURI");
+
+    const uri = resolveSubroutineURI("name");
+    expect(uri).toBe("theURI");
+    expect(searchCopybookInWorkspace).toBeCalledWith(
+      "name",
+      folders,
+      COBOL_EXT_ARRAY,
+    );
+  });
 });

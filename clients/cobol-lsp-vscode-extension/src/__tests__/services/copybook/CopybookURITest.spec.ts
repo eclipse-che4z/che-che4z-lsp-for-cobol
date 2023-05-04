@@ -19,16 +19,29 @@ import { Utils } from "../../../services/util/Utils";
 Utils.getZoweExplorerAPI = jest.fn();
 
 describe("CopybooksPathGenerator tests", () => {
-    const fsPath = "/projects";
-    const profile = "profile";
-    const dataset = "dataset";
-    (vscode.workspace.workspaceFolders as any) = [{ uri: { fsPath } } as any];
+  const fsPath = "/projects";
+  const profile = "profile";
+  const dataset = "dataset";
+  (vscode.workspace.workspaceFolders as any) = [{ uri: { fsPath } } as any];
 
-    it("creates copybook path", () => {
-        expect(CopybookURI.createCopybookPath(profile, dataset, "copybook"))
-            .toEqual(path.join("/", "projects", ".c4z", ".copybooks", "profile", "dataset", "copybook.cpy"));
-    });
-    it("creates dataset path", () => {
-        expect(CopybookURI.createDatasetPath(profile, dataset)).toEqual(path.join("/projects", ".c4z", ".copybooks", "profile", "dataset"));
-    });
+  it("creates copybook path", () => {
+    expect(
+      CopybookURI.createCopybookPath(profile, dataset, "copybook"),
+    ).toEqual(
+      path.join(
+        "/",
+        "projects",
+        ".c4z",
+        ".copybooks",
+        "profile",
+        "dataset",
+        "copybook.cpy",
+      ),
+    );
+  });
+  it("creates dataset path", () => {
+    expect(CopybookURI.createDatasetPath(profile, dataset)).toEqual(
+      path.join("/projects", ".c4z", ".copybooks", "profile", "dataset"),
+    );
+  });
 });

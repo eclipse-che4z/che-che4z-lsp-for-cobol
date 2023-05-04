@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.service;
 
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -58,7 +59,6 @@ public class WatcherServiceImpl implements WatcherService {
   private static final String WATCH_CONFIGURATION = "workspace/didChangeConfiguration";
   private static final String CONFIGURATION_CHANGE_ID = "configurationChange";
   private static final String PREDEFINED_FOLDER_WATCHER = "copybooksWatcher";
-  public static final String FILE_BASENAME_VARIABLE = "${fileBasenameNoExtension}";
 
   private final List<String> folderWatchers = new ArrayList<>();
   private final Map<String, List<String>> runtimeSpecifiedFolderWatchers = new HashMap<>();
@@ -177,12 +177,12 @@ public class WatcherServiceImpl implements WatcherService {
 
   private Either<String, RelativePattern> createFileWatcher(String folder) {
     return Either.forLeft((new File(folder).isAbsolute() ? "" : "**/")
-            + folder.replace(FILE_BASENAME_VARIABLE, "**") + "/**/*");
+            + folder.replace(CopybookService.FILE_BASENAME_VARIABLE, "**") + "/**/*");
   }
 
   private Either<String, RelativePattern> createFolderWatcher(String folder) {
     return Either.forLeft((new File(folder).isAbsolute() ? "" : "**/")
-            + folder.replace(FILE_BASENAME_VARIABLE, "**"));
+            + folder.replace(CopybookService.FILE_BASENAME_VARIABLE, "**"));
   }
 
   private void register(List<Registration> registrations) {

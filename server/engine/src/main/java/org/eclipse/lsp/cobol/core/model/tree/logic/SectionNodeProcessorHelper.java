@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree.variables;
+package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -29,6 +29,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.OutlineNodeNames;
+import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,20 +46,20 @@ import static org.eclipse.lsp.cobol.common.model.tree.variable.VariableType.SD;
 /** The utility class is for converting VariableDefinitionNode into appropriate VariableNode. */
 @UtilityClass
 @Slf4j
-public class VariableDefinitionUtil {
+class SectionNodeProcessorHelper {
 
   private final List<Function<VariableDefinitionNode, ResultWithErrors<VariableNode>>> matchers =
       ImmutableList.of(
-          VariableDefinitionUtil::fdMatcher,
-          VariableDefinitionUtil::renameItemMatcher,
-          VariableDefinitionUtil::conditionalDataNameMatcher,
-          VariableDefinitionUtil::mnemonicNameMatcher,
-          VariableDefinitionUtil::independentDataItemMatcher,
-          VariableDefinitionUtil::multiTableDataNameMatcher,
-          VariableDefinitionUtil::groupItemMatcher,
-          VariableDefinitionUtil::tableDataNameMatcher,
-          VariableDefinitionUtil::elementItemMatcher,
-          VariableDefinitionUtil::mapNameMatcher
+          SectionNodeProcessorHelper::fdMatcher,
+          SectionNodeProcessorHelper::renameItemMatcher,
+          SectionNodeProcessorHelper::conditionalDataNameMatcher,
+          SectionNodeProcessorHelper::mnemonicNameMatcher,
+          SectionNodeProcessorHelper::independentDataItemMatcher,
+          SectionNodeProcessorHelper::multiTableDataNameMatcher,
+          SectionNodeProcessorHelper::groupItemMatcher,
+          SectionNodeProcessorHelper::tableDataNameMatcher,
+          SectionNodeProcessorHelper::elementItemMatcher,
+          SectionNodeProcessorHelper::mapNameMatcher
           // TODO: add check that the following items do not have VALUE:
           // TODO: 1. JUSTIFIED
           // TODO: 2. SYNCHRONIZED
@@ -128,8 +129,7 @@ public class VariableDefinitionUtil {
             .collect(Collectors.toList());
 
     allCopybooks.stream()
-        .filter(c -> c.getDefinition() != null)
-        .filter(c -> c.getDefinition().getLocation() != null)
+        .filter(c -> c.getUri() != null)
         .forEach(
             c ->
                 new ArrayList<>(variables)
@@ -141,7 +141,7 @@ public class VariableDefinitionUtil {
                             v ->
                                 v.getLocality()
                                     .getUri()
-                                    .equals(c.getDefinition().getLocation().getUri()))
+                                    .equals(c.getUri()))
                         .forEach(
                             v -> {
                               variables.remove(v);
@@ -184,7 +184,7 @@ public class VariableDefinitionUtil {
     if (children.isEmpty()) {
       return;
     }
-    children.forEach(VariableDefinitionUtil::reshapeVariablesLocality);
+    children.forEach(SectionNodeProcessorHelper::reshapeVariablesLocality);
     if (node.getNodeType() == NodeType.VARIABLE) {
       VariableNode variableNode = (VariableNode) node;
       if (isGroupedVariable(variableNode)) {

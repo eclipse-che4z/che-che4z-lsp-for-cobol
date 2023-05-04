@@ -16,44 +16,43 @@
  * These types extracted from the ZOWE Explorer API's.
  */
 interface IApiRegisterClient {
-
-    getExplorerExtenderApi(): IApiExplorerExtender;
-    getUssApi(profile: IProfileLoaded): IUss;
-    getMvsApi(profile: IProfileLoaded): IMvs;
-    registeredApiTypes(): string[];
+  getExplorerExtenderApi(): IApiExplorerExtender;
+  getUssApi(profile: IProfileLoaded): IUss;
+  getMvsApi(profile: IProfileLoaded): IMvs;
+  registeredApiTypes(): string[];
 }
 
 interface IApiExplorerExtender {
-    getProfilesCache(): ProfilesCache;
+  getProfilesCache(): ProfilesCache;
 }
 
 interface ProfilesCache {
-    loadNamedProfile(name: string, type?: string): IProfileLoaded;
-    getProfiles(type: string): IProfileLoaded[];
+  loadNamedProfile(name: string, type?: string): IProfileLoaded;
+  getProfiles(type: string): IProfileLoaded[];
 }
 
 interface IUss {
-    getContents(dataSetName: string, options?: any): Promise<IZosFilesResponse>;
-    fileList(ussFilePath: string): Promise<IZosFilesResponse>;
+  getContents(dataSetName: string, options?: any): Promise<IZosFilesResponse>;
+  fileList(ussFilePath: string): Promise<IZosFilesResponse>;
 }
 
 interface IMvs {
-    getContents(dataSetName: string, options?: any): Promise<IZosFilesResponse>;
-    allMembers(dataSetName: string, options?: any): Promise<IZosFilesResponse>;
+  getContents(dataSetName: string, options?: any): Promise<IZosFilesResponse>;
+  allMembers(dataSetName: string, options?: any): Promise<IZosFilesResponse>;
 }
 
 interface IProfileLoaded {
-    profile: {
-        encoding: string,
-    };
-    name: string;
+  profile: {
+    encoding: string;
+  };
+  name: string;
 }
 
 interface IZosFilesResponse {
-    apiResponse: {
-        items: Array<{
-            name: string,
-            member: string,
-        }>,
-    };
+  apiResponse: {
+    items: Array<{
+      name: string;
+      member: string;
+    }>;
+  };
 }

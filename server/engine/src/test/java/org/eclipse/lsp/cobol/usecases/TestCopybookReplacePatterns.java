@@ -94,6 +94,12 @@ class TestCopybookReplacePatterns {
           + "8      PROCEDURE DIVISION.\n"
           + "9          MOVE 0 TO {$ACC_ID}.";
 
+  private static final String TEXT10 =
+      BASE
+          + "5      COPY {~REPL9} SUPPRESS REPLACING =='XXX'_ID== BY ==ACC_ID==.\n"
+          + "8      PROCEDURE DIVISION.\n"
+          + "9          MOVE 0 TO {$ACC_ID}.";
+
   private static final String REPL = "0      01 {$*TAG_ID}        PIC 9.\n";
   private static final String REPL_NAME = "REPL";
 
@@ -188,5 +194,11 @@ class TestCopybookReplacePatterns {
   void testPartialQuotedTextAreReplaced() {
     UseCaseEngine.runTest(
         TEXT9, ImmutableList.of(new CobolText(REPL9_NAME, REPL9)), ImmutableMap.of());
+  }
+
+  @Test
+  void testCopySuppressReplacing() {
+    UseCaseEngine.runTest(
+            TEXT10, ImmutableList.of(new CobolText(REPL9_NAME, REPL9)), ImmutableMap.of());
   }
 }

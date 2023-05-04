@@ -51,6 +51,15 @@ public class MockLanguageClient implements CobolLanguageClient {
   }
 
   @Override
+  public CompletableFuture<Void> createProgress(WorkDoneProgressCreateParams params) {
+    return CompletableFuture.completedFuture(null);
+  }
+
+  @Override
+  public void notifyProgress(ProgressParams params) {
+  }
+
+  @Override
   public void showMessage(MessageParams messageParams) {
     messagesToShow.add(messageParams);
   }

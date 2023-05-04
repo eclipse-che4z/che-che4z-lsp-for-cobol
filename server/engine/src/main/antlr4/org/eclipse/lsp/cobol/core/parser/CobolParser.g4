@@ -217,7 +217,7 @@ identificationDivisionBody
 // - program id paragraph ----------------------------------
 
 programIdParagraph
-   : PROGRAM_ID DOT_FS programName (IS? (COMMON | INITIAL | LIBRARY | DEFINITION | RECURSIVE) PROGRAM?)? DOT_FS?
+   : PROGRAM_ID DOT_FS? programName (IS? (COMMON | INITIAL | LIBRARY | DEFINITION | RECURSIVE) PROGRAM?)? DOT_FS?
    ;
 
 // - author paragraph ----------------------------------
@@ -281,9 +281,27 @@ configurationSection
 // - configuration section paragraph ----------------------------------
 
 configurationSectionParagraph
-   : sourceComputerParagraph | objectComputerParagraph | specialNamesParagraph
+   : sourceComputerParagraph | objectComputerParagraph | specialNamesParagraph | repositoryParagraph
    // strictly, specialNamesParagraph does not belong into configurationSectionParagraph, but IBM-COBOL allows this
    ;
+
+// - repository paragraph ----------------------------------
+
+repositoryParagraph
+    : REPOSITORY DOT_FS (classRepositoryClause | functionRepositoryClause)* DOT_FS?
+    ;
+
+classRepositoryClause
+    : CLASS className IS? literal
+    ;
+
+functionRepositoryClause
+    : FUNCTION functionName | intrinsicClause
+    ;
+
+intrinsicClause
+    : (functionName* | ALL) INTRINSIC
+    ;
 
 // - source computer paragraph ----------------------------------
 
@@ -954,8 +972,25 @@ statement
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
     serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | unstringStatement | writeStatement | xmlStatement
+    terminateStatement | unstringStatement | writeStatement | xmlStatement | jsonStatement
    ;
+
+jsonStatement
+    : jsonParse | jsonGenerate
+    ;
+
+jsonParse
+    : JSON PARSE qualifiedDataName INTO qualifiedDataName (statement | WITH | DETAIL | NAME | OF | IS | OMITTED | (SUPPRESS qualifiedDataName*) | CONVERTING | ALSO )* onExceptionClause? notOnExceptionClause? END_JSON
+    ;
+
+jsonGenerate
+    : JSON GENERATE qualifiedDataName FROM qualifiedDataName
+        (
+            statement | COUNT | IN | NAME | OF | IS | OMITTED | SUPPRESS | WHEN | ZERO | ZEROES | ZEROS |
+            SPACE | SPACES | LOW_VALUE | LOW_VALUES | HIGH_VALUE | HIGH_VALUES | OR | EVERY | NUMERIC | NONNUMERIC |
+            (CONVERTING qualifiedDataName) | TO | JSON | BOOLEAN | BOOL | USING | (ALSO qualifiedDataName) | (USING generalIdentifier | literal)
+        )* onExceptionClause? notOnExceptionClause? END_JSON
+    ;
 
 dialectStatement
    : dialectNodeFiller | dialectIfStatment

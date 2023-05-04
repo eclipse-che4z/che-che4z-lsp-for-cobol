@@ -13,7 +13,10 @@
  */
 
 import { fetchCopybookCommand } from "../../commands/FetchCopybookCommand";
-import { CopybookDownloadService, CopybookName } from "../../services/copybook/CopybookDownloadService";
+import {
+  CopybookDownloadService,
+  CopybookName,
+} from "../../services/copybook/CopybookDownloadService";
 import { TelemetryService } from "../../services/reporter/TelemetryService";
 import { Utils } from "../../services/util/Utils";
 
@@ -21,13 +24,22 @@ jest.mock("../../services/reporter/TelemetryService");
 jest.mock("../../services/copybook/CopybookDownloadService");
 Utils.getZoweExplorerAPI = jest.fn();
 
-const copybookDownloadService: CopybookDownloadService = new CopybookDownloadService();
+const copybookDownloadService: CopybookDownloadService =
+  new CopybookDownloadService();
 const copybook: string = "cobyBookTest";
 const progName: string = "progNameTest";
 
 test("Test fetchCopybookCommand calls telementry services and coprbook download service with proper input", () => {
-    expect(fetchCopybookCommand).toBeTruthy();
-    fetchCopybookCommand(copybook, copybookDownloadService, progName);
-    expect(TelemetryService.registerEvent).toBeCalledWith("Fetch copybook", ["COBOL", "copybook", "quickfix"], "The user tries to resolve a copybook that is not currently found");
-    expect(copybookDownloadService.downloadCopybooks).toBeCalledWith(progName, [new CopybookName(copybook, "COBOL")], false);
+  expect(fetchCopybookCommand).toBeTruthy();
+  fetchCopybookCommand(copybook, copybookDownloadService, progName);
+  expect(TelemetryService.registerEvent).toBeCalledWith(
+    "Fetch copybook",
+    ["COBOL", "copybook", "quickfix"],
+    "The user tries to resolve a copybook that is not currently found",
+  );
+  expect(copybookDownloadService.downloadCopybooks).toBeCalledWith(
+    progName,
+    [new CopybookName(copybook, "COBOL")],
+    false,
+  );
 });

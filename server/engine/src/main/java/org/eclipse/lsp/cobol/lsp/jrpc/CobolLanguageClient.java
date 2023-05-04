@@ -39,14 +39,14 @@ public interface CobolLanguageClient extends LanguageClient {
    * The copybook/resolve request is sent from the server to the client to
    * resolve copybook local absolute path if found
    *
-   * @param cobolFilename the name of cobol program
+   * @param cobolFileUri the uri of cobol program
    * @param copybookName the name of copybook to resolve
    * @param dialectType the name of copybook dialect
    * @return corresponding local file absolute path
    */
   @JsonRequest("copybook/resolve")
   default CompletableFuture<String> resolveCopybook(
-      String cobolFilename,
+      String cobolFileUri,
       String copybookName,
       String dialectType) {
     throw new UnsupportedOperationException();

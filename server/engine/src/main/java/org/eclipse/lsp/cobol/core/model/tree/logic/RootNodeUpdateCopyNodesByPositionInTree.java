@@ -14,17 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
-import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
-import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Range;
 
 import java.util.List;
 
@@ -48,24 +45,19 @@ public class RootNodeUpdateCopyNodesByPositionInTree implements Processor<RootNo
                 .orElse(node)
                 .addChild(it));
 
-    node.getDepthFirstStream()
+    List<CopyNode> copyNodes = node.getDepthFirstStream()
         .filter(Node.hasType(NodeType.COPY))
         .map(CopyNode.class::cast)
-        .forEach(copyNode -> registerCopyUsage(node, copyNode));
+        .collect(toList());
+
+    copyNodes.forEach(c -> registerCopyUsage(copyNodes, c.getNameLocation(), c.getUri()));
   }
 
-  private void registerCopyUsage(RootNode node, CopyNode copyNode) {
-    String copyBookId =
-        copyNode.getDialect() == null
-            ? copyNode.getName()
-            : copyNode.getName() + '!' + copyNode.getDialect();
-    node.getCopyDefinitionMap()
-        .putIfAbsent(
-            copyBookId,
-            new CopyDefinition(
-                new Location(ImplicitCodeUtils.createLocation(), new Range()), copyNode.getName()));
-    CopyDefinition foundDefinition = node.getCopyDefinitionMap().get(copyBookId);
-    foundDefinition.addUsages(copyNode);
-    copyNode.setDefinition(foundDefinition);
+  private void registerCopyUsage(List<CopyNode> node, Location nameLocation, String uri) {
+    node.forEach(n -> {
+      if (n.getUri() != null && !n.getNameLocation().equals(nameLocation) && n.getUri().equals(uri)) {
+        n.addUsage(nameLocation);
+      }
+    });
   }
 }

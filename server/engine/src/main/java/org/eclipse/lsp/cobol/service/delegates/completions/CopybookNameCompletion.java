@@ -26,6 +26,7 @@ import org.eclipse.lsp4j.CompletionItemKind;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.COPYBOOKS;
@@ -48,14 +49,15 @@ public class CopybookNameCompletion implements Completion {
   public @NonNull Collection<CompletionItem> getCompletionItems(
       @NonNull String token, @Nullable CobolDocumentModel document) {
 
-    return copybookNameService.getNames().stream()
-        .map(CopybookName::getQualifiedName)
-        .filter(DocumentationUtils.startsWithIgnoreCase(token))
-        .map(this::toCopybookCompletion)
-        .collect(toList());
+    List<CopybookName> names = copybookNameService.getNames(document == null ? null : document.getUri());
+    return names.stream()
+            .map(CopybookName::getQualifiedName)
+            .filter(DocumentationUtils.startsWithIgnoreCase(token))
+            .map(CopybookNameCompletion::toCopybookCompletion)
+            .collect(toList());
   }
 
-  private CompletionItem toCopybookCompletion(String name) {
+  private static CompletionItem toCopybookCompletion(String name) {
     CompletionItem item = new CompletionItem(name);
     item.setLabel(name);
     item.setInsertText(name);
