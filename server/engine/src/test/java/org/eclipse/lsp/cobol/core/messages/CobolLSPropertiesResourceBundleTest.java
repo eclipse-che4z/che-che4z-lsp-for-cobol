@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Locale;
@@ -42,8 +43,8 @@ class CobolLSPropertiesResourceBundleTest {
             org.apache.commons.io.IOUtils.toInputStream(
                 "test.test: flip flop", StandardCharsets.UTF_8))
         .when(spyBundle)
-        .getDialectResources(any(), any(), any());
-    DialectRegistryItem dialectRegistryItem = new DialectRegistryItem("dummyDialect", "/path", "dummy dialect", "dummyDialect");
+        .getDialectResources(any(), any());
+    DialectRegistryItem dialectRegistryItem = new DialectRegistryItem("dummyDialect", URI.create("file://uri"), "dummy dialect", "dummyDialect");
     spyBundle.updateMessageResourceBundle(dialectRegistryItem);
     Assertions.assertEquals(spyBundle.handleGetObject("test.test"), "flip flop");
     Assertions.assertEquals(spyBundle.handleGetObject("1"), "French test selected.");
@@ -59,7 +60,7 @@ class CobolLSPropertiesResourceBundleTest {
 
   @Test
   void updateMessageResourceBundleWhenResourcesNotFound() throws IOException {
-    DialectRegistryItem dialectRegistryItem = new DialectRegistryItem("dummyDialect", "/path", "dummy dialect", "dummyDialect");
+    DialectRegistryItem dialectRegistryItem = new DialectRegistryItem("dummyDialect", URI.create("file://uri"), "dummy dialect", "dummyDialect");
     CobolLSPropertiesResourceBundle bundle =
         new CobolLSPropertiesResourceBundle(
             "resourceBundles/test", Locale.FRENCH);

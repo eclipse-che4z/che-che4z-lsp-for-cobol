@@ -20,46 +20,67 @@ import { C4Z_FOLDER, COPYBOOKS_FOLDER } from "../../constants";
 const fsPath = "tmp-ws";
 
 let copybookCachePath: string;
-const wsPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, C4Z_FOLDER, COPYBOOKS_FOLDER);
+const wsPath = path.join(
+  vscode.workspace.workspaceFolders[0].uri.fsPath,
+  C4Z_FOLDER,
+  COPYBOOKS_FOLDER,
+);
 
 jest.mock("vscode", () => ({
-    Uri: {
-        parse: jest.fn().mockReturnValue(path.join("tmp-ws", ".c4z", ".copybooks"))
+  Uri: {
+    parse: jest.fn().mockReturnValue(path.join("tmp-ws", ".c4z", ".copybooks")),
+  },
+  window: {
+    setStatusBarMessage: jest.fn().mockResolvedValue(true),
+    showInformationMessage: jest
+      .fn()
+      .mockImplementation((message: string) => Promise.resolve(message)),
+  },
+  workspace: {
+    fs: {
+      delete: jest.fn().mockReturnValue(true),
+      readDirectory: jest.fn().mockResolvedValue([["fileName", 2]]),
     },
-    window: {
-        setStatusBarMessage: jest.fn().mockResolvedValue(true),
-        showInformationMessage: jest.fn().mockImplementation((message: string) => Promise.resolve(message)),
-    },
-    workspace: {
-        fs: {
-            delete: jest.fn().mockReturnValue(true),
-            readDirectory: jest.fn().mockResolvedValue([['fileName', 2]])
+    workspaceFolders: [
+      {
+        uri: {
+          fsPath: "tmp-ws",
+          with: jest
+            .fn()
+            .mockImplementation(
+              (change: {
+                scheme?: string;
+                authority?: string;
+                path?: string;
+                query?: string;
+                fragment?: string;
+              }) => {
+                return {
+                  path: change.path,
+                  fsPath: change.path,
+                  with: jest.fn().mockReturnValue({ path: change.path }),
+                };
+              },
+            ),
         },
-        workspaceFolders: [{
-            uri: {
-                fsPath: "tmp-ws",
-                with: jest.fn().mockImplementation((change: { scheme?: string; authority?: string; path?: string; query?: string; fragment?: string }) => {
-                    return {path: change.path, fsPath: change.path, with: jest.fn().mockReturnValue({path: change.path})};
-                }),
-            },
-        } as any],
-    },
+      } as any,
+    ],
+  },
 }));
 beforeEach(() => {
-    jest.clearAllMocks();
+  jest.clearAllMocks();
 });
 
 afterAll(() => {
-    jest.clearAllMocks();
-  }
-);
+  jest.clearAllMocks();
+});
 
 describe("Tests downloaded copybook cache clear", () => {
-    it("checks running command multiple times doesn't produce error", () => {
-        expect(() => {
-            for (let index = 0; index < 3; index++) {
-                clearCache();
-            }
-        }).not.toThrowError();
-    });
+  it("checks running command multiple times doesn't produce error", () => {
+    expect(() => {
+      for (let index = 0; index < 3; index++) {
+        clearCache();
+      }
+    }).not.toThrowError();
+  });
 });

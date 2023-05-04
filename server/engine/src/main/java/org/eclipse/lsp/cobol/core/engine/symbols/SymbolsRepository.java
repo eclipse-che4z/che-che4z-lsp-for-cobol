@@ -97,18 +97,19 @@ public class SymbolsRepository {
    * @param position the position to check
    * @return element at specified position
    */
-  public Optional<Context> findElementByPosition(
+  public static Optional<Context> findElementByPosition(
       CobolDocumentModel document, TextDocumentPositionParams position) {
     AnalysisResult result = document.getAnalysisResult();
-    if (result.getRootNode() == null) {
+    if (result == null || result.getRootNode() == null) {
       return Optional.empty();
     }
     Optional<Node> node =
         findNodeByPosition(
             result.getRootNode(), position.getTextDocument().getUri(), position.getPosition());
+
     return node.filter(Context.class::isInstance)
         .map(Context.class::cast)
-        .map(this::constructElementsExcludingImplicits);
+        .map(SymbolsRepository::constructElementsExcludingImplicits);
   }
 
 //  /**
@@ -124,7 +125,7 @@ public class SymbolsRepository {
 //    programSymbols.remove(documentUri);
 //  }
 
-  private Context constructElementsExcludingImplicits(Context ctx) {
+  private static Context constructElementsExcludingImplicits(Context ctx) {
     List<Location> definitions =
         ctx.getDefinitions().stream().filter(uriNotImplicit()).collect(Collectors.toList());
     List<Location> usages =

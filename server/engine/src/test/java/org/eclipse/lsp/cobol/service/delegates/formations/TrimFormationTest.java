@@ -54,7 +54,7 @@ class TrimFormationTest {
   @Test
   void whenFormatIsCalledValidListParam_thenGetTextLines() {
     TrimFormation trimFormation = new TrimFormation();
-    CobolDocumentModel model = new CobolDocumentModel(TEXT);
+    CobolDocumentModel model = new CobolDocumentModel("", TEXT);
     List<CobolDocumentModel.Line> lines = model.getLines();
     List<TextEdit> format = trimFormation.format(lines);
     assertEquals(5, format.size());

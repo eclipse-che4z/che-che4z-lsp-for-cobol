@@ -15,8 +15,6 @@
 package org.eclipse.lsp.cobol.common.mapping;
 
 import lombok.var;
-import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -72,11 +70,91 @@ class MappingServiceTest {
           + "\n"
           + "6\n";
 
+  private static final String TEXT_REPLACEMENT_FOR_RANGE =
+      "00000000\n"
+          + "1111111\n"
+          + "2222222\n"
+          + "3333333\n"
+          + "4444444\n"
+          + "5555555\n"
+          + "6666666\n"
+          + "7777777\n"
+          + "8888888\n";
+
   private static final String COPYBOOK = "           COPYBOOK TEXT\n"
       + "           NEXT LINE 1\n"
       + "           NEXT LINE 2\n"
       + "           NEXT LINE 3\n";
+
   private static final String COPYBOOK2 = "!!!!\n";
+
+  private static final String BIG_COPY = "11111-COPYBOOK\n"
+      + "22222-COPYBOOK\n"
+      + "33333-COPYBOOK\n"
+      + "44444-COPYBOOK\n"
+      + "55555-COPYBOOK\n"
+      + "66666-COPYBOOK\n"
+      + "77777-COPYBOOK\n"
+      + "88888-COPYBOOK\n"
+      + "99999-COPYBOOK\n"
+      + "10 10-COPYBOOK\n"
+      + "11 11-COPYBOOK\n"
+      + "12 12-COPYBOOK\n"
+      + "13 13-COPYBOOK\n"
+      + "14 14-COPYBOOK\n"
+      + "15 15-COPYBOOK";
+
+  @Test
+  void testMappingWithErasingForRange1() {
+    TextTransformations textTransformations = TextTransformations.of(TEXT_REPLACEMENT_FOR_RANGE, "original");
+    Range copybookRange = new Range(new Position(1, 2), new Position(3, 5));
+
+    textTransformations.replace(copybookRange, TextTransformations.empty());
+    copybookRange = new Range(new Position(4, 2), new Position(6, 5));
+
+    textTransformations.extend(copybookRange, TextTransformations.of(BIG_COPY, "copybook2"));
+    MappingService mappingService = new MappingService(textTransformations);
+
+    Range copyRange = new Range(new Position(2, 2), new Position(2, 4));
+    Optional<Location> originalLocation1 = mappingService.getOriginalLocation(copyRange);
+
+    Range bottomRange = new Range(new Position(17, 2), new Position(8, 4));
+    Optional<Location> originalLocation2 = mappingService.getOriginalLocation(bottomRange);
+
+    assertTrue(originalLocation1.isPresent());
+    assertEquals(0, originalLocation1.get().getRange().getStart().getLine());
+    assertEquals(2, originalLocation1.get().getRange().getStart().getCharacter());
+
+    assertTrue(originalLocation2.isPresent());
+    assertEquals(7, originalLocation2.get().getRange().getStart().getLine());
+    assertEquals(2, originalLocation2.get().getRange().getStart().getCharacter());
+  }
+
+  @Test
+  void testMappingWithErasingForRange2() {
+    TextTransformations textTransformations = TextTransformations.of(TEXT_REPLACEMENT_FOR_RANGE, "original");
+    Range copybookRange = new Range(new Position(1, 2), new Position(3, 5));
+
+    textTransformations.extend(copybookRange, TextTransformations.of(BIG_COPY, "copybook1"));
+    copybookRange = new Range(new Position(4, 2), new Position(6, 5));
+
+    textTransformations.replace(copybookRange, TextTransformations.empty());
+    MappingService mappingService = new MappingService(textTransformations);
+
+    Range copyRange = new Range(new Position(2, 2), new Position(2, 4));
+    Optional<Location> originalLocation1 = mappingService.getOriginalLocation(copyRange);
+
+    Range bottomRange = new Range(new Position(8, 2), new Position(8, 4));
+    Optional<Location> originalLocation2 = mappingService.getOriginalLocation(bottomRange);
+
+    assertTrue(originalLocation1.isPresent());
+    assertEquals(1, originalLocation1.get().getRange().getStart().getLine());
+    assertEquals(2, originalLocation1.get().getRange().getStart().getCharacter());
+
+    assertTrue(originalLocation2.isPresent());
+    assertEquals(7, originalLocation2.get().getRange().getStart().getLine());
+    assertEquals(2, originalLocation2.get().getRange().getStart().getCharacter());
+  }
 
   @Test
   void testMapping() {
@@ -133,14 +211,12 @@ class MappingServiceTest {
   @Test
   void testLocationInNestedCopybook() {
     TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
-    CopyNode copyNode = new CopyNode(Locality.builder().range(new Range(new Position(7, 11), new Position(7, 21))).build(),
-            "copybook");
-    CopyNode copyNode2 = new CopyNode(Locality.builder().range(new Range(new Position(1, 0), new Position(1, 22))).build(),
-            "copybook2");
+    Range range1 = new Range(new Position(7, 11), new Position(7, 21));
     TextTransformations copybookTT = TextTransformations.of(COPYBOOK, "copybook");
-    textTransformations.extend(copyNode.getLocality().getRange(), copybookTT);
-    copybookTT.extend(copyNode2.getLocality().getRange(),
-            TextTransformations.of(COPYBOOK2, "copybook2"));
+    textTransformations.extend(range1, copybookTT);
+
+    Range range2 = new Range(new Position(1, 0), new Position(1, 22));
+    copybookTT.extend(range2, TextTransformations.of(COPYBOOK2, "copybook2"));
 
     MappingService service = new MappingService(textTransformations);
     Optional<Location> location = service.getOriginalLocation(
@@ -187,13 +263,9 @@ class MappingServiceTest {
   @Test
   void testLocationInNestedCopybook2() {
     TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
-    CopyNode copyNode = new CopyNode(Locality.builder().range(new Range(new Position(7, 11), new Position(7, 21))).build(),
-            "copybook");
-    CopyNode copyNode2 = new CopyNode(Locality.builder().range(new Range(new Position(), new Position(0, 24))).build(),
-            "copybook2");
     TextTransformations copybookTT = TextTransformations.of(COPYBOOK, "copybook");
-    textTransformations.extend(copyNode.getLocality().getRange(), copybookTT);
-    copybookTT.extend(copyNode2.getLocality().getRange(), TextTransformations.of(COPYBOOK2, "copybook2"));
+    textTransformations.extend(new Range(new Position(7, 11), new Position(7, 21)), copybookTT);
+    copybookTT.extend(new Range(new Position(), new Position(0, 24)), TextTransformations.of(COPYBOOK2, "copybook2"));
 
     MappingService service = new MappingService(textTransformations);
     Optional<Location> location = service.getOriginalLocation(
@@ -270,15 +342,16 @@ class MappingServiceTest {
     textTransformations.replace(range, "");
 
     MappingService mappingService = new MappingService(textTransformations);
+
+    // Original location for "77"
     Optional<Location> location = mappingService.getOriginalLocation(new Range(new Position(5, 5), new Position(5, 10)));
     assertTrue(location.isPresent());
-
     assertEquals(9, location.get().getRange().getStart().getLine());
     assertEquals(5, location.get().getRange().getStart().getCharacter());
 
+    // Original location for "DISPLAY"
     location = mappingService.getOriginalLocation(new Range(new Position(8, 5), new Position(8, 10)));
     assertTrue(location.isPresent());
-
     assertEquals(18, location.get().getRange().getStart().getLine());
   }
 
@@ -286,11 +359,7 @@ class MappingServiceTest {
   void testExtendAndShrinkEmptyLines() {
     TextTransformations textTransformations = TextTransformations.of(TEXT_SHRINK, "original");
 
-    CopyNode copyNode = new CopyNode(Locality.builder()
-        .range(new Range(new Position(4, 0), new Position(4, 24)))
-        .build(), "copybook");
-
-    textTransformations.extend(copyNode.getLocality().getRange(), new TextTransformations("COPYBOOK\nCOPYBOOK\n", "copybook"));
+    textTransformations.extend(new Range(new Position(4, 0), new Position(4, 24)), new TextTransformations("COPYBOOK\nCOPYBOOK\n", "copybook"));
 
     Range range = new Range(new Position(5, 0), new Position(8, 8));
     textTransformations.replace(range, "");
@@ -341,10 +410,6 @@ class MappingServiceTest {
     TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
 
     Range copybookRange = new Range(new Position(7, 11), new Position(7, 21));
-    CopyNode copyNode = new CopyNode(Locality.builder()
-        .range(copybookRange)
-        .build(), "copybook");
-
     textTransformations.insert(7, TextTransformations.of(COPYBOOK2, "copybook"));
     MappingService mappingService = new MappingService(textTransformations);
 
@@ -366,9 +431,6 @@ class MappingServiceTest {
     TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
 
     Range copybookRange = new Range(new Position(7, 11), new Position(7, 21));
-    CopyNode copyNode = new CopyNode(Locality.builder()
-        .range(copybookRange)
-        .build(), "copybook");
 
     textTransformations.insert(7, TextTransformations.of("", "copybook"));
     MappingService mappingService = new MappingService(textTransformations);
@@ -388,12 +450,7 @@ class MappingServiceTest {
 
   private MappingService prepareService() {
     TextTransformations textTransformations = TextTransformations.of(TEXT, "original");
-
-    CopyNode copyNode = new CopyNode(Locality.builder()
-        .range(new Range(new Position(7, 11), new Position(7, 21)))
-        .build(), "copybook");
-
-    textTransformations.extend(copyNode.getLocality().getRange(), TextTransformations.of(COPYBOOK, "copybook"));
+    textTransformations.extend(new Range(new Position(7, 11), new Position(7, 21)), TextTransformations.of(COPYBOOK, "copybook"));
 
     return new MappingService(textTransformations);
   }

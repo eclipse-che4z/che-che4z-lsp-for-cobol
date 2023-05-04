@@ -37,7 +37,7 @@ public class CopybookCompletion implements Completion {
   @Override
   public @NonNull Collection<CompletionItem> getCompletionItems(
       @NonNull String token, @Nullable CobolDocumentModel document) {
-    if (document == null) return emptyList();
+    if (!isDocumentReadyForSemanticCollection(document)) return emptyList();
     return document
         .getAnalysisResult()
         .getRootNode()
@@ -46,11 +46,11 @@ public class CopybookCompletion implements Completion {
         .map(CopyNode.class::cast)
         .map(CopyNode::getName)
         .filter(DocumentationUtils.startsWithIgnoreCase(token))
-        .map(this::toCopybookCompletion)
+        .map(CopybookCompletion::toCopybookCompletion)
         .collect(toList());
   }
 
-  private CompletionItem toCopybookCompletion(String name) {
+  private static CompletionItem toCopybookCompletion(String name) {
     CompletionItem item = new CompletionItem(name);
     item.setLabel(name);
     item.setInsertText(name);

@@ -184,7 +184,6 @@ public class SymbolAccumulatorService implements VariableAccumulator {
     return "";
   }
 
-
   private SymbolTable createOrGetSymbolTable(ProgramNode program) {
     return programSymbols.computeIfAbsent(
         SymbolTable.generateKey(program), p -> new SymbolTable());

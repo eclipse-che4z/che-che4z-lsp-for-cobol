@@ -31,7 +31,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class IndexItemNode extends VariableNode implements EffectiveData {
 
-  protected IndexItemNode(Locality locality, String name, boolean global) {
+  public IndexItemNode(Locality locality, String name, boolean global) {
     super(locality, name, VariableType.INDEX_ITEM, global);
   }
 

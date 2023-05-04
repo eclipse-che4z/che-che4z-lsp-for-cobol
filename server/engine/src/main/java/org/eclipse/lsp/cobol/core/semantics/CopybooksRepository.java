@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.core.semantics;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Value;
+import org.eclipse.lsp.cobol.common.copybook.CopybookId;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
 
@@ -29,7 +30,7 @@ import java.util.Map;
  */
 @Value
 public class CopybooksRepository {
-  Multimap<String, Location> definitions = HashMultimap.create();
+  Multimap<String, String> definitions = HashMultimap.create();
   Multimap<String, Location> usages = HashMultimap.create();
   Multimap<String, Locality> definitionStatements = HashMultimap.create();
 
@@ -38,10 +39,11 @@ public class CopybooksRepository {
    *
    * @param name     name of the element
    * @param dialect  the copybook dialect
-   * @param location location of the used element
+   * @param documentUri uri of the document that contains a coopybook definition
+   * @param copybookUri - the uri of a copybook
    */
-  public void define(String name, String dialect, Location location) {
-    definitions.put(toId(name, dialect), location);
+  public void define(String name, String dialect, String documentUri, String copybookUri) {
+    definitions.put(toId(name, dialect, documentUri), copybookUri);
   }
 
   /**
@@ -52,7 +54,7 @@ public class CopybooksRepository {
    * @param location location of the used element
    */
   public void addUsage(String name, String dialect, Location location) {
-    usages.put(toId(name, dialect), location);
+    usages.put(toId(name, dialect, location.getUri()), location);
   }
 
   /**
@@ -63,7 +65,7 @@ public class CopybooksRepository {
    * @param location the location of the definition statements
    */
   public void addStatement(String name, String dialect, Locality location) {
-    definitionStatements.put(toId(name, dialect), location);
+    definitionStatements.put(toId(name, dialect, location.getUri()), location);
   }
 
   /**
@@ -71,20 +73,22 @@ public class CopybooksRepository {
    *
    * @param name    a language element name to check
    * @param dialect the copybook dialectÒ
+   * @param uri - the uri of a copybook
    * @return true if the element already defined
    */
-  public boolean contains(String name, String dialect) {
-    return definitions.containsKey(toId(name, dialect));
+  public boolean contains(String name, String dialect, String uri) {
+    return definitions.containsKey(toId(name, dialect, uri));
   }
 
   /**
    * Creates copybook id
    * @param name - name of the copybook
    * @param dialect - copybook dialect
+   * @param uri - the uri of a copybook
    * @return the copybook id string value
    */
-  public static String toId(String name, String dialect) {
-    return dialect == null ? name : String.format("%s!%s", name, dialect);
+  public static String toId(String name, String dialect, String uri) {
+    return dialect == null ? name : CopybookId.create(name, dialect, uri).toString();
   }
 
   /**
@@ -94,7 +98,7 @@ public class CopybooksRepository {
    */
   public String getCopybookIdByUri(String uri) {
     return definitions.asMap().entrySet().stream()
-        .filter(e -> e.getValue().stream().anyMatch(l -> l.getUri().equals(uri)))
+        .filter(e -> e.getValue().stream().anyMatch(u -> u.equals(uri)))
         .findFirst()
         .map(Map.Entry::getKey)
         .orElse(null);

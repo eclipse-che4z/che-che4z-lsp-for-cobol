@@ -167,7 +167,7 @@ class WorkspaceServiceTest {
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     String path = "foo/bar";
 
-    when(copybookNameService.copybookLocalFolders())
+    when(copybookNameService.copybookLocalFolders(null))
         .thenReturn(completedFuture(singletonList(path)));
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
@@ -216,7 +216,7 @@ class WorkspaceServiceTest {
 
     String path = "foo/bar";
 
-    when(copybookNameService.copybookLocalFolders())
+    when(copybookNameService.copybookLocalFolders(null))
         .thenReturn(completedFuture(singletonList(path)));
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
@@ -263,7 +263,7 @@ class WorkspaceServiceTest {
     String path = "foo/bar";
     arr.add(new JsonPrimitive(path));
 
-    when(copybookNameService.copybookLocalFolders())
+    when(copybookNameService.copybookLocalFolders(null))
         .thenReturn(completedFuture(emptyList()));
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
@@ -307,7 +307,7 @@ class WorkspaceServiceTest {
             stateService,
             copybookNameService, keywords, messageService);
 
-    when(copybookNameService.copybookLocalFolders())
+    when(copybookNameService.copybookLocalFolders(null))
         .thenReturn(completedFuture(emptyList()));
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));

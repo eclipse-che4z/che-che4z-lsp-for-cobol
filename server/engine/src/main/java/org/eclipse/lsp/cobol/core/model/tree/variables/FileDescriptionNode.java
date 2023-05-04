@@ -34,7 +34,7 @@ public class FileDescriptionNode extends VariableNode {
   @Getter private final String fileDescriptorText;
   @Getter private final String fileControlClause;
 
-  protected FileDescriptionNode(
+  public FileDescriptionNode(
       Locality location,
       String name,
       VariableType variableType,

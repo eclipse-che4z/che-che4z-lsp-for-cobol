@@ -16,7 +16,6 @@
 package org.eclipse.lsp.cobol.core.visitor;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -111,18 +110,18 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     // we can skip the other nodes, but not the root
     return ImmutableList.of(
         retrieveLocality(ctx)
-            .map(it -> new RootNode(it, copybooks.getDefinitions()))
+            .map(RootNode::new)
             .map(
                 rootNode -> {
                   visitChildren(ctx).forEach(rootNode::addChild);
-                  addCopyNodes(rootNode, copybooks.getUsages());
+                  addCopyNodes(rootNode);
                   addDialectsNode(rootNode);
                   return rootNode;
                 })
             .orElseGet(
                 () -> {
                   LOG.warn("The root node for syntax tree was not constructed");
-                  return new RootNode(Locality.builder().build(), copybooks.getDefinitions());
+                  return new RootNode();
                 }));
   }
 
@@ -643,7 +642,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitVariableUsageName(VariableUsageNameContext ctx) {
-    return addTreeNode(ctx, locality -> new VariableUsageNode(getName(ctx), locality));
+    return addTreeNode(ctx, locality -> new VariableUsageNode(getName(ctx), locality, isVariableDefinitionMandatory(ctx)));
+  }
+
+  private boolean isVariableDefinitionMandatory(VariableUsageNameContext ctx) {
+    Boolean isDataRecordClause = ofNullable(ctx.getParent())
+            .map(ParserRuleContext::getParent)
+            .map(DataRecordsClauseContext.class::isInstance)
+            .orElse(false);
+    return !isDataRecordClause;
   }
 
   @Override
@@ -968,8 +975,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private Locality getLevelLocality(TerminalNode terminalNode) {
-    Location location = extendedSource.mapLocationUnsafe(buildTokenRange(terminalNode.getSymbol()));
-    return locationToLocality(location);
+    try {
+      Location location = extendedSource.mapLocationUnsafe(buildTokenRange(terminalNode.getSymbol()));
+      return locationToLocality(location);
+    } catch (IllegalStateException e) {
+      LOG.debug("Node: {} with range: {} has issue with the mapping", terminalNode, buildTokenRange(terminalNode.getSymbol()));
+      throw e;
+    }
   }
 
   private Locality locationToLocality(Location location) {
@@ -980,13 +992,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .build();
   }
 
-  private void addCopyNodes(Node rootNode, Multimap<String, Location> copybookUsages) {
-    for (Map.Entry<String, Location> copybook : copybookUsages.entries()) {
+  private void addCopyNodes(Node rootNode) {
+    for (Map.Entry<String, Location> copybook : copybooks.getUsages().entries()) {
       String name = copybook.getKey();
       Range range = copybook.getValue().getRange();
+      Locality statementLocality = Locality.builder().range(range).uri(copybook.getValue().getUri()).build();
+      String copybookUri = copybooks.getDefinitions().get(name).stream().findFirst().orElse(null);
       rootNode.addChild(
-          new CopyNode(
-              Locality.builder().range(range).uri(copybook.getValue().getUri()).build(), name));
+          new CopyNode(statementLocality, copybook.getValue(), name, copybookUri));
     }
   }
 }

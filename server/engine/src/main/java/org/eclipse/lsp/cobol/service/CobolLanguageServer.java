@@ -129,10 +129,6 @@ public class CobolLanguageServer implements LanguageServer {
     capabilities.setDocumentSymbolProvider(documentSymbolOptions);
     capabilities.setHoverProvider(TRUE);
     capabilities.setFoldingRangeProvider(TRUE);
-    DiagnosticRegistrationOptions diagnosticRegistrationOptions = new DiagnosticRegistrationOptions();
-    diagnosticRegistrationOptions.setWorkspaceDiagnostics(false);
-    diagnosticRegistrationOptions.setInterFileDependencies(true);
-    capabilities.setDiagnosticProvider(diagnosticRegistrationOptions);
     WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
     workspaceFoldersOptions.setSupported(TRUE);
     WorkspaceServerCapabilities workspaceServiceCapabilities =

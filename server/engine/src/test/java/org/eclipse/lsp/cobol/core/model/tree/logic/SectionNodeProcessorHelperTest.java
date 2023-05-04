@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree.variables;
+package org.eclipse.lsp.cobol.core.model.tree.logic;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -32,8 +32,8 @@ import java.util.stream.Collectors;
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** Test {@link VariableDefinitionUtil} */
-class VariableDefinitionUtilTest {
+/** Test {@link SectionNodeProcessorHelper} */
+class SectionNodeProcessorHelperTest {
   private static final Locality LOCALITY = Locality.builder()
       .uri("")
       .range(new Range(new Position(1, 1), new Position(2, 2)))
@@ -84,7 +84,7 @@ class VariableDefinitionUtilTest {
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-01-order-3", LOCALITY))
             .build());
-    VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
+    SectionNodeProcessorHelper.processNodeWithVariableDefinitions(programNode);
     new SymbolAccumulatorService().registerVariablesInProgram(programNode);
     List<VariableNode> nodesLevel01 = getVariables(programNode);
     checkNames(nodesLevel01, "Level-01-order-1", "Level-01-order-2", "Level-01-order-3");
@@ -125,7 +125,7 @@ class VariableDefinitionUtilTest {
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-07", LOCALITY))
             .build());
-    VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
+    SectionNodeProcessorHelper.processNodeWithVariableDefinitions(programNode);
     new SymbolAccumulatorService().registerVariablesInProgram(programNode);
     List<VariableNode> nodesLowLevel = getVariables(programNode);
     checkNames(nodesLowLevel, "Level-05", "Level-01");
@@ -157,7 +157,7 @@ class VariableDefinitionUtilTest {
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-66", LOCALITY))
             .build());
-    VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
+    SectionNodeProcessorHelper.processNodeWithVariableDefinitions(programNode);
     new SymbolAccumulatorService().registerVariablesInProgram(programNode);
     List<VariableNode> nodesLevel01 = getVariables(programNode);
     checkNames(nodesLevel01, "Level-01", "Level-66");
@@ -206,7 +206,7 @@ class VariableDefinitionUtilTest {
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-05-2", LOCALITY))
             .build());
-    VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
+    SectionNodeProcessorHelper.processNodeWithVariableDefinitions(programNode);
     new SymbolAccumulatorService().registerVariablesInProgram(programNode);
     List<VariableNode> nodesLevel01 = getVariables(programNode);
     checkNames(nodesLevel01, "Level-01");

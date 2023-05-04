@@ -14,22 +14,27 @@
 
 import { join } from "path";
 import { Executable } from "vscode-languageclient/node";
-import {NativeLanguageClient} from "./nativelanguageClientInterface";
+import { NativeLanguageClient } from "./nativelanguageClientInterface";
 
 export class WindowsLanguageClient implements NativeLanguageClient {
-    private readonly executablePath: string;
-    private readonly command: string;
+  private readonly executablePath: string;
+  private readonly command: string;
 
-    constructor(serverPath) {
-        this.executablePath = join(serverPath, "native");
-        this.command = `engine.exe`;
-    }
+  constructor(serverPath) {
+    this.executablePath = join(serverPath, "native");
+    this.command = `engine.exe`;
+  }
 
-    public getServer(): Executable {
-        return {
-            args: ["pipeEnabled", "-Dline.separator=\r\n", "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener", "-DserverType=NATIVE"],
-            command: this.command,
-            options: { detached: false, cwd: this.executablePath },
-        };
-    }
+  public getServer(): Executable {
+    return {
+      args: [
+        "pipeEnabled",
+        "-Dline.separator=\r\n",
+        "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener",
+        "-DserverType=NATIVE",
+      ],
+      command: this.command,
+      options: { detached: false, cwd: this.executablePath },
+    };
+  }
 }

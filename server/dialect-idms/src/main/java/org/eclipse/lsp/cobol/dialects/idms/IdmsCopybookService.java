@@ -27,15 +27,11 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.common.model.tree.CopyDefinition;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -78,13 +74,7 @@ class IdmsCopybookService {
 
     processedCopybooks.add(copybookName);
 
-    CopyNode node = new CopyNode(locality, copybookName.getDisplayName(), IdmsDialect.NAME);
-
-    Location location = new Location();
-    location.setUri(copybookModel.getUri());
-    location.setRange(new Range(new Position(), new Position()));
-
-    node.setDefinition(new CopyDefinition(location, copybookModel.getUri()));
+    CopyNode node = new CopyNode(locality, locality.toLocation(), copybookName.getDisplayName(), IdmsDialect.NAME, copybookModel.getUri());
 
     List<SyntaxError> errors = new LinkedList<>();
     processNodes(copybookModel, parentLevel).unwrap(errors::addAll)

@@ -70,7 +70,7 @@ class TestMapDefinition {
     final Hover mapHover =
         new VariableHover()
             .getHover(
-                new CobolDocumentModel(TEXT, result),
+                new CobolDocumentModel(UseCaseUtils.DOCUMENT_URI, TEXT, result),
                 new TextDocumentPositionParams(
                     new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), new Position(5, 19)));
     assertEquals(

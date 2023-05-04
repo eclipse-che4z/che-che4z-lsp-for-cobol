@@ -20,11 +20,12 @@ import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.CPY_
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.CPY_LOCAL_PATHS;
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonArray;
 import com.google.inject.Provider;
 import java.net.URI;
 import java.nio.file.Path;
@@ -82,10 +83,16 @@ class CopybookNameServiceTest {
     copyNames.addAll(ImmutableList.of(absoluteValidCpyPath, relativeValidCpyPath, workspaceProgramPath));
     when(provider.get()).thenReturn(client);
     when(client.workspaceFolders()).thenReturn(CompletableFuture.completedFuture(workspace));
-    when(settingsService.fetchTextConfiguration(CPY_LOCAL_PATHS.label))
-        .thenReturn(CompletableFuture.completedFuture(copyNames));
+    when(settingsService.fetchConfigurations(any(), eq(ImmutableList.of(CPY_LOCAL_PATHS.label))))
+        .thenReturn(CompletableFuture.completedFuture(ImmutableList.of(toJsonArray(copyNames))));
     when(settingsService.fetchTextConfiguration(DIALECTS.label))
         .thenReturn(CompletableFuture.completedFuture(emptyList()));
+  }
+
+  private JsonArray toJsonArray(List<String> copyNames) {
+    JsonArray result = new JsonArray();
+    copyNames.forEach(result::add);
+    return result;
   }
 
   static Stream<Arguments> collectCopybookNamesData() {
@@ -163,7 +170,7 @@ class CopybookNameServiceTest {
         new CopybookNameServiceImpl(settingsService, files, provider);
     copybookNameService.collectLocalCopybookNames();
 
-    assertEquals(copybookFound, copybookNameService.findByName("A"));
+    assertEquals(copybookFound, copybookNameService.findByName("", "A"));
 
   }
 
@@ -183,9 +190,8 @@ class CopybookNameServiceTest {
 
     CopybookNameService copybookNameService =
         new CopybookNameServiceImpl(settingsService, files, provider);
-    copybookNameService.collectLocalCopybookNames();
 
-    assertEquals(expectedCopybookFound, copybookNameService.getNames().size());
+    assertEquals(expectedCopybookFound, copybookNameService.getNames("/TEST/MY.CBL").size());
   }
 
   @Test
@@ -193,14 +199,15 @@ class CopybookNameServiceTest {
     CopybookNameService copybookNameService =
         new CopybookNameServiceImpl(settingsService, files, provider);
 
-    when(settingsService.fetchTextConfiguration(
-        CPY_EXTENSIONS.label)).thenReturn(CompletableFuture.completedFuture(Collections.singletonList("cpy")));
+    when(settingsService.fetchTextConfiguration(CPY_EXTENSIONS.label))
+            .thenReturn(CompletableFuture.completedFuture(Collections.singletonList("cpy")));
+    when(settingsService.fetchConfigurations(any(), any())).thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
     when(files.decodeURI(absoluteValidCpyPath)).thenReturn(null);
     when(files.getPathFromURI(absoluteValidCpyPath)).thenReturn(null);
     when(cpyPath.resolve(absoluteValidCpyPath)).thenReturn(null);
 
     copybookNameService.collectLocalCopybookNames();
-    assertEquals(0, copybookNameService.getNames().size());
+    assertEquals(0, copybookNameService.getNames(null).size());
   }
 
   private void validFoldersMock() {

@@ -36,16 +36,19 @@ public class CobolDocumentModel {
   private static final String DELIMITER = "[ .\\[\\]()<>,*\"']+";
   private final List<Line> lines = new ArrayList<>();
   private final String text;
+  private final String uri;
   private AnalysisResult analysisResult;
 
-  public CobolDocumentModel(String text, AnalysisResult analysisResult) {
+  public CobolDocumentModel(String uri, String text, AnalysisResult analysisResult) {
+    this.uri = uri;
     this.text = text;
     this.analysisResult = analysisResult;
     parse(text);
   }
 
-  public CobolDocumentModel(String text) {
+  public CobolDocumentModel(String uri, String text) {
     this.text = text;
+    this.uri = uri;
     parse(text);
   }
 

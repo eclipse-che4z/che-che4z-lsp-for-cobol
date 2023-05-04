@@ -59,6 +59,7 @@ import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
+import java.net.URI;
 import java.util.List;
 
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
@@ -124,7 +125,7 @@ public class TestModule extends AbstractModule {
       }
 
       @Override
-      public List<CobolDialect> loadDialects(String path, CopybookService copybookService, MessageService messageService) {
+      public List<CobolDialect> loadDialects(URI uri, CopybookService copybookService, MessageService messageService) {
         return ImmutableList.of();
       }
     });

@@ -13,30 +13,18 @@
  */
 
 {
-    "rules": {
-        "no-string-throw": true,
-        "no-unused-expression": true,
-        "no-duplicate-variable": true,
-        "curly": true,
-        "class-name": true,
-        "semicolon": [
-            true,
-            "always"
-        ],
-        "triple-equals": true,
-        "interface-name": [
-            true,
-            "never-prefix"
-        ],
-        "arrow-parens": [
-            true,
-            "ban-single-arg-parens"
-        ],
-        "prettier": true
-    },
-    "defaultSeverity": "warning",
-    "extends": [
-        "tslint:recommended",
-        "eslint-plugin-sonarjs"
-    ]
+  "rules": {
+    "no-string-throw": true,
+    "no-unused-expression": true,
+    "no-duplicate-variable": true,
+    "curly": true,
+    "class-name": true,
+    "semicolon": [true, "always"],
+    "triple-equals": true,
+    "interface-name": [true, "never-prefix"],
+    "arrow-parens": [true, "ban-single-arg-parens"],
+    "prettier": true
+  },
+  "defaultSeverity": "warning",
+  "extends": ["tslint:recommended", "eslint-plugin-sonarjs"]
 }

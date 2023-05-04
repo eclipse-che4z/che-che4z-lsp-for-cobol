@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
  */
 public class MappingService {
   static final int LINE_LEN = 80;
+  private static final String SEPARATOR = "\\r?\\n";
 
   /**
    * Mapping item object
@@ -205,7 +206,7 @@ public class MappingService {
       result.addAll(map);
     }
 
-    String[] originalLines = textTransformations.getText().split("\\r?\\n", -1);
+    String[] originalLines = textTransformations.getText().split(SEPARATOR, -1);
     int size = originalLines.length;
 
     MappingItem last = new MappingItem(new Range(new Position(extendedDocumentLine, 0), new Position(extendedDocumentLine + size - 1, LINE_LEN)),
@@ -248,31 +249,16 @@ public class MappingService {
         continue;
       }
 
-      String[] lines =  text.split("\\r?\\n");
+      String[] lines =  text.split(SEPARATOR);
       List<MappingItem> iterationMap = new LinkedList<>(localityMap);
       for (MappingItem item : iterationMap) {
         if (MappingHelper.rangeIn(range, item.originalLocation.getRange())) {
+          Range adjustedRange = extendRangeIfNeeded(range, lines, replacements.get(range));
 
-          range = extendRangeIfNeeded(range, lines, replacements.get(range));
-          List<Location> newLocations = MappingHelper.split(range, item.originalLocation.getRange())
+          List<Location> newLocations = MappingHelper.split(adjustedRange, item.originalLocation.getRange())
               .stream().map(r -> new Location(item.originalLocation.getUri(), r)).collect(Collectors.toList());
 
-          int lineShift = range.getStart().getLine() - item.originalLocation.getRange().getStart().getLine();
-          int charShift = range.getStart().getCharacter() - item.originalLocation.getRange().getStart().getCharacter();
-
-          int charPos = item.extendedRange.getStart().getCharacter() + charShift;
-          int linePos = item.extendedRange.getStart().getLine() + lineShift;
-          if (charPos < 0) {
-            charPos = LINE_LEN;
-            linePos -= 1;
-          }
-          Position startPosition = new Position(linePos, charPos);
-
-          Position endPosition = new Position(item.extendedRange.getStart().getLine()
-              + lineShift + MappingHelper.size(range) - 1,
-              item.extendedRange.getStart().getCharacter() + charShift + MappingHelper.charSize(range));
-
-          Range extendedRange = new Range(startPosition, endPosition);
+          Range extendedRange = calculateExtendedRange(adjustedRange, item);
 
           List<Range> newRanges = MappingHelper.concat(extendedRange, item.extendedRange);
           if (newLocations.size() == newRanges.size()) {
@@ -290,14 +276,34 @@ public class MappingService {
             }
           }
           localityMap.remove(item);
+          break;
         }
       }
     }
     return localityMap;
   }
 
+  private static Range calculateExtendedRange(Range range, MappingItem item) {
+    int lineShift = range.getStart().getLine() - item.originalLocation.getRange().getStart().getLine();
+    int charShift = range.getStart().getCharacter() - item.originalLocation.getRange().getStart().getCharacter();
+
+    int charPos = item.extendedRange.getStart().getCharacter() + charShift;
+    int linePos = item.extendedRange.getStart().getLine() + lineShift;
+    if (charPos < 0) {
+      charPos = LINE_LEN;
+      linePos -= 1;
+    }
+    Position startPosition = new Position(linePos, charPos);
+
+    Position endPosition = new Position(item.extendedRange.getStart().getLine()
+        + lineShift + MappingHelper.size(range) - 1,
+        item.extendedRange.getStart().getCharacter() + charShift + MappingHelper.charSize(range));
+
+    return new Range(startPosition, endPosition);
+  }
+
   private static boolean affectsToMapping(Range range, String text) {
-    String[] lines = text.split("\\r?\n");
+    String[] lines = text.split(SEPARATOR);
     if (lines.length < 1) {
       return false;
     }
@@ -308,7 +314,7 @@ public class MappingService {
   private static Range extendRangeIfNeeded(Range range, String[] lines, String text) {
     String firstLine = lines[range.getStart().getLine()];
     String lastLine = lines[range.getEnd().getLine()];
-    String[] replaceLines = text.split("\\r?\\n");
+    String[] replaceLines = text.split(SEPARATOR);
 
     Position start = new Position(range.getStart().getLine(), range.getStart().getCharacter());
     Position end = new Position(range.getEnd().getLine(), range.getEnd().getCharacter());

@@ -19,6 +19,7 @@ import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -103,6 +104,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
         .flatMap(Collection::stream)
         .map(Location::getUri)
         .filter(it -> !ImplicitCodeUtils.isImplicit(it))
+        .distinct()
         .collect(toList());
 
     return AnalysisResult.builder()
@@ -165,7 +167,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private List<String> filenameSpecificWatchFolders(String uri) {
     return new ArrayList<>(watcherService.getWatchingFolders()).stream()
-            .filter(txt -> txt.contains("${fileBasenameNoExtension}"))
+            .filter(txt -> txt.contains(CopybookService.FILE_BASENAME_VARIABLE))
             .map(txt -> txt.replace("\\$\\{fileBasenameNoExtension\\}", getNameFromURI(uri)))
             .collect(toList());
   }
