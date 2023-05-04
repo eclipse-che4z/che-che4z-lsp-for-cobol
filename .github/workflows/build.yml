@@ -97,6 +97,13 @@ jobs:
           cp ../../server/dialect-daco/target/dialect-daco.jar ./server/jar
           npm run package
           cp *.vsix ../../.
+      - name: Package COBOL CHECK vsix
+        working-directory: clients/cobol-check-dialect
+        run: |
+          npm ci
+          cp ../../server/dialect-cobol-check/target/dialect-cobol-check.jar ./server/jar
+          npm run package
+          cp *.vsix ../../.
       - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
@@ -107,6 +114,11 @@ jobs:
           if-no-files-found: warn
           name: vsix-daco-dialect
           path: 'cobol-dialect-support-for-daco*.vsix'
+      - uses: actions/upload-artifact@v3
+          with:
+            if-no-files-found: warn
+            name: vsix-cobol-check-dialect
+            path: 'cobol-check-dialect-for-cobol*.vsix'
   buildNative:
     strategy:
       fail-fast: false
