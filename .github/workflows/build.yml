@@ -115,10 +115,10 @@ jobs:
           name: vsix-daco-dialect
           path: 'cobol-dialect-support-for-daco*.vsix'
       - uses: actions/upload-artifact@v3
-          with:
-            if-no-files-found: warn
-            name: vsix-cobol-check-dialect
-            path: 'cobol-check-dialect-for-cobol*.vsix'
+        with:
+          if-no-files-found: warn
+          name: vsix-cobol-check-dialect
+          path: 'cobol-check-dialect-for-cobol*.vsix'
   buildNative:
     strategy:
       fail-fast: false
