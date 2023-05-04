@@ -74,7 +74,7 @@ public class DialectService {
     try {
       orderedDialects = sortDialects(filterMissing(dialects, errors, context));
     } catch (NoSuchElementException e) {
-      return handleMissingDialect(context, errors, e);
+      return handleMissingDialect(context, errors, e.getMessage());
     }
     for (CobolDialect orderedDialect : orderedDialects) {
       List<SyntaxError> dialectErrors = orderedDialect.extend(context);
@@ -123,10 +123,10 @@ public class DialectService {
   }
 
   private ResultWithErrors<DialectOutcome> handleMissingDialect(DialectProcessingContext context,
-                                                                List<SyntaxError> errors, NoSuchElementException e) {
-    Optional<String> originalDialectName = findOriginalDialect(e.getMessage());
-    String errorMsg = originalDialectName.map(name -> e.getMessage() + " (needed for " + name + ")")
-            .orElse(e.getMessage());
+                                                                List<SyntaxError> errors, String missedDialectName) {
+    Optional<String> originalDialectName = findOriginalDialect(missedDialectName);
+    String errorMsg = originalDialectName.map(name -> missedDialectName + " (needed for " + name + ")")
+            .orElse(missedDialectName);
     errors.add(errorMissingDialect(context, errorMsg));
     return new ResultWithErrors<>(new DialectOutcome(context), errors);
   }
@@ -142,26 +142,9 @@ public class DialectService {
 
   private LinkedList<CobolDialect> sortDialects(List<String> dialects) {
     LinkedList<CobolDialect> orderedDialects = new LinkedList<>();
-    LinkedList<String> dialectsQueue = new LinkedList<>(dialects);
-    while (!dialectsQueue.isEmpty()) {
-      String dialectName = dialectsQueue.pop();
+    for (String dialectName : dialects) {
       CobolDialect dialect = getDialectByName(dialectName).orElseThrow(() -> new NoSuchElementException(dialectName));
-      if (dialect.runBefore().isEmpty()) {
-        orderedDialects.add(dialect);
-        continue;
-      }
-      for (String name : dialect.runBefore()) {
-        CobolDialect d = getDialectByName(name).orElseThrow(() -> new NoSuchElementException(name));
-        int index = orderedDialects.indexOf(d);
-        if (index >= 0) {
-          orderedDialects.add(index, dialect);
-        } else {
-          if (!dialectsQueue.contains(d.getName())) {
-            dialectsQueue.add(d.getName());
-          }
-          dialectsQueue.add(dialect.getName());
-        }
-      }
+      orderedDialects.add(dialect);
     }
     return orderedDialects;
   }
@@ -211,7 +194,7 @@ public class DialectService {
     AtomicBoolean changed = new AtomicBoolean(false);
     dialectRegistry.forEach(r ->
       dialectSuppliers.computeIfAbsent(r.getName(), name ->
-          discoveryService.loadDialects(r.getPath(), copybookService, messageService).stream()
+          discoveryService.loadDialects(r.getUri(), copybookService, messageService).stream()
           .filter(d -> d.getName().equals(name))
           .findFirst()
               .map(dialect -> {

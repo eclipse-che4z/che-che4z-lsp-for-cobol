@@ -18,22 +18,24 @@ import * as vscode from "vscode";
  * This class collects utility methods for general purpose activities
  */
 export class Utils {
-    /**
-     * This method provides a quick way to verify if the input is null or undefined.
-     * The idea is to have something similar to the util library {@link node.isNullOrUndefined} that is deprecated.
-     * @param content the string value target of the validation
-     * @return true if the content is not null or undefined, false otherwise
-     */
-    public static isNullOrUndefined(content: string): boolean {
-        return content === null || content === undefined;
-    }
+  /**
+   * This method provides a quick way to verify if the input is null or undefined.
+   * The idea is to have something similar to the util library {@link node.isNullOrUndefined} that is deprecated.
+   * @param content the string value target of the validation
+   * @return true if the content is not null or undefined, false otherwise
+   */
+  public static isNullOrUndefined(content: string): boolean {
+    return content === null || content === undefined;
+  }
 
-    public static async getZoweExplorerAPI(): Promise<IApiRegisterClient> {
-        const ext = vscode.extensions.getExtension("Zowe.vscode-extension-for-zowe");
-        if (!ext) {
-          return  Promise.resolve(undefined);
-        }
-        await ext.activate();
-        return ext.exports as any;
+  public static async getZoweExplorerAPI(): Promise<IApiRegisterClient> {
+    const ext = vscode.extensions.getExtension(
+      "Zowe.vscode-extension-for-zowe",
+    );
+    if (!ext) {
+      return Promise.resolve(undefined);
     }
+    await ext.activate();
+    return ext.exports as any;
+  }
 }

@@ -9,7 +9,7 @@
 
 # COBOL Language Support
 
-COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using the Zowe Explorer extension to automatically retrieve copybooks used in your programs and store them in your workspace. COBOL Language Support also supports COBOL programs which interact with IDMS, Datacom, CICS, and DB2 SQL.
+COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using the Zowe Explorer extension to automatically retrieve copybooks used in your programs and store them in your workspace. COBOL Language Support also supports COBOL programs which interact with Datacom, CICS, and DB2 SQL. An add-on extension which adds support for the IDMS dialect is available on the VS Code Marketplace.
 
 COBOL Language Support recognizes files with the extensions `.cob`, `.cbl` and `.cobol` as COBOL files.
 
@@ -21,15 +21,13 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 ## Prerequisites
 
-For dialect support:
-- Java version 8 or higher with the PATH variable correctly configured.  
-For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
+There are no client or server-side prerequisites for COBOL Language Support.
 
 ## Compatibility
 
 The COBOL Language Support extension is supported on Visual Studio Code and Github Codespaces.
 
-This extension is not compatible with other extensions that provide COBOL support except [COBOL Control Flow](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.ccf). We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
+This extension is not compatible with other extensions that provide COBOL support except [COBOL Control Flow](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.ccf) and the dialect add-ons published by Broadcom. We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
 
 The COBOL Language Support extension only supports IBM Enterprise COBOL. Other versions of COBOL are not supported.
 
@@ -51,7 +49,6 @@ COBOL Language Support provides the following COBOL syntax awareness features:
 Autocomplete speeds up the coding process by intuitively suggesting the most likely variables or paragraphs to follow existing code. The extension provides live suggestions while you type for:
 
 - COBOL keywords, variables, paragraphs and sections
-- IDMS DML keywords
 - CICS keywords
 - DB2 and Datacom SQL keywords
 - Code Snippets
@@ -66,7 +63,7 @@ The autocomplete feature is only available in the main COBOL file, not in copybo
 ### Syntax and Semantic Check for Code
 This feature checks for mistakes and errors in COBOL code. The syntax check feature reviews the whole content of the code and suggests fixes, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
 
-This feature is also enabled for IDMS, Datacom, CICS, and DB2 SQL keywords and variables.
+This feature is also enabled for Datacom, CICS, and DB2 SQL keywords and variables.
 
 ![Syntax check](/docs/images/CLSErrorHighlighting.gif)
 
@@ -120,17 +117,17 @@ The following example sets tab stops after columns 1, 2, 3 and 4 after the line 
     }
     ```
 
-### Dialects
+### Dialect Add-ons
 
-The dialects setting lets you include specific language analysis in your COBOL files. For now you can include IDMS as a language of choice. The dialects setting currently requires Java to work.
+Dialect add-ons are available to add support for specific language analysis in your COBOL files. Currently an add-on for the IDMS dialect is available on the Visual Studio Code Marketplace. 
 
-The dialects setting is not enabled by default. To enable the setting, follow these steps: 
+Dialect add-ons must be enabled in the COBOL Language Support extension settings. To enable dialect add-ons that you install, complete the following tasks:
 
-1. Go to **VS Code Settings** > **User** > **Extensions** > **COBOL Language Support** 
-2. Set **Cobol-lsp: serverRuntime** to **JAVA**
-3. Under **Cobol-lsp: Dialects**, select **Add Item**, select your dialect and click **OK**. 
+1. Ensure that you meet the Java prerequisite described in the add-on readme. 
+2. Set **Cobol-lsp: serverRuntime** to **JAVA** in the your extension settings.
+3. Add the dialect to the **Cobol-lsp: dialects** array in your workspace extension settings, or to the `preprocessor` parameter in a processor group. For more information, see [Processor Groups](#Processor-Groups).
 
-**Note:** If you disable the setting, your IDMS bits of code are highlighted as errors.
+COBOL Language Support processes dialects in the order you list them in the **Cobol-lsp: dialects** setting or within the `preprocessor` parameter of a processor group. If you list dialects in the wrong order, some pieces of code might be incorrectly processed using the wrong dialect parser and marked as errors. 
 
 ### SQL Backend Server
 
@@ -167,7 +164,6 @@ Configuring copybook support on COBOL Language Support also enables copybook sup
 COBOL Language Support supports the following copybook types:
 
 - IBM COBOL Copybooks, called with the `COPY` statement.
-- IDMS dialect copybooks, called with the `COPY IDMS` statement. For more information, see the [IDMS documentation](https://techdocs.broadcom.com/idms)
 - Datacom COBOL copybooks, called with the `COPY` statement. Datacom copybooks must be extracted to a mainframe data set or local folder for use in COBOL Language Support. For more information, see the [Datacom documentation](https://techdocs.broadcom.com/datacom).
 
 ### Storing Copybooks Locally
@@ -176,9 +172,7 @@ You can store your copybooks locally in folders in your workspace and specify th
 
 1. Open the COBOL Language Support extension settings.
 2. Switch from **User** to **Workspace**.
-3. Specify the paths of the folders containing copybooks:
-   - Under **Cpy-manager: Paths-local** for standard IBM Enterprise COBOL and Datacom.
-   - Under **Cpy-manager: Paths-local: Idms** for the IDMS dialect.
+3. Specify the paths of the folders containing copybooks under **Cpy-manager: Paths-local**.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
    - You can use [Glob](https://www.npmjs.com/package/glob) wildcards, such as * to substitute one whole level of the path. For example, specifying the path `*/copybooks` searches all subfolders named "copybooks" in  subfolders of your workspace root, while the path `copybooks/*` searches all subfolders one level below the `copybooks` folder in the workspace root. For more information on available wildcards, see the [Glob Primer](https://www.npmjs.com/package/glob#Glob-Primer)
    - The folders are searched in the order they are listed, or in alphabetical order if multiple paths are indexed by a wildcard. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
@@ -240,6 +234,49 @@ The Find All References and Go To Definition functionalities are extended to wor
 * Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.
 * Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code.
 * Functionality to skip variable levels when called, reducing call time.
+
+## Processor Groups
+
+Use processor groups to link programs with specific dialects and specific folders and data sets containing copybooks. You define processor groups in a `proc_grps.json` file and associate them with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
+
+In the `proc_grps.json` file, specify your copybook folders and data sets in a `libs` array, and specify dialects within a `preprocessor` JSON element. Use the following format:
+```
+{
+    "pgroups": [
+        {
+            "name": "GROUP1",
+            "libs": [
+                "LIB1", "LIB2"
+            ],
+        },
+        {
+            "name": "GROUP2",
+            "libs": [
+                "LIB3", "LIB4"
+            ],
+            "preprocessor": [
+                {
+                    "name": "IDMS"
+                },
+            ],
+        }
+    ]
+}
+```
+
+The `pgm_conf.json` file has the following format:
+```
+{
+    "pgms": [
+        { "program": "PROGRAM1", "pgroup": "GROUP1" },
+        { "program": "PROGRAM2", "pgroup": "GROUP2" },
+    ]
+}
+```
+
+The two examples above use copybooks from libraries LIB1 and LIB2 for PROGRAM1, and copybooks from libraries LIB3 and LIB4 for PROGRAM2. The processor groups file also enables the IDMS dialect for PROGRAM2.
+
+Specify libraries as absolute or relative local paths in the `libs` array. These libraries take priority over the libraries that you specify in the extension settings. Dialects that you specify in processor groups also take priority over those in the workspace extension settings.
 
 ## Troubleshooting
 

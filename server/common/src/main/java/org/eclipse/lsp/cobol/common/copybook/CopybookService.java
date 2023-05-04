@@ -21,6 +21,7 @@ import lombok.NonNull;
  * filesystem load.
  */
 public interface CopybookService {
+  String FILE_BASENAME_VARIABLE = "${fileBasenameNoExtension}";
   /** Remove all the stored copybook. */
   void invalidateCache();
 

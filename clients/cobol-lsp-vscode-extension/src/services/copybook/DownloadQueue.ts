@@ -13,69 +13,89 @@
  */
 
 export class CopybookProfile {
-    private copybook: any;
-    constructor(readonly filename: string, copybook: string, readonly dialectType: string,
-        readonly profile: string, readonly quiet: boolean) {
-            this.copybook = copybook;
-        }
+  private copybook: any;
+  constructor(
+    readonly documentUri: string,
+    copybook: string,
+    readonly dialectType: string,
+    readonly profile: string,
+    readonly quiet: boolean,
+  ) {
+    this.copybook = copybook;
+  }
 
-    public equals(other: CopybookProfile): boolean {
-        return this.filename == other.filename &&
-         this.copybook == other.copybook && 
-         this.dialectType == other.dialectType && 
-         this.profile == other.profile && 
-         this.quiet == other.quiet;
-    }
+  public equals(other: CopybookProfile): boolean {
+    return (
+      this.documentUri == other.documentUri &&
+      this.copybook == other.copybook &&
+      this.dialectType == other.dialectType &&
+      this.profile == other.profile &&
+      this.quiet == other.quiet
+    );
+  }
 
-    public updateCopybook(copybook: string) {
-        this.copybook = copybook;
-    }
+  public updateCopybook(copybook: string) {
+    this.copybook = copybook;
+  }
 
-    public getCopybook() {
-        return this.copybook;
-    }
-
+  public getCopybook() {
+    return this.copybook;
+  }
 }
 
 export class DownloadQueue {
-    private queue: CopybookProfile[] = [];
-    private resolve: any;
+  private queue: CopybookProfile[] = [];
+  private resolve: any;
 
-    public push(filename: string, copybook: string, dialectType: string, profile: string, quiet: boolean): void {
-        if (this.resolve) {
-            this.resolve(new CopybookProfile(filename, copybook, dialectType, profile, quiet));
-            this.resolve = undefined;
-        } else {
-            const copybookProfile = new CopybookProfile(filename, copybook, dialectType, profile, quiet);
-            for (const item of this.queue) {
-                if (copybookProfile.equals(item)) {
-                    return;
-                }
-            }
-            this.queue.push(copybookProfile);
+  public push(
+    documentUri: string,
+    copybook: string,
+    dialectType: string,
+    profile: string,
+    quiet: boolean,
+  ): void {
+    if (this.resolve) {
+      this.resolve(
+        new CopybookProfile(documentUri, copybook, dialectType, profile, quiet),
+      );
+      this.resolve = undefined;
+    } else {
+      const copybookProfile = new CopybookProfile(
+        documentUri,
+        copybook,
+        dialectType,
+        profile,
+        quiet,
+      );
+      for (const item of this.queue) {
+        if (copybookProfile.equals(item)) {
+          return;
         }
+      }
+      this.queue.push(copybookProfile);
     }
+  }
 
-    public async pop(): Promise<CopybookProfile | undefined> {
-        if (this.queue.length > 0) {
-            return Promise.resolve(this.queue.pop());
-        }
-        return new Promise((resolve, reject) => {
-            this.resolve = resolve;
-        });
+  public async pop(): Promise<CopybookProfile | undefined> {
+    if (this.queue.length > 0) {
+      return Promise.resolve(this.queue.pop());
     }
+    return new Promise((resolve, reject) => {
+      this.resolve = resolve;
+    });
+  }
 
-    public get length(): number {
-        return this.queue.length;
-    }
+  public get length(): number {
+    return this.queue.length;
+  }
 
-    public clean(): void {
-        this.queue = [];
-    }
+  public clean(): void {
+    this.queue = [];
+  }
 
-    public stop(): void {
-        if (this.resolve) {
-            this.resolve(undefined);
-        }
+  public stop(): void {
+    if (this.resolve) {
+      this.resolve(undefined);
     }
+  }
 }

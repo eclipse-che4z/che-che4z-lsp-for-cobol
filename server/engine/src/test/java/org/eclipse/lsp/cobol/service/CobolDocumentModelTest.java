@@ -42,7 +42,7 @@ class CobolDocumentModelTest {
 
   @BeforeEach
   void createModel() {
-    model = new CobolDocumentModel(TEXT, AnalysisResult.builder().build());
+    model = new CobolDocumentModel("", TEXT, AnalysisResult.builder().build());
   }
 
   @Test
@@ -107,7 +107,7 @@ class CobolDocumentModelTest {
 
   @Test
   void testTokenRetrieving() {
-    CobolDocumentModel model = new CobolDocumentModel("a bc\r\nde", AnalysisResult.builder().build());
+    CobolDocumentModel model = new CobolDocumentModel("", "a bc\r\nde", AnalysisResult.builder().build());
     assertEquals("", model.getTokenBeforePosition(new Position()));
     assertEquals("a", model.getTokenBeforePosition(new Position(0, 1)));
     assertEquals("bc", model.getTokenBeforePosition(new Position(0, 4)));

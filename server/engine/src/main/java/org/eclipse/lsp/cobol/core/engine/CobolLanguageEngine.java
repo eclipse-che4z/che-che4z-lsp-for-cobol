@@ -35,7 +35,6 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
@@ -156,6 +155,7 @@ public class CobolLanguageEngine {
 
     // Preprocessor (replacement, copybooks)
     CopybooksRepository copybooksRepository = ctx.measure(PREPROCESSOR, () -> runPreprocessor(documentUri, ctx));
+    applyDialectCopybooks(copybooksRepository, dialectOutcome.getDialectNodes());
 
     // Run parser
     ParserListener listener = new ParserListener(ctx.getExtendedSource(), copybooksRepository);
@@ -244,8 +244,6 @@ public class CobolLanguageEngine {
   private List<Node> transformAST(AnalysisContext ctx, List<Node> dialectNodes,
                                   CopybooksRepository copybooksRepository, CommonTokenStream tokens,
                                   CobolParser.StartRuleContext tree) {
-    applyDialectCopybooks(copybooksRepository, dialectNodes);
-
     CobolVisitor visitor =
         new CobolVisitor(copybooksRepository, tokens, ctx.getExtendedSource(),
             messageService, subroutineService, dialectNodes, cachingConfigurationService);
@@ -302,7 +300,7 @@ public class CobolLanguageEngine {
     ProcessingPhase t = ProcessingPhase.TRANSFORMATION;
     ctx.register(t, CompilerDirectiveNode.class, new CompilerDirectiveProcess());
     ctx.register(t, ProgramIdNode.class, new ProgramIdProcess());
-    ctx.register(t, SectionNode.class, new ProcessNodeWithVariableDefinitions(symbolAccumulatorService));
+    ctx.register(t, SectionNode.class, new SectionNodeProcessor(symbolAccumulatorService));
     ctx.register(t, FileEntryNode.class, new FileEntryProcess());
     ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess(symbolAccumulatorService));
     ctx.register(t, DeclarativeProcedureSectionNode.class, new DeclarativeProcedureSectionRegister(symbolAccumulatorService));
@@ -345,12 +343,14 @@ public class CobolLanguageEngine {
     pds.forEach(ctx::register);
   }
 
-  private void applyDialectCopybooks(CopybooksRepository copybooks, List<Node> dialectNodes) {
+  private void applyDialectCopybooks(CopybooksRepository copybooksRepository, List<Node> dialectNodes) {
     dialectNodes.stream()
-        .flatMap(Node::getDepthFirstStream)
-        .filter(n -> n.getNodeType().equals(NodeType.COPY))
+        .filter(n -> n instanceof CopyNode)
         .map(CopyNode.class::cast)
-        .filter(n -> n.getDefinition() != null)
-        .forEach(n -> copybooks.define(n.getName(), n.getDialect(), n.getDefinition().getLocation()));
+        .filter(n -> n.getUri() != null)
+        .forEach(n -> {
+          copybooksRepository.addStatement(n.getName(), n.getDialect(), n.getLocality());
+          copybooksRepository.define(n.getName(), n.getDialect(), n.getNameLocation().getUri(), n.getUri());
+        });
   }
 }

@@ -37,13 +37,13 @@ class CopybookNameCompletionTest {
 
   @Test
   void testCopybookNameCompletion() {
-    when(copybookNameService.getNames()).thenReturn(Arrays.asList(
+    when(copybookNameService.getNames("id")).thenReturn(Arrays.asList(
         CopybookName.builder().displayName("Copy1").build(),
         CopybookName.builder().displayName("copy2").build(),
         CopybookName.builder().displayName("no-copy").build()));
 
     CopybookNameCompletion copybookNameCompletion = new CopybookNameCompletion(copybookNameService);
-    CobolDocumentModel document = new CobolDocumentModel(TEXT, AnalysisResult.builder().build());
+    CobolDocumentModel document = new CobolDocumentModel("id", TEXT, AnalysisResult.builder().build());
     CompletionParams params =
         new CompletionParams(new TextDocumentIdentifier("id"), new Position(1, 16));
 

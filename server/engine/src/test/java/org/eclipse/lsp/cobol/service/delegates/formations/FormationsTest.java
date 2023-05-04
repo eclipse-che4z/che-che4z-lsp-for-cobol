@@ -43,7 +43,7 @@ class FormationsTest {
 
   @Test
   void WhenCobolDocumentModelNonNull_thenFormatReturnsFormattedString() {
-    CobolDocumentModel model = new CobolDocumentModel("SAMPLE TEXT FOR TEST");
+    CobolDocumentModel model = new CobolDocumentModel("", "SAMPLE TEXT FOR TEST");
     List<TextEdit> response1 = ImmutableList.of(new TextEdit());
     List<TextEdit> response2 = ImmutableList.of(new TextEdit(), new TextEdit());
     when(FORMATION_1.format(anyList())).thenReturn(response1);

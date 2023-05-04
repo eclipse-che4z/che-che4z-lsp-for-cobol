@@ -37,4 +37,6 @@ public interface Communications {
   void registerExecuteCommandCapability(List<String> capabilities, String id);
 
   void unregisterExecuteCommandCapability(String id);
+
+  void logGeneralMessage(MessageType messageType, String errorMessage);
 }

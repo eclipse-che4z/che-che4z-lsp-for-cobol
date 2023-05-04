@@ -45,6 +45,7 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
   private final int startingLevel;
   private final String suffix;
   private int firstCopybookLevel = 0;
+  private final String copybookId;
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat1(VariableParser.DataDescriptionEntryFormat1Context ctx) {
@@ -180,6 +181,7 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
     return Locality.builder()
             .uri(uri)
             .range(range)
+            .copybookId(copybookId)
             .build();
   }
 
@@ -188,6 +190,7 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
             .range(new Range(
                     new Position(terminalNode.getSymbol().getLine(), terminalNode.getSymbol().getCharPositionInLine()),
                     new Position(terminalNode.getSymbol().getLine(), terminalNode.getSymbol().getCharPositionInLine())))
+            .copybookId(copybookId)
             .build();
   }
 
@@ -202,10 +205,6 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
     return extractNameAndLocality(context.cobolWord());
   }
 
-  private VariableNameAndLocality extractNameAndLocality(VariableParser.QualifiedVariableDataNameContext context) {
-    return extractNameAndLocality(context.dataName().get(0).cobolWord());
-  }
-
   private VariableNameAndLocality extractNameAndLocality(VariableParser.CobolWordContext context) {
     String name = VisitorHelper.getName(context);
     String generatedName = name;
@@ -218,7 +217,9 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
         generatedName = name.substring(0, name.length() - 2) + suffix;
       }
     }
-    return new VariableNameAndLocality(generatedName, VisitorHelper.buildNameRangeLocality(context, name, uri));
+    Locality locality =  VisitorHelper.buildNameRangeLocality(context, name, uri);
+    locality.setCopybookId(copybookId);
+    return new VariableNameAndLocality(generatedName, locality);
   }
 
   private List<ValueClause> retrieveValues(List<VariableParser.DataValueClauseContext> clauses) {

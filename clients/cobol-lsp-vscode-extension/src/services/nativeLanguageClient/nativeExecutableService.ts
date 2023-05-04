@@ -13,31 +13,31 @@
  */
 
 import * as os from "os";
-import {LinuxlanguageClient} from "./linuxlanguageClient";
-import {MacosLanguageClient} from "./macosLanguageClient";
-import {NativeLanguageClient} from "./nativelanguageClientInterface";
-import {WindowsLanguageClient} from "./windowsLanguageClient";
+import { LinuxlanguageClient } from "./linuxlanguageClient";
+import { MacosLanguageClient } from "./macosLanguageClient";
+import { NativeLanguageClient } from "./nativelanguageClientInterface";
+import { WindowsLanguageClient } from "./windowsLanguageClient";
 
 export class NativeExecutableService {
-    public constructor(public serverPath: string) {}
+  public constructor(public serverPath: string) {}
 
-    public getNativeLanguageClient() {
-        let client: NativeLanguageClient;
-        switch (os.type()) {
-            case "Windows_NT":
-                client = new WindowsLanguageClient(this.serverPath);
-                break;
-            case "Darwin":
-                client = new MacosLanguageClient(this.serverPath);
-                break;
-            case "Linux":
-                client = new LinuxlanguageClient(this.serverPath);
-                break;
-            default:
-                break;
-        }
-        if (client) {
-            return client.getServer();
-        }
+  public getNativeLanguageClient() {
+    let client: NativeLanguageClient;
+    switch (os.type()) {
+      case "Windows_NT":
+        client = new WindowsLanguageClient(this.serverPath);
+        break;
+      case "Darwin":
+        client = new MacosLanguageClient(this.serverPath);
+        break;
+      case "Linux":
+        client = new LinuxlanguageClient(this.serverPath);
+        break;
+      default:
+        break;
     }
+    if (client) {
+      return client.getServer();
+    }
+  }
 }

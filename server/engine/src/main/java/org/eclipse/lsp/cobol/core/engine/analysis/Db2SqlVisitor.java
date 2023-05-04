@@ -19,7 +19,9 @@ import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -69,10 +71,13 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitDbs_host_name_container(Db2SqlParser.Dbs_host_name_containerContext ctx) {
-    return addTreeNode(
-            ctx,
-            locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality)
-    );
+    if (isVariableUsage(ctx.getParent())) {
+      return addTreeNode(
+          ctx,
+          locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality)
+      );
+    }
+    return ImmutableList.of();
   }
 
   @Override
@@ -98,6 +103,48 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
   @Override
   protected List<Node> aggregateResult(List<Node> aggregate, List<Node> nextResult) {
     return Stream.concat(aggregate.stream(), nextResult.stream()).collect(toList());
+  }
+
+  private boolean isVariableUsage(ParserRuleContext ctx) {
+    if (hasColumn(ctx)) {
+      return true;
+    }
+
+    if (ctx instanceof Db2SqlParser.Dbs_host_names_varContext && !isSpecialName(ctx)) {
+      return true;
+    }
+
+    for (ParseTree child : ctx.children) {
+      if (child instanceof ParserRuleContext) {
+        if (isVariableUsage((ParserRuleContext) child)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private boolean hasColumn(ParserRuleContext ctx) {
+    for (ParseTree child : ctx.children) {
+      if (child instanceof TerminalNode && child.getText().equals(":")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isSpecialName(ParserRuleContext ctx) {
+    if (ctx instanceof Db2SqlParser.Dbs_special_nameContext) {
+      return true;
+    }
+    for (ParseTree child : ctx.children) {
+      if (child instanceof ParserRuleContext) {
+        if (isSpecialName((ParserRuleContext) child)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {

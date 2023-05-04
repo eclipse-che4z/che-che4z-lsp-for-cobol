@@ -67,7 +67,7 @@ class KeywordCompletionTest {
   void testCompletionEmptyResult() {
     assertThat(
         completion.getCompletionItems(
-            "accep", new CobolDocumentModel("", AnalysisResult.builder().build())),
+            "accep", new CobolDocumentModel("", "", AnalysisResult.builder().build())),
         is(createExpected()));
   }
 

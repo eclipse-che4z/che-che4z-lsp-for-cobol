@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -63,16 +62,11 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
     Properties properties = new Properties();
     List<String> resourceName = toSuspectedBundleNames(locale);
     Collections.reverse(resourceName);
-    URI workingFolder = new File(dialectRegistryItem.getPath()).getAbsoluteFile().toURI();
-    LOG.debug("working URI for dialect resource :" + workingFolder);
+    LOG.debug("URI for dialect jar:" + dialectRegistryItem.getUri());
     InputStream validResources =
-        getDialectResources(resourceName, workingFolder, getJarName(dialectRegistryItem.getName()));
+        getDialectResources(resourceName, dialectRegistryItem.getUri());
     properties.load(validResources);
     return properties;
-  }
-
-  private String getJarName(String dialectName) {
-    return "dialect-" + dialectName + ".jar";
   }
 
   /**
@@ -80,20 +74,19 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
    * dialect
    *
    * @param resourceName Ordered list of resources to search based on locale
-   * @param workingFolder URI for dialect jar
-   * @param jarName dialect jar name
+   * @param jarUri dialect jar URI
    * @return an {@link InputStream} for found resource
    * @throws IOException when no resource is found or jar not found
    */
   @VisibleForTesting
   public InputStream getDialectResources(
-      List<String> resourceName, URI workingFolder, String jarName) throws IOException {
+      List<String> resourceName, URI jarUri) throws IOException {
     for (String s : resourceName) {
-      URL url = new URL("jar:" + workingFolder + "/" + jarName + "!/" + s);
+      URL url = new URL(jarUri.toURL() + "!/" + s);
       if (jarUrlExists(url)) {
         return url.openStream();
       } else {
-        LOG.debug("Resource Bundle " + s + " not available at " + jarName);
+        LOG.debug("Resource Bundle " + s + " not available at " + jarUri);
       }
     }
     return IOUtils.toInputStream("", StandardCharsets.UTF_8);

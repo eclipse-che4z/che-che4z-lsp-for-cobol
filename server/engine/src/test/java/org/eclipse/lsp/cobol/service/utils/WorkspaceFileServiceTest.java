@@ -90,7 +90,7 @@ class WorkspaceFileServiceTest {
         Arguments.of(
             pathPrefix() + "workspace/POSITIVE_TESTS/",
             uriPrefix() + "workspace/POSITIVE_TESTS/",
-            0),
+            1),
         Arguments.of(
             pathPrefix() + "workspace/POSITIVE_TESTS/*",
             uriPrefix() + "workspace/POSITIVE_TESTS/",

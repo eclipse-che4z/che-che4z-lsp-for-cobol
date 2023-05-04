@@ -16,7 +16,6 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultimap;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
@@ -34,9 +33,9 @@ import org.eclipse.lsp.cobol.common.AnalysisResult;
 class MockCompletionModel {
   static final AnalysisResult RESULT =
       AnalysisResult.builder()
-          .rootNode(new RootNode(Locality.builder().build(), ImmutableMultimap.of()))
+          .rootNode(new RootNode())
           .build();
-  static final CobolDocumentModel MODEL = new CobolDocumentModel("some text", RESULT);
+  static final CobolDocumentModel MODEL = new CobolDocumentModel("", "some text", RESULT);
   static final SymbolAccumulatorService SYMBOL_SERVICE = new SymbolAccumulatorService();
   static final SymbolsRepository REPO = new SymbolsRepository();
 
@@ -66,12 +65,12 @@ class MockCompletionModel {
               SYMBOL_SERVICE.registerSectionNameNode(programNode, nameNode);
             });
 
-    RootNode rootNode = new RootNode(Locality.builder().build(), ImmutableMultimap.of());
+    RootNode rootNode = new RootNode();
     RESULT.getRootNode().addChild(rootNode);
     ImmutableList.of("cpyU1", "CpyU2", "Not-cpyU")
         .forEach(
             name -> {
-              CopyNode nameNode = new CopyNode(Locality.builder().build(), name);
+              CopyNode nameNode = new CopyNode(Locality.builder().build(), Locality.builder().build().toLocation(), name, "uri");
               rootNode.addChild(nameNode);
             });
       REPO.updateSymbols(SYMBOL_SERVICE.getProgramSymbols());

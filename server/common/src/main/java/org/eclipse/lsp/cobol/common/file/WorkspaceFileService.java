@@ -31,7 +31,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -118,21 +120,17 @@ public class WorkspaceFileService implements FileSystemService {
         path).split("\\*", 2);
     final String pathToResolve = pathSplittedByFirstAsterisk[0];
     final boolean isPathContainsAsterisk = pathSplittedByFirstAsterisk.length >= 2;
-    int maxDepth = 0;
+    int maxDepth = 1;
     if (isPathContainsAsterisk) {
       maxDepth = pathSplittedByFirstAsterisk[1].split("/").length + 1;
     }
 
-    try (Stream<Path> streamPath = Files.find(
-        Paths.get(pathToResolve),
-        maxDepth,
-        (a, c) -> {
-          final String uriPath = a.toUri().getPath().replaceAll("\\\\", "/");
-          return !isPathContainsAsterisk || Pattern.compile(pathSplittedByFirstAsterisk[1])
-              .matcher(uriPath).find();
-        })) {
-      return
-          streamPath
+    BiPredicate<Path, BasicFileAttributes> pathBasicFileAttributesBiPredicate = (a, c) -> {
+      final String uriPath = a.toUri().getPath().replace("\\\\", "/");
+      return !isPathContainsAsterisk || Pattern.compile(pathSplittedByFirstAsterisk[1]).matcher(uriPath).find();
+    };
+    try (Stream<Path> streamPath = Files.find(Paths.get(pathToResolve), maxDepth, pathBasicFileAttributesBiPredicate)) {
+      return streamPath
               .map(Path::toFile)
               .filter(File::isFile)
               .map(File::getName)

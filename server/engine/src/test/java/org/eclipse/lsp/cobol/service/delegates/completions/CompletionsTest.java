@@ -40,7 +40,7 @@ class CompletionsTest {
                     new ParagraphCompletion(REPO)));
     CompletionList actual =
         completions.collectFor(
-            new CobolDocumentModel("Lorem ipsum dolor c amet", RESULT),
+            new CobolDocumentModel("", "Lorem ipsum dolor c amet", RESULT),
             new CompletionParams(
                 new TextDocumentIdentifier(""), new Position(0, 19))); // The position of 'c;
     assertThat(actual.getItems(), Matchers.containsInAnyOrder(createExpected()));

@@ -22,7 +22,6 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.variables.FileDescriptionNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 
 import static org.eclipse.lsp.cobol.common.VariableConstants.FD_WITHOUT_FILE_CONTROL;
 
@@ -42,7 +41,7 @@ public class FileDescriptionProcess implements Processor<FileDescriptionNode> {
               MessageTemplate.of(FD_WITHOUT_FILE_CONTROL, node.getName()), ErrorSeverity.ERROR);
       ctx.getErrors().add(error);
     }
-    ctx.getErrors().addAll(VariableDefinitionUtil.processNodeWithVariableDefinitions(node));
+    ctx.getErrors().addAll(SectionNodeProcessorHelper.processNodeWithVariableDefinitions(node));
     symbolAccumulatorService.registerVariablesInProgram(node);
   }
 }

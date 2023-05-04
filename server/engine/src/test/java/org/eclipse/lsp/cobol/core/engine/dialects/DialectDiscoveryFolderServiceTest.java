@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.communications.ServerCommunications;
 import org.junit.jupiter.api.Test;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
@@ -78,7 +79,7 @@ class DialectDiscoveryFolderServiceTest {
     when(workingFolderService.getFilenames(any())).thenReturn(ImmutableList.of("dialect-test.jar"));
 
     DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
-    List<CobolDialect> dialectList = service.loadDialects("path", mock(CopybookService.class), mock(MessageService.class));
+    List<CobolDialect> dialectList = service.loadDialects(URI.create(""), mock(CopybookService.class), mock(MessageService.class));
     assertEquals(0, dialectList.size());
   }
 
