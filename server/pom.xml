@@ -13,7 +13,7 @@
         <module>common</module>
         <module>dialect-idms</module>
         <module>dialect-daco</module>
-<!--        <module>dialect-cobol-check</module>-->
+        <module>dialect-cobol-check</module>
         <module>test</module>
     </modules>
 
