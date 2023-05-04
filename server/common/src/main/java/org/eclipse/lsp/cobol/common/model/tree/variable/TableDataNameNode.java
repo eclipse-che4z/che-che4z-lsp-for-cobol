@@ -40,6 +40,35 @@ public class TableDataNameNode extends ElementaryNode {
       int occursTimes,
       UsageFormat usageFormat,
       boolean isBlankWhenZeroPresent,
+      boolean isSignClausePresent) {
+    this(
+        location,
+        level,
+        name,
+        redefines,
+        global,
+        picClause,
+        value,
+        occursTimes,
+        usageFormat,
+        isBlankWhenZeroPresent,
+        isSignClausePresent,
+        false,
+        false,
+        false);
+  }
+
+  public TableDataNameNode(
+      Locality location,
+      int level,
+      String name,
+      boolean redefines,
+      boolean global,
+      String picClause,
+      String value,
+      int occursTimes,
+      UsageFormat usageFormat,
+      boolean isBlankWhenZeroPresent,
       boolean isSignClausePresent,
       boolean isDynamicLength,
       boolean isJustified,
@@ -53,7 +82,10 @@ public class TableDataNameNode extends ElementaryNode {
         global,
         isBlankWhenZeroPresent,
         isSignClausePresent,
-            isDynamicLength, isJustified, isUnBounded, picClause,
+        isDynamicLength,
+        isJustified,
+        isUnBounded,
+        picClause,
         usageFormat);
     this.value = value;
     this.occursTimes = occursTimes;
@@ -64,7 +96,8 @@ public class TableDataNameNode extends ElementaryNode {
     StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
     stringBuilder.append(String.format(" OCCURS %1$d TIMES", occursTimes));
     if (picClause != null) stringBuilder.append(" PIC ").append(picClause);
-    if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat.toDisplayString());
+    if (usageFormat != UsageFormat.UNDEFINED)
+      stringBuilder.append(" USAGE ").append(usageFormat.toDisplayString());
     if (StringUtils.isNoneBlank(value)) stringBuilder.append(" VALUE ").append(value);
     return stringBuilder.append(".").toString();
   }

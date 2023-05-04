@@ -38,7 +38,7 @@ class GeneratorHelper {
         .uri(ImplicitCodeUtils.createFullUrl("daco-implicit-code"))
         .build();
     return new ElementaryItemNode(locality, level, name, false, picClause, value,
-        usageFormat, false, false, false, false, false, false);
+        usageFormat, false, false, false);
   }
 
 }

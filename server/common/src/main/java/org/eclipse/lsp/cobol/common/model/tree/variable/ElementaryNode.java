@@ -41,23 +41,49 @@ public abstract class ElementaryNode extends VariableWithLevelNode
   private final boolean isUnBounded;
   EffectiveDataType effectiveDataType;
   String picClause;
-  @Getter
-  UsageFormat usageFormat;
+  @Getter UsageFormat usageFormat;
 
   protected ElementaryNode(
-          Locality location,
-          int level,
-          String name,
-          boolean redefines,
-          VariableType variableType,
-          boolean global,
-          boolean isBlankWhenZeroPresent,
-          boolean isSignClausePresent,
-          boolean isDynamicLength,
-          boolean isJustified,
-          boolean isUnBounded,
-          String picClause,
-          UsageFormat usageFormat) {
+      Locality location,
+      int level,
+      String name,
+      boolean redefines,
+      VariableType variableType,
+      boolean global,
+      boolean isBlankWhenZeroPresent,
+      boolean isSignClausePresent,
+      String picClause,
+      UsageFormat usageFormat) {
+    this(
+        location,
+        level,
+        name,
+        redefines,
+        variableType,
+        global,
+        isBlankWhenZeroPresent,
+        isSignClausePresent,
+        false,
+        false,
+        false,
+        picClause,
+        usageFormat);
+  }
+
+  protected ElementaryNode(
+      Locality location,
+      int level,
+      String name,
+      boolean redefines,
+      VariableType variableType,
+      boolean global,
+      boolean isBlankWhenZeroPresent,
+      boolean isSignClausePresent,
+      boolean isDynamicLength,
+      boolean isJustified,
+      boolean isUnBounded,
+      String picClause,
+      UsageFormat usageFormat) {
     super(location, level, name, redefines, variableType, global);
     this.isBlankWhenZeroPresent = isBlankWhenZeroPresent;
     this.isSignClausePresent = isSignClausePresent;
@@ -66,10 +92,10 @@ public abstract class ElementaryNode extends VariableWithLevelNode
     this.isUnBounded = isUnBounded;
     this.picClause = picClause;
     this.usageFormat = usageFormat;
-    this.effectiveDataType = Arrays.stream(EffectiveDataType.values())
+    this.effectiveDataType =
+        Arrays.stream(EffectiveDataType.values())
             .filter(type -> type.checkDataType(this))
             .findFirst()
             .orElse(UNDETERMINED);
   }
-
 }

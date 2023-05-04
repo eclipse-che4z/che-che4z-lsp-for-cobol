@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ElementaryNodeTest {
   ElementaryItemNode getNode(String picClause, UsageFormat usageClause) {
     return new ElementaryItemNode(
-        Locality.builder().build(), 2, "TEST-NODE", false, picClause, "", usageClause, false, false, false, false, false, false);
+        Locality.builder().build(), 2, "TEST-NODE", false, picClause, "", usageClause, false, false, false);
   }
 
   @Test
@@ -95,7 +95,7 @@ class ElementaryNodeTest {
   void testValidatePicAndUsageClauseWhenUsageInCompatibleWithOtherClauses() {
     ElementaryItemNode elementNode =
         new ElementaryItemNode(
-            Locality.builder().build(), 2, "TEST-NODE", false, "PIC X", "", UsageFormat.UTF_8, false, true, false, false, false, false);
+            Locality.builder().build(), 2, "TEST-NODE", false, "PIC X", "", UsageFormat.UTF_8, false, true, false);
     ArrayList<SyntaxError> errors = new ArrayList<>();
     ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
     AstProcessor astProcessor = new AstProcessor();
