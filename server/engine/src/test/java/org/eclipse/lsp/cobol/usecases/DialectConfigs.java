@@ -47,7 +47,7 @@ public class DialectConfigs {
     return new AnalysisConfig(
             new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
             ImmutableList.of(),
-            ImmutableList.of("DaCo"), true,
+            ImmutableList.of("DaCo", "IDMS"), true,
             ImmutableList.of(),
         ImmutableMap.of("daco.predefined-sections", new Gson().toJsonTree(list)));
   }
