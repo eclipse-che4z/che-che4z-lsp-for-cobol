@@ -14,20 +14,25 @@
 
 import * as assert from "assert";
 import * as helper from "./testHelper";
+import { pos } from "./testHelper";
 import * as vscode from "vscode";
 
 const TEST_TIMEOUT = 30000;
 const WORKSPACE_FILE = "USER1.cbl";
 
-suite.skip("Tests with USER1.cbl", async () => {
+suite("Tests with USER1.cbl", function () {
   let editor: vscode.TextEditor;
   suiteSetup(async function () {
     this.timeout(TEST_TIMEOUT);
     this.slow(2000);
-    await helper.showDocument(WORKSPACE_FILE);
     helper.updateConfig("basic.json");
-    editor = helper.get_editor(WORKSPACE_FILE);
     await helper.activate();
+  });
+
+  this.afterEach(async () => await helper.closeAllEditors());
+  this.beforeEach(async () => {
+    await helper.showDocument(WORKSPACE_FILE);
+    editor = helper.get_editor(WORKSPACE_FILE);
   });
 
   // open 'open' file, should be recognized as COBOL
@@ -38,7 +43,7 @@ suite.skip("Tests with USER1.cbl", async () => {
   });
 
   test("TC152046: Nominal - check syntax Ok message", async () => {
-    await helper.waitFor(() => vscode.window.activeTextEditor !== undefined);
+    await helper.waitFor(() => editor.document.languageId === "cobol");
     const diagnostics = vscode.languages.getDiagnostics(
       vscode.window.activeTextEditor.document.uri,
     );
@@ -51,7 +56,7 @@ suite.skip("Tests with USER1.cbl", async () => {
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeDefinitionProvider",
       editor.document.uri,
-      new vscode.Position(28, 24),
+      pos(28, 24),
     );
     assert.ok(
       result.length === 1 &&
@@ -66,7 +71,7 @@ suite.skip("Tests with USER1.cbl", async () => {
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeReferenceProvider",
       editor.document.uri,
-      new vscode.Position(20, 15),
+      pos(20, 15),
     );
     assert.ok(
       result.length === 3 &&
@@ -82,7 +87,7 @@ suite.skip("Tests with USER1.cbl", async () => {
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeReferenceProvider",
       editor.document.uri,
-      new vscode.Position(20, 10),
+      pos(20, 10),
     );
     assert.ok(
       result.length === 3 &&
@@ -95,7 +100,7 @@ suite.skip("Tests with USER1.cbl", async () => {
   });
   // TODO: Check if this test is still valid?
   test.skip("TC152054 Auto format of right trailing spaces", async () => {
-    await helper.insertString(editor, new vscode.Position(34, 57), "        ");
+    await helper.insertString(editor, pos(34, 57), "        ");
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeFormatDocumentProvider",
       editor.document.uri,
@@ -103,10 +108,7 @@ suite.skip("Tests with USER1.cbl", async () => {
     );
     helper.assertRangeIsEqual(
       result[0].range,
-      new vscode.Range(
-        new vscode.Position(34, 57),
-        new vscode.Position(34, 65),
-      ),
+      new vscode.Range(pos(34, 57), pos(34, 65)),
     );
     assert.strictEqual(result[0].newText, "");
   });

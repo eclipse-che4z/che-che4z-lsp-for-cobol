@@ -57,13 +57,17 @@ export async function showDocument(workspace_file: string) {
 
 export async function closeActiveEditor() {
   await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-  await sleep(500);
+  await sleep(100);
 }
 
 export async function closeAllEditors() {
-  while (vscode.window.activeTextEditor !== undefined) {
-    closeActiveEditor();
-  }
+  await waitFor(async () => {
+    if (vscode.window.activeTextEditor === undefined) {
+      return true;
+    }
+    await closeActiveEditor();
+    return vscode.window.activeTextEditor === undefined;
+  });
 }
 
 export function moveCursor(
@@ -110,11 +114,12 @@ export async function insertString(
 }
 
 export async function waitFor(
-  doneFunc: () => boolean,
+  doneFunc: () => boolean | Promise<boolean>,
   timeout: number = 50000,
 ) {
   const startTime = Date.now();
-  while (!doneFunc()) {
+
+  while (!(await Promise.resolve(doneFunc()))) {
     await sleep(100);
     if (Date.now() - startTime > timeout) {
       break;
@@ -126,6 +131,13 @@ export function sleep(ms: number): Promise<unknown> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+export function pos(line: number, character: number): vscode.Position {
+  return new vscode.Position(line, character);
+}
+export function range(p0: vscode.Position, p1: vscode.Position): vscode.Range {
+  return new vscode.Range(p0, p1);
 }
 
 export function updateConfig(configFileName: string) {
