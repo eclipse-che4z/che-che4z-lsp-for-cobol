@@ -22,30 +22,10 @@ suite("Test snippets with different dialects settings", () => {
     await helper.activate();
   });
 
-  test
-    .only("Autocompletion with IDMS dialect", async () => {
-      await helper.showDocument("SNIPPET.cbl");
-      const editor = helper.get_editor("SNIPPET.cbl");
-      await helper.waitFor(() => editor.document.languageId === "cobol");
-      await helper.insertString(editor, new vscode.Position(1, 0), "   COPY");
-      await vscode.commands.executeCommand(
-        "editor.action.triggerSuggest",
-        editor.document.uri,
-      );
-      await helper.executeCommandMultipleTimes("selectNextSuggestion", 1);
-      await vscode.commands.executeCommand("acceptSelectedSuggestion");
-      const text = editor.document.getText();
-      assert.ok(text, "   COPY IDMS idms-entity.");
-      console.log("we are here!");
-      await helper.sleep(1000);
-      await helper.closeActiveEditor();
-    })
-    .timeout(helper.TEST_TIMEOUT);
-
   test("Autocompletion basic dialect", async () => {
+    helper.updateConfig("basic.json");
     await helper.showDocument("SNIPPET.cbl");
     const editor = helper.get_editor("SNIPPET.cbl");
-    helper.updateConfig("basic.json");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     await helper.insertString(editor, new vscode.Position(2, 0), "   COPY");
     await vscode.commands.executeCommand(
@@ -55,8 +35,27 @@ suite("Test snippets with different dialects settings", () => {
     await helper.sleep(1000);
     await helper.executeCommandMultipleTimes("selectNextSuggestion", 1);
     await vscode.commands.executeCommand("acceptSelectedSuggestion");
+    await helper.waitFor(() => editor.document.getText().length > 0);
     const text = editor.document.getText();
     assert.strictEqual(text, "   COPY");
+    await helper.closeActiveEditor();
+  }).timeout(helper.TEST_TIMEOUT);
+
+  test("Autocompletion with IDMS dialect", async () => {
+    await helper.showDocument("SNIPPET_IDMS.cbl");
+    const editor = helper.get_editor("SNIPPET_IDMS.cbl");
+    await helper.waitFor(() => editor.document.languageId === "cobol");
+    await helper.insertString(editor, new vscode.Position(1, 0), "   COPY");
+    await vscode.commands.executeCommand(
+      "editor.action.triggerSuggest",
+      editor.document.uri,
+    );
+    await helper.executeCommandMultipleTimes("selectNextSuggestion", 1);
+    await vscode.commands.executeCommand("acceptSelectedSuggestion");
+    await helper.waitFor(() => editor.document.getText().length > 0);
+    const text = editor.document.getText();
+    assert.ok(text, "   COPY IDMS idms-entity.");
+    await helper.sleep(1000);
     await helper.closeActiveEditor();
   }).timeout(helper.TEST_TIMEOUT);
 
