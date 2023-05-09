@@ -98,8 +98,8 @@ suite("Tests with USER1.cbl", function () {
       "Checks that LSP can find all references and navigate by them",
     );
   });
-  // TODO: Check if this test is still valid?
-  test.skip("TC152054 Auto format of right trailing spaces", async () => {
+
+  test("TC152054 Auto format of right trailing spaces", async () => {
     await helper.insertString(editor, pos(34, 57), "        ");
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeFormatDocumentProvider",

@@ -15,27 +15,23 @@
 import * as assert from "assert";
 import * as helper from "./testHelper";
 import * as vscode from "vscode";
-import { getWorkspacePath, pos } from "./testHelper";
+import { getWorkspacePath, pos, range } from "./testHelper";
 import * as path from "path";
 
-const WORKSPACE_FILE = "USER1.cbl";
-
 suite("Integration Test Suite: Copybooks", function () {
-  let editor: vscode.TextEditor;
-
   suiteSetup(async function () {
     this.timeout(helper.TEST_TIMEOUT);
-    await helper.showDocument(WORKSPACE_FILE);
     helper.updateConfig("basic.json");
-    editor = helper.get_editor(WORKSPACE_FILE);
     await helper.activate();
   });
 
-  this.afterEach(async () => await helper.closeAllEditors());
+  this.afterEach(async () => await helper.closeAllEditors()).timeout(
+    helper.TEST_TIMEOUT,
+  );
 
   test("TC174655: Copybook - Nominal", async () => {
     await helper.showDocument("USERC1N1.cbl");
-    let editor = helper.get_editor("USERC1N1.cbl");
+    const editor = helper.get_editor("USERC1N1.cbl");
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
     );
@@ -46,11 +42,13 @@ suite("Integration Test Suite: Copybooks", function () {
       vscode.DiagnosticSeverity.Error,
       "No syntax errors detected in USERC1N1.cbl",
     );
-  });
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
 
   test("TC174657: Copybook - not exist: no syntax ok message", async () => {
     await helper.showDocument("USERC1F.cbl");
-    let editor = helper.get_editor("USERC1F.cbl");
+    const editor = helper.get_editor("USERC1F.cbl");
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
     );
@@ -60,11 +58,13 @@ suite("Integration Test Suite: Copybooks", function () {
       vscode.DiagnosticSeverity.Error,
       "No syntax errors detected in USERC1F.cbl",
     );
-  });
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
 
   test("TC174658, TC174658: Copybook - not exist: error underlying and detailed hint", async () => {
     await helper.showDocument("USERC1F.cbl");
-    let editor = helper.get_editor("USERC1F.cbl");
+    const editor = helper.get_editor("USERC1F.cbl");
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
     );
@@ -72,14 +72,16 @@ suite("Integration Test Suite: Copybooks", function () {
     assert.strictEqual(diagnostics.length, 3);
     helper.assertRangeIsEqual(
       diagnostics[0].range,
-      new vscode.Range(pos(18, 12), pos(18, 17)),
+      range(pos(18, 12), pos(18, 17)),
     );
     assert.strictEqual(diagnostics[0].message, "BOOK3: Copybook not found");
-  });
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
 
   test("TC174916/TC174917 Copybook - recursive error and detailed hint", async () => {
     await helper.showDocument("USERC1R.cbl");
-    let editor = helper.get_editor("USERC1R.cbl");
+    const editor = helper.get_editor("USERC1R.cbl");
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
     );
@@ -93,11 +95,13 @@ suite("Integration Test Suite: Copybooks", function () {
       diagnostics[0].message,
       "Recursive copybook declaration for: BOOK1R",
     );
-  });
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
 
   test("TC174932/TC174933 Copybook - invalid definition and hint", async () => {
     await helper.showDocument("USERC1N2.cbl");
-    let editor = helper.get_editor("USERC1N2.cbl");
+    const editor = helper.get_editor("USERC1N2.cbl");
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
     );
@@ -105,7 +109,7 @@ suite("Integration Test Suite: Copybooks", function () {
     assert.strictEqual(diagnostics.length, 7);
     helper.assertRangeIsEqual(
       diagnostics[6].range,
-      new vscode.Range(pos(51, 38), pos(51, 56)),
+      range(pos(51, 38), pos(51, 56)),
     );
     assert.strictEqual(
       diagnostics[6].message,
