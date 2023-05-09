@@ -16,15 +16,14 @@ package org.eclipse.lsp.cobol.service.settings;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -35,6 +34,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * Config helper class
  */
+@Slf4j
 @UtilityClass
 public class ConfigHelper {
 
@@ -59,14 +59,34 @@ public class ConfigHelper {
    */
   public List<DialectRegistryItem> parseDialectRegistry(JsonArray jsonArray) {
     return Streams.stream(jsonArray)
-            .map(JsonElement::getAsJsonObject)
-            .filter(Objects::nonNull)
-            .map(o -> new DialectRegistryItem(
-                    o.get("name").getAsString(),
-                    o.get("path").getAsString(),
-                    o.get("description").getAsString(),
-                    o.get("extensionId").getAsString())
-            ).collect(toList());
+        .map(JsonElement::getAsJsonObject)
+        .filter(Objects::nonNull)
+        .map(o -> {
+              URI uri;
+              try {
+                JsonObject jsonUri = o.get("uri").getAsJsonObject();
+                String path = getAsString(jsonUri, "path");
+                String scheme = getAsString(jsonUri, "scheme");
+                String host = getAsString(jsonUri, "host");
+                String fragment = getAsString(jsonUri, "fragment");
+                uri = new URI(scheme, host, path, fragment);
+              } catch (Exception e) {
+                LOG.warn("Cannot parse dialect registry item {}", o, e);
+                return null;
+              }
+              return new DialectRegistryItem(
+                  o.get("name").getAsString(),
+                  uri,
+                  o.get("description").getAsString(),
+                  o.get("extensionId").getAsString());
+            }
+        )
+        .filter(Objects::nonNull)
+        .collect(toList());
+  }
+
+  private String getAsString(JsonObject json, String field) {
+    return Optional.ofNullable(json.get(field)).map(JsonElement::getAsString).orElse(null);
   }
 
   /**

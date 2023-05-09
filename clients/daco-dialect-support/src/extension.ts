@@ -27,7 +27,7 @@ export async function activate(context: vscode.ExtensionContext) {
     extensionUri,
     "server",
     "jar",
-    /* TODO: "dialect-daco.jar" */
+    "dialect-daco.jar"
   );
   unregisterDialect = await registerDialect(extensionId, {
     apiVersion: 1,

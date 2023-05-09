@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -35,7 +36,7 @@ public class ExplicitDialectDiscoveryService implements DialectDiscoveryService 
   }
 
   @Override
-  public List<CobolDialect> loadDialects(String path, CopybookService copybookService, MessageService messageService) {
+  public List<CobolDialect> loadDialects(URI uri, CopybookService copybookService, MessageService messageService) {
     return ImmutableList.of();
   }
 

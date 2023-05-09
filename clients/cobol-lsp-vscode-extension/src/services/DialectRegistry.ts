@@ -12,6 +12,8 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import { Uri } from "vscode";
+
 export const DIALECT_REGISTRY_SECTION: string = "cobol-lsp.dialect.registry";
 
 /**
@@ -19,7 +21,7 @@ export const DIALECT_REGISTRY_SECTION: string = "cobol-lsp.dialect.registry";
  */
 export type DialectInfo = {
   name: string;
-  path: string;
+  uri: Uri;
   description: string;
   extensionId: string;
   snippetPath: string;
@@ -57,13 +59,13 @@ export class DialectRegistry {
   public static register(
     extensionId: string,
     name: string,
-    path: string,
+    uri: Uri,
     description: string,
     snippetPath: string,
   ) {
     const dialectInfo: DialectInfo = {
       name: name,
-      path: path,
+      uri: uri,
       description: description,
       extensionId: extensionId,
       snippetPath: snippetPath,

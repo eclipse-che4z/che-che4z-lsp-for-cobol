@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.service.settings.ConfigHelper;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -41,7 +42,7 @@ import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIAL
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECT_REGISTRY;
 
 /**
- * This class is an properties file implementation of {@link MessageService} . It loads messages
+ * This class is a properties file implementation of {@link MessageService} . It loads messages
  * from a properties file into memory to be used latter on for logging or messaging.
  */
 @Singleton
@@ -141,9 +142,13 @@ public class PropertiesMessageService implements MessageService {
     updateResourceBundle(
         new DialectRegistryItem(
             dialect,
-            this.workingFolderService.getWorkingFolder().getPath(),
+            createImplicitDialectUri(dialect),
             "implicit found dialects",
             "implicit-dialects"));
+  }
+
+  private URI createImplicitDialectUri(String dialect) {
+    return URI.create(this.workingFolderService.getWorkingFolder() + "dialect-" + dialect + ".jar");
   }
 
   private void updateResourceBundle(DialectRegistryItem dialectRegistryItem) {
@@ -152,7 +157,7 @@ public class PropertiesMessageService implements MessageService {
           "update resource for - "
               + dialectRegistryItem.getName()
               + " ,"
-              + dialectRegistryItem.getPath());
+              + dialectRegistryItem.getUri());
       this.resourceBundle.updateMessageResourceBundle(dialectRegistryItem);
     } catch (IOException e) {
       LOG.error("Issue while loading resource bundle for " + dialectRegistryItem.getName());

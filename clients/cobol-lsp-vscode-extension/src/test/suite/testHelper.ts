@@ -109,9 +109,16 @@ export async function insertString(
   return movePosition;
 }
 
-export async function waitFor(doneFunc: () => boolean) {
+export async function waitFor(
+  doneFunc: () => boolean,
+  timeout: number = 50000,
+) {
+  const startTime = Date.now();
   while (!doneFunc()) {
     await sleep(100);
+    if (Date.now() - startTime > timeout) {
+      break;
+    }
   }
 }
 

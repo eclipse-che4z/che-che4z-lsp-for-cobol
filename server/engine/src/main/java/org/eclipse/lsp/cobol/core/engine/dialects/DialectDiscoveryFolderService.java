@@ -32,12 +32,9 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-
 
 /**
  * Discover cobol jar files with dialects
@@ -67,7 +64,7 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
   public List<CobolDialect> loadDialects(CopybookService copybookService, MessageService messageService) {
     try {
       URI workdir = workingFolderService.getWorkingFolder();
-      return loadDialects(workdir, copybookService, messageService);
+      return loadDialectFromWorkingFolder(workdir, copybookService, messageService);
     } catch (Exception e) {
       warningCannotLoadDialects(e.getMessage());
     }
@@ -76,29 +73,27 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
 
   /**
    * Load cobol dialects from the given path
-   * @param path is a path to the dialect
+   * @param uri is a URI to the dialect's jar file
    * @param copybookService a copybook service
    * @param messageService a message service
    * @return a list of loaded dialects
    */
   @Override
-  public List<CobolDialect> loadDialects(String path, CopybookService copybookService, MessageService messageService) {
+  public List<CobolDialect> loadDialects(URI uri, CopybookService copybookService, MessageService messageService) {
     try {
-      URI workdir = workingFolderService.getWorkingFolder(path);
-      return loadDialects(workdir, copybookService, messageService);
+      return createDialectsFromJar(uri, copybookService, messageService);
     } catch (Exception e) {
       warningCannotLoadDialects(e.getMessage());
     }
     return ImmutableList.of();
   }
 
-  private List<CobolDialect> loadDialects(URI workdir, CopybookService copybookService, MessageService messageService) {
+  private List<CobolDialect> loadDialectFromWorkingFolder(URI workdir, CopybookService copybookService, MessageService messageService) {
     try {
       return workingFolderService.getFilenames(workdir).stream()
           .filter(filename -> filename.startsWith("dialect-"))
           .filter(filename -> filename.endsWith(".jar"))
-          .map(filename -> createDialect(workdir, filename, copybookService, messageService))
-          .filter(Objects::nonNull)
+          .flatMap(filename -> createDialects(workdir, filename, copybookService, messageService).stream())
           .collect(Collectors.toList());
     } catch (Exception e) {
       warningCannotLoadDialects(e.getMessage());
@@ -110,30 +105,47 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
     LOG.warn("Cannot load dialects: {}", message);
   }
 
-  private CobolDialect createDialect(URI currentUri, String filename, CopybookService copybookService, MessageService messageService) {
+  private List<CobolDialect> createDialects(URI currentUri, String filename, CopybookService copybookService, MessageService messageService) {
+    URI uri;
     try {
-      URLClassLoader classLoader = createClassLoader(currentUri + filename);
-      classLoaderHolder.add(classLoader);
-
-      String classname = getClassNames(currentUri.getPath() + filename).stream()
-          .filter(c -> !c.equals(CobolDialect.class.getName()))
-          .filter(c -> c.endsWith("Dialect"))
-          .findFirst()
-          .orElseThrow(() -> new Exception("Cannot find dialect class in the jar file " + filename));
-
-      Class<CobolDialect> clazz = (Class<CobolDialect>) Class.forName(classname, true, classLoader);
-      Constructor<CobolDialect> constructor = clazz.getConstructor(CopybookService.class, MessageService.class);
-      return constructor.newInstance(copybookService, messageService);
-    } catch (Exception e) {
-      LOG.warn("Cannot create dialect {}: {}", filename, e.getMessage());
+      uri = new URI(currentUri + filename);
+    } catch (URISyntaxException e) {
+      LOG.warn("Cannot create dialect {}: {}", currentUri + filename, e.getMessage());
+      return ImmutableList.of();
     }
-    return null;
+    return createDialectsFromJar(uri, copybookService, messageService);
   }
 
-  private URLClassLoader createClassLoader(String pathToJar) throws URISyntaxException, MalformedURLException {
+  private List<CobolDialect> createDialectsFromJar(URI jarUri, CopybookService copybookService, MessageService messageService) {
+    List<CobolDialect> dialects = new LinkedList<>();
+    try {
+      URLClassLoader classLoader = createClassLoader(jarUri);
+      classLoaderHolder.add(classLoader);
+
+      List<String> classnames = getClassNames(jarUri.getPath()).stream()
+          .filter(c -> !c.equals(CobolDialect.class.getName()))
+          .filter(c -> c.endsWith("Dialect"))
+          .collect(Collectors.toList());
+
+      if (classnames.isEmpty()) {
+        throw new Exception("Cannot find dialect class in the jar file " + jarUri);
+      }
+
+      for (String classname : classnames) {
+        Class<CobolDialect> clazz = (Class<CobolDialect>) Class.forName(classname, true, classLoader);
+        Constructor<CobolDialect> constructor = clazz.getConstructor(CopybookService.class, MessageService.class);
+        dialects.add(constructor.newInstance(copybookService, messageService));
+      }
+    } catch (Exception e) {
+      LOG.warn("Cannot create dialect {}: {}", jarUri, e.getMessage());
+    }
+    return dialects;
+  }
+
+  private URLClassLoader createClassLoader(URI uriToJar) throws MalformedURLException {
     return new URLClassLoader(
         new URL[] {
-            new URI(pathToJar).toURL()
+            uriToJar.toURL()
         },
         this.getClass().getClassLoader()
     );
