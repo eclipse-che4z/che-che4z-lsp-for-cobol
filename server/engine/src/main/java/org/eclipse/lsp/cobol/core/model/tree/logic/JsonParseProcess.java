@@ -87,6 +87,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
     List<VariableNode> foundDefinitionsForIdentifier5 = getIdentifierDefinitions(jsonParseNode, identifier5Nodes);
 
     List<VariableUsageNode> conditionNames = getIdentifier(jsonParseNode, jsonParseNode.getConditionName());
+    if (conditionNames.isEmpty()) return;
     List<VariableNode> conditionDefinition = getIdentifierDefinitions(jsonParseNode, conditionNames);
 
     if (foundDefinitionsForIdentifier5.isEmpty() || conditionDefinition.isEmpty()) return;
@@ -139,10 +140,9 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
       JsonParseNode jsonParseNode,
       ProcessingContext ctx,
       List<VariableNode> identifier1Definitions) {
-    List<VariableUsageNode> identifier2Nodes =
-        getIdentifier(jsonParseNode, jsonParseNode.getIdentifier2());
-    List<VariableNode> foundDefinitionsForIdentifier2 =
-        getIdentifierDefinitions(jsonParseNode, identifier2Nodes);
+    List<VariableUsageNode> identifier2Nodes = getIdentifier(jsonParseNode, jsonParseNode.getIdentifier2());
+    if (identifier2Nodes.isEmpty()) return;
+    List<VariableNode> foundDefinitionsForIdentifier2 = getIdentifierDefinitions(jsonParseNode, identifier2Nodes);
     if (foundDefinitionsForIdentifier2.isEmpty()) return;
     checkValidDefinition(jsonParseNode, ctx, identifier2Nodes, foundDefinitionsForIdentifier2);
     if (!foundDefinitionsForIdentifier2.isEmpty()
@@ -164,7 +164,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
     }
 
     if (!(foundDefinitionsForIdentifier2.get(0) instanceof ElementaryItemNode)) {
-      if (foundDefinitionsForIdentifier2.get(0) instanceof GroupItemNode) {
+      if (foundDefinitionsForIdentifier2.get(0) instanceof VariableWithLevelNode) {
         validateIdentifier2GroupItem(ctx, identifier2Nodes, foundDefinitionsForIdentifier2);
       } else {
         ctx.getErrors()
@@ -320,6 +320,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
     List<VariableNode> foundDefinitionsForIdentifier2 = getIdentifierDefinitions(jsonParseNode, identifier2Nodes);
 
     List<VariableUsageNode> identifier4Nodes = getIdentifier(jsonParseNode, jsonParseNode.getIdentifier4());
+    if (identifier4Nodes.isEmpty()) return;
     identifier4Nodes.forEach(identifier4 -> {
       List<VariableNode> foundDefinitionsForIdentifier4 = getIdentifierDefinitions(jsonParseNode, Collections.singletonList(identifier4));
 
@@ -352,9 +353,11 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
 
   private void semanticAnalysisForIdentifier3(JsonParseNode jsonParseNode, ProcessingContext ctx) {
     List<VariableUsageNode> identifier2Nodes = getIdentifier(jsonParseNode, jsonParseNode.getIdentifier2());
+    if (identifier2Nodes.isEmpty()) return;
     List<VariableNode> foundDefinitionsForIdentifier2 = getIdentifierDefinitions(jsonParseNode, identifier2Nodes);
 
     List<VariableUsageNode> identifier3Nodes = getIdentifier(jsonParseNode, jsonParseNode.getIdentifier3());
+    if (identifier3Nodes.isEmpty()) return;
     identifier3Nodes.forEach(identifier3 -> {
       List<VariableNode> foundDefinitionsForIdentifier3 = getIdentifierDefinitions(jsonParseNode, Collections.singletonList(identifier3));
 
