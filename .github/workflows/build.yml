@@ -64,9 +64,31 @@ jobs:
           if-no-files-found: warn
           name: native-build-configuration
           path: server/engine/target/native/agent-output/test/*
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
       - name: Build Server and Dialects Jars
         working-directory: server
-        run: mvn clean package -Dmaven.test.skip --no-transfer-progress
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          BRANCH_NAME: ${{ github.ref_name || github.head_ref }} 
+        run: mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=eclipse-che4z_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse-che4z -Dsonar.host.url=https://sonarcloud.io -Dsonar.branch.name=${BRANCH_NAME} -Dsonar.login=${{ secrets.SONAR_TOKEN }} --no-transfer-progress
       - uses: actions/upload-artifact@v3
         with:
           name: jar
@@ -74,6 +96,26 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      # Sonar stuff
+      - name: Test VS Code extension
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          echo path:
+          pwd
+          npm ci
+          npm test
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: clients/cobol-lsp-vscode-extension
+          args: >
+            -Dsonar.branch.name=${BRANCH_NAME}
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          BRANCH_NAME: ${{ github.ref_name || github.head_ref }} 
+
       - name: Build VS Code extension dialect API
         working-directory: clients/cobol-dialect-api
         run: |
