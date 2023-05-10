@@ -390,20 +390,20 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .collect(Collectors.toList());
 
     List<VariableNameAndLocality> identifier5 =
-        ctx.phrase1().isEmpty()
+        ctx.json_parse_phrase1().isEmpty()
             ? null
-            : ctx.phrase1().stream()
+            : ctx.json_parse_phrase1().stream()
                 .filter(idctx -> Objects.nonNull(idctx.jsonIdentifier5()))
-                .map(Phrase1Context::jsonIdentifier5)
+                .map(Json_parse_phrase1Context::jsonIdentifier5)
                 .map(idctx -> new VariableNameAndLocality(idctx.getText(), retrieveLocality(idctx).orElse(null)))
                 .collect(Collectors.toList());
 
     List<VariableNameAndLocality> conditionName =
-        ctx.phrase1().isEmpty()
+        ctx.json_parse_phrase1().isEmpty()
             ? null
-            : ctx.phrase1().get(0).callUsingPhrase1().isEmpty()
+            : ctx.json_parse_phrase1().get(0).callUsingPhrase1().isEmpty()
                 ? null
-                : ctx.phrase1().get(0).callUsingPhrase1().jsonConditionName().stream()
+                : ctx.json_parse_phrase1().get(0).callUsingPhrase1().jsonConditionName().stream()
                     .map(
                         context ->
                             new VariableNameAndLocality(
@@ -424,6 +424,55 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                 identifier5,
                 conditionName,
                 isOmitted));
+  }
+
+  @Override
+  public List<Node> visitJsonGenerate(JsonGenerateContext ctx) {
+    VariableNameAndLocality identifier1 = new VariableNameAndLocality(
+            ctx.jsonGenIdentifier1().getText(), retrieveLocality(ctx.jsonGenIdentifier1()).orElse(null));
+
+    VariableNameAndLocality identifier2 = new VariableNameAndLocality(
+            ctx.jsonGenIdentifier2().getText(), retrieveLocality(ctx.jsonGenIdentifier2()).orElse(null));
+
+    VariableNameAndLocality identifier3 = Optional.ofNullable(ctx.jsonGenIdentifier3())
+            .map(iden3 -> new VariableNameAndLocality(iden3.getText(), retrieveLocality(iden3).orElse(null)))
+                    .orElse(null);
+
+    List<VariableNameAndLocality> identifier4 = ctx.jsonGenIdentifier4().isEmpty()
+            ? null
+            : ctx.jsonGenIdentifier4().stream()
+            .map(iden4 -> new VariableNameAndLocality(iden4.getText(), retrieveLocality(iden4).orElse(null)))
+            .collect(Collectors.toList());
+
+    List<VariableNameAndLocality> identifier5 = ctx.jsonGenIdentifier5().isEmpty()
+            ? null
+            : ctx.jsonGenIdentifier5().stream()
+            .map(iden5 -> new VariableNameAndLocality(iden5.getText(), retrieveLocality(iden5).orElse(null)))
+            .collect(Collectors.toList());
+
+    List<JsonGenerateNode.JsonGenPhase> phases = ctx.json_gen_phrase1().isEmpty()
+            ? null
+            : ctx.json_gen_phrase1().stream()
+            .filter(idctx -> Objects.nonNull(idctx.jsonGenIdentifier6()))
+            .map(idctx -> new JsonGenerateNode.JsonGenPhase(
+                    new VariableNameAndLocality(idctx.jsonGenIdentifier6().getText(),
+                            retrieveLocality(idctx.jsonGenIdentifier6()).orElse(null)),
+                    Objects.nonNull(idctx.jsonGenConditionName()) ? new VariableNameAndLocality(idctx.jsonGenConditionName().getText(),
+                                    retrieveLocality(idctx.jsonGenConditionName()).orElse(null)) : null
+            ))
+            .collect(Collectors.toList());
+
+    return addTreeNode(
+            ctx,
+            locality ->
+                    new JsonGenerateNode(
+                            locality,
+                            identifier1,
+                            identifier2,
+                            identifier3,
+                            identifier4,
+                            identifier5,
+                            phases));
   }
 
   private void checkFileControlUniqueness(FileControlEntryContext ctx, String filename) {

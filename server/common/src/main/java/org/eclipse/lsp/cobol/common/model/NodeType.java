@@ -43,6 +43,7 @@ public enum NodeType {
   IF,
   IF_ELSE,
   JSON_PARSE,
+  JSON_GENERATE,
   SENTENCE,
   STATEMENT,
   EMBEDDED_CODE,
