@@ -393,8 +393,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         ctx.json_parse_phrase1().isEmpty()
             ? null
             : ctx.json_parse_phrase1().stream()
-                .filter(idctx -> Objects.nonNull(idctx.jsonIdentifier5()))
                 .map(Json_parse_phrase1Context::jsonIdentifier5)
+                .filter(Objects::nonNull)
                 .map(idctx -> new VariableNameAndLocality(idctx.getText(), retrieveLocality(idctx).orElse(null)))
                 .collect(Collectors.toList());
 

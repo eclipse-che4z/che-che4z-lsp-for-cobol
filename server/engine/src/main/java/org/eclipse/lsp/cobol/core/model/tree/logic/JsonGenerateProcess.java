@@ -28,12 +28,15 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.JsonGenerateNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.ConditionDataNameNode;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.groupingBy;
 import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
@@ -43,7 +46,8 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
   public static final ImmutableList<EffectiveDataType> ALPHANUMERIC_DATA_TYPES =
       ImmutableList.of(
           EffectiveDataType.STRING, EffectiveDataType.INTEGER, EffectiveDataType.UNDETERMINED);
-  public static final ImmutableList<EffectiveDataType> IDENTIFIER3_DATA_TYPES = ImmutableList.of(EffectiveDataType.INTEGER, EffectiveDataType.UNDETERMINED);
+  public static final ImmutableList<EffectiveDataType> IDENTIFIER3_DATA_TYPES =
+          ImmutableList.of(EffectiveDataType.INTEGER, EffectiveDataType.REAL, EffectiveDataType.UNDETERMINED);
   private final SymbolAccumulatorService symbolAccumulatorService;
 
   public JsonGenerateProcess(SymbolAccumulatorService symbolAccumulatorService) {
@@ -66,6 +70,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
     List<VariableUsageNode> identifier2Nodes = getIdentifier(jsonGenerateNode, jsonGenerateNode.getIdentifier2());
     if (identifier2Nodes.isEmpty()) return;
     List<VariableNode> identifier2FoundDefinitions = getIdentifierDefinitions(jsonGenerateNode, identifier2Nodes);
+    if (identifier2FoundDefinitions.isEmpty()) return;
     semanticAnalysisForIdentifier2(processingContext, identifier2Nodes, identifier2FoundDefinitions, identifier1FoundDefinitions);
 
     if (Objects.nonNull(jsonGenerateNode.getIdentifier3())) {
@@ -114,7 +119,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
                       .severity(ErrorSeverity.ERROR)
                       .location(identifier6.getLocality().toOriginalLocation())
                       .messageTemplate(
-                              MessageTemplate.of("should be elementary item with PIC X clause."))
+                              MessageTemplate.of("jsonGenProcess.identifier6.dataType", identifier6.getName()))
                       .build()
       );
     });
@@ -137,7 +142,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
                               .location(phase.getConditionNames().getLocality().toOriginalLocation())
                               .messageTemplate(
                                       MessageTemplate.of(
-                                              "jsonParseProcess.condition1",
+                                              "jsonGenProcess.condition.dataType",
                                               phase.getConditionNames().getName(),
                                               foundDefinitionsForIdentifier6.get(0).getName()))
                               .build());
@@ -207,6 +212,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
   }
 
   private void semanticAnalysisForIdentifier3(ProcessingContext ctx, List<VariableUsageNode> identifier3Nodes, List<VariableNode> identifier3FoundDefinitions, List<VariableNode> identifier2FoundDefinitions, List<VariableNode> identifier1FoundDefinitions) {
+    if (identifier3FoundDefinitions.isEmpty()) return;
     if (checkForNoOverlapBetweenNodes(identifier3FoundDefinitions.get(0), identifier1FoundDefinitions.get(0))) {
       ctx.getErrors()
               .add(
@@ -238,7 +244,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
     }
 
     if (identifier3FoundDefinitions.get(0) instanceof ElementaryItemNode) {
-      ElementaryItemNode node = (ElementaryItemNode) identifier1FoundDefinitions.get(0);
+      ElementaryItemNode node = (ElementaryItemNode) identifier3FoundDefinitions.get(0);
       if (!IDENTIFIER3_DATA_TYPES.contains(node.getEffectiveDataType())) {
         ctx.getErrors()
                 .add(
@@ -248,11 +254,11 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
                                 .location(identifier3Nodes.get(0).getLocality().toOriginalLocation())
                                 .messageTemplate(
                                         MessageTemplate.of(
-                                                "jsonParseProcess.identifier2.overlap",
-                                                identifier2FoundDefinitions.get(0).getName(),
+                                                "jsonGenProcess.identifier3.dataType",
                                                 identifier3Nodes.get(0).getName()))
                                 .build());
-      } else {
+      }
+    } else {
         boolean isValidGroupItem =
                 identifier3FoundDefinitions
                         .get(0)
@@ -269,14 +275,12 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
                           .location(identifier3Nodes.get(0).getLocality().toOriginalLocation())
                           .messageTemplate(
                                   MessageTemplate.of(
-                                          "jsonParseProcess.identifier2.overlap",
-                                          identifier2FoundDefinitions.get(0).getName(),
+                                          "jsonGenProcess.identifier3.dataType",
                                           identifier3Nodes.get(0).getName()))
                           .build()
           );
         }
       }
-    }
   }
 
   private void semanticAnalysisForIdentifier2(ProcessingContext ctx, List<VariableUsageNode> identifier2Nodes, List<VariableNode> identifier2FoundDefinitions, List<VariableNode> identifier1FoundDefinitions) {
@@ -324,16 +328,12 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
   }
 
   private void validateIdentifier2GroupItem(ProcessingContext ctx, List<VariableUsageNode> nodes, List<VariableNode> definitions) {
-    boolean isGroupItemValid =
-            definitions
-                    .get(0)
-                    .getDepthFirstStream()
-                    .filter(ElementaryNode.class::isInstance)
-                    .map(ElementaryNode.class::cast)
-                    .filter(node -> node.getLevel() != 66)
-                    .filter(node -> !node.isRedefines())
-                    .filter(node -> !ImmutableList.of(UsageFormat.POINTER, UsageFormat.FUNCTION_POINTER, UsageFormat.PROCEDURE_POINTER, UsageFormat.OBJECT_REFERENCE).contains(node.getUsageFormat()))
-                    .anyMatch(node -> !(node.getName().trim().equals("") || node.getName().equals(FILLER_NAME)));
+    boolean isNonUniqueChildrenItem = getElementaryNodeStreamForIdentifier2(definitions)
+            .collect(groupingBy(VariableWithLevelNode::getName))
+            .entrySet().stream()
+            .anyMatch(e -> e.getValue().size() > 1);
+
+    boolean isGroupItemValid = getElementaryNodeStreamForIdentifier2(definitions).findAny().isPresent() && !isNonUniqueChildrenItem;
 
     boolean isGroupItemDynamic =
             definitions
@@ -351,10 +351,34 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
                               .location(nodes.get(0).getLocality().toOriginalLocation())
                               .messageTemplate(
                                       MessageTemplate.of(
-                                              "jsonParseProcess.identifier2.groupItemError",
+                                              "jsonGenProcess.identifier2.groupItemError",
                                               nodes.get(0).getName()))
                               .build());
     }
+  }
+
+  private Stream<VariableWithLevelNode> getElementaryNodeStreamForIdentifier2(List<VariableNode> definitions) {
+    List<VariableWithLevelNode> childItems = new ArrayList<>();
+    List<VariableWithLevelNode> collect = definitions.get(0).getChildren().stream()
+            .filter(VariableWithLevelNode.class::isInstance)
+            .map(VariableWithLevelNode.class::cast)
+            .filter(node -> node.getLevel() != 66)
+            .filter(node -> !node.isRedefines())
+            .filter(node -> !(node.getName().trim().equals("") || node.getName().equals(FILLER_NAME))).collect(Collectors.toList());
+
+    collect.forEach(node -> {
+      if (node instanceof UsageClause) {
+        UsageClause currentNode = (UsageClause) node;
+        boolean isProperUsageForIden2 = !ImmutableList.of(UsageFormat.POINTER, UsageFormat.FUNCTION_POINTER,
+                UsageFormat.PROCEDURE_POINTER, UsageFormat.OBJECT_REFERENCE).contains(currentNode.getUsageFormat());
+        if (isProperUsageForIden2) {
+          childItems.add(node);
+        }
+      } else {
+        childItems.add(node);
+      }
+    });
+    return childItems.stream();
   }
 
   private boolean isRenameClause(ElementaryItemNode foundDefinitionNode) {
@@ -465,9 +489,11 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
                     node ->
                             identifiers.stream()
                                     .anyMatch(
-                                            str ->
-                                                    str.getName().equalsIgnoreCase(node.getName())
-                                                            && str.getLocality().equals(node.getLocality())))
+                                       str -> str.getLocality().getUri().equals(node.getLocality().getUri())
+                                    && str.getLocality().getRange().getStart().getLine() == node.getLocality().getRange().getStart().getLine()
+                                    && str.getLocality().getRange().getStart().getCharacter() <= node.getLocality().getRange().getStart().getCharacter()
+                                    && str.getLocality().getRange().getEnd().getCharacter() >= node.getLocality().getRange().getEnd().getCharacter()
+                                    && str.getName().contains(node.getName())))
             .collect(Collectors.toList());
   }
 
