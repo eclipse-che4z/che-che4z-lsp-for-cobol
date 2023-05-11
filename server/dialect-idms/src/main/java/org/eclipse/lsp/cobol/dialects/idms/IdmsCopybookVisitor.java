@@ -306,7 +306,7 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
     return ofNullable(getInteger(ctx.integerLiteral()))
         .map(
             intLit ->
-                new OccursClause(intLit, retrieveOccursToValue(ctx).orElse(null), retrieveIndexNames(ctx)));
+                new OccursClause(intLit, retrieveOccursToValue(ctx).orElse(null), false, retrieveIndexNames(ctx)));
   }
 
   private Integer getInteger(IdmsCopyParser.IntegerLiteralContext context) {

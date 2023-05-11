@@ -131,7 +131,7 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
               srcNode.getLevel(),
               newName,
               srcNode.isRedefines(),
-              srcNode.getOccursTimes(),
+              srcNode.getOccursClause(),
               srcNode.getUsageFormat(),
               srcNode.isGlobal());
       createVariableDefinitionNameNode(node, newName).ifPresent(cloneNode::addChild);

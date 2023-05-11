@@ -211,13 +211,18 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
             .map(ElementaryNode.class::cast)
             .anyMatch(node -> ALPHANUMERIC_DATA_TYPES.contains(node.getEffectiveDataType()));
 
-    boolean isGroupItemUnbounded =
+    boolean isGroupChildrenItemUnbounded =
         foundDefinitionsForIdentifier2
             .get(0)
             .getDepthFirstStream()
             .filter(TableDataNameNode.class::isInstance)
             .map(TableDataNameNode.class::cast)
             .anyMatch(TableDataNameNode::isUnBounded);
+
+    boolean isGroupItemUnbounded = Optional.of(foundDefinitionsForIdentifier2.get(0))
+            .filter(MultiTableDataNameNode.class::isInstance)
+            .map(MultiTableDataNameNode.class::cast)
+            .map(node -> node.getOccursClause().isUnbounded()).orElse(false);
 
     boolean isGroupItemDynamic =
         foundDefinitionsForIdentifier2
@@ -226,7 +231,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
             .filter(ElementaryItemNode.class::isInstance)
             .map(ElementaryItemNode.class::cast)
             .anyMatch(ElementaryNode::isDynamicLength);
-    if (!isGroupItemAlphanumeric || isGroupItemUnbounded || isGroupItemDynamic) {
+    if (!isGroupItemAlphanumeric || isGroupChildrenItemUnbounded || isGroupItemUnbounded || isGroupItemDynamic) {
       ctx.getErrors()
           .add(
               SyntaxError.syntaxError()

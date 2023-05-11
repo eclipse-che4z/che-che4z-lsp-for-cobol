@@ -27,7 +27,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class MultiTableDataNameNode extends VariableWithLevelNode implements UsageClause {
-  private final int occursTimes;
+  private final OccursClause occursClause;
   private final UsageFormat usageFormat;
 
   public MultiTableDataNameNode(
@@ -35,18 +35,18 @@ public class MultiTableDataNameNode extends VariableWithLevelNode implements Usa
       int level,
       String name,
       boolean redefines,
-      int occursTimes,
+      OccursClause occursClause,
       UsageFormat usageFormat,
       boolean global) {
     super(location, level, name, redefines, VariableType.MULTI_TABLE_DATA_NAME, global);
-    this.occursTimes = occursTimes;
+    this.occursClause = occursClause;
     this.usageFormat = usageFormat;
   }
 
   @Override
   protected String getVariableDisplayString() {
     StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
-    stringBuilder.append(String.format(" OCCURS %1$d TIMES", occursTimes));
+    stringBuilder.append(String.format(" OCCURS %1$d TIMES", occursClause.getFrom()));
     if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat.toDisplayString());
     return stringBuilder.append(".").toString();
   }

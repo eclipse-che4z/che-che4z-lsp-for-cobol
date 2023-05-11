@@ -23,5 +23,6 @@ import java.util.List;
 public class OccursClause {
   Integer from;
   Integer to;
+  boolean isUnbounded;
   List<VariableNameAndLocality> indexed;
 }

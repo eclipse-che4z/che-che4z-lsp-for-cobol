@@ -380,7 +380,7 @@ class SectionNodeProcessorHelper {
               definitionNode.getLevel(),
               getName(definitionNode),
               definitionNode.hasRedefines(),
-              definitionNode.getOccursNumber(),
+              definitionNode.getOccursClauses().get(0),
               definitionNode.getUsage(),
               definitionNode.isGlobal());
       createVariableNameNode(variable, definitionNode.getVariableName());

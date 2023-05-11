@@ -1026,7 +1026,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .map(
             intLit ->
                 new OccursClause(
-                    intLit, retrieveOccursToValue(ctx).orElse(null), retrieveIndexNames(ctx)));
+                    intLit, retrieveOccursToValue(ctx).orElse(null),
+                        Optional.ofNullable(ctx.dataOccursTo()).map(DataOccursToContext::UNBOUNDED).isPresent(),
+                        retrieveIndexNames(ctx)));
   }
 
   private List<VariableNameAndLocality> retrieveIndexNames(DataOccursClauseContext ctx) {

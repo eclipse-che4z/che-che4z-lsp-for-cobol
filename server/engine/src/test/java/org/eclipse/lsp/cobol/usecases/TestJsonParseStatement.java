@@ -375,7 +375,7 @@ public class TestJsonParseStatement {
             "1",
             new Diagnostic(
                     new Range(),
-                    "MYRECORD and its subordinate data items must be alphanumeric and must NOT contain UNBOUNDED or RENAMES clauses.",
+                    "MYRECORD group item must be alphanumeric and not be UNBOUNDED or contain a RENAMES clause.",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())));
   }
