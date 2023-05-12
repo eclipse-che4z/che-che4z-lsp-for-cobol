@@ -981,9 +981,9 @@ jsonStatement
 
 jsonParse
     : JSON PARSE jsonIdentifier1 INTO jsonIdentifier2 (WITH? DETAIL)? (NAME OF? (jsonIdentifier3 IS? (literal | OMITTED))+)?
-      (SUPPRESS jsonIdentifier4+)? (CONVERTING phrase1 (ALSO phrase1)*)? onExceptionClause? notOnExceptionClause? END_JSON?;
+      (SUPPRESS jsonIdentifier4+)? (CONVERTING json_parse_phrase1 (ALSO json_parse_phrase1)*)? onExceptionClause? notOnExceptionClause? END_JSON?;
 
-phrase1
+json_parse_phrase1
     : jsonIdentifier5 FROM? JSON? (BOOLEAN | BOOL) callUsingPhrase1;
 
 jsonIdentifier1: qualifiedDataName;
@@ -1002,13 +1002,35 @@ callUsingPhrase1
     : USING? ((jsonConditionName (AND? jsonConditionName)?) | (literal AND? literal));
 
 jsonGenerate
-    : JSON GENERATE qualifiedDataName FROM qualifiedDataName
-        (
-            statement | COUNT | IN | NAME | OF | IS | OMITTED | SUPPRESS | WHEN | ZERO | ZEROES | ZEROS |
-            SPACE | SPACES | LOW_VALUE | LOW_VALUES | HIGH_VALUE | HIGH_VALUES | OR | EVERY | NUMERIC | NONNUMERIC |
-            (CONVERTING qualifiedDataName) | TO | JSON | BOOLEAN | BOOL | USING | (ALSO qualifiedDataName) | (USING generalIdentifier | literal)
-        )* onExceptionClause? notOnExceptionClause? END_JSON
+    : JSON GENERATE jsonGenIdentifier1 FROM jsonGenIdentifier2
+    (COUNT IN? jsonGenIdentifier3)?
+    (NAME OF? (jsonGenIdentifier4 IS? (literal | OMITTED))+)?
+    (SUPPRESS ((jsonGenIdentifier5 when_phrase?) | generic_suppression_phrase)+)?
+    (CONVERTING json_gen_phrase1 (ALSO json_gen_phrase1)*)?
+    onExceptionClause? notOnExceptionClause? END_JSON?
     ;
+
+jsonGenIdentifier1: qualifiedDataName;
+
+jsonGenIdentifier2: qualifiedDataName;
+
+jsonGenIdentifier3: qualifiedDataName;
+
+jsonGenIdentifier4: qualifiedDataName;
+
+jsonGenIdentifier5: qualifiedDataName;
+
+jsonGenConditionName: qualifiedDataName;
+
+jsonGenIdentifier6: qualifiedDataName;
+
+when_phrase: WHEN  json_phrases (OR? (json_phrases))*;
+
+generic_suppression_phrase: (EVERY (NUMERIC | NONNUMERIC))? when_phrase;
+
+json_phrases: ZERO | ZEROES | ZEROS | SPACE | SPACES | LOW_VALUE | LOW_VALUES | HIGH_VALUE | HIGH_VALUES;
+
+json_gen_phrase1: jsonGenIdentifier6 TO? JSON? (BOOLEAN |  BOOL) USING? (jsonGenConditionName | literal);
 
 dialectStatement
    : dialectNodeFiller | dialectIfStatment
