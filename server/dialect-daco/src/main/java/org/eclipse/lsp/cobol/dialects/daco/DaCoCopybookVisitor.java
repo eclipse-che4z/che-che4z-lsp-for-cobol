@@ -66,6 +66,8 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
                             .collect(toList()))
             .blankWhenZero(!ctx.dataBlankWhenZeroClause().isEmpty())
             .signClause(!ctx.dataSignClause().isEmpty())
+            .isDynamicLength(!ctx.dataDynamicLengthClause().isEmpty())
+            .isJustified(!ctx.dataJustifiedClause().isEmpty())
             .build();
 
     return addTreeNode(variableDefinitionNode, visitChildren(ctx));
@@ -117,6 +119,8 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
                             .collect(toList()))
             .blankWhenZero(!ctx.dataBlankWhenZeroClause().isEmpty())
             .signClause(!ctx.dataSignClause().isEmpty())
+            .isDynamicLength(!ctx.dataDynamicLengthClause().isEmpty())
+            .isJustified(!ctx.dataJustifiedClause().isEmpty())
             .build();
     return addTreeNode(variableDefinitionNode, visitChildren(ctx));
   }
@@ -244,7 +248,8 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
     return ofNullable(VisitorHelper.getInteger(ctx.integerLiteral()))
             .map(
                     intLit ->
-                            new OccursClause(intLit, VisitorHelper.retrieveOccursToValue(ctx).orElse(null), retrieveIndexNames(ctx)));
+                            new OccursClause(intLit, VisitorHelper.retrieveOccursToValue(ctx).orElse(null), false,
+                                    retrieveIndexNames(ctx)));
   }
 
   private List<VariableNameAndLocality> retrieveIndexNames(VariableParser.DataOccursClauseContext ctx) {

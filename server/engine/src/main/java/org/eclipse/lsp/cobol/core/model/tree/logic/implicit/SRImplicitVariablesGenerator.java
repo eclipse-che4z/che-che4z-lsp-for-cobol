@@ -146,7 +146,7 @@ class SRImplicitVariablesGenerator {
     result.add(new ElementaryItemNode(locality, 1, "XML-EVENT", false, "X(30)",
         "SPACE", UsageFormat.DISPLAY, false, false, false));
 
-    //TODO: COMP SYNC?
+    //TODO: COMP SYNC?, false
     result.add(new ElementaryItemNode(locality, 1, "LINE-COUNTER", false, "S9(9)",
         null, UsageFormat.COMP, false, false, false));
     //TODO: COMP SYNC?

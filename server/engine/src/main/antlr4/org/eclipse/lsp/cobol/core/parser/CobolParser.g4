@@ -980,8 +980,26 @@ jsonStatement
     ;
 
 jsonParse
-    : JSON PARSE qualifiedDataName INTO qualifiedDataName (statement | WITH | DETAIL | NAME | OF | IS | OMITTED | (SUPPRESS qualifiedDataName*) | CONVERTING | ALSO )* onExceptionClause? notOnExceptionClause? END_JSON
-    ;
+    : JSON PARSE jsonIdentifier1 INTO jsonIdentifier2 (WITH? DETAIL)? (NAME OF? (jsonIdentifier3 IS? (literal | OMITTED))+)?
+      (SUPPRESS jsonIdentifier4+)? (CONVERTING phrase1 (ALSO phrase1)*)? onExceptionClause? notOnExceptionClause? END_JSON?;
+
+phrase1
+    : jsonIdentifier5 FROM? JSON? (BOOLEAN | BOOL) callUsingPhrase1;
+
+jsonIdentifier1: qualifiedDataName;
+
+jsonIdentifier2: qualifiedDataName;
+
+jsonIdentifier3: qualifiedDataName;
+
+jsonIdentifier4: qualifiedDataName;
+
+jsonIdentifier5: qualifiedDataName;
+
+jsonConditionName: qualifiedDataName;
+
+callUsingPhrase1
+    : USING? ((jsonConditionName (AND? jsonConditionName)?) | (literal AND? literal));
 
 jsonGenerate
     : JSON GENERATE qualifiedDataName FROM qualifiedDataName
@@ -1410,15 +1428,19 @@ ifElse
 // initialize statement
 
 initializeStatement
-   : INITIALIZE generalIdentifier (COMMACHAR? generalIdentifier)*? initializeReplacingPhrase?
+   : INITIALIZE generalIdentifier (COMMACHAR? generalIdentifier)*? (WITH? FILLER)? ((ALL | categoryName) TO? VALUE)?
+     (THEN? initializeReplacingPhrase)? (THEN? TO? DEFAULT)?
    ;
+
+categoryName: ALPHABETIC | ALPHANUMERIC | ALPHANUMERIC_EDITED | DBCS | EGCS | NATIONAL | NATIONAL_EDITED | NUMERIC
+    | NUMERIC_EDITED;
 
 initializeReplacingPhrase
    : REPLACING initializeReplacingBy+
    ;
 
 initializeReplacingBy
-   : (ALPHABETIC | ALPHANUMERIC | ALPHANUMERIC_EDITED | NATIONAL | NATIONAL_EDITED | NUMERIC | NUMERIC_EDITED | DBCS | EGCS) DATA? BY (literal | generalIdentifier)
+   : categoryName DATA? BY (literal | generalIdentifier)
    ;
 
 // initiate statement

@@ -44,6 +44,36 @@ public class ElementaryItemNode extends ElementaryNode {
       boolean redefines,
       boolean isBlankWhenZeroPresent,
       boolean isSignClausePresent) {
+    this(
+        location,
+        level,
+        name,
+        global,
+        picClause,
+        value,
+        usageFormat,
+        redefines,
+        isBlankWhenZeroPresent,
+        isSignClausePresent,
+        false,
+        false,
+        false);
+  }
+
+  public ElementaryItemNode(
+      Locality location,
+      int level,
+      String name,
+      boolean global,
+      String picClause,
+      String value,
+      UsageFormat usageFormat,
+      boolean redefines,
+      boolean isBlankWhenZeroPresent,
+      boolean isSignClausePresent,
+      boolean isDynamicLength,
+      boolean isJustified,
+      boolean isUnBounded) {
     super(
         location,
         level,
@@ -53,6 +83,9 @@ public class ElementaryItemNode extends ElementaryNode {
         global,
         isBlankWhenZeroPresent,
         isSignClausePresent,
+        isDynamicLength,
+        isJustified,
+        isUnBounded,
         picClause,
         usageFormat);
     this.value = value;
@@ -62,7 +95,8 @@ public class ElementaryItemNode extends ElementaryNode {
   protected String getVariableDisplayString() {
     StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
     if (picClause != null) stringBuilder.append(" PIC ").append(picClause);
-    if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat.toDisplayString());
+    if (usageFormat != UsageFormat.UNDEFINED)
+      stringBuilder.append(" USAGE ").append(usageFormat.toDisplayString());
     if (StringUtils.isNoneBlank(value)) stringBuilder.append(" VALUE ").append(value);
     return stringBuilder.append(".").toString();
   }

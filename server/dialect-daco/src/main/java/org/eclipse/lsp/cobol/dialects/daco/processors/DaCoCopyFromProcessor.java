@@ -115,7 +115,10 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
               elNode.getUsageFormat(),
               elNode.isRedefines(),
               elNode.isBlankWhenZeroPresent(),
-              elNode.isSignClausePresent());
+              elNode.isSignClausePresent(),
+              elNode.isDynamicLength(),
+              elNode.isJustified(),
+              elNode.isUnBounded());
       createVariableDefinitionNameNode(node, newName).ifPresent(cloneNode::addChild);
       return Optional.of(cloneNode);
     }
@@ -128,7 +131,7 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
               srcNode.getLevel(),
               newName,
               srcNode.isRedefines(),
-              srcNode.getOccursTimes(),
+              srcNode.getOccursClause(),
               srcNode.getUsageFormat(),
               srcNode.isGlobal());
       createVariableDefinitionNameNode(node, newName).ifPresent(cloneNode::addChild);

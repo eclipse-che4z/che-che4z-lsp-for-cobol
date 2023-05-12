@@ -57,6 +57,7 @@ import org.eclipse.lsp4j.Range;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -368,6 +369,63 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return addTreeNode(ctx, locality -> new FileEntryNode(locality, filename, ""));
   }
 
+  @Override
+  public List<Node> visitJsonParse(JsonParseContext ctx) {
+    VariableNameAndLocality identifier1 = new VariableNameAndLocality(
+            ctx.jsonIdentifier1().getText(), retrieveLocality(ctx.jsonIdentifier1()).orElse(null));
+
+    VariableNameAndLocality identifier2 = new VariableNameAndLocality(
+            ctx.jsonIdentifier2().getText(), retrieveLocality(ctx.jsonIdentifier2()).orElse(null));
+
+    List<VariableNameAndLocality> identifier3 = ctx.jsonIdentifier3().isEmpty()
+            ? null
+            : ctx.jsonIdentifier3().stream()
+            .map(iden3 -> new VariableNameAndLocality(iden3.getText(), retrieveLocality(iden3).orElse(null)))
+            .collect(Collectors.toList());
+
+    List<VariableNameAndLocality> identifier4 = ctx.jsonIdentifier4().isEmpty()
+            ? null
+            : ctx.jsonIdentifier4().stream()
+            .map(iden4 -> new VariableNameAndLocality(iden4.getText(), retrieveLocality(iden4).orElse(null)))
+            .collect(Collectors.toList());
+
+    List<VariableNameAndLocality> identifier5 =
+        ctx.phrase1().isEmpty()
+            ? null
+            : ctx.phrase1().stream()
+                .filter(idctx -> Objects.nonNull(idctx.jsonIdentifier5()))
+                .map(Phrase1Context::jsonIdentifier5)
+                .map(idctx -> new VariableNameAndLocality(idctx.getText(), retrieveLocality(idctx).orElse(null)))
+                .collect(Collectors.toList());
+
+    List<VariableNameAndLocality> conditionName =
+        ctx.phrase1().isEmpty()
+            ? null
+            : ctx.phrase1().get(0).callUsingPhrase1().isEmpty()
+                ? null
+                : ctx.phrase1().get(0).callUsingPhrase1().jsonConditionName().stream()
+                    .map(
+                        context ->
+                            new VariableNameAndLocality(
+                                context.getText(), retrieveLocality(context).orElse(null)))
+                    .collect(toList());
+
+    boolean isOmitted = Objects.nonNull(ctx.OMITTED()) && !ctx.OMITTED().isEmpty();
+
+    return addTreeNode(
+        ctx,
+        locality ->
+            new JsonParseNode(
+                locality,
+                identifier1,
+                identifier2,
+                identifier3,
+                identifier4,
+                identifier5,
+                conditionName,
+                isOmitted));
+  }
+
   private void checkFileControlUniqueness(FileControlEntryContext ctx, String filename) {
     getLocality(ctx.selectClause().fileName().getStart())
         .ifPresent(
@@ -500,6 +558,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                     .collect(toList()))
             .blankWhenZero(!ctx.dataBlankWhenZeroClause().isEmpty())
             .signClause(!ctx.dataSignClause().isEmpty())
+            .isDynamicLength(!ctx.dataDynamicLengthClause().isEmpty())
+            .isJustified(!ctx.dataJustifiedClause().isEmpty())
+            .isUnBounded(
+                !ctx.dataOccursClause().isEmpty()
+                    && ofNullable(ctx.dataOccursClause().get(0).dataOccursTo()).isPresent()
+                    && ofNullable(ctx.dataOccursClause().get(0).dataOccursTo().UNBOUNDED())
+                        .isPresent())
             .build(),
         visitChildren(ctx));
   }
@@ -589,6 +654,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                     .collect(toList()))
             .blankWhenZero(!ctx.dataBlankWhenZeroClause().isEmpty())
             .signClause(!ctx.dataSignClause().isEmpty())
+            .isJustified(!ctx.dataJustifiedClause().isEmpty())
+            .isDynamicLength(!ctx.dataDynamicLengthClause().isEmpty())
+            .isUnBounded(
+                !ctx.dataOccursClause().isEmpty()
+                    && ofNullable(ctx.dataOccursClause().get(0).dataOccursTo()).isPresent()
+                    && ofNullable(ctx.dataOccursClause().get(0).dataOccursTo().UNBOUNDED())
+                        .isPresent())
             .build(),
         visitChildren(ctx));
   }
@@ -954,7 +1026,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .map(
             intLit ->
                 new OccursClause(
-                    intLit, retrieveOccursToValue(ctx).orElse(null), retrieveIndexNames(ctx)));
+                    intLit, retrieveOccursToValue(ctx).orElse(null),
+                        Optional.ofNullable(ctx.dataOccursTo()).map(DataOccursToContext::UNBOUNDED).isPresent(),
+                        retrieveIndexNames(ctx)));
   }
 
   private List<VariableNameAndLocality> retrieveIndexNames(DataOccursClauseContext ctx) {

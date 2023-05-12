@@ -337,6 +337,7 @@ public class CobolLanguageEngine {
     ctx.register(v, StandAloneDataItemNode.class, new StandAloneDataItemCheck());
     ctx.register(v, ProgramEndNode.class, new ProgramEndCheck());
     ctx.register(v, CICSTranslatorNode.class, new CICSTranslatorProcessor(analysisConfig, messageService));
+    ctx.register(t, JsonParseNode.class, new JsonParseProcess(symbolAccumulatorService));
 
     // Dialects
     List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());

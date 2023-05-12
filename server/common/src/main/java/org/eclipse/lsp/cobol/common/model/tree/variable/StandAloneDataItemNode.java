@@ -43,6 +43,34 @@ public class StandAloneDataItemNode extends ElementaryNode {
       UsageFormat usageFormat,
       boolean isBlankWhenZeroPresent,
       boolean isSignClausePresent) {
+    this(
+        location,
+        name,
+        global,
+        picClause,
+        value,
+        redefines,
+        usageFormat,
+        isBlankWhenZeroPresent,
+        isSignClausePresent,
+        false,
+        false,
+        false);
+  }
+
+  public StandAloneDataItemNode(
+      Locality location,
+      String name,
+      boolean global,
+      String picClause,
+      String value,
+      boolean redefines,
+      UsageFormat usageFormat,
+      boolean isBlankWhenZeroPresent,
+      boolean isSignClausePresent,
+      boolean isDynamicLength,
+      boolean isJustified,
+      boolean isUnBounded) {
     super(
         location,
         LEVEL_77,
@@ -52,6 +80,9 @@ public class StandAloneDataItemNode extends ElementaryNode {
         global,
         isBlankWhenZeroPresent,
         isSignClausePresent,
+        isDynamicLength,
+        isJustified,
+        isUnBounded,
         picClause,
         usageFormat);
     this.value = value;
