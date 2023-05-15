@@ -17,12 +17,16 @@ package org.eclipse.lsp.cobol.core.model;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import lombok.experimental.UtilityClass;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_77;
 
 /** The class take all defined variables and search through them by partial qualifier */
 @UtilityClass
@@ -82,5 +86,31 @@ public class VariableUsageUtils {
     return variable.getNearestParentByType(NodeType.VARIABLE)
             .map(VariableNode.class::cast)
             .orElse(null);
+  }
+
+  /**
+   * Checks that there is no overlap between the passed nodes
+   * @param node1 First Node
+   * @param node2 Second Node
+   * @return True when nodes overlap, false otherwise.
+   */
+  public boolean checkForNoOverlapBetweenNodes(
+          VariableNode node1, VariableNode node2) {
+    if (checkFirstInSecond(node1, node2)) return true;
+    return checkFirstInSecond(node2, node1);
+  }
+
+  private boolean checkFirstInSecond(VariableNode node1, VariableNode node2) {
+    for (Node child : node1.getChildren()) {
+      Optional<VariableWithLevelNode> any = child
+              .getDepthFirstStream()
+              .filter(VariableWithLevelNode.class::isInstance)
+              .map(VariableWithLevelNode.class::cast)
+              .filter(node -> node.getLevel() != LEVEL_77)
+              .filter(node -> node.equals(node2))
+              .findAny();
+      if (any.isPresent()) return true;
+    }
+    return false;
   }
 }
