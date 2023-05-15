@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.core.model.tree.JsonParseNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.ConditionDataNameNode;
 
@@ -147,7 +148,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
     checkValidDefinition(jsonParseNode, ctx, identifier2Nodes, foundDefinitionsForIdentifier2);
     if (!foundDefinitionsForIdentifier2.isEmpty()
         && !identifier1Definitions.isEmpty()
-        && checkForNoOverlapBetweenIdentifier1AndIdentifier2(
+        && VariableUsageUtils.checkForNoOverlapBetweenNodes(
             identifier1Definitions.get(0), foundDefinitionsForIdentifier2.get(0))) {
       ctx.getErrors()
           .add(
@@ -244,21 +245,6 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
                           identifier2Nodes.get(0).getName()))
                   .build());
     }
-  }
-
-  private boolean checkForNoOverlapBetweenIdentifier1AndIdentifier2(
-      VariableNode identifier1Definitions, VariableNode identifier2Definitions) {
-    Optional<Node> match1 =
-        identifier1Definitions
-            .getDepthFirstStream()
-            .filter(node -> node.equals(identifier2Definitions))
-            .findAny();
-    Optional<Node> match2 =
-        identifier2Definitions
-            .getDepthFirstStream()
-            .filter(node -> node.equals(identifier1Definitions))
-            .findAny();
-    return match1.isPresent() || match2.isPresent();
   }
 
   private List<VariableUsageNode> getIdentifier(

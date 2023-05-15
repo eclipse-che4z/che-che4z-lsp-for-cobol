@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.core.model.tree.JsonGenerateNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.ConditionDataNameNode;
 
@@ -32,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -213,7 +213,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
 
   private void semanticAnalysisForIdentifier3(ProcessingContext ctx, List<VariableUsageNode> identifier3Nodes, List<VariableNode> identifier3FoundDefinitions, List<VariableNode> identifier2FoundDefinitions, List<VariableNode> identifier1FoundDefinitions) {
     if (identifier3FoundDefinitions.isEmpty()) return;
-    if (checkForNoOverlapBetweenNodes(identifier3FoundDefinitions.get(0), identifier1FoundDefinitions.get(0))) {
+    if (VariableUsageUtils.checkForNoOverlapBetweenNodes(identifier3FoundDefinitions.get(0), identifier1FoundDefinitions.get(0))) {
       ctx.getErrors()
               .add(
                       SyntaxError.syntaxError()
@@ -228,7 +228,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
                               .build());
     }
 
-    if (checkForNoOverlapBetweenNodes(identifier3FoundDefinitions.get(0), identifier2FoundDefinitions.get(0))) {
+    if (VariableUsageUtils.checkForNoOverlapBetweenNodes(identifier3FoundDefinitions.get(0), identifier2FoundDefinitions.get(0))) {
       ctx.getErrors()
               .add(
                       SyntaxError.syntaxError()
@@ -287,7 +287,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
     // check no overlap
     if (!identifier2FoundDefinitions.isEmpty()
             && !identifier1FoundDefinitions.isEmpty()
-            && checkForNoOverlapBetweenNodes(identifier2FoundDefinitions.get(0), identifier1FoundDefinitions.get(0))) {
+            && VariableUsageUtils.checkForNoOverlapBetweenNodes(identifier2FoundDefinitions.get(0), identifier1FoundDefinitions.get(0))) {
       ctx.getErrors()
               .add(
                       SyntaxError.syntaxError()
@@ -506,21 +506,5 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
                 symbolAccumulatorService.getVariableDefinition(
                     programNode, Collections.singletonList(identifier1Nodes.get(0))))
         .orElseGet(ImmutableList::of);
-  }
-
-
-  private boolean checkForNoOverlapBetweenNodes(
-          VariableNode identifier1Definitions, VariableNode identifier2Definitions) {
-    Optional<Node> match1 =
-            identifier1Definitions
-                    .getDepthFirstStream()
-                    .filter(node -> node.equals(identifier2Definitions))
-                    .findAny();
-    Optional<Node> match2 =
-            identifier2Definitions
-                    .getDepthFirstStream()
-                    .filter(node -> node.equals(identifier1Definitions))
-                    .findAny();
-    return match1.isPresent() || match2.isPresent();
   }
 }
