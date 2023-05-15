@@ -17,7 +17,7 @@
 import * as vscode from "vscode";
 import { registerDialect } from "@code4z/cobol-dialect-api";
 
-let unregisterDialect: () => void;
+let unregisterDialect = () => {};
 
 export async function activate(context: vscode.ExtensionContext) {
   const extensionId = context.extension.id;
