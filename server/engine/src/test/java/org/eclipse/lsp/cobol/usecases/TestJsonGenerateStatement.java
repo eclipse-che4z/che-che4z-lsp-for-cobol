@@ -51,54 +51,54 @@ public class TestJsonGenerateStatement {
           + "                END-JSON.";
 
   public static final String TEXT_IDENTIFIER1_NOT_ALPHANUMERIC =
-          "       Identification division.\n"
-                  + "       Program-id. jp_ex.\n"
-                  + "       Data division.\n"
-                  + "       Working-storage section.\n"
-                  + "       01 {$*STRUCT}. \n"
-                  + "         02 {$*NG-AREA1}. \n"
-                  + "           03 {$*FLAGS} PIC X.      03 PIC X(3). \n"
-                  + "           03 {$*PTR} USAGE POINTER.\n"
-                  + "           03 {$*ASNUM} REDEFINES {$PTR} USAGE COMP-5 PIC S9(9). \n"
-                  + "           03 PIC X(92). \n"
-                  + "       01 {$*docx} pic E(1000).\n"
-                  + "       01 {$*countN} pic P.\n"
-                  + "       01 {$*myrecord}.\n"
-                  + "           02 {$*data-a} PIC X.\n"
-                  + "           02 {$*data-b} PIC X.\n"
-                  + "             88 {$*data-b-flag} VALUE 'a' THRU 'z'.\n"
-                  + "       Procedure division.\n"
-                  + "               JSON GENERATE {$docx|1} FROM {$NG-AREA1} COUNT {$countN}\n"
-                  + "               name of {$FLAGS} OF {$NG-AREA1} is OMITTED\n"
-                  + "               SUPPRESS {$ASNUM}\n"
-                  + "                 CONVERTING {$data-a} TO BOOLEAN USING 'T'\n"
-                  + "                       ALSO {$data-b} TO BOOLEAN USING {$data-b-flag}\n"
-                  + "                END-JSON.";
+      "       Identification division.\n"
+          + "       Program-id. jp_ex.\n"
+          + "       Data division.\n"
+          + "       Working-storage section.\n"
+          + "       01 {$*STRUCT}. \n"
+          + "         02 {$*NG-AREA1}. \n"
+          + "           03 {$*FLAGS} PIC X.      03 PIC X(3). \n"
+          + "           03 {$*PTR} USAGE POINTER.\n"
+          + "           03 {$*ASNUM} REDEFINES {$PTR} USAGE COMP-5 PIC S9(9). \n"
+          + "           03 PIC X(92). \n"
+          + "       01 {$*docx} pic E(1000).\n"
+          + "       01 {$*countN} pic P.\n"
+          + "       01 {$*myrecord}.\n"
+          + "           02 {$*data-a} PIC X.\n"
+          + "           02 {$*data-b} PIC X.\n"
+          + "             88 {$*data-b-flag} VALUE 'a' THRU 'z'.\n"
+          + "       Procedure division.\n"
+          + "               JSON GENERATE {$docx|1} FROM {$NG-AREA1} COUNT {$countN}\n"
+          + "               name of {$FLAGS} OF {$NG-AREA1} is OMITTED\n"
+          + "               SUPPRESS {$ASNUM}\n"
+          + "                 CONVERTING {$data-a} TO BOOLEAN USING 'T'\n"
+          + "                       ALSO {$data-b} TO BOOLEAN USING {$data-b-flag}\n"
+          + "                END-JSON.";
 
   public static final String TEXT_IDENTIFIER1_JUSTIFIED =
-          "       Identification division.\n"
-                  + "       Program-id. jp_ex.\n"
-                  + "       Data division.\n"
-                  + "       Working-storage section.\n"
-                  + "       01 {$*STRUCT}. \n"
-                  + "         02 {$*NG-AREA1}. \n"
-                  + "           03 {$*FLAGS} PIC X.      03 PIC X(3). \n"
-                  + "           03 {$*PTR} USAGE POINTER.\n"
-                  + "           03 {$*ASNUM} REDEFINES {$PTR} USAGE COMP-5 PIC S9(9). \n"
-                  + "           03 PIC X(92). \n"
-                  + "       01 {$*docx} pic E(1000).\n"
-                  + "       01 {$*countN} pic P.\n"
-                  + "       01 {$*myrecord}.\n"
-                  + "           02 {$*data-a} PIC X.\n"
-                  + "           02 {$*data-b} PIC X.\n"
-                  + "             88 {$*data-b-flag} VALUE 'a' THRU 'z'.\n"
-                  + "       Procedure division.\n"
-                  + "               JSON GENERATE {$docx|1} FROM {$NG-AREA1} COUNT {$countN}\n"
-                  + "               name of {$FLAGS} OF {$NG-AREA1} is OMITTED\n"
-                  + "               SUPPRESS {$ASNUM}\n"
-                  + "                 CONVERTING {$data-a} TO BOOLEAN USING 'T'\n"
-                  + "                       ALSO {$data-b} TO BOOLEAN USING {$data-b-flag}\n"
-                  + "                END-JSON.";
+      "       Identification division.\n"
+          + "       Program-id. jp_ex.\n"
+          + "       Data division.\n"
+          + "       Working-storage section.\n"
+          + "       01 {$*STRUCT}. \n"
+          + "         02 {$*NG-AREA1}. \n"
+          + "           03 {$*FLAGS} PIC X.      03 PIC X(3). \n"
+          + "           03 {$*PTR} USAGE POINTER.\n"
+          + "           03 {$*ASNUM} REDEFINES {$PTR} USAGE COMP-5 PIC S9(9). \n"
+          + "           03 PIC X(92). \n"
+          + "       01 {$*docx} pic E(1000).\n"
+          + "       01 {$*countN} pic P.\n"
+          + "       01 {$*myrecord}.\n"
+          + "           02 {$*data-a} PIC X.\n"
+          + "           02 {$*data-b} PIC X.\n"
+          + "             88 {$*data-b-flag} VALUE 'a' THRU 'z'.\n"
+          + "       Procedure division.\n"
+          + "               JSON GENERATE {$docx|1} FROM {$NG-AREA1} COUNT {$countN}\n"
+          + "               name of {$FLAGS} OF {$NG-AREA1} is OMITTED\n"
+          + "               SUPPRESS {$ASNUM}\n"
+          + "                 CONVERTING {$data-a} TO BOOLEAN USING 'T'\n"
+          + "                       ALSO {$data-b} TO BOOLEAN USING {$data-b-flag}\n"
+          + "                END-JSON.";
 
   public static final String TEXT_IDEN2_UNIQUE_SUBORDINATE =
       "       Identification division.\n"
@@ -294,6 +294,39 @@ public class TestJsonGenerateStatement {
           + "                       ALSO {$data-b} TO BOOLEAN USING {$data-b-flag}\n"
           + "                END-JSON.";
 
+  public static final String TEXT_LEVEL77 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.   JSONTEST.\n"
+          + "\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       CONFIGURATION SECTION.\n"
+          + "\n"
+          + "       SOURCE-COMPUTER. IBM-370-158.\n"
+          + "\n"
+          + "       DATA DIVISION.\n"
+          + "\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "\n"
+          + "        01 {$*MYDATA}.\n"
+          + "           05 {$*header}.\n"
+          + "                10 {$*systemId}       PIC X(10).\n"
+          + "                10 {$*timestamp}      PIC X(30).\n"
+          + "           05 {$*payload}.\n"
+          + "                10 {$*customerid}         PIC X(10).\n"
+          + "  \n"
+          + "        77 {$*JSONLEN}   PIC 9(05).\n"
+          + "        77 {$*utf-8-pos}   PIC 9(05).\n"
+          + "        77 {$*utf-8-end}   PIC 9(05).\n"
+          + "\n"
+          + "       01 {$*jsonout}    PIC X(30000).\n"
+          + "\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           JSON GENERATE {$JSONOUT} FROM {$MYDATA} COUNT {$JSONLEN}                \n"
+          + "               SUPPRESS WHEN ZERO                                           \n"
+          + "               ON EXCEPTION DISPLAY 'ERROR JSON-CODE: ' {$JSON-CODE}        \n"
+          + "               NOT ON EXCEPTION DISPLAY 'JSON GENERATED - LEN=' {$JSONLEN}\n"
+          + "               END-Json.  ";
+
   @Test
   void testValidJsonGenerateStatement() {
     UseCaseEngine.runTest(VALID_TEXT, ImmutableList.of(), ImmutableMap.of());
@@ -301,95 +334,124 @@ public class TestJsonGenerateStatement {
 
   @Test
   void test_whenIdentifier1NotAlphanumeric_throwDiagnostics() {
-    UseCaseEngine.runTest(TEXT_IDENTIFIER1_NOT_ALPHANUMERIC, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDENTIFIER1_NOT_ALPHANUMERIC,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "DOCX can only be of category national or alphanumeric and must not be dynamic length or justified.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "DOCX can only be of category national or alphanumeric and must not be dynamic length or justified.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_whenIdentifier1Justified_throwDiagnostics() {
-    UseCaseEngine.runTest(TEXT_IDENTIFIER1_JUSTIFIED, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDENTIFIER1_JUSTIFIED,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "DOCX can only be of category national or alphanumeric and must not be dynamic length or justified.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "DOCX can only be of category national or alphanumeric and must not be dynamic length or justified.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_whenIdentifier2_haveNonUniqueSubOrdinateElement_throwDiagnostics() {
-    UseCaseEngine.runTest(TEXT_IDEN2_UNIQUE_SUBORDINATE, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDEN2_UNIQUE_SUBORDINATE,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "NG-AREA2 group item must have unique data-name and must not contain RENAMES clause.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "NG-AREA2 group item must have unique data-name and must not contain RENAMES clause.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_whenIdentifier2_isInvalid_throwDiagnostics() {
-    UseCaseEngine.runTest(TEXT_IDEN2_INVALID, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDEN2_INVALID,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "NG-AREA1 group item must have unique data-name and must not contain RENAMES clause.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "NG-AREA1 group item must have unique data-name and must not contain RENAMES clause.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_whenIdentifier3_isInvalid_throwDiagnostics() {
-    UseCaseEngine.runTest(TEXT_IDEN3_INVALID, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDEN3_INVALID,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "COUNT1 must be an integer data item defined without the symbol P in its picture string.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "COUNT1 must be an integer data item defined without the symbol P in its picture string.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_whenIdentifier4_isInvalid_throwDiagnostics() {
-    UseCaseEngine.runTest(TEXT_IDEN4_INVALID, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDEN4_INVALID,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "FLAGS must reference a data item that is subordinate to IN-AREA",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()),
+                new Range(),
+                "FLAGS must reference a data item that is subordinate to IN-AREA",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
-                    new Range(),
-                    "NG-AREA1 must reference a data item that is subordinate to IN-AREA",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "NG-AREA1 must reference a data item that is subordinate to IN-AREA",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_whenIdentifier5_isInvalid_throwDiagnostics() {
-    UseCaseEngine.runTest(TEXT_IDEN5_INVALID, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDEN5_INVALID,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "ASNUM must reference a data item that is subordinate to IN-AREA",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "ASNUM must reference a data item that is subordinate to IN-AREA",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_whenIdentifier6_isInvalid_throwDiagnostics() {
-    UseCaseEngine.runTest(TEXT_IDEN6_INVALID, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDEN6_INVALID,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "data-a should be elementary item with PIC X clause.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "data-a should be elementary item with PIC X clause.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void whenLevel77_considerIndependentNode() {
+    UseCaseEngine.runTest(TEXT_LEVEL77, ImmutableList.of(), ImmutableMap.of());
   }
 }
