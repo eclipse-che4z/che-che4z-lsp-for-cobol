@@ -39,17 +39,18 @@ Utils.getZoweExplorerAPI = jest.fn();
 describe("Test profile Utils", () => {
   const programName = "COBOLFILE.cbl";
   const profile = "profile";
-  it("checks that profile is fetched from the file path as 1st strategy", async () => {
+  it("checks a profile passed through settings is always given preference over profile from doc path for copybook download", async () => {
     Utils.getZoweExplorerAPI = getZoweExplorerMock();
     (vscode.workspace.textDocuments as any) = [];
     (vscode.workspace.textDocuments as any).push({
       fileName: path.join(profile, programName),
     } as any);
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-      get: jest.fn().mockReturnValue([]),
+      get: jest.fn().mockReturnValue("profileInSettings"),
     });
+    ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue([profile]);
     expect(await ProfileUtils.getProfileNameForCopybook(programName)).toBe(
-      profile,
+      "profileInSettings",
     );
   });
 

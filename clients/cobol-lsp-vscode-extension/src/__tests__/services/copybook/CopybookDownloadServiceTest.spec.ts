@@ -452,6 +452,7 @@ describe("Test downloadCopybook user interaction", () => {
   });
 
   test("check profile not found", async () => {
+    ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue([]);
     ProfileUtils.getProfileNameForCopybook = jest
       .fn()
       .mockReturnValue(undefined);
@@ -468,6 +469,7 @@ describe("Test downloadCopybook user interaction", () => {
   });
 
   test("check profile not found with user interaction", async () => {
+    ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue([]);
     ProfileUtils.getProfileNameForCopybook = jest
       .fn()
       .mockReturnValue(undefined);
@@ -484,6 +486,7 @@ describe("Test downloadCopybook user interaction", () => {
   });
 
   test("check good path", async () => {
+    ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue(["profile"]);
     ProfileUtils.getProfileNameForCopybook = jest
       .fn()
       .mockReturnValue("profile");
@@ -501,6 +504,9 @@ describe("Test downloadCopybook user interaction", () => {
   });
 
   test("check locked profile", async () => {
+    ProfileUtils.getAvailableProfiles = jest
+      .fn()
+      .mockReturnValue([wrongCredProfile]);
     ProfileUtils.getProfileNameForCopybook = jest
       .fn()
       .mockReturnValue(wrongCredProfile);
@@ -512,6 +518,9 @@ describe("Test downloadCopybook user interaction", () => {
   });
 
   test("check locked profile and user kept it locked", async () => {
+    ProfileUtils.getAvailableProfiles = jest
+      .fn()
+      .mockReturnValue([wrongCredProfile]);
     ProfileUtils.getProfileNameForCopybook = jest
       .fn()
       .mockReturnValue(wrongCredProfile);
@@ -531,6 +540,9 @@ describe("Test downloadCopybook user interaction", () => {
   });
 
   test("queue locked and user unlocked it", async () => {
+    ProfileUtils.getAvailableProfiles = jest
+      .fn()
+      .mockReturnValue([wrongCredProfile]);
     ProfileUtils.getProfileNameForCopybook = jest
       .fn()
       .mockReturnValue(wrongCredProfile);

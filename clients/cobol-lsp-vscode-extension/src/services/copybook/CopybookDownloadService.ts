@@ -399,8 +399,9 @@ export class CopybookDownloadService implements vscode.Disposable {
       return;
     }
     const profile = await ProfileUtils.getProfileNameForCopybook(documentUri);
+    const availableProfiles = ProfileUtils.getAvailableProfiles(explorerAPI);
 
-    if (!profile) {
+    if (!profile || availableProfiles.indexOf(profile) < 0) {
       if (!quiet) {
         const providedProfile: string = SettingsService.getProfileName();
         const message = providedProfile

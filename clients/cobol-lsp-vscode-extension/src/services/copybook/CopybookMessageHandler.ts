@@ -25,18 +25,21 @@ enum CopybookFolderKind {
   "downloaded-uss",
 }
 
-export function resolveCopybookHandler(
+export async function resolveCopybookHandler(
   documentUri: string,
   copybookName: string,
   dialectType: string,
-): string {
+): Promise<string> {
   let result: string;
   result = searchCopybook(documentUri, copybookName, dialectType);
   // check in subfolders under .copybooks (copybook downloaded from MF)
   if (!result) {
     result = searchCopybookInWorkspace(
       copybookName,
-      CopybookURI.createPathForCopybookDownloaded(documentUri, dialectType),
+      await CopybookURI.createPathForCopybookDownloaded(
+        documentUri,
+        dialectType,
+      ),
       SettingsService.getCopybookExtension(),
     );
   }

@@ -26,7 +26,7 @@ vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
 Utils.getZoweExplorerAPI = jest.fn();
 
 describe("Test the copybook message handler", () => {
-  it("checks local present copybooks are resolved", () => {
+  it("checks local present copybooks are resolved", async () => {
     SettingsService.getCopybookExtension = jest.fn().mockReturnValue([".cpy"]);
     SettingsService.getCopybookLocalPath = jest
       .fn()
@@ -35,11 +35,15 @@ describe("Test the copybook message handler", () => {
       .fn()
       .mockReturnValue("copybook content");
     expect(
-      resolveCopybookHandler("cobolFileName", "copybookName", "dialectType"),
+      await resolveCopybookHandler(
+        "cobolFileName",
+        "copybookName",
+        "dialectType",
+      ),
     ).toBe("copybook content");
   });
 
-  it("checks downloaded copybooks are resolved", () => {
+  it("checks downloaded copybooks are resolved", async () => {
     SettingsService.getCopybookExtension = jest.fn().mockReturnValue([".cpy"]);
     SettingsService.getCopybookLocalPath = jest.fn().mockReturnValue("");
     SettingsService.getDsnPath = jest
@@ -53,11 +57,15 @@ describe("Test the copybook message handler", () => {
       .mockReturnValueOnce("")
       .mockReturnValueOnce("Downloaded copybook content");
     expect(
-      resolveCopybookHandler("cobolFileName", "copybookName", "dialectType"),
+      await resolveCopybookHandler(
+        "cobolFileName",
+        "copybookName",
+        "dialectType",
+      ),
     ).toBe("Downloaded copybook content");
   });
 
-  it("checks USS downloaded copybooks are resolved", () => {
+  it("checks USS downloaded copybooks are resolved", async () => {
     SettingsService.getCopybookExtension = jest.fn().mockReturnValue([".cpy"]);
     SettingsService.getCopybookLocalPath = jest.fn().mockReturnValue("");
     SettingsService.getDsnPath = jest.fn().mockReturnValue([]);
@@ -73,7 +81,11 @@ describe("Test the copybook message handler", () => {
       .mockReturnValueOnce("")
       .mockReturnValue("Downloaded USS copybook content");
     expect(
-      resolveCopybookHandler("cobolFileName", "copybookName", "dialectType"),
+      await resolveCopybookHandler(
+        "cobolFileName",
+        "copybookName",
+        "dialectType",
+      ),
     ).toBe("Downloaded USS copybook content");
   });
 });
