@@ -15,8 +15,9 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import { registerDialect } from "@code4z/cobol-dialect-api";
+import { v1 } from "@code4z/cobol-dialect-api";
 
+const registerDialect = v1.registerDialect;
 let unregisterDialect = () => {};
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -30,7 +31,6 @@ export async function activate(context: vscode.ExtensionContext) {
     "dialect-daco.jar"
   );
   unregisterDialect = await registerDialect(extensionId, {
-    apiVersion: 1,
     name: "DaCo",
     description: "DaCo dialect support",
     snippets,

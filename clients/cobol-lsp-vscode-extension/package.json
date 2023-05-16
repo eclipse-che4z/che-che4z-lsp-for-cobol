@@ -469,6 +469,7 @@
     "package": "vsce package"
   },
   "dependencies": {
+    "@code4z/cobol-dialect-api": "file:../cobol-dialect-api",
     "glob": "8.1.0",
     "iconv-lite": "^0.6.3",
     "micromatch": "4.0.5",

@@ -13,6 +13,7 @@
  */
 
 import * as vscode from "vscode";
+import { ExtensionApi } from "@code4z/cobol-dialect-api";
 
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
@@ -41,7 +42,7 @@ import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 
 let languageClientService: LanguageClientService;
 let outputChannel: vscode.OutputChannel;
-const API_VERSION: string = "1.0";
+const API_VERSION: string = "1.0.0";
 
 function initialize() {
   // We need lazy initialization to be able to mock this for unit testing
@@ -52,7 +53,9 @@ function initialize() {
   return { copyBooksDownloader, configurationWatcher };
 }
 
-export async function activate(context: vscode.ExtensionContext) {
+export async function activate(
+  context: vscode.ExtensionContext,
+): Promise<ExtensionApi> {
   DialectRegistry.clear();
   const { copyBooksDownloader, configurationWatcher } = initialize();
   initSmartTab(context);
@@ -119,15 +122,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // 'export' public api-surface
   return {
-    analysis(uri: string, text: string): Promise<any> {
-      return languageClientService.retrieveAnalysis(uri, text);
+    v1: {
+      registerDialect,
     },
-    dialectAPI_1_0() {
-      return getDialectAPI_v_1_0();
-    },
-    version(): string {
-      return API_VERSION;
-    },
+    version: API_VERSION,
   };
 }
 
@@ -135,37 +133,35 @@ export function deactivate() {
   return languageClientService.stop();
 }
 
-interface Dialect {
+interface DialectDetailV1 {
   name: string;
   description: string;
   jar: vscode.Uri;
   snippets: vscode.Uri;
 }
 
-function getDialectAPI_v_1_0() {
-  return {
-    registerDialect(extensionId: string, dialect: Dialect) {
-      outputChannel.appendLine(
-        "Register new dialect: \r\n" + JSON.stringify(dialect),
-      );
+const registerDialect = (extensionId: string, dialect: DialectDetailV1) => {
+  outputChannel.appendLine(
+    "Register new dialect: \r\n" + JSON.stringify(dialect),
+  );
 
-      DialectRegistry.register(
-        extensionId,
-        dialect.name,
-        dialect.jar,
-        dialect.description,
-        dialect.snippets.fsPath,
-      );
-      outputChannel.appendLine("Restart analysis");
-      languageClientService.invalidateConfiguration();
+  DialectRegistry.register(
+    extensionId,
+    dialect.name,
+    dialect.jar,
+    dialect.description,
+    dialect.snippets.fsPath,
+  );
+  outputChannel.appendLine("Restart analysis");
+  languageClientService.invalidateConfiguration();
 
-      return function unregisterDialect() {
-        DialectRegistry.unregister(dialect.name);
-        languageClientService.invalidateConfiguration();
-      };
-    },
+  const unregisterDialect = () => {
+    DialectRegistry.unregister(dialect.name);
+    languageClientService.invalidateConfiguration();
   };
-}
+
+  return unregisterDialect;
+};
 
 function registerCommands(
   context: vscode.ExtensionContext,

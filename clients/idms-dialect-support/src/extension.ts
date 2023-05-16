@@ -15,8 +15,9 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import { registerDialect } from "@code4z/cobol-dialect-api";
+import { v1 } from "@code4z/cobol-dialect-api";
 
+const registerDialect = v1.registerDialect;
 let unregisterDialect = () => {};
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -27,10 +28,9 @@ export async function activate(context: vscode.ExtensionContext) {
     extensionUri,
     "server",
     "jar",
-    "dialect-idms.jar"
+    "dialect-idms.jar",
   );
   unregisterDialect = await registerDialect(extensionId, {
-    apiVersion: 1,
     name: "IDMS",
     description: "IDMS dialect support",
     snippets,
