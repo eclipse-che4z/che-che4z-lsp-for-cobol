@@ -125,7 +125,7 @@ Dialect add-ons must be enabled in the COBOL Language Support extension settings
 
 1. Ensure that you meet the Java prerequisite described in the add-on readme. 
 2. Set **Cobol-lsp: serverRuntime** to **JAVA** in the your extension settings.
-3. Add the dialect to the **Cobol-lsp: dialects** array in your workspace extension settings, or to the `preprocessor` parameter in a processor group. For more information, see [Processor Groups](#Processor-Groups).
+3. Add the dialect to the **Cobol-lsp: dialects** array in your workspace extension settings, or to the `preprocessor` parameter in a processor group. For more information, see [Processor Groups](#processor-groups).
 
 COBOL Language Support processes dialects in the order you list them in the **Cobol-lsp: dialects** setting or within the `preprocessor` parameter of a processor group. If you list dialects in the wrong order, some pieces of code might be incorrectly processed using the wrong dialect parser and marked as errors. 
 
