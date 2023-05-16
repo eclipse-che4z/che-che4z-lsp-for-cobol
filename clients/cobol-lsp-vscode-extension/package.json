@@ -466,7 +466,7 @@
     "watch": "tsc -watch -p ./",
     "test": "jest -w 1 --unhandled-rejections=strict",
     "coverage": "jest --coverage --runInBand",
-    "package": "vsce package"
+    "package": "vsce package --no-dependencies"
   },
   "dependencies": {
     "@code4z/cobol-dialect-api": "file:../cobol-dialect-api",

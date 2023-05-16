@@ -81,7 +81,7 @@
     "pretty": "prettier -w .",
     "lint": "prettier -c . && eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
-    "package": "vsce package"
+    "package": "vsce package --no-dependencies"
   },
   "devDependencies": {
     "@types/glob": "^8.0.0",
