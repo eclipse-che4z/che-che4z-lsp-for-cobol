@@ -50,18 +50,18 @@ export const getV1Api = async (extensionId: string): Promise<V1Api> => {
       typeof api.version !== "string"
     ) {
       throw new Error(
-        `The version of COBOL Language Support extension ${mainExtensionId} you have installed does not provide API.`,
+        `The version ${main.packageJSON.version} of COBOL Language Support extension ${main.id} you have installed does not provide API.`,
       );
     }
     if (!("v1" in api)) {
       throw new Error(
-        `The version of COBOL Language Support extension ${mainExtensionId} you have installed does not provide v1 API: `,
+        `The version ${main.packageJSON.version} of COBOL Language Support extension ${main.id} you have installed does not provide v1 API: `,
       );
     }
     const v1 = api.v1;
     if (!isV1Api(v1)) {
       throw new Error(
-        `The v1 API of the version of COBOL Language Support extension ${mainExtensionId} you have installed does not match expected signature.`,
+        `The v1 API of the version ${main.packageJSON.version} of COBOL Language Support extension ${main.id} you have installed does not match the expected signature.`,
       );
     }
     v1Api = {
