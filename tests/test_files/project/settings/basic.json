@@ -1,4 +1,7 @@
 {
+    "git.enabled": false,
+    "git.path": null,
+    "git.autofetch": false,
     "cobol-lsp.logging.level.root": "DEBUG",
     "cobol-lsp.cpy-manager.profiles": "",
     "cobol-lsp.cpy-manager.paths-local": [
