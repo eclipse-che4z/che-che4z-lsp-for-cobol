@@ -1,10 +1,25 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [1.1.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.1.2) (2022-12-22)
+## [1.2.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.2.0...1.2.1) (2023-03-08)
 
 #### Fixed
-- Fix copybook download and clear downloaded copybook cache commands
+- Fix fatal java exception when editing a new file.
+
+## [1.2.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.2.0) (2023-02-02)
+
+#### Added
+- Support platform binary for darwin-arm64, darwin-x64, linux-arm64, linux-x64, win32-arm64 and win32-x64.
+
+#### Changed
+- Preserve alignment while using multiselect smart tab
+- An empty string as a default for copybook extensions
+- Create .c4z only when it is needed
+- Readme update
+
+#### Fixed
+- Miscellaneous bug fixes
+- Discovery of dialects on Windows
 
 ## [1.1.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.0...1.1.1) (2022-12-07)
 
