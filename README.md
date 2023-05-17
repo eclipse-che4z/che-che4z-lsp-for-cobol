@@ -251,12 +251,12 @@ In the `proc_grps.json` file, specify your copybook folders and data sets in a `
         },
         {
             "name": "GROUP2",
-            "libs": [
-                "LIB3", "LIB4"
-            ],
             "preprocessor": [
                 {
                     "name": "IDMS"
+                    "libs": [
+                "LIB3", "LIB4"
+            ],
                 },
             ],
         }
