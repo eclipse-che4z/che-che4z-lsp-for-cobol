@@ -146,8 +146,14 @@ function globSearch(
   return result[0] ? path.join(cwd, result[0]) : undefined;
 }
 
-export function getProgramNameFromUri(uri: string): string {
+export function getProgramNameFromUri(
+  uri: string,
+  includeExt: boolean = false,
+): string {
   const fullPath = Uri.parse(uri).fsPath;
+  if (includeExt) {
+    return path.basename(fullPath);
+  }
   return path.basename(fullPath, path.extname(fullPath));
 }
 

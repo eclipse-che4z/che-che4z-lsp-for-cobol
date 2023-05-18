@@ -15,7 +15,10 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { C4Z_FOLDER, COPYBOOKS_FOLDER } from "../../constants";
 import { SettingsService } from "../Settings";
-import { searchCopybookInWorkspace } from "../util/FSUtils";
+import {
+  getProgramNameFromUri,
+  searchCopybookInWorkspace,
+} from "../util/FSUtils";
 import { ProfileUtils } from "../util/ProfileUtils";
 
 /**
@@ -52,7 +55,10 @@ export class CopybookURI {
     if (!result) {
       result = searchCopybookInWorkspace(
         copybookName,
-        CopybookURI.createPathForCopybookDownloaded(documentUri, dialectType),
+        await CopybookURI.createPathForCopybookDownloaded(
+          documentUri,
+          dialectType,
+        ),
         SettingsService.getCopybookExtension(),
       );
     }
@@ -95,11 +101,12 @@ export class CopybookURI {
    * @param profile represent a name of a folder within the .copybooks folder that have the same name as the
    * connection name needed to download copybooks from mainframe.
    */
-  public static createPathForCopybookDownloaded(
+  public static async createPathForCopybookDownloaded(
     documentUri: string,
     dialectType: string,
-  ): string[] {
-    const profile = ProfileUtils.getProfileNameForCopybook(documentUri);
+  ): Promise<string[]> {
+    const filename = getProgramNameFromUri(documentUri, true);
+    const profile = await ProfileUtils.getProfileNameForCopybook(filename);
 
     let result: string[] = [];
     const datasets: string[] = SettingsService.getDsnPath(

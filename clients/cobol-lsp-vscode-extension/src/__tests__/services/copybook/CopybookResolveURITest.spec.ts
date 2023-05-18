@@ -65,12 +65,12 @@ function removeFolder(targetPath: string) {
   return false;
 }
 
-function buildResultArrayFrom(
+async function buildResultArrayFrom(
   settingsMockValue: string[],
   filename: string,
   profileName: string,
   ussPath: string[] = [],
-): number {
+): Promise<number> {
   vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
     get: jest.fn().mockReturnValueOnce(settingsMockValue),
   });
@@ -81,11 +81,12 @@ function buildResultArrayFrom(
   }
   ProfileUtils.getProfileNameForCopybook = jest
     .fn()
-    .mockReturnValue(profileName);
-  return (CopybookURI as any).createPathForCopybookDownloaded(
+    .mockResolvedValue(profileName);
+  const result = await (CopybookURI as any).createPathForCopybookDownloaded(
     filename,
     SettingsService.DEFAULT_DIALECT,
-  ).length;
+  );
+  return result.length;
 }
 
 beforeEach(() => {
@@ -191,24 +192,24 @@ describe("Resolve local copybook present in one or more folders specified by the
   });
 });
 describe("With invalid input parameters, the list of URI that represent copybook downloaded are not generated", () => {
-  test("given a profile but no dataset, the result list returned is empty", () => {
-    expect(buildResultArrayFrom(undefined, "file", "PRF")).toBe(0);
+  test("given a profile but no dataset, the result list returned is empty", async () => {
+    expect(await buildResultArrayFrom(undefined, "file", "PRF")).toBe(0);
   });
-  test("given a list of dataset but no profile, the result list returned is empty", () => {
+  test("given a list of dataset but no profile, the result list returned is empty", async () => {
     expect(
-      buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "file", undefined),
+      await buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "file", undefined),
     ).toBe(0);
   });
 });
 describe("With allowed input parameters, the list of URI that represent copybook downloaded is correctly generated", () => {
-  test("given profile and dataset list with one element, the result list is correctly generated with size 1 ", () => {
-    expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "file", "PRF")).toBe(
-      1,
-    );
-  });
-  test("given profile, dataset and USS path, list with one element each, the result list is correctly generated with size 2 ", () => {
+  test("given profile and dataset list with one element, the result list is correctly generated with size 1 ", async () => {
     expect(
-      buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "file", "PRF", [
+      await buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "file", "PRF"),
+    ).toBe(1);
+  });
+  test("given profile, dataset and USS path, list with one element each, the result list is correctly generated with size 2 ", async () => {
+    expect(
+      await buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "file", "PRF", [
         "/test/uss/path",
       ]),
     ).toBe(2);

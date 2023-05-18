@@ -25,6 +25,13 @@ export class ProfileUtils {
     if (!zoweExplorerApi) {
       return undefined;
     }
+    return ProfileUtils.getValidProfileForCopybookDownload(
+      cobolFileName,
+      ProfileUtils.getAvailableProfiles(zoweExplorerApi),
+    );
+  }
+
+  public static getAvailableProfiles(zoweExplorerApi: IApiRegisterClient) {
     let availableProfiles: string[] = [];
     zoweExplorerApi.registeredApiTypes().forEach((profileType) => {
       availableProfiles = availableProfiles.concat(
@@ -35,10 +42,7 @@ export class ProfileUtils {
           ?.map((ele) => ele.name),
       );
     });
-    return ProfileUtils.getValidProfileForCopybookDownload(
-      cobolFileName,
-      availableProfiles,
-    );
+    return availableProfiles;
   }
 
   private static getValidProfileForCopybookDownload(
@@ -50,10 +54,10 @@ export class ProfileUtils {
       availableProfiles,
     );
     const passedProfile = SettingsService.getProfileName();
-    if (!profileFromDoc && availableProfiles.indexOf(passedProfile) >= 0) {
-      return passedProfile;
+    if (!passedProfile && profileFromDoc) {
+      return profileFromDoc;
     }
-    return profileFromDoc;
+    return passedProfile;
   }
 
   private static getProfileFromDocument(
