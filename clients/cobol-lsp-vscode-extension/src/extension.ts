@@ -14,7 +14,7 @@
 
 import * as vscode from "vscode";
 
-import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
+import {  fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import { LANGUAGE_ID } from "./constants";
 import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";

@@ -460,16 +460,13 @@
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "test:integration": "npm run compile && node ./out/test/runTest.js",
     "compile": "tsc -p ./",
-    "lint": "pwd; prettier --version; prettier --find-config-path src/test/suite/lsp.spec.test.ts; prettier -c .",
+    "lint": "pwd; prettier --version; prettier --find-config-path src/test/suite/lsp.spec.test.ts; prettier --loglevel=debug -c .",
     "pretest": "npm run compile && npm run lint",
     "pretty": "prettier -w .",
     "watch": "tsc -watch -p ./",
     "test": "jest -w 1 --unhandled-rejections=strict",
     "coverage": "jest --coverage --runInBand",
     "package": "vsce package"
-  },
-  "prettier": {
-    "trailingComma": "all"
   },
   "dependencies": {
     "glob": "8.1.0",
