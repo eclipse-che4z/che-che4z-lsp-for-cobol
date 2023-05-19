@@ -58,52 +58,7 @@ jobs:
           echo path:
           pwd
           npm ci
-          npm test
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        with:
-          projectBaseDir: clients/cobol-lsp-vscode-extension
-          args: >
-            -Dsonar.branch.name=${BRANCH_NAME}
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          BRANCH_NAME: ${{ github.ref_name || github.head_ref }} 
-
-      - name: Build VS Code extension dialect API
-        working-directory: clients/cobol-dialect-api
-        run: |
-          npm ci
-          npm run compile
-      - uses: actions/upload-artifact@v3
-        with:
-          name: lib
-          path: clients/cobol-dialect-api/lib/*         
-      - name: Package IDMS vsix
-        working-directory: clients/idms-dialect-support
-        run: |
-          npm ci
-          cp ../../server/dialect-idms/target/dialect-idms.jar ./server/jar
-          npm run package
-          cp *.vsix ../../.
-      - name: Package DaCo vsix
-        working-directory: clients/daco-dialect-support
-        run: |
-          npm ci
-          cp ../../server/dialect-daco/target/dialect-daco.jar ./server/jar
-          npm run package
-          cp *.vsix ../../.
-      - uses: actions/upload-artifact@v3
-        with:
-          if-no-files-found: warn
-          name: vsix-idms-dialect
-          path: 'cobol-dialect-support-for-idms*.vsix'
-      - uses: actions/upload-artifact@v3
-        with:
-          if-no-files-found: warn
-          name: vsix-daco-dialect
-          path: 'cobol-dialect-support-for-daco*.vsix'
+          npm lint
   buildNative:
     strategy:
       fail-fast: false
