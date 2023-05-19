@@ -35,7 +35,6 @@ jobs:
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
           echo path:
-          pwd
           npm ci
           npm run lint
   buildNative:
