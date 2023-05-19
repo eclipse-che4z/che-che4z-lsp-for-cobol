@@ -460,7 +460,7 @@
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "test:integration": "npm run compile && node ./out/test/runTest.js",
     "compile": "tsc -p ./",
-    "lint": "pwd; prettier --version; prettier --find-config-path src/test/suite/lsp.spec.test.ts; cat src/test/suite/lsp.spec.test.ts > a; prettier src/test/suite/lsp.spec.test.ts > b; diff -C 100 -u a b; git diff; git status; prettier --loglevel=debug -c .",
+    "lint": "pwd; prettier --version; prettier --find-config-path src/test/suite/lsp.spec.test.ts; cat src/test/suite/lsp.spec.test.ts > a; prettier src/test/suite/lsp.spec.test.ts > b; diff -U 100 a b; git diff; git status; prettier --loglevel=debug -c .",
     "pretest": "npm run compile && npm run lint",
     "pretty": "prettier -w .",
     "watch": "tsc -watch -p ./",
