@@ -58,7 +58,7 @@ jobs:
           echo path:
           pwd
           npm ci
-          npm lint
+          npm run lint
   buildNative:
     strategy:
       fail-fast: false
