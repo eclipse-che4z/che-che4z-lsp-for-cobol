@@ -23,9 +23,9 @@ import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 /**
@@ -81,24 +81,15 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
   @VisibleForTesting
   public InputStream getDialectResources(
       List<String> resourceName, URI jarUri) throws IOException {
+    JarFile jar = new JarFile(jarUri.toURL().getFile());
     for (String s : resourceName) {
-      URL url = new URL(jarUri.toURL() + "!/" + s);
-      if (jarUrlExists(url)) {
-        return url.openStream();
+      if (Objects.nonNull(jar.getJarEntry(s))) {
+        return jar.getInputStream(jar.getJarEntry(s));
       } else {
         LOG.debug("Resource Bundle " + s + " not available at " + jarUri);
       }
     }
     return IOUtils.toInputStream("", StandardCharsets.UTF_8);
-  }
-
-  private boolean jarUrlExists(URL url) {
-    try {
-      IOUtils.toString(url.openStream(), StandardCharsets.UTF_8);
-      return true;
-    } catch (IOException e) {
-      return false;
-    }
   }
 
   private List<String> toSuspectedBundleNames(String baseName, Locale locale) {
