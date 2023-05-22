@@ -1,0 +1,17 @@
+{
+    "scopeName": "example-cobol.injection",
+    "injectionSelector": "L:source.cobol",
+    "patterns": [
+      {
+        "include": "#example-keywords"
+      }
+    ],
+    "repository": {
+      "example-keywords": {
+        "begin": "^.{7}",
+        "end": ".{72}$",
+        "match": "(?i:BITWISE|CALL|DETAILS|INJECT|LEFT|MESSAGE|MSG_TYPE|MSG|EXAMPLE|PARSE|REPLY|RIGHT|RPC|RPC-MSG|SHIFT|UNSET|UNTIE|XID)",
+        "name": "keyword.myrule"
+      }
+    }
+  }

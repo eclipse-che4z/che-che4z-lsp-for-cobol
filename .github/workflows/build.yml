@@ -119,7 +119,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: lib
-          path: clients/cobol-dialect-api/lib/*    
+          path: clients/cobol-dialect-api/lib/*
       - name: Unit Test COBOL LS extension
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
@@ -329,7 +329,7 @@ jobs:
         with:
           name: lib
           path: clients/cobol-dialect-api
-      - name: Build COBOL LS extension 
+      - name: Build COBOL LS extension
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
       - name: Package COBOL LS vsix for ${{ env.target }}
@@ -369,7 +369,7 @@ jobs:
           run: |
             npm run compile
             npm run test:integration
-          working-directory: clients/cobol-lsp-vscode-extension          
+          working-directory: clients/cobol-lsp-vscode-extension
       - name: Run native executable test code
         working-directory: tests/native-executable-tests
         run: |

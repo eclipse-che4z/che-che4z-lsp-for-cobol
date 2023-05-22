@@ -1,0 +1,48 @@
+{
+    "SHIFT var": {
+        "prefix": "SHIFT VAR",
+        "description": "move identifier1 to identifier2",
+        "body": [
+            "EXAMPLE SHIFT ${1:var} TO ${2:var}"
+        ]
+    },
+    "BITWISE SHIFT block": {
+        "prefix": "BITWISE SHIFT",
+        "description": "perform bitwise shift",
+        "body": [
+            "EXAMPLE BITWISE SHIFT ${1:var} ${2|RIGHT,LEFT|} ${3:var}"
+        ]
+    },
+    "UNTIE statement": {
+        "prefix": "UNTIE statement",
+        "description": "releases dynamic storage that was previously obtained with an ALLOCATE statement",
+        "body": [
+            "EXAMPLE UNTIE ${1:var}"
+        ]
+    },
+    "UNSET statement": {
+        "prefix": "UNSET statement",
+        "description": "resets a boolean",
+        "body": [
+            "EXAMPLE UNSET ${1:var}"
+        ]
+    },
+    "INJECT statement": {
+        "prefix": "INJECT",
+        "description": "inject a copybook",
+        "body": [
+            "EXAMPLE INJECT ${1:copybookName}"
+        ]
+    },
+    "RPC PARSE": {
+        "prefix": "RPC MESSAGE PARSE",
+        "description": "RPC parse statement",
+        "body": [
+            "EXAMPLE RPC-MSG PARSE ${1:var INTO ${2:var}", 
+            "WITH DETAILS XID ${3:var}",
+            "WITH DETAILS MSG_TYPE ${4:var}",
+            "WITH DETAILS CALL ${5:var}",
+            "WITH DETAILS REPLY ${6:var}"
+        ]
+    }
+}

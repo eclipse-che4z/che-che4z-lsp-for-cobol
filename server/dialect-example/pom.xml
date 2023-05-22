@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>server</artifactId>
+        <groupId>org.eclipse.lsp.cobol</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <version>1.0-SNAPSHOT</version>
+    <artifactId>dialect-example</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <antlr.version>4.12.0</antlr.version>
+        <lombok.version>1.18.26</lombok.version>
+        <maven.antlr4.plugin.version>4.7</maven.antlr4.plugin.version>
+        <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>Broadcom</id>
+            <name>Broadcom Inc</name>
+            <url>https://packages.broadcom.com/artifactory/brightside-maven/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.eclipse.lsp.cobol</groupId>
+            <artifactId>common</artifactId>
+            <version>${dialect.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>${antlr.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>dialect-example</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/antlr4</directory>
+                <excludes>
+                    <exclude>**</exclude>
+                </excludes>
+                <includes>
+                    <include>*.tokens</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven.resources.plugin.version}</version>
+            </plugin>
+            <!--       Call the antlr4 maven plugin to generate parser from the configured grammar -->
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>${maven.antlr4.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>run antlr</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>
+                                <argument>-package</argument>
+                                <argument>org.broadcom.cobol.dialects.cobolExample</argument>
+                                <argument>-o</argument>
+                                <argument>
+                                    ${basedir}/target/generated-sources/antlr4/org/broadcom/cobol/dialects/cobolExample
+                                </argument>
+                            </arguments>
+                            <sourceDirectory>src/main/antlr4/org/broadcom/cobolExample/parser</sourceDirectory>
+                            <listener>true</listener>
+                            <visitor>true</visitor>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
