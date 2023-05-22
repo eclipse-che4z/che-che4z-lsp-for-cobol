@@ -305,7 +305,11 @@ suite("Integration Test Suite", function () {
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 2,
     );
     let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 2, "got: " + JSON.stringify(diagnostics));
+    assert.strictEqual(
+      diagnostics.length,
+      2,
+      "got: " + JSON.stringify(diagnostics),
+    );
     assert.strictEqual(
       diagnostics[0].message,
       "The following token must start in Area A: FD",
