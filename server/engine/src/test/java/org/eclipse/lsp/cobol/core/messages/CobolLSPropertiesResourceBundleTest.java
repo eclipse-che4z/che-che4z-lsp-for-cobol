@@ -22,9 +22,11 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.jar.JarFile;
 
 import static org.mockito.Mockito.*;
 
@@ -60,12 +62,21 @@ class CobolLSPropertiesResourceBundleTest {
 
   @Test
   void updateMessageResourceBundleWhenResourcesNotFound() throws IOException {
-    DialectRegistryItem dialectRegistryItem = new DialectRegistryItem("dummyDialect", URI.create("file://uri"), "dummy dialect", "dummyDialect");
+    URI uri = mock(URI.class);
+    DialectRegistryItem dialectRegistryItem = new DialectRegistryItem("dummyDialect", uri, "dummy dialect", "dummyDialect");
     CobolLSPropertiesResourceBundle bundle =
         new CobolLSPropertiesResourceBundle(
             "resourceBundles/test", Locale.FRENCH);
 
+    mockConstruction(JarFile.class);
+    JarFile jarFileSpy = mock(JarFile.class);
+    URL url = mock(URL.class);
+    when(uri.toURL()).thenReturn(url);
+    when(url.getFile()).thenReturn("file://uri");
+    when(jarFileSpy.getJarEntry("resourceBundles/test")).thenReturn(null);
+
     bundle.updateMessageResourceBundle(dialectRegistryItem);
+
     Assertions.assertEquals(bundle.handleGetObject("test.test"), "test.test");
     Assertions.assertEquals(bundle.handleGetObject("1"), "French test selected.");
   }
