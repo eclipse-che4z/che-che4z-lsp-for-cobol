@@ -154,7 +154,7 @@ function getDialectAPI_v_1_0() {
         dialect.name,
         dialect.jar,
         dialect.description,
-        dialect.snippets.path,
+        dialect.snippets.fsPath,
       );
       outputChannel.appendLine("Restart analysis");
       languageClientService.invalidateConfiguration();
