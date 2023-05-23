@@ -6,6 +6,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 #### Added
 - Support for processor groups
 - User-defined dialect order in processor groups
+- SQL backend can be specified in processor groups
 - Support for JSON syntax in the grammar
 
 #### Changed
