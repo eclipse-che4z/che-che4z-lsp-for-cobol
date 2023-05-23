@@ -1,7 +1,41 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [1.1.2](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.1.2) (2022-12-22)
+## [2.0.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/2.0.0...1.2.1) (2023-05-23)
+
+### Bug Fixes
+* Clear diagnostics when the changed content is not analysed
+* Issues with proc_grps json schema
+* Broken SSQ CASE statement grammar
+* Same copybook used more than once within a program shows error if copybook refers to another copybook #1833
+* Support repository paragraph
+* Tolerate json syntax
+* Enable ** match for .folders
+* DaCo extensionDependencies as per new naming convention.
+* Support SUPPRESS keyword in the copy statement #1816
+* SQL special words recognition
+* programId paragraph syntax as per docs
+* Completions for untitled files
+* Completion error when working with un-analyzed file
+* Close analysis and log message when exception encountered while analysing document
+* Mapping for SQL statements
+* Use file path instead file names
+* Do not show diagnostics of closed files
+* Dialect copybook diagnostic propagation
+* Copybook names duplication in suggestions
+* Do not show loading in the outline for a copybook
+* Show progress notification on actual analysis start up
+* Resolve program name variables in autocompletion
+* Broken smart tab #1740
+* Data record definition is optional #1636
+* Variable in copybook resolution and windows paths in processor group
+
+### Features
+* Support JSON parse statement #1746
+* Allow user defined dialect order
+* Allow to setup SQL backend in processor groups
+
+## [1.2.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.2.1) (2022-12-22)
 
 ### Bug Fixes
 * Fix copybook download and clear ([44dff94](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/44dff946fabb0089b3c61e95cb6b1464c0167db5))
