@@ -71,7 +71,6 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run build",
-    "postinstall": "node -e \"if (process.env.NODE_ENV === 'production'){process.exit(1)} \" && patch-package || echo skip patching",
     "build": "esbuild src/extension.ts --bundle --sourcemap --target=node16.17.1,chrome108 --outdir=dist --external:vscode --format=cjs",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
