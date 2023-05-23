@@ -33,9 +33,7 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onCommand:cobol-lsp.smart-tab",
-    "onLanguage:cobol",
-    "workspaceContains:/.c4z"
+    "onLanguage:cobol"
   ],
   "icon": "resources/logo.png",
   "main": "./out/extension.js",

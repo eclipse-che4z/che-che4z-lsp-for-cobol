@@ -28,10 +28,7 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onCommand:cobol-lsp.smart-tab",
-    "onCommand:cobol-lsp.dialect.register",
-    "onLanguage:cobol",
-    "workspaceContains:/.c4z"
+    "onLanguage:cobol"
   ],
   "main": "./dist/extension.js",
   "contributes": {
