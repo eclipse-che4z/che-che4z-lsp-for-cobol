@@ -12,8 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { getV1Api } from "@code4z/cobol-dialect-api";
 
