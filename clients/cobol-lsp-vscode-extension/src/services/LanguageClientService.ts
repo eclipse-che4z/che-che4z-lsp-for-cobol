@@ -12,9 +12,9 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "fs";
+import * as fs from "node:fs";
 import * as net from "net";
-import { join } from "path";
+import { join } from "node:path";
 import * as vscode from "vscode";
 
 import {

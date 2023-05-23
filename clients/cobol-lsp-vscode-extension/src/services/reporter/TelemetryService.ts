@@ -11,8 +11,8 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { userInfo } from "os";
-import { sep } from "path";
+import { userInfo } from "node:os";
+import { sep } from "node:path";
 import { TelemetryEvent } from "./model/TelemetryEvent";
 import { TelemetryFactory } from "./TelemetryFactory";
 import { Utils } from "../util/Utils";
