@@ -4,8 +4,8 @@ All notable changes to the COBOL Language Support extension are documented in th
 ## [2.0.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.2.1...2.0.0) (2023-05-23)
 
 #### Added
-- Processor group support
-- User-defined dialect order
+- Support for processor groups
+- User-defined dialect order in processor groups
 - Support for JSON syntax in the grammar
 
 #### Changed
