@@ -124,7 +124,7 @@ export async function activate(
   // 'export' public api-surface
   return {
     v1: {
-      registerDialect(extensionId: string, dialect: unknown) {
+      async registerDialect(extensionId: string, dialect: unknown) {
         if (
           typeof extensionId !== "string" ||
           !isV1RuntimeDialectDetail(dialect)
@@ -154,10 +154,25 @@ export interface DialectDetail {
   snippets: vscode.Uri;
 }
 
-const registerNewDialect = (extensionId: string, dialect: DialectDetail) => {
+const registerNewDialect = async (
+  extensionId: string,
+  dialect: DialectDetail,
+) => {
   outputChannel.appendLine(
     "Register new dialect: \r\n" + JSON.stringify(dialect),
   );
+
+  try {
+    await vscode.workspace.fs.stat(dialect.jar);
+  } catch (_error) {
+    return Error(`Dialect jar file ${dialect.jar.fsPath} does not exist`);
+  }
+
+  try {
+    await vscode.workspace.fs.stat(dialect.snippets);
+  } catch (_error) {
+    return Error(`Dialect snippets file ${dialect.jar.fsPath} does not exist`);
+  }
 
   DialectRegistry.register(
     extensionId,

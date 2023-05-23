@@ -27,13 +27,22 @@ export async function activate(context: vscode.ExtensionContext) {
     "jar",
     "dialect-daco.jar",
   );
-  const { registerDialect } = await getV1Api(extensionId);
-  unregisterDialect = registerDialect({
+  const v1Api = await getV1Api(extensionId);
+  if (v1Api instanceof Error) {
+    vscode.window.showErrorMessage(v1Api.toString());
+    return;
+  }
+  const registerResponse = await v1Api.registerDialect({
     name: "DaCo",
     description: "DaCo dialect support",
     snippets,
     jar,
   });
+  if (registerResponse instanceof Error) {
+    vscode.window.showErrorMessage(registerResponse.toString());
+    return;
+  }
+  unregisterDialect = registerResponse;
 }
 
 export function deactivate() {
