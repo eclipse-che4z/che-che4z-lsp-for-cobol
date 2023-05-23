@@ -4,36 +4,36 @@ All notable changes to the COBOL Language Support extension are documented in th
 ## [2.0.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/2.0.0...1.2.1) (2023-05-16)
 
 ### Bug Fixes
-* fix: Clear diagnostics when the changed content is not analysed
-* fix: Issues with proc_grps json schema
-* fix: Broken SSQ CASE statement grammar
-* fix: Same copybook used more than once within a program shows error if copybook refers to another copybook #1833
-* fix: Support repository paragraph
-* fix: Tolerate json syntax
-* fix: Enable ** match for .folders
-* fix: DaCo extensionDependencies as per new naming convention.
-* fix: Support SUPPRESS keyword in the copy statement #1816
-* fix: SQL special words recognition
-* fix: programId paragraph syntax as per docs
-* fix: Completions for untitled files
-* fix: Completion error when working with un-analyzed file
-* fix: Close analysis and log message when exception encountered while analysing document
-* fix: Mapping for SQL statements
-* fix: Use file path instead file names
-* fix: Do not show diagnostics of closed files
-* fix: Dialect copybook diagnostic propagation
-* fix: Copybook names duplication in suggestions
-* fix: Do not show loading in the outline for a copybook
-* fix: Show progress notification on actual analysis start up
-* fix: Resolve program name variables in autocompletion
-* fix: Broken smart tab #1740
-* fix: Data record definition is optional #1636
-* fix: Variable in copybook resolution and windows paths in processor group
+* Clear diagnostics when the changed content is not analysed
+* Issues with proc_grps json schema
+* Broken SSQ CASE statement grammar
+* Same copybook used more than once within a program shows error if copybook refers to another copybook #1833
+* Support repository paragraph
+* Tolerate json syntax
+* Enable ** match for .folders
+* DaCo extensionDependencies as per new naming convention.
+* Support SUPPRESS keyword in the copy statement #1816
+* SQL special words recognition
+* programId paragraph syntax as per docs
+* Completions for untitled files
+* Completion error when working with un-analyzed file
+* Close analysis and log message when exception encountered while analysing document
+* Mapping for SQL statements
+* Use file path instead file names
+* Do not show diagnostics of closed files
+* Dialect copybook diagnostic propagation
+* Copybook names duplication in suggestions
+* Do not show loading in the outline for a copybook
+* Show progress notification on actual analysis start up
+* Resolve program name variables in autocompletion
+* Broken smart tab #1740
+* Data record definition is optional #1636
+* Variable in copybook resolution and windows paths in processor group
 
 ### Features
-* feature: Support JSON parse statement #1746
-* feature: Allow user defined dialect order
-* feature: Allow to setup SQL backend in processor groups
+* Support JSON parse statement #1746
+* Allow user defined dialect order
+* Allow to setup SQL backend in processor groups
 
 ## [1.2.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.1.1...1.2.1) (2022-12-22)
 
