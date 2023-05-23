@@ -237,9 +237,9 @@ The Find All References and Go To Definition functionalities are extended to wor
 
 ## Processor Groups
 
-Use processor groups to link programs with specific dialects and specific folders and data sets containing copybooks. You define processor groups in a `proc_grps.json` file and associate them with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
+Use processor groups to link programs with specific dialects and local folders containing copybooks. You define processor groups in a `proc_grps.json` file and associate them with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
 
-In the `proc_grps.json` file, specify your copybook folders and data sets in a `libs` array, and specify dialects within a `preprocessor` JSON element. Use the following format:
+In the `proc_grps.json` file, specify your copybook folders in a `libs` array, and specify dialects within a `preprocessor` JSON element which contains the libraries which use that dialect. Use the following format:
 ```
 {
     "pgroups": [
@@ -247,18 +247,21 @@ In the `proc_grps.json` file, specify your copybook folders and data sets in a `
             "name": "GROUP1",
             "libs": [
                 "LIB1", "LIB2"
-            ],
+            ]
         },
         {
             "name": "GROUP2",
-            "libs": [
-                "LIB3", "LIB4"
-            ],
             "preprocessor": [
                 {
-                    "name": "IDMS"
-                },
+                    "name": "IDMS",
+                    "libs": [
+                "LIB3", "LIB4"
+            ]
+                }
             ],
+            "libs": [
+            "LIB5", "LIB6"
+            ]
         }
     ]
 }
@@ -274,9 +277,11 @@ The `pgm_conf.json` file has the following format:
 }
 ```
 
-The two examples above use copybooks from libraries LIB1 and LIB2 for PROGRAM1, and copybooks from libraries LIB3 and LIB4 for PROGRAM2. The processor groups file also enables the IDMS dialect for PROGRAM2.
+The program name can be wildcarded.
 
-Specify libraries as absolute or relative local paths in the `libs` array. These libraries take priority over the libraries that you specify in the extension settings. Dialects that you specify in processor groups also take priority over those in the workspace extension settings.
+The two examples above use copybooks from libraries LIB1 and LIB2 for PROGRAM1, and copybooks from libraries LIB3, LIB4, LIB5 and LIB6 for PROGRAM2. The processor groups file also enables the IDMS dialect for LIB3 and LIB4 for PROGRAM2.
+
+Specify libraries as absolute or relative local paths in the `libs` array. These libraries take priority over the libraries that you specify in the extension settings. Dialects that you specify in processor groups also take priority over those in the extension settings.
 
 ## Troubleshooting
 
