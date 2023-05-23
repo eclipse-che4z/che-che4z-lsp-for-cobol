@@ -403,7 +403,6 @@
     },
     "configurationDefaults": {
       "[cobol]": {
-        "editor.renderIndentGuides": false,
         "editor.rulers": [
           7,
           11,
