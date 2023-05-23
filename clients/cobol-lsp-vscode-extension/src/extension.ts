@@ -13,7 +13,8 @@
  */
 
 import * as vscode from "vscode";
-import { ExtensionApi } from "@code4z/cobol-dialect-api";
+import { __ExtensionApi } from "@code4z/cobol-dialect-api";
+import { isV1RuntimeDialectDetail } from "./dialect/utils";
 
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
@@ -55,7 +56,7 @@ function initialize() {
 
 export async function activate(
   context: vscode.ExtensionContext,
-): Promise<ExtensionApi> {
+): Promise<__ExtensionApi> {
   DialectRegistry.clear();
   const { copyBooksDownloader, configurationWatcher } = initialize();
   initSmartTab(context);
@@ -123,7 +124,20 @@ export async function activate(
   // 'export' public api-surface
   return {
     v1: {
-      registerDialect,
+      registerDialect(extensionId: string, dialect: unknown) {
+        if (
+          typeof extensionId !== "string" ||
+          !isV1RuntimeDialectDetail(dialect)
+        ) {
+          throw Error("Invalid `dialect` argument" + JSON.stringify(dialect));
+        }
+        return registerNewDialect(extensionId, {
+          name: dialect.name,
+          description: dialect.description,
+          jar: vscode.Uri.parse(dialect.jar, true),
+          snippets: vscode.Uri.parse(dialect.snippets, true),
+        });
+      },
     },
     version: API_VERSION,
   };
@@ -133,14 +147,14 @@ export function deactivate() {
   return languageClientService.stop();
 }
 
-interface DialectDetailV1 {
+export interface DialectDetail {
   name: string;
   description: string;
   jar: vscode.Uri;
   snippets: vscode.Uri;
 }
 
-const registerDialect = (extensionId: string, dialect: DialectDetailV1) => {
+const registerNewDialect = (extensionId: string, dialect: DialectDetail) => {
   outputChannel.appendLine(
     "Register new dialect: \r\n" + JSON.stringify(dialect),
   );

@@ -3,33 +3,6 @@ import * as vscode from "vscode";
 const mainExtensionId = "BroadcomMFD.cobol-language-support";
 let v1Api: V1Api | undefined = undefined;
 
-export interface V1Api {
-  registerDialect(dialect: V1DialectDetail): V1Unregister;
-}
-
-interface V1DialectDetail {
-  name: string;
-  description: string;
-  jar: vscode.Uri;
-  snippets: vscode.Uri;
-}
-
-interface V1Unregister {
-  (): void;
-}
-
-/**
- * Basic `type guard` that we have v1 api
- */
-function isV1Api(api: unknown): api is ExtensionV1Api {
-  if (typeof api !== "object" || api === null || !("registerDialect" in api))
-    return false;
-  const registerDialect = api.registerDialect;
-  if (typeof registerDialect !== "function" || registerDialect.length !== 2)
-    return false;
-  return true;
-}
-
 /**
  * Retrieve Version 1 of the API
  * @param id id of the extension requesting v1 API
@@ -66,7 +39,12 @@ export const getV1Api = async (extensionId: string): Promise<V1Api> => {
     }
     v1Api = {
       registerDialect: (dialect: V1DialectDetail): V1Unregister => {
-        return v1.registerDialect(extensionId, dialect);
+        return v1.registerDialect(extensionId, {
+          name: dialect.name,
+          description: dialect.description,
+          jar: dialect.jar.toString(),
+          snippets: dialect.snippets.toString(),
+        });
       },
     };
   }
@@ -75,16 +53,61 @@ export const getV1Api = async (extensionId: string): Promise<V1Api> => {
 };
 
 /**
+ * Check that we have v1 api
+ */
+function isV1Api(api: unknown): api is __ExtensionV1Api {
+  if (typeof api !== "object" || api === null || !("registerDialect" in api))
+    return false;
+  const registerDialect = api.registerDialect;
+  if (typeof registerDialect !== "function" || registerDialect.length !== 2)
+    return false;
+  return true;
+}
+
+/**
  * Not intenteded as API for extenders. DO NOT USE in your application!
  *
- * Interface exported by {@link mainExtensionId COBOL Language Support extension}.
+ * Interface provided by {@link mainExtensionId COBOL Language Support extension}.
+ *
  * Imported from the COBOL Language Support extenension for cross type checking.
  *
  */
-export interface ExtensionApi {
+export interface __ExtensionApi {
   version: string;
-  v1: ExtensionV1Api;
+  v1: __ExtensionV1Api;
 }
-interface ExtensionV1Api {
-  registerDialect(extensionId: string, dialect: V1DialectDetail): V1Unregister;
+/**
+ * Not intenteded as API for extenders. DO NOT USE in your application!
+ *
+ * Imported from the COBOL Language Support extenension for cross type checking.
+ */
+export interface __ExtensionV1Api {
+  registerDialect(
+    extensionId: string,
+    dialect: __ExtensionV1DialectDetail,
+  ): V1Unregister;
+}
+/**
+ * Not intenteded as API for extenders. DO NOT USE in your application!
+ *
+ * Imported from the COBOL Language Support extenension for cross type checking.
+ */
+export interface __ExtensionV1DialectDetail {
+  name: string;
+  description: string;
+  jar: string;
+  snippets: string;
+}
+
+export interface V1Api {
+  registerDialect(dialect: V1DialectDetail): V1Unregister;
+}
+export interface V1DialectDetail {
+  name: string;
+  description: string;
+  jar: vscode.Uri;
+  snippets: vscode.Uri;
+}
+export interface V1Unregister {
+  (): void;
 }
