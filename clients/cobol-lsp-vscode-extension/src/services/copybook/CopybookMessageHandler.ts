@@ -40,7 +40,7 @@ export async function resolveCopybookHandler(
         documentUri,
         dialectType,
       ),
-      SettingsService.getCopybookExtension(),
+      SettingsService.getCopybookExtension(documentUri),
     );
   }
   return result;
@@ -59,7 +59,7 @@ function searchCopybook(
       documentUri,
       dialectType,
     );
-    const allowedExtensions = resolveAllowedExtensions(folderKind);
+    const allowedExtensions = resolveAllowedExtensions(folderKind, documentUri);
     result = searchCopybookInWorkspace(
       copybookName,
       targetFolder,
@@ -104,13 +104,16 @@ function getTargetFolderForCopybook(
   return result || [];
 }
 
-function resolveAllowedExtensions(folderKind: string | CopybookFolderKind) {
+function resolveAllowedExtensions(
+  folderKind: string | CopybookFolderKind,
+  documentUri: string,
+) {
   switch (folderKind) {
     case "downloaded-dsn":
     case "downloaded-uss":
       return [""];
     default:
-      return SettingsService.getCopybookExtension();
+      return SettingsService.getCopybookExtension(documentUri);
   }
 }
 export function downloadCopybookHandler(

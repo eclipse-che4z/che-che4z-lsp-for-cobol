@@ -49,7 +49,7 @@ export class CopybookURI {
     result = searchCopybookInWorkspace(
       copybookName,
       copybookFolders,
-      SettingsService.getCopybookExtension(),
+      SettingsService.getCopybookExtension(documentUri),
     );
     // check in subfolders under .copybooks (copybook downloaded from MF)
     if (!result) {
@@ -59,7 +59,7 @@ export class CopybookURI {
           documentUri,
           dialectType,
         ),
-        SettingsService.getCopybookExtension(),
+        SettingsService.getCopybookExtension(documentUri),
       );
     }
     return result || "";

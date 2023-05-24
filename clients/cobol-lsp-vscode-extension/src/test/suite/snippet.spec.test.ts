@@ -19,18 +19,22 @@ import * as vscode from "vscode";
 
 suite(
   "Integration Test Suite: Snippets with different dialects settings",
-  () => {
+  function () {
     suiteSetup(async function () {
+      this.timeout(helper.TEST_TIMEOUT);
       helper.updateConfig("idms.json");
       await helper.activate();
     });
+    this.afterEach(async () => await helper.closeAllEditors()).timeout(
+      helper.TEST_TIMEOUT,
+    );
 
     test("Autocompletion basic dialect", async () => {
       helper.updateConfig("basic.json");
       await helper.showDocument("SNIPPET.cbl");
       const editor = helper.get_editor("SNIPPET.cbl");
       await helper.waitFor(() => editor.document.languageId === "cobol");
-      await helper.insertString(editor, pos(2, 0), "   COPY");
+      await helper.insertString(editor, pos(2, 0), "   IDENTIFICATION");
       await vscode.commands.executeCommand(
         "editor.action.triggerSuggest",
         editor.document.uri,
@@ -39,9 +43,9 @@ suite(
       await helper.executeCommandMultipleTimes("selectNextSuggestion", 1);
       await vscode.commands.executeCommand("acceptSelectedSuggestion");
       await helper.waitFor(() => editor.document.getText().length > 0);
+      await helper.sleep(1000);
       const text = editor.document.getText();
-      assert.strictEqual(text, "   COPY");
-      await helper.closeActiveEditor();
+      assert.strictEqual(text.trimEnd(), "   IDENTIFICATION DIVISION.");
     }).timeout(helper.TEST_TIMEOUT);
 
     test("Autocompletion with IDMS dialect", async () => {
@@ -58,8 +62,6 @@ suite(
       await helper.waitFor(() => editor.document.getText().length > 0);
       const text = editor.document.getText();
       assert.ok(text, "   COPY IDMS idms-entity.");
-      await helper.sleep(1000);
-      await helper.closeActiveEditor();
     }).timeout(helper.TEST_TIMEOUT);
 
     test("TC152058 Autocompletion basic dialect", async () => {
@@ -89,7 +91,6 @@ suite(
         acceptedLine.includes("ADD 1 TO str"),
         "Checks auto complete functionality, also with navigation by snippets",
       );
-      await helper.closeActiveEditor();
     }).timeout(helper.TEST_TIMEOUT);
   },
 );
