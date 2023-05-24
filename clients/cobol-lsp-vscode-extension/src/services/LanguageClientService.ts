@@ -13,7 +13,7 @@
  */
 
 import * as fs from "node:fs";
-import * as net from "net";
+import * as net from "node:net";
 import { join } from "node:path";
 import * as vscode from "vscode";
 
