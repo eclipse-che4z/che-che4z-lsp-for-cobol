@@ -32,17 +32,17 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.window.showErrorMessage(v1Api.toString());
     return;
   }
-  const registerResponse = await v1Api.registerDialect({
+  const unregister = await v1Api.registerDialect({
     name: "IDMS",
     description: "IDMS dialect support",
     snippets,
     jar,
   });
-  if (registerResponse instanceof Error) {
-    vscode.window.showErrorMessage(registerResponse.toString());
+  if (unregister instanceof Error) {
+    vscode.window.showErrorMessage(unregister.toString());
     return;
   }
-  unregisterDialect = registerResponse;
+  unregisterDialect = unregister;
 }
 
 export function deactivate() {
