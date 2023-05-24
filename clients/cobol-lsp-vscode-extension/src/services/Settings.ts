@@ -189,10 +189,16 @@ export class SettingsService {
     ];
   }
 
-  public static getCopybookExtension(): string[] {
-    return vscode.workspace
+  public static getCopybookExtension(documentUri: string): string[] {
+    const global: string[] = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(COPYBOOK_EXTENSIONS);
+    return documentUri === undefined
+      ? global
+      : loadProcessorGroupCopybookExtensionsConfig(
+          { scopeUri: documentUri },
+          global,
+        );
   }
 
   /**

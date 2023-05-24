@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,7 +43,7 @@ class CopybooksResolutionWithVariableInPathTest {
     element.add("my/${fileBasenameNoExtension}");
     when(settings.fetchConfigurations(any(), any()))
             .thenReturn(CompletableFuture.completedFuture(ImmutableList.of(element)));
-    when(settings.fetchTextConfiguration("cpy-manager.copybook-extensions"))
+    when(settings.fetchTextConfigurationWithScope(eq("cpy-manager.copybook-extensions"), anyString()))
             .thenReturn(CompletableFuture.completedFuture(ImmutableList.of(".cpy", "CPY")));
     when(settings.fetchTextConfiguration("dialects")).thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
 
