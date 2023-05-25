@@ -32,13 +32,14 @@ public class KeywordsUtils {
 
   /**
    * Reads keywords from resource file
+   * @param classLoader classLoader to load the resource from
    * @param fileName is a file name
    * @return key/value keywords with descriptions map
    */
-  public Map<String, String> getKeywords(String fileName) {
+  public Map<String, String> getKeywords(ClassLoader classLoader, String fileName) {
     Properties props = new Properties();
     try {
-      props.load(ResourceUtils.getInputStream(fileName));
+      props.load(classLoader.getResourceAsStream(fileName));
       return props.entrySet().stream()
           .collect(
               Collectors.toMap(
@@ -48,6 +49,16 @@ public class KeywordsUtils {
       LOG.error("Unable to load the Keywords file {}: {}", fileName, e.getMessage());
     }
     return ImmutableMap.of();
+  }
+
+  /**
+   * Reads keywords from resource file
+   * @param fileName is a file name
+   * @return key/value keywords with descriptions map
+   */
+  public Map<String, String> getKeywords(String fileName) {
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    return getKeywords(classLoader,  fileName);
   }
 
   /**

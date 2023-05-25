@@ -213,7 +213,7 @@ public final class IdmsDialect implements CobolDialect {
 
   @Override
   public Map<String, String> getKeywords() {
-    return KeywordsUtils.getKeywords("KeywordsIdms.txt");
+    return KeywordsUtils.getKeywords(IdmsDialect.class.getClassLoader(), "KeywordsIdms.txt");
   }
 
   @Override
