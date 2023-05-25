@@ -7,9 +7,9 @@
 
 </div>
 
-# COBOL Dialect Support for DaCo
+# COBOL Language Support for DaCo
     
-COBOL Dialect Support for DaCo is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension. This add-on enables language server protocol features for the DaCo dialect of COBOL, and support for MAID copybooks.
+COBOL Language Support for DaCo is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension. This add-on enables language server protocol features for the DaCo dialect of COBOL, and support for MAID copybooks.
 
 ## Prerequisites
 
@@ -18,11 +18,11 @@ COBOL Dialect Support for DaCo is an add-on for the [COBOL Language Support](htt
 
 ## Getting Started
 
-To enable COBOL Dialect Support for DaCo, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. Use the string "DaCo" to enable the DaCo dialect in your workspace extension settings or in a processor group.
+To enable COBOL Language Support for DaCo, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. Use the string "DaCo" to enable the DaCo dialect in your workspace extension settings or in a processor group.
     
 ## LSP Features
     
-COBOL Dialect Support for DaCo enables the following LSP features:
+COBOL Language Support for DaCo enables the following LSP features:
 - Autocomplete for DaCo keywords
 - Syntax and semantic check for DaCo keywords and variables
 - Syntax highlighting and coloring for DaCo keywords and variables
@@ -30,7 +30,7 @@ COBOL Dialect Support for DaCo enables the following LSP features:
     
 ## Copybook Support
     
-COBOL Dialect Support for DaCo enables copybook support features of the COBOL Language Support extension for copybooks named in `COPY MAID` statements. 
+COBOL Language Support for DaCo enables copybook support features of the COBOL Language Support extension for copybooks named in `COPY MAID` statements. 
     
 To enable copybook support, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. 
     
