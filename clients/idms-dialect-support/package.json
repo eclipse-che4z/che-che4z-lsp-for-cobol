@@ -1,5 +1,5 @@
 {
-  "name": "cobol-dialect-support-for-idms",
+  "name": "cobol-language-support-for-idms",
   "displayName": "COBOL Language Support for IDMS",
   "description": "Autocomplete, highlighting and diagnostics for IDMS COBOL code and copybooks",
   "author": "Broadcom",
