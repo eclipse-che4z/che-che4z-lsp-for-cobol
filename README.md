@@ -119,6 +119,8 @@ The following example sets tab stops after columns 1, 2, 3 and 4 after the line 
 
 ### Dialect Add-ons
 
+Many companies have their own COBOL preprocessors which complement or modify standard IBM enterprise COBOL with custom statements and keywords. In our documentation, we refer to these preprocessors as "dialects".
+
 Dialect add-ons are available to add support for specific language analysis in your COBOL files. Currently an add-on for the IDMS dialect is available on the Visual Studio Code Marketplace. 
 
 Dialect add-ons must be enabled in the COBOL Language Support extension settings. To enable dialect add-ons that you install, complete the following tasks:
@@ -237,9 +239,20 @@ The Find All References and Go To Definition functionalities are extended to wor
 
 ## Processor Groups
 
-Use processor groups to link programs with specific dialects and local folders containing copybooks. You define processor groups in a `proc_grps.json` file and associate them with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
+Use processor groups to link programs with specific dialects, SQL backend settings, and local folders containing copybooks. You define processor groups in a `proc_grps.json` file and associate them with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
 
-In the `proc_grps.json` file, specify your copybook folders in a `libs` array, and specify dialects within a `preprocessor` JSON element which contains the libraries which use that dialect. Use the following format:
+In the `proc_grps.json` file: 
+
+- Specify your copybook folders in a `libs` array.
+- Specify dialects within a `preprocessor` JSON element. This element can contain a `libs` array which specifies folders that contain copybooks which use that dialect. 
+- Specify SQL backend settings within a separate `preprocessor` JSON element with the following parameters: 
+   - `name` (string)
+   Specify **DB2** or **DATACOM** 
+   - `target-sql-backend` (string)  
+   Specify either **DB2_SERVER** or **DATACOM_SERVER**  
+   Ensure that the two parameters specify the same server configuration. 
+   
+Use the following format:
 ```
 {
     "pgroups": [
@@ -257,6 +270,10 @@ In the `proc_grps.json` file, specify your copybook folders in a `libs` array, a
                     "libs": [
                 "LIB3", "LIB4"
             ]
+                }, 
+                {
+                    "name": "DB2",
+                    "target-sql-backend": "DB2_SERVER"
                 }
             ],
             "libs": [
@@ -279,7 +296,7 @@ The `pgm_conf.json` file has the following format:
 
 The program name can be wildcarded.
 
-The two examples above use copybooks from libraries LIB1 and LIB2 for PROGRAM1, and copybooks from libraries LIB3, LIB4, LIB5 and LIB6 for PROGRAM2. The processor groups file also enables the IDMS dialect for LIB3 and LIB4 for PROGRAM2.
+The two examples above use copybooks from libraries LIB1 and LIB2 for PROGRAM1, and copybooks from libraries LIB3, LIB4, LIB5 and LIB6 for PROGRAM2. The processor groups file also enables the DB2 SQL server for PROGRAM2, and enables the IDMS dialect for LIB3 and LIB4 for PROGRAM2.
 
 Specify libraries as absolute or relative local paths in the `libs` array. These libraries take priority over the libraries that you specify in the extension settings. Dialects that you specify in processor groups also take priority over those in the extension settings.
 
