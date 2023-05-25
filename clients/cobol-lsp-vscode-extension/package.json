@@ -33,12 +33,10 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onCommand:cobol-lsp.smart-tab",
-    "onLanguage:cobol",
-    "workspaceContains:/.c4z"
+    "onLanguage:cobol"
   ],
   "icon": "resources/logo.png",
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
@@ -403,7 +401,6 @@
     },
     "configurationDefaults": {
       "[cobol]": {
-        "editor.renderIndentGuides": false,
         "editor.rulers": [
           7,
           11,
@@ -453,11 +450,10 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run -S esbuild-base -- --minify",
+    "vscode:prepublish": "npm run -S build -- --minify",
     "postinstall": "node -e \"if (process.env.NODE_ENV === 'production'){process.exit(1)} \" && patch-package || echo skip patching",
-    "esbuild-base": "rimraf out && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
-    "esbuild": "npm run esbuild-base -- --sourcemap",
-    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "build": "esbuild src/extension.ts --bundle --sourcemap --platform=node --target=node16.17.1 --outdir=dist --external:vscode --format=cjs",
+    "build:watch": "npm run build -- --watch",
     "test:integration": "npm run compile && node ./out/test/runTest.js",
     "compile": "tsc -p ./",
     "lint": "prettier -c .",
@@ -466,9 +462,10 @@
     "watch": "tsc -watch -p ./",
     "test": "jest -w 1 --unhandled-rejections=strict",
     "coverage": "jest --coverage --runInBand",
-    "package": "vsce package"
+    "package": "vsce package --no-dependencies"
   },
   "dependencies": {
+    "@code4z/cobol-dialect-api": "file:../cobol-dialect-api",
     "glob": "8.1.0",
     "iconv-lite": "^0.6.3",
     "micromatch": "4.0.5",

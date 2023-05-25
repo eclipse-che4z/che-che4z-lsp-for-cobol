@@ -4,6 +4,7 @@
   "description": "COBOL Dialect API for extending COBOL LS extension for Visual Studio Code",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "type": "module",
   "scripts": {
     "lint": "prettier -c . && eslint src --ext ts",
     "pretty": "prettier -w .",
@@ -26,8 +27,9 @@
   },
   "homepage": "https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol#readme",
   "devDependencies": {
+    "@tsconfig/node16": "^1.0.4",
     "@types/vscode": "1.74.0",
-    "typescript": "4.9.5",
-    "prettier": "2.8.7"
+    "prettier": "2.8.7",
+    "typescript": "5.0.4"
   }
 }

@@ -12,9 +12,9 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "fs";
+import * as fs from "node:fs";
 import * as iconv from "iconv-lite";
-import * as Path from "path";
+import * as Path from "node:path";
 import * as vscode from "vscode";
 import {
   C4Z_FOLDER,

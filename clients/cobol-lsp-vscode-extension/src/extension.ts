@@ -13,6 +13,8 @@
  */
 
 import * as vscode from "vscode";
+import { __ExtensionApi } from "@code4z/cobol-dialect-api";
+import { isV1RuntimeDialectDetail } from "./dialect/utils";
 
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
@@ -41,7 +43,7 @@ import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 
 let languageClientService: LanguageClientService;
 let outputChannel: vscode.OutputChannel;
-const API_VERSION: string = "1.0";
+const API_VERSION: string = "1.0.0";
 
 function initialize() {
   // We need lazy initialization to be able to mock this for unit testing
@@ -52,7 +54,9 @@ function initialize() {
   return { copyBooksDownloader, configurationWatcher };
 }
 
-export async function activate(context: vscode.ExtensionContext) {
+export async function activate(
+  context: vscode.ExtensionContext,
+): Promise<__ExtensionApi> {
   DialectRegistry.clear();
   const { copyBooksDownloader, configurationWatcher } = initialize();
   initSmartTab(context);
@@ -119,15 +123,23 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // 'export' public api-surface
   return {
-    analysis(uri: string, text: string): Promise<any> {
-      return languageClientService.retrieveAnalysis(uri, text);
+    v1: {
+      async registerDialect(extensionId: string, dialect: unknown) {
+        if (
+          typeof extensionId !== "string" ||
+          !isV1RuntimeDialectDetail(dialect)
+        ) {
+          throw Error("Invalid `dialect` argument" + JSON.stringify(dialect));
+        }
+        return registerNewDialect(extensionId, {
+          name: dialect.name,
+          description: dialect.description,
+          jar: vscode.Uri.parse(dialect.jar, true),
+          snippets: vscode.Uri.parse(dialect.snippets, true),
+        });
+      },
     },
-    dialectAPI_1_0() {
-      return getDialectAPI_v_1_0();
-    },
-    version(): string {
-      return API_VERSION;
-    },
+    version: API_VERSION,
   };
 }
 
@@ -135,37 +147,50 @@ export function deactivate() {
   return languageClientService.stop();
 }
 
-interface Dialect {
+export interface DialectDetail {
   name: string;
   description: string;
   jar: vscode.Uri;
   snippets: vscode.Uri;
 }
 
-function getDialectAPI_v_1_0() {
-  return {
-    registerDialect(extensionId: string, dialect: Dialect) {
-      outputChannel.appendLine(
-        "Register new dialect: \r\n" + JSON.stringify(dialect),
-      );
+const registerNewDialect = async (
+  extensionId: string,
+  dialect: DialectDetail,
+) => {
+  outputChannel.appendLine(
+    "Register new dialect: \r\n" + JSON.stringify(dialect),
+  );
 
-      DialectRegistry.register(
-        extensionId,
-        dialect.name,
-        dialect.jar,
-        dialect.description,
-        dialect.snippets.fsPath,
-      );
-      outputChannel.appendLine("Restart analysis");
-      languageClientService.invalidateConfiguration();
+  try {
+    await vscode.workspace.fs.stat(dialect.jar);
+  } catch (_error) {
+    return Error(`Dialect jar file ${dialect.jar.fsPath} does not exist`);
+  }
 
-      return function unregisterDialect() {
-        DialectRegistry.unregister(dialect.name);
-        languageClientService.invalidateConfiguration();
-      };
-    },
+  try {
+    await vscode.workspace.fs.stat(dialect.snippets);
+  } catch (_error) {
+    return Error(`Dialect snippets file ${dialect.jar.fsPath} does not exist`);
+  }
+
+  DialectRegistry.register(
+    extensionId,
+    dialect.name,
+    dialect.jar,
+    dialect.description,
+    dialect.snippets.fsPath,
+  );
+  outputChannel.appendLine("Restart analysis");
+  languageClientService.invalidateConfiguration();
+
+  const unregisterDialect = () => {
+    DialectRegistry.unregister(dialect.name);
+    languageClientService.invalidateConfiguration();
   };
-}
+
+  return unregisterDialect;
+};
 
 function registerCommands(
   context: vscode.ExtensionContext,

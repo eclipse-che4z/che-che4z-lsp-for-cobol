@@ -13,7 +13,7 @@
  *   Broadcom, Inc. - initial API and implementation
 -->
 
-# IDMS dialect support information
+# Dialect support information
 Put in this folder COBOL dialect jar file with following name convention:
 
 ```

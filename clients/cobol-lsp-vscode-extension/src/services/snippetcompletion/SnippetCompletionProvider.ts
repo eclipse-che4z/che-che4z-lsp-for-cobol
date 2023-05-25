@@ -15,7 +15,7 @@ import * as vscode from "vscode";
 import { LANGUAGE_ID } from "../../constants";
 import { DialectRegistry } from "../DialectRegistry";
 import { SettingsService } from "../Settings";
-import { readFileSync } from "fs";
+import { readFileSync } from "node:fs";
 
 const SNIPPETS: Map<string, Map<any, any>> = new Map();
 

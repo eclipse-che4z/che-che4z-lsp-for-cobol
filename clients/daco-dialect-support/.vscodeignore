@@ -25,15 +25,11 @@
 !CHANGELOG.md
 !resources/logo.png
 !package.json
-# * extension code
-!out/extension.js
-!out/extension.js.map
+# * bundled extension code
+!dist/extension.js
+!dist/extension.js.map
 # ** dialect snippets
 !snippets.json
 # ** dialect implementation
 !server/jar/dialect-daco.jar
 
-# * dialect registration VS Code API
-!node_modules/@code4z/cobol-dialect-api/package.json
-!node_modules/@code4z/cobol-dialect-api/lib/index.js
-!node_modules/@code4z/cobol-dialect-api/lib/index.d.ts

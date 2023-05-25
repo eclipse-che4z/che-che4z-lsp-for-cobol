@@ -11,7 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as path from "path";
+import * as path from "node:path";
 import * as vscode from "vscode";
 import { C4Z_FOLDER, COPYBOOKS_FOLDER } from "../../constants";
 import { SettingsService } from "../Settings";

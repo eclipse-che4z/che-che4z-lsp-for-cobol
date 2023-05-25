@@ -1,7 +1,8 @@
 {
+  "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "lib": ["es6"],
+    "module": "es2022",
+    "verbatimModuleSyntax": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": true,
