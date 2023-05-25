@@ -64,6 +64,24 @@ suite.skip(
       assert.ok(text, "   COPY IDMS idms-entity.");
     }).timeout(helper.TEST_TIMEOUT);
 
+    test("Keywords Autocompletion for IDMS dialect", async () => {
+      await helper.showDocument("SNIPPET_IDMS.cbl");
+      const editor = helper.get_editor("SNIPPET_IDMS.cbl");
+      await helper.waitFor(() => editor.document.languageId === "cobol");
+      await helper.insertString(editor, pos(1, 0), "   IDMS-STATIST");
+      await vscode.commands.executeCommand(
+        "editor.action.triggerSuggest",
+        editor.document.uri,
+      );
+      await helper.executeCommandMultipleTimes("selectNextSuggestion", 1);
+      await vscode.commands.executeCommand("acceptSelectedSuggestion");
+      await helper.waitFor(() => editor.document.getText().length > 0);
+      const text = editor.document.getText();
+      assert.ok(text, "   IDMS-STATISTICS");
+      await helper.sleep(1000);
+      await helper.closeActiveEditor();
+    }).timeout(helper.TEST_TIMEOUT);
+
     test("TC152058 Autocompletion basic dialect", async () => {
       await helper.showDocument("USER1.cbl");
       const editor = helper.get_editor("USER1.cbl");
