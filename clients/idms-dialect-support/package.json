@@ -94,7 +94,6 @@
     "eslint-plugin-sonarjs": "^0.15.0",
     "glob": "^8.0.3",
     "mocha": "^10.1.0",
-    "patch-package": "^6.4.7",
     "prettier": "2.8.7",
     "ts-jest": "^29.0.1",
     "tslint": "^5.18.0",
