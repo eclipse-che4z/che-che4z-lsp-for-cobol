@@ -111,11 +111,11 @@ suite("Integration Test Suite", function () {
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 2);
     helper.assertRangeIsEqual(
-      diagnostics[1].range,
+      diagnostics[0].range,
       range(pos(34, 11), pos(34, 15)),
     );
     assert.strictEqual(
-      diagnostics[1].message,
+      diagnostics[0].message,
       "Missing token SQL at execSqlStatement",
     );
   })
@@ -228,7 +228,7 @@ suite("Integration Test Suite", function () {
       diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
       assert.strictEqual(diagnostics.length, 4);
       assert.ok(
-        diagnostics[1].message.includes(
+        diagnostics[2].message.includes(
           "A misspelled word, maybe you want to put MOVE",
         ),
       );

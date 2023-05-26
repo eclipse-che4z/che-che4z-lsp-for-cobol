@@ -14,12 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.engine.analysis;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -28,13 +31,16 @@ import java.util.function.Supplier;
  * Contains related to analysis state
  */
 @RequiredArgsConstructor
-@Value
 @Slf4j
 public class AnalysisContext {
-  ExtendedSource extendedSource;
-  Map<Activity, Timing> timing = new EnumMap<>(Activity.class);
-  AnalysisConfig config;
-  List<SyntaxError> accumulatedErrors = new ArrayList<>();
+  private final @Getter ExtendedSource extendedSource;
+  private final @Getter Map<Activity, Timing> timing = new EnumMap<>(Activity.class);
+  private final @Getter AnalysisConfig config;
+  private final @Getter String documentUri;
+  private final @Getter List<SyntaxError> accumulatedErrors = new ArrayList<>();
+
+  private @Getter @Setter List<Node> dialectNodes;
+  private @Getter @Setter CopybooksRepository copybooksRepository;
 
   /**
    * Measure run time of supplier
