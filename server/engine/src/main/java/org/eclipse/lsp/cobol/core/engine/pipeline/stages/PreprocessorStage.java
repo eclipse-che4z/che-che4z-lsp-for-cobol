@@ -31,8 +31,6 @@ import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext.Activity.PREPROCESSOR;
-
 /**
  * Preprocessor stage
  */
@@ -43,12 +41,17 @@ public class PreprocessorStage implements Stage<CopybooksRepository, DialectOutc
   @Override
   public PipelineResult<CopybooksRepository> run(AnalysisContext context, PipelineResult<DialectOutcome> prevPipelineResult) {
     // Preprocessor (replacement, copybooks)
-    CopybooksRepository copybooksRepository = context.measure(PREPROCESSOR, () -> runPreprocessor(context.getDocumentUri(), context));
+    CopybooksRepository copybooksRepository = runPreprocessor(context.getDocumentUri(), context);
     applyDialectCopybooks(copybooksRepository, prevPipelineResult.getData().getDialectNodes());
 
     context.setDialectNodes(prevPipelineResult.getData().getDialectNodes());
     context.setCopybooksRepository(copybooksRepository);
     return new PipelineResult<>(copybooksRepository);
+  }
+
+  @Override
+  public String getName() {
+    return "Preprocessing";
   }
 
   private void applyDialectCopybooks(CopybooksRepository copybooksRepository, List<Node> dialectNodes) {

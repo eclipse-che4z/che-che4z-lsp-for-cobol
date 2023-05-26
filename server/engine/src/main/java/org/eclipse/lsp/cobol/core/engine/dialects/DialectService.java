@@ -72,7 +72,8 @@ public class DialectService {
     List<SyntaxError> errors = new LinkedList<>();
     List<CobolDialect> orderedDialects;
     try {
-      orderedDialects = sortDialects(filterMissing(dialects, errors, context));
+      checkMissingDialects(dialects);
+      orderedDialects = sortDialects(dialects);
     } catch (NoSuchElementException e) {
       return handleMissingDialect(context, errors, e.getMessage());
     }
@@ -99,16 +100,12 @@ public class DialectService {
     return acc;
   }
 
-  private List<String> filterMissing(List<String> dialects, List<SyntaxError> errors, DialectProcessingContext context) {
-    List<String> result = new ArrayList<>();
+  private void checkMissingDialects(List<String> dialects) {
     for (String dialectName: dialects) {
       if (!dialectSuppliers.containsKey(dialectName)) {
-        errors.add(errorMissingDialect(context, dialectName));
-      } else {
-        result.add(dialectName);
+        throw new NoSuchElementException(dialectName);
       }
     }
-    return result;
   }
 
   private static SyntaxError errorMissingDialect(DialectProcessingContext context, String dialectName) {
@@ -128,7 +125,7 @@ public class DialectService {
     String errorMsg = originalDialectName.map(name -> missedDialectName + " (needed for " + name + ")")
             .orElse(missedDialectName);
     errors.add(errorMissingDialect(context, errorMsg));
-    return new ResultWithErrors<>(new DialectOutcome(context), errors);
+    return new ResultWithErrors<>(new DialectOutcome(context, true), errors);
   }
 
   private Optional<String> findOriginalDialect(String name) {

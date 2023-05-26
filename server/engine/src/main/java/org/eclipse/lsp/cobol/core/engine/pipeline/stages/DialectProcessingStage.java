@@ -27,8 +27,6 @@ import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext.Activity.DIALECTS;
-
 /**
  * Dialect Processing Stage
  */
@@ -41,7 +39,13 @@ public class DialectProcessingStage implements Stage<DialectOutcome, Void> {
   public PipelineResult<DialectOutcome> run(AnalysisContext context, PipelineResult<Void> prevPipelineResult) {
     // Dialect processing
     dialectService.updateDialects(context.getConfig().getDialectRegistry());
-    return new PipelineResult<>(context.measure(DIALECTS, () -> processDialects(context)));
+    DialectOutcome dialectOutcome = processDialects(context);
+    return new PipelineResult<>(dialectOutcome, dialectOutcome.isDialectMissed());
+  }
+
+  @Override
+  public String getName() {
+    return "Dialects processing";
   }
 
   private DialectOutcome processDialects(AnalysisContext ctx) {

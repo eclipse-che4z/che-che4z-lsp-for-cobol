@@ -14,14 +14,16 @@
  */
 package org.eclipse.lsp.cobol.core.engine.pipeline;
 
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
+import org.eclipse.lsp.cobol.core.engine.analysis.Timing;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Processing pipeline functionality
  */
+@Slf4j
 public class Pipeline {
   private final List<Stage<?, ?>> stages = new LinkedList<>();
 
@@ -39,13 +41,25 @@ public class Pipeline {
    * @return - a final result of the pipeline processing
    */
   public PipelineResult<?> run(AnalysisContext context) {
+    Map<String, Timing> timing = new LinkedHashMap<>();
     PipelineResult<?> result = PipelineResult.empty();
-    for (Stage stage : stages) {
-      result = stage.run(context, result);
-      if (result.stopProcessing()) {
-        return result;
+
+    try {
+      for (Stage stage : stages) {
+        PipelineResult<?> prevResult = result;
+        result = timing.computeIfAbsent(stage.getName(), a -> new Timing()).measure(() -> stage.run(context, prevResult));
+
+        if (result.stopProcessing()) {
+          return result;
+        }
       }
+      return result;
+    } finally {
+      logTiming(timing);
     }
-    return result;
+  }
+
+  private void logTiming(Map<String, Timing> timing) {
+    timing.forEach((key, value) -> LOG.debug("Timing for {}: {}", key, value.getTime()));
   }
 }

@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.analysis.EmbeddedCodeService;
@@ -50,7 +51,6 @@ import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.common.error.ErrorSource.WORKSPACE_SETTINGS;
-import static org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext.Activity.*;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
@@ -64,14 +64,6 @@ public class CobolLanguageEngine {
   private final TextPreprocessor preprocessor;
   private final MessageService messageService;
   private final ErrorFinalizerService errorFinalizerService;
-  private final GrammarPreprocessor grammarPreprocessor;
-  private final ParseTreeListener treeListener;
-  private final SubroutineService subroutineService;
-  private final CachingConfigurationService cachingConfigurationService;
-  private final DialectService dialectService;
-  private final AstProcessor astProcessor;
-  private final SymbolsRepository symbolsRepository;
-  private final EmbeddedCodeService embeddedCodeService;
   private final Pipeline pipeline;
 
   @Inject
@@ -90,14 +82,6 @@ public class CobolLanguageEngine {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.errorFinalizerService = errorFinalizerService;
-    this.grammarPreprocessor = grammarPreprocessor;
-    this.treeListener = treeListener;
-    this.subroutineService = subroutineService;
-    this.cachingConfigurationService = cachingConfigurationService;
-    this.dialectService = dialectService;
-    this.astProcessor = astProcessor;
-    this.symbolsRepository = symbolsRepository;
-    this.embeddedCodeService = embeddedCodeService;
 
     this.pipeline = new Pipeline();
     this.pipeline.add(new DialectProcessingStage(dialectService));
@@ -137,19 +121,13 @@ public class CobolLanguageEngine {
     if (result.stopProcessing() || !(result.getData() instanceof ProcessingResult)) {
       return new ResultWithErrors<>(
           AnalysisResult.builder()
-              .rootNode(null)
+              .rootNode(new RootNode())
               .symbolTableMap(ImmutableMap.of())
               .build(),
           ctx.getAccumulatedErrors().stream().map(errorFinalizerService::localizeErrorMessage).collect(toList()));
     } else {
       ProcessingResult processingResult = (ProcessingResult) result.getData();
-
-      ctx.measure(LATE_ERROR_PROCESSING,
-          () -> errorFinalizerService.processLateErrors(ctx, ctx.getCopybooksRepository()));
-
-      if (LOG.isDebugEnabled()) {
-        ctx.logTiming();
-      }
+      errorFinalizerService.processLateErrors(ctx, ctx.getCopybooksRepository());
 
       return new ResultWithErrors<>(
           AnalysisResult.builder()
