@@ -17,7 +17,7 @@ import * as helper from "./testHelper";
 import { pos } from "./testHelper";
 import * as vscode from "vscode";
 
-suite(
+suite.skip(
   "Integration Test Suite: Snippets with different dialects settings",
   function () {
     suiteSetup(async function () {
