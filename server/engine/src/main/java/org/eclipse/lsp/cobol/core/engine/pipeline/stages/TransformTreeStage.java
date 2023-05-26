@@ -47,9 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext.Activity.SYNTAX_TREE;
-import static org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext.Activity.VISITOR;
-
 /**
  * Transform Tree Stage
  */
@@ -66,25 +63,25 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
   @Override
   public PipelineResult<ProcessingResult> run(AnalysisContext context, PipelineResult<Pair<ParserStageResult, List<Node>>> prevPipelineResult) {
     // Transform parsed tree to AST
-    List<Node> syntaxTree = context.measure(VISITOR,
-        () -> transformAST(
+    List<Node> syntaxTree = transformAST(
             context,
             context.getDialectNodes(),
             context.getCopybooksRepository(),
             prevPipelineResult.getData().getKey().getTokens(),
-            prevPipelineResult.getData().getKey().getTree()));
+            prevPipelineResult.getData().getKey().getTree());
 
     addEmbeddedNodes(syntaxTree.get(0), prevPipelineResult.getData().getRight());
 
     SymbolAccumulatorService symbolAccumulatorService = new SymbolAccumulatorService();
-    Node rootNode = context.measure(SYNTAX_TREE,
-        () -> {
-          Node root = processSyntaxTree(context.getConfig(), symbolAccumulatorService, context, syntaxTree);
-          symbolsRepository.updateSymbols(symbolAccumulatorService.getProgramSymbols());
-          return root;
-        });
+    Node rootNode = processSyntaxTree(context.getConfig(), symbolAccumulatorService, context, syntaxTree);
+    symbolsRepository.updateSymbols(symbolAccumulatorService.getProgramSymbols());
 
     return new PipelineResult<>(new ProcessingResult(symbolAccumulatorService.getProgramSymbols(), rootNode));
+  }
+
+  @Override
+  public String getName() {
+    return "Transform tree";
   }
 
   private List<Node> transformAST(AnalysisContext ctx, List<Node> dialectNodes,

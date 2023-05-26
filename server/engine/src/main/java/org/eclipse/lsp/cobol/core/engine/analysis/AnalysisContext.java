@@ -25,7 +25,6 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
 import java.util.*;
-import java.util.function.Supplier;
 
 /**
  * Contains related to analysis state
@@ -34,58 +33,10 @@ import java.util.function.Supplier;
 @Slf4j
 public class AnalysisContext {
   private final @Getter ExtendedSource extendedSource;
-  private final @Getter Map<Activity, Timing> timing = new EnumMap<>(Activity.class);
   private final @Getter AnalysisConfig config;
   private final @Getter String documentUri;
   private final @Getter List<SyntaxError> accumulatedErrors = new ArrayList<>();
 
   private @Getter @Setter List<Node> dialectNodes;
   private @Getter @Setter CopybooksRepository copybooksRepository;
-
-  /**
-   * Measure run time of supplier
-   * @param activity current activity
-   * @param supplier execution logic
-   * @return result of execution
-   * @param <T> type of execution result
-   */
-  public <T> T measure(Activity activity, Supplier<T> supplier) {
-    return timing.computeIfAbsent(activity, a -> new Timing()).measure(supplier);
-  }
-
-  /**
-   * Measure run time of runnable
-   * @param activity current activity
-   * @param runnable execution logic
-   */
-  public void measure(Activity activity, Runnable runnable) {
-    timing.computeIfAbsent(activity, a -> new Timing()).measure(runnable);
-  }
-
-  /**
-   * Log the timing of analysis
-   */
-  public void logTiming() {
-    LOG.debug(
-            "Timing for parsing {}. Dialects: {}, preprocessor: {}, parser: {}, visitor: {}, syntaxTree: {}, "
-                    + "late error processing: {}",
-            getExtendedSource().getUri(),
-            timing.get(Activity.DIALECTS).getTime(),
-            timing.get(Activity.PREPROCESSOR).getTime(),
-            timing.get(Activity.PARSER).getTime(),
-            timing.get(Activity.VISITOR).getTime(),
-            timing.get(Activity.SYNTAX_TREE).getTime(),
-            timing.get(Activity.LATE_ERROR_PROCESSING).getTime());
-  }
-  /**
-   * Type of activities we want to measure time for
-   */
-  public enum Activity {
-    DIALECTS,
-    PREPROCESSOR,
-    PARSER,
-    VISITOR,
-    SYNTAX_TREE,
-    LATE_ERROR_PROCESSING
-  }
 }

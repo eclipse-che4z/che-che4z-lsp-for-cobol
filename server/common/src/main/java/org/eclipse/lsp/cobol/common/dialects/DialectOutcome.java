@@ -29,9 +29,24 @@ import java.util.List;
 public class DialectOutcome {
   List<Node> dialectNodes;
   DialectProcessingContext context;
+  boolean dialectMissed;
 
   public DialectOutcome(DialectProcessingContext context) {
     this.context = context;
     this.dialectNodes = ImmutableList.of();
+    this.dialectMissed = false;
   }
+
+  public DialectOutcome(List<Node> dialectNodes, DialectProcessingContext context) {
+    this.context = context;
+    this.dialectNodes = dialectNodes;
+    this.dialectMissed = false;
+  }
+
+  public DialectOutcome(DialectProcessingContext context, boolean hasMissedDialect) {
+    this.context = context;
+    this.dialectNodes = ImmutableList.of();
+    this.dialectMissed = hasMissedDialect;
+  }
+
 }

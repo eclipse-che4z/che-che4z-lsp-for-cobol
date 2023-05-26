@@ -14,15 +14,22 @@
  */
 package org.eclipse.lsp.cobol.core.engine.pipeline;
 
+import lombok.AllArgsConstructor;
 import lombok.Value;
 
 /**
  * Processing Pipeline Stage Result
  */
 @Value
+@AllArgsConstructor
 public class PipelineResult<T> {
   T data;
+  boolean stopProcessing;
 
+  public PipelineResult(T data) {
+    this.data = data;
+    stopProcessing = false;
+  }
   /**
    * Creates an empty stage processing result
    * @return an empty stage processing result
@@ -36,6 +43,6 @@ public class PipelineResult<T> {
    * @return true if processing needs to be stopped and false otherwise
    */
   public boolean stopProcessing() {
-    return false;
+    return stopProcessing;
   }
 }

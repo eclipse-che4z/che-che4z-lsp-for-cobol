@@ -27,4 +27,10 @@ public interface Stage<T, R> {
    * @return the result of the current stage processing
    */
   PipelineResult<T> run(AnalysisContext context, PipelineResult<R> prevPipelineResult);
+
+  /**
+   * Returns the name of the stage
+   * @return the name of the stage
+   */
+  String getName();
 }

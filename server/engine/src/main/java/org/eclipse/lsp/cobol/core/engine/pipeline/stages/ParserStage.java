@@ -29,8 +29,6 @@ import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 
-import static org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext.Activity.PARSER;
-
 /**
  * Parser stage
  */
@@ -48,10 +46,15 @@ public class ParserStage implements Stage<ParserStageResult, CopybooksRepository
     lexer.removeErrorListeners();
     CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-    CobolParser.StartRuleContext tree = context.measure(PARSER, () -> runParser(listener, lexer, tokens));
+    CobolParser.StartRuleContext tree = runParser(listener, lexer, tokens);
 
     context.getAccumulatedErrors().addAll(listener.getErrors());
     return new PipelineResult<>(new ParserStageResult(tokens, tree));
+  }
+
+  @Override
+  public String getName() {
+    return "Parsing stage";
   }
 
   private CobolParser.StartRuleContext runParser(ParserListener listener, CobolLexer lexer, CommonTokenStream tokens) {

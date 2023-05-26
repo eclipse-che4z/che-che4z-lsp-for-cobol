@@ -46,4 +46,9 @@ public class EmbeddedCodeStage implements Stage<Pair<ParserStageResult, List<Nod
     Pair<ParserStageResult, List<Node>> result = Pair.of(prevPipelineResult.getData(), embeddedNodes);
     return new PipelineResult<>(result);
   }
+
+  @Override
+  public String getName() {
+    return "Embedded code processing";
+  }
 }
