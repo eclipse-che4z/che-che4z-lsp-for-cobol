@@ -6,8 +6,8 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 - [ ] Test B
 
 ## Checklist:
-- [ ] Each my commit contains one meaningful change
-- [ ] I have performed rebase my branch on top of development
+- [ ] Each of my commits contains one meaningful change
+- [ ] I have performed rebase of my branch on top of the development
 - [ ] I have performed a self-review of my own code
 - [ ] I have made corresponding changes to the documentation
 - [ ] My changes generate no new warnings
