@@ -74,7 +74,7 @@ export function loadProcessorGroupSqlBackendConfig(
     item.scopeUri,
     "target-sql-backend",
     configObject,
-    "DB2/DATACOM",
+    "SQL",
   );
 }
 
@@ -101,8 +101,8 @@ export function loadProcessorGroupDialectConfig(
       }
     }
 
-    // "DB2/DATACOM" is not a real dialect, we will use it only to set up sql backend for now
-    return dialects.filter((name) => name != "DB2/DATACOM") || configObject;
+    // "SQL" is not a real dialect, we will use it only to set up sql backend for now
+    return dialects.filter((name) => name != "SQL") || configObject;
   } catch (e) {
     console.error(JSON.stringify(e));
     return configObject;
