@@ -40,7 +40,7 @@ jest.mock("fs", () => ({
                                 "libs": ["/daco"]
                             },
                             {
-                                "name": "DB2/DATACOM",
+                                "name": "SQL",
                                 "target-sql-backend": "DATACOM_SERVER"
                             }
                         ], 
