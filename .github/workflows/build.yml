@@ -54,7 +54,8 @@ jobs:
           java-version: '11'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          native-image-job-reports: 'true'
+          ## uncomment me if you need native image job reports
+          # native-image-job-reports: 'true'
           cache: 'maven'
       - name: Generate assisted configuration for GraalVM native build
         working-directory: server
@@ -101,12 +102,12 @@ jobs:
         with:
           if-no-files-found: warn
           name: vsix-idms-dialect
-          path: 'cobol-dialect-support-for-idms*.vsix'
+          path: 'cobol-language-support-for-idms*.vsix'
       - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: vsix-daco-dialect
-          path: 'cobol-dialect-support-for-daco*.vsix'
+          path: 'cobol-language-support-for-daco*.vsix'
   buildNative:
     strategy:
       fail-fast: false
@@ -152,7 +153,8 @@ jobs:
           components: 'native-image'
           native-image-musl: 'true'
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          native-image-job-reports: 'true'
+          ## uncomment me if you need native image job reports
+          # native-image-job-reports: 'true'
           cache: 'maven'
       - uses: graalvm/setup-graalvm@v1
         if: matrix.os != 'ubuntu-latest' || matrix.arch != 'x64'
@@ -161,7 +163,8 @@ jobs:
           java-version: '11'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          native-image-job-reports: 'true'
+          ## uncomment me if you need native image job reports
+          # native-image-job-reports: 'true'
           cache: 'maven'
       - name: Retrieve native build configurations
         uses: actions/download-artifact@v3
@@ -252,7 +255,7 @@ jobs:
           name: vsix-cobol-language-support-${{ env.target }}
           path: 'cobol-language-support*.vsix'
       - name: Run integration tests
-        uses: GabrielBB/xvfb-action@v1.0
+        uses: coactions/setup-xvfb@v1
         with:
           run: npm --prefix clients/cobol-lsp-vscode-extension run test:integration
       - name: Run native executable test code
