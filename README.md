@@ -247,10 +247,9 @@ In the `proc_grps.json` file:
 - Specify dialects within a `preprocessor` JSON element. This element can contain a `libs` array which specifies folders that contain copybooks which use that dialect. 
 - Specify SQL backend settings within a separate `preprocessor` JSON element with the following parameters: 
    - `name` (string)
-   Specify **DB2** or **DATACOM** 
+   Specify **SQL** 
    - `target-sql-backend` (string)  
    Specify either **DB2_SERVER** or **DATACOM_SERVER**  
-   Ensure that the two parameters specify the same server configuration. 
    
 Use the following format:
 ```
@@ -272,7 +271,7 @@ Use the following format:
             ]
                 }, 
                 {
-                    "name": "DB2",
+                    "name": "SQL",
                     "target-sql-backend": "DB2_SERVER"
                 }
             ],
