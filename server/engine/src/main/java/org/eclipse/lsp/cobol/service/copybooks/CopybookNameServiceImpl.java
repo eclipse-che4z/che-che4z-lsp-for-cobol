@@ -206,7 +206,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   private List<CopybookName> createCopybookNamesList(String uri, Predicate<CopybookName> predicate) {
     CobolLanguageClient cobolLanguageClient = clientProvider.get();
     CompletableFuture<List<WorkspaceFolder>> copybookWorkspaces = cobolLanguageClient.workspaceFolders();
-    CompletableFuture<List<String>> copybooksExtensions = settingsService.fetchTextConfigurationWithScope(CPY_EXTENSIONS.label, uri);
+    CompletableFuture<List<String>> copybooksExtensions = settingsService.fetchTextConfigurationWithScope(uri, CPY_EXTENSIONS.label);
     CompletableFuture<List<String>> copybookLocalFolders = copybookLocalFolders(uri);
     return resolveNames(copybookWorkspaces.join(), copybookLocalFolders.join(), copybooksExtensions.join(),
             extractProgramName(uri), predicate);
