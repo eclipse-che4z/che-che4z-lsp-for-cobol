@@ -20,6 +20,8 @@ import java.util.Set;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 /** Test @{@link CopybookReferenceRepo} */
 class CopybookReferenceRepoImplTest {
@@ -43,6 +45,17 @@ class CopybookReferenceRepoImplTest {
     CopybookModel referencedCopybookModels = copybookUsageReference.toArray(new CopybookModel[0])[0];
     assertEquals(COPYBOOK_CONTENT, referencedCopybookModels.getContent());
     assertEquals(DOCUMENT_URI, referencedCopybookModels.getUri());
+  }
+
+  @Test
+  @EnabledOnOs({OS.WINDOWS})
+  void getCopybookUsageReference_whenUriIsCaseInsensitive() {
+    CopybookReferenceRepo repo = storeReferences();
+    Set<CopybookModel> copybookUsageReference = repo.getCopybookUsageReference("file:///C:/workspace/.c4z/.copybooks/PARENT.CPY");
+    CopybookModel referencedCopybookModels = copybookUsageReference.toArray(new CopybookModel[0])[0];
+    assertEquals(1, copybookUsageReference.size());
+    assertEquals(DOCUMENT_URI, referencedCopybookModels.getUri());
+    assertEquals(COPYBOOK_CONTENT, referencedCopybookModels.getContent());
   }
 
   private Set<CopybookModel> setUpRepo() {

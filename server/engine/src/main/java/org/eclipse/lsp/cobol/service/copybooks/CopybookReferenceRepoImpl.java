@@ -18,6 +18,7 @@ import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -42,7 +43,11 @@ public class CopybookReferenceRepoImpl implements CopybookReferenceRepo {
    */
   @Override
   public Set<CopybookModel> getCopybookUsageReference(String copybookUri) {
-    return copybookRef.getOrDefault(copybookUri, Collections.emptySet());
+    return copybookRef.entrySet().stream()
+            .filter(entry -> new File(entry.getKey()).equals(new File(copybookUri)))
+            .map(Map.Entry::getValue)
+            .findFirst()
+            .orElse(Collections.emptySet());
   }
 
   /** Clears all copybook references. */
