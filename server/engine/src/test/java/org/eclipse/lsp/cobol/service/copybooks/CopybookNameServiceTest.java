@@ -165,8 +165,8 @@ class CopybookNameServiceTest {
   ) {
 
     validFoldersMock();
-    when(settingsService.fetchTextConfigurationWithScope(
-            eq(CPY_EXTENSIONS.label), anyString())).thenReturn(CompletableFuture.completedFuture(extensionsInConfig));
+    when(settingsService.fetchTextConfigurationWithScope(anyString(),
+            eq(CPY_EXTENSIONS.label))).thenReturn(CompletableFuture.completedFuture(extensionsInConfig));
     when(files.listFilesInDirectory(anyString())).thenReturn(emptyList());
     when(files.listFilesInDirectory(anyString())).thenReturn(Arrays.asList("A.CPY", "A.COPY", "A.cpy", "A.copy", "A"));
 
@@ -190,8 +190,8 @@ class CopybookNameServiceTest {
           int expectedCopybookFound
   ) {
     validFoldersMock();
-    when(settingsService.fetchTextConfigurationWithScope(
-            eq(CPY_EXTENSIONS.label), anyString())).thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
+    when(settingsService.fetchTextConfigurationWithScope(anyString(),
+            eq(CPY_EXTENSIONS.label))).thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
     when(files.listFilesInDirectory(absoluteValidCpyPath)).thenReturn(filesInCopybookDirectory);
 
     CopybookNameService copybookNameService =
@@ -205,7 +205,7 @@ class CopybookNameServiceTest {
     CopybookNameService copybookNameService =
             new CopybookNameServiceImpl(settingsService, files, provider);
 
-    when(settingsService.fetchTextConfigurationWithScope(eq(CPY_EXTENSIONS.label), anyString()))
+    when(settingsService.fetchTextConfigurationWithScope(anyString(), eq(CPY_EXTENSIONS.label)))
             .thenReturn(CompletableFuture.completedFuture(Collections.singletonList("cpy")));
     when(settingsService.fetchConfigurations(any(), any())).thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
     when(files.decodeURI(absoluteValidCpyPath)).thenReturn(null);
