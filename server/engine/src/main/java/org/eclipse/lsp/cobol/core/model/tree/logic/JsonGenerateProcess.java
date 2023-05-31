@@ -65,6 +65,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
     List<VariableUsageNode> identifier1Nodes = getIdentifier(jsonGenerateNode, jsonGenerateNode.getIdentifier1());
     if (identifier1Nodes.isEmpty()) return;
     List<VariableNode> identifier1FoundDefinitions = getIdentifierDefinitions(jsonGenerateNode, identifier1Nodes);
+    if (identifier1FoundDefinitions.isEmpty()) return;
     semanticAnalysisForIdentifier1(processingContext, identifier1Nodes, identifier1FoundDefinitions);
 
     List<VariableUsageNode> identifier2Nodes = getIdentifier(jsonGenerateNode, jsonGenerateNode.getIdentifier2());

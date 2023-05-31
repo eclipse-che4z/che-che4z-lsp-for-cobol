@@ -50,6 +50,30 @@ public class TestJsonGenerateStatement {
           + "                       ALSO {$data-b} TO BOOLEAN USING {$data-b-flag}\n"
           + "                END-JSON.";
 
+  public static final String TEXT_NO_IDEN1 =
+          "       Identification division.\n"
+                  + "       Program-id. jp_ex.\n"
+                  + "       Data division.\n"
+                  + "       Working-storage section.\n"
+                  + "       01 {$*STRUCT}. \n"
+                  + "         02 {$*NG-AREA1}. \n"
+                  + "           03 {$*FLAGS} PIC X.      03 PIC X(3). \n"
+                  + "           03 {$*PTR} USAGE POINTER.\n"
+                  + "           03 {$*ASNUM} REDEFINES {$PTR} USAGE COMP-5 PIC S9(9). \n"
+                  + "           03 PIC X(92). \n"
+                  + "       01 {$*countN} pic P.\n"
+                  + "       01 {$*myrecord}.\n"
+                  + "           02 {$*data-a} PIC X.\n"
+                  + "           02 {$*data-b} PIC X.\n"
+                  + "             88 {$*data-b-flag} VALUE 'a' THRU 'z'.\n"
+                  + "       Procedure division.\n"
+                  + "               JSON GENERATE {docx|1} FROM {$NG-AREA1} COUNT {$countN}\n"
+                  + "               name of {$FLAGS} OF {$NG-AREA1} is OMITTED\n"
+                  + "               SUPPRESS {$ASNUM}\n"
+                  + "                 CONVERTING {$data-a} TO BOOLEAN USING 'T'\n"
+                  + "                       ALSO {$data-b} TO BOOLEAN USING {$data-b-flag}\n"
+                  + "                END-JSON.";
+
   public static final String TEXT_IDENTIFIER1_NOT_ALPHANUMERIC =
       "       Identification division.\n"
           + "       Program-id. jp_ex.\n"
@@ -453,5 +477,14 @@ public class TestJsonGenerateStatement {
   @Test
   void whenLevel77_considerIndependentNode() {
     UseCaseEngine.runTest(TEXT_LEVEL77, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void whenIdentifier1NotDefined_showError() {
+    UseCaseEngine.runTest(TEXT_NO_IDEN1, ImmutableList.of(), ImmutableMap.of("1", new Diagnostic(
+            new Range(),
+            "Variable DOCX is not defined",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText())));
   }
 }
