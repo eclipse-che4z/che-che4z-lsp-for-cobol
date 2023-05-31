@@ -44,6 +44,7 @@ public class CopybookReferenceRepoImpl implements CopybookReferenceRepo {
   @Override
   public Set<CopybookModel> getCopybookUsageReference(String copybookUri) {
     return copybookRef.entrySet().stream()
+            .filter(entry -> Objects.nonNull(entry.getKey()))
             .filter(entry -> new File(entry.getKey()).equals(new File(copybookUri)))
             .map(Map.Entry::getValue)
             .findFirst()
