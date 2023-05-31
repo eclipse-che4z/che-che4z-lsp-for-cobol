@@ -43,7 +43,7 @@ class CopybooksResolutionWithVariableInPathTest {
     element.add("my/${fileBasenameNoExtension}");
     when(settings.fetchConfigurations(any(), any()))
             .thenReturn(CompletableFuture.completedFuture(ImmutableList.of(element)));
-    when(settings.fetchTextConfigurationWithScope(eq("cpy-manager.copybook-extensions"), anyString()))
+    when(settings.fetchTextConfigurationWithScope(anyString(), eq("cpy-manager.copybook-extensions")))
             .thenReturn(CompletableFuture.completedFuture(ImmutableList.of(".cpy", "CPY")));
     when(settings.fetchTextConfiguration("dialects")).thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
 
