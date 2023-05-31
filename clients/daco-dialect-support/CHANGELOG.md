@@ -2,6 +2,6 @@
 
 All notable changes to the "COBOL Language Support for DaCo" extension are documented in this file.
 
-## 1.0.0
+## 1.0.0 (2023-06-01)
 
 - Initial release
