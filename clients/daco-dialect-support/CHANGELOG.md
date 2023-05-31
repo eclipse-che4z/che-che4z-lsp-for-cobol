@@ -1,9 +1,7 @@
 # Change Log
 
-All notable changes to the "daco-dialect-support" extension will be documented in this file.
+All notable changes to the "COBOL Language Support for DaCo" extension are documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [Unreleased]
+## 1.0.0
 
 - Initial release
