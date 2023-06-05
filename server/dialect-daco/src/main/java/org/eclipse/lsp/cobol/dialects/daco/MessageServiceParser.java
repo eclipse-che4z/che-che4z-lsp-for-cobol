@@ -21,7 +21,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.TokenStream;
 import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
-import org.eclipse.lsp.cobol.common.utils.PreprocessorStringUtils;
+import org.eclipse.lsp.cobol.common.utils.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -259,7 +259,7 @@ public abstract class MessageServiceParser extends Parser {
    */
   protected String trimQuotes(String input) {
     if (input != null) {
-      return PreprocessorStringUtils.trimQuotes(input);
+      return StringUtils.trimQuotes(input);
     }
     return null;
   }

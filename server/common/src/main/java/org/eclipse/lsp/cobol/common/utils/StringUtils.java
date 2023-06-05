@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 /** This utility class provides functions that are useful for pre-processing a COBOL document */
 @UtilityClass
-public class PreprocessorStringUtils {
+public class StringUtils {
   public static final Pattern QUOTE_PATTERN = Pattern.compile("(^[\"'])|([\"']$)");
 
   /**
