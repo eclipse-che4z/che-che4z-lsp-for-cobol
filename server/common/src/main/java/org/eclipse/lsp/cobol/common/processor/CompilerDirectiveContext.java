@@ -16,14 +16,16 @@ package org.eclipse.lsp.cobol.common.processor;
 
 import lombok.Getter;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /** Compiler directive context */
 public class CompilerDirectiveContext {
-  @Getter private final List<CompilerDirectiveOption> compilerDirectiveList = new ArrayList<>();
+  @Getter private final Map<CompilerDirectiveName, List<String>> compilerDirectiveMap = new HashMap<>();
 
   /**
    * Updates the compiler directive options
@@ -31,14 +33,9 @@ public class CompilerDirectiveContext {
    * @param compilerDirectiveOption @{@link CompilerDirectiveOption}
    */
   public void updateDirectiveOptions(CompilerDirectiveOption compilerDirectiveOption) {
-    Optional<CompilerDirectiveOption> existingOption =
-        compilerDirectiveList.stream()
-            .filter(
-                options ->
-                    options.getCompilerDirectiveName()
-                        == compilerDirectiveOption.getCompilerDirectiveName())
-            .findFirst();
-    compilerDirectiveList.add(existingOption.orElse(compilerDirectiveOption));
+    compilerDirectiveMap.merge(compilerDirectiveOption.getCompilerDirectiveName(),
+            compilerDirectiveOption.getValue(),
+            (n1, n2) -> Stream.concat(n1.stream(), n2.stream()).collect(Collectors.toList()));
   }
 
   /**
@@ -57,8 +54,10 @@ public class CompilerDirectiveContext {
    * @return List of @{@link CompilerDirectiveOption}
    */
   public List<CompilerDirectiveOption> filterDirectiveList(List<CompilerDirectiveName> names) {
-    return compilerDirectiveList.stream()
-        .filter(p -> names.contains(p.getCompilerDirectiveName()))
+    return compilerDirectiveMap.entrySet().stream()
+        .filter(entry -> Objects.nonNull(entry.getKey()))
+        .filter(entry -> names.contains(entry.getKey()))
+        .map(entry -> new CompilerDirectiveOption(entry.getKey(), entry.getValue()))
         .collect(Collectors.toList());
   }
 }
