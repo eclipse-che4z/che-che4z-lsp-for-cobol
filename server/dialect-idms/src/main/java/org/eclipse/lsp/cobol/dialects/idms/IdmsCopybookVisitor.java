@@ -32,7 +32,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.OccursClause;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueClause;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
-import org.eclipse.lsp.cobol.common.utils.PreprocessorStringUtils;
+import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -83,7 +83,7 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
   public List<Node> visitCopyIdmsStatement(IdmsCopyParser.CopyIdmsStatementContext ctx) {
     IdmsCopyParser.CopyIdmsSourceContext optionsContext = ctx.copyIdmsOptions().copyIdmsSource();
     String nameToken = optionsContext.getText().toUpperCase();
-    CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
+    CopybookName copybookName = new CopybookName(StringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
 
     CopybookModel copybookModel = copybookService.resolve(
             copybookName.toCopybookId(programDocumentUri),

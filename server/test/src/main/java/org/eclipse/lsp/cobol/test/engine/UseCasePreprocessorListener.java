@@ -23,7 +23,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.eclipse.lsp.cobol.common.utils.PreprocessorStringUtils;
+import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -161,7 +161,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     return it -> {
       String dialect = it.cpyDialect() == null ? "" : it.cpyDialect().getText();
       processCopybookToken(
-              PreprocessorStringUtils.trimQuotes(it.cpyName().getText().toUpperCase()),
+              StringUtils.trimQuotes(it.cpyName().getText().toUpperCase()),
               dialect,
               ctx,
               it.replacement(),
@@ -452,7 +452,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                     it -> {
                       String storedText = replacementText;
                       if (stripQuotes) {
-                        storedText = PreprocessorStringUtils.trimQuotes(storedText);
+                        storedText = StringUtils.trimQuotes(storedText);
                       }
                       if (replacement != null && replacement.ORIGINAL_SIZE_COPY_START() != null) {
                         addTokenLocation(it, text.toUpperCase(), range);

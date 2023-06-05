@@ -25,7 +25,6 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -35,7 +34,7 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.*;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
-import org.eclipse.lsp.cobol.common.utils.PreprocessorStringUtils;
+import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.model.tree.*;
@@ -163,7 +162,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     List<Node> result = new ArrayList<>();
     ofNullable(ctx.programName())
         .map(RuleContext::getText)
-        .map(PreprocessorStringUtils::trimQuotes)
+        .map(StringUtils::trimQuotes)
         .ifPresent(
             name ->
                 retrieveLocality(ctx)
@@ -343,7 +342,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return ofNullable(ctx.programName())
         .map(ParserRuleContext::getStart)
         .map(Token::getText)
-        .map(PreprocessorStringUtils::trimQuotes)
+        .map(StringUtils::trimQuotes)
         .map(id -> addTreeNode(ctx.programName(), locality -> new ProgramEndNode(locality, id)))
         .orElse(ImmutableList.of());
   }
@@ -361,7 +360,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitFileControlEntry(FileControlEntryContext ctx) {
     String filename = VisitorHelper.getName(ctx.selectClause().fileName());
-    if (StringUtils.isNotBlank(filename)) {
+    if (org.apache.commons.lang3.StringUtils.isNotBlank(filename)) {
       String fileControlClause = getIntervalText(ctx.fileControlClauses());
       checkFileControlUniqueness(ctx, filename);
       return addTreeNode(ctx, locality -> new FileEntryNode(locality, filename, fileControlClause));
@@ -857,7 +856,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitConstantName(ConstantNameContext ctx) {
-    String subroutineName = PreprocessorStringUtils.trimQuotes(ctx.getText()).toUpperCase();
+    String subroutineName = StringUtils.trimQuotes(ctx.getText()).toUpperCase();
     return getLocality(ctx.getStart())
         .map(
             locality -> {

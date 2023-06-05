@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
-import static edu.emory.mathcs.backport.java.util.Collections.emptyList;
-import static edu.emory.mathcs.backport.java.util.Collections.singletonList;
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.CPY_EXTENSIONS;
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.CPY_LOCAL_PATHS;
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECTS;
@@ -89,7 +87,7 @@ class CopybookNameServiceTest {
     when(settingsService.fetchConfigurations(any(), eq(ImmutableList.of(CPY_LOCAL_PATHS.label))))
             .thenReturn(CompletableFuture.completedFuture(ImmutableList.of(toJsonArray(copyNames))));
     when(settingsService.fetchTextConfiguration(DIALECTS.label))
-            .thenReturn(CompletableFuture.completedFuture(emptyList()));
+            .thenReturn(CompletableFuture.completedFuture(Collections.emptyList()));
   }
 
   private JsonArray toJsonArray(List<String> copyNames) {
@@ -122,7 +120,7 @@ class CopybookNameServiceTest {
                     2),
             Arguments.of(
                     Arrays.asList("VALIDNAME2", "VALIDNAME"),
-                    singletonList(""),
+                    Collections.singletonList(""),
                     2)
     );
   }
@@ -146,7 +144,7 @@ class CopybookNameServiceTest {
                     Optional.of(CopybookName.builder().displayName("A").extension("").build())
             ),
             Arguments.of(
-                    emptyList(),
+                    Collections.emptyList(),
                     Optional.empty()
             ),
             Arguments.of(
@@ -166,7 +164,7 @@ class CopybookNameServiceTest {
     validFoldersMock();
     when(settingsService.fetchTextConfigurationWithScope(anyString(),
             eq(CPY_EXTENSIONS.label))).thenReturn(CompletableFuture.completedFuture(extensionsInConfig));
-    when(files.listFilesInDirectory(anyString())).thenReturn(emptyList());
+    when(files.listFilesInDirectory(anyString())).thenReturn(Collections.emptyList());
     when(files.listFilesInDirectory(anyString())).thenReturn(Arrays.asList("A.CPY", "A.COPY", "A.cpy", "A.copy", "A"));
 
     CopybookNameService copybookNameService =

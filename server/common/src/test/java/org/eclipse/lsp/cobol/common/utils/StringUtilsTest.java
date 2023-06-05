@@ -18,8 +18,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** This test checks {@link PreprocessorStringUtils} utility functions. */
-class PreprocessorStringUtilsTest {
+/** This test checks {@link StringUtils} utility functions. */
+class StringUtilsTest {
 
   private static final String TEST_SINGLE_QUOTE_STRING =
       "\'TESTING IF ALL QUOTES WILL BE REMOVED\'";
@@ -27,21 +27,21 @@ class PreprocessorStringUtilsTest {
       "\"TESTING IF ALL QUOTES WILL BE REMOVED\"";
   private static final String EXPECTED_STRING = "TESTING IF ALL QUOTES WILL BE REMOVED";
 
-  /** Test trimming leading quotes by {@link PreprocessorStringUtils#trimQuotes(String)} */
+  /** Test trimming leading quotes by {@link StringUtils#trimQuotes(String)} */
   @Test
   void trimQuotesTest() {
-    assertEquals(EXPECTED_STRING, PreprocessorStringUtils.trimQuotes(TEST_SINGLE_QUOTE_STRING));
-    assertEquals(EXPECTED_STRING, PreprocessorStringUtils.trimQuotes(TEST_DOUBLE_QUOTE_STRING));
-    assertEquals(EXPECTED_STRING, PreprocessorStringUtils.trimQuotes(EXPECTED_STRING));
+    assertEquals(EXPECTED_STRING, StringUtils.trimQuotes(TEST_SINGLE_QUOTE_STRING));
+    assertEquals(EXPECTED_STRING, StringUtils.trimQuotes(TEST_DOUBLE_QUOTE_STRING));
+    assertEquals(EXPECTED_STRING, StringUtils.trimQuotes(EXPECTED_STRING));
   }
 
   @Test
   void noTrimQuotesInsideTest() {
     assertEquals(
         "TESTING 'NO' QUOTES WILL BE REMOVED",
-        PreprocessorStringUtils.trimQuotes("TESTING 'NO' QUOTES WILL BE REMOVED"));
+        StringUtils.trimQuotes("TESTING 'NO' QUOTES WILL BE REMOVED"));
     assertEquals(
         "TESTING \"NO\" QUOTES WILL BE REMOVED",
-        PreprocessorStringUtils.trimQuotes("TESTING \"NO\" QUOTES WILL BE REMOVED"));
+        StringUtils.trimQuotes("TESTING \"NO\" QUOTES WILL BE REMOVED"));
   }
 }

@@ -18,7 +18,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
@@ -30,7 +29,7 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.common.utils.PreprocessorStringUtils;
+import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
@@ -235,7 +234,7 @@ class CopybookPreprocessorService {
   }
 
   private CopybookName getCopybookName(CobolPreprocessor.CopySourceContext ctx) {
-    return new CopybookName(PreprocessorStringUtils.trimQuotes(ctx.getText()));
+    return new CopybookName(StringUtils.trimQuotes(ctx.getText()));
   }
 
   private CopybookModel read(CopybookConfig copybookConfig, CopybookName copybookName, String documentUri) {
@@ -258,6 +257,6 @@ class CopybookPreprocessorService {
 
   void replaceWithSpaces(ParserRuleContext ctx) {
     Range range = VisitorHelper.constructRange(ctx);
-    currentDocument.replace(range, StringUtils.rightPad(" ", range.getEnd().getCharacter() - range.getStart().getCharacter()));
+    currentDocument.replace(range, org.apache.commons.lang3.StringUtils.rightPad(" ", range.getEnd().getCharacter() - range.getStart().getCharacter()));
   }
 }
