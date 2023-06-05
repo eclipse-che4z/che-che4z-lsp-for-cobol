@@ -17,13 +17,11 @@ package org.eclipse.lsp.cobol.common.processor;
 
 import lombok.Value;
 
-/**
- * Compiler directive Options
- *
- * @param <T> value set corresponding to a compiler directive option.
- */
+import java.util.List;
+
+/** Compiler directive Options */
 @Value
-public class CompilerDirectiveOption<T> {
-  T value;
+public class CompilerDirectiveOption {
   CompilerDirectiveName compilerDirectiveName;
+  List<String> value;
 }

@@ -20,18 +20,17 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
-import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveOption;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.model.tree.FigurativeConstants;
-import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,8 +61,9 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
             .filterDirectiveList(
                 ImmutableList.of(CompilerDirectiveName.QUALIFY, CompilerDirectiveName.QUA))
             .stream()
+            .filter(t -> !t.getValue().isEmpty())
+            .map(t -> t.getValue().get(t.getValue().size() - 1).equals("EXTEND"))
             .findFirst()
-            .map(CompilerDirectiveOption<Boolean>::getValue)
             .orElse(false);
 
     if (variableUsageNodes.isEmpty()) {
