@@ -469,7 +469,7 @@ public class TestJsonGenerateStatement {
             "1",
             new Diagnostic(
                 new Range(),
-                "data-a should be elementary item with PIC X clause.",
+                "data-a must be an elementary item with a PIC X clause.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

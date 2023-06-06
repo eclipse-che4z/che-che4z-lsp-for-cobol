@@ -16,11 +16,12 @@ package org.eclipse.lsp.cobol.core.model;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
-import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 
 import java.util.*;
@@ -112,5 +113,23 @@ public class VariableUsageUtils {
       if (any.isPresent()) return true;
     }
     return false;
+  }
+
+  /**
+   * Retrieves {@link VariableUsageNode} based on the passed parent node and variable locality
+   * @param parentNode parent node under which usage needs to be determined
+   * @param identifier {@link VariableNameAndLocality} variable locality whose usage needs to be determined.
+   * @return Optional of {@link VariableUsageNode} for the passed identifier
+   */
+  public Optional<VariableUsageNode> getVariableUsageNode(
+          Node parentNode, VariableNameAndLocality identifier) {
+    return parentNode.getDepthFirstStream()
+            .filter(VariableUsageNode.class::isInstance)
+            .map(VariableUsageNode.class::cast)
+            .filter(
+                    node1 ->
+                            node1.getName().equalsIgnoreCase(identifier.getName())
+                                    && node1.getLocality().equals(identifier.getLocality()))
+            .findFirst();
   }
 }

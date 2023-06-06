@@ -273,6 +273,42 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .isEmpty();
   }
 
+  @Override
+  public List<Node> visitXmlParseStatement(XmlParseStatementContext ctx) {
+    VariableNameAndLocality identifier1 = new VariableNameAndLocality(
+            ctx.qualifiedDataName().getText(), retrieveLocality(ctx.qualifiedDataName()).orElse(null));
+
+    VariableNameAndLocality xmlValidatingContext = ofNullable(ctx.xmlValidating())
+            .map(c -> new VariableNameAndLocality(c.getText(), retrieveLocality(c).orElse(null)))
+            .orElse(null);
+
+    VariableNameAndLocality xmlNationalContext = ofNullable(ctx.xmlNational())
+            .map(c -> new VariableNameAndLocality(c.getText(), retrieveLocality(c).orElse(null)))
+            .orElse(null);
+
+    VariableNameAndLocality identifier2 = ofNullable(ctx.xmlValidating())
+            .map(XmlValidatingContext::qualifiedDataName)
+            .map(qualCtx -> new VariableNameAndLocality(qualCtx.getText(),
+                    retrieveLocality(qualCtx).orElse(null)))
+            .orElse(null);
+
+    VariableNameAndLocality encodingLocality = ofNullable(ctx.xmlEncoding()).map(ctx2 ->
+                    new VariableNameAndLocality(ctx2.integerLiteral().getText(), retrieveLocality(ctx2).orElse(null)))
+            .orElse(null);
+
+    return addTreeNode(
+            ctx,
+            locality ->
+                    new XMLParseNode(
+                            locality,
+                            identifier1,
+                            identifier2,
+                            encodingLocality,
+                            xmlValidatingContext,
+                            xmlNationalContext
+                    ));
+  }
+
   /**
    * In this method, first condition is checking if there is any other element present on the same
    * line as DECLARATIVES token and throws an error if the condition is true; In the PROCEDURE
