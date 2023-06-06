@@ -1001,7 +1001,7 @@ statement
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
     serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | unstringStatement | writeStatement | xmlStatement | jsonStatement
+    terminateStatement | unstringStatement | writeStatement | xmlParseStatement | jsonStatement
    ;
 
 jsonStatement
@@ -2185,8 +2185,8 @@ writeNotAtEndOfPagePhrase
 
 // xml statement
 
-xmlStatement
-   : XML PARSE generalIdentifier xmlEncoding? xmlNational? xmlValidating? xmlProcessinProcedure xmlThru? onExceptionClause? notOnExceptionClause? END_XML?
+xmlParseStatement
+   : XML PARSE qualifiedDataName xmlEncoding? xmlNational? xmlValidating? xmlProcessinProcedure xmlThru? onExceptionClause? notOnExceptionClause? END_XML?
    ;
 
 xmlEncoding
@@ -2198,7 +2198,7 @@ xmlNational
    ;
 
 xmlValidating
-   : VALIDATING WITH? (generalIdentifier | FILE literal)
+   : VALIDATING WITH? (qualifiedDataName | FILE literal)
    ;
 
 xmlThru

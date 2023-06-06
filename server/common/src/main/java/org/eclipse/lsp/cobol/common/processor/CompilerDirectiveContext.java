@@ -16,10 +16,7 @@ package org.eclipse.lsp.cobol.common.processor;
 
 import lombok.Getter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -53,11 +50,11 @@ public class CompilerDirectiveContext {
    * @param names List of @{@link CompilerDirectiveName}
    * @return List of @{@link CompilerDirectiveOption}
    */
-  public List<CompilerDirectiveOption> filterDirectiveList(List<CompilerDirectiveName> names) {
+  public Optional<CompilerDirectiveOption> filterDirectiveList(List<CompilerDirectiveName> names) {
     return compilerDirectiveMap.entrySet().stream()
         .filter(entry -> Objects.nonNull(entry.getKey()))
         .filter(entry -> names.contains(entry.getKey()))
         .map(entry -> new CompilerDirectiveOption(entry.getKey(), entry.getValue()))
-        .collect(Collectors.toList());
+        .findFirst();
   }
 }

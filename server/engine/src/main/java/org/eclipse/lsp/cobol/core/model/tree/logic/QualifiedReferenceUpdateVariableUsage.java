@@ -56,15 +56,12 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
             .collect(Collectors.toList());
 
     boolean isQualifyExtendedDirectiveEnabled =
-        ctx
-            .getCompilerDirectiveContext()
-            .filterDirectiveList(
-                ImmutableList.of(CompilerDirectiveName.QUALIFY))
-            .stream()
-            .filter(t -> !t.getValue().isEmpty())
-            .map(t -> t.getValue().get(t.getValue().size() - 1).equals("EXTEND"))
-            .findFirst()
-            .orElse(false);
+            ctx
+                    .getCompilerDirectiveContext()
+                    .filterDirectiveList(ImmutableList.of(CompilerDirectiveName.QUALIFY))
+                    .filter(t -> !t.getValue().isEmpty())
+                    .map(t -> t.getValue().get(t.getValue().size() - 1).equals("EXTEND"))
+                    .orElse(false);
 
     if (variableUsageNodes.isEmpty()) {
       LOG.warn("Qualified reference node don't have any variable usages. {}", node);
