@@ -8,13 +8,13 @@
       "include": "#comment-floating"
     },
     {
-      "include": "#number-constant"
-    },
-    {
       "include": "#string-quoted-constant"
     },
     {
       "include": "#string-double-quoted-constant"
+    },
+    {
+      "include": "#number-constant"
     },
     {
       "include": "#picture"
@@ -56,14 +56,70 @@
       "name": "constant.numeric.integer"
     },
     "string-quoted-constant": {
-      "begin": "'",
-      "end": "'|$",
-      "name": "string.quoted.single.cobol"
+      "match": "(^.{7}.*?)('.*?('|$))",
+      "captures": {
+        "1": {
+          "patterns": [
+            {
+              "include": "#number-constant"
+            },
+            {
+              "include": "#picture"
+            },
+            {
+              "include": "#sql-block"
+            },
+            {
+              "include": "#cics-block"
+            },
+            {
+              "include": "#cobol-keywords"
+            },
+            {
+              "include": "#cobol-preprocessor-keywords"
+            },
+            {
+              "include": "#idms-keywords"
+            }
+          ]
+        },
+        "2": {
+          "name": "string.quoted.single.cobol"
+        }
+      }
     },
     "string-double-quoted-constant": {
-      "begin": "\"",
-      "end": "\"|$",
-      "name": "string.quoted.double.cobol"
+      "match": "(^.{7}.*?)(\".*?(\"|$))",
+      "captures": {
+        "1": {
+          "patterns": [
+            {
+              "include": "#number-constant"
+            },
+            {
+              "include": "#picture"
+            },
+            {
+              "include": "#sql-block"
+            },
+            {
+              "include": "#cics-block"
+            },
+            {
+              "include": "#cobol-keywords"
+            },
+            {
+              "include": "#cobol-preprocessor-keywords"
+            },
+            {
+              "include": "#idms-keywords"
+            }
+          ]
+        },
+        "2": {
+          "name": "string.quoted.double.cobol"
+        }
+      }
     },
     "picture": {
       "match": "(?i:\\b(picture|pic)\\s+(is\\s+)?\\S+)(?<!\\.)",
