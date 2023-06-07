@@ -2,41 +2,60 @@
   "scopeName": "source.cobol",
   "patterns": [
     {
-      "include": "#comment-line"
+      "include": "#comment-cobol-source"
     },
     {
-      "include": "#comment-floating"
-    },
-    {
-      "include": "#number-constant"
-    },
-    {
-      "include": "#string-quoted-constant"
-    },
-    {
-      "include": "#string-double-quoted-constant"
-    },
-    {
-      "include": "#picture"
-    },
-    {
-      "include": "#sql-block"
-    },
-    {
-      "include": "#cics-block"
-    },
-    {
-      "include": "#cobol-keywords"
-    },
-    {
-      "include": "#cobol-preprocessor-keywords"
-    },
-    {
-      "include": "#idms-keywords"
+      "include": "#cobol-source"
     }
   ],
   "repository": {
-    "comment-line": {
+    "cobol-source": {
+      "match": "(^.{6})(.)(.*?$)",
+      "captures": {
+        "1": {
+          "patterns": [
+            {
+              "include": "#number-constant"
+            }
+          ]
+        },
+        "3": {
+          "patterns": [
+            {
+              "include": "#comment-floating"
+            },
+            {
+              "include": "#string-quoted-constant"
+            },
+            {
+              "include": "#string-double-quoted-constant"
+            },
+            {
+              "include": "#number-constant"
+            },
+            {
+              "include": "#picture"
+            },
+            {
+              "include": "#sql-block"
+            },
+            {
+              "include": "#cics-block"
+            },
+            {
+              "include": "#cobol-keywords"
+            },
+            {
+              "include": "#cobol-preprocessor-keywords"
+            },
+            {
+              "include": "#idms-keywords"
+            }
+          ] 
+        }
+      }
+    },
+    "comment-cobol-source": {
       "match": "^(.{6})(\\/.*|\\*.*)$",
       "captures": {
         "1": {
@@ -45,8 +64,8 @@
         "2": {
           "name": "comment.line.cobol.fixed"
         }
-      }
-    },
+    }
+  },
     "comment-floating": {
       "match": "\\s\\*>\\s.*",
       "name": "comment.line.cobol.floating"
