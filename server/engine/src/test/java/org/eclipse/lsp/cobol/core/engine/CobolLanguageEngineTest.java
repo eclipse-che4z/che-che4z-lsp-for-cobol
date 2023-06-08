@@ -28,8 +28,8 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
-import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
@@ -161,13 +161,13 @@ class CobolLanguageEngineTest {
     CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER);
 
     DialectProcessingContext context = DialectProcessingContext.builder()
-            .extendedSource(new ExtendedSource(TEXT, URI))
+            .extendedDocument(new ExtendedDocument(TEXT, URI))
             .build();
-    context.getExtendedSource().commitTransformations();
+    context.getExtendedDocument().commitTransformations();
     when(dialectService.process(anyList(), any()))
         .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
     when(preprocessor.cleanUpCode(URI, TEXT))
-        .thenReturn(new ResultWithErrors<>(TextTransformations.of(TEXT, URI), ImmutableList.of()));
+        .thenReturn(new ResultWithErrors<>(new ExtendedText(TEXT, URI), ImmutableList.of()));
 
     when(embeddedCodeService.generateNodes(any(), any(), any(), any(), anyString(), anyList()))
         .thenReturn(new ResultWithErrors<>(ImmutableList.of(), ImmutableList.of()));

@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
 
 /** This service applies replacing for given text by replace clauses and tokens. */
@@ -26,11 +26,11 @@ public interface ReplacingService {
   /**
    * Replace given content of documentMap by given patterns and tokens
    *
-   * @param documentMap - a document map to work on
+   * @param extendedDocument - an extended text document to work on
    * @param replaceData - Necessary data to apply the replacements
    */
   @NonNull
-  void applyReplacing(@NonNull DocumentMap documentMap, @NonNull ReplaceData replaceData);
+  void applyReplacing(@NonNull ExtendedDocument extendedDocument, @NonNull ReplaceData replaceData);
 
   /**
    * Retrieve pseudo-text replacing pattern from the given string. If the pseudo text consist of

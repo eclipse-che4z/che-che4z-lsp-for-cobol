@@ -16,9 +16,8 @@
 package org.eclipse.lsp.cobol.core.preprocessor;
 
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
@@ -61,12 +60,11 @@ class TestLinesConcatenation {
           + "       WORKING-STORAGE SECTION.\n"
           + "       77  CONT-B                       PICTURE S9(5)V9(5) VALUE ZERO.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           MOVE     45678 TO CONT-B.";
+          + "           MOVE     45678 TO CONT-B.\n";
 
   @Test
   void test() {
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
-    GrammarPreprocessor grammarPreprocessor = mock(GrammarPreprocessor.class);
     MessageService messageService = mock(MessageService.class);
     CobolLineReader reader = new CobolLineReaderImpl(messageService);
     CobolLineWriter writer = new CobolLineWriterImpl();
@@ -74,9 +72,8 @@ class TestLinesConcatenation {
     CobolLineReWriter indicatorProcessor = new CobolLineIndicatorProcessorImpl();
 
     TextPreprocessor textPreprocessor = new TextPreprocessorImpl(reader, writer, transformation, indicatorProcessor);
-    TextTransformations textTransformations = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
-    assertEquals(EXPECTED, textTransformations.calculateExtendedText());
+    ExtendedText extendedText = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
+    assertEquals(EXPECTED, extendedText.toString());
     assertTrue(accumulatedErrors.isEmpty());
-    assertEquals(1, textTransformations.getReplacements().size());
   }
 }

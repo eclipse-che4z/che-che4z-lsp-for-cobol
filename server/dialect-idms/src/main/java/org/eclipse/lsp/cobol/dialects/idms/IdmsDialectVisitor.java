@@ -59,7 +59,7 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
 
   @Override
   public List<IdmsCopybookDescriptor> visitCopyIdmsStatement(IdmsParser.CopyIdmsStatementContext ctx) {
-    return ImmutableList.of(IdmsCopybookDescriptor.from(ctx, context.getExtendedSource().getUri()));
+    return ImmutableList.of(IdmsCopybookDescriptor.from(ctx, context.getExtendedDocument().getUri()));
   }
 
   @Override
@@ -110,7 +110,7 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
     List<IdmsCopybookDescriptor> result = new LinkedList<>();
     Pattern pattern = Pattern.compile(recordsDescriptor.getRecordsWithinPlacement() + " +SECTION", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
-    String[] lines = context.getExtendedSource().getText().split("\\r?\\n");
+    String[] lines = context.getExtendedDocument().toString().split("\\r?\\n");
     for (int i = 0; i < lines.length; i++) {
       Matcher matcher = pattern.matcher(lines[i]);
       if (matcher.find()) {

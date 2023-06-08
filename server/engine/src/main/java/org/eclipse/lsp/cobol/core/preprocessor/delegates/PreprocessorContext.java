@@ -17,8 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates;
 import lombok.NonNull;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
-import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
@@ -28,8 +27,7 @@ import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 @Value
 public class PreprocessorContext {
   @NonNull String programDocumentUri;
-  @NonNull ExtendedSource extendedSource;
-  @NonNull DocumentMap currentDocument;
+  @NonNull ExtendedDocument currentDocument;
   @NonNull CopybookConfig copybookConfig;
   @NonNull CopybookHierarchy hierarchy;
   @NonNull CopybooksRepository copybooksRepository;

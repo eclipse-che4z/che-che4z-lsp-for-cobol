@@ -128,4 +128,24 @@ public class RangeUtils {
         new Position(position.getLine() + range.getEnd().getLine(), range.getEnd().getCharacter() + shift)
     );
   }
+
+  /**
+   * Moves the end of the range on defined character's count
+   * @param range - range to extend
+   * @param count - character's count
+   * @return a new range
+   */
+  public Range extendByCharacter(Range range, int count) {
+    return new Range(range.getStart(),
+        new Position(range.getEnd().getLine(), range.getEnd().getCharacter() + count));
+  }
+
+  /**
+   * Returns character size of the range
+   * @param range - range
+   * @return character size
+   */
+  public int charSize(Range range) {
+    return range.getEnd().getCharacter() - range.getStart().getCharacter() + 1;
+  }
 }

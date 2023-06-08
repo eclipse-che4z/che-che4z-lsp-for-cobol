@@ -30,7 +30,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.*;
 import org.eclipse.lsp.cobol.common.model.tree.*;
@@ -46,7 +46,6 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode.B
 import org.eclipse.lsp.cobol.core.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.common.SubroutineService;
@@ -80,11 +79,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
   private final CopybooksRepository copybooks;
   private final CommonTokenStream tokenStream;
-  private final ExtendedSource extendedSource;
+  private final ExtendedDocument extendedDocument;
   private final MessageService messageService;
   private final SubroutineService subroutineService;
 
-  private final List<Node> dialectNodes;
   private Map<String, FileControlEntryContext> fileControls = null;
   private final Map<String, SubroutineDefinition> subroutineDefinitionMap = new HashMap<>();
   private final CachingConfigurationService cachingConfigurationService;
@@ -92,17 +90,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public CobolVisitor(
           @NonNull CopybooksRepository copybooks,
           @NonNull CommonTokenStream tokenStream,
-          @NonNull ExtendedSource extendedSource,
+          @NonNull ExtendedDocument extendedDocument,
           MessageService messageService,
           SubroutineService subroutineService,
-          List<Node> dialectNodes,
           CachingConfigurationService cachingConfigurationService) {
     this.copybooks = copybooks;
     this.tokenStream = tokenStream;
-    this.extendedSource = extendedSource;
+    this.extendedDocument = extendedDocument;
     this.messageService = messageService;
     this.subroutineService = subroutineService;
-    this.dialectNodes = dialectNodes;
     this.cachingConfigurationService = cachingConfigurationService;
   }
 
@@ -115,8 +111,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .map(
                 rootNode -> {
                   visitChildren(ctx).forEach(rootNode::addChild);
-                  addCopyNodes(rootNode);
-                  addDialectsNode(rootNode);
                   return rootNode;
                 })
             .orElseGet(
@@ -124,18 +118,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                   LOG.warn("The root node for syntax tree was not constructed");
                   return new RootNode();
                 }));
-  }
-
-  private void addDialectsNode(Node rootNode) {
-    for (Node dialectNode : dialectNodes) {
-      Optional<Node> nodeByPosition =
-          RangeUtils.findNodeByPosition(
-              rootNode,
-              dialectNode.getLocality().getUri(),
-              dialectNode.getLocality().getRange().getStart());
-
-      nodeByPosition.orElse(rootNode).addChild(dialectNode);
-    }
   }
 
   /**
@@ -936,7 +918,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private Optional<Locality> getLocality(Token childToken) {
-    Location location = extendedSource.mapLocationUnsafe(buildTokenRange(childToken));
+    Location location = extendedDocument.mapLocation(buildTokenRange(childToken));
     return ofNullable(locationToLocality(location));
   }
 
@@ -1057,7 +1039,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private Optional<Locality> retrieveLocality(ParserRuleContext ctx) {
     return retrieveRangeLocality(ctx)
-        .map(extendedSource::mapLocation)
+        .map(extendedDocument::mapLocation)
         .map(this::locationToLocality);
   }
 
@@ -1099,7 +1081,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private Locality getLevelLocality(TerminalNode terminalNode) {
     try {
-      Location location = extendedSource.mapLocationUnsafe(buildTokenRange(terminalNode.getSymbol()));
+      Location location = extendedDocument.mapLocation(buildTokenRange(terminalNode.getSymbol()));
       return locationToLocality(location);
     } catch (IllegalStateException e) {
       LOG.debug("Node: {} with range: {} has issue with the mapping", terminalNode, buildTokenRange(terminalNode.getSymbol()));
@@ -1113,16 +1095,5 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .uri(location.getUri())
         .copybookId(copybooks.getCopybookIdByUri(location.getUri()))
         .build();
-  }
-
-  private void addCopyNodes(Node rootNode) {
-    for (Map.Entry<String, Location> copybook : copybooks.getUsages().entries()) {
-      String name = copybook.getKey();
-      Range range = copybook.getValue().getRange();
-      Locality statementLocality = Locality.builder().range(range).uri(copybook.getValue().getUri()).build();
-      String copybookUri = copybooks.getDefinitions().get(name).stream().findFirst().orElse(null);
-      rootNode.addChild(
-          new CopyNode(statementLocality, copybook.getValue(), name, copybookUri));
-    }
   }
 }

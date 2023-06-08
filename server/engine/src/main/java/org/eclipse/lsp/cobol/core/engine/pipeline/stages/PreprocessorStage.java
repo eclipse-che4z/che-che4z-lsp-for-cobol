@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
@@ -41,7 +41,7 @@ public class PreprocessorStage implements Stage<CopybooksRepository, DialectOutc
   @Override
   public PipelineResult<CopybooksRepository> run(AnalysisContext context, PipelineResult<DialectOutcome> prevPipelineResult) {
     // Preprocessor (replacement, copybooks)
-    CopybooksRepository copybooksRepository = runPreprocessor(context.getDocumentUri(), context);
+    CopybooksRepository copybooksRepository = runPreprocessor(context.getExtendedDocument().getUri(), context);
     applyDialectCopybooks(copybooksRepository, prevPipelineResult.getData().getDialectNodes());
 
     context.setDialectNodes(prevPipelineResult.getData().getDialectNodes());
@@ -67,12 +67,12 @@ public class PreprocessorStage implements Stage<CopybooksRepository, DialectOutc
 
   private CopybooksRepository runPreprocessor(String programDocumentUri, AnalysisContext ctx) {
     List<SyntaxError> preprocessorErrors = new ArrayList<>();
-    ExtendedSource extendedSource = ctx.getExtendedSource();
+    ExtendedDocument extendedDocument = ctx.getExtendedDocument();
     CopybooksRepository copybooks =
-        grammarPreprocessor.preprocess(new PreprocessorContext(programDocumentUri, extendedSource, extendedSource.getMainMap(),
+        grammarPreprocessor.preprocess(new PreprocessorContext(programDocumentUri, extendedDocument,
                 ctx.getConfig().getCopybookConfig(), new CopybookHierarchy(), new CopybooksRepository()))
             .unwrap(preprocessorErrors::addAll);
-    extendedSource.commitTransformations();
+    extendedDocument.commitTransformations();
 
     ctx.getAccumulatedErrors().addAll(preprocessorErrors);
     return copybooks;

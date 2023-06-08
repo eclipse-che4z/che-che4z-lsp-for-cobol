@@ -53,10 +53,10 @@ public class DialectProcessingStage implements Stage<DialectOutcome, Void> {
     DialectProcessingContext dialectProcessingContext =
         DialectProcessingContext.builder()
             .copybookConfig(copybookConfig)
-            .programDocumentUri(ctx.getExtendedSource().getUri())
-            .extendedSource(ctx.getExtendedSource())
+            .programDocumentUri(ctx.getExtendedDocument().getUri())
+            .extendedDocument(ctx.getExtendedDocument())
             .build();
-    dialectProcessingContext.getExtendedSource().commitTransformations();
+    dialectProcessingContext.getExtendedDocument().commitTransformations();
 
     DialectOutcome dialectOutcome = dialectService
         .process(ctx.getConfig().getDialects(), dialectProcessingContext)

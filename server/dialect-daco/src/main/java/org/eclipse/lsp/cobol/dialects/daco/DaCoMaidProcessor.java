@@ -86,7 +86,7 @@ public class DaCoMaidProcessor {
     List<Node> dacoNodes = new ArrayList<>();
     DaCoMaidProcessingState state = DaCoMaidProcessingState.START;
 
-    String[] lines = context.getExtendedSource().getText().split("\n", -1);
+    String[] lines = context.getExtendedDocument().toString().split("\n", -1);
     String lastSuffix = null;
     for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
       String line = lines[lineNumber];
@@ -129,13 +129,13 @@ public class DaCoMaidProcessor {
     String prototypeName =
         entryName.substring(0, entryName.length() - 2) + copyFrom.group("protoSuffix");
     int startChar = copyFrom.start("copyfrom");
-    int endChar = copyFrom.end("protoSuffix");
+    int endChar = copyFrom.end("protoSuffix") - 1;
     Range range = new Range(new Position(lineNumber, startChar), new Position(lineNumber, endChar));
     int len = endChar - startChar;
     String newString = String.join("", Collections.nCopies(len, " "));
-    context.getExtendedSource().replace(range, newString);
+    context.getExtendedDocument().replace(range, newString);
 
-    Location originalLocation = context.getExtendedSource().mapLocationUnsafe(range);
+    Location originalLocation = context.getExtendedDocument().mapLocation(range);
     Locality locality =
         Locality.builder().uri(originalLocation.getUri()).range(originalLocation.getRange()).build();
 
@@ -153,13 +153,13 @@ public class DaCoMaidProcessor {
     Matcher matcher = copyMaidPattern.matcher(input);
     if (matcher.find()) {
       String indent = matcher.group("indent");
-      int startChar = indent == null ? 0 : matcher.end("indent");
+      int startChar = indent == null ? 0 : matcher.end("indent") - 1;
       int endChar = matcher.end();
       int len = endChar - startChar;
       String newString = String.join("", Collections.nCopies(len, CobolDialect.FILLER));
       Range rangeReplace =
           new Range(new Position(lineNumber, startChar), new Position(lineNumber, endChar));
-      context.getExtendedSource().replace(rangeReplace, newString);
+      context.getExtendedDocument().replace(rangeReplace, newString);
       String level = matcher.group("level");
       String layoutId = matcher.group("layoutId");
       String layoutUsage = matcher.group("layoutUsage");
@@ -168,13 +168,13 @@ public class DaCoMaidProcessor {
             new Range(
                 new Position(lineNumber, matcher.start("level")),
                 new Position(lineNumber, matcher.end("layoutId")));
-        statementRange = context.getExtendedSource().mapLocationUnsafe(statementRange).getRange();
+        statementRange = context.getExtendedDocument().mapLocation(statementRange).getRange();
 
         Range nameRange =
             new Range(
                 new Position(lineNumber, matcher.start("layoutId")),
                 new Position(lineNumber, matcher.end("layoutId")));
-        nameRange = context.getExtendedSource().mapLocationUnsafe(nameRange).getRange();
+        nameRange = context.getExtendedDocument().mapLocation(nameRange).getRange();
         copyMaidNodes.add(
             createMaidCopybookNode(
                 context,
@@ -199,19 +199,19 @@ public class DaCoMaidProcessor {
       Range nameRange,
       List<SyntaxError> errors) {
     Locality statementLocality =
-        Locality.builder().uri(context.getExtendedSource().getUri()).range(statementRange).build();
+        Locality.builder().uri(context.getExtendedDocument().getUri()).range(statementRange).build();
 
-    Locality nameLocality = Locality.builder().uri(context.getExtendedSource().getUri()).range(nameRange).build();
+    Locality nameLocality = Locality.builder().uri(context.getExtendedDocument().getUri()).range(nameRange).build();
 
     CopybookName copybookName =
         new CopybookName(
             makeCopybookFileName(startingLevel, layoutId, layoutUsage), DaCoDialect.NAME);
     CopybookModel copybookModel =
         copybookService.resolve(
-            copybookName.toCopybookId(context.getExtendedSource().getUri()),
+            copybookName.toCopybookId(context.getExtendedDocument().getUri()),
             copybookName,
-            context.getExtendedSource().getUri(),
-            context.getExtendedSource().getUri(),
+            context.getExtendedDocument().getUri(),
+            context.getExtendedDocument().getUri(),
             context.getCopybookConfig(),
             true);
 
