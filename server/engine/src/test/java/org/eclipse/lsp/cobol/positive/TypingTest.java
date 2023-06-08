@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
@@ -81,10 +81,10 @@ class TypingTest extends FileBasedTest {
             new CobolLineWriterImpl(),
             new ContinuationLineTransformation(null),
             new CobolLineIndicatorProcessorImpl());
-    ResultWithErrors<TextTransformations> cleanTextResult =
+    ResultWithErrors<ExtendedText> cleanTextResult =
         preprocessor.cleanUpCode(cobolText.getFileName(), cobolText.getFullText());
     for (SyntaxError error : cleanTextResult.getErrors()) LOG.error(error.toString());
-    return cleanTextResult.getResult().calculateExtendedText();
+    return cleanTextResult.getResult().toString();
   }
 
   private void analyze(String name, String fullText) {

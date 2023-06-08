@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -34,19 +34,19 @@ import static org.eclipse.lsp.cobol.common.VariableConstants.*;
  * Visitor to collect all IDMS copybooks
  */
 class IdmsCopyVisitor extends IdmsCopyParserBaseVisitor<List<IdmsCopybookDescriptor>> {
-  private final DocumentMap documentMap;
+  private final ExtendedDocument extendedDocument;
   @Getter
   private final List<Pair<Range, Integer>> variableLevels = new LinkedList<>();
 
-  IdmsCopyVisitor(DocumentMap documentMap) {
-    this.documentMap = documentMap;
+  IdmsCopyVisitor(ExtendedDocument extendedDocument) {
+    this.extendedDocument = extendedDocument;
   }
 
   @Override
   public List<IdmsCopybookDescriptor> visitCopyIdmsStatement(
           IdmsCopyParser.CopyIdmsStatementContext ctx) {
     return ImmutableList.of(
-            IdmsCopybookDescriptor.from(ctx, documentMap.getUri()));
+            IdmsCopybookDescriptor.from(ctx, extendedDocument.getUri()));
   }
 
   @Override

@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor;
 
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 
 /**
  * This interface describes the text preprocessor which prepares the given string for analysis by
@@ -31,5 +31,5 @@ public interface TextPreprocessor {
    * @return modified code wrapped object and list of syntax error that might send back to the
    *     client
    */
-  ResultWithErrors<TextTransformations> cleanUpCode(String documentUri, String cobolCode);
+  ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode);
 }

@@ -22,7 +22,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
@@ -52,7 +52,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
   private final Position position;
   private final String programUri;
-  private final ExtendedSource extendedSource;
+  private final ExtendedDocument extendedDocument;
 
   @Override
   public List<Node> visitDbs_host_variable(Dbs_host_variableContext ctx) {
@@ -151,7 +151,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     Locality locality = VisitorHelper.buildNameRangeLocality(ctx, VisitorHelper.getName(ctx), programUri);
     locality.setRange(RangeUtils.shiftRangeWithPosition(position, locality.getRange()));
 
-    Location location = extendedSource.mapLocation(locality.getRange());
+    Location location = extendedDocument.mapLocation(locality.getRange());
 
     Node node = nodeConstructor.apply(Locality.builder()
         .range(location.getRange())

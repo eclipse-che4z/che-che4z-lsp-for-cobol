@@ -20,7 +20,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
@@ -32,10 +32,9 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class AnalysisContext {
-  private final @Getter ExtendedSource extendedSource;
-  private final @Getter AnalysisConfig config;
-  private final @Getter String documentUri;
-  private final @Getter List<SyntaxError> accumulatedErrors = new ArrayList<>();
+  @Getter private final ExtendedDocument extendedDocument;
+  @Getter private final AnalysisConfig config;
+  @Getter private final List<SyntaxError> accumulatedErrors = new ArrayList<>();
 
   private @Getter @Setter List<Node> dialectNodes;
   private @Getter @Setter CopybooksRepository copybooksRepository;

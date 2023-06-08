@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.common;
 
-import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 
 /**
  * Preprocessor that provides cleaning code functionality
@@ -28,5 +28,5 @@ public interface CleanerPreprocessor {
    * @return modified code wrapped object and list of syntax error that might send back to the
    *     client
    */
-  ResultWithErrors<TextTransformations> cleanUpCode(String documentUri, String cobolCode);
+  ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode);
 }

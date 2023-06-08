@@ -96,8 +96,8 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
   }
 
   private Locality constructLocality(ParserRuleContext ctx) {
-    Location location = context.getExtendedSource().getMainMap().mapLocation(DialectUtils.constructRange(ctx), false);
-    return Locality.builder().uri(context.getExtendedSource().getUri()).range(location.getRange()).build();
+    Location location = context.getExtendedDocument().mapLocation(DialectUtils.constructRange(ctx));
+    return Locality.builder().uri(context.getExtendedDocument().getUri()).range(location.getRange()).build();
   }
 
   public List<SyntaxError> getErrors() {
@@ -105,17 +105,17 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
   }
 
   private void addReplacementContext(TerminalNode token) {
-    String newText = context.getExtendedSource().getText()
+    String newText = context.getExtendedDocument().toString()
             .substring(token.getSymbol().getStartIndex(), token.getSymbol().getStopIndex() + 1)
             .replaceAll("[^ \n]", " ");
     Range range = DialectUtils.constructRange(token);
-    context.getExtendedSource().replace(range, newText);
+    context.getExtendedDocument().replace(range, newText);
   }
   private void addReplacementContext(ParserRuleContext ctx) {
-    String newText = context.getExtendedSource().getText()
+    String newText = context.getExtendedDocument().toString()
             .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
             .replaceAll("[^ \n]", CobolDialect.FILLER);
     Range range = DialectUtils.constructRange(ctx);
-    context.getExtendedSource().replace(range, newText);
+    context.getExtendedDocument().replace(range, newText);
   }
 }

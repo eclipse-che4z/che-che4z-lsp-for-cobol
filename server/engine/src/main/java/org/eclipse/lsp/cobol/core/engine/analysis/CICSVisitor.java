@@ -20,7 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.RuleNode;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
@@ -49,7 +49,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
   private final Position position;
   private final String programUri;
-  private final ExtendedSource extendedSource;
+  private final ExtendedDocument extendedDocument;
 
   @Override
   public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
@@ -68,7 +68,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     Locality locality = VisitorHelper.buildNameRangeLocality(ctx, name, programUri);
     locality.setRange(RangeUtils.shiftRangeWithPosition(position, locality.getRange()));
 
-    Location location = extendedSource.mapLocation(locality.getRange());
+    Location location = extendedDocument.mapLocation(locality.getRange());
 
     Node node = new CodeBlockUsageNode(Locality.builder()
         .range(location.getRange())
@@ -104,7 +104,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     Locality locality = VisitorHelper.buildNameRangeLocality(ctx, VisitorHelper.getName(ctx), programUri);
     locality.setRange(RangeUtils.shiftRangeWithPosition(position, locality.getRange()));
 
-    Location location = extendedSource.mapLocation(locality.getRange());
+    Location location = extendedDocument.mapLocation(locality.getRange());
 
     Node node = nodeConstructor.apply(Locality.builder()
             .range(location.getRange())

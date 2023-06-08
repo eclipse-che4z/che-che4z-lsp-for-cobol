@@ -20,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
@@ -42,9 +43,12 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -65,7 +69,6 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     // Transform parsed tree to AST
     List<Node> syntaxTree = transformAST(
             context,
-            context.getDialectNodes(),
             context.getCopybooksRepository(),
             prevPipelineResult.getData().getKey().getTokens(),
             prevPipelineResult.getData().getKey().getTree());
@@ -74,6 +77,7 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
 
     SymbolAccumulatorService symbolAccumulatorService = new SymbolAccumulatorService();
     Node rootNode = processSyntaxTree(context.getConfig(), symbolAccumulatorService, context, syntaxTree);
+
     symbolsRepository.updateSymbols(symbolAccumulatorService.getProgramSymbols());
 
     return new PipelineResult<>(new ProcessingResult(symbolAccumulatorService.getProgramSymbols(), rootNode));
@@ -84,12 +88,35 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     return "Transform tree";
   }
 
-  private List<Node> transformAST(AnalysisContext ctx, List<Node> dialectNodes,
+  private void addDialectsNode(AnalysisContext context, Node rootNode) {
+    for (Node dialectNode : context.getDialectNodes()) {
+      Optional<Node> nodeByPosition =
+          RangeUtils.findNodeByPosition(
+              rootNode,
+              dialectNode.getLocality().getUri(),
+              dialectNode.getLocality().getRange().getStart());
+
+      nodeByPosition.orElse(rootNode).addChild(dialectNode);
+    }
+  }
+
+  private void addCopyNodes(AnalysisContext context, Node rootNode) {
+    for (Map.Entry<String, Location> copybook : context.getCopybooksRepository().getUsages().entries()) {
+      String name = copybook.getKey();
+      Range range = copybook.getValue().getRange();
+      Locality statementLocality = Locality.builder().range(range).uri(copybook.getValue().getUri()).build();
+      String copybookUri = context.getCopybooksRepository().getDefinitions().get(name).stream().findFirst().orElse(null);
+      rootNode.addChild(
+          new CopyNode(statementLocality, copybook.getValue(), name, copybookUri));
+    }
+  }
+
+  private List<Node> transformAST(AnalysisContext ctx,
                                   CopybooksRepository copybooksRepository, CommonTokenStream tokens,
                                   CobolParser.StartRuleContext tree) {
     CobolVisitor visitor =
-        new CobolVisitor(copybooksRepository, tokens, ctx.getExtendedSource(),
-            messageService, subroutineService, dialectNodes, cachingConfigurationService);
+        new CobolVisitor(copybooksRepository, tokens, ctx.getExtendedDocument(),
+            messageService, subroutineService, cachingConfigurationService);
     List<Node> syntaxTree = visitor.visit(tree);
     ctx.getAccumulatedErrors().addAll(visitor.getErrors());
     return syntaxTree;
@@ -109,6 +136,9 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
 
   private Node processSyntaxTree(AnalysisConfig analysisConfig, SymbolAccumulatorService symbolAccumulatorService, AnalysisContext ctx, List<Node> syntaxTree) {
     Node rootNode = syntaxTree.get(0);
+    addCopyNodes(ctx, rootNode);
+    addDialectsNode(ctx, rootNode);
+
     ProcessingContext processingContext = new ProcessingContext(new ArrayList<>(), symbolAccumulatorService, ctx.getConfig().getDialectsSettings());
     registerProcessors(analysisConfig, processingContext, symbolAccumulatorService);
     ctx.getAccumulatedErrors().addAll(astProcessor.processSyntaxTree(processingContext, rootNode));

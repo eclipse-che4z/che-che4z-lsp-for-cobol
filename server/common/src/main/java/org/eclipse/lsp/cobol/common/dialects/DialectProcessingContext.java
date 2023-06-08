@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.common.dialects;
 import lombok.Builder;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 import java.util.ArrayList;
@@ -29,6 +29,6 @@ import java.util.List;
 public class DialectProcessingContext {
   CopybookConfig copybookConfig;
   String programDocumentUri;
-  ExtendedSource extendedSource;
+  ExtendedDocument extendedDocument;
   @Builder.Default List<Node> dialectNodes = new ArrayList<>();
 }

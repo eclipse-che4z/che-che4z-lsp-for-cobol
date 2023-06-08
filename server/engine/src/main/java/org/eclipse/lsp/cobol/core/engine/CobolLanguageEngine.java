@@ -24,9 +24,9 @@ import org.eclipse.lsp.cobol.common.*;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
-import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
@@ -112,8 +112,8 @@ public class CobolLanguageEngine {
     }
 
     // Cleaning up
-    ResultWithErrors<TextTransformations> resultWithErrors = preprocessor.cleanUpCode(documentUri, text);
-    AnalysisContext ctx = new AnalysisContext(new ExtendedSource(resultWithErrors.getResult()), analysisConfig, documentUri);
+    ResultWithErrors<ExtendedText> resultWithErrors = preprocessor.cleanUpCode(documentUri, text);
+    AnalysisContext ctx = new AnalysisContext(new ExtendedDocument(resultWithErrors.getResult(), text), analysisConfig);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
 
     PipelineResult<?> result = pipeline.run(ctx);
@@ -151,5 +151,4 @@ public class CobolLanguageEngine {
                             null)).build()
             ));
   }
-
 }

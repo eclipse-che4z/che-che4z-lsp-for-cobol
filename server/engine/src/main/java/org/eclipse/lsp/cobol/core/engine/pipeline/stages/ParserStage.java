@@ -41,8 +41,8 @@ public class ParserStage implements Stage<ParserStageResult, CopybooksRepository
   @Override
   public PipelineResult<ParserStageResult> run(AnalysisContext context, PipelineResult<CopybooksRepository> prevPipelineResult) {
     // Run parser
-    ParserListener listener = new ParserListener(context.getExtendedSource(), prevPipelineResult.getData());
-    CobolLexer lexer = new CobolLexer(CharStreams.fromString(context.getExtendedSource().extendedText()));
+    ParserListener listener = new ParserListener(context.getExtendedDocument(), prevPipelineResult.getData());
+    CobolLexer lexer = new CobolLexer(CharStreams.fromString(context.getExtendedDocument().toString()));
     lexer.removeErrorListeners();
     CommonTokenStream tokens = new CommonTokenStream(lexer);
 

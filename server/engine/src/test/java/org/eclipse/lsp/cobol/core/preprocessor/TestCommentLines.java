@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.preprocessor;
 
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
@@ -61,7 +60,6 @@ class TestCommentLines {
   @Test
   void test() {
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
-    GrammarPreprocessor grammarPreprocessor = mock(GrammarPreprocessor.class);
     MessageService messageService = mock(MessageService.class);
     CobolLineReader reader = new CobolLineReaderImpl(messageService);
     CobolLineWriter writer = new CobolLineWriterImpl();
@@ -71,7 +69,7 @@ class TestCommentLines {
     TextPreprocessor textPreprocessor =
         new TextPreprocessorImpl(reader, writer, transformation, indicatorProcessor);
     String actual =
-        textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll).calculateExtendedText();
+        textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll).toString();
     assertEquals(EXPECTED, actual);
     assertTrue(accumulatedErrors.isEmpty());
   }

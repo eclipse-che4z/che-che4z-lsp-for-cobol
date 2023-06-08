@@ -14,21 +14,11 @@
  */
 package org.eclipse.lsp.cobol.common.mapping;
 
-import lombok.experimental.UtilityClass;
+import org.eclipse.lsp4j.Location;
 
 /**
- * Maping helper class
+ * Provides mapping functionality
  */
-@UtilityClass
-public class MappingHelper {
-  public static final String SEPARATOR = "\\r?\\n";
-
-  /**
-   * Splits text into string array
-   * @param text - text to split
-   * @return an array of string objects
-   */
-  public String[] split(String text) {
-    return text.split(SEPARATOR);
-  }
+interface Mapper {
+  Location apply(MappedCharacter startCharacter, MappedCharacter endCharacter);
 }

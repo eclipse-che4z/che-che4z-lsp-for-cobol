@@ -21,7 +21,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,7 +70,7 @@ class DialectServiceTest {
   @Test
   void testUpdateDialects() {
     DialectProcessingContext context = mock(DialectProcessingContext.class);
-    when(context.getExtendedSource()).thenReturn(mock(ExtendedSource.class));
+    when(context.getExtendedDocument()).thenReturn(mock(ExtendedDocument.class));
 
     CobolDialect dialect = configureDialect(context, "dialect");
 
@@ -92,7 +92,7 @@ class DialectServiceTest {
   @Test
   void testDialectOrder() {
     DialectProcessingContext context = mock(DialectProcessingContext.class);
-    when(context.getExtendedSource()).thenReturn(mock(ExtendedSource.class));
+    when(context.getExtendedDocument()).thenReturn(mock(ExtendedDocument.class));
 
     CobolDialect dialect1 = configureDialect(context, "1");
     CobolDialect dialect2 = configureDialect(context, "2");

@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
@@ -78,14 +78,14 @@ public final class DaCoDialect implements CobolDialect {
   @Override
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
     List<SyntaxError> errors = new ArrayList<>();
-    removeDcDb(context.getExtendedSource());
+    removeDcDb(context.getExtendedDocument());
     DialectOutcome maidOutcome = maidProcessor.process(context, errors);
-    context.getExtendedSource().commitTransformations();
-    DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(context.getExtendedSource().getText()));
+    context.getExtendedDocument().commitTransformations();
+    DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(context.getExtendedDocument().toString()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     DaCoParser parser = new DaCoParser(tokens);
     DialectParserListener listener =
-        new DialectParserListener(context.getExtendedSource().getUri());
+        new DialectParserListener(context.getExtendedDocument().getUri());
     lexer.removeErrorListeners();
     lexer.addErrorListener(listener);
     parser.removeErrorListeners();
@@ -100,7 +100,7 @@ public final class DaCoDialect implements CobolDialect {
     parserErrors.addAll(visitor.getErrors());
 
     parserErrors.forEach(error -> error.getLocation().getLocation().setRange(
-            context.getExtendedSource().mapLocationUnsafe(error.getLocation().getLocation().getRange()).getRange()));
+            context.getExtendedDocument().mapLocation(error.getLocation().getLocation().getRange()).getRange()));
 
     errors.addAll(parserErrors);
 
@@ -113,14 +113,14 @@ public final class DaCoDialect implements CobolDialect {
     return KeywordsUtils.getKeywords(DaCoDialect.class.getClassLoader(), "KeywordsDaCo.txt");
   }
 
-  private void removeDcDb(ExtendedSource extendedSource) {
-    String input = extendedSource.getText();
+  private void removeDcDb(ExtendedDocument extendedDocument) {
+    String input = extendedDocument.toString();
     Matcher matcher = dcdbPattern.matcher(input);
     while (matcher.find()) {
       Position start = DialectUtils.findPosition(input, matcher.start());
-      Position end = DialectUtils.findPosition(input, matcher.end() - 1);
+      Position end = DialectUtils.findPosition(input, matcher.end() - 2);
       String replace = new String(new char[matcher.end() - matcher.start() - 1]).replace('\0', ' ');
-      extendedSource.replace(new Range(start, end), replace);
+      extendedDocument.replace(new Range(start, end), replace);
     }
   }
 

@@ -38,11 +38,11 @@ public class EmbeddedCodeStage implements Stage<Pair<ParserStageResult, List<Nod
   @Override
   public PipelineResult<Pair<ParserStageResult, List<Node>>> run(AnalysisContext context, PipelineResult<ParserStageResult> prevPipelineResult) {
     // Parse embedded code
-    List<Node> embeddedNodes = embeddedCodeService.generateNodes(context.getExtendedSource(), new ParserListener(context.getExtendedSource(), context.getCopybooksRepository()),
-            prevPipelineResult.getData().getTree(), treeListener, context.getDocumentUri(), context.getConfig().getFeatures())
+    List<Node> embeddedNodes = embeddedCodeService.generateNodes(context.getExtendedDocument(), new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository()),
+            prevPipelineResult.getData().getTree(), treeListener, context.getExtendedDocument().getUri(), context.getConfig().getFeatures())
         .unwrap(context.getAccumulatedErrors()::addAll);
 
-    context.getExtendedSource().commitTransformations();
+    context.getExtendedDocument().commitTransformations();
     Pair<ParserStageResult, List<Node>> result = Pair.of(prevPipelineResult.getData(), embeddedNodes);
     return new PipelineResult<>(result);
   }
