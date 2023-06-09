@@ -43,7 +43,7 @@ class ExtendedTextTest {
   @Test
   void testInsertToMiddle() {
     ExtendedText extendedText = new ExtendedText(TEXT, "uri");
-    extendedText.insert(2, new ExtendedText("NEW LINE", "copybook"));
+    extendedText.insert(2, new ExtendedText("NEW LINE", "copybook"), new Location());
 
     Range range = new Range(new Position(4, 0), new Position(4, 5));
     Location location = extendedText.mapLocation(range);
@@ -58,7 +58,7 @@ class ExtendedTextTest {
   @Test
   void testInsertToBottom() {
     ExtendedText extendedText = new ExtendedText(TEXT, "uri");
-    extendedText.insert(4, new ExtendedText("NEW LINE", "copybook"));
+    extendedText.insert(4, new ExtendedText("NEW LINE", "copybook"), new Location());
 
     Range range = new Range(new Position(4, 0), new Position(4, 5));
     Location location = extendedText.mapLocation(range);
@@ -69,7 +69,7 @@ class ExtendedTextTest {
   @Test
   void testInsertToTop() {
     ExtendedText extendedText = new ExtendedText(TEXT, "uri");
-    extendedText.insert(0, new ExtendedText("NEW LINE", "copybook"));
+    extendedText.insert(0, new ExtendedText("NEW LINE", "copybook"), new Location());
 
     Range range = new Range(new Position(0, 0), new Position(0, 5));
     Location location = extendedText.mapLocation(range);
@@ -109,7 +109,7 @@ class ExtendedTextTest {
   @Test
   void testDeleteLines() {
     ExtendedText extendedText = new ExtendedText(TEXT, "uri");
-    extendedText.insert(4, new ExtendedText("NEW LINE", "copybook"));
+    extendedText.insert(4, new ExtendedText("NEW LINE", "copybook"), new Location());
 
     extendedText.deleteLines(new Range(new Position(1, 5), new Position(3, 8)));
     assertEquals("     0 LINE\nNEW LINE", extendedText.toString());
@@ -339,16 +339,16 @@ class ExtendedTextTest {
     copybook1.insert(new Range(new Position(2, 0), new Position(2, 11)), copybook2);
     Location copyLocation = copybook1.mapLocation(new Range(new Position(1, 0), new Position(3, 8)));
     assertEquals("copybook1", copyLocation.getUri());
-    assertEquals(new Range(new Position(1, 0), new Position(2, 0)), copyLocation.getRange());
+    assertEquals(new Range(new Position(1, 0), new Position(2, 11)), copyLocation.getRange());
 
     document.insert(new Range(new Position(3, 8), new Position(3, 11)), copybook1);
     Location documentLocation = document.mapLocation(new Range(new Position(2, 0), new Position(7, 5)));
     assertEquals("uri", documentLocation.getUri());
-    assertEquals(new Range(new Position(2, 0), new Position(3, 0)), documentLocation.getRange());
+    assertEquals(new Range(new Position(2, 0), new Position(3, 11)), documentLocation.getRange());
 
     copyLocation = document.mapLocation(new Range(new Position(4, 0), new Position(7, 5)));
     assertEquals("copybook1", copyLocation.getUri());
-    assertEquals(new Range(new Position(2, 0), new Position(3, 0)), documentLocation.getRange());
+    assertEquals(new Range(new Position(2, 0), new Position(3, 11)), documentLocation.getRange());
 
   }
 
