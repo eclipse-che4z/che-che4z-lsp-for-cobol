@@ -102,8 +102,8 @@ public class ExtendedDocument {
    * @param copybook - a copybook extended text
    */
   public void insertCopybook(int line, ExtendedText copybook) {
-    line = updateLineDueToChanges(line);
-    currentText.insert(line, copybook);
+    int updatedLine = updateLineDueToChanges(line);
+    currentText.insert(updatedLine, copybook, new Location(currentText.getUri(), new Range(new Position(line, 0), new Position(line, 0))));
     dirty = true;
   }
 

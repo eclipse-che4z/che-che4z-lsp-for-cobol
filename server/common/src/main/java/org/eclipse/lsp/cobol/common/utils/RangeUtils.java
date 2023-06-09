@@ -141,6 +141,17 @@ public class RangeUtils {
   }
 
   /**
+   * Moves the end of the range on defined lines's count
+   * @param range - range to extend
+   * @param count - line's count
+   * @return a new range
+   */
+  public Range moveByLine(Range range, int count) {
+    return new Range(new Position(range.getStart().getLine() + count, range.getStart().getCharacter()),
+        new Position(range.getEnd().getLine() + count, range.getEnd().getCharacter()));
+  }
+
+  /**
    * Returns character size of the range
    * @param range - range
    * @return character size
