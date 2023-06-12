@@ -1,0 +1,8 @@
+{
+    "pgms": [
+        {
+            "program": "cobol-vanila/*",
+            "pgroup": "VANILA"
+        }
+    ]
+}
