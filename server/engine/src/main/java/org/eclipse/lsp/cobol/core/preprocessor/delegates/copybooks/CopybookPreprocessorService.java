@@ -25,8 +25,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
@@ -59,8 +58,7 @@ import java.util.stream.Collectors;
 class CopybookPreprocessorService {
   private final String programDocumentUri;
   private final GrammarPreprocessor grammarPreprocessor;
-  private final ExtendedSource extendedSource;
-  private final DocumentMap currentDocument;
+  private final ExtendedDocument currentDocument;
 
   private final CopybookService copybookService;
   private final CopybookConfig copybookConfig;
@@ -79,8 +77,7 @@ class CopybookPreprocessorService {
 
   CopybookPreprocessorService(String programDocumentUri,
                                      GrammarPreprocessor grammarPreprocessor,
-                                     ExtendedSource extendedSource,
-                                     DocumentMap currentDocument,
+                                     ExtendedDocument currentDocument,
                                      CopybookService copybookService,
                                      CopybookConfig copybookConfig,
                                      CopybooksRepository copybooks,
@@ -89,7 +86,6 @@ class CopybookPreprocessorService {
                                      ReplacingService replacingService) {
     this.programDocumentUri = programDocumentUri;
     this.grammarPreprocessor = grammarPreprocessor;
-    this.extendedSource = extendedSource;
     this.currentDocument = currentDocument;
     this.copybookService = copybookService;
     this.copybookConfig = copybookConfig;
@@ -116,23 +112,23 @@ class CopybookPreprocessorService {
     if (copybook != null) {
       if (hierarchy.hasRecursion(name)) {
         errors.add(copybookErrorService.addRecursionError(name.getQualifiedName(), statementLocality.toBuilder().copybookId(null).build()));
-        currentDocument.erase(VisitorHelper.constructRange(ctx));
+        currentDocument.clear(VisitorHelper.constructRange(ctx));
         copybooks.define(copybookName, null, currentDocument.getUri(), copybook.getUri());
         return;
       }
       copybooks.addStatement(copybookName, null, statementLocality);
 
       prepareReplacements(ctx);
-      DocumentMap copybookDocument = processCopybookWithReplacement(replacementContext, copybook, nameLocality, statementLocality);
+      ExtendedDocument copybookDocument = processCopybookWithReplacement(replacementContext, copybook, nameLocality, statementLocality);
 
       if (firstInstruction(currentDocument, range.getStart())) {
-        extendedSource.extend(currentDocument, range, copybookDocument);
+        currentDocument.insertCopybook(range, copybookDocument.getCurrentText());
       } else {
-        extendedSource.replace(currentDocument, range, copybookDocument);
+        currentDocument.insertCopybookWithPadding(range, copybookDocument.getCurrentText());
       }
       copybooks.define(copybookName, null, currentDocument.getUri(), copybook.getUri());
     } else {
-      currentDocument.erase(VisitorHelper.constructRange(ctx));
+      currentDocument.clear(VisitorHelper.constructRange(ctx));
       errors.add(copybookErrorService.addMissingCopybook(name.getQualifiedName(), nameLocality));
     }
   }
@@ -150,7 +146,7 @@ class CopybookPreprocessorService {
     });
   }
 
-  private DocumentMap processCopybookWithReplacement(List<ReplacementContext> replacementContext, CopybookModel copybook,
+  private ExtendedDocument processCopybookWithReplacement(List<ReplacementContext> replacementContext, CopybookModel copybook,
                                                         Locality nameLocality,
                                                         Locality statementLocality) {
     hierarchy.push(new CopybookUsage(copybook.getCopybookName(), CopybooksRepository.toId(copybook.getCopybookName().getQualifiedName(), null, nameLocality.getUri()), nameLocality));
@@ -158,7 +154,7 @@ class CopybookPreprocessorService {
       replacementContext.forEach(h -> hierarchy.addTextReplacing(h.getReplacement(), h.getLocality().getUri(), h.getLocality().getRange()));
     }
 
-    DocumentMap copybookDocument = new DocumentMap(copybook.getUri(), copybook.getContent());
+    ExtendedDocument copybookDocument = new ExtendedDocument(copybook.getContent(), copybook.getUri());
     hierarchy.prepareCopybookReplacement(copybook.getUri());
 
     if (hierarchy.containsRecursiveReplacement()) {
@@ -167,7 +163,7 @@ class CopybookPreprocessorService {
 
     hierarchy.replaceCopybook(copybookDocument, replacingService::applyReplacing, errors);
 
-    PreprocessorContext copybookContext = new PreprocessorContext(programDocumentUri, extendedSource, copybookDocument, copybookConfig, hierarchy, copybooks);
+    PreprocessorContext copybookContext = new PreprocessorContext(programDocumentUri, copybookDocument, copybookConfig, hierarchy, copybooks);
     List<SyntaxError> copybookErrors = new LinkedList<>();
     grammarPreprocessor.preprocess(copybookContext).unwrap(copybookErrors::addAll);
 
@@ -183,7 +179,7 @@ class CopybookPreprocessorService {
   }
 
   private Locality mapLocality(Locality locality) {
-    Location location = currentDocument.mapLocation(locality.getRange(), false);
+    Location location = currentDocument.mapLocation(locality.getRange());
     return Locality.builder()
         .uri(location.getUri())
         .range(location.getRange())
@@ -192,7 +188,7 @@ class CopybookPreprocessorService {
   }
 
   private Locality mapLocality(Range range) {
-    Location location = currentDocument.mapLocation(range, false);
+    Location location = currentDocument.mapLocation(range);
     return Locality.builder()
         .uri(location.getUri())
         .range(location.getRange())
@@ -217,11 +213,11 @@ class CopybookPreprocessorService {
       errors.add(copybookErrorService.addUnderscoreError(name, locality));
   }
 
-  private boolean firstInstruction(DocumentMap documentMap, Position start) {
+  private boolean firstInstruction(ExtendedDocument extendedDocument, Position start) {
     if (start.getCharacter() < 7) {
       return true;
     }
-    String text = documentMap.extendedText();
+    String text = extendedDocument.toString();
     String[] lines = text.split("\\r?\\n");
     if (lines.length <= start.getLine()) {
       return true;

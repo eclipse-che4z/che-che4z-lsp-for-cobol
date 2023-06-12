@@ -43,15 +43,15 @@ class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
       "CBL DATA(24)\n"
           + "                       PERFORM BBAB-MOVE-TO-DETAIL-MAP\n"
           + "                       MOVE -1 TO SNAMEDL\n"
-          + "                       MOVE 'PRESS \"CLEAR\" OR \"ENTER\" TO RETURN TO THE MENU WHEN FINISHED'\n"
-          + "                       MOVE \"PRESS 'CLEAR' OR 'ENTER' TO RETURN TO THE MENU WHEN FINISHED\"\n"
-          + "                       MOVE 'asd' NEXT LINE";
+          + "                       MOVE 'PRESS \"CLEAR\" OR \"ENTER\" TO RETURN TO THE MENU WHEN FINISHED'\n\n"
+          + "                       MOVE \"PRESS 'CLEAR' OR 'ENTER' TO RETURN TO THE MENU WHEN FINISHED\"\n\n"
+          + "                       MOVE 'asd' NEXT LINE\n";
 
   @Test
   void test() {
     ResultWithErrors<List<CobolLine>> result = super.processText(TEXT_TO_TEST);
     CobolLineWriter writer = new CobolLineWriterImpl();
-    assertEquals(EXPECTED, writer.serialize(result.getResult(), "").calculateExtendedText());
+    assertEquals(EXPECTED, writer.serialize(result.getResult(), "").toString());
     assertEquals(0, result.getErrors().size());
   }
 }

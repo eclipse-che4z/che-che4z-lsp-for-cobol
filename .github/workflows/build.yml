@@ -13,6 +13,12 @@
 name: build
 
 on:
+  workflow_dispatch:
+    inputs:
+      with_telemetry:
+        description: "Build with telemetry"
+        required: true
+        default: 'false'
   pull_request:
     branches:
       - development
@@ -207,7 +213,7 @@ jobs:
         run: cp ../../jar/jar/server.jar ./server/jar
       - name: Setup telemetry key
         working-directory: clients/cobol-lsp-vscode-extension
-        if: github.ref == 'refs/heads/master'
+        if: github.event.inputs.with_telemetry == 'true'
         run: echo ${{ secrets.TELEMETRY_INSTRUMENTATION_KEY }} > resources/TELEMETRY_KEY
       - name: Deploy windows executable
         working-directory: clients/cobol-lsp-vscode-extension

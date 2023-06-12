@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer;
 
-import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 
 import java.util.List;
@@ -32,5 +32,5 @@ public interface CobolLineWriter {
    * @param documentUri - uri of the document
    * @return a string representation of the COBOL program
    */
-  TextTransformations serialize(List<CobolLine> lines, String documentUri);
+  ExtendedDocument serialize(List<CobolLine> lines, String documentUri);
 }

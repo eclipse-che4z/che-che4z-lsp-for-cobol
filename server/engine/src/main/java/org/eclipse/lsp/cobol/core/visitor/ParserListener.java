@@ -24,7 +24,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Location;
@@ -40,7 +40,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ParserListener extends BaseErrorListener {
 
-  private final ExtendedSource extendedSource;
+  private final ExtendedDocument extendedDocument;
   private final CopybooksRepository copybooksRepository;
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
@@ -61,7 +61,7 @@ public class ParserListener extends BaseErrorListener {
       return;
     }
 
-    Location location = extendedSource.mapLocation(range);
+    Location location = extendedDocument.mapLocation(range);
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)

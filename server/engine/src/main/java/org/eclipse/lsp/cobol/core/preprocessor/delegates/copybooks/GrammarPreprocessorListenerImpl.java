@@ -70,7 +70,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     this.messageService = messageService;
     this.preprocessorService = new CopybookPreprocessorService(context.getProgramDocumentUri(),
         grammarPreprocessor,
-        context.getExtendedSource(),
         context.getCurrentDocument(),
         copybookService,
         copybookConfig,

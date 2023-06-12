@@ -121,7 +121,7 @@ public class UseCaseUtils {
           String copybookText = cobolText.getFullText();
           if (cobolText.isPreprocess()) {
             copybookText = preprocessor.cleanUpCode("uri", cobolText.getFullText())
-                .getResult().calculateExtendedText();
+                .getResult().toString();
           }
 
           cobolText = new CobolText(cobolText.getFileName().toUpperCase(), cobolText.getDialectType(), copybookText);

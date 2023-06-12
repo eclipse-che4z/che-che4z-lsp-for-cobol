@@ -395,13 +395,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                     .map(ParserRuleContext::getText)
                     .orElse(text);
 
-    int tokenLength =
-            ofNullable(replacement)
-                    .filter(it -> it.FINAL_SIZE_REPLACEMENT_START() != null)
-                    .map(ReplacementContext::identifier)
-                    .map(ParserRuleContext::getText)
-                    .map(String::length)
-                    .orElseGet(text::length);
+    int tokenLength = text.length();
 
     Range range = retrieveRange(ctx, tokenLength);
     ofNullable(storage)
@@ -438,15 +432,9 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                     .map(ParserRuleContext::getText)
                     .orElse(text);
 
-    int tokenLength =
-            ofNullable(replacement)
-                    .filter(it -> it.FINAL_SIZE_REPLACEMENT_START() != null)
-                    .map(ReplacementContext::identifier)
-                    .map(ParserRuleContext::getText)
-                    .map(String::length)
-                    .orElseGet(text::length);
+    int tokenLength = text.length();
 
-    Range range = retrieveRange(ctx, tokenLength);
+    Range range = retrieveRange(ctx, text.length());
     ofNullable(storage)
             .ifPresent(
                     it -> {

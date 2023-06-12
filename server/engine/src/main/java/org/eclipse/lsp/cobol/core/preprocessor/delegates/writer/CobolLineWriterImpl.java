@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
@@ -32,7 +32,7 @@ import java.util.Map;
 public class CobolLineWriterImpl implements CobolLineWriter {
 
   @Override
-  public TextTransformations serialize(final List<CobolLine> lines, String documentUri) {
+  public ExtendedDocument serialize(final List<CobolLine> lines, String documentUri) {
     final StringBuilder sb = new StringBuilder();
     final Map<Range, String> acc = new HashMap<>();
     StringBuilder clSb = new StringBuilder();
@@ -68,7 +68,7 @@ public class CobolLineWriterImpl implements CobolLineWriter {
       }
     }
 
-    TextTransformations result = TextTransformations.of(sb.toString(), documentUri);
+    ExtendedDocument result = new ExtendedDocument(sb.toString(), documentUri);
     acc.forEach(result::replace);
     if (start != null) {
       CobolLine lastLine = lines.get(lines.size() - 1);
@@ -76,6 +76,7 @@ public class CobolLineWriterImpl implements CobolLineWriter {
       Range range = new Range(start, stop);
       result.replace(range, clSb.toString());
     }
+    result.commitTransformations();
     return result;
   }
 

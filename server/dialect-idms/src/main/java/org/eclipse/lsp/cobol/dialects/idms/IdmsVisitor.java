@@ -174,7 +174,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   private Locality constructLocality(ParserRuleContext ctx) {
     Location location =
-        context.getExtendedSource().mapLocationUnsafe(DialectUtils.constructRange(ctx));
+        context.getExtendedDocument().mapLocation(DialectUtils.constructRange(ctx));
     return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
   }
 
@@ -186,10 +186,10 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     String newText =
         prefix
             + context
-                .getExtendedSource()
-                .getText()
+                .getExtendedDocument()
+                .toString()
                 .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
                 .replaceAll("[^ \n]", CobolDialect.FILLER);
-    context.getExtendedSource().replace(DialectUtils.constructRange(ctx), newText);
+    context.getExtendedDocument().replace(DialectUtils.constructRange(ctx), newText);
   }
 }

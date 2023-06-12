@@ -42,7 +42,7 @@ class TestReplacingByEmptyPseudoText {
           + "           GOBACK. ";
 
   private static final String REPL =
-      "           10 {$*TAG-PID^PID} PIC 9.\n" + "           10 {$*TAR-PKEY^PKEY} PIC 9.\n";
+      "           10 TAG-{$*PID} PIC 9.\n" + "           10 TAR-{$*PKEY} PIC 9.\n";
 
   private static final String REPL_NAME = "REPL";
 

@@ -20,7 +20,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
@@ -155,26 +155,26 @@ public class CopybookHierarchy {
   /**
    * Replace the copybook text using the internal state of the hierarchy
    *
-   * @param copybookMap copybook replacements map
+   * @param copybook copybook extended document
    * @param accumulator a function for applying the replacing
    * @param errors errors collection
    */
   public void replaceCopybook(
-          DocumentMap copybookMap, BiConsumer<DocumentMap, ReplaceData> accumulator,
-          List<SyntaxError> errors) {
+      ExtendedDocument copybook, BiConsumer<ExtendedDocument, ReplaceData> accumulator,
+      List<SyntaxError> errors) {
     for (ReplaceData replaceData : recursiveReplaceStmtStack) {
-      accumulator.accept(copybookMap, replaceData);
+      accumulator.accept(copybook, replaceData);
     }
   }
 
   /**
    * Apply replacements the documentMap using the internal state of the hierarchy
    *
-   * @param documentMap documentMap to replace
+   * @param extendedDocument an extended document to replace
    * @param accumulator a consumer for applying the replacing
    */
-  public void replaceText(DocumentMap documentMap, BiConsumer<DocumentMap, ReplaceData> accumulator) {
-    textReplacing.forEach(tr -> accumulator.accept(documentMap, tr));
+  public void replaceText(ExtendedDocument extendedDocument, BiConsumer<ExtendedDocument, ReplaceData> accumulator) {
+    textReplacing.forEach(tr -> accumulator.accept(extendedDocument, tr));
     textReplacing.clear();
   }
 

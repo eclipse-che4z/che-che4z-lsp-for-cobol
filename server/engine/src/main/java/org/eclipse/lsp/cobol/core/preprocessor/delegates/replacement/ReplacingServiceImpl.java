@@ -27,7 +27,7 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
@@ -81,9 +81,9 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   @NonNull
   @Override
-  public void applyReplacing(@NonNull DocumentMap documentMap, @NonNull ReplaceData replaceData) {
+  public void applyReplacing(@NonNull ExtendedDocument extendedDocument, @NonNull ReplaceData replaceData) {
     for (Pair<String, String> replacePattern : replaceData.getReplacePatterns()) {
-      replace(documentMap, replacePattern, replaceData.getRange(documentMap.getUri()));
+      replace(extendedDocument, replacePattern, replaceData.getRange(extendedDocument.getUri()));
     }
   }
 
@@ -229,20 +229,20 @@ public class ReplacingServiceImpl implements ReplacingService {
     return trim.replace(", ", " ").replace("; ", " ");
   }
 
-  private void replace(@NonNull DocumentMap documentMap, @NonNull Pair<String, String> pattern, @NonNull Range scope) {
-    if (StringUtils.isBlank(documentMap.extendedText())) {
+  private void replace(@NonNull ExtendedDocument extendedDocument, @NonNull Pair<String, String> pattern, @NonNull Range scope) {
+    if (StringUtils.isBlank(extendedDocument.toString())) {
       return;
     }
-    String text = documentMap.getText();
+    String text = extendedDocument.toString();
     try {
       Matcher matcher = Pattern.compile(pattern.getLeft(), Pattern.CASE_INSENSITIVE).matcher(text);
       while (matcher.find()) {
         Range range = getRange(text, matcher);
         if (RangeUtils.isInside(range, scope)) {
-          documentMap.replace(range, pattern.getRight());
+          extendedDocument.replace(range, pattern.getRight());
         }
       }
-      documentMap.commitTransformations();
+      extendedDocument.commitTransformations();
     } catch (IndexOutOfBoundsException e) {
       LOG.error(format(ERROR_REPLACING, text, pattern), e);
     }
@@ -251,7 +251,7 @@ public class ReplacingServiceImpl implements ReplacingService {
   private Range getRange(String text, Matcher matcher) {
     Position start = getPosition(text, matcher.start());
     Position end = getPosition(text, matcher.end());
-    return new Range(start, end);
+    return new Range(start, new Position(end.getLine(), end.getCharacter() - 1));
   }
 
   private Position getPosition(String text, int positionInFile) {

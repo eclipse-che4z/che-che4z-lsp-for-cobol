@@ -84,18 +84,17 @@ public class DialectService {
               e.getLocation().getLocation()
                   .setRange(
                       context
-                          .getExtendedSource()
-                          .getMainMap()
-                          .mapLocation(e.getLocation().getLocation().getRange(), false)
+                          .getExtendedDocument()
+                          .mapLocation(e.getLocation().getLocation().getRange())
                           .getRange()));
 
       errors.addAll(dialectErrors);
-      context.getExtendedSource().commitTransformations();
+      context.getExtendedDocument().commitTransformations();
     }
     ResultWithErrors<DialectOutcome> acc = new ResultWithErrors<>(new DialectOutcome(context), errors);
     for (CobolDialect orderedDialect : orderedDialects) {
       acc = processDialect(acc, orderedDialect, context);
-      context.getExtendedSource().commitTransformations();
+      context.getExtendedDocument().commitTransformations();
     }
     return acc;
   }
@@ -111,7 +110,7 @@ public class DialectService {
   private static SyntaxError errorMissingDialect(DialectProcessingContext context, String dialectName) {
     return SyntaxError.syntaxError()
             .messageTemplate(MessageTemplate.of("dialects.missingDialect",
-                    dialectName, context.getExtendedSource().getUri()))
+                    dialectName, context.getExtendedDocument().getUri()))
             .severity(ErrorSeverity.ERROR)
             .location(new OriginalLocation(new Location(context.getProgramDocumentUri(),
                     new Range(new Position(0, 0), new Position(0, 0))), null))

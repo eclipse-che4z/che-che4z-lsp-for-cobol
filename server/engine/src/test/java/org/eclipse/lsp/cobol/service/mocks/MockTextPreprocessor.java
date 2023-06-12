@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.service.mocks;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 
 /**
@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
  */
 public class MockTextPreprocessor implements TextPreprocessor {
   @Override
-  public ResultWithErrors<TextTransformations> cleanUpCode(String documentUri, String cobolCode) {
-    return new ResultWithErrors<>(TextTransformations.of(cobolCode, documentUri), ImmutableList.of());
+  public ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode) {
+    return new ResultWithErrors<>(new ExtendedText(cobolCode, documentUri), ImmutableList.of());
   }
 }

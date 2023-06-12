@@ -22,8 +22,8 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedSource;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.*;
@@ -50,7 +50,7 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
   private final ParserListener errorListener;
   private final String programUri;
   private final List<EmbeddedLanguage> features;
-  private final ExtendedSource extendedSource;
+  private final ExtendedDocument extendedDocument;
 
   @Getter private final List<Node> resultNodes = new LinkedList<>();
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
@@ -165,11 +165,11 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
    */
   public ParseTreeVisitor<List<Node>> instanceVisitor(Position position, EmbeddedLanguage lang) {
     if (EmbeddedLanguage.CICS == lang) {
-      return new CICSVisitor(position, programUri, extendedSource);
+      return new CICSVisitor(position, programUri, extendedDocument);
     }
 
     if (EmbeddedLanguage.SQL == lang) {
-      return new Db2SqlVisitor(position, programUri, extendedSource);
+      return new Db2SqlVisitor(position, programUri, extendedDocument);
     }
     throw new RuntimeException("Unknown language " + lang);
   }

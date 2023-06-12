@@ -26,12 +26,13 @@ import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.DocumentMap;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
+import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -64,18 +65,17 @@ public final class IdmsDialect implements CobolDialect {
     List<SyntaxError> errors = new LinkedList<>();
 
     IdmsDialectVisitor inlineVisitor = new IdmsDialectVisitor(context);
-    IdmsParser.StartRuleContext ruleContext = parseIdms(context.getExtendedSource().getText(), context.getProgramDocumentUri(), errors);
+    IdmsParser.StartRuleContext ruleContext = parseIdms(context.getExtendedDocument().toString(), context.getProgramDocumentUri(), errors);
 
     List<IdmsCopybookDescriptor> cbs = inlineVisitor.visitStartRule(ruleContext);
     cbs.forEach(cb -> {
-      DocumentMap currentMap = context.getExtendedSource().getMainMap();
-      String currentUri = context.getExtendedSource().getUri();
-      insertIdmsCopybook(context, currentMap, errors, cb, context.getProgramDocumentUri(), currentUri, new LinkedList<>());
+      String currentUri = context.getExtendedDocument().getUri();
+      insertIdmsCopybook(context, context.getExtendedDocument(), errors, cb, context.getProgramDocumentUri(), currentUri, new LinkedList<>());
     });
     return errors;
   }
 
-  private void insertIdmsCopybook(DialectProcessingContext ctx, DocumentMap currentMap, List<SyntaxError> errors,
+  private void insertIdmsCopybook(DialectProcessingContext ctx, ExtendedDocument extendedDocument, List<SyntaxError> errors,
                                   IdmsCopybookDescriptor cb, String programDocumentUri, String currentUri,
                                   Deque<String> copybookStack) {
     CopybookName copybookName = new CopybookName(cb.getName(), IdmsDialect.NAME);
@@ -91,33 +91,33 @@ public final class IdmsDialect implements CobolDialect {
     if (copybookModel.getUri() == null || copybookModel.getContent() == null) {
       errors.add(ErrorHelper.missingCopybooks(messageService, cb.getUsage(), cb.getName()));
       if (!cb.isInsert()) {
-        ctx.getExtendedSource().replace(cb.getStatement().getRange(), "");
+        ctx.getExtendedDocument().replace(cb.getStatement().getRange(), "");
       }
       return;
     }
 
     CopyNode copyNode = new CopyNode(removeDotAtEnd(cb.getStatement()), cb.getUsage().toLocation(), cb.getName(), IdmsDialect.NAME, copybookModel.getUri());
     if (recursiveCall(copybookStack, copyNode.getName())) {
-      currentMap.replace(cb.getStatement().getRange(), "");
+      extendedDocument.replace(cb.getStatement().getRange(), "");
       errors.add(ErrorHelper.circularDependency(messageService, cb.getUsage(), cb.getName()));
       return;
     }
-    Range range = ctx.getExtendedSource().mapLocationUnsafe(copyNode.getLocality().getRange()).getRange();
+    Range range = ctx.getExtendedDocument().mapLocation(copyNode.getLocality().getRange()).getRange();
     copyNode.getLocality().setRange(range);
 
-    range = ctx.getExtendedSource().mapLocationUnsafe(copyNode.getNameLocation().getRange()).getRange();
+    range = ctx.getExtendedDocument().mapLocation(copyNode.getNameLocation().getRange()).getRange();
     copyNode.getNameLocation().setRange(range);
 
     copybookStack.push(copyNode.getName());
 
-    DocumentMap copybookMap = new DocumentMap(copybookModel.getUri(), copybookModel.getContent());
-    processTextTransformation(ctx, copybookMap,
+    ExtendedDocument copybookDocument = new ExtendedDocument(copybookModel.getContent(), copybookModel.getUri());
+    processTextTransformation(ctx, copybookDocument,
             errors, programDocumentUri, cb.getLevel(), copybookStack, copyNode);
-    copybookMap.commitTransformations();
+    copybookDocument.commitTransformations();
     if (cb.isInsert()) {
-      ctx.getExtendedSource().insert(currentMap, cb.getStatement().getRange().getStart().getLine(), copybookMap);
+      extendedDocument.insertCopybook(cb.getStatement().getRange().getStart().getLine() + 1, copybookDocument.getCurrentText());
     } else {
-      ctx.getExtendedSource().extend(currentMap, cb.getStatement().getRange(), copybookMap);
+      extendedDocument.insertCopybookWithPadding(cb.getStatement().getRange(), copybookDocument.getCurrentText());
     }
 
     ctx.getDialectNodes().add(copyNode);
@@ -143,15 +143,15 @@ public final class IdmsDialect implements CobolDialect {
 
   private void processTextTransformation(
           DialectProcessingContext ctx,
-          DocumentMap currentDocumentMap,
+          ExtendedDocument currentDocument,
           List<SyntaxError> errors,
           String programDocumentUri,
           int copybookLevel,
           Deque<String> copybookStack,
           CopyNode copyNode) {
-    IdmsCopyVisitor copyVisitor = new IdmsCopyVisitor(currentDocumentMap);
+    IdmsCopyVisitor copyVisitor = new IdmsCopyVisitor(currentDocument);
     IdmsCopyParser.StartRuleContext context =
-        parseCopyIdms(currentDocumentMap.extendedText(), programDocumentUri, errors);
+        parseCopyIdms(currentDocument.toString(), programDocumentUri, errors);
 
     List<IdmsCopybookDescriptor> cbs = copyVisitor.visitStartRule(context);
     int firstLevel =
@@ -162,10 +162,10 @@ public final class IdmsDialect implements CobolDialect {
             p -> {
               if (copybookLevel > 0 && p.getRight() != null) {
                 CopyIdmsAdjustmentProcessor copyIdmsAdjustmentProcessor = new CopyIdmsAdjustmentProcessor(copyNode,
-                        currentDocumentMap.getUri(), copybookLevel, firstLevel, p, messageService);
-                currentDocumentMap.replace(
-                        p.getLeft(),
-                        String.format("%02d", copyIdmsAdjustmentProcessor.calculateLevel(copybookLevel, firstLevel, p.getRight())));
+                    currentDocument.getUri(), copybookLevel, firstLevel, p, messageService);
+                currentDocument.replace(
+                    RangeUtils.extendByCharacter(p.getLeft(), -1),
+                    String.format("%02d", copyIdmsAdjustmentProcessor.calculateLevel(copybookLevel, firstLevel, p.getRight())));
                 copyIdmsAdjustmentProcessor.processError(errors);
               }
             });
@@ -175,7 +175,7 @@ public final class IdmsDialect implements CobolDialect {
             cb.setLevel(copybookLevel);
           }
 
-          insertIdmsCopybook(ctx, currentDocumentMap, errors, cb, programDocumentUri, currentDocumentMap.getUri(), copybookStack);
+          insertIdmsCopybook(ctx, currentDocument, errors, cb, programDocumentUri, currentDocument.getUri(), copybookStack);
         });
   }
 
@@ -189,8 +189,8 @@ public final class IdmsDialect implements CobolDialect {
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
     IdmsVisitor visitor = new IdmsVisitor(context);
     List<SyntaxError> errors = new ArrayList<>();
-    IdmsParser.StartRuleContext startRuleContext = parseIdms(context.getExtendedSource().getText(),
-            context.getExtendedSource().getUri(), errors);
+    IdmsParser.StartRuleContext startRuleContext = parseIdms(context.getExtendedDocument().toString(),
+            context.getExtendedDocument().getUri(), errors);
     List<Node> nodes = new ArrayList<>();
     nodes.addAll(visitor.visitStartRule(startRuleContext));
     nodes.addAll(context.getDialectNodes());
@@ -207,6 +207,12 @@ public final class IdmsDialect implements CobolDialect {
         }));
 
     errors.addAll(visitor.getErrors());
+    errors.forEach(e -> e.getLocation().getLocation()
+                .setRange(
+                    context
+                        .getExtendedDocument()
+                        .mapLocation(e.getLocation().getLocation().getRange())
+                        .getRange()));
 
     return new ResultWithErrors<>(new DialectOutcome(nodes, context), errors);
   }

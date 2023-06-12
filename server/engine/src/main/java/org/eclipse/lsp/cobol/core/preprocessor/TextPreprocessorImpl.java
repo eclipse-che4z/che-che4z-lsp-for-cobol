@@ -20,8 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.TextTransformations;
-import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
@@ -33,8 +33,7 @@ import java.util.List;
 /**
  * This class re-writes the content of the analyzing file to simplify the processing by the grammar,
  * e.g. removes comments or cleans-up the comment and sequence areas. See the delegates for more
- * details. As a result it returns the {@link OldExtendedDocument}, e.g. one that has all the copybook
- * content built inside the document text.
+ * details.
  */
 @Slf4j
 @Singleton
@@ -57,13 +56,13 @@ public class TextPreprocessorImpl implements TextPreprocessor, CleanerPreprocess
   }
 
   @Override
-  public ResultWithErrors<TextTransformations> cleanUpCode(String documentUri, String cobolCode) {
+  public ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode) {
     List<SyntaxError> errors = new ArrayList<>();
     List<CobolLine> lines = reader.processLines(documentUri, cobolCode).unwrap(errors::addAll);
     List<CobolLine> transformedLines = transformation.transformLines(documentUri, lines).unwrap(errors::addAll);
     List<CobolLine> rewrittenLines = indicatorProcessor.processLines(transformedLines);
 
-    TextTransformations code = writer.serialize(rewrittenLines, documentUri);
-    return new ResultWithErrors<>(code, errors);
+    ExtendedDocument code = writer.serialize(rewrittenLines, documentUri);
+    return new ResultWithErrors<>(code.getCurrentText(), errors);
   }
 }
