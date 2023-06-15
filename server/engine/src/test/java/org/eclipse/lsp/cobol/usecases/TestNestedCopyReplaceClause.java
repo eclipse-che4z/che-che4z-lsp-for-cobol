@@ -69,7 +69,7 @@ class TestNestedCopyReplaceClause {
             "1",
             new Diagnostic(
                 new Range(),
-                "More than one nested copy replace statement for copybook declaration of: STRUCT1",
+                "Errors inside the copybook",
                 DiagnosticSeverity.Error,
                 ErrorSource.COPYBOOK.getText()),
             "2",

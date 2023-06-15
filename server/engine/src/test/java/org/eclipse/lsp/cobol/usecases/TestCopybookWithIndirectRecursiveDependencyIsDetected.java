@@ -38,10 +38,10 @@ class TestCopybookWithIndirectRecursiveDependencyIsDetected {
           + "        PROGRAM-ID. test1.\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
-          + "        {_COPY {~INDIRECT-COPY|3}.|1|3|4_}\n"
+          + "        {_COPY {~INDIRECT-COPY|1|3}.|2_}\n"
           + "        PROCEDURE DIVISION.\n";
 
-  private static final String INDIRECT = "        {_COPY {~INNER-COPY|4}.|1|3_}";
+  private static final String INDIRECT = "        {_COPY {~INNER-COPY|1|4}.|2_}";
   private static final String INNER_COPY = "        {_COPY {~INDIRECT-COPY|3}.|1_}";
 
   private static final String INDIRECT_NAME = "INDIRECT-COPY";
@@ -63,7 +63,7 @@ class TestCopybookWithIndirectRecursiveDependencyIsDetected {
                 new Range(), MESSAGE_RECURSION + INDIRECT_NAME, Error, ErrorSource.COPYBOOK.getText()),
             "2",
             new Diagnostic(
-                new Range(), MESSAGE_RECURSION + INNER_COPY_NAME, Error, ErrorSource.COPYBOOK.getText()),
+                new Range(), "Errors inside the copybook", Error, ErrorSource.COPYBOOK.getText()),
             "3",
             new Diagnostic(
                 new Range(),

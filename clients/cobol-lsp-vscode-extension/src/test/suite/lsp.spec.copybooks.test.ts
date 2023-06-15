@@ -86,10 +86,10 @@ suite("Integration Test Suite: Copybooks", function () {
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
     );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 4);
+    assert.strictEqual(diagnostics.length, 3);
     helper.assertRangeIsEqual(
       diagnostics[0].range,
-      new vscode.Range(pos(18, 7), pos(18, 19)),
+      new vscode.Range(pos(18, 12), pos(18, 18)),
     );
     assert.strictEqual(
       diagnostics[0].message,
@@ -106,13 +106,13 @@ suite("Integration Test Suite: Copybooks", function () {
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
     );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 7);
+    assert.strictEqual(diagnostics.length, 4);
     helper.assertRangeIsEqual(
-      diagnostics[6].range,
+      diagnostics[3].range,
       range(pos(51, 38), pos(51, 56)),
     );
     assert.strictEqual(
-      diagnostics[6].message,
+      diagnostics[3].message,
       "Variable USER-PHONE-MOBILE1 is not defined",
     );
   })

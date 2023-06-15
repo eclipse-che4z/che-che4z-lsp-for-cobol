@@ -52,7 +52,7 @@ class TestSemanticErrorsFromCopybooksShownInDocument {
             "1",
             new Diagnostic(
                 new Range(),
-                "Variable SMTH is not defined",
+                "Errors inside the copybook",
                 DiagnosticSeverity.Error,
                 ErrorSource.COPYBOOK.getText()),
             "2",

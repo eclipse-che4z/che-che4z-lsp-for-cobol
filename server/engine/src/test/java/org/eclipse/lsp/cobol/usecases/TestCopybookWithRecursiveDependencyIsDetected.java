@@ -36,10 +36,10 @@ class TestCopybookWithRecursiveDependencyIsDetected {
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
-          + "        {_COPY {~REC-CPY}.|1_}\n\n"
+          + "        {_COPY {~REC-CPY|2}.|1_}\n\n"
           + "        PROCEDURE DIVISION.\n\n";
 
-  private static final String REC_CPY = "        {_COPY {~REC-CPY}.|1_}";
+  private static final String REC_CPY = "        {_COPY {~REC-CPY}.|2_}";
   private static final String REC_CPY_NAME = "REC-CPY";
   private static final String MESSAGE = "Recursive copybook declaration for: " + REC_CPY_NAME;
 
@@ -51,6 +51,9 @@ class TestCopybookWithRecursiveDependencyIsDetected {
         ImmutableList.of(new CobolText(REC_CPY_NAME, REC_CPY)),
         ImmutableMap.of(
             "1",
+            new Diagnostic(
+                new Range(), "Errors inside the copybook", DiagnosticSeverity.Error, ErrorSource.COPYBOOK.getText()),
+            "2",
             new Diagnostic(
                 new Range(), MESSAGE, DiagnosticSeverity.Error, ErrorSource.COPYBOOK.getText())));
   }

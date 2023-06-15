@@ -57,7 +57,7 @@ class TestIdentificationDivisionInCopybookWithError {
         ImmutableList.of(new CobolText(IDDIV_NAME, IDDIV), new CobolText(STRUCT1_NAME, STRUCT1)),
         ImmutableMap.of(
             "1",
-            new Diagnostic(new Range(), MESSAGE, Error, ErrorSource.COPYBOOK.getText()),
+            new Diagnostic(new Range(), "Errors inside the copybook", Error, ErrorSource.COPYBOOK.getText()),
             "2",
             new Diagnostic(new Range(), MESSAGE, Error, ErrorSource.PARSING.getText())));
   }
