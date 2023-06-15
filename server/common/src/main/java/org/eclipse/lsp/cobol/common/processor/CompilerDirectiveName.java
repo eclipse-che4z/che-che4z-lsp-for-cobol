@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.common.processor;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.Optional;
 
 /**
@@ -24,24 +26,40 @@ import java.util.Optional;
 public enum CompilerDirectiveName {
   ADATA {
     @Override
-    public Optional<CompilerDirectiveOption<Boolean>> getDirectiveOption(String directiveText) {
+    public Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText) {
       return Optional.empty();
     }
   },
   QUALIFY {
     @Override
-    public Optional<CompilerDirectiveOption<Boolean>> getDirectiveOption(String directiveText) {
-      return Optional.of(new CompilerDirectiveOption<>(true, this))
-              .filter(cd -> directiveText.contains("QUALIFY(EXTEND)"));
+    public Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText) {
+      return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("EXTEND")))
+              .filter(cd -> isContains(directiveText, "QUALIFY(EXTEND)"));
     }
   },
   QUA {
     @Override
-    public Optional<CompilerDirectiveOption<Boolean>> getDirectiveOption(String directiveText) {
-      return Optional.of(new CompilerDirectiveOption<>(true, this))
-              .filter(cd -> directiveText.contains("QUA(EXTEND)"));
+    public Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText) {
+      return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("EXTEND")))
+              .filter(cd -> isContains(directiveText, "QUA(EXTEND)"));
+    }
+  },
+  XMLPARSE {
+    @Override
+    public Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText) {
+      if (isContains(directiveText, "XMLPARSE(XMLSS)")) {
+        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("XMLSS")));
+      } else if (isContains(directiveText, "XMLPARSE(COMPAT)")) {
+        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("COMPAT")));
+      } else {
+        return Optional.empty();
+      }
     }
   };
+
+  private static boolean isContains(String directiveText, String s) {
+    return directiveText.toUpperCase().contains(s);
+  }
 
   /**
    * Get the {@link CompilerDirectiveOption} based on the compiler directive text in the document.
@@ -49,5 +67,5 @@ public enum CompilerDirectiveName {
    * @param directiveText is compiler directive text in the document
    * @return List of {@link CompilerDirectiveOption}
    */
-  public abstract Optional<CompilerDirectiveOption<Boolean>> getDirectiveOption(String directiveText);
+  public abstract Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText);
 }

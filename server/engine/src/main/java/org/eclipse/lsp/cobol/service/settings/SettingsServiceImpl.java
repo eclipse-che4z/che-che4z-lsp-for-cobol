@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.service.settings;
 
-import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
@@ -24,15 +23,16 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp4j.ConfigurationItem;
 import org.eclipse.lsp4j.ConfigurationParams;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LSP_PREFIX;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LSP_PREFIX;
 
 /** This service fetch configuration settings from the client. */
 @Slf4j
@@ -54,6 +54,7 @@ public class SettingsServiceImpl implements SettingsService {
   @Override
   public CompletableFuture<List<String>> fetchTextConfiguration(@NonNull String... section) {
     return fetchConfiguration(section).thenApply(objects -> objects.stream()
+            .filter(JsonArray.class::isInstance)
             .map(JsonArray.class::cast)
             .flatMap(Streams::stream)
             .map(JsonElement::getAsString)
@@ -63,6 +64,7 @@ public class SettingsServiceImpl implements SettingsService {
   @Override
   public CompletableFuture<List<String>> fetchTextConfigurationWithScope(String scopeUri, String section) {
     return fetchConfigurations(scopeUri, singletonList(section)).thenApply(objects -> objects.stream()
+            .filter(JsonArray.class::isInstance)
             .map(JsonArray.class::cast)
             .flatMap(Streams::stream)
             .map(JsonElement::getAsString)

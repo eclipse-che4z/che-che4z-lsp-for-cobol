@@ -401,6 +401,7 @@
     },
     "configurationDefaults": {
       "[cobol]": {
+        "editor.guides.indentation": false,
         "editor.rulers": [
           7,
           11,
