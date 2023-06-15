@@ -55,10 +55,9 @@ class TestMissingNestedCopybookProducesError {
             "missing",
             new Diagnostic(
                 new Range(),
-                "CPYNAME: Copybook not found",
+                "Errors inside the copybook",
                 Error,
-                ErrorSource.COPYBOOK.getText(),
-                    ErrorCodes.MISSING_COPYBOOK.getLabel()),
+                ErrorSource.COPYBOOK.getText()),
             "missingCpy",
             new Diagnostic(
                 new Range(),

@@ -77,9 +77,9 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
           + "           Move {$inner2} of {$outer1} to {$Str}.\n"
           + "           Move {$inner1} of {$outer2} to {$Str}.\n"
           + "           Move {$inner2} of {$outer2} to {$Str}.\n"
-          + "       {_COPY {~CPYBK1}.|1_}\n"
-          + "       {_COPY {~CPYBK2}.|2_}\n"
-          + "       {_COPY {~CPYBK1}.|1_}\n"
+          + "       {_COPY {~CPYBK1|1}.|3_}\n"
+          + "       {_COPY {~CPYBK2|2}.|3_}\n"
+          + "       {_COPY {~CPYBK1|1}.|3_}\n"
           + "       End program ProgramId.";
   @Inject TextDocumentService service;
   @Inject MockLanguageClient client;

@@ -82,7 +82,7 @@ class TestMappingComplexCopybook {
             "3",
             new Diagnostic(
                 new Range(new Position(8, 11), new Position(14, 18)),
-                "Variable WRK-DS-05V00-O005-001 is not defined",
+                "Errors inside the copybook",
                 Error,
                 ErrorSource.COPYBOOK.getText())
         )

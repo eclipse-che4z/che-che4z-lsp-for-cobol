@@ -50,6 +50,14 @@ public class ClientServerIntegrationTestImpl implements LanguageEngineFacade {
                 new Range(),
                 "Recursive copybook declaration for: CPYBK2",
                 DiagnosticSeverity.Error,
-                ErrorSource.COPYBOOK.getText())));
+                ErrorSource.COPYBOOK.getText()),
+            "3",
+            new Diagnostic(
+                new Range(),
+                "Errors inside the copybook",
+                DiagnosticSeverity.Error,
+                ErrorSource.COPYBOOK.getText())
+        )
+    );
   }
 }

@@ -21,7 +21,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
-import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplaceData;
@@ -78,12 +77,6 @@ public class CopybookHierarchy {
     recursiveReplaceStmtStack.pollFirst();
   }
 
-  /** @return root document URI */
-  public Optional<String> getRootDocumentUri() {
-    return Optional.ofNullable(copybookStack.peekLast())
-            .map(CopybookUsage::getLocality)
-            .map(Locality::getUri);
-  }
   /**
    * Add a pattern for replacing from COPY statement
    *

@@ -53,7 +53,7 @@ class TestCopyIdmsError {
             "1",
             new Diagnostic(
                 new Range(),
-                "semantics.emptyStructure",
+                "postprocessing.copybookHasErrors",
                 DiagnosticSeverity.Error,
                 ErrorSource.COPYBOOK.getText()),
             "2",

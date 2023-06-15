@@ -40,11 +40,11 @@ class TestSyntaxErrorTraversedThroughHierarchy {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "       {_COPY {~CONT}.|1|2_}\n"
+          + "       {_COPY {~CONT}.|1_}\n"
           + "       {#*MAINLINE}. \n"
           + "           GOBACK. ";
 
-  private static final String CONT = "       {_COPY {~REPL}.|1|2_}";
+  private static final String CONT = "       {_COPY {~REPL}.|1_}";
   private static final String CONT_NAME = "CONT";
 
   private static final String REPL = "       {@*05} {@*TAG-ID|3} {PIC|4} 9.\n";
@@ -59,14 +59,7 @@ class TestSyntaxErrorTraversedThroughHierarchy {
             "1",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'TAG-ID' expected SECTION",
-                Error,
-                ErrorSource.COPYBOOK.getText(),
-                null),
-            "2",
-            new Diagnostic(
-                new Range(),
-                "Syntax error on 'PIC' expected SECTION",
+                "Errors inside the copybook",
                 Error,
                 ErrorSource.COPYBOOK.getText(),
                 null),

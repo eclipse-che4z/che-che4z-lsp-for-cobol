@@ -47,7 +47,7 @@ class TestLineContinuation2 {
             "CBBMAIN",
             new Diagnostic(
                 new Range(),
-                "The following paragraph is not defined: MISSING-PAR",
+                "Errors inside the copybook",
                 Error,
                 "COBOL Language Support (copybook)",
                 null),

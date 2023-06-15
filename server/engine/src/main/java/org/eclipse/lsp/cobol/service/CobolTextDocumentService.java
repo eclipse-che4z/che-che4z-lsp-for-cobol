@@ -487,7 +487,11 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     registerFutureTask(
         uri,
         () -> {
-          doAnalysis(uri, text, userRequest, true);
+          try {
+            doAnalysis(uri, text, userRequest, true);
+          } catch (Throwable th) {
+            LOG.error("Error while processing file: {}, {}", uri, th.getMessage());
+          }
           return null;
         });
     if (!isCopybook(uri, text, copybookExtensions)) {

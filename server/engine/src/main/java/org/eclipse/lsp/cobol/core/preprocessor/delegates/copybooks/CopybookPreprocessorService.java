@@ -20,10 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
-import org.eclipse.lsp.cobol.common.copybook.CopybookName;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -99,6 +96,7 @@ class CopybookPreprocessorService {
                           int maxCopybookLen, List<ReplacementContext> replacementContext) {
     CopybookName name = getCopybookName(copySource);
     String copybookName = name.getQualifiedName();
+    String copybookId = name.toCopybookId(programDocumentUri).toString();
 
     Range range = VisitorHelper.constructRange(ctx);
     Locality nameLocality = mapLocality(retrieveLocality(copySource));
@@ -111,7 +109,9 @@ class CopybookPreprocessorService {
 
     if (copybook != null) {
       if (hierarchy.hasRecursion(name)) {
-        errors.add(copybookErrorService.addRecursionError(name.getQualifiedName(), statementLocality.toBuilder().copybookId(null).build()));
+        List<SyntaxError> hierarchyErrors = hierarchy.mapCopybooks(cu -> copybookErrorService.addRecursionError(name.getQualifiedName(), cu.getLocality()));
+        hierarchyErrors.add(copybookErrorService.addRecursionError(name.getQualifiedName(), statementLocality));
+        errors.addAll(hierarchyErrors);
         currentDocument.clear(VisitorHelper.constructRange(ctx));
         copybooks.define(copybookName, null, currentDocument.getUri(), copybook.getUri());
         return;
@@ -119,7 +119,7 @@ class CopybookPreprocessorService {
       copybooks.addStatement(copybookName, null, statementLocality);
 
       prepareReplacements(ctx);
-      ExtendedDocument copybookDocument = processCopybookWithReplacement(replacementContext, copybook, nameLocality, statementLocality);
+      ExtendedDocument copybookDocument = processCopybookWithReplacement(replacementContext, copybook, nameLocality);
 
       if (firstInstruction(currentDocument, range.getStart())) {
         currentDocument.insertCopybook(range, copybookDocument.getCurrentText());
@@ -147,8 +147,7 @@ class CopybookPreprocessorService {
   }
 
   private ExtendedDocument processCopybookWithReplacement(List<ReplacementContext> replacementContext, CopybookModel copybook,
-                                                        Locality nameLocality,
-                                                        Locality statementLocality) {
+                                                        Locality nameLocality) {
     hierarchy.push(new CopybookUsage(copybook.getCopybookName(), CopybooksRepository.toId(copybook.getCopybookName().getQualifiedName(), null, nameLocality.getUri()), nameLocality));
     if (replacementContext != null) {
       replacementContext.forEach(h -> hierarchy.addTextReplacing(h.getReplacement(), h.getLocality().getUri(), h.getLocality().getRange()));
@@ -167,7 +166,6 @@ class CopybookPreprocessorService {
     List<SyntaxError> copybookErrors = new LinkedList<>();
     grammarPreprocessor.preprocess(copybookContext).unwrap(copybookErrors::addAll);
 
-    copybookErrors.forEach(e -> errors.add(e.toBuilder().location(statementLocality.toOriginalLocation()).build()));
     errors.addAll(copybookErrors);
     List<SyntaxError> distinct = errors.stream().distinct().collect(Collectors.toList());
     errors.clear();

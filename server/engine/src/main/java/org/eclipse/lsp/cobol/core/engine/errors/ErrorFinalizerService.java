@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.engine.errors;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -83,24 +84,27 @@ public class ErrorFinalizerService {
         .forEach(
             err -> {
               for (Locality locality : copybooksRepository.getDefinitionStatements().get(err.getLocation().getCopybookId())) {
-                raiseErrorForCopybook(err, locality, processedErrors, copybooksRepository);
+                raiseErrorForCopybook(locality, processedErrors, copybooksRepository);
               }
             });
   }
 
-  private void raiseErrorForCopybook(SyntaxError error, Locality copybookStatementLocality,
+  private void raiseErrorForCopybook(Locality copybookStatementLocality,
                                      Set<SyntaxError> processedErrors,
                                      CopybooksRepository copybooksRepository) {
-    SyntaxError newError = error.toBuilder()
+    SyntaxError newError = SyntaxError.syntaxError()
         .location(copybookStatementLocality.toOriginalLocation())
         .errorSource(ErrorSource.COPYBOOK)
+        .severity(ErrorSeverity.ERROR)
+        .suggestion(
+            messageService.getMessage("postprocessing.copybookHasErrors"))
         .build();
     if (processedErrors.contains(newError)) {
       return;
     }
     processedErrors.add(newError);
     for (Locality locality : copybooksRepository.getDefinitionStatements().get(newError.getLocation().getCopybookId())) {
-      raiseErrorForCopybook(newError, locality, processedErrors, copybooksRepository);
+      raiseErrorForCopybook(locality, processedErrors, copybooksRepository);
     }
   }
 

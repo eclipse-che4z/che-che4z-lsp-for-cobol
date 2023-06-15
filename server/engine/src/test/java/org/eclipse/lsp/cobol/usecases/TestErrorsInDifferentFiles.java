@@ -40,7 +40,7 @@ class TestErrorsInDifferentFiles {
           + "3      Working-Storage Section.\n"
           + "4      Procedure Division.\n"
           + "5      {#*000-Main-Logic}.\n"
-          + "6      {_COPY {~ASDASD}.|child1|areaA1|areaA2|pic_} \n"
+          + "6      {_COPY {~ASDASD}.|error_} \n"
           + "7          DISPLAY {CHILD1|invalid}.\n"
           + "8      End program ProgramId.";
 
@@ -102,11 +102,11 @@ class TestErrorsInDifferentFiles {
                     Warning,
                     ErrorSource.PARSING.getText()))
             .put(
-                "areaA2",
+                "error",
                 new Diagnostic(
                     new Range(),
-                    "The following token must start in Area A: CHILD1",
-                    Warning,
+                    "Errors inside the copybook",
+                    Error,
                     ErrorSource.COPYBOOK.getText()))
                 .put(
                 "areaA22",
