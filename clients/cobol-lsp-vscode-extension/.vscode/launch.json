@@ -35,6 +35,27 @@
       "args": ["-i"],
       "internalConsoleOptions": "openOnSessionStart",
       "outFiles": ["${workspaceRoot}/src/__tests__/*"]
+    },
+    {
+      "name": "Integration Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "${workspaceFolder}/../../tests/test_files/project",
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
+      ],
+      "sourceMaps": true,
+      "smartStep": true,
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js",
+        "!${workspaceFolder}/**/node_modules**/*"
+      ],
+      "preLaunchTask": "Compile",
+      "env": {},
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }

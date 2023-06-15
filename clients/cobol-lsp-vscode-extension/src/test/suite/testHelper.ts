@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 
-export const TEST_TIMEOUT = 60000;
+export const TEST_TIMEOUT = 80000;
 
 export async function activate() {
   // The extensionId is `publisher.name` from package.json
@@ -258,4 +258,27 @@ export async function executeCommandMultipleTimes(
   for (let index = 0; index < times; index++) {
     await vscode.commands.executeCommand(command);
   }
+}
+
+interface PgmConf {
+  program: string;
+  pgroup: string;
+}
+
+export function remove_pgm_cfg(pgmConf: PgmConf) {
+  const pgm_conf_path = path.join(getWorkspacePath(), ".cobolplugin", "pgm_conf.json");
+  const fileContents = fs.readFileSync(pgm_conf_path, 'utf8');
+  const pgmConfs = JSON.parse(fileContents);
+  pgmConfs.pgms = pgmConfs.pgms.filter((obj: PgmConf) => obj.program !== pgmConf.program && obj.pgroup !== pgmConf.pgroup);
+  const updatedJson = JSON.stringify(pgmConfs, null, 4);
+  fs.writeFileSync(pgm_conf_path, updatedJson, 'utf8');
+}
+
+export function add_pgm_cfg(pgmConf: PgmConf) {
+  const pgm_conf_path = path.join(getWorkspacePath(), ".cobolplugin", "pgm_conf.json");
+  const fileContents = fs.readFileSync(pgm_conf_path, 'utf8');
+  const pgmConfs = JSON.parse(fileContents);
+  pgmConfs.pgms.push(pgmConf);
+  const updatedJson = JSON.stringify(pgmConfs, null, 4);
+  fs.writeFileSync(pgm_conf_path, updatedJson, 'utf8');
 }

@@ -149,3 +149,9 @@ cypress/report
 results
 .c4z
 .theia
+
+# 
+cobol-daco
+cobol-idms
+copy-daco
+copy-idms
