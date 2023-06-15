@@ -215,6 +215,7 @@ public class UseCaseEngine {
                 .features(analysisConfig.getFeatures())
                 .dialects(analysisConfig.getDialects())
                 .dialectsSettings(analysisConfig.getDialectsSettings())
+                .compilerOptions(analysisConfig.getCompilerOptions())
                 .build());
     assertResultEquals(actual, document.getTestData());
     return actual;

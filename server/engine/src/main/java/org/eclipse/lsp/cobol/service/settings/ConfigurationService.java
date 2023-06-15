@@ -60,6 +60,7 @@ public interface ConfigurationService {
     List<String> subroutines;
     boolean cicsTranslatorEnabled;
     List<DialectRegistryItem> dialectRegistry;
+    List<String> compilerOptions;
     Map<String, JsonElement> dialectsSettings;
 
     public ConfigurationEntity() {
@@ -69,6 +70,7 @@ public interface ConfigurationService {
       subroutines = ImmutableList.of();
       cicsTranslatorEnabled = true;
       dialectRegistry = ImmutableList.of();
+      compilerOptions = ImmutableList.of();
       dialectsSettings = ImmutableMap.of();
     }
   }

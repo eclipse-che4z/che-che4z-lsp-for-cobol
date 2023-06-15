@@ -59,7 +59,7 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
         ctx
             .getCompilerDirectiveContext()
             .filterDirectiveList(
-                ImmutableList.of(CompilerDirectiveName.QUALIFY, CompilerDirectiveName.QUA))
+                ImmutableList.of(CompilerDirectiveName.QUALIFY))
             .stream()
             .filter(t -> !t.getValue().isEmpty())
             .map(t -> t.getValue().get(t.getValue().size() - 1).equals("EXTEND"))

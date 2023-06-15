@@ -66,6 +66,17 @@ export function loadProcessorGroupCopybookEncodingConfig(
   );
 }
 
+export function loadProcessorGroupCompileOptionsConfig(
+  item: { scopeUri: string },
+  configObject: string,
+): string {
+  return loadProcessorGroupSettings(
+    item.scopeUri,
+    "compiler-options",
+    configObject,
+  );
+}
+
 export function loadProcessorGroupSqlBackendConfig(
   item: { scopeUri: string },
   configObject: string,

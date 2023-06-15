@@ -17,12 +17,19 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
 
 /**
  * Tests if there is only one 01 level with a given name, that name can be referenced even if it is
@@ -31,10 +38,8 @@ import org.junit.jupiter.api.Test;
  * <p>Ref - https://www.ibm.com/docs/en/cobol-zos/6.3?topic=reference-qualification
  */
 public class TestQualifyExtendedImpactOnVariableDefinition {
-  public static final String TEXT_WITH_EXTENDED_OPTION =
-      "PROCESS PGMN(LM),DYNAM,QUALIFY(EXTEND),SSRANGE(ZLEN)\n"
-          + "\n"
-          + "       IDENTIFICATION DIVISION.\n"
+  private static final String TEXT_PROGRAM_WITH_NO_CD =
+      "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. 'demo' RECURSIVE.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       INPUT-OUTPUT SECTION.\n"
@@ -58,6 +63,9 @@ public class TestQualifyExtendedImpactOnVariableDefinition {
           + "           >>CALLINTERFACE DYNAMIC\n"
           + "           GOBACK.\n"
           + "       END PROGRAM 'demo'.\n";
+
+  public static final String TEXT_WITH_EXTENDED_OPTION =
+      "PROCESS PGMN(LM),DYNAM,QUALIFY(EXTEND),SSRANGE(ZLEN)\n" + "\n" + TEXT_PROGRAM_WITH_NO_CD;
 
   public static final String TEXT_WITHOUT_EXTENDED_OPTION =
       "PROCESS PGMN(LM),DYNAM,SSRANGE(ZLEN)\n"
@@ -122,6 +130,21 @@ public class TestQualifyExtendedImpactOnVariableDefinition {
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of("SOMETHING"));
+  }
+
+  @Test
+  void whenQualifyExtendedOptionActiveFromConfigurationWithMultipleDefinitionThenConsider01LevelAsDefinition() {
+    AnalysisConfig analysisConfig = new AnalysisConfig(
+            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
+            Arrays.asList(EmbeddedLanguage.values()),
+            ImmutableList.of(), true, ImmutableList.of(), ImmutableMap.of());
+    analysisConfig.getCompilerOptions().add("QUALIFY(EXTEND)");
+    UseCaseEngine.runTest(
+            TEXT_PROGRAM_WITH_NO_CD,
+            ImmutableList.of(),
+            ImmutableMap.of(),
+            ImmutableList.of("SOMETHING"),
+            analysisConfig);
   }
 
   @Test

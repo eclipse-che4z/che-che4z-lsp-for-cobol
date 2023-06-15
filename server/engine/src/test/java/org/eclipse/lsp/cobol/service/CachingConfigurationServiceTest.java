@@ -84,6 +84,7 @@ class CachingConfigurationServiceTest {
             subroutines,
             new JsonPrimitive("true"),
             new JsonArray(),
+            new JsonArray(),
             predefinedParagraphs);
 
     when(settingsService.fetchConfigurations("",
@@ -94,6 +95,7 @@ class CachingConfigurationServiceTest {
                 SUBROUTINE_LOCAL_PATHS.label,
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
+                COMPILER_OPTIONS.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
 
@@ -130,6 +132,7 @@ class CachingConfigurationServiceTest {
             subroutineSettings,
             new JsonNull(),
             new JsonArray(),
+             new JsonArray(),
             dialectsSettings);
     when(settingsService.fetchConfigurations("",
             Arrays.asList(
@@ -139,6 +142,7 @@ class CachingConfigurationServiceTest {
                 SUBROUTINE_LOCAL_PATHS.label,
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
+                COMPILER_OPTIONS.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
 

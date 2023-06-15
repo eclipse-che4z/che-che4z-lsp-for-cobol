@@ -30,10 +30,12 @@ import {
   SETTINGS_SUBROUTINE_LOCAL_KEY,
   SETTINGS_TAB_CONFIG,
   SETTINGS_SQL_BACKEND,
+  SETTINGS_COMPILE_OPTIONS,
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import {
+  loadProcessorGroupCompileOptionsConfig,
   loadProcessorGroupCopybookEncodingConfig,
   loadProcessorGroupCopybookExtensionsConfig,
   loadProcessorGroupCopybookPaths,
@@ -131,6 +133,12 @@ export function configHandler(request: any): Array<any> {
           result.push(object);
         } else if (item.section === SETTINGS_CPY_FILE_ENCODING) {
           const object = loadProcessorGroupCopybookEncodingConfig(
+            item,
+            cfg as string,
+          );
+          result.push(object);
+        } else if (item.section === SETTINGS_COMPILE_OPTIONS) {
+          const object = loadProcessorGroupCompileOptionsConfig(
             item,
             cfg as string,
           );

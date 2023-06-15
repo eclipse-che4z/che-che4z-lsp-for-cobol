@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ public class AnalysisConfig {
   boolean isCicsTranslatorEnabled;
   List<DialectRegistryItem> dialectRegistry;
   Map<String, JsonElement> dialectsSettings;
+  List<String> compilerOptions = new ArrayList<>();
 
   /**
    * Create the default language features config, containing all features and the given copybook

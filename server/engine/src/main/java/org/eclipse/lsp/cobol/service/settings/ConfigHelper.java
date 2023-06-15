@@ -148,4 +148,18 @@ public class ConfigHelper {
     }
     return ImmutableList.of();
   }
+
+  /**
+   * Parse compiler options client configurations
+   * @param jsonElements configured compiler options
+   * @return List of configured compiler options
+   */
+    public static List<String> parseCompilerOptions(Object jsonElements) {
+    if (jsonElements instanceof JsonArray) {
+      return Streams.stream((JsonArray) jsonElements)
+          .map(JsonElement::getAsString)
+          .collect(toList());
+    }
+    return ImmutableList.of();
+  }
 }
