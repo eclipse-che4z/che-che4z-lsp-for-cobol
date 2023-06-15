@@ -13,6 +13,7 @@
  */
 jest.mock("glob");
 import {
+  loadProcessorGroupCompileOptionsConfig,
   loadProcessorGroupCopybookEncodingConfig,
   loadProcessorGroupCopybookExtensionsConfig,
   loadProcessorGroupCopybookPaths,
@@ -34,6 +35,7 @@ jest.mock("fs", () => ({
                         "name": "DAF",
                         "copybook-extensions": [".copy"],
                         "copybook-file-encoding": "UTF-8",
+                        "compiler-options": ["QUALIFY(EXTEND)","XMLPARSE(COMPAT)"],
                         "preprocessor": [
                             "IDMS",
                             { 
@@ -202,4 +204,13 @@ it("Processor groups configuration mismatches program with *", () => {
   };
   const result = loadProcessorGroupDialectConfig(item, {});
   expect(result).toStrictEqual({});
+});
+
+it("Processor groups configuration provides compiler-options", () => {
+  const item = {
+    scopeUri: WORKSPACE_URI + "/TEST.cob",
+    section: "cobol-lsp.compiler.options",
+  };
+  const result = loadProcessorGroupCompileOptionsConfig(item, "");
+  expect(result).toStrictEqual(["QUALIFY(EXTEND)", "XMLPARSE(COMPAT)"]);
 });

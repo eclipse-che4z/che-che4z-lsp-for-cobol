@@ -33,24 +33,30 @@ public enum CompilerDirectiveName {
   QUALIFY {
     @Override
     public Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText) {
-      return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("EXTEND")))
-              .filter(cd -> isContains(directiveText, "QUALIFY(EXTEND)"));
-    }
-  },
-  QUA {
-    @Override
-    public Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText) {
-      return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("EXTEND")))
-              .filter(cd -> isContains(directiveText, "QUA(EXTEND)"));
+      if (isContains(directiveText, "QUALIFY(EXTEND)") || isContains(directiveText, "QUA(EXTEND)")) {
+        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("EXTEND")));
+      } else if (isContains(directiveText, "QUALIFY(COMPAT)") || isContains(directiveText, "QUA(COMPAT)")) {
+        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("COMPAT")));
+      } else if (isContains(directiveText, "QUALIFY(E_CHAR)") || isContains(directiveText, "QUA(E_CHAR)")) {
+        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("E_CHAR")));
+      } else if (isContains(directiveText, "QUALIFY(C_CHAR)") || isContains(directiveText, "QUA(C_CHAR)")) {
+        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("C_CHAR")));
+      } else {
+        return Optional.empty();
+      }
     }
   },
   XMLPARSE {
     @Override
     public Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText) {
-      if (isContains(directiveText, "XMLPARSE(XMLSS)")) {
+      if (isContains(directiveText, "XMLPARSE(XMLSS)") || isContains(directiveText, "XP(XMLSS)")) {
         return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("XMLSS")));
-      } else if (isContains(directiveText, "XMLPARSE(COMPAT)")) {
+      } else if (isContains(directiveText, "XMLPARSE(COMPAT)") || isContains(directiveText, "XP(COMPAT)")) {
         return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("COMPAT")));
+      } else if (isContains(directiveText, "XMLPARSE(X_CHAR)") || isContains(directiveText, "XP(X_CHAR)")) {
+        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("X_CHAR")));
+      } else if (isContains(directiveText, "XMLPARSE(C_CHAR)") || isContains(directiveText, "XP(C_CHAR)")) {
+        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("C_CHAR")));
       } else {
         return Optional.empty();
       }

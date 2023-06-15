@@ -1,0 +1,18 @@
+{
+  "type": "array",
+  "description": "List of compiler options",
+  "items": {
+    "type": "string",
+    "anyOf": [
+      {
+        "pattern": "(?i)ADATA"
+      },
+      {
+        "pattern": "(?i)(XMLPARSE|XP)\\s*\\(\\s*(COMPAT|C_CHAR|XMLSS|X_CHAR)\\s*\\)"
+      },
+      {
+        "pattern": "(?i)(QUALIFY|QUA)\\s*\\(\\s*(COMPAT|C_CHAR|EXTEND|E_CHAR)\\s*\\)"
+      }
+    ]
+  }
+}

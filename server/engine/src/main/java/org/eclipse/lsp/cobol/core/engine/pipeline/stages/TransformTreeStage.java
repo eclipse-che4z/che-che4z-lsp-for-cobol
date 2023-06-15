@@ -23,6 +23,9 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
+import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveContext;
+import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
+import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveOption;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
@@ -47,6 +50,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -139,10 +143,27 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     addCopyNodes(ctx, rootNode);
     addDialectsNode(ctx, rootNode);
 
-    ProcessingContext processingContext = new ProcessingContext(new ArrayList<>(), symbolAccumulatorService, ctx.getConfig().getDialectsSettings());
+    ProcessingContext processingContext =
+            new ProcessingContext(new ArrayList<>(), symbolAccumulatorService, getCompilerDirectiveContext(analysisConfig), ctx.getConfig().getDialectsSettings());
     registerProcessors(analysisConfig, processingContext, symbolAccumulatorService);
     ctx.getAccumulatedErrors().addAll(astProcessor.processSyntaxTree(processingContext, rootNode));
     return rootNode;
+  }
+
+  private CompilerDirectiveContext getCompilerDirectiveContext(AnalysisConfig analysisConfig) {
+    CompilerDirectiveContext compilerDirectiveContext = new CompilerDirectiveContext();
+    analysisConfig.getCompilerOptions().stream()
+            .map(this::getCompilerDirective)
+            .forEach(opts -> opts.ifPresent(compilerDirectiveContext::updateDirectiveOptions));
+    return compilerDirectiveContext;
+  }
+
+  private Optional<CompilerDirectiveOption> getCompilerDirective(String compilerOptions) {
+    return Arrays.stream(CompilerDirectiveName.values())
+            .map(val -> val.getDirectiveOption(compilerOptions))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
   }
 
   private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx, SymbolAccumulatorService symbolAccumulatorService) {

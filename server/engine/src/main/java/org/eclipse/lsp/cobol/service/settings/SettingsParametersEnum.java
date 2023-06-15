@@ -35,6 +35,7 @@ public enum SettingsParametersEnum {
   ANALYSIS_FEATURES("analysis.features"),
   DIALECTS("dialects"),
   CICS_TRANSLATOR_ENABLED("cics.translator"),
+  COMPILER_OPTIONS("compiler.options"),
   DIALECT_REGISTRY("dialect.registry");
 
   public final String label;

@@ -49,6 +49,6 @@ public class DialectConfigs {
             ImmutableList.of(),
             ImmutableList.of("DaCo", "IDMS"), true,
             ImmutableList.of(),
-        ImmutableMap.of("daco.predefined-sections", new Gson().toJsonTree(list)));
+            ImmutableMap.of("daco.predefined-sections", new Gson().toJsonTree(list)));
   }
 }
