@@ -28,6 +28,17 @@
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "label": "Compile",
+      "type": "npm",
+      "script": "compile",
+      "isBackground": true,
+      "problemMatcher": ["$tsc-watch"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
     }
   ]
 }
