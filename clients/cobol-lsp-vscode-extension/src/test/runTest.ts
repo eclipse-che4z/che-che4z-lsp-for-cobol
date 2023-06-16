@@ -21,7 +21,11 @@ import * as process from "process";
 async function main() {
   try {
     // prepare development and tests paths
-    const extensionDevelopmentPath = path.join(__dirname, "../../");
+    const extensionDevelopmentPath = [
+      path.join(__dirname, "../../"), 
+      path.join(__dirname, "../../../idms-dialect-support/"),
+      path.join(__dirname, "../../../daco-dialect-support/")
+    ];
     const extensionTestsPath = path.join(__dirname, "./suite/index");
     const launchArgs = [
       path.join(__dirname, "../../../../tests/test_files/project"),
