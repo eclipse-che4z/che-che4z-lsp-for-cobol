@@ -19,7 +19,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Extension",
+      "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -28,13 +28,35 @@
       "preLaunchTask": "npm: build"
     },
     {
+      "name": "Debug Tests",
       "type": "node",
       "request": "launch",
-      "name": "Debug Tests",
       "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
       "args": ["-i"],
       "internalConsoleOptions": "openOnSessionStart",
       "outFiles": ["${workspaceRoot}/src/__tests__/*"]
+    },
+    {
+      "name": "Debug Integration Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "${workspaceFolder}/../../tests/test_files/project",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionDevelopmentPath=${workspaceFolder}/../idms-dialect-support/",
+        "--extensionDevelopmentPath=${workspaceFolder}/../daco-dialect-support/",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
+      ],
+      "sourceMaps": true,
+      "smartStep": true,
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js",
+        "!${workspaceFolder}/**/node_modules**/*"
+      ],
+      "env": {},
+      "skipFiles": ["<node_internals>/**"],
+      "preLaunchTask": "Watch"
     }
   ]
 }

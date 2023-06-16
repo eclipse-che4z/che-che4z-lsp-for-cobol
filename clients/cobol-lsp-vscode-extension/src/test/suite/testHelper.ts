@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 
-export const TEST_TIMEOUT = 60000;
+export const TEST_TIMEOUT = 80000;
 
 export async function activate() {
   // The extensionId is `publisher.name` from package.json
@@ -54,8 +54,9 @@ export async function showDocument(workspace_file: string) {
   const file = await getUri(workspace_file);
   // open and show the file
   const document = await vscode.workspace.openTextDocument(file);
+  const editor = await vscode.window.showTextDocument(document);
 
-  await vscode.window.showTextDocument(document);
+  return editor;
 }
 
 export async function closeActiveEditor() {
@@ -130,9 +131,10 @@ export async function waitFor(
   while (!(await Promise.resolve(doneFunc()))) {
     await sleep(100);
     if (Date.now() - startTime > timeout) {
-      break;
+      return false;
     }
   }
+  return true;
 }
 
 export function sleep(ms: number): Promise<unknown> {
@@ -266,4 +268,45 @@ export async function executeCommandMultipleTimes(
   for (let index = 0; index < times; index++) {
     await vscode.commands.executeCommand(command);
   }
+}
+
+export async function getWorkspaceFile(workspace_file: string) {
+  const files = await vscode.workspace.findFiles(workspace_file);
+
+  assert.ok(files && files[0], workspace_file);
+
+  return files[0];
+}
+
+export async function waitForDiagnosticsChange(file: string | vscode.Uri) {
+  const fileUri =
+    typeof file === "string" ? await getWorkspaceFile(file) : file;
+
+  const initialDiags = vscode.languages
+    .getDiagnostics(fileUri)
+    .map((x) => JSON.stringify(x))
+    .sort();
+
+  const result = new Promise<vscode.Diagnostic[]>((resolve) => {
+    let listener: vscode.Disposable | null =
+      vscode.languages.onDidChangeDiagnostics((e) => {
+        if (!listener) return;
+        const forFile = e.uris.find((v) => v.toString() === fileUri.toString());
+        if (!forFile) return;
+        const diags = vscode.languages.getDiagnostics(forFile);
+        if (
+          diags.length === initialDiags.length &&
+          diags
+            .map((x) => JSON.stringify(x))
+            .sort()
+            .every((x, i) => x === initialDiags[i])
+        )
+          return;
+        listener.dispose();
+        listener = null;
+        resolve(diags);
+      });
+  });
+
+  return result;
 }

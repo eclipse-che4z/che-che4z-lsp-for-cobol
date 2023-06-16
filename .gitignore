@@ -17,6 +17,10 @@ bin/
 .mvn/
 *.project
 
+# Downloaded dependencies #
+###################
+.c4z
+
 # Compiled source #
 ###################
 *.com

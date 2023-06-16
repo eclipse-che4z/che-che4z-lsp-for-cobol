@@ -15,7 +15,7 @@
 {
   "compilerOptions": {
     "types": ["node", "jest", "mocha"],
-    "target": "es6",
+    "target": "ES2017",
     "skipLibCheck": true,
     "lib": ["es6"],
     "module": "commonjs",
