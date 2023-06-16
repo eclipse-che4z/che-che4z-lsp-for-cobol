@@ -115,7 +115,7 @@ BYTITLE : B Y T I T L E;
 CALL : C A L L;
 CANCEL : C A N C E L;
 CAPABLE : C A P A B L E;
-CBL : C B L {enableCobolSpecialSeparators = false;};
+CBL : C B L;
 CCSVERSION : C C S V E R S I O N;
 CHAINING : C H A I N I N G;
 CHANGED : C H A N G E D;

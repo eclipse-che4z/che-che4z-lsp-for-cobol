@@ -1131,7 +1131,7 @@ constantName
    ;
 
 callUsingPhrase
-   : USING callUsingParameter (COMMACHAR? callUsingParameter)*
+   : USING callUsingParameter (commaSeparator? callUsingParameter)*
    ;
 
 callUsingParameter
