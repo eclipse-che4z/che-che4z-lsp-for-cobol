@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.copybook;
 
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
 
 /**
  * Provide API definition to search for copybooks files. The service also caches copybook to reduce
@@ -27,6 +28,7 @@ public interface CopybookService {
 
   /**
    * Retrieve and return the copybook by its name.
+   * Returns a CopybookModel and preprocessed errors for the resolved copybook wrapped inside {@link ResultWithErrors}.
    *
    * @param copybookId - the id of the copybook to be retrieved
    * @param copybookName - the name of the copybook to be retrieved
@@ -35,9 +37,10 @@ public interface CopybookService {
    * @param copybookConfig - contains config info like: copybook processing mode, target backend sql
    *     server
    * @param preprocess - indicates if copybook needs to be preprocessed after resolving
-   * @return a CopybookModel that contains copybook name, its URI and the content
+   * @return a CopybookModel wrapped inside {@link ResultWithErrors} which contains copybook name, its URI and the content.
+   *         Wrapped errors are preprocessed errors for the returned CopybookModel.
    */
-  CopybookModel resolve(
+  ResultWithErrors<CopybookModel> resolve(
       @NonNull CopybookId copybookId,
       @NonNull CopybookName copybookName,
       @NonNull String programDocumentUri,

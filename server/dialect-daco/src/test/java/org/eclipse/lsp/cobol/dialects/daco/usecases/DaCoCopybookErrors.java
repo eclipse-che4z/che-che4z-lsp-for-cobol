@@ -57,7 +57,7 @@ class DaCoCopybookErrors {
             "1",
             new Diagnostic(
                 new Range(),
-                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item LDQLAB1M-XQL",
+                "postprocessing.copybookHasErrors",
                 DiagnosticSeverity.Error,
                 ErrorSource.COPYBOOK.getText()),
             "2",
@@ -65,8 +65,7 @@ class DaCoCopybookErrors {
                 new Range(),
                 "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item LDQLAB1M-XQL",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())
-        ),
+                ErrorSource.PARSING.getText())),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());
   }

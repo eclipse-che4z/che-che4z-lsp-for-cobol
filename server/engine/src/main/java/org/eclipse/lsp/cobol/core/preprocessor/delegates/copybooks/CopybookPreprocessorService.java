@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
@@ -232,16 +233,18 @@ class CopybookPreprocessorService {
   }
 
   private CopybookModel read(CopybookConfig copybookConfig, CopybookName copybookName, String documentUri) {
-    CopybookModel copybookModel = copybookService.resolve(
-        copybookName.toCopybookId(programDocumentUri),
-        copybookName,
-        programDocumentUri,
-        documentUri,
-        copybookConfig,
-        true);
+    ResultWithErrors<CopybookModel> resolvedCopybook = copybookService.resolve(
+            copybookName.toCopybookId(programDocumentUri),
+            copybookName,
+            programDocumentUri,
+            documentUri,
+            copybookConfig,
+            true);
+    CopybookModel copybookModel = resolvedCopybook.getResult();
     if (copybookModel.getContent() == null) {
       return null;
     }
+    errors.addAll(resolvedCopybook.getErrors());
     return copybookModel;
   }
 

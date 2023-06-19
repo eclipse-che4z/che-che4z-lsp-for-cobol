@@ -56,10 +56,10 @@ class TestWorkingStorageSectionSize {
       + "008400 PROCEDURE DIVISION.\n";
 
   private static final String DACO_COPY = "     1 01  {$*LDDATE1M-XDT}.\n"
-      + "     2     03 {$*F00-XDT.                                                       1\n"
-      + "     3       05 {$*JMDPRSGDV-XDT}          PIC X(8)    VALUE SPACE.              1\n"
-      + "     4       05 {$*TYD-NDT}                PIC 9(8)    VALUE ZERO.               9\n"
-      + "     5       05 {$*JMD-NDT}                PIC 9(6)    VALUE ZERO.              17\n";
+      + "     2     03 {$*F00-XDT.                                                     1\n"
+      + "     3       05 {$*JMDPRSGDV-XDT}          PIC X(8)    VALUE SPACE.            1\n"
+      + "     4       05 {$*TYD-NDT}                PIC 9(8)    VALUE ZERO.             9\n"
+      + "     5       05 {$*JMD-NDT}                PIC 9(6)    VALUE ZERO.            17\n";
 
   private static final String NAMES_COPY = "       01  {$*SUBSCHEMA-SETNAMES}.\n"
       + "           03 {$*POLBSS-POLCRI}            PIC X(16)   VALUE\n"
