@@ -28,6 +28,8 @@
         <maven.surefire.plugin.version>3.0.0-M3</maven.surefire.plugin.version>
         <guice.version>4.2.2</guice.version>
         <autoservice.version>1.0.1</autoservice.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <dependencies>
