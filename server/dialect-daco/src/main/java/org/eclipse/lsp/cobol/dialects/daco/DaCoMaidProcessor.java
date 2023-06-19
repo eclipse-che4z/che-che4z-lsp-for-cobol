@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.VariableConstants;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
@@ -206,14 +207,14 @@ public class DaCoMaidProcessor {
     CopybookName copybookName =
         new CopybookName(
             makeCopybookFileName(startingLevel, layoutId, layoutUsage), DaCoDialect.NAME);
-    CopybookModel copybookModel =
-        copybookService.resolve(
+    ResultWithErrors<CopybookModel> resolvedCopybook = copybookService.resolve(
             copybookName.toCopybookId(context.getExtendedDocument().getUri()),
             copybookName,
             context.getExtendedDocument().getUri(),
             context.getExtendedDocument().getUri(),
             context.getCopybookConfig(),
             true);
+    CopybookModel copybookModel = resolvedCopybook.getResult();
 
     DaCoCopyNode cbNode =
         new DaCoCopyNode(
@@ -226,6 +227,7 @@ public class DaCoMaidProcessor {
             copybookModel.getUri());
 
     if (copybookModel.getContent() != null) {
+      errors.addAll(resolvedCopybook.getErrors());
       checkWrkSuffix(cbNode, layoutUsage, errors);
       String suffix = calculateSuffix(layoutUsage, cbNode);
       parseCopybookContent(copybookModel, startingLevel, suffix)

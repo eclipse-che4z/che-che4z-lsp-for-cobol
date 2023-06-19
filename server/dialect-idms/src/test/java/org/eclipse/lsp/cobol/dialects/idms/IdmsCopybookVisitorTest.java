@@ -25,13 +25,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +44,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class IdmsCopybookVisitorTest {
 
+  private static final String PROGRAM_DOCUMENT_URI = "programDocumentUri";
   @Mock
   private CopybookService copybookService;
   @Mock
@@ -53,7 +57,7 @@ class IdmsCopybookVisitorTest {
     Set<CopybookName> processedCopybooks = new HashSet<>();
 
     visitor = new IdmsCopybookVisitor(copybookService, copybookConfig,
-        idmsCopybookService, "programDocumentUri", "documentUri", 1, processedCopybooks);
+        idmsCopybookService, PROGRAM_DOCUMENT_URI, "documentUri", 1, processedCopybooks);
   }
 
   @Test
@@ -61,6 +65,13 @@ class IdmsCopybookVisitorTest {
     IdmsCopyParser.CopyIdmsStatementContext ctx = mock(IdmsCopyParser.CopyIdmsStatementContext.class);
     IdmsCopyParser.CopyIdmsOptionsContext copyContext = mock(IdmsCopyParser.CopyIdmsOptionsContext.class);
     IdmsCopyParser.CopyIdmsSourceContext sourceContext = mock(IdmsCopyParser.CopyIdmsSourceContext.class);
+    CopybookName expectedCopybookName = new CopybookName("copybook", "IDMS");
+    when(copybookService.resolve(any(CopybookId.class), any(CopybookName.class), anyString(), anyString(),
+            any(CopybookConfig.class), anyBoolean()))
+            .thenReturn(
+                    new ResultWithErrors<>(
+                            new CopybookModel(expectedCopybookName.toCopybookId(PROGRAM_DOCUMENT_URI), expectedCopybookName, null, null),
+                            Collections.emptyList()));
 
     when(ctx.copyIdmsOptions()).thenReturn(copyContext);
     when(copyContext.copyIdmsSource()).thenReturn(sourceContext);
