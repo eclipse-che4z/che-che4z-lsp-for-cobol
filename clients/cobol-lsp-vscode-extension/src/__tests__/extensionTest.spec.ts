@@ -210,3 +210,13 @@ describe("Check recognition of COBOL from first line", () => {
     expect(pgm).toEqual(cobol);
   });
 });
+
+describe("check exposed API's by the COBOL LS extension", () => {
+  test("analysis API is exposed by the COBOL LS extension", async () => {
+    const expectedGraph = "THIS IS A CFAST GRAPH OBJECT";
+    jest.spyOn(LanguageClientService.prototype, "retrieveAnalysis").mockResolvedValue(expectedGraph);
+    const ext = await activate(context);
+    expect(ext).toHaveProperty("analysis");
+    expect(await ext.analysis("test", "text")).toBe(expectedGraph);
+  });
+});
