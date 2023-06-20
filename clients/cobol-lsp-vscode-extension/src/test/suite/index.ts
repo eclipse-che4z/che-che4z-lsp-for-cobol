@@ -14,7 +14,7 @@
 
 import * as path from "path";
 import * as Mocha from "mocha";
-import * as glob from "glob";
+import { glob } from "glob";
 import * as process from "process";
 
 export async function run(): Promise<void> {
@@ -49,18 +49,10 @@ export async function run(): Promise<void> {
   // Create the mocha test
   const mocha = new Mocha({ ui: "tdd", color: true });
   const testsPath = path.join(__dirname, "..");
-
-  const files = await new Promise<string[]>((resolve, reject) => {
-    glob(
+  const files = await glob(
       is_vscode ? "**/**.test.js" : "**/integration.test.js",
-      { cwd: testsPath },
-      (err, files) => {
-        if (err) reject(err);
-        else resolve(files);
-      },
+      { cwd: testsPath }
     );
-  });
-
   // Add files to the test suite
   files.forEach((file) => mocha.addFile(path.resolve(testsPath, file)));
 

@@ -135,6 +135,18 @@ describe("Check plugin extension for cobol starts successfully.", () => {
   });
 });
 
+describe("check exposed API's by the COBOL LS extension", () => {
+  test("analysis API is exposed by the COBOL LS extension", async () => {
+    const expectedGraph = "THIS IS A CFAST GRAPH OBJECT";
+    jest
+      .spyOn(LanguageClientService.prototype, "retrieveAnalysis")
+      .mockResolvedValue(expectedGraph);
+    const ext = await activate(context);
+    expect(ext).toHaveProperty("analysis");
+    expect(await ext.analysis("test", "text")).toBe(expectedGraph);
+  });
+});
+
 describe("Check plugin extension for cobol fails.", () => {
   beforeEach(() => {
     (LanguageClientService as any).mockImplementation(() => {
@@ -208,15 +220,5 @@ describe("Check recognition of COBOL from first line", () => {
   test("CICS Translator Directive NOSEQ", () => {
     const pgm = `       CBL XOPTS(COBOL2)`;
     expect(pgm).toEqual(cobol);
-  });
-});
-
-describe("check exposed API's by the COBOL LS extension", () => {
-  test("analysis API is exposed by the COBOL LS extension", async () => {
-    const expectedGraph = "THIS IS A CFAST GRAPH OBJECT";
-    jest.spyOn(LanguageClientService.prototype, "retrieveAnalysis").mockResolvedValue(expectedGraph);
-    const ext = await activate(context);
-    expect(ext).toHaveProperty("analysis");
-    expect(await ext.analysis("test", "text")).toBe(expectedGraph);
   });
 });

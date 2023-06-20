@@ -467,10 +467,10 @@
   },
   "dependencies": {
     "@code4z/cobol-dialect-api": "file:../cobol-dialect-api",
-    "glob": "8.1.0",
+    "glob": "10.2.7",
     "iconv-lite": "^0.6.3",
     "micromatch": "4.0.5",
-    "@vscode/extension-telemetry": "0.7.7",
+    "@vscode/extension-telemetry": "0.8.0",
     "vscode-languageclient": "8.0.2"
   },
   "devDependencies": {

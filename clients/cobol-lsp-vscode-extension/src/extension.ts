@@ -146,7 +146,7 @@ export async function activate(
     version: API_VERSION,
     analysis(uri: string, text: string): Promise<any> {
       return languageClientService.retrieveAnalysis(uri, text);
-    }
+    },
   };
 }
 

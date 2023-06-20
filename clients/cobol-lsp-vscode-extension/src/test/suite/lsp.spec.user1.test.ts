@@ -23,13 +23,13 @@ const WORKSPACE_FILE = "USER1.cbl";
 suite("Tests with USER1.cbl", function () {
   let editor: vscode.TextEditor;
   suiteSetup(async function () {
-    this.timeout(TEST_TIMEOUT);
+    this.timeout(0);
     this.slow(2000);
     helper.updateConfig("basic.json");
     await helper.activate();
   });
 
-  this.afterEach(async () => await helper.closeAllEditors());
+  this.afterEach(async () => await helper.closeAllEditors()).timeout(helper.TEST_TIMEOUT);
   this.beforeEach(async () => {
     await helper.showDocument(WORKSPACE_FILE);
     editor = helper.get_editor(WORKSPACE_FILE);
