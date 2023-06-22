@@ -642,7 +642,7 @@ recordContainsTo
    ;
 
 labelRecordsClause
-   : LABEL (RECORD IS? | RECORDS ARE?) (OMITTED | STANDARD | dataName*)
+   : LABEL (RECORD | RECORDS) (IS | ARE)? (OMITTED | STANDARD | dataName*)
    ;
 
 valueOfClause
