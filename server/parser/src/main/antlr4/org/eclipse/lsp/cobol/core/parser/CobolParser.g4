@@ -32,6 +32,35 @@ compilerXOpts
    : XOPTS LPARENCHAR compilerXOptsOption (commaSeparator? compilerXOptsOption)* RPARENCHAR
    ;
 
+deprecatedCompilerOptions:
+            CPP
+           | (DATEPROC | DP) (LPARENCHAR (FLAG | NOFLAG)? COMMACHAR? (TRIG | NOTRIG)? RPARENCHAR)?
+           | EPILOG
+           | GDS | GRAPHIC
+           | LEASM | LIB | LIN
+           | MARGINS LPARENCHAR literal COMMACHAR literal (COMMACHAR literal)? RPARENCHAR
+           | NATLANG LPARENCHAR (CS | EN | KA) RPARENCHAR
+           | NUMPROC LPARENCHAR MIG RPARENCHAR
+           | NOCMPR2
+           | (NODATEPROC | NODP)
+           | NODE
+           | NOEPILOG
+           | NOFLAGMIG
+           | NOGRAPHIC
+           | NOLIB
+           | NOOPSEQUENCE
+           | (NOOPTIMIZE | NOOPT)
+           | NOP | NOPROLOG
+           | NOSTDTRUNC
+           | NSEQ
+           | OPMARGINS LPARENCHAR literal COMMACHAR literal (COMMACHAR literal)? RPARENCHAR
+           | OPSEQUENCE LPARENCHAR literal COMMACHAR literal RPARENCHAR
+           | OP
+           | PROLOG
+           | RES
+           | (SIZE | SZ) LPARENCHAR (MAX | literal) RPARENCHAR
+           | (YEARWINDOW | YW) LPARENCHAR literal RPARENCHAR
+        ;
 compilerXOptsOption
     : APOST |
       CBLCARD |
@@ -163,7 +192,7 @@ compilerOption
    | (XREF | X_CHAR) (LPARENCHAR (FULL | SHORT) RPARENCHAR)? | NOXREF | NOX
    | (ZONECHECK | ZC) LPARENCHAR (MSG | ABD) RPARENCHAR | NOZONECHECK | NOZC
    | (ZONEDATA | ZD) LPARENCHAR (PFD | MIG | NOPFD) RPARENCHAR
-   | ZWB | NOZWB
+   | ZWB | NOZWB | deprecatedCompilerOptions
    ;
 
 commaSeparator: COMMACHAR | COMMASEPARATOR;
@@ -2527,8 +2556,13 @@ cobolCompilerDirectivesKeywords
     | VBREF | VLR | VOLATILE | VS | VSAMOPENFS
     | W_CHAR | WD | WORD
     | X_CHAR | XMLPARSE | XMLSS | XP | XREF
-    | ZC | ZD | ZLEN | ZON | ZONECHECK | ZONEDATA | ZWB
+    | ZC | ZD | ZLEN | ZON | ZONECHECK | ZONEDATA | ZWB | deprecatedCompilerDirectivesKeywords
     ;
+
+deprecatedCompilerDirectivesKeywords:
+     EPILOG | NOCMPR2 | NOTRIG | CPP | DATEPROC | DP | GDS | GRAPHIC | KA | LEASM | LIB | LIN | MARGINS | NODE
+     | NODATEPROC | NODP | NOEPILOG | NOFLAGMIG | NOGRAPHIC | NOLIB | NOOPSEQUENCE | NOOPT | NOOPTIMIZE | NOP
+     | NOPROLOG | NOSTDTRUNC | NSEQ | OP | OPMARGINS | OPSEQUENCE | PROLOG| RES | SZ | TRIG | YEARWINDOW | YW;
 
 dialectNodeFiller
     : ZERO_WIDTH_SPACE+
