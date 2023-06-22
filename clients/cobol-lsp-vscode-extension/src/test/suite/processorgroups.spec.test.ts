@@ -61,11 +61,11 @@ suite("Integration Test Suite: Processor Groups", function () {
   // cobol-dialect-api (development) npm install && npm run compile
   // daco-dialect-support (development) npm install && npm run package
   // idms-dialect-support (development) npm install && npm run package
-  // put dialect-idms.jar and dialect-daco.jar into server/jar/dialects
+  // put server.jar, dialect-idms.jar and dialect-daco.jar into their server/jar folder
 
   test("TC355920: IDMS - processor group", async () => {
     add_pgm_cfg(idmsPgmConf)
-    const extSrcPath = path.join("cobol-idms", "CADIRQ1M.cbl");
+    const extSrcPath = path.join("cobol-idms", "DACRFI11N.cbl");
     await helper.showDocument(extSrcPath);
     const editor = helper.get_editor(extSrcPath);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
@@ -77,7 +77,7 @@ suite("Integration Test Suite: Processor Groups", function () {
   
   test("TC355921: DaCo - processor group", async () => {
     add_pgm_cfg(dacoPgmConf)
-    const extSrcPath = path.join("cobol-daco", "BADPA61M.cbl");
+    const extSrcPath = path.join("cobol-daco", "DABPA11N.cbl");
     await helper.showDocument(extSrcPath);
     const editor = helper.get_editor(extSrcPath);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
@@ -89,7 +89,7 @@ suite("Integration Test Suite: Processor Groups", function () {
 
   test("TC355918: IDMS - No processor group", async () => {
     remove_pgm_cfg(idmsPgmConf)
-    const extSrcPath = path.join("cobol-idms", "CADIRQ1M.cbl");
+    const extSrcPath = path.join("cobol-idms", "DACRFI11N.cbl");
     await helper.showDocument(extSrcPath);
     const editor = helper.get_editor(extSrcPath);
     await helper.waitFor(
@@ -104,7 +104,7 @@ suite("Integration Test Suite: Processor Groups", function () {
 
   test("TC355919: DaCo - No processor group", async () => {
     remove_pgm_cfg(dacoPgmConf)
-    const extSrcPath = path.join("cobol-daco", "BADPA61M.cbl");
+    const extSrcPath = path.join("cobol-daco", "DABPA11N.cbl");
     await helper.showDocument(extSrcPath);
     const editor = helper.get_editor(extSrcPath);
     await helper.waitFor(
