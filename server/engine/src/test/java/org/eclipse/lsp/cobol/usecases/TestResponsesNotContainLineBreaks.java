@@ -54,12 +54,15 @@ class TestResponsesNotContainLineBreaks {
             "1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input '>' expected {CBLCARD, COBOL2, COBOL3, CPSM, DLI, EDF, EXCI, FEPI, NATLANG, "
-                    + "NOCBLCARD, NOCPSM, NODEBUG, NOEDF, NOFEPI, NOLENGTH, NOLINKAGE, NOOPTIONS, NOSPIE, OPTIONS, SP,"
-                    + " SPIE, SYSEIB, ALL, DFHRESP, DFHVALUE, FALSE, FUNCTION, HIGH-VALUE, HIGH-VALUES, LENGTH, "
-                    + "LINAGE-COUNTER, LOW-VALUE, LOW-VALUES, NOT, NULL, NULLS, QUOTES, SPACE, SPACES, TRUE, ZERO, "
-                    + "ZEROES, ZEROS, '(', '-', '+', '01-49', '66', '77', '88', INTEGERLITERAL, NUMERICLITERAL, "
-                    + "NONNUMERICLITERAL, IDENTIFIER, FINALCHARSTRING}",
+                "Extraneous input '>' expected {CBLCARD, COBOL2, COBOL3, CPSM, DLI, EDF, EPILOG, EXCI, FEPI,"
+                    + " NATLANG, NOCBLCARD, NOCMPR2, NOCPSM, NODEBUG, NOEDF, NOFEPI, NOLENGTH, NOLINKAGE, NOOPTIONS,"
+                    + " NOSPIE, NOTRIG, OPTIONS, SP, SPIE, SYSEIB, ALL, CPP, DATEPROC, DFHRESP, DFHVALUE, DP, FALSE,"
+                    + " FUNCTION, GDS, GRAPHIC, HIGH-VALUE, HIGH-VALUES, KA, LEASM, LENGTH, LIB, LIN, LINAGE-COUNTER, "
+                    + "LOW-VALUE, LOW-VALUES, MARGINS, NODE, NODATEPROC, NODP, NOEPILOG, NOFLAGMIG, NOGRAPHIC, NOLIB,"
+                    + " NOOPSEQUENCE, NOOPT, NOOPTIMIZE, NOP, NOPROLOG, NOSTDTRUNC, NOT, NSEQ, NULL, NULLS, OP, "
+                    + "OPMARGINS, OPSEQUENCE, PROLOG, QUOTES, RES, SPACE, SPACES, SZ, TRIG, TRUE, YEARWINDOW, YW, "
+                    + "ZERO, ZEROES, ZEROS, '(', '-', '+', '01-49', '66', '77', '88', INTEGERLITERAL, NUMERICLITERAL,"
+                    + " NONNUMERICLITERAL, IDENTIFIER, FINALCHARSTRING}",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
