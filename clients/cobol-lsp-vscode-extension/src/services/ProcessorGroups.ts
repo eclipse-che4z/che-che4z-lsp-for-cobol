@@ -16,6 +16,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { Minimatch } from "minimatch";
 import { SettingsUtils } from "./util/SettingsUtils";
+import { globSync } from "glob";
 import { Uri } from "vscode";
 
 const PROCESSOR_GROUP_FOLDER = ".cobolplugin";
@@ -38,10 +39,11 @@ export function loadProcessorGroupCopybookPathsConfig(
   item: { scopeUri: string },
   configObject: string[],
 ): string[] {
-  return [
+  const config = [
     ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]),
     ...configObject,
   ];
+  return globSync(config);
 }
 
 export function loadProcessorGroupCopybookExtensionsConfig(
