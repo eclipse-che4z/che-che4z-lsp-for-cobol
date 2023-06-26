@@ -18,7 +18,7 @@ import lombok.Value;
 
 /**
  * The class represents value interval in COBOL. Including its THRU/THROUGH token. Examples: 88 SOME
- * values 4. => [from: 4, to: null] 88 high-school values are 10 through 12. => [from: 10, to: 12]
+ * values 4. =} [from: 4, to: null] 88 high-school values are 10 through 12. =} [from: 10, to: 12]
  */
 @Value
 public class ValueInterval {

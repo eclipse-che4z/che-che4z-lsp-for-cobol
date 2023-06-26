@@ -40,10 +40,10 @@ import java.util.List;
  * Here we have different locations for whole definition and variable name:
  *
  * <pre>
- *     ->|   |<- Name location
+ *     -}|   |{- Name location
  *       |   |
- * ->|01 FIRST.
- * |    05 SECOND PIC 9.|<-------|
+ * -}|01 FIRST.
+ * |    05 SECOND PIC 9.|{-------|
  * |                             |
  * |-- var definition location --|
  * </pre>
