@@ -15,7 +15,7 @@
 import { existsSync, readdirSync } from "fs";
 import * as fs from "fs";
 import * as path from "path";
-import * as glob from "glob";
+import { globSync, hasMagic } from "glob";
 import * as urlUtil from "url";
 import { SettingsUtils } from "./SettingsUtils";
 import { Uri } from "vscode";
@@ -121,7 +121,7 @@ function globSearch(
   const segments = pathName.split(path.sep);
   const cwdSegments: string[] = [];
   for (const s of segments) {
-    if (!glob.hasMagic(s)) {
+    if (!hasMagic(s)) {
       cwdSegments.push(s);
     } else {
       break;
@@ -141,9 +141,9 @@ function globSearch(
     copybookName +
     ext;
   pattern = pattern + suffix;
-  const result = glob.sync(pattern, { cwd, dot: true });
+  const result = globSync(pattern, { cwd, dot: true });
   // TODO report the case with more then one copybook fit the pattern.
-  return result[0] ? path.join(cwd, result[0]) : undefined;
+  return result[0] ? path.resolve(cwd, result[0]) : undefined;
 }
 
 export function getProgramNameFromUri(
