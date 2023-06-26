@@ -30,7 +30,7 @@ public class CompilerDirectiveContext {
   /**
    * Updates the compiler directive options
    *
-   * @param compilerDirectiveOption @{@link CompilerDirectiveOption}
+   * @param compilerDirectiveOption {@link CompilerDirectiveOption}
    */
   public void updateDirectiveOptions(CompilerDirectiveOption compilerDirectiveOption) {
     compilerDirectiveMap.merge(compilerDirectiveOption.getCompilerDirectiveName(),

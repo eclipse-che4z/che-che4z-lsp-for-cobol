@@ -58,7 +58,7 @@ public interface LocaleStore {
   /**
    * Notify all the subscriber about an update in Locale.
    *
-   * @return {@link Consumer<List<String>>}
+   * @return {@link Consumer}
    */
   Consumer<List<Object>> notifyLocaleStore();
 

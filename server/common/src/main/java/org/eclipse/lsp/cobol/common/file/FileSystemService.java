@@ -30,7 +30,7 @@ public interface FileSystemService {
   /**
    * Normalize the URI defined in the workspace to get a NIO Path object that will be used within
    * the FileSystemService, example: [input:
-   * file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy] --> [output:
+   * file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy] --} [output:
    * C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy]
    *
    * @param uri URI string representation of a file
