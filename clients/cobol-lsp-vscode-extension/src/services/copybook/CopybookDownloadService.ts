@@ -336,10 +336,19 @@ export class CopybookDownloadService implements vscode.Disposable {
     });
   }
 
-  private static isEligibleForCopybookDownload() {
+  private static isEligibleForCopybookDownload(dialects: string[]) {
     const dsnPath: string[] = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(PATHS_ZOWE);
+
+    const dialectsDsn = [];
+    dialects.forEach((d) => {
+      const dialectDsn: string[] = vscode.workspace
+        .getConfiguration(SETTINGS_CPY_SECTION)
+        .get(d + "." + PATHS_ZOWE);
+      dialectsDsn.push(dialectDsn);
+    });
+
     const ussPath: string[] = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(PATHS_USS);
@@ -347,7 +356,10 @@ export class CopybookDownloadService implements vscode.Disposable {
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get("profiles");
     return (
-      dsnPath?.length > 0 || ussPath?.length > 0 || providedProfile?.length > 0
+      dsnPath?.length > 0 ||
+      ussPath?.length > 0 ||
+      providedProfile?.length > 0 ||
+      dialectsDsn?.length > 0
     );
   }
 
@@ -367,7 +379,15 @@ export class CopybookDownloadService implements vscode.Disposable {
     copybookNames: CopybookName[],
     quiet: boolean = true,
   ): Promise<void> {
-    if (!CopybookDownloadService.isEligibleForCopybookDownload()) {
+    const dialects: string[] = [
+      ...new Set(
+        copybookNames
+          .map((n) => n.dialect.toLocaleLowerCase())
+          .filter((n) => n !== undefined),
+      ),
+    ];
+
+    if (!CopybookDownloadService.isEligibleForCopybookDownload(dialects)) {
       if (!quiet) {
         CopybookDownloadService.createErrorMessageForCopybooks(
           new Set<string>(copybookNames.map((c) => c.name)),
@@ -377,7 +397,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     }
     const explorerAPI = await Utils.getZoweExplorerAPI();
     if (
-      CopybookDownloadService.isEligibleForCopybookDownload() &&
+      CopybookDownloadService.isEligibleForCopybookDownload(dialects) &&
       !explorerAPI
     ) {
       if (!quiet) {
