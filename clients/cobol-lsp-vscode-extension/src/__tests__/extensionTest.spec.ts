@@ -212,13 +212,43 @@ describe("Check recognition of COBOL from first line", () => {
     expect(pgm).toEqual(cobol);
   });
 
-  test("CICS Translator Directive SEQ", () => {
-    const pgm = `000010 CBL XOPTS(COBOL2)`;
+  test("Compiler Directive SEQ in column 8", () => {
+    const pgm = `000010 PROCESS `;
     expect(pgm).toEqual(cobol);
   });
 
-  test("CICS Translator Directive NOSEQ", () => {
-    const pgm = `       CBL XOPTS(COBOL2)`;
+  test("Compiler Directive NOSEQ in column 8", () => {
+    const pgm = `       CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Compiler Directive SEQ after column 8", () => {
+    const pgm = `000010     CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Compiler Directive NOSEQ after column 8", () => {
+    const pgm = `           PROCESS `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Listing control SEQ in column 8", () => {
+    const pgm = `000010 *PROCESS `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Listing control NOSEQ in column 8", () => {
+    const pgm = `       *CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Listing control SEQ after column 8", () => {
+    const pgm = `000010    *CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Listing control NOSEQ after column 8", () => {
+    const pgm = `          *PROCESS `;
     expect(pgm).toEqual(cobol);
   });
 });
