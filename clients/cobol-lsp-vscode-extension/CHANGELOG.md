@@ -1,6 +1,22 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [2.0.1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.0...2.0.1) (2023-06-28)
+
+#### Fixed
+* call + using statement
+* coloring for quoted string
+* disable indent lines for cobol
+* expose analysis API
+* Fix copybook error processing
+* fix copybookName completion list in case of glob patterns
+* Fix dialect copybook downloading
+* Fix mapping for multiple copybooks processing
+* handle settings value coming as null
+* improve cobol file recognition
+* tolerate cobol5 compiler directives
+* tolerate FD label records mis match clause as per IBM doc
+
 ## [2.0.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/1.2.1...2.0.0) (2023-06-02)
 
 #### Added
