@@ -114,7 +114,7 @@ public class ExtendedDocument {
    */
   public void replace(Range range, String newText) {
     Range updatedRange = updateRangeDueToChanges(range);
-    currentText.replace(updatedRange, newText, new Location(currentText.getUri(), range));
+    currentText.replace(updatedRange, newText, mapLocation(range));
     dirty = true;
   }
 
