@@ -99,6 +99,16 @@ public class CachingConfigurationService implements ConfigurationService {
     return ImmutableList.of();
   }
 
+  @Override
+  public CompletableFuture<List<String>> getListConfiguration(String documentUri, String section) {
+    return settingsService.fetchTextConfigurationWithScope(documentUri, section);
+  }
+
+  @Override
+  public List<String> getDialectWatchingFolders() {
+    return dialectService.getWatchingFolderSettings();
+  }
+
   private ConfigurationEntity parseConfig(List<Object> clientConfig, List<String> dialectsSections) {
     return Optional.ofNullable(clientConfig)
         .map(cc -> this.parseSettings(cc, dialectsSections))
