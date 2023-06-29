@@ -22,6 +22,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.Synchronized;
+import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
@@ -36,6 +37,8 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.CPY_LOCAL_PATHS;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.SUBROUTINE_LOCAL_PATHS;
 
 /**
  * This class creates watchers with type to watch all types of events. The key to remove a watcher
@@ -50,24 +53,21 @@ public class WatcherServiceImpl implements WatcherService {
    */
   private static final int WATCH_ALL_KIND = 7;
 
-  /**
-   * Glob patterns to watch the copybooks folder and copybook files
-   */
-  private static final String COPYBOOKS_FOLDER_GLOB = "**/.copybooks/**/*";
-
   private static final String WATCH_FILES = "workspace/didChangeWatchedFiles";
   private static final String WATCH_CONFIGURATION = "workspace/didChangeConfiguration";
   private static final String CONFIGURATION_CHANGE_ID = "configurationChange";
-  private static final String PREDEFINED_FOLDER_WATCHER = "copybooksWatcher";
 
   private final List<String> folderWatchers = new ArrayList<>();
   private final Map<String, List<String>> runtimeSpecifiedFolderWatchers = new HashMap<>();
 
   private final Provider<CobolLanguageClient> clientProvider;
+  private final ConfigurationService configurationService;
 
   @Inject
-  WatcherServiceImpl(Provider<CobolLanguageClient> clientProvider) {
+  WatcherServiceImpl(
+      Provider<CobolLanguageClient> clientProvider, ConfigurationService configurationService) {
     this.clientProvider = clientProvider;
+    this.configurationService = configurationService;
   }
 
   @NonNull
@@ -78,19 +78,6 @@ public class WatcherServiceImpl implements WatcherService {
   @Override
   public void watchConfigurationChange() {
     register(singletonList(new Registration(CONFIGURATION_CHANGE_ID, WATCH_CONFIGURATION, null)));
-  }
-
-  @Override
-  public void watchPredefinedFolder() {
-    register(
-            singletonList(
-                    new Registration(
-                            PREDEFINED_FOLDER_WATCHER,
-                            WATCH_FILES,
-                            new DidChangeWatchedFilesRegistrationOptions(
-                                    singletonList(
-                                            new FileSystemWatcher(
-                                                    Either.forLeft(COPYBOOKS_FOLDER_GLOB), WATCH_ALL_KIND))))));
   }
 
   @Override
@@ -109,33 +96,6 @@ public class WatcherServiceImpl implements WatcherService {
                                                       new FileSystemWatcher(createFileWatcher(folder), WATCH_ALL_KIND),
                                                       new FileSystemWatcher(createFolderWatcher(folder), WATCH_ALL_KIND))));
                             })
-                    .collect(toList()));
-  }
-
-  /**
-   * Watch all types of file system changes in folders with given paths relative to workspace folder
-   *
-   * @param paths       - folders inside workspace to watch
-   * @param documentUri - documents for which specified path need to be watched.
-   */
-  @Override
-  public void addRuntimeWatchers(@NonNull List<String> paths, String documentUri) {
-    List<String> watchedFolders =
-            runtimeSpecifiedFolderWatchers.getOrDefault(documentUri, new ArrayList<>());
-    watchedFolders.addAll(paths);
-    runtimeSpecifiedFolderWatchers.put(documentUri, watchedFolders);
-    register(
-            watchedFolders.stream()
-                    .map(
-                            folder ->
-                                    new Registration(
-                                            folder,
-                                            WATCH_FILES,
-                                            new DidChangeWatchedFilesRegistrationOptions(
-                                                    asList(
-                                                            new FileSystemWatcher(createFileWatcher(folder), WATCH_ALL_KIND),
-                                                            new FileSystemWatcher(
-                                                                    createFolderWatcher(folder), WATCH_ALL_KIND)))))
                     .collect(toList()));
   }
 
@@ -175,14 +135,101 @@ public class WatcherServiceImpl implements WatcherService {
     }
   }
 
+  /**
+   * Add Watchers for all types of file system changes for the copybooks specific to a document.
+   * This includes dialects watching folders.
+   *
+   * @param documentUri - documents for which specified path need to be watched.
+   */
+  @Override
+  public void addRuntimeWatchers(String documentUri) {
+    addWatchersForLocalCopybooks(documentUri);
+    addWatchersForDialects(documentUri);
+    addWatchersForSubroutines(documentUri);
+  }
+
+  private void addWatchersForSubroutines(String uri) {
+    configurationService
+        .getListConfiguration(uri, SUBROUTINE_LOCAL_PATHS.label)
+        .thenAccept(dir -> addRuntimeWatcher(uri, dir));
+  }
+
+  private void addWatchersForDialects(String uri) {
+    configurationService
+        .getDialectWatchingFolders()
+        .forEach(
+            s ->
+                configurationService
+                    .getListConfiguration(uri, s)
+                    .thenAccept(dir -> addRuntimeWatcher(uri, dir)));
+  }
+
+  private void addWatchersForLocalCopybooks(String uri) {
+    configurationService
+        .getListConfiguration(uri, CPY_LOCAL_PATHS.label)
+        .thenAccept(dir -> addRuntimeWatcher(uri, dir));
+  }
+
+  private void addRuntimeWatcher(String uri, List<String> dir) {
+    List<String> directories = new ArrayList<>();
+    for (String path : dir) {
+      if (path.contains(CopybookService.FILE_BASENAME_VARIABLE)) {
+        path = path.replace("\\$\\{fileBasenameNoExtension\\}", getNameFromURI(uri));
+      }
+      directories.add(path);
+    }
+    addRuntimeWatchers(directories, uri);
+  }
+
+  private String getNameFromURI(String uri) {
+    return new File(uri).getName().replaceFirst("\\?.*$", "").split("\\.")[0];
+  }
+
+  private void addRuntimeWatchers(@NonNull List<String> paths, String documentUri) {
+    List<String> watchedFolders =
+        runtimeSpecifiedFolderWatchers.getOrDefault(documentUri, new ArrayList<>());
+    watchedFolders.addAll(paths);
+    runtimeSpecifiedFolderWatchers.put(documentUri, watchedFolders);
+    register(
+            paths.stream()
+            .map(
+                folder ->
+                    new Registration(
+                        folder,
+                        WATCH_FILES,
+                        new DidChangeWatchedFilesRegistrationOptions(
+                            asList(
+                                new FileSystemWatcher(createFileWatcher(folder), WATCH_ALL_KIND),
+                                new FileSystemWatcher(
+                                    createFolderWatcher(folder), WATCH_ALL_KIND)))))
+            .collect(toList()));
+  }
+
   private Either<String, RelativePattern> createFileWatcher(String folder) {
-    return Either.forLeft((new File(folder).isAbsolute() ? "" : "**/")
-            + folder.replace(CopybookService.FILE_BASENAME_VARIABLE, "**") + "/**/*");
+    File file = new File(folder);
+    folder = file.toURI().toString();
+    String pattern = "**/*";
+    RelativePattern relativePattern = new RelativePattern();
+    if (folder.contains(CopybookService.FILE_BASENAME_VARIABLE)) {
+      String[] split = folder.split(CopybookService.FILE_BASENAME_VARIABLE);
+      folder = split[0];
+      pattern = "**" + split[1] + pattern;
+    }
+    relativePattern.setBaseUri(folder);
+    relativePattern.setPattern(pattern);
+    return Either.forRight(relativePattern);
   }
 
   private Either<String, RelativePattern> createFolderWatcher(String folder) {
-    return Either.forLeft((new File(folder).isAbsolute() ? "" : "**/")
-            + folder.replace(CopybookService.FILE_BASENAME_VARIABLE, "**"));
+    File file = new File(folder);
+    folder = file.toURI().toString();
+    RelativePattern relativePattern = new RelativePattern();
+    if (folder.contains(CopybookService.FILE_BASENAME_VARIABLE)) {
+      String[] split = folder.split(CopybookService.FILE_BASENAME_VARIABLE);
+      folder = split[0] + "**" + split[1];
+    }
+    relativePattern.setBaseUri(folder);
+    return Either.forRight(relativePattern);
   }
 
   private void register(List<Registration> registrations) {

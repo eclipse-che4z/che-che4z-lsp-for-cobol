@@ -25,7 +25,6 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
-import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
@@ -51,7 +50,6 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.verification.Times;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -93,7 +91,6 @@ class CobolLanguageServerTest {
     SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
-    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     MessageService messageService = mock(MessageService.class);
     Keywords keywords = mock(Keywords.class);
@@ -113,21 +110,16 @@ class CobolLanguageServerTest {
             localeStore,
             customExecutor,
             stateService,
-            configurationService,
             copybookNameService,
             keywords,
-            dialectService,
             messageService);
 
     server.initialized(new InitializedParams());
 
     verify(watchingService).watchConfigurationChange();
-    verify(watchingService).watchPredefinedFolder();
-    verify(settingsService).fetchConfiguration(CPY_LOCAL_PATHS.label);
     verify(settingsService).fetchConfiguration(LOCALE.label);
+    verify(settingsService).fetchConfiguration(LOGGING_LEVEL.label);
     verify(settingsService).fetchConfiguration(CPY_EXTENSIONS.label);
-    verify(settingsService).fetchConfiguration("dialect");
-    verify(watchingService, new Times(2)).addWatchers(singletonList("foo/bar"));
     verify(localeStore).notifyLocaleStore();
   }
 
@@ -156,7 +148,6 @@ class CobolLanguageServerTest {
     SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
-    ConfigurationService configurationService = mock(ConfigurationService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
     CobolTextDocumentService textService = mock(CobolTextDocumentService.class);
@@ -178,10 +169,8 @@ class CobolLanguageServerTest {
             localeStore,
             customExecutor,
             stateService,
-            configurationService,
             copybookNameService,
             keywords,
-            dialectService,
             messageService);
 
     server.initialized(new InitializedParams());
@@ -204,8 +193,6 @@ class CobolLanguageServerTest {
             null,
             customExecutor,
             stateService,
-            null,
-            null,
             null,
             null,
             null);
@@ -260,8 +247,6 @@ class CobolLanguageServerTest {
             null,
             customExecutor,
             stateService,
-            null,
-            null,
             null,
             null,
             null);
