@@ -122,7 +122,7 @@ export async function waitFor(
   while (!(await Promise.resolve(doneFunc()))) {
     await sleep(100);
     if (Date.now() - startTime > timeout) {
-      break;
+      return false
     }
   }
 }

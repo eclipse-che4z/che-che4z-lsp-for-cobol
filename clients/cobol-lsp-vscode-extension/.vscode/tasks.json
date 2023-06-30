@@ -33,7 +33,7 @@
       "label": "Compile",
       "type": "npm",
       "script": "compile",
-      "isBackground": true,
+      "isBackground": false,
       "problemMatcher": ["$tsc-watch"],
       "group": {
         "kind": "build",

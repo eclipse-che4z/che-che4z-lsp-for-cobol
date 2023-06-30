@@ -3,6 +3,14 @@
         {
             "program": "cobol-vanila/*",
             "pgroup": "VANILA"
+        },
+        {
+            "program": "cobol-idms/*",
+            "pgroup": "IDMS"
+        },
+        {
+            "program": "cobol-daco/*",
+            "pgroup": "DaCo"
         }
     ]
 }
