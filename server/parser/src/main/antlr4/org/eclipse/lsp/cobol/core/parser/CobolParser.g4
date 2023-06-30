@@ -298,7 +298,7 @@ environmentDivision
    ;
 
 environmentDivisionBody
-   : configurationSection | inputOutputSection | dialectSection | dacoControlSection
+   : configurationSection | inputOutputSection | dialectSection
    ;
 
 // -- configuration section ----------------------------------
@@ -1061,22 +1061,13 @@ json_phrases: ZERO | ZEROES | ZEROS | SPACE | SPACES | LOW_VALUE | LOW_VALUES | 
 
 json_gen_phrase1: jsonGenIdentifier6 TO? JSON? (BOOLEAN |  BOOL) USING? (jsonGenConditionName | literal);
 
-dialectStatement
-   : dialectNodeFiller | dialectIfStatment
-   ;
-
-// DAF DaCo Statements
-
-dacoControlSection
-    : DACO_CONTROL SECTION
-    ;
-
-// End of DaCo Statements
-
 // accept statement
-
 acceptStatement
    : ACCEPT generalIdentifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?
+   ;
+
+dialectStatement
+   : dialectNodeFiller | dialectIfStatment
    ;
 
 acceptFromDateStatement
