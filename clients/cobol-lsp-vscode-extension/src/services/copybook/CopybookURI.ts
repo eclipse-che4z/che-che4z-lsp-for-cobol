@@ -46,22 +46,24 @@ export class CopybookURI {
       documentUri,
       dialectType,
     );
+
     result = searchCopybookInWorkspace(
       copybookName,
       copybookFolders,
       SettingsService.getCopybookExtension(documentUri),
     );
-    // check in subfolders under .copybooks (copybook downloaded from MF)
-    if (!result) {
-      result = searchCopybookInWorkspace(
-        copybookName,
-        await CopybookURI.createPathForCopybookDownloaded(
-          documentUri,
-          dialectType,
-        ),
-        SettingsService.getCopybookExtension(documentUri),
-      );
+    if (result) {
+      return result;
     }
+    // check in subfolders under .copybooks (copybook downloaded from MF)
+    result = searchCopybookInWorkspace(
+      copybookName,
+      await CopybookURI.createPathForCopybookDownloaded(
+        documentUri,
+        dialectType,
+      ),
+      SettingsService.getCopybookExtension(documentUri),
+    );
     return result || "";
   }
 

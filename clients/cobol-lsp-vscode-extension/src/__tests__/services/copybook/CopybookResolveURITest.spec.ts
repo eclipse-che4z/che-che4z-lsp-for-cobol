@@ -13,7 +13,7 @@
  */
 jest.mock("glob");
 
-import { sync } from "glob";
+import { globSync, sync } from "glob";
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -109,15 +109,15 @@ describe("Resolve local copybook against bad configuration of target folders", (
   });
   test("given a folder that not contains copybooks, the target copybook is not retrieved", () => {
     (sync as any).mockReturnValue([]);
-    expect(
-      fsUtils.searchCopybookInWorkspace(
-        copybookName,
-        [__dirname],
-        COPYBOOK_EXT_ARRAY,
-      ),
-    ).toBe(undefined);
+    const cp = fsUtils.searchCopybookInWorkspace(
+      copybookName,
+      [__dirname],
+      COPYBOOK_EXT_ARRAY,
+    );
+    expect(cp).toBe(undefined);
     (sync as any).mockReturnValue((x) => x);
   });
+
   test("given a not empty folder, a copybook that is not present in that folder is not retrivied and the uri returned is undefined", () => {
     (sync as any).mockReturnValue([]);
     expect(
@@ -133,6 +133,7 @@ describe("Resolve local copybook against bad configuration of target folders", (
 describe("Resolve local copybook present in one or more folders specified by the user", () => {
   test("given a folder that contains the target copybook, it is found and its uri is returned", () => {
     (sync as any).mockReturnValue([copybookName]);
+    (globSync as any).mockImplementation((x) => x);
     expect(
       fsUtils.searchCopybookInWorkspace(
         copybookName,
@@ -140,10 +141,12 @@ describe("Resolve local copybook present in one or more folders specified by the
         COPYBOOK_EXT_ARRAY,
       ),
     ).toBeDefined();
+    (globSync as any).mockImplementation((x) => []);
     (sync as any).mockReturnValue((x) => x);
   });
   test("given two times the same folder that contains the target copybook, one uri is still returned", () => {
     (sync as any).mockReturnValue([copybookName]);
+    (globSync as any).mockImplementation((x) => x);
     expect(
       fsUtils.searchCopybookInWorkspace(
         copybookName,
@@ -151,10 +154,12 @@ describe("Resolve local copybook present in one or more folders specified by the
         COPYBOOK_EXT_ARRAY,
       ),
     ).toBeDefined();
+    (globSync as any).mockImplementation((x) => []);
     (sync as any).mockReturnValue((x) => x);
   });
   test("Given a copybook with extension on filesystem, the uri is correctly returned", () => {
     (sync as any).mockReturnValue(["NSTCOPY2"]);
+    (globSync as any).mockImplementation((x) => x);
     expect(
       fsUtils.searchCopybookInWorkspace(
         "NSTCOPY2",
@@ -162,10 +167,12 @@ describe("Resolve local copybook present in one or more folders specified by the
         COPYBOOK_EXT_ARRAY,
       ),
     ).toBeDefined();
+    (globSync as any).mockImplementation((x) => []);
     (sync as any).mockReturnValue((x) => x);
   });
   test("Given a valid relative path for copybook with extension on filesystem, the uri is correctly returned", () => {
     (sync as any).mockReturnValue(["NSTCOPY2"]);
+    (globSync as any).mockImplementation((x) => x);
     const dir = path.join(__dirname, RELATIVE_CPY_FOLDER_NAME);
     createDirectory(dir);
     createFile(copybookNameWithExtension, dir);
@@ -176,11 +183,13 @@ describe("Resolve local copybook present in one or more folders specified by the
         COPYBOOK_EXT_ARRAY,
       ),
     ).toBeDefined();
+    (globSync as any).mockImplementation((x) => []);
     removeFolder(dir);
     (sync as any).mockReturnValue((x) => x);
   });
   test("Given a valid absolute path for copybook with extension on filesystem, the uri is correctly returned", () => {
     (sync as any).mockReturnValue(["NSTCOPY2"]);
+    (globSync as any).mockImplementation((x) => x);
     expect(
       fsUtils.searchCopybookInWorkspace(
         "NSTCOPY2",
@@ -188,6 +197,7 @@ describe("Resolve local copybook present in one or more folders specified by the
         COPYBOOK_EXT_ARRAY,
       ),
     ).toBeDefined();
+    (globSync as any).mockImplementation((x) => []);
     (sync as any).mockReturnValue((x) => x);
   });
 });
@@ -232,6 +242,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
     });
+    (globSync as any).mockImplementation((x) => x);
     (sync as any).mockReturnValue([CPY_FOLDER_NAME]);
     const uri: string = await CopybookURI.resolveCopybookURI(
       copybookName,
@@ -239,9 +250,11 @@ describe("Prioritize search criteria for copybooks test suite", () => {
       "COBOL",
     );
     expect(uri).toMatch(CPY_FOLDER_NAME);
+    (globSync as any).mockImplementation((x) => []);
     expect(spySearchInWorkspace).toBeCalledTimes(1);
     (sync as any).mockReturnValue((x) => x);
   });
+
   test("With no settings provided, two search strategies are applied and function return an empty string", async () => {
     (sync as any).mockReturnValue([]);
     provideMockValueForLocalAndDSN("", "");
@@ -257,17 +270,20 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     expect(spySearchInWorkspace).toBeCalledTimes(2);
     (sync as any).mockReturnValue((x) => x);
   });
+
   test(
     "With both local and dsn references defined in the settings.json, the search is applied on local resources" +
       "first",
     async () => {
       (sync as any).mockReturnValue(["hi.cbl"]);
+      (globSync as any).mockImplementation((x) => x);
       provideMockValueForLocalAndDSN(CPY_FOLDER_NAME, "");
       const uri: string = await CopybookURI.resolveCopybookURI(
         copybookName,
         "PRGNAME",
         "COBOL",
       );
+      (globSync as any).mockImplementation((x) => []);
       expect(uri).not.toBe("");
       expect(spySearchInWorkspace).toBeCalledTimes(1);
       (sync as any).mockReturnValue((x) => x);
@@ -275,9 +291,19 @@ describe("Prioritize search criteria for copybooks test suite", () => {
   );
   test("With only a local folder defined for the dialect in the settings.json, the search is applied locally", async () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-      get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
+      get: jest.fn().mockImplementation((arg) => {
+        switch (arg) {
+          case "dialect.paths-local":
+            return [CPY_FOLDER_NAME];
+          case "copybook-extensions":
+            return [""];
+          default:
+            return [];
+        }
+      }),
     });
     (sync as any).mockReturnValue([CPY_FOLDER_NAME]);
+    (globSync as any).mockImplementation((x) => x);
     const uri: string = await CopybookURI.resolveCopybookURI(
       copybookName,
       "PRGNAME",
@@ -286,5 +312,6 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     expect(uri).toMatch(CPY_FOLDER_NAME);
     expect(spySearchInWorkspace).toBeCalledTimes(1);
     (sync as any).mockReturnValue((x) => x);
+    (globSync as any).mockImplementation((x) => []);
   });
 });
