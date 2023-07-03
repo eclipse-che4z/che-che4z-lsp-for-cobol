@@ -457,7 +457,7 @@
     "build:watch": "npm run build -- --watch",
     "test:integration": "npm run compile && node ./out/test/runTest.js",
     "compile": "tsc -p ./",
-    "lint": "prettier -c .",
+    "lint": "prettier --config ./prettier.config.js -c .",
     "pretest": "npm run compile && npm run lint",
     "pretty": "prettier -w .",
     "watch": "tsc -watch -p ./",

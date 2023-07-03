@@ -29,7 +29,9 @@ suite("Tests with USER1.cbl", function () {
     await helper.activate();
   });
 
-  this.afterEach(async () => await helper.closeAllEditors()).timeout(helper.TEST_TIMEOUT);
+  this.afterEach(async () => await helper.closeAllEditors()).timeout(
+    helper.TEST_TIMEOUT,
+  );
   this.beforeEach(async () => {
     await helper.showDocument(WORKSPACE_FILE);
     editor = helper.get_editor(WORKSPACE_FILE);
