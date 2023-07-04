@@ -95,7 +95,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           BRANCH_NAME: ${{ github.ref_name || github.head_ref }} 
-        run: mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=eclipse-che4z_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse-che4z -Dsonar.host.url=https://sonarcloud.io -Dsonar.branch.name=${BRANCH_NAME} -Dsonar.login=${{ secrets.SONAR_TOKEN }} --no-transfer-progress
+        run: mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=eclipse-che4z_che-che4z-lsp-for-cobol-server -Dsonar.organization=eclipse-che4z -Dsonar.host.url=https://sonarcloud.io -Dsonar.branch.name=${BRANCH_NAME} -Dsonar.login=${{ secrets.SONAR_TOKEN }} --no-transfer-progress
       - uses: actions/upload-artifact@v3
         with:
           name: jar
