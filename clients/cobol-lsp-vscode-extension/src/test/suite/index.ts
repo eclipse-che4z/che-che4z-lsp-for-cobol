@@ -50,9 +50,9 @@ export async function run(): Promise<void> {
   const mocha = new Mocha({ ui: "tdd", color: true });
   const testsPath = path.join(__dirname, "..");
   const files = await glob(
-    is_vscode ? "**/**.test.js" : "**/integration.test.js",
-    { cwd: testsPath },
-  );
+      is_vscode ? "**/**.test.js" : "**/integration.test.js",
+      { cwd: testsPath }
+    );
   // Add files to the test suite
   files.forEach((file) => mocha.addFile(path.resolve(testsPath, file)));
 
