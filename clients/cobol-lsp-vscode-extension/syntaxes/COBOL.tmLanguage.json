@@ -51,7 +51,7 @@
             {
               "include": "#idms-keywords"
             }
-          ]
+          ] 
         }
       }
     },
@@ -64,8 +64,8 @@
         "2": {
           "name": "comment.line.cobol.fixed"
         }
-      }
-    },
+    }
+  },
     "comment-floating": {
       "match": "\\s\\*>\\s.*",
       "name": "comment.line.cobol.floating"
