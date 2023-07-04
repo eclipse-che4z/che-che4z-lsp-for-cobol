@@ -2498,7 +2498,9 @@ basis
    ;
 
 cobolWord
-   : IDENTIFIER | cobolCompilerDirectivesKeywords | cobolKeywords | cicsTranslatorCompileDirectivedKeywords
+   : IDENTIFIER
+   | cobolCompilerDirectivesKeywords | cobolKeywords
+   | cicsTranslatorCompileDirectivedKeywords | cics_conditions
    ;
 
 cicsTranslatorCompileDirectivedKeywords
