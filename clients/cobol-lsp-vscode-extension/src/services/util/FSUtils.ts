@@ -89,7 +89,7 @@ export function searchCopybookInWorkspace(
   extensions: string[],
 ): string | undefined {
   for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
-    const workspaceFolder = workspaceFolderPath.replace(/\/(.*:)/, "$1");
+    const workspaceFolder = cleanWorkspaceFolder(workspaceFolderPath);
     for (const p of copybookFolders) {
       for (const ext of extensions) {
         const searchResult = globSearch(workspaceFolder, p, copybookName, ext);
@@ -108,7 +108,12 @@ export function searchCopybookInWorkspace(
   return undefined;
 }
 
-const backwardSlashRegex = new RegExp("\\\\", "g");
+export const backwardSlashRegex = new RegExp("\\\\", "g");
+
+export function cleanWorkspaceFolder(workspaceFolderPath: string) {
+  return workspaceFolderPath.replace(/\/(.*:)/, "$1");
+}
+
 function globSearch(
   workspaceFolder: string,
   resource: string,

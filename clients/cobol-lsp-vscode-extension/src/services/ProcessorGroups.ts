@@ -18,6 +18,7 @@ import { Minimatch } from "minimatch";
 import { SettingsUtils } from "./util/SettingsUtils";
 import { globSync } from "glob";
 import { Uri } from "vscode";
+import { backwardSlashRegex, cleanWorkspaceFolder } from "./util/FSUtils";
 
 const PROCESSOR_GROUP_FOLDER = ".cobolplugin";
 const PROCESSOR_GROUP_PGM = "pgm_conf.json";
@@ -43,7 +44,12 @@ export function loadProcessorGroupCopybookPathsConfig(
     ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]),
     ...configObject,
   ];
-  return globSync(config);
+  return SettingsUtils.getWorkspaceFoldersPath(true)
+    .map((folder) => globSync(config.map(ele => ele.replace(backwardSlashRegex, "/")),
+     { cwd: cleanWorkspaceFolder(folder) }))
+    .reduce((acc, curVal) => {
+      return acc.concat(curVal);
+    }, []);
 }
 
 export function loadProcessorGroupCopybookExtensionsConfig(
