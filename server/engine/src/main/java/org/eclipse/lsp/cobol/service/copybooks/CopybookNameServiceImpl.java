@@ -14,35 +14,34 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
-import static java.util.Collections.singleton;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.CPY_EXTENSIONS;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.CPY_LOCAL_PATHS;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECTS;
-
 import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
+import org.eclipse.lsp4j.WorkspaceFolder;
 
+import javax.annotation.Nullable;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.copybook.CopybookName;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.settings.SettingsService;
-import org.eclipse.lsp.cobol.common.file.FileSystemService;
-import org.eclipse.lsp4j.WorkspaceFolder;
-
-import javax.annotation.Nullable;
+import static java.util.Collections.singleton;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 
 /**
  * This service processes all the copybook names present in the local directory. The service also
@@ -86,26 +85,14 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   @Override
   public CompletableFuture<List<String>> copybookLocalFolders(String documentUri) {
     List<CompletableFuture<List<String>>> copybookLocalFolders = new ArrayList<>();
-    Function<List<Object>, List<String>> unwrapJsonArrays = l -> {
-      List<String> result = new ArrayList<>();
-      for (Object ja : l) {
-        if (ja instanceof JsonArray) {
-          for (JsonElement element : (JsonArray) ja) {
-            result.add(element.getAsString());
-          }
-        }
-      }
-      return result;
-    };
 
     copybookLocalFolders.add(
-            settingsService.fetchConfigurations(documentUri, ImmutableList.of(CPY_LOCAL_PATHS.label))
-                    .thenApply(unwrapJsonArrays));
-    return settingsService.fetchTextConfiguration(DIALECTS.label)
+            settingsService.fetchTextConfigurationWithScope(documentUri, CPY_LOCAL_PATHS.label));
+    return settingsService.fetchTextConfigurationWithScope(documentUri, DIALECTS.label)
             .thenAccept(
                     dialects -> dialects.forEach(dialect -> copybookLocalFolders.add(
-                            settingsService.fetchTextConfiguration(
-                                    String.format("cpy-manager.%s.paths-local", dialect.toLowerCase())))))
+                            settingsService.fetchTextConfigurationWithScope(documentUri, "cobol-lsp.dialect.libs", dialect)
+                    )))
             .thenCompose(
                     c -> CompletableFuture.allOf(copybookLocalFolders.toArray(new CompletableFuture<?>[0]))
                             .thenApply(v -> copybookLocalFolders.stream()

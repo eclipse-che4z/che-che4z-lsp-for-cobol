@@ -49,6 +49,15 @@ public interface SettingsService {
   CompletableFuture<List<String>> fetchTextConfigurationWithScope(String scopeUri, String section);
 
   /**
+   * Fetch the required dialect specific text configuration section from the client.
+   * @param scopeUri the required section
+   * @param section the required section.
+   * @param dialect
+   * @return a list of string of one configuration object.
+   */
+  CompletableFuture<List<String>> fetchTextConfigurationWithScope(String scopeUri, String section, String dialect);
+
+  /**
    * Fetch the required configuration sections from the client. Note that Scope URI is null. The
    * {@link SettingsParametersEnum#LSP_PREFIX LSP prefix} will be added to each specified section.
    *

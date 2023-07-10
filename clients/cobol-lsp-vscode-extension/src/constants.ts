@@ -27,6 +27,7 @@ export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";
 
 export const SERVER_PORT = "cobol-lsp.server.port";
 export const SERVER_RUNTIME = "cobol-lsp.serverRuntime";
+export const DIALECT_LIBS = "cobol-lsp.dialect.libs";
 export const PATHS_LOCAL_KEY = "paths-local";
 export const PATHS_ZOWE = "paths-dsn";
 export const PATHS_USS = "paths-uss";

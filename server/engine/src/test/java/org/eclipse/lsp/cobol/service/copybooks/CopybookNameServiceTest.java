@@ -84,9 +84,9 @@ class CopybookNameServiceTest {
     copyNames.addAll(ImmutableList.of(absoluteValidCpyPath, relativeValidCpyPath, workspaceProgramPath));
     when(provider.get()).thenReturn(client);
     when(client.workspaceFolders()).thenReturn(CompletableFuture.completedFuture(workspace));
-    when(settingsService.fetchConfigurations(any(), eq(ImmutableList.of(CPY_LOCAL_PATHS.label))))
-            .thenReturn(CompletableFuture.completedFuture(ImmutableList.of(toJsonArray(copyNames))));
-    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+    when(settingsService.fetchTextConfigurationWithScope(any(), eq(CPY_LOCAL_PATHS.label)))
+            .thenReturn(CompletableFuture.completedFuture(copyNames));
+    when(settingsService.fetchTextConfigurationWithScope(any(), eq(DIALECTS.label)))
             .thenReturn(CompletableFuture.completedFuture(Collections.emptyList()));
   }
 

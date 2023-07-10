@@ -18,6 +18,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -57,6 +58,7 @@ public class SettingsServiceImpl implements SettingsService {
             .filter(JsonArray.class::isInstance)
             .map(JsonArray.class::cast)
             .flatMap(Streams::stream)
+            .filter(ele -> !(ele instanceof JsonNull))
             .map(JsonElement::getAsString)
             .collect(toList()));
   }
@@ -67,8 +69,25 @@ public class SettingsServiceImpl implements SettingsService {
             .filter(JsonArray.class::isInstance)
             .map(JsonArray.class::cast)
             .flatMap(Streams::stream)
+            .filter(ele -> !(ele instanceof JsonNull))
             .map(JsonElement::getAsString)
             .collect(toList()));
+  }
+
+  @Override
+  public CompletableFuture<List<String>> fetchTextConfigurationWithScope(String scopeUri, String section, String dialect) {
+    CobolConfigItem item = new CobolConfigItem();
+    item.setSection(section);
+    item.setDialect(dialect);
+    item.setScopeUri(scopeUri);
+    return clientProvider.get().configuration(new ConfigurationParams(singletonList(item)))
+            .thenApply(objects -> objects.stream()
+                    .filter(JsonArray.class::isInstance)
+                    .map(JsonArray.class::cast)
+                    .flatMap(Streams::stream)
+                    .filter(ele -> !(ele instanceof JsonNull))
+                    .map(JsonElement::getAsString)
+                    .collect(toList()));
   }
 
   @NonNull
