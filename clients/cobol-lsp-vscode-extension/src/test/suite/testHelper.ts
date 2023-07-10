@@ -125,6 +125,7 @@ export async function waitFor(
       return false
     }
   }
+  return true;
 }
 
 export function sleep(ms: number): Promise<unknown> {
