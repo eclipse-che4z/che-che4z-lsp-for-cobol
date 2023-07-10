@@ -11,6 +11,10 @@
         {
             "program": "cobol-daco/*",
             "pgroup": "DaCo"
+        },
+        {
+            "program": "cobol-dc/*",
+            "pgroup": "DaCo"
         }
     ]
 }
