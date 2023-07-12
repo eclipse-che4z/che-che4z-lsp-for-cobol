@@ -210,6 +210,7 @@ public class UseCaseEngine {
                 .copybooks(document.getCopybooks())
                 .subroutines(subroutineNames)
                 .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
+                .cicsTranslator(analysisConfig.isCicsTranslatorEnabled())
                 .copybookProcessingMode(
                     analysisConfig.getCopybookConfig().getCopybookProcessingMode())
                 .features(analysisConfig.getFeatures())
@@ -253,6 +254,7 @@ public class UseCaseEngine {
                 .text(document.getText())
                 .copybooks(document.getCopybooks())
                 .subroutines(subroutineNames)
+                .cicsTranslator(analysisConfig.isCicsTranslatorEnabled())
                 .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
                 .copybookProcessingMode(
                     analysisConfig.getCopybookConfig().getCopybookProcessingMode())
