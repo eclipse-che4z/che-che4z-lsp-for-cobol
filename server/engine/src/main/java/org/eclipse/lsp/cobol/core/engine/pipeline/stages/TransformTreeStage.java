@@ -208,9 +208,9 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     ctx.register(v, StandAloneDataItemNode.class, new StandAloneDataItemCheck());
     ctx.register(v, ProgramEndNode.class, new ProgramEndCheck());
     ctx.register(v, CICSTranslatorNode.class, new CICSTranslatorProcessor(analysisConfig, messageService));
-    ctx.register(t, JsonParseNode.class, new JsonParseProcess(symbolAccumulatorService));
-    ctx.register(t, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulatorService));
-    ctx.register(t, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
+    ctx.register(v, JsonParseNode.class, new JsonParseProcess(symbolAccumulatorService));
+    ctx.register(v, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulatorService));
+    ctx.register(v, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
 
     // Dialects
     List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());
