@@ -170,6 +170,7 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     // Phase TRANSFORMATION
     ProcessingPhase t = ProcessingPhase.TRANSFORMATION;
     ctx.register(t, CompilerDirectiveNode.class, new CompilerDirectiveProcess());
+    ctx.register(t, ProgramNode.class, new CICSTranslateMandatorySectionProcess(analysisConfig));
     ctx.register(t, ProgramIdNode.class, new ProgramIdProcess());
     ctx.register(t, SectionNode.class, new SectionNodeProcessor(symbolAccumulatorService));
     ctx.register(t, FileEntryNode.class, new FileEntryProcess());
@@ -184,7 +185,7 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     ctx.register(d, ProcedureDivisionBodyNode.class, new DefineCodeBlock(symbolAccumulatorService));
 
     // Phase POST DEFINITION
-    ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor());
+    ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor(analysisConfig));
 
     // Phase USAGE
     ProcessingPhase u = ProcessingPhase.USAGE;

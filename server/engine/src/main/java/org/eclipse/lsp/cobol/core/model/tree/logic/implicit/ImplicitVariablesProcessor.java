@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.logic.implicit;
 
+import lombok.AllArgsConstructor;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
@@ -27,15 +29,20 @@ import java.util.List;
 /**
  * Enrich symbolic table with predefined variables
  */
+@AllArgsConstructor
 public class ImplicitVariablesProcessor implements Processor<SectionNode> {
 
+  private final AnalysisConfig config;
   @Override
   public void accept(SectionNode sectionNode, ProcessingContext processingContext) {
     if (sectionNode.getSectionType() == SectionType.LINKAGE) {
       VariableAccumulator variableAccumulator = processingContext.getVariableAccumulator();
       ProgramNode programNode = sectionNode.getProgram()
           .orElseThrow(() -> new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found"));
-      registerVariable(variableAccumulator, programNode, BlkImplicitVariablesGenerator.generate());
+      if (config.isCicsTranslatorEnabled()) {
+        registerVariable(
+            variableAccumulator, programNode, BlkImplicitVariablesGenerator.generate());
+      }
     }
 
     if (sectionNode.getSectionType() == SectionType.WORKING_STORAGE) {
@@ -43,6 +50,9 @@ public class ImplicitVariablesProcessor implements Processor<SectionNode> {
       ProgramNode programNode = sectionNode.getProgram()
           .orElseThrow(() -> new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found"));
       registerVariables(variableAccumulator, programNode, SRImplicitVariablesGenerator.generate());
+      if (config.isCicsTranslatorEnabled()) {
+        registerVariables(variableAccumulator, programNode, SRImplicitVariablesGenerator.generateCicsRegisters());
+      }
     }
   }
 
