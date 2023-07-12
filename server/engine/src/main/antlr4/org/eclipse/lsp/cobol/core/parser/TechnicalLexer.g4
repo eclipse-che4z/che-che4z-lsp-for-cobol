@@ -93,8 +93,8 @@ ZERO_DIGIT: '0';
 
 
 fragment HEXNUMBER :
-	X '"' [0-9A-F]+ '"'
-	| X '\'' [0-9A-F]+ '\''
+	X '"' [0-9A-Fa-f]+ '"'
+	| X '\'' [0-9A-Fa-f]+ '\''
 ;
 
 fragment NULLTERMINATED :
