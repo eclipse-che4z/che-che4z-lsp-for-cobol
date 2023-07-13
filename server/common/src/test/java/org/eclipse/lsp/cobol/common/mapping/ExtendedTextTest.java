@@ -90,11 +90,15 @@ class ExtendedTextTest {
     Range range = new Range(new Position(1, 0), new Position(1, 3));
     Location location = extendedText.mapLocation(range);
 
-    assertEquals("     0 LINE\n"
-        + "COPYBOOK 1 LINE\n"
-        + "COPYBOOK 2 LINE\n"
-        + "COPYBOOK 3 LINE\n"
-        + "     3 LINE", extendedText.toString());
+    assertEquals(
+        "     0 LINE\n"
+            + "COPYBOOK 1 LINE\n"
+            + "COPYBOOK 2 LINE\n"
+            + "COPYBOOK 3 LINE\n"
+            + "     1     \n"
+            + "     2 LINE\n"
+            + "     3 LINE",
+        extendedText.toString());
 
     assertEquals(new Range(new Position(0, 0), new Position(0, 3)).toString(), location.getRange().toString());
     assertEquals("copybook", location.getUri());
@@ -102,7 +106,7 @@ class ExtendedTextTest {
     range = new Range(new Position(4, 0), new Position(4, 3));
     location = extendedText.mapLocation(range);
 
-    assertEquals(new Range(new Position(3, 0), new Position(3, 3)).toString(), location.getRange().toString());
+    assertEquals(new Range(new Position(1, 0), new Position(1, 3)).toString(), location.getRange().toString());
     assertEquals("uri", location.getUri());
   }
 
