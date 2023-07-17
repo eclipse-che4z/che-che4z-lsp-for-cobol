@@ -19,8 +19,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
-import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
@@ -33,9 +31,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /** Apply all the validation for the JSON Parse statement and return found errors. */
 public class JsonParseProcess implements Processor<JsonParseNode> {
@@ -60,8 +55,12 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
   }
 
   private void semanticAnalysisForIdentifier(JsonParseNode jsonParseNode, ProcessingContext ctx) {
-    List<VariableUsageNode> identifier1Nodes = getIdentifier(jsonParseNode, jsonParseNode.getIdentifier1());
-    List<VariableNode> identifierFoundDefinitions = getIdentifierDefinitions(jsonParseNode, identifier1Nodes);
+    List<VariableUsageNode> identifier1Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier1());
+    if (identifier1Nodes.isEmpty()) {
+      return;
+    }
+    List<VariableNode> identifierFoundDefinitions =
+            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier1Nodes);
 
     semanticAnalysisForIdentifier1(jsonParseNode, ctx, identifier1Nodes, identifierFoundDefinitions);
     semanticAnalysisForIdentifier2(jsonParseNode, ctx, identifierFoundDefinitions);
@@ -84,12 +83,14 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
   }
 
   private void semanticAnalysisForCondition(JsonParseNode jsonParseNode, ProcessingContext ctx) {
-    List<VariableUsageNode> identifier5Nodes = getIdentifier(jsonParseNode, jsonParseNode.getIdentifier5());
-    List<VariableNode> foundDefinitionsForIdentifier5 = getIdentifierDefinitions(jsonParseNode, identifier5Nodes);
+    List<VariableUsageNode> identifier5Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier5());
+    List<VariableNode> foundDefinitionsForIdentifier5 =
+            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier5Nodes);
 
-    List<VariableUsageNode> conditionNames = getIdentifier(jsonParseNode, jsonParseNode.getConditionName());
+    List<VariableUsageNode> conditionNames = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getConditionName());
     if (conditionNames.isEmpty()) return;
-    List<VariableNode> conditionDefinition = getIdentifierDefinitions(jsonParseNode, conditionNames);
+    List<VariableNode> conditionDefinition =
+            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, conditionNames);
 
     if (foundDefinitionsForIdentifier5.isEmpty() || conditionDefinition.isEmpty()) return;
     conditionDefinition.forEach(
@@ -141,9 +142,10 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
       JsonParseNode jsonParseNode,
       ProcessingContext ctx,
       List<VariableNode> identifier1Definitions) {
-    List<VariableUsageNode> identifier2Nodes = getIdentifier(jsonParseNode, jsonParseNode.getIdentifier2());
+    List<VariableUsageNode> identifier2Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier2());
     if (identifier2Nodes.isEmpty()) return;
-    List<VariableNode> foundDefinitionsForIdentifier2 = getIdentifierDefinitions(jsonParseNode, identifier2Nodes);
+    List<VariableNode> foundDefinitionsForIdentifier2 =
+            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier2Nodes);
     if (foundDefinitionsForIdentifier2.isEmpty()) return;
     checkValidDefinition(jsonParseNode, ctx, identifier2Nodes, foundDefinitionsForIdentifier2);
     if (!foundDefinitionsForIdentifier2.isEmpty()
@@ -247,39 +249,11 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
     }
   }
 
-  private List<VariableUsageNode> getIdentifier(
-      JsonParseNode jsonParseNode, VariableNameAndLocality identifier) {
-    return jsonParseNode.getChildren().stream()
-        .flatMap(Node::getDepthFirstStream)
-        .filter(hasType(NodeType.VARIABLE_USAGE))
-        .map(VariableUsageNode.class::cast)
-        .filter(
-            node ->
-                node.getName().equalsIgnoreCase(identifier.getName())
-                    && node.getLocality().equals(identifier.getLocality()))
-        .collect(Collectors.toList());
-  }
-
-  private List<VariableUsageNode> getIdentifier(
-      JsonParseNode jsonParseNode, List<VariableNameAndLocality> identifiers) {
-    return jsonParseNode.getChildren().stream()
-        .flatMap(Node::getDepthFirstStream)
-        .filter(hasType(NodeType.VARIABLE_USAGE))
-        .map(VariableUsageNode.class::cast)
-        .filter(
-            node ->
-                identifiers.stream()
-                    .anyMatch(
-                        str ->
-                            str.getName().equalsIgnoreCase(node.getName())
-                                && str.getLocality().equals(node.getLocality())))
-        .collect(Collectors.toList());
-  }
-
   private void semanticAnalysisForIdentifier5(JsonParseNode jsonParseNode, ProcessingContext ctx) {
-    List<VariableUsageNode> identifier5Nodes = getIdentifier(jsonParseNode, jsonParseNode.getIdentifier5());
+    List<VariableUsageNode> identifier5Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier5());
     identifier5Nodes.forEach(identifier5 -> {
-      List<VariableNode> foundDefinitionsForIdentifier5 = getIdentifierDefinitions(jsonParseNode, Collections.singletonList(identifier5));
+      List<VariableNode> foundDefinitionsForIdentifier5 =
+              VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, Collections.singletonList(identifier5));
 
       if (foundDefinitionsForIdentifier5.isEmpty()) {
         return;
@@ -307,13 +281,18 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
   }
 
   private void semanticAnalysisForIdentifier4(JsonParseNode jsonParseNode, ProcessingContext ctx) {
-    List<VariableUsageNode> identifier2Nodes = getIdentifier(jsonParseNode, jsonParseNode.getIdentifier2());
-    List<VariableNode> foundDefinitionsForIdentifier2 = getIdentifierDefinitions(jsonParseNode, identifier2Nodes);
+    List<VariableUsageNode> identifier2Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier2());
+    if (identifier2Nodes.isEmpty()) {
+      return;
+    }
+    List<VariableNode> foundDefinitionsForIdentifier2 =
+            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier2Nodes);
 
-    List<VariableUsageNode> identifier4Nodes = getIdentifier(jsonParseNode, jsonParseNode.getIdentifier4());
+    List<VariableUsageNode> identifier4Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier4());
     if (identifier4Nodes.isEmpty()) return;
     identifier4Nodes.forEach(identifier4 -> {
-      List<VariableNode> foundDefinitionsForIdentifier4 = getIdentifierDefinitions(jsonParseNode, Collections.singletonList(identifier4));
+      List<VariableNode> foundDefinitionsForIdentifier4 =
+              VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, Collections.singletonList(identifier4));
 
       if (foundDefinitionsForIdentifier2.isEmpty() || foundDefinitionsForIdentifier4.isEmpty()) {
         return;
@@ -343,14 +322,18 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
   }
 
   private void semanticAnalysisForIdentifier3(JsonParseNode jsonParseNode, ProcessingContext ctx) {
-    List<VariableUsageNode> identifier2Nodes = getIdentifier(jsonParseNode, jsonParseNode.getIdentifier2());
-    if (identifier2Nodes.isEmpty()) return;
-    List<VariableNode> foundDefinitionsForIdentifier2 = getIdentifierDefinitions(jsonParseNode, identifier2Nodes);
+    List<VariableUsageNode> identifier2Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier2());
+    if (identifier2Nodes.isEmpty()) {
+      return;
+    }
+    List<VariableNode> foundDefinitionsForIdentifier2 =
+            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier2Nodes);
 
-    List<VariableUsageNode> identifier3Nodes = getIdentifier(jsonParseNode, jsonParseNode.getIdentifier3());
+    List<VariableUsageNode> identifier3Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier3());
     if (identifier3Nodes.isEmpty()) return;
     identifier3Nodes.forEach(identifier3 -> {
-      List<VariableNode> foundDefinitionsForIdentifier3 = getIdentifierDefinitions(jsonParseNode, Collections.singletonList(identifier3));
+      List<VariableNode> foundDefinitionsForIdentifier3 =
+              VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, Collections.singletonList(identifier3));
 
       if (foundDefinitionsForIdentifier3.isEmpty() || foundDefinitionsForIdentifier2.isEmpty())
         return;
@@ -505,16 +488,5 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
                       MessageTemplate.of("jsonParseProcess.identifier1.groupItemError"))
                   .build());
     }
-  }
-
-  private List<VariableNode> getIdentifierDefinitions(
-      JsonParseNode jsonParseNode, List<VariableUsageNode> identifier1Nodes) {
-    return jsonParseNode
-        .getProgram()
-        .map(
-            programNode ->
-                symbolAccumulatorService.getVariableDefinition(
-                    programNode, Collections.singletonList(identifier1Nodes.get(0))))
-        .orElseGet(ImmutableList::of);
   }
 }

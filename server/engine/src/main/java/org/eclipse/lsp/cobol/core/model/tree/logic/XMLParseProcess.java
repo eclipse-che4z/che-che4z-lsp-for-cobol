@@ -20,7 +20,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
 import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveOption;
@@ -111,12 +110,12 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
   private List<VariableNode> getVariableDefinition(
       XMLParseNode xmlParseNode, VariableNameAndLocality identifier) {
     if (Objects.nonNull(identifier)) {
-      Optional<VariableUsageNode> variableUsageNodeForIdentifier =
+      List<VariableUsageNode> variableUsageNodeForIdentifier =
           VariableUsageUtils.getVariableUsageNode(xmlParseNode, identifier);
-      if (!variableUsageNodeForIdentifier.isPresent()) {
+      if (variableUsageNodeForIdentifier.isEmpty()) {
         return Collections.emptyList();
       }
-      return getIdentifierDefinitions(xmlParseNode, variableUsageNodeForIdentifier.get());
+      return VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, xmlParseNode, variableUsageNodeForIdentifier);
     }
     return Collections.emptyList();
   }
@@ -272,14 +271,5 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
     return compilerDirectiveOption
         .map(CompilerDirectiveOption::getValue)
         .orElse(Collections.emptyList());
-  }
-
-  private List<VariableNode> getIdentifierDefinitions(Node node, VariableUsageNode identifier) {
-    return node.getProgram()
-        .map(
-            programNode ->
-                symbolAccumulatorService.getVariableDefinition(
-                    programNode, Collections.singletonList(identifier)))
-        .orElseGet(ImmutableList::of);
   }
 }
