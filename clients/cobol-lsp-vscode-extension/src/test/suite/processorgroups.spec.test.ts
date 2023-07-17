@@ -28,38 +28,34 @@ suite("Integration Test Suite: Processor Groups", function () {
     helper.TEST_TIMEOUT,
   );
 
-  // cobol-dialect-api (development) npm install && npm run compile
-  // daco-dialect-support (development) npm install && npm run package
-  // idms-dialect-support (development) npm install && npm run package
+  // cobol-dialect-api (development) npm ci && npm run compile
+  // daco-dialect-support (development) npm ci && npm run package
+  // idms-dialect-support (development) npm ci && npm run package
   // put server.jar, dialect-idms.jar and dialect-daco.jar into their server/jar folder
 
   test("TC355920: IDMS - processor group", async () => {
-    const extSrcPath = path.join("cobol-idms", "DACRFI11N.cbl");
+    const extSrcPath = path.join("cobol-idms", "DACRFIERR.cbl");
     await helper.showDocument(extSrcPath);
     const editor = helper.get_editor(extSrcPath);
     const waitResult = await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length == 1,
-      5000
+      () => vscode.languages.getDiagnostics(editor.document.uri).length == 1
     );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(waitResult, false);
-    assert.strictEqual(diagnostics.length, 0);
+    assert.strictEqual(diagnostics.length, 1);
     await helper.closeAllEditors();
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
   
   test("TC355921: DaCo - processor group", async () => {
-    const extSrcPath = path.join("cobol-daco", "DABPA11N.cbl");
+    const extSrcPath = path.join("cobol-daco", "DABPAERR.cbl");
     await helper.showDocument(extSrcPath);
     const editor = helper.get_editor(extSrcPath);
     const waitResult = await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length == 1,
-      5000
+      () => vscode.languages.getDiagnostics(editor.document.uri).length == 1
     );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(waitResult, false);
-    assert.strictEqual(diagnostics.length, 0);
+    assert.strictEqual(diagnostics.length, 1);
     await helper.closeAllEditors();
   })
     .timeout(helper.TEST_TIMEOUT)
