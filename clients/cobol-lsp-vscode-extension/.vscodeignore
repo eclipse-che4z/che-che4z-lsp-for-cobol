@@ -29,6 +29,7 @@
 !schema/pgm_conf.schema.json
 !schema/preprocessor_entry.schema.json
 !schema/proc_grps.schema.json
+!schema/compiler_options.schema.json
 # * bundled extension code
 !dist/extension.js
 !dist/extension.js.map
