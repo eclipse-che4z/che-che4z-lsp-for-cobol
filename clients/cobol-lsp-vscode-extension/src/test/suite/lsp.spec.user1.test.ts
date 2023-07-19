@@ -106,6 +106,8 @@ suite("Tests with USER1.cbl", function () {
       editor.document.uri,
       { tabSize: 4, insertSpaces: true },
     );
+    assert.strictEqual(result.length, 1);
+    
     helper.assertRangeIsEqual(
       result[0].range,
       new vscode.Range(pos(34, 57), pos(34, 65)),

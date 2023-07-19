@@ -1,0 +1,305 @@
+/*
+ * Copyright (c) 2023 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ *
+ */
+package org.eclipse.lsp.cobol.service;
+
+import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
+import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
+import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
+import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
+import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
+import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
+import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
+import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
+import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
+import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+
+/**
+ * Provides async document analysis functionality
+ */
+@Slf4j
+@Singleton
+class AnalysisService {
+  private static final String GIT_FS_URI = "gitfs:/";
+  private static final String GIT_URI = "git:/";
+  private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
+  private final Communications communications;
+  private final LanguageEngineFacade engine;
+  private final DataBusBroker dataBus;
+  private final ConfigurationService configurationService;
+  private final SyncProvider syncProvider;
+  private final CopybookIdentificationService copybookIdentificationService;
+  private final CopybookReferenceRepo copybookReferenceRepo;
+  private final CopybookService copybookService;
+  private final CountDownLatch waitConfig = new CountDownLatch(1);
+  private List<String> copybookExtensions;
+  private final Completions completions;
+  private final Occurrences occurrences;
+  private final Formations formations;
+  private final HoverProvider hoverProvider;
+
+  private final DocumentModelService documentService;
+
+  @Inject
+  AnalysisService(Communications communications,
+                  LanguageEngineFacade engine,
+                  DataBusBroker dataBus,
+                  ConfigurationService configurationService,
+                  SyncProvider syncProvider,
+                  @Named("combinedStrategy") CopybookIdentificationService copybookIdentificationService,
+                  CopybookReferenceRepo copybookReferenceRepo,
+                  CopybookService copybookService,
+                  Completions completions,
+                  Occurrences occurrences,
+                  Formations formations,
+                  HoverProvider hoverProvider,
+                  DocumentModelService documentService) {
+    this.communications = communications;
+    this.engine = engine;
+    this.dataBus = dataBus;
+    this.configurationService = configurationService;
+    this.syncProvider = syncProvider;
+    this.copybookIdentificationService = copybookIdentificationService;
+    this.copybookReferenceRepo = copybookReferenceRepo;
+    this.copybookService = copybookService;
+    this.completions = completions;
+    this.occurrences = occurrences;
+    this.formations = formations;
+    this.hoverProvider = hoverProvider;
+    this.documentService = documentService;
+  }
+
+  /**
+   * Check if given document is copybook or not
+   * @param uri - document uri
+   * @param text - document text
+   * @return true for copybook and false otherwise
+   */
+  @SneakyThrows
+  public boolean isCopybook(String uri, String text) {
+    waitConfig.await();
+    return copybookIdentificationService.isCopybook(uri, text, copybookExtensions);
+  }
+
+  /**
+   * Set extension config
+   * @param config - extension config
+   */
+  public void setExtensionConfig(List<String> config) {
+    this.copybookExtensions = Collections.unmodifiableList(config);
+    this.waitConfig.countDown();
+  }
+
+  public Either<List<CompletionItem>, CompletionList> findCompletion(String uri, CompletionParams params) {
+    return Either.forRight(completions.collectFor(documentService.get(uri), params));
+  }
+
+  public Either<List<? extends Location>, List<? extends LocationLink>> findDefinition(String uri, DefinitionParams params) {
+    List<Location> definitions =
+        documentService.isDocumentSynced(uri)
+            ? occurrences.findDefinitions(documentService.get(uri), params)
+            : Collections.emptyList();
+    return Either.forLeft(definitions);
+  }
+
+  public List<? extends Location> findReferences(String uri, ReferenceParams params) {
+    return documentService.isDocumentSynced(uri)
+        ? occurrences.findReferences(documentService.get(uri), params, params.getContext())
+        : Collections.emptyList();
+  }
+
+  public List<? extends DocumentHighlight> findHighlights(String uri, DocumentHighlightParams params) {
+    return documentService.isDocumentSynced(uri)
+        ? occurrences.findHighlights(
+        documentService.get(uri), params)
+        : Collections.emptyList();
+  }
+
+  public List<? extends TextEdit> findFormatting(String uri) {
+    return formations.format(documentService.get(uri));
+  }
+
+  public void analyzeDocument(String uri, String text) {
+    // git FS URIs are not currently supported
+    if (uri.startsWith(GIT_FS_URI) || uri.startsWith(GIT_URI)) {
+      LOG.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
+      return;
+    }
+    documentService.openDocument(uri, text);
+    if (isCopybook(uri, text)) {
+      communications.publishDiagnostics(documentService.getAllDiagnostic());
+    } else {
+      analyzeDocumentWithCopybooks(uri, text);
+    }
+  }
+
+  public void reanalyzeDocument(String uri, String text) {
+    // git FS URIs are not currently supported
+    if (uri.startsWith(GIT_FS_URI) || uri.startsWith(GIT_URI)) {
+      LOG.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
+      return;
+    }
+    documentService.updateDocument(uri, text);
+
+    if (isCopybook(uri, text)) {
+      reanalyseOpenedPrograms(uri, text);
+    } else {
+      analyzeDocumentWithCopybooks(uri, text);
+    }
+  }
+
+  public void stopAnalysis(String uri) {
+    CobolDocumentModel documentModel = documentService.get(uri);
+    documentService.closeDocument(uri);
+    communications.notifyProgressEnd(uri);
+    communications.publishDiagnostics(documentService.getAllDiagnostic());
+    if (documentModel != null && !isCopybook(uri, documentModel.getText())) {
+      documentService.removeDocument(uri);
+    }
+    syncProvider.remove(uri);
+  }
+
+  public List<Either<SymbolInformation, DocumentSymbol>> findDocumentSymbol(String uri) {
+    List<DocumentSymbol> symbols = documentService.get(uri).getOutlineResult();
+    try {
+      return createDocumentSymbols(symbols);
+    } finally {
+      communications.notifyProgressEnd(uri);
+    }
+  }
+
+  public Node retrieveAnalysis(String uri, String text) {
+    CobolDocumentModel documentModel = documentService.get(uri);
+
+    if (!documentModel.isDocumentSynced()) {
+      analyzeDocumentWithCopybooks(uri, text);
+    }
+    return documentService.get(uri).getAnalysisResult().getRootNode();
+  }
+
+  public Hover findHover(String uri, HoverParams params) {
+    return hoverProvider.getHover(documentService.get(uri), params);
+  }
+
+  public List<FoldingRange> findFoldingRange(String uri) {
+    List<DocumentSymbol> symbols = documentService.get(uri).getOutlineResult();
+    return DocumentServiceHelper.getFoldingRangeFromDocumentSymbol(symbols);
+  }
+
+  /**
+   * Asynchronously analyze document with copybooks
+   * @param uri - document uri
+   * @param text - document text
+   */
+  private void analyzeDocumentWithCopybooks(String uri, String text) {
+    try {
+      if (isCopybook(uri, text)) {
+        return;
+      }
+      communications.notifyProgressBegin(uri);
+      doAnalysis(uri, text);
+    } catch (Throwable th) {
+      LOG.error("Error while processing file: {}, {}", uri, th.getMessage());
+    } finally {
+      communications.notifyProgressEnd(uri);
+    }
+  }
+
+  private void notifyAnalysisFinished(
+      String uri, List<String> copybooks, CopybookProcessingMode copybookProcessingMode) {
+    dataBus.postData(
+        AnalysisFinishedEvent.builder()
+            .documentUri(uri)
+            .copybookUris(copybooks)
+            .copybookProcessingMode(copybookProcessingMode)
+            .build());
+  }
+
+  private void doAnalysis(String uri, String text) {
+    synchronized (syncProvider.getSync(uri)) {
+      try {
+        if (isCopybook(uri, text)) {
+          return;
+        }
+        CopybookProcessingMode processingMode =
+            CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.ENABLED);
+        AnalysisConfig config = configurationService.getConfig(uri, processingMode);
+        AnalysisResult result = engine.analyze(uri, text, config);
+        ThreadInterruptionUtil.checkThreadInterrupted();
+
+        documentService.processAnalysisResult(uri, result);
+        notifyAnalysisFinished(uri, DocumentServiceHelper.extractCopybookUris(result), processingMode);
+        communications.publishDiagnostics(documentService.getAllDiagnostic());
+      } catch (Exception e) {
+        communications.logGeneralMessage(MessageType.Error, createDescriptiveErrorMessage("analysis", uri));
+
+        LOG.error(createDescriptiveErrorMessage("analysis", uri), e);
+        throw e;
+      }
+    }
+  }
+
+  private void reanalyseOpenedPrograms(String uri, String text) {
+    copybookReferenceRepo
+        .getCopybookUsageReference(uri)
+        .forEach(
+            val -> {
+              CopybookModel copybookModel =
+                  new CopybookModel(
+                      val.getCopybookId(),
+                      val.getCopybookName(),
+                      uri,
+                      text);
+              this.copybookService.store(copybookModel, true);
+            });
+
+    documentService.getAllOpened()
+        .stream().filter(d -> !isCopybook(d.getUri(), d.getText()))
+        .forEach(doc -> analyzeDocumentWithCopybooks(doc.getUri(), doc.getText()));
+  }
+
+  private String createDescriptiveErrorMessage(String action, String uri) {
+    return format("An exception thrown while applying %s for %s:", action, uri);
+  }
+
+  private List<Either<SymbolInformation, DocumentSymbol>> createDocumentSymbols(List<DocumentSymbol> documentSymbols) {
+    return documentSymbols == null ? ImmutableList.of()
+        : documentSymbols.stream()
+        .map(Either::<SymbolInformation, DocumentSymbol>forRight)
+        .collect(toList());
+  }
+}

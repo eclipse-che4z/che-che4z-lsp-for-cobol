@@ -30,7 +30,7 @@ public enum SourceInfoLevels {
 
   private static final String COBOL_LANG_SUPPORT_LABEL = "COBOL Language Support";
 
-  private String label;
+  private final String label;
 
   public String getText() {
     return COBOL_LANG_SUPPORT_LABEL + " - " + label;
