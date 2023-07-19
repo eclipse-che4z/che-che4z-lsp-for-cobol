@@ -189,17 +189,6 @@ public class ServerCommunications implements Communications {
     getClient().unregisterCapability(unregistrationParams);
   }
 
-  /**
-   * logs a supplied message to the client with the supplied {@link MessageType}
-   *
-   * @param messageType {@link MessageType}
-   * @param message to be logged at client end.
-   */
-  @Override
-  public void logGeneralMessage(MessageType messageType, String message) {
-    runAsync(() -> logMessage(messageType, message));
-  }
-
   private void showMessage(MessageType type, String message) {
     getClient().showMessage(new MessageParams(type, clean(message)));
   }

@@ -361,7 +361,7 @@ To generate a troubleshooting log for the LSP server, specify a value for the pa
 
 These values are ordered from returning the least information ("ERROR"; errors only) to the most information ("ALL"; all details).
 
-Troubleshooting logs are stored in the subfolder **\LSPCobol\logs** within your user home directory.
+Server logs could be found under "COBOL Language Support" output terminal.
 
 ## Technical Assistance and Support for COBOL Language Support
 
