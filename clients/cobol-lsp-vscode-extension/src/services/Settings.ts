@@ -359,13 +359,11 @@ export class SettingsService {
       const pathList: string[] = vscode.workspace
         .getConfiguration(SETTINGS_CPY_SECTION)
         .get(`${dialectType.toLowerCase()}.${section}`);
-      if (pathList && pathList.length > 0) {
         return SettingsService.evaluateVariable(
           pathList,
           "fileBasenameNoExtension",
           programFile,
         );
-      }
     }
     const pathList: string[] = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
