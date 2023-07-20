@@ -87,6 +87,13 @@ public class TestXMLParseStatement {
           + "           {_VALIDATING WITH {$QUESTION}|3_}\n"
           + "           PROCESSING PROCEDURE {#XML-HANDLER}\n";
 
+  private static final String XMP_PARSE_STATEMENT_XMLSS =
+          "           XML PARSE {$XML-DOC} \n"
+                  + "           WITH ENCODING 1200\n"
+                  + "           RETURNING NATIONAL\n"
+                  + "           VALIDATING WITH {$QUESTION}\n"
+                  + "           PROCESSING PROCEDURE {#XML-HANDLER}\n";
+
   public static final String TEXT =
       XML_PARSE_STATEMENT_PRECESSED + XMP_PARSE_STATEMENT + XML_PARSE_SUCCESSOR;
 
@@ -179,7 +186,10 @@ public class TestXMLParseStatement {
   @Test
   void xmlParse_whenXmlssNotSet_provideHints() {
     UseCaseEngine.runTest(
-        XML_PARSE_STATEMENT_PRECESSED + XMP_PARSE_STATEMENT_NO_XMLSS + XML_PARSE_SUCCESSOR,
+        "     PROCESS XMLPARSE(COMPAT)\n"
+            + XML_PARSE_STATEMENT_PRECESSED
+            + XMP_PARSE_STATEMENT_NO_XMLSS
+            + XML_PARSE_SUCCESSOR,
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
@@ -200,6 +210,14 @@ public class TestXMLParseStatement {
                 "Validating phrase can be specified only when XMLPARSE(XMLSS) compiler option is in effect",
                 DiagnosticSeverity.Hint,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void xmlParse_whenCompilerOptionNotProvided_XMLPARSE_XMLSS_isConsideredDefault() {
+    UseCaseEngine.runTest(
+        XML_PARSE_STATEMENT_PRECESSED + XMP_PARSE_STATEMENT_XMLSS + XML_PARSE_SUCCESSOR,
+        ImmutableList.of(),
+        ImmutableMap.of());
   }
 
   @Test

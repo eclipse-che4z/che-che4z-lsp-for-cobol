@@ -42,7 +42,7 @@ public enum CompilerDirectiveName {
       } else if (isContains(directiveText, "QUALIFY(C_CHAR)") || isContains(directiveText, "QUA(C_CHAR)")) {
         return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("C_CHAR")));
       } else {
-        return Optional.empty();
+        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("COMPAT")));
       }
     }
   },
@@ -58,7 +58,7 @@ public enum CompilerDirectiveName {
       } else if (isContains(directiveText, "XMLPARSE(C_CHAR)") || isContains(directiveText, "XP(C_CHAR)")) {
         return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("C_CHAR")));
       } else {
-        return Optional.empty();
+        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("XMLSS")));
       }
     }
   };
