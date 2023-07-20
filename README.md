@@ -239,19 +239,78 @@ The Find All References and Go To Definition functionalities are extended to wor
 
 ## Processor Groups
 
-Use processor groups to link programs with specific dialects, SQL backend settings, and local folders containing copybooks. You define processor groups in a `proc_grps.json` file and associate them with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
+Use processor groups to link programs with specific dialects, SQL backend settings, copybook extensions, compiler options, and local folders containing copybooks. You define processor groups in a `proc_grps.json` file and associate processor groups with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
 
-In the `proc_grps.json` file: 
+The `proc_grps.json` file is formatted as an array of JSON elements, with one JSON per processor group. Each processor group can contain the following elements:
 
-- Specify your copybook folders in a `libs` array.
-- Specify dialects within a `preprocessor` JSON element. This element can contain a `libs` array which specifies folders that contain copybooks which use that dialect. 
-- Specify SQL backend settings within a separate `preprocessor` JSON element with the following parameters: 
-   - `name` (string)  
-   Specify **SQL** 
-   - `target-sql-backend` (string)  
-   Specify either **DB2_SERVER** or **DATACOM_SERVER**  
+- **"name":** (string)  
+    - Specify a name for the processor group.
+- (Optional) **"libs":** (array)  
+    - Specify libraries that contain copybooks as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the local copybook libraries that you specify in the extension settings.
+- (Optional) **"copybook-extensions":** (array)  
+    - Specify copybook extensions that you use for the programs linked with this processor groups. These copybook extensions take priority over extensions that you specify in the extension settings.
+- (Optional) **"compiler-options":** (array)  
+    - Specify compiler directives that you want to apply to the programs linked with this processor group. Currently the following directives are supported:
+        - QUALIFY(*EXTEND|COMPAT*)
+		- XMLPARSE(*XMLSS|COMPAT*)
+	- For more information on COBOL compiler options, see the [IBM Enterprise COBOL documentation](https://www.ibm.com/docs/en/cobol-zos/6.3?topic=guide-enterprise-cobol-compiler-options).
+- (Optional) **"preprocessor":** (array)
+	- Specify dialect and SQL preprocessors that you want to apply to the programs linked with this processor group. See the [Preprocessors](#preprocessors) section below for further information.
+
+### Preprocessors
+
+Specify preprocessors to enable specific dialects and SQL backend settings for the programs linked to a processor group. You can also specify libraries that contain copybooks that use a specific dialect.
+
+Each preprocessor is formatted as a JSON element containing a name, which identifies the type of preprocessor, and other parameters which specify the configuration. As the `preprocessor` element of the `proc_grps.json` file is an array, you can specify more than one preprocessor per processor group.
+
+#### SQL Backend Preprocessor
+
+The SQL backend preprocessor is used to override the SQL server that you specify in the extension settings. This preprocessor has the following parameters:
+
+- **"name":** (string)
+    - Specify **SQL**
+- **"target-sql-backend":** (string)
+    - Specify either **DB2_SERVER** or **DATACOM_SERVER**
+	
+#### Dialect Preprocessor
+
+A dialect preprocessor can be used to enable a COBOL dialect for a particular processor group and specify libraries which contain copybooks written in that dialect. Dialects that you enable in processor groups take priority over those that you specify in the extension settings. A dialect preprocessor has the following parameters:
+
+- **"name":** (string)
+    - Specify the name of a dialect.
+- (Optional) **"libs":** (array)
+    - Specify libraries that contain copybooks written in the specified dialect as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the local copybook libraries that you specify in the extension settings.
+ 
+### Program configuration file
+
+The program configuration file, `pgm_conf.json`, links programs to processor groups. The program configuration file has the following format:
+
+```
+{
+    "pgms": [
+        { "program": "PROGRAM1", "pgroup": "GROUP1" },
+        { "program": "PROGRAM2", "pgroup": "GROUP2" },
+    ]
+}
+```
+
+Each element contains the following parameters:
+
+- **"program":** (string)
+    - Specify a program name. This field can be wildcarded.
+- **"pgroup":** (string)
+    - Specify the name of a procecssor group that is defined in `proc_grps.json`.
    
-Use the following format:
+### Example
+
+Using the example `pgm_conf.json` file above, the following `proc_grps.json` example enables the following:
+
+- Copybooks from libraries LIB1 and LIB2, with the extensions ".cpy" and ".copy", are used with PROGRAM1.
+- The QUALIFY(EXTEND) and XMLPARSE(COMPAT) compiler options are enabled for PROGRAM1.
+- The IDMS dialect is enabled for PROGRAM2, and IDMS copybooks from LIB3 and LIB4 are used with PROGRAM2.
+- The DB2 SQL server is enabled for PROGRAM2. 
+- Non-IDMS copybooks from libraries LIB5 and LIB6 are used with PROGRAM2. 
+
 ```
 {
     "pgroups": [
@@ -260,6 +319,12 @@ Use the following format:
             "libs": [
                 "LIB1", "LIB2"
             ]
+			"copybook-extensions": [
+			    ".cpy", ".copy"
+		    ]
+			"compiler-options": [
+			    "QUALIFY(EXTEND)", "XMLPARSE(COMPAT)"
+			]
         },
         {
             "name": "GROUP2",
@@ -282,22 +347,6 @@ Use the following format:
     ]
 }
 ```
-
-The `pgm_conf.json` file has the following format:
-```
-{
-    "pgms": [
-        { "program": "PROGRAM1", "pgroup": "GROUP1" },
-        { "program": "PROGRAM2", "pgroup": "GROUP2" },
-    ]
-}
-```
-
-The program name can be wildcarded.
-
-The two examples above use copybooks from libraries LIB1 and LIB2 for PROGRAM1, and copybooks from libraries LIB3, LIB4, LIB5 and LIB6 for PROGRAM2. The processor groups file also enables the DB2 SQL server for PROGRAM2, and enables the IDMS dialect for LIB3 and LIB4 for PROGRAM2.
-
-Specify libraries as absolute or relative local paths in the `libs` array. These libraries take priority over the libraries that you specify in the extension settings. Dialects that you specify in processor groups also take priority over those in the extension settings.
 
 ## Troubleshooting
 
