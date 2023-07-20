@@ -318,13 +318,13 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
             "name": "GROUP1",
             "libs": [
                 "LIB1", "LIB2"
+            ],
+            "copybook-extensions": [
+                ".cpy", ".copy"
+            ],
+            "compiler-options": [
+                "QUALIFY(EXTEND)", "XMLPARSE(COMPAT)"
             ]
-			"copybook-extensions": [
-			    ".cpy", ".copy"
-		    ]
-			"compiler-options": [
-			    "QUALIFY(EXTEND)", "XMLPARSE(COMPAT)"
-			]
         },
         {
             "name": "GROUP2",
@@ -332,8 +332,8 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
                 {
                     "name": "IDMS",
                     "libs": [
-                "LIB3", "LIB4"
-            ]
+                        "LIB3", "LIB4"
+                        ]
                 }, 
                 {
                     "name": "SQL",
@@ -341,8 +341,8 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
                 }
             ],
             "libs": [
-            "LIB5", "LIB6"
-            ]
+                "LIB5", "LIB6"
+                ]
         }
     ]
 }
