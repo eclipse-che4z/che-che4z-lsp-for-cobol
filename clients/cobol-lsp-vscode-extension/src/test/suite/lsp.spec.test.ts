@@ -367,4 +367,27 @@ suite("Integration Test Suite", function () {
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
+
+  test("TC314771: Support INCLUDE in EXEC SQL to build extended document", async () => {
+    await helper.showDocument("ADSORT.cbl");
+    let editor = helper.get_editor("ADSORT.cbl");
+    await helper.deleteLine(editor, 58);
+    await helper.insertString(
+      editor, pos(36, 11),
+      "           EXEC SQL SQL-STATEMENT END-EXEC."
+    );
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
+    );
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 1);
+    helper.assertRangeIsEqual( diagnostics[0].range, range(pos(36, 20), pos(36, 23)));
+    assert.ok(
+      diagnostics[0].message.includes(
+        "Syntax error on 'SQL' expected {ALLOCATE, ALTER, ASSOCIATE, CALL, CLOSE"
+      )
+    );
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
 });
