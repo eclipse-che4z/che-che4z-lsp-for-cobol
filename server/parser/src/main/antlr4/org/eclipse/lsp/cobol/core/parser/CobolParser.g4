@@ -683,7 +683,7 @@ valuePair
    ;
 
 dataRecordsClause
-   : DATA (RECORD IS? | RECORDS ARE?) qualifiedDataName+
+   : DATA (RECORD | RECORDS) (IS | ARE)? qualifiedDataName+
    ;
 
 linageClause
