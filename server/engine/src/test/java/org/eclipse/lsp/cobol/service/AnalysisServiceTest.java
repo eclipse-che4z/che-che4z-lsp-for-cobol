@@ -210,7 +210,7 @@ class AnalysisServiceTest {
 
     service.reanalyzeDocument(uri, text);
     verify(documentService, times(1)).updateDocument(uri, text);
-    verify(communications, times(0)).publishDiagnostics(documentService.getAllDiagnostic());
+    verify(communications, times(0)).publishDiagnostics(documentService.getOpenedDiagnostic());
     verify(communications, times(0)).notifyProgressBegin(uri);
     verify(engine, times(0)).analyze(any(), any(), any());
   }

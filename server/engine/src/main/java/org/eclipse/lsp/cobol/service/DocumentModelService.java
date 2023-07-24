@@ -132,6 +132,18 @@ class DocumentModelService {
    * and a value is a list of diagnostics for this document
    */
   @Synchronized
+  public Map<String, List<Diagnostic>> getOpenedDiagnostic() {
+    return docs.values().stream()
+        .collect(Collectors.toMap(CobolDocumentModel::getUri, d -> {
+          List<Diagnostic> diagnostics = diagnosticRepo.get(d.getUri());
+          if (!d.isOpened() || diagnostics == null) {
+            return ImmutableList.of();
+          }
+          return diagnostics;
+        }));
+  }
+
+  @Synchronized
   public Map<String, List<Diagnostic>> getAllDiagnostic() {
     return docs.values().stream()
         .collect(Collectors.toMap(CobolDocumentModel::getUri, d -> {

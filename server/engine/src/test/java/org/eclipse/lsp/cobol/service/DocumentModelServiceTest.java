@@ -88,7 +88,7 @@ class DocumentModelServiceTest {
     service.processAnalysisResult(uri2, createAnalysisResult(uri2));
 
     service.closeDocument(uri1);
-    Map<String, List<Diagnostic>> diagnostics = service.getAllDiagnostic();
+    Map<String, List<Diagnostic>> diagnostics = service.getOpenedDiagnostic();
 
     assertEquals(2, diagnostics.size());
     assertEquals(0, diagnostics.get(uri1).size());
@@ -101,14 +101,14 @@ class DocumentModelServiceTest {
     service.openDocument(uri, UUID.randomUUID().toString());
     service.processAnalysisResult(uri, createAnalysisResult(uri));
 
-    Map<String, List<Diagnostic>> diagnostics = service.getAllDiagnostic();
+    Map<String, List<Diagnostic>> diagnostics = service.getOpenedDiagnostic();
     assertEquals(1, diagnostics.get(uri).size());
 
     CobolDocumentModel documentModel = service.get(uri);
     assertNotNull(documentModel);
 
     service.updateDocument(uri, UUID.randomUUID().toString());
-    diagnostics = service.getAllDiagnostic();
+    diagnostics = service.getOpenedDiagnostic();
     assertEquals(0, diagnostics.get(uri).size());
 
     documentModel = service.get(uri);

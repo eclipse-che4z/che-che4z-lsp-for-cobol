@@ -41,6 +41,8 @@ import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -160,9 +162,14 @@ class AnalysisService {
       return;
     }
     documentService.openDocument(uri, text);
+    communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocument] Document " + uri + " opened");
+
     if (isCopybook(uri, text)) {
-      communications.publishDiagnostics(documentService.getAllDiagnostic());
+      communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocument] Document " + uri + " treated as a copy");
+      communications.publishDiagnostics(documentService.getOpenedDiagnostic());
+      communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocument] Publish diagnostics: " + documentService.getOpenedDiagnostic());
     } else {
+      communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocument] Document " + uri + " treated as a program, start analyzing");
       analyzeDocumentWithCopybooks(uri, text);
     }
   }
@@ -174,10 +181,13 @@ class AnalysisService {
       return;
     }
     documentService.updateDocument(uri, text);
+    communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " updated");
 
     if (isCopybook(uri, text)) {
+      communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " treated as a copy");
       reanalyseOpenedPrograms(uri, text);
     } else {
+      communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " treated as a program");
       analyzeDocumentWithCopybooks(uri, text);
     }
   }
@@ -185,8 +195,11 @@ class AnalysisService {
   public void stopAnalysis(String uri) {
     CobolDocumentModel documentModel = documentService.get(uri);
     documentService.closeDocument(uri);
+    communications.logGeneralMessage(MessageType.Log, now() + "[stopAnalysis] Document " + uri + " closed");
+
     communications.notifyProgressEnd(uri);
-    communications.publishDiagnostics(documentService.getAllDiagnostic());
+    communications.logGeneralMessage(MessageType.Log, now() + "[stopAnalysis] Document " + uri + " publish diagnostic: " + documentService.getOpenedDiagnostic());
+    communications.publishDiagnostics(documentService.getOpenedDiagnostic());
     if (documentModel != null && !isCopybook(uri, documentModel.getText())) {
       documentService.removeDocument(uri);
     }
@@ -204,6 +217,7 @@ class AnalysisService {
 
   public Node retrieveAnalysis(String uri, String text) {
     CobolDocumentModel documentModel = documentService.get(uri);
+    communications.logGeneralMessage(MessageType.Log, now() + "[retrieveAnalysis] Document " + uri);
 
     if (!documentModel.isDocumentSynced()) {
       analyzeDocumentWithCopybooks(uri, text);
@@ -230,6 +244,7 @@ class AnalysisService {
       if (isCopybook(uri, text)) {
         return;
       }
+      communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocumentWithCopybooks] Start analysis: " + uri);
       communications.notifyProgressBegin(uri);
       doAnalysis(uri, text);
     } catch (Throwable th) {
@@ -263,7 +278,10 @@ class AnalysisService {
 
         documentService.processAnalysisResult(uri, result);
         notifyAnalysisFinished(uri, DocumentServiceHelper.extractCopybookUris(result), processingMode);
-        communications.publishDiagnostics(documentService.getAllDiagnostic());
+
+        communications.logGeneralMessage(MessageType.Log, now() + "[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
+        communications.publishDiagnostics(documentService.getOpenedDiagnostic());
+        communications.logGeneralMessage(MessageType.Log, now() + "[doAnalysis] Document " + uri + " diagnostic published: " + documentService.getOpenedDiagnostic());
       } catch (Exception e) {
         communications.logGeneralMessage(MessageType.Error, createDescriptiveErrorMessage("analysis", uri));
 
@@ -302,4 +320,11 @@ class AnalysisService {
         .map(Either::<SymbolInformation, DocumentSymbol>forRight)
         .collect(toList());
   }
+
+  private String now() {
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    LocalDateTime now = LocalDateTime.now();
+    return dtf.format(now) + " ";
+  }
+
 }
