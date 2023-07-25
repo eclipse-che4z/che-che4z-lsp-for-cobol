@@ -350,7 +350,7 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
 
 ## Troubleshooting
 
-To generate a troubleshooting log for the LSP server, specify a value for the parameter **cobol-lsp.logging.level.root** in the extension settings. Specify one of the following values:
+To enable troubleshooting logs for the LSP server, specify a value for the parameter **cobol-lsp.logging.level.root** in the extension settings. Specify one of the following values:
 
 * ERROR
 * WARN
@@ -361,7 +361,7 @@ To generate a troubleshooting log for the LSP server, specify a value for the pa
 
 These values are ordered from returning the least information ("ERROR"; errors only) to the most information ("ALL"; all details).
 
-Server logs could be found under "COBOL Language Support" output terminal.
+To view troubleshooting logs, open the output panel and select **COBOL Language Support** from the drop-down menu.
 
 ## Technical Assistance and Support for COBOL Language Support
 
