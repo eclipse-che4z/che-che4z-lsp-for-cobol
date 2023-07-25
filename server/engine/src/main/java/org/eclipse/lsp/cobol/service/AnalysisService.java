@@ -185,7 +185,8 @@ class AnalysisService {
 
     if (isCopybook(uri, text)) {
       communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " treated as a copy");
-      reanalyseOpenedPrograms(uri, text);
+      updateCopybook(uri, text);
+      reanalyseOpenedPrograms();
     } else {
       communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " treated as a program");
       analyzeDocumentWithCopybooks(uri, text);
@@ -291,7 +292,7 @@ class AnalysisService {
     }
   }
 
-  private void reanalyseOpenedPrograms(String uri, String text) {
+  private void updateCopybook(String uri, String text) {
     copybookReferenceRepo
         .getCopybookUsageReference(uri)
         .forEach(
@@ -304,7 +305,9 @@ class AnalysisService {
                       text);
               this.copybookService.store(copybookModel, true);
             });
+  }
 
+  public void reanalyseOpenedPrograms() {
     documentService.getAllOpened()
         .stream().filter(d -> !isCopybook(d.getUri(), d.getText()))
         .forEach(doc -> analyzeDocumentWithCopybooks(doc.getUri(), doc.getText()));

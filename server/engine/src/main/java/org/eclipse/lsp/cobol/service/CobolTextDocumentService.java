@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.jrpc.ExtendedApi;
@@ -222,6 +224,20 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
    */
   public void notifyExtensionConfig(List<String> config) {
     analysisService.setExtensionConfig(config);
+  }
+
+  /**
+   * Handle RunAnalysisEvent from the DataBus.
+   *
+   * @param event a RunAnalysisEvent
+   */
+  @Subscribe
+  public void onRunAnalysisEventCallback(@NonNull RunAnalysisEvent event) {
+    if (disposableLSPStateService.isServerShutdown()) return;
+    taskService.runTask(() -> {
+      analysisService.reanalyseOpenedPrograms();
+      return null;
+    });
   }
 
   private String createDescriptiveErrorMessage(String action, String uri) {

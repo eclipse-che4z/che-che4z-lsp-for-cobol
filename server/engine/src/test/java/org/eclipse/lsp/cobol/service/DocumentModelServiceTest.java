@@ -78,7 +78,7 @@ class DocumentModelServiceTest {
   }
 
   @Test
-  void testGetAllDiagnostic() {
+  void testGetOpenedDiagnostic() {
     String uri1 = UUID.randomUUID().toString();
     String uri2 = UUID.randomUUID().toString();
     service.openDocument(uri1, UUID.randomUUID().toString());
