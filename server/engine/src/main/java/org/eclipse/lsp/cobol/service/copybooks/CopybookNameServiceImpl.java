@@ -85,7 +85,6 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   @Override
   public CompletableFuture<List<String>> copybookLocalFolders(String documentUri) {
     List<CompletableFuture<List<String>>> copybookLocalFolders = new ArrayList<>();
-
     copybookLocalFolders.add(
             settingsService.fetchTextConfigurationWithScope(documentUri, CPY_LOCAL_PATHS.label));
     return settingsService.fetchTextConfigurationWithScope(documentUri, DIALECTS.label)

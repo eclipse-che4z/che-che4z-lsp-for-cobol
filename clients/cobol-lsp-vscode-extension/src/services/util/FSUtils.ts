@@ -20,6 +20,7 @@ import * as urlUtil from "url";
 import { SettingsUtils } from "./SettingsUtils";
 import { Uri } from "vscode";
 import * as vscode from "vscode";
+import { getChannel } from "../../extension";
 
 /**
  * This method is responsible to return a valid URI without extension if the extension is not provided or an URI
@@ -89,6 +90,10 @@ export function searchCopybookInWorkspace(
   copybookFolders: string[],
   extensions: string[],
 ): string | undefined {
+  getChannel().appendLine(
+    "Search copybook using folders: " + copybookFolders.toString(),
+  );
+
   for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
     const workspaceFolder = cleanWorkspaceFolder(workspaceFolderPath);
     for (const p of copybookFolders) {
@@ -116,8 +121,7 @@ export function cleanWorkspaceFolder(workspaceFolderPath: string) {
 }
 
 export function normalizePath(folder: string): string {
-  return vscode.Uri.parse(path.join("file://" + cleanWorkspaceFolder(folder)))
-    .fsPath;
+  return vscode.Uri.file(folder).fsPath;
 }
 
 function globSearch(

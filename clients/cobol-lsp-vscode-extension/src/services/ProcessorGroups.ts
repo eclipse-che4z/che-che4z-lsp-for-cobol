@@ -23,6 +23,7 @@ import {
   cleanWorkspaceFolder,
   normalizePath,
 } from "./util/FSUtils";
+import { getChannel } from "../extension";
 
 const PROCESSOR_GROUP_FOLDER = ".cobolplugin";
 const PROCESSOR_GROUP_PGM = "pgm_conf.json";
@@ -46,7 +47,9 @@ export function loadProcessorGroupCopybookPathsConfig(
   configObject: string[],
 ): string[] {
   const config = [
-    ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]),
+    ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]).map(
+      (s) => normalizePath(s),
+    ),
     ...configObject,
   ];
   return SettingsUtils.getWorkspaceFoldersPath(true)
