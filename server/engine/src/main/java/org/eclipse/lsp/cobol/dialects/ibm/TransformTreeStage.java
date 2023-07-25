@@ -197,6 +197,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulatorService));
     ctx.register(v, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
     ctx.register(v, FileOperationStatementNode.class, new FileOperationProcess());
+    ctx.register(v, XmlGenerateNode.class, new XmlGenerateProcess(symbolAccumulatorService));
 
     // Implicit Dialects
     dialectService.getActiveImplicitDialects(analysisConfig)
