@@ -43,5 +43,6 @@ public class TestAllocateStatement {
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+
   }
 }
