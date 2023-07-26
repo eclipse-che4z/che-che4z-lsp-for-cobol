@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.common.model.Describable;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.MarkedString;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
@@ -42,7 +43,7 @@ public class VariableHover implements HoverProvider {
         .flatMap(
             root ->
                 RangeUtils.findNodeByPosition(
-                    root, position.getTextDocument().getUri(), position.getPosition()))
+                    root, UriHelper.decode(position.getTextDocument().getUri()), position.getPosition()))
         .filter(Describable.class::isInstance)
         .map(Describable.class::cast)
         .map(VariableHover::createHoverInfo)

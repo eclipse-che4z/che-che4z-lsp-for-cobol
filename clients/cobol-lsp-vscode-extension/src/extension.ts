@@ -58,6 +58,10 @@ function initialize() {
   return { copyBooksDownloader, configurationWatcher };
 }
 
+export function getChannel(): vscode.OutputChannel {
+  return outputChannel;
+}
+
 export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<__ExtensionApi & __AnalysisApi> {

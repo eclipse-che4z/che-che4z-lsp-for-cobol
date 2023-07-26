@@ -75,7 +75,8 @@ class TestDefinitionOnLongCopybooks {
     when(ctx.getDefinitions()).thenReturn(Collections.singletonList(expectedDef));
 
     try (MockedStatic mocked = mockStatic(SymbolsRepository.class)) {
-      mocked.when(() -> SymbolsRepository.findElementByPosition(eq(document), eq(position))).thenReturn(Optional.of(ctx));
+      mocked.when(() -> SymbolsRepository.findElementByPosition(eq(DOCUMENT_URI), eq(document.getAnalysisResult()),
+          eq(position.getPosition()))).thenReturn(Optional.of(ctx));
       List<Location> definitions = new ElementOccurrences().findDefinitions(document, position);
 
       assertEquals(1, definitions.size());

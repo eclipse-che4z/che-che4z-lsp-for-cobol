@@ -19,6 +19,8 @@ import { globSync, hasMagic } from "glob";
 import * as urlUtil from "url";
 import { SettingsUtils } from "./SettingsUtils";
 import { Uri } from "vscode";
+import * as vscode from "vscode";
+import { getChannel } from "../../extension";
 
 /**
  * This method is responsible to return a valid URI without extension if the extension is not provided or an URI
@@ -62,7 +64,7 @@ export function getURIFrom(
 export function getURIFromResource(resource: string): urlUtil.URL[] {
   const uris: urlUtil.URL[] = [];
   for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
-    const workspaceFolder = workspaceFolderPath.replace(/\/(.*:)/, "$1");
+    const workspaceFolder = cleanWorkspaceFolder(workspaceFolderPath);
     const uri = isAbsolute(resource)
       ? urlUtil.pathToFileURL(resource)
       : new urlUtil.URL(
@@ -88,6 +90,10 @@ export function searchCopybookInWorkspace(
   copybookFolders: string[],
   extensions: string[],
 ): string | undefined {
+  getChannel().appendLine(
+    "Search copybook using folders: " + copybookFolders.toString(),
+  );
+
   for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
     const workspaceFolder = cleanWorkspaceFolder(workspaceFolderPath);
     for (const p of copybookFolders) {
@@ -112,6 +118,10 @@ export const backwardSlashRegex = new RegExp("\\\\", "g");
 
 export function cleanWorkspaceFolder(workspaceFolderPath: string) {
   return workspaceFolderPath.replace(/\/(.*:)/, "$1");
+}
+
+export function normalizePath(folder: string): string {
+  return vscode.Uri.file(folder).fsPath;
 }
 
 function globSearch(

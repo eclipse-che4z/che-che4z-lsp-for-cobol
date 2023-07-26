@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Broadcom.
+ * Copyright (c) 2023 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,30 +12,28 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service.copybooks;
+package org.eclipse.lsp.cobol.service;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import org.eclipse.lsp.cobol.common.copybook.CopybookId;
-import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import lombok.NonNull;
 
-import java.util.concurrent.Callable;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Implements copybook cache functionality
+ * Document content cache organized by document uri
  */
 @Singleton
-public class CopybookCache {
-
-  private final Cache<CopybookId, CopybookModel> cache;
+public class DocumentContentCache {
+  private final Cache<String, Optional<String>> cache;
 
   @Inject
-  public CopybookCache(
+  public DocumentContentCache(
       @Named("CACHE-MAX-SIZE") int cacheSize,
       @Named("CACHE-DURATION") int duration,
       @Named("CACHE-TIME-UNIT") String timeUnitName) {
@@ -47,28 +45,32 @@ public class CopybookCache {
   }
 
   /**
-   * Invalidates copybook cache
+   * Stores document content by uri
+   * @param uri - uri of the document
+   * @param text - text of the document
    */
-  public void invalidateAll() {
-    cache.invalidateAll();
+  public void store(String uri, @NonNull String text) {
+    cache.put(uri, Optional.of(text));
   }
 
   /**
-   * Gets copybook model from cache
-   * @param copybookId copybook name
-   * @param callable function to call if copybook does not exist
-   * @return a copybook model
-   * @throws ExecutionException with error message
+   * Returns a document content by uri
+   * @param uri - uri of the document
+   * @return the text of a document
    */
-  public CopybookModel get(CopybookId copybookId, Callable<CopybookModel> callable) throws ExecutionException {
-    return cache.get(copybookId, callable);
+  public Optional<String> get(String uri) {
+    try {
+      return cache.get(uri, Optional::empty);
+    } catch (ExecutionException e) {
+      return Optional.empty();
+    }
   }
 
   /**
-   * Store copybook model to cache
-   * @param copybookModel to store
+   * Invalidates document content
+   * @param uri - uri of the document
    */
-  public void store(CopybookModel copybookModel) {
-    cache.put(copybookModel.getCopybookId(), copybookModel);
+  public void invalidate(String uri) {
+    cache.invalidate(uri);
   }
 }
