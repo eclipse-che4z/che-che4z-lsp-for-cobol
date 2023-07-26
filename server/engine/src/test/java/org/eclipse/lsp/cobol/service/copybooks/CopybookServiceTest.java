@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.service.DocumentContentCache;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -79,6 +80,7 @@ class CopybookServiceTest {
   private final TextPreprocessor preprocessor = mock(TextPreprocessor.class);
   private final Path cpyPath = mock(Path.class);
   private final Path parentPath = mock(Path.class);
+  private final DocumentContentCache documentCache = mock(DocumentContentCache.class);
   private CopybookConfig cpyConfig;
 
   @BeforeEach
@@ -441,7 +443,7 @@ class CopybookServiceTest {
   private CopybookServiceImpl createCopybookService() {
     ClientProvider provider = new ClientProvider();
     provider.setClient(client);
-    return new CopybookServiceImpl(broker, provider, files, preprocessor, new CopybookCache(3, 3, "HOURS"), copybookReferenceRepo);
+    return new CopybookServiceImpl(broker, provider, files, preprocessor, new CopybookCache(3, 3, "HOURS"), copybookReferenceRepo, documentCache);
   }
 
   private CopybookName createCopybook(String displayName) {

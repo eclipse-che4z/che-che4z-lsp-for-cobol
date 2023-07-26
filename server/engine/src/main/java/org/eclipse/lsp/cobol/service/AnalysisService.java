@@ -76,6 +76,8 @@ class AnalysisService {
 
   private final DocumentModelService documentService;
 
+  private final DocumentContentCache contentCache;
+
   @Inject
   AnalysisService(Communications communications,
                   LanguageEngineFacade engine,
@@ -89,7 +91,8 @@ class AnalysisService {
                   Occurrences occurrences,
                   Formations formations,
                   HoverProvider hoverProvider,
-                  DocumentModelService documentService) {
+                  DocumentModelService documentService,
+                  DocumentContentCache contentCache) {
     this.communications = communications;
     this.engine = engine;
     this.dataBus = dataBus;
@@ -103,6 +106,7 @@ class AnalysisService {
     this.formations = formations;
     this.hoverProvider = hoverProvider;
     this.documentService = documentService;
+    this.contentCache = contentCache;
   }
 
   /**
@@ -161,6 +165,7 @@ class AnalysisService {
       LOG.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
       return;
     }
+    contentCache.store(uri, text);
     documentService.openDocument(uri, text);
     communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocument] Document " + uri + " opened");
 
@@ -180,6 +185,7 @@ class AnalysisService {
       LOG.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
       return;
     }
+    contentCache.store(uri, text);
     documentService.updateDocument(uri, text);
     communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " updated");
 
@@ -195,6 +201,8 @@ class AnalysisService {
 
   public void stopAnalysis(String uri) {
     CobolDocumentModel documentModel = documentService.get(uri);
+
+    contentCache.invalidate(uri);
     documentService.closeDocument(uri);
     communications.logGeneralMessage(MessageType.Log, now() + "[stopAnalysis] Document " + uri + " closed");
 

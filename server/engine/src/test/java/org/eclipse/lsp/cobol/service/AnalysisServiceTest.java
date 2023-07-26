@@ -61,18 +61,19 @@ class AnalysisServiceTest {
   @Mock private Formations formations;
   @Mock private HoverProvider hoverProvider;
   @Mock private DocumentModelService documentService;
+  @Mock private DocumentContentCache contentCache;
 
   @BeforeEach
   void init() {
     service = new AnalysisService(communications, engine, dataBus, configurationService, syncProvider, copybookIdentificationService,
-        copybookReferenceRepo, copybookService, completions, occurrences, formations, hoverProvider, documentService);
+        copybookReferenceRepo, copybookService, completions, occurrences, formations, hoverProvider, documentService, contentCache);
     service.setExtensionConfig(ImmutableList.of());
   }
 
   @Test
   void testIsCopybook() throws InterruptedException {
     service = new AnalysisService(communications, engine, dataBus, configurationService, syncProvider, copybookIdentificationService,
-        copybookReferenceRepo, copybookService, completions, occurrences, formations, hoverProvider, documentService);
+        copybookReferenceRepo, copybookService, completions, occurrences, formations, hoverProvider, documentService, contentCache);
 
     CompletableFuture.supplyAsync(() -> service.isCopybook("", ""));
 
