@@ -87,6 +87,7 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
     if (context == null) return;
     if (!features.contains(EmbeddedLanguage.CICS)) return;
 
+    errorListener.getErrors().clear();
     CommonTokenStream tokens = applyCicsLexer(context);
     CICSParser parser = createCicsParser(tokens);
 
@@ -110,6 +111,7 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
       ExecSqlStatementContext context, Function<Db2SqlParser, ParserRuleContext> grammarStartRule) {
     if (!features.contains(EmbeddedLanguage.SQL)) return;
 
+    errorListener.getErrors().clear();
     SqlCodeContext sqlCode = context.sqlCode();
     if (sqlCode == null) return;
     CommonTokenStream tokens = applyDb2Lexer(sqlCode);
