@@ -536,9 +536,16 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitStatement(StatementContext ctx) {
-    areaBWarning(ctx);
+    if (!isSqlStatement(ctx)) {
+      areaBWarning(ctx);
+    }
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
+  }
+
+  private boolean isSqlStatement(StatementContext ctx) {
+    return Objects.nonNull(ctx.execSqlStatementInProcedureDivision())
+            || Objects.nonNull(ctx.execSqlImsStatement());
   }
 
   @Override
@@ -549,7 +556,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitExecSqlStatement(ExecSqlStatementContext ctx) {
-    areaBWarning(ctx);
     return Collections.emptyList();
   }
 
