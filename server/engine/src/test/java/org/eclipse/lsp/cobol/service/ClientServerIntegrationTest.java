@@ -99,7 +99,6 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
 
     stateService.shutdown();
     ((CobolTextDocumentService) service).notifyExtensionConfig(ImmutableList.of());
-    ((CobolTextDocumentService) service).setDisposableLSPStateService(stateService);
     assertEquals(0, stateService.getExitCode());
 
     CodeActionParams params =

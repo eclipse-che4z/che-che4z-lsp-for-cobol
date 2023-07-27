@@ -1,7 +1,0 @@
-{
-    '**/*.+(js|ts)': [
-      'eslint --no-ignore --color',
-      'prettier --write',
-      'git add',
-    ],
-}

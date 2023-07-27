@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.service.delegates.actions;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
+import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
@@ -67,7 +68,7 @@ public class FindCopybookCommand implements CodeActionProvider {
     return new Command(
         TITLE,
             ErrorCodes.MISSING_COPYBOOK.getLabel(),
-        asList(retrieveCopybookName(it), params.getTextDocument().getUri()));
+        asList(retrieveCopybookName(it), UriHelper.decode(params.getTextDocument().getUri())));
   }
 
   @NonNull

@@ -31,6 +31,7 @@ import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -89,10 +90,10 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
     CommonTokenStream tokens = applyCicsLexer(context);
     CICSParser parser = createCicsParser(tokens);
 
-    Position position = createPosition(context.getStart());
+    Position position = getOriginalPosition(context);
 
     ParserRuleContext tree = parser.allCicsRules();
-    ParseTreeVisitor<List<Node>> visitor = instanceVisitor(position, EmbeddedLanguage.CICS);
+    ParseTreeVisitor<List<Node>> visitor = instanceVisitor(createPosition(context.getStart()), EmbeddedLanguage.CICS);
     resultNodes.addAll(visitor.visit(tree));
 
     errorListener.getErrors().forEach(e -> e.getLocation().getLocation().setRange(
@@ -112,7 +113,7 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
     SqlCodeContext sqlCode = context.sqlCode();
     if (sqlCode == null) return;
     CommonTokenStream tokens = applyDb2Lexer(sqlCode);
-    Position position = createPosition(sqlCode.getStart());
+    Position position = getOriginalPosition(sqlCode);
 
     ParserRuleContext tree = grammarStartRule.apply(createDb2SqlParser(tokens));
     ParseTreeVisitor<List<Node>> visitor = instanceVisitor(createPosition(sqlCode.getStart()), EmbeddedLanguage.SQL);
@@ -121,6 +122,12 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
     errorListener.getErrors().forEach(e -> e.getLocation().getLocation().setRange(
         RangeUtils.shiftRangeWithPosition(position, e.getLocation().getLocation().getRange())));
     errors.addAll(errorListener.getErrors());
+  }
+
+  private Position getOriginalPosition(ParserRuleContext parserRuleContext) {
+    return extendedDocument.mapLocation(
+            new Range(createPosition(parserRuleContext.getStart()), createPosition(parserRuleContext.getStop())))
+            .getRange().getStart();
   }
 
   private CommonTokenStream applyDb2Lexer(ParserRuleContext context) {

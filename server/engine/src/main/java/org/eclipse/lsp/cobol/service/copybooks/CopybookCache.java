@@ -56,12 +56,11 @@ public class CopybookCache {
   /**
    * Gets copybook model from cache
    * @param copybookId copybook name
-   * @param programDocumentUri program uri
    * @param callable function to call if copybook does not exist
    * @return a copybook model
    * @throws ExecutionException with error message
    */
-  public CopybookModel get(CopybookId copybookId, String programDocumentUri, Callable<CopybookModel> callable) throws ExecutionException {
+  public CopybookModel get(CopybookId copybookId, Callable<CopybookModel> callable) throws ExecutionException {
     return cache.get(copybookId, callable);
   }
 

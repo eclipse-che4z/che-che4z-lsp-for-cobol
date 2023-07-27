@@ -37,10 +37,10 @@
               "include": "#picture"
             },
             {
-              "include": "#sql-block"
+              "include": "#cics-keywords"
             },
             {
-              "include": "#cics-block"
+              "include": "#db2-sql-keywords"
             },
             {
               "include": "#cobol-keywords"
@@ -107,58 +107,6 @@
     "cobol-preprocessor-keywords": {
       "match": "(?<![\\-\\w])(?i:CBL|CONTROL|COPY|BY|CR|DB|END-EXEC|ENTER|EXEC|FILE|FUNCTION|IDMS|IN|INCLUDE|LEADING|LINKAGE|PROCEDURE|DIVISION|LIST|MAID|MAP|MAP-CONTROL|MODULE|NO|NOLIST|NOMAP|NOSOURCE|OF|OFF|PIC|PICTURE|RECORD|REDEFINES|REPLACING|REPLACE|TITLE|TRAILING|SECTION|SOURCE|SQL|SUPPRESS|VERSION|WORKING-STORAGE|IS)(?![\\-\\w])",
       "name": "keyword.cobol"
-    },
-    "sql-block": {
-      "begin": "(?i:exec\\s+sql)",
-      "name": "string.quoted.cobol.sql",
-      "contentName": "meta.embedded.block.sql",
-      "patterns": [
-        {
-          "include": "#db2-sql-keywords"
-        },
-        {
-          "include": "#comment-line"
-        },
-        {
-          "include": "#comment-floating"
-        },
-        {
-          "include": "#number-constant"
-        },
-        {
-          "include": "#string-quoted-constant"
-        },
-        {
-          "include": "#string-double-quoted-constant"
-        }
-      ],
-      "end": "(?i:end\\-exec)\\.?"
-    },
-    "cics-block": {
-      "begin": "(?i:exec\\s+cics)",
-      "name": "string.quoted.cobol.cics",
-      "contentName": "meta.embedded.block.cics",
-      "patterns": [
-        {
-          "include": "#cics-keywords"
-        },
-        {
-          "include": "#comment-line"
-        },
-        {
-          "include": "#comment-floating"
-        },
-        {
-          "include": "#number-constant"
-        },
-        {
-          "include": "#string-quoted-constant"
-        },
-        {
-          "include": "#string-double-quoted-constant"
-        }
-      ],
-      "end": "(?i:end\\-exec)\\.?"
     },
     "cics-translator-keywords": {
       "match": "(?<![\\-\\w])(?i:APOST|CBLCARD|CICS|COBOL2|COBOL3|CPSM|DBCS|DEBUG|DLI|EDF|EXCI|FEPI|LENGTH|LINKAGE|NATLANG|NOCBLCARD|NOCPSM|NODEBUG|NOEDF|NOFEPI|NOLENGTH|NOLINKAGE|NONUM|NOOPTIONS|NOSEQ|NOSPIE|NOVBREF|NUM|OPTIONS|QUOTE|SEQ|SP|SPIE|SYSEIB|VBREF|XOPTS)(?![\\-\\w])",

@@ -15,13 +15,15 @@
 
 package org.eclipse.lsp.cobol.common.copybook;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  * This value class represents a resolved copybook. It consists of the copybook name, its URI using
  * for positions and the content.
  */
-@Value
+@Data
+@AllArgsConstructor
 public class CopybookModel {
   CopybookId copybookId;
   CopybookName copybookName;

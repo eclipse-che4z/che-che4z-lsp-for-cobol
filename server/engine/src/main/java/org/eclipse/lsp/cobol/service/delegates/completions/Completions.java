@@ -47,7 +47,7 @@ import static java.util.stream.Collectors.toList;
 @Singleton
 public class Completions {
 
-  private Set<Completion> providers;
+  private final Set<Completion> providers;
 
   @Inject
   Completions(Set<Completion> providers) {
