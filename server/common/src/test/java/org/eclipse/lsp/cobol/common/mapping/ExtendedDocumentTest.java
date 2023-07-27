@@ -72,11 +72,11 @@ class ExtendedDocumentTest {
     assertFalse(document.isDirty());
 
     Location location = document.mapLocation(new Range(new Position(5, 8), new Position(5, 16)));
-    assertEquals(new Range(new Position(1, 8), new Position(1, 16)).toString(), location.getRange().toString());
+    assertEquals(new Range(new Position(0, 8), new Position(0, 16)).toString(), location.getRange().toString());
     assertEquals(copybookUri, location.getUri());
 
-    location = document.mapLocation(new Range(new Position(8, 8), new Position(8, 16)));
-    assertEquals(new Range(new Position(4, 8), new Position(4, 16)).toString(), location.getRange().toString());
+    location = document.mapLocation(new Range(new Position(9, 8), new Position(9, 16)));
+    assertEquals(new Range(new Position(5, 8), new Position(5, 16)).toString(), location.getRange().toString());
     assertEquals(documentUri, location.getUri());
   }
 

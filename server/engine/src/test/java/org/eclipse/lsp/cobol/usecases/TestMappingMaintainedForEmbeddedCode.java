@@ -25,9 +25,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
-/**
- * Tests that the mapping for the embedded code is maintained.
- */
+/** Tests that the mapping for the embedded code is maintained. */
 public class TestMappingMaintainedForEmbeddedCode {
 
   public static final String TEXT =
@@ -76,6 +74,33 @@ public class TestMappingMaintainedForEmbeddedCode {
           + "           .                                                                    \n"
           + "       END PROGRAM TEST-123.";
 
+  public static final String MULTIPLE_EMBEDDED_CODE_IN_DOC =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "           EXEC SQL END DECLARE SECTION END-EXEC\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           DISPLAY '-------------------------------------' .\n"
+          + "           EXEC SQL WHENEVER SQLERROR  {PERFORM|1} ERROR-RTN  END-EXEC.\n"
+          + "           EXEC SQL\n"
+          + "            SELECT ABC FROM XYZ;\n"
+          + "           END-EXEC.\n"
+          + "           EXEC SQL\n"
+          + "            OPEN C1\n"
+          + "           END-EXEC.\n"
+          + "           EXEC SQL\n"
+          + "            SELECT ABC FROM XYZ;\n"
+          + "           END-EXEC.\n"
+          + "           DISPLAY '-- TEST IN PROGRESS --'.\n"
+          + "           EXEC SQL\n"
+          + "            CLOSE C1\n"
+          + "           END-EXEC.\n"
+          + "           EXEC SQL DECLARE CURSOR1 CURSOR FOR STMT1     END-EXEC.\n"
+          + "       {#*END-OF-FILE}.\n"
+          + "           GOBACK.";
+
   private static final String COPYBOOK =
       "       01  {$*GRP-ITEM}.\n"
           + "           05 {$*ELEMENT1}     PIC X(50) VALUE\n"
@@ -84,12 +109,30 @@ public class TestMappingMaintainedForEmbeddedCode {
           + "             'This is an elementary item 2'.\n";
 
   @Test
-  void assertCopybookWithQuotesProcessing() {
+  void assertEmbeddedCodeMaintainsMapping() {
     UseCaseEngine.runTest(
-        TEXT, ImmutableList.of(new CobolText("COPYBOOK", COPYBOOK)), ImmutableMap.of("1", new Diagnostic(
-                    new Range(),
-                    "Syntax error on 'DUMMY-CMD' expected {CHANNEL, COMMAREA, INPUTMSG, RESP, RESP2, SYNCONRETURN, SYSID, TRANSID}",
-                    Error,
-                    ErrorSource.PARSING.getText())));
+        TEXT,
+        ImmutableList.of(new CobolText("COPYBOOK", COPYBOOK)),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Syntax error on 'DUMMY-CMD' expected {CHANNEL, COMMAREA, INPUTMSG, RESP, RESP2, SYNCONRETURN, SYSID, TRANSID}",
+                Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void assertEmbeddedCodeMaintainsMappingForMultipleInstancesOfEmbeddedCode() {
+    UseCaseEngine.runTest(
+            MULTIPLE_EMBEDDED_CODE_IN_DOC,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "1",
+                    new Diagnostic(
+                            new Range(),
+                            "Syntax error on 'PERFORM' expected {CONTINUE, GO, GOTO}",
+                            Error,
+                            ErrorSource.PARSING.getText())));
   }
 }
