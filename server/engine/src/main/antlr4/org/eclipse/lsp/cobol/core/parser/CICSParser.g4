@@ -14,7 +14,7 @@
 parser grammar CICSParser;
 options {tokenVocab = CICSLexer; superClass = MessageServiceParser;}
 
-allCicsRules: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
+allCicsRules: (cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
           cics_build | cics_cancel | cics_change | cics_change_task | cics_check | cics_connect | cics_converttime |
           cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
           cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
@@ -26,7 +26,7 @@ allCicsRules: cics_send | cics_receive | cics_add | cics_address | cics_allocate
           cics_soapfault | cics_spoolclose | cics_spoolopen | cics_spoolread | cics_spoolwrite | cics_start |
           cics_startbr | cics_startbrowse | cics_suspend | cics_syncpoint | cics_test | cics_transform | cics_unlock |
           cics_update | cics_verify | cics_wait | cics_waitcics | cics_web | cics_write | cics_writeq | cics_wsacontext |
-          cics_wsaepr | cics_xctl | cics_converse | cics_abend | cics_acquire | cics_exci_link
+          cics_wsaepr | cics_xctl | cics_converse | cics_abend | cics_acquire | cics_exci_link) EOF
         ;
 
 /** RECEIVE: */
@@ -550,7 +550,7 @@ cics_query_security: SECURITY (RESTYPE cics_data_value | RESCLASS cics_data_valu
 cics_read: READ (cics_file_name | UNCOMMITTED | CONSISTENT | REPEATABLE | UPDATE | TOKEN cics_data_area |
            INTO cics_data_area | SET cics_ref | RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC |
            SYSID cics_data_area LENGTH cics_data_area | LENGTH cics_data_area | DEBKEY | DEBREC | RBA | RBN |
-           XRBA | EQUAL | GTEC | NOSUSPEND | cics_resp)+;
+           XRBA | EQUAL | GTEQ | NOSUSPEND | cics_resp)+;
 
 /** READNEXT | READPREV*/
 cics_readnext: (READNEXT | READPREV | cics_file_name | cics_into | UNCOMMITTED | CONSISTENT | REPETABLE |
@@ -817,7 +817,7 @@ cics_write_reply: REPLY cics_data_area (MAXLENGTH cics_data_value | REPLYLENGTH 
 
 /** WRITEQ TD/TS */
 cics_writeq: WRITEQ (cics_writeq_td | cics_writeq_ts);
-cics_writeq_td: TD (QUEUE cics_name | FROM cics_data_area | LENGTH cics_data_value | SYSID cics_data_area)+;
+cics_writeq_td: TD (QUEUE cics_name | FROM cics_data_area | LENGTH cics_data_value | SYSID cics_data_area | cics_resp)+;
 cics_writeq_ts: TS? (QUEUE cics_name | QNAME cics_name | FROM cics_data_area | LENGTH cics_data_value |
                 NUMITEMS cics_data_area | ITEM cics_data_area | REWRITE | SYSID cics_data_area | AUXILIARY | MAIN | NOSUSPEND | cics_resp)+;
 

@@ -16,14 +16,14 @@ parser grammar Db2SqlParser;
 options {tokenVocab = Db2SqlLexer; superClass = MessageServiceParser;}
 
 /*Allowable SQL statements for COBOL program specific dvisions or sections*/
-dataDivisionRules: (dbs_declare_variable | rulesAllowedInDataDivision | rulesAllowedInWorkingStorageAndLinkageSection)+;
+dataDivisionRules: (dbs_declare_variable | rulesAllowedInDataDivision | rulesAllowedInWorkingStorageAndLinkageSection)+ EOF;
 
 procedureDivisionRules: ((dbs_allocate | dbs_alter | dbs_associate | dbs_call | dbs_close | dbs_comment | dbs_commit |
           dbs_connect | dbs_create | dbs_declare | dbs_declare_cursor | dbs_declare_table | dbs_delete | dbs_describe | dbs_drop | dbs_exchange | dbs_execute | dbs_explain |
           dbs_fetch | dbs_free | dbs_get | dbs_grant | dbs_hold | dbs_include | dbs_insert |
           dbs_label | dbs_lock | dbs_merge | dbs_open | dbs_prepare | dbs_refresh | dbs_release | dbs_rename |
           dbs_revoke | dbs_rollback | dbs_savepoint | dbs_select | dbs_set | dbs_signal | dbs_transfer | dbs_truncate |
-          dbs_update | dbs_values | dbs_whenever) dbs_semicolon_end?)+;
+          dbs_update | dbs_values | dbs_whenever) dbs_semicolon_end?)+ EOF;
 rulesAllowedInDataDivision: ((dbs_declare_cursor | dbs_declare_table | dbs_include) dbs_semicolon_end?)+;
 rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca | dbs_include_sqlda) dbs_semicolon_end?)+;
 
