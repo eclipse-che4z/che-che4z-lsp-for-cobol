@@ -91,7 +91,7 @@ class TestFileDescriptor {
           + System.lineSeparator()
           + "RECORDING MODE IS F"
           + System.lineSeparator()
-          + "BLOCK CONTAINS 0 RECORDS."
+          + "BLOCK CONTAINS 0 RECORDS.\n"
           + System.lineSeparator()
           + " "
           + System.lineSeparator()
@@ -105,7 +105,7 @@ class TestFileDescriptor {
           + System.lineSeparator()
           + "ACCESS MODE IS SEQUENTIAL"
           + System.lineSeparator()
-          + "FILE STATUS IS IFCODE "
+          + "FILE STATUS IS IFCODE. "
           + System.lineSeparator();
 
   private static final String NO_FILE_CONTROL_TEXT =

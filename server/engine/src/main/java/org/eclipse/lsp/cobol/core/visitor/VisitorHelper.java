@@ -177,7 +177,7 @@ public class VisitorHelper {
   private String retrieveIntervalText(@Nonnull ParserRuleContext ctx) {
     int start = ctx.getStart().getStartIndex();
     int stop = ctx.getStop().getStopIndex();
-    return stop < start ? "" : ctx.getStart().getInputStream().getText(new Interval(start, stop));
+    return stop < start ? "" : ctx.getStart().getInputStream().getText(new Interval(start, stop + 1));
   }
 
   /**
