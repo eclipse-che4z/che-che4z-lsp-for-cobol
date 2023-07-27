@@ -170,6 +170,7 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     // Phase TRANSFORMATION
     ProcessingPhase t = ProcessingPhase.TRANSFORMATION;
     ctx.register(t, CompilerDirectiveNode.class, new CompilerDirectiveProcess());
+    ctx.register(t, ProgramNode.class, new CICSTranslateMandatorySectionProcess(analysisConfig));
     ctx.register(t, ProgramIdNode.class, new ProgramIdProcess());
     ctx.register(t, SectionNode.class, new SectionNodeProcessor(symbolAccumulatorService));
     ctx.register(t, FileEntryNode.class, new FileEntryProcess());
@@ -184,7 +185,7 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     ctx.register(d, ProcedureDivisionBodyNode.class, new DefineCodeBlock(symbolAccumulatorService));
 
     // Phase POST DEFINITION
-    ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor());
+    ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor(analysisConfig));
 
     // Phase USAGE
     ProcessingPhase u = ProcessingPhase.USAGE;
@@ -208,9 +209,9 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     ctx.register(v, StandAloneDataItemNode.class, new StandAloneDataItemCheck());
     ctx.register(v, ProgramEndNode.class, new ProgramEndCheck());
     ctx.register(v, CICSTranslatorNode.class, new CICSTranslatorProcessor(analysisConfig, messageService));
-    ctx.register(t, JsonParseNode.class, new JsonParseProcess(symbolAccumulatorService));
-    ctx.register(t, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulatorService));
-    ctx.register(t, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
+    ctx.register(v, JsonParseNode.class, new JsonParseProcess(symbolAccumulatorService));
+    ctx.register(v, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulatorService));
+    ctx.register(v, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
 
     // Dialects
     List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());

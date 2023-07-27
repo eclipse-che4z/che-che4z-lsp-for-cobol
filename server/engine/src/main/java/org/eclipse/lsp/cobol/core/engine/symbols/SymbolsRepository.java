@@ -26,10 +26,9 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
+import org.eclipse.lsp4j.Position;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -93,19 +92,16 @@ public class SymbolsRepository {
   /**
    * Find element using a position
    *
-   * @param document the document to search in
+   * @param uri the document uri
+   * @param result the document analysis result to search in
    * @param position the position to check
    * @return element at specified position
    */
-  public static Optional<Context> findElementByPosition(
-      CobolDocumentModel document, TextDocumentPositionParams position) {
-    AnalysisResult result = document.getAnalysisResult();
+  public static Optional<Context> findElementByPosition(String uri, AnalysisResult result, Position position) {
     if (result == null || result.getRootNode() == null) {
       return Optional.empty();
     }
-    Optional<Node> node =
-        findNodeByPosition(
-            result.getRootNode(), position.getTextDocument().getUri(), position.getPosition());
+    Optional<Node> node = findNodeByPosition(result.getRootNode(), uri, position);
 
     return node.filter(Context.class::isInstance)
         .map(Context.class::cast)

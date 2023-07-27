@@ -137,11 +137,7 @@ class SectionNodeProcessorHelper {
                         .filter(Objects::nonNull)
                         .filter(v -> v.getLocality() != null)
                         .filter(v -> v.getLocality().getUri() != null)
-                        .filter(
-                            v ->
-                                v.getLocality()
-                                    .getUri()
-                                    .equals(c.getUri()))
+                        .filter(v -> v.getLocality().getUri().equals(c.getUri()))
                         .forEach(
                             v -> {
                               variables.remove(v);
@@ -188,11 +184,13 @@ class SectionNodeProcessorHelper {
     if (node.getNodeType() == NodeType.VARIABLE) {
       VariableNode variableNode = (VariableNode) node;
       if (isGroupedVariable(variableNode)) {
-        List<Node> sameFileChildren = children.stream()
+        List<Node> sameFileChildren =
+            children.stream()
                 .filter(c -> c.getLocality().getUri().equals(variableNode.getLocality().getUri()))
                 .collect(Collectors.toList());
         if (!sameFileChildren.isEmpty()) {
-          variableNode.extendLocality(sameFileChildren.get(sameFileChildren.size() - 1).getLocality().getRange().getEnd());
+          variableNode.extendLocality(
+              sameFileChildren.get(sameFileChildren.size() - 1).getLocality().getRange().getEnd());
         }
       }
     }
@@ -237,20 +235,38 @@ class SectionNodeProcessorHelper {
         }
         definitionNodes.removeFirst();
       } else {
-        Node parentForNextLevel =
-            Optional.ofNullable(lastVariableOnTheLevel)
-                .filter(
-                    it ->
-                        it.getVariableType() == VariableType.GROUP_ITEM
-                            || it.getVariableType() == VariableType.MULTI_TABLE_DATA_NAME
-                            || definitionNode.getLevel() == LEVEL_88)
-                .map(Node.class::cast)
-                .orElse(rootNode);
         errors.addAll(
-            processDefinition(parentForNextLevel, definitionNode.getLevel(), definitionNodes));
+            processDefinition(
+                getParentForNextLevel(rootNode, lastVariableOnTheLevel, definitionNode),
+                definitionNode.getLevel(),
+                definitionNodes));
       }
     }
     return errors;
+  }
+
+  private boolean isRootLevel(int level) {
+    return ImmutableSet.of(LEVEL_66, LEVEL_77, LEVEL_01).contains(level);
+  }
+
+  private static Node getParentForNextLevel(
+      Node rootNode, VariableNode lastVariableOnTheLevel, VariableDefinitionNode definitionNode) {
+    if (lastVariableOnTheLevel == null) {
+      return rootNode;
+    }
+    if (definitionNode.getLevel() == LEVEL_88) {
+      return lastVariableOnTheLevel;
+    }
+    if (isRootLevel(definitionNode.getLevel())) {
+      return definitionNode.getNearestParent(n -> !n.getNodeType().equals(NodeType.VARIABLE_DEFINITION)).get();
+    }
+    if (lastVariableOnTheLevel.getVariableType() == VariableType.GROUP_ITEM) {
+      return lastVariableOnTheLevel;
+    }
+    if (lastVariableOnTheLevel.getVariableType() == VariableType.MULTI_TABLE_DATA_NAME) {
+      return lastVariableOnTheLevel;
+    }
+    return rootNode;
   }
 
   private Optional<ResultWithErrors<VariableNode>> convert(VariableDefinitionNode definitionNode) {

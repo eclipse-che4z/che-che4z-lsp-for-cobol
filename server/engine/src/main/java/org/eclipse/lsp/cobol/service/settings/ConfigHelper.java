@@ -119,7 +119,10 @@ public class ConfigHelper {
    * @return List of configured dialects
    */
   public List<String> parseDialects(JsonArray dialects) {
-    return Streams.stream(dialects).map(JsonElement::getAsString).collect(toList());
+    return Streams.stream(dialects)
+            .filter(ele -> !(ele instanceof JsonNull))
+            .map(JsonElement::getAsString)
+            .collect(toList());
   }
 
   /**

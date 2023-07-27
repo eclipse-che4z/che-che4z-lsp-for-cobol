@@ -33,7 +33,7 @@ import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIAL
 public abstract class CompletionStorage<T> {
   private List<String> dialectType = ImmutableList.of();
   private Map<String, T> storage;
-  private SettingsService settingsService;
+  private final SettingsService settingsService;
 
   CompletionStorage(final SettingsService settingsService) {
     this.settingsService = settingsService;

@@ -15,766 +15,193 @@
 package org.eclipse.lsp.cobol.service;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import org.awaitility.Awaitility;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.common.model.tree.RootNode;
-import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
-import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
-import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
-import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
-import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
-import org.eclipse.lsp.cobol.service.mocks.MockTextDocumentService;
+import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.internal.stubbing.answers.AnswersWithDelay;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.*;
-import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.*;
-import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.*;
-import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
  * This test checks the entry points of the {@link TextDocumentService} implementation.
  */
-class CobolTextDocumentServiceTest extends MockTextDocumentService {
+@ExtendWith(MockitoExtension.class)
+class CobolTextDocumentServiceTest {
 
-  private static final String LANGUAGE = "COBOL";
-  private static final String EXT_SRC_DOC_URI = "file://workspace/.c4z/.extsrcs/EXTSRC.cbl";
-  private static final String PARENT_CPY_URI = "file:///.copybooks/PARENT.cpy";
-  private static final String NESTED_CPY_URI = "file:///.copybooks/NESTED.cpy";
-  private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
-  private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
-  private static final String DOCUMENT_WITH_ERRORS_URI =
-      "file:///c:/workspace/incorrect_document.cbl";
+  @Mock protected Completions completions;
+  @Mock protected CodeActions actions;
+  @Mock protected CFASTBuilder builder;
+  @Mock protected WatcherService watcherService;
+  @Mock protected TaskService taskService;
+  @Mock protected AnalysisService analysisService;
 
   private CobolTextDocumentService service;
 
+  /**
+   * Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing. All tasks run
+   * synchronously.
+   */
   @BeforeEach
   void setupService() {
-    service = getMockedTextDocumentServiceUsingSameThread();
+    service = new CobolTextDocumentService(
+        actions,
+        builder,
+        new CobolLSPServerStateService(),
+        watcherService,
+        analysisService,
+        taskService);
   }
 
   @Test
-  void testCompletion() {
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-    when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.builder().build());
-    when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
-    CompletionItem completionItem = new CompletionItem();
-    completionItem.setLabel("test");
-    when(completions.collectFor(any(CobolDocumentModel.class), any(CompletionParams.class)))
-        .thenReturn(new CompletionList(true, ImmutableList.of(completionItem)));
+  void testAnalysis() {
+    JsonObject json = new JsonObject();
+    json.addProperty("uri", "");
+    when(taskService.runNextTask(any(), any(), any())).thenReturn(CompletableFuture.completedFuture(null));
 
-    service.notifyExtensionConfig(ImmutableList.of());
-    openDocument(service);
-
-    CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion =
-        service.completion(
-            new CompletionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Position(0, 8)));
-    assertCompletionCorrect(completion);
+    service.analysis(json);
+    Mockito.verify(taskService, times(1)).runNextTask(any(), any(), any());
   }
 
   @Test
-  void testDidChange() throws ExecutionException, InterruptedException {
-    List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
-    textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
-    doNothing().when(communications).publishDiagnostics(anyMap());
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-    when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.builder().build());
-    when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(
-            new DidOpenTextDocumentParams(
-                    new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
+  void testDidChange() {
+    VersionedTextDocumentIdentifier doc = mock(VersionedTextDocumentIdentifier.class);
+    when(doc.getUri()).thenReturn("");
 
-    service.didChange(
-        new DidChangeTextDocumentParams(
-            new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0), textEdits));
-    Optional<Future<?>> opt = Optional.ofNullable(service.getFutureMap().get(DOCUMENT_URI));
-    if (opt.isPresent()) {
-      opt.get().get();
-    }
-    verify(engine, times(2)).analyze(anyString(), anyString(), any(AnalysisConfig.class));
-    verify(communications, times(2)).publishDiagnostics(anyMap());
+    DidChangeTextDocumentParams params = mock(DidChangeTextDocumentParams.class);
+    when(params.getTextDocument()).thenReturn(doc);
+    when(params.getContentChanges()).thenReturn(ImmutableList.of(mock(TextDocumentContentChangeEvent.class)));
+    when(taskService.runTask(any(), any())).thenReturn(CompletableFuture.completedFuture(null));
+
+    service.didChange(params);
+    Mockito.verify(taskService, times(1)).runTask(any(), any());
   }
 
   @Test
   void testDidClose() {
-    doNothing().when(communications).publishDiagnostics(anyMap());
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-    when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.builder().build());
-    when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
+    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
+    when(doc.getUri()).thenReturn("");
 
-    service.notifyExtensionConfig(ImmutableList.of());
-    openDocument(service);
-    assertEquals(1, closeGetter(service).size());
-    TextDocumentIdentifier testDocument = new TextDocumentIdentifier(DOCUMENT_URI);
-    DidCloseTextDocumentParams closedDocument = new DidCloseTextDocumentParams(testDocument);
-    service.didClose(closedDocument);
-    assertEquals(Collections.EMPTY_MAP, closeGetter(service));
-  }
+    DidCloseTextDocumentParams params = mock(DidCloseTextDocumentParams.class);
+    when(params.getTextDocument()).thenReturn(doc);
+    when(taskService.runTask(any())).thenReturn(CompletableFuture.completedFuture(null));
 
-  @SafeVarargs
-  private final Map<String, List<Diagnostic>> mergeDiagnosticMaps(
-      Map<String, List<Diagnostic>>... maps) {
-    return Arrays.stream(maps)
-        .flatMap(m -> m.entrySet().stream())
-        .collect(Collectors.toMap(
-            Entry::getKey,
-            Entry::getValue,
-            (v1, v2) -> Stream.concat(v1.stream(), v2.stream()).collect(Collectors.toList())));
+    service.didClose(params);
+    Mockito.verify(taskService, times(1)).runTask(any());
+    Mockito.verify(watcherService, times(1)).removeRuntimeWatchers(any());
   }
 
   @Test
-  void testDidCloseForMainProgramsAndRelatedCopybook() {
-    when(configurationService.getConfig(anyString(), eq(ENABLED))).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
+  void testDidOpen() {
+    TextDocumentItem textDocument = mock(TextDocumentItem.class);
+    when(textDocument.getUri()).thenReturn("");
 
-    Map<String, List<Diagnostic>> copybookDiagnostics = new HashMap<>(createDefaultDiagnostics(COPYBOOK_URI));
-    Map<String, List<Diagnostic>> programDiagnostics = mergeDiagnosticMaps(
-        createDefaultDiagnostics(DOCUMENT_URI),
-        copybookDiagnostics);
-    Map<String, List<Diagnostic>> secondProgramDiagnostics = mergeDiagnosticMaps(
-        createDefaultDiagnostics(DOCUMENT2_URI),
-        copybookDiagnostics);
+    DidOpenTextDocumentParams params = mock(DidOpenTextDocumentParams.class);
+    when(params.getTextDocument()).thenReturn(textDocument);
+    when(taskService.runTask(any(), any())).thenReturn(CompletableFuture.completedFuture(null));
 
-    doAnswer(new AnswersWithDelay(1000,
-        invocation -> AnalysisResult.builder().diagnostics(copybookDiagnostics).build()))
-        .when(engine)
-        .analyze(COPYBOOK_URI, INCORRECT_TEXT_EXAMPLE, AnalysisConfig.defaultConfig(ENABLED));
-    doAnswer(new AnswersWithDelay(1000,
-        invocation -> AnalysisResult.builder().diagnostics(programDiagnostics).build()))
-        .when(engine)
-        .analyze(DOCUMENT_URI, INCORRECT_TEXT_EXAMPLE, AnalysisConfig.defaultConfig(ENABLED));
-    doAnswer(new AnswersWithDelay(1000,
-        invocation -> AnalysisResult.builder().diagnostics(secondProgramDiagnostics).build()))
-        .when(engine)
-        .analyze(DOCUMENT2_URI, INCORRECT_TEXT_EXAMPLE, AnalysisConfig.defaultConfig(ENABLED));
-
-    // Opens both main program and related copybook
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, INCORRECT_TEXT_EXAMPLE)));
-    // we expect 2 keys, one for mainProgram and one for related copyBook
-    assertEquals(programDiagnostics, service.collectAllDiagnostics());
-
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT2_URI, LANGUAGE, 0, INCORRECT_TEXT_EXAMPLE)));
-    // we expect 3 keys, two for programs and one for copybook
-    assertEquals(mergeDiagnosticMaps(programDiagnostics, secondProgramDiagnostics),
-        service.collectAllDiagnostics());
-
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(COPYBOOK_URI, LANGUAGE, 0, INCORRECT_TEXT_EXAMPLE)));
-    // now we expect 3 keys, with multiple values for copybook key
-    assertEquals(
-        mergeDiagnosticMaps(copybookDiagnostics, programDiagnostics, secondProgramDiagnostics),
-        service.collectAllDiagnostics());
-    // and copybook diagnostics has more entries (duplicities)
-    assertTrue(service.collectAllDiagnostics().get(COPYBOOK_URI).size()
-        > copybookDiagnostics.get(COPYBOOK_URI).size());
-
-    service.didClose(new DidCloseTextDocumentParams(new TextDocumentIdentifier(DOCUMENT2_URI)));
-    service.didClose(new DidCloseTextDocumentParams(new TextDocumentIdentifier(DOCUMENT_URI)));
-
-    // we still expect 3 keys, but both programs value is an empty List []
-    assertEquals(mergeDiagnosticMaps(copybookDiagnostics,
-            singletonMap(DOCUMENT_URI, emptyList()),
-            singletonMap(DOCUMENT2_URI, emptyList())),
-        service.collectAllDiagnostics());
-
-    service.didClose(new DidCloseTextDocumentParams(new TextDocumentIdentifier(COPYBOOK_URI)));
-    assertEquals(mergeDiagnosticMaps(singletonMap(COPYBOOK_URI, emptyList()),
-            singletonMap(DOCUMENT_URI, emptyList()),
-            singletonMap(DOCUMENT2_URI, emptyList())),
-        service.collectAllDiagnostics());
+    service.didOpen(params);
+    Mockito.verify(taskService, times(1)).runTask(any(), any());
+    Mockito.verify(watcherService, times(1)).addRuntimeWatchers(any());
   }
 
   @Test
-  void testDidSave() {
-    TextDocumentIdentifier saveDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
-    DidSaveTextDocumentParams saveDocumentParams =
-        new DidSaveTextDocumentParams(saveDocumentIdentifier);
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-    when(engine.analyze(eq(DOCUMENT_URI), eq(TEXT_EXAMPLE), any()))
-        .thenReturn(AnalysisResult.builder().build());
-    when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
+  void testCodeAction() {
+    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
+    when(doc.getUri()).thenReturn("");
 
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
-    service.didSave(saveDocumentParams);
-    assertTrue(closeGetter(service).containsKey(DOCUMENT_URI));
-  }
+    CodeActionParams params = mock(CodeActionParams.class);
+    when(params.getTextDocument()).thenReturn(doc);
+    when(taskService.runTask(any())).thenReturn(CompletableFuture.completedFuture(null));
 
-  /**
-   * This test verifies that when an extended document opened, the code analyzed, and the copybook
-   * analysis disabled using {@link org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode#DISABLED}
-   */
-  @Test
-  void disableCopybookAnalysisOnExtendedDoc() {
-    when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.builder().build());
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-    when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(DISABLED));
-
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(EXT_SRC_DOC_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
-    waitFor(service, EXT_SRC_DOC_URI);
-    ArgumentCaptor<AnalysisConfig> argument = ArgumentCaptor.forClass(AnalysisConfig.class);
-    verify(engine).analyze(eq(EXT_SRC_DOC_URI), anyString(), argument.capture());
-    assertEquals(DISABLED, argument.getValue().getCopybookConfig().getCopybookProcessingMode());
-  }
-
-  /**
-   * This test verifies that when a document opened in DID_OPEN mode, the code analyzed, and the
-   * copybook analysis is enabled using {@link org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode#ENABLED}
-   */
-  @Test
-  void enableCopybooksOnDidOpenTest() {
-    when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.builder().build());
-    when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
-
-    //tests when copybook dir is configured, shouldn't be analyzed
-    mockSettingServiceForCopybooks(Boolean.TRUE);
-    assertNull(service.getFutureMap().get(COPYBOOK_URI));
-    verify(engine, never()).analyze(eq(COPYBOOK_URI), anyString(), any());
-
-    //tests when copybook dir is NOT configured, should be analyzed
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(COPYBOOK_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
-    waitFor(service, COPYBOOK_URI);
-
-    ArgumentCaptor<AnalysisConfig> argument = ArgumentCaptor.forClass(AnalysisConfig.class);
-    verify(engine).analyze(eq(COPYBOOK_URI), anyString(), argument.capture());
-    assertEquals(ENABLED, argument.getValue().getCopybookConfig().getCopybookProcessingMode());
-  }
-
-  /**
-   * This test verifies that when a document updated in DID_CHANGE mode, the code analyzed, and the
-   * copybook analysis enabled using {@link org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode#ENABLED}
-   */
-  @Test
-  void enableCopybooksOnDidChangeTest() {
-    when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.builder().build());
-    when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(SKIP));
-
-    //tests when copybook dir is configured, shouldn't be analyzed
-    mockSettingServiceForCopybooks(Boolean.TRUE);
-    assertNull(service.getFutureMap().get(COPYBOOK_URI));
-    verify(engine, never()).analyze(eq(COPYBOOK_URI), anyString(), any());
-
-    //tests when no copybook dir is NOT configured
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-    service.didChange(
-        new DidChangeTextDocumentParams(
-            new VersionedTextDocumentIdentifier(COPYBOOK_URI, 0),
-            ImmutableList.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
-    waitFor(service, COPYBOOK_URI);
-    ArgumentCaptor<AnalysisConfig> argument = ArgumentCaptor.forClass(AnalysisConfig.class);
-    verify(engine).analyze(eq(COPYBOOK_URI), anyString(), argument.capture());
-    assertEquals(SKIP, argument.getValue().getCopybookConfig().getCopybookProcessingMode());
-  }
-
-  /**
-   * This test verifies that when a copybook document updated in DID_CHANGE mode, the analysis is triggered with updated cache
-   */
-  @Test
-  void copybookChangeTriggerReAnalysisDidChangeTest() {
-    mockSettingServiceForCopybooks(Boolean.TRUE);
-    service.didChange(
-            new DidChangeTextDocumentParams(
-                    new VersionedTextDocumentIdentifier(COPYBOOK_URI, 0),
-                    ImmutableList.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
-    verify(broker).postData(any(RunAnalysisEvent.class));
-  }
-
-  /**
-   * This test checks that {@link CobolTextDocumentService} is subscribed to the databus events and
-   * may re-run analysis of the open documents if it receives a notification.
-   */
-  @Test
-  void observerCallback() {
-    Map<String, List<Diagnostic>> diagnosticsNoErrors = emptyMap();
-    Map<String, List<Diagnostic>> diagnosticsWithErrors = createDefaultDiagnostics();
-
-    // created two dummy analysis result, one with error and another without
-    // those object will be used as result of dynamic stubbing stage
-    AnalysisResult resultNoErrors =
-        AnalysisResult.builder().diagnostics(diagnosticsNoErrors).build();
-    AnalysisResult resultWithErrors =
-        AnalysisResult.builder().diagnostics(diagnosticsWithErrors).build();
-
-    /*
-     * Defined dynamic response based on the possible combinations available when the document analyzed:
-     *  - text document sync state: [DID_OPEN|DID_CHANGE]
-     *  - document URI [correct|incorrect]
-     */
-    doReturn(resultNoErrors)
-        .when(engine)
-        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(ENABLED));
-    doReturn(resultWithErrors)
-        .when(engine)
-        .analyze(
-            DOCUMENT_WITH_ERRORS_URI,
-            INCORRECT_TEXT_EXAMPLE,
-            AnalysisConfig.defaultConfig(ENABLED));
-    doReturn(resultNoErrors)
-        .when(engine)
-        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(SKIP));
-    doReturn(resultWithErrors)
-        .when(engine)
-        .analyze(
-            DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, AnalysisConfig.defaultConfig(SKIP));
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-    lenient().when(configurationService.getConfig(anyString(), eq(SKIP)))
-        .thenReturn(AnalysisConfig.defaultConfig(SKIP));
-    lenient().when(configurationService.getConfig(anyString(), eq(ENABLED)))
-        .thenReturn(AnalysisConfig.defaultConfig(ENABLED));
-
-    // create a service and verify is subscribed to the required event
-    CobolTextDocumentService service = verifyServiceStart();
-    // simulate the call to the didOpen for two different document one with and one without errors
-    verifyDidOpen(
-        communications, engine, broker, diagnosticsNoErrors, service, TEXT_EXAMPLE, DOCUMENT_URI);
-    verifyDidChange(
-        communications, engine, diagnosticsNoErrors, service, TEXT_EXAMPLE, DOCUMENT_URI);
-    verifyDidOpen(
-        communications,
-        engine,
-        broker,
-        diagnosticsWithErrors,
-        service,
-        INCORRECT_TEXT_EXAMPLE,
-        DOCUMENT_WITH_ERRORS_URI);
-    verifyDidChange(
-        communications,
-        engine,
-        diagnosticsWithErrors,
-        service,
-        INCORRECT_TEXT_EXAMPLE,
-        DOCUMENT_WITH_ERRORS_URI);
-
-    // after the simulation for triggering the observer callback verify that the analysis method
-    // (more in general the document analysis stage) is triggered
-    service.onRunAnalysisEventCallback(new RunAnalysisEvent());
-
-    /* After sending a message on the data bus we'll verify that the document analyzed by the preprocessor.
-    More in detail we'll check:
-            - analysis invoked two times (because two documents opened previously)
-            - the diagnostic published exactly 2 times after the syntax/semantic analysis invoked.
-            */
-    verifyCallback(communications, engine, diagnosticsWithErrors, TEXT_EXAMPLE, DOCUMENT_URI);
-    verifyCallback(
-        communications,
-        engine,
-        diagnosticsWithErrors,
-        INCORRECT_TEXT_EXAMPLE,
-        DOCUMENT_WITH_ERRORS_URI);
-  }
-
-  /**
-   * Test on the textDocument/codeAction request the {@link CodeActions} delegate called. The
-   * specific logic tested in CodeActionsTest, here it is only to verify that the
-   * {@link CobolTextDocumentService#codeAction(CodeActionParams)} calls the
-   * {@link CodeActions#collect(CodeActionParams)}
-   */
-  @Test
-  void testCodeActionsEndpoint() {
-    CodeActionParams params =
-        new CodeActionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Range(),
-            new CodeActionContext());
-    List<Either<Command, CodeAction>> expected = emptyList();
-    when(actions.collect(params)).thenReturn(expected);
-    try {
-      assertEquals(expected, service.codeAction(params).get());
-    } catch (InterruptedException | ExecutionException e) {
-      fail(e.getMessage());
-    }
-    verify(actions).collect(params);
-  }
-
-  private Map<String, List<Diagnostic>> createDefaultDiagnostics(String documentUri) {
-    return singletonMap(
-        documentUri,
-        singletonList(
-            new Diagnostic(
-                new Range(new Position(), new Position(0, INCORRECT_TEXT_EXAMPLE.length())),
-                INCORRECT_TEXT_EXAMPLE)));
-  }
-
-  private Map<String, List<Diagnostic>> createDefaultDiagnostics() {
-    return createDefaultDiagnostics(DOCUMENT_URI);
-  }
-
-  /**
-   * This test verify that when a
-   * {@link CobolTextDocumentService#didClose(DidCloseTextDocumentParams)} is sent from the client
-   * to dispose a document, all the related diagnostic message are disposed from the document.
-   */
-  @Test
-  void testDidCloseDisposeDiagnostics() {
-    Communications spyCommunications = spy(Communications.class);
-    when(configurationService.getConfig(anyString(), eq(ENABLED))).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
-    doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.builder().build()))
-        .when(engine)
-        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(ENABLED));
-
-    DidCloseTextDocumentParams closedDocument =
-        new DidCloseTextDocumentParams(new TextDocumentIdentifier(DOCUMENT_URI));
-
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
-
-    service.didClose(closedDocument);
-
-    assertEquals(Collections.EMPTY_MAP, closeGetter(service));
-    verify(spyCommunications, atMost(1))
-        .publishDiagnostics(ImmutableMap.of(DOCUMENT_URI, ImmutableList.of()));
-  }
-
-  /**
-   * This test verify that when a {@link CobolTextDocumentService#analysis(JsonObject)}
-   * (JsonObject)} is sent from the client to get analysis result, it processes properly.
-   */
-  @Test
-  void testAnalysis() throws ExecutionException, InterruptedException {
-    doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.builder().build()))
-        .when(engine)
-        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(ENABLED));
-    when(configurationService.getConfig(anyString(), eq(ENABLED))).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
-
-    JsonObject json = new JsonObject();
-    json.add("uri", new JsonPrimitive(DOCUMENT_URI));
-    json.add("text", new JsonPrimitive(TEXT_EXAMPLE));
-
-    ExtendedApiResult result = service.analysis(json).get();
-    assertNotNull(result);
-  }
-
-  private CobolTextDocumentService verifyServiceStart() {
-    CobolTextDocumentService service = getMockedTextDocumentServiceUsingSameThread();
-
-    verify(broker).subscribe(service);
-    return service;
-  }
-
-  private void verifyDidOpen(
-      Communications communications,
-      LanguageEngineFacade engine,
-      DataBusBroker dataBus,
-      Map<String, List<Diagnostic>> diagnostics,
-      CobolTextDocumentService service,
-      String textToAnalyse,
-      String uri) {
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(
-        new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
-    waitFor(service, uri);
-    verify(engine).analyze(uri, textToAnalyse, AnalysisConfig.defaultConfig(ENABLED));
-    verify(dataBus)
-        .postData(
-            AnalysisFinishedEvent.builder()
-                .documentUri(uri)
-                .copybookUris(emptyList())
-                .copybookProcessingMode(ENABLED)
-                .build());
-    verify(communications).publishDiagnostics(diagnostics);
-  }
-
-  // We don't send anything in dataBus when didChange analysis finished
-  private void verifyDidChange(
-      Communications communications,
-      LanguageEngineFacade engine,
-      Map<String, List<Diagnostic>> diagnostics,
-      CobolTextDocumentService service,
-      String textToAnalyse,
-      String uri) {
-    int newVersion = 2;
-    service.didChange(
-        new DidChangeTextDocumentParams(
-            new VersionedTextDocumentIdentifier(uri, newVersion),
-            ImmutableList.of(new TextDocumentContentChangeEvent(textToAnalyse))));
-
-    verify(engine).analyze(uri, textToAnalyse, AnalysisConfig.defaultConfig(SKIP));
-    verify(communications, times(2)).publishDiagnostics(diagnostics);
-  }
-
-  private void verifyCallback(
-      Communications communications,
-      LanguageEngineFacade engine,
-      Map<String, List<Diagnostic>> diagnostics,
-      String text,
-      String uri) {
-
-    // for didOpen and after RunAnalysisEvent
-    verify(engine, times(2)).analyze(uri, text, AnalysisConfig.defaultConfig(ENABLED));
-    // for didChange
-    verify(engine, times(1)).analyze(uri, text, AnalysisConfig.defaultConfig(SKIP));
-    // all three above produces the same diagnostics
-    verify(communications, times(4)).publishDiagnostics(diagnostics);
-  }
-
-  /**
-   * Check there were no NullPointerException thrown if a
-   * {@link TextDocumentService#didClose(DidCloseTextDocumentParams)} is invoked when
-   * {@link TextDocumentService#didOpen(DidOpenTextDocumentParams)} processing is not finished yet.
-   */
-  @Test
-  @Disabled("Unstable")
-  void testImmediateClosingOfDocumentDoNotCauseNPE() {
-    service = getMockedTextDocumentServiceUsingSeparateThread();
-    lenient()
-        .when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(ENABLED)))
-        .thenReturn(AnalysisResult.builder().build());
-
-    lenient()
-        .when(configurationService.getConfig(any(), ENABLED))
-        .thenReturn(AnalysisConfig.defaultConfig(ENABLED));
-
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
-
-    assertThat(service.getDocs().entrySet(), hasSize(1));
-
-    service.didClose(new DidCloseTextDocumentParams(new TextDocumentIdentifier(DOCUMENT_URI)));
-
-    assertThat(service.getDocs().entrySet(), hasSize(0));
-    assertThat(service.getFutureMap().entrySet(), hasSize(0));
+    service.codeAction(params);
+    Mockito.verify(taskService, times(1)).runTask(any());
   }
 
   @Test
-  void testHover() {
-    service = getMockedTextDocumentServiceUsingSeparateThread();
-    TextDocumentItem testHoverDocument =
-        new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE);
+  void testCompletion() {
+    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
+    when(doc.getUri()).thenReturn("");
 
-    AnalysisResult analysisResult = AnalysisResult.builder().build();
-    when(engine.analyze(eq(DOCUMENT_URI), eq(TEXT_EXAMPLE), any(AnalysisConfig.class)))
-        .thenReturn(analysisResult);
-    when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
-    mockSettingServiceForCopybooks(Boolean.FALSE);
+    CompletionParams params = mock(CompletionParams.class);
+    when(params.getTextDocument()).thenReturn(doc);
 
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(new DidOpenTextDocumentParams(testHoverDocument));
-
-    Position testHoverPosition = new Position(0, 2);
-    TextDocumentIdentifier testTextDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
-    HoverParams testHoverPositionParams = new HoverParams(testTextDocumentIdentifier,
-        testHoverPosition);
-
-    Awaitility.await()
-        .until(
-            () -> service.getDocs().get(DOCUMENT_URI).getAnalysisResult().equals(analysisResult));
-    service.hover(testHoverPositionParams);
-
-    verify(hoverProvider, timeout(2000))
-        .getHover(new CobolDocumentModel(DOCUMENT_URI, TEXT_EXAMPLE, analysisResult), testHoverPositionParams);
-  }
-
-  /**
-   * Test {@link AnalysisFinishedEvent} sent after the analysis finished and contains all the
-   * document URIs that contain nested copybooks, including the main document
-   */
-  @Test
-  void testAnalysisFinishedNotification() {
-    AnalysisResult analysisResult =
-        AnalysisResult.builder()
-            .rootNode(new RootNode(Locality.builder().build()))
-            .build();
-
-    RootNode rootNode = new RootNode(Locality.builder().build());
-    analysisResult.getRootNode().addChild(rootNode);
-    CopyNode parent = new CopyNode(Locality.builder().uri(DOCUMENT_URI).build(),
-        Locality.builder().uri(DOCUMENT_URI).build().toLocation(),
-        "PARENT", DOCUMENT_URI);
-
-    CopyNode nested = new CopyNode(Locality.builder().uri(PARENT_CPY_URI).build(),
-        Locality.builder().uri(PARENT_CPY_URI).build().toLocation(),
-        "NESTED", PARENT_CPY_URI);
-
-    CopyNode nested2 =
-        new CopyNode(Locality.builder().uri(NESTED_CPY_URI).build(),
-            Locality.builder().uri(NESTED_CPY_URI).build().toLocation(),
-            "NESTED_CPY_URI", NESTED_CPY_URI);
-
-    rootNode.addChild(parent);
-    rootNode.addChild(nested);
-    rootNode.addChild(nested2);
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, AnalysisConfig.defaultConfig(ENABLED)))
-        .thenReturn(analysisResult);
-    when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
-    waitFor(service, DOCUMENT_URI);
-    verify(broker)
-        .postData(
-            AnalysisFinishedEvent.builder()
-                .documentUri(DOCUMENT_URI)
-                .copybookUris(asList(DOCUMENT_URI, PARENT_CPY_URI, NESTED_CPY_URI))
-                .copybookProcessingMode(ENABLED)
-                .build());
+    service.completion(params);
+    Mockito.verify(taskService, times(1)).runNextTask(any(), any(), any());
   }
 
   @Test
-  void testFormatCallDelegatesToFormationsObject() throws ExecutionException, InterruptedException {
-    when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.builder().build());
-    when(formations.format(any(CobolDocumentModel.class))).thenReturn(emptyList());
-    when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
-    waitFor(service, DOCUMENT_URI);
-    service
-        .formatting(
-            new DocumentFormattingParams(
-                new TextDocumentIdentifier(DOCUMENT_URI), new FormattingOptions(1, false)))
-        .get();
-    verify(formations).format(any(CobolDocumentModel.class));
+  void testDefinition() {
+    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
+    when(doc.getUri()).thenReturn("");
+
+    DefinitionParams params = mock(DefinitionParams.class);
+    when(params.getTextDocument()).thenReturn(doc);
+
+    service.definition(params);
+    Mockito.verify(taskService, times(1)).runNextTask(any(), any(), any());
   }
 
   @Test
-  void testDefinitionCallDelegatesToOccurrencesObject()
-      throws ExecutionException, InterruptedException {
-    when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.builder().build());
-    when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-    when(occurrences.findDefinitions(
-        any(CobolDocumentModel.class), any(TextDocumentPositionParams.class)))
-        .thenReturn(emptyList());
+  void testDocumentHighlight() {
+    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
+    when(doc.getUri()).thenReturn("");
 
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
-    waitFor(service, DOCUMENT_URI);
-    service
-        .definition(new DefinitionParams(
-            new TextDocumentIdentifier(DOCUMENT_URI), new Position())).get();
-    verify(occurrences)
-        .findDefinitions(any(CobolDocumentModel.class), any(TextDocumentPositionParams.class));
+    DocumentHighlightParams params = mock(DocumentHighlightParams.class);
+    when(params.getTextDocument()).thenReturn(doc);
+
+    service.documentHighlight(params);
+    Mockito.verify(taskService, times(1)).runNextTask(any(), any(), any());
   }
 
   @Test
-  void testReferenceCallDelegatesToOccurrencesObject()
-      throws ExecutionException, InterruptedException {
-    when(engine.analyze(anyString(), anyString(), any(AnalysisConfig.class)))
-        .thenReturn(AnalysisResult.builder().build());
-    when(configurationService.getConfig(any(), any())).thenReturn(AnalysisConfig.defaultConfig(ENABLED));
-    mockSettingServiceForCopybooks(Boolean.FALSE);
-    when(occurrences.findReferences(
-        any(CobolDocumentModel.class),
-        any(TextDocumentPositionParams.class),
-        any(ReferenceContext.class)))
-        .thenReturn(ImmutableList.of());
+  void testDocumentSymbol() {
+    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
+    when(doc.getUri()).thenReturn("");
 
-    service.notifyExtensionConfig(ImmutableList.of());
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
-    waitFor(service, DOCUMENT_URI);
-    ReferenceParams referenceParams = new ReferenceParams();
-    referenceParams.setContext(new ReferenceContext(true));
-    referenceParams.setTextDocument(new TextDocumentIdentifier(DOCUMENT_URI));
-    service.references(referenceParams).get();
-    verify(occurrences)
-        .findReferences(
-            any(CobolDocumentModel.class),
-            any(TextDocumentPositionParams.class),
-            any(ReferenceContext.class));
+    DocumentSymbolParams params = mock(DocumentSymbolParams.class);
+    when(params.getTextDocument()).thenReturn(doc);
+    when(taskService.runNextTask(any(), any(), any())).thenReturn(CompletableFuture.completedFuture(null));
+
+    service.documentSymbol(params);
+    Mockito.verify(taskService, times(1)).runNextTask(any(), any(), any());
   }
 
-  public static void waitFor(CobolTextDocumentService service, String url) {
-    try {
-      Future<?> future = service.getFutureMap().get(DOCUMENT_URI);
-      if (future != null) {
-        future.get();
-      }
-    } catch (InterruptedException | ExecutionException e) {
-      throw new RuntimeException(e);
-    }
+  @Test
+  void testFoldingRange() {
+    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
+    when(doc.getUri()).thenReturn("");
+
+    FoldingRangeRequestParams params = mock(FoldingRangeRequestParams.class);
+    when(params.getTextDocument()).thenReturn(doc);
+    when(taskService.runNextTask(any(), any(), any())).thenReturn(CompletableFuture.completedFuture(null));
+
+    service.foldingRange(params);
+    Mockito.verify(taskService, times(1)).runNextTask(any(), any(), any());
   }
 
-  private void openDocument(CobolTextDocumentService service) {
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
-    waitFor(service, DOCUMENT_URI);
+  @Test
+  void testFormatting() throws ExecutionException, InterruptedException {
+    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
+    when(doc.getUri()).thenReturn("");
+
+    DocumentFormattingParams params = mock(DocumentFormattingParams.class);
+    when(params.getTextDocument()).thenReturn(doc);
+    when(taskService.runTask(any())).thenReturn(CompletableFuture.completedFuture(null));
+
+    service.formatting(params).get();
+    Mockito.verify(taskService, times(1)).runTask(any());
   }
 
-  private void assertCompletionCorrect(
-      CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion) {
-    try {
-      Either<List<CompletionItem>, CompletionList> either = completion.get();
-      CompletionList right = either.getRight();
-      assertFalse(right.getItems().isEmpty());
-
-      right.getItems().forEach(it -> assertEquals("test", it.getLabel().toLowerCase()));
-    } catch (InterruptedException | ExecutionException e) {
-      fail(e.getMessage());
-    }
-  }
-
-  private Map<String, CobolDocumentModel> closeGetter(TextDocumentService service) {
-    return ((CobolTextDocumentService) service).getDocs();
-  }
 }

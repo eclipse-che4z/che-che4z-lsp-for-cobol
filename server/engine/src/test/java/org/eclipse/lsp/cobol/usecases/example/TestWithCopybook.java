@@ -32,11 +32,33 @@ class TestWithCopybook {
           + "       Procedure Division.\n"
           + "           display {$VAR}.";
 
+  public static final String TEXT2 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        01 {$*test1} pic x(9).\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       {#*bug-test}.\n"
+          + "           move 0 to {$test1}.\n"
+          + "       copy {~bug0}. .\n"
+          + "       {#*bug-test2}.\n"
+          + "           move 0 to {$test1}.\n";
+
   private static final String COPYBOOK_CONTENT = "       01  {$*VAR}     PIC S9(4) COMP.";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT, ImmutableList.of(new CobolText("THEBOOK", COPYBOOK_CONTENT)), ImmutableMap.of());
+  }
+
+  @Test
+  void testCopybookSubstitutionOnACobolLinePartially() {
+    UseCaseEngine.runTest(
+        TEXT2,
+        ImmutableList.of(new CobolText("BUG0", "           PERFORM {#BUG-TEST}\n")),
+        ImmutableMap.of());
   }
 }
