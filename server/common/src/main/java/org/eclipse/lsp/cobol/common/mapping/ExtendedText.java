@@ -129,7 +129,7 @@ public class ExtendedText {
   public void insert(Range copyStatementRange, ExtendedText copybook) {
     Location location = mapLocation(copyStatementRange);
     clear(copyStatementRange);
-    insert(copyStatementRange.getStart().getLine(), copybook, location);
+    insert(copyStatementRange.getStart().getLine() + 1, copybook, location);
   }
 
   /**

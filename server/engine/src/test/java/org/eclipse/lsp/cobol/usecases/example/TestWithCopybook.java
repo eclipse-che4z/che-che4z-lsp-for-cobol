@@ -42,7 +42,8 @@ class TestWithCopybook {
           + "       PROCEDURE DIVISION.\n"
           + "       {#*bug-test}.\n"
           + "           move 0 to {$test1}.\n"
-          + "       copy {~bug0}. .\n"
+          + "       copy \n"
+          + "             {~bug0}. .\n"
           + "       {#*bug-test2}.\n"
           + "           move 0 to {$test1}.\n";
 
