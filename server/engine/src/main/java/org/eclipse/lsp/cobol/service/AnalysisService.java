@@ -183,7 +183,7 @@ class AnalysisService {
 
     if (isCopybook(uri, text)) {
       communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " treated as a copy");
-      Set<String> affectedOpenedPrograms = documentService.updateCopybook(uri, text, (d) -> !isCopybook(d.getUri(), d.getText()));
+      Set<String> affectedOpenedPrograms = documentService.findAffectedDocumentsForCopybook(uri, (d) -> !isCopybook(d.getUri(), d.getText()));
       reanalysePrograms(affectedOpenedPrograms);
     } else {
       communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " treated as a program");

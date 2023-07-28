@@ -108,19 +108,6 @@ public class SymbolsRepository {
         .map(SymbolsRepository::constructElementsExcludingImplicits);
   }
 
-//  /**
-//   * Remove program related symbols
-//   *
-//   * @param documentUri the program uri
-//   */
-//  public void reset(String documentUri) {
-//    programSymbols.keySet().stream()
-//        .filter(k -> k.endsWith("%" + documentUri))
-//        .collect(Collectors.toList())
-//        .forEach(programSymbols::remove);
-//    programSymbols.remove(documentUri);
-//  }
-
   private static Context constructElementsExcludingImplicits(Context ctx) {
     List<Location> definitions =
         ctx.getDefinitions().stream().filter(uriNotImplicit()).collect(Collectors.toList());

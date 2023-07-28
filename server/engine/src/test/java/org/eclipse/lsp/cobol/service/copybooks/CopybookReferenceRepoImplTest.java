@@ -18,10 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
-import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -43,39 +40,28 @@ class CopybookReferenceRepoImplTest {
 
   @Test
   void getCopybookUsageReference() {
-    Set<CopybookModel> copybookUsageReference = setUpRepo();
+    Set<String> copybookUsageReference = setUpRepo();
     assertEquals(1, copybookUsageReference.size());
-    CopybookModel referencedCopybookModels = copybookUsageReference.toArray(new CopybookModel[0])[0];
-    assertEquals(COPYBOOK_CONTENT, referencedCopybookModels.getContent());
-    assertEquals(DOCUMENT_URI, referencedCopybookModels.getUri());
+    String referencedCopybookModels = copybookUsageReference.toArray(new String[0])[0];
+    assertEquals(DOCUMENT_URI, referencedCopybookModels);
   }
 
   @Test
   void getCopybookUsageReference_complexDependency() {
     CopybookReferenceRepoImpl repo = new CopybookReferenceRepoImpl();
 
-    CopybookName copybookName1 = new CopybookName("1");
-    CopybookModel copybookModel1 = new CopybookModel(copybookName1.toCopybookId(DOCUMENT_URI), copybookName1, "copy1", "");
+    repo.storeCopybookUsageReference("program1", "copy1");
+    repo.storeCopybookUsageReference("copy1", "copy2");
 
-    CopybookName copybookName2 = new CopybookName("2");
-    CopybookModel copybookModel2 = new CopybookModel(copybookName2.toCopybookId(DOCUMENT_URI), copybookName2, "copy2", "");
-
-    repo.storeCopybookUsageReference(copybookName1, "program1", copybookModel1);
-    repo.storeCopybookUsageReference(copybookName1, "copy1", copybookModel2);
-
-    Set<String> references = repo.getCopybookUsageReference("copy2").stream()
-        .map(CopybookModel::getUri)
-        .collect(Collectors.toSet());
+    Set<String> references = repo.getCopybookUsageReference("copy2");
 
     assertEquals(2, references.size());
     assertTrue(references.contains("copy1"));
     assertTrue(references.contains("program1"));
 
-    repo.storeCopybookUsageReference(copybookName1, "program2", copybookModel1);
+    repo.storeCopybookUsageReference("program2", "copy1");
 
-    references = repo.getCopybookUsageReference("copy2").stream()
-        .map(CopybookModel::getUri)
-        .collect(Collectors.toSet());
+    references = repo.getCopybookUsageReference("copy2");
 
     assertEquals(3, references.size());
     assertTrue(references.contains("copy1"));
@@ -87,18 +73,10 @@ class CopybookReferenceRepoImplTest {
   void getCopybookUsageReference_circularDependency() {
     CopybookReferenceRepoImpl repo = new CopybookReferenceRepoImpl();
 
-    CopybookName copybookName1 = new CopybookName("1");
-    CopybookModel copybookModel1 = new CopybookModel(copybookName1.toCopybookId(DOCUMENT_URI), copybookName1, "copy1", "");
+    repo.storeCopybookUsageReference("copy2", "copy1");
+    repo.storeCopybookUsageReference("copy1", "copy2");
 
-    CopybookName copybookName2 = new CopybookName("2");
-    CopybookModel copybookModel2 = new CopybookModel(copybookName2.toCopybookId(DOCUMENT_URI), copybookName2, "copy2", "");
-
-    repo.storeCopybookUsageReference(copybookName1, "copy2", copybookModel1);
-    repo.storeCopybookUsageReference(copybookName1, "copy1", copybookModel2);
-
-    Set<String> references = repo.getCopybookUsageReference("copy2").stream()
-        .map(CopybookModel::getUri)
-        .collect(Collectors.toSet());
+    Set<String> references = repo.getCopybookUsageReference("copy2");
 
     assertEquals(2, references.size());
     assertTrue(references.contains("copy1"));
@@ -109,23 +87,20 @@ class CopybookReferenceRepoImplTest {
   @EnabledOnOs({OS.WINDOWS})
   void getCopybookUsageReference_whenUriIsCaseInsensitive() {
     CopybookReferenceRepo repo = storeReferences();
-    Set<CopybookModel> copybookUsageReference = repo.getCopybookUsageReference("file:///C:/workspace/.c4z/.copybooks/PARENT.CPY");
-    CopybookModel referencedCopybookModels = copybookUsageReference.toArray(new CopybookModel[0])[0];
+    Set<String> copybookUsageReference = repo.getCopybookUsageReference("file:///C:/workspace/.c4z/.copybooks/PARENT.CPY");
+    String referencedCopybookModels = copybookUsageReference.toArray(new String[0])[0];
     assertEquals(1, copybookUsageReference.size());
-    assertEquals(DOCUMENT_URI, referencedCopybookModels.getUri());
-    assertEquals(COPYBOOK_CONTENT, referencedCopybookModels.getContent());
+    assertEquals(DOCUMENT_URI, referencedCopybookModels);
   }
 
-  private Set<CopybookModel> setUpRepo() {
+  private Set<String> setUpRepo() {
     CopybookReferenceRepo repo = storeReferences();
     return repo.getCopybookUsageReference(CPY_URI);
   }
 
   private CopybookReferenceRepo storeReferences() {
     CopybookReferenceRepo repo = new CopybookReferenceRepoImpl();
-    CopybookName copybookName = new CopybookName("COPYBOOK");
-    CopybookModel copybookModel = new CopybookModel(copybookName.toCopybookId(DOCUMENT_URI), copybookName, CPY_URI, COPYBOOK_CONTENT);
-    repo.storeCopybookUsageReference(copybookName, DOCUMENT_URI, copybookModel);
+    repo.storeCopybookUsageReference(DOCUMENT_URI, CPY_URI);
     return repo;
   }
 }

@@ -15,8 +15,6 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.inject.Singleton;
-import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
-import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 
 import java.io.File;
 import java.util.*;
@@ -29,7 +27,7 @@ import java.util.*;
 @Singleton
 public class CopybookReferenceRepoImpl implements CopybookReferenceRepo {
 
-  private final Map<String, Set<CopybookModel>> copybookRef;
+  private final Map<String, Set<String>> copybookRef;
 
   public CopybookReferenceRepoImpl() {
     this.copybookRef = new HashMap<>();
@@ -39,11 +37,11 @@ public class CopybookReferenceRepoImpl implements CopybookReferenceRepo {
    * Gives all the usage references of a copybook URI.
    *
    * @param copybookUri is a URI of a copybook
-   * @return a set of all reference of passed copybook URI {@link CopybookModel}
+   * @return a set of all reference of passed copybook URI
    */
   @Override
-  public Set<CopybookModel> getCopybookUsageReference(String copybookUri) {
-    Set<CopybookModel> result = new HashSet<>();
+  public Set<String> getCopybookUsageReference(String copybookUri) {
+    Set<String> result = new HashSet<>();
     getReferences(copybookUri, result);
     return result;
   }
@@ -57,22 +55,18 @@ public class CopybookReferenceRepoImpl implements CopybookReferenceRepo {
   /**
    * Stores the references of cobol programs which refers a copybook.
    *
-   * @param copybookName CopybookName for which references are to be maintained.
    * @param documentUri Cobol document (program or copybook) that refers the copybook
-   * @param copybookModel @copybookModel for the copybook.
+   * @param copybookUri copybook uri
    */
   @Override
-  public void storeCopybookUsageReference(
-      CopybookName copybookName, String documentUri, CopybookModel copybookModel) {
-    Set<CopybookModel> copybookUsageRef =
-        copybookRef.computeIfAbsent(copybookModel.getUri(), k -> new HashSet<>());
-    CopybookModel copybookResolveContext =
-        new CopybookModel(copybookName.toCopybookId(documentUri), copybookName,  documentUri, copybookModel.getContent());
-    copybookUsageRef.add(copybookResolveContext);
-    copybookRef.put(copybookModel.getUri(), copybookUsageRef);
+  public void storeCopybookUsageReference(String documentUri, String copybookUri) {
+    Set<String> copybookUsageRef =
+        copybookRef.computeIfAbsent(copybookUri, k -> new HashSet<>());
+    copybookUsageRef.add(documentUri);
+    copybookRef.put(copybookUri, copybookUsageRef);
   }
 
-  private void getReferences(String copybookUri, Set<CopybookModel> result) {
+  private void getReferences(String copybookUri, Set<String> result) {
     copybookRef.entrySet().stream()
         .filter(entry -> Objects.nonNull(entry.getKey()))
         .filter(entry -> new File(entry.getKey()).equals(new File(copybookUri)))
@@ -81,7 +75,7 @@ public class CopybookReferenceRepoImpl implements CopybookReferenceRepo {
         .filter(d -> !result.contains(d))
         .forEach(d -> {
           result.add(d);
-          getReferences(d.getUri(), result);
+          getReferences(d, result);
         });
   }
 }

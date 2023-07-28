@@ -19,8 +19,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Synchronized;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp4j.Diagnostic;
@@ -38,12 +36,10 @@ class DocumentModelService {
   private final Map<String, CobolDocumentModel> docs = new ConcurrentHashMap<>();
   private final DiagnosticRepo diagnosticRepo = new DiagnosticRepo();
   private final CopybookReferenceRepo copybookReferenceRepo;
-  private final CopybookService copybookService;
 
   @Inject
-  DocumentModelService(CopybookReferenceRepo copybookReferenceRepo, CopybookService copybookService) {
+  DocumentModelService(CopybookReferenceRepo copybookReferenceRepo) {
     this.copybookReferenceRepo = copybookReferenceRepo;
-    this.copybookService = copybookService;
   }
 
   /**
@@ -175,27 +171,19 @@ class DocumentModelService {
   /**
    * Updates copybook and returns all affected opened programs filtered by predicate
    * @param uri - copybook uri
-   * @param text - copybook text
    * @param predicate - filtering predicate for programs
    * @return set of affected opened programs
    */
   @Synchronized
-  public Set<String> updateCopybook(String uri, String text, Predicate<CobolDocumentModel> predicate) {
+  public Set<String> findAffectedDocumentsForCopybook(String uri, Predicate<CobolDocumentModel> predicate) {
     Set<String> affectedPrograms = new HashSet<>();
     copybookReferenceRepo
         .getCopybookUsageReference(uri)
         .forEach(
-            val -> {
-              CopybookModel copybookModel =
-                  new CopybookModel(
-                      val.getCopybookId(),
-                      val.getCopybookName(),
-                      uri,
-                      text);
-              if (Optional.ofNullable(get(val.getUri())).map(CobolDocumentModel::isOpened).orElse(false)) {
-                affectedPrograms.add(val.getUri());
+            curi -> {
+              if (Optional.ofNullable(get(curi)).map(CobolDocumentModel::isOpened).orElse(false)) {
+                affectedPrograms.add(curi);
               }
-              this.copybookService.store(copybookModel, true);
             });
 
     // Add all not synced programs

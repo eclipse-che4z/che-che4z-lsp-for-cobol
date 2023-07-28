@@ -164,7 +164,7 @@ public class CopybookServiceImpl implements CopybookService {
         copybookModel = copybookModelResultWithErrors.getResult();
         preprocessCopybookErrors.put(copybookModel.getUri(), copybookModelResultWithErrors.getErrors());
       }
-      copybookReferenceRepo.storeCopybookUsageReference(copybookName, documentUri, copybookModel);
+      copybookReferenceRepo.storeCopybookUsageReference(documentUri, copybookModel.getUri());
       return copybookModel;
     });
   }
