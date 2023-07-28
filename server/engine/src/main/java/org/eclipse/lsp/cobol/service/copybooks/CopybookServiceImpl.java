@@ -92,7 +92,6 @@ public class CopybookServiceImpl implements CopybookService {
     LOG.debug("Copybooks for downloading: {}", copybooksForDownloading);
     LOG.debug("Copybook cache: {}", copybookCache);
     LOG.debug("Cache invalidated");
-    copybookReferenceRepo.clearReferences();
     copybooksForDownloading.clear();
     copybookCache.invalidateAll();
   }

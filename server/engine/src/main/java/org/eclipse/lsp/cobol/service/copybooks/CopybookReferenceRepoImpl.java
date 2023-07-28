@@ -43,12 +43,9 @@ public class CopybookReferenceRepoImpl implements CopybookReferenceRepo {
    */
   @Override
   public Set<CopybookModel> getCopybookUsageReference(String copybookUri) {
-    return copybookRef.entrySet().stream()
-            .filter(entry -> Objects.nonNull(entry.getKey()))
-            .filter(entry -> new File(entry.getKey()).equals(new File(copybookUri)))
-            .map(Map.Entry::getValue)
-            .findFirst()
-            .orElse(Collections.emptySet());
+    Set<CopybookModel> result = new HashSet<>();
+    getReferences(copybookUri, result);
+    return result;
   }
 
   /** Clears all copybook references. */
@@ -61,17 +58,30 @@ public class CopybookReferenceRepoImpl implements CopybookReferenceRepo {
    * Stores the references of cobol programs which refers a copybook.
    *
    * @param copybookName CopybookName for which references are to be maintained.
-   * @param programUri Cobol program that refers the copybook
+   * @param documentUri Cobol document (program or copybook) that refers the copybook
    * @param copybookModel @copybookModel for the copybook.
    */
   @Override
   public void storeCopybookUsageReference(
-      CopybookName copybookName, String programUri, CopybookModel copybookModel) {
+      CopybookName copybookName, String documentUri, CopybookModel copybookModel) {
     Set<CopybookModel> copybookUsageRef =
         copybookRef.computeIfAbsent(copybookModel.getUri(), k -> new HashSet<>());
     CopybookModel copybookResolveContext =
-        new CopybookModel(copybookName.toCopybookId(programUri), copybookName,  programUri, copybookModel.getContent());
+        new CopybookModel(copybookName.toCopybookId(documentUri), copybookName,  documentUri, copybookModel.getContent());
     copybookUsageRef.add(copybookResolveContext);
     copybookRef.put(copybookModel.getUri(), copybookUsageRef);
+  }
+
+  private void getReferences(String copybookUri, Set<CopybookModel> result) {
+    copybookRef.entrySet().stream()
+        .filter(entry -> Objects.nonNull(entry.getKey()))
+        .filter(entry -> new File(entry.getKey()).equals(new File(copybookUri)))
+        .map(Map.Entry::getValue)
+        .flatMap(Collection::stream)
+        .filter(d -> !result.contains(d))
+        .forEach(d -> {
+          result.add(d);
+          getReferences(d.getUri(), result);
+        });
   }
 }

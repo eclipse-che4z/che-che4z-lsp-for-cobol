@@ -37,7 +37,7 @@ public interface CopybookReferenceRepo {
    * Stores the references of cobol programs which refers a copybook.
    *
    * @param copybookName CopybookName for which references are to be maintained.
-   * @param documentUri Cobol program that refers the copybook
+   * @param documentUri Cobol document (program or copybook) that refers the copybook
    * @param copybookModel @copybookModel for the copybook.
    */
   void storeCopybookUsageReference(

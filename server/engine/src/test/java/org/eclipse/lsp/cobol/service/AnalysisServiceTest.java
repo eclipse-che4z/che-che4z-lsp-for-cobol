@@ -17,11 +17,9 @@ package org.eclipse.lsp.cobol.service;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
@@ -54,8 +52,6 @@ class AnalysisServiceTest {
   @Mock private CopybookIdentificationService copybookIdentificationService;
   @Mock private Communications communications;
   @Mock private DataBusBroker dataBus;
-  @Mock private CopybookReferenceRepo copybookReferenceRepo;
-  @Mock private CopybookService copybookService;
   @Mock private Completions completions;
   @Mock private Occurrences occurrences;
   @Mock private Formations formations;
@@ -66,14 +62,14 @@ class AnalysisServiceTest {
   @BeforeEach
   void init() {
     service = new AnalysisService(communications, engine, dataBus, configurationService, syncProvider, copybookIdentificationService,
-        copybookReferenceRepo, copybookService, completions, occurrences, formations, hoverProvider, documentService, contentCache);
+        completions, occurrences, formations, hoverProvider, documentService, contentCache);
     service.setExtensionConfig(ImmutableList.of());
   }
 
   @Test
   void testIsCopybook() throws InterruptedException {
     service = new AnalysisService(communications, engine, dataBus, configurationService, syncProvider, copybookIdentificationService,
-        copybookReferenceRepo, copybookService, completions, occurrences, formations, hoverProvider, documentService, contentCache);
+        completions, occurrences, formations, hoverProvider, documentService, contentCache);
 
     CompletableFuture.supplyAsync(() -> service.isCopybook("", ""));
 

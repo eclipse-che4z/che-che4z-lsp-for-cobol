@@ -15,16 +15,19 @@
 package org.eclipse.lsp.cobol.service;
 
 import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Synchronized;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp4j.Diagnostic;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +37,14 @@ import java.util.stream.Collectors;
 class DocumentModelService {
   private final Map<String, CobolDocumentModel> docs = new ConcurrentHashMap<>();
   private final DiagnosticRepo diagnosticRepo = new DiagnosticRepo();
+  private final CopybookReferenceRepo copybookReferenceRepo;
+  private final CopybookService copybookService;
+
+  @Inject
+  DocumentModelService(CopybookReferenceRepo copybookReferenceRepo, CopybookService copybookService) {
+    this.copybookReferenceRepo = copybookReferenceRepo;
+    this.copybookService = copybookService;
+  }
 
   /**
    * Mark the document as opened and stores document text
@@ -45,16 +56,6 @@ class DocumentModelService {
     docs.computeIfAbsent(uri, (u) -> new CobolDocumentModel(uri, text));
     CobolDocumentModel documentModel = docs.get(uri);
     documentModel.setOpened(true);
-  }
-
-  /**
-   * Returns available diagnostic for the document
-   * @param uri - document uri
-   * @return list of diagnostic
-   */
-  @Synchronized
-  public List<Diagnostic> getDiagnostics(String uri) {
-    return diagnosticRepo.get(uri);
   }
 
   /**
@@ -143,18 +144,6 @@ class DocumentModelService {
         }));
   }
 
-  @Synchronized
-  public Map<String, List<Diagnostic>> getAllDiagnostic() {
-    return docs.values().stream()
-        .collect(Collectors.toMap(CobolDocumentModel::getUri, d -> {
-          List<Diagnostic> diagnostics = diagnosticRepo.get(d.getUri());
-          if (!d.isOpened() || diagnostics == null) {
-            return ImmutableList.of();
-          }
-          return diagnostics;
-        }));
-  }
-
   /**
    * Updates document with a new test
    * @param uri - document uri
@@ -171,4 +160,51 @@ class DocumentModelService {
     });
   }
 
+  /**
+   * Collects all documents with given uri list
+   * @param programs - the uri list
+   * @return a list of documents
+   */
+  @Synchronized
+  public List<CobolDocumentModel> getAll(Set<String> programs) {
+    return programs.stream().map(docs::get)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Updates copybook and returns all affected opened programs filtered by predicate
+   * @param uri - copybook uri
+   * @param text - copybook text
+   * @param predicate - filtering predicate for programs
+   * @return set of affected opened programs
+   */
+  @Synchronized
+  public Set<String> updateCopybook(String uri, String text, Predicate<CobolDocumentModel> predicate) {
+    Set<String> affectedPrograms = new HashSet<>();
+    copybookReferenceRepo
+        .getCopybookUsageReference(uri)
+        .forEach(
+            val -> {
+              CopybookModel copybookModel =
+                  new CopybookModel(
+                      val.getCopybookId(),
+                      val.getCopybookName(),
+                      uri,
+                      text);
+              if (Optional.ofNullable(get(val.getUri())).map(CobolDocumentModel::isOpened).orElse(false)) {
+                affectedPrograms.add(val.getUri());
+              }
+              this.copybookService.store(copybookModel, true);
+            });
+
+    // Add all not synced programs
+    affectedPrograms.addAll(docs.values().stream()
+        .filter(d -> !d.isDocumentSynced())
+        .filter(predicate)
+        .map(CobolDocumentModel::getUri)
+        .collect(Collectors.toList()));
+
+    return affectedPrograms;
+  }
 }

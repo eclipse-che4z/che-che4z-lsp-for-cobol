@@ -15,7 +15,10 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
@@ -45,6 +48,61 @@ class CopybookReferenceRepoImplTest {
     CopybookModel referencedCopybookModels = copybookUsageReference.toArray(new CopybookModel[0])[0];
     assertEquals(COPYBOOK_CONTENT, referencedCopybookModels.getContent());
     assertEquals(DOCUMENT_URI, referencedCopybookModels.getUri());
+  }
+
+  @Test
+  void getCopybookUsageReference_complexDependency() {
+    CopybookReferenceRepoImpl repo = new CopybookReferenceRepoImpl();
+
+    CopybookName copybookName1 = new CopybookName("1");
+    CopybookModel copybookModel1 = new CopybookModel(copybookName1.toCopybookId(DOCUMENT_URI), copybookName1, "copy1", "");
+
+    CopybookName copybookName2 = new CopybookName("2");
+    CopybookModel copybookModel2 = new CopybookModel(copybookName2.toCopybookId(DOCUMENT_URI), copybookName2, "copy2", "");
+
+    repo.storeCopybookUsageReference(copybookName1, "program1", copybookModel1);
+    repo.storeCopybookUsageReference(copybookName1, "copy1", copybookModel2);
+
+    Set<String> references = repo.getCopybookUsageReference("copy2").stream()
+        .map(CopybookModel::getUri)
+        .collect(Collectors.toSet());
+
+    assertEquals(2, references.size());
+    assertTrue(references.contains("copy1"));
+    assertTrue(references.contains("program1"));
+
+    repo.storeCopybookUsageReference(copybookName1, "program2", copybookModel1);
+
+    references = repo.getCopybookUsageReference("copy2").stream()
+        .map(CopybookModel::getUri)
+        .collect(Collectors.toSet());
+
+    assertEquals(3, references.size());
+    assertTrue(references.contains("copy1"));
+    assertTrue(references.contains("program1"));
+    assertTrue(references.contains("program2"));
+  }
+
+  @Test
+  void getCopybookUsageReference_circularDependency() {
+    CopybookReferenceRepoImpl repo = new CopybookReferenceRepoImpl();
+
+    CopybookName copybookName1 = new CopybookName("1");
+    CopybookModel copybookModel1 = new CopybookModel(copybookName1.toCopybookId(DOCUMENT_URI), copybookName1, "copy1", "");
+
+    CopybookName copybookName2 = new CopybookName("2");
+    CopybookModel copybookModel2 = new CopybookModel(copybookName2.toCopybookId(DOCUMENT_URI), copybookName2, "copy2", "");
+
+    repo.storeCopybookUsageReference(copybookName1, "copy2", copybookModel1);
+    repo.storeCopybookUsageReference(copybookName1, "copy1", copybookModel2);
+
+    Set<String> references = repo.getCopybookUsageReference("copy2").stream()
+        .map(CopybookModel::getUri)
+        .collect(Collectors.toSet());
+
+    assertEquals(2, references.size());
+    assertTrue(references.contains("copy1"));
+    assertTrue(references.contains("copy2"));
   }
 
   @Test

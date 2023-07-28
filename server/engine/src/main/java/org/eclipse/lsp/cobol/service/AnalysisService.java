@@ -23,15 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
@@ -45,6 +42,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import static java.lang.String.format;
@@ -65,8 +63,6 @@ class AnalysisService {
   private final ConfigurationService configurationService;
   private final SyncProvider syncProvider;
   private final CopybookIdentificationService copybookIdentificationService;
-  private final CopybookReferenceRepo copybookReferenceRepo;
-  private final CopybookService copybookService;
   private final CountDownLatch waitConfig = new CountDownLatch(1);
   private List<String> copybookExtensions;
   private final Completions completions;
@@ -85,8 +81,6 @@ class AnalysisService {
                   ConfigurationService configurationService,
                   SyncProvider syncProvider,
                   @Named("combinedStrategy") CopybookIdentificationService copybookIdentificationService,
-                  CopybookReferenceRepo copybookReferenceRepo,
-                  CopybookService copybookService,
                   Completions completions,
                   Occurrences occurrences,
                   Formations formations,
@@ -99,8 +93,6 @@ class AnalysisService {
     this.configurationService = configurationService;
     this.syncProvider = syncProvider;
     this.copybookIdentificationService = copybookIdentificationService;
-    this.copybookReferenceRepo = copybookReferenceRepo;
-    this.copybookService = copybookService;
     this.completions = completions;
     this.occurrences = occurrences;
     this.formations = formations;
@@ -191,8 +183,8 @@ class AnalysisService {
 
     if (isCopybook(uri, text)) {
       communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " treated as a copy");
-      updateCopybook(uri, text);
-      reanalyseOpenedPrograms();
+      Set<String> affectedOpenedPrograms = documentService.updateCopybook(uri, text, (d) -> !isCopybook(d.getUri(), d.getText()));
+      reanalysePrograms(affectedOpenedPrograms);
     } else {
       communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " treated as a program");
       analyzeDocumentWithCopybooks(uri, text);
@@ -300,23 +292,14 @@ class AnalysisService {
     }
   }
 
-  private void updateCopybook(String uri, String text) {
-    copybookReferenceRepo
-        .getCopybookUsageReference(uri)
-        .forEach(
-            val -> {
-              CopybookModel copybookModel =
-                  new CopybookModel(
-                      val.getCopybookId(),
-                      val.getCopybookName(),
-                      uri,
-                      text);
-              this.copybookService.store(copybookModel, true);
-            });
-  }
-
   public void reanalyseOpenedPrograms() {
     documentService.getAllOpened()
+        .stream().filter(d -> !isCopybook(d.getUri(), d.getText()))
+        .forEach(doc -> analyzeDocumentWithCopybooks(doc.getUri(), doc.getText()));
+  }
+
+  private void reanalysePrograms(Set<String> programs) {
+    documentService.getAll(programs)
         .stream().filter(d -> !isCopybook(d.getUri(), d.getText()))
         .forEach(doc -> analyzeDocumentWithCopybooks(doc.getUri(), doc.getText()));
   }
