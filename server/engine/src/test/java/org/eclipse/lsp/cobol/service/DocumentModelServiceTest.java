@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

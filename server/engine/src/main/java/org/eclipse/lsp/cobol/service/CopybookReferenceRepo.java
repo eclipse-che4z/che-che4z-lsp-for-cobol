@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service.copybooks;
+package org.eclipse.lsp.cobol.service;
 
 import com.google.inject.Singleton;
 
@@ -21,15 +21,13 @@ import java.util.*;
 
 /**
  * Provides API to search for COBOL programs that refers a copybooks file.
- *
- * <p>Implementation of @{@link CopybookReferenceRepo}.
  */
 @Singleton
-public class CopybookReferenceRepoImpl implements CopybookReferenceRepo {
+public class CopybookReferenceRepo {
 
   private final Map<String, Set<String>> copybookRef;
 
-  public CopybookReferenceRepoImpl() {
+  public CopybookReferenceRepo() {
     this.copybookRef = new HashMap<>();
   }
 
@@ -39,7 +37,6 @@ public class CopybookReferenceRepoImpl implements CopybookReferenceRepo {
    * @param copybookUri is a URI of a copybook
    * @return a set of all reference of passed copybook URI
    */
-  @Override
   public Set<String> getCopybookUsageReference(String copybookUri) {
     Set<String> result = new HashSet<>();
     getReferences(copybookUri, result);
@@ -47,7 +44,6 @@ public class CopybookReferenceRepoImpl implements CopybookReferenceRepo {
   }
 
   /** Clears all copybook references. */
-  @Override
   public void clearReferences() {
     this.copybookRef.clear();
   }
@@ -58,7 +54,6 @@ public class CopybookReferenceRepoImpl implements CopybookReferenceRepo {
    * @param documentUri Cobol document (program or copybook) that refers the copybook
    * @param copybookUri copybook uri
    */
-  @Override
   public void storeCopybookUsageReference(String documentUri, String copybookUri) {
     Set<String> copybookUsageRef =
         copybookRef.computeIfAbsent(copybookUri, k -> new HashSet<>());

@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service.copybooks;
+package org.eclipse.lsp.cobol.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,7 +24,7 @@ import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
 /** Test @{@link CopybookReferenceRepo} */
-class CopybookReferenceRepoImplTest {
+class CopybookReferenceRepoTest {
 
   public static final String DOCUMENT_URI = "file:///c:/workspace/document.cbl";
   private static final String CPY_URI = "file:///c:/workspace/.c4z/.copybooks/PARENT.CPY";
@@ -48,7 +48,7 @@ class CopybookReferenceRepoImplTest {
 
   @Test
   void getCopybookUsageReference_complexDependency() {
-    CopybookReferenceRepoImpl repo = new CopybookReferenceRepoImpl();
+    CopybookReferenceRepo repo = new CopybookReferenceRepo();
 
     repo.storeCopybookUsageReference("program1", "copy1");
     repo.storeCopybookUsageReference("copy1", "copy2");
@@ -71,7 +71,7 @@ class CopybookReferenceRepoImplTest {
 
   @Test
   void getCopybookUsageReference_circularDependency() {
-    CopybookReferenceRepoImpl repo = new CopybookReferenceRepoImpl();
+    CopybookReferenceRepo repo = new CopybookReferenceRepo();
 
     repo.storeCopybookUsageReference("copy2", "copy1");
     repo.storeCopybookUsageReference("copy1", "copy2");
@@ -99,7 +99,7 @@ class CopybookReferenceRepoImplTest {
   }
 
   private CopybookReferenceRepo storeReferences() {
-    CopybookReferenceRepo repo = new CopybookReferenceRepoImpl();
+    CopybookReferenceRepo repo = new CopybookReferenceRepo();
     repo.storeCopybookUsageReference(DOCUMENT_URI, CPY_URI);
     return repo;
   }

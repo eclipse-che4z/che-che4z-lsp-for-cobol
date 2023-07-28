@@ -19,7 +19,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Synchronized;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp4j.Diagnostic;
 

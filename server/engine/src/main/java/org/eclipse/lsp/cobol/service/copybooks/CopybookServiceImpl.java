@@ -37,6 +37,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.service.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.DocumentContentCache;
 
 import java.nio.file.Path;
