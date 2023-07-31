@@ -158,7 +158,9 @@ function globSearch(
   pattern = pattern + suffix;
   const result = globSync(pattern, { cwd, dot: true });
   // TODO report the case with more then one copybook fit the pattern.
-  return result[0] ? path.resolve(cwd, result[0]) : undefined;
+  return result[0]
+    ? normalizePath(fs.realpathSync.native(path.resolve(cwd, result[0])))
+    : undefined;
 }
 
 export function getProgramNameFromUri(

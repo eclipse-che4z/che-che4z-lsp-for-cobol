@@ -23,13 +23,9 @@ import java.util.*;
  * Provides API to search for COBOL programs that refers a copybooks file.
  */
 @Singleton
-public class CopybookReferenceRepo {
+class CopybookReferenceRepo {
 
-  private final Map<String, Set<String>> copybookRef;
-
-  public CopybookReferenceRepo() {
-    this.copybookRef = new HashMap<>();
-  }
+  private final Map<String, Set<String>> copybookRef = new HashMap<>();
 
   /**
    * Gives all the usage references of a copybook URI.

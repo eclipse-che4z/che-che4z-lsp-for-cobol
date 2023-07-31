@@ -25,7 +25,6 @@ import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.DocumentContentCache;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
@@ -38,7 +37,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -76,7 +74,6 @@ class CopybookServiceTest {
 
   private final DataBusBroker broker = mock(DataBusBroker.class);
   private final CobolLanguageClient client = mock(CobolLanguageClient.class);
-  private final CopybookReferenceRepo copybookReferenceRepo = new CopybookReferenceRepo();
   private final FileSystemService files = mock(FileSystemService.class);
   private final TextPreprocessor preprocessor = mock(TextPreprocessor.class);
   private final Path cpyPath = mock(Path.class);
@@ -444,7 +441,7 @@ class CopybookServiceTest {
   private CopybookServiceImpl createCopybookService() {
     ClientProvider provider = new ClientProvider();
     provider.setClient(client);
-    return new CopybookServiceImpl(broker, provider, files, preprocessor, new CopybookCache(3, 3, "HOURS"), copybookReferenceRepo, documentCache);
+    return new CopybookServiceImpl(broker, provider, files, preprocessor, new CopybookCache(3, 3, "HOURS"), documentCache);
   }
 
   private CopybookName createCopybook(String displayName) {
@@ -485,16 +482,5 @@ class CopybookServiceTest {
     CopybookModel copybookModel = resolvedCopybook.getResult();
     assertEquals(copybookModel.getContent(), copybookContent);
     assertEquals(resolvedCopybook.getErrors().get(0), expectedSyntaxError);
-  }
-
-  @Test
-  void getCopybookUsageReference() {
-    CopybookName copybookName = createCopybook(VALID_CPY_NAME);
-    CopybookService copybookService = createCopybookService();
-    copybookService.resolve(copybookName.toCopybookId(DOCUMENT_URI), copybookName, DOCUMENT_URI, DOCUMENT_URI, cpyConfig, false);
-    Set<String> copybookUsageReference = copybookReferenceRepo.getCopybookUsageReference("file:///c:/workspace/.c4z/.copybooks/VALIDNAME.CPY");
-    assertEquals(1, copybookUsageReference.size());
-    String referencedCopybook = copybookUsageReference.toArray(new String[0])[0];
-    assertEquals(DOCUMENT_URI, referencedCopybook);
   }
 }

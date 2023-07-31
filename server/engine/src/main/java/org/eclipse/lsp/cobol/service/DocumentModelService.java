@@ -19,6 +19,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Synchronized;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp4j.Diagnostic;
 
@@ -74,6 +76,11 @@ class DocumentModelService {
       d.setAnalysisResult(analysisResult);
       diagnosticRepo.put(analysisResult.getDiagnostics());
       d.setOutlineResult(BuildOutlineTreeFromSyntaxTree.convert(analysisResult.getRootNode(), uri));
+      analysisResult.getRootNode().getDepthFirstStream()
+          .filter(n -> n.getNodeType() == NodeType.COPY)
+          .filter(n -> n instanceof CopyNode)
+              .map(CopyNode.class::cast)
+                  .forEach(n -> copybookReferenceRepo.storeCopybookUsageReference(n.getNameLocation().getUri(), n.getUri()));
     });
   }
 
@@ -129,14 +136,17 @@ class DocumentModelService {
    */
   @Synchronized
   public Map<String, List<Diagnostic>> getOpenedDiagnostic() {
-    return docs.values().stream()
-        .collect(Collectors.toMap(CobolDocumentModel::getUri, d -> {
-          List<Diagnostic> diagnostics = diagnosticRepo.get(d.getUri());
-          if (!d.isOpened() || diagnostics == null) {
-            return ImmutableList.of();
-          }
-          return diagnostics;
-        }));
+    Map<String, List<Diagnostic>> result = new HashMap<>();
+    docs.forEach((key, value) -> {
+      List<Diagnostic> diagnostics = diagnosticRepo.get(value.getUri());
+      if (diagnostics != null && value.isOpened()) {
+        result.put(key, diagnostics);
+      } else {
+        result.put(key, ImmutableList.of());
+      }
+    });
+
+    return result;
   }
 
   /**
