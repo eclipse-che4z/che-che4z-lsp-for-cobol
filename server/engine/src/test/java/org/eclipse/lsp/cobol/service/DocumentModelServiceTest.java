@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * Test for DocumentModelService
@@ -36,7 +37,7 @@ class DocumentModelServiceTest {
 
   @BeforeEach
   void init() {
-    service = new DocumentModelService();
+    service = new DocumentModelService(mock(CopybookReferenceRepo.class));
   }
 
   @Test
