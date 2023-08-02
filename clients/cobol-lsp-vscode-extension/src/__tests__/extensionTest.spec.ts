@@ -212,42 +212,72 @@ describe("Check recognition of COBOL from first line", () => {
     expect(pgm).toEqual(cobol);
   });
 
-  test("Compiler Directive SEQ in column 8", () => {
-    const pgm = `000010 PROCESS `;
+  test("Compiler Directive at the beginnig of a line", () => {
+    const pgm = `CBL `;
     expect(pgm).toEqual(cobol);
   });
 
-  test("Compiler Directive NOSEQ in column 8", () => {
+  test("Compiler Directive after 3 spaces", () => {
+    const pgm = `   CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Compiler Directive after 6 spaces", () => {
+    const pgm = `      CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Compiler Directive after 7 spaces", () => {
     const pgm = `       CBL `;
     expect(pgm).toEqual(cobol);
   });
 
-  test("Compiler Directive SEQ after column 8", () => {
+  test("Compiler Directive after spaces 8 spaces", () => {
+    const pgm = `        CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Compiler Directive after more spaces", () => {
+    const pgm = `           CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Incorrect compiler directive", () => {
+    const pgm = `a    CBL `;
+    expect(pgm).not.toEqual(cobol);
+  });
+
+  test("Compiler Directive after \"sequence number\"", () => {
+    const pgm = `0abcdePROCESS `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Compiler Directive in column 8 - SEQ", () => {
+    const pgm = `000010 PROCESS `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Compiler Directive after column 8 - SEQ", () => {
     const pgm = `000010     CBL `;
     expect(pgm).toEqual(cobol);
   });
 
-  test("Compiler Directive NOSEQ after column 8", () => {
-    const pgm = `           PROCESS `;
-    expect(pgm).toEqual(cobol);
-  });
-
-  test("Listing control SEQ in column 8", () => {
+  test("Listing control in column 8 - SEQ", () => {
     const pgm = `000010 *PROCESS `;
     expect(pgm).toEqual(cobol);
   });
 
-  test("Listing control NOSEQ in column 8", () => {
+  test("Listing control in column 8 - NOSEQ", () => {
     const pgm = `       *CBL `;
     expect(pgm).toEqual(cobol);
   });
 
-  test("Listing control SEQ after column 8", () => {
+  test("Listing control after column 8 - SEQ ", () => {
     const pgm = `000010    *CBL `;
     expect(pgm).toEqual(cobol);
   });
 
-  test("Listing control NOSEQ after column 8", () => {
+  test("Listing control after column 8 - NOSEQ ", () => {
     const pgm = `          *PROCESS `;
     expect(pgm).toEqual(cobol);
   });
