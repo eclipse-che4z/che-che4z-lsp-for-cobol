@@ -72,20 +72,9 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitDbs_host_name_container(Db2SqlParser.Dbs_host_name_containerContext ctx) {
     if (isVariableUsage(ctx.getParent())) {
-      return addTreeNode(
-          ctx,
-          locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality)
-      );
+      return addVariableUsageNodes(ctx);
     }
     return ImmutableList.of();
-  }
-
-  @Override
-  public List<Node> visitDbs_sql_identifier(Db2SqlParser.Dbs_sql_identifierContext ctx) {
-    return addTreeNode(
-        ctx,
-        locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality)
-    );
   }
 
   // NOTE: Visitor is not managed by Guice DI, so can't use annotation here.
@@ -159,5 +148,26 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         .build());
     visitChildren(ctx).forEach(node::addChild);
     return ImmutableList.of(node);
+  }
+
+  private List<Node> addVariableUsageNodes(ParserRuleContext ctx) {
+    String name = VisitorHelper.getName(ctx);
+    boolean hasColumn = name.startsWith(":");
+    if (hasColumn) {
+      name = name.substring(1);
+    }
+
+    if (Db2SqlVisitorHelper.isGroupName(name)) {
+      Locality locality = VisitorHelper.buildNameRangeLocality(ctx, name, programUri);
+      locality.setRange(RangeUtils.shiftRangeWithPosition(new Position(position.getLine(),
+          position.getCharacter() + (hasColumn ? 1 : 0)), locality.getRange()));
+
+      return Db2SqlVisitorHelper.generateGroupNodes(name, locality);
+    }
+    String finalName = name;
+    return addTreeNode(
+        ctx,
+        locality -> new VariableUsageNode(finalName, locality)
+    );
   }
 }
