@@ -128,7 +128,7 @@ public class ErrorMessageHelper {
     String tokenName = SPECIAL_TOKEN_MAPPING.getOrDefault(t.getText(), t.getText());
     return recognizer.getContext().getRuleIndex() == CobolParser.RULE_performInlineStatement
         ? messageService.getMessage(PERFORM_MISSING_END, tokenName)
-        : messageService.getMessage(REPORT_UNWANTED_TOKEN, tokenName, getExpectedText(recognizer));
+        : messageService.getMessage(REPORT_UNWANTED_TOKEN, tokenName);
   }
 
   private String buildErrorMessage(List<String> tokens) {
