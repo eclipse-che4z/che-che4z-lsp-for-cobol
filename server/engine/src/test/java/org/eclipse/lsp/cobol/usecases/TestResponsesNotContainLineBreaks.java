@@ -54,16 +54,7 @@ class TestResponsesNotContainLineBreaks {
             "1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input '>' expected {CBLCARD, COBOL2, COBOL3, CPSM, DLI, EDF, EPILOG, EXCI, FEPI, "
-                    + "NATLANG, NOCBLCARD, NOCMPR2, NOCPSM, NODEBUG, NOEDF, NOFEPI, NOLENGTH, NOLINKAGE, NOOPTIONS, "
-                    + "NOSPIE, NOTRIG, OPTIONS, SP, SPIE, SYSEIB, ALL, CPP, DATEPROC, DFHRESP, DFHVALUE, DP, EOC, "
-                    + "EODS, FALSE, FUNCTION, GDS, GRAPHIC, HIGH-VALUE, HIGH-VALUES, INVMPSZ, INVPARTN, INVREQ, KA, "
-                    + "LEASM, LENGTH, LIB, LIN, LINAGE-COUNTER, LOW-VALUE, LOW-VALUES, MAPFAIL, MARGINS, NODE, "
-                    + "NODATEPROC, NODP, NOEPILOG, NOFLAGMIG, NOGRAPHIC, NOLIB, NOOPSEQUENCE, NOOPT, NOOPTIMIZE, "
-                    + "NOP, NOPROLOG, NOSTDTRUNC, NOT, NSEQ, NULL, NULLS, OP, OPMARGINS, OPSEQUENCE, PARTNFAIL, "
-                    + "PROLOG, QUOTES, RDATT, RES, SPACE, SPACES, SZ, TRIG, TRUE, UNEXPIN, YEARWINDOW, YW, ZERO, "
-                    + "ZEROES, ZEROS, '(', '-', '+', '01-49', '66', '77', '88', INTEGERLITERAL, NUMERICLITERAL, "
-                    + "NONNUMERICLITERAL, IDENTIFIER, FINALCHARSTRING}",
+                    "Extraneous input '>'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

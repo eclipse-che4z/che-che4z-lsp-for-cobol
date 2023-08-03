@@ -122,7 +122,7 @@ class ErrorMessageHelper {
 
   private String createMessage(Parser recognizer, Token t) {
     String tokenName = t.getText();
-    return messageService.getMessage(REPORT_UNWANTED_TOKEN, tokenName, getExpectedText(recognizer));
+    return messageService.getMessage(REPORT_UNWANTED_TOKEN, tokenName);
   }
 
   private String buildErrorMessage(List<String> tokens) {
