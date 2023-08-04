@@ -43,12 +43,15 @@ export function get_editor(workspace_file: string): vscode.TextEditor {
   return editor;
 }
 
-export async function showDocument(workspace_file: string) {
+export async function getUri(workspace_file: string): Promise<vscode.Uri> {
   const files = await vscode.workspace.findFiles(workspace_file);
 
-  assert.ok(files && files[0]);
-  const file = files[0];
+  assert.ok(files && files[0], `Cannot find file ${workspace_file}`);
+  return files[0];
+}
 
+export async function showDocument(workspace_file: string) {
+  const file = await getUri(workspace_file);
   // open and show the file
   const document = await vscode.workspace.openTextDocument(file);
 

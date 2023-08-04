@@ -367,4 +367,72 @@ suite("Integration Test Suite", function () {
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
+
+  test("Show errors only for opened files", async () => {
+    // Open program with error inside a copybook
+    await helper.showDocument("TESTCPY1.cbl");
+    const progUri = await helper.getUri("TESTCPY1.cbl");
+
+    const copybookPath = path.join("testing", "COPYE");
+    const copybookUri = await helper.getUri(copybookPath);
+
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(progUri).length === 1,
+    );
+    let diagnostics = vscode.languages.getDiagnostics(progUri);
+    assert.strictEqual(
+      diagnostics.length,
+      1,
+      "got: " + JSON.stringify(diagnostics),
+    );
+    assert.strictEqual(diagnostics[0].message, "Errors inside the copybook");
+
+    // No diagnostic for copybook so far
+    let copyDiagnostics = vscode.languages.getDiagnostics(copybookUri);
+    assert.strictEqual(copyDiagnostics.length, 0);
+
+    // Open copybook with an error
+    await helper.showDocument(copybookPath);
+
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(copybookUri).length === 1,
+    );
+    copyDiagnostics = vscode.languages.getDiagnostics(copybookUri);
+    assert.strictEqual(
+      copyDiagnostics.length,
+      1,
+      "got: " + JSON.stringify(diagnostics),
+    );
+    assert.strictEqual(
+      copyDiagnostics[0].message,
+      "Extraneous input 'VvvALUE' expected {BINARY, BLANK, COMP, COMPUTATIONAL, COMPUTATIONAL-1, COMPUTATIONAL-2, COMPUTATIONAL-3, COMPUTATIONAL-4, COMPUTATIONAL-5, COMP-1, COMP-2, COMP-3, COMP-4, COMP-5, DISPLAY, DISPLAY-1, DYNAMIC, EXTERNAL, FUNCTION-POINTER, GLOBAL, GROUP-USAGE, INDEX, IS, JUST, JUSTIFIED, LEADING, NATIONAL, OBJECT, OCCURS, PACKED-DECIMAL, PIC, PICTURE, POINTER, POINTER-32, PROCEDURE-POINTER, REDEFINES, SIGN, SYNC, SYNCHRONIZED, TRAILING, USAGE, UTF-8, VALUE, VALUES, VOLATILE, '.'}",
+    );
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
+
+  test("Show transition copybook errors", async () => {
+    // Open program with error inside a copybook
+    await helper.showDocument("TESTCPY2.cbl");
+    const progUri = await helper.getUri("TESTCPY2.cbl");
+
+    const copybookPath = path.join("testing", "COPYC");
+    const copybookUri = await helper.getUri(copybookPath);
+
+    // Open copybook with an error
+    await helper.showDocument(copybookPath);
+
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(copybookUri).length === 1,
+    );
+    const diagnostic = vscode.languages.getDiagnostics(copybookUri);
+    assert.strictEqual(
+      diagnostic.length,
+      1,
+      "got: " + JSON.stringify(diagnostic),
+    );
+    assert.strictEqual(diagnostic[0].message, "Errors inside the copybook");
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
 });
