@@ -63,7 +63,7 @@ public class TestMappingMaintainedForEmbeddedCode {
           + "      *  some comments                                              \n"
           + "      *                                                                         \n"
           + "                 EXEC CICS LINK                                                 \n"
-          + "                    PROGRAM({$PGM})                                        \n"
+          + "                    PROGRAM(PGM)                                        \n"
           + "                    {DUMMY-CMD|1}()                            \n"
           + "                    SYNCONRETURN                                                \n"
           + "                 END-EXEC                                                       \n"
@@ -117,7 +117,7 @@ public class TestMappingMaintainedForEmbeddedCode {
             "1",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'DUMMY-CMD' expected {CHANNEL, COMMAREA, INPUTMSG, RESP, RESP2, SYNCONRETURN, SYSID, TRANSID}",
+                    "No viable alternative at input LINK\n                    PROGRAM(PGM)\n                    DUMMY-CMD",
                 Error,
                 ErrorSource.PARSING.getText())));
   }
