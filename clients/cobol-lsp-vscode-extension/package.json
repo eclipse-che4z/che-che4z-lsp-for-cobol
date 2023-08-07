@@ -470,7 +470,7 @@
     "glob": "10.2.7",
     "iconv-lite": "^0.6.3",
     "micromatch": "4.0.5",
-    "@vscode/extension-telemetry": "0.8.0",
+    "@vscode/extension-telemetry": "0.8.2",
     "vscode-languageclient": "8.0.2"
   },
   "devDependencies": {
