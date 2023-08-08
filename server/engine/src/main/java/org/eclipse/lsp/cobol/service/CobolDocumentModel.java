@@ -23,8 +23,8 @@ import org.eclipse.lsp4j.Position;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * This class stores a COBOL program text to be processed. Provides a list of lines and text tokens
@@ -34,7 +34,7 @@ import java.util.List;
 @Slf4j
 public class CobolDocumentModel {
   private static final String DELIMITER = "[ .\\[\\]()<>,*\"']+";
-  @Getter private final List<Line> lines = new ArrayList<>();
+  @Getter private final List<Line> lines = new CopyOnWriteArrayList<>();
   @Getter private String text;
   @Getter private final String uri;
   @Getter @Setter private boolean opened = true;

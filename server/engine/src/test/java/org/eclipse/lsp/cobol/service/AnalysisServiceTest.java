@@ -36,6 +36,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -61,15 +62,39 @@ class AnalysisServiceTest {
 
   @BeforeEach
   void init() {
-    service = new AnalysisService(communications, engine, dataBus, configurationService, syncProvider, copybookIdentificationService,
-        completions, occurrences, formations, hoverProvider, documentService, contentCache);
+    service =
+        new AnalysisService(
+            communications,
+            engine,
+            dataBus,
+            configurationService,
+            syncProvider,
+            copybookIdentificationService,
+            completions,
+            occurrences,
+            formations,
+            hoverProvider,
+            documentService,
+            contentCache);
     service.setExtensionConfig(ImmutableList.of());
   }
 
   @Test
   void testIsCopybook() throws InterruptedException {
-    service = new AnalysisService(communications, engine, dataBus, configurationService, syncProvider, copybookIdentificationService,
-        completions, occurrences, formations, hoverProvider, documentService, contentCache);
+    service =
+        new AnalysisService(
+            communications,
+            engine,
+            dataBus,
+            configurationService,
+            syncProvider,
+            copybookIdentificationService,
+            completions,
+            occurrences,
+            formations,
+            hoverProvider,
+            documentService,
+            contentCache);
 
     CompletableFuture.supplyAsync(() -> service.isCopybook("", ""));
 
@@ -125,10 +150,16 @@ class AnalysisServiceTest {
   @Test
   void findFormatting() {
     String uri = UUID.randomUUID().toString();
-
+    when(documentService.get(uri)).thenReturn(mock(CobolDocumentModel.class));
     service.findFormatting(uri);
-    verify(documentService, times(1)).get(uri);
     verify(formations, times(1)).format(any());
+  }
+
+  @Test
+  void findFormatting_whenDocumentNotAnalysed() {
+    String uri = UUID.randomUUID().toString();
+    when(documentService.get(uri)).thenReturn(null);
+    assertEquals(service.findFormatting(uri).size(), 0);
   }
 
   @Test
@@ -143,6 +174,7 @@ class AnalysisServiceTest {
   @Test
   void findFoldingRange() {
     String uri = UUID.randomUUID().toString();
+    when(documentService.isDocumentSynced(uri)).thenReturn(true);
     when(documentService.get(uri)).thenReturn(mock(CobolDocumentModel.class));
 
     service.findFoldingRange(uri);
@@ -150,14 +182,30 @@ class AnalysisServiceTest {
   }
 
   @Test
+  void findFoldingRange_whenDocNotAnalysed() {
+    String uri = UUID.randomUUID().toString();
+    when(documentService.isDocumentSynced(uri)).thenReturn(false);
+    assertEquals(service.findFoldingRange(uri).size(), 0);
+  }
+
+  @Test
   void findDocumentSymbol() {
     String uri = UUID.randomUUID().toString();
+    when(documentService.isDocumentSynced(uri)).thenReturn(true);
     when(documentService.get(uri)).thenReturn(mock(CobolDocumentModel.class));
 
     service.findDocumentSymbol(uri);
     verify(communications, times(1)).notifyProgressEnd(uri);
   }
 
+  @Test
+  void findDocumentSymbolWhenDocNotAnalysed() {
+    String uri = UUID.randomUUID().toString();
+    when(documentService.isDocumentSynced(uri)).thenReturn(false);
+
+    assertEquals(service.findDocumentSymbol(uri).size(), 0);
+    verify(communications, times(1)).notifyProgressEnd(uri);
+  }
 
   @Test
   void testAnalyzeDocument_git() {
@@ -267,8 +315,6 @@ class AnalysisServiceTest {
   }
 
   private AnalysisResult prepareAnalysisResult() {
-    return AnalysisResult.builder()
-        .rootNode(new RootNode())
-        .build();
+    return AnalysisResult.builder().rootNode(new RootNode()).build();
   }
 }
