@@ -208,7 +208,10 @@ class AnalysisService {
   }
 
   public List<Either<SymbolInformation, DocumentSymbol>> findDocumentSymbol(String uri) {
-    List<DocumentSymbol> symbols = documentService.get(uri).getOutlineResult();
+    List<DocumentSymbol> symbols =
+        documentService.isDocumentSynced(uri)
+            ? documentService.get(uri).getOutlineResult()
+            : Collections.emptyList();
     try {
       return createDocumentSymbols(symbols);
     } finally {
@@ -231,7 +234,10 @@ class AnalysisService {
   }
 
   public List<FoldingRange> findFoldingRange(String uri) {
-    List<DocumentSymbol> symbols = documentService.get(uri).getOutlineResult();
+    List<DocumentSymbol> symbols =
+        documentService.isDocumentSynced(uri)
+            ? documentService.get(uri).getOutlineResult()
+            : Collections.emptyList();
     return DocumentServiceHelper.getFoldingRangeFromDocumentSymbol(symbols);
   }
 
@@ -320,5 +326,4 @@ class AnalysisService {
     LocalDateTime now = LocalDateTime.now();
     return dtf.format(now) + " ";
   }
-
 }
