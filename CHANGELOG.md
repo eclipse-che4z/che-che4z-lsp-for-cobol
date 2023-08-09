@@ -1,6 +1,33 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+Changelog:
+# [2.0.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.1...2.0.2) (2023-08-09)
+### Bug Fixes
+* Fix pop-up error for completion requests ([658f6cb](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/658f6cb86bc5993c2f8f0624cd523ccc8eba4104))
+* Add default compiler directives while processing when no compiler directive configuration present ([06769fa](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/06769faa256d34f1d6114f9f603a1cbfacdc666c))
+* Allow defining CICS condition names as variables ([2682568](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/2682568ef07f713b626babbd8a24995454d56317))
+* Allow hex token with lowercase alphabets ([54ff8c8](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/54ff8c8645a5c75844f8302b5566286d2d4f34c9))
+* Recognize COBOL language ID if a compiler directive is specified in the first 7 columns of the first line ([83dfd27](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/83dfd27abfb80571daec41a2cc6fdf69b2761226))
+* Fetch copybook for dialect from the dialect configured settings ([a9765f5](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/a9765f537b08fb10da165b0dfb48719c5fbddee5))
+* Fix coloring for EXEC block ([fab389c](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/fab389c36783411eb1e4ad81cdf6cbb39768c916))
+* Fix copybook content substitution [#1961](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/1961) ([2a0f605](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/2a0f6053599580fbba4ddaa9d030df893bb9739d))
+* Fix group variables for SQL statements ([#2001](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2001)) ([6db4f0b](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/6db4f0ba761519b911088c76e21db0d24ece549a))
+* Fix runtime copybook watchers ([d24ce81](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/d24ce8122d4e71be5f27f4787d9eeefebd80dffc))
+* Handle 77 level as first level ([091d1b5](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/091d1b59d2cd4d7ebe6faa920458c034a56d9e13))
+* Handle implicit registers introduced by CICS translator ([703aa60](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/703aa601c3d2db52aaea64e6a5adf26368430a64))
+* Maintain mapping for embedded code ([bcde14c](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/bcde14cd1bb32bfa92ebbabd65e6d17e5d488232))
+* Maintain mapping for multiple instances of embedded code ([449dfba](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/449dfbaddf73faa45ee1548adaae69df6310a352))
+* Respect processor group configuration for copybookName autocompletion ([8f2f1cd](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/8f2f1cd765dc4b3c8a6d3472ed27813deadaa1f2))
+* Skip analysis for not used copybook ([#1996](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/1996)) ([cee3b08](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/cee3b08d6f8fb707d8093823a2bca0fb52561ebe))
+* Tolerate CICS LINK EXCI statement ([70bcbcb](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/70bcbcb69d9d972f4dcfbe79f070fcf634c5eab6))
+* Tolerate FD data record mismatch clause as per IBM doc ([5fff092](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/5fff0922abef1390489a44bad3de162fa7db32f3))
+* Update copybook extended text position ([813703f](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/813703f41621c35997af446964ba73cc9e06c2e2))
+* Update grammar to restrict only reserved word for COBOL identifiers [#1761](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/1761) ([17d12b1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/17d12b1e0232e8ff4ebc752f2b94321c587dd2cc))
+### Features
+* Show diagnostic only for opened documents ([#1965](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/1965)) ([28631ab](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/28631abe14878b99cb49782b51daa21a76fedbd3))
+* Log Server messages to VS Code output panel([#1949](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/1949)) ([cab35d7](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/cab35d71cc0b2301c6a044450add422f77b37196))
+
 ## [2.0.1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.0...2.0.1) (2023-06-29)
 
 ### Bug Fixes
