@@ -189,7 +189,7 @@ public class TestXMLParseStatement {
           + "       PROCEDURE DIVISION.\n"
           + "          {#*MAINLINE}.\n"
           + "             DISPLAY 'XML-DOCUMENT=' {$XML-STRING}(1:{$EZ-PTR})\n"
-          + "             XML PARSE {$XML-STRING}(1:{$EZ-PTR}) {_RETURNING NATIONAL|1_}\n"
+          + "             XML PARSE {$XML-STRING}(1:{$EZ-PTR}) RETURNING NATIONAL\n"
           + "                                PROCESSING PROCEDURE {#XML-HANDLER}\n"
           + "               ON EXCEPTION\n"
           + "                 DISPLAY 'XML DOCUMENT ERROR ' {$XML-CODE}\n"
@@ -303,12 +303,6 @@ public class TestXMLParseStatement {
     UseCaseEngine.runTest(
             XML_PARSE_SUBSTRING_IDENTIFIER,
             ImmutableList.of(),
-            ImmutableMap.of(
-                    "1",
-                    new Diagnostic(
-                            new Range(),
-                            "RETURNING NATIONAL phrase can be specified only when the XMLPARSE(XMLSS) compiler option is in effect",
-                            DiagnosticSeverity.Hint,
-                            ErrorSource.PARSING.getText())));
+            ImmutableMap.of());
   }
 }
