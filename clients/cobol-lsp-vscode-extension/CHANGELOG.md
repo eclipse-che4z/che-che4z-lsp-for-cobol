@@ -3,29 +3,15 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ## [2.0.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.1...2.0.2) (2023-08-09)
 
-#### Fixed
-- fix pop up error for completion requests
-- allow defining cics conditions names as variable
-- allow hex token with lowercase alphabets
-- recognize COBOL language id if a compiler directive is specified in the first 7 columns of the first line
-- fetch copybook for dialect from the dialect configured settings
-- fix coloring for exec block
-- fix copybook content substitution
-- fix group variables for sql statements
-- fix runtime copybook watchers
-- handle 77 level as first level
-- handle implicit registers introduced by CICS translator
-- maintain mapping for embedded code
-- maintain mapping for multiple instances of embedded code
-- respect processor group configuration for copybookName autocompletion
-- skip analysis for not used copybook
-- update grammar to restrict only reserved word for cobol identifiers
-- tolerate CICS LINK EXCI statement
-- tolerate FD data records mismatch clause as per IBM doc
-
 #### Added
 - Log Server messages to VS Code output panel
+
+#### Changed
 - Show diagnostic only for opened documents
+- Readme update
+
+#### Fixed
+- Miscellaneous bug fixes
 
 ## [2.0.1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.0...2.0.1) (2023-06-29)
 
