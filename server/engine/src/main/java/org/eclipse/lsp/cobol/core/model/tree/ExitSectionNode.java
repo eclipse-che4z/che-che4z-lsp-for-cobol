@@ -19,7 +19,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 
-/** The class represents exit in COBOL. */
+/** The class represents exit section in COBOL. */
 @ToString(callSuper = true)
 public class ExitSectionNode extends Node {
   public ExitSectionNode(Locality location) {

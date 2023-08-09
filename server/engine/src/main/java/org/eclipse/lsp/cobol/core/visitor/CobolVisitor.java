@@ -829,6 +829,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     if (ctx.SECTION() != null) {
       return addTreeNode(ctx, ExitSectionNode::new);
     }
+    if (ctx.PARAGRAPH() != null) {
+      return addTreeNode(ctx, ExitParagraphNode::new);
+    }
     return addTreeNode(ctx, ExitNode::new);
   }
 

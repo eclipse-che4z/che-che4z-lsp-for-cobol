@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Broadcom.
+ * Copyright (c) 2023 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -16,13 +16,13 @@ package org.eclipse.lsp.cobol.core.model.tree;
 
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 
-/** The class represents exit in COBOL. */
+/** The class represents exit paragraph in COBOL. */
 @ToString(callSuper = true)
-public class ExitSectionNode extends Node {
-  public ExitSectionNode(Locality location) {
+public class ExitParagraphNode extends Node {
+  public ExitParagraphNode(Locality location) {
     super(location, NodeType.EXIT_SECTION);
   }
 }
