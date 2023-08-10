@@ -188,7 +188,7 @@ class CobolLanguageServerTest {
         new CobolLanguageServer(
             null,
             null,
-            null,
+            mock(WatcherServiceImpl.class),
             null,
             null,
             customExecutor,

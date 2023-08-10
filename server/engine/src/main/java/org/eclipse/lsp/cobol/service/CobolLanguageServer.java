@@ -106,6 +106,8 @@ public class CobolLanguageServer implements LanguageServer {
   @Override
   @NonNull
   public CompletableFuture<InitializeResult> initialize(@NonNull InitializeParams params) {
+    watchingService.getWorkspaceFolders().addAll(params.getWorkspaceFolders());
+
     ServerCapabilities capabilities = new ServerCapabilities();
 
     capabilities.setTextDocumentSync(Full);
@@ -216,8 +218,7 @@ public class CobolLanguageServer implements LanguageServer {
 
   @NonNull
   private ExecuteCommandOptions collectExecuteCommandList() {
-    return new ExecuteCommandOptions(
-            ImmutableList.of(ErrorCodes.MISSING_COPYBOOK.getLabel()));
+    return new ExecuteCommandOptions(ImmutableList.of(ErrorCodes.MISSING_COPYBOOK.getLabel()));
   }
 
   /** Represents the JSON RPC response structure for shutdown command as per LSP specification */
