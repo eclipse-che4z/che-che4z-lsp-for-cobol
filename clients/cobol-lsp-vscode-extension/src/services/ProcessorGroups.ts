@@ -33,13 +33,12 @@ export function loadProcessorGroupCopybookPaths(
   documentUri: string,
   dialectType: string,
 ): string[] {
-  const result = loadProcessorGroupSettings(
+  return loadProcessorGroupSettings(
     documentUri,
     "libs",
     [] as string[],
     dialectType,
   );
-  return result.map((s) => normalizePath(s));
 }
 
 export function loadProcessorGroupCopybookPathsConfig(
