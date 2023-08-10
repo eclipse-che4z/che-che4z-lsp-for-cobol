@@ -194,7 +194,6 @@ class AnalysisService {
   public void stopAnalysis(String uri) {
     CobolDocumentModel documentModel = documentService.get(uri);
 
-    contentCache.invalidate(uri);
     documentService.closeDocument(uri);
     LOG.debug("[stopAnalysis] Document " + uri + " closed");
 
