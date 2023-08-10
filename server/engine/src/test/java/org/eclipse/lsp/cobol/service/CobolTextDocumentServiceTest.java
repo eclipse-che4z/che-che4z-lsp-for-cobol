@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
+import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
 import org.eclipse.lsp4j.*;
@@ -61,7 +62,8 @@ class CobolTextDocumentServiceTest {
         new CobolLSPServerStateService(),
         watcherService,
         analysisService,
-        taskService);
+        taskService,
+        mock(DataBusBroker.class));
   }
 
   @Test

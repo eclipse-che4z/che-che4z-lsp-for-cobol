@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
@@ -71,13 +72,15 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       DisposableLSPStateService disposableLSPStateService,
       WatcherService watcherService,
       AnalysisService analysisService,
-      TaskService taskService) {
+      TaskService taskService,
+      DataBusBroker dataBus) {
     this.actions = actions;
     this.cfastBuilder = cfastBuilder;
     this.disposableLSPStateService = disposableLSPStateService;
     this.watcherService = watcherService;
     this.analysisService = analysisService;
     this.taskService = taskService;
+    dataBus.subscribe(this);
   }
 
   @Override
