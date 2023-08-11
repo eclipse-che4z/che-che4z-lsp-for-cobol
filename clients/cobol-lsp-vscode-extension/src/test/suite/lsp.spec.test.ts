@@ -257,14 +257,10 @@ suite("Integration Test Suite", function () {
     ?.slow(1000);
 
   test("TC250109 Test Area B", async () => {
-    if (process.platform === "win32") {
-      // TODO: fix this test in windows environment
-      return;
-    }
     await helper.showDocument("USER1.cbl");
     const editor = helper.get_editor("USER1.cbl");
     await editor.edit((edit) =>
-      edit.replace(range(pos(32, 0), pos(32, 3)), ""),
+      edit.delete(range(pos(32, 0), pos(32, 3))),
     );
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
@@ -277,7 +273,7 @@ suite("Integration Test Suite", function () {
     );
 
     await editor.edit((edit) => {
-      edit.replace(range(pos(41, 0), pos(41, 3)), "");
+      edit.delete(range(pos(41, 0), pos(41, 3)));
     });
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 2,
