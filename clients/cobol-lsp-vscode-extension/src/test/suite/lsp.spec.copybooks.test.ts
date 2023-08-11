@@ -148,10 +148,6 @@ suite("Integration Test Suite: Copybooks", function () {
     .slow(1000);
 
   test("TC174952 / TC174953 Copybook - definition not exist, but dynamically appears", async () => {
-    // Ignore unsable case for now
-    if (process.arch === "arm64" && process.platform === "darwin") {
-      return;
-    }
     await helper.showDocument("USERC1F.cbl");
     let editor = helper.get_editor("USERC1F.cbl");
     await helper.waitFor(

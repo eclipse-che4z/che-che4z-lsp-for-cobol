@@ -268,7 +268,8 @@ jobs:
       - name: Run integration tests
         uses: coactions/setup-xvfb@v1
         with:
-          run: npm --prefix clients/cobol-lsp-vscode-extension run test:integration
+          run: npm run test:integration
+          working-directory: clients/cobol-lsp-vscode-extension
       - name: Run native executable test code
         working-directory: tests/native-executable-tests
         run: |
