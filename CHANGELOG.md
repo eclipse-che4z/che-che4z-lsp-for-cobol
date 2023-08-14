@@ -2,7 +2,7 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 
 Changelog:
-# [2.0.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.1...2.0.2) (2023-08-09)
+# [2.0.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.1...2.0.2) (2023-08-15)
 ### Bug Fixes
 * Fix pop-up error for completion requests ([658f6cb](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/658f6cb86bc5993c2f8f0624cd523ccc8eba4104))
 * Add default compiler directives while processing when no compiler directive configuration present ([06769fa](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/06769faa256d34f1d6114f9f603a1cbfacdc666c))

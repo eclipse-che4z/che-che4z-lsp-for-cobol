@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [2.0.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.1...2.0.2) (2023-08-09)
+## [2.0.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.1...2.0.2) (2023-08-15)
 
 #### Added
 - Log Server messages to VS Code output panel
