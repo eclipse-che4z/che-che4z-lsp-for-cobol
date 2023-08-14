@@ -212,8 +212,12 @@ public class WatcherServiceImpl implements WatcherService {
   }
 
   private Either<String, RelativePattern> createFileWatcher(String folder) {
-    String pattern = folder + File.separator + "**/*";
+    String pattern = "**/*";
     RelativePattern relativePattern = new RelativePattern();
+    if (folder.contains(CopybookService.FILE_BASENAME_VARIABLE)) {
+      String[] split = folder.split(CopybookService.FILE_BASENAME_VARIABLE);
+      pattern = "**" + split[1] + pattern;
+    }
     relativePattern.setBaseUri(getWorkspaceFolders().get(0));
     relativePattern.setPattern(pattern);
     return Either.forRight(relativePattern);

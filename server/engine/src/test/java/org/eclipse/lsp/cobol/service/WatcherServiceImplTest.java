@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.internal.verification.Times;
 
-import java.io.File;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -199,9 +198,7 @@ class WatcherServiceImplTest {
             .getWatchers();
     assertEquals(2, watchers.size());
     FileSystemWatcher fileWatcher = watchers.get(0);
-    assertEquals(
-            glob + File.separator + "**/*",
-        fileWatcher.getGlobPattern().getRight().getPattern());
+    assertEquals("**/*", fileWatcher.getGlobPattern().getRight().getPattern());
     assertEquals(WORKSPACE_URI, fileWatcher
             .getGlobPattern()
             .getRight()
