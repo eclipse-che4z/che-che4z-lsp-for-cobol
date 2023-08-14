@@ -46,9 +46,7 @@ export function loadProcessorGroupCopybookPathsConfig(
   configObject: string[],
 ): string[] {
   const config = [
-    ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]).map(
-      (s) => normalizePath(s),
-    ),
+    ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]),
     ...configObject,
   ];
   return SettingsUtils.getWorkspaceFoldersPath(true)
@@ -56,6 +54,8 @@ export function loadProcessorGroupCopybookPathsConfig(
       globSync(
         config.map((ele) => ele.replace(backwardSlashRegex, "/")),
         { cwd: cleanWorkspaceFolder(folder) },
+      ).map(
+        (s) => normalizePath(s),
       ),
     )
     .reduce((acc, curVal) => {
