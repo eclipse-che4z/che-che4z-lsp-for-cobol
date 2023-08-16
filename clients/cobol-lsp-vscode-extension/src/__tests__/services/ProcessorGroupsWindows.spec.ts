@@ -12,34 +12,31 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 jest.mock("glob");
-import { loadProcessorGroupCopybookPathsConfig } from "../../services/ProcessorGroups";
 import { globSync } from "glob";
-
-const WORKSPACE_URI = "file:///my/workspace";
-
+import { loadProcessorGroupCopybookPathsConfig } from "../../services/ProcessorGroups";
 jest.mock("fs", () => ({
   existsSync: jest.fn().mockReturnValue(true),
-  readFileSync: jest.fn().mockImplementation((f) => {
-    if (f == "procCfgPath") {
+  readFileSync: jest.fn().mockImplementation(f => {
+    if (f === "procCfgPath") {
       return `{
                 "pgroups": [
-                    { 
+                    {
                         "name": "DAF",
                         "copybook-extensions": [".copy"],
                         "copybook-file-encoding": "UTF-8",
                         "preprocessor": [
                             "IDMS",
-                            { 
-                                "name": "DaCo", 
+                            {
+                                "name": "DaCo",
                                 "libs": ["/daco"]
                             }
-                        ], 
+                        ],
                         "libs": ["/copy"]
                     },
                     {
                         "name": "IDMSPG",
                         "preprocessor": [ "IDMS" ]
-                    }, 
+                    },
                     {
                         "name": "ABS",
                         "libs": ["/abs"]
@@ -47,11 +44,11 @@ jest.mock("fs", () => ({
                 ]
             }`;
     }
-    if (f == "pgmCfgPath") {
+    if (f === "pgmCfgPath") {
       return `{
-                "pgms": [ 
+                "pgms": [
                     { "program": "/my/workspace/abs/TEST.cob", "pgroup": "ABS" },
-                    { "program": "TEST.cob", "pgroup": "DAF" }, 
+                    { "program": "TEST.cob", "pgroup": "DAF" },
                     { "program": "*DAF.cob", "pgroup": "DAF" },
                     { "program": "IDMS/TEST.cob", "pgroup": "IDMSPG" }
                 ]
@@ -66,6 +63,11 @@ jest.mock("vscode", () => ({
     parse: jest.fn().mockImplementation((str: string) => {
       return {
         fsPath: str.replace("/c%3A", "c:").substring("file://".length),
+      };
+    }),
+    file: jest.fn().mockImplementation((str: string) => {
+      return {
+        fsPath: str,
       };
     }),
   },
@@ -102,8 +104,8 @@ it.only("Processor groups configuration provides lib path in Windows", () => {
     section: "cobol-lsp.cpy-manager.paths-local",
   };
   (globSync as any) = jest.fn().mockImplementation((config: string[]) => {
-    if (config[0] === "/copy") return ["/copy-resolved-from-glob"];
-    else throw Error("some issue with input param");
+    if (config[0] === "/copy") { return ["/copy-resolved-from-glob"]; }
+    else { throw Error("some issue with input param"); }
   });
   const result = loadProcessorGroupCopybookPathsConfig(item, []);
   expect(result).toStrictEqual(["/copy-resolved-from-glob"]);
