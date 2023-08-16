@@ -82,7 +82,7 @@ jest.mock("vscode", () => ({
       };
     }),
     file: jest.fn().mockImplementation((str: string) => {
-      return {fsPath: str};
+      return { fsPath: str };
     }),
   },
   workspace: {

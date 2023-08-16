@@ -42,7 +42,7 @@ jest.mock("vscode", () => ({
       return {
         fsPath: str,
       };
-    }) ,
+    }),
   },
   workspace: {},
 }));
@@ -237,7 +237,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
     });
-    SettingsService.getCopybookExtension = jest.fn().mockReturnValue([""]) ;
+    SettingsService.getCopybookExtension = jest.fn().mockReturnValue([""]);
     (globSync as any) = jest.fn().mockReturnValue([copybookName]);
     const uri: string = await CopybookURI.resolveCopybookURI(
       copybookName,
