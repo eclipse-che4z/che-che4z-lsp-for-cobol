@@ -89,7 +89,12 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: lib
-          path: clients/cobol-dialect-api/lib/*         
+          path: clients/cobol-dialect-api/lib/*    
+      - name: Unit Test COBOL LS extension
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          npm ci
+          npm run test  
       - name: Package IDMS vsix
         working-directory: clients/idms-dialect-support
         run: |
