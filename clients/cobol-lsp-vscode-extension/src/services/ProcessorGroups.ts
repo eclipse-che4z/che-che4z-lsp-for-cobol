@@ -23,7 +23,6 @@ import {
   cleanWorkspaceFolder,
   normalizePath,
 } from "./util/FSUtils";
-import { getChannel } from "../extension";
 
 const PROCESSOR_GROUP_FOLDER = ".cobolplugin";
 const PROCESSOR_GROUP_PGM = "pgm_conf.json";
@@ -232,7 +231,7 @@ function loadProcessorsConfig(
 
   let result = undefined;
   procCfg.pgroups.forEach((p) => {
-    if (pgroup == p.name) {
+    if (pgroup === p.name) {
       result = p;
       return;
     }
@@ -248,7 +247,7 @@ function loadProcessorGroupSettings<T>(
 ): T | undefined {
   try {
     const pgCfg = loadProcessorsConfig(scopeUri);
-    if (pgCfg == undefined) {
+    if (pgCfg === undefined) {
       return configObject;
     }
 
