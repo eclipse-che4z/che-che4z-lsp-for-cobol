@@ -53,9 +53,7 @@ export function loadProcessorGroupCopybookPathsConfig(
       globSync(
         config.map((ele) => ele.replace(backwardSlashRegex, "/")),
         { cwd: cleanWorkspaceFolder(folder) },
-      ).map(
-        (s) => normalizePath(s),
-      ),
+      ).map((s) => normalizePath(s)),
     )
     .reduce((acc, curVal) => {
       return acc.concat(curVal);

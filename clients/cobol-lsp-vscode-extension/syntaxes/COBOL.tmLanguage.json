@@ -7,7 +7,7 @@
   ],
   "repository": {
     "cobol-source": {
-      "patterns":[
+      "patterns": [
         {
           "include": "#comment-cobol-source"
         },
@@ -52,8 +52,8 @@
         "2": {
           "name": "comment.line.cobol.fixed"
         }
-    }
-  },
+      }
+    },
     "comment-floating": {
       "match": "\\s\\*>\\s.*",
       "name": "comment.line.cobol.floating"
@@ -78,13 +78,13 @@
     },
     "cobol-keywords": {
       "patterns": [
-        {"include": "#cobol-condition-keyword"},
-        {"include": "#cobol-branch-keyword"},
-        {"include": "#cobol-callback-keyword"},
-        {"include": "#cobol-serialization-keyword"},
-        {"include": "#cobol-subroutine-keyword"},
-        {"include": "#cobol-exit-keyword"},
-        {"include": "#cobol-general-keyword"}
+        { "include": "#cobol-condition-keyword" },
+        { "include": "#cobol-branch-keyword" },
+        { "include": "#cobol-callback-keyword" },
+        { "include": "#cobol-serialization-keyword" },
+        { "include": "#cobol-subroutine-keyword" },
+        { "include": "#cobol-exit-keyword" },
+        { "include": "#cobol-general-keyword" }
       ]
     },
     "cobol-condition-keyword": {
@@ -119,7 +119,7 @@
         }
       },
       "name": "exec.sql.cobol",
-	    "patterns": [
+      "patterns": [
         {
           "include": "#db2-sql-keywords"
         },
@@ -134,11 +134,11 @@
         },
         {
           "include": "#comment-cobol-source"
-        } 
+        }
       ],
       "end": "(?i:END-EXEC)",
       "endCaptures": {
-        "0" : {
+        "0": {
           "name": "string.quoted.cics.cobol"
         }
       }
@@ -152,7 +152,7 @@
       },
       "name": "exec.cics.cobol",
       "contentName": "meta.embedded.block.cics",
-	    "patterns": [
+      "patterns": [
         {
           "include": "#cics-keywords"
         },
@@ -167,11 +167,11 @@
         },
         {
           "include": "#comment-cobol-source"
-        } 
+        }
       ],
       "end": "(?i:END-EXEC)",
       "endCaptures": {
-        "0" : {
+        "0": {
           "name": "string.quoted.cics.cobol"
         }
       }

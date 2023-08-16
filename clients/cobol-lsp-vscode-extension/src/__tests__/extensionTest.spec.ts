@@ -247,7 +247,7 @@ describe("Check recognition of COBOL from first line", () => {
     expect(pgm).not.toEqual(cobol);
   });
 
-  test("Compiler Directive after \"sequence number\"", () => {
+  test('Compiler Directive after "sequence number"', () => {
     const pgm = `0abcdePROCESS `;
     expect(pgm).toEqual(cobol);
   });

@@ -16,7 +16,7 @@ import { globSync } from "glob";
 import { loadProcessorGroupCopybookPathsConfig } from "../../services/ProcessorGroups";
 jest.mock("fs", () => ({
   existsSync: jest.fn().mockReturnValue(true),
-  readFileSync: jest.fn().mockImplementation(f => {
+  readFileSync: jest.fn().mockImplementation((f) => {
     if (f === "procCfgPath") {
       return `{
                 "pgroups": [
@@ -104,8 +104,11 @@ it.only("Processor groups configuration provides lib path in Windows", () => {
     section: "cobol-lsp.cpy-manager.paths-local",
   };
   (globSync as any) = jest.fn().mockImplementation((config: string[]) => {
-    if (config[0] === "/copy") { return ["/copy-resolved-from-glob"]; }
-    else { throw Error("some issue with input param"); }
+    if (config[0] === "/copy") {
+      return ["/copy-resolved-from-glob"];
+    } else {
+      throw Error("some issue with input param");
+    }
   });
   const result = loadProcessorGroupCopybookPathsConfig(item, []);
   expect(result).toStrictEqual(["/copy-resolved-from-glob"]);
