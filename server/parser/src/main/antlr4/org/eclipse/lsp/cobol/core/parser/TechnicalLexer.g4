@@ -23,7 +23,7 @@ ASTERISKCHAR : '*';
 DOUBLEASTERISKCHAR : '**';
 COLONCHAR : ':';
 COMMACHAR : ',';
-COMMENTTAG : '*>';
+COMMENTTAG : '*>' -> channel(COMMENTS);
 DOLLARCHAR : '$';
 DOUBLEMORETHANCHAR : '>>';
 
@@ -65,7 +65,7 @@ HEX_NUMBERS : HEXNUMBER;
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
-COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(COMMENTS);
+COMMENTLINE : COMMENTTAG ~('\n' | '\r')* -> channel(COMMENTS);
 WS : [ \t\f]+ -> channel(HIDDEN);
 COMPILERLINE : DOUBLEMORETHANCHAR ~('\n' | '\r')* -> channel(HIDDEN);
 
