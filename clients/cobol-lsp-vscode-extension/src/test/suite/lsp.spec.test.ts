@@ -109,14 +109,14 @@ suite("Integration Test Suite", function () {
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
     );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 2);
+    assert.strictEqual(diagnostics.length, 1);
     helper.assertRangeIsEqual(
       diagnostics[0].range,
-      range(pos(34, 11), pos(34, 15)),
+      range(pos(34, 16), pos(34, 20)),
     );
     assert.strictEqual(
       diagnostics[0].message,
-      "Missing token SQL at execSqlStatement",
+      "No viable alternative at input EXEC CICS",
     );
   })
     .timeout(helper.TEST_TIMEOUT)

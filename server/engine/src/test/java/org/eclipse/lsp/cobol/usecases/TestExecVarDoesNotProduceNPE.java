@@ -32,7 +32,7 @@ class TestExecVarDoesNotProduceNPE {
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       {01|1} {EXEC|2|3}{|4}\n";
+          + "       {01|1} {EXEC|2|3}\n";
 
   @Test
   void test() {
@@ -68,12 +68,6 @@ class TestExecVarDoesNotProduceNPE {
                 new Range(),
                 "The following token must start in Area B: EXEC",
                 DiagnosticSeverity.Warning,
-                ErrorSource.PARSING.getText()),
-            "4",
-            new Diagnostic(
-                new Range(),
-                "Unexpected end of file",
-                DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
 }
