@@ -1372,6 +1372,8 @@ evaluateValue
 // exec cics statement
 execCicsStatement
    : EXEC CICS cicsRules END_EXEC
+   | {notifyError("cobolParser.missingEndExec");} EXEC CICS cicsRules
+   | {notifyError("cobolParser.missingEndExec");} EXEC CICS
    ;
 
 cicsRules
@@ -1397,6 +1399,8 @@ execSqlStatementInDataDivision
 
 execSqlStatement
    : EXEC SQL sqlCode END_EXEC
+   | {notifyError("cobolParser.missingEndExec");} EXEC SQL sqlCode
+   | {notifyError("cobolParser.missingEndExec");} EXEC SQL
    ;
 
 sqlCode
