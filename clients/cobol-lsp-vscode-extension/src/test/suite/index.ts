@@ -31,12 +31,12 @@ export async function run(): Promise<void> {
   // decache files on windows to be hookable by nyc
   let decache = require("decache");
   glob
-     .sync("**/**.js", {
+    .sync("**/**.js", {
       cwd: sourceRoot,
     })
     .forEach((file) => {
       decache(path.join(sourceRoot, file));
-   });
+    });
 
   nyc.createTempDirectory();
   nyc.wrap();
@@ -59,8 +59,8 @@ export async function run(): Promise<void> {
     });
   });
 
-    // report code coverage
-    nyc.writeCoverageFile();
-    await nyc.report();
-    console.log("Report created");
+  // report code coverage
+  nyc.writeCoverageFile();
+  await nyc.report();
+  console.log("Report created");
 }

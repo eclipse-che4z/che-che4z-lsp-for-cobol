@@ -259,9 +259,7 @@ suite("Integration Test Suite", function () {
   test("TC250109 Test Area B", async () => {
     await helper.showDocument("USER1.cbl");
     const editor = helper.get_editor("USER1.cbl");
-    await editor.edit((edit) =>
-      edit.delete(range(pos(32, 0), pos(32, 3))),
-    );
+    await editor.edit((edit) => edit.delete(range(pos(32, 0), pos(32, 3))));
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
