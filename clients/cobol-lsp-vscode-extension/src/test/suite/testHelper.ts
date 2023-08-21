@@ -59,7 +59,7 @@ export async function showDocument(workspace_file: string) {
 }
 
 export async function closeActiveEditor() {
-  const doc  = vscode.window.activeTextEditor;
+  const doc = vscode.window.activeTextEditor;
   while (doc.document.isDirty) {
     await vscode.commands.executeCommand("undo");
     await sleep(100);
