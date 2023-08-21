@@ -2502,7 +2502,7 @@ basis
    ;
 
 cobolWord
-   : IDENTIFIER
+   : IDENTIFIER | SYMBOL
    | cobolCompilerDirectivesKeywords | cobolKeywords
    | cicsTranslatorCompileDirectivedKeywords | cics_conditions
    ;
