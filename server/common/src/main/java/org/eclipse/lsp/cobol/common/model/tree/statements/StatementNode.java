@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.common.model.tree.statements;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 import static org.eclipse.lsp.cobol.common.model.NodeType.STATEMENT;
@@ -30,5 +31,9 @@ public abstract class StatementNode extends Node {
 
   protected StatementNode(Locality locality) {
     super(locality, STATEMENT);
+  }
+
+  protected StatementNode(Locality locality, NodeType nodeType) {
+    super(locality, nodeType);
   }
 }
