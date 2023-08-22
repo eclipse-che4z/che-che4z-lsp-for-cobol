@@ -33,8 +33,8 @@ import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.core.model.tree.CodeBlockUsageNode;
-import org.eclipse.lsp.cobol.core.model.tree.ParagraphNameNode;
-import org.eclipse.lsp.cobol.core.model.tree.SectionNameNode;
+import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
+import org.eclipse.lsp.cobol.common.model.tree.SectionNameNode;
 import org.eclipse.lsp4j.Location;
 
 import java.util.*;
@@ -43,7 +43,9 @@ import java.util.stream.Collectors;
 
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
-/** Service to handle symbol information and dependencies */
+/**
+ * Service to handle symbol information and dependencies
+ */
 public class SymbolAccumulatorService implements VariableAccumulator {
   private final Map<String, SymbolTable> programSymbols;
 
@@ -55,10 +57,10 @@ public class SymbolAccumulatorService implements VariableAccumulator {
    * Add the variable definition to that program context.
    *
    * @param programNode the program where this variable belongs to.
-   * @param node the variable definition node
+   * @param node        the variable definition node
    */
   public void addVariableDefinition(ProgramNode programNode, VariableNode node) {
-    createOrGetSymbolTable(programNode).getVariables().put(node.getName().toUpperCase(Locale.ROOT), node);
+    createOrGetSymbolTable(programNode).addVariable(node);
   }
 
   /**
@@ -70,20 +72,20 @@ public class SymbolAccumulatorService implements VariableAccumulator {
     // The variable can have nested variable definitions (like IndexItemNode), we need to
     // collect them
     List<VariableNode> variables =
-        node.getChildren().stream()
-            .flatMap(Node::getDepthFirstStream)
-            .filter(hasType(NodeType.VARIABLE))
-            .map(VariableNode.class::cast)
-            .collect(Collectors.toList());
+            node.getChildren().stream()
+                    .flatMap(Node::getDepthFirstStream)
+                    .filter(hasType(NodeType.VARIABLE))
+                    .map(VariableNode.class::cast)
+                    .collect(Collectors.toList());
     node.getProgram()
-        .ifPresent(programNode -> variables.forEach(v -> addVariableDefinition(programNode, v)));
+            .ifPresent(programNode -> variables.forEach(v -> addVariableDefinition(programNode, v)));
   }
 
   /**
    * Add a paragraph defined in the program context.
    *
    * @param program - the program to register code block in
-   * @param node - the paragraph node
+   * @param node    - the paragraph node
    */
   public void registerCodeBlock(ProgramNode program, CodeBlockDefinitionNode node) {
     SymbolTable symbolTable = createOrGetSymbolTable(program);
@@ -95,27 +97,27 @@ public class SymbolAccumulatorService implements VariableAccumulator {
    * paragraph is not defined.
    *
    * @param program the program to register block usage in
-   * @param node the usage node to register
+   * @param node    the usage node to register
    * @return Optional error if the paragraph or section with the given name is not defined
    */
   public Optional<SyntaxError> registerCodeBlockUsage(
-      ProgramNode program, CodeBlockUsageNode node) {
+          ProgramNode program, CodeBlockUsageNode node) {
     SymbolTable symbolTable = createOrGetSymbolTable(program);
 
     List<CodeBlockDefinitionNode> definitions =
-        symbolTable.getCodeBlocks().stream()
-            .filter(it -> filterNodes(it, node))
-            .collect(Collectors.toList());
+            symbolTable.getCodeBlocks().stream()
+                    .filter(it -> filterNodes(it, node))
+                    .collect(Collectors.toList());
 
-    if (definitions.size() == 0) {
+    if (definitions.isEmpty()) {
       return Optional.of(
-          SyntaxError.syntaxError()
-              .errorSource(ErrorSource.PARSING)
-              .messageTemplate(
-                  MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
-              .severity(ErrorSeverity.ERROR)
-              .location(node.getLocality().toOriginalLocation())
-              .build());
+              SyntaxError.syntaxError()
+                      .errorSource(ErrorSource.PARSING)
+                      .messageTemplate(
+                              MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
+                      .severity(ErrorSeverity.ERROR)
+                      .location(node.getLocality().toOriginalLocation())
+                      .build());
     }
 
     if (definitions.size() > 1) {
@@ -143,10 +145,8 @@ public class SymbolAccumulatorService implements VariableAccumulator {
     CodeBlockDefinitionNode definition = definitions.get(0);
     definition.addUsage(node.getLocality());
 
-    Optional.ofNullable(symbolTable.getParagraphMap().get(node.getName()))
-        .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
-    Optional.ofNullable(symbolTable.getSectionMap().get(node.getName()))
-        .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
+    symbolTable.findParagraphs(node.getName()).stream().forEach(it -> it.addUsage(node.getLocality().toLocation()));
+    symbolTable.getSection(node.getName()).ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
 
     return Optional.empty();
   }
@@ -158,16 +158,16 @@ public class SymbolAccumulatorService implements VariableAccumulator {
 
     //Filter nodes in case of section usage in the PERFORM or GO TO statements. i.e. GO TO PARAG1 OF SECTION-1.
     if (usage.getParent().getNodeType() == NodeType.PERFORM
-        || usage.getParent().getNodeType() == NodeType.GO_TO
-        || usage.getParent().getNodeType() == NodeType.SENTENCE) {
+            || usage.getParent().getNodeType() == NodeType.GO_TO
+            || usage.getParent().getNodeType() == NodeType.SENTENCE) {
       Optional<SectionNameNode> sectionNameNode = usage.getParent().getChildren().stream()
-          .filter(c -> c instanceof SectionNameNode)
-          .map(SectionNameNode.class::cast).findFirst();
+              .filter(SectionNameNode.class::isInstance)
+              .map(SectionNameNode.class::cast).findFirst();
 
       return sectionNameNode
-          .map(SectionNameNode::getName)
-          .map(n -> n.equalsIgnoreCase(getSectionName(definition)))
-          .orElse(true);
+              .map(SectionNameNode::getName)
+              .map(n -> n.equalsIgnoreCase(getSectionName(definition)))
+              .orElse(true);
     }
     return true;
   }
@@ -186,21 +186,21 @@ public class SymbolAccumulatorService implements VariableAccumulator {
 
   private SymbolTable createOrGetSymbolTable(ProgramNode program) {
     return programSymbols.computeIfAbsent(
-        SymbolTable.generateKey(program), p -> new SymbolTable());
+            SymbolTable.generateKey(program), p -> new SymbolTable());
   }
 
   /**
    * Add a section definition name node in the program context.
    *
    * @param program the program to register section in
-   * @param node - the section definition node
+   * @param node    - the section definition node
    * @return syntax error if the code block duplicates
    */
   public Optional<SyntaxError> registerSectionNameNode(ProgramNode program, SectionNameNode node) {
-    createOrGetSymbolTable(program)
-        .getSectionMap()
-        .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
-        .addDefinition(node.getLocality().toLocation());
+    SymbolTable symbolTable = createOrGetSymbolTable(program);
+    if(!symbolTable.getSection(node.getName()).isPresent()) {
+      symbolTable.addSection(node);
+    }
     return Optional.empty();
   }
 
@@ -208,15 +208,13 @@ public class SymbolAccumulatorService implements VariableAccumulator {
    * Add a paragraph definition name node in the program context.
    *
    * @param programNode the program to register in
-   * @param node - the section definition node
+   * @param node        - the section definition node
    * @return syntax error if the code block duplicates
    */
   public Optional<SyntaxError> registerParagraphNameNode(
-      ProgramNode programNode, ParagraphNameNode node) {
-    createOrGetSymbolTable(programNode)
-        .getParagraphMap()
-        .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
-        .addDefinition(node.getLocality().toLocation());
+          ProgramNode programNode, ParagraphNameNode node) {
+    SymbolTable symbolTable = createOrGetSymbolTable(programNode);
+    symbolTable.addParagraph(node);
     return Optional.empty();
   }
 
@@ -224,46 +222,48 @@ public class SymbolAccumulatorService implements VariableAccumulator {
    * Search for a block reference in a paragraph and then in a section map
    *
    * @param programNode the program to search block references in
-   * @param name the name of the block
+   * @param name        the name of the block
    * @return the block reference or null if not found
    */
   public CodeBlockReference getCodeBlockReference(ProgramNode programNode, String name) {
     SymbolTable symbolTable = createOrGetSymbolTable(programNode);
-    return symbolTable.getParagraphMap().computeIfAbsent(name, symbolTable.getSectionMap()::get);
+    return symbolTable.findParagraphs(name).stream().findAny().orElse(symbolTable.getSection(name).orElse(null));
   }
 
   /**
    * Get Section locations
    *
-   * @param node the section node
+   * @param node              the section node
    * @param retrieveLocations location extract function
    * @return a list of locations
    */
   public List<Location> getSectionLocations(
-      SectionNameNode node, Function<CodeBlockReference, List<Location>> retrieveLocations) {
-    return node.getProgram()
-        .map(this::createOrGetSymbolTable)
-        .map(SymbolTable::getSectionMap)
-        .map(it -> it.get(node.getName()))
-        .map(retrieveLocations)
-        .orElse(ImmutableList.of());
+          SectionNameNode node, Function<CodeBlockReference, List<Location>> retrieveLocations) {
+    Optional<SymbolTable> optionalSymbolTable = node.getProgram().map(this::createOrGetSymbolTable);
+    if(!optionalSymbolTable.isPresent()) {
+      return ImmutableList.of();
+    }
+    SymbolTable symbolTable = optionalSymbolTable.get();
+    return symbolTable.getSection(node.getName()).map(retrieveLocations).orElse(ImmutableList.of());
   }
 
   /**
    * Get Paragraph locations
    *
-   * @param node the paragraph node
+   * @param node              the paragraph node
    * @param retrieveLocations location extract function
    * @return a list of locations
    */
   public List<Location> getParagraphLocations(
-      ParagraphNameNode node, Function<CodeBlockReference, List<Location>> retrieveLocations) {
-    return node.getProgram()
-        .map(this::createOrGetSymbolTable)
-        .map(SymbolTable::getParagraphMap)
-        .map(it -> it.get(node.getName()))
-        .map(retrieveLocations)
-        .orElse(ImmutableList.of());
+          ParagraphNameNode node, Function<CodeBlockReference, List<Location>> retrieveLocations) {
+    Optional<SymbolTable> optionalSymbolTable = node.getProgram().map(this::createOrGetSymbolTable);
+    if (!optionalSymbolTable.isPresent()) {
+      return ImmutableList.of();
+    }
+    SymbolTable symbolTable = optionalSymbolTable.get();
+    return symbolTable.findParagraphs(node.getName()).stream().findAny()
+            .map(retrieveLocations)
+            .orElse(ImmutableList.of());
   }
 
   /**
@@ -279,31 +279,31 @@ public class SymbolAccumulatorService implements VariableAccumulator {
    * Get variable definition node based on list of variable usage nodes.
    *
    * @param programNode the program node
-   * @param usageNodes represents variable name and its parents
+   * @param usageNodes  represents variable name and its parents
    * @return the list of founded variable definitions
    */
   public List<VariableNode> getVariableDefinition(
-      ProgramNode programNode, List<VariableUsageNode> usageNodes) {
+          ProgramNode programNode, List<VariableUsageNode> usageNodes) {
     Multimap<String, VariableNode> variables = createOrGetSymbolTable(programNode).getVariables();
     List<VariableNode> foundDefinitions =
-        VariableUsageUtils.findVariablesForUsage(variables, usageNodes);
+            VariableUsageUtils.findVariablesForUsage(variables, usageNodes);
     if (!foundDefinitions.isEmpty()) {
       return foundDefinitions;
     }
 
     Multimap<String, VariableNode> globals = ArrayListMultimap.create();
     getMapOfGlobalVariables(programNode)
-        .values()
-        .forEach(variableNode -> globals.put(variableNode.getName(), variableNode));
+            .values()
+            .forEach(variableNode -> globals.put(variableNode.getName(), variableNode));
     return VariableUsageUtils.findVariablesForUsage(globals, usageNodes);
   }
 
   private Map<String, VariableNode> getMapOfGlobalVariables(ProgramNode programNode) {
     Map<String, VariableNode> result =
-        programNode.getProgram().map(this::getMapOfGlobalVariables).orElseGet(HashMap::new);
+            programNode.getProgram().map(this::getMapOfGlobalVariables).orElseGet(HashMap::new);
     createOrGetSymbolTable(programNode).getVariables().values().stream()
-        .filter(VariableNode::isGlobal)
-        .forEach(variableNode -> result.put(variableNode.getName(), variableNode));
+            .filter(VariableNode::isGlobal)
+            .forEach(variableNode -> result.put(variableNode.getName(), variableNode));
     return result;
   }
 }

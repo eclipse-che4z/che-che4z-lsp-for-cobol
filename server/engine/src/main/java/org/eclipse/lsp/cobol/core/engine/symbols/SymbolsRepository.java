@@ -91,7 +91,7 @@ public class SymbolsRepository {
 
   /**
    * Find element using a position
-   *
+   *+
    * @param uri the document uri
    * @param result the document analysis result to search in
    * @param position the position to check

@@ -15,6 +15,8 @@
 package org.eclipse.lsp.cobol.common.symbols;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
@@ -25,9 +27,19 @@ import java.util.List;
  * grammar.
  */
 @Getter
+@NoArgsConstructor
 public class CodeBlockReference {
-  List<Location> definitions = new ArrayList<>();
-  List<Location> usage = new ArrayList<>();
+  private final List<Location> definitions = new ArrayList<>();
+  private final List<Location> usage = new ArrayList<>();
+
+  public CodeBlockReference(List<OriginalLocation> definitions, List<OriginalLocation> usage) {
+    if (definitions != null) {
+      definitions.forEach(ol -> this.definitions.add(ol.getLocation()));
+    }
+    if (usage != null) {
+      usage.forEach(ol -> this.usage.add(ol.getLocation()));
+    }
+  }
 
   /**
    * Add a location of code block usage

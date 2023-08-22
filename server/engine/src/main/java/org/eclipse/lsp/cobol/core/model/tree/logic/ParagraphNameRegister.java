@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
-import org.eclipse.lsp.cobol.core.model.tree.ParagraphNameNode;
+import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
 
 /** ParagraphNameNode processor */
 public class ParagraphNameRegister implements Processor<ParagraphNameNode> {

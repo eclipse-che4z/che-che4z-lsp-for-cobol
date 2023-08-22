@@ -14,9 +14,15 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.references;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.model.Context;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.symbols.Symbol;
+import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
@@ -35,9 +41,18 @@ public class ElementOccurrences implements Occurrences {
   @Override
   public @NonNull List<Location> findDefinitions(
       @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
-    return SymbolsRepository.findElementByPosition(
-        UriHelper.decode(position.getTextDocument().getUri()), document.getAnalysisResult(), position.getPosition())
-            .map(Context::getDefinitions).orElse(Collections.emptyList());
+    Optional<ProgramNode> program = document.getAnalysisResult().getRootNode().getProgram();
+    if(!program.isPresent()) {
+      // TODO find a program from current node
+      return ImmutableList.of();
+    }
+    SymbolTable st = document.getAnalysisResult().getSymbolTableMap().get(SymbolTable.generateKey(program.get()));
+    Optional<Symbol> s = st.findSymbol(position);
+    return s.map(st::getDefinitions).orElse(Collections.emptyList())
+            .stream().map(OriginalLocation::getLocation).collect(Collectors.toList());
+//    return SymbolsRepository.findElementByPosition(
+//        UriHelper.decode(position.getTextDocument().getUri()), document.getAnalysisResult(), position.getPosition())
+//            .map(Context::getDefinitions).orElse(Collections.emptyList());
   }
 
   @Override
@@ -45,11 +60,15 @@ public class ElementOccurrences implements Occurrences {
       @NonNull CobolDocumentModel document,
       @NonNull TextDocumentPositionParams position,
       @NonNull ReferenceContext refCtx) {
-    Optional<Context> element = SymbolsRepository.findElementByPosition(
-        UriHelper.decode(position.getTextDocument().getUri()), document.getAnalysisResult(), position.getPosition());
+    String uri = UriHelper.decode(position.getTextDocument().getUri());
+    AnalysisResult analysisResult = document.getAnalysisResult();
+    Position position1 = position.getPosition();
+    Optional<Context> element = SymbolsRepository.findElementByPosition(uri, analysisResult, position1);
+
     if (!element.isPresent()) {
       return Collections.emptyList();
     }
+
     List<Location> references = new ArrayList<>(element.get().getUsages());
     if (refCtx.isIncludeDeclaration()) {
       references.addAll(element.get().getDefinitions());

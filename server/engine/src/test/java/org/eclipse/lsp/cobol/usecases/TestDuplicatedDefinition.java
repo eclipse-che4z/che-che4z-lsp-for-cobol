@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * This test checks that we collect all multiple definitions for variable.
  */
-public class TestDuplicatedDefinition {
+class TestDuplicatedDefinition {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. AMB01.\n"

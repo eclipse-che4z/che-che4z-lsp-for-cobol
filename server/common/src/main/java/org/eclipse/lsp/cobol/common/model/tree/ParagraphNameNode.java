@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree;
+package org.eclipse.lsp.cobol.common.model.tree;
 
 import lombok.Getter;
 import lombok.Setter;

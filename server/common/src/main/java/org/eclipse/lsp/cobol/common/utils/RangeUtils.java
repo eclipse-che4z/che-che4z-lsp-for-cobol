@@ -77,7 +77,6 @@ public class RangeUtils {
     return compareTo(after, before) < 0;
   }
 
-
   /**
    * Check if a range is in a scope
    * @param range range that should be in scope

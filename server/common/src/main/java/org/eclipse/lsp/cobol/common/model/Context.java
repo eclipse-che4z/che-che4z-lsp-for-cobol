@@ -21,6 +21,7 @@ import java.util.List;
 /**
  * The interface represents structure that can be defined and used.
  */
+@Deprecated
 public interface Context {
   /**
    * Get the name of the Context Object

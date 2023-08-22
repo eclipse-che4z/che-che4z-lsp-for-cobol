@@ -29,13 +29,14 @@ import java.util.*;
 /**
  * Contains related to analysis state
  */
+@Getter
 @RequiredArgsConstructor
 @Slf4j
 public class AnalysisContext {
-  @Getter private final ExtendedDocument extendedDocument;
-  @Getter private final AnalysisConfig config;
-  @Getter private final List<SyntaxError> accumulatedErrors = new ArrayList<>();
+  private final ExtendedDocument extendedDocument;
+  private final AnalysisConfig config;
+  private final List<SyntaxError> accumulatedErrors = new ArrayList<>();
 
-  private @Getter @Setter List<Node> dialectNodes;
-  private @Getter @Setter CopybooksRepository copybooksRepository;
+  private @Setter List<Node> dialectNodes;
+  private @Setter CopybooksRepository copybooksRepository;
 }
