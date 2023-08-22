@@ -44,6 +44,8 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode.B
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.core.model.tree.FileOperationStatementNode;
+import org.eclipse.lsp.cobol.core.model.tree.OpenStatementNode;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.common.SubroutineService;

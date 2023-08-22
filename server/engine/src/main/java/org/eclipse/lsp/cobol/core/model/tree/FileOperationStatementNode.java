@@ -18,8 +18,8 @@ package org.eclipse.lsp.cobol.core.model.tree;
 import lombok.Getter;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
-import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
 
 /**
  * File operation statement Nodes , namely READ_STATEMENT, WRITE_STATEMENT, I_O_STATEMENT, EXTEND

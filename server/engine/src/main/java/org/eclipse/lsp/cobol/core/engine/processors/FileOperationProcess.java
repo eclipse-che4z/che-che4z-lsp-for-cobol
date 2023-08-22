@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.model.tree.logic;
+package org.eclipse.lsp.cobol.core.engine.processors;
 
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +28,11 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
+import org.eclipse.lsp.cobol.common.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.model.tree.FileOperationStatementNode;
 import org.eclipse.lsp.cobol.core.model.tree.OpenStatementNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.FileDescriptionNode;
 
 import java.util.List;
 import java.util.Objects;
