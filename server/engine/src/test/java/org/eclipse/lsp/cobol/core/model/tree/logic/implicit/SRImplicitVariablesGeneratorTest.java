@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic.implicit;
 
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.core.engine.processors.implicit.SRImplicitVariablesGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

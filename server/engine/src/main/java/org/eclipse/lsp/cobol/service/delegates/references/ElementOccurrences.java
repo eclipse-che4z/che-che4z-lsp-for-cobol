@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.service.delegates.references;
 
 import com.google.common.collect.Streams;
 import lombok.NonNull;
-import org.eclipse.lsp.cobol.common.model.Context;
+import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
@@ -37,7 +37,7 @@ public class ElementOccurrences implements Occurrences {
       @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
     return SymbolsRepository.findElementByPosition(
         UriHelper.decode(position.getTextDocument().getUri()), document.getAnalysisResult(), position.getPosition())
-            .map(Context::getDefinitions).orElse(Collections.emptyList());
+            .map(DefinedAndUsedStructure::getDefinitions).orElse(Collections.emptyList());
   }
 
   @Override
@@ -45,7 +45,7 @@ public class ElementOccurrences implements Occurrences {
       @NonNull CobolDocumentModel document,
       @NonNull TextDocumentPositionParams position,
       @NonNull ReferenceContext refCtx) {
-    Optional<Context> element = SymbolsRepository.findElementByPosition(
+    Optional<DefinedAndUsedStructure> element = SymbolsRepository.findElementByPosition(
         UriHelper.decode(position.getTextDocument().getUri()), document.getAnalysisResult(), position.getPosition());
     if (!element.isPresent()) {
       return Collections.emptyList();
@@ -60,7 +60,7 @@ public class ElementOccurrences implements Occurrences {
   @Override
   public @NonNull List<DocumentHighlight> findHighlights(
       @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
-    Optional<Context> element = SymbolsRepository.findElementByPosition(UriHelper.decode(position.getTextDocument().getUri()),
+    Optional<DefinedAndUsedStructure> element = SymbolsRepository.findElementByPosition(UriHelper.decode(position.getTextDocument().getUri()),
         document.getAnalysisResult(), position.getPosition());
     return element.map(context -> Streams.concat(context.getUsages().stream(), context.getDefinitions().stream())
             .filter(byUri(position))

@@ -16,13 +16,11 @@
 package org.eclipse.lsp.cobol.core.engine;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.SubroutineService;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
@@ -39,8 +37,6 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
-import org.eclipse.lsp.cobol.core.model.DocumentMapping;
-import org.eclipse.lsp.cobol.core.model.OldExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
@@ -54,7 +50,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
-import static org.eclipse.lsp.cobol.common.copybook.SQLBackend.DB2_SERVER;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
@@ -116,49 +111,6 @@ class CobolLanguageEngineTest {
                     .build().toOriginalLocation())
             .severity(ERROR)
             .build();
-
-    OldExtendedDocument oldExtendedDocument =
-        new OldExtendedDocument(
-            "",
-            TEXT,
-            new CopybooksRepository(),
-            ImmutableMap.of(
-                URI,
-                new DocumentMapping(
-                    ImmutableList.of(
-                        Locality.builder()
-                            .uri(URI)
-                            .range(new Range(new Position(), new Position(0, 7)))
-                            .token("       ")
-                            .build(),
-                        Locality.builder()
-                            .uri(URI)
-                            .range(new Range(new Position(0, 7), new Position(0, 20)))
-                            .token("IDENTIFICATION")
-                            .build(),
-                        Locality.builder()
-                            .uri(URI)
-                            .range(new Range(new Position(0, 21), new Position(0, 22)))
-                            .token(" ")
-                            .build(),
-                        Locality.builder()
-                            .uri(URI)
-                            .range(new Range(new Position(0, 22), new Position(0, 29)))
-                            .token("DIVISION")
-                            .build(),
-                        Locality.builder()
-                            .uri(URI)
-                            .range(new Range(new Position(0, 30), new Position(0, 31)))
-                            .token(".")
-                            .build(),
-                        Locality.builder()
-                            .uri(URI)
-                            .range(new Range(new Position(0, 31), new Position(0, 31)))
-                            .token("<EOF>")
-                            .build()),
-                    ImmutableMap.of())));
-
-    CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER);
 
     DialectProcessingContext context = DialectProcessingContext.builder()
             .extendedDocument(new ExtendedDocument(TEXT, URI))

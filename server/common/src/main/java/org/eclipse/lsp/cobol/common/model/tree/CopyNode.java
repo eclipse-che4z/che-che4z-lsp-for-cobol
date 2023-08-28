@@ -30,7 +30,7 @@ import java.util.Optional;
 /** The class represents the copyBookNode. */
 @ToString(callSuper = true)
 @Getter
-public class CopyNode extends Node implements Context {
+public class CopyNode extends Node implements DefinedAndUsedStructure {
   private final String name;
   @EqualsAndHashCode.Exclude @ToString.Exclude private final Location nameLocation;
   private final String uri;
