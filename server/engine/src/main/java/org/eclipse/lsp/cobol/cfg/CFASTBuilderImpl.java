@@ -14,12 +14,9 @@
  */
 package org.eclipse.lsp.cobol.cfg;
 
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.ProcedureSectionNode;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.*;
+import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.core.model.extendedapi.*;
-import org.eclipse.lsp.cobol.core.model.tree.*;
-import org.eclipse.lsp.cobol.core.model.variables.DivisionType;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
