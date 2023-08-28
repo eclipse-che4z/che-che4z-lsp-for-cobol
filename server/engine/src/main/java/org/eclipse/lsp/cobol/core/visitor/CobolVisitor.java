@@ -386,6 +386,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitFileStatusClause(FileStatusClauseContext ctx) {
+    return addTreeNode(ctx, FileStatusNode::new);
+  }
+
+  @Override
   public List<Node> visitJsonParse(JsonParseContext ctx) {
     VariableNameAndLocality identifier1 = new VariableNameAndLocality(
             ctx.jsonIdentifier1().getText(), retrieveLocality(ctx.jsonIdentifier1()).orElse(null));
