@@ -796,7 +796,7 @@ dialectDescriptionEntry
    ;
 
 entryName
-   : (FILLER | dataName)
+   : (FILLER | { validateLength(_input.LT(1).getText(), "variable name", 30);} dataName)
    ;
 
 dataGroupUsageClause
