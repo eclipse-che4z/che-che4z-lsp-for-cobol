@@ -32,7 +32,7 @@ class TestExecVarDoesNotProduceNPE {
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       {01|1} {EXEC|2|3}\n";
+          + "       {01|1} {EXEC|2}\n";
 
   @Test
   void test() {
@@ -62,12 +62,6 @@ class TestExecVarDoesNotProduceNPE {
                     + "RDATT, REDEFINES, RES, SIGN, SYMBOL, SYNC, SYNCHRONIZED, SZ, TRAILING, TRIG, UNEXPIN, USAGE, UTF-8,"
                     + " VALUE, VALUES, YEARWINDOW, YW, '.', IDENTIFIER}",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "3",
-            new Diagnostic(
-                new Range(),
-                "The following token must start in Area B: EXEC",
-                DiagnosticSeverity.Warning,
                 ErrorSource.PARSING.getText())));
   }
 }

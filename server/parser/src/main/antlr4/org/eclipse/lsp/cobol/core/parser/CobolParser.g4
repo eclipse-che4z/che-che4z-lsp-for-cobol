@@ -987,17 +987,17 @@ paragraph
    ;
 
 sentence
-   : statement* (endClause | dialectStatement)
+   : (statement | execSqlStatementInProcedureDivision) * (endClause | dialectStatement)
    ;
 
 conditionalStatementCall
-   : statement | dialectStatement
+   : statement | dialectStatement | execSqlStatementInProcedureDivision
    ;
 
 statement
    : acceptStatement | addStatement | allocateStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
     disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement |
-    execSqlStatementInProcedureDivision | execSqlImsStatement | exitStatement | freeStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
+    execSqlImsStatement | exitStatement | freeStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
     serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |

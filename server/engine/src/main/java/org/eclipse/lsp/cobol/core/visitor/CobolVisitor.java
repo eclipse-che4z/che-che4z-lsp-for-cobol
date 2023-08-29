@@ -549,7 +549,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitExecSqlStatement(ExecSqlStatementContext ctx) {
-    areaBWarning(ctx);
     return Collections.emptyList();
   }
 
