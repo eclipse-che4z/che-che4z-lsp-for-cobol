@@ -736,7 +736,12 @@ linkageSection
 // -- local storage section ----------------------------------
 
 localStorageSection
-   : LOCAL_STORAGE SECTION DOT_FS dataDescriptionEntries
+   : LOCAL_STORAGE SECTION DOT_FS dataDescriptionEntryForLocalStorageSection*
+   ;
+
+dataDescriptionEntryForLocalStorageSection
+   : execSqlStatementInLocalStorage
+   | dataDescriptionEntry
    ;
 
 dataDescriptionEntries
@@ -1386,6 +1391,10 @@ execSqlStatementInProcedureDivision
    ;
 
 execSqlStatementInWorkingStorage
+   : execSqlStatement DOT_FS?
+   ;
+
+execSqlStatementInLocalStorage
    : execSqlStatement DOT_FS?
    ;
 
