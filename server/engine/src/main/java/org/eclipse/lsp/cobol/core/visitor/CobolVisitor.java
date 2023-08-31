@@ -593,6 +593,18 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitDeprecatedCompilerOptions(DeprecatedCompilerOptionsContext ctx) {
+    retrieveLocality(ctx).ifPresent(locality -> errors.add(SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
+            .errorCode(() -> "IGYOS4003-E")
+            .location(locality.toOriginalLocation())
+            .suggestion(messageService.getMessage("compilerDirective.deprecatedDirectiveUse", ctx.getText()))
+            .severity(ErrorSeverity.ERROR)
+            .build()));
+    return Collections.emptyList();
+  }
+
+  @Override
   public List<Node> visitParagraphName(ParagraphNameContext ctx) {
     return addTreeNode(
         ctx, locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx)));
