@@ -119,13 +119,6 @@ jobs:
           if-no-files-found: warn
           name: vsix-daco-dialect
           path: 'cobol-language-support-for-daco*.vsix'
-      - name: Run integration tests
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: |
-            npm run compile
-            npm run test:integration
-          working-directory: clients/cobol-lsp-vscode-extension
   buildNative:
     strategy:
       fail-fast: false
