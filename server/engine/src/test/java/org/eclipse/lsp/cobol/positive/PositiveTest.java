@@ -46,6 +46,7 @@ class PositiveTest extends FileBasedTest {
   @DisplayName("Parameterized - positive tests")
   @NullSource
   void test(String testFolder) {
+    LOG.info("-- {} under test --", testFolder);
     cobolTextRegistry = retrieveTextsRegistry(testFolder);
     List<CobolText> textsToTest = getTextsToTest(cobolTextRegistry);
     for (CobolText text : textsToTest) {
@@ -56,7 +57,7 @@ class PositiveTest extends FileBasedTest {
       Map<ReportSection, List<SysprintSnap>> dataNameRefs =
           getDataNameRefs(fileName, cobolTextRegistry);
       LOG.debug("Processing: " + fileName);
-      AnalysisConfig analysisConfig = getAnalysisConfiguration();
+      AnalysisConfig analysisConfig = getAnalysisConfiguration(cobolTextRegistry.getDialect());
       UseCase useCase =
           UseCase.builder()
               .documentUri(fileName)
