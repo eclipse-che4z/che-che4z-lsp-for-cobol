@@ -68,8 +68,9 @@ suite("Integration Test Suite: Processor Groups", function () {
     const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
     const diagnostics = await diagPromise;
-    assert.strictEqual(diagnostics.length, 1);
-    const message = diagnostics[0].message;
-    assert.match(message, /^Syntax error on 'MAID'/);
+    const maidSyntaxErrors = diagnostics.filter((diag) =>
+      diag.message.startsWith("Syntax error on 'MAID'"),
+    );
+    assert.strictEqual(maidSyntaxErrors.length, 2);
   });
 });

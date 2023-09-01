@@ -2,7 +2,7 @@
      1 01  PDRTPY-DXY.                                                     320
      2     03 ERGTVYMDK-DXY.                                                 1
      3       05 DMQSXREF-DXY.                                                1
-     4         07 QSXREF-DXY           PIC X(2)    VALUE SPACE.              1
+     4         07 QSXREF-DXY.                                                1
      9           09 PARTYLEV-DXY       PIC X       OCCURS 3.                13
     11         07 UMSGAL-DRT           PIC S9(6)   VALUE ZERO  COMP.        20
     15       05 RIXBADJETWOL-DXY       PIC X       VALUE SPACE.             46
