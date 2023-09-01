@@ -272,21 +272,19 @@ jobs:
           path: dialects-idms
       - name: Restore idms jar and dist folder
         run: |
-          cd dialects-idms
-          unzip *.vsix
-          cd -
-          cp -R dialects-idms/extension/dist dialects-idms/extension/server clients/idms-dialect-support
+          unzip -j dialects-idms/*.vsix extension/dist/extension.js extension/dist/extension.js.map -d clients/idms-dialect-support/dist/
+          unzip -j dialects-idms/*.vsix extension/server/jar/dialect-idms.jar -d clients/idms-dialect-support/server/jar
+        shell: bash
       - name: Retrieve daco dialect
         uses: actions/download-artifact@v3
         with:
           name: vsix-daco-dialect
-          path: dialects/daco
+          path: dialects-daco
       - name: Restore daco jar and dist folder
         run: |
-          cd dialects-daco
-          unzip *.vsix
-          cd -
-          cp -R dialects-daco/extension/dist dialects-daco/extension/server clients/daco-dialect-support
+          unzip -j dialects-daco/*.vsix extension/dist/extension.js extension/dist/extension.js.map -d clients/daco-dialect-support/dist/
+          unzip -j dialects-daco/*.vsix extension/server/jar/dialect-daco.jar -d clients/daco-dialect-support/server/jar
+        shell: bash
       - name: Run integration tests
         uses: coactions/setup-xvfb@v1
         with:
