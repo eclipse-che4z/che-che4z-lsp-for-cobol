@@ -49,6 +49,7 @@ public class FolderTextRegistry implements CobolTextRegistry {
 
   private final ListMultimap<String, CobolText> texts = ArrayListMultimap.create();
   @Getter private Map<String, TreeMap<ReportSection, List<SysprintSnap>>> snaps = new HashMap<>();
+  private String dialect;
 
   @SneakyThrows
   public FolderTextRegistry(String pathToTestResources) {
@@ -80,9 +81,24 @@ public class FolderTextRegistry implements CobolTextRegistry {
     String updateListingFlag = getUpdateListingFlag();
     Files.walk(Paths.get(folderPath)).filter(Files::isRegularFile).forEach(this::processFile);
     processCopybooks(folderPath);
+    dialect = getDialect(folderPath);
     if (!Files.exists(Paths.get(getListingFileLocation(folderPath))) || !updateListingFlag.equals("false"))
       createListingSnap(snaps, folderPath);
     else snaps = readFromSnap(folderPath);
+  }
+
+  private String getDialect(String folderPath) throws IOException {
+    return Files.walk(Paths.get(folderPath)).filter(Files::isRegularFile)
+            .filter(f -> f.getFileName().toString().equals("dialect"))
+            .findFirst().map(f -> {
+              try {
+                return readFileToString(f.toFile(), StandardCharsets.UTF_8);
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
+              return "default";
+            })
+            .orElse("default");
   }
 
   private void processCopybooks(String folderPath) throws IOException {
@@ -247,6 +263,11 @@ public class FolderTextRegistry implements CobolTextRegistry {
    */
   public TreeMap<ReportSection, List<SysprintSnap>> getSnapForFile(String filename) {
     return snaps.getOrDefault(filename, new TreeMap<>(Collections.emptyMap()));
+  }
+
+  @Override
+  public String getDialect() {
+    return dialect;
   }
 
   private String cleanup(String name) {
