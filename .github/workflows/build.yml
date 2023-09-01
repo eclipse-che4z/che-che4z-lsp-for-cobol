@@ -122,7 +122,9 @@ jobs:
       - name: Run integration tests
         uses: coactions/setup-xvfb@v1
         with:
-          run: npm run test:integration
+          run: |
+            npm run compile
+            npm run test:integration
           working-directory: clients/cobol-lsp-vscode-extension
   buildNative:
     strategy:
@@ -274,12 +276,31 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: vsix-idms-dialect
-          path: dialects/idms
+          path: dialects-idms
+      - name: Restore idms jar and dist folder
+        run: |
+          cd dialects-idms
+          unzip *.vsix
+          cd -
+          cp -R dialects-idms/extension/dist dialects-idms/extension/server clients/idms-dialect-support
       - name: Retrieve daco dialect
         uses: actions/download-artifact@v3
         with:
           name: vsix-daco-dialect
           path: dialects/daco
+      - name: Restore daco jar and dist folder
+        run: |
+          cd dialects-daco
+          unzip *.vsix
+          cd -
+          cp -R dialects-daco/extension/dist dialects-daco/extension/server clients/daco-dialect-support
+      - name: Run integration tests
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: |
+            npm run compile
+            npm run test:integration
+          working-directory: clients/cobol-lsp-vscode-extension          
       - name: Run native executable test code
         working-directory: tests/native-executable-tests
         run: |
