@@ -265,13 +265,28 @@ jobs:
           if-no-files-found: warn
           name: vsix-cobol-language-support-${{ env.target }}
           path: 'cobol-language-support*.vsix'
-      - name: Run integration tests
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm run test:integration
-          working-directory: clients/cobol-lsp-vscode-extension
       - name: Run native executable test code
         working-directory: tests/native-executable-tests
         run: |
           npm ci
           npm run test
+      - name: Retrieve idms dialect
+        uses: actions/download-artifact@v3
+        with:
+          name: vsix-idms-dialect
+          path: dialects/idms
+      - name: Retrieve daco dialect
+        uses: actions/download-artifact@v3
+        with:
+          name: vsix-daco-dialect
+          path: dialects/daco
+      - name: List dialects
+        run: |
+          ls dialects
+          ls dialects/idms
+          ls dialects/daco
+      - name: Run integration tests
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: npm run test:integration
+          working-directory: clients/cobol-lsp-vscode-extension
