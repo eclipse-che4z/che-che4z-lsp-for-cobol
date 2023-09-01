@@ -32,7 +32,7 @@ jobs:
   zipSources:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies for COBOL LS API
         working-directory: clients/cobol-dialect-api
         run: NODE_ENV=production npm ci
@@ -53,7 +53,9 @@ jobs:
   buildPlatformIndependedPart:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with: 
+          fetch-depth: 0
       - uses: graalvm/setup-graalvm@v1
         with:
           version: '22.3.0'
@@ -73,7 +75,7 @@ jobs:
           path: server/engine/target/native/agent-output/test/*
       - name: Build Server and Dialects Jars
         working-directory: server
-        run: mvn clean package -Dmaven.test.skip --no-transfer-progress
+        run: mvn clean package --no-transfer-progress
       - uses: actions/upload-artifact@v3
         with:
           name: jar
@@ -94,7 +96,14 @@ jobs:
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
           npm ci
-          npm run test  
+          npm run test
+      - name: SonarQube Scan
+        uses: kitabisa/sonarqube-action@v1.2.0
+        with:
+          projectBaseDir: ${{ github.workspace }}
+          projectKey: "eclipse-che4z_che-che4z-lsp-for-cobol"
+          host: https://sonarcloud.io
+          login: ${{ secrets.SONAR_TOKEN }}
       - name: Package IDMS vsix
         working-directory: clients/idms-dialect-support
         run: |

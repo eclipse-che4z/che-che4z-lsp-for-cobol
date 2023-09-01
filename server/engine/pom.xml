@@ -275,7 +275,7 @@
                         </property>
                     </systemProperties>
                     <excludes>
-                        <exclude>**/org/eclipse/lsp/cobol/dialects/daco/**/*</exclude>
+                        <exclude>**/org/eclipse/lsp/cobol/dialects/**/*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -323,6 +323,7 @@
                     </execution>
                     <execution>
                         <id>coverage-report</id>
+                        <phase>test</phase>
                         <goals>
                             <goal>report</goal>
                         </goals>
