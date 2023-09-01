@@ -57,6 +57,28 @@
       "env": {},
       "skipFiles": ["<node_internals>/**"],
       "preLaunchTask": "Watch"
+    },
+    {
+      "name": "Run extension with dialects",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "${workspaceFolder}/../../tests/test_files/project",
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/../daco-dialect-support/",
+        "--extensionDevelopmentPath=${workspaceFolder}/../idms-dialect-support/",
+        "--extensionDevelopmentPath=${workspaceFolder}"
+      ],
+      "sourceMaps": true,
+      "smartStep": true,
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js",
+        "!${workspaceFolder}/**/node_modules**/*"
+      ],
+      "env": {},
+      "skipFiles": ["<node_internals>/**"],
+      "preLaunchTask": "Watch"
     }
   ]
 }

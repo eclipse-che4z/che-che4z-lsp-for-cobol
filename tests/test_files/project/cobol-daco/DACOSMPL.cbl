@@ -11,7 +11,7 @@
 001600*----------------------------------------------------------------*
 001700 DATA   DIVISION.
 001800 WORKING-STORAGE SECTION.
-001810 01  COPY MAID PDRTPY-DXY
+001805 01  COPY MAID PDRTPY-DXY
 001810 01  COPY MAID MAIDABCD
 001900 01  WS-AREA.                                                       D00000
 002000     03 AREA-XW1.                                                   D00000
