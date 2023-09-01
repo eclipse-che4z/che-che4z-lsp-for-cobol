@@ -31,7 +31,7 @@ suite("Integration Test Suite: Processor Groups", function () {
   // cobol-dialect-api (development) npm ci && npm run compile
   // daco-dialect-support (development) npm ci && npm run package
   // idms-dialect-support (development) npm ci && npm run package
-  // put server.jar, dialect-idms.jar and dialect-daco.jar into their server/jar folder
+  // put server.jar, dialect-idms.jar and dialect-daco.jar into their server/jar folders
 
   test("TC355920: IDMS - with preprocessor setup", async () => {
     const extSrcPath = path.join("cobol-idms", "IDMSSMPL.cbl");

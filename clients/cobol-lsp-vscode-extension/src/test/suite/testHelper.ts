@@ -20,13 +20,24 @@ export const TEST_TIMEOUT = 80000;
 
 export async function activate() {
   // The extensionId is `publisher.name` from package.json
-  const ext = vscode.extensions.getExtension(
+  const cobol = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support",
   )!;
-  if (ext.isActive) {
-    return;
+  if (!cobol.isActive) {
+    await cobol.activate();
   }
-  await ext.activate();
+  const idms = vscode.extensions.getExtension(
+    "BroadcomMFD.cobol-language-support-for-idms",
+  )!;
+  if (!idms.isActive) {
+    await idms.activate();
+  }
+  const daco = vscode.extensions.getExtension(
+    "BroadcomMFD.cobol-language-support-for-daco",
+  )!;
+  if (!daco.isActive) {
+    await daco.activate();
+  }
 }
 
 export function getWorkspacePath(): string {
