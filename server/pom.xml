@@ -22,7 +22,6 @@
         <dialect.api.version>2.1.0</dialect.api.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <sonar.exclusions>**/org/eclipse/lsp/cobol/test/**/*, **/org/eclipse/lsp/cobol/dialects/daco/**/*, **/org/eclipse/lsp/cobol/core/parser/**/*, **/org/eclipse/lsp/cobol/domain/modules/**/*</sonar.exclusions>
     </properties>
 
 </project>
