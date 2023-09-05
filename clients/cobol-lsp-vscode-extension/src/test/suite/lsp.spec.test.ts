@@ -367,19 +367,23 @@ suite("Integration Test Suite", function () {
     let editor = helper.get_editor("ADSORT.cbl");
     await helper.deleteLine(editor, 58);
     await helper.insertString(
-      editor, pos(36, 11),
-      "           EXEC SQL SQL-STATEMENT END-EXEC."
+      editor,
+      pos(36, 11),
+      "           EXEC SQL SQL-STATEMENT END-EXEC.",
     );
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
-    helper.assertRangeIsEqual( diagnostics[0].range, range(pos(36, 20), pos(36, 23)));
+    helper.assertRangeIsEqual(
+      diagnostics[0].range,
+      range(pos(36, 20), pos(36, 23)),
+    );
     assert.ok(
       diagnostics[0].message.includes(
-        "Syntax error on 'SQL' expected {ALLOCATE, ALTER, ASSOCIATE, CALL, CLOSE"
-      )
+        "Syntax error on 'SQL' expected {ALLOCATE, ALTER, ASSOCIATE, CALL, CLOSE",
+      ),
     );
   })
     .timeout(helper.TEST_TIMEOUT)
