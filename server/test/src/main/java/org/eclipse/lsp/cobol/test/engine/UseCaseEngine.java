@@ -19,7 +19,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.common.model.Context;
+import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
@@ -210,6 +210,7 @@ public class UseCaseEngine {
                 .copybooks(document.getCopybooks())
                 .subroutines(subroutineNames)
                 .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
+                .cicsTranslator(analysisConfig.isCicsTranslatorEnabled())
                 .copybookProcessingMode(
                     analysisConfig.getCopybookConfig().getCopybookProcessingMode())
                 .features(analysisConfig.getFeatures())
@@ -253,6 +254,7 @@ public class UseCaseEngine {
                 .text(document.getText())
                 .copybooks(document.getCopybooks())
                 .subroutines(subroutineNames)
+                .cicsTranslator(analysisConfig.isCicsTranslatorEnabled())
                 .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
                 .copybookProcessingMode(
                     analysisConfig.getCopybookConfig().getCopybookProcessingMode())
@@ -310,18 +312,18 @@ public class UseCaseEngine {
     return extractVariables(
         result,
         it -> !ImplicitCodeUtils.isImplicit(it.getLocality().getUri()),
-        Context::getDefinitions);
+        DefinedAndUsedStructure::getDefinitions);
   }
 
   private Map<String, List<Location>> extractVariableUsages(AnalysisResult result) {
     return extractVariables(
-        result, variable -> !variable.getUsages().isEmpty(), Context::getUsages);
+        result, variable -> !variable.getUsages().isEmpty(), DefinedAndUsedStructure::getUsages);
   }
 
   private Map<String, List<Location>> extractVariables(
       AnalysisResult result,
       Predicate<VariableNode> predicate,
-      Function<Context, List<Location>> extractor) {
+      Function<DefinedAndUsedStructure, List<Location>> extractor) {
 
     return result
             .getRootNode()
@@ -342,32 +344,32 @@ public class UseCaseEngine {
     return extract(
         result,
         nodeType,
-        Context::getDefinitions,
+        DefinedAndUsedStructure::getDefinitions,
         context ->
             !(context.getDefinitions().isEmpty()
                 || ImplicitCodeUtils.isImplicit(context.getDefinitions().get(0).getUri())));
   }
 
   private Map<String, List<Location>> extractUsages(AnalysisResult result, NodeType nodeType) {
-    return extract(result, nodeType, Context::getUsages, context -> !context.getUsages().isEmpty());
+    return extract(result, nodeType, DefinedAndUsedStructure::getUsages, context -> !context.getUsages().isEmpty());
   }
 
   private Map<String, List<Location>> extract(
       AnalysisResult result,
       NodeType nodeType,
-      Function<Context, List<Location>> extractor,
-      Predicate<Context> predicate) {
+      Function<DefinedAndUsedStructure, List<Location>> extractor,
+      Predicate<DefinedAndUsedStructure> predicate) {
     return result
         .getRootNode()
         .getDepthFirstStream()
         .filter(hasType(nodeType))
-        .map(Context.class::cast)
+        .map(DefinedAndUsedStructure.class::cast)
         .filter(predicate)
         .collect(toMap(extractor, nodeType));
   }
 
-  private Collector<Context, ?, Map<String, List<Location>>> toMap(
-          Function<Context, List<Location>> extractor, NodeType nodeType) {
+  private Collector<DefinedAndUsedStructure, ?, Map<String, List<Location>>> toMap(
+          Function<DefinedAndUsedStructure, List<Location>> extractor, NodeType nodeType) {
     return Collectors.toMap(
         ctx -> {
           if (nodeType != COPY) {

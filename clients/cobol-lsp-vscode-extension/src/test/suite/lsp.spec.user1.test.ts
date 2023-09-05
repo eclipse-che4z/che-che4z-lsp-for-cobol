@@ -29,7 +29,9 @@ suite("Tests with USER1.cbl", function () {
     await helper.activate();
   });
 
-  this.afterEach(async () => await helper.closeAllEditors()).timeout(helper.TEST_TIMEOUT);
+  this.afterEach(async () => await helper.closeAllEditors()).timeout(
+    helper.TEST_TIMEOUT,
+  );
   this.beforeEach(async () => {
     await helper.showDocument(WORKSPACE_FILE);
     editor = helper.get_editor(WORKSPACE_FILE);
@@ -100,15 +102,24 @@ suite("Tests with USER1.cbl", function () {
   });
 
   test("TC152054 Auto format of right trailing spaces", async () => {
-    await helper.insertString(editor, pos(34, 57), "        ");
+    await helper.insertString(
+      editor,
+      pos(34, 57),
+      "                                ",
+    );
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+    );
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeFormatDocumentProvider",
       editor.document.uri,
       { tabSize: 4, insertSpaces: true },
     );
+    assert.strictEqual(result.length, 1);
+
     helper.assertRangeIsEqual(
       result[0].range,
-      new vscode.Range(pos(34, 57), pos(34, 65)),
+      new vscode.Range(pos(34, 57), pos(34, 89)),
     );
     assert.strictEqual(result[0].newText, "");
   });

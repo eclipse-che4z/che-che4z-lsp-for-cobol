@@ -667,7 +667,7 @@ dbs_fetch_multi: dbs_fetch_rowsetpos? FROM? dbs_cursor_name dbs_fetch_multirow;
 dbs_fetch_rowsetpos: (ROWSET STARTING AT (ABSOLUTE | RELATIVE) (dbs_host_variable | dbs_integer_constant) | (NEXT | PRIOR |
                     FIRST | LAST | CURRENT) ROWSET);
 dbs_fetch_multirow: (FOR (dbs_host_variable | dbs_integer_constant) ROWS)? ((INTO | USING) (DESCRIPTOR dbs_descriptor_name |
-                    dbs_host_variable_array (dbs_comma_separator dbs_host_variable_array)*))?;
+                    dbs_fetch_target_variable (dbs_comma_separator dbs_fetch_target_variable)*))?;
 
 
 /*FREE LOCATOR */

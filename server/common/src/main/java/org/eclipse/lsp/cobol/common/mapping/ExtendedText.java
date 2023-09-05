@@ -128,7 +128,7 @@ public class ExtendedText {
    */
   public void insert(Range copyStatementRange, ExtendedText copybook) {
     Location location = mapLocation(copyStatementRange);
-    deleteLines(copyStatementRange);
+    clear(copyStatementRange);
     insert(copyStatementRange.getStart().getLine(), copybook, location);
   }
 
@@ -138,7 +138,7 @@ public class ExtendedText {
    * @param copybook - a copybook extended text
    */
   public void insertWithPadding(Range copyStatementRange, ExtendedText copybook) {
-    delete(copyStatementRange);
+    clear(copyStatementRange);
     Location initialLocation = mapLocation(copyStatementRange);
 
     if (!copybook.lines.isEmpty()) {
@@ -149,7 +149,7 @@ public class ExtendedText {
       ExtendedTextLine copybookLine = copybook.lines.get(0);
       ExtendedTextLine firstLine = lines.get(initialLine);
       copybookLine.trim();
-      firstLine.append(updateLine(copybookLine, initialLocation));
+      firstLine.insert(copyStatementRange.getEnd().getCharacter(), updateLine(copybookLine, initialLocation));
 
       for (int i = 1; i < copybook.lines.size() - 1; i++) {
         copybookLine = copybook.lines.get(i);

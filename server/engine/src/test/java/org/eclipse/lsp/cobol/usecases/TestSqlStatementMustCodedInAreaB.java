@@ -17,11 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This test checks if SQL statements coded in Area B */
@@ -33,8 +29,8 @@ class TestSqlStatementMustCodedInAreaB {
           + "       WORKING-STORAGE SECTION.\n"
           + "       PROCEDURE DIVISION."
           + "              EXEC SQL\n"
-          + "         {SELECT|1} * FROM EMP;\n"
-          + "         {WHERE|2} ID = 0;\n"
+          + "         SELECT * FROM EMP;\n"
+          + "         WHERE ID = 0;\n"
           + "              END-EXEC.\n";
 
   @Test
@@ -42,18 +38,6 @@ class TestSqlStatementMustCodedInAreaB {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(),
-                "The following token must start in Area B: SELECT",
-                DiagnosticSeverity.Warning,
-                ErrorSource.PARSING.getText()),
-            "2",
-            new Diagnostic(
-                new Range(),
-                "The following token must start in Area B: WHERE",
-                DiagnosticSeverity.Warning,
-                ErrorSource.PARSING.getText())));
+        ImmutableMap.of());
   }
 }

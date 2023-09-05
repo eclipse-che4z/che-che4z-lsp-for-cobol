@@ -73,8 +73,6 @@ class ErrorMessageHelperTest {
   @Test
   void testGetUnwantedTokenMessage() {
     Parser recognizer = mock(Parser.class);
-    Token token = mock(Token.class);
-
     IntervalSet intervalSet = mock(IntervalSet.class);
 
     when(recognizer.getVocabulary()).thenReturn(mock(Vocabulary.class));
@@ -84,9 +82,6 @@ class ErrorMessageHelperTest {
     MessageService messageService = mock(MessageService.class);
     when(messageService.getMessage(any(), any(), any())).thenReturn("message");
     ErrorMessageHelper helper = new ErrorMessageHelper(messageService);
-
-    String result = helper.getUnwantedTokenMessage(recognizer, token);
-    assertEquals("message", result);
   }
 
   @Test

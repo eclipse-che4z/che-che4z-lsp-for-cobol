@@ -32,13 +32,16 @@ class CompilerDirectiveContextTest {
   @Test
   void testCompilerOptionsContextFetch() {
     CompilerDirectiveContext context = new CompilerDirectiveContext();
+
+    assertEquals(context.getCompilerDirectiveMap().entrySet().size(), 2);
     context.updateDirectiveOptions(
         new CompilerDirectiveOption(CompilerDirectiveName.ADATA, ImmutableList.of(EXTEND)));
     Optional<CompilerDirectiveOption> result1 =
         context.filterDirectiveList(ImmutableList.of(CompilerDirectiveName.QUALIFY));
     Optional<CompilerDirectiveOption> result2 =
         context.filterDirectiveList(ImmutableList.of(CompilerDirectiveName.ADATA));
-    assertFalse(result1.isPresent());
+    assertTrue(result1.isPresent());
+    assertTrue(result1.get().getValue().contains("COMPAT"));
     assertTrue(result2.isPresent());
     Assertions.assertTrue(result2.get().getValue().contains(EXTEND));
 

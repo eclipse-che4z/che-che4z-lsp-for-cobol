@@ -23,7 +23,7 @@ ASTERISKCHAR : '*';
 DOUBLEASTERISKCHAR : '**';
 COLONCHAR : ':';
 COMMACHAR : ',';
-COMMENTTAG : '*>';
+COMMENTTAG : '*>' -> channel(COMMENTS);
 DOLLARCHAR : '$';
 DOUBLEQUOTE : '"';
 DOUBLEEQUALCHAR : '==';
@@ -77,7 +77,7 @@ HEX_NUMBERS : HEXNUMBER;
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
-COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(COMMENTS);
+COMMENTLINE : COMMENTTAG ~('\n' | '\r')* -> channel(COMMENTS);
 WS : [ \t\f]+ -> channel(HIDDEN);
 COMPILERLINE : DOUBLEMORETHANCHAR ~('\n' | '\r')* -> channel(HIDDEN);
 
@@ -93,8 +93,8 @@ ZERO_DIGIT: '0';
 
 
 fragment HEXNUMBER :
-	X '"' [0-9A-F]+ '"'
-	| X '\'' [0-9A-F]+ '\''
+	X '"' [0-9A-Fa-f]+ '"'
+	| X '\'' [0-9A-Fa-f]+ '\''
 ;
 
 fragment NULLTERMINATED :

@@ -33,7 +33,7 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*SQLCA} PIC X(10).\n"
-          + "           {EXEC|1} INCLUDE STRUCT1 END-EXEC.";
+          + "           EXEC {INCLUDE|1} STRUCT1 END-EXEC.";
 
   @Test
   void test() {
@@ -44,7 +44,7 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
             "1",
             new Diagnostic(
                 new Range(),
-                "Missing token SQL at execSqlStatement",
+                    "No viable alternative at input EXEC INCLUDE",
                 Error,
                 ErrorSource.PARSING.getText())));
   }

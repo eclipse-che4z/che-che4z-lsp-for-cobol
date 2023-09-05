@@ -26,7 +26,7 @@ allCicsRules: cics_send | cics_receive | cics_add | cics_address | cics_allocate
           cics_soapfault | cics_spoolclose | cics_spoolopen | cics_spoolread | cics_spoolwrite | cics_start |
           cics_startbr | cics_startbrowse | cics_suspend | cics_syncpoint | cics_test | cics_transform | cics_unlock |
           cics_update | cics_verify | cics_wait | cics_waitcics | cics_web | cics_write | cics_writeq | cics_wsacontext |
-          cics_wsaepr | cics_xctl | cics_converse | cics_abend | cics_acquire
+          cics_wsaepr | cics_xctl | cics_converse | cics_abend | cics_acquire | cics_exci_link
         ;
 
 /** RECEIVE: */
@@ -489,6 +489,22 @@ cics_link_commarea: COMMAREA cics_data_area (LENGTH cics_data_value | DATALENGTH
 cics_link_inputmsg: INPUTMSG cics_data_area (INPUTMSGLEN cics_data_value)?;
 cics_link_acqprocess: (ACQPROCESS | INPUTEVENT cics_data_value | cics_resp)+;
 cics_link_activity: (ACTIVITY cics_data_value | ACQACTIVITY | INPUTEVENT cics_data_value | cics_resp)+;
+
+/** EXCI LINK, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-link-command-exci*/
+cics_exci_link: LINK cics_link_program_exci;
+cics_link_commarea_exci: COMMAREA cics_data_area (LENGTH cics_data_value)? (DATALENGTH cics_data_value)?;
+cics_link_channel_exci: CHANNEL cics_name;
+cics_link_program_exci: PROGRAM cics_name
+                     (
+                        cics_link_commarea_exci
+                        | cics_link_channel_exci
+                        | APPLID cics_data_area
+                        | TRANSID cics_name
+                        | RETCODE cics_data_area
+                        | SYNCONRETURN
+                        | cics_resp
+                     )+;
+
 
 /** LOAD */
 cics_load: LOAD (PROGRAM cics_name | SET cics_ref | LENGTH cics_data_area | FLENGTH cics_data_area | ENTRY cics_ref | HOLD | cics_resp)*;

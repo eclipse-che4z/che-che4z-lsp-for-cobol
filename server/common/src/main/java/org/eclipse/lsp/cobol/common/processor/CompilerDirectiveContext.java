@@ -22,7 +22,21 @@ import java.util.stream.Stream;
 
 /** Compiler directive context */
 public class CompilerDirectiveContext {
-  @Getter private final Map<CompilerDirectiveName, List<String>> compilerDirectiveMap = new HashMap<>();
+  @Getter private final Map<CompilerDirectiveName, List<String>> compilerDirectiveMap;
+
+  public CompilerDirectiveContext() {
+    this.compilerDirectiveMap = defaultCompilerDirective();
+  }
+
+  private Map<CompilerDirectiveName, List<String>> defaultCompilerDirective() {
+    return Arrays.stream(CompilerDirectiveName.values())
+        .map(directive -> directive.getDirectiveOption(""))
+        .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty))
+        .collect(
+            Collectors.toMap(
+                CompilerDirectiveOption::getCompilerDirectiveName,
+                CompilerDirectiveOption::getValue));
+  }
 
   /**
    * Updates the compiler directive options

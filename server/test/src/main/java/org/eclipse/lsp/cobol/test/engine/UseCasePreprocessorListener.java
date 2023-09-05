@@ -318,14 +318,22 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     // Closing mark of the last token in multi-token error definition is an effective pivot of the
     // entire statement to calculate its stop position
     Token closingOfMultiToken = ctx.multiToken().stop;
-    int line = getLine(ctx.getStart());
+    int startLine = getLine(ctx.getStart());
     int stopMarkLen = closingOfMultiToken.getText().length();
-    int stop = closingOfMultiToken.getCharPositionInLine() + stopMarkLen - lineShifts[line];
-    int start = stop - affectedTokens.length();
-    lineShifts[line] += ctx.getStop().getText().length();
+    int stopLine = getLine(closingOfMultiToken);
+    int stop;
+    int start;
+    if (stopLine == startLine) {
+      stop = closingOfMultiToken.getCharPositionInLine() + stopMarkLen - lineShifts[startLine];
+      start = stop - affectedTokens.length();
+    } else {
+      stop = closingOfMultiToken.getCharPositionInLine() + stopMarkLen;
+      start = ctx.getStart().getCharPositionInLine();
+    }
+    lineShifts[startLine] += ctx.getStop().getText().length();
 
     registerDiagnostics(
-            new Range(new Position(line, start), new Position(line, stop)), ctx.diagnostic());
+            new Range(new Position(startLine, start), new Position(stopLine, stop)), ctx.diagnostic());
     pop();
     write(affectedTokens);
   }
@@ -403,7 +411,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                     it -> addTokenLocation(it, replacementText + dialect.toUpperCase(), range));
 
     ofNullable(replacement).ifPresent(addPositionShift());
-    lineShifts[getLine(ctx.start)] += text.length() - tokenLength + dialect.length();
+    lineShifts[getLine(ctx.start)] += dialect.length();
     registerDiagnostics(range, diagnosticIds);
     write(getHiddenText(tokens.getHiddenTokensToLeft(ctx.start.getTokenIndex())));
     write(text);
@@ -432,8 +440,6 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                     .map(ParserRuleContext::getText)
                     .orElse(text);
 
-    int tokenLength = text.length();
-
     Range range = retrieveRange(ctx, text.length());
     ofNullable(storage)
             .ifPresent(
@@ -449,7 +455,6 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                     });
 
     ofNullable(replacement).ifPresent(addPositionShift());
-    lineShifts[getLine(ctx.start)] += text.length() - tokenLength;
     registerDiagnostics(range, diagnosticIds);
     write(getHiddenText(tokens.getHiddenTokensToLeft(ctx.start.getTokenIndex())));
     write(text);

@@ -87,6 +87,13 @@ public class TestXMLParseStatement {
           + "           {_VALIDATING WITH {$QUESTION}|3_}\n"
           + "           PROCESSING PROCEDURE {#XML-HANDLER}\n";
 
+  private static final String XMP_PARSE_STATEMENT_XMLSS =
+          "           XML PARSE {$XML-DOC} \n"
+                  + "           WITH ENCODING 1200\n"
+                  + "           RETURNING NATIONAL\n"
+                  + "           VALIDATING WITH {$QUESTION}\n"
+                  + "           PROCESSING PROCEDURE {#XML-HANDLER}\n";
+
   public static final String TEXT =
       XML_PARSE_STATEMENT_PRECESSED + XMP_PARSE_STATEMENT + XML_PARSE_SUCCESSOR;
 
@@ -170,6 +177,28 @@ public class TestXMLParseStatement {
           + "           DISPLAY {$XML-EVENT} (1:22) ':' {$XML-TEXT}\n"
           + "           .";
 
+  public static final String XML_PARSE_SUBSTRING_IDENTIFIER =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TDXMLTST.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       INPUT-OUTPUT SECTION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*XML-STRING}                PIC X(1000) VALUE SPACES.\n"
+          + "       01 {$*EZ-PTR}                    PIC S9(4) COMP VALUE 1.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "          {#*MAINLINE}.\n"
+          + "             DISPLAY 'XML-DOCUMENT=' {$XML-STRING}(1:{$EZ-PTR})\n"
+          + "             XML PARSE {$XML-STRING}(1:{$EZ-PTR}) RETURNING NATIONAL\n"
+          + "                                PROCESSING PROCEDURE {#XML-HANDLER}\n"
+          + "               ON EXCEPTION\n"
+          + "                 DISPLAY 'XML DOCUMENT ERROR ' {$XML-CODE}\n"
+          + "               NOT ON EXCEPTION\n"
+          + "                 DISPLAY 'XML DOCUMENT SUCCESSFULLY PARSED'\n"
+          + "              END-XML.\n"
+          + "       {#*XML-HANDLER}.\n"
+          + "           DISPLAY 'XML-EVENT=' {$XML-EVENT}.";
+
   @Test
   void xmlParsePositiveTest() {
     UseCaseEngine.runTest(
@@ -179,7 +208,10 @@ public class TestXMLParseStatement {
   @Test
   void xmlParse_whenXmlssNotSet_provideHints() {
     UseCaseEngine.runTest(
-        XML_PARSE_STATEMENT_PRECESSED + XMP_PARSE_STATEMENT_NO_XMLSS + XML_PARSE_SUCCESSOR,
+        "     PROCESS XMLPARSE(COMPAT)\n"
+            + XML_PARSE_STATEMENT_PRECESSED
+            + XMP_PARSE_STATEMENT_NO_XMLSS
+            + XML_PARSE_SUCCESSOR,
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
@@ -200,6 +232,14 @@ public class TestXMLParseStatement {
                 "Validating phrase can be specified only when XMLPARSE(XMLSS) compiler option is in effect",
                 DiagnosticSeverity.Hint,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void xmlParse_whenCompilerOptionNotProvided_XMLPARSE_XMLSS_isConsideredDefault() {
+    UseCaseEngine.runTest(
+        XML_PARSE_STATEMENT_PRECESSED + XMP_PARSE_STATEMENT_XMLSS + XML_PARSE_SUCCESSOR,
+        ImmutableList.of(),
+        ImmutableMap.of());
   }
 
   @Test
@@ -256,5 +296,13 @@ public class TestXMLParseStatement {
                 "Variable NAME is not defined",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void test_whenIdentifier1HasMoreThanOneDefinitions_thenProcess() {
+    UseCaseEngine.runTest(
+            XML_PARSE_SUBSTRING_IDENTIFIER,
+            ImmutableList.of(),
+            ImmutableMap.of());
   }
 }

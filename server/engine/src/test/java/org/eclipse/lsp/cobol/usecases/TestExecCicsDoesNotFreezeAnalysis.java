@@ -17,6 +17,8 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
@@ -33,11 +35,11 @@ class TestExecCicsDoesNotFreezeAnalysis {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           EXEC CICS{|1}\n";
+          + "           EXEC {CICS|2}{|1|3}\n";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(
+    UseCaseEngine.runTestForDiagnostics(
         TEXT,
         ImmutableList.of(),
         ImmutableMap.of(
@@ -46,6 +48,20 @@ class TestExecCicsDoesNotFreezeAnalysis {
                 new Range(),
                 "Unexpected end of file",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "The following token must start in Area A: CICS",
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText()),
+            "3",
+            new Diagnostic(
+                new Range(),
+                "No viable alternative at input EXEC CICS",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of(),
+        AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
   }
 }

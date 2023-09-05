@@ -32,9 +32,9 @@ import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
-import org.eclipse.lsp.cobol.core.model.tree.CodeBlockUsageNode;
-import org.eclipse.lsp.cobol.core.model.tree.ParagraphNameNode;
-import org.eclipse.lsp.cobol.core.model.tree.SectionNameNode;
+import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
+import org.eclipse.lsp.cobol.common.model.tree.SectionNameNode;
 import org.eclipse.lsp4j.Location;
 
 import java.util.*;

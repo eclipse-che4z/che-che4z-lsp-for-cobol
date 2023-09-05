@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
@@ -23,6 +24,8 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
+import org.eclipse.lsp.cobol.common.utils.RangeUtils;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -119,17 +122,46 @@ public class VariableUsageUtils {
    * Retrieves {@link VariableUsageNode} based on the passed parent node and variable locality
    * @param parentNode parent node under which usage needs to be determined
    * @param identifier {@link VariableNameAndLocality} variable locality whose usage needs to be determined.
-   * @return Optional of {@link VariableUsageNode} for the passed identifier
+   * @return List of {@link VariableUsageNode} for the passed identifier
    */
-  public Optional<VariableUsageNode> getVariableUsageNode(
+  public List<VariableUsageNode> getVariableUsageNode(
           Node parentNode, VariableNameAndLocality identifier) {
     return parentNode.getDepthFirstStream()
             .filter(VariableUsageNode.class::isInstance)
             .map(VariableUsageNode.class::cast)
-            .filter(
-                    node1 ->
-                            node1.getName().equalsIgnoreCase(identifier.getName())
-                                    && node1.getLocality().equals(identifier.getLocality()))
-            .findFirst();
+            .filter(node1 -> RangeUtils.isInside(node1.getLocality().getRange(), identifier.getLocality().getRange()))
+            .collect(Collectors.toList());
+  }
+
+  /**
+   * Retrieves {@link VariableUsageNode} based on the passed parent node and variable locality
+   * @param parentNode parent node under which usage needs to be determined
+   * @param identifiers Lis of {@link VariableNameAndLocality} variable locality whose usage needs to be determined.
+   * @return List of {@link VariableUsageNode} for the passed identifier
+   */
+  public List<VariableUsageNode> getVariableUsageNode(
+          Node parentNode, List<VariableNameAndLocality> identifiers) {
+    return identifiers.stream().map(iden -> VariableUsageUtils.getVariableUsageNode(parentNode, iden))
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+  }
+
+
+  /**
+   * Retrieves variable definition nodes for the passed {@link VariableUsageNode}
+   * @param symbolAccumulatorService instance of {@link SymbolAccumulatorService}
+   * @param containerNode  container node for the variableUsage node
+   * @param identifiers List of {@link VariableUsageNode}
+   * @return List of {@link VariableNode}
+   */
+  public List<VariableNode> getDefinitionNode(SymbolAccumulatorService symbolAccumulatorService,
+                                               Node containerNode, List<VariableUsageNode> identifiers) {
+    return containerNode.getProgram()
+            .map(
+                    programNode -> identifiers.stream().map(id -> symbolAccumulatorService.getVariableDefinition(
+                            programNode, Collections.singletonList(id))).collect(Collectors.toList()))
+            .map(e -> e.stream().flatMap(Collection::stream))
+            .map(e1 -> e1.collect(Collectors.toList()))
+            .orElse(ImmutableList.of());
   }
 }

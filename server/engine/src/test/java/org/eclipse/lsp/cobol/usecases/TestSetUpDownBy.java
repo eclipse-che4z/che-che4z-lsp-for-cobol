@@ -87,11 +87,7 @@ class TestSetUpDownBy {
             "3",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'IND3' expected {ACCEPT, ADD, ALLOCATE, ALTER, CALL, CANCEL, CLOSE, COMPUTE, "
-                    + "CONTINUE, DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, FREE,"
-                    + " GENERATE, GO, GOBACK, IF, INITIALIZE, INITIATE, INSPECT, JSON, MERGE, MOVE, MULTIPLY, OPEN, PERFORM,"
-                    + " PURGE, READ, READY, RECEIVE, RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, "
-                    + "SORT, START, STOP, STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, '.'}",
+                "Extraneous input 'IND3'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "4",

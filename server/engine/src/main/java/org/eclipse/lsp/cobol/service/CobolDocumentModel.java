@@ -14,30 +14,32 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import lombok.*;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
-import lombok.Data;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * This class stores a COBOL program text to be processed. Provides a list of lines and text tokens
  * by position.
  */
-@Data
+@RequiredArgsConstructor
 @Slf4j
 public class CobolDocumentModel {
   private static final String DELIMITER = "[ .\\[\\]()<>,*\"']+";
-  private final List<Line> lines = new ArrayList<>();
-  private final String text;
-  private final String uri;
-  private AnalysisResult analysisResult;
+  @Getter private final List<Line> lines = new CopyOnWriteArrayList<>();
+  @Getter private String text;
+  @Getter private final String uri;
+  @Getter @Setter private boolean opened = true;
+  @Getter @Setter private AnalysisResult analysisResult;
+  @Getter @Setter private List<DocumentSymbol> outlineResult;
 
   public CobolDocumentModel(String uri, String text, AnalysisResult analysisResult) {
     this.uri = uri;
@@ -51,6 +53,11 @@ public class CobolDocumentModel {
     this.uri = uri;
     parse(text);
   }
+
+  public boolean isDocumentSynced() {
+    return (analysisResult != null && outlineResult != null);
+  }
+
 
   Line getLine(int number) {
     return lines.stream().filter(line -> line.getNumber() == number).findFirst().orElse(null);
@@ -70,6 +77,17 @@ public class CobolDocumentModel {
     return retrieveTokenBeginning(position, route);
   }
 
+  /**
+   * Update CobolDocumentModel with a new text
+   * @param text - the new document text
+   */
+  public void update(String text) {
+    this.text = text;
+    parse(text);
+    analysisResult = null;
+    outlineResult = null;
+  }
+
   String getFullTokenAtPosition(Position position) {
     Line route = getLine(position.getLine());
     if (route == null) {
@@ -79,6 +97,7 @@ public class CobolDocumentModel {
   }
 
   private void parse(String text) {
+    lines.clear();
     try (BufferedReader reader = new BufferedReader(new StringReader(text))) {
       String lineText;
       int lineNumber = 0;
@@ -133,8 +152,8 @@ public class CobolDocumentModel {
   /** A value object to store program lines */
   @Value
   public static class Line {
-    private final int number;
-    private final String text;
+    int number;
+    String text;
 
     Line(int number, String text) {
       this.number = number;

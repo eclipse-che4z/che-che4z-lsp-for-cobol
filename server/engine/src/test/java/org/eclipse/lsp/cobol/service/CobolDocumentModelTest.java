@@ -19,8 +19,7 @@ import org.eclipse.lsp4j.Position;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /** This test check functions of the {@link CobolDocumentModel}. */
 class CobolDocumentModelTest {
@@ -113,6 +112,15 @@ class CobolDocumentModelTest {
     assertEquals("bc", model.getTokenBeforePosition(new Position(0, 4)));
     assertEquals("d", model.getTokenBeforePosition(new Position(1, 1)));
     assertEquals("de", model.getTokenBeforePosition(new Position(1, 2)));
+  }
+
+  @Test
+  void testUpdate() {
+    CobolDocumentModel model = new CobolDocumentModel("", TEXT);
+    assertEquals(10, model.getLines().size());
+
+    model.update("NEW TEXT");
+    assertEquals(1, model.getLines().size());
   }
 
   private String retrieveFirstTextLine() {

@@ -31,6 +31,7 @@ import {
   SETTINGS_TAB_CONFIG,
   SETTINGS_SQL_BACKEND,
   SETTINGS_COMPILE_OPTIONS,
+  DIALECT_LIBS,
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
@@ -119,6 +120,12 @@ export function configHandler(request: any): Array<any> {
             cfg as string[],
           );
           result.push(object);
+        } else if (item.section === DIALECT_LIBS && !!item.dialect) {
+          const dialectLibs = SettingsService.getCopybookLocalPath(
+            item.scopeUri,
+            item.dialect,
+          );
+          result.push(dialectLibs);
         } else if (item.section === SETTINGS_CPY_EXTENSIONS) {
           const object = loadProcessorGroupCopybookExtensionsConfig(
             item,
@@ -355,13 +362,11 @@ export class SettingsService {
       const pathList: string[] = vscode.workspace
         .getConfiguration(SETTINGS_CPY_SECTION)
         .get(`${dialectType.toLowerCase()}.${section}`);
-      if (pathList && pathList.length > 0) {
-        return SettingsService.evaluateVariable(
-          pathList,
-          "fileBasenameNoExtension",
-          programFile,
-        );
-      }
+      return SettingsService.evaluateVariable(
+        pathList,
+        "fileBasenameNoExtension",
+        programFile,
+      );
     }
     const pathList: string[] = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)

@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
+import org.eclipse.lsp.cobol.core.engine.processors.SectionNodeProcessorHelper;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;

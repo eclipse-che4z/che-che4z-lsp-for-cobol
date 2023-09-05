@@ -15,7 +15,6 @@
 import * as path from "path";
 import * as Mocha from "mocha";
 import { glob } from "glob";
-import * as process from "process";
 
 export async function run(): Promise<void> {
   const sourceRoot = path.join(__dirname, "..", "..");
@@ -29,30 +28,23 @@ export async function run(): Promise<void> {
     exclude: ["**/test/**", ".vscode-test/**"],
   });
 
-  const is_vscode = process.execPath.includes("Code");
-  // only on VSCode
-  if (is_vscode) {
-    // decache files on windows to be hookable by nyc
-    let decache = require("decache");
-    glob
-      .sync("**/**.js", {
-        cwd: sourceRoot,
-      })
-      .forEach((file) => {
-        decache(path.join(sourceRoot, file));
-      });
+  // decache files on windows to be hookable by nyc
+  let decache = require("decache");
+  glob
+    .sync("**/**.js", {
+      cwd: sourceRoot,
+    })
+    .forEach((file) => {
+      decache(path.join(sourceRoot, file));
+    });
 
-    nyc.createTempDirectory();
-    nyc.wrap();
-  }
+  nyc.createTempDirectory();
+  nyc.wrap();
 
   // Create the mocha test
   const mocha = new Mocha({ ui: "tdd", color: true });
   const testsPath = path.join(__dirname, "..");
-  const files = await glob(
-      is_vscode ? "**/**.test.js" : "**/integration.test.js",
-      { cwd: testsPath }
-    );
+  const files = await glob("**/*.test.js", { cwd: testsPath });
   // Add files to the test suite
   files.forEach((file) => mocha.addFile(path.resolve(testsPath, file)));
 
@@ -67,10 +59,8 @@ export async function run(): Promise<void> {
     });
   });
 
-  if (is_vscode) {
-    // report code coverage
-    nyc.writeCoverageFile();
-    await nyc.report();
-    console.log("Report created");
-  }
+  // report code coverage
+  nyc.writeCoverageFile();
+  await nyc.report();
+  console.log("Report created");
 }

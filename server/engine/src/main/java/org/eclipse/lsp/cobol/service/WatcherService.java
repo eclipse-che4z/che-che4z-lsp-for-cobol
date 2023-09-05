@@ -16,6 +16,8 @@
 package org.eclipse.lsp.cobol.service;
 
 import lombok.NonNull;
+import org.eclipse.lsp4j.WorkspaceFolder;
+
 import java.util.List;
 
 /**
@@ -65,4 +67,13 @@ public interface WatcherService {
    */
   @NonNull
   List<String> getWatchingFolders();
+
+
+  /**
+   * Get a list of all workspace associated with this watcher
+   *
+   * @return a list of paths
+   */
+  @NonNull
+  List<WorkspaceFolder> getWorkspaceFolders();
 }

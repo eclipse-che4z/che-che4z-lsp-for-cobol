@@ -197,3 +197,44 @@ describe("SettingsService returns correct tab settings", () => {
     expect(tabSettings.rules.length).toBe(2);
   });
 });
+
+describe("SettingsService returns correct Copybook Configuration Values", () => {
+  const mockConfigurationFetch = (settings, configuredValue) =>
+    jest.fn().mockReturnValue({
+      get: (args: String) => {
+        if (settings === args) {
+          return configuredValue;
+        }
+      },
+    });
+
+  test("returns empty array when dialect configuration is not provided", () => {
+    vscode.workspace.getConfiguration = mockConfigurationFetch(
+      "dialect.paths-uss",
+      undefined,
+    );
+    expect(SettingsService.getUssPath("doc-uri", "dialect")).toHaveLength(0);
+  });
+
+  test("returns configured array when dialect configuration is provided", () => {
+    vscode.workspace.getConfiguration = mockConfigurationFetch(
+      "dialect.paths-uss",
+      ["configured-dialect-settings"],
+    );
+    const configuredValue = SettingsService.getUssPath("doc-uri", "dialect");
+    expect(configuredValue).toHaveLength(1);
+    expect(configuredValue[0]).toBe("configured-dialect-settings");
+  });
+
+  test("returns configured array for COBOL configuration", () => {
+    vscode.workspace.getConfiguration = mockConfigurationFetch("paths-uss", [
+      "configured-cobol-settings",
+    ]);
+    const configuredValue = SettingsService.getUssPath(
+      "doc-uri",
+      SettingsService.DEFAULT_DIALECT,
+    );
+    expect(configuredValue).toHaveLength(1);
+    expect(configuredValue[0]).toBe("configured-cobol-settings");
+  });
+});

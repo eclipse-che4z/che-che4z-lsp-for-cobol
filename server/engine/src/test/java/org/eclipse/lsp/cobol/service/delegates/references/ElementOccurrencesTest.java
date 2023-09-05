@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.service.delegates.references;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
+import org.eclipse.lsp.cobol.common.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;

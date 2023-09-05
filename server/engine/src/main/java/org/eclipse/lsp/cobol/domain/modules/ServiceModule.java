@@ -38,8 +38,6 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationBasedOnExte
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationCombinedStrategy;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationServiceBasedOnContent;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
@@ -89,7 +87,6 @@ public class ServiceModule extends AbstractModule {
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(HoverProvider.class).to(VariableHover.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
-    bind(CopybookReferenceRepo.class).to(CopybookReferenceRepoImpl.class);
     bind(CopybookIdentificationService.class)
         .annotatedWith(Names.named("contentStrategy"))
         .to(CopybookIdentificationServiceBasedOnContent.class);

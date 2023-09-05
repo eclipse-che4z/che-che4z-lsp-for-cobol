@@ -28,7 +28,7 @@ const WORKSPACE_URI = "file:///my/workspace";
 jest.mock("fs", () => ({
   existsSync: jest.fn().mockReturnValue(true),
   readFileSync: jest.fn().mockImplementation((f) => {
-    if (f == "procCfgPath") {
+    if (f === "procCfgPath") {
       return `{
                 "pgroups": [
                     { 
@@ -39,7 +39,7 @@ jest.mock("fs", () => ({
                         "preprocessor": [
                             "IDMS",
                             { 
-                                "name": "DaCo", 
+                                "name": "DaCo",
                                 "libs": ["/daco"]
                             },
                             {
@@ -60,7 +60,7 @@ jest.mock("fs", () => ({
                 ]
             }`;
     }
-    if (f == "pgmCfgPath") {
+    if (f === "pgmCfgPath") {
       return `{
                 "pgms": [ 
                     { "program": "/my/workspace/abs/TEST.cob", "pgroup": "ABS" },
@@ -80,6 +80,9 @@ jest.mock("vscode", () => ({
       return {
         fsPath: str.substring("file://".length),
       };
+    }),
+    file: jest.fn().mockImplementation((str: string) => {
+      return { fsPath: str };
     }),
   },
   workspace: {

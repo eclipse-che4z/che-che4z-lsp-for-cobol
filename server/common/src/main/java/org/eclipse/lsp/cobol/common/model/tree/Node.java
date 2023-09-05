@@ -98,7 +98,17 @@ public abstract class Node {
    */
   public Optional<Node> getNearestParentByType(NodeType type) {
     return Optional.ofNullable(parent)
-        .flatMap(it -> (it.nodeType == type) ? Optional.of(it) : it.getNearestParentByType(type));
+            .flatMap(it -> (it.nodeType == type) ? Optional.of(it) : it.getNearestParentByType(type));
+  }
+  /**
+   * Get nearest parent using predicate.
+   *
+   * @param predicate to find the right parent.
+   * @return an optional with requested nearest node.
+   */
+  public Optional<Node> getNearestParent(Predicate<Node> predicate) {
+    return Optional.ofNullable(parent)
+            .flatMap(it -> predicate.test(it) ? Optional.of(it) : it.getNearestParent(predicate));
   }
 
   /**

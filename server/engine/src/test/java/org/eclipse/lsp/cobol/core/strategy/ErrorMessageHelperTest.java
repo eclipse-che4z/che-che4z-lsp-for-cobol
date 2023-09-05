@@ -113,7 +113,7 @@ class ErrorMessageHelperTest {
     when(interval.toString(any(Vocabulary.class))).thenReturn("INTERVAL");
 
     errorMessageHelper.getUnwantedTokenMessage(recognizer, token);
-    verify(messageService).getMessage(REPORT_UNWANTED_TOKEN, "'EXEC SQL'", "INTERVAL");
+    verify(messageService).getMessage(REPORT_UNWANTED_TOKEN, "'EXEC SQL'");
   }
 
   @Test
