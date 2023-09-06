@@ -22,7 +22,7 @@ import com.google.inject.name.Names;
 public class DatabusModule extends AbstractModule {
   @Override
   protected void configure() {
-    bindConstant().annotatedWith(Names.named("CACHE-MAX-SIZE")).to(500);
+    bindConstant().annotatedWith(Names.named("CACHE-MAX-SIZE")).to(1500);
     bindConstant().annotatedWith(Names.named("CACHE-DURATION")).to(3);
     bindConstant().annotatedWith(Names.named("CACHE-TIME-UNIT")).to("HOURS");
     bindConstant().annotatedWith(Names.named("CORE-POOL-SIZE")).to(4);
