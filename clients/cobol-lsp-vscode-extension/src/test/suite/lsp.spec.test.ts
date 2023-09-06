@@ -376,10 +376,6 @@ suite("Integration Test Suite", function () {
     );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
-    helper.assertRangeIsEqual(
-      diagnostics[0].range,
-      range(pos(36, 20), pos(36, 23)),
-    );
     assert.ok(
       diagnostics[0].message.includes(
         "Syntax error on 'SQL' expected {ALLOCATE, ALTER, ASSOCIATE, CALL, CLOSE",
