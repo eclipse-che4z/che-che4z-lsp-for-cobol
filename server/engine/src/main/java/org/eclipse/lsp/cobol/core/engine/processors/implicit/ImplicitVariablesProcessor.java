@@ -16,6 +16,9 @@ package org.eclipse.lsp.cobol.core.engine.processors.implicit;
 
 import lombok.AllArgsConstructor;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
@@ -33,27 +36,42 @@ import java.util.List;
 public class ImplicitVariablesProcessor implements Processor<SectionNode> {
 
   private final AnalysisConfig config;
+
   @Override
   public void accept(SectionNode sectionNode, ProcessingContext processingContext) {
     if (sectionNode.getSectionType() == SectionType.LINKAGE) {
       VariableAccumulator variableAccumulator = processingContext.getVariableAccumulator();
       ProgramNode programNode = sectionNode.getProgram()
-          .orElseThrow(() -> new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found"));
+              .orElseThrow(() -> new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found"));
       if (config.isCicsTranslatorEnabled()) {
         registerVariable(
-            variableAccumulator, programNode, BlkImplicitVariablesGenerator.generate());
+                variableAccumulator, programNode, BlkImplicitVariablesGenerator.generate());
       }
     }
 
     if (sectionNode.getSectionType() == SectionType.WORKING_STORAGE) {
       VariableAccumulator variableAccumulator = processingContext.getVariableAccumulator();
       ProgramNode programNode = sectionNode.getProgram()
-          .orElseThrow(() -> new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found"));
+              .orElseThrow(() -> new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found"));
       registerVariables(variableAccumulator, programNode, SRImplicitVariablesGenerator.generate());
       if (config.isCicsTranslatorEnabled()) {
         registerVariables(variableAccumulator, programNode, SRImplicitVariablesGenerator.generateCicsRegisters());
       }
+
+      if (config.getFeatures().contains(EmbeddedLanguage.SQL)
+              && config.getCopybookConfig().getSqlBackend().equals(SQLBackend.DB2_SERVER)
+              && !hasSqlCa(programNode)) {
+        registerVariables(variableAccumulator, programNode, Db2ImplicitVariablesGenerator.generate());
+      }
     }
+  }
+
+  private static boolean hasSqlCa(ProgramNode programNode) {
+    return programNode.getDepthFirstStream().anyMatch(node ->
+            node.getNodeType().equals(NodeType.VARIABLE)
+                    && ((VariableNode) node).getName().equalsIgnoreCase("SQLCA")
+                    && (node instanceof VariableWithLevelNode)
+                    && ((VariableWithLevelNode) node).getLevel() == 1);
   }
 
   private void registerVariables(VariableAccumulator variableAccumulator, ProgramNode programNode, List<VariableNode> nodes) {
@@ -63,8 +81,8 @@ public class ImplicitVariablesProcessor implements Processor<SectionNode> {
   private void registerVariable(VariableAccumulator variableAccumulator, ProgramNode programNode, VariableNode variable) {
     variableAccumulator.addVariableDefinition(programNode, variable);
     variable.getChildren()
-        .stream()
-        .map(VariableNode.class::cast)
-        .forEach(c -> variableAccumulator.addVariableDefinition(programNode, c));
+            .stream()
+            .map(VariableNode.class::cast)
+            .forEach(c -> variableAccumulator.addVariableDefinition(programNode, c));
   }
 }
