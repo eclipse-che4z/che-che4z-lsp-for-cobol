@@ -130,8 +130,8 @@ suite("Integration Test Suite", function () {
       editor,
       pos(39, 0),
       "           EXEC CICS\n" +
-      "               SEN MAP('DETAIL') MAPSET(MODULE-NAME-1)    ERASE\n" +
-      "           END-EXEC.",
+        "               SEN MAP('DETAIL') MAPSET(MODULE-NAME-1)    ERASE\n" +
+        "           END-EXEC.",
     );
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
@@ -145,13 +145,13 @@ suite("Integration Test Suite", function () {
     assert.ok(
       diagnostics[0].message.includes(
         "Syntax error on 'SEN' expected {ABEND, ADD, ADDRESS, ALLOCATE, ASKTIME, ASSIGN",
-      )
+      ),
     );
     await helper.deleteLine(editor, 40);
     await helper.insertString(
       editor,
       pos(40, 0),
-      "               SEND MAP('DETAIL') MAPSET(MODULE-NAME-1)    ERASE"
+      "               SEND MAP('DETAIL') MAPSET(MODULE-NAME-1)    ERASE",
     );
     editor = helper.get_editor("ADSORT.cbl");
     await helper.waitFor(
@@ -162,7 +162,7 @@ suite("Integration Test Suite", function () {
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
-  
+
   test("TC312745 Error check", async () => {
     await helper.showDocument("ADSORT.cbl");
     let editor = helper.get_editor("ADSORT.cbl");
@@ -184,7 +184,7 @@ suite("Integration Test Suite", function () {
     assert.ok(
       diagnostics[0].message.includes(
         "Syntax error on 'XCTL123' expected {ABEND, ADD, ADDRESS, ALLOCATE, ASKTIME, ASSIGN",
-      )
+      ),
     );
     await helper.deleteLine(editor, 58);
     await helper.insertString(
@@ -201,7 +201,7 @@ suite("Integration Test Suite", function () {
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
-  
+
   test("TC312738 CICS variables and paragraphs support", async () => {
     await helper.showDocument("ADSORT.cbl");
     let editor = helper.get_editor("ADSORT.cbl");
@@ -239,7 +239,7 @@ suite("Integration Test Suite", function () {
       diagnostics[0].range,
       range(pos(28, 22), pos(28, 29)),
     );
-    assert.ok( diagnostics[0].message.includes( "Missing token", ) );
+    assert.ok(diagnostics[0].message.includes("Missing token"));
     await helper.deleteLine(editor, 28);
     await helper.insertString(
       editor,
