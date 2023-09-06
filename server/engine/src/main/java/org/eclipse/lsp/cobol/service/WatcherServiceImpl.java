@@ -15,13 +15,13 @@
 
 package org.eclipse.lsp.cobol.service;
 
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.Synchronized;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -59,6 +59,7 @@ public class WatcherServiceImpl implements WatcherService {
 
   private final List<String> folderWatchers = new ArrayList<>();
   private final Map<String, List<String>> runtimeSpecifiedFolderWatchers = new HashMap<>();
+  private final List<WorkspaceFolder> workspaceFolders = new ArrayList<>();
 
   private final Provider<CobolLanguageClient> clientProvider;
   private final ConfigurationService configurationService;
@@ -78,6 +79,11 @@ public class WatcherServiceImpl implements WatcherService {
   @Override
   public void watchConfigurationChange() {
     register(singletonList(new Registration(CONFIGURATION_CHANGE_ID, WATCH_CONFIGURATION, null)));
+  }
+
+  @Override
+  public @NonNull List<WorkspaceFolder> getWorkspaceFolders() {
+    return workspaceFolders;
   }
 
   @Override
@@ -206,29 +212,20 @@ public class WatcherServiceImpl implements WatcherService {
   }
 
   private Either<String, RelativePattern> createFileWatcher(String folder) {
-    File file = new File(folder);
-    folder = file.toURI().toString();
     String pattern = "**/*";
     RelativePattern relativePattern = new RelativePattern();
     if (folder.contains(CopybookService.FILE_BASENAME_VARIABLE)) {
       String[] split = folder.split(CopybookService.FILE_BASENAME_VARIABLE);
-      folder = split[0];
       pattern = "**" + split[1] + pattern;
     }
-    relativePattern.setBaseUri(folder);
+    relativePattern.setBaseUri(getWorkspaceFolders().get(0));
     relativePattern.setPattern(pattern);
     return Either.forRight(relativePattern);
   }
 
   private Either<String, RelativePattern> createFolderWatcher(String folder) {
-    File file = new File(folder);
-    folder = file.toURI().toString();
     RelativePattern relativePattern = new RelativePattern();
-    if (folder.contains(CopybookService.FILE_BASENAME_VARIABLE)) {
-      String[] split = folder.split(CopybookService.FILE_BASENAME_VARIABLE);
-      folder = split[0] + "**" + split[1];
-    }
-    relativePattern.setBaseUri(folder);
+    relativePattern.setBaseUri(getWorkspaceFolders().get(0));
     return Either.forRight(relativePattern);
   }
 

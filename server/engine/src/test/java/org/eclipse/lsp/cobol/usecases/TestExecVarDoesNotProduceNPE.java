@@ -32,7 +32,7 @@ class TestExecVarDoesNotProduceNPE {
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       {01|1} {EXEC|2|3}{|4}\n";
+          + "       {01|1} {EXEC|2}\n";
 
   @Test
   void test() {
@@ -59,20 +59,8 @@ class TestExecVarDoesNotProduceNPE {
                     + "MARGINS, NODE, NODATEPROC, NODP, NOEPILOG, NOFLAGMIG, NOGRAPHIC, NOLIB, NOOPSEQUENCE, NOOPT, "
                     + "NOOPTIMIZE, NOP, NOPROLOG, NOSTDTRUNC, NSEQ, OCCURS, OP, OPMARGINS, OPSEQUENCE, "
                     + "PACKED-DECIMAL, PARTNFAIL, PIC, PICTURE, POINTER, POINTER-32, PROCEDURE-POINTER, PROLOG, "
-                    + "RDATT, REDEFINES, RES, SIGN, SYNC, SYNCHRONIZED, SZ, TRAILING, TRIG, UNEXPIN, USAGE, UTF-8,"
+                    + "RDATT, REDEFINES, RES, SIGN, SYMBOL, SYNC, SYNCHRONIZED, SZ, TRAILING, TRIG, UNEXPIN, USAGE, UTF-8,"
                     + " VALUE, VALUES, YEARWINDOW, YW, '.', IDENTIFIER}",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "3",
-            new Diagnostic(
-                new Range(),
-                "The following token must start in Area B: EXEC",
-                DiagnosticSeverity.Warning,
-                ErrorSource.PARSING.getText()),
-            "4",
-            new Diagnostic(
-                new Range(),
-                "Unexpected end of file",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

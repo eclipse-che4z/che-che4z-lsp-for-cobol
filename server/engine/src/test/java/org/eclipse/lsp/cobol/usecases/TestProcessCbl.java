@@ -457,7 +457,17 @@ class TestProcessCbl {
   @ParameterizedTest
   @MethodSource("getDeprecatedOptions")
   void testDeprecatedOption(String cblOption) {
-    UseCaseEngine.runTest(PREFIX + cblOption + SUFFIX, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        PREFIX + "{" + cblOption + "|1}" + SUFFIX,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                String.format("%s is a deprecated compiler directive", cblOption.replace(" ", "")),
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText(),
+                "IGYOS4003-E")));
   }
 
   @Test

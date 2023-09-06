@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.common.model.Context;
+import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
@@ -71,7 +71,7 @@ class TestDefinitionOnLongCopybooks {
     Location expectedDef = new Location(
             "file:///c:/workspace/.c4z/.copybooks/ABCD.cpy",
             new Range(new Position(), new Position()));
-    Context ctx = mock(Context.class);
+    DefinedAndUsedStructure ctx = mock(DefinedAndUsedStructure.class);
     when(ctx.getDefinitions()).thenReturn(Collections.singletonList(expectedDef));
 
     try (MockedStatic mocked = mockStatic(SymbolsRepository.class)) {

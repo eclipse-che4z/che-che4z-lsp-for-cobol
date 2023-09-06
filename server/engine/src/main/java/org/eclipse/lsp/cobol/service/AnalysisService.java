@@ -159,14 +159,14 @@ class AnalysisService {
     }
     contentCache.store(uri, text);
     documentService.openDocument(uri, text);
-    communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocument] Document " + uri + " opened");
+    LOG.debug("[analyzeDocument] Document " + uri + " opened");
 
     if (isCopybook(uri, text)) {
-      communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocument] Document " + uri + " treated as a copy");
+      LOG.debug("[analyzeDocument] Document " + uri + " treated as a copy");
       communications.publishDiagnostics(documentService.getOpenedDiagnostic());
-      communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocument] Publish diagnostics: " + documentService.getOpenedDiagnostic());
+      LOG.debug("[analyzeDocument] Publish diagnostics: " + documentService.getOpenedDiagnostic());
     } else {
-      communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocument] Document " + uri + " treated as a program, start analyzing");
+      LOG.debug("[analyzeDocument] Document " + uri + " treated as a program, start analyzing");
       analyzeDocumentWithCopybooks(uri, text);
     }
   }
@@ -179,14 +179,14 @@ class AnalysisService {
     }
     contentCache.store(uri, text);
     documentService.updateDocument(uri, text);
-    communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " updated");
+    LOG.debug("[reanalyzeDocument] Document " + uri + " updated");
 
     if (isCopybook(uri, text)) {
-      communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " treated as a copy");
+      LOG.debug("[reanalyzeDocument] Document " + uri + " treated as a copy");
       Set<String> affectedOpenedPrograms = documentService.findAffectedDocumentsForCopybook(uri, (d) -> !isCopybook(d.getUri(), d.getText()));
       reanalysePrograms(affectedOpenedPrograms);
     } else {
-      communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " treated as a program");
+      LOG.debug("[reanalyzeDocument] Document " + uri + " treated as a program");
       analyzeDocumentWithCopybooks(uri, text);
     }
   }
@@ -194,12 +194,11 @@ class AnalysisService {
   public void stopAnalysis(String uri) {
     CobolDocumentModel documentModel = documentService.get(uri);
 
-    contentCache.invalidate(uri);
     documentService.closeDocument(uri);
-    communications.logGeneralMessage(MessageType.Log, now() + "[stopAnalysis] Document " + uri + " closed");
+    LOG.debug("[stopAnalysis] Document " + uri + " closed");
 
     communications.notifyProgressEnd(uri);
-    communications.logGeneralMessage(MessageType.Log, now() + "[stopAnalysis] Document " + uri + " publish diagnostic: " + documentService.getOpenedDiagnostic());
+    LOG.debug("[stopAnalysis] Document " + uri + " publish diagnostic: " + documentService.getOpenedDiagnostic());
     communications.publishDiagnostics(documentService.getOpenedDiagnostic());
     if (documentModel != null && !isCopybook(uri, documentModel.getText())) {
       documentService.removeDocument(uri);
@@ -208,7 +207,10 @@ class AnalysisService {
   }
 
   public List<Either<SymbolInformation, DocumentSymbol>> findDocumentSymbol(String uri) {
-    List<DocumentSymbol> symbols = documentService.get(uri).getOutlineResult();
+    List<DocumentSymbol> symbols =
+        documentService.isDocumentSynced(uri)
+            ? documentService.get(uri).getOutlineResult()
+            : Collections.emptyList();
     try {
       return createDocumentSymbols(symbols);
     } finally {
@@ -218,7 +220,7 @@ class AnalysisService {
 
   public Node retrieveAnalysis(String uri, String text) {
     CobolDocumentModel documentModel = documentService.get(uri);
-    communications.logGeneralMessage(MessageType.Log, now() + "[retrieveAnalysis] Document " + uri);
+    LOG.debug("[retrieveAnalysis] Document " + uri);
 
     if (!documentModel.isDocumentSynced()) {
       analyzeDocumentWithCopybooks(uri, text);
@@ -231,7 +233,10 @@ class AnalysisService {
   }
 
   public List<FoldingRange> findFoldingRange(String uri) {
-    List<DocumentSymbol> symbols = documentService.get(uri).getOutlineResult();
+    List<DocumentSymbol> symbols =
+        documentService.isDocumentSynced(uri)
+            ? documentService.get(uri).getOutlineResult()
+            : Collections.emptyList();
     return DocumentServiceHelper.getFoldingRangeFromDocumentSymbol(symbols);
   }
 
@@ -245,7 +250,7 @@ class AnalysisService {
       if (isCopybook(uri, text)) {
         return;
       }
-      communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocumentWithCopybooks] Start analysis: " + uri);
+      LOG.debug("[analyzeDocumentWithCopybooks] Start analysis: " + uri);
       communications.notifyProgressBegin(uri);
       doAnalysis(uri, text);
     } catch (Throwable th) {
@@ -280,11 +285,11 @@ class AnalysisService {
         documentService.processAnalysisResult(uri, result);
         notifyAnalysisFinished(uri, DocumentServiceHelper.extractCopybookUris(result), processingMode);
 
-        communications.logGeneralMessage(MessageType.Log, now() + "[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
+        LOG.debug("[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
         communications.publishDiagnostics(documentService.getOpenedDiagnostic());
-        communications.logGeneralMessage(MessageType.Log, now() + "[doAnalysis] Document " + uri + " diagnostic published: " + documentService.getOpenedDiagnostic());
+        LOG.debug("[doAnalysis] Document " + uri + " diagnostic published: " + documentService.getOpenedDiagnostic());
       } catch (Exception e) {
-        communications.logGeneralMessage(MessageType.Error, createDescriptiveErrorMessage("analysis", uri));
+        LOG.debug(createDescriptiveErrorMessage("analysis", uri));
 
         LOG.error(createDescriptiveErrorMessage("analysis", uri), e);
         throw e;
@@ -320,5 +325,4 @@ class AnalysisService {
     LocalDateTime now = LocalDateTime.now();
     return dtf.format(now) + " ";
   }
-
 }

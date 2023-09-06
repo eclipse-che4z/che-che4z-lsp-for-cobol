@@ -1,0 +1,47 @@
+{
+    "pgroups": [
+        {
+            "name": "VANILA",
+            "libs": [
+                "copy-vanila"
+            ]
+        },
+        {
+            "name": "IDMS",
+            "preprocessor": [
+                {
+                    "name": "IDMS",
+                    "libs": [
+                        "copy-idms/${fileBasenameNoExtension}",
+                        "copy-idms"
+                    ]
+                }
+            ],
+            "libs": [
+                "copy-vanila"
+            ]
+        },
+        {
+            "name": "DaCo",
+            "preprocessor": [
+                {
+                    "name": "DaCo",
+                    "libs": [
+                        "copy-daco/${fileBasenameNoExtension}",
+                        "copy-daco"
+                    ]
+                },
+                {
+                    "name": "IDMS",
+                    "libs": [
+                        "copy-idms/${fileBasenameNoExtension}",
+                        "copy-idms"
+                    ]
+                }
+            ],
+            "libs": [
+                "copy-vanila"
+            ]
+        }
+    ]
+}

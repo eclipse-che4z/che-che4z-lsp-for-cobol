@@ -63,10 +63,10 @@ class TestCopybookReplacePatterns {
   private static final String TEXT5 =
       BASE
           + "       01  {$*LOGA}.  \r\n"
-          + "       COPY {~REPL5}  \r\n"
+          + "       {_COPY {~REPL5}  \r\n"
           + "            REPLACING  ==LDAY== BY ==DMAN123000000000000000000000000000000005900\n"
           + "      -    0000000000000000011111111111111111111111111111111111111111111\n"
-          + "      -    00000000000000000000000== .\r\n";
+          + "      -    00000000000000000000000== .|2_}\r\n";
 
   private static final String TEXT6 =
       BASE
@@ -77,10 +77,10 @@ class TestCopybookReplacePatterns {
   private static final String TEXT7 =
       BASE
           + "       01  {$*LOGA}.  \r\n"
-          + "       COPY {~REPL7}  \r\n"
+          + "       {_COPY {~REPL7}  \r\n"
           + "            REPLACING  ==LDAY== BY ==DMAN123000000000000000000000000000000005900\n"
           + "      -    0000000000000000011111111111111111111111111111111111111111111\n"
-          + "      -    00000000000000000000000== .\r\n";
+          + "      -    00000000000000000000000== .|2_}\r\n";
 
   private static final String TEXT8 =
       BASE
@@ -115,7 +115,7 @@ class TestCopybookReplacePatterns {
   private static final String REPL5 =
       "      ***************************************************************** 09700000\r\n"
           + "         02  {$*LOGHDR}.                                                    18000000\r\n"
-          + "           03  {$*LDAY^DMAN1230000000000000000000000000000000000000000000001111111111111111111111111111111111111111111100000000000000000000000}           PIC S9(7) COMP-3.                         24000000";
+          + "           03  {$*LDAY^DMAN1230000000000000000000000000000000000000000000001111111111111111111111111111111111111111111100000000000000000000000|1}           PIC S9(7) COMP-3.                         24000000";
   private static final String REPL5_NAME = "REPL5";
 
   private static final String REPL6 =
@@ -125,7 +125,7 @@ class TestCopybookReplacePatterns {
   private static final String REPL7 =
       "      ***************************************************************** 09700000\r\n"
           + "         02  {$*LOGHDR}.                                                    18000000\r\n"
-          + "           03  {$*LDAY^DMAN1230000000000000000000000000000000000000000000001111111111111111111111111111111111111111111100000000000000000000000}           PIC S9(7) COMP-3.";
+          + "           03  {$*LDAY^DMAN1230000000000000000000000000000000000000000000001111111111111111111111111111111111111111111100000000000000000000000|1}           PIC S9(7) COMP-3.";
   private static final String REPL7_NAME = "REPL7";
 
   private static final String REPL8 = "0      01 {$*'XXX_ID$'^ACC_ID}    PIC 9.\n";
@@ -169,7 +169,21 @@ class TestCopybookReplacePatterns {
   @Test
   void testWhenReplacedLengthIsMoreThanReplaceable() {
     UseCaseEngine.runTest(
-        TEXT5, ImmutableList.of(new CobolText(REPL5_NAME, REPL5)), ImmutableMap.of());
+        TEXT5,
+        ImmutableList.of(new CobolText(REPL5_NAME, REPL5)),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Max length limit of 30 bytes allowed for variable name.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+                "2",
+                new Diagnostic(
+                        new Range(),
+                        "Errors inside the copybook",
+                        DiagnosticSeverity.Error,
+                        ErrorSource.COPYBOOK.getText())));
   }
 
   @Test
@@ -181,7 +195,21 @@ class TestCopybookReplacePatterns {
   @Test
   void testWhenReplacedLengthIsMoreThanReplaceableAndCopybookHasNoSequence() {
     UseCaseEngine.runTest(
-        TEXT7, ImmutableList.of(new CobolText(REPL7_NAME, REPL7)), ImmutableMap.of());
+        TEXT7,
+        ImmutableList.of(new CobolText(REPL7_NAME, REPL7)),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Max length limit of 30 bytes allowed for variable name.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+                "2",
+                new Diagnostic(
+                        new Range(),
+                        "Errors inside the copybook",
+                        DiagnosticSeverity.Error,
+                        ErrorSource.COPYBOOK.getText())));
   }
 
   @Test
@@ -199,6 +227,6 @@ class TestCopybookReplacePatterns {
   @Test
   void testCopySuppressReplacing() {
     UseCaseEngine.runTest(
-            TEXT10, ImmutableList.of(new CobolText(REPL9_NAME, REPL9)), ImmutableMap.of());
+        TEXT10, ImmutableList.of(new CobolText(REPL9_NAME, REPL9)), ImmutableMap.of());
   }
 }
