@@ -92,15 +92,15 @@ class ExtendedTextTest {
 
     assertEquals(
         "     0 LINE\n"
-            + "     1     \n"
             + "COPYBOOK 1 LINE\n"
             + "COPYBOOK 2 LINE\n"
             + "COPYBOOK 3 LINE\n"
+            + "     1     \n"
             + "        INE\n"
             + "     3 LINE",
         extendedText.toString());
 
-    assertEquals(new Range(new Position(0, 0), new Position(0, 3)).toString(), location.getRange().toString());
+    assertEquals(new Range(new Position(1, 0), new Position(1, 3)).toString(), location.getRange().toString());
     assertEquals("copybook", location.getUri());
 
     range = new Range(new Position(5, 0), new Position(5, 3));

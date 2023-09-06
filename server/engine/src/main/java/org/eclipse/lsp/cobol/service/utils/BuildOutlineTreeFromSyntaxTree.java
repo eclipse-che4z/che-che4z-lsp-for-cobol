@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.service.utils;
 import com.google.common.collect.ImmutableList;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.tree.*;
-import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.NodeSymbolType;
 import org.eclipse.lsp4j.DocumentSymbol;

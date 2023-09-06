@@ -736,7 +736,12 @@ linkageSection
 // -- local storage section ----------------------------------
 
 localStorageSection
-   : LOCAL_STORAGE SECTION DOT_FS dataDescriptionEntries
+   : LOCAL_STORAGE SECTION DOT_FS dataDescriptionEntryForLocalStorageSection*
+   ;
+
+dataDescriptionEntryForLocalStorageSection
+   : execSqlStatementInLocalStorage
+   | dataDescriptionEntry
    ;
 
 dataDescriptionEntries
@@ -796,7 +801,7 @@ dialectDescriptionEntry
    ;
 
 entryName
-   : (FILLER | dataName)
+   : (FILLER | { validateLength(_input.LT(1).getText(), "variable name", 30);} dataName)
    ;
 
 dataGroupUsageClause
@@ -987,17 +992,17 @@ paragraph
    ;
 
 sentence
-   : statement* (endClause | dialectStatement)
+   : (statement | execSqlStatementInProcedureDivision) * (endClause | dialectStatement)
    ;
 
 conditionalStatementCall
-   : statement | dialectStatement
+   : statement | dialectStatement | execSqlStatementInProcedureDivision
    ;
 
 statement
    : acceptStatement | addStatement | allocateStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
     disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement |
-    execSqlStatementInProcedureDivision | execSqlImsStatement | exitStatement | freeStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
+    execSqlImsStatement | exitStatement | freeStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
     serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
@@ -1372,6 +1377,8 @@ evaluateValue
 // exec cics statement
 execCicsStatement
    : EXEC CICS cicsRules END_EXEC
+   | {notifyError("cobolParser.missingEndExec");} EXEC CICS cicsRules
+   | {notifyError("cobolParser.missingEndExec");} EXEC CICS
    ;
 
 cicsRules
@@ -1387,6 +1394,10 @@ execSqlStatementInWorkingStorage
    : execSqlStatement DOT_FS?
    ;
 
+execSqlStatementInLocalStorage
+   : execSqlStatement DOT_FS?
+   ;
+
 execSqlStatementInWorkingStorageAndLinkageSection
    : execSqlStatement DOT_FS?
    ;
@@ -1397,6 +1408,8 @@ execSqlStatementInDataDivision
 
 execSqlStatement
    : EXEC SQL sqlCode END_EXEC
+   | {notifyError("cobolParser.missingEndExec");} EXEC SQL sqlCode
+   | {notifyError("cobolParser.missingEndExec");} EXEC SQL
    ;
 
 sqlCode
@@ -2498,7 +2511,7 @@ basis
    ;
 
 cobolWord
-   : IDENTIFIER
+   : IDENTIFIER | SYMBOL
    | cobolCompilerDirectivesKeywords | cobolKeywords
    | cicsTranslatorCompileDirectivedKeywords | cics_conditions
    ;
@@ -2511,7 +2524,7 @@ cobolKeywords
    : ADDRESS | BOTTOM | COUNT | CR | FIELD | FIRST | MMDDYYYY | PRINTER | DAY | TIME | DATE | DAY_OF_WEEK
    | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | TOP | YEAR | YYYYDDD | YYYYMMDD | WHEN_COMPILED
    | DISK | KEYBOARD | PORT | READER | REMOTE | VIRTUAL | LIBRARY | DEFINITION | PARSE | BOOL | ESCAPE | INITIALIZED
-   | LOC | BYTITLE | BYFUNCTION | ABORT | ORDERLY | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH
+   | LOC | BYTITLE | BYFUNCTION | ABORT | ORDERLY | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | CLOSE
    ;
 
 cobolCompilerDirectivesKeywords

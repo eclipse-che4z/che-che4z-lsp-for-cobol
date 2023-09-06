@@ -121,7 +121,10 @@ export function configHandler(request: any): Array<any> {
           );
           result.push(object);
         } else if (item.section === DIALECT_LIBS && !!item.dialect) {
-          const dialectLibs = SettingsService.getCopybookLocalPath(item.scopeUri, item.dialect);
+          const dialectLibs = SettingsService.getCopybookLocalPath(
+            item.scopeUri,
+            item.dialect,
+          );
           result.push(dialectLibs);
         } else if (item.section === SETTINGS_CPY_EXTENSIONS) {
           const object = loadProcessorGroupCopybookExtensionsConfig(
@@ -359,11 +362,11 @@ export class SettingsService {
       const pathList: string[] = vscode.workspace
         .getConfiguration(SETTINGS_CPY_SECTION)
         .get(`${dialectType.toLowerCase()}.${section}`);
-        return SettingsService.evaluateVariable(
-          pathList,
-          "fileBasenameNoExtension",
-          programFile,
-        );
+      return SettingsService.evaluateVariable(
+        pathList,
+        "fileBasenameNoExtension",
+        programFile,
+      );
     }
     const pathList: string[] = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)

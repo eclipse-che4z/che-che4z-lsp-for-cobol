@@ -42,6 +42,9 @@ import static org.mockito.Mockito.when;
  */
 class WatcherServiceImplTest {
 
+  private static final String WORKSPACE_URI = "workspace-uri";
+  private static final String WORKSPACE_NAME = "workspace-name";
+
   @Test
   void watchConfigurationChange() {
     CobolLanguageClient client = mock(CobolLanguageClient.class);
@@ -72,6 +75,7 @@ class WatcherServiceImplTest {
     provider.setClient(client);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider, configurationService);
+    watcherService.getWorkspaceFolders().add(new WorkspaceFolder(WORKSPACE_URI, WORKSPACE_NAME));
 
     watcherService.addWatchers(ImmutableList.of("foo/bar", "baz", "bar/foo"));
     assertEquals(
@@ -96,7 +100,7 @@ class WatcherServiceImplTest {
     provider.setClient(client);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider, configurationService);
-
+    watcherService.getWorkspaceFolders().add(new WorkspaceFolder(WORKSPACE_URI, WORKSPACE_NAME));
     watcherService.addRuntimeWatchers("document.cbl");
 
     verify(client, new Times(3)).registerCapability(captor.capture());
@@ -126,6 +130,7 @@ class WatcherServiceImplTest {
     provider.setClient(client);
     ArgumentCaptor<UnregistrationParams> captor = forClass(UnregistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider, configurationService);
+    watcherService.getWorkspaceFolders().add(new WorkspaceFolder(WORKSPACE_URI, WORKSPACE_NAME));
 
     watcherService.addWatchers(ImmutableList.of("foo/bar", "baz", "bar\\foo"));
     watcherService.removeWatchers(ImmutableList.of("non-existing", "foo/bar"));
@@ -153,7 +158,7 @@ class WatcherServiceImplTest {
     ArgumentCaptor<UnregistrationParams> captor = forClass(UnregistrationParams.class);
     ArgumentCaptor<RegistrationParams> registerRequest = forClass(RegistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider, configurationService);
-
+    watcherService.getWorkspaceFolders().add(new WorkspaceFolder(WORKSPACE_URI, WORKSPACE_NAME));
     watcherService.addRuntimeWatchers("document.cbl");
     watcherService.removeRuntimeWatchers("document.cbl");
 
@@ -194,23 +199,19 @@ class WatcherServiceImplTest {
     assertEquals(2, watchers.size());
     FileSystemWatcher fileWatcher = watchers.get(0);
     assertEquals("**/*", fileWatcher.getGlobPattern().getRight().getPattern());
-    assertTrue(
-        fileWatcher
+    assertEquals(WORKSPACE_URI, fileWatcher
             .getGlobPattern()
             .getRight()
             .getBaseUri()
-            .getRight()
-            .endsWith(glob.replace("\\", "/")));
+            .getLeft().getUri());
     assertEquals(7, fileWatcher.getKind().intValue());
 
     FileSystemWatcher folderWatcher = watchers.get(1);
-    assertTrue(
-        folderWatcher
+    assertEquals(WORKSPACE_URI, folderWatcher
             .getGlobPattern()
             .getRight()
             .getBaseUri()
-            .getRight()
-            .endsWith(glob.replace("\\", "/")));
+            .getLeft().getUri());
     assertNull(folderWatcher.getGlobPattern().getRight().getPattern());
     assertEquals(7, folderWatcher.getKind().intValue());
   }

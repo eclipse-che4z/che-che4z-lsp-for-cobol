@@ -23,7 +23,6 @@ import {
   cleanWorkspaceFolder,
   normalizePath,
 } from "./util/FSUtils";
-import { getChannel } from "../extension";
 
 const PROCESSOR_GROUP_FOLDER = ".cobolplugin";
 const PROCESSOR_GROUP_PGM = "pgm_conf.json";
@@ -33,13 +32,12 @@ export function loadProcessorGroupCopybookPaths(
   documentUri: string,
   dialectType: string,
 ): string[] {
-  const result = loadProcessorGroupSettings(
+  return loadProcessorGroupSettings(
     documentUri,
     "libs",
     [] as string[],
     dialectType,
   );
-  return result.map((s) => normalizePath(s));
 }
 
 export function loadProcessorGroupCopybookPathsConfig(
@@ -47,9 +45,7 @@ export function loadProcessorGroupCopybookPathsConfig(
   configObject: string[],
 ): string[] {
   const config = [
-    ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]).map(
-      (s) => normalizePath(s),
-    ),
+    ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]),
     ...configObject,
   ];
   return SettingsUtils.getWorkspaceFoldersPath(true)
@@ -57,7 +53,7 @@ export function loadProcessorGroupCopybookPathsConfig(
       globSync(
         config.map((ele) => ele.replace(backwardSlashRegex, "/")),
         { cwd: cleanWorkspaceFolder(folder) },
-      ),
+      ).map((s) => normalizePath(s)),
     )
     .reduce((acc, curVal) => {
       return acc.concat(curVal);
@@ -233,7 +229,7 @@ function loadProcessorsConfig(
 
   let result = undefined;
   procCfg.pgroups.forEach((p) => {
-    if (pgroup == p.name) {
+    if (pgroup === p.name) {
       result = p;
       return;
     }
@@ -249,7 +245,7 @@ function loadProcessorGroupSettings<T>(
 ): T | undefined {
   try {
     const pgCfg = loadProcessorsConfig(scopeUri);
-    if (pgCfg == undefined) {
+    if (pgCfg === undefined) {
       return configObject;
     }
 

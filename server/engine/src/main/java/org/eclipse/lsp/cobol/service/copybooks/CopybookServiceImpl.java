@@ -66,7 +66,6 @@ public class CopybookServiceImpl implements CopybookService {
       new ConcurrentHashMap<>(8, 0.9f, 1);
 
   private final CopybookCache copybookCache;
-  private final CopybookReferenceRepo copybookReferenceRepo;
   private final DocumentContentCache contentCache;
 
   @Inject
@@ -76,13 +75,11 @@ public class CopybookServiceImpl implements CopybookService {
       FileSystemService files,
       TextPreprocessor preprocessor,
       CopybookCache copybookCache,
-      CopybookReferenceRepo copybookReferenceRepo,
       DocumentContentCache contentCache) {
     this.files = files;
     this.clientProvider = clientProvider;
     this.preprocessor = preprocessor;
     this.copybookCache = copybookCache;
-    this.copybookReferenceRepo = copybookReferenceRepo;
     this.contentCache = contentCache;
     dataBus.subscribe(this);
   }
@@ -92,7 +89,6 @@ public class CopybookServiceImpl implements CopybookService {
     LOG.debug("Copybooks for downloading: {}", copybooksForDownloading);
     LOG.debug("Copybook cache: {}", copybookCache);
     LOG.debug("Cache invalidated");
-    copybookReferenceRepo.clearReferences();
     copybooksForDownloading.clear();
     copybookCache.invalidateAll();
   }
@@ -126,7 +122,7 @@ public class CopybookServiceImpl implements CopybookService {
     try {
       ThreadInterruptionUtil.checkThreadInterrupted();
 
-      CopybookModel copybookModel = getFromCache(programDocumentUri, documentUri, copybookId, copybookName,
+      CopybookModel copybookModel = getFromCache(programDocumentUri, copybookId, copybookName,
           copybookConfig, preprocess);
 
       updateContent(copybookModel, preprocess);
@@ -156,7 +152,7 @@ public class CopybookServiceImpl implements CopybookService {
     }
   }
 
-  private CopybookModel getFromCache(String programDocumentUri, String documentUri, CopybookId copybookId,
+  private CopybookModel getFromCache(String programDocumentUri, CopybookId copybookId,
                                      CopybookName copybookName, CopybookConfig copybookConfig, boolean preprocess) throws ExecutionException {
     return copybookCache.get(copybookId, () -> {
       CopybookModel copybookModel = resolveSync(copybookName, programDocumentUri, copybookConfig);
@@ -165,7 +161,6 @@ public class CopybookServiceImpl implements CopybookService {
         copybookModel = copybookModelResultWithErrors.getResult();
         preprocessCopybookErrors.put(copybookModel.getUri(), copybookModelResultWithErrors.getErrors());
       }
-      copybookReferenceRepo.storeCopybookUsageReference(copybookName, documentUri, copybookModel);
       return copybookModel;
     });
   }

@@ -20,7 +20,6 @@ import * as urlUtil from "url";
 import { SettingsUtils } from "./SettingsUtils";
 import { Uri } from "vscode";
 import * as vscode from "vscode";
-import { getChannel } from "../../extension";
 
 /**
  * This method is responsible to return a valid URI without extension if the extension is not provided or an URI
@@ -90,10 +89,6 @@ export function searchCopybookInWorkspace(
   copybookFolders: string[],
   extensions: string[],
 ): string | undefined {
-  getChannel().appendLine(
-    "Search copybook using folders: " + copybookFolders.toString(),
-  );
-
   for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
     const workspaceFolder = cleanWorkspaceFolder(workspaceFolderPath);
     for (const p of copybookFolders) {
@@ -152,13 +147,15 @@ function globSearch(
       ? ""
       : normalizePathName.replace(cwd.endsWith("/") ? cwd : cwd + "/", "");
   const suffix =
-    (pattern.length == 0 || pattern.endsWith("/") ? "" : "/") +
+    (pattern.length === 0 || pattern.endsWith("/") ? "" : "/") +
     copybookName +
     ext;
   pattern = pattern + suffix;
   const result = globSync(pattern, { cwd, dot: true });
   // TODO report the case with more then one copybook fit the pattern.
-  return result[0] ? path.resolve(cwd, result[0]) : undefined;
+  return result[0]
+    ? normalizePath(fs.realpathSync.native(path.resolve(cwd, result[0])))
+    : undefined;
 }
 
 export function getProgramNameFromUri(

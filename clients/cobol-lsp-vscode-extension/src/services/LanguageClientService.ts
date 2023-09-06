@@ -138,7 +138,7 @@ export class LanguageClientService {
         fileEvents: [
           vscode.workspace.createFileSystemWatcher("**/pgm_conf.json"),
           vscode.workspace.createFileSystemWatcher("**/proc_grps.json"),
-          vscode.workspace.createFileSystemWatcher("**/.copybooks/**/*")
+          vscode.workspace.createFileSystemWatcher("**/.copybooks/**/*"),
         ],
       },
     };

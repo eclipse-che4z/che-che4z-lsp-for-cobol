@@ -91,7 +91,7 @@
           "COBOL"
         ],
         "configuration": "./syntaxes/lang-config.json",
-        "firstLine": "^[0-9 ]{6}([*].*|[ Dd] *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ]|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ]|[*]?(CBL|PROCESS) ).*)$"
+        "firstLine": "^[0-9 ]{6}([*].*|[ Dd] *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ]|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ]|[*](CBL|PROCESS) ).*)$|^([0-9].{5})?[ ]*(CBL|PROCESS) "
       }
     ],
     "grammars": [
@@ -470,7 +470,7 @@
     "glob": "10.2.7",
     "iconv-lite": "^0.6.3",
     "micromatch": "4.0.5",
-    "@vscode/extension-telemetry": "0.8.0",
+    "@vscode/extension-telemetry": "^0.8.2",
     "vscode-languageclient": "8.0.2"
   },
   "devDependencies": {

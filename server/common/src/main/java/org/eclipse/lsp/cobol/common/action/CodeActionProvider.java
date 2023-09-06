@@ -15,12 +15,12 @@
 
 package org.eclipse.lsp.cobol.common.action;
 
+import lombok.NonNull;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-import lombok.NonNull;
 import java.util.List;
 
 /**

@@ -23,15 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
@@ -45,6 +42,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import static java.lang.String.format;
@@ -65,8 +63,6 @@ class AnalysisService {
   private final ConfigurationService configurationService;
   private final SyncProvider syncProvider;
   private final CopybookIdentificationService copybookIdentificationService;
-  private final CopybookReferenceRepo copybookReferenceRepo;
-  private final CopybookService copybookService;
   private final CountDownLatch waitConfig = new CountDownLatch(1);
   private List<String> copybookExtensions;
   private final Completions completions;
@@ -85,8 +81,6 @@ class AnalysisService {
                   ConfigurationService configurationService,
                   SyncProvider syncProvider,
                   @Named("combinedStrategy") CopybookIdentificationService copybookIdentificationService,
-                  CopybookReferenceRepo copybookReferenceRepo,
-                  CopybookService copybookService,
                   Completions completions,
                   Occurrences occurrences,
                   Formations formations,
@@ -99,8 +93,6 @@ class AnalysisService {
     this.configurationService = configurationService;
     this.syncProvider = syncProvider;
     this.copybookIdentificationService = copybookIdentificationService;
-    this.copybookReferenceRepo = copybookReferenceRepo;
-    this.copybookService = copybookService;
     this.completions = completions;
     this.occurrences = occurrences;
     this.formations = formations;
@@ -167,14 +159,14 @@ class AnalysisService {
     }
     contentCache.store(uri, text);
     documentService.openDocument(uri, text);
-    communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocument] Document " + uri + " opened");
+    LOG.debug("[analyzeDocument] Document " + uri + " opened");
 
     if (isCopybook(uri, text)) {
-      communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocument] Document " + uri + " treated as a copy");
+      LOG.debug("[analyzeDocument] Document " + uri + " treated as a copy");
       communications.publishDiagnostics(documentService.getOpenedDiagnostic());
-      communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocument] Publish diagnostics: " + documentService.getOpenedDiagnostic());
+      LOG.debug("[analyzeDocument] Publish diagnostics: " + documentService.getOpenedDiagnostic());
     } else {
-      communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocument] Document " + uri + " treated as a program, start analyzing");
+      LOG.debug("[analyzeDocument] Document " + uri + " treated as a program, start analyzing");
       analyzeDocumentWithCopybooks(uri, text);
     }
   }
@@ -187,14 +179,14 @@ class AnalysisService {
     }
     contentCache.store(uri, text);
     documentService.updateDocument(uri, text);
-    communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " updated");
+    LOG.debug("[reanalyzeDocument] Document " + uri + " updated");
 
     if (isCopybook(uri, text)) {
-      communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " treated as a copy");
-      updateCopybook(uri, text);
-      reanalyseOpenedPrograms();
+      LOG.debug("[reanalyzeDocument] Document " + uri + " treated as a copy");
+      Set<String> affectedOpenedPrograms = documentService.findAffectedDocumentsForCopybook(uri, (d) -> !isCopybook(d.getUri(), d.getText()));
+      reanalysePrograms(affectedOpenedPrograms);
     } else {
-      communications.logGeneralMessage(MessageType.Log, now() + "[reanalyzeDocument] Document " + uri + " treated as a program");
+      LOG.debug("[reanalyzeDocument] Document " + uri + " treated as a program");
       analyzeDocumentWithCopybooks(uri, text);
     }
   }
@@ -202,12 +194,11 @@ class AnalysisService {
   public void stopAnalysis(String uri) {
     CobolDocumentModel documentModel = documentService.get(uri);
 
-    contentCache.invalidate(uri);
     documentService.closeDocument(uri);
-    communications.logGeneralMessage(MessageType.Log, now() + "[stopAnalysis] Document " + uri + " closed");
+    LOG.debug("[stopAnalysis] Document " + uri + " closed");
 
     communications.notifyProgressEnd(uri);
-    communications.logGeneralMessage(MessageType.Log, now() + "[stopAnalysis] Document " + uri + " publish diagnostic: " + documentService.getOpenedDiagnostic());
+    LOG.debug("[stopAnalysis] Document " + uri + " publish diagnostic: " + documentService.getOpenedDiagnostic());
     communications.publishDiagnostics(documentService.getOpenedDiagnostic());
     if (documentModel != null && !isCopybook(uri, documentModel.getText())) {
       documentService.removeDocument(uri);
@@ -216,7 +207,10 @@ class AnalysisService {
   }
 
   public List<Either<SymbolInformation, DocumentSymbol>> findDocumentSymbol(String uri) {
-    List<DocumentSymbol> symbols = documentService.get(uri).getOutlineResult();
+    List<DocumentSymbol> symbols =
+        documentService.isDocumentSynced(uri)
+            ? documentService.get(uri).getOutlineResult()
+            : Collections.emptyList();
     try {
       return createDocumentSymbols(symbols);
     } finally {
@@ -226,7 +220,7 @@ class AnalysisService {
 
   public Node retrieveAnalysis(String uri, String text) {
     CobolDocumentModel documentModel = documentService.get(uri);
-    communications.logGeneralMessage(MessageType.Log, now() + "[retrieveAnalysis] Document " + uri);
+    LOG.debug("[retrieveAnalysis] Document " + uri);
 
     if (!documentModel.isDocumentSynced()) {
       analyzeDocumentWithCopybooks(uri, text);
@@ -239,7 +233,10 @@ class AnalysisService {
   }
 
   public List<FoldingRange> findFoldingRange(String uri) {
-    List<DocumentSymbol> symbols = documentService.get(uri).getOutlineResult();
+    List<DocumentSymbol> symbols =
+        documentService.isDocumentSynced(uri)
+            ? documentService.get(uri).getOutlineResult()
+            : Collections.emptyList();
     return DocumentServiceHelper.getFoldingRangeFromDocumentSymbol(symbols);
   }
 
@@ -253,7 +250,7 @@ class AnalysisService {
       if (isCopybook(uri, text)) {
         return;
       }
-      communications.logGeneralMessage(MessageType.Log, now() + "[analyzeDocumentWithCopybooks] Start analysis: " + uri);
+      LOG.debug("[analyzeDocumentWithCopybooks] Start analysis: " + uri);
       communications.notifyProgressBegin(uri);
       doAnalysis(uri, text);
     } catch (Throwable th) {
@@ -288,11 +285,11 @@ class AnalysisService {
         documentService.processAnalysisResult(uri, result);
         notifyAnalysisFinished(uri, DocumentServiceHelper.extractCopybookUris(result), processingMode);
 
-        communications.logGeneralMessage(MessageType.Log, now() + "[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
+        LOG.debug("[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
         communications.publishDiagnostics(documentService.getOpenedDiagnostic());
-        communications.logGeneralMessage(MessageType.Log, now() + "[doAnalysis] Document " + uri + " diagnostic published: " + documentService.getOpenedDiagnostic());
+        LOG.debug("[doAnalysis] Document " + uri + " diagnostic published: " + documentService.getOpenedDiagnostic());
       } catch (Exception e) {
-        communications.logGeneralMessage(MessageType.Error, createDescriptiveErrorMessage("analysis", uri));
+        LOG.debug(createDescriptiveErrorMessage("analysis", uri));
 
         LOG.error(createDescriptiveErrorMessage("analysis", uri), e);
         throw e;
@@ -300,23 +297,14 @@ class AnalysisService {
     }
   }
 
-  private void updateCopybook(String uri, String text) {
-    copybookReferenceRepo
-        .getCopybookUsageReference(uri)
-        .forEach(
-            val -> {
-              CopybookModel copybookModel =
-                  new CopybookModel(
-                      val.getCopybookId(),
-                      val.getCopybookName(),
-                      uri,
-                      text);
-              this.copybookService.store(copybookModel, true);
-            });
-  }
-
   public void reanalyseOpenedPrograms() {
     documentService.getAllOpened()
+        .stream().filter(d -> !isCopybook(d.getUri(), d.getText()))
+        .forEach(doc -> analyzeDocumentWithCopybooks(doc.getUri(), doc.getText()));
+  }
+
+  private void reanalysePrograms(Set<String> programs) {
+    documentService.getAll(programs)
         .stream().filter(d -> !isCopybook(d.getUri(), d.getText()))
         .forEach(doc -> analyzeDocumentWithCopybooks(doc.getUri(), doc.getText()));
   }
@@ -337,5 +325,4 @@ class AnalysisService {
     LocalDateTime now = LocalDateTime.now();
     return dtf.format(now) + " ";
   }
-
 }

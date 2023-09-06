@@ -19,7 +19,7 @@ import com.google.common.collect.Multimap;
 import com.google.inject.Singleton;
 import lombok.Synchronized;
 import lombok.Value;
-import org.eclipse.lsp.cobol.common.model.Context;
+import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
@@ -97,31 +97,18 @@ public class SymbolsRepository {
    * @param position the position to check
    * @return element at specified position
    */
-  public static Optional<Context> findElementByPosition(String uri, AnalysisResult result, Position position) {
+  public static Optional<DefinedAndUsedStructure> findElementByPosition(String uri, AnalysisResult result, Position position) {
     if (result == null || result.getRootNode() == null) {
       return Optional.empty();
     }
     Optional<Node> node = findNodeByPosition(result.getRootNode(), uri, position);
 
-    return node.filter(Context.class::isInstance)
-        .map(Context.class::cast)
+    return node.filter(DefinedAndUsedStructure.class::isInstance)
+        .map(DefinedAndUsedStructure.class::cast)
         .map(SymbolsRepository::constructElementsExcludingImplicits);
   }
 
-//  /**
-//   * Remove program related symbols
-//   *
-//   * @param documentUri the program uri
-//   */
-//  public void reset(String documentUri) {
-//    programSymbols.keySet().stream()
-//        .filter(k -> k.endsWith("%" + documentUri))
-//        .collect(Collectors.toList())
-//        .forEach(programSymbols::remove);
-//    programSymbols.remove(documentUri);
-//  }
-
-  private static Context constructElementsExcludingImplicits(Context ctx) {
+  private static DefinedAndUsedStructure constructElementsExcludingImplicits(DefinedAndUsedStructure ctx) {
     List<Location> definitions =
         ctx.getDefinitions().stream().filter(uriNotImplicit()).collect(Collectors.toList());
     List<Location> usages =
@@ -140,7 +127,7 @@ public class SymbolsRepository {
   }
 
   @Value
-  private static class Element implements Context {
+  private static class Element implements DefinedAndUsedStructure {
     String name;
     List<Location> definitions;
     List<Location> usages;

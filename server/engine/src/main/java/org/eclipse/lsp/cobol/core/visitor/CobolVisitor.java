@@ -37,12 +37,11 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.model.tree.*;
-import org.eclipse.lsp.cobol.core.model.tree.statements.SetToBooleanStatement;
-import org.eclipse.lsp.cobol.core.model.tree.statements.SetToOnOffStatement;
-import org.eclipse.lsp.cobol.core.model.tree.statements.SetUpDownByStatement;
+import org.eclipse.lsp.cobol.common.model.tree.statements.SetToBooleanStatement;
+import org.eclipse.lsp.cobol.common.model.tree.statements.SetToOnOffStatement;
+import org.eclipse.lsp.cobol.common.model.tree.statements.SetUpDownByStatement;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode.Builder;
-import org.eclipse.lsp.cobol.core.model.variables.DivisionType;
+import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
@@ -549,7 +548,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitExecSqlStatement(ExecSqlStatementContext ctx) {
-    areaBWarning(ctx);
     return Collections.emptyList();
   }
 
@@ -591,6 +589,18 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitEvaluateWhenOther(EvaluateWhenOtherContext ctx) {
     throwWarning(ctx.getStart());
     return addTreeNode(ctx, EvaluateWhenOtherNode::new);
+  }
+
+  @Override
+  public List<Node> visitDeprecatedCompilerOptions(DeprecatedCompilerOptionsContext ctx) {
+    retrieveLocality(ctx).ifPresent(locality -> errors.add(SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
+            .errorCode(() -> "IGYOS4003-E")
+            .location(locality.toOriginalLocation())
+            .suggestion(messageService.getMessage("compilerDirective.deprecatedDirectiveUse", ctx.getText()))
+            .severity(ErrorSeverity.ERROR)
+            .build()));
+    return Collections.emptyList();
   }
 
   @Override
@@ -828,6 +838,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     }
     if (ctx.SECTION() != null) {
       return addTreeNode(ctx, ExitSectionNode::new);
+    }
+    if (ctx.PARAGRAPH() != null) {
+      return addTreeNode(ctx, ExitParagraphNode::new);
     }
     return addTreeNode(ctx, ExitNode::new);
   }

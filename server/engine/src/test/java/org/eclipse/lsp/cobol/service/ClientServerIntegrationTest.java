@@ -24,8 +24,6 @@ import org.eclipse.lsp.cobol.ClientServerTestModule;
 import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp4j.*;
@@ -178,7 +176,6 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
           protected void configure() {
             bind(LanguageEngineFacade.class).to(ClientServerIntegrationTestImpl.class);
             bind(TextDocumentService.class).to(CobolTextDocumentService.class);
-            bind(CopybookReferenceRepo.class).to(CopybookReferenceRepoImpl.class);
           }
         });
   }

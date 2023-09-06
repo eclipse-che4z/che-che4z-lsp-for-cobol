@@ -109,14 +109,14 @@ suite("Integration Test Suite", function () {
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
     );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 2);
+    assert.strictEqual(diagnostics.length, 1);
     helper.assertRangeIsEqual(
       diagnostics[0].range,
-      range(pos(34, 11), pos(34, 15)),
+      range(pos(34, 16), pos(34, 20)),
     );
     assert.strictEqual(
       diagnostics[0].message,
-      "Missing token SQL at execSqlStatement",
+      "No viable alternative at input EXEC CICS",
     );
   })
     .timeout(helper.TEST_TIMEOUT)
@@ -391,15 +391,9 @@ suite("Integration Test Suite", function () {
     ?.slow(1000);
 
   test("TC250109 Test Area B", async () => {
-    if (process.platform === "win32") {
-      // TODO: fix this test in windows environment
-      return;
-    }
     await helper.showDocument("USER1.cbl");
     const editor = helper.get_editor("USER1.cbl");
-    await editor.edit((edit) =>
-      edit.replace(range(pos(32, 0), pos(32, 3)), ""),
-    );
+    await editor.edit((edit) => edit.delete(range(pos(32, 0), pos(32, 3))));
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
@@ -411,7 +405,7 @@ suite("Integration Test Suite", function () {
     );
 
     await editor.edit((edit) => {
-      edit.replace(range(pos(41, 0), pos(41, 3)), "");
+      edit.delete(range(pos(41, 0), pos(41, 3)));
     });
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 2,
@@ -498,6 +492,74 @@ suite("Integration Test Suite", function () {
       diagnostics[3].message,
       "The following token must start in Area A: 100-Print-User",
     );
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
+
+  test("Show errors only for opened files", async () => {
+    // Open program with error inside a copybook
+    await helper.showDocument("TESTCPY1.cbl");
+    const progUri = await helper.getUri("TESTCPY1.cbl");
+
+    const copybookPath = path.join("testing", "COPYE");
+    const copybookUri = await helper.getUri(copybookPath);
+
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(progUri).length === 1,
+    );
+    let diagnostics = vscode.languages.getDiagnostics(progUri);
+    assert.strictEqual(
+      diagnostics.length,
+      1,
+      "got: " + JSON.stringify(diagnostics),
+    );
+    assert.strictEqual(diagnostics[0].message, "Errors inside the copybook");
+
+    // No diagnostic for copybook so far
+    let copyDiagnostics = vscode.languages.getDiagnostics(copybookUri);
+    assert.strictEqual(copyDiagnostics.length, 0);
+
+    // Open copybook with an error
+    await helper.showDocument(copybookPath);
+
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(copybookUri).length === 1,
+    );
+    copyDiagnostics = vscode.languages.getDiagnostics(copybookUri);
+    assert.strictEqual(
+      copyDiagnostics.length,
+      1,
+      "got: " + JSON.stringify(diagnostics),
+    );
+    assert.strictEqual(
+      copyDiagnostics[0].message,
+      "Extraneous input 'VvvALUE'",
+    );
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
+
+  test("Show transition copybook errors", async () => {
+    // Open program with error inside a copybook
+    await helper.showDocument("TESTCPY2.cbl");
+    const progUri = await helper.getUri("TESTCPY2.cbl");
+
+    const copybookPath = path.join("testing", "COPYC");
+    const copybookUri = await helper.getUri(copybookPath);
+
+    // Open copybook with an error
+    await helper.showDocument(copybookPath);
+
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(copybookUri).length === 1,
+    );
+    const diagnostic = vscode.languages.getDiagnostics(copybookUri);
+    assert.strictEqual(
+      diagnostic.length,
+      1,
+      "got: " + JSON.stringify(diagnostic),
+    );
+    assert.strictEqual(diagnostic[0].message, "Errors inside the copybook");
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
