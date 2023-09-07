@@ -371,13 +371,15 @@ suite("Integration Test Suite", function () {
     await helper.insertString(
       editor,
       pos(36, 11),
-      "           EXEC SQL SQL-STATEMENT END-EXEC.",
+      "           EXEC SQL SQL_STATEMENT END-EXEC.",
     );
     const diagnostics = await diagPromise;
+    helper.assertRangeIsEqual(
+      diagnostics[0].range,
+      range(pos(36, 20), pos(36, 33)),
+    );
     const syntaxErrors = diagnostics.filter((diag) =>
-      diag.message.startsWith(
-        "Syntax error on 'SQL' expected {ALLOCATE, ALTER, ASSOCIATE, CALL, CLOSE",
-      ),
+      diag.message.startsWith("Syntax error on 'SQL_STATEMENT'"),
     );
     assert.strictEqual(syntaxErrors.length, 1);
   })
