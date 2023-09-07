@@ -367,7 +367,7 @@ suite("Integration Test Suite", function () {
     let editor = helper.get_editor("cobol-dc/ABCD.cbl");
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
-      500
+      500,
     );
     let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 0);
@@ -382,7 +382,7 @@ suite("Integration Test Suite", function () {
     assert.strictEqual(diagnostics[0].message, "Variable ABCD1 is not defined");
   })
     .timeout(helper.TEST_TIMEOUT)
-    .slow(1000);  
+    .slow(1000);
 
   test("Show errors only for opened files", async () => {
     // Open program with error inside a copybook
