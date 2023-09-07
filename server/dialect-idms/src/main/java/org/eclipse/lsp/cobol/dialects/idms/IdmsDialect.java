@@ -79,16 +79,17 @@ public final class IdmsDialect implements CobolDialect {
                                   IdmsCopybookDescriptor cb, String programDocumentUri, String currentUri,
                                   Deque<String> copybookStack) {
     CopybookName copybookName = new CopybookName(cb.getName(), IdmsDialect.NAME);
-    CopybookModel copybookModel =
-        copybookService.resolve(
+    ResultWithErrors<CopybookModel> resolvedCopybook = copybookService.resolve(
             copybookName.toCopybookId(programDocumentUri),
             copybookName,
             programDocumentUri,
             currentUri,
             ctx.getCopybookConfig(),
             true);
+    CopybookModel copybookModel = resolvedCopybook.getResult();
 
     if (copybookModel.getUri() == null || copybookModel.getContent() == null) {
+      errors.addAll(resolvedCopybook.getErrors());
       errors.add(ErrorHelper.missingCopybooks(messageService, cb.getUsage(), cb.getName()));
       if (!cb.isInsert()) {
         ctx.getExtendedDocument().replace(cb.getStatement().getRange(), "");

@@ -33,7 +33,7 @@ class TestUnexpectedCharErrorShown {
           + "        PROCEDURE DIVISION.\r\n"
           + "        END PROGRAM test1.";
 
-  private static final String MESSAGE = "Extraneous input '?' expected '.'";
+  private static final String MESSAGE = "Extraneous input '?'";
 
   @Test
   void test() {

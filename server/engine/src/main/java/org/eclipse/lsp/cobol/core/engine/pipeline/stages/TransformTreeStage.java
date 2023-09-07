@@ -23,6 +23,9 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
+import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveContext;
+import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
+import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveOption;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
@@ -33,13 +36,12 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
+import org.eclipse.lsp.cobol.core.engine.processors.*;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
-import org.eclipse.lsp.cobol.core.model.tree.*;
-import org.eclipse.lsp.cobol.core.model.tree.logic.*;
-import org.eclipse.lsp.cobol.core.model.tree.logic.implicit.ImplicitVariablesProcessor;
-import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.FileDescriptionNode;
+import org.eclipse.lsp.cobol.core.engine.processors.implicit.ImplicitVariablesProcessor;
+import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
+import org.eclipse.lsp.cobol.common.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
@@ -47,6 +49,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -139,16 +142,34 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     addCopyNodes(ctx, rootNode);
     addDialectsNode(ctx, rootNode);
 
-    ProcessingContext processingContext = new ProcessingContext(new ArrayList<>(), symbolAccumulatorService, ctx.getConfig().getDialectsSettings());
+    ProcessingContext processingContext =
+            new ProcessingContext(new ArrayList<>(), symbolAccumulatorService, getCompilerDirectiveContext(analysisConfig), ctx.getConfig().getDialectsSettings());
     registerProcessors(analysisConfig, processingContext, symbolAccumulatorService);
     ctx.getAccumulatedErrors().addAll(astProcessor.processSyntaxTree(processingContext, rootNode));
     return rootNode;
+  }
+
+  private CompilerDirectiveContext getCompilerDirectiveContext(AnalysisConfig analysisConfig) {
+    CompilerDirectiveContext compilerDirectiveContext = new CompilerDirectiveContext();
+    analysisConfig.getCompilerOptions().stream()
+            .map(this::getCompilerDirective)
+            .forEach(opts -> opts.ifPresent(compilerDirectiveContext::updateDirectiveOptions));
+    return compilerDirectiveContext;
+  }
+
+  private Optional<CompilerDirectiveOption> getCompilerDirective(String compilerOptions) {
+    return Arrays.stream(CompilerDirectiveName.values())
+            .map(val -> val.getDirectiveOption(compilerOptions))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
   }
 
   private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx, SymbolAccumulatorService symbolAccumulatorService) {
     // Phase TRANSFORMATION
     ProcessingPhase t = ProcessingPhase.TRANSFORMATION;
     ctx.register(t, CompilerDirectiveNode.class, new CompilerDirectiveProcess());
+    ctx.register(t, ProgramNode.class, new CICSTranslateMandatorySectionProcess(analysisConfig));
     ctx.register(t, ProgramIdNode.class, new ProgramIdProcess());
     ctx.register(t, SectionNode.class, new SectionNodeProcessor(symbolAccumulatorService));
     ctx.register(t, FileEntryNode.class, new FileEntryProcess());
@@ -163,7 +184,7 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     ctx.register(d, ProcedureDivisionBodyNode.class, new DefineCodeBlock(symbolAccumulatorService));
 
     // Phase POST DEFINITION
-    ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor());
+    ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor(analysisConfig));
 
     // Phase USAGE
     ProcessingPhase u = ProcessingPhase.USAGE;
@@ -187,8 +208,9 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     ctx.register(v, StandAloneDataItemNode.class, new StandAloneDataItemCheck());
     ctx.register(v, ProgramEndNode.class, new ProgramEndCheck());
     ctx.register(v, CICSTranslatorNode.class, new CICSTranslatorProcessor(analysisConfig, messageService));
-    ctx.register(t, JsonParseNode.class, new JsonParseProcess(symbolAccumulatorService));
-    ctx.register(t, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulatorService));
+    ctx.register(v, JsonParseNode.class, new JsonParseProcess(symbolAccumulatorService));
+    ctx.register(v, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulatorService));
+    ctx.register(v, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
 
     // Dialects
     List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());

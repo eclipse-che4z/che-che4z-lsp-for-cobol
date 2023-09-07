@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,22 +32,25 @@ class CompilerDirectiveContextTest {
   @Test
   void testCompilerOptionsContextFetch() {
     CompilerDirectiveContext context = new CompilerDirectiveContext();
+
+    assertEquals(context.getCompilerDirectiveMap().entrySet().size(), 2);
     context.updateDirectiveOptions(
         new CompilerDirectiveOption(CompilerDirectiveName.ADATA, ImmutableList.of(EXTEND)));
-    List<CompilerDirectiveOption> result1 =
+    Optional<CompilerDirectiveOption> result1 =
         context.filterDirectiveList(ImmutableList.of(CompilerDirectiveName.QUALIFY));
-    List<CompilerDirectiveOption> result2 =
+    Optional<CompilerDirectiveOption> result2 =
         context.filterDirectiveList(ImmutableList.of(CompilerDirectiveName.ADATA));
-    Assertions.assertTrue(result1.isEmpty());
-    assertEquals(1, result2.size());
-    Assertions.assertTrue(result2.get(0).getValue().contains(EXTEND));
+    assertTrue(result1.isPresent());
+    assertTrue(result1.get().getValue().contains("COMPAT"));
+    assertTrue(result2.isPresent());
+    Assertions.assertTrue(result2.get().getValue().contains(EXTEND));
 
     context.updateDirectiveOptions(
         new CompilerDirectiveOption(CompilerDirectiveName.ADATA, ImmutableList.of(COMPAT)));
-    List<CompilerDirectiveOption> result3 =
+    Optional<CompilerDirectiveOption> result3 =
         context.filterDirectiveList(ImmutableList.of(CompilerDirectiveName.ADATA));
-    assertEquals(1, result3.size());
-    List<String> contextValueResult3 = result3.get(0).getValue();
+    assertTrue(result3.isPresent());
+    List<String> contextValueResult3 = result3.get().getValue();
     assertEquals(2, contextValueResult3.size());
 
     assertEquals(COMPAT, contextValueResult3.get(contextValueResult3.size() - 1));

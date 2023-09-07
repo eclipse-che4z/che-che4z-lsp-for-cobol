@@ -24,11 +24,9 @@ import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.utils.LogLevelUtils;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
-import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp4j.*;
@@ -61,10 +59,8 @@ public class CobolLanguageServer implements LanguageServer {
   private final SettingsService settingsService;
   private final LocaleStore localeStore;
   private final CustomThreadPoolExecutor customThreadPoolExecutor;
-  private final ConfigurationService configurationService;
   private final CopybookNameService copybookNameService;
   private final Keywords keywords;
-  private final DialectService dialectService;
   private final MessageService messageService;
 
   @Inject
@@ -77,10 +73,8 @@ public class CobolLanguageServer implements LanguageServer {
       LocaleStore localeStore,
       CustomThreadPoolExecutor customThreadPoolExecutor,
       DisposableLSPStateService disposableLSPStateService,
-      ConfigurationService configurationService,
       CopybookNameService copybookNameService,
       Keywords keywords,
-      DialectService dialectService,
       MessageService messageService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
@@ -89,10 +83,8 @@ public class CobolLanguageServer implements LanguageServer {
     this.localeStore = localeStore;
     this.customThreadPoolExecutor = customThreadPoolExecutor;
     this.disposableLSPStateService = disposableLSPStateService;
-    this.configurationService = configurationService;
     this.copybookNameService = copybookNameService;
     this.keywords = keywords;
-    this.dialectService = dialectService;
     this.messageService = messageService;
   }
 
@@ -114,6 +106,8 @@ public class CobolLanguageServer implements LanguageServer {
   @Override
   @NonNull
   public CompletableFuture<InitializeResult> initialize(@NonNull InitializeParams params) {
+    watchingService.getWorkspaceFolders().addAll(params.getWorkspaceFolders());
+
     ServerCapabilities capabilities = new ServerCapabilities();
 
     capabilities.setTextDocumentSync(Full);
@@ -147,8 +141,6 @@ public class CobolLanguageServer implements LanguageServer {
   @Override
   public void initialized(@Nullable InitializedParams params) {
     watchingService.watchConfigurationChange();
-    watchingService.watchPredefinedFolder();
-    addLocalFilesWatcher();
     getLocaleFromClient();
     getLogLevelFromClient();
     copybookNameService.collectLocalCopybookNames();
@@ -224,25 +216,9 @@ public class CobolLanguageServer implements LanguageServer {
     System.exit(exitCode);
   }
 
-  private void addLocalFilesWatcher() {
-    settingsService
-        .fetchTextConfiguration(CPY_LOCAL_PATHS.label)
-        .thenAccept(watchingService::addWatchers);
-
-    dialectService.getWatchingFolderSettings()
-            .forEach(s -> settingsService
-                .fetchTextConfiguration(s)
-                .thenAccept(watchingService::addWatchers));
-
-    settingsService
-        .fetchTextConfiguration(SUBROUTINE_LOCAL_PATHS.label)
-        .thenAccept(watchingService::addWatchers);
-  }
-
   @NonNull
   private ExecuteCommandOptions collectExecuteCommandList() {
-    return new ExecuteCommandOptions(
-            ImmutableList.of(ErrorCodes.MISSING_COPYBOOK.getLabel()));
+    return new ExecuteCommandOptions(ImmutableList.of(ErrorCodes.MISSING_COPYBOOK.getLabel()));
   }
 
   /** Represents the JSON RPC response structure for shutdown command as per LSP specification */

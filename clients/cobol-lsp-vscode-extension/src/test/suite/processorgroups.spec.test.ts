@@ -14,82 +14,63 @@
 
 import * as assert from "assert";
 import * as helper from "./testHelper";
-import * as vscode from "vscode";
 import * as path from "path";
 
 suite("Integration Test Suite: Processor Groups", function () {
+  this.timeout(helper.TEST_TIMEOUT);
+  this.slow(1000);
   suiteSetup(async function () {
-    this.timeout(helper.TEST_TIMEOUT);
     helper.updateConfig("basic.json");
     await helper.activate();
   });
 
-  this.afterEach(async () => await helper.closeAllEditors()).timeout(
-    helper.TEST_TIMEOUT,
-  );
-
-  // cobol-dialect-api (development) npm install && npm run compile
-  // daco-dialect-support (development) npm install && npm run package
-  // idms-dialect-support (development) npm install && npm run package
-  // put server.jar, dialect-idms.jar and dialect-daco.jar into their server/jar folder
-
-  test("TC355920: IDMS - processor group", async () => {
-    const extSrcPath = path.join("cobol-idms", "DACRFI11N.cbl");
-    await helper.showDocument(extSrcPath);
-    const editor = helper.get_editor(extSrcPath);
-    const waitResult = await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length == 1,
-      5000
-    );
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(waitResult, false);
-    assert.strictEqual(diagnostics.length, 0);
+  this.beforeEach(async () => {
     await helper.closeAllEditors();
-  })
-    .timeout(helper.TEST_TIMEOUT)
-    .slow(1000);
-  
-  test("TC355921: DaCo - processor group", async () => {
-    const extSrcPath = path.join("cobol-daco", "DABPA11N.cbl");
-    await helper.showDocument(extSrcPath);
-    const editor = helper.get_editor(extSrcPath);
-    const waitResult = await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length == 1,
-      5000
-    );
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(waitResult, false);
-    assert.strictEqual(diagnostics.length, 0);
-    await helper.closeAllEditors();
-  })
-    .timeout(helper.TEST_TIMEOUT)
-    .slow(1000);
+  });
 
-  test("TC355918: IDMS - No processor group", async () => {
-    const extSrcPath = path.join("cobol-idms-noconf", "DACRFI11N.cbl");
+  // cobol-dialect-api (development) npm ci && npm run compile
+  // daco-dialect-support (development) npm ci && npm run package
+  // idms-dialect-support (development) npm ci && npm run package
+  // put server.jar, dialect-idms.jar and dialect-daco.jar into their server/jar folders
+
+  test("TC355920: IDMS - with preprocessor setup", async () => {
+    const extSrcPath = path.join("cobol-idms", "IDMSSMPL.cbl");
+    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
-    const editor = helper.get_editor(extSrcPath);
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length == 1,
-    );
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await diagPromise;
     assert.strictEqual(diagnostics.length, 1);
-    await helper.closeAllEditors();
-  })
-    .timeout(helper.TEST_TIMEOUT)
-    .slow(1000);
+    const message = diagnostics[0].message;
+    assert.match(message, /^IDMSABCD: Copybook not found/);
+  });
 
-  test("TC355919: DaCo - No processor group", async () => {
-    const extSrcPath = path.join("cobol-daco-noconf", "DABPA11N.cbl");
+  test("TC355921: DaCo - with processor setup", async () => {
+    const extSrcPath = path.join("cobol-daco", "DACOSMPL.cbl");
+    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
-    const editor = helper.get_editor(extSrcPath);
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length == 1,
-    );
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await diagPromise;
     assert.strictEqual(diagnostics.length, 1);
-    await helper.closeAllEditors();
-  })
-    .timeout(helper.TEST_TIMEOUT)
-    .slow(1000);
+    const message = diagnostics[0].message;
+    assert.match(message, /^MAIDABCD: Copybook not found/);
+  });
+
+  test("TC355918: IDMS - without preprocessor setup", async () => {
+    const extSrcPath = path.join("cobol-vanila", "IDMSSMPL.cbl");
+    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
+    await helper.showDocument(extSrcPath);
+    const diagnostics = await diagPromise;
+    assert.strictEqual(diagnostics.length, 1);
+    const message = diagnostics[0].message;
+    assert.match(message, /^Syntax error on 'IDMS-CONTROL'/);
+  });
+
+  test("TC355919: DaCo - without preprocessor setup", async () => {
+    const extSrcPath = path.join("cobol-idms", "DACOSMPL.cbl");
+    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
+    await helper.showDocument(extSrcPath);
+    const diagnostics = await diagPromise;
+    const maidSyntaxErrors = diagnostics.filter((diag) =>
+      diag.message.startsWith("Syntax error on 'MAID'"),
+    );
+    assert.strictEqual(maidSyntaxErrors.length, 2);
+  });
 });

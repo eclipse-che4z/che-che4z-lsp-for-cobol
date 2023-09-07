@@ -16,21 +16,32 @@ package org.eclipse.lsp.cobol.common.processor;
 
 import lombok.Getter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /** Compiler directive context */
 public class CompilerDirectiveContext {
-  @Getter private final Map<CompilerDirectiveName, List<String>> compilerDirectiveMap = new HashMap<>();
+  @Getter private final Map<CompilerDirectiveName, List<String>> compilerDirectiveMap;
+
+  public CompilerDirectiveContext() {
+    this.compilerDirectiveMap = defaultCompilerDirective();
+  }
+
+  private Map<CompilerDirectiveName, List<String>> defaultCompilerDirective() {
+    return Arrays.stream(CompilerDirectiveName.values())
+        .map(directive -> directive.getDirectiveOption(""))
+        .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty))
+        .collect(
+            Collectors.toMap(
+                CompilerDirectiveOption::getCompilerDirectiveName,
+                CompilerDirectiveOption::getValue));
+  }
 
   /**
    * Updates the compiler directive options
    *
-   * @param compilerDirectiveOption @{@link CompilerDirectiveOption}
+   * @param compilerDirectiveOption {@link CompilerDirectiveOption}
    */
   public void updateDirectiveOptions(CompilerDirectiveOption compilerDirectiveOption) {
     compilerDirectiveMap.merge(compilerDirectiveOption.getCompilerDirectiveName(),
@@ -53,11 +64,11 @@ public class CompilerDirectiveContext {
    * @param names List of @{@link CompilerDirectiveName}
    * @return List of @{@link CompilerDirectiveOption}
    */
-  public List<CompilerDirectiveOption> filterDirectiveList(List<CompilerDirectiveName> names) {
+  public Optional<CompilerDirectiveOption> filterDirectiveList(List<CompilerDirectiveName> names) {
     return compilerDirectiveMap.entrySet().stream()
         .filter(entry -> Objects.nonNull(entry.getKey()))
         .filter(entry -> names.contains(entry.getKey()))
         .map(entry -> new CompilerDirectiveOption(entry.getKey(), entry.getValue()))
-        .collect(Collectors.toList());
+        .findFirst();
   }
 }

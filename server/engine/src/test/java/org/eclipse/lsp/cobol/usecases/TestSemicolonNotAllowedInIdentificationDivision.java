@@ -44,7 +44,7 @@ class TestSemicolonNotAllowedInIdentificationDivision {
             "1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'PROGRAM-ID' expected '.'",
+                    "Extraneous input 'PROGRAM-ID'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "2",

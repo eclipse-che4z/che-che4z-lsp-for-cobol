@@ -135,6 +135,18 @@ describe("Check plugin extension for cobol starts successfully.", () => {
   });
 });
 
+describe("check exposed API's by the COBOL LS extension", () => {
+  test("analysis API is exposed by the COBOL LS extension", async () => {
+    const expectedGraph = "THIS IS A CFAST GRAPH OBJECT";
+    jest
+      .spyOn(LanguageClientService.prototype, "retrieveAnalysis")
+      .mockResolvedValue(expectedGraph);
+    const ext = await activate(context);
+    expect(ext).toHaveProperty("analysis");
+    expect(await ext.analysis("test", "text")).toBe(expectedGraph);
+  });
+});
+
 describe("Check plugin extension for cobol fails.", () => {
   beforeEach(() => {
     (LanguageClientService as any).mockImplementation(() => {
@@ -200,13 +212,73 @@ describe("Check recognition of COBOL from first line", () => {
     expect(pgm).toEqual(cobol);
   });
 
-  test("CICS Translator Directive SEQ", () => {
-    const pgm = `000010 CBL XOPTS(COBOL2)`;
+  test("Compiler Directive at the beginnig of a line", () => {
+    const pgm = `CBL `;
     expect(pgm).toEqual(cobol);
   });
 
-  test("CICS Translator Directive NOSEQ", () => {
-    const pgm = `       CBL XOPTS(COBOL2)`;
+  test("Compiler Directive after 3 spaces", () => {
+    const pgm = `   CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Compiler Directive after 6 spaces", () => {
+    const pgm = `      CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Compiler Directive after 7 spaces", () => {
+    const pgm = `       CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Compiler Directive after spaces 8 spaces", () => {
+    const pgm = `        CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Compiler Directive after more spaces", () => {
+    const pgm = `           CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Incorrect compiler directive", () => {
+    const pgm = `a    CBL `;
+    expect(pgm).not.toEqual(cobol);
+  });
+
+  test('Compiler Directive after "sequence number"', () => {
+    const pgm = `0abcdePROCESS `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Compiler Directive in column 8 - SEQ", () => {
+    const pgm = `000010 PROCESS `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Compiler Directive after column 8 - SEQ", () => {
+    const pgm = `000010     CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Listing control in column 8 - SEQ", () => {
+    const pgm = `000010 *PROCESS `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Listing control in column 8 - NOSEQ", () => {
+    const pgm = `       *CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Listing control after column 8 - SEQ ", () => {
+    const pgm = `000010    *CBL `;
+    expect(pgm).toEqual(cobol);
+  });
+
+  test("Listing control after column 8 - NOSEQ ", () => {
+    const pgm = `          *PROCESS `;
     expect(pgm).toEqual(cobol);
   });
 });

@@ -41,6 +41,10 @@ import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 import { ServerRuntimeCodeActionProvider } from "./services/nativeLanguageClient/serverRuntimeCodeActionProvider";
 import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 
+interface __AnalysisApi {
+  analysis(uri: string, text: string): Promise<any>;
+}
+
 let languageClientService: LanguageClientService;
 let outputChannel: vscode.OutputChannel;
 const API_VERSION: string = "1.0.0";
@@ -54,9 +58,13 @@ function initialize() {
   return { copyBooksDownloader, configurationWatcher };
 }
 
+export function getChannel(): vscode.OutputChannel {
+  return outputChannel;
+}
+
 export async function activate(
   context: vscode.ExtensionContext,
-): Promise<__ExtensionApi> {
+): Promise<__ExtensionApi & __AnalysisApi> {
   DialectRegistry.clear();
   const { copyBooksDownloader, configurationWatcher } = initialize();
   initSmartTab(context);
@@ -140,6 +148,9 @@ export async function activate(
       },
     },
     version: API_VERSION,
+    analysis(uri: string, text: string): Promise<any> {
+      return languageClientService.retrieveAnalysis(uri, text);
+    },
   };
 }
 

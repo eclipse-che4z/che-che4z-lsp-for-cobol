@@ -6,6 +6,14 @@
     "name":"[Ljava.lang.String;"
   },
   {
+    "name":"ch.qos.logback.core.ConsoleAppender",
+    "queryAllPublicMethods":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name":"setTarget","parameterTypes":["java.lang.String"] }
+    ]
+  },
+  {
     "name": "ch.qos.logback.classic.encoder.PatternLayoutEncoder",
     "queryAllPublicMethods": true,
     "methods": [

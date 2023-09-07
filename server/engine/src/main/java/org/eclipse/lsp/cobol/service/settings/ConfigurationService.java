@@ -27,6 +27,7 @@ import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /** This interface handles the request for configurations from the client settings */
 public interface ConfigurationService {
@@ -42,10 +43,31 @@ public interface ConfigurationService {
   AnalysisConfig getConfig(String scopeURI, CopybookProcessingMode mode);
 
   /**
-   *Get a Subroutine configuration for the analysis using the settings file
+   * Gets a client configuration for the Subroutine settings
+   *
    * @return the list from the Subroutine directories defined in user settings
    */
   List<String> getSubroutineDirectories();
+
+  /**
+   * Get a list configuration for a document.
+   * For example. "configuration-example" : ["setting1","setting2"]
+   *
+   * <p>NOTE: This method won't work for a single element setting like
+   * "configuration-example" : "setting1"
+   *
+   * @param documentUri document URI for which configuration needs to be fetched.
+   * @param section the required section in the client configuration.
+   * @return the list from the copybook directories defined in user settings
+   */
+  CompletableFuture<List<String>> getListConfiguration(String documentUri, String section);
+
+  /**
+   * Get a list of watching folders for the provided dialects.
+   *
+   * @return List of watching folders for the provided dialects
+   */
+  List<String> getDialectWatchingFolders();
 
   /**
    * A value class to store the configuration. Reflects the required values from the settings.json
@@ -60,6 +82,7 @@ public interface ConfigurationService {
     List<String> subroutines;
     boolean cicsTranslatorEnabled;
     List<DialectRegistryItem> dialectRegistry;
+    List<String> compilerOptions;
     Map<String, JsonElement> dialectsSettings;
 
     public ConfigurationEntity() {
@@ -69,6 +92,7 @@ public interface ConfigurationService {
       subroutines = ImmutableList.of();
       cicsTranslatorEnabled = true;
       dialectRegistry = ImmutableList.of();
+      compilerOptions = ImmutableList.of();
       dialectsSettings = ImmutableMap.of();
     }
   }

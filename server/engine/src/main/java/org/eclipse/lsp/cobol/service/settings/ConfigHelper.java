@@ -119,7 +119,10 @@ public class ConfigHelper {
    * @return List of configured dialects
    */
   public List<String> parseDialects(JsonArray dialects) {
-    return Streams.stream(dialects).map(JsonElement::getAsString).collect(toList());
+    return Streams.stream(dialects)
+            .filter(ele -> !(ele instanceof JsonNull))
+            .map(JsonElement::getAsString)
+            .collect(toList());
   }
 
   /**
@@ -145,6 +148,20 @@ public class ConfigHelper {
   public List<String> parseSubroutineFolder(JsonElement subroutine) {
     if (subroutine.isJsonArray()) {
       return Streams.stream((JsonArray) subroutine).map(JsonElement::getAsString).collect(toList());
+    }
+    return ImmutableList.of();
+  }
+
+  /**
+   * Parse compiler options client configurations
+   * @param jsonElements configured compiler options
+   * @return List of configured compiler options
+   */
+    public static List<String> parseCompilerOptions(Object jsonElements) {
+    if (jsonElements instanceof JsonArray) {
+      return Streams.stream((JsonArray) jsonElements)
+          .map(JsonElement::getAsString)
+          .collect(toList());
     }
     return ImmutableList.of();
   }

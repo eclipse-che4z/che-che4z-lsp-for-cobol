@@ -35,8 +35,6 @@ import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
 import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.WatcherServiceImpl;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepo;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import org.eclipse.lsp.cobol.test.UseCaseInitializer;
@@ -80,7 +78,6 @@ public class UseCaseInitializerService implements UseCaseInitializer {
                 bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
                 bind(CleanerPreprocessor.class).to(TextPreprocessorImpl.class);
                 bind(WatcherService.class).to(WatcherServiceImpl.class);
-                bind(CopybookReferenceRepo.class).toInstance(new CopybookReferenceRepoImpl());
                 bind(DialectDiscoveryService.class).to(ExplicitDialectDiscoveryService.class);
               }
             });

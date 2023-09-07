@@ -37,12 +37,11 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
-import org.eclipse.lsp.cobol.core.model.tree.*;
-import org.eclipse.lsp.cobol.core.model.tree.statements.SetToBooleanStatement;
-import org.eclipse.lsp.cobol.core.model.tree.statements.SetToOnOffStatement;
-import org.eclipse.lsp.cobol.core.model.tree.statements.SetUpDownByStatement;
+import org.eclipse.lsp.cobol.common.model.tree.statements.SetToBooleanStatement;
+import org.eclipse.lsp.cobol.common.model.tree.statements.SetToOnOffStatement;
+import org.eclipse.lsp.cobol.common.model.tree.statements.SetUpDownByStatement;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode.Builder;
-import org.eclipse.lsp.cobol.core.model.variables.DivisionType;
+import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
@@ -271,6 +270,42 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .fileDescriptionEntryClause(0)
             .globalClause()
             .isEmpty();
+  }
+
+  @Override
+  public List<Node> visitXmlParseStatement(XmlParseStatementContext ctx) {
+    VariableNameAndLocality identifier1 = new VariableNameAndLocality(
+            ctx.qualifiedDataName().getText(), retrieveLocality(ctx.qualifiedDataName()).orElse(null));
+
+    VariableNameAndLocality xmlValidatingContext = ofNullable(ctx.xmlValidating())
+            .map(c -> new VariableNameAndLocality(c.getText(), retrieveLocality(c).orElse(null)))
+            .orElse(null);
+
+    VariableNameAndLocality xmlNationalContext = ofNullable(ctx.xmlNational())
+            .map(c -> new VariableNameAndLocality(c.getText(), retrieveLocality(c).orElse(null)))
+            .orElse(null);
+
+    VariableNameAndLocality identifier2 = ofNullable(ctx.xmlValidating())
+            .map(XmlValidatingContext::qualifiedDataName)
+            .map(qualCtx -> new VariableNameAndLocality(qualCtx.getText(),
+                    retrieveLocality(qualCtx).orElse(null)))
+            .orElse(null);
+
+    VariableNameAndLocality encodingLocality = ofNullable(ctx.xmlEncoding()).map(ctx2 ->
+                    new VariableNameAndLocality(ctx2.integerLiteral().getText(), retrieveLocality(ctx2).orElse(null)))
+            .orElse(null);
+
+    return addTreeNode(
+            ctx,
+            locality ->
+                    new XMLParseNode(
+                            locality,
+                            identifier1,
+                            identifier2,
+                            encodingLocality,
+                            xmlValidatingContext,
+                            xmlNationalContext
+                    ));
   }
 
   /**
@@ -513,7 +548,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitExecSqlStatement(ExecSqlStatementContext ctx) {
-    areaBWarning(ctx);
     return Collections.emptyList();
   }
 
@@ -555,6 +589,18 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitEvaluateWhenOther(EvaluateWhenOtherContext ctx) {
     throwWarning(ctx.getStart());
     return addTreeNode(ctx, EvaluateWhenOtherNode::new);
+  }
+
+  @Override
+  public List<Node> visitDeprecatedCompilerOptions(DeprecatedCompilerOptionsContext ctx) {
+    retrieveLocality(ctx).ifPresent(locality -> errors.add(SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
+            .errorCode(() -> "IGYOS4003-E")
+            .location(locality.toOriginalLocation())
+            .suggestion(messageService.getMessage("compilerDirective.deprecatedDirectiveUse", ctx.getText()))
+            .severity(ErrorSeverity.ERROR)
+            .build()));
+    return Collections.emptyList();
   }
 
   @Override
@@ -792,6 +838,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     }
     if (ctx.SECTION() != null) {
       return addTreeNode(ctx, ExitSectionNode::new);
+    }
+    if (ctx.PARAGRAPH() != null) {
+      return addTreeNode(ctx, ExitParagraphNode::new);
     }
     return addTreeNode(ctx, ExitNode::new);
   }

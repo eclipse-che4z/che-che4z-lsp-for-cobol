@@ -20,13 +20,24 @@ export const TEST_TIMEOUT = 80000;
 
 export async function activate() {
   // The extensionId is `publisher.name` from package.json
-  const ext = vscode.extensions.getExtension(
+  const cobol = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support",
   )!;
-  if (ext.isActive) {
-    return;
+  if (!cobol.isActive) {
+    await cobol.activate();
   }
-  await ext.activate();
+  const idms = vscode.extensions.getExtension(
+    "BroadcomMFD.cobol-language-support-for-idms",
+  )!;
+  if (!idms.isActive) {
+    await idms.activate();
+  }
+  const daco = vscode.extensions.getExtension(
+    "BroadcomMFD.cobol-language-support-for-daco",
+  )!;
+  if (!daco.isActive) {
+    await daco.activate();
+  }
 }
 
 export function getWorkspacePath(): string {
@@ -43,19 +54,28 @@ export function get_editor(workspace_file: string): vscode.TextEditor {
   return editor;
 }
 
-export async function showDocument(workspace_file: string) {
+export async function getUri(workspace_file: string): Promise<vscode.Uri> {
   const files = await vscode.workspace.findFiles(workspace_file);
 
-  assert.ok(files && files[0]);
-  const file = files[0];
+  assert.ok(files && files[0], `Cannot find file ${workspace_file}`);
+  return files[0];
+}
 
+export async function showDocument(workspace_file: string) {
+  const file = await getUri(workspace_file);
   // open and show the file
   const document = await vscode.workspace.openTextDocument(file);
+  const editor = await vscode.window.showTextDocument(document);
 
-  await vscode.window.showTextDocument(document);
+  return editor;
 }
 
 export async function closeActiveEditor() {
+  const doc = vscode.window.activeTextEditor;
+  while (doc.document.isDirty) {
+    await vscode.commands.executeCommand("undo");
+    await sleep(100);
+  }
   await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
   await sleep(100);
 }
@@ -122,9 +142,10 @@ export async function waitFor(
   while (!(await Promise.resolve(doneFunc()))) {
     await sleep(100);
     if (Date.now() - startTime > timeout) {
-      return false
+      return false;
     }
   }
+  return true;
 }
 
 export function sleep(ms: number): Promise<unknown> {
@@ -258,4 +279,45 @@ export async function executeCommandMultipleTimes(
   for (let index = 0; index < times; index++) {
     await vscode.commands.executeCommand(command);
   }
+}
+
+export async function getWorkspaceFile(workspace_file: string) {
+  const files = await vscode.workspace.findFiles(workspace_file);
+
+  assert.ok(files && files[0], workspace_file);
+
+  return files[0];
+}
+
+export async function waitForDiagnosticsChange(file: string | vscode.Uri) {
+  const fileUri =
+    typeof file === "string" ? await getWorkspaceFile(file) : file;
+
+  const initialDiags = vscode.languages
+    .getDiagnostics(fileUri)
+    .map((x) => JSON.stringify(x))
+    .sort();
+
+  const result = new Promise<vscode.Diagnostic[]>((resolve) => {
+    let listener: vscode.Disposable | null =
+      vscode.languages.onDidChangeDiagnostics((e) => {
+        if (!listener) return;
+        const forFile = e.uris.find((v) => v.toString() === fileUri.toString());
+        if (!forFile) return;
+        const diags = vscode.languages.getDiagnostics(forFile);
+        if (
+          diags.length === initialDiags.length &&
+          diags
+            .map((x) => JSON.stringify(x))
+            .sort()
+            .every((x, i) => x === initialDiags[i])
+        )
+          return;
+        listener.dispose();
+        listener = null;
+        resolve(diags);
+      });
+  });
+
+  return result;
 }

@@ -42,6 +42,9 @@
           "copybook-file-encoding": {
             "type": "string",
             "description": "Copybook file encoding."
+          },
+          "compiler-options": {
+            "$ref": "compiler_options.schema.json"
           }
         }
       },

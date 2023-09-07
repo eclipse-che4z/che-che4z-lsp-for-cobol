@@ -18,11 +18,11 @@ import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.eclipse.lsp.cobol.common.model.Context;
-import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.Describable;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class VariableUsageNode extends Node implements Context, Describable {
+public class VariableUsageNode extends Node implements DefinedAndUsedStructure, Describable {
   private final String name;
   @EqualsAndHashCode.Exclude @ToString.Exclude private final List<VariableNode> definitions = new ArrayList<>();
   private final boolean isDefinitionMandatory;

@@ -397,6 +397,52 @@ class TestProcessCbl {
         "NOZWB");
   }
 
+  private static Stream<String> getDeprecatedOptions() {
+    return Stream.of(
+        "CPP",
+        "DATEPROC(FLAG ,TRIG)",
+        "DATEPROC(NOFLAG ,NOTRIG)",
+        "DATEPROC(FLAG ,TRIG)",
+        "DP(NOFLAG ,NOTRIG)",
+        "EPILOG",
+        "GDS",
+        "GRAPHIC",
+        "LEASM",
+        "LIB",
+        "LIN",
+        "MARGINS('test','test2')",
+        "NATLANG(CS)",
+        "NATLANG(EN)",
+        "NATLANG(KA)",
+        "NUMPROC(MIG)",
+        "NOCMPR2",
+        "NODATEPROC",
+        "NODP",
+        "NODE",
+        "NOEPILOG",
+        "NOFLAGMIG",
+        "NOGRAPHIC",
+        "NOLIB",
+        "NOOPSEQUENCE",
+        "NOOPTIMIZE",
+        "NOOPT",
+        "NOP",
+        "NOPROLOG",
+        "NOSTDTRUNC",
+        "NSEQ",
+        "OPMARGINS ('lo','as')",
+        "OPSEQUENCE('we','er')",
+        "OP",
+        "PROLOG",
+        "RES",
+        "SIZE(MAX)",
+        "SIZE('8')",
+        "SZ(MAX)",
+        "SZ('8')",
+        "YEARWINDOW('9999')",
+        "YW('9999')");
+  }
+
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
@@ -406,6 +452,22 @@ class TestProcessCbl {
   @MethodSource("getOptions")
   void testOption(String cblOption) {
     UseCaseEngine.runTest(PREFIX + cblOption + SUFFIX, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @ParameterizedTest
+  @MethodSource("getDeprecatedOptions")
+  void testDeprecatedOption(String cblOption) {
+    UseCaseEngine.runTest(
+        PREFIX + "{" + cblOption + "|1}" + SUFFIX,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                String.format("%s is a deprecated compiler directive", cblOption.replace(" ", "")),
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText(),
+                "IGYOS4003-E")));
   }
 
   @Test

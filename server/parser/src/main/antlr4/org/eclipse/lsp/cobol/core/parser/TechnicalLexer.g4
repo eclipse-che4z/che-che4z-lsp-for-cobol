@@ -23,10 +23,8 @@ ASTERISKCHAR : '*';
 DOUBLEASTERISKCHAR : '**';
 COLONCHAR : ':';
 COMMACHAR : ',';
-COMMENTTAG : '*>';
+COMMENTTAG : '*>' -> channel(COMMENTS);
 DOLLARCHAR : '$';
-DOUBLEQUOTE : '"';
-DOUBLEEQUALCHAR : '==';
 DOUBLEMORETHANCHAR : '>>';
 
 // period full stopPosition
@@ -40,11 +38,8 @@ MORETHANCHAR : '>';
 MORETHANOREQUAL : '>=';
 NOTEQUALCHAR : '<>';
 PLUSCHAR : '+';
-SEMICOLON_FS : ';' EOF?;
-SINGLEQUOTE : '\'';
 RPARENCHAR : ')';
 SLASHCHAR : '/';
-SQLLINECOMMENTCHAR: '--';
 
 // Special IF for dialect
 UNDERSCORECHAR : '_';
@@ -60,41 +55,26 @@ LEVEL_NUMBER_88 : '88';
 
 INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+ | LEVEL_NUMBER;
 
-SINGLEDIGITLITERAL : DIGIT;
-
 NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT_FS | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
 
 NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
 
-CHAR_STRING_CONSTANT : HEXNUMBER | STRINGLITERAL;
-
 IDENTIFIER : [a-zA-Z0-9][-_a-zA-Z0-9]*;
-COPYBOOK_IDENTIFIER : [a-zA-Z0-9#@$][-_a-zA-Z0-9#@$]*;
 FILENAME : IDENTIFIER+ '.' IDENTIFIER+;
-
-OCTDIGITS : OCT_DIGIT;
 HEX_NUMBERS : HEXNUMBER;
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
-COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(COMMENTS);
+COMMENTLINE : COMMENTTAG ~('\n' | '\r')* -> channel(COMMENTS);
 WS : [ \t\f]+ -> channel(HIDDEN);
 COMPILERLINE : DOUBLEMORETHANCHAR ~('\n' | '\r')* -> channel(HIDDEN);
-
-//SQL comments
-SQLLINECOMMENT
-	:	SQLLINECOMMENTCHAR ~[\r\n]* NEWLINE -> channel(HIDDEN)
-	;
 
 // treat all the non-processed tokens as errors
 ERRORCHAR : . ;
 
-ZERO_DIGIT: '0';
-
-
 fragment HEXNUMBER :
-	X '"' [0-9A-F]+ '"'
-	| X '\'' [0-9A-F]+ '\''
+	X '"' [0-9A-Fa-f]+ '"'
+	| X '\'' [0-9A-Fa-f]+ '\''
 ;
 
 fragment NULLTERMINATED :

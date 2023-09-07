@@ -37,8 +37,12 @@ public class ProcessingContext {
 
     final List<SyntaxError> errors;
     final VariableAccumulator variableAccumulator;
-    private final CompilerDirectiveContext compilerDirectiveContext = new CompilerDirectiveContext();
+    private final CompilerDirectiveContext compilerDirectiveContext;
     private final Map<String, JsonElement> dialectsConfig;
+
+    public ProcessingContext(List<SyntaxError> errors, VariableAccumulator variableAccumulator, Map<String, JsonElement> dialectsConfig) {
+        this(errors, variableAccumulator, new CompilerDirectiveContext(), dialectsConfig);
+    }
 
     /**
      * Register node type processor

@@ -11,8 +11,9 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-
+jest.mock("glob");
 import {
+  loadProcessorGroupCompileOptionsConfig,
   loadProcessorGroupCopybookEncodingConfig,
   loadProcessorGroupCopybookExtensionsConfig,
   loadProcessorGroupCopybookPaths,
@@ -20,23 +21,25 @@ import {
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
 } from "../../services/ProcessorGroups";
+import { globSync } from "glob";
 
 const WORKSPACE_URI = "file:///my/workspace";
 
 jest.mock("fs", () => ({
   existsSync: jest.fn().mockReturnValue(true),
   readFileSync: jest.fn().mockImplementation((f) => {
-    if (f == "procCfgPath") {
+    if (f === "procCfgPath") {
       return `{
                 "pgroups": [
                     { 
                         "name": "DAF",
                         "copybook-extensions": [".copy"],
                         "copybook-file-encoding": "UTF-8",
+                        "compiler-options": ["QUALIFY(EXTEND)","XMLPARSE(COMPAT)"],
                         "preprocessor": [
                             "IDMS",
                             { 
-                                "name": "DaCo", 
+                                "name": "DaCo",
                                 "libs": ["/daco"]
                             },
                             {
@@ -57,7 +60,7 @@ jest.mock("fs", () => ({
                 ]
             }`;
     }
-    if (f == "pgmCfgPath") {
+    if (f === "pgmCfgPath") {
       return `{
                 "pgms": [ 
                     { "program": "/my/workspace/abs/TEST.cob", "pgroup": "ABS" },
@@ -77,6 +80,9 @@ jest.mock("vscode", () => ({
       return {
         fsPath: str.substring("file://".length),
       };
+    }),
+    file: jest.fn().mockImplementation((str: string) => {
+      return { fsPath: str };
     }),
   },
   workspace: {
@@ -111,8 +117,12 @@ it("Processor groups configuration provides lib path", () => {
     scopeUri: WORKSPACE_URI + "/TEST.cob",
     section: "cobol-lsp.cpy-manager.paths-local",
   };
+  (globSync as any) = jest.fn().mockImplementation((config: string[]) => {
+    if (config[0] === "/copy") return ["/copy-resolved-from-glob"];
+    else throw Error("some issue with input param");
+  });
   const result = loadProcessorGroupCopybookPathsConfig(item, []);
-  expect(result).toStrictEqual(["/copy"]);
+  expect(result).toStrictEqual(["/copy-resolved-from-glob"]);
 });
 
 it("Processor groups configuration understend absolute paths", () => {
@@ -120,8 +130,12 @@ it("Processor groups configuration understend absolute paths", () => {
     scopeUri: WORKSPACE_URI + "/abs/TEST.cob",
     section: "cobol-lsp.cpy-manager.paths-local",
   };
+  (globSync as any) = jest.fn().mockImplementation((config: string[]) => {
+    if (config[0] === "/abs") return ["/copy-resolved-from-glob"];
+    else throw Error("some issue with input param");
+  });
   const result = loadProcessorGroupCopybookPathsConfig(item, []);
-  expect(result).toStrictEqual(["/abs"]);
+  expect(result).toStrictEqual(["/copy-resolved-from-glob"]);
 });
 
 it("Processor groups configuration provides copybook-extensions", () => {
@@ -193,4 +207,13 @@ it("Processor groups configuration mismatches program with *", () => {
   };
   const result = loadProcessorGroupDialectConfig(item, {});
   expect(result).toStrictEqual({});
+});
+
+it("Processor groups configuration provides compiler-options", () => {
+  const item = {
+    scopeUri: WORKSPACE_URI + "/TEST.cob",
+    section: "cobol-lsp.compiler.options",
+  };
+  const result = loadProcessorGroupCompileOptionsConfig(item, "");
+  expect(result).toStrictEqual(["QUALIFY(EXTEND)", "XMLPARSE(COMPAT)"]);
 });

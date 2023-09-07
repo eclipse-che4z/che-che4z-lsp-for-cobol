@@ -56,6 +56,9 @@ public class UseCase {
   /** Dialects config */
   @Builder.Default Map<String, JsonElement> dialectsSettings = ImmutableMap.of();
 
+  /** Compile options config */
+  @Builder.Default List<String> compilerOptions = Collections.emptyList();
+
   @Builder.Default boolean cicsTranslator = true;
   /**
    * Get the {@link AnalysisConfig} using the specified processing mode and the {@link SQLBackend}
@@ -64,12 +67,14 @@ public class UseCase {
    * @return CopybookConfig for the analysis
    */
   public AnalysisConfig getAnalysisConfig() {
-    return new AnalysisConfig(
-        new CopybookConfig(copybookProcessingMode, sqlBackend),
-        features,
-        dialects,
-        cicsTranslator,
-        ImmutableList.of(),
-        dialectsSettings);
+    AnalysisConfig analysisConfig = new AnalysisConfig(
+            new CopybookConfig(copybookProcessingMode, sqlBackend),
+            features,
+            dialects,
+            cicsTranslator,
+            ImmutableList.of(),
+            dialectsSettings);
+    analysisConfig.getCompilerOptions().addAll(compilerOptions);
+    return analysisConfig;
   }
 }

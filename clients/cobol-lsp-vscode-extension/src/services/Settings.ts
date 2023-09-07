@@ -30,10 +30,13 @@ import {
   SETTINGS_SUBROUTINE_LOCAL_KEY,
   SETTINGS_TAB_CONFIG,
   SETTINGS_SQL_BACKEND,
+  SETTINGS_COMPILE_OPTIONS,
+  DIALECT_LIBS,
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import {
+  loadProcessorGroupCompileOptionsConfig,
   loadProcessorGroupCopybookEncodingConfig,
   loadProcessorGroupCopybookExtensionsConfig,
   loadProcessorGroupCopybookPaths,
@@ -117,6 +120,12 @@ export function configHandler(request: any): Array<any> {
             cfg as string[],
           );
           result.push(object);
+        } else if (item.section === DIALECT_LIBS && !!item.dialect) {
+          const dialectLibs = SettingsService.getCopybookLocalPath(
+            item.scopeUri,
+            item.dialect,
+          );
+          result.push(dialectLibs);
         } else if (item.section === SETTINGS_CPY_EXTENSIONS) {
           const object = loadProcessorGroupCopybookExtensionsConfig(
             item,
@@ -131,6 +140,12 @@ export function configHandler(request: any): Array<any> {
           result.push(object);
         } else if (item.section === SETTINGS_CPY_FILE_ENCODING) {
           const object = loadProcessorGroupCopybookEncodingConfig(
+            item,
+            cfg as string,
+          );
+          result.push(object);
+        } else if (item.section === SETTINGS_COMPILE_OPTIONS) {
+          const object = loadProcessorGroupCompileOptionsConfig(
             item,
             cfg as string,
           );
@@ -347,13 +362,11 @@ export class SettingsService {
       const pathList: string[] = vscode.workspace
         .getConfiguration(SETTINGS_CPY_SECTION)
         .get(`${dialectType.toLowerCase()}.${section}`);
-      if (pathList && pathList.length > 0) {
-        return SettingsService.evaluateVariable(
-          pathList,
-          "fileBasenameNoExtension",
-          programFile,
-        );
-      }
+      return SettingsService.evaluateVariable(
+        pathList,
+        "fileBasenameNoExtension",
+        programFile,
+      );
     }
     const pathList: string[] = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)

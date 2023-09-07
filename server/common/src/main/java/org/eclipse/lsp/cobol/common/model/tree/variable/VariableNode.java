@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
-import org.eclipse.lsp.cobol.common.model.Context;
+import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
@@ -42,7 +42,7 @@ import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE_DEFINITION_NA
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public abstract class VariableNode extends Node implements Context {
+public abstract class VariableNode extends Node implements DefinedAndUsedStructure {
 
   public static final String PREFIX = "  ";
   private final VariableType variableType;

@@ -84,6 +84,7 @@ class CachingConfigurationServiceTest {
             subroutines,
             new JsonPrimitive("true"),
             new JsonArray(),
+            new JsonArray(),
             predefinedParagraphs);
 
     when(settingsService.fetchConfigurations("",
@@ -94,6 +95,7 @@ class CachingConfigurationServiceTest {
                 SUBROUTINE_LOCAL_PATHS.label,
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
+                COMPILER_OPTIONS.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
 
@@ -130,6 +132,7 @@ class CachingConfigurationServiceTest {
             subroutineSettings,
             new JsonNull(),
             new JsonArray(),
+             new JsonArray(),
             dialectsSettings);
     when(settingsService.fetchConfigurations("",
             Arrays.asList(
@@ -139,6 +142,7 @@ class CachingConfigurationServiceTest {
                 SUBROUTINE_LOCAL_PATHS.label,
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
+                COMPILER_OPTIONS.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
 
@@ -154,5 +158,32 @@ class CachingConfigurationServiceTest {
             ImmutableList.of(),
             ImmutableMap.of("dialect", dialectsSettings)),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));
+  }
+
+  @Test
+  void testFetchingListConfiguration() {
+    String expectedValue = "list-of-some-values-from-client";
+    String documentUri = "documentUri";
+    String section = "settings-section";
+    SettingsService settingsService = mock(SettingsService.class);
+    when(settingsService.fetchTextConfigurationWithScope(documentUri, section))
+            .thenReturn(CompletableFuture.completedFuture(ImmutableList.of(expectedValue)));
+    DialectService dialectService = mock(DialectService.class);
+    CachingConfigurationService configuration = new CachingConfigurationService(settingsService, dialectService);
+    configuration.getListConfiguration(documentUri, section)
+            .whenComplete((result, ex) -> {
+              assertEquals(result.size(), 1);
+              assertEquals(result.get(0), expectedValue);
+            });
+  }
+
+  @Test
+  void testGetDialectWatchingFolders() {
+    SettingsService settingsService = mock(SettingsService.class);
+    DialectService dialectService = mock(DialectService.class);
+    String expectedResult = "dialect-watch-folders";
+    when(dialectService.getWatchingFolderSettings()).thenReturn(ImmutableList.of(expectedResult));
+    CachingConfigurationService configuration = new CachingConfigurationService(settingsService, dialectService);
+    assertEquals(configuration.getDialectWatchingFolders().get(0), expectedResult);
   }
 }

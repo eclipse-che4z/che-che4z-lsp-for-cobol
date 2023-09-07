@@ -16,7 +16,13 @@ import * as fs from "fs";
 import * as path from "path";
 import { Minimatch } from "minimatch";
 import { SettingsUtils } from "./util/SettingsUtils";
+import { globSync } from "glob";
 import { Uri } from "vscode";
+import {
+  backwardSlashRegex,
+  cleanWorkspaceFolder,
+  normalizePath,
+} from "./util/FSUtils";
 
 const PROCESSOR_GROUP_FOLDER = ".cobolplugin";
 const PROCESSOR_GROUP_PGM = "pgm_conf.json";
@@ -38,10 +44,20 @@ export function loadProcessorGroupCopybookPathsConfig(
   item: { scopeUri: string },
   configObject: string[],
 ): string[] {
-  return [
+  const config = [
     ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]),
     ...configObject,
   ];
+  return SettingsUtils.getWorkspaceFoldersPath(true)
+    .map((folder) =>
+      globSync(
+        config.map((ele) => ele.replace(backwardSlashRegex, "/")),
+        { cwd: cleanWorkspaceFolder(folder) },
+      ).map((s) => normalizePath(s)),
+    )
+    .reduce((acc, curVal) => {
+      return acc.concat(curVal);
+    }, []);
 }
 
 export function loadProcessorGroupCopybookExtensionsConfig(
@@ -62,6 +78,17 @@ export function loadProcessorGroupCopybookEncodingConfig(
   return loadProcessorGroupSettings(
     item.scopeUri,
     "copybook-file-encoding",
+    configObject,
+  );
+}
+
+export function loadProcessorGroupCompileOptionsConfig(
+  item: { scopeUri: string },
+  configObject: string,
+): string {
+  return loadProcessorGroupSettings(
+    item.scopeUri,
+    "compiler-options",
     configObject,
   );
 }
@@ -202,7 +229,7 @@ function loadProcessorsConfig(
 
   let result = undefined;
   procCfg.pgroups.forEach((p) => {
-    if (pgroup == p.name) {
+    if (pgroup === p.name) {
       result = p;
       return;
     }
@@ -218,7 +245,7 @@ function loadProcessorGroupSettings<T>(
 ): T | undefined {
   try {
     const pgCfg = loadProcessorsConfig(scopeUri);
-    if (pgCfg == undefined) {
+    if (pgCfg === undefined) {
       return configObject;
     }
 

@@ -76,7 +76,7 @@ class ExtendedDocumentTest {
     assertEquals(copybookUri, location.getUri());
 
     location = document.mapLocation(new Range(new Position(8, 8), new Position(8, 16)));
-    assertEquals(new Range(new Position(5, 8), new Position(5, 16)).toString(), location.getRange().toString());
+    assertEquals(new Range(new Position(4, 8), new Position(4, 16)).toString(), location.getRange().toString());
     assertEquals(documentUri, location.getUri());
   }
 

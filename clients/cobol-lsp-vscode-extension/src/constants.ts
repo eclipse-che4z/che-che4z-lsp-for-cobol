@@ -20,12 +20,14 @@ export const SETTINGS_CPY_FILE_ENCODING: string =
   "cobol-lsp.cpy-manager.copybook-file-encoding";
 export const SETTINGS_SQL_BACKEND: string = "cobol-lsp.target-sql-backend";
 export const SETTINGS_DIALECT = "cobol-lsp.dialects";
+export const SETTINGS_COMPILE_OPTIONS = "cobol-lsp.compiler.options";
 export const SETTINGS_SUBROUTINE_LOCAL_KEY =
   "cobol-lsp.subroutine-manager.paths-local";
 export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";
 
 export const SERVER_PORT = "cobol-lsp.server.port";
 export const SERVER_RUNTIME = "cobol-lsp.serverRuntime";
+export const DIALECT_LIBS = "cobol-lsp.dialect.libs";
 export const PATHS_LOCAL_KEY = "paths-local";
 export const PATHS_ZOWE = "paths-dsn";
 export const PATHS_USS = "paths-uss";

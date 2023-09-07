@@ -16,6 +16,8 @@
 package org.eclipse.lsp.cobol.service;
 
 import lombok.NonNull;
+import org.eclipse.lsp4j.WorkspaceFolder;
+
 import java.util.List;
 
 /**
@@ -28,9 +30,6 @@ public interface WatcherService {
   /** Subscribe to notifications that the settings.json changed */
   void watchConfigurationChange();
 
-  /** Watch all types of file system changes in .copybooks folder */
-  void watchPredefinedFolder();
-
   /**
    * Watch all types of file system changes in folders with given paths relative to workspace folder
    *
@@ -39,12 +38,12 @@ public interface WatcherService {
   void addWatchers(@NonNull List<String> paths);
 
   /**
-   * Watch all types of file system changes in folders with given paths relative to workspace folder
+   * Add Watchers for all types of file system changes for the copybooks specific to a document.
+   * This includes dialects watching folders.
    *
-   * @param paths - folders inside workspace to watch
    * @param documentUri - documents for which specified path need to be watched.
    */
-  void addRuntimeWatchers(@NonNull List<String> paths, String documentUri);
+  void addRuntimeWatchers(String documentUri);
 
   /**
    * Stop watching all types of file system changes in folders with given paths relative to
@@ -68,4 +67,13 @@ public interface WatcherService {
    */
   @NonNull
   List<String> getWatchingFolders();
+
+
+  /**
+   * Get a list of all workspace associated with this watcher
+   *
+   * @return a list of paths
+   */
+  @NonNull
+  List<WorkspaceFolder> getWorkspaceFolders();
 }

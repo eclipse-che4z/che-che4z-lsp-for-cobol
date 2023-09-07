@@ -30,7 +30,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
  * <pre>
  *  Case 1.
  *    Working-Storage Section.
- *    01 FOO POINTER GLOBAL.   <-- This is valid. Here FOO node has
+ *    01 FOO POINTER GLOBAL.   {- This is valid. Here FOO node has
  *    01 FOO2 pointer GLOBAL.       only 1 children of node type
  *    Procedure Division.           VARIABLE_DEFINITION_NAME. Which should not
  *                                  be considered for empty structure.
@@ -39,7 +39,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
  * <pre>
  *    Case 2.
  *       WORKING-STORAGE SECTION.
- *       01 PARENT.    <--- This is invalid
+ *       01 PARENT.    {--- This is invalid
  *       PROCEDURE DIVISION.
  * </pre>
  */

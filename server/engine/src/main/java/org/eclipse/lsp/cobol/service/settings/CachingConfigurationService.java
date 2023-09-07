@@ -51,7 +51,8 @@ public class CachingConfigurationService implements ConfigurationService {
         DIALECTS.label,
         SUBROUTINE_LOCAL_PATHS.label,
         CICS_TRANSLATOR_ENABLED.label,
-        DIALECT_REGISTRY.label));
+        DIALECT_REGISTRY.label,
+        COMPILER_OPTIONS.label));
 
     List<String> dialectsSections = dialectService.getSettingsSections();
     settingsList.addAll(dialectsSections);
@@ -99,6 +100,16 @@ public class CachingConfigurationService implements ConfigurationService {
     return ImmutableList.of();
   }
 
+  @Override
+  public CompletableFuture<List<String>> getListConfiguration(String documentUri, String section) {
+    return settingsService.fetchTextConfigurationWithScope(documentUri, section);
+  }
+
+  @Override
+  public List<String> getDialectWatchingFolders() {
+    return dialectService.getWatchingFolderSettings();
+  }
+
   private ConfigurationEntity parseConfig(List<Object> clientConfig, List<String> dialectsSections) {
     return Optional.ofNullable(clientConfig)
         .map(cc -> this.parseSettings(cc, dialectsSections))
@@ -114,7 +125,8 @@ public class CachingConfigurationService implements ConfigurationService {
             ConfigHelper.parseSubroutineFolder((JsonElement) clientConfig.get(3)),
             ConfigHelper.parseCicsTranslatorOption((JsonElement) clientConfig.get(4)),
             ConfigHelper.parseDialectRegistry((JsonArray) clientConfig.get(5)),
-        getDialectsSettings(clientConfig.subList(6, 6 + dialectsSections.size()).toArray(), dialectsSections.toArray())
+            ConfigHelper.parseCompilerOptions(clientConfig.get(6)),
+        getDialectsSettings(clientConfig.subList(7, 7 + dialectsSections.size()).toArray(), dialectsSections.toArray())
         );
   }
 

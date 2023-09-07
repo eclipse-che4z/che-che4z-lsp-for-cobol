@@ -32,6 +32,35 @@ compilerXOpts
    : XOPTS LPARENCHAR compilerXOptsOption (commaSeparator? compilerXOptsOption)* RPARENCHAR
    ;
 
+deprecatedCompilerOptions:
+            CPP
+           | (DATEPROC | DP) (LPARENCHAR (FLAG | NOFLAG)? COMMACHAR? (TRIG | NOTRIG)? RPARENCHAR)?
+           | EPILOG
+           | GDS | GRAPHIC
+           | LEASM | LIB | LIN
+           | MARGINS LPARENCHAR literal COMMACHAR literal (COMMACHAR literal)? RPARENCHAR
+           | NATLANG LPARENCHAR (CS | EN | KA) RPARENCHAR
+           | NUMPROC LPARENCHAR MIG RPARENCHAR
+           | NOCMPR2
+           | (NODATEPROC | NODP)
+           | NODE
+           | NOEPILOG
+           | NOFLAGMIG
+           | NOGRAPHIC
+           | NOLIB
+           | NOOPSEQUENCE
+           | (NOOPTIMIZE | NOOPT)
+           | NOP | NOPROLOG
+           | NOSTDTRUNC
+           | NSEQ
+           | OPMARGINS LPARENCHAR literal COMMACHAR literal (COMMACHAR literal)? RPARENCHAR
+           | OPSEQUENCE LPARENCHAR literal COMMACHAR literal RPARENCHAR
+           | OP
+           | PROLOG
+           | RES
+           | (SIZE | SZ) LPARENCHAR (MAX | literal) RPARENCHAR
+           | (YEARWINDOW | YW) LPARENCHAR literal RPARENCHAR
+        ;
 compilerXOptsOption
     : APOST |
       CBLCARD |
@@ -163,7 +192,7 @@ compilerOption
    | (XREF | X_CHAR) (LPARENCHAR (FULL | SHORT) RPARENCHAR)? | NOXREF | NOX
    | (ZONECHECK | ZC) LPARENCHAR (MSG | ABD) RPARENCHAR | NOZONECHECK | NOZC
    | (ZONEDATA | ZD) LPARENCHAR (PFD | MIG | NOPFD) RPARENCHAR
-   | ZWB | NOZWB
+   | ZWB | NOZWB | deprecatedCompilerOptions
    ;
 
 commaSeparator: COMMACHAR | COMMASEPARATOR;
@@ -269,7 +298,7 @@ environmentDivision
    ;
 
 environmentDivisionBody
-   : configurationSection | inputOutputSection | dialectSection | dacoControlSection
+   : configurationSection | inputOutputSection | dialectSection
    ;
 
 // -- configuration section ----------------------------------
@@ -642,7 +671,7 @@ recordContainsTo
    ;
 
 labelRecordsClause
-   : LABEL (RECORD IS? | RECORDS ARE?) (OMITTED | STANDARD | dataName*)
+   : LABEL (RECORD | RECORDS) (IS | ARE)? (OMITTED | STANDARD | dataName*)
    ;
 
 valueOfClause
@@ -654,7 +683,7 @@ valuePair
    ;
 
 dataRecordsClause
-   : DATA (RECORD IS? | RECORDS ARE?) qualifiedDataName+
+   : DATA (RECORD | RECORDS) (IS | ARE)? qualifiedDataName+
    ;
 
 linageClause
@@ -707,7 +736,12 @@ linkageSection
 // -- local storage section ----------------------------------
 
 localStorageSection
-   : LOCAL_STORAGE SECTION DOT_FS dataDescriptionEntries
+   : LOCAL_STORAGE SECTION DOT_FS dataDescriptionEntryForLocalStorageSection*
+   ;
+
+dataDescriptionEntryForLocalStorageSection
+   : execSqlStatementInLocalStorage
+   | dataDescriptionEntry
    ;
 
 dataDescriptionEntries
@@ -767,7 +801,7 @@ dialectDescriptionEntry
    ;
 
 entryName
-   : (FILLER | dataName)
+   : (FILLER | { validateLength(_input.LT(1).getText(), "variable name", 30);} dataName)
    ;
 
 dataGroupUsageClause
@@ -958,21 +992,21 @@ paragraph
    ;
 
 sentence
-   : statement* (endClause | dialectStatement)
+   : (statement | execSqlStatementInProcedureDivision) * (endClause | dialectStatement)
    ;
 
 conditionalStatementCall
-   : statement | dialectStatement
+   : statement | dialectStatement | execSqlStatementInProcedureDivision
    ;
 
 statement
    : acceptStatement | addStatement | allocateStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
     disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement |
-    execSqlStatementInProcedureDivision | execSqlImsStatement | exitStatement | freeStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
+    execSqlImsStatement | exitStatement | freeStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
     serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | unstringStatement | writeStatement | xmlStatement | jsonStatement
+    terminateStatement | unstringStatement | writeStatement | xmlParseStatement | jsonStatement
    ;
 
 jsonStatement
@@ -1032,22 +1066,13 @@ json_phrases: ZERO | ZEROES | ZEROS | SPACE | SPACES | LOW_VALUE | LOW_VALUES | 
 
 json_gen_phrase1: jsonGenIdentifier6 TO? JSON? (BOOLEAN |  BOOL) USING? (jsonGenConditionName | literal);
 
-dialectStatement
-   : dialectNodeFiller | dialectIfStatment
-   ;
-
-// DAF DaCo Statements
-
-dacoControlSection
-    : DACO_CONTROL SECTION
-    ;
-
-// End of DaCo Statements
-
 // accept statement
-
 acceptStatement
    : ACCEPT generalIdentifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?
+   ;
+
+dialectStatement
+   : dialectNodeFiller | dialectIfStatment
    ;
 
 acceptFromDateStatement
@@ -1131,7 +1156,7 @@ constantName
    ;
 
 callUsingPhrase
-   : USING callUsingParameter (COMMACHAR? callUsingParameter)*
+   : USING callUsingParameter (commaSeparator? callUsingParameter)*
    ;
 
 callUsingParameter
@@ -1352,6 +1377,8 @@ evaluateValue
 // exec cics statement
 execCicsStatement
    : EXEC CICS cicsRules END_EXEC
+   | {notifyError("cobolParser.missingEndExec");} EXEC CICS cicsRules
+   | {notifyError("cobolParser.missingEndExec");} EXEC CICS
    ;
 
 cicsRules
@@ -1367,6 +1394,10 @@ execSqlStatementInWorkingStorage
    : execSqlStatement DOT_FS?
    ;
 
+execSqlStatementInLocalStorage
+   : execSqlStatement DOT_FS?
+   ;
+
 execSqlStatementInWorkingStorageAndLinkageSection
    : execSqlStatement DOT_FS?
    ;
@@ -1377,6 +1408,8 @@ execSqlStatementInDataDivision
 
 execSqlStatement
    : EXEC SQL sqlCode END_EXEC
+   | {notifyError("cobolParser.missingEndExec");} EXEC SQL sqlCode
+   | {notifyError("cobolParser.missingEndExec");} EXEC SQL
    ;
 
 sqlCode
@@ -2165,8 +2198,8 @@ writeNotAtEndOfPagePhrase
 
 // xml statement
 
-xmlStatement
-   : XML PARSE generalIdentifier xmlEncoding? xmlNational? xmlValidating? xmlProcessinProcedure xmlThru? onExceptionClause? notOnExceptionClause? END_XML?
+xmlParseStatement
+   : XML PARSE qualifiedDataName xmlEncoding? xmlNational? xmlValidating? xmlProcessinProcedure xmlThru? onExceptionClause? notOnExceptionClause? END_XML?
    ;
 
 xmlEncoding
@@ -2178,7 +2211,7 @@ xmlNational
    ;
 
 xmlValidating
-   : VALIDATING WITH? (generalIdentifier | FILE literal)
+   : VALIDATING WITH? (qualifiedDataName | FILE literal)
    ;
 
 xmlThru
@@ -2478,7 +2511,9 @@ basis
    ;
 
 cobolWord
-   : IDENTIFIER | cobolCompilerDirectivesKeywords | cobolKeywords | cicsTranslatorCompileDirectivedKeywords
+   : IDENTIFIER | SYMBOL
+   | cobolCompilerDirectivesKeywords | cobolKeywords
+   | cicsTranslatorCompileDirectivedKeywords | cics_conditions
    ;
 
 cicsTranslatorCompileDirectivedKeywords
@@ -2488,6 +2523,8 @@ cicsTranslatorCompileDirectivedKeywords
 cobolKeywords
    : ADDRESS | BOTTOM | COUNT | CR | FIELD | FIRST | MMDDYYYY | PRINTER | DAY | TIME | DATE | DAY_OF_WEEK
    | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | TOP | YEAR | YYYYDDD | YYYYMMDD | WHEN_COMPILED
+   | DISK | KEYBOARD | PORT | READER | REMOTE | VIRTUAL | LIBRARY | DEFINITION | PARSE | BOOL | ESCAPE | INITIALIZED
+   | LOC | BYTITLE | BYFUNCTION | ABORT | ORDERLY | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | CLOSE
    ;
 
 cobolCompilerDirectivesKeywords
@@ -2527,8 +2564,13 @@ cobolCompilerDirectivesKeywords
     | VBREF | VLR | VOLATILE | VS | VSAMOPENFS
     | W_CHAR | WD | WORD
     | X_CHAR | XMLPARSE | XMLSS | XP | XREF
-    | ZC | ZD | ZLEN | ZON | ZONECHECK | ZONEDATA | ZWB
+    | ZC | ZD | ZLEN | ZON | ZONECHECK | ZONEDATA | ZWB | deprecatedCompilerDirectivesKeywords
     ;
+
+deprecatedCompilerDirectivesKeywords:
+     EPILOG | NOCMPR2 | NOTRIG | CPP | DATEPROC | DP | GDS | GRAPHIC | KA | LEASM | LIB | LIN | MARGINS | NODE
+     | NODATEPROC | NODP | NOEPILOG | NOFLAGMIG | NOGRAPHIC | NOLIB | NOOPSEQUENCE | NOOPT | NOOPTIMIZE | NOP
+     | NOPROLOG | NOSTDTRUNC | NSEQ | OP | OPMARGINS | OPSEQUENCE | PROLOG| RES | SZ | TRIG | YEARWINDOW | YW;
 
 dialectNodeFiller
     : ZERO_WIDTH_SPACE+
