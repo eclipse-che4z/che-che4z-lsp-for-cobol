@@ -12,23 +12,26 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
+package org.eclipse.lsp.cobol.common.model.tree;
 
-package org.eclipse.lsp.cobol.core.model.tree;
-
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
+import org.eclipse.lsp.cobol.common.model.FileOperationKind;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 
-/**
- * File operation statement Nodes , namely READ_STATEMENT, WRITE_STATEMENT, I_O_STATEMENT, EXTEND
- */
-public class FileOperationStatementNode extends StatementNode {
-  @Getter private final VariableNameAndLocality filename;
+/** Open Statement node */
+@ToString(callSuper = true)
+@Getter
+@EqualsAndHashCode(callSuper = true)
+public class OpenStatementNode extends FileOperationStatementNode {
+  private FileOperationKind fileOperationKind;
 
-  public FileOperationStatementNode(Locality locality, VariableNameAndLocality filename, NodeType nodeType) {
-    super(locality, nodeType);
-    this.filename = filename;
+  public OpenStatementNode(
+          Locality locality, VariableNameAndLocality filename, FileOperationKind fileOperationKind) {
+    super(locality, filename, NodeType.OPEN_STATEMENT);
+    this.fileOperationKind = fileOperationKind;
   }
 }
