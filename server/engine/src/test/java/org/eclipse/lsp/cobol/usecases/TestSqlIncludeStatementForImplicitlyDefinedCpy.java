@@ -36,112 +36,151 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
  */
 class TestSqlIncludeStatementForImplicitlyDefinedCpy {
   private static final String TEXT_BACKEND_DB2 =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. HELLO-DB2.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "           EXEC SQL INCLUDE {~SQLCA} END-EXEC.\n"
-          + "           EXEC SQL INCLUDE {~SQLDA} END-EXEC.\n"
-          + "       PROCEDURE DIVISION.\n"
-          + "           MOVE 23 TO {$SQLCAID}  OF  {$SQLCA}.\n"
-          + "           MOVE 63 TO {$SQLCABC} OF  {$SQLCA}.\n"
-          + "           MOVE 00 TO {$SQLCODE} OF  {$SQLCA}.\n"
-          + "           MOVE 144 TO {$SQLN} OF  {$SQLDA}.\n"
-          + "           MOVE 200 TO {$SQLD} OF  {$SQLDA}.\n"
-          + "           IF {$SQLCODE} = ZERO  THEN  DISPLAY \"SUCCESS SQLCODE = \" {$SQLCODE}\n "
-          + "           ELSE DISPLAY \" FAIL SQLEXT = \"  {$SQLEXT}.\n"
-          + "           DISPLAY  {$SQLCABC} .\n"
-          + "           DISPLAY  {$SQLERRMC}.\n"
-          + "           DISPLAY  {$SQLN}.\n"
-          + "           DISPLAY  {$SQLD}.\n";
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. HELLO-DB2.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "           EXEC SQL INCLUDE {~SQLCA} END-EXEC.\n"
+                  + "           EXEC SQL INCLUDE {~SQLDA} END-EXEC.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           MOVE 23 TO {$SQLCAID}  OF  {$SQLCA}.\n"
+                  + "           MOVE 63 TO {$SQLCABC} OF  {$SQLCA}.\n"
+                  + "           MOVE 00 TO {$SQLCODE} OF  {$SQLCA}.\n"
+                  + "           MOVE 144 TO {$SQLN} OF  {$SQLDA}.\n"
+                  + "           MOVE 200 TO {$SQLD} OF  {$SQLDA}.\n"
+                  + "           IF {$SQLCODE} = ZERO  THEN  DISPLAY \"SUCCESS SQLCODE = \" {$SQLCODE}\n "
+                  + "           ELSE DISPLAY \" FAIL SQLEXT = \"  {$SQLEXT}.\n"
+                  + "           DISPLAY  {$SQLCABC} .\n"
+                  + "           DISPLAY  {$SQLERRMC}.\n"
+                  + "           DISPLAY  {$SQLN}.\n"
+                  + "           DISPLAY  {$SQLD}.\n";
 
   private static final String TEXT_BACKEND_DATACOM =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. HELLO-DB2.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "           EXEC SQL INCLUDE {~SQLCA} END-EXEC.\n"
-          + "           EXEC SQL INCLUDE {~SQLDA} END-EXEC.\n"
-          + "       PROCEDURE DIVISION.\n"
-          + "           MOVE 23 TO {$SQLCA-DB-VRS}  OF  {$SQLCA}.\n"
-          + "           MOVE 00 TO {$SQLCA-SQLCODE} OF  {$SQLCA}.\n"
-          + "           MOVE 44 TO {$SQLCA-ERROR-PGM} OF  {$SQLCA}.\n"
-          + "           MOVE 144 TO {$SQLN} OF  {$SQLDA}.\n"
-          + "           MOVE 200 TO {$SQLD} OF  {$SQLDA}.\n"
-          + "           IF {$SQLCA-SQLCODE} = ZERO  THEN \n"
-          + "               DISPLAY \"SUCCESS CODE = \" {$SQLCA-SQLCODE} \n"
-          + "           ELSE DISPLAY \" FAIL CODE = \"  {$SQLCA-ERROR-PGM}.\n"
-          + "           DISPLAY  {$SQLCA-DB-VRS} .\n"
-          + "           DISPLAY  {$SQLN}.\n"
-          + "           DISPLAY  {$SQLD}.\n";
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. HELLO-DB2.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "           EXEC SQL INCLUDE {~SQLCA} END-EXEC.\n"
+                  + "           EXEC SQL INCLUDE {~SQLDA} END-EXEC.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           MOVE 23 TO {$SQLCA-DB-VRS}  OF  {$SQLCA}.\n"
+                  + "           MOVE 00 TO {$SQLCA-SQLCODE} OF  {$SQLCA}.\n"
+                  + "           MOVE 44 TO {$SQLCA-ERROR-PGM} OF  {$SQLCA}.\n"
+                  + "           MOVE 144 TO {$SQLN} OF  {$SQLDA}.\n"
+                  + "           MOVE 200 TO {$SQLD} OF  {$SQLDA}.\n"
+                  + "           IF {$SQLCA-SQLCODE} = ZERO  THEN \n"
+                  + "               DISPLAY \"SUCCESS CODE = \" {$SQLCA-SQLCODE} \n"
+                  + "           ELSE DISPLAY \" FAIL CODE = \"  {$SQLCA-ERROR-PGM}.\n"
+                  + "           DISPLAY  {$SQLCA-DB-VRS} .\n"
+                  + "           DISPLAY  {$SQLN}.\n"
+                  + "           DISPLAY  {$SQLD}.\n";
 
   private static final String TEXT_ERR_PRG =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. HELLO-DB2.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "           EXEC SQL INCLUDE {~SQLCA} END-EXEC.\n"
-          + "           EXEC SQL INCLUDE {~SQLDA} END-EXEC.\n"
-          + "       PROCEDURE DIVISION.\n"
-          + "           MOVE 23 TO {$SQLCABC}  OF  {$SQLCA}.\n"
-          + "           MOVE 63 TO {$SQLCABC} OF  {$SQLCA}.\n"
-          + "           MOVE 200 TO {$SQLD} OF  {$SQLDA}.\n"
-          + "           IF {SQLCODE|err1} = ZERO  THEN  DISPLAY \"SUCCESS  \"\n "
-          + "           ELSE DISPLAY \" FAILED \"  {SQLEXT|err2}.\n"
-          + "           DISPLAY  {$SQLCABC} .\n"
-          + "           DISPLAY  {$SQLD}.\n";
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. HELLO-DB2.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "           EXEC SQL INCLUDE {~SQLCA} END-EXEC.\n"
+                  + "           EXEC SQL INCLUDE {~SQLDA} END-EXEC.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           MOVE 23 TO {$SQLCABC}  OF  {$SQLCA}.\n"
+                  + "           MOVE 63 TO {$SQLCABC} OF  {$SQLCA}.\n"
+                  + "           MOVE 200 TO {$SQLD} OF  {$SQLDA}.\n"
+                  + "           IF {SQLCODE|err1} = ZERO  THEN  DISPLAY \"SUCCESS  \"\n "
+                  + "           ELSE DISPLAY \" FAILED \"  {SQLEXT|err2}.\n"
+                  + "           DISPLAY  {$SQLCABC} .\n"
+                  + "           DISPLAY  {$SQLD}.\n";
+
+  private static final String TEXT_BACKEND_DB2_IMPLICIT =
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. HELLO-DB2.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           IF {$SQLCODE} = ZERO  THEN  DISPLAY \"SUCCESS SQLCODE = \" {$SQLCODE}\n "
+                  + "           ELSE DISPLAY \" FAIL SQLEXT = \"  {$SQLEXT}.\n";
+
+  private static final String TEXT_BACKEND_DB2_2 =
+                    "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. HELLO-DB2.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       EXEC SQL\n"
+                  + "         INCLUDE {~SQLCA}\n"
+                  + "       END-EXEC.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           IF {$SQLCODE} = ZERO  THEN  DISPLAY \"SUCCESS SQLCODE = \" {$SQLCODE}\n "
+                  + "           ELSE DISPLAY \" FAIL SQLEXT = \"  {$SQLEXT}.\n";
 
   private static final String ERR_MESSAGE = "Variable %s is not defined";
 
   @Test
   void test1() {
     UseCaseEngine.runTest(
-        TEXT_BACKEND_DB2,
-        ImmutableList.of(),
-        ImmutableMap.of(),
-        ImmutableList.of(),
-        AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
+            TEXT_BACKEND_DB2,
+            ImmutableList.of(),
+            ImmutableMap.of(),
+            ImmutableList.of(),
+            AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
   }
 
   @Test
   void test2() {
     UseCaseEngine.runTest(
-        TEXT_BACKEND_DATACOM,
-        ImmutableList.of(),
-        ImmutableMap.of(),
-        ImmutableList.of(),
-        new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
+            TEXT_BACKEND_DATACOM,
             ImmutableList.of(),
-            ImmutableList.of(), true,
+            ImmutableMap.of(),
             ImmutableList.of(),
-            ImmutableMap.of()));
+            new AnalysisConfig(
+                    new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
+                    ImmutableList.of(),
+                    ImmutableList.of(), true,
+                    ImmutableList.of(),
+                    ImmutableMap.of()));
   }
 
   @Test
   void test3() {
     UseCaseEngine.runTest(
-        TEXT_ERR_PRG,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "err1",
-            new Diagnostic(
-                new Range(),
-                String.format(ERR_MESSAGE, "SQLCODE"),
-                Error,
-                ErrorSource.PARSING.getText()),
-            "err2",
-            new Diagnostic(
-                new Range(),
-                String.format(ERR_MESSAGE, "SQLEXT"),
-                Error,
-                ErrorSource.PARSING.getText())),
-        ImmutableList.of(),
-        new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
+            TEXT_ERR_PRG,
             ImmutableList.of(),
-            ImmutableList.of(), true,
+            ImmutableMap.of(
+                    "err1",
+                    new Diagnostic(
+                            new Range(),
+                            String.format(ERR_MESSAGE, "SQLCODE"),
+                            Error,
+                            ErrorSource.PARSING.getText()),
+                    "err2",
+                    new Diagnostic(
+                            new Range(),
+                            String.format(ERR_MESSAGE, "SQLEXT"),
+                            Error,
+                            ErrorSource.PARSING.getText())),
             ImmutableList.of(),
-            ImmutableMap.of()));
+            new AnalysisConfig(
+                    new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
+                    ImmutableList.of(),
+                    ImmutableList.of(), true,
+                    ImmutableList.of(),
+                    ImmutableMap.of()));
+  }
+
+  @Test
+  void test4() {
+    UseCaseEngine.runTest(
+            TEXT_BACKEND_DB2_IMPLICIT,
+            ImmutableList.of(),
+            ImmutableMap.of(),
+            ImmutableList.of(),
+            AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
+  }
+
+  @Test
+  void test5() {
+    UseCaseEngine.runTest(
+            TEXT_BACKEND_DB2_2,
+            ImmutableList.of(),
+            ImmutableMap.of(),
+            ImmutableList.of(),
+            AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
   }
 }
