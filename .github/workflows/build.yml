@@ -261,6 +261,11 @@ jobs:
         with:
           name: lib
           path: clients/cobol-dialect-api
+      - name: Change COBOL LS extension version for PR
+        working-directory: clients/cobol-lsp-vscode-extension
+        if: ${{ github.event.pull_request.head.ref != 'development'}} or ${{ github.event.pull_request.head.ref != 'master'}}
+        run: |
+          sed -r -i "s/\"version\": +\"(.*)\"/\"version\": \"\1+pr-${{ github.event.pull_request.number }}\"/" package.json
       - name: Build COBOL LS extension 
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
