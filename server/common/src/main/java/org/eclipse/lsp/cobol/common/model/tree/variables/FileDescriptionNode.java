@@ -31,6 +31,7 @@ import java.util.List;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class FileDescriptionNode extends VariableNode {
+  @Getter private final boolean isExternal;
   @Getter private final String fileDescriptorText;
   @Getter private final String fileControlClause;
 
@@ -39,9 +40,11 @@ public class FileDescriptionNode extends VariableNode {
       String name,
       VariableType variableType,
       boolean global,
+      boolean isExternal,
       String fileDescriptorText,
       String fileControlClause) {
     super(location, name, variableType, global);
+    this.isExternal = isExternal;
     this.fileDescriptorText = fileDescriptorText;
     this.fileControlClause = fileControlClause;
   }

@@ -300,7 +300,6 @@ GETMAIN : G E T M A I N;
 GETNEXT : G E T N E X T;
 GMMI : G M M I;
 GROUPID : G R O U P I D;
-GTEC : G T E C;
 GTEQ : G T E Q;
 HANDLE : H A N D L E;
 HEAD : H E A D;

@@ -310,6 +310,7 @@ public class SectionNodeProcessorHelper {
               getName(definitionNode),
               definitionNode.isSortDescription() ? SD : FD,
               definitionNode.isGlobal(),
+              definitionNode.isExternal(),
               definitionNode.getFileDescriptor(),
               definitionNode.getFileControlClause());
       createVariableNameNode(variable, definitionNode.getVariableName());

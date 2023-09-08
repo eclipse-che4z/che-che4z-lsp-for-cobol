@@ -73,6 +73,7 @@ class TestFileDescriptor {
           + "               88 {$*NO-MORE-DATA}  VALUE \"10\".\n"
           + "\n"
           + "       PROCEDURE DIVISION.\n"
+          + "            OPEN INPUT {$INFILE}.\n"
           + "            READ {$INFILE}.\n"
           + "            CLOSE {$INFILE}.";
 
@@ -138,7 +139,7 @@ class TestFileDescriptor {
           + "       PROGRAM-ID.  calc2.\n"
           + "       DATA DIVISION.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           READ {INFILE|1}.\n"
+          + "           READ {INFILE|1|2}.\n"
           + "       END PROGRAM calc2.";
 
   private static final String DUPLICATE_ENTRY_IN_FILE_CONTROL =
@@ -158,7 +159,6 @@ class TestFileDescriptor {
           + "           RECORDING MODE IS F\n"
           + "           BLOCK CONTAINS 0 RECORDS.\n"
           + "       01  {$*InputRec} PIC X(8).";
-
 
   private static final String MULTIPLE_ASSIGNMENTS_NAME_TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -224,7 +224,7 @@ class TestFileDescriptor {
                 new Range(),
                 "No FILE-CONTROL entry found for INFILE",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -238,7 +238,7 @@ class TestFileDescriptor {
                 new Range(),
                 "Variable INFILE is not defined",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -252,7 +252,13 @@ class TestFileDescriptor {
                 new Range(),
                 "Variable INFILE is not defined",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "READ statement can only reference a file opened for INPUT or I-O",
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -266,7 +272,7 @@ class TestFileDescriptor {
                 new Range(),
                 "File INFILE is already in the FILE-CONTROL paragraph",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
