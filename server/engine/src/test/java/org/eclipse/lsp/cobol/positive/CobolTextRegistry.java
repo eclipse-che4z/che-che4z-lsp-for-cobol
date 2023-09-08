@@ -36,4 +36,10 @@ public interface CobolTextRegistry extends CopybooksMock {
    * @return Map of positive filename mapped to a snap objects.
    */
   Map<ReportSection, List<SysprintSnap>> getSnapForFile(String filename);
+
+  /**
+   * Gives the dialect.
+   * @return Dialect string name
+   */
+  String getDialect();
 }

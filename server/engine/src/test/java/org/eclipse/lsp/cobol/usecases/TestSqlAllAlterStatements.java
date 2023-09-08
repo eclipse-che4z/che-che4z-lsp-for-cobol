@@ -467,7 +467,7 @@ class TestSqlAllAlterStatements {
   private static final String ALTER_VIEW =
       TEXT
           + "            EXEC SQL\n"
-          + "             ALTER VIEW MYVIEW REGENERATE;;\n"
+          + "             ALTER VIEW MYVIEW REGENERATE;\n"
           + "            END-EXEC.";
 
   private static final String ALTER_VIEW2 =

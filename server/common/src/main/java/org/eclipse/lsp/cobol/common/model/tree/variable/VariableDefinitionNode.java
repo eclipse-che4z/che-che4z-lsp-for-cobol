@@ -56,6 +56,7 @@ public final class VariableDefinitionNode extends Node {
   private final boolean isSignClausePresent;
   private final String valueToken;
   private final String fileDescriptor;
+  private final boolean isExternal;
   @Setter private String fileControlClause;
   private final boolean isSortDescription;
   @Setter private List<UsageFormat> usageClauses;
@@ -85,7 +86,8 @@ public final class VariableDefinitionNode extends Node {
       boolean isSortDescription,
       boolean isDynamicLength,
       boolean isJustified,
-      boolean isUnBounded) {
+      boolean isUnBounded,
+      boolean isExternal) {
     super(location, NodeType.VARIABLE_DEFINITION);
     this.level = level;
     this.variableName = variableName;
@@ -108,6 +110,7 @@ public final class VariableDefinitionNode extends Node {
     this.isDynamicLength = isDynamicLength;
     this.isJustified = isJustified;
     this.isUnBounded = isUnBounded;
+    this.isExternal = isExternal;
   }
 
   private static SyntaxError checkClauseIsSingle(
@@ -356,6 +359,7 @@ public final class VariableDefinitionNode extends Node {
     boolean isDynamicLength;
     boolean isJustified;
     boolean isUnBounded;
+    boolean isExternal;
 
     private Builder() {}
 
@@ -387,7 +391,8 @@ public final class VariableDefinitionNode extends Node {
           isSortDescription,
           isDynamicLength,
           isJustified,
-          isUnBounded);
+          isUnBounded,
+          isExternal);
     }
   }
 }

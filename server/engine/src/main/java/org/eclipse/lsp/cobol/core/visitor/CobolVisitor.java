@@ -257,9 +257,19 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .fileDescriptor(getIntervalText(ctx.fileDescriptionEntryClauses()))
             .fileControlClause(fileControlClause)
             .isSortDescription(Objects.nonNull(ctx.fileDescriptionEntryClauses().SD()))
+            .isExternal(isFDExternal(ctx))
             .global(isFeildDescriptionEntryGlobal(ctx))
             .build(),
         visitChildren(ctx));
+  }
+
+  private boolean isFDExternal(FileDescriptionEntryContext ctx) {
+    return Objects.nonNull(ctx.fileDescriptionEntryClauses())
+            && ctx.fileDescriptionEntryClauses()
+            .fileDescriptionEntryClause()
+            .stream()
+            .map(FileDescriptionEntryClauseContext::externalClause)
+            .anyMatch(Objects::nonNull);
   }
 
   private boolean isFeildDescriptionEntryGlobal(FileDescriptionEntryContext ctx) {
@@ -383,6 +393,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       return addTreeNode(ctx, locality -> new FileEntryNode(locality, filename, fileControlClause));
     }
     return addTreeNode(ctx, locality -> new FileEntryNode(locality, filename, ""));
+  }
+
+  @Override
+  public List<Node> visitFileStatusClause(FileStatusClauseContext ctx) {
+    return addTreeNode(ctx, FileStatusNode::new);
   }
 
   @Override
@@ -561,6 +576,97 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitIfElse(IfElseContext ctx) {
     throwWarning(ctx.getStart());
     return addTreeNode(ctx, IfElseNode::new);
+  }
+
+  @Override
+  public List<Node> visitOpenInputStatement(OpenInputStatementContext ctx) {
+    List<Node> nodes = new ArrayList<>();
+    for (OpenInputContext openInputContext : ctx.openInput()) {
+      VariableNameAndLocality fileNameLocality =
+              new VariableNameAndLocality(openInputContext.fileName().getText().toUpperCase(),
+                      retrieveLocality(openInputContext.fileName()).orElse(null));
+      nodes.addAll(addTreeNode(ctx, locality -> new OpenStatementNode(locality, fileNameLocality, FileOperationKind.INPUT)));
+    }
+    return nodes;
+  }
+
+  @Override
+  public List<Node> visitOpenOutputStatement(OpenOutputStatementContext ctx) {
+    List<Node> nodes = new ArrayList<>();
+    for (OpenOutputContext openOutputContext : ctx.openOutput()) {
+      VariableNameAndLocality fileNameLocality =
+              new VariableNameAndLocality(openOutputContext.fileName().getText().toUpperCase(),
+                      retrieveLocality(openOutputContext.fileName()).orElse(null));
+      nodes.addAll(addTreeNode(openOutputContext,
+              locality -> new OpenStatementNode(locality, fileNameLocality, FileOperationKind.OUTPUT)));
+    }
+    return nodes;
+  }
+
+  @Override
+  public List<Node> visitOpenIOStatement(OpenIOStatementContext ctx) {
+    List<Node> nodes = new ArrayList<>();
+    for (FileNameContext fileNameContext : ctx.fileName()) {
+      VariableNameAndLocality fileNameLocality =
+              new VariableNameAndLocality(fileNameContext.getText().toUpperCase(),
+                      retrieveLocality(fileNameContext).orElse(null));
+      nodes.addAll(addTreeNode(ctx,
+              locality -> new OpenStatementNode(locality, fileNameLocality, FileOperationKind.I_O)));
+    }
+    return nodes;
+  }
+
+  @Override
+  public List<Node> visitOpenExtendStatement(OpenExtendStatementContext ctx) {
+    List<Node> nodes = new ArrayList<>();
+    for (FileNameContext fileNameContext : ctx.fileName()) {
+      VariableNameAndLocality fileNameLocality =
+              new VariableNameAndLocality(fileNameContext.getText().toUpperCase(),
+                      retrieveLocality(fileNameContext).orElse(null));
+      nodes.addAll(addTreeNode(ctx,
+              locality -> new OpenStatementNode(locality, fileNameLocality, FileOperationKind.EXTEND)));
+    }
+    return nodes;
+  }
+
+  @Override
+  public List<Node> visitReadStatement(ReadStatementContext ctx) {
+    VariableNameAndLocality fileNameLocality =
+            new VariableNameAndLocality(ctx.readFilenameClause().fileName().getText().toUpperCase(),
+                    retrieveLocality(ctx.readFilenameClause().fileName()).orElse(null));
+    return addTreeNode(ctx, locality -> new FileOperationStatementNode(locality, fileNameLocality, NodeType.READ_STATEMENT));
+  }
+
+  @Override
+  public List<Node> visitWriteStatement(WriteStatementContext ctx) {
+    VariableNameAndLocality fileNameLocality =
+            new VariableNameAndLocality(ctx.writeStatementClause().recordName().getText().toUpperCase(),
+                    retrieveLocality(ctx.writeStatementClause().recordName()).orElse(null));
+    return addTreeNode(ctx, locality -> new FileOperationStatementNode(locality, fileNameLocality, NodeType.WRITE_STATEMENT));
+  }
+
+  @Override
+  public List<Node> visitRewriteStatement(RewriteStatementContext ctx) {
+    VariableNameAndLocality fileNameLocality =
+            new VariableNameAndLocality(ctx.recordName().getText().toUpperCase(),
+                    retrieveLocality(ctx.recordName()).orElse(null));
+    return addTreeNode(ctx, locality -> new FileOperationStatementNode(locality, fileNameLocality, NodeType.REWRITE_STATEMENT));
+  }
+
+  @Override
+  public List<Node> visitDeleteStatement(DeleteStatementContext ctx) {
+    VariableNameAndLocality fileNameLocality =
+            new VariableNameAndLocality(ctx.deleteFilenameClause().fileName().getText().toUpperCase(),
+                    retrieveLocality(ctx.deleteFilenameClause().fileName()).orElseGet(null));
+    return addTreeNode(ctx, locality -> new FileOperationStatementNode(locality, fileNameLocality, NodeType.DELETE_STATEMENT));
+  }
+
+  @Override
+  public List<Node> visitStartStatement(StartStatementContext ctx) {
+    VariableNameAndLocality fileNameLocality =
+            new VariableNameAndLocality(ctx.fileName().getText().toUpperCase(),
+                    retrieveLocality(ctx.fileName()).orElse(null));
+    return addTreeNode(ctx, locality -> new FileOperationStatementNode(locality, fileNameLocality, NodeType.START_STATEMENT));
   }
 
   @Override

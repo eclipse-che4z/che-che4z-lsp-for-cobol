@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.cfg;
 
 import org.eclipse.lsp.cobol.common.model.tree.*;
+import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.core.model.extendedapi.*;
 import org.eclipse.lsp4j.Position;
@@ -76,6 +77,8 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.ENDIF.getValue()));
     } else if (node instanceof SentenceNode) {
+      node.getChildren().forEach(child -> traverse(parent, child));
+    } else if (node instanceof StatementNode) {
       node.getChildren().forEach(child -> traverse(parent, child));
     } else if (node instanceof IfElseNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.ELSE.getValue()));

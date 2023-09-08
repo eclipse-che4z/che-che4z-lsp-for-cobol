@@ -82,7 +82,7 @@ class TestSqlInsertStatement {
   private static final String INSERT6 =
       TEXT
           + "           INSERT INTO ABC INCLUDE (A SMALLINT, \n"
-          + "           B SMALLINT) VALUEs :{$TAD}+1;\n"
+          + "           B SMALLINT) VALUEs (:{$TAD}+1);\n"
           + "           END-EXEC.";
 
   public static final String INSERT7 =

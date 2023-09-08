@@ -31,7 +31,7 @@ import org.eclipse.lsp.cobol.core.engine.processors.implicit.ImplicitVariablesPr
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.mockito.Mockito.*;
 
@@ -43,7 +43,7 @@ class ImplicitVariablesProcessorTest {
   private static final int CICS_INTRODUCED_REGISTERS_COUNT = 72;
   private static final AnalysisConfig ANALYSIS_CONFIG_CICS_TRANSLATE_DIABLED = new AnalysisConfig(
           new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
-          Arrays.asList(EmbeddedLanguage.values()),
+          Collections.singletonList(EmbeddedLanguage.CICS),
           ImmutableList.of(), false, ImmutableList.of(), ImmutableMap.of());
   private ProcessingContext processingContext;
   private VariableAccumulator variableAccumulator;
@@ -56,8 +56,10 @@ class ImplicitVariablesProcessorTest {
 
     when(processingContext.getVariableAccumulator()).thenReturn(variableAccumulator);
     processor =
-        new ImplicitVariablesProcessor(
-            AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
+            new ImplicitVariablesProcessor(new AnalysisConfig(
+                    new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
+                    Collections.singletonList(EmbeddedLanguage.CICS),
+                    ImmutableList.of(), true, ImmutableList.of(), ImmutableMap.of()));
   }
 
   @Test

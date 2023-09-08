@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.List;
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class JsonGenerateNode extends Node {
+public class JsonGenerateNode extends StatementNode {
   private final VariableNameAndLocality identifier1;
   private final VariableNameAndLocality identifier2;
   private final VariableNameAndLocality identifier3;
