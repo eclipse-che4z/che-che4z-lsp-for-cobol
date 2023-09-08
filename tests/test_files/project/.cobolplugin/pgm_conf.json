@@ -15,6 +15,10 @@
         {
             "program": "cobol-daco-noconf/*",
             "pgroup": "IDMS"
+        },
+        {
+            "program": "cobol-dc/*",
+            "pgroup": "DaCo"
         }
     ]
 }
