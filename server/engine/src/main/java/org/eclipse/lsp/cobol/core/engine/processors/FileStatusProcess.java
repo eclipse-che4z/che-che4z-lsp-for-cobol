@@ -35,21 +35,23 @@ import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * Process FileStatus Node
- */
+/** Process FileStatus Node */
 public class FileStatusProcess implements Processor<FileStatusNode> {
   private static final ImmutableList<SectionType> SECTION_ALLOWED_FOR_STATUS_VARIABLES =
       ImmutableList.of(SectionType.WORKING_STORAGE, SectionType.LOCAL_STORAGE, SectionType.LINKAGE);
-  private static final ImmutableList<String> ALLOWED_PIC_CLAUSE_FOR_STATUS_VARIABLE =
-      ImmutableList.of("XX", "X(2)", "9(2)", "99", "S99", "S9(2)");
 
-  private static final ImmutableList<String> ONE_CHARACTER_VARIABLE_PIC_CLAUSE =
-      ImmutableList.of("X", "9", "S9");
+  private static final Pattern DATATYPE_FORMAT =
+      Pattern.compile(
+          "(?<dataType>[\\w|\\d]+)(\\((?<byteLength>\\d+)\\))?", Pattern.CASE_INSENSITIVE);
+  private static final Pattern ALPHANUMREIC_DATATYPE_REGEX = Pattern.compile("(((V|E|S|CR|DB)?9)|x)+", Pattern.CASE_INSENSITIVE);
+
 
   private final SymbolAccumulatorService symbolAccumulatorService;
 
@@ -87,39 +89,62 @@ public class FileStatusProcess implements Processor<FileStatusNode> {
       List<VariableNode> definitionNode) {
     if (definitionNode.get(0) instanceof VariableWithLevelNode) {
       VariableWithLevelNode statusDefinitionNode = (VariableWithLevelNode) definitionNode.get(0);
-      List<String> picClauses =
-          statusDefinitionNode.getChildren().stream()
-              .filter(ElementaryNode.class::isInstance)
-              .map(ElementaryNode.class::cast)
-              .map(ElementaryNode::getPicClause)
-              .map(formatPicClause())
-              .collect(Collectors.toList());
-      if (statusDefinitionNode instanceof ElementaryNode) {
-        picClauses.add(
-            formatPicClause().apply(((ElementaryNode) statusDefinitionNode).getPicClause()));
-      }
+      List<String> picClauses = getPicClause(statusDefinitionNode);
 
       if (picClauses.isEmpty()) {
         addDataSizeError(processingContext, statusVariable);
       }
-      if (picClauses.size() > 2) {
-        addDataSizeError(processingContext, statusVariable);
-      }
-
-      if (picClauses.size() == 2) {
-        if (!ONE_CHARACTER_VARIABLE_PIC_CLAUSE.containsAll(picClauses)) {
+      try {
+        int charLength = getCharLength(picClauses);
+        if (charLength > 2) {
           addDataSizeError(processingContext, statusVariable);
         }
-      }
-
-      if (picClauses.size() == 1) {
-        if (!ALLOWED_PIC_CLAUSE_FOR_STATUS_VARIABLE.containsAll(picClauses)) {
-          addDataSizeError(processingContext, statusVariable);
-        }
+      } catch (UnsupportedOperationException ex) {
+        addDataDataTypeError(processingContext, statusVariable);
       }
     } else {
       addDataSizeError(processingContext, statusVariable);
     }
+  }
+
+  private List<String> getPicClause(VariableWithLevelNode statusDefinitionNode) {
+    List<String> picClauses =
+        statusDefinitionNode.getChildren().stream()
+            .filter(ElementaryNode.class::isInstance)
+            .map(ElementaryNode.class::cast)
+            .map(ElementaryNode::getPicClause)
+            .map(formatPicClause())
+            .collect(Collectors.toList());
+    if (statusDefinitionNode instanceof ElementaryNode) {
+      picClauses.add(
+          formatPicClause().apply(((ElementaryNode) statusDefinitionNode).getPicClause()));
+    }
+    return picClauses;
+  }
+
+  private int getCharLength(List<String> picClauses) throws UnsupportedOperationException {
+    int charCount = 0;
+    for (String picClause : picClauses) {
+      Matcher matcher = DATATYPE_FORMAT.matcher(picClause);
+      if (matcher.find()) {
+        String dataType = matcher.group("dataType");
+        String byteLength = matcher.group("byteLength");
+        if (Objects.nonNull(dataType)) {
+          Matcher alphaNumericMatcher = ALPHANUMREIC_DATATYPE_REGEX.matcher(dataType);
+          boolean isAlphanumeric = !alphaNumericMatcher.matches() || picClauses.size() != 1 || dataType.matches("(?i)([X9])+");
+          if (!isAlphanumeric) {
+            throw new UnsupportedOperationException("passed clause is not alhpanumeric");
+          }
+          int dataLength = alphaNumericMatcher.end() == 1 ? 1 : alphaNumericMatcher.end() - 1;
+          int effectiveCharLength =
+                  Objects.isNull(byteLength)
+                          ? dataLength
+                          : dataLength + Integer.parseInt(byteLength) - 1;
+          charCount = charCount + effectiveCharLength;
+        }
+      }
+    }
+    return charCount;
   }
 
   private Function<String, String> formatPicClause() {
@@ -137,6 +162,20 @@ public class FileStatusProcess implements Processor<FileStatusNode> {
                 .location(statusVariable.getLocality().toOriginalLocation())
                 .messageTemplate(
                     MessageTemplate.of("fileStatus.charLimit", statusVariable.getName()))
+                .build());
+  }
+
+  private void addDataDataTypeError(
+      ProcessingContext processingContext, VariableUsageNode statusVariable) {
+    processingContext
+        .getErrors()
+        .add(
+            SyntaxError.syntaxError()
+                .errorSource(ErrorSource.PARSING)
+                .severity(ErrorSeverity.ERROR)
+                .location(statusVariable.getLocality().toOriginalLocation())
+                .messageTemplate(
+                    MessageTemplate.of("fileStatus.allowedDataType", statusVariable.getName()))
                 .build());
   }
 

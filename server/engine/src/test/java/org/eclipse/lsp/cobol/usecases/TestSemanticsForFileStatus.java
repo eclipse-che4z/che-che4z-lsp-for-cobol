@@ -63,6 +63,44 @@ public class TestSemanticsForFileStatus {
           + "\n"
           + "       PROCEDURE DIVISION.\n";
 
+  public static final String NEGATIVE_TEST_NOT_ALPHANUMERIC =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       INPUT-OUTPUT SECTION.\n"
+          + "       FILE-CONTROL.\n"
+          + "           SELECT {$FILE-IN}  file STATUS is {$DS|1} ASSIGN TO UT-S-YYCUSMST .\n"
+          + "       DATA DIVISION.\n"
+          + "       FILE SECTION.\n"
+          + "       FD  {$*FILE-IN} IS EXTERNAL\n"
+          + "           RECORD CONTAINS 450 CHARACTERS\n"
+          + "           DATA RECORDS ARE {$WREHOUSE-RECORD}.\n"
+          + "       01  {$*WREHOUSE-RECORD}                         PIC X(450).\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*DS} PIC V9(2).\n"
+          + "\n"
+          + "       PROCEDURE DIVISION.";
+
+  public static final String POSITIVE_TEST_ALPHANUMERIC =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       INPUT-OUTPUT SECTION.\n"
+          + "       FILE-CONTROL.\n"
+          + "           SELECT {$FILE-IN}  file STATUS is {$DS} ASSIGN TO UT-S-YYCUSMST .\n"
+          + "       DATA DIVISION.\n"
+          + "       FILE SECTION.\n"
+          + "       FD  {$*FILE-IN} IS EXTERNAL\n"
+          + "           RECORD CONTAINS 450 CHARACTERS\n"
+          + "           DATA RECORDS ARE {$WREHOUSE-RECORD}.\n"
+          + "       01  {$*WREHOUSE-RECORD}                         PIC X(450).\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*DS}  .\n"
+          + "           05 {$*XY} PIC V9(01) .\n"
+          + "           05 {$*YZ} pic x.\n"
+          + "\n"
+          + "       PROCEDURE DIVISION.";
+
   @Test
   void positiveText() {
     UseCaseEngine.runTest(POSITIVE_TEXT, ImmutableList.of(), ImmutableMap.of());
@@ -86,5 +124,26 @@ public class TestSemanticsForFileStatus {
                 "DS was not defined in the 'WORKING-STORAGE SECTION', 'LOCAL-STORAGE SECTION' or 'LINKAGE SECTION'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void negativeTestForInvalidDataType() {
+    UseCaseEngine.runTest(
+        NEGATIVE_TEST_NOT_ALPHANUMERIC,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "data-name DS was not defined as a category alphanumeric data item, "
+                    + "a category national data item or as a category numeric data item with "
+                    + "either \"USAGE DISPLAY\" or \"USAGE NATIONAL\"",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void positiveTestForInvalidDataType() {
+    UseCaseEngine.runTest(POSITIVE_TEST_ALPHANUMERIC, ImmutableList.of(), ImmutableMap.of());
   }
 }
