@@ -255,6 +255,12 @@ jobs:
       - name: Build COBOL LS extension 
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
+      - name: Change client version
+        working-directory: clients/cobol-lsp-vscode-extension
+        if: ${{ github.event.pull_request.head.ref != 'development'}} or ${{ github.event.pull_request.head.ref != 'master'}}
+        run: |
+          echo "branch=${{ github.event.pull_request.head.ref }}.replaceAll(/[^a-zA-Z0-9.-]+/,"")" >> $env:GITHUB_ENV
+          sh 'sed -i "s/\\"version\\": \\"\\(.*\\)\\"/\\"version\\": \\"\\1+${{ env.branch }}\\"/g" */package.json'
       - name: Package COBOL LS vsix for ${{ env.target }}
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
