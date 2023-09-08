@@ -16,14 +16,14 @@ parser grammar Db2SqlParser;
 options {tokenVocab = Db2SqlLexer; superClass = MessageServiceParser;}
 
 /*Allowable SQL statements for COBOL program specific dvisions or sections*/
-dataDivisionRules: (dbs_declare_variable | rulesAllowedInDataDivision | rulesAllowedInWorkingStorageAndLinkageSection)+;
+dataDivisionRules: (dbs_declare_variable | rulesAllowedInDataDivision | rulesAllowedInWorkingStorageAndLinkageSection)+ EOF;
 
 procedureDivisionRules: ((dbs_allocate | dbs_alter | dbs_associate | dbs_call | dbs_close | dbs_comment | dbs_commit |
           dbs_connect | dbs_create | dbs_declare | dbs_declare_cursor | dbs_declare_table | dbs_delete | dbs_describe | dbs_drop | dbs_exchange | dbs_execute | dbs_explain |
           dbs_fetch | dbs_free | dbs_get | dbs_grant | dbs_hold | dbs_include | dbs_insert |
           dbs_label | dbs_lock | dbs_merge | dbs_open | dbs_prepare | dbs_refresh | dbs_release | dbs_rename |
           dbs_revoke | dbs_rollback | dbs_savepoint | dbs_select | dbs_set | dbs_signal | dbs_transfer | dbs_truncate |
-          dbs_update | dbs_values | dbs_whenever) dbs_semicolon_end?)+;
+          dbs_update | dbs_values | dbs_whenever) dbs_semicolon_end?)+ EOF;
 rulesAllowedInDataDivision: ((dbs_declare_cursor | dbs_declare_table | dbs_include) dbs_semicolon_end?)+;
 rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca | dbs_include_sqlda) dbs_semicolon_end?)+;
 
@@ -880,8 +880,16 @@ dbs_savepoint: SAVEPOINT dbs_savepoint_name UNIQUE? ON ROLLBACK RETAIN (CURSORS 
 /*SELECT (both) */
 
 
-dbs_select: dbs_select_unpack_function_invocation | dbs_fullselect;
-
+dbs_select: dbs_select_unpack_function_invocation | (WITH common_table_expression_loop)? dbs_fullselect
+            (dbs_select_update
+             | dbs_select_readOnly
+             | dbs_select_optimize
+             | dbs_select_statement_isolation_clause
+             | (QUERYNO dbs_integer)
+             | (SKIPCHAR LOCKED DATA))*;
+dbs_select_update: FOR UPDATE (OF dbs_column_name (dbs_comma_separator dbs_column_name)*)? ;
+dbs_select_readOnly: FOR READ ONLY;
+dbs_select_optimize:OPTIMIZE FOR dbs_integer (ROWS | ROW);
 /*Queries Subselects (all)*/
 dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCHAR DOT_FS ASTERISKCHAR AS LPARENCHAR dbs_field_name db2sql_data_types (dbs_comma_separator dbs_field_name db2sql_data_types)* RPARENCHAR;
 dbs_select_row_fullselect: (NONNUMERICLITERAL | NUMERICLITERAL)+ ;
@@ -1523,7 +1531,7 @@ dbs_special_name: ABSOLUTE | ACCELERATION | ACCELERATOR | ACCESS | ACCESSCTRL | 
                   | MODIFIERS | MODIFIES | MONITOR1 | MONITOR2 | MONTH | MONTHS | MORECHAR | MOVE | MULTIPLIER
                   | M_CHAR| NAME | NAMES | NAMESPACE | NATIONAL | NCNAME| NEW | NEW_TABLE | NEXT | NO | NODEFER
                   | NONE | NOT | NTH_VALUE| NTILE| NULL | NULLS | NULTERM | NUMBER | NUMERIC | NUMPARTS| OBID| OBJECT
-                  | OF | OFF | OFFSET | OLD | OLD_TABLE | ON | ONCE | ONLY | OPEN | OPERATION | OPTHINT
+                  | OF | OFF | OFFSET | OLD | OLD_TABLE | ON | ONCE | ONLY | OPEN | OPERATION | OPTHINT | OPTIMIZE
                   | OPTIMIZATION | OPTION | OPTIONAL | OPTIONS | OR | ORDER | ORDINALITY | ORGANIZE | ORIGINAL | OUT
                   | OUTCOME | OUTER | OUTPUT | OVER | OVERLAPS | OVERRIDING | OWNER | OWNERSHIP | PACKADM | PACKAGE
                   | PACKAGESET| PACKAGE_NAME | PACKAGE_SCHEMA | PACKAGE_VERSION | PADDED | PAGE | PAGENUM | PARALLEL

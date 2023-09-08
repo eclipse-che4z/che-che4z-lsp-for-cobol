@@ -28,15 +28,15 @@ import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 
+import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.System.getProperty;
-import static java.lang.System.getenv;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -51,21 +51,49 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public abstract class FileBasedTest extends ConfigurableTest {
 
-  public static final String SYS_ENV_VAR_TESTING_DIALECTS = "TestingDialects";
-
   static Stream<String> getSourceFolder() {
-    return Arrays.stream(
-        ofNullable(getProperty(PATH_TO_TEST_RESOURCES))
-            .orElse("../../tests/test_files/Cobol85PositiveTestsSuite")
-            .split(",")).map(String::trim);
+    String path = ofNullable(getProperty(PATH_TO_TEST_RESOURCES))
+            .orElse("../../tests/test_files");
+    return searchFolderToTest(Paths.get(path)).stream().map(p -> p.toAbsolutePath().toString());
   }
 
-  /**
-   * Get the files to be analyzed by Language Server from {@link CobolTextRegistry} using file-based
-   * implementation.
-   *
-   * @return the list of objects that would be passed to the constructor one by one
-   */
+  private static List<Path> searchFolderToTest(Path path) {
+    return searchFolderToTest(ImmutableList.of(path.toFile()));
+  }
+  private static List<Path> searchFolderToTest(List<File> files) {
+    List<Path> paths = new ArrayList<>();
+    for (File file : files) {
+      if (file.isHidden()) continue;
+      if (file.isDirectory()) {
+        if (isValidTestFolder(file)) {
+          paths.add(file.toPath());
+        }
+        paths.addAll(searchFolderToTest(listFiles(file)));
+      }
+    }
+    return paths;
+  }
+
+  private static List<File> listFiles(File file) {
+    return Optional.ofNullable(file.listFiles()).map(Arrays::stream)
+            .orElse(Stream.empty())
+            .collect(Collectors.toList());
+  }
+
+  private static boolean isValidTestFolder(File file) {
+    return Optional.ofNullable(file.listFiles())
+        .map(Arrays::stream)
+        .orElse(Stream.empty())
+        .anyMatch(f -> f.getName().equals("positive"));
+    }
+
+
+    /**
+     * Get the files to be analyzed by Language Server from {@link CobolTextRegistry} using file-based
+     * implementation.
+     *
+     * @return the list of objects that would be passed to the constructor one by one
+     */
   protected static List<CobolText> getTextsToTest(CobolTextRegistry textRegistry) {
     return textRegistry.getPositives();
   }
@@ -170,12 +198,7 @@ public abstract class FileBasedTest extends ConfigurableTest {
    *
    * @return {@link AnalysisConfig}
    */
-  protected AnalysisConfig getAnalysisConfiguration() {
-    String passedDialects =
-        ofNullable(getProperty(SYS_ENV_VAR_TESTING_DIALECTS))
-            .orElse(ofNullable(getenv("dialect")).orElse("default"));
-    List<String> testDialectsLists = Arrays.asList(passedDialects.split(","));
-
+  protected AnalysisConfig getAnalysisConfiguration(String testDialectsLists) {
     if (testDialectsLists.contains("DaCo")) {
       return DialectConfigs.getDaCoAnalysisConfig();
     }

@@ -19,13 +19,14 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 
 /** XMLParse node */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class XMLParseNode extends Node {
+public class XMLParseNode extends StatementNode {
   private final VariableNameAndLocality encodingLocality;
   private final VariableNameAndLocality identifier2;
   private final VariableNameAndLocality identifier1;
