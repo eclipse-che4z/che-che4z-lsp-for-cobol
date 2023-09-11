@@ -23,10 +23,6 @@ on:
     branches:
       - development
       - master
-  pull_request_target:
-    branches:
-      - development
-      - master
   push:
     branches:
       - development
@@ -102,6 +98,7 @@ jobs:
           npm ci
           npm run test
       - name: SonarQube Scan
+        if: github.ref == 'refs/heads/development'
         uses: kitabisa/sonarqube-action@v1.2.0
         with:
           projectBaseDir: ${{ github.workspace }}
