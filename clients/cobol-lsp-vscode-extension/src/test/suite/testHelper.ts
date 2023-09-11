@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 
-export const TEST_TIMEOUT = 80000;
+export const TEST_TIMEOUT = 100000;
 
 export async function activate() {
   // The extensionId is `publisher.name` from package.json

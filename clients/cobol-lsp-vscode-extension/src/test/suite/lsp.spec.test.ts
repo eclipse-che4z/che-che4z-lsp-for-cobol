@@ -362,6 +362,30 @@ suite("Integration Test Suite", function () {
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
+  test("TC314771: Support INCLUDE in EXEC SQL to build extended document", async () => {
+    const extSrcPath = path.join("ADSORT.cbl");
+    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
+    await helper.showDocument(extSrcPath);
+    let editor = helper.get_editor("ADSORT.cbl");
+    await helper.deleteLine(editor, 58);
+    await helper.insertString(
+      editor,
+      pos(36, 11),
+      "           EXEC SQL SQL_STATEMENT END-EXEC.",
+    );
+    const diagnostics = await diagPromise;
+    helper.assertRangeIsEqual(
+      diagnostics[0].range,
+      range(pos(36, 20), pos(36, 33)),
+    );
+    const syntaxErrors = diagnostics.filter((diag) =>
+      diag.message.startsWith("Syntax error on 'SQL_STATEMENT'"),
+    );
+    assert.strictEqual(syntaxErrors.length, 1);
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
+
   test("TC335192 COPY MAID scenarios", async () => {
     await helper.showDocument("cobol-dc/ABCD.cbl");
     let editor = helper.get_editor("cobol-dc/ABCD.cbl");
