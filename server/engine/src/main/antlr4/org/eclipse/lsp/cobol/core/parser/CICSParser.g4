@@ -81,10 +81,11 @@ cics_send_page: PAGE (RELEASE | TRANSID cics_name | RETAIN | TRAILER cics_data_a
 cics_send_partnset: PARTNSET cics_name?;
 cics_send_text: TEXT (cics_send_text_null | cics_send_text_mapped | cics_send_text_noedit);
 cics_send_text_null: (cics_send_text_std | cics_send_text_full);
-cics_send_text_std: FROM cics_data_area (LENGTH cics_data_value | CURSOR cics_data_value | FORMFEED | cics_send_erase |
-                    PRINT | FREEKB | ALARM | NLEOM | FMHPARM cics_name | OUTPARTN cics_name | ACTPARTN cics_name |
-                    LDC cics_name | MSR cics_data_value | cics_handle_response)*;
-cics_send_text_full: (cics_send_terminal | SET cics_ref | PAGING | REQID cics_name | HEADER cics_data_area |
+cics_send_text_std: FROM cics_data_area cics_send_text_std_args*;
+cics_send_text_std_args: LENGTH cics_data_value | CURSOR cics_data_value | FORMFEED | cics_send_erase |
+                     PRINT | FREEKB | ALARM | NLEOM | FMHPARM cics_name | OUTPARTN cics_name | ACTPARTN cics_name |
+                     LDC cics_name | MSR cics_data_value | cics_handle_response;
+cics_send_text_full: FROM cics_data_area (cics_send_text_std_args | cics_send_terminal | SET cics_ref | PAGING | REQID cics_name | HEADER cics_data_area |
                      TRAILER cics_data_area | JUSTIFY cics_data_value | JUSFIRST | JUSLAST | ACCUM |
                      HONEOM | L40 | L64 | L80 | cics_handle_response)*;
 cics_send_text_mapped: MAPPED (FROM cics_data_area | LENGTH cics_data_value | cics_send_terminal |
@@ -163,7 +164,7 @@ cics_allocate_session: SESSION  cics_name (PROFILE cics_name | NOQUEUE | cics_ha
 cics_allocate_partner: PARTNER cics_name (NOQUEUE | STATE cics_cvda | cics_handle_response)*;
 
 /** ASKTIME */
-cics_asktime: ASKTIME (ABSTIME cics_data_area)?;
+cics_asktime: ASKTIME cics_handle_response? (ABSTIME (cics_data_area | cics_handle_response)+)?;
 
 /** ASSIGN */
 cics_assign: ASSIGN (ABCODE cics_data_area | ABDUMP cics_data_area | ABPROGRAM cics_data_area | ACTIVITY cics_data_area |
@@ -258,7 +259,7 @@ cics_delay_for: (FOR | UNTIL) (HOURS cics_data_value | MINUTES cics_data_value |
 
 /** DELETE (all of them) */
 cics_delete: DELETE (cics_delete_file | ACTIVITY cics_data_value | cics_delete_container | cics_delete_counter |
-             EVENT cics_data_value | TIMER cics_data_value);
+             EVENT cics_data_value | TIMER cics_data_value | cics_handle_response)+;
 cics_delete_file: cics_file_name (TOKEN cics_data_area | cics_delete_ridfld | SYSID cics_data_area | NOSUSPEND |
                   RBA | RRN | cics_handle_response)*;
 cics_delete_ridfld: RIDFLD cics_data_area (KEYLENGTH cics_data_value | GENERIC | NUMREC cics_data_area | cics_handle_response)*;
