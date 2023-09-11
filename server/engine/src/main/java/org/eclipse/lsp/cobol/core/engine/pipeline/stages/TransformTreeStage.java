@@ -43,7 +43,11 @@ import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Transform Tree Stage
@@ -202,7 +206,6 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     ctx.register(v, JsonParseNode.class, new JsonParseProcess(symbolAccumulatorService));
     ctx.register(v, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulatorService));
     ctx.register(v, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
-    ctx.register(v, FileStatusNode.class, new FileStatusProcess(symbolAccumulatorService));
     ctx.register(v, FileOperationStatementNode.class, new FileOperationProcess());
 
     // Dialects
