@@ -137,6 +137,11 @@ class TestExecCicsSendStatementsArgumentsOrder {
           + "           EXEC CICS SEND ERASE FROM ({$MESSAGE-AREA}) WAIT\n"
           + "                LENGTH ({$MESSAGE-LENGTH})\n"
           + "           END-EXEC.\n"
+          + "           EXEC CICS SEND TEXT\n"
+          + "                FROM({$MESSAGE-LENGTH}({$PAT}:{$ABD1}))  \n"
+          + "                LENGTH({$MESSAGE-LENGTH})     \n"
+          + "                ACCUM    \n"
+          + "           END-EXEC.\n"
           + "           GOBACK.";
 
   @Test
