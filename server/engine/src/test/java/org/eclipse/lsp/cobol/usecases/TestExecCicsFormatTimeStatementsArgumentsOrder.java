@@ -38,6 +38,7 @@ class TestExecCicsFormatTimeStatementsArgumentsOrder {
           + "       01  {$*TIMEO}                             PIC X(008).\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC CICS ASKTIME\n"
+          + "                     RESP({$WS-TIME})\n"
           + "                     ABSTIME({$WS-TIME})\n"
           + "           END-EXEC.\n"
           + "           EXEC CICS FORMATTIME\n"
