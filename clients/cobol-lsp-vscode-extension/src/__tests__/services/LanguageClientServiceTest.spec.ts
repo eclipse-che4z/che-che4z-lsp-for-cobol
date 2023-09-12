@@ -37,6 +37,11 @@ jest.mock("vscode", () => ({
   window: {
     createOutputChannel: jest.fn(),
   },
+  Uri: {
+    file: jest.fn().mockReturnValue({
+      fsPath: "path",
+    }),
+  },
 }));
 jest.mock("vscode-languageclient/node", () => ({
   LanguageClient: jest.fn(),
@@ -44,6 +49,7 @@ jest.mock("vscode-languageclient/node", () => ({
 jest.mock("fs", () => ({
   fs: jest.fn(),
 }));
+
 Utils.getZoweExplorerAPI = jest.fn();
 let languageClientService: LanguageClientService;
 
