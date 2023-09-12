@@ -66,14 +66,14 @@ class TestSyntaxErrorTraversedThroughHierarchy {
             "3",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'TAG-ID' expected SECTION",
+                "Syntax error on 'TAG-ID'",
                 Error,
                 ErrorSource.PARSING.getText(),
                 null),
             "4",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'PIC' expected SECTION",
+                "Syntax error on 'PIC'",
                 Error,
                 ErrorSource.PARSING.getText(),
                 null)));

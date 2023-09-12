@@ -22,17 +22,22 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.*;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
@@ -52,6 +57,7 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
   private final String programUri;
   private final List<EmbeddedLanguage> features;
   private final ExtendedDocument extendedDocument;
+  private final CopybooksRepository copybooksRepository;
 
   @Getter private final List<Node> resultNodes = new LinkedList<>();
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
@@ -78,29 +84,41 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
     parseSql(ctx.execSqlStatement(), Db2SqlParser::dataDivisionRules);
   }
 
-  @Override
-  public void exitExecCicsStatement(ExecCicsStatementContext ctx) {
-    parseCics(ctx.cicsRules());
+
+  private List<SyntaxError> fetchError(Location originalLocation) {
+    List<SyntaxError> errorList = new ArrayList<>();
+    errorListener.getErrors().forEach(e -> {
+      if (embeddedCodePresentInMainSource(originalLocation)) {
+        e.getLocation().getLocation().setRange(
+                getAdjustedRange(originalLocation, e));
+        errorList.add(e);
+      } else {
+        errorList.add(getSyntaxErrorForCopybook(originalLocation, e));
+      }
+    });
+    return Collections.unmodifiableList(errorList);
   }
 
-  private void parseCics(CicsRulesContext context) {
-    if (context == null) return;
-    if (!features.contains(EmbeddedLanguage.CICS)) return;
+  private Range getAdjustedRange(Location originalLocation, SyntaxError e) {
+    return RangeUtils.shiftRangeWithPosition(originalLocation.getRange().getStart(), e.getLocation().getLocation().getRange());
+  }
 
-    errorListener.getErrors().clear();
-    CommonTokenStream tokens = applyCicsLexer(context);
-    CICSParser parser = createCicsParser(tokens);
+  private SyntaxError getSyntaxErrorForCopybook(Location originalLocation, SyntaxError e) {
+    return SyntaxError.syntaxError()
+            .errorSource(e.getErrorSource())
+            .location(
+                    Locality.builder()
+                            .uri(originalLocation.getUri())
+                            .range(getAdjustedRange(originalLocation, e))
+                            .copybookId(copybooksRepository.getCopybookIdByUri(originalLocation.getUri()))
+                            .build().toOriginalLocation())
+            .suggestion(e.getSuggestion())
+            .severity(e.getSeverity())
+            .build();
+  }
 
-    Position position = getOriginalPosition(context);
-
-    ParserRuleContext tree = parser.allCicsRules();
-    ParseTreeVisitor<List<Node>> visitor = instanceVisitor(createPosition(context.getStart()), EmbeddedLanguage.CICS);
-    resultNodes.addAll(visitor.visit(tree));
-
-    errorListener.getErrors().forEach(e -> e.getLocation().getLocation().setRange(
-        RangeUtils.shiftRangeWithPosition(position, e.getLocation().getLocation().getRange())));
-
-    errors.addAll(errorListener.getErrors());
+  private boolean embeddedCodePresentInMainSource(Location originalLocation) {
+    return extendedDocument.getCurrentText().getUri().equals(originalLocation.getUri());
   }
 
   private Position createPosition(Token token) {
@@ -115,21 +133,18 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
     SqlCodeContext sqlCode = context.sqlCode();
     if (sqlCode == null) return;
     CommonTokenStream tokens = applyDb2Lexer(sqlCode);
-    Position position = getOriginalPosition(sqlCode);
+    Location originalLocation = getOriginalLocation(sqlCode);
 
     ParserRuleContext tree = grammarStartRule.apply(createDb2SqlParser(tokens));
     ParseTreeVisitor<List<Node>> visitor = instanceVisitor(createPosition(sqlCode.getStart()), EmbeddedLanguage.SQL);
     resultNodes.addAll(visitor.visit(tree));
 
-    errorListener.getErrors().forEach(e -> e.getLocation().getLocation().setRange(
-        RangeUtils.shiftRangeWithPosition(position, e.getLocation().getLocation().getRange())));
-    errors.addAll(errorListener.getErrors());
+    errors.addAll(fetchError(originalLocation));
   }
 
-  private Position getOriginalPosition(ParserRuleContext parserRuleContext) {
+  private Location getOriginalLocation(ParserRuleContext parserRuleContext) {
     return extendedDocument.mapLocation(
-            new Range(createPosition(parserRuleContext.getStart()), createPosition(parserRuleContext.getStop())))
-            .getRange().getStart();
+            new Range(createPosition(parserRuleContext.getStart()), createPosition(parserRuleContext.getStop())));
   }
 
   private CommonTokenStream applyDb2Lexer(ParserRuleContext context) {
@@ -140,21 +155,8 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
     return new CommonTokenStream(lexer);
   }
 
-  private CommonTokenStream applyCicsLexer(CicsRulesContext context) {
-    CICSLexer lexer = new CICSLexer(CharStreams.fromString(VisitorHelper.getIntervalText(context)));
-    lexer.removeErrorListeners();
-
-    return new CommonTokenStream(lexer);
-  }
-
   private Db2SqlParser createDb2SqlParser(CommonTokenStream tokens) {
     Db2SqlParser parser = new Db2SqlParser(tokens);
-    configureParser(parser);
-    return parser;
-  }
-
-  private CICSParser createCicsParser(CommonTokenStream tokens) {
-    CICSParser parser = new CICSParser(tokens);
     configureParser(parser);
     return parser;
   }
@@ -173,10 +175,6 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
    * @return a visitor
    */
   public ParseTreeVisitor<List<Node>> instanceVisitor(Position position, EmbeddedLanguage lang) {
-    if (EmbeddedLanguage.CICS == lang) {
-      return new CICSVisitor(position, programUri, extendedDocument);
-    }
-
     if (EmbeddedLanguage.SQL == lang) {
       return new Db2SqlVisitor(position, programUri, extendedDocument);
     }

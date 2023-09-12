@@ -479,7 +479,7 @@ class TestProcessCbl {
             "1",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'foo' expected 'Currency symbol'",
+                "Syntax error on 'foo'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -493,7 +493,7 @@ class TestProcessCbl {
             "1",
             new Diagnostic(
                 new Range(),
-                "Syntax error on '256Kb' expected {'01-49', '66', '77', '88', INTEGERLITERAL}",
+                "Syntax error on '256Kb'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

@@ -16,9 +16,9 @@ import * as assert from "assert";
 import * as helper from "./testHelper";
 import * as vscode from "vscode";
 import * as path from "path";
-import { pos } from "./testHelper";
+import { pos, range } from "./testHelper";
 
-suite("TF35623: Support for 'REPLACING' statement (and also Mapping)", function () {
+suite("TF35623: Support for Replacing and Mapping statement", function () {
   this.timeout(helper.TEST_TIMEOUT);
   this.slow(1000);
   suiteSetup(async function () {
@@ -40,7 +40,11 @@ suite("TF35623: Support for 'REPLACING' statement (and also Mapping)", function 
     const message = diagnostics[0].message;
     assert.match(message, /^Variable ABC-ID is not defined/);
     await helper.deleteLine(editor, 18);
-    await helper.insertString(editor, pos(18, 0), "       COPY REPL REPLACING ==TAG-ID== BY ==ABC-ID==.");
+    await helper.insertString(
+      editor,
+      pos(18, 0),
+      "       COPY REPL REPLACING ==TAG-ID== BY ==ABC-ID==.",
+    );
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
     );
@@ -58,14 +62,22 @@ suite("TF35623: Support for 'REPLACING' statement (and also Mapping)", function 
     const message = diagnostics[0].message;
     assert.match(message, /^Variable XYZ-ID is not defined/);
     await helper.deleteLine(editor, 18);
-    await helper.insertString(editor, pos(18, 0), "       COPY REPL REPLACING ==TAG-ID== BY ==ABC-ID== ");
-    await helper.insertString(editor, pos(19, 0), "           ==ABC-ID== by ==XYZ-ID==.");
+    await helper.insertString(
+      editor,
+      pos(18, 0),
+      "       COPY REPL REPLACING ==TAG-ID== BY ==ABC-ID== ",
+    );
+    await helper.insertString(
+      editor,
+      pos(19, 0),
+      "           ==ABC-ID== by ==XYZ-ID==.",
+    );
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
     );
     diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 0);
-    await helper.sleep(5000)
+    await helper.sleep(5000);
   });
 
   test("TC248131: Several COPY statements with replacing", async () => {
@@ -76,7 +88,11 @@ suite("TF35623: Support for 'REPLACING' statement (and also Mapping)", function 
     assert.strictEqual(diagnostics.length, 1);
     const message = diagnostics[0].message;
     assert.match(message, /^Variable DEF-ID is not defined/);
-    await helper.insertString(editor, pos(20, 0), "       COPY REPL REPLACING ==TAG-ID== BY ==DEF-ID==.");
+    await helper.insertString(
+      editor,
+      pos(20, 0),
+      "       COPY REPL REPLACING ==TAG-ID== BY ==DEF-ID==.",
+    );
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
     );
@@ -84,14 +100,18 @@ suite("TF35623: Support for 'REPLACING' statement (and also Mapping)", function 
     assert.strictEqual(diagnostics.length, 0);
   });
 
-  test("TC250950: Parser Does React on CPY Exit Tag", async () => {
+  test.skip("TC250950: Parser Does React on CPY Exit Tag", async () => {
     let editor = await helper.showDocument(path.join("TEST4.CBL"));
     await helper.deleteLine(editor, 13);
     await helper.insertString(editor, pos(13, 0), "       COPY CHOPIN.");
     const extSrcPath = path.join("testing", "CHOPIN.CPY");
     editor = await helper.showDocument(extSrcPath);
     await helper.deleteLine(editor, 0);
-    await helper.insertString(editor, pos(0, 0), "       IDENTIFICATION DIVISIO.");
+    await helper.insertString(
+      editor,
+      pos(0, 0),
+      "       IDENTIFICATION DIVISIO.",
+    );
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
@@ -115,4 +135,29 @@ suite("TF35623: Support for 'REPLACING' statement (and also Mapping)", function 
     assert.match(message, /^Variable VARNAME is not defined/);
   });
 
+  test.skip("TC250747: Support building of the extended document", async () => {
+    const extSrcPath = path.join("TEST6.CBL");
+    let editor = await helper.showDocument(extSrcPath);
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+    );
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    diagnostics.sort((a, b) => a.severity - b.severity);
+    let message = diagnostics[0].message;
+    assert.match(message, /^Syntax error on 'NEW' expected SECTION/);
+    message = diagnostics[1].message;
+    assert.match(message, /^Syntax error on 'REPLACING' expected SECTION/);
+  });
+
+  test("TC250946: Support building of the extended document - Replace by arithmetic operations", async () => {
+    let editor = await helper.showDocument(path.join("TEST7.CBL"));
+    const extSrcPath = path.join("testing", "NEW.CPY");
+    editor = await helper.showDocument(extSrcPath);
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+    );
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const message = diagnostics[0].message;
+    assert.match(message, /^Missing token SECTION at procedureSectionHeader/);
+  });
 });

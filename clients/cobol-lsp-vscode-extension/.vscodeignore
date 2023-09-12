@@ -26,6 +26,8 @@
 !package.json
 !syntaxes/lang-config.json
 !syntaxes/COBOL.tmLanguage.json
+!syntaxes/CICS.tmLanguage.json
+!syntaxes/SQL.tmLanguage.json
 !schema/pgm_conf.schema.json
 !schema/preprocessor_entry.schema.json
 !schema/proc_grps.schema.json

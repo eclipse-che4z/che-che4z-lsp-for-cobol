@@ -66,26 +66,26 @@ class TestErrorsInDifferentFiles {
                 "pic",
                 new Diagnostic(
                     new Range(),
-                    "Syntax error on 'PIC' expected SECTION",
+                    "Syntax error on 'PIC'",
                     Error,
                     ErrorSource.COPYBOOK.getText())).put(
                 "pic1",
                 new Diagnostic(
                     new Range(),
-                    "Syntax error on 'PIC' expected SECTION",
+                    "Syntax error on 'PIC'",
                     Error,
                     ErrorSource.PARSING.getText()))
             .put(
                 "child1",
                 new Diagnostic(
                     new Range(),
-                    "Syntax error on 'CHILD1' expected SECTION",
+                    "Syntax error on 'CHILD1'",
                     Error,
                     ErrorSource.COPYBOOK.getText())).put(
                 "child11",
                 new Diagnostic(
                     new Range(),
-                    "Syntax error on 'CHILD1' expected SECTION",
+                    "Syntax error on 'CHILD1'",
                     Error,
                     ErrorSource.PARSING.getText()))
             .put(

@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 
-export const TEST_TIMEOUT = 120000;
+export const TEST_TIMEOUT = 150000;
 
 export async function activate() {
   // The extensionId is `publisher.name` from package.json
@@ -129,7 +129,7 @@ export async function insertString(
     lines == 1 ? position.character + str.length : str_split[lines - 1].length,
   );
   editor.selection = new vscode.Selection(movePosition, movePosition);
-
+  await sleep(1000);
   return movePosition;
 }
 

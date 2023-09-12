@@ -22,8 +22,8 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
-import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CompilerDirectives;
 import org.eclipse.lsp4j.Position;
@@ -32,11 +32,13 @@ import org.eclipse.lsp4j.Range;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl.FLOATING_COMMENT_LINE;
 
 /**
  * Process continuation lines. Any sentence, entry, clause, or phrase that requires more than one
@@ -52,6 +54,7 @@ import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 public class ContinuationLineTransformation implements CobolLinesTransformation {
   private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("\\s*");
   private static final String PSEUDO_TEXT_DELIMITER = "=";
+  private static final int SEQUENCE_LENGTH = 6;
   private final MessageService messageService;
 
   @Inject
@@ -60,7 +63,8 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   }
 
   @Override
-  public ResultWithErrors<List<CobolLine>> transformLines(
+  public ResultWithErrors<List<CobolLine>>
+  transformLines(
       String documentURI, List<CobolLine> lines) {
     List<CobolLine> result = new ArrayList<>();
     List<SyntaxError> errors = new ArrayList<>();
@@ -203,20 +207,57 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
       return registerStringClosingError(
           uri, lineNumber, getCobolLineTrimmedLength(previousCobolLine));
     }
+    Integer invalidIndexOfInlineComment = getInvalidIndexOfInlineComment(previousCobolLine);
+    if (invalidIndexOfInlineComment != null) {
+      return registerInlineCommentError(uri, lineNumber, invalidIndexOfInlineComment);
+    }
+    return null;
+  }
+
+  private SyntaxError registerInlineCommentError(String uri, int lineNumber, Integer invalidIndexOfInlineComment) {
+    return SyntaxError.syntaxError().errorSource(ErrorSource.PREPROCESSING)
+            .location(
+                    Locality.builder()
+                            .uri(uri)
+                            .range(
+                                    new Range(
+                                            new Position(lineNumber - 1, invalidIndexOfInlineComment),
+                                            new Position(lineNumber - 1, invalidIndexOfInlineComment + 1)))
+                            .recognizer(ContinuationLineTransformation.class)
+                            .build().toOriginalLocation())
+            .suggestion(messageService.getMessage("inlineComment.missingBlank"))
+            .severity(ERROR)
+            .build();
+  }
+
+  private Integer getInvalidIndexOfInlineComment(CobolLine cobolLine) {
+    if (doNotNeedAnalysis(cobolLine)) return null;
+    Matcher floatingCommentMatcher = FLOATING_COMMENT_LINE.matcher(cobolLine.getContentArea());
+    boolean isInlineCommentPresent = floatingCommentMatcher.matches() && floatingCommentMatcher.group("floatingComment") != null;
+    if (!isInlineCommentPresent) return null;
+    boolean isMissingSpace = !floatingCommentMatcher.group("validText").endsWith(" ");
+    if (isMissingSpace) {
+      int floatingCommentIndex = floatingCommentMatcher.start("floatingComment");
+      return (floatingCommentIndex == 0) ? null : (floatingCommentIndex + SEQUENCE_LENGTH);
+    }
     return null;
   }
 
   /** Check with a good pattern if there is an unclosed string */
   private boolean checkIfLineHasUnclosedString(CobolLine cobolLine) {
-    if (Objects.isNull(cobolLine) || isCommentLine(cobolLine))  {
-      return false;
-    }
-
-    String cobolLineToCheck = cobolLine.getContentAreaA() + cobolLine.getContentAreaB();
+    if (doNotNeedAnalysis(cobolLine)) return false;
+    Matcher floatingCommentMatcher = FLOATING_COMMENT_LINE.matcher(cobolLine.getContentArea());
+    String cobolLineToCheck = floatingCommentMatcher.matches()
+            ? floatingCommentMatcher.group("validText")
+            : cobolLine.getContentArea();
     String startChar = findQuoteOpeningChar(cobolLineToCheck);
 
     if (startChar == null) return false;
     return isStringMatchOdd(cobolLineToCheck, startChar);
+  }
+
+  private boolean doNotNeedAnalysis(CobolLine cobolLine) {
+    return Objects.isNull(cobolLine) || isCommentLine(cobolLine);
   }
 
   private String findQuoteOpeningChar(String cobolLineToCheck) {

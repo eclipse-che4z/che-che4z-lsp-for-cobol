@@ -259,6 +259,7 @@
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
                     <parallel>all</parallel>
+                    <argLine>-Dperformance.log.path=${project.build.directory}/perf.csv</argLine>
                     <systemProperties>
                         <property>
                             <name>filesToTestPath</name>
@@ -363,9 +364,29 @@
                                 <argument>-package</argument>
                                 <argument>org.eclipse.lsp.cobol.core</argument>
                                 <argument>-o</argument>
-                                <argument>${basedir}/target/generated-sources/antlr4/org/eclipse/lsp/cobol/core</argument>
+                                <argument>${project.build.directory}/generated-sources/antlr4/org/eclipse/lsp/cobol/core</argument>
                             </arguments>
                             <sourceDirectory>src/main/antlr4/org/eclipse/lsp/cobol/core/parser</sourceDirectory>
+                            <listener>true</listener>
+                            <visitor>true</visitor>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>run cics antlr</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>
+                                <argument>-package</argument>
+                                <argument>org.eclipse.lsp.cobol.implicitDialects.cics</argument>
+                                <argument>-o</argument>
+                                <argument>
+                                    ${project.build.directory}/generated-sources/antlr4/org/eclipse/lsp/cobol/implicitDialects/cics
+                                </argument>
+                            </arguments>
+                            <sourceDirectory>src/main/antlr4/org/eclipse/lsp/cics/parser</sourceDirectory>
                             <listener>true</listener>
                             <visitor>true</visitor>
                         </configuration>

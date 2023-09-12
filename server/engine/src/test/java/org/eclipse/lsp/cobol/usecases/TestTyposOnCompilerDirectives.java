@@ -44,26 +44,7 @@ class TestTyposOnCompilerDirectives {
           + "024200 PROCEDURE DIVISION .                                             CM1014.2\r\n";
 
   private static final String DATA_ERROR_MESSAGE =
-      "Syntax error on 'DDATA' expected {ADATA, EPILOG, NATLANG, NOCMPR2, ADV, AFP, APOST, AR, ARCH, ARITH, AWO, BLOCK0,"
-          + " BUF, BUFSIZE, CICS, CODEPAGE, COMPILE, COPYLOC, COPYRIGHT, CP, CPP, CPLC, CPYR, CURR, CURRENCY, C, DATA,"
-          + " DATEPROC, DBCS, DECK, DEF, DEFINE, DIAGTRUNC, DISPSIGN, DLL, DP, DS, DTR, DU, DUMP, DYN, DYNAM, D, EX,"
-          + " EXIT, EXP, EXPORTALL, FASTSRT, FLAG, FLAGSTD, FSRT, F, GDS, GRAPHIC, HGPR, IC, INITCHECK, INITIAL, INL,"
-          + " INLINE, INTDATE, INVD, INVDATA, LANG, LANGUAGE, LC, LEASM, LIB, LIN, LINECOUNT, LIST, LP, MAP, MARGINS,"
-          + " MAXPCF, MD, MDECK, NAME, NC, NOADATA, NOADV, NOAWO, NOBLOCK0, NOC, NOCICS, NOCOMPILE, NOCOPYLOC, "
-          + "NOCOPYRIGHT, NOCPLC, NOCPYR, NOCURR, NOCURRENCY, NOD, NODBCS, NODE, NODECK, NODEF, NODEFINE, NODATEPROC,"
-          + " NODP, NODIAGTRUNC, NODLL, NODTR, NODU, NODUMP, NODYN, NODYNAM, NOEPILOG, NOEX, NOEXIT, NOEXP, "
-          + "NOEXPORTALL, NOF, NOFASTSRT, NOFLAG, NOFLAGSTD, NOFSRT, NOFLAGMIG, NOGRAPHIC, NOIC, NOINITCHECK, "
-          + "NOINITIAL, NOINL, NOINLINE, NOINVD, NOINVDATA, NOLIB, NOLIST, NOMAP, NOMD, NOMDECK, NONAME, NONC, "
-          + "NONUM, NONUMBER, NONUMCHECK, NOOBJ, NOOBJECT, NOOFF, NOOFFSET, NOOPSEQUENCE, NOOPT, NOOPTIMIZE, NOP, "
-          + "NOPARMCHECK, NOPC, NOPROLOG, NORENT, NORULES, NOS, NOSEQ, NOSEQUENCE, NOSERV, NOSERVICE, NOSO, NOSOURCE,"
-          + " NOSQL, NOSQLC, NOSQLCCSID, NOSQLIMS, NOSSR, NOSSRANGE, NOSTGOPT, NOSTDTRUNC, NOSUPP, NOSUPPRESS, NOTERM,"
-          + " NOTERMINAL, NOTEST, NOTHREAD, NOVBREF, NOWD, NOWORD, NOX, NOXREF, NOZC, NOZONECHECK, NOZWB, NS, NSEQ, "
-          + "NSYMBOL, NUM, NUMBER, NUMCHECK, NUMPROC, OBJ, OBJECT, OFF, OFFSET, OP, OPMARGINS, OPSEQUENCE, OPT, "
-          + "OPTFILE, OPTIMIZE, OUT, OUTDD, PARMCHECK, PC, PGMN, PGMNAME, PROLOG, QUA, QUALIFY, QUOTE, Q, RENT, RES,"
-          + " RMODE, RULES, SEQ, SEQUENCE, SERV, SERVICE, SIZE, SO, SOURCE, SPACE, SQL, SQLC, SQLCCSID, SQLIMS, SSR,"
-          + " SSRANGE, STGOPT, SUPP, SUPPRESS, S, SZ, TERM, TERMINAL, TEST, THREAD, TRUNC, TUNE, VBREF, VLR, VS, "
-          + "VSAMOPENFS, WD, WORD, XMLPARSE, XOPTS, XP, XREF, X, YEARWINDOW, YW, ZC, ZD, ZONECHECK, ZONEDATA, ZWB, "
-          + "','}";
+      "Syntax error on 'DDATA'";
 
   @Test
   void testProcessWithoutNumbersWithTypo() {
@@ -74,7 +55,7 @@ class TestTyposOnCompilerDirectives {
             "1",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'DATA' expected {CBL, ID, IDENTIFICATION, PROCESS}",
+                "Syntax error on 'DATA'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -88,7 +69,7 @@ class TestTyposOnCompilerDirectives {
             "1",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'PROESS' expected {CBL, ID, IDENTIFICATION, PROCESS}",
+                "Syntax error on 'PROESS'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

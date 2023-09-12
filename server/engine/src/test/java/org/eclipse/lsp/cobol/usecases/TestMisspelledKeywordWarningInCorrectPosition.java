@@ -70,9 +70,6 @@ class TestMisspelledKeywordWarningInCorrectPosition {
                 ErrorSource.PARSING.getText()),
             "hello",
             new Diagnostic(
-                new Range(),
-                "Syntax error on '\"hello\"' expected SECTION",
-                Error,
-                ErrorSource.PARSING.getText())));
+                new Range(), "Syntax error on '\"hello\"'", Error, ErrorSource.PARSING.getText())));
   }
 }

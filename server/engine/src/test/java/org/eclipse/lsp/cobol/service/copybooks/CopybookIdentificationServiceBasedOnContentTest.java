@@ -117,4 +117,21 @@ class CopybookIdentificationServiceBasedOnContentTest {
     doc.setText(content);
     Assertions.assertFalse(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of()));
   }
+
+  @Test
+  void WhenAsteriskBeforeProgramId_thenReturnFalse() {
+    String content =
+        "      *                                                                         \n"
+            + "       IDENTIFICATION DIVISION.                                                 \n"
+            + "      *                                                                         \n"
+            + "       PROGRAM-ID.    CCB007.                                                   \n"
+            + "       AUTHOR.        CAPGEMINI.                                                \n"
+            + "       DATE-WRITTEN.  24/08/16 07:12.                                           \n";
+
+    CopybookIdentificationService service = new CopybookIdentificationServiceBasedOnContent();
+    TextDocumentItem doc = new TextDocumentItem();
+    doc.setText(content);
+    Assertions.assertFalse(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of()));
+  }
+
 }

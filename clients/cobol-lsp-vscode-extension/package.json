@@ -4,7 +4,7 @@
   "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
   "author": "Broadcom",
   "license": "EPL-2.0",
-  "version": "2.1.0",
+  "version": "2.0.3",
   "preview": false,
   "publisher": "BroadcomMFD",
   "engines": {
@@ -100,9 +100,25 @@
         "scopeName": "source.cobol",
         "path": "./syntaxes/COBOL.tmLanguage.json",
         "embeddedLanguages": {
-          "meta.embedded.block.sql": "sql",
           "meta.embedded.block.html": "html"
         }
+      },
+      {
+        "scopeName": "meta.embedded.block.cics",
+        "path": "./syntaxes/CICS.tmLanguage.json",
+        "injectTo": [
+          "source.cobol"
+        ]
+      },
+      {
+        "scopeName": "meta.embedded.block.sql",
+        "path": "./syntaxes/SQL.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.sql": "sql"
+        },
+        "injectTo": [
+          "source.cobol"
+        ]
       }
     ],
     "configuration": {

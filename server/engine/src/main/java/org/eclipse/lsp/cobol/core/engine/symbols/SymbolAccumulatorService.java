@@ -160,10 +160,14 @@ public class SymbolAccumulatorService implements VariableAccumulator {
     if (usage.getParent().getNodeType() == NodeType.PERFORM
         || usage.getParent().getNodeType() == NodeType.GO_TO
         || usage.getParent().getNodeType() == NodeType.SENTENCE) {
-      Optional<SectionNameNode> sectionNameNode = usage.getParent().getChildren().stream()
-          .filter(c -> c instanceof SectionNameNode)
-          .map(SectionNameNode.class::cast).findFirst();
+      int index = usage.getParent().getChildren().indexOf(usage);
 
+      Optional<SectionNameNode> sectionNameNode = Optional.empty();
+      if (index + 1 < usage.getParent().getChildren().size()) {
+        sectionNameNode = Optional.ofNullable(usage.getParent().getChildren().get(index + 1))
+            .filter(c -> c instanceof SectionNameNode)
+            .map(SectionNameNode.class::cast);
+      }
       return sectionNameNode
           .map(SectionNameNode::getName)
           .map(n -> n.equalsIgnoreCase(getSectionName(definition)))

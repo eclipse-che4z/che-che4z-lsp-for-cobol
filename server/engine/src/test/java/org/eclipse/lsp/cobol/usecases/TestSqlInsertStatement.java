@@ -105,18 +105,43 @@ class TestSqlInsertStatement {
           + "           END-EXEC.";
 
   private static final String INSERT8 =
-          TEXT
-                  + "           insert into all values(1,1);\n"
-                  + "           END-EXEC.";
+      TEXT + "           insert into all values(1,1);\n" + "           END-EXEC.";
 
   private static final String INSERT9 =
-          TEXT
-                  + "           insert into all(all,avg) \n"
-                  + "           select all all as all, avg from all;\n"
-                  + "           END-EXEC.";
+      TEXT
+          + "           insert into all(all,avg) \n"
+          + "           select all all as all, avg from all;\n"
+          + "           END-EXEC.";
+
+  public static final String INSERT10 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. testpgm.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*WS-VARIABLES}.\n"
+          + "           05 {$*WS-TIMESTAMP}                PIC X(26).\n"
+          + "           05 {$*WS-originalIssueDate}        PIC S9(18) COMP.\n"
+          + "           05 {$*WS-FIELD1}                   PIC X(01).\n"
+          + "           05 {$*WS-EXPIRES-IN}               PIC S9(18)V COMP-3.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "                 EXEC SQL\n"
+          + "              INSERT INTO TABLE1\n"
+          + "              (\n"
+          + "                TBL1_FIELD1 \n"
+          + "               ,TBL1_TIMESTAMP\n"
+          + "              )\n"
+          + "              VALUES\n"
+          + "              (\n"
+          + "                :{$WS-FIELD1}\n"
+          + "               ,TIMESTAMP(:{$WS-TIMESTAMP}) +\n"
+          + "                          (:{$WS-EXPIRES-IN} SECONDS)\n"
+          + "              )\n"
+          + "           END-EXEC   .\n"
+          + "       end program testpgm.";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(INSERT1, INSERT2, INSERT3, INSERT4, INSERT5, INSERT6, INSERT7, INSERT8, INSERT9);
+    return Stream.of(
+        INSERT1, INSERT2, INSERT3, INSERT4, INSERT5, INSERT6, INSERT7, INSERT8, INSERT9, INSERT10);
   }
 
   @ParameterizedTest
