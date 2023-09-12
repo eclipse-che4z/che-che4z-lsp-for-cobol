@@ -184,19 +184,29 @@ class CobolLanguageServerTest {
    */
   @Test
   void initialize() {
-    CobolLanguageServer server =
-        new CobolLanguageServer(
-            null,
-            null,
-            mock(WatcherServiceImpl.class),
-            null,
-            null,
-            customExecutor,
-            stateService,
-            null,
-            null,
-            null);
+    testServerInitialization(getInitializeParams());
+  }
+
+  @Test
+  void initializeWithoutWorkspace() {
     InitializeParams initializeParams = getInitializeParams();
+    initializeParams.setWorkspaceFolders(null);
+    testServerInitialization(initializeParams);
+  }
+
+  private void testServerInitialization(InitializeParams initializeParams) {
+    CobolLanguageServer server =
+            new CobolLanguageServer(
+                    null,
+                    null,
+                    mock(WatcherServiceImpl.class),
+                    null,
+                    null,
+                    customExecutor,
+                    stateService,
+                    null,
+                    null,
+                    null);
 
     try {
       InitializeResult result = server.initialize(initializeParams).get();
