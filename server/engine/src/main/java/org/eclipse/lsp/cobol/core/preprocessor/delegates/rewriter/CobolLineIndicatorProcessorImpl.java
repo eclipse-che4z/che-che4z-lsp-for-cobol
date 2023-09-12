@@ -38,7 +38,7 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
   private static final String EMPTY_STRING = "";
   private static final String DOUBLE_QUOTE_LITERAL = "\"([^\"]|\"\"|'')*+\"";
   private static final String SINGLE_QUOTE_LITERAL = "'([^']|''|\"\")*+'";
-  private static final Pattern FLOATING_COMMENT_LINE =
+  public static final Pattern FLOATING_COMMENT_LINE =
       Pattern.compile("(?<validText>.*?)(?<floatingComment>\\*> .+)?");
 
   /**
