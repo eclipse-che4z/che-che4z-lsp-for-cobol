@@ -38,6 +38,19 @@ public class TestInlineCommentWithOnlyCommentTag {
           + "       77 {$*VARNAME} USAGE INDEX.\n"
           + "       PROCEDURE DIVISION.\n";
 
+  public static final String TEXT3 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TESTREPL.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01  {$*PARENT} PIC 9.\n"
+          + "       01  {$*CHILD1} PIC 9.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       MAINLINE.\n"
+          + "           MOVE 0 TO   {$CHILD1}   *>\"\"\" '.\n"
+          + "           display \"Testing in progress\"\n"
+          + "           GOBACK.";
+
   @Test
   void testNoErrorWhenCommentTagNotFollowedByText() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
@@ -46,5 +59,10 @@ public class TestInlineCommentWithOnlyCommentTag {
   @Test
   void testNoErrorWhenCommentTagisFollowedByTextWithoutSpace() {
     UseCaseEngine.runTest(TEXT2, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testNoErrorWhenCommentTagisFollowedByUnBalancedQuotes() {
+    UseCaseEngine.runTest(TEXT3, ImmutableList.of(), ImmutableMap.of());
   }
 }
