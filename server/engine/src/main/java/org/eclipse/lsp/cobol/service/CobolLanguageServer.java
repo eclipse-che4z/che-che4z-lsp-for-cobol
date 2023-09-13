@@ -35,6 +35,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 
@@ -106,7 +107,8 @@ public class CobolLanguageServer implements LanguageServer {
   @Override
   @NonNull
   public CompletableFuture<InitializeResult> initialize(@NonNull InitializeParams params) {
-    watchingService.getWorkspaceFolders().addAll(params.getWorkspaceFolders());
+    Optional.ofNullable(params.getWorkspaceFolders())
+            .ifPresent(workspace -> watchingService.getWorkspaceFolders().addAll(workspace));
 
     ServerCapabilities capabilities = new ServerCapabilities();
 

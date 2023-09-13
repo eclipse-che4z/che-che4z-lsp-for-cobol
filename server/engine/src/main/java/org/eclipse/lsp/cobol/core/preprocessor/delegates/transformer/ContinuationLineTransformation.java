@@ -32,11 +32,13 @@ import org.eclipse.lsp4j.Range;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl.FLOATING_COMMENT_LINE;
 
 /**
  * Process continuation lines. Any sentence, entry, clause, or phrase that requires more than one
@@ -60,7 +62,8 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   }
 
   @Override
-  public ResultWithErrors<List<CobolLine>> transformLines(
+  public ResultWithErrors<List<CobolLine>>
+  transformLines(
       String documentURI, List<CobolLine> lines) {
     List<CobolLine> result = new ArrayList<>();
     List<SyntaxError> errors = new ArrayList<>();
@@ -212,7 +215,10 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
       return false;
     }
 
-    String cobolLineToCheck = cobolLine.getContentAreaA() + cobolLine.getContentAreaB();
+    Matcher floatingCommentMatcher = FLOATING_COMMENT_LINE.matcher(cobolLine.getContentArea());
+    String cobolLineToCheck = floatingCommentMatcher.matches()
+            ? floatingCommentMatcher.group("validText")
+            : cobolLine.getContentArea();
     String startChar = findQuoteOpeningChar(cobolLineToCheck);
 
     if (startChar == null) return false;

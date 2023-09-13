@@ -39,10 +39,10 @@ jobs:
       - name: Install dependencies for COBOL LS
         working-directory: clients/cobol-lsp-vscode-extension
         run: NODE_ENV=production npm ci
-      - name: Install dependencies for IDMS
+      - name: Install dependencies for IDMS dialect
         working-directory: clients/idms-dialect-support
         run: NODE_ENV=production npm ci
-      - name: Install dependencies for DaCo
+      - name: Install dependencies for DaCo dialect
         working-directory: clients/daco-dialect-support
         run: NODE_ENV=production npm ci
       - uses: actions/upload-artifact@v3
@@ -98,6 +98,7 @@ jobs:
           npm ci
           npm run test
       - name: SonarQube Scan
+        if: github.ref == 'refs/heads/development'
         uses: kitabisa/sonarqube-action@v1.2.0
         with:
           projectBaseDir: ${{ github.workspace }}
