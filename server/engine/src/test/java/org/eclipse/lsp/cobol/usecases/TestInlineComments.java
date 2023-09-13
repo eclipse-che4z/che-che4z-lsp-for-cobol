@@ -17,11 +17,16 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 /** Tests inline comment with just the comment tag doesn't throw error. */
-public class TestInlineCommentWithOnlyCommentTag {
+public class TestInlineComments {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
@@ -48,6 +53,19 @@ public class TestInlineCommentWithOnlyCommentTag {
           + "           DISPLAY \"TEST IN PROGRESS\" *> COMMENT '\n"
           + "           ADD 0 TO {$ABC}.\n";
 
+  public static final String TEXT4 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TESTREPL.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01  {$*VAR1} PIC 9.\n"
+          + "       01  {$*VAR2} PIC 9.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           MOVE 0 TO   {$VAR1}.   *>'\" '  \"\n"
+          + "           display \"Test in progress\"{.|1}*>'\n"
+          + "           MOVE 0 TO   {$VAR2}.\n"
+          + "           GOBACK.";
+
   @Test
   void testNoErrorWhenCommentTagNotFollowedByText() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
@@ -61,5 +79,14 @@ public class TestInlineCommentWithOnlyCommentTag {
   @Test
   void testFloatingCommentDoNotFlagErrorWhenCommentsHaveUnBalancedQuotes() {
     UseCaseEngine.runTest(TEXT3, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testFloatingCommentFlagsErrorWhenCommentIsNotPrecededBySpace() {
+    UseCaseEngine.runTest(TEXT4, ImmutableList.of(), ImmutableMap.of("1", new Diagnostic(
+            new Range(),
+            "Missing blank before inline comment",
+            Error,
+            ErrorSource.PREPROCESSING.getText())));
   }
 }
