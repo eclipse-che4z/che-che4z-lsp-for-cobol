@@ -103,13 +103,13 @@
           "meta.embedded.block.sql": "sql",
           "meta.embedded.block.html": "html"
         }
-      }, 
+      },
       {
         "scopeName": "meta.embedded.block.cics",
         "path": "./syntaxes/CICS.tmLanguage.json",
         "injectTo": [
-					"source.cobol"
-				]
+          "source.cobol"
+        ]
       }
     ],
     "configuration": {
