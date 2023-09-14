@@ -67,16 +67,16 @@ public class CobolLanguageServer implements LanguageServer {
   @Inject
   @SuppressWarnings("squid:S107")
   CobolLanguageServer(
-      TextDocumentService textService,
-      WorkspaceService workspaceService,
-      WatcherService watchingService,
-      SettingsService settingsService,
-      LocaleStore localeStore,
-      CustomThreadPoolExecutor customThreadPoolExecutor,
-      DisposableLSPStateService disposableLSPStateService,
-      CopybookNameService copybookNameService,
-      Keywords keywords,
-      MessageService messageService) {
+          TextDocumentService textService,
+          WorkspaceService workspaceService,
+          WatcherService watchingService,
+          SettingsService settingsService,
+          LocaleStore localeStore,
+          CustomThreadPoolExecutor customThreadPoolExecutor,
+          DisposableLSPStateService disposableLSPStateService,
+          CopybookNameService copybookNameService,
+          Keywords keywords,
+          MessageService messageService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
@@ -128,7 +128,7 @@ public class CobolLanguageServer implements LanguageServer {
     WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
     workspaceFoldersOptions.setSupported(TRUE);
     WorkspaceServerCapabilities workspaceServiceCapabilities =
-        new WorkspaceServerCapabilities(workspaceFoldersOptions);
+            new WorkspaceServerCapabilities(workspaceFoldersOptions);
     capabilities.setWorkspace(workspaceServiceCapabilities);
 
     return supplyAsync(() -> new InitializeResult(capabilities));
@@ -153,19 +153,19 @@ public class CobolLanguageServer implements LanguageServer {
 
   private void notifyConfiguredCopybookExtensions() {
     settingsService
-        .fetchTextConfiguration(CPY_EXTENSIONS.label)
-        .thenAccept(
-            config -> {
-              if (textService instanceof CobolTextDocumentService) {
-                ((CobolTextDocumentService) textService).notifyExtensionConfig(config);
-              }
-            });
+            .fetchTextConfiguration(CPY_EXTENSIONS.label)
+            .thenAccept(
+                    config -> {
+                      if (textService instanceof CobolTextDocumentService) {
+                        ((CobolTextDocumentService) textService).notifyExtensionConfig(config);
+                      }
+                    });
   }
 
   private void getLogLevelFromClient() {
     settingsService
-        .fetchConfiguration(LOGGING_LEVEL.label)
-        .thenAccept(LogLevelUtils.updateLogLevel());
+            .fetchConfiguration(LOGGING_LEVEL.label)
+            .thenAccept(LogLevelUtils.updateLogLevel());
   }
 
   private void getLocaleFromClient() {
@@ -223,7 +223,9 @@ public class CobolLanguageServer implements LanguageServer {
     return new ExecuteCommandOptions(ImmutableList.of(ErrorCodes.MISSING_COPYBOOK.getLabel()));
   }
 
-  /** Represents the JSON RPC response structure for shutdown command as per LSP specification */
+  /**
+   * Represents the JSON RPC response structure for shutdown command as per LSP specification
+   */
   @AllArgsConstructor
   private static class ShutdownResponse {
     private final String result;
