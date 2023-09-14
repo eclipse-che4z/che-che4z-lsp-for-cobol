@@ -144,7 +144,7 @@ class CobolLanguageServerTest {
   }
 
   @Test
-  void initializedConfig() {
+  void initializedConfig() throws ExecutionException, InterruptedException {
     SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
@@ -156,8 +156,8 @@ class CobolLanguageServerTest {
     DialectService dialectService = mock(DialectService.class);
     when(dialectService.getSettingsSections()).thenReturn(ImmutableList.of("daco"));
 
-    when(settingsService.fetchTextConfiguration(anyString()))
-        .thenReturn(CompletableFuture.supplyAsync(ImmutableList::of));
+    CompletableFuture<List<String>> completableFuture = CompletableFuture.supplyAsync(ImmutableList::of);
+    when(settingsService.fetchTextConfiguration(anyString())).thenReturn(completableFuture);
     prepareSettingsService(settingsService, localeStore);
 
     CobolLanguageServer server =
@@ -174,6 +174,7 @@ class CobolLanguageServerTest {
             messageService);
 
     server.initialized(new InitializedParams());
+    completableFuture.get();
     verify(textService, times(1)).notifyExtensionConfig(any());
   }
 
