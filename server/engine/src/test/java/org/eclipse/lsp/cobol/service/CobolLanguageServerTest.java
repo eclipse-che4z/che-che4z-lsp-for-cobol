@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -157,8 +158,7 @@ class CobolLanguageServerTest {
     DialectService dialectService = mock(DialectService.class);
     when(dialectService.getSettingsSections()).thenReturn(ImmutableList.of("daco"));
 
-    CompletableFuture<List<String>> completableFuture = CompletableFuture.supplyAsync(ImmutableList::of);
-    when(settingsService.fetchTextConfiguration(anyString())).thenReturn(completableFuture);
+    when(settingsService.fetchTextConfiguration(anyString())).thenReturn(CompletableFuture.supplyAsync(ImmutableList::of));
     prepareSettingsService(settingsService, localeStore);
 
     CobolLanguageServer server =
@@ -175,8 +175,8 @@ class CobolLanguageServerTest {
             messageService);
 
     server.initialized(new InitializedParams());
-    completableFuture.get();
-    verify(textService, times(1)).notifyExtensionConfig(any());
+    verify(textService, timeout(TimeUnit.SECONDS.toMillis(5))
+                    .times(1)).notifyExtensionConfig(any());
   }
 
   /**
