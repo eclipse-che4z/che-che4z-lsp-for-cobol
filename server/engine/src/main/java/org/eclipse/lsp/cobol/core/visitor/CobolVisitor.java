@@ -677,7 +677,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             ? procedureNameContext.inSection().sectionName().getText()
             : null;
     final String targetName = procedureNameContext.paragraphName().getText();
-    return addTreeNode(ctx, locality -> new PerformNode(locality, section, targetName));
+    return addTreeNode(ctx, locality -> new PerformNode(locality, section, targetName, extractThru(ctx)));
   }
 
   @Override
@@ -1049,6 +1049,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitAtEndPhrase(AtEndPhraseContext ctx) {
     return addTreeNode(ctx, AtEndNode::new);
+  }
+
+  private String extractThru(PerformProcedureStatementContext ctx) {
+    if (((ctx.THRU() != null) || (ctx.THROUGH() != null)) && ctx.getChildCount() > 2) {
+      return ctx.getChild(2).getText();
+    }
+    return null;
   }
 
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {
