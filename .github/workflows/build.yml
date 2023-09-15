@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: 
+        with:
           fetch-depth: 0
       - uses: graalvm/setup-graalvm@v1
         with:
@@ -91,7 +91,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: lib
-          path: clients/cobol-dialect-api/lib/*    
+          path: clients/cobol-dialect-api/lib/*
       - name: Unit Test COBOL LS extension
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
@@ -153,7 +153,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: echo "target=linux-${{ matrix.arch }}" >> $GITHUB_ENV
 
-      # Setup envierment
+      # Setup environment
       - name: switch xcode to 12.5.1
         if: matrix.os == 'macos-11'
         run: |
@@ -262,6 +262,11 @@ jobs:
         with:
           name: lib
           path: clients/cobol-dialect-api
+      - name: update version for PR
+        working-directory: clients/cobol-lsp-vscode-extension
+        if: ${{ github.event.pull_request.head.ref != 'development'}} or ${{ github.event.pull_request.head.ref != 'master'}}
+        run: |
+          node -e "const fs=require('fs');const fileName='./package.json';var content=require(fileName);content.version=content.version+'\+pr-'+${{ github.event.pull_request.number }};fs.writeFileSync(fileName,JSON.stringify(content,null,2));"
       - name: Build COBOL LS extension 
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
@@ -301,7 +306,7 @@ jobs:
           run: |
             npm run compile
             npm run test:integration
-          working-directory: clients/cobol-lsp-vscode-extension          
+          working-directory: clients/cobol-lsp-vscode-extension
       - name: Run native executable test code
         working-directory: tests/native-executable-tests
         run: |
