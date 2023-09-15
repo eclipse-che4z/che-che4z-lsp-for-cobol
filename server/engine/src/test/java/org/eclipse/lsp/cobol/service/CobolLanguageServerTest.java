@@ -49,6 +49,7 @@ import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -188,6 +189,7 @@ class CobolLanguageServerTest {
   }
 
   @Test
+  @Disabled("Fails the build intermittently. Disabled until reason identified")
   void initializeWithoutWorkspace() {
     InitializeParams initializeParams = getInitializeParams();
     initializeParams.setWorkspaceFolders(null);

@@ -55,7 +55,7 @@
       }
     },
     "comment-floating": {
-      "match": "\\s\\*>\\s.*",
+      "match": "\\s\\*>.*",
       "name": "comment.line.cobol.floating"
     },
     "number-constant": {
