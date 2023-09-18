@@ -27,17 +27,20 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 public class PerformNode extends Node {
   String section;
   String paragraph;
+  String thru;
 
   public PerformNode(Locality location) {
     super(location, NodeType.PERFORM);
     this.section = null;
     this.paragraph = null;
+    this.thru = null;
   }
 
-  public PerformNode(Locality location, String section, String paragraph) {
+  public PerformNode(Locality location, String section, String paragraph, String thru) {
     super(location, NodeType.PERFORM);
     this.section = section;
     this.paragraph = paragraph;
+    this.thru = thru;
   }
 
   public boolean isInline() {

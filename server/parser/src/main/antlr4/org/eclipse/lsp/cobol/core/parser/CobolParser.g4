@@ -825,7 +825,7 @@ dataJustifiedClause
    ;
 
 dataOccursClause
-   : OCCURS integerLiteral dataOccursTo? TIMES? (DEPENDING ON? qualifiedDataName)? dataOccursSort* (INDEXED BY? LOCAL? indexName+)?
+   : OCCURS (integerLiteral | UNBOUNDED) dataOccursTo? TIMES? (DEPENDING ON? qualifiedDataName)? dataOccursSort* (INDEXED BY? LOCAL? indexName+)?
    ;
 
 dataOccursTo
