@@ -16,8 +16,13 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.PerformNode;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Paragraph name can be "CLOSE"
@@ -30,8 +35,35 @@ class TestPerformClose {
           + "       {#*CLOSE}.\n"
           + "           DISPLAY 'CLOSE'.\n";
 
+  private static final String TEXT_THRU = "       IDENTIFICATION DIVISION.\n"
+      + "       PROGRAM-ID. CLOSEPAR.\n"
+      + "       PROCEDURE DIVISION.\n"
+      + "           PERFORM {#BP} OF SEC1 THRU {#EP}.\n"
+      + "       {@*SEC1} SECTION.\n"
+      + "       {#*BP}.\n"
+      + "           DISPLAY 'BP'.\n"
+      + "       {#*CP}.\n"
+      + "           DISPLAY 'CP'.\n"
+      + "       {#*EP}.\n"
+      + "           DISPLAY 'EP'.\n";
+
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of());
   }
+
+  @Test
+  void testPerformThru() {
+    AnalysisResult result = UseCaseEngine.runTest(TEXT_THRU, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of());
+    PerformNode perform = result.getRootNode().getDepthFirstStream()
+        .filter(n -> n.getNodeType() == NodeType.PERFORM)
+        .findFirst()
+        .map(PerformNode.class::cast)
+        .orElseThrow(RuntimeException::new);
+
+    assertEquals("BP", perform.getParagraph());
+    assertEquals("SEC1", perform.getSection());
+    assertEquals("EP", perform.getThru());
+  }
+
 }

@@ -49,7 +49,7 @@ import static java.util.Optional.ofNullable;
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
  * that start with "textDocument" go here. The current implementation contains only supported
  * language features. For more details, please, see the specification:
- * https://microsoft.github.io//language-server-protocol/specifications/specification-3-14/
+ * <a href="https://microsoft.github.io//language-server-protocol/specifications/specification-3-14/">...</a>
  *
  * <p>For the maintainers: Please, add logging for exceptions if you run any asynchronous operation.
  * Also, you perform any communication with the client, do it a using {@link Communications}
@@ -190,10 +190,13 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         ofNullable(new Gson().fromJson(json.toString(), AnalysisResultEvent.class))
             .orElseGet(() -> new AnalysisResultEvent("", ""));
 
-    return taskService.runNextTask(UriHelper.decode(event.getUri()), () -> {
-      Node node = analysisService.retrieveAnalysis(event.getUri(), event.getText());
+    String uri = UriHelper.decode(event.getUri());
+    String text = event.getText();
+
+    return taskService.runNextTask(uri, () -> {
+      Node node = analysisService.retrieveAnalysis(uri, text);
       return cfastBuilder.build(node);
-    }, "analysis").whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis retrieving", event.getUri())));
+    }, "analysis").whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis retrieving", uri)));
   }
 
   @Override
