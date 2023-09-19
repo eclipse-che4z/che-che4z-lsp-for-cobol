@@ -45,7 +45,7 @@ public class TestIssueWithEmbeddedCodePresentInCopybook {
           + "XDEBUG     END-EXEC.   \n"
           + "           EXEC SQL \n"
           + "           declare scur cursor for select a,b,c from tabD where a = 8\n"
-          + "           order by c for {fetch|4} only;\n"
+          + "           order by c for {detch|4} only;\n"
           + "            END-EXEC.\n";
 
   @Test
@@ -76,7 +76,7 @@ public class TestIssueWithEmbeddedCodePresentInCopybook {
             "4",
             new Diagnostic(
                 new Range(),
-                "No viable alternative at input for fetch",
+                "No viable alternative at input for detch",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
