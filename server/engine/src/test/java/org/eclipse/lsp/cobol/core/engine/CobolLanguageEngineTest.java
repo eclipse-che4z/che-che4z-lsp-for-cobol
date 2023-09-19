@@ -121,7 +121,7 @@ class CobolLanguageEngineTest {
     when(preprocessor.cleanUpCode(URI, TEXT))
         .thenReturn(new ResultWithErrors<>(new ExtendedText(TEXT, URI), ImmutableList.of()));
 
-    when(embeddedCodeService.generateNodes(any(), any(), any(), any(), anyString(), anyList()))
+    when(embeddedCodeService.generateNodes(any(), any(), any(), any(), anyString(), anyList(), any()))
         .thenReturn(new ResultWithErrors<>(ImmutableList.of(), ImmutableList.of()));
 
     when(grammarPreprocessor.preprocess(any())).thenReturn(new ResultWithErrors<>(new CopybooksRepository(), ImmutableList.of()));
