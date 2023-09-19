@@ -130,7 +130,7 @@ compilerOption
    | DYNAM | DYN | NODYNAM | NODYN
    | (EXIT | EX) LPARENCHAR (
         ((INEXIT | INX | LIBEXIT | LIBX | PRTEXIT | PRTX | ADEXIT | ADX | MSGEXIT | MSGX)
-            LPARENCHAR dataName (commaSeparator dataName)? RPARENCHAR)
+            LPARENCHAR (dataName | NONNUMERICLITERAL) (commaSeparator (dataName | NONNUMERICLITERAL))? RPARENCHAR)
         | (NOINEXIT | NOINX | NOLIBEXIT | NOLIBX | NOPRTEXIT | NOPRTX | NOADEXIT | NOADX | NOMSGEXIT | NOMSGX)
       )* RPARENCHAR
    | NOEXIT | NOEX
