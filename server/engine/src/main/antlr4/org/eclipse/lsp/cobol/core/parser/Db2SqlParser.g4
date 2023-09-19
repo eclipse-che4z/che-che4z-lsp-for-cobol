@@ -881,15 +881,19 @@ dbs_savepoint: SAVEPOINT dbs_savepoint_name UNIQUE? ON ROLLBACK RETAIN (CURSORS 
 
 
 dbs_select: dbs_select_unpack_function_invocation | (WITH common_table_expression_loop)? dbs_fullselect
-            (dbs_select_update
+            ( dbs_select_update
              | dbs_select_readOnly
              | dbs_select_optimize
              | dbs_select_statement_isolation_clause
-             | (QUERYNO dbs_integer)
-             | (SKIPCHAR LOCKED DATA))*;
+             | dbs_concurrent_access_resolution_clause
+             | dbs_offset_clause
+             | dbs_fetch_clause
+             | dbs_lock_req_clause )*;
 dbs_select_update: FOR UPDATE (OF dbs_column_name (dbs_comma_separator dbs_column_name)*)? ;
-dbs_select_readOnly: FOR READ ONLY;
+dbs_select_readOnly: FOR (READ | FETCH) ONLY;
 dbs_select_optimize:OPTIMIZE FOR dbs_integer (ROWS | ROW);
+dbs_concurrent_access_resolution_clause: (WAIT FOR OUTCOME) | (SKIPCHAR LOCKED DATA) ;
+dbs_lock_req_clause: USE AND KEEP (SHARE| UPDATE | EXCLUSIVE) LOCKS;
 /*Queries Subselects (all)*/
 dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCHAR DOT_FS ASTERISKCHAR AS LPARENCHAR dbs_field_name db2sql_data_types (dbs_comma_separator dbs_field_name db2sql_data_types)* RPARENCHAR;
 dbs_select_row_fullselect: (NONNUMERICLITERAL | NUMERICLITERAL)+ ;
