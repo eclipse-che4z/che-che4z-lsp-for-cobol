@@ -20,7 +20,7 @@ Changelog:
 * Change scope of WAIT to be used same as NOHANDLE ([082059219](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/082059219))
 * Update DB2 SELECT clause ([45f70183c](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/45f70183c))
 * Add inline exception handle for EXEC CICS commands ([2ca8ae648](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/2ca8ae648))
-* All tokens are passed and matched for embedded language ([CICS and SQL](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/CICS and SQL)) ([274ce6d87](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/274ce6d87))
+* All tokens are passed and matched for embedded language (CICS and SQL) ([274ce6d87](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/274ce6d87))
 * DB2 predefined variables ([7ceda1a56](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/7ceda1a56))
 * Error out the usage of deprecated cobol 5 compiler directives ([b34bebf06](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/b34bebf06))
 * Validate variable name length ([6fdae199d](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/6fdae199d))
