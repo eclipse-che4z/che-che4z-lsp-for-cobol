@@ -2,6 +2,36 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 
 Changelog:
+## [2.0.3](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.2...2.0.3) (2023-09-20)
+### Bug Fixes
+* allow whenever in data division ([be50acf](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/be50acfc63c76da3b388c7eb831e02a33f47fbab))
+* fix: allow whenever in data division ([be50acfc6](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/be50acfc6))
+* fix: update db2 select grammar as per doc ([47a48696c](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/47a48696c))
+* fix: tolerate cics format time syntax when TIMESEP and TIME are not present is a fixed order ([222d558a6](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/222d558a6))
+* fix: fix wrong diagnostic location for embedded code present inside a copybook ([9a99e14ae](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/9a99e14ae))
+* fix: Add support for 'PERFORM THRU' CCF node ([#2064](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/#2064)) ([99d51ef16](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/99d51ef16))
+* fix: unbounded occurs support added ([1a0bb2f06](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/1a0bb2f06))
+* fix: fix issues with inline comment. ([ccda2be9d](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/ccda2be9d))
+* fix: server initialization when file is opened without workspace ([3571332a3](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/3571332a3))
+* fix: Fix CCF extended api call ([#2054](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/#2054)) ([4e1df638f](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/4e1df638f))
+* fix: inline comments shouldn't be analysed while preprocessing ([481688f03](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/481688f03))
+* fix: update cics rules for sent text and asktime ([fe6123dc0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/fe6123dc0))
+* fix: add semantics check for file IO operations ([ad9e331e6](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/ad9e331e6))
+* fix: change scope of WAIT to be used same as NOHANDLE ([082059219](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/082059219))
+* fix: update db2 select clause ([45f70183c](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/45f70183c))
+* fix: add inline exception handle for EXEC CICS commands ([2ca8ae648](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/2ca8ae648))
+* fix: all tokens are passed and matched for embedded language ([CICS and SQL](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/CICS and SQL)) ([274ce6d87](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/274ce6d87))
+* fix: db2 predefined variables ([7ceda1a56](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/7ceda1a56))
+* fix: error out the usage of deprecated cobol 5 compiler directives ([b34bebf06](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/b34bebf06))
+* fix: validate variable name length ([6fdae199d](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/6fdae199d))
+* fix: remove area A warning for exec sql block ([aefe2f646](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/aefe2f646))
+* fix: allow CLOSE as paragraph name ([5af11159e](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/5af11159e))
+* fix: allow EXEC SQL in LOCAL STORAGE ([bea2ec5b4](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/bea2ec5b4))
+* fix: allow SYMBOL as variable name ([7fc0bcc13](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/7fc0bcc13))
+* fix: allow fetch into variable ([0e5532ea5](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/0e5532ea5))
+* fix: expect a mandatory END-EXEC for EXEC block ([5550bd76b](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/5550bd76b))
+* fix: show no error for inline comment with just comment tag ([478f377db](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/478f377db))
+
 # [2.0.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.1...2.0.2) (2023-08-15)
 ### Bug Fixes
 * Fix pop-up error for completion requests ([658f6cb](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/658f6cb86bc5993c2f8f0624cd523ccc8eba4104))
