@@ -24,7 +24,7 @@ procedureDivisionRules: ((dbs_allocate | dbs_alter | dbs_associate | dbs_call | 
           dbs_label | dbs_lock | dbs_merge | dbs_open | dbs_prepare | dbs_refresh | dbs_release | dbs_rename |
           dbs_revoke | dbs_rollback | dbs_savepoint | dbs_select | dbs_set | dbs_signal | dbs_transfer | dbs_truncate |
           dbs_update | dbs_values | dbs_whenever) dbs_semicolon_end?)+ EOF;
-rulesAllowedInDataDivision: ((dbs_declare_cursor | dbs_declare_table | dbs_include) dbs_semicolon_end?)+;
+rulesAllowedInDataDivision: ((dbs_declare_cursor | dbs_whenever | dbs_declare_table | dbs_include) dbs_semicolon_end?)+;
 rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca | dbs_include_sqlda) dbs_semicolon_end?)+;
 
 //used in working-storage section of cobol program
