@@ -4,8 +4,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 Changelog:
 ## [2.0.3](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.2...2.0.3) (2023-09-20)
 ### Bug Fixes
-* Allow WHENEVER in data division ([be50acf](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/be50acfc63c76da3b388c7eb831e02a33f47fbab))
-* Allow WHENEVER in data division ([be50acfc6](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/be50acfc6))
+* Allow WHENEVER in data division ([be50acf](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/be50acfc63c76da3b388c7eb831e02a33f47fbab)), ([be50acfc6](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/be50acfc6))
 * Update DB2 SELECT grammar as per doc ([47a48696c](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/47a48696c))
 * Tolerate CICS format time syntax when TIMESEP and TIME are not present is a fixed order ([222d558a6](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/222d558a6))
 * Fix wrong diagnostic location for embedded code present inside a copybook ([9a99e14ae](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/9a99e14ae))
