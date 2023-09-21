@@ -888,7 +888,7 @@ dbs_select: dbs_select_unpack_function_invocation | (WITH common_table_expressio
              | (QUERYNO dbs_integer)
              | (SKIPCHAR LOCKED DATA))*;
 dbs_select_update: FOR UPDATE (OF dbs_column_name (dbs_comma_separator dbs_column_name)*)? ;
-dbs_select_readOnly: FOR READ ONLY;
+dbs_select_readOnly: FOR (READ | FETCH) ONLY;
 dbs_select_optimize:OPTIMIZE FOR dbs_integer (ROWS | ROW);
 /*Queries Subselects (all)*/
 dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCHAR DOT_FS ASTERISKCHAR AS LPARENCHAR dbs_field_name db2sql_data_types (dbs_comma_separator dbs_field_name db2sql_data_types)* RPARENCHAR;
@@ -1285,7 +1285,7 @@ dbs_select_into: (WITH common_table_expression_loop)?  dbs_select_clause INTO (t
 common_table_expression_loop: dbs_select_statement_common_table_expression (dbs_comma_separator dbs_select_statement_common_table_expression)*;
 target_variable_names_loop: target_variable_names_opts (dbs_comma_separator target_variable_names_opts)*;
 target_variable_names_opts: dbs_global_variable_name | dbs_host_variable | dbs_sql_parameter_name | dbs_sql_variable_name | dbs_transition_variable_name;
-dbs_select_statement_common_table_expression: dbs_sql_identifier LPARENCHAR dbs_sql_identifier (dbs_comma_separator dbs_sql_identifier)* RPARENCHAR AS dbs_fullselect;
+dbs_select_statement_common_table_expression: dbs_sql_identifier (LPARENCHAR dbs_sql_identifier (dbs_comma_separator dbs_sql_identifier)* RPARENCHAR)? AS dbs_fullselect;
 dbs_select_statement_isolation_clause: WITH (RR dbs_select_statement_isolation_clause_lock_clause | RS dbs_select_statement_isolation_clause_lock_clause | CS | UR );
 dbs_select_statement_isolation_clause_lock_clause: USE AND KEEP (EXCLUSIVE | UPDATE | SHARE) LOCKS;
 dbs_select_statement_queryno_clause: QUERYNO dbs_integer;
