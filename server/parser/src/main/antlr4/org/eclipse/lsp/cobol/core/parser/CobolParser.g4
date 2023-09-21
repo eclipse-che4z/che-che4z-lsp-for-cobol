@@ -1297,11 +1297,15 @@ divideIntoStatement
    ;
 
 divideIntoGivingStatement
-   : INTO (literal | generalIdentifier) divideGivingPhrase?
+   : INTO (literal | generalIdentifier) divideGivingPhrase divideRemainderPhrase?
+   ;
+
+divideRemainderPhrase
+   : REMAINDER generalIdentifier
    ;
 
 divideByGivingStatement
-   : BY (literal | generalIdentifier) divideGivingPhrase?
+   : BY (literal | generalIdentifier) divideGivingPhrase
    ;
 
 divideGivingPhrase
