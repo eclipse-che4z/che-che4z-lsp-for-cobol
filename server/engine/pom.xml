@@ -259,6 +259,7 @@
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
                     <parallel>all</parallel>
+                    <argLine>-Dperformance.log.path=${project.build.directory}/perf.csv</argLine>
                     <systemProperties>
                         <property>
                             <name>filesToTestPath</name>
