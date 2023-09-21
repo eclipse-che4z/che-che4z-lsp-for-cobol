@@ -45,7 +45,7 @@ public class TestVariableLength {
             "1",
             new Diagnostic(
                 new Range(),
-                "Max length limit of 30 bytes allowed for variable name.",
+                "Variable name cannot exceed 30 characters",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
