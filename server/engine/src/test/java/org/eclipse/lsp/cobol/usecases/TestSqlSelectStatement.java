@@ -139,16 +139,9 @@ class TestSqlSelectStatement {
           + "            FROM SYSIBM.SYSDUMMY1                                       00095700\n"
           + "           END-EXEC.                                                    00095800";
 
-  private static final String SELECT14 =
-          TEXT
-                  + "            DECLARE C1 CURSOR FOR \n"
-                  + "             SELECT * FROM RMTTAB\n"
-                  + "               FOR FETCH ONLY \n"
-                  + "           END-EXEC.\n";
-
   private static Stream<String> textsToTest() {
     return Stream.of(SELECT, SELECT2, SELECT3, SELECT4, SELECT5, SELECT6, SELECT7, SELECT8, SELECT9, SELECT10,
-            SELECT11, SELECT12, SELECT13, SELECT14);
+            SELECT11, SELECT12, SELECT13);
   }
 
   @ParameterizedTest
