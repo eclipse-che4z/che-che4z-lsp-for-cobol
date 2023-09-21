@@ -122,6 +122,140 @@ suite("Integration Test Suite", function () {
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
+  test("TC312753 Check EXEC CICS allows free arguments order", async () => {
+    await helper.showDocument("ADSORT.cbl");
+    let editor = helper.get_editor("ADSORT.cbl");
+    await helper.deleteLine(editor, 58);
+    await helper.insertString(
+      editor,
+      pos(39, 0),
+      "           EXEC CICS\n" +
+        "               SEN MAP('DETAIL') MAPSET(MODULE-NAME-1)    ERASE\n" +
+        "           END-EXEC.",
+    );
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
+    );
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 1);
+    helper.assertRangeIsEqual(
+      diagnostics[0].range,
+      range(pos(40, 15), pos(40, 18)),
+    );
+    assert.ok(
+      diagnostics[0].message.includes(
+        "Syntax error on 'SEN' expected {ABEND, ADD, ADDRESS, ALLOCATE, ASKTIME, ASSIGN",
+      ),
+    );
+    await helper.deleteLine(editor, 40);
+    await helper.insertString(
+      editor,
+      pos(40, 0),
+      "               SEND MAP('DETAIL') MAPSET(MODULE-NAME-1)    ERASE",
+    );
+    editor = helper.get_editor("ADSORT.cbl");
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
+    );
+    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 0);
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
+
+  test("TC312745 Error check", async () => {
+    await helper.showDocument("ADSORT.cbl");
+    let editor = helper.get_editor("ADSORT.cbl");
+    await helper.deleteLine(editor, 58);
+    await helper.insertString(
+      editor,
+      pos(58, 0),
+      "           EXEC CICS XCTL123 PROGRAM (XCTL1) END-EXEC.",
+    );
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
+    );
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 1);
+    helper.assertRangeIsEqual(
+      diagnostics[0].range,
+      range(pos(58, 21), pos(58, 28)),
+    );
+    assert.ok(
+      diagnostics[0].message.includes(
+        "Syntax error on 'XCTL123' expected {ABEND, ADD, ADDRESS, ALLOCATE, ASKTIME, ASSIGN",
+      ),
+    );
+    await helper.deleteLine(editor, 58);
+    await helper.insertString(
+      editor,
+      pos(58, 0),
+      "           EXEC CICS XCTL PROGRAM (XCTL1) END-EXEC.",
+    );
+    editor = helper.get_editor("ADSORT.cbl");
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
+    );
+    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 0);
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
+
+  test("TC312738 CICS variables and paragraphs support", async () => {
+    await helper.showDocument("ADSORT.cbl");
+    let editor = helper.get_editor("ADSORT.cbl");
+
+    const result: any[] = await vscode.commands.executeCommand(
+      "vscode.executeDefinitionProvider",
+      editor.document.uri,
+      pos(58, 36),
+    );
+    assert.ok(
+      result.length === 1 &&
+        result[0].uri.fsPath === editor.document.fileName &&
+        result[0].range.start.line === 27 &&
+        result[0].range.start.character === 7,
+      "Checks behavior of go to definition action",
+    );
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
+
+  test("TC314992 CICS as a Variable Name", async () => {
+    await helper.showDocument("ADSORT.cbl");
+    let editor = helper.get_editor("ADSORT.cbl");
+    await helper.insertString(
+      editor,
+      pos(28, 0),
+      "       88  CICS VALUE 'CICS '",
+    );
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
+    );
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 1);
+    helper.assertRangeIsEqual(
+      diagnostics[0].range,
+      range(pos(28, 22), pos(28, 29)),
+    );
+    assert.ok(diagnostics[0].message.includes("Missing token"));
+    await helper.deleteLine(editor, 28);
+    await helper.insertString(
+      editor,
+      pos(28, 0),
+      "       88  CICS VALUE 'CICS '.",
+    );
+    editor = helper.get_editor("ADSORT.cbl");
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
+    );
+    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 0);
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
+
   test("TC266094 Underline the entire incorrect variable structure", async () => {
     await helper.showDocument("VAR.cbl");
     let editor = helper.get_editor("VAR.cbl");
