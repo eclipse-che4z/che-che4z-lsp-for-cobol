@@ -16,7 +16,7 @@ import * as assert from "assert";
 import * as helper from "./testHelper";
 import * as vscode from "vscode";
 import * as path from "path";
-import { pos } from "./testHelper";
+import { pos, range } from "./testHelper";
 
 suite("TF35623: Support for Replacing and Mapping statement", function () {
   this.timeout(helper.TEST_TIMEOUT);
@@ -133,5 +133,22 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
     assert.strictEqual(diagnostics.length, 1);
     const message = diagnostics[0].message;
     assert.match(message, /^Variable VARNAME is not defined/);
+  });
+
+  test("TC250747: Support building of the extended document", async () => {
+    const extSrcPath = path.join("TEST6.CBL");
+    let editor = await helper.showDocument(extSrcPath);
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+    );
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    helper.assertRangeIsEqual(
+      diagnostics[1].range,
+      range(pos(35, 11), pos(35, 14)),
+    );
+    helper.assertRangeIsEqual(
+      diagnostics[7].range,
+      range(pos(35, 15), pos(35, 24)),
+    );
   });
 });
