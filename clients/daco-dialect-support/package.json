@@ -33,6 +33,13 @@
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [],
+    "grammars": [
+      {
+        "injectTo": ["source.cobol"],
+        "scopeName": "daco.injection",
+        "path": "./syntaxes/daco.injection.json"
+      }
+    ],
     "configuration": {
       "title": "COBOL Dialect Support for DaCo",
       "properties": {

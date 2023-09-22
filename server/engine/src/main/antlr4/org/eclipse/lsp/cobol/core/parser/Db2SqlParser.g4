@@ -24,7 +24,7 @@ procedureDivisionRules: ((dbs_allocate | dbs_alter | dbs_associate | dbs_call | 
           dbs_label | dbs_lock | dbs_merge | dbs_open | dbs_prepare | dbs_refresh | dbs_release | dbs_rename |
           dbs_revoke | dbs_rollback | dbs_savepoint | dbs_select | dbs_set | dbs_signal | dbs_transfer | dbs_truncate |
           dbs_update | dbs_values | dbs_whenever) dbs_semicolon_end?)+ EOF;
-rulesAllowedInDataDivision: ((dbs_declare_cursor | dbs_declare_table | dbs_include) dbs_semicolon_end?)+;
+rulesAllowedInDataDivision: ((dbs_declare_cursor | dbs_whenever | dbs_declare_table | dbs_include) dbs_semicolon_end?)+;
 rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca | dbs_include_sqlda) dbs_semicolon_end?)+;
 
 //used in working-storage section of cobol program
@@ -881,19 +881,15 @@ dbs_savepoint: SAVEPOINT dbs_savepoint_name UNIQUE? ON ROLLBACK RETAIN (CURSORS 
 
 
 dbs_select: dbs_select_unpack_function_invocation | (WITH common_table_expression_loop)? dbs_fullselect
-            ( dbs_select_update
+            (dbs_select_update
              | dbs_select_readOnly
              | dbs_select_optimize
              | dbs_select_statement_isolation_clause
-             | dbs_concurrent_access_resolution_clause
-             | dbs_offset_clause
-             | dbs_fetch_clause
-             | dbs_lock_req_clause )*;
+             | (QUERYNO dbs_integer)
+             | (SKIPCHAR LOCKED DATA))*;
 dbs_select_update: FOR UPDATE (OF dbs_column_name (dbs_comma_separator dbs_column_name)*)? ;
 dbs_select_readOnly: FOR (READ | FETCH) ONLY;
 dbs_select_optimize:OPTIMIZE FOR dbs_integer (ROWS | ROW);
-dbs_concurrent_access_resolution_clause: (WAIT FOR OUTCOME) | (SKIPCHAR LOCKED DATA) ;
-dbs_lock_req_clause: USE AND KEEP (SHARE| UPDATE | EXCLUSIVE) LOCKS;
 /*Queries Subselects (all)*/
 dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCHAR DOT_FS ASTERISKCHAR AS LPARENCHAR dbs_field_name db2sql_data_types (dbs_comma_separator dbs_field_name db2sql_data_types)* RPARENCHAR;
 dbs_select_row_fullselect: (NONNUMERICLITERAL | NUMERICLITERAL)+ ;
@@ -1289,7 +1285,7 @@ dbs_select_into: (WITH common_table_expression_loop)?  dbs_select_clause INTO (t
 common_table_expression_loop: dbs_select_statement_common_table_expression (dbs_comma_separator dbs_select_statement_common_table_expression)*;
 target_variable_names_loop: target_variable_names_opts (dbs_comma_separator target_variable_names_opts)*;
 target_variable_names_opts: dbs_global_variable_name | dbs_host_variable | dbs_sql_parameter_name | dbs_sql_variable_name | dbs_transition_variable_name;
-dbs_select_statement_common_table_expression: dbs_sql_identifier LPARENCHAR dbs_sql_identifier (dbs_comma_separator dbs_sql_identifier)* RPARENCHAR AS dbs_fullselect;
+dbs_select_statement_common_table_expression: dbs_sql_identifier (LPARENCHAR dbs_sql_identifier (dbs_comma_separator dbs_sql_identifier)* RPARENCHAR)? AS dbs_fullselect;
 dbs_select_statement_isolation_clause: WITH (RR dbs_select_statement_isolation_clause_lock_clause | RS dbs_select_statement_isolation_clause_lock_clause | CS | UR );
 dbs_select_statement_isolation_clause_lock_clause: USE AND KEEP (EXCLUSIVE | UPDATE | SHARE) LOCKS;
 dbs_select_statement_queryno_clause: QUERYNO dbs_integer;

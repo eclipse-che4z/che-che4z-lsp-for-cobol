@@ -140,15 +140,37 @@ class TestSqlSelectStatement {
           + "           END-EXEC.                                                    00095800";
 
   private static final String SELECT14 =
-          TEXT
-                  + "            DECLARE C1 CURSOR FOR \n"
-                  + "             SELECT * FROM RMTTAB\n"
-                  + "               FOR FETCH ONLY \n"
-                  + "           END-EXEC.\n";
+      TEXT
+          + "            DECLARE C1 CURSOR FOR \n"
+          + "             SELECT * FROM RMTTAB\n"
+          + "               FOR FETCH ONLY \n"
+          + "           END-EXEC.\n";
+
+  private static final String SELECT15 =
+      TEXT
+          + "              WITH T1 AS\n"
+          + "              (\n"
+          + "              SELECT  CARD           AS PAN\n"
+          + "                     ,CVV            AS CVV2\n"
+          + "                     ,Y1             AS W1\n"
+          + "                     ,Y2             AS W2\n"
+          + "              FROM TABLEY\n"
+          + "              )\n"
+          + "              SELECT  'Y'\n"
+          + "              INTO   :{$WS-D-DEB}\n"
+          + "              FROM TABLEY\n"
+          + "              INNER JOIN T1 ON\n"
+          + "                       TABLEY.Y1         = T1.W1\n"
+          + "                  AND  TABLEY.Y2         = T1.W2\n"
+          + "              WHERE 1 = 1\n"
+          + "             FETCH FIRST 1 ROW ONLY\n"
+          + "             WITH UR\n"
+          + "           END-EXEC.\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(SELECT, SELECT2, SELECT3, SELECT4, SELECT5, SELECT6, SELECT7, SELECT8, SELECT9, SELECT10,
-            SELECT11, SELECT12, SELECT13, SELECT14);
+    return Stream.of(
+        SELECT, SELECT2, SELECT3, SELECT4, SELECT5, SELECT6, SELECT7, SELECT8, SELECT9, SELECT10,
+        SELECT11, SELECT12, SELECT13, SELECT14, SELECT15);
   }
 
   @ParameterizedTest
