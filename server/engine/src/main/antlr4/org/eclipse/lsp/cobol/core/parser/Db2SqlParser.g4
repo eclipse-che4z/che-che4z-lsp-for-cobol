@@ -758,7 +758,7 @@ dbs_label_loop: (dbs_table_name | dbs_view_name) LPARENCHAR dbs_column_name IS d
 dbs_lock: LOCK TABLE dbs_table_name (PARTITION dbs_integer)? IN (SHARE | EXCLUSIVE) MODE;
 
 /*MERGE */
-dbs_merge: MERGE INTO (dbs_table_name | dbs_view_name) dbs_merge_correlation? dbs_merge_include? USING (dbs_table_reference | dbs_joined_table |
+dbs_merge: MERGE INTO (dbs_table_name | dbs_view_name) dbs_merge_correlation? dbs_merge_include? USING (dbs_table_reference |
         dbs_merge_values) ON dbs_search_condition (WHEN NOT? MATCHED (AND dbs_search_condition)? THEN (dbs_signal |
         dbs_merge_update | DELETE | dbs_merge_insert))+ (ELSE IGNORE)? (NOT ATOMIC CONTINUE ON SQLEXCEPTION)? (QUERYNO dbs_integer)?;
 dbs_merge_correlation: AS? dbs_correlation_name (LPARENCHAR dbs_column_name (dbs_comma_separator dbs_column_name)* RPARENCHAR)?;
