@@ -899,7 +899,7 @@ dbs_select_clause: SELECT (ALL | DISTINCT)? ( ASTERISKCHAR | dbs_select_item (db
 dbs_select_item: (dbs_expressions AS? dbs_sql_identifier? | dbs_unpacked_row | dbs_generic_name SELECT_ALL);
 dbs_unpacked_row: dbs_select_unpack_function_invocation SELECT_ALL AS LPARENCHAR (dbs_generic_name db2sql_data_types)
 (dbs_comma_separator dbs_generic_name db2sql_data_types)* RPARENCHAR;
-dbs_from_clause: FROM (dbs_table_reference | dbs_joined_table) (dbs_comma_separator (dbs_table_reference | dbs_joined_table))*;
+dbs_from_clause: FROM dbs_table_reference  (dbs_comma_separator dbs_table_reference)*;
 dbs_where_clause: WHERE (dbs_search_condition | LPARENCHAR dbs_search_condition RPARENCHAR);
 dbs_groupby_alternatives: (dbs_grouping_expression| dbs_groupingset_alternative);
 dbs_groupby_clause: GROUP BY dbs_groupby_alternatives (dbs_comma_separator dbs_groupby_alternatives)*;
@@ -1520,7 +1520,7 @@ dbs_special_name: ABSOLUTE | ACCELERATION | ACCELERATOR | ACCESS | ACCESSCTRL | 
                   | GOTO | GRANT | GRAPHIC | GROUP | GROUPING | G_CHAR| HANDLER | HASH | HAVING | HEX | HIDDENCHAR
                   | HIGH | HINT| HISTORY | HOLD | HOUR | HOURS | ID | IDENTITY | IF | IGNORE | IMAGCOPY | IMMEDIATE
                   | IMPLICITLY | IN | INCLUDE | INCLUDING | INCLUSIVE | INCREMENT | INDEX | INDEXBP | INDICATOR
-                  | INHERIT | INITIALLY | INLINE | INNER | INOUT | INPUT | INSENSITIVE | INSERT | INSTEAD | INT
+                  | INHERIT | INITIALLY | INLINE | INOUT | INPUT | INSENSITIVE | INSERT | INSTEAD | INT
                   | INTEGER | INTERSECT | INTO | INVALID | INVOKEBIND | INVOKERUN | IS | ISO | ISOLATION | ITERATE
                   | JAR | JAVA | JIS | JOBNAME| JOIN | KEEP | KEY | KEYS | K_CHAR| LABEL | LABELS | LAG| LANGUAGE
                   | LANGUAGE_C | LARGE | LAST | LAST_VALUE| LC_CTYPE | LEAD | LEAVE | LEFT | LENGTH | LEVEL | LIKE
@@ -1667,7 +1667,31 @@ dbs_string_expression: (DOUBLEQUOTE | SINGLEQUOTE) (dbs_allocate | dbs_alter | d
 dbs_synonym: T=dbs_sql_identifier {validateLength($T.text, "synonym name", 128);};
 dbs_table_identifier: dbs_sql_identifier;
 dbs_table_name: T=dbs_sql_identifier {validateLength($T.text, "table name", 128);};
-dbs_table_reference : dbs_single_table_ref | dbs_single_view_ref | dbs_nested_table_expression | dbs_data_change_table_ref | dbs_table_function_ref |
+
+dbs_table_reference: dbs_joined_table | dbs_table_reference_non_join;
+
+dbs_joined_table : dbs_normal_join
+            | dbs_braced_join
+            | dbs_cross_join
+            ;
+
+// Ref: A : A C | B
+// Can be represented as
+//      A: B A'
+//      A': C A' | <null>;
+// dbs_normal_join: dbs_table_reference dbs_join_type? JOIN dbs_table_reference ON dbs_join_condition;
+dbs_normal_join: dbs_table_reference_non_join dbs_normal_join_prime;
+dbs_normal_join_prime: dbs_normal_join_alpha dbs_normal_join_prime | empty_rule;
+dbs_normal_join_alpha: (INNER | (LEFT | RIGHT | FULL) OUTER?)? JOIN dbs_table_reference ON dbs_join_condition;
+dbs_braced_join: LPARENCHAR dbs_joined_table RPARENCHAR;
+
+// dbs_cross_join: dbs_table_reference CROSS JOIN dbs_table_reference
+dbs_cross_join_alpha: CROSS JOIN dbs_table_reference;
+dbs_cross_join: dbs_table_reference_non_join dbs_cross_join_prime;
+dbs_cross_join_prime: dbs_cross_join_alpha dbs_cross_join_prime | empty_rule;
+empty_rule: /* epsilon */;
+
+dbs_table_reference_non_join : dbs_single_table_ref | dbs_single_view_ref | dbs_nested_table_expression | dbs_data_change_table_ref | dbs_table_function_ref |
  dbs_table_locator_ref | dbs_xmltable_expression | dbs_collection_derived_table;
 dbs_single_table_ref : dbs_table_name dbs_period_specification* dbs_correlation_clause?;
 dbs_period_specification : FOR (SYSTEM_TIME | BUSINESS_TIME) (AS OF dbs_value | FROM dbs_value TO dbs_value  | BETWEEN dbs_value AND dbs_value);
@@ -1699,7 +1723,6 @@ dbs_xml_table_ordinality_column_defn: dbs_column_name FOR ORDINALITY;
 dbs_collection_derived_table :  UNNEST LPARENCHAR (dbs_ordinary_array_expression (dbs_comma_separator dbs_ordinary_array_expression)* | dbs_assosiative_array_expression) RPARENCHAR (WITH ORDINALITY)? dbs_correlation_clause?;
 dbs_ordinary_array_expression : IDENTIFIER;
 dbs_assosiative_array_expression : NONNUMERICLITERAL;
-dbs_joined_table : (dbs_table_reference (INNER | (LEFT | RIGHT | FULL) OUTER?)? JOIN dbs_table_reference ON dbs_join_condition | dbs_table_reference CROSS JOIN dbs_table_reference | LPARENCHAR dbs_joined_table RPARENCHAR);
 dbs_join_condition: dbs_inner_left_outer_join | dbs_full_join_expression;
 dbs_inner_left_outer_join : dbs_search_condition;
 dbs_full_join_expression : (dbs_column_name | dbs_cast_specification) | COALESCE LPARENCHAR (dbs_column_name | dbs_cast_specification) (dbs_comma_separator dbs_column_name | dbs_comma_separator dbs_cast_specification)+ RPARENCHAR;
