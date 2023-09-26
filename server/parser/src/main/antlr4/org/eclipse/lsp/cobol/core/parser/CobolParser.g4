@@ -2472,8 +2472,7 @@ cicsDfhValueLiteral
 cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN;
 
 literal
-   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | cicsDfhRespLiteral
-   | cicsDfhValueLiteral | utfLiteral | hexadecimalUtfLiteral
+   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | utfLiteral | hexadecimalUtfLiteral
    ;
 
 utfLiteral: U_CHAR NONNUMERICLITERAL;
@@ -2511,11 +2510,16 @@ power
    ;
 
 basis
-   : dialectNodeFiller | generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
+   : dialectNodeFiller | cicsLiteral | generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
    ;
 
+cicsLiteral
+    : cicsDfhRespLiteral
+    | cicsDfhValueLiteral
+    ;
+
 cobolWord
-   : IDENTIFIER | SYMBOL
+   : IDENTIFIER | SYMBOL | DFHRESP | DFHVALUE | CHANNEL | INTEGER | PROCESS | REMOVE | WAIT
    | cobolCompilerDirectivesKeywords | cobolKeywords
    | cicsTranslatorCompileDirectivedKeywords | cics_conditions
    ;
