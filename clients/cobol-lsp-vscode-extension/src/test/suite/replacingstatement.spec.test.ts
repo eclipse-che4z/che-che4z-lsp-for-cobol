@@ -141,11 +141,11 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
     );
-    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    helper.assertRangeIsEqual(
-      diagnostics[7].range,
-      range(pos(35, 15), pos(35, 24)),
-    );
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    let message = diagnostics[6].message;
+    assert.match(message, /^Syntax error on 'NEW' expected SECTION/);
+    message = diagnostics[7].message;
+    assert.match(message, /^Syntax error on 'REPLACING' expected SECTION/);
   });
 
   test("TC250946: Support building of the extended document - Replace by arithmetic operations", async () => {
