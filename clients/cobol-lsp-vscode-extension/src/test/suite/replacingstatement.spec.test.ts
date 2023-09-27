@@ -151,4 +151,16 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
       range(pos(35, 15), pos(35, 24)),
     );
   });
+
+  test("TC250946: Support building of the extended document - Replace by arithmetic operations", async () => {
+    let editor = await helper.showDocument(path.join("TEST7.CBL"));
+    const extSrcPath = path.join("testing", "NEW.CPY");
+    editor = await helper.showDocument(extSrcPath);
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+    );
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const message = diagnostics[0].message;
+    assert.match(message, /^Missing token SECTION at procedureSectionHeader/);
+  });
 });
