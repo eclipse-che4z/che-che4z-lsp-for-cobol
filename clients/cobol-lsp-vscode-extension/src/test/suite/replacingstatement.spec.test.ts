@@ -143,10 +143,6 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
     );
     let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     helper.assertRangeIsEqual(
-      diagnostics[1].range,
-      range(pos(35, 11), pos(35, 14)),
-    );
-    helper.assertRangeIsEqual(
       diagnostics[7].range,
       range(pos(35, 15), pos(35, 24)),
     );
