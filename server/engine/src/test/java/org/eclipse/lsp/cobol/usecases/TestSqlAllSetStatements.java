@@ -259,6 +259,22 @@ class TestSqlAllSetStatements {
   private static final String SET_SESSION_TIME_ZONE =
       TEXT + "             SET SESSION TIME ZONE = '-8:00';\n" + "           END-EXEC.";
 
+  public static final String SET_VRAIABLE_VALUE_EVALUATED_BY_FUNCTION_CALL =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. testpgm.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*WS-VARIABLES}.\n"
+          + "           05 {$*WS-TIMESTAMP}                PIC X(26).\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       EXEC SQL\n"
+          + "                SET :{$WS-TIMESTAMP} =\n"
+          + "                             TIMESTAMP('1970-01-01-00.00.00.000000')\n"
+          + "                       + (:{$WS-TIMESTAMP} / 1000) SECOND\n"
+          + "                       + (INT(CURRENT TIMEZONE/10000)) HOURS\n"
+          + "           END-EXEC.\n"
+          + "       end program testpgm.";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         SET_CONNECTION,
@@ -307,7 +323,8 @@ class TestSqlAllSetStatements {
         SET_SCHEMA2,
         SET_SCHEMA3,
         SET_SCHEMA4,
-        SET_SESSION_TIME_ZONE);
+        SET_SESSION_TIME_ZONE,
+        SET_VRAIABLE_VALUE_EVALUATED_BY_FUNCTION_CALL);
   }
 
   @ParameterizedTest
