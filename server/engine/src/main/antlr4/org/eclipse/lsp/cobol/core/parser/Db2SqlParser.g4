@@ -732,13 +732,14 @@ dbs_include_sqlda: INCLUDE SQLDA;
 
 /*INSERT */
 dbs_insert: INSERT INTO (dbs_table_name | dbs_view_name) (LPARENCHAR dbs_column_name (dbs_comma_separator dbs_column_name)* RPARENCHAR)?
-            dbs_insert_include? (OVERRIDING USER VALUE)? (dbs_insert_values | dbs_insert_fullselect);
+            dbs_insert_include? (OVERRIDING USER VALUE)? dbs_insert_values;
 dbs_insert_include: INCLUDE LPARENCHAR dbs_column_name dbs_include_data_type (dbs_comma_separator dbs_column_name dbs_include_data_type)* RPARENCHAR;
 //?
 dbs_insert_data_type: (common_short_built_in_type | dbs_distinct_type);
 //dbs_insert_values: VALUES LPARENCHAR (dbs_insert_values_single | dbs_insert_values_multi) RPARENCHAR;
-dbs_insert_values: VALUES ((dbs_expression | DEFAULT | NULL) | LPARENCHAR dbs_insert_values_sgloop RPARENCHAR) | (FOR (dbs_host_variable | dbs_integer_constant) ROWS)? VALUES dbs_insert_values_multi;
-dbs_insert_values_sgloop: (dbs_expression | DEFAULT | NULL) (dbs_comma_separator (dbs_expression | DEFAULT | NULL) | NUMERICLITERAL)*;
+dbs_insert_values: (VALUES (dbs_insert_values_single | dbs_insert_values_multi)) | dbs_insert_fullselect;
+dbs_insert_values_single: (dbs_expression | DEFAULT | NULL) | LPARENCHAR dbs_insert_values_sgloop RPARENCHAR;
+dbs_insert_values_sgloop: (dbs_expressions | DEFAULT | NULL) (dbs_comma_separator (dbs_expressions | DEFAULT | NULL) | NUMERICLITERAL)*;
 dbs_insert_values_multi: (dbs_expression | dbs_host_variable_array | DEFAULT | NULL | LPARENCHAR dbs_insert_values_mloop RPARENCHAR)
                         (FOR (dbs_host_variable | T=dbs_integer_constant {validateDb2MaxInt($T.text);}) ROWS)?
                         (ATOMIC | NOT ATOMIC CONTINUE ON SQLEXCEPTION)?;
@@ -1340,7 +1341,7 @@ dbs_column_name | dbs_variable | dbs_special_register | dbs_scalar_fullselect | 
 
 dbs_time_zone_specific_expression : dbs_time_zone_expression ( AT LOCAL | AT TIME ZONE dbs_time_zone_expression);
 dbs_time_unit: (YEAR | YEARS | MONTH | MONTHS | DAY | DAYS | HOUR | HOURS | MINUTE | MINUTES | SECOND | SECONDS | MICROSECOND | MICROSECONDS );
-dbs_labeled_duration: (dbs_function_invocation | LPARENCHAR dbs_expression RPARENCHAR | dbs_constant |
+dbs_labeled_duration: (dbs_function_invocation | LPARENCHAR dbs_expressions RPARENCHAR | dbs_constant |
 dbs_column_name | dbs_variable) dbs_time_unit;
 
 dbs_XMLCAST_specification: XMLCAST LPARENCHAR (dbs_expression | NULL | dbs_parameter_marker) AS dbs_comment_parameter_type RPARENCHAR;
