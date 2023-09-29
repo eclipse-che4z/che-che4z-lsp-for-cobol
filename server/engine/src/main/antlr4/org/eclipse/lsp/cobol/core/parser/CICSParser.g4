@@ -775,13 +775,15 @@ cics_web_receive: RECEIVE (cics_web_rserver | cics_web_rtocontainer | cics_web_r
 cics_web_rserver: cics_into (LENGTH cics_data_area | MAXLENGTH cics_data_value | NOTRUNCATE | TYPE cics_cvda | SRVCONVERT |
                   NOSRVCONVERT | SERVERCONV cics_cvda | CHARACTERSET cics_data_value | HOSTCODEPAGE cics_data_value |
                   BODYCHARSET cics_data_area | MEDIATYPE cics_data_value | cics_handle_response)+;
-cics_web_rtocontainer: TOCONTAINER cics_data_value (TOCHANNEL cics_data_value | TYPE cics_cvda | CHARACTERSET cics_data_value |
+cics_web_rtocontainer: TOCONTAINER cics_data_value (TOCHANNEL cics_data_value | TYPE cics_cvda | CHARACTERSET cics_data_value | CLNTCODEPAGE cics_data_value |
                        BODYCHARSET cics_data_area | MEDIATYPE cics_data_value | cics_handle_response)+;
 cics_web_rsesstoken: SESSTOKEN cics_data_value (MEDIATYPE cics_data_area | cics_web_rcbuffers | cics_web_rccontainers | cics_handle_response)+;
 cics_web_rcbuffers: cics_web_statuscode? (cics_into | LENGTH cics_data_area | MAXLENGTH cics_data_value |
-                    NOTRUNCATE | CLICONVERT | NOCLICONVERT | CLIENTCONV cics_cvda | BODYCHARSET cics_data_area | cics_handle_response)+;
+                    NOTRUNCATE | CLICONVERT | NOCLICONVERT | CLIENTCONV cics_cvda | BODYCHARSET cics_data_area | CHARACTERSET cics_data_value |
+                    CLNTCODEPAGE cics_data_value cics_handle_response)+;
 cics_web_statuscode: STATUSCODE cics_data_value cics_web_statustext;
-cics_web_rccontainers: (cics_web_statustext | TOCONTAINER cics_data_value | TOCHANNEL cics_data_value | BODYCHARSET cics_data_area | cics_handle_response)+;
+cics_web_rccontainers: (cics_web_statustext | TOCONTAINER cics_data_value | TOCHANNEL cics_data_value | BODYCHARSET cics_data_area | CHARACTERSET cics_data_value
+                    | CLNTCODEPAGE cics_data_value | cics_handle_response)+;
 cics_web_retrieve: (RETRIECE | DOCTOKEN cics_data_area | cics_handle_response)+;
 cics_web_send: SEND (cics_web_sserver | cics_web_sclient);
 cics_web_sserver: (cics_web_doctoken | cics_web_ssfrom | cics_web_container | MEDIATYPE cics_data_value | SRVCONVERT |
@@ -885,7 +887,7 @@ cicsLexerDefinedVariableUsageTokens: ABCODE | ABDUMP | ABEND | ABORT | ABPROGRAM
     | BASICAUTH | BELOW | BIF | BODYCHARSET | BOOKMARK | BRDATA | BRDATALENGTH | BREXIT | BRIDGE | BROWSETOKEN
     | BTRANS | BUFFER | BUILD | BURGEABILITY | CADDRLENGTH | CARD | CBUFF | CCSID | CERTIFICATE | CHANGE | CHANGETIME
     | CHANNEL | CHAR | CHARACTERSET | CHECK | CHUNKEND | CHUNKING | CHUNKNO | CHUNKYES | CICSDATAKEY | CIPHERS | CLEAR
-    | CLICONVERT | CLIENT | CLIENTADDR | CLIENTADDRNU | CLIENTCONV | CLIENTNAME | CLNTADDR6NU | CLNTIPFAMILY
+    | CLICONVERT | CLIENT | CLIENTADDR | CLIENTADDRNU | CLIENTCONV | CLNTCODEPAGE | CLIENTNAME | CLNTADDR6NU | CLNTIPFAMILY
     | CLOSESTATUS | CLRPARTN | CMDSEC | CNAMELENGTH | CNOTCOMPL | CODEPAGE | COLOR | COMMAREA | COMMONNAME
     | COMMONNAMLEN | COMPAREMAX | COMPAREMIN | COMPLETE | COMPOSITE | COMPSTATUS | CONFIRM | CONFIRMATION | CONNECT
     | CONSISTENT | CONSOLE | CONTAINER | CONTEXTTYPE | CONVDATA | CONVERSE | CONVERTST | CONVERTTIME | CONVID
