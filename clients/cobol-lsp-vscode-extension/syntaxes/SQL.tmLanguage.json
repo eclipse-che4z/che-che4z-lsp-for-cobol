@@ -1,9 +1,6 @@
 {
   "scopeName": "meta.embedded.block.sql",
-  "injectionSelector": [
-    "R:sql.embedded.code",
-    "L:string.quoted.sql.cobol"
-  ],
+  "injectionSelector": ["R:sql.embedded.code", "L:string.quoted.sql.cobol"],
   "patterns": [
     {
       "include": "source.sql"
