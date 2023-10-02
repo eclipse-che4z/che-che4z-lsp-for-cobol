@@ -64,7 +64,7 @@ public class ErrorMessageHelper {
     return token.getType() == EOF
         ? messageService.getMessage(END_OF_FILE_MESSAGE)
         : messageService.getMessage(
-            REPORT_INPUT_MISMATCH, offendingTokens, getExpectedText(recognizer, e));
+            REPORT_INPUT_MISMATCH, offendingTokens);
   }
 
   /**
@@ -111,10 +111,6 @@ public class ErrorMessageHelper {
     return Optional.ofNullable(recognizer.getInputStream())
         .map(it -> it.getText(e.getStartToken(), e.getOffendingToken()))
         .orElse("<unknown input>");
-  }
-
-  private String getExpectedText(Parser recognizer, InputMismatchException e) {
-    return getExpectedText(recognizer, e.getExpectedTokens());
   }
 
   private String getExpectedText(Parser recognizer, IntervalSet interval) {
