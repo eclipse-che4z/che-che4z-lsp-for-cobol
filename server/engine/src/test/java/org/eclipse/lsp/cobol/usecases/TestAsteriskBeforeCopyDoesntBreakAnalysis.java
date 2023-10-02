@@ -53,8 +53,7 @@ class TestAsteriskBeforeCopyDoesntBreakAnalysis {
             "1",
             new Diagnostic(
                 new Range(),
-                "Syntax error on '*' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, LINKAGE, "
-                    + "LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE, '01-49', '66', '77', '88'}",
+                "Syntax error on '*'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

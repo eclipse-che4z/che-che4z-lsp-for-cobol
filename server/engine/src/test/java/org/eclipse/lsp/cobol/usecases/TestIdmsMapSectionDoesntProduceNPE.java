@@ -47,8 +47,7 @@ class TestIdmsMapSectionDoesntProduceNPE {
             "1",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'MAP' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, LINKAGE, "
-                    + "LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE}",
+                "Syntax error on 'MAP'",
                 Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of(),

@@ -69,8 +69,7 @@ public class TestIssueWithEmbeddedCodePresentInCopybook {
             "3",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'TIMESEP1' expected {FUNCTION, IN, LINAGE-COUNTER, OF, '(', ')', '01-49', "
-                    + "'66', '77', '88', INTEGERLITERAL, NUMERICLITERAL, NONNUMERICLITERAL, IDENTIFIER}",
+                "Syntax error on 'TIMESEP1'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "4",

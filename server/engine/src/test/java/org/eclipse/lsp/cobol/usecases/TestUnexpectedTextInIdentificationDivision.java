@@ -46,8 +46,7 @@ class TestUnexpectedTextInIdentificationDivision {
             "1",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'DISPLAY' expected {AUTHOR, CBL, DATA, DATE-COMPILED, DATE-WRITTEN, "
-                    + "END, ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, PROCESS, SECURITY}",
+                "Syntax error on 'DISPLAY'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

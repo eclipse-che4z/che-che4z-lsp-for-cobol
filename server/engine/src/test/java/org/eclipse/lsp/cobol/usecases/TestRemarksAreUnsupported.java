@@ -61,8 +61,7 @@ class TestRemarksAreUnsupported {
             "unsupported",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'INPUT' expected {AUTHOR, CBL, DATA, DATE-COMPILED, DATE-WRITTEN, "
-                    + "END, ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, PROCESS, SECURITY}",
+                "Syntax error on 'INPUT'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
