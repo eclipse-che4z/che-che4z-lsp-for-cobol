@@ -30,10 +30,12 @@ import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
+import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
@@ -228,7 +230,24 @@ public class CopybookServiceImpl implements CopybookService {
     ResultWithErrors<ExtendedText> textTransformationsResultWithErrors = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent());
     String cleanText = CharMatcher.whitespace().trimTrailingFrom(textTransformationsResultWithErrors.getResult().toString());
     CopybookModel copybookModel = new CopybookModel(dirtyCopybook.getCopybookId(), dirtyCopybook.getCopybookName(), dirtyCopybook.getUri(), cleanText);
-    return new ResultWithErrors<>(copybookModel, textTransformationsResultWithErrors.getErrors());
+    return new ResultWithErrors<>(copybookModel, adjustErrorLocation(dirtyCopybook, textTransformationsResultWithErrors.getErrors()));
+  }
+
+  private List<SyntaxError> adjustErrorLocation(
+      CopybookModel dirtyCopybook, List<SyntaxError> originalErrors) {
+    return originalErrors.stream()
+        .map(
+            error ->
+                error.toBuilder().location(getErrorOriginalLocation(dirtyCopybook, error)).build())
+        .collect(toList());
+  }
+
+  private OriginalLocation getErrorOriginalLocation(CopybookModel dirtyCopybook, SyntaxError error) {
+    return new OriginalLocation(
+            Optional.ofNullable(error.getLocation()).map(OriginalLocation::getLocation).orElse(null),
+            CopybooksRepository.toId(dirtyCopybook.getCopybookName().getQualifiedName(),
+                    dirtyCopybook.getCopybookName().getDialectType(),
+                    dirtyCopybook.getUri()));
   }
 
   private Optional<CopybookModel> tryResolveCopybookFromWorkspace(
@@ -323,5 +342,4 @@ public class CopybookServiceImpl implements CopybookService {
   Map<String, Set<CopybookName>> getCopybooksForDownloading() {
     return ImmutableMap.copyOf(copybooksForDownloading);
   }
-
 }
