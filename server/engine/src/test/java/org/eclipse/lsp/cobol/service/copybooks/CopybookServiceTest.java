@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
+import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
@@ -467,6 +468,7 @@ class CopybookServiceTest {
     CopybookService copybookService = createCopybookService();
     String copybookContent = "SOME TEXT";
     SyntaxError expectedSyntaxError = SyntaxError.syntaxError()
+            .location(new OriginalLocation(null, VALID_CPY_NAME))
             .suggestion("some suggestion")
             .severity(ErrorSeverity.ERROR)
             .build();
