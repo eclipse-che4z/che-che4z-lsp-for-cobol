@@ -53,7 +53,7 @@ public class TestDivideStatement {
             "1",
             new Diagnostic(
                 new Range(),
-                "Syntax error on '.' expected {GIVING, IN, OF, '('}",
+                "Syntax error on '.'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

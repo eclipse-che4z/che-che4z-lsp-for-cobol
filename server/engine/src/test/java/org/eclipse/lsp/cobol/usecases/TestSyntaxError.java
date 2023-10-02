@@ -36,7 +36,7 @@ class TestSyntaxError {
           + "        PROCEDURE DIVISION.\r\n"
           + "        END PROGRAM {test1|name}.";
 
-  private static final String DIVISION = "Syntax error on 'DIVISIONs' expected DIVISION";
+  private static final String DIVISION = "Syntax error on 'DIVISIONs'";
   private static final String NAME = "There is an issue with PROGRAM-ID paragraph";
 
   @Test

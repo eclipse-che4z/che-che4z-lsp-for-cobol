@@ -64,7 +64,7 @@ class TestPICVariableStructure {
             "1",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'W' expected FINALCHARSTRING",
+                "Syntax error on 'W'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

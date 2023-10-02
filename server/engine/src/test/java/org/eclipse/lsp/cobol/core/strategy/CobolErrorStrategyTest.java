@@ -69,17 +69,16 @@ class CobolErrorStrategyTest {
     when(recognizer.getRuleInvocationStack()).thenReturn(Collections.singletonList("rule"));
     when(recognizer.getVocabulary()).thenReturn(vocab);
     when(intervalSet.toString(vocab)).thenReturn("text");
-    when(errorMock.getExpectedTokens()).thenReturn(intervalSet);
     when(errorMock.getOffendingToken()).thenReturn(token);
     when(messageService.getMessage(
-            matches("ErrorStrategy.rulereportInputMismatch"), anyString(), anyString()))
+            matches("ErrorStrategy.rulereportInputMismatch"), anyString()))
         .thenReturn("ErrorStrategy.rulereportInputMismatch");
     when(messageService.getMessage(
-            matches("ErrorStrategy.reportInputMismatch"), anyString(), anyString()))
-        .thenReturn("Syntax error on '<0>' expected text");
+            matches("ErrorStrategy.reportInputMismatch"), anyString()))
+        .thenReturn("Syntax error on '<0>'");
     strategy.reportError(recognizer, errorMock);
     verify(recognizer)
-        .notifyErrorListeners(token, "Syntax error on '<0>' expected text", errorMock);
+        .notifyErrorListeners(token, "Syntax error on '<0>'", errorMock);
   }
 
   @Test
