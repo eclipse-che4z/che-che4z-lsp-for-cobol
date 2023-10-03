@@ -54,7 +54,7 @@ suite("Integration Test Suite", function () {
 
     assert.strictEqual(
       d1.message,
-      "Syntax error on 'HELLO-WORLD' expected {AUTHOR, CBL, DATA, DATE-COMPILED, DATE-WRITTEN, END, ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, PROCESS, SECURITY}",
+      "Syntax error on 'HELLO-WORLD'",
     );
     helper.assertRangeIsEqual(d1.range, range(pos(14, 20), pos(14, 31)));
   });
@@ -144,7 +144,7 @@ suite("Integration Test Suite", function () {
     );
     assert.ok(
       diagnostics[0].message.includes(
-        "Syntax error on 'SEN' expected {ABEND, ADD, ADDRESS, ALLOCATE, ASKTIME, ASSIGN",
+        "Syntax error on 'SEN'",
       ),
     );
     await helper.deleteLine(editor, 40);
@@ -183,7 +183,7 @@ suite("Integration Test Suite", function () {
     );
     assert.ok(
       diagnostics[0].message.includes(
-        "Syntax error on 'XCTL123' expected {ABEND, ADD, ADDRESS, ALLOCATE, ASKTIME, ASSIGN",
+        "Syntax error on 'XCTL123'",
       ),
     );
     await helper.deleteLine(editor, 58);
@@ -330,7 +330,7 @@ suite("Integration Test Suite", function () {
       diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
       assert.strictEqual(diagnostics.length, 1);
       assert.ok(
-        diagnostics[0].message.includes("Syntax error on 'COPY' expected"),
+        diagnostics[0].message.includes("Syntax error on 'COPY'"),
       );
 
       await helper.insertString(editor, pos(25, 20), "\n           Mov");
