@@ -142,9 +142,10 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
     );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    let message = diagnostics[6].message;
+    diagnostics.sort((a, b) => a.severity - b.severity);
+    let message = diagnostics[0].message;
     assert.match(message, /^Syntax error on 'NEW' expected SECTION/);
-    message = diagnostics[7].message;
+    message = diagnostics[1].message;
     assert.match(message, /^Syntax error on 'REPLACING' expected SECTION/);
   });
 
