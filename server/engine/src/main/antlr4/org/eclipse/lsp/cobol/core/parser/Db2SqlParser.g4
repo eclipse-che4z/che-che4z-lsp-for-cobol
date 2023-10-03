@@ -791,7 +791,7 @@ dbs_refresh: REFRESH TABLE dbs_table_name (QUERYNO dbs_integer)?;
 /* RELEASE (both) */
 dbs_release: RELEASE (dbs_location_name | CURRENT | ALL SQL? | TO? SAVEPOINT dbs_savepoint_name | dbs_host_variable);
 
-dbs_savepoint_name: T=dbs_savepoint_name_rule {validateLength($T.text, "savepoint name", 128);};
+dbs_savepoint_name: T=dbs_savepoint_name_rule {validateLength($T.text, "Savepoint name", 128);};
 dbs_savepoint_name_rule: (NONNUMERICLITERAL | NUMERICLITERAL)+ | IDENTIFIER;
 
 /*RENAME */
@@ -1450,7 +1450,7 @@ dbs_hostname_identifier : (IDENTIFIER | (DOT_FS | COLONCHAR | SLASHCHAR))+;
 dbs_quad: (ZERO_DIGIT  HEX_NUMBERS+ | ZERO_DIGIT OCTDIGITS+) | INTEGERLITERAL;
 dbs_ip4: dbs_quad DOT_FS dbs_quad DOT_FS dbs_quad DOT_FS dbs_quad+;
 dbs_address_value: dbs_ip4 | dbs_hostname_identifier | NONNUMERICLITERAL ;
-dbs_alias_name: T=dbs_sql_identifier { validateLength($T.text, "alias name", 128); }; //must not be an alias that exists at the current server
+dbs_alias_name: T=dbs_sql_identifier { validateLength($T.text, "Alias name", 128); }; //must not be an alias that exists at the current server
 dbs_applcompat_value: FUNCTION_LEVEL_10 | FUNCTION_LEVEL_11 | FUNCTION_LEVEL_12;
 dbs_array_index: dbs_integer;
 dbs_array_type_name: dbs_sql_identifier;
@@ -1459,19 +1459,19 @@ dbs_array_variable_name: literal+;
 dbs_attr_host_variable: dbs_hostname_identifier | NUMERICLITERAL ; // VARCHAR(128)
 dbs_authorization_name: dbs_sql_identifier;
 dbs_authorization_specification: IDENTIFIER;
-dbs_aux_table_name: T=dbs_sql_identifier {validateLength($T.text, "auxiliary table name", 128);};
+dbs_aux_table_name: T=dbs_sql_identifier {validateLength($T.text, "Auxiliary table name", 128);};
 dbs_begin_column_name: dbs_generic_name;
 dbs_binary_string_constant: BINARY_STRING_CONSTANT;
-dbs_bp_name: T=dbs_sql_identifier {validateLength($T.text, "buffer pool name", 8);};
+dbs_bp_name: T=dbs_sql_identifier {validateLength($T.text, "Buffer pool name", 8);};
 dbs_case_expression : CASE (dbs_searched_when_clause | dbs_simple_when_clause) (ELSE NULL | ELSE dbs_result_expression1)? END ;
 dbs_cast_function_name: dbs_sql_identifier;
-dbs_catalog_name: T=dbs_sql_identifier {validateLength($T.text, "catalog name", 8);};
+dbs_catalog_name: T=dbs_sql_identifier {validateLength($T.text, "Catalog name", 8);};
 dbs_ccsid_value: INTEGERLITERAL;
 dbs_character_string_constant: CHAR_STRING_CONSTANT;
-dbs_clone_table_name: T=dbs_sql_identifier {validateLength($T.text, "clone table name", 128);};
+dbs_clone_table_name: T=dbs_sql_identifier {validateLength($T.text, "Clone table name", 128);};
 dbs_collection_id: IDENTIFIER;
 dbs_collection_id_package_name: FILENAME;
-dbs_collection_name: T=dbs_sql_identifier {validateLength($T.text, "collection name", 128);}; // SQLIDENTIFIER are case sensitive. allows only uppercase or quoted string as per doc.
+dbs_collection_name: T=dbs_sql_identifier {validateLength($T.text, "Collection name", 128);}; // SQLIDENTIFIER are case sensitive. allows only uppercase or quoted string as per doc.
 dbs_generic_name: dbs_host_names | NONNUMERICLITERAL;
 dbs_host_names: dbs_special_name | IDENTIFIER ;
 dbs_host_names_var:  COLONCHAR? dbs_host_name_container;
@@ -1565,20 +1565,20 @@ dbs_special_name: ABSOLUTE | ACCELERATION | ACCELERATOR | ACCESS | ACCESSCTRL | 
                   | WHENEVER | WHERE | WHILE | WITH | WITHOUT | WLM | WORK | WORKFILE | WRAPPED | WRITE | WRKSTNNAME
                   | XML | XMLCAST| XMLNAMESPACES| XMLPATTERN| XMLQUERY| XMLSCHEMA| XMLTABLE | YEAR | YEARS | YES
                   | ZONE;
-dbs_column_name: (dbs_generic_name DOT_FS)? T=dbs_generic_name {validateLength($T.text, "column name", 30);};
+dbs_column_name: (dbs_generic_name DOT_FS)? T=dbs_generic_name {validateLength($T.text, "Column name", 30);};
 dbs_constant : (dbs_string_constant | dbs_integer_constant | DATELITERAL);
-dbs_constraint_name: T=dbs_sql_identifier {validateLength($T.text, "constraint name", 128);};
+dbs_constraint_name: T=dbs_sql_identifier {validateLength($T.text, "Constraint name", 128);};
 dbs_context: dbs_sql_identifier;
-dbs_context_name: T=dbs_host_name_container {validateLength($T.text, "profile name", 127);};
+dbs_context_name: T=dbs_host_name_container {validateLength($T.text, "Profile name", 127);};
 dbs_copy_id: CURRENT | PREVIOUS | ORIGINAL;
-dbs_correlation_name: T=dbs_host_name_container {validateLength($T.text, "correlation name", 128);};
-dbs_cursor_name: T=dbs_host_name_container {validateLength($T.text, "cursor name", 128);};
-dbs_database_name: T=dbs_host_name_container {validateLength($T.text, "database name", 8);};
+dbs_correlation_name: T=dbs_host_name_container {validateLength($T.text, "Correlation name", 128);};
+dbs_cursor_name: T=dbs_host_name_container {validateLength($T.text, "Cursor name", 128);};
+dbs_database_name: T=dbs_host_name_container {validateLength($T.text, "Database name", 8);};
 dbs_dc_name: dbs_host_name_container;// JAVA - lenght must be < 9
 dbs_descriptor_name: COLONCHAR? (SQLD | SQLDABC | SQLN | SQLVAR | SQLDA | IDENTIFIER);
 dbs_diagnostic_string_expression: dbs_expressions;
 dbs_distinct_type: db2sql_data_types+;
-dbs_distinct_type_name: T=dbs_sql_identifier {validateLength($T.text, "distinct type name", 128);};
+dbs_distinct_type_name: T=dbs_sql_identifier {validateLength($T.text, "Distinct type name", 128);};
 dbs_dpsegsz_param: SINGLEDIGITLITERAL? (ZERO_DIGIT | dbs_integer2 | dbs_integer4 | dbs_integer6 | dbs_integer8);// DPSEGSZ value, divisible by 4. Range [0,64], must be checked in code.
 dbs_end_column_name: dbs_generic_name;
 dbs_element_name: IDENTIFIER;
@@ -1591,27 +1591,27 @@ dbs_hint_variable:  dbs_variable;
 dbs_hint_string_constant:  IDENTIFIER;
 dbs_fetch_clause: FETCH (FIRST | NEXT) (PLUSCHAR? INTEGERLITERAL)? (ROW | ROWS) ONLY;
 dbs_field_name: dbs_sql_identifier;
-dbs_function_name: T=dbs_sql_identifier {validateLength($T.text, "function name", 128);} | dbs_inbuild_functions; //must not be any of the  system-reserved keywords
+dbs_function_name: T=dbs_sql_identifier {validateLength($T.text, "Function name", 128);} | dbs_inbuild_functions; //must not be any of the  system-reserved keywords
 dbs_global_variable_name: dbs_generic_name | ROWID;
 dbs_graphic_string_constant: GRAPHIC_CONSTANT;
 dbs_history_table_name: dbs_table_name;
 dbs_host_variable: dbs_host_var_identifier (INDICATOR? dbs_host_var_identifier)?;
 dbs_host_variable_array: IDENTIFIER; // variable array must be defined in the application program
-dbs_host_var_identifier: T=dbs_host_names_var {validateLength($T.text, "host variable name", 128);};
+dbs_host_var_identifier: T=dbs_host_names_var {validateLength($T.text, "Host variable name", 128);};
 dbs_id_host_variable: NUMERICLITERAL;
 dbs_identifier: dbs_sql_identifier;
 dbs_imptkmod_param: YES | NO;
 dbs_include_data_type: dbs_alter_procedure_bit_int | dbs_alter_procedure_bit_decimal | dbs_alter_procedure_bit_float | dbs_alter_procedure_bit_decfloat | dbs_alter_procedure_bit_char | dbs_alter_procedure_bit_graphic | dbs_alter_procedure_bit_varchar | DATE | TIME | dbs_alter_procedure_bit_timestamp;
 dbs_index_identifier: IDENTIFIER;
-dbs_index_name: T=dbs_sql_identifier {validateLength($T.text, "index name", 128);};
+dbs_index_name: T=dbs_sql_identifier {validateLength($T.text, "Index name", 128);};
 dbs_integer: INTEGERLITERAL | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88;
 dbs_integer_constant: dbs_integer | NUMERICLITERAL; //range 1 - 32767
-dbs_jar_name: T=dbs_hostname_identifier {validateLength($T.text, "jar name", 128);};
+dbs_jar_name: T=dbs_hostname_identifier {validateLength($T.text, "Jar name", 128);};
 dbs_jobname_value: IDENTIFIER | NONNUMERICLITERAL;
 dbs_key_label_name: IDENTIFIER;
 dbs_length: INTEGERLITERAL; //length must be between 1 and 32767. The default value is 100 bytes.
 dbs_level: dbs_integer0 | dbs_integer1 dbs_integer2;
-dbs_location_name: IDENTIFIER {validateLength($IDENTIFIER.text, "location name", 16);}; //not greater than 16
+dbs_location_name: IDENTIFIER {validateLength($IDENTIFIER.text, "Location name", 16);}; //not greater than 16
 dbs_mask_name: dbs_sql_identifier;
 dbs_mc_name: IDENTIFIER;// must be 1-8 characters in length
 dbs_member_name: dbs_sql_identifier;
@@ -1622,21 +1622,21 @@ dbs_non_deterministic_expression: DATA CHANGE OPERATION | dbs_special_register |
 dbs_session_variable : SYSIBM DOT_FS PACKAGE_NAME | SYSIBM DOT_FS PACKAGE_SCHEMA | SYSIBM DOT_FS PACKAGE_VERSION;
 dbs_numeric_constant: dbs_integer;// numeric literal without non-zero digits to the right of the decimal point.
 dbs_obfuscated_statement_text: literal+ ;
-dbs_package_name: NONNUMERICLITERAL {validateLength($NONNUMERICLITERAL.text, "package name", 8);};
+dbs_package_name: NONNUMERICLITERAL {validateLength($NONNUMERICLITERAL.text, "Package name", 8);};
 dbs_password_variable: COLONCHAR? (literal | dbs_generic_name)+;
 dbs_password_string_constant: IDENTIFIER;
 dbs_package_path: FILENAME+;
 dbs_pageset_pagenum_param: ABSOLUTE | dbs_char_a | RELATIVE | dbs_char_r ;
 dbs_parameter_marker: ( QUESTIONMARK | COLONCHAR dbs_variable);
-dbs_parameter_name: T=dbs_sql_identifier {validateLength($T.text, "parameter name", 128);};
+dbs_parameter_name: T=dbs_sql_identifier {validateLength($T.text, "Parameter name", 128);};
 dbs_permission_name: dbs_sql_identifier;
-dbs_plan_name: T=dbs_sql_identifier {validateLength($T.text, "plan name", 8);} ;
-dbs_procedure_name: T=dbs_sql_identifier {validateLength($T.text, "procedure name", 128);};
+dbs_plan_name: T=dbs_sql_identifier {validateLength($T.text, "Plan name", 8);} ;
+dbs_procedure_name: T=dbs_sql_identifier {validateLength($T.text, "Procedure name", 128);};
 dbs_profile_name: NONNUMERICLITERAL;//
-dbs_program_name: IDENTIFIER {validateLength($IDENTIFIER.text, "program name", 8);};
+dbs_program_name: IDENTIFIER {validateLength($IDENTIFIER.text, "Program name", 8);};
 dbs_registered_xml_schema_name: dbs_sql_identifier;
 dbs_result_expression1: dbs_expressions;
-dbs_role_name: T=dbs_sql_identifier+ {validateLength($T.text, "role name", 128);};
+dbs_role_name: T=dbs_sql_identifier+ {validateLength($T.text, "Role name", 128);};
 dbs_routine_version_id: IDENTIFIER {validateLength($IDENTIFIER.text, "Routine version identifier in UTF-8", 122);};
 dbs_rs_locator_variable: dbs_host_var_identifier;
 dbs_run_time_options: NONNUMERICLITERAL; // a character string that is no longer than 254 bytes
@@ -1644,30 +1644,30 @@ dbs_s: SINGLEDIGITLITERAL ; // a number between 1 and 9
 dbs_sc_name: IDENTIFIER;// must be from 1-8 characters in length
 dbs_scalar_fullselect : LPARENCHAR dbs_fullselect RPARENCHAR;
 dbs_schema_location: dbs_hostname_identifier;
-dbs_schema_name: IDENTIFIER {validateLength($IDENTIFIER.text, "schema name", 128);} | SYSIBM;
+dbs_schema_name: IDENTIFIER {validateLength($IDENTIFIER.text, "Schema name", 128);} | SYSIBM;
 dbs_search_condition: (NOT? dbs_predicate (SELECTIVITY dbs_integer_constant)? | LPARENCHAR dbs_search_condition RPARENCHAR) ((AND|OR) NOT?
                       (dbs_predicate | dbs_search_condition))* ;
-dbs_seclabel_name: IDENTIFIER {validateLength($IDENTIFIER.text, "security label", 8);};
-dbs_sequence_name: T=dbs_sql_identifier {validateLength($T.text, "sequence name", 128);};
+dbs_seclabel_name: IDENTIFIER {validateLength($IDENTIFIER.text, "Security label", 8);};
+dbs_sequence_name: T=dbs_sql_identifier {validateLength($T.text, "Sequence name", 128);};
 dbs_servauth_value: NONNUMERICLITERAL;
 dbs_simple_when_clause: (dbs_expressions) (WHEN (dbs_basic_predicate | dbs_expressions) THEN (dbs_result_expression1 | NULL))+;
 dbs_smallint: T=dbs_integer_constant {validateTextInRange($T.text, -2, 100);};//MINUSCHAR? SINGLEDIGITLITERAL SINGLEDIGITLITERAL?;// java ref - -1 to 99
-dbs_specific_name: T=dbs_sql_identifier {validateLength($T.text, "specific name", 128);};
+dbs_specific_name: T=dbs_sql_identifier {validateLength($T.text, "Specific name", 128);};
 dbs_sql_condition_name: T=dbs_generic_name {validateLength($T.text, "SQL condition name", 128);}; // No particular spec found in doc. Specifies the name of the condition.
 dbs_sql_control_statement: dbs_control_statement;
 dbs_sql_parameter_name: T=dbs_sql_parameter_name_rule {validateLength($T.text, "SQL parameter name", 128);};
 dbs_sql_parameter_name_rule: COLONCHAR? dbs_generic_name;
 dbs_sql_variable_name: dbs_sql_parameter_name | ASTERISKCHAR;
 dbs_sqlstate_string_constant: NONNUMERICLITERAL;
-dbs_statement_name: T=dbs_generic_name {validateLength($T.text, "statement name", 128);};
-dbs_stogroup_name: T=dbs_sql_identifier {validateLength($T.text, "storage group name", 128);};
+dbs_statement_name: T=dbs_generic_name {validateLength($T.text, "Statement name", 128);};
+dbs_stogroup_name: T=dbs_sql_identifier {validateLength($T.text, "Storage group name", 128);};
 dbs_string_constant: dbs_binary_string_constant | dbs_character_string_constant | dbs_graphic_string_constant | NONNUMERICLITERAL;
 dbs_string_expression: (DOUBLEQUOTE | SINGLEQUOTE) (dbs_allocate | dbs_alter | dbs_associate | dbs_comment | dbs_commit | dbs_create | dbs_declare_global |
   dbs_delete | dbs_drop | dbs_explain | dbs_free | dbs_grant |dbs_hold |dbs_insert | dbs_label | dbs_lock | dbs_merge | dbs_refresh | dbs_release|
   dbs_rename | dbs_revoke | dbs_rollback | dbs_savepoint | dbs_set | dbs_signal |dbs_truncate | dbs_update) (DOUBLEQUOTE | SINGLEQUOTE); // ref- https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_executeimmediate.html
-dbs_synonym: T=dbs_sql_identifier {validateLength($T.text, "synonym name", 128);};
+dbs_synonym: T=dbs_sql_identifier {validateLength($T.text, "Synonym name", 128);};
 dbs_table_identifier: dbs_sql_identifier;
-dbs_table_name: T=dbs_sql_identifier {validateLength($T.text, "table name", 128);};
+dbs_table_name: T=dbs_sql_identifier {validateLength($T.text, "Table name", 128);};
 
 dbs_table_reference: dbs_joined_table | dbs_table_reference_non_join;
 
@@ -1732,7 +1732,7 @@ dbs_target_namespace: dbs_hostname_identifier;
 dbs_token_host_variable: dbs_generic_name;
 dbs_transition_table_name: dbs_sql_identifier;
 dbs_transition_variable_name: COLONCHAR? dbs_generic_name;
-dbs_trigger_name: T=dbs_sql_identifier {validateLength($T.text, "trigger name", 128);};
+dbs_trigger_name: T=dbs_sql_identifier {validateLength($T.text, "Trigger name", 128);};
 dbs_trigger_version_id: dbs_sql_identifier;
 dbs_triggered_sql_statement : dbs_call | dbs_delete | dbs_select_statement_common_table_expression | dbs_fullselect | dbs_insert | dbs_merge | dbs_refresh |
                                dbs_set | dbs_signal | dbs_truncate | dbs_update | dbs_values_statement;
@@ -1746,7 +1746,7 @@ dbs_variable : ( dbs_host_variable | dbs_transition_variable_name | dbs_sql_vari
 dbs_variable_name: dbs_sql_identifier;
 dbs_version_id: dbs_hostname_identifier | FILENAME | NONNUMERICLITERAL;
 dbs_version_name: IDENTIFIER | FILENAME;
-dbs_view_name: dbs_hostname_identifier? T=dbs_sql_identifier {validateLength($T.text, "view name", 128);};
+dbs_view_name: dbs_hostname_identifier? T=dbs_sql_identifier {validateLength($T.text, "View name", 128);};
 dbs_volume_id: IDENTIFIER;
 dbs_pieceSize : IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");};
 dbs_sql_identifier: NONNUMERICLITERAL | IDENTIFIER | FILENAME | FILENAME (DOT_FS IDENTIFIER)* | DSNDB04 | TRANSACTION | RECORDS | dbs_special_name;
