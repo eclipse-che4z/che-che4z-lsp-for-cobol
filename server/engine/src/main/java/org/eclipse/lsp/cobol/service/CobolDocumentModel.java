@@ -34,17 +34,29 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 public class CobolDocumentModel {
   private static final String DELIMITER = "[ .\\[\\]()<>,*\"']+";
-  @Getter private final List<Line> lines = new CopyOnWriteArrayList<>();
-  @Getter private String text;
-  @Getter private final String uri;
-  @Getter @Setter private boolean opened = true;
-  @Getter @Setter private AnalysisResult analysisResult;
-  @Getter @Setter private List<DocumentSymbol> outlineResult;
+  @Getter
+  private final List<Line> lines = new CopyOnWriteArrayList<>();
+  @Getter
+  private String text;
+  @Getter
+  private final String uri;
+  @Getter
+  @Setter
+  private boolean opened = true;
+  @Getter
+  private AnalysisResult analysisResult;
+  /** Store last successfully completed analysis result, mostly for generation completion lists proposes */
+  @Getter
+  private AnalysisResult lastAnalysisResult;
+  @Getter
+  @Setter
+  private List<DocumentSymbol> outlineResult;
 
   public CobolDocumentModel(String uri, String text, AnalysisResult analysisResult) {
     this.uri = uri;
     this.text = text;
     this.analysisResult = analysisResult;
+    this.lastAnalysisResult = analysisResult;
     parse(text);
   }
 
@@ -58,6 +70,16 @@ public class CobolDocumentModel {
     return (analysisResult != null && outlineResult != null);
   }
 
+  /**
+   * Set new analysis result and update the last valid result
+   * @param analysisResult an analysis result
+   */
+  public void setAnalysisResult(AnalysisResult analysisResult) {
+    this.analysisResult = analysisResult;
+    if (analysisResult != null) {
+      lastAnalysisResult = analysisResult;
+    }
+  }
 
   Line getLine(int number) {
     return lines.stream().filter(line -> line.getNumber() == number).findFirst().orElse(null);
@@ -79,6 +101,7 @@ public class CobolDocumentModel {
 
   /**
    * Update CobolDocumentModel with a new text
+   *
    * @param text - the new document text
    */
   public void update(String text) {
@@ -146,10 +169,12 @@ public class CobolDocumentModel {
 
   private boolean isPositionAtDelimiter(Position position, Line route) {
     return position.getCharacter() > 1
-        && DELIMITER.contains(String.valueOf(route.getText().charAt(position.getCharacter() - 1)));
+            && DELIMITER.contains(String.valueOf(route.getText().charAt(position.getCharacter() - 1)));
   }
 
-  /** A value object to store program lines */
+  /**
+   * A value object to store program lines
+   */
   @Value
   public static class Line {
     int number;

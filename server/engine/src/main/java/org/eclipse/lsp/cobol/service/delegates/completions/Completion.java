@@ -20,7 +20,6 @@ import org.eclipse.lsp4j.CompletionItem;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Objects;
 
 /**
  * Completion provider that allows to resolve autocomplete requests with specific items based on
@@ -32,13 +31,13 @@ public interface Completion {
   /**
    * Provide a list of completion items of specific kind
    *
-   * @param token - token to filter the suggestions
+   * @param token    - token to filter the suggestions
    * @param document - object that contains text and analysis output
    * @return collection of strings to be converted into completion items
    */
   @NonNull
   Collection<CompletionItem> getCompletionItems(
-      @NonNull String token, @Nullable CobolDocumentModel document);
+          @NonNull String token, @Nullable CobolDocumentModel document);
 
   /**
    * Checks if the supplied document is ready for collection based on weather document is analysis.
@@ -47,6 +46,6 @@ public interface Completion {
    * @return True if document is ready, false otherwise.
    */
   default boolean isDocumentReadyForSemanticCollection(CobolDocumentModel document) {
-    return !(Objects.isNull(document) || Objects.isNull(document.getAnalysisResult()));
+    return document != null && document.getLastAnalysisResult() != null;
   }
 }

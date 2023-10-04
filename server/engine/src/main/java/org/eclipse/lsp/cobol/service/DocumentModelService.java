@@ -45,7 +45,8 @@ class DocumentModelService {
 
   /**
    * Mark the document as opened and stores document text
-   * @param uri - document uri
+   *
+   * @param uri  - document uri
    * @param text - document text
    */
   @Synchronized
@@ -57,6 +58,7 @@ class DocumentModelService {
 
   /**
    * Returns document model object
+   *
    * @param uri - document uri
    * @return the document model object
    */
@@ -67,7 +69,8 @@ class DocumentModelService {
 
   /**
    * Process analysis result and store diagnostics
-   * @param uri - document uri
+   *
+   * @param uri            - document uri
    * @param analysisResult - analysis result
    */
   @Synchronized
@@ -77,15 +80,16 @@ class DocumentModelService {
       diagnosticRepo.put(analysisResult.getDiagnostics());
       d.setOutlineResult(BuildOutlineTreeFromSyntaxTree.convert(analysisResult.getRootNode(), uri));
       analysisResult.getRootNode().getDepthFirstStream()
-          .filter(n -> n.getNodeType() == NodeType.COPY)
-          .filter(n -> n instanceof CopyNode)
+              .filter(n -> n.getNodeType() == NodeType.COPY)
+              .filter(CopyNode.class::isInstance)
               .map(CopyNode.class::cast)
-                  .forEach(n -> copybookReferenceRepo.storeCopybookUsageReference(n.getNameLocation().getUri(), n.getUri()));
+              .forEach(n -> copybookReferenceRepo.storeCopybookUsageReference(n.getNameLocation().getUri(), n.getUri()));
     });
   }
 
   /**
    * Mark the document as closed
+   *
    * @param uri - document uri
    */
   @Synchronized
@@ -95,14 +99,15 @@ class DocumentModelService {
 
   /**
    * Removes document from registry
+   *
    * @param uri - document uri
    */
   @Synchronized
   public void removeDocument(String uri) {
     Optional.ofNullable(docs.get(uri)).ifPresent(d -> {
       Optional.ofNullable(d.getAnalysisResult()).map(AnalysisResult::getDiagnostics)
-          .ifPresent(m -> m.keySet()
-              .forEach(diagnosticRepo::delete));
+              .ifPresent(m -> m.keySet()
+                      .forEach(diagnosticRepo::delete));
 
       diagnosticRepo.delete(uri);
       docs.remove(uri);
@@ -111,16 +116,18 @@ class DocumentModelService {
 
   /**
    * Returns all opened documents
+   *
    * @return a list of opened documents
    */
   @Synchronized
   public List<CobolDocumentModel> getAllOpened() {
     return docs.values().stream()
-        .filter(CobolDocumentModel::isOpened).collect(Collectors.toList());
+            .filter(CobolDocumentModel::isOpened).collect(Collectors.toList());
   }
 
   /**
    * Returns true if document was analysed and false otherwise
+   *
    * @param uri - document uri
    * @return true if document was analysed and false otherwise
    */
@@ -131,6 +138,7 @@ class DocumentModelService {
 
   /**
    * Returns all available diagnostics for opened documents and empty diagnostics for clothed documents
+   *
    * @return map of diagnostics where the key is a document uri
    * and a value is a list of diagnostics for this document
    */
@@ -151,35 +159,43 @@ class DocumentModelService {
 
   /**
    * Updates document with a new test
+   *
    * @param uri - document uri
    */
   @Synchronized
   public void updateDocument(String uri, String text) {
-    Optional.ofNullable(docs.get(uri)).ifPresent(d -> {
-      Optional.ofNullable(d.getAnalysisResult()).map(AnalysisResult::getDiagnostics)
-          .ifPresent(m -> m.keySet()
-                  .forEach(diagnosticRepo::delete));
-
-      diagnosticRepo.delete(uri);
-      d.update(text);
-    });
+    CobolDocumentModel d = docs.get(uri);
+    if (d == null) {
+      return;
+    }
+    AnalysisResult analysisResult = d.getAnalysisResult();
+    if (analysisResult != null) {
+      Map<String, List<Diagnostic>> diagnostics = analysisResult.getDiagnostics();
+      if (diagnostics != null) {
+        diagnostics.keySet().forEach(diagnosticRepo::delete);
+      }
+    }
+    diagnosticRepo.delete(uri);
+    d.update(text);
   }
 
   /**
    * Collects all documents with given uri list
+   *
    * @param programs - the uri list
    * @return a list of documents
    */
   @Synchronized
   public List<CobolDocumentModel> getAll(Set<String> programs) {
     return programs.stream().map(docs::get)
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
   }
 
   /**
    * Updates copybook and returns all affected opened programs filtered by predicate
-   * @param uri - copybook uri
+   *
+   * @param uri       - copybook uri
    * @param predicate - filtering predicate for programs
    * @return set of affected opened programs
    */
@@ -187,20 +203,20 @@ class DocumentModelService {
   public Set<String> findAffectedDocumentsForCopybook(String uri, Predicate<CobolDocumentModel> predicate) {
     Set<String> affectedPrograms = new HashSet<>();
     copybookReferenceRepo
-        .getCopybookUsageReference(uri)
-        .forEach(
-            curi -> {
-              if (Optional.ofNullable(get(curi)).map(CobolDocumentModel::isOpened).orElse(false)) {
-                affectedPrograms.add(curi);
-              }
-            });
+            .getCopybookUsageReference(uri)
+            .forEach(
+                    curi -> {
+                      if (Optional.ofNullable(get(curi)).map(CobolDocumentModel::isOpened).orElse(false)) {
+                        affectedPrograms.add(curi);
+                      }
+                    });
 
     // Add all not synced programs
     affectedPrograms.addAll(docs.values().stream()
-        .filter(d -> !d.isDocumentSynced())
-        .filter(predicate)
-        .map(CobolDocumentModel::getUri)
-        .collect(Collectors.toList()));
+            .filter(d -> !d.isDocumentSynced())
+            .filter(predicate)
+            .map(CobolDocumentModel::getUri)
+            .collect(Collectors.toList()));
 
     return affectedPrograms;
   }
