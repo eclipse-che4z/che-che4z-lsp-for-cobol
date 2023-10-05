@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.service.copybooks;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.Inject;
@@ -36,8 +35,6 @@ import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
-import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.DocumentContentCache;
 
@@ -71,9 +68,7 @@ public class CopybookServiceImpl implements CopybookService {
   private final DocumentContentCache contentCache;
 
   @Inject
-  public CopybookServiceImpl(
-      DataBusBroker dataBus,
-      Provider<CobolLanguageClient> clientProvider,
+  public CopybookServiceImpl(Provider<CobolLanguageClient> clientProvider,
       FileSystemService files,
       TextPreprocessor preprocessor,
       CopybookCache copybookCache,
@@ -83,7 +78,6 @@ public class CopybookServiceImpl implements CopybookService {
     this.preprocessor = preprocessor;
     this.copybookCache = copybookCache;
     this.contentCache = contentCache;
-    dataBus.subscribe(this);
   }
 
   @Override
@@ -302,23 +296,14 @@ public class CopybookServiceImpl implements CopybookService {
         : registerForDownloading(copybookName, programUri);
   }
 
-  /**
-   * Send downloading requests to the Client for copybooks not presented locally, if any.
-   *
-   * <p>A list of missed copybooks grouped by document URI, including nested copybooks.
-   *
-   * @param event - document analysis done
-   */
-  @Subscribe
-  public void handleAnalysisFinishedEvent(AnalysisFinishedEvent event) {
-    LOG.debug("Received event {}", event);
+  @Override
+  public void sendCopybookDownloadRequest(String documentUri, Collection<String> copybookUris, CopybookProcessingMode processingMode) {
     LOG.debug("Copybooks expecting downloading: {}", copybooksForDownloading);
-    Set<String> uris = new HashSet<>(event.getCopybookUris());
-    String documentUri = event.getDocumentUri();
+    Set<String> uris = new HashSet<>(copybookUris);
     uris.add(documentUri);
     String document = files.getNameFromURI(documentUri);
 
-    if (event.getCopybookProcessingMode().download) {
+    if (processingMode.download) {
       List<CopybookName> copybooksToDownload =
           uris.stream()
               .map(files::getNameFromURI)
@@ -332,8 +317,7 @@ public class CopybookServiceImpl implements CopybookService {
             document,
             copybooksToDownload.stream().map(CopybookName::getQualifiedName).collect(toList()),
             Optional.ofNullable(copybooksToDownload.stream().findFirst().get().getDialectType()).orElse(COBOL), //NOSONAR
-            !event.getCopybookProcessingMode().userInteraction);
-
+            !processingMode.userInteraction);
       }
     }
   }

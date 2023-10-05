@@ -38,13 +38,15 @@ public class CobolDocumentModel {
   @Getter private String text;
   @Getter private final String uri;
   @Getter @Setter private boolean opened = true;
-  @Getter @Setter private AnalysisResult analysisResult;
+  @Getter private AnalysisResult analysisResult;
+  @Getter private AnalysisResult lastAnalysisResult;
   @Getter @Setter private List<DocumentSymbol> outlineResult;
 
   public CobolDocumentModel(String uri, String text, AnalysisResult analysisResult) {
     this.uri = uri;
     this.text = text;
     this.analysisResult = analysisResult;
+    this.lastAnalysisResult = analysisResult;
     parse(text);
   }
 
@@ -75,6 +77,17 @@ public class CobolDocumentModel {
       return "";
     }
     return retrieveTokenBeginning(position, route);
+  }
+
+  /**
+   * Assign analysis result to the document.
+   * @param analysisResult the analysis result.
+   */
+  public void setAnalysisResult(AnalysisResult analysisResult) {
+    if (analysisResult != null) {
+      this.lastAnalysisResult = analysisResult;
+    }
+    this.analysisResult = analysisResult;
   }
 
   /**
@@ -160,4 +173,5 @@ public class CobolDocumentModel {
       this.text = text;
     }
   }
+
 }

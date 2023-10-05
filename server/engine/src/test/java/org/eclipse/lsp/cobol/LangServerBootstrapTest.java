@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol;
 
 import com.google.inject.Injector;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.CobolLanguageServer;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageServer;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageServer;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp4j.jsonrpc.Launcher;

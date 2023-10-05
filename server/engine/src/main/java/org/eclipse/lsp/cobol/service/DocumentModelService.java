@@ -25,7 +25,6 @@ import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp4j.Diagnostic;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -33,8 +32,8 @@ import java.util.stream.Collectors;
  * Provides document model management functionality
  */
 @Singleton
-class DocumentModelService {
-  private final Map<String, CobolDocumentModel> docs = new ConcurrentHashMap<>();
+public class DocumentModelService {
+  private final Map<String, CobolDocumentModel> docs = new HashMap<>();
   private final DiagnosticRepo diagnosticRepo = new DiagnosticRepo();
   private final CopybookReferenceRepo copybookReferenceRepo;
 
@@ -150,8 +149,9 @@ class DocumentModelService {
   }
 
   /**
-   * Updates document with a new test
-   * @param uri - document uri
+   * Updates document with a new test.
+   * @param uri - document uri.
+   * @param text - content of the document.
    */
   @Synchronized
   public void updateDocument(String uri, String text) {

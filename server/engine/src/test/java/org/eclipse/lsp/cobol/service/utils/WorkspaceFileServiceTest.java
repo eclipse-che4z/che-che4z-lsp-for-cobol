@@ -113,13 +113,14 @@ class WorkspaceFileServiceTest {
       String uriToTheFolder,
       int maxDepth
   ) {
+    FileSystemService fileSystemService = new WorkspaceFileService();
     try (MockedStatic<Files> filesMock = mockStatic(Files.class)) {
-      FileSystemService fileSystemService = new WorkspaceFileService();
-
       Path pathToTheFolder = fileSystemService.getPathFromURI(uriToTheFolder);
 
+      filesMock.when(() -> Files.isDirectory(pathToTheFolder)).thenReturn(true);
+
       filesMock.when(() -> Files.find(eq(pathToTheFolder), eq(maxDepth), any()))
-          .thenReturn(Stream.of(fileSystemService.getPathFromURI("file:///")));
+              .thenReturn(Stream.of(fileSystemService.getPathFromURI("file:///")));
 
       fileSystemService.listFilesInDirectory(searchUri);
 

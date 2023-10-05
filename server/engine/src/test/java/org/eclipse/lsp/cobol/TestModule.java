@@ -31,6 +31,8 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
+import org.eclipse.lsp.cobol.lsp.CobolTextDocumentService;
+import org.eclipse.lsp.cobol.lsp.CobolWorkspaceServiceImpl;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.*;
@@ -53,8 +55,6 @@ import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageServer;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
@@ -73,7 +73,6 @@ public class TestModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(CustomThreadPoolExecutor.class).to(CustomThreadPoolExecutorService.class);
     bind(CobolLanguageClient.class).to(MockLanguageClient.class);
     bind(LanguageServer.class).to(MockLanguageServer.class);
     bind(DisposableLSPStateService.class).to(CobolLSPServerStateService.class);

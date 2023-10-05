@@ -22,12 +22,18 @@ import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageServer;
+import org.eclipse.lsp.cobol.lsp.CobolTextDocumentService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.lsp.LspMessageDispatcher;
+import org.eclipse.lsp.cobol.lsp.handlers.server.ExitHandler;
+import org.eclipse.lsp.cobol.lsp.handlers.server.InitializeHandler;
+import org.eclipse.lsp.cobol.lsp.handlers.server.InitializedHandler;
+import org.eclipse.lsp.cobol.lsp.handlers.server.ShutdownHandler;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.ClientInfo;
 import org.eclipse.lsp4j.CompletionCapabilities;
@@ -47,7 +53,6 @@ import org.eclipse.lsp4j.TextDocumentSyncKind;
 import org.eclipse.lsp4j.WorkspaceClientCapabilities;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -55,8 +60,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -65,19 +70,12 @@ import static org.eclipse.lsp4j.DiagnosticTag.Unnecessary;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/** This test asserts functions of the {@link CobolLanguageServer}, such as initialization. */
+/**
+ * This test asserts functions of the {@link CobolLanguageServer}, such as initialization.
+ */
 class CobolLanguageServerTest {
 
-  private static CustomThreadPoolExecutor customExecutor;
   private DisposableLSPStateService stateService;
-
-  @BeforeAll
-  static void init() {
-    customExecutor = mock(CustomThreadPoolExecutor.class);
-    when(customExecutor.getThreadPoolExecutor()).thenReturn(Executors.newFixedThreadPool(3));
-    when(customExecutor.getScheduledThreadPoolExecutor())
-        .thenReturn(Executors.newSingleThreadScheduledExecutor());
-  }
 
   @BeforeEach
   void getStateService() {
@@ -89,7 +87,7 @@ class CobolLanguageServerTest {
    * system watchers registered correctly.
    */
   @Test
-  void initialized() {
+  void initialized() throws InterruptedException {
     SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
@@ -103,21 +101,22 @@ class CobolLanguageServerTest {
     when(settingsService.fetchTextConfiguration(anyString())).thenCallRealMethod();
     prepareSettingsService(settingsService, localeStore);
 
+    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
+    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
     CobolLanguageServer server =
-        new CobolLanguageServer(
-            null,
-            null,
-            watchingService,
-            settingsService,
-            localeStore,
-            customExecutor,
-            stateService,
-            copybookNameService,
-            keywords,
-            messageService);
+            new CobolLanguageServer(
+                    lspMessageDispatcher,
+                    null,
+                    null,
+                    new ExitHandler(stateService),
+                    new ShutdownHandler(stateService, lspMessageDispatcher),
+                    new InitializeHandler(watchingService),
+                    new InitializedHandler(watchingService, copybookNameService, keywords, settingsService, localeStore, mock(AnalysisService.class), messageService));
+
 
     server.initialized(new InitializedParams());
-
+    lspMessageDispatcher.stop();
+    done.join();
     verify(watchingService).watchConfigurationChange();
     verify(settingsService).fetchConfiguration(LOCALE.label);
     verify(settingsService).fetchConfiguration(LOGGING_LEVEL.label);
@@ -131,18 +130,18 @@ class CobolLanguageServerTest {
     arr.add(new JsonPrimitive(path));
 
     when(settingsService.fetchConfiguration(CPY_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
+            .thenReturn(completedFuture(singletonList(arr)));
     when(localeStore.notifyLocaleStore()).thenReturn(System.out::println);
     when(settingsService.fetchConfiguration(LOCALE.label))
-        .thenReturn(completedFuture(singletonList(arr)));
+            .thenReturn(completedFuture(singletonList(arr)));
     when(settingsService.fetchConfiguration(SUBROUTINE_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(ImmutableList.of()));
+            .thenReturn(completedFuture(ImmutableList.of()));
     when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
-        .thenReturn(completedFuture(ImmutableList.of("INFO")));
+            .thenReturn(completedFuture(ImmutableList.of("INFO")));
     when(settingsService.fetchConfiguration(CPY_EXTENSIONS.label))
-        .thenReturn(completedFuture(ImmutableList.of("cpy")));
+            .thenReturn(completedFuture(ImmutableList.of("cpy")));
     when(settingsService.fetchConfiguration("dialect"))
-        .thenReturn(completedFuture(singletonList(arr)));
+            .thenReturn(completedFuture(singletonList(arr)));
   }
 
   @Test
@@ -153,6 +152,7 @@ class CobolLanguageServerTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
     CobolTextDocumentService textService = mock(CobolTextDocumentService.class);
+    AnalysisService analysisService = mock(AnalysisService.class);
     MessageService messageService = mock(MessageService.class);
 
     DialectService dialectService = mock(DialectService.class);
@@ -161,22 +161,23 @@ class CobolLanguageServerTest {
     when(settingsService.fetchTextConfiguration(anyString())).thenReturn(CompletableFuture.supplyAsync(ImmutableList::of));
     prepareSettingsService(settingsService, localeStore);
 
+    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
+    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
     CobolLanguageServer server =
-        new CobolLanguageServer(
-            textService,
-            null,
-            watchingService,
-            settingsService,
-            localeStore,
-            customExecutor,
-            stateService,
-            copybookNameService,
-            keywords,
-            messageService);
+            new CobolLanguageServer(
+                    lspMessageDispatcher,
+                    textService,
+                    null,
+                    new ExitHandler(stateService),
+                    new ShutdownHandler(stateService, lspMessageDispatcher),
+                    new InitializeHandler(watchingService),
+                    new InitializedHandler(watchingService, copybookNameService, keywords, settingsService, localeStore, analysisService, messageService));
 
     server.initialized(new InitializedParams());
-    verify(textService, timeout(TimeUnit.SECONDS.toMillis(5))
-                    .times(1)).notifyExtensionConfig(any());
+    verify(analysisService, timeout(TimeUnit.SECONDS.toMillis(5))
+            .times(1)).setExtensionConfig(any());
+    lspMessageDispatcher.stop();
+    done.join();
   }
 
   /**
@@ -198,18 +199,17 @@ class CobolLanguageServerTest {
   }
 
   private void testServerInitialization(InitializeParams initializeParams) {
+    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
+    lspMessageDispatcher.startEventLoop();
     CobolLanguageServer server =
             new CobolLanguageServer(
+                    lspMessageDispatcher,
                     null,
                     null,
-                    mock(WatcherServiceImpl.class),
-                    null,
-                    null,
-                    customExecutor,
-                    stateService,
-                    null,
-                    null,
-                    null);
+                    new ExitHandler(stateService),
+                    new ShutdownHandler(stateService, lspMessageDispatcher),
+                    new InitializeHandler(mock(WatcherServiceImpl.class)),
+                    new InitializedHandler(mock(WatcherServiceImpl.class), null, null, null, null, null, null));
 
     try {
       InitializeResult result = server.initialize(initializeParams).get();
@@ -228,16 +228,16 @@ class CobolLanguageServerTest {
     initializeParams.setLocale("en");
     ClientCapabilities clientCapabilities = new ClientCapabilities();
     TextDocumentClientCapabilities textDocumentClientCapabilities =
-        new TextDocumentClientCapabilities();
+            new TextDocumentClientCapabilities();
     PublishDiagnosticsCapabilities publishDiagnosticsCapabilities =
-        new PublishDiagnosticsCapabilities();
+            new PublishDiagnosticsCapabilities();
     publishDiagnosticsCapabilities.setTagSupport(
-        new DiagnosticsTagSupport(ImmutableList.of(Unnecessary, DiagnosticTag.Deprecated)));
+            new DiagnosticsTagSupport(ImmutableList.of(Unnecessary, DiagnosticTag.Deprecated)));
     textDocumentClientCapabilities.setPublishDiagnostics(publishDiagnosticsCapabilities);
     CompletionCapabilities completionCapabilities = new CompletionCapabilities();
     CompletionItemCapabilities completionItemCapabilities = new CompletionItemCapabilities();
     completionItemCapabilities.setTagSupport(
-        new CompletionItemTagSupportCapabilities(ImmutableList.of(CompletionItemTag.Deprecated)));
+            new CompletionItemTagSupportCapabilities(ImmutableList.of(CompletionItemTag.Deprecated)));
     completionCapabilities.setCompletionItem(completionItemCapabilities);
     textDocumentClientCapabilities.setCompletion(completionCapabilities);
     clientCapabilities.setTextDocument(textDocumentClientCapabilities);
@@ -247,24 +247,27 @@ class CobolLanguageServerTest {
     return initializeParams;
   }
 
-  /** Test change in server exit status upon shutdown call. */
+  /**
+   * Test change in server exit status upon shutdown call.
+   */
   @Test
-  void shutdown() {
+  void shutdown() throws ExecutionException, InterruptedException, TimeoutException {
     TextDocumentService textDocumentService = mock(CobolTextDocumentService.class);
+    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
+    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+
     CobolLanguageServer server =
-        new CobolLanguageServer(
-            textDocumentService,
-            null,
-            null,
-            null,
-            null,
-            customExecutor,
-            stateService,
-            null,
-            null,
-            null);
+            new CobolLanguageServer(
+                    lspMessageDispatcher,
+                    textDocumentService,
+                    null,
+                    new ExitHandler(stateService),
+                    new ShutdownHandler(stateService, lspMessageDispatcher),
+                    new InitializeHandler(null),
+                    new InitializedHandler(null, null, null, null, null, null, null));
     assertEquals(1, stateService.getExitCode());
     server.shutdown();
+    done.get(1, TimeUnit.SECONDS);
     assertEquals(0, stateService.getExitCode());
   }
 
@@ -279,7 +282,7 @@ class CobolLanguageServerTest {
     assertTrue(capabilities.getDocumentSymbolProvider().getRight().getWorkDoneProgress());
     assertTrue(capabilities.getFoldingRangeProvider().getLeft());
     assertEquals(ImmutableList.of(ErrorCodes.MISSING_COPYBOOK.getLabel()),
-        capabilities.getExecuteCommandProvider().getCommands());
+            capabilities.getExecuteCommandProvider().getCommands());
 
     assertFalse(capabilities.getCompletionProvider().getResolveProvider());
     assertNull(capabilities.getWorkspace().getWorkspaceFolders().getChangeNotifications());

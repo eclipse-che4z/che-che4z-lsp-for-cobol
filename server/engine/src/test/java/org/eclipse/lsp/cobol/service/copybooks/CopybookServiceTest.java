@@ -23,8 +23,6 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
-import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
-import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.DocumentContentCache;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
@@ -72,8 +70,6 @@ class CopybookServiceTest {
   private static final String DOCUMENT_2_URI = "file:///c:/workspace/document2.cbl";
   private static final String DOCUMENT_3_URI = "implicit:///implicitCopybooks/SQLCA_DB2.cpy";
   private static final String COPYBOOK_3_NAME = "SQLCA_DB2";
-
-  private final DataBusBroker broker = mock(DataBusBroker.class);
   private final CobolLanguageClient client = mock(CobolLanguageClient.class);
   private final FileSystemService files = mock(FileSystemService.class);
   private final TextPreprocessor preprocessor = mock(TextPreprocessor.class);
@@ -212,15 +208,14 @@ class CopybookServiceTest {
   }
 
   /**
-   * Test the service must collect not resolved copybooks and sends downloading request for them on
-   * {@link AnalysisFinishedEvent}. The server must track missed copybooks for each document
+   * Test the service must collect not resolved copybooks and sends downloading request for them.
+   * The server must track missed copybooks for each document
    * separately. The server must send a downloading request only once. Any subsequent Done analysis
    * events should not trigger downloading requests until new missed copybooks found.
    */
   @Test
   void testServiceSendsDownloadingRequestForAnalysisFinishedEvent() {
     CopybookServiceImpl copybookService = createCopybookService();
-    verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(DOCUMENT_2_URI)).thenReturn("document2");
     when(client.resolveCopybook(DOCUMENT_2_URI, INVALID_2_CPY_NAME, "COBOL"))
@@ -245,33 +240,18 @@ class CopybookServiceTest {
     assertEquals(new CopybookModel(copybookInvalid2.toCopybookId(DOCUMENT_2_URI), copybookInvalid2, null, null), invalidCpy2);
 
     // First document parsing done
-    copybookService.handleAnalysisFinishedEvent(
-        AnalysisFinishedEvent.builder()
-            .documentUri(DOCUMENT_URI)
-            .copybookUris(emptyList())
-            .copybookProcessingMode(ENABLED)
-            .build());
+    copybookService.sendCopybookDownloadRequest(DOCUMENT_URI, emptyList(), ENABLED);
     verify(client, times(1))
         .downloadCopybooks("document", ImmutableList.of(INVALID_CPY_NAME), "COBOL", true);
 
     // Others parsing done events for first document are not trigger settingsService
-    copybookService.handleAnalysisFinishedEvent(
-        AnalysisFinishedEvent.builder()
-            .documentUri(DOCUMENT_URI)
-            .copybookUris(emptyList())
-            .copybookProcessingMode(ENABLED)
-            .build());
+    copybookService.sendCopybookDownloadRequest(DOCUMENT_URI, emptyList(),  ENABLED);
 
     verify(client, times(1))
         .downloadCopybooks("document", ImmutableList.of(INVALID_CPY_NAME), "COBOL", true);
 
     // Second document parsing done
-    copybookService.handleAnalysisFinishedEvent(
-        AnalysisFinishedEvent.builder()
-            .documentUri(DOCUMENT_2_URI)
-            .copybookUris(emptyList())
-            .copybookProcessingMode(ENABLED)
-            .build());
+    copybookService.sendCopybookDownloadRequest(DOCUMENT_2_URI, emptyList(), ENABLED);
     verify(client, times(1))
         .downloadCopybooks("document2", ImmutableList.of(INVALID_2_CPY_NAME), "COBOL", true);
   }
@@ -295,7 +275,6 @@ class CopybookServiceTest {
   void testServiceResolvesImplicitCopybook() {
     CopybookName copybookName = new CopybookName(SQLCA);
     CopybookServiceImpl copybookService = createCopybookService();
-    verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(DOCUMENT_3_URI)).thenReturn("document2");
     when(files.readImplicitCode(COPYBOOK_3_NAME)).thenReturn(CONTENT);
@@ -314,7 +293,6 @@ class CopybookServiceTest {
   void testServiceResolvesImplicitCopybookForDataCom() {
     CopybookName copybookName = new CopybookName(SQLCA);
     CopybookServiceImpl copybookService = createCopybookService();
-    verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(DOCUMENT_URI)).thenReturn("document2");
     when(files.readImplicitCode("SQLCA_DATACOM")).thenReturn(CONTENT);
@@ -335,7 +313,6 @@ class CopybookServiceTest {
   void testSqldaCopybookResolutionDoesNotRelyOnBackend() {
     CopybookName copybookName = new CopybookName(SQLDA);
     CopybookServiceImpl copybookService = createCopybookService();
-    verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(DOCUMENT_URI)).thenReturn("document2");
     when(client.resolveCopybook("document2", SQLCA, "COBOL"))
@@ -353,7 +330,6 @@ class CopybookServiceTest {
   @Test
   void testServiceSendsDownloadingRequestForAllNotResolvedCopybooks() {
     CopybookServiceImpl copybookService = createCopybookService();
-    verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(PARENT_CPY_URI)).thenReturn(PARENT_CPY_NAME);
     when(files.getPathFromURI(PARENT_CPY_URI)).thenReturn(parentPath);
@@ -384,13 +360,7 @@ class CopybookServiceTest {
 
     // Notify that analysis finished sending the document URI and copybook names that have nested
     // copybooks
-    copybookService.handleAnalysisFinishedEvent(
-        AnalysisFinishedEvent.builder()
-            .documentUri(DOCUMENT_URI)
-            .copybookUris(asList(PARENT_CPY_URI, DOCUMENT_URI))
-            .copybookProcessingMode(ENABLED)
-            .build());
-
+    copybookService.sendCopybookDownloadRequest(DOCUMENT_URI, asList(PARENT_CPY_URI, DOCUMENT_URI), ENABLED);
     verify(client, times(1))
         .downloadCopybooks("document", asList(INVALID_CPY_NAME, NESTED_CPY_NAME), "COBOL", true);
   }
@@ -442,7 +412,7 @@ class CopybookServiceTest {
   private CopybookServiceImpl createCopybookService() {
     ClientProvider provider = new ClientProvider();
     provider.setClient(client);
-    return new CopybookServiceImpl(broker, provider, files, preprocessor, new CopybookCache(3, 3, "HOURS"), documentCache);
+    return new CopybookServiceImpl(provider, files, preprocessor, new CopybookCache(3, 3, "HOURS"), documentCache);
   }
 
   private CopybookName createCopybook(String displayName) {

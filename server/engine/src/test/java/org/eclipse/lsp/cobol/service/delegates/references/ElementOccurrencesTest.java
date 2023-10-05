@@ -211,7 +211,7 @@ class ElementOccurrencesTest {
     List<DocumentHighlight> highlights =
         new ElementOccurrences()
             .findHighlights(
-                new CobolDocumentModel(URI, "", analysisResult),
+                analysisResult,
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage));
     List<DocumentHighlight> expectedHighlights =
         ImmutableList.of(
