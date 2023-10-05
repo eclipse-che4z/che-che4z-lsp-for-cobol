@@ -33,7 +33,7 @@ import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
  * FoldingRange helper
  */
 @UtilityClass
-class DocumentServiceHelper {
+public class DocumentServiceHelper {
 
   /**
    * Creates folding ranges for given document symbol table

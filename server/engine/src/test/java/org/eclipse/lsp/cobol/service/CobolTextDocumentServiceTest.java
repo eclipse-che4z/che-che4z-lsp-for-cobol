@@ -14,14 +14,25 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
-import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
+import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.CobolTextDocumentService;
+import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.lsp.LspMessageDispatcher;
+import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisHandler;
+import org.eclipse.lsp.cobol.lsp.handlers.text.*;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
+import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
+import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
+import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
+import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +40,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -41,12 +51,29 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CobolTextDocumentServiceTest {
 
-  @Mock protected Completions completions;
-  @Mock protected CodeActions actions;
-  @Mock protected CFASTBuilder builder;
-  @Mock protected WatcherService watcherService;
-  @Mock protected TaskService taskService;
-  @Mock protected AnalysisService analysisService;
+  @Mock
+  protected Completions completions;
+  @Mock
+  protected CodeActions actions;
+  @Mock
+  protected CFASTBuilder builder;
+  @Mock
+  protected WatcherService watcherService;
+  @Mock
+  protected AnalysisService analysisService;
+  @Mock
+  protected DocumentModelService documentModelService;
+  @Mock
+  protected Communications communications;
+  @Mock
+  protected Occurrences occurrences;
+  @Mock
+  protected Formations formations;
+
+  @Mock
+  protected HoverProvider hoverProvider;
+  @Mock
+  LspMessageDispatcher lspMessageDispatcher;
 
   private CobolTextDocumentService service;
 
@@ -56,154 +83,127 @@ class CobolTextDocumentServiceTest {
    */
   @BeforeEach
   void setupService() {
+    DisposableLSPStateService disposableLSPStateService = new CobolLSPServerStateService();
+    CopybookService copybookService = mock(CopybookService.class);
+    SubroutineService subroutineService = mock(SubroutineService.class);
+    AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(documentModelService, analysisService, copybookService, subroutineService);
+
+    CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions);
+    FormattingHandler formattingHandler = new FormattingHandler(documentModelService, formations);
+
+    CodeActionHandler codeActionHandler = new CodeActionHandler(actions);
+    AnalysisHandler analysisHandler = new AnalysisHandler(asyncAnalysisService, builder);
+
+    DidOpenHandler didOpenHandler = new DidOpenHandler(asyncAnalysisService, watcherService);
+    DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, analysisService, watcherService);
+    DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService);
+    DefinitionHandler definitionHandler = new DefinitionHandler(asyncAnalysisService, occurrences);
+    DocumentSymbolHandler documentSymbolHandler = new DocumentSymbolHandler(documentModelService, communications);
+    DocumentHighlightHandler documentHighlightHandler = new DocumentHighlightHandler(asyncAnalysisService, occurrences);
+    ReferencesHandler referencesHandler = new ReferencesHandler(asyncAnalysisService, occurrences);
+    HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider);
+    FoldingRangeHandler foldingRangeHandler = new FoldingRangeHandler(documentModelService);
+
+
+    lspMessageDispatcher.startEventLoop();
     service = new CobolTextDocumentService(
-        actions,
-        builder,
-        new CobolLSPServerStateService(),
-        watcherService,
-        analysisService,
-        taskService,
-        mock(DataBusBroker.class));
+            lspMessageDispatcher,
+            completionHandler,
+            codeActionHandler,
+            analysisHandler,
+            formattingHandler,
+            didOpenHandler,
+            didCloseHandler,
+            didChangeHandler,
+            definitionHandler,
+            documentSymbolHandler,
+            documentHighlightHandler,
+            referencesHandler,
+            hoverHandler,
+            foldingRangeHandler);
+  }
+
+  @AfterEach
+  void tearDown() throws InterruptedException {
+    lspMessageDispatcher.stop();
   }
 
   @Test
   void testAnalysis() {
     JsonObject json = new JsonObject();
     json.addProperty("uri", "");
-    when(taskService.runNextTask(any(), any(), any())).thenReturn(CompletableFuture.completedFuture(null));
 
     service.analysis(json);
-    Mockito.verify(taskService, times(1)).runNextTask(any(), any(), any());
+    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
 
   @Test
   void testDidChange() {
-    VersionedTextDocumentIdentifier doc = mock(VersionedTextDocumentIdentifier.class);
-    when(doc.getUri()).thenReturn("");
-
     DidChangeTextDocumentParams params = mock(DidChangeTextDocumentParams.class);
-    when(params.getTextDocument()).thenReturn(doc);
-    when(params.getContentChanges()).thenReturn(ImmutableList.of(mock(TextDocumentContentChangeEvent.class)));
-    when(taskService.runTask(any(), any())).thenReturn(CompletableFuture.completedFuture(null));
-
     service.didChange(params);
-    Mockito.verify(taskService, times(1)).runTask(any(), any());
+    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
 
   @Test
   void testDidClose() {
-    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
-    when(doc.getUri()).thenReturn("");
-
     DidCloseTextDocumentParams params = mock(DidCloseTextDocumentParams.class);
-    when(params.getTextDocument()).thenReturn(doc);
-    when(taskService.runTask(any())).thenReturn(CompletableFuture.completedFuture(null));
-
     service.didClose(params);
-    Mockito.verify(taskService, times(1)).runTask(any());
-    Mockito.verify(watcherService, times(1)).removeRuntimeWatchers(any());
+    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
 
   @Test
   void testDidOpen() {
-    TextDocumentItem textDocument = mock(TextDocumentItem.class);
-    when(textDocument.getUri()).thenReturn("");
-
     DidOpenTextDocumentParams params = mock(DidOpenTextDocumentParams.class);
-    when(params.getTextDocument()).thenReturn(textDocument);
-    when(taskService.runTask(any(), any())).thenReturn(CompletableFuture.completedFuture(null));
-
     service.didOpen(params);
-    Mockito.verify(taskService, times(1)).runTask(any(), any());
-    Mockito.verify(watcherService, times(1)).addRuntimeWatchers(any());
+    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
 
   @Test
   void testCodeAction() {
-    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
-    when(doc.getUri()).thenReturn("");
-
     CodeActionParams params = mock(CodeActionParams.class);
-    when(params.getTextDocument()).thenReturn(doc);
-    when(taskService.runTask(any())).thenReturn(CompletableFuture.completedFuture(null));
-
     service.codeAction(params);
-    Mockito.verify(taskService, times(1)).runTask(any());
+    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
 
   @Test
   void testCompletion() {
-    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
-    when(doc.getUri()).thenReturn("");
-
     CompletionParams params = mock(CompletionParams.class);
-    when(params.getTextDocument()).thenReturn(doc);
-
     service.completion(params);
-    Mockito.verify(taskService, times(1)).runNextTask(any(), any(), any());
+    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
 
   @Test
   void testDefinition() {
-    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
-    when(doc.getUri()).thenReturn("");
-
     DefinitionParams params = mock(DefinitionParams.class);
-    when(params.getTextDocument()).thenReturn(doc);
-
     service.definition(params);
-    Mockito.verify(taskService, times(1)).runNextTask(any(), any(), any());
+    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
 
   @Test
   void testDocumentHighlight() {
-    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
-    when(doc.getUri()).thenReturn("");
-
     DocumentHighlightParams params = mock(DocumentHighlightParams.class);
-    when(params.getTextDocument()).thenReturn(doc);
-
     service.documentHighlight(params);
-    Mockito.verify(taskService, times(1)).runNextTask(any(), any(), any());
+    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
 
   @Test
   void testDocumentSymbol() {
-    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
-    when(doc.getUri()).thenReturn("");
-
     DocumentSymbolParams params = mock(DocumentSymbolParams.class);
-    when(params.getTextDocument()).thenReturn(doc);
-    when(taskService.runNextTask(any(), any(), any())).thenReturn(CompletableFuture.completedFuture(null));
-
     service.documentSymbol(params);
-    Mockito.verify(taskService, times(1)).runNextTask(any(), any(), any());
+    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
 
   @Test
   void testFoldingRange() {
-    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
-    when(doc.getUri()).thenReturn("");
-
     FoldingRangeRequestParams params = mock(FoldingRangeRequestParams.class);
-    when(params.getTextDocument()).thenReturn(doc);
-    when(taskService.runNextTask(any(), any(), any())).thenReturn(CompletableFuture.completedFuture(null));
-
     service.foldingRange(params);
-    Mockito.verify(taskService, times(1)).runNextTask(any(), any(), any());
+    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
 
   @Test
   void testFormatting() throws ExecutionException, InterruptedException {
-    TextDocumentIdentifier doc = mock(TextDocumentIdentifier.class);
-    when(doc.getUri()).thenReturn("");
-
     DocumentFormattingParams params = mock(DocumentFormattingParams.class);
-    when(params.getTextDocument()).thenReturn(doc);
-    when(taskService.runTask(any())).thenReturn(CompletableFuture.completedFuture(null));
-
-    service.formatting(params).get();
-    Mockito.verify(taskService, times(1)).runTask(any());
+    service.formatting(params);
+    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
-
 }

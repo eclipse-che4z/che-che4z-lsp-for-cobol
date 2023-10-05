@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service.delegates.references;
 
 import com.google.common.collect.Streams;
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
@@ -59,9 +60,9 @@ public class ElementOccurrences implements Occurrences {
 
   @Override
   public @NonNull List<DocumentHighlight> findHighlights(
-      @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
+      @NonNull AnalysisResult analysisResult, @NonNull TextDocumentPositionParams position) {
     Optional<DefinedAndUsedStructure> element = SymbolsRepository.findElementByPosition(UriHelper.decode(position.getTextDocument().getUri()),
-        document.getAnalysisResult(), position.getPosition());
+            analysisResult, position.getPosition());
     return element.map(context -> Streams.concat(context.getUsages().stream(), context.getDefinitions().stream())
             .filter(byUri(position))
             .map(toDocumentHighlight())

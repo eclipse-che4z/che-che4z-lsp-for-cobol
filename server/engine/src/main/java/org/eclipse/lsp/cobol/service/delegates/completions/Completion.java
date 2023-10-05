@@ -47,6 +47,6 @@ public interface Completion {
    * @return True if document is ready, false otherwise.
    */
   default boolean isDocumentReadyForSemanticCollection(CobolDocumentModel document) {
-    return !(Objects.isNull(document) || Objects.isNull(document.getAnalysisResult()));
+    return !(Objects.isNull(document) || Objects.isNull(document.getLastAnalysisResult()));
   }
 }

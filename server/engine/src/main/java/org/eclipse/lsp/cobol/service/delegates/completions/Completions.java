@@ -68,7 +68,8 @@ public class Completions {
   @NonNull
   public CompletionList collectFor(
           @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
-    return new CompletionList(false, collectCompletions(document, params));
+    List<CompletionItem> items = collectCompletions(document, params);
+    return new CompletionList(false, items);
   }
 
   @NonNull
