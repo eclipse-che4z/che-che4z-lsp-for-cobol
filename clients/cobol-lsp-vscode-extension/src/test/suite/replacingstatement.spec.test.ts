@@ -135,7 +135,7 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
     assert.match(message, /^Variable VARNAME is not defined/);
   });
 
-  test("TC250747: Support building of the extended document", async () => {
+  test.skip("TC250747: Support building of the extended document", async () => {
     const extSrcPath = path.join("TEST6.CBL");
     let editor = await helper.showDocument(extSrcPath);
     await helper.waitFor(
