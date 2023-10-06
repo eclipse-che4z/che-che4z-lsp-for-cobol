@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableMap;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.eclipse.lsp.cobol.core.CICSParser;
 import org.eclipse.lsp.cobol.core.CobolParser;
 
 import java.lang.reflect.Method;
@@ -47,9 +46,8 @@ class IdentifierReplacing {
               CobolParser.class,
               ImmutableList.of(
                   CobolParser.CobolCompilerDirectivesKeywordsContext.class,
-                  CobolParser.CobolKeywordsContext.class),
-              CICSParser.class,
-              ImmutableList.of(CICSParser.CicsWordsContext.class));
+                  CobolParser.CobolKeywordsContext.class)
+          );
 
   /**
    * Retrieve all the tokens from the rules that represent identifiers

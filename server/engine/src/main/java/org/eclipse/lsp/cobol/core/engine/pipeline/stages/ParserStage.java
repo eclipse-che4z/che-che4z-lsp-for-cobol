@@ -14,18 +14,20 @@
  */
 package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
 
+import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
-import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 
@@ -33,15 +35,19 @@ import org.eclipse.lsp.cobol.core.visitor.ParserListener;
  * Parser stage
  */
 @RequiredArgsConstructor
-public class ParserStage implements Stage<ParserStageResult, CopybooksRepository> {
+public class ParserStage implements Stage<ParserStageResult, DialectOutcome> {
 
   private final MessageService messageService;
   private final ParseTreeListener treeListener;
 
   @Override
-  public PipelineResult<ParserStageResult> run(AnalysisContext context, PipelineResult<CopybooksRepository> prevPipelineResult) {
-    // Run parser
-    ParserListener listener = new ParserListener(context.getExtendedDocument(), prevPipelineResult.getData());
+  public PipelineResult<ParserStageResult> run(AnalysisContext context, PipelineResult<DialectOutcome> prevPipelineResult) {
+    // Run parser;
+    context.setDialectNodes(ImmutableList.<Node>builder()
+            .addAll(context.getDialectNodes())
+            .addAll(prevPipelineResult.getData().getDialectNodes())
+            .build());
+    ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(context.getExtendedDocument().toString()));
     lexer.removeErrorListeners();
     CommonTokenStream tokens = new CommonTokenStream(lexer);

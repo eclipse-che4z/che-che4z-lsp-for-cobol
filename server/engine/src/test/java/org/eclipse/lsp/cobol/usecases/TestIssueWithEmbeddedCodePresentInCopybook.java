@@ -69,7 +69,7 @@ public class TestIssueWithEmbeddedCodePresentInCopybook {
             "3",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'TIMESEP1'",
+                "Extraneous input 'TIMESEP1'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "4",

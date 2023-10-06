@@ -41,6 +41,9 @@ public class TestCicsSecurityQuery {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of());
   }
 }

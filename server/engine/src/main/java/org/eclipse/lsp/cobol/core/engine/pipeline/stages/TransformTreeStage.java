@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.*;
@@ -164,7 +165,6 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     // Phase TRANSFORMATION
     ProcessingPhase t = ProcessingPhase.TRANSFORMATION;
     ctx.register(t, CompilerDirectiveNode.class, new CompilerDirectiveProcess());
-    ctx.register(t, ProgramNode.class, new CICSTranslateMandatorySectionProcess(analysisConfig));
     ctx.register(t, ProgramIdNode.class, new ProgramIdProcess());
     ctx.register(t, SectionNode.class, new SectionNodeProcessor(symbolAccumulatorService));
     ctx.register(t, FileEntryNode.class, new FileEntryProcess());
@@ -202,11 +202,16 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     ctx.register(v, ObsoleteNode.class, new ObsoleteNodeCheck());
     ctx.register(v, StandAloneDataItemNode.class, new StandAloneDataItemCheck());
     ctx.register(v, ProgramEndNode.class, new ProgramEndCheck());
-    ctx.register(v, CICSTranslatorNode.class, new CICSTranslatorProcessor(analysisConfig, messageService));
     ctx.register(v, JsonParseNode.class, new JsonParseProcess(symbolAccumulatorService));
     ctx.register(v, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulatorService));
     ctx.register(v, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
     ctx.register(v, FileOperationStatementNode.class, new FileOperationProcess());
+
+    // Implicit Dialects
+    dialectService.getActiveImplicitDialects(analysisConfig)
+            .stream().map(CobolDialect::getProcessors)
+            .flatMap(List::stream)
+            .forEach(ctx::register);
 
     // Dialects
     List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());

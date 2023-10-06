@@ -84,27 +84,6 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
     parseSql(ctx.execSqlStatement(), Db2SqlParser::dataDivisionRules);
   }
 
-  @Override
-  public void exitExecCicsStatement(ExecCicsStatementContext ctx) {
-    parseCics(ctx.cicsRules());
-  }
-
-  private void parseCics(CicsRulesContext context) {
-    if (context == null) return;
-    if (!features.contains(EmbeddedLanguage.CICS)) return;
-
-    errorListener.getErrors().clear();
-    CommonTokenStream tokens = applyCicsLexer(context);
-    CICSParser parser = createCicsParser(tokens);
-
-    Location originalLocation = getOriginalLocation(context);
-
-    ParserRuleContext tree = parser.allCicsRules();
-    ParseTreeVisitor<List<Node>> visitor = instanceVisitor(createPosition(context.getStart()), EmbeddedLanguage.CICS);
-    resultNodes.addAll(visitor.visit(tree));
-
-    errors.addAll(fetchError(originalLocation));
-  }
 
   private List<SyntaxError> fetchError(Location originalLocation) {
     List<SyntaxError> errorList = new ArrayList<>();
@@ -176,21 +155,8 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
     return new CommonTokenStream(lexer);
   }
 
-  private CommonTokenStream applyCicsLexer(CicsRulesContext context) {
-    CICSLexer lexer = new CICSLexer(CharStreams.fromString(VisitorHelper.getIntervalText(context)));
-    lexer.removeErrorListeners();
-
-    return new CommonTokenStream(lexer);
-  }
-
   private Db2SqlParser createDb2SqlParser(CommonTokenStream tokens) {
     Db2SqlParser parser = new Db2SqlParser(tokens);
-    configureParser(parser);
-    return parser;
-  }
-
-  private CICSParser createCicsParser(CommonTokenStream tokens) {
-    CICSParser parser = new CICSParser(tokens);
     configureParser(parser);
     return parser;
   }
@@ -209,10 +175,6 @@ public class EmbeddedCodeListener extends CobolParserBaseListener {
    * @return a visitor
    */
   public ParseTreeVisitor<List<Node>> instanceVisitor(Position position, EmbeddedLanguage lang) {
-    if (EmbeddedLanguage.CICS == lang) {
-      return new CICSVisitor(position, programUri, extendedDocument);
-    }
-
     if (EmbeddedLanguage.SQL == lang) {
       return new Db2SqlVisitor(position, programUri, extendedDocument);
     }
