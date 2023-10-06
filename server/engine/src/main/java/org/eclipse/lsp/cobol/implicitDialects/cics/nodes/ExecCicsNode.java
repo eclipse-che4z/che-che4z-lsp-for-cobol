@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Broadcom.
+ * Copyright (c) 2023 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,14 +12,16 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.common.model.tree;
+
+package org.eclipse.lsp.cobol.implicitDialects.cics.nodes;
 
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 
-/** The class represents the CICS Translator Node. */
-public class CICSTranslatorNode extends Node {
-  public CICSTranslatorNode(Locality location, NodeType nodeType) {
-    super(location, nodeType);
+/** EXEC CICS block node */
+public class ExecCicsNode extends Node {
+  public ExecCicsNode(Locality location, NodeType nodeType, String dialect) {
+    super(location, nodeType, dialect);
   }
 }

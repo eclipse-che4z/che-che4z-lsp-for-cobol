@@ -68,7 +68,7 @@ public class TestExecBlockWithoutEndExec {
             "1",
             new Diagnostic(
                 new Range(),
-                "Missing token END-EXEC for the EXEC block",
+                "Missing token END-EXEC for the CICS EXEC block",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

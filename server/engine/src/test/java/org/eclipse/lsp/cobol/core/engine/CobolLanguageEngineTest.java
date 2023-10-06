@@ -118,6 +118,8 @@ class CobolLanguageEngineTest {
     context.getExtendedDocument().commitTransformations();
     when(dialectService.process(anyList(), any()))
         .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
+    when(dialectService.processImplicitDialects(any(), anyList(), any()))
+            .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
     when(preprocessor.cleanUpCode(URI, TEXT))
         .thenReturn(new ResultWithErrors<>(new ExtendedText(TEXT, URI), ImmutableList.of()));
 

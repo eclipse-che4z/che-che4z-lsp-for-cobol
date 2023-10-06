@@ -12,11 +12,6 @@
         "character": 30
       }
     },
-    "type": "program",
-    "children": [
-      {
-        "type": "stop"
-      }
-    ]
+    "type": "program"
   }
 ]

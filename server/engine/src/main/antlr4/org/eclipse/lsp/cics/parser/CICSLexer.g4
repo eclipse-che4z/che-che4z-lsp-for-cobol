@@ -14,7 +14,6 @@
 
 lexer grammar CICSLexer;
 channels{COMMENTS}
-import TechnicalLexer;
 
 ABCODE : A B C O D E;
 ABDUMP : A B D U M P;
@@ -46,6 +45,7 @@ AND : A N D;
 ANYKEY : A N Y K E Y;
 APLKYBD : A P L K Y B D;
 APLTEXT : A P L T E X T;
+APOST : A P O S T;
 APPLID : A P P L I D;
 AS : A S;
 ASA : A S A;
@@ -86,6 +86,7 @@ BURGEABILITY : B U R G E A B I L I T Y;
 CADDRLENGTH : C A D D R L E N G T H;
 CANCEL : C A N C E L;
 CARD : C A R D;
+CBLCARD : C B L C A R D;
 CBUFF : C B U F F;
 CCSID : C C S I D;
 CERTIFICATE : C E R T I F I C A T E;
@@ -100,6 +101,7 @@ CHUNKEND : C H U N K E N D;
 CHUNKING : C H U N K I N G;
 CHUNKNO : C H U N K N O;
 CHUNKYES : C H U N K Y E S;
+CICS: C I C S;
 CICSDATAKEY : C I C S D A T A K E Y;
 CIPHERS : C I P H E R S;
 CLASS : C L A S S;
@@ -118,6 +120,8 @@ CLRPARTN : C L R P A R T N;
 CMDSEC : C M D S E C;
 CNAMELENGTH : C N A M E L E N G T H;
 CNOTCOMPL : C N O T C O M P L;
+COBOL2 : C O B O L '2';
+COBOL3 : C O B O L '3';
 CODEPAGE : C O D E P A G E;
 COLOR : C O L O R;
 COMMAREA : C O M M A R E A;
@@ -146,6 +150,7 @@ COPY : C O P Y;
 COUNTER : C O U N T E R;
 COUNTRY : C O U N T R Y;
 COUNTRYLEN : C O U N T R Y L E N;
+CPSM : C P S M;
 CREATE : C R E A T E;
 CRITICAL : C R I T I C A L;
 CTLCHAR : C T L C H A R;
@@ -175,11 +180,13 @@ DAYOFWEEK : D A Y O F W E E K;
 DAYOFYEAR : D A Y O F Y E A R;
 DAYS : D A Y S;
 DAYSLEFT : D A Y S L E F T;
+DBCS : D B C S ;
 DCOUNTER : D C O U N T E R;
 DDMMYY : D D M M Y Y;
 DDMMYYYY : D D M M Y Y Y Y;
 DEBKEY : D E B K E Y;
 DEBREC : D E B R E C;
+DEBUG : D E B U G ;
 DEEDIT : D E E D I T;
 DEFAULT : D E F A U L T;
 DEFINE : D E F I N E;
@@ -201,6 +208,7 @@ DFHVALUE : D F H V A L U E;
 DIGEST : D I G E S T;
 DIGESTTYPE : D I G E S T T Y P E;
 DISCONNECT : D I S C O N N E C T;
+DLI : D L I;
 DOCDELETE : D O C D E L E T E;
 DOCSIZE : D O C S I Z E;
 DOCSTATUS : D O C S T A T U S;
@@ -212,14 +220,17 @@ DUMP : D U M P;
 DUMPCODE : D U M P C O D E;
 DUMPID : D U M P I D;
 DUPREC : D U P R E C;
+E_CHAR : E;
 ECADDR : E C A D D R;
 ECBLIST : E C B L I S T;
+EDF : E D F;
 EIB : E I B;
 ELEMNAME : E L E M N A M E;
 ELEMNAMELEN : E L E M N A M E L E N;
 ELEMNS : E L E M N S;
 ELEMNSLEN : E L E M N S L E N;
 END : E N D;
+END_EXEC: E N D MINUSCHAR E X E C;
 ENDACTIVITY : E N D A C T I V I T Y;
 ENDBR : E N D B R;
 ENDBROWSE : E N D B R O W S E;
@@ -249,11 +260,14 @@ EVENTTYPE : E V E N T T Y P E;
 EVENTUAL : E V E N T U A L;
 EWASUPP : E W A S U P P;
 EXCEPTION : E X C E P T I O N;
+EXCI : E X C I;
+EXEC: E X E C;
 EXPECT : E X P E C T;
 EXPIRYTIME : E X P I R Y T I M E;
 EXTDS : E X T D S;
 EXTERNAL : E X T E R N A L;
 EXTRACT : E X T R A C T;
+F_CHAR : F;
 FACILITY : F A C I L I T Y;
 FACILITYTOKN : F A C I L I T Y T O K N;
 FALSE : F A L S E;
@@ -266,9 +280,11 @@ FAULTSTRING : F A U L T S T R I N G;
 FAULTSTRLEN : F A U L T S T R L E N;
 FCI : F C I;
 FCT : F C T;
+FEPI :  F E P I;
 FIELD : F I E L D;
 FILE : F I L E;
 FIRESTATUS : F I R E S T A T U S;
+FLAG: F L A G;
 FLENGTH : F L E N G T H;
 FMH : F M H;
 FMHPARM : F M H P A R M;
@@ -321,6 +337,7 @@ HTTPMETHOD : H T T P M E T H O D;
 HTTPRNUM : H T T P R N U M;
 HTTPVERSION : H T T P V E R S I O N;
 HTTPVNUM : H T T P V N U M;
+I_CHAR : I;
 IGNORE : I G N O R E;
 IMMEDIATE : I M M E D I A T E;
 IN : I N;
@@ -368,6 +385,7 @@ LANGINUSE : L A N G I N U S E;
 LANGUAGECODE : L A N G U A G E C O D E;
 LAST : L A S T;
 LASTUSETIME : L A S T U S E T I M E;
+LC : L C;
 LDC : L D C;
 LDCMNEM : L D C M N E M;
 LDCNUM : L D C N U M;
@@ -379,7 +397,9 @@ LIGHTPEN : L I G H T P E N;
 LINAGE_COUNTER : L I N A G E MINUSCHAR C O U N T E R;
 LINE : L I N E;
 LINEADDR : L I N E A D D R;
+LINECOUNT : L I N E C O U N T;
 LINK : L I N K;
+LINKAGE : L I N K A G E;
 LIST : L I S T;
 LISTLENGTH : L I S T L E N G T H;
 LLID : L L I D;
@@ -444,31 +464,44 @@ NEXT : N E X T;
 NEXTTRANSID : N E X T T R A N S I D;
 NLEOM : N L E O M;
 NOAUTOPAGE : N O A U T O P A G E;
+NOCBLCARD : N O C B L C A R D;
 NOCC : N O C C;
 NOCHECK : N O C H E C K;
 NOCLICONVERT : N O C L I C O N V E R T;
 NOCLOSE : N O C L O S E;
+NOCPSM : N O C P S M;
 NODATA : N O D A T A;
 NODE : N O D E;
+NODEBUG : N O D E B U G;
 NODOCDELETE : N O D O C D E L E T E;
 NODUMP : N O D U M P;
+NOEDF : N O E D F;
 NOEDIT : N O E D I T;
+NOFEPI : N O F E P I;
 NOFLUSH : N O F L U S H;
 NOHANDLE : N O H A N D L E;
 NOINCONVERT : N O I N C O N V E R T;
+NOLENGTH : N O L E N G T H;
+NOLINKAGE : N O L I N K A G E;
 NONE : N O N E;
+NONUM : N O N U M;
+NOOPTIONS : N O O P T I O N S;
 NOOUTCONERT : N O O U T C O N E R T;
 NOQUEUE : N O Q U E U E;
 NOQUIESCE : N O Q U I E S C E;
+NOSEQ : N O S E Q;
+NOSPIE : N O S P I E;
 NOSRVCONVERT : N O S R V C O N V E R T;
 NOSUSPEND : N O S U S P E N D;
 NOTE : N O T E;
 NOTPURGEABLE : N O T P U R G E A B L E;
 NOTRUNCATE : N O T R U N C A T E;
+NOVBREF : N O V B R E F;
 NOWAIT : N O W A I T;
 NSCONTAINER : N S C O N T A I N E R;
 NULL : N U L L;
 NULLS : N U L L S;
+NUM : N U M;
 NUMCIPHERS : N U M C I P H E R S;
 NUMEVENTS : N U M E V E N T S;
 NUMITEMS : N U M I T E M S;
@@ -504,8 +537,8 @@ PA1: P A '1';
 PA2: P A '2';
 PA3: P A '3';
 PAGE : P A G E;
-PAGENUM : P A G E N U M;
 PAGE_COUNTER : P A G E MINUSCHAR C O U N T E R;
+PAGENUM : P A G E N U M;
 PAGING : P A G I N G;
 PARSE : P A R S E;
 PARTN: P A R T N;
@@ -522,6 +555,14 @@ PATH : P A T H;
 PATHLENGTH : P A T H L E N G T H;
 PCT : P C T;
 PF1 : P F '1';
+PF2 : P F '2';
+PF3 : P F '3';
+PF4 : P F '4';
+PF5 : P F '5';
+PF6 : P F '6';
+PF7 : P F '7';
+PF8 : P F '8';
+PF9 : P F '9';
 PF10 : P F '10';
 PF11 : P F '11';
 PF12 : P F '12';
@@ -532,19 +573,11 @@ PF16 : P F '16';
 PF17 : P F '17';
 PF18 : P F '18';
 PF19 : P F '19';
-PF2 : P F '2';
 PF20 : P F '20';
 PF21 : P F '21';
 PF22 : P F '22';
 PF23 : P F '23';
 PF24 : P F '24';
-PF3 : P F '3';
-PF4 : P F '4';
-PF5 : P F '5';
-PF6 : P F '6';
-PF7 : P F '7';
-PF8 : P F '8';
-PF9 : P F '9';
 PFXLENG : P F X L E N G;
 PHRASE : P H R A S E;
 PHRASELEN : P H R A S E L E N;
@@ -650,6 +683,7 @@ RRN : R R N;
 RTERMID : R T E R M I D;
 RTRANSID : R T R A N S I D;
 RUN : R U N;
+S_CHAR : S;
 SADDRLENGTH : S A D D R L E N G T H;
 SCHEME : S C H E M E;
 SCHEMENAME : S C H E M E N A M E;
@@ -662,6 +696,7 @@ SECURITY : S E C U R I T Y;
 SEGMENTLIST : S E G M E N T L I S T;
 SEND : S E N D;
 SENDER : S E N D E R;
+SEQ : S E Q;
 SERIALNUM : S E R I A L N U M;
 SERIALNUMLEN : S E R I A L N U M L E N;
 SERVER : S E R V E R;
@@ -682,8 +717,10 @@ SIT : S I T;
 SNAMELENGTH : S N A M E L E N G T H;
 SOAPFAULT : S O A P F A U L T;
 SOSI : S O S I;
+SP : S P;
 SPACE : S P A C E;
 SPACES : S P A C E S;
+SPIE : S P I E;
 SPOOLCLOSE : S P O O L C L O S E;
 SPOOLOPEN : S P O O L O P E N;
 SPOOLREAD : S P O O L R E A D;
@@ -727,6 +764,7 @@ SYNCHRONOUS : S Y N C H R O N O U S;
 SYNCLEVEL : S Y N C L E V E L;
 SYNCONRETURN : S Y N C O N R E T U R N;
 SYNCPOINT : S Y N C P O I N T;
+SYSEIB : S Y S E I B;
 SYSID : S Y S I D;
 TABLES : T A B L E S;
 TASK : T A S K;
@@ -779,6 +817,7 @@ TYPENAME : T Y P E N A M E;
 TYPENAMELEN : T Y P E N A M E L E N;
 TYPENS : T Y P E N S;
 TYPENSLEN : T Y P E N S L E N;
+U_CHAR : U;
 UNATTEND : U N A T T E N D;
 UNCOMMITTED : U N C O M M I T T E D;
 UNESCAPED : U N E S C A P E D;
@@ -800,10 +839,12 @@ USING : U S I N G;
 VALIDATION : V A L I D A T I O N;
 VALUE : V A L U E;
 VALUELENGTH : V A L U E L E N G T H;
+VBREF : V B R E F;
 VERIFY : V E R I F Y;
 VERSIONLEN : V E R S I O N L E N;
 VOLUME : V O L U M E;
 VOLUMELENG : V O L U M E L E N G;
+W_CHAR : W;
 WAIT : W A I T;
 WAITCICS : W A I T C I C S;
 WEB : W E B;
@@ -821,6 +862,7 @@ XCTL : X C T L;
 XMLCONTAINER : X M L C O N T A I N E R;
 XMLTODATA : X M L T O D A T A;
 XMLTRANSFORM : X M L T R A N S F O R M;
+XOPTS: X O P T S;
 XRBA : X R B A;
 YEAR : Y E A R;
 YYDDD : Y Y D D D;
@@ -833,6 +875,101 @@ ZERO : Z E R O;
 ZEROES : Z E R O E S;
 ZEROS : Z E R O S;
 
-// special separator tokens for embedded langauages
-SEMICOLONSEPARATORCICS : '; ' ;
-COMMASEPARATORCICS : ', ' ;
+// symbols
+ASTERISKCHAR : '*';
+DOUBLEASTERISKCHAR : '**';
+COLONCHAR : ':';
+COMMACHAR : ',';
+COMMENTTAG : '*>' -> channel(COMMENTS);
+DOUBLEMORETHANCHAR : '>>';
+
+// period full stopPosition
+DOT : '.';
+LPARENCHAR : '(';
+MINUSCHAR : '-';
+PLUSCHAR : '+';
+RPARENCHAR : ')';
+SLASHCHAR : '/';
+
+INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+ ;
+
+SINGLEDIGITLITERAL : DIGIT;
+
+NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
+
+NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
+
+IDENTIFIER : [a-zA-Z0-9][-_a-zA-Z0-9]*;
+COPYBOOK_IDENTIFIER : [a-zA-Z0-9#@$][-_a-zA-Z0-9#@$]*;
+
+OCTDIGITS : OCT_DIGIT;
+HEX_NUMBERS : HEXNUMBER;
+
+// whitespace, line breaks, comments, ...
+NEWLINE : '\r'? '\n' -> channel(HIDDEN);
+COMMASEPARATOR : ', ' -> channel(HIDDEN);
+COMMENTLINE : COMMENTTAG ~('\n' | '\r')* -> channel(COMMENTS);
+WS : [ \t\f]+ -> channel(HIDDEN);
+COMPILERLINE : DOUBLEMORETHANCHAR ~('\n' | '\r')* -> channel(HIDDEN);
+
+// treat all the non-processed tokens as errors
+ERRORCHAR : . ;
+
+ZERO_DIGIT: '0';
+
+
+fragment HEXNUMBER :
+	X '"' [0-9A-Fa-f]+ '"'
+	| X '\'' [0-9A-Fa-f]+ '\''
+;
+
+fragment NULLTERMINATED :
+	Z '"' (~["\n\r] | '""' | '\'')* '"'
+	| Z '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
+
+fragment STRINGLITERAL :
+	'"' (~["\n\r] | '""' | '\'')* '"'
+	| '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
+
+fragment UNTRMSTRINGLITERAL :
+	'"' (~["\n\r] | '""' | '\'')*
+	| '\'' (~['\n\r] | '\'\'' | '"')*
+;
+
+fragment DBCSLITERAL :
+	[GN] '"' (~["\n\r] | '""' | '\'')* '"'
+	| [GN] '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
+
+fragment
+OCT_DIGIT        : [0-8] ;
+fragment DIGIT: OCT_DIGIT | [9];
+// case insensitive chars
+fragment A:('a'|'A');
+fragment B:('b'|'B');
+fragment C:('c'|'C');
+fragment D:('d'|'D');
+fragment E:('e'|'E');
+fragment F:('f'|'F');
+fragment G:('g'|'G');
+fragment H:('h'|'H');
+fragment I:('i'|'I');
+fragment J:('j'|'J');
+fragment K:('k'|'K');
+fragment L:('l'|'L');
+fragment M:('m'|'M');
+fragment N:('n'|'N');
+fragment O:('o'|'O');
+fragment P:('p'|'P');
+fragment Q:('q'|'Q');
+fragment R:('r'|'R');
+fragment S:('s'|'S');
+fragment T:('t'|'T');
+fragment U:('u'|'U');
+fragment V:('v'|'V');
+fragment W:('w'|'W');
+fragment X:('x'|'X');
+fragment Y:('y'|'Y');
+fragment Z:('z'|'Z');

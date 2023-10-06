@@ -47,10 +47,7 @@ class TestWorkingStoragePredefinedVariables {
             + "                END-EXEC.\n"
             + "       End program ProgramId.";
 
-    UseCaseEngine.runTest(
-        text,
-        ImmutableList.of(),
-        ImmutableMap.of());
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test

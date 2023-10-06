@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Test for SRImplicitVariablesGenerator
  */
-class SRImplicitVariablesGeneratorTest {
+class CICSSRImplicitVariablesGeneratorTest {
   @Test
   void test() {
     List<VariableNode> variableNodes = SRImplicitVariablesGenerator.generate();
