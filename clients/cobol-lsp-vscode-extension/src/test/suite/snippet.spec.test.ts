@@ -123,94 +123,113 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
     helper.TEST_TIMEOUT,
   );
 
-  test.skip("TC289633 Provide default COBOL code snippets - basic scenario", async () => {
-    await helper.showDocument("SNIPPET.cbl");
-    const editor = helper.get_editor("SNIPPET.cbl");
-    await helper.insertString(editor, pos(2, 0), "sh");
-    await vscode.commands.executeCommand(
-      "editor.action.triggerSuggest",
-      editor.document.uri,
-    );
-    await helper.waitFor(() => editor.document.getText().length > 2, 500);
-    await helper.executeCommandMultipleTimes("selectNextSuggestion", 0);
-    await vscode.commands.executeCommand("acceptSelectedSuggestion");
-    await helper.waitFor(() => editor.document.getText().length > 5);
-    const lines = editor.document.getText().split(/\r\n|\r|\n/);
-    assert.strictEqual(lines[0], "       IDENTIFICATION DIVISION.");
-    assert.strictEqual(lines[2], "       ENVIRONMENT DIVISION.");
-    assert.strictEqual(lines[7], "       DATA DIVISION.");
-    assert.strictEqual(lines[11], "       PROCEDURE DIVISION.");
-  }).timeout(helper.TEST_TIMEOUT);
+  test
+    .skip(
+      "TC289633 Provide default COBOL code snippets - basic scenario",
+      async () => {
+        await helper.showDocument("SNIPPET.cbl");
+        const editor = helper.get_editor("SNIPPET.cbl");
+        await helper.insertString(editor, pos(2, 0), "sh");
+        await vscode.commands.executeCommand(
+          "editor.action.triggerSuggest",
+          editor.document.uri,
+        );
+        await helper.waitFor(() => editor.document.getText().length > 2, 500);
+        await helper.executeCommandMultipleTimes("selectNextSuggestion", 0);
+        await vscode.commands.executeCommand("acceptSelectedSuggestion");
+        await helper.waitFor(() => editor.document.getText().length > 5);
+        const lines = editor.document.getText().split(/\r\n|\r|\n/);
+        assert.strictEqual(lines[0], "       IDENTIFICATION DIVISION.");
+        assert.strictEqual(lines[2], "       ENVIRONMENT DIVISION.");
+        assert.strictEqual(lines[7], "       DATA DIVISION.");
+        assert.strictEqual(lines[11], "       PROCEDURE DIVISION.");
+      },
+    )
+    .timeout(helper.TEST_TIMEOUT);
 
-  test.skip("TC289635 Provide default COBOL code snippets - upper case", async () => {
-    await helper.showDocument("SNIPPET.cbl");
-    const editor = helper.get_editor("SNIPPET.cbl");
-    await helper.insertString(editor, pos(2, 0), "sh");
-    await vscode.commands.executeCommand(
-      "editor.action.triggerSuggest",
-      editor.document.uri,
-    );
-    await helper.waitFor(() => editor.document.getText().length > 2, 500);
-    await helper.executeCommandMultipleTimes("selectNextSuggestion", 0);
-    await vscode.commands.executeCommand("acceptSelectedSuggestion");
-    await helper.waitFor(() => editor.document.getText().length > 5);
-    await helper.insertString(editor, pos(14, 0), "           COPY AB.");
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
-    );
-    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 1);
-    assert.strictEqual(diagnostics[0].message, "AB: Copybook not found");
+  test
+    .skip(
+      "TC289635 Provide default COBOL code snippets - upper case",
+      async () => {
+        await helper.showDocument("SNIPPET.cbl");
+        const editor = helper.get_editor("SNIPPET.cbl");
+        await helper.insertString(editor, pos(2, 0), "sh");
+        await vscode.commands.executeCommand(
+          "editor.action.triggerSuggest",
+          editor.document.uri,
+        );
+        await helper.waitFor(() => editor.document.getText().length > 2, 500);
+        await helper.executeCommandMultipleTimes("selectNextSuggestion", 0);
+        await vscode.commands.executeCommand("acceptSelectedSuggestion");
+        await helper.waitFor(() => editor.document.getText().length > 5);
+        await helper.insertString(editor, pos(14, 0), "           COPY AB.");
+        await helper.waitFor(
+          () =>
+            vscode.languages.getDiagnostics(editor.document.uri).length === 1,
+        );
+        let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 1);
+        assert.strictEqual(diagnostics[0].message, "AB: Copybook not found");
 
-    await helper.insertString(editor, pos(15, 0), "\n");
-    await helper.insertString(editor, pos(15, 0), "           FUNCTION CO");
-    await vscode.commands.executeCommand(
-      "editor.action.triggerSuggest",
-      editor.document.uri,
-    );
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 3,
-      500,
-    );
-    await helper.executeCommandMultipleTimes("selectNextSuggestion", 0);
-    await vscode.commands.executeCommand("acceptSelectedSuggestion");
-    const lines = editor.document.getText().split(/\r\n|\r|\n/);
-    assert.ok(lines[15].includes("FUNCTION COS"));
-  }).timeout(helper.TEST_TIMEOUT);
+        await helper.insertString(editor, pos(15, 0), "\n");
+        await helper.insertString(editor, pos(15, 0), "           FUNCTION CO");
+        await vscode.commands.executeCommand(
+          "editor.action.triggerSuggest",
+          editor.document.uri,
+        );
+        await helper.waitFor(
+          () =>
+            vscode.languages.getDiagnostics(editor.document.uri).length === 3,
+          500,
+        );
+        await helper.executeCommandMultipleTimes("selectNextSuggestion", 0);
+        await vscode.commands.executeCommand("acceptSelectedSuggestion");
+        const lines = editor.document.getText().split(/\r\n|\r|\n/);
+        assert.ok(lines[15].includes("FUNCTION COS"));
+      },
+    )
+    .timeout(helper.TEST_TIMEOUT);
 
-  test.skip("TC289636 Provide default COBOL code snippets - lower case", async () => {
-    await helper.showDocument("SNIPPET.cbl");
-    const editor = helper.get_editor("SNIPPET.cbl");
-    await helper.insertString(editor, pos(2, 0), "sh");
-    await vscode.commands.executeCommand(
-      "editor.action.triggerSuggest",
-      editor.document.uri,
-    );
-    await helper.waitFor(() => editor.document.getText().length > 2, 500);
-    await helper.executeCommandMultipleTimes("selectNextSuggestion", 0);
-    await vscode.commands.executeCommand("acceptSelectedSuggestion");
-    await helper.waitFor(() => editor.document.getText().length > 5);
-    await helper.insertString(editor, pos(14, 0), "           COPY AB.");
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
-    );
-    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 1);
-    assert.strictEqual(diagnostics[0].message, "AB: Copybook not found");
+  test
+    .skip(
+      "TC289636 Provide default COBOL code snippets - lower case",
+      async () => {
+        await helper.showDocument("SNIPPET.cbl");
+        const editor = helper.get_editor("SNIPPET.cbl");
+        await helper.insertString(editor, pos(2, 0), "sh");
+        await vscode.commands.executeCommand(
+          "editor.action.triggerSuggest",
+          editor.document.uri,
+        );
+        await helper.waitFor(() => editor.document.getText().length > 2, 500);
+        await helper.executeCommandMultipleTimes("selectNextSuggestion", 0);
+        await vscode.commands.executeCommand("acceptSelectedSuggestion");
+        await helper.waitFor(() => editor.document.getText().length > 5);
+        await helper.insertString(editor, pos(14, 0), "           COPY AB.");
+        await helper.waitFor(
+          () =>
+            vscode.languages.getDiagnostics(editor.document.uri).length === 1,
+        );
+        let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+        assert.strictEqual(diagnostics.length, 1);
+        assert.strictEqual(diagnostics[0].message, "AB: Copybook not found");
 
-    await helper.insertString(editor, pos(15, 0), "\n");
-    await helper.insertString(editor, pos(15, 0), "           function co");
-    await vscode.commands.executeCommand(
-      "editor.action.triggerSuggest",
-      editor.document.uri,
-    );
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 3,
-      500,
-    );
-    await helper.executeCommandMultipleTimes("selectNextSuggestion", 0);
-    await vscode.commands.executeCommand("acceptSelectedSuggestion");
-    const lines = editor.document.getText().split(/\r\n|\r|\n/);
-    assert.ok(lines[15].includes("FUNCTION COS"));
-  }).timeout(helper.TEST_TIMEOUT);
+        await helper.insertString(editor, pos(15, 0), "\n");
+        await helper.insertString(editor, pos(15, 0), "           function co");
+        await vscode.commands.executeCommand(
+          "editor.action.triggerSuggest",
+          editor.document.uri,
+        );
+        await helper.waitFor(
+          () =>
+            vscode.languages.getDiagnostics(editor.document.uri).length === 3,
+          500,
+        );
+        await helper.executeCommandMultipleTimes("selectNextSuggestion", 0);
+        await vscode.commands.executeCommand("acceptSelectedSuggestion");
+        const lines = editor.document.getText().split(/\r\n|\r|\n/);
+        assert.ok(lines[15].includes("FUNCTION COS"));
+      },
+    )
+    .timeout(helper.TEST_TIMEOUT);
 });
