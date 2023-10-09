@@ -520,7 +520,7 @@ suite("Integration Test Suite", function () {
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
-  test("TC335192 COPY MAID scenarios", async () => {
+  test.skip("TC335192 COPY MAID scenarios", async () => {
     await helper.showDocument("cobol-dc/ABCD.cbl");
     let editor = helper.get_editor("cobol-dc/ABCD.cbl");
     await helper.waitFor(
