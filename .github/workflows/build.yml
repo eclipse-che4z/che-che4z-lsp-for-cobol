@@ -78,6 +78,11 @@ jobs:
         run: mvn clean package --no-transfer-progress
       - uses: actions/upload-artifact@v3
         with:
+          if-no-files-found: warn
+          name: test-perfomance-data
+          path: server/engine/target/perf.csv
+      - uses: actions/upload-artifact@v3
+        with:
           name: jar
           path: server/engine/target/server.jar
       - uses: actions/setup-node@v3

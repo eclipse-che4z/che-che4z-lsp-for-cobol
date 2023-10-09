@@ -115,16 +115,11 @@
           "name": "string.quoted.sql.cobol"
         }
       },
-      "name": "meta.embedded.block.sql",
-      "patterns": [
-        {
-          "include": "source.sql"
-        }
-      ],
+      "name": "sql.embedded.code",
       "end": "(?i:END-EXEC)",
       "endCaptures": {
         "0": {
-          "name": "string.quoted.cics.cobol"
+          "name": "string.quoted.sql.cobol"
         }
       }
     },

@@ -48,7 +48,7 @@ class TestIdentificationDivisionInCopybookWithError {
   private static final String IDDIV_NAME = "IDDIV";
   private static final String STRUCT1_NAME = "STRUCT1";
 
-  private static final String MESSAGE = "Syntax error on 'DIVISIONs' expected DIVISION";
+  private static final String MESSAGE = "Syntax error on 'DIVISIONs'";
 
   @Test
   void test() {

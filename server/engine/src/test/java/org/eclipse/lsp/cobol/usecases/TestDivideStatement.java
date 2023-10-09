@@ -10,8 +10,6 @@
  *
  * Contributors:
  *    Broadcom, Inc. - initial API and implementation
- *    DAF Trucks NV – implementation of DaCo COBOL statements
- *    and DAF development standards
  *
  */
 package org.eclipse.lsp.cobol.usecases;
@@ -25,16 +23,26 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/** Tests the length checks on a variable name. */
-public class TestVariableLength {
+/** Test cobol divide statement */
+public class TestDivideStatement {
+
   public static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID.    TEST12.\n"
-          + "       ENVIRONMENT DIVISION.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*TEST123456789123456789123456789|1} PIC 9(2).\n"
-          + "       PROCEDURE DIVISION.";
+      "       Identification Division.\n"
+          + "       Program-id. HELLO-WORLD.\n"
+          + "\n"
+          + "       Data Division.\n"
+          + "       Working-Storage Section.\n"
+          + "       01 {$*USER-NUM1} PIC 9(9).\n"
+          + "       01 {$*USER-NUM2} PIC 9(9).\n"
+          + "       01 {$*USER-INFO}.\n"
+          + "           05 {$*USER-INDEX} PIC 9(6).\n"
+          + "           05 {$*USER-PHONE} PIC 9(6).\n"
+          + "       Procedure Division.\n"
+          + "           DIVIDE {$USER-NUM1} BY {$USER-NUM2} GIVING {$USER-INDEX}.\n"
+          + "           DIVIDE {$USER-NUM1} BY {$USER-NUM2}{.|1}\n"
+          + "           DIVIDE {$USER-NUM1} INTO {$USER-NUM2} \n"
+          + "           GIVING {$USER-INDEX} ROUNDED REMAINDER {$USER-PHONE}.\n"
+          + "       End program HELLO-WORLD.\n";
 
   @Test
   void test() {
@@ -45,7 +53,7 @@ public class TestVariableLength {
             "1",
             new Diagnostic(
                 new Range(),
-                "Variable name cannot exceed 30 characters",
+                "Syntax error on '.'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

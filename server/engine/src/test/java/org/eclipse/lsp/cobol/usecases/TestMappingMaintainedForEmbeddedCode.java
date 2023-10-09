@@ -131,7 +131,7 @@ public class TestMappingMaintainedForEmbeddedCode {
                     "1",
                     new Diagnostic(
                             new Range(),
-                            "Syntax error on 'PERFORM' expected {CONTINUE, GO, GOTO}",
+                            "Syntax error on 'PERFORM'",
                             Error,
                             ErrorSource.PARSING.getText())));
   }

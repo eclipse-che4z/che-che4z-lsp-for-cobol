@@ -42,12 +42,11 @@ class ErrorMessageHelperTest {
 
     when(token.getType()).thenReturn(2);
     when(recognizer.getVocabulary()).thenReturn(vocabulary);
-    when(mockInputMismatchExp.getExpectedTokens()).thenReturn(interval);
     when(interval.toString(any(Vocabulary.class))).thenReturn("INTERVAL");
 
     errorMessageHelper.getInputMismatchMessage(
         recognizer, mockInputMismatchExp, token, "OFFENDING_TOKEN");
-    verify(messageService).getMessage(REPORT_INPUT_MISMATCH, "OFFENDING_TOKEN", "INTERVAL");
+    verify(messageService).getMessage(REPORT_INPUT_MISMATCH, "OFFENDING_TOKEN");
   }
 
   @Test

@@ -96,7 +96,7 @@ public abstract class MessageServiceParser extends Parser {
    */
   protected void validateLength(String input, String objectType, Integer validLength) {
     if (input != null && input.length() > validLength) {
-      notifyError("parsers.maxLength", validLength.toString(), objectType);
+      notifyError("parsers.maxLength", objectType, validLength.toString());
     }
   }
 

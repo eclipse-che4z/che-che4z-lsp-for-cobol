@@ -52,10 +52,7 @@ suite("Integration Test Suite", function () {
       "No syntax errors detected in USER2.cbl",
     );
 
-    assert.strictEqual(
-      d1.message,
-      "Syntax error on 'HELLO-WORLD' expected {AUTHOR, CBL, DATA, DATE-COMPILED, DATE-WRITTEN, END, ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, PROCESS, SECURITY}",
-    );
+    assert.strictEqual(d1.message, "Syntax error on 'HELLO-WORLD'");
     helper.assertRangeIsEqual(d1.range, range(pos(14, 20), pos(14, 31)));
   });
 
@@ -142,11 +139,7 @@ suite("Integration Test Suite", function () {
       diagnostics[0].range,
       range(pos(40, 15), pos(40, 18)),
     );
-    assert.ok(
-      diagnostics[0].message.includes(
-        "Syntax error on 'SEN' expected {ABEND, ADD, ADDRESS, ALLOCATE, ASKTIME, ASSIGN",
-      ),
-    );
+    assert.ok(diagnostics[0].message.includes("Syntax error on 'SEN'"));
     await helper.deleteLine(editor, 40);
     await helper.insertString(
       editor,
@@ -181,11 +174,7 @@ suite("Integration Test Suite", function () {
       diagnostics[0].range,
       range(pos(58, 21), pos(58, 28)),
     );
-    assert.ok(
-      diagnostics[0].message.includes(
-        "Syntax error on 'XCTL123' expected {ABEND, ADD, ADDRESS, ALLOCATE, ASKTIME, ASSIGN",
-      ),
-    );
+    assert.ok(diagnostics[0].message.includes("Syntax error on 'XCTL123'"));
     await helper.deleteLine(editor, 58);
     await helper.insertString(
       editor,
@@ -329,9 +318,7 @@ suite("Integration Test Suite", function () {
       );
       diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
       assert.strictEqual(diagnostics.length, 1);
-      assert.ok(
-        diagnostics[0].message.includes("Syntax error on 'COPY' expected"),
-      );
+      assert.ok(diagnostics[0].message.includes("Syntax error on 'COPY'"));
 
       await helper.insertString(editor, pos(25, 20), "\n           Mov");
       await helper.waitFor(

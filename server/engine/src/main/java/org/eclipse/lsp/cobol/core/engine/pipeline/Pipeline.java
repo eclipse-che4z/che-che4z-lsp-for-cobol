@@ -18,6 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.analysis.Timing;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 /**
@@ -25,6 +29,7 @@ import java.util.*;
  */
 @Slf4j
 public class Pipeline {
+  private static final String PERFORMANCE_LOG_PATH = "performance.log.path";
   private final List<Stage<?, ?>> stages = new LinkedList<>();
 
   /**
@@ -55,11 +60,53 @@ public class Pipeline {
       }
       return result;
     } finally {
-      logTiming(timing);
+      logTiming(timing, context);
     }
   }
 
-  private void logTiming(Map<String, Timing> timing) {
+  private void logTiming(Map<String, Timing> timing, AnalysisContext context) {
     timing.forEach((key, value) -> LOG.debug("Timing for {}: {}", key, value.getTime()));
+    Optional.ofNullable(System.getProperty(PERFORMANCE_LOG_PATH))
+            .map(Paths::get)
+            .ifPresent(path -> {
+      try {
+        if (!Files.exists(path)) {
+          LOG.info("Write performance data into: " + path);
+          Files.write(path, Collections.singleton(createHeaderLine()), StandardOpenOption.CREATE);
+        }
+        Files.write(path, Collections.singleton(createTimingLine(timing, context)), StandardOpenOption.APPEND);
+      } catch (IOException e) {
+        LOG.debug(e.getMessage(), e);
+      }
+    });
+  }
+
+  private String createHeaderLine() {
+    StringBuilder line = new StringBuilder("url");
+    for (Stage stage: stages) {
+      line.append(",");
+      line.append(stage.getName());
+    }
+    line.append(",");
+    line.append("Total time");
+    line.append(",");
+    line.append("Size");
+    return line.toString();
+  }
+
+  private String createTimingLine(Map<String, Timing> timing, AnalysisContext context) {
+    StringBuilder line = new StringBuilder(context.getExtendedDocument().getUri());
+    long total = 0;
+    for (Stage stage: stages) {
+      line.append(",");
+      long time = Optional.ofNullable(timing.get(stage.getName())).map(Timing::getTime).orElse(0L);
+      line.append(time);
+      total += time;
+    }
+    line.append(",");
+    line.append(total);
+    line.append(",");
+    line.append(context.getExtendedDocument().toString().length());
+    return line.toString();
   }
 }

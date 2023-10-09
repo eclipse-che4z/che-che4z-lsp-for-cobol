@@ -130,7 +130,7 @@ compilerOption
    | DYNAM | DYN | NODYNAM | NODYN
    | (EXIT | EX) LPARENCHAR (
         ((INEXIT | INX | LIBEXIT | LIBX | PRTEXIT | PRTX | ADEXIT | ADX | MSGEXIT | MSGX)
-            LPARENCHAR dataName (commaSeparator dataName)? RPARENCHAR)
+            LPARENCHAR (dataName | NONNUMERICLITERAL) (commaSeparator (dataName | NONNUMERICLITERAL))? RPARENCHAR)
         | (NOINEXIT | NOINX | NOLIBEXIT | NOLIBX | NOPRTEXIT | NOPRTX | NOADEXIT | NOADX | NOMSGEXIT | NOMSGX)
       )* RPARENCHAR
    | NOEXIT | NOEX
@@ -801,7 +801,7 @@ dialectDescriptionEntry
    ;
 
 entryName
-   : (FILLER | { validateLength(_input.LT(1).getText(), "variable name", 30);} dataName)
+   : (FILLER | { validateLength(_input.LT(1).getText(), "Variable name", 30);} dataName)
    ;
 
 dataGroupUsageClause
@@ -1297,11 +1297,15 @@ divideIntoStatement
    ;
 
 divideIntoGivingStatement
-   : INTO (literal | generalIdentifier) divideGivingPhrase?
+   : INTO (literal | generalIdentifier) divideGivingPhrase divideRemainderPhrase?
+   ;
+
+divideRemainderPhrase
+   : REMAINDER generalIdentifier
    ;
 
 divideByGivingStatement
-   : BY (literal | generalIdentifier) divideGivingPhrase?
+   : BY (literal | generalIdentifier) divideGivingPhrase
    ;
 
 divideGivingPhrase
@@ -2468,8 +2472,7 @@ cicsDfhValueLiteral
 cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN;
 
 literal
-   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | cicsDfhRespLiteral
-   | cicsDfhValueLiteral | utfLiteral | hexadecimalUtfLiteral
+   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | utfLiteral | hexadecimalUtfLiteral
    ;
 
 utfLiteral: U_CHAR NONNUMERICLITERAL;
@@ -2507,11 +2510,16 @@ power
    ;
 
 basis
-   : dialectNodeFiller | generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
+   : dialectNodeFiller | cicsLiteral | generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
    ;
 
+cicsLiteral
+    : cicsDfhRespLiteral
+    | cicsDfhValueLiteral
+    ;
+
 cobolWord
-   : IDENTIFIER | SYMBOL
+   : IDENTIFIER | SYMBOL | DFHRESP | DFHVALUE | CHANNEL | INTEGER | PROCESS | REMOVE | WAIT
    | cobolCompilerDirectivesKeywords | cobolKeywords
    | cicsTranslatorCompileDirectivedKeywords | cics_conditions
    ;
