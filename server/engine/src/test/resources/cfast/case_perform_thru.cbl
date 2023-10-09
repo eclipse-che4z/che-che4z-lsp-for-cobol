@@ -13,11 +13,12 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. CLOSEPAR.
        PROCEDURE DIVISION.
-           PERFORM BP OF SEC1 THRU EP.
+           PERFORM BP OF SEC1 THRU EP OF SEC2.
        SEC1 SECTION.
        BP.
            DISPLAY 'BP'.
        CP.
            DISPLAY 'CP'.
+       SEC2 SECTION.
        EP.
            DISPLAY 'EP'.

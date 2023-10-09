@@ -38,12 +38,13 @@ class TestPerformClose {
   private static final String TEXT_THRU = "       IDENTIFICATION DIVISION.\n"
       + "       PROGRAM-ID. CLOSEPAR.\n"
       + "       PROCEDURE DIVISION.\n"
-      + "           PERFORM {#BP} OF SEC1 THRU {#EP}.\n"
+      + "           PERFORM {#BP} OF SEC1 THRU {#EP} OF SEC2.\n"
       + "       {@*SEC1} SECTION.\n"
       + "       {#*BP}.\n"
       + "           DISPLAY 'BP'.\n"
       + "       {#*CP}.\n"
       + "           DISPLAY 'CP'.\n"
+      + "       {@*SEC2} SECTION.\n"
       + "       {#*EP}.\n"
       + "           DISPLAY 'EP'.\n";
 
@@ -61,9 +62,10 @@ class TestPerformClose {
         .map(PerformNode.class::cast)
         .orElseThrow(RuntimeException::new);
 
-    assertEquals("BP", perform.getParagraph());
-    assertEquals("SEC1", perform.getSection());
-    assertEquals("EP", perform.getThru());
+    assertEquals("BP", perform.getTargetName());
+    assertEquals("SEC1", perform.getTargetSectionName());
+    assertEquals("EP", perform.getThruName());
+    assertEquals("SEC2", perform.getThruSectionName());
   }
 
 }
