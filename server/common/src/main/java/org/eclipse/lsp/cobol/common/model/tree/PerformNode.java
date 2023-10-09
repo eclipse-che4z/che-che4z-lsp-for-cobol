@@ -25,25 +25,28 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class PerformNode extends Node {
-  String section;
-  String paragraph;
-  String thru;
+  String targetName;
+  String targetSectionName;
+  String thruName;
+  String thruSectionName;
 
   public PerformNode(Locality location) {
     super(location, NodeType.PERFORM);
-    this.section = null;
-    this.paragraph = null;
-    this.thru = null;
+    this.targetName = null;
+    this.targetSectionName = null;
+    this.thruName = null;
+    this.thruSectionName = null;
   }
 
-  public PerformNode(Locality location, String section, String paragraph, String thru) {
+  public PerformNode(Locality location, String targetName, String targetSectionName, String thruName, String thruSectionName) {
     super(location, NodeType.PERFORM);
-    this.section = section;
-    this.paragraph = paragraph;
-    this.thru = thru;
+    this.targetName = targetName;
+    this.targetSectionName = targetSectionName;
+    this.thruName = thruName;
+    this.thruSectionName = thruSectionName;
   }
 
   public boolean isInline() {
-    return paragraph == null && section == null;
+    return targetName == null && targetSectionName == null;
   }
 }
