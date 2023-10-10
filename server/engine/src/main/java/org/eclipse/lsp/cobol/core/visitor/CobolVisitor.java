@@ -26,6 +26,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -671,13 +672,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitPerformProcedureStatement(PerformProcedureStatementContext ctx) {
-    ProcedureNameContext procedureNameContext = ctx.procedureName().get(0);
-    final String section =
-        procedureNameContext.inSection() != null
-            ? procedureNameContext.inSection().sectionName().getText()
-            : null;
-    final String targetName = procedureNameContext.paragraphName().getText();
-    return addTreeNode(ctx, locality -> new PerformNode(locality, section, targetName, extractThru(ctx)));
+    final Pair<String, String> targetName = getPerformItemName(ctx.procedureName(), 0);
+    final Pair<String, String> thruName = getPerformItemName(ctx.procedureName(), 1);
+    return addTreeNode(ctx, locality -> new PerformNode(locality, targetName.getLeft(), targetName.getRight(),
+        thruName.getLeft(), thruName.getRight()));
   }
 
   @Override
@@ -1051,11 +1049,18 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return addTreeNode(ctx, AtEndNode::new);
   }
 
-  private String extractThru(PerformProcedureStatementContext ctx) {
-    if (((ctx.THRU() != null) || (ctx.THROUGH() != null)) && ctx.getChildCount() > 2) {
-      return ctx.getChild(2).getText();
+  private Pair<String, String> getPerformItemName(List<CobolParser.ProcedureNameContext> procedureNames, int index) {
+    if (index >= procedureNames.size()) {
+      return Pair.of(null, null);
     }
-    return null;
+    ProcedureNameContext procedureNameContext = procedureNames.get(index);
+
+    final String sectionName =
+        procedureNameContext.inSection() != null
+            ? procedureNameContext.inSection().sectionName().getText()
+            : null;
+    final String targetName = procedureNameContext.paragraphName().getText();
+    return Pair.of(targetName, sectionName);
   }
 
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {

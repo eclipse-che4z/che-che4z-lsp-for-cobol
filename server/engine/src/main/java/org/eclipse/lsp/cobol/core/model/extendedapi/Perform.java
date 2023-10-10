@@ -23,12 +23,14 @@ import lombok.Value;
 public class Perform extends CFASTNode {
   String targetName;
   String targetSectionName;
-  String thru;
+  String thruName;
+  String thruSectionName;
 
-  public Perform(String targetName, String targetSectionName, String thru) {
+  public Perform(String targetName, String targetSectionName, String thruName, String thruSectionName) {
     super(CFASTNodeType.PERFORM.getValue());
     this.targetName = targetName;
     this.targetSectionName = targetSectionName;
-    this.thru = thru;
+    this.thruName = thruName;
+    this.thruSectionName = thruSectionName;
   }
 }

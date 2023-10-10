@@ -8,7 +8,7 @@
         "character": 8.0
       },
       "end": {
-        "line": 23.0,
+        "line": 24.0,
         "character": 25.0
       }
     },
@@ -17,12 +17,13 @@
       {
         "targetName": "BP",
         "targetSectionName": "SEC1",
-        "thru": "EP",
+        "thruName": "EP",
+        "thruSectionName": "SEC2",
         "type": "perform"
       },
       {
         "name": "SEC1",
-        "snippet": "SEC1 SECTION.\r\n       BP.\r\n           DISPLAY \u0027BP\u0027.\r\n       CP.\r\n           DISPLAY \u0027CP\u0027.\r\n       EP.\r\n           DISPLAY \u0027EP\u0027.",
+        "snippet": "SEC1 SECTION.\r\n       BP.\r\n           DISPLAY \u0027BP\u0027.\r\n       CP.\r\n           DISPLAY \u0027CP\u0027.",
         "location": {
           "uri": "fake/path",
           "start": {
@@ -30,7 +31,7 @@
             "character": 8.0
           },
           "end": {
-            "line": 23.0,
+            "line": 21.0,
             "character": 25.0
           }
         },
@@ -67,18 +68,36 @@
               }
             },
             "type": "paragraph"
+          }
+        ]
+      },
+      {
+        "name": "SEC2",
+        "snippet": "SEC2 SECTION.\r\n       EP.\r\n           DISPLAY \u0027EP\u0027.",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 22.0,
+            "character": 8.0
           },
+          "end": {
+            "line": 24.0,
+            "character": 25.0
+          }
+        },
+        "type": "section",
+        "children": [
           {
             "snippet": "EP.\r\n           DISPLAY \u0027EP\u0027.",
             "name": "EP",
             "location": {
               "uri": "fake/path",
               "start": {
-                "line": 22.0,
+                "line": 23.0,
                 "character": 8.0
               },
               "end": {
-                "line": 23.0,
+                "line": 24.0,
                 "character": 25.0
               }
             },
