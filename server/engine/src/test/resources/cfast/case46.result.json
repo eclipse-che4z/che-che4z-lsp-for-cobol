@@ -70,12 +70,12 @@
         "location": {
           "uri": "fake/path",
           "start": {
-            "line": 33.0,
-            "character": 8.0
+            "line": 33,
+            "character": 8
           },
           "end": {
-            "line": 34.0,
-            "character": 17.0
+            "line": 34,
+            "character": 17
           }
         },
         "type": "paragraph",

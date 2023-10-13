@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.extendedapi;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.ToNumberPolicy;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
@@ -39,7 +40,11 @@ import java.util.stream.Stream;
 /** Test for @link({@link CFASTBuilderImpl}. */
 @Slf4j
 class CFASTBuilderTest {
-  private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+  private static final Gson GSON =
+      new GsonBuilder()
+          .setPrettyPrinting()
+          .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
+          .create();
 
   static Stream<Arguments> casesToTest() throws IOException {
     return Files.list(Paths.get("src", "test", "resources", "cfast"))
@@ -58,7 +63,12 @@ class CFASTBuilderTest {
   @MethodSource("casesToTest")
   void cfastBuilderTest(String src, String jsonTree, String caseName) {
     AnalysisResult analysisResult =
-        UseCaseUtils.analyze(UseCase.builder().documentUri("fake/path").features(Arrays.asList(EmbeddedLanguage.values())).text(src).build());
+        UseCaseUtils.analyze(
+            UseCase.builder()
+                .documentUri("fake/path")
+                .features(Arrays.asList(EmbeddedLanguage.values()))
+                .text(src)
+                .build());
     CFASTBuilder builder = new CFASTBuilderImpl();
     Assertions.assertEquals(
         GSON.toJson(GSON.fromJson(jsonTree, List.class)),
