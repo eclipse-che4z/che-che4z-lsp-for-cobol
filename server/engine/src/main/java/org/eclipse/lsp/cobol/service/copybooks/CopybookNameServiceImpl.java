@@ -40,6 +40,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 
@@ -175,7 +176,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   private List<String> listExistedFiles(
           final List<WorkspaceFolder> workspaces,
           final String copybookPath) {
-    return workspaces.stream()
+    return Optional.ofNullable(workspaces).orElse(emptyList()).stream()
             .map(workspace -> files.getPathFromURI(workspace.getUri()))
             .map(workspacePath -> {
               String copybookFinalPath = Paths.get(copybookPath.replace("*", "tmp")).isAbsolute() ? copybookPath
