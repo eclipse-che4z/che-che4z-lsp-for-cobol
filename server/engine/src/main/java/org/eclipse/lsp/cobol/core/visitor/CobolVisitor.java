@@ -27,6 +27,7 @@ import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -193,11 +194,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitWorkingStorageSection(WorkingStorageSectionContext ctx) {
     return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.WORKING_STORAGE));
-  }
-
-  @Override
-  public List<Node> visitCompilerXOpts(CompilerXOptsContext ctx) {
-    return addTreeNode(ctx, locality -> new CICSTranslatorNode(locality, NodeType.CUSTOM));
   }
 
   @Override
@@ -549,12 +545,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     areaBWarning(ctx);
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
-  }
-
-  @Override
-  public List<Node> visitExecCicsStatement(ExecCicsStatementContext ctx) {
-    areaBWarning(ctx);
-    return Collections.emptyList();
   }
 
   @Override
@@ -1073,7 +1063,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .build();
 
     LOG.debug("Syntax error by CobolVisitor#throwException: {}", error);
-    if (!errors.contains(error)) {
+    if (!errors.contains(error) && !wrongToken.equals(CobolDialect.FILLER)) {
       errors.add(error);
     }
   }

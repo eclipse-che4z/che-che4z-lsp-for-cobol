@@ -25,11 +25,7 @@ endProgramStatement
 
 // compiler options
 compilerOptions
-   : (PROCESS | CBL) (commaSeparator? compilerOption | compilerXOpts)+
-   ;
-
-compilerXOpts
-   : XOPTS LPARENCHAR compilerXOptsOption (commaSeparator? compilerXOptsOption)* RPARENCHAR
+   : (PROCESS | CBL) (commaSeparator? compilerOption | dialectNodeFiller)+
    ;
 
 deprecatedCompilerOptions:
@@ -61,46 +57,7 @@ deprecatedCompilerOptions:
            | (SIZE | SZ) LPARENCHAR (MAX | literal) RPARENCHAR
            | (YEARWINDOW | YW) LPARENCHAR literal RPARENCHAR
         ;
-compilerXOptsOption
-    : APOST |
-      CBLCARD |
-      CICS |
-      COBOL2 |
-      COBOL3 |
-      CPSM |
-      DBCS |
-      DEBUG |
-      DLI |
-      EDF |
-      EXCI |
-      FEPI |
-      ((FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (commaSeparator (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR) |
-      LENGTH |
-      ((LINECOUNT | LC) LPARENCHAR integerLiteral RPARENCHAR) |
-      LINKAGE |
-      NATLANG |
-      NOCBLCARD |
-      NOCPSM |
-      NODEBUG |
-      NOEDF |
-      NOFEPI |
-      NOLENGTH |
-      NOLINKAGE |
-      NONUM |
-      NOOPTIONS |
-      NOSEQ |
-      NOSPIE |
-      NOVBREF |
-      NUM |
-      OPTIONS |
-      QUOTE |
-      SEQ |
-      SP |
-      SPACE LPARENCHAR integerLiteral RPARENCHAR |
-      SPIE |
-      SYSEIB |
-      VBREF
-    ;
+
 // https://www.ibm.com/docs/en/cobol-zos/6.3?topic=program-compiler-options
 compilerOption
    : ADATA | NOADATA
@@ -1001,7 +958,7 @@ conditionalStatementCall
 
 statement
    : acceptStatement | addStatement | allocateStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
-    disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement |
+    disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement |
     execSqlImsStatement | exitStatement | freeStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
@@ -1376,17 +1333,6 @@ evaluateWhenOther
 
 evaluateValue
    : arithmeticExpression
-   ;
-
-// exec cics statement
-execCicsStatement
-   : EXEC CICS cicsRules END_EXEC
-   | {notifyError("cobolParser.missingEndExec");} EXEC CICS cicsRules
-   | {notifyError("cobolParser.missingEndExec");} EXEC CICS
-   ;
-
-cicsRules
-   : ~END_EXEC*?
    ;
 
 // exec sql statement for specific divisions or sections of COBOL program
@@ -2461,19 +2407,13 @@ integerLiteral
    : INTEGERLITERAL | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88
    ;
 
-cicsDfhRespLiteral
-   : DFHRESP LPARENCHAR (cics_conditions | cobolWord | literal) RPARENCHAR
-   ;
-
-cicsDfhValueLiteral
-   : DFHVALUE LPARENCHAR (cics_conditions | cobolWord | literal) RPARENCHAR
-   ;
-
-cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN;
+//cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN;
 
 literal
-   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | utfLiteral | hexadecimalUtfLiteral
+   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | dialectLiteral | utfLiteral | hexadecimalUtfLiteral
    ;
+
+dialectLiteral: dialectNodeFiller+;
 
 utfLiteral: U_CHAR NONNUMERICLITERAL;
 
@@ -2510,24 +2450,14 @@ power
    ;
 
 basis
-   : dialectNodeFiller | cicsLiteral | generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
+   : dialectNodeFiller | generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
    ;
-
-cicsLiteral
-    : cicsDfhRespLiteral
-    | cicsDfhValueLiteral
-    ;
 
 cobolWord
-   : IDENTIFIER | SYMBOL | DFHRESP | DFHVALUE | CHANNEL | INTEGER | PROCESS | REMOVE | WAIT
+   : IDENTIFIER | SYMBOL | INTEGER | CHANNEL | PROCESS | REMOVE | WAIT
    | cobolCompilerDirectivesKeywords | cobolKeywords
-   | cicsTranslatorCompileDirectivedKeywords | cics_conditions
    ;
 
-cicsTranslatorCompileDirectivedKeywords
-   : CBLCARD | COBOL2 | COBOL3 | CPSM | DLI | EDF | EXCI | FEPI | NATLANG | NOCBLCARD | NOCPSM | NODEBUG | NOEDF
-   | NOFEPI | NOLENGTH | NOLINKAGE | NOOPTIONS | NOSPIE | OPTIONS | SP | SPIE | SYSEIB
-   ;
 cobolKeywords
    : ADDRESS | BOTTOM | COUNT | CR | FIELD | FIRST | MMDDYYYY | PRINTER | DAY | TIME | DATE | DAY_OF_WEEK
    | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | TOP | YEAR | YYYYDDD | YYYYMMDD | WHEN_COMPILED
@@ -2549,7 +2479,7 @@ cobolCompilerDirectivesKeywords
     | LANG | LANGUAGE | LAX | LAXPERF | LAXREDEF | LC | LIBEXIT | LIBX | LILIAN | LINECOUNT | LIST | LM | LONGMIXED
     | LONGUPPER | LP | LU | LXPRF | LXRDF
     | M_CHAR | MAP | MAXPCF | MD | MDECK | MIG | MIXED | MSG | MSGEXIT | MSGX
-    | N_CHAR | NAME | NAT | NATIONAL | NC | ND | NOADATA | NOADEXIT | NOADV | NOADX | NOALIAS | NOALPHNUM | NOAWO | NOBIN
+    | N_CHAR | NAME | NAT | NATLANG | NATIONAL | NC | ND | NOADATA | NOADEXIT | NOADV | NOADX | NOALIAS | NOALPHNUM | NOAWO | NOBIN
     | NOBLOCK0 | NOC | NOCICS | NOCLEANSIGN | NOCOMPILE | NOCOPYLOC | NOCOPYRIGHT | NOCPLC | NOCPYR | NOCS | NOCURR
     | NOCURRENCY | NOD | NODBCS | NODECK | NODEF | NODEFINE | NODIAGTRUNC | NODLL | NODSNAME | NODTR | NODU | NODUMP
     | NODWARF | NODYN | NODYNAM | NOEJPD | NOENDPERIOD | NOEVENPACK | NOEX | NOEXIT | NOEXP | NOEXPORTALL | NOF

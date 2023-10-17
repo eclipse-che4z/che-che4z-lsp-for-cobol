@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/actions/workflows/build.yml/badge.svg)](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/actions/workflows/build.yml)
 [![GitHub issues](https://img.shields.io/github/issues-raw/eclipse/che-che4z-lsp-for-cobol)](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues)
-[![slack](https://img.shields.io/badge/chat-on%20Slack-blue)](https://che4z.slack.com)
+[![slack](https://img.shields.io/badge/chat-on%20Slack-blue)](https://join.slack.com/t/che4z/shared_invite/zt-22b0064vn-nBh~Fs9Fl47Prp5ItWOLWw)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=eclipse-che4z_che-che4z-lsp-for-cobol&metric=alert_status)](https://sonarcloud.io/dashboard?id=eclipse-che4z_che-che4z-lsp-for-cobol)
 
 </div>

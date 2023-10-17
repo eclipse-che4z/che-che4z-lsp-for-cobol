@@ -4,12 +4,12 @@
     "location": {
       "uri": "fake/path",
       "start": {
-        "line": 15.0,
-        "character": 8.0
+        "line": 15,
+        "character": 8
       },
       "end": {
-        "line": 19.0,
-        "character": 18.0
+        "line": 19,
+        "character": 18
       }
     },
     "type": "program",
@@ -27,12 +27,12 @@
         "location": {
           "uri": "fake/path",
           "start": {
-            "line": 18.0,
-            "character": 8.0
+            "line": 18,
+            "character": 8
           },
           "end": {
-            "line": 19.0,
-            "character": 18.0
+            "line": 19,
+            "character": 18
           }
         },
         "type": "paragraph",

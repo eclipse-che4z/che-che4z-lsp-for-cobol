@@ -14,8 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
@@ -30,12 +32,15 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
+import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /** Dialect utility class */
@@ -97,6 +102,48 @@ public class DialectService {
       context.getExtendedDocument().commitTransformations();
     }
     return acc;
+  }
+
+  /**
+   * processes the implicit cobol dialect. For example CICS
+   *
+   * @param ctx a {@link AnalysisContext} class
+   * @param errors list to accumulate errors
+   * @param dialectProcessingContext is a DialectProcessingContext class with all needed data for dialect processing
+   * @return a {@link DialectOutcome}
+   */
+  public ResultWithErrors<DialectOutcome> processImplicitDialects(AnalysisContext ctx,
+                                                                   List<SyntaxError> errors,
+                                                                   DialectProcessingContext dialectProcessingContext) {
+
+    ResultWithErrors<DialectOutcome> acc = new ResultWithErrors<>(new DialectOutcome(dialectProcessingContext), errors);
+
+    for (CobolDialect activeImplicitDialect : getActiveImplicitDialects(ctx.getConfig())) {
+      acc = processDialect(acc, activeImplicitDialect, dialectProcessingContext);
+      dialectProcessingContext.getExtendedDocument().commitTransformations();
+    }
+    return acc;
+  }
+
+  /**
+   * Returns list of active implicit dialects
+   * @param config a AnalysisConfig class. This class holds user configuration for the analysis
+   * @return list of active implicit dialects
+   */
+  public List<CobolDialect> getActiveImplicitDialects(AnalysisConfig config) {
+    return ImmutableList.of(new CICSDialect(copybookService, messageService)).stream()
+            .filter(activeImplicitDialect(config))
+            .collect(Collectors.toList());
+  }
+
+  private Predicate<CobolDialect> activeImplicitDialect(AnalysisConfig config) {
+    return dialect -> getImplicitDialects(config).contains(dialect.getName());
+  }
+
+  private List<String> getImplicitDialects(AnalysisConfig config) {
+    List<String> result = new ArrayList<>();
+    if (config.isCicsTranslatorEnabled()) result.add(CICSDialect.DIALECT_NAME);
+    return Collections.unmodifiableList(result);
   }
 
   private void checkMissingDialects(List<String> dialects) {

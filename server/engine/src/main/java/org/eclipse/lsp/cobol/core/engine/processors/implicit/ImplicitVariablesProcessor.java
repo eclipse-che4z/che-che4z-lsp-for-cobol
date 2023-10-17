@@ -39,25 +39,11 @@ public class ImplicitVariablesProcessor implements Processor<SectionNode> {
 
   @Override
   public void accept(SectionNode sectionNode, ProcessingContext processingContext) {
-    if (sectionNode.getSectionType() == SectionType.LINKAGE) {
-      VariableAccumulator variableAccumulator = processingContext.getVariableAccumulator();
-      ProgramNode programNode = sectionNode.getProgram()
-              .orElseThrow(() -> new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found"));
-      if (config.isCicsTranslatorEnabled()) {
-        registerVariable(
-                variableAccumulator, programNode, BlkImplicitVariablesGenerator.generate());
-      }
-    }
-
     if (sectionNode.getSectionType() == SectionType.WORKING_STORAGE) {
       VariableAccumulator variableAccumulator = processingContext.getVariableAccumulator();
       ProgramNode programNode = sectionNode.getProgram()
               .orElseThrow(() -> new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found"));
       registerVariables(variableAccumulator, programNode, SRImplicitVariablesGenerator.generate());
-      if (config.isCicsTranslatorEnabled()) {
-        registerVariables(variableAccumulator, programNode, SRImplicitVariablesGenerator.generateCicsRegisters());
-      }
-
       if (config.getFeatures().contains(EmbeddedLanguage.SQL)
               && config.getCopybookConfig().getSqlBackend().equals(SQLBackend.DB2_SERVER)
               && !hasSqlCa(programNode)) {

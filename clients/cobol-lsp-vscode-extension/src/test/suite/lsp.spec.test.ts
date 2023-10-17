@@ -109,12 +109,9 @@ suite("Integration Test Suite", function () {
     assert.strictEqual(diagnostics.length, 1);
     helper.assertRangeIsEqual(
       diagnostics[0].range,
-      range(pos(34, 16), pos(34, 20)),
+      range(pos(34, 11), pos(34, 51)),
     );
-    assert.strictEqual(
-      diagnostics[0].message,
-      "No viable alternative at input EXEC CICS",
-    );
+    assert.strictEqual(diagnostics[0].message, "Invalid CICS EXEC block");
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
@@ -139,7 +136,7 @@ suite("Integration Test Suite", function () {
       diagnostics[0].range,
       range(pos(40, 15), pos(40, 18)),
     );
-    assert.ok(diagnostics[0].message.includes("Syntax error on 'SEN'"));
+    assert.ok(diagnostics[0].message.includes("Extraneous input 'SEN'"));
     await helper.deleteLine(editor, 40);
     await helper.insertString(
       editor,
@@ -174,7 +171,7 @@ suite("Integration Test Suite", function () {
       diagnostics[0].range,
       range(pos(58, 21), pos(58, 28)),
     );
-    assert.ok(diagnostics[0].message.includes("Syntax error on 'XCTL123'"));
+    assert.ok(diagnostics[0].message.includes("Extraneous input 'XCTL123'"));
     await helper.deleteLine(editor, 58);
     await helper.insertString(
       editor,

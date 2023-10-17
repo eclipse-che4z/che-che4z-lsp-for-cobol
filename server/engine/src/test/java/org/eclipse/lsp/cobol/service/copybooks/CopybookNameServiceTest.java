@@ -201,7 +201,7 @@ class CopybookNameServiceTest {
   void testNullPaths() {
     CopybookNameService copybookNameService =
             new CopybookNameServiceImpl(settingsService, files, provider);
-
+    when(client.workspaceFolders()).thenReturn(CompletableFuture.completedFuture(null));
     when(settingsService.fetchTextConfigurationWithScope(anyString(), eq(CPY_EXTENSIONS.label)))
             .thenReturn(CompletableFuture.completedFuture(Collections.singletonList("cpy")));
     when(settingsService.fetchConfigurations(any(), any())).thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));

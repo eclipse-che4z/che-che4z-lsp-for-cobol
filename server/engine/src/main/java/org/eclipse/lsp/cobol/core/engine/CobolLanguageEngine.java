@@ -86,6 +86,7 @@ public class CobolLanguageEngine {
     this.pipeline = new Pipeline();
     this.pipeline.add(new DialectProcessingStage(dialectService));
     this.pipeline.add(new PreprocessorStage(grammarPreprocessor));
+    this.pipeline.add(new ImplicitDialectProcessingStage(dialectService));
     this.pipeline.add(new ParserStage(messageService, treeListener));
     this.pipeline.add(new EmbeddedCodeStage(embeddedCodeService, treeListener));
     this.pipeline.add(new TransformTreeStage(symbolsRepository, messageService, subroutineService, cachingConfigurationService, dialectService, astProcessor));
