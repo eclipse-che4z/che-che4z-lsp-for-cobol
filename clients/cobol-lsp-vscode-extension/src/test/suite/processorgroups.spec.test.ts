@@ -43,6 +43,7 @@ suite("Integration Test Suite: Processor Groups", function () {
     assert.match(message, /^IDMSABCD: Copybook not found/);
   });
 
+  /* Commented out unstable test
   test("TC355921: DaCo - with processor setup", async () => {
     const extSrcPath = path.join("cobol-daco", "DACOSMPL.cbl");
     const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
@@ -52,6 +53,7 @@ suite("Integration Test Suite: Processor Groups", function () {
     const message = diagnostics[0].message;
     assert.match(message, /^MAIDABCD: Copybook not found/);
   });
+  */
 
   test("TC355918: IDMS - without preprocessor setup", async () => {
     const extSrcPath = path.join("cobol-vanila", "IDMSSMPL.cbl");

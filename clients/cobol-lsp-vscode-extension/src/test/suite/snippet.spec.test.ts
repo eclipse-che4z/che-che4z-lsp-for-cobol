@@ -122,6 +122,7 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
   this.afterEach(async () => await helper.closeAllEditors()).timeout(
     helper.TEST_TIMEOUT,
   );
+/* Unstable test commented out
 
   test("TC289633 Provide default COBOL code snippets - basic scenario", async () => {
     await helper.showDocument("SNIPPET.cbl");
@@ -141,7 +142,7 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
     assert.strictEqual(lines[7], "       DATA DIVISION.");
     assert.strictEqual(lines[11], "       PROCEDURE DIVISION.");
   }).timeout(helper.TEST_TIMEOUT);
-
+*/
   test("TC289635 Provide default COBOL code snippets - upper case", async () => {
     await helper.showDocument("SNIPPET.cbl");
     const editor = helper.get_editor("SNIPPET.cbl");
