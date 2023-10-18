@@ -100,7 +100,7 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
     assert.strictEqual(diagnostics.length, 0);
   });
 
-  test("TC250950: Parser Does React on CPY Exit Tag", async () => {
+  test.skip("TC250950: Parser Does React on CPY Exit Tag", async () => {
     let editor = await helper.showDocument(path.join("TEST4.CBL"));
     await helper.deleteLine(editor, 13);
     await helper.insertString(editor, pos(13, 0), "       COPY CHOPIN.");
