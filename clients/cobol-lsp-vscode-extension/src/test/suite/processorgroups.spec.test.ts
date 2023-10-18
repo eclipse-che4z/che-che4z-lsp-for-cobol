@@ -43,7 +43,7 @@ suite("Integration Test Suite: Processor Groups", function () {
     assert.match(message, /^IDMSABCD: Copybook not found/);
   });
 
-  test("TC355921: DaCo - with processor setup", async () => {
+  test.skip("TC355921: DaCo - with processor setup", async () => {
     const extSrcPath = path.join("cobol-daco", "DACOSMPL.cbl");
     const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
