@@ -145,7 +145,7 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
         assert.strictEqual(lines[11], "       PROCEDURE DIVISION.");
       },
     )
-    .timeout(helper.TEST_TIMEOUT);
+    // .timeout(helper.TEST_TIMEOUT);
 
   test
     .skip(
@@ -188,7 +188,7 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
         assert.ok(lines[15].includes("FUNCTION COS"));
       },
     )
-    .timeout(helper.TEST_TIMEOUT);
+    // .timeout(helper.TEST_TIMEOUT);
 
   test
     .skip(
@@ -231,5 +231,5 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
         assert.ok(lines[15].includes("FUNCTION COS"));
       },
     )
-    .timeout(helper.TEST_TIMEOUT);
+    // .timeout(helper.TEST_TIMEOUT);
 });

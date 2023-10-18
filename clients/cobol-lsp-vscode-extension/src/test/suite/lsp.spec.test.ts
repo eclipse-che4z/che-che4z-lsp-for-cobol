@@ -527,8 +527,8 @@ suite("Integration Test Suite", function () {
         "Variable ABCD1 is not defined",
       );
     })
-    .timeout(helper.TEST_TIMEOUT)
-    .slow(1000);
+    // .timeout(helper.TEST_TIMEOUT)
+    // .slow(1000);
 
   test("Show errors only for opened files", async () => {
     // Open program with error inside a copybook
