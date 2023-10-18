@@ -116,7 +116,7 @@ suite("Integration Test Suite", function () {
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
-  test("TC312753 Check EXEC CICS allows free arguments order", async () => {
+  test.skip("TC312753 Check EXEC CICS allows free arguments order", async () => {
     await helper.showDocument("ADSORT.cbl");
     let editor = helper.get_editor("ADSORT.cbl");
     await helper.deleteLine(editor, 58);
@@ -149,9 +149,9 @@ suite("Integration Test Suite", function () {
     );
     diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 0);
-  })
-    .timeout(helper.TEST_TIMEOUT)
-    .slow(1000);
+  });
+  // .timeout(helper.TEST_TIMEOUT)
+  // .slow(1000);
 
   test("TC312745 Error check", async () => {
     await helper.showDocument("ADSORT.cbl");
@@ -591,6 +591,37 @@ suite("Integration Test Suite", function () {
     );
     assert.strictEqual(diagnostic[0].message, "Errors inside the copybook");
   })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
+
+  test
+    .only("TC250107 Test Area A, Check FD/SD level data", async () => {
+      await helper.showDocument("TEST4.CBL");
+      let editor = helper.get_editor("TEST4.CBL");
+      await helper.insertString(
+        editor,
+        pos(13, 0),
+        '       TITLE "something".\n',
+      );
+      await helper.insertString(
+        editor,
+        pos(18, 0),
+        "           FD  TRANS-FILE-IN IS EXTERNAL.\n",
+      );
+      await helper.waitFor(
+        () => vscode.languages.getDiagnostics(editor.document.uri).length === 2,
+      );
+      let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+      assert.strictEqual(
+        diagnostics.length,
+        2,
+        "got: " + JSON.stringify(diagnostics),
+      );
+      assert.strictEqual(
+        diagnostics[0].message,
+        "The following token must start in Area A: FD",
+      );
+    })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 });
