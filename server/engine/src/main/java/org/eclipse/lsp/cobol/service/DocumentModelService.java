@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.service;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Synchronized;
@@ -74,7 +75,7 @@ class DocumentModelService {
   public void processAnalysisResult(String uri, AnalysisResult analysisResult) {
     Optional.ofNullable(docs.get(uri)).ifPresent(d -> {
       d.setAnalysisResult(analysisResult);
-      diagnosticRepo.put(analysisResult.getDiagnostics());
+      updateDiagnosticRepo(uri, analysisResult.getDiagnostics());
       d.setOutlineResult(BuildOutlineTreeFromSyntaxTree.convert(analysisResult.getRootNode(), uri));
       analysisResult.getRootNode().getDepthFirstStream()
           .filter(n -> n.getNodeType() == NodeType.COPY)
@@ -84,13 +85,43 @@ class DocumentModelService {
     });
   }
 
+    private void updateDiagnosticRepo(String uri, Map<String, List<Diagnostic>> diagnostics) {
+        diagnostics.forEach((key, diagnosticList) -> {
+            if (key.equals(uri)) {
+                diagnosticRepo.put(ImmutableMap.of(uri, diagnosticList));
+            } else {
+                List<Diagnostic> existingDiagnostics = Optional.ofNullable(diagnosticRepo.get(key)).orElse(new ArrayList<>());
+                existingDiagnostics.addAll(diagnosticList);
+                diagnosticRepo.put(ImmutableMap.of(key, existingDiagnostics));
+            }
+        });
+  }
+
   /**
    * Mark the document as closed
    * @param uri - document uri
    */
   @Synchronized
   public void closeDocument(String uri) {
-    Optional.ofNullable(docs.get(uri)).ifPresent(d -> d.setOpened(false));
+    Optional.ofNullable(docs.get(uri))
+        .ifPresent(
+            d -> {
+              d.setOpened(false);
+              removeAllRelatedDiagnostics(d);
+            });
+  }
+
+  private void removeAllRelatedDiagnostics(CobolDocumentModel documentModel) {
+    Optional.ofNullable(documentModel.getAnalysisResult())
+        .map(AnalysisResult::getDiagnostics)
+        .ifPresent(
+            d ->
+                d.forEach(
+                    (uri, closedFileRelatedDiagnostics) -> {
+                      List<Diagnostic> oldDiagnostics = diagnosticRepo.get(uri);
+                      Optional.ofNullable(oldDiagnostics).ifPresent(dia -> dia.removeAll(closedFileRelatedDiagnostics));
+                      diagnosticRepo.put(ImmutableMap.of(uri, Optional.ofNullable(oldDiagnostics).orElse(ImmutableList.of())));
+                    }));
   }
 
   /**
@@ -99,14 +130,12 @@ class DocumentModelService {
    */
   @Synchronized
   public void removeDocument(String uri) {
-    Optional.ofNullable(docs.get(uri)).ifPresent(d -> {
-      Optional.ofNullable(d.getAnalysisResult()).map(AnalysisResult::getDiagnostics)
-          .ifPresent(m -> m.keySet()
-              .forEach(diagnosticRepo::delete));
-
-      diagnosticRepo.delete(uri);
-      docs.remove(uri);
-    });
+    Optional.ofNullable(docs.get(uri))
+        .ifPresent(
+            d -> {
+              diagnosticRepo.delete(uri);
+              docs.remove(uri);
+            });
   }
 
   /**
@@ -150,19 +179,18 @@ class DocumentModelService {
   }
 
   /**
-   * Updates document with a new test
+   * Updates document with a new text
    * @param uri - document uri
    */
   @Synchronized
   public void updateDocument(String uri, String text) {
-    Optional.ofNullable(docs.get(uri)).ifPresent(d -> {
-      Optional.ofNullable(d.getAnalysisResult()).map(AnalysisResult::getDiagnostics)
-          .ifPresent(m -> m.keySet()
-                  .forEach(diagnosticRepo::delete));
-
-      diagnosticRepo.delete(uri);
-      d.update(text);
-    });
+    Optional.ofNullable(docs.get(uri))
+        .ifPresent(
+            d -> {
+              diagnosticRepo.delete(uri);
+              removeAllRelatedDiagnostics(d);
+              d.update(text);
+            });
   }
 
   /**
