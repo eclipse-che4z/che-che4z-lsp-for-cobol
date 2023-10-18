@@ -65,6 +65,7 @@ export async function showDocument(workspace_file: string) {
   const file = await getUri(workspace_file);
   // open and show the file
   const document = await vscode.workspace.openTextDocument(file);
+  await vscode.languages.setTextDocumentLanguage(document, "cobol");
   const editor = await vscode.window.showTextDocument(document);
 
   return editor;
@@ -76,6 +77,7 @@ export async function closeActiveEditor() {
     await vscode.commands.executeCommand("undo");
     await sleep(100);
   }
+  await vscode.languages.setTextDocumentLanguage(doc.document, "json");
   await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
   await sleep(100);
 }
