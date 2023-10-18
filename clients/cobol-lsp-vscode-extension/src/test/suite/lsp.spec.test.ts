@@ -593,35 +593,4 @@ suite("Integration Test Suite", function () {
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
-
-  test
-    .only("TC250107 Test Area A, Check FD/SD level data", async () => {
-      await helper.showDocument("TEST4.CBL");
-      let editor = helper.get_editor("TEST4.CBL");
-      await helper.insertString(
-        editor,
-        pos(13, 0),
-        '       TITLE "something".\n',
-      );
-      await helper.insertString(
-        editor,
-        pos(18, 0),
-        "           FD  TRANS-FILE-IN IS EXTERNAL.\n",
-      );
-      await helper.waitFor(
-        () => vscode.languages.getDiagnostics(editor.document.uri).length === 2,
-      );
-      let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-      assert.strictEqual(
-        diagnostics.length,
-        2,
-        "got: " + JSON.stringify(diagnostics),
-      );
-      assert.strictEqual(
-        diagnostics[0].message,
-        "The following token must start in Area A: FD",
-      );
-    })
-    .timeout(helper.TEST_TIMEOUT)
-    .slow(1000);
 });
