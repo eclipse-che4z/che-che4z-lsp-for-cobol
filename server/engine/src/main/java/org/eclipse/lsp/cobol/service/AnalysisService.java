@@ -29,6 +29,7 @@ import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
+import org.eclipse.lsp4j.MessageType;
 
 import java.util.Collections;
 import java.util.List;
