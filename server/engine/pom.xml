@@ -258,6 +258,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
+                    <forkCount>3</forkCount>
+                    <reuseForks>true</reuseForks>
                     <parallel>all</parallel>
                     <argLine>${argLine} -Dperformance.log.path=${project.build.directory}/perf.csv</argLine>
                     <systemProperties>

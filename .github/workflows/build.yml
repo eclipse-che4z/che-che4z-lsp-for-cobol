@@ -75,7 +75,7 @@ jobs:
           path: server/engine/target/native/agent-output/test/*
       - name: Build Server and Dialects Jars
         working-directory: server
-        run: mvn clean package --no-transfer-progress
+        run: mvn clean -DskipTests package --no-transfer-progress
       - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
