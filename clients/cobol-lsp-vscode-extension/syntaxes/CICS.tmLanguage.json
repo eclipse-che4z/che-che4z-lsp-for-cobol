@@ -1,6 +1,6 @@
 {
   "scopeName": "meta.embedded.block.cics",
-  "injectionSelector": "L:cics.embedded.code",
+  "injectionSelector": ["R:cics.embedded.code", "L:string.quoted.cics.cobol"],
   "patterns": [
     {
       "include": "#cics-injection"
