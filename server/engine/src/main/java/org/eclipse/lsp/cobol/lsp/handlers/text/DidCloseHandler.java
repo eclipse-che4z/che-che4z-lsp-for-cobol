@@ -16,8 +16,8 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
-import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
@@ -30,15 +30,14 @@ import static java.lang.String.format;
 @Slf4j
 public class DidCloseHandler {
   private final DisposableLSPStateService disposableLSPStateService;
-  private final AnalysisService analysisService;
+  private final AsyncAnalysisService asyncAnalysisService;
   private final WatcherService watcherService;
 
   @Inject
   public DidCloseHandler(DisposableLSPStateService disposableLSPStateService,
-                         AnalysisService analysisService,
-                         WatcherService watcherService) {
+                         AsyncAnalysisService asyncAnalysisService, WatcherService watcherService) {
     this.disposableLSPStateService = disposableLSPStateService;
-    this.analysisService = analysisService;
+    this.asyncAnalysisService = asyncAnalysisService;
     this.watcherService = watcherService;
   }
 
@@ -52,7 +51,7 @@ public class DidCloseHandler {
     }
     String uri = UriHelper.decode(params.getTextDocument().getUri());
     LOG.info(format("Document closing invoked on URI %s", uri));
-    analysisService.stopAnalysis(uri);
+    asyncAnalysisService.cancelAnalysis(uri);
     watcherService.removeRuntimeWatchers(uri);
   }
 }

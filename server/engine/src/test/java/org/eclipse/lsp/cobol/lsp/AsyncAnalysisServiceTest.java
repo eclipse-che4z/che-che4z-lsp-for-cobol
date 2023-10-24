@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
+import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -44,7 +45,8 @@ class AsyncAnalysisServiceTest {
         AnalysisService analysisService = mock(AnalysisService.class);
         CopybookService copybookService = mock(CopybookService.class);
         SubroutineService subroutineService = mock(SubroutineService.class);
-        AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(documentModelService, analysisService, copybookService, subroutineService);
+        Communications communications = mock(Communications.class);
+        AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(documentModelService, analysisService, copybookService, subroutineService, communications);
         Optional<CompletableFuture<CobolDocumentModel>> result = asyncAnalysisService.fetchLastResultOrAnalyzeDocument(URI);
         assertFalse(result.isPresent());
     }
@@ -61,13 +63,16 @@ class AsyncAnalysisServiceTest {
             latch.await();
             return null;
         }).when(analysisService).analyzeDocument(eq(URI), anyString(), eq(true));
-        AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(documentModelService, analysisService, copybookService, subroutineService);
+        Communications communications = mock(Communications.class);
+        AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(documentModelService, analysisService, copybookService, subroutineService, communications);
         asyncAnalysisService.scheduleAnalysis(URI, "text", true);
         CompletableFuture<CobolDocumentModel> result = asyncAnalysisService.fetchLastResultOrAnalyzeDocument(URI).get();
         assertFalse(result.isDone());
         latch.countDown();
         result.get(1, TimeUnit.SECONDS);
         assertTrue(result.isDone());
+        verify(communications).publishDiagnostics(any());
+        verify(communications).notifyProgressBegin(URI);
     }
 
     // case 3: document open, analysis is done
@@ -78,11 +83,14 @@ class AsyncAnalysisServiceTest {
         SubroutineService subroutineService = mock(SubroutineService.class);
         CobolDocumentModel doc = mock(CobolDocumentModel.class);
         when(doc.getLastAnalysisResult()).thenReturn(mock(AnalysisResult.class));
+        Communications communications = mock(Communications.class);
         when(documentModelService.get(URI)).thenReturn(doc);
         AnalysisService analysisService = mock(AnalysisService.class);
-        AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(documentModelService, analysisService, copybookService, subroutineService);
+        AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(documentModelService, analysisService, copybookService, subroutineService, communications);
         asyncAnalysisService.scheduleAnalysis(URI, "text", true).join();
         CompletableFuture<CobolDocumentModel> result = asyncAnalysisService.fetchLastResultOrAnalyzeDocument(URI).get();
+        verify(communications).publishDiagnostics(documentModelService.getOpenedDiagnostic());
+        verify(communications).notifyProgressBegin(URI);
         assertTrue(result.isDone());
     }
 }

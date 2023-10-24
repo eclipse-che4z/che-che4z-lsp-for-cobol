@@ -86,16 +86,16 @@ class CobolTextDocumentServiceTest {
     DisposableLSPStateService disposableLSPStateService = new CobolLSPServerStateService();
     CopybookService copybookService = mock(CopybookService.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
-    AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(documentModelService, analysisService, copybookService, subroutineService);
+    AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(documentModelService, analysisService, copybookService, subroutineService, communications);
 
     CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions);
     FormattingHandler formattingHandler = new FormattingHandler(documentModelService, formations);
 
     CodeActionHandler codeActionHandler = new CodeActionHandler(actions);
-    AnalysisHandler analysisHandler = new AnalysisHandler(asyncAnalysisService, builder);
+    AnalysisHandler analysisHandler = new AnalysisHandler(asyncAnalysisService, analysisService, builder, communications);
 
     DidOpenHandler didOpenHandler = new DidOpenHandler(asyncAnalysisService, watcherService);
-    DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, analysisService, watcherService);
+    DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, asyncAnalysisService, watcherService);
     DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService);
     DefinitionHandler definitionHandler = new DefinitionHandler(asyncAnalysisService, occurrences);
     DocumentSymbolHandler documentSymbolHandler = new DocumentSymbolHandler(communications, asyncAnalysisService);

@@ -31,7 +31,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -41,40 +40,44 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AnalysisServiceTest {
   private AnalysisService service;
-  @Mock private LanguageEngineFacade engine;
-  @Mock private ConfigurationService configurationService;
-  @Mock private SyncProvider syncProvider;
-  @Mock private CopybookIdentificationService copybookIdentificationService;
-  @Mock private Communications communications;
-  @Mock private DocumentModelService documentService;
-  @Mock private DocumentContentCache contentCache;
-  @Mock private CopybookService copybookService;
+  @Mock
+  private LanguageEngineFacade engine;
+  @Mock
+  private ConfigurationService configurationService;
+  @Mock
+  private SyncProvider syncProvider;
+  @Mock
+  private CopybookIdentificationService copybookIdentificationService;
+  @Mock
+  private Communications communications;
+  @Mock
+  private DocumentModelService documentService;
+  @Mock
+  private DocumentContentCache contentCache;
+  @Mock
+  private CopybookService copybookService;
 
   @BeforeEach
   void init() {
     service =
-        new AnalysisService(
-            communications,
-            engine,
-            configurationService,
-            syncProvider,
-            copybookIdentificationService,
-                copybookService, documentService,
-            contentCache);
+            new AnalysisService(engine,
+                    configurationService,
+                    syncProvider,
+                    copybookIdentificationService,
+                    copybookService, documentService,
+                    contentCache);
     service.setExtensionConfig(ImmutableList.of());
   }
 
   @Test
   void testIsCopybook() throws InterruptedException {
     service =
-        new AnalysisService(
-            communications,
-            engine,
-            configurationService,
-            syncProvider,
-            copybookIdentificationService,
-                copybookService, documentService,
-            contentCache);
+            new AnalysisService(engine,
+                    configurationService,
+                    syncProvider,
+                    copybookIdentificationService,
+                    copybookService, documentService,
+                    contentCache);
 
     CompletableFuture.supplyAsync(() -> service.isCopybook("", ""));
 
@@ -95,8 +98,6 @@ class AnalysisServiceTest {
 
     service.analyzeDocument(uri, text, true);
     verify(documentService, times(1)).openDocument(uri, text);
-    verify(communications, times(1)).publishDiagnostics(any());
-    verify(communications, times(0)).notifyProgressBegin(uri);
     verify(engine, times(0)).analyze(any(), any(), any());
   }
 
@@ -113,8 +114,6 @@ class AnalysisServiceTest {
 
     service.analyzeDocument(uri, text, true);
     verify(documentService, times(1)).openDocument(uri, text);
-    verify(communications, times(1)).publishDiagnostics(any());
-    verify(communications, times(1)).notifyProgressBegin(uri);
     verify(engine, times(1)).analyze(any(), any(), any());
   }
 
@@ -126,8 +125,6 @@ class AnalysisServiceTest {
 
     service.analyzeDocument(uri, text, false);
     verify(documentService, times(1)).updateDocument(uri, text);
-    verify(communications, times(0)).publishDiagnostics(documentService.getOpenedDiagnostic());
-    verify(communications, times(0)).notifyProgressBegin(uri);
     verify(engine, times(0)).analyze(any(), any(), any());
   }
 
@@ -141,8 +138,6 @@ class AnalysisServiceTest {
 
     service.analyzeDocument(uri, text, false);
     verify(documentService, times(1)).updateDocument(uri, text);
-    verify(communications, times(1)).publishDiagnostics(any());
-    verify(communications, times(1)).notifyProgressBegin(uri);
     verify(engine, times(1)).analyze(any(), any(), any());
   }
 
@@ -154,7 +149,6 @@ class AnalysisServiceTest {
 
     service.stopAnalysis(uri);
     verify(documentService, times(1)).closeDocument(uri);
-    verify(communications, times(1)).publishDiagnostics(any());
     verify(documentService, times(0)).removeDocument(uri);
   }
 
@@ -166,23 +160,7 @@ class AnalysisServiceTest {
 
     service.stopAnalysis(uri);
     verify(documentService, times(1)).closeDocument(uri);
-    verify(communications, times(1)).publishDiagnostics(any());
     verify(documentService, times(1)).removeDocument(uri);
-  }
-
-  @Test
-  void testRetrieveAnalysis_analyzed() {
-    String uri = UUID.randomUUID().toString();
-    String text = UUID.randomUUID().toString();
-
-    CobolDocumentModel document = mock(CobolDocumentModel.class);
-    when(document.isDocumentSynced()).thenReturn(true);
-    when(document.getAnalysisResult()).thenReturn(prepareAnalysisResult());
-
-    when(documentService.get(uri)).thenReturn(document);
-
-    assertNotNull(service.retrieveAnalysis(uri, text));
-    verify(engine, times(0)).analyze(any(), any(), any());
   }
 
   private AnalysisResult prepareAnalysisResult() {
