@@ -32,6 +32,7 @@ import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
@@ -164,7 +165,14 @@ public class AnalysisService {
     if (!documentModel.isDocumentSynced()) {
       analyzeDocumentWithCopybooks(uri, text);
     }
-    return documentService.get(uri).getAnalysisResult().getRootNode();
+    return Optional.ofNullable(documentService.get(uri))
+        .map(CobolDocumentModel::getAnalysisResult)
+        .map(AnalysisResult::getRootNode).orElseGet(() -> {
+          if (isCopybook(uri, text)) {
+            communications.notifyGeneralMessage(MessageType.Info, "Cannot retrieve outline tree because file was treated as a copybook");
+          }
+          return null;
+        });
   }
 
   /**
