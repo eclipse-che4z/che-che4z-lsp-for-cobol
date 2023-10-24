@@ -22,11 +22,9 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
+import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -41,6 +39,7 @@ public class AsyncAnalysisService {
   private final AnalysisService analysisService;
   private final CopybookService copybookService;
   private final SubroutineService subroutineService;
+  private final Communications communications;
 
   private final Map<String, CompletableFuture<CobolDocumentModel>> analysisResults = Collections.synchronizedMap(new HashMap<>());
   private final Map<String, Long> analysisResultsRevisions = Collections.synchronizedMap(new HashMap<>());
@@ -51,11 +50,12 @@ public class AsyncAnalysisService {
   public AsyncAnalysisService(DocumentModelService documentModelService,
                               AnalysisService analysisService,
                               CopybookService copybookService,
-                              SubroutineService subroutineService) {
+                              SubroutineService subroutineService, Communications communications) {
     this.documentModelService = documentModelService;
     this.analysisService = analysisService;
     this.copybookService = copybookService;
     this.subroutineService = subroutineService;
+    this.communications = communications;
   }
 
   /**
@@ -82,11 +82,22 @@ public class AsyncAnalysisService {
    * @return document model with analysis result
    */
   public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, boolean open) {
-    String id = makeId(uri, analysisResultsRevisions.compute(uri, (k, v) -> (v == null ? 0 : v) + 1));
+    Long currentRevision = analysisResultsRevisions.compute(uri, (k, v) -> (v == null ? 0 : v) + 1);
+    String id = makeId(uri, currentRevision);
     return analysisResults.computeIfAbsent(id, u -> CompletableFuture.supplyAsync(() -> {
-      analysisService.analyzeDocument(uri, text, open);
-      analysisResults.remove(u);
-      return documentModelService.get(uri);
+      LOG.debug("[analyzeDocumentWithCopybooks] Start analysis: " + uri);
+
+      try {
+        communications.notifyProgressBegin(uri);
+        analysisService.analyzeDocument(uri, text, open);
+        analysisResults.remove(u);
+        return documentModelService.get(uri);
+      } finally {
+        if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision)) {
+          communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
+        }
+        communications.notifyProgressEnd(uri);
+      }
     }, analysisExecutor));
   }
 
@@ -104,5 +115,17 @@ public class AsyncAnalysisService {
     documentModelService.getAllOpened()
             .stream().filter(d -> !analysisService.isCopybook(d.getUri(), d.getText()))
             .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), false));
+  }
+
+  /**
+   * Stop code analysis.
+   *
+   * @param uri source URI
+   */
+  public void cancelAnalysis(String uri) {
+    analysisService.stopAnalysis(uri);
+    communications.notifyProgressEnd(uri);
+    LOG.debug("[stopAnalysis] Document " + uri + " publish diagnostic: " + documentModelService.getOpenedDiagnostic());
+    communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
   }
 }

@@ -14,17 +14,22 @@
  */
 package org.eclipse.lsp.cobol.lsp.handlers.extended;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
+import org.eclipse.lsp4j.MessageType;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -38,12 +43,16 @@ import static java.util.Optional.ofNullable;
 @Slf4j
 public class AnalysisHandler {
   private final AsyncAnalysisService asyncAnalysisService;
+  private final AnalysisService analysisService;
   private final CFASTBuilder cfastBuilder;
+  private final Communications communications;
 
   @Inject
-  public AnalysisHandler(AsyncAnalysisService asyncAnalysisService, CFASTBuilder cfastBuilder) {
+  public AnalysisHandler(AsyncAnalysisService asyncAnalysisService, AnalysisService analysisService, CFASTBuilder cfastBuilder, Communications communications) {
     this.asyncAnalysisService = asyncAnalysisService;
+    this.analysisService = analysisService;
     this.cfastBuilder = cfastBuilder;
+    this.communications = communications;
   }
 
   /**
@@ -66,6 +75,15 @@ public class AnalysisHandler {
     } else {
       doc = asyncAnalysisService.scheduleAnalysis(uri, event.getText(), true).get();
     }
-    return cfastBuilder.build(doc.getLastAnalysisResult().getRootNode());
+    return Optional.ofNullable(doc)
+            .map(CobolDocumentModel::getAnalysisResult)
+            .map(AnalysisResult::getRootNode)
+            .map(cfastBuilder::build)
+            .orElseGet(() -> {
+              if (analysisService.isCopybook(uri, event.getText())) {
+                communications.notifyGeneralMessage(MessageType.Info, "Cannot retrieve outline tree because file was treated as a copybook");
+              }
+              return new ExtendedApiResult(ImmutableList.of());
+            });
   }
 }
