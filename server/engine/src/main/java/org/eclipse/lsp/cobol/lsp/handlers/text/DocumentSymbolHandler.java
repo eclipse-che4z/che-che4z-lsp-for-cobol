@@ -17,7 +17,8 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.service.DocumentModelService;
+import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.DocumentSymbol;
@@ -27,6 +28,9 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static java.util.stream.Collectors.toList;
 
@@ -35,13 +39,13 @@ import static java.util.stream.Collectors.toList;
  */
 @Slf4j
 public class DocumentSymbolHandler {
-  private final DocumentModelService documentService;
-  private final Communications communications; // FIXME: do we really need this communications?
+  private final Communications communications;
+  private final AsyncAnalysisService asyncAnalysisService;
 
   @Inject
-  public DocumentSymbolHandler(DocumentModelService documentService, Communications communications) {
-    this.documentService = documentService;
+  public DocumentSymbolHandler(Communications communications, AsyncAnalysisService asyncAnalysisService) {
     this.communications = communications;
+    this.asyncAnalysisService = asyncAnalysisService;
   }
 
   /**
@@ -49,15 +53,14 @@ public class DocumentSymbolHandler {
    * @param params DocumentSymbolParams.
    * @return The list of either SymbolInformation or DocumentSymbols.
    */
-  public List<Either<SymbolInformation, DocumentSymbol>> documentSymbol(DocumentSymbolParams params) {
+  public List<Either<SymbolInformation, DocumentSymbol>> documentSymbol(DocumentSymbolParams params) throws ExecutionException, InterruptedException {
     String uri = UriHelper.decode(params.getTextDocument().getUri());
-
-    List<DocumentSymbol> symbols =
-            documentService.isDocumentSynced(uri)
-                    ? documentService.get(uri).getOutlineResult()
-                    : Collections.emptyList();
+    Optional<CompletableFuture<CobolDocumentModel>> optional = asyncAnalysisService.fetchLastResultOrAnalyzeDocument(uri);
+    if (!optional.isPresent()) {
+      return Collections.emptyList();
+    }
     try {
-      return createDocumentSymbols(symbols);
+      return createDocumentSymbols(optional.get().get().getOutlineResult());
     } finally {
       communications.notifyProgressEnd(uri);
     }

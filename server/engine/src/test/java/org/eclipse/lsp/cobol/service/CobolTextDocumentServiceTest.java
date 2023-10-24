@@ -98,7 +98,7 @@ class CobolTextDocumentServiceTest {
     DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, analysisService, watcherService);
     DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService);
     DefinitionHandler definitionHandler = new DefinitionHandler(asyncAnalysisService, occurrences);
-    DocumentSymbolHandler documentSymbolHandler = new DocumentSymbolHandler(documentModelService, communications);
+    DocumentSymbolHandler documentSymbolHandler = new DocumentSymbolHandler(communications, asyncAnalysisService);
     DocumentHighlightHandler documentHighlightHandler = new DocumentHighlightHandler(asyncAnalysisService, occurrences);
     ReferencesHandler referencesHandler = new ReferencesHandler(asyncAnalysisService, occurrences);
     HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider);
