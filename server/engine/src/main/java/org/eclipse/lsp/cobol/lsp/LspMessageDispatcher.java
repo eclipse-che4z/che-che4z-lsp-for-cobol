@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.lsp;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,10 +34,6 @@ public class LspMessageDispatcher {
   private final Map<LspEvent<?>, CompletableFuture<?>> eventResults = Collections.synchronizedMap(new HashMap<>());
 
   private final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-
-  @Inject
-  public LspMessageDispatcher() {
-  }
 
   /**
    * Starts event loop
@@ -68,6 +63,10 @@ public class LspMessageDispatcher {
           continue;
         }
         try {
+          if (!nextEven.getDependencies().stream().allMatch(LspEventDependency::isSatisfied)) {
+            putBack(nextEven, future);
+            continue;
+          }
           future.complete(nextEven.execute());
         } catch (Exception e) {
           future.completeExceptionally(e);
@@ -79,6 +78,15 @@ public class LspMessageDispatcher {
         nextEven = eventQueue.take();
       }
     }
+  }
+
+  private void putBack(LspEvent<?> nextEven, CompletableFuture<Object> future) throws InterruptedException {
+    eventResults.put(nextEven, future);
+    if (!eventQueue.offer(nextEven)) {
+      LOG.warn("Event " + nextEven + " dropped");
+    }
+    // save the CPU
+    TimeUnit.MILLISECONDS.sleep(100);
   }
 
   /**
@@ -105,5 +113,4 @@ public class LspMessageDispatcher {
   public void stop() throws InterruptedException {
     eventQueue.put(POISON_PILL);
   }
-
 }

@@ -88,21 +88,21 @@ class CobolTextDocumentServiceTest {
     SubroutineService subroutineService = mock(SubroutineService.class);
     AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(documentModelService, analysisService, copybookService, subroutineService, communications);
 
-    CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions);
-    FormattingHandler formattingHandler = new FormattingHandler(documentModelService, formations);
+    CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions, documentModelService);
+    FormattingHandler formattingHandler = new FormattingHandler(documentModelService, formations, asyncAnalysisService);
 
     CodeActionHandler codeActionHandler = new CodeActionHandler(actions);
     AnalysisHandler analysisHandler = new AnalysisHandler(asyncAnalysisService, analysisService, builder, communications);
 
     DidOpenHandler didOpenHandler = new DidOpenHandler(asyncAnalysisService, watcherService);
-    DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, asyncAnalysisService, watcherService);
+    DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, asyncAnalysisService, watcherService, communications);
     DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService);
-    DefinitionHandler definitionHandler = new DefinitionHandler(asyncAnalysisService, occurrences);
-    DocumentSymbolHandler documentSymbolHandler = new DocumentSymbolHandler(communications, asyncAnalysisService);
+    DefinitionHandler definitionHandler = new DefinitionHandler(asyncAnalysisService, documentModelService, occurrences);
+    DocumentSymbolHandler documentSymbolHandler = new DocumentSymbolHandler(asyncAnalysisService);
     DocumentHighlightHandler documentHighlightHandler = new DocumentHighlightHandler(asyncAnalysisService, occurrences);
     ReferencesHandler referencesHandler = new ReferencesHandler(asyncAnalysisService, occurrences);
     HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider);
-    FoldingRangeHandler foldingRangeHandler = new FoldingRangeHandler(documentModelService);
+    FoldingRangeHandler foldingRangeHandler = new FoldingRangeHandler(documentModelService, asyncAnalysisService);
 
 
     lspMessageDispatcher.startEventLoop();

@@ -27,6 +27,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +43,6 @@ import static java.lang.String.format;
 public class AnalysisService {
   private final LanguageEngineFacade engine;
   private final ConfigurationService configurationService;
-  private final SyncProvider syncProvider;
   private final CopybookIdentificationService copybookIdentificationService;
   private final CopybookService copybookService;
   private final CountDownLatch waitConfig = new CountDownLatch(1);
@@ -55,13 +55,11 @@ public class AnalysisService {
   @Inject
   AnalysisService(LanguageEngineFacade engine,
                   ConfigurationService configurationService,
-                  SyncProvider syncProvider,
                   @Named("combinedStrategy") CopybookIdentificationService copybookIdentificationService,
                   CopybookService copybookService, DocumentModelService documentService,
                   DocumentContentCache contentCache) {
     this.engine = engine;
     this.configurationService = configurationService;
-    this.syncProvider = syncProvider;
     this.copybookIdentificationService = copybookIdentificationService;
     this.copybookService = copybookService;
     this.documentService = documentService;
@@ -77,6 +75,9 @@ public class AnalysisService {
    */
   @SneakyThrows
   public boolean isCopybook(String uri, String text) {
+    if (waitConfig.getCount() > 0) {
+      LOG.info("Waiting for extension config..");
+    }
     waitConfig.await();
     return copybookIdentificationService.isCopybook(uri, text, copybookExtensions);
   }
@@ -113,7 +114,9 @@ public class AnalysisService {
       LOG.debug(logPrefix + uri + " treated as a copy");
       if (!onOpen) {
         Set<String> affectedOpenedPrograms = documentService.findAffectedDocumentsForCopybook(uri, d -> !isCopybook(d.getUri(), d.getText()));
-        reanalysePrograms(affectedOpenedPrograms);
+        documentService.getAll(affectedOpenedPrograms).stream()
+                .filter(d -> !isCopybook(d.getUri(), d.getText()))
+                .forEach(doc -> analyzeDocumentWithCopybooks(doc.getUri(), doc.getText()));
       }
       LOG.debug(logPrefix + " publish diagnostics: " + documentService.getOpenedDiagnostic());
     } else {
@@ -136,7 +139,6 @@ public class AnalysisService {
     if (documentModel != null && !isCopybook(uri, documentModel.getText())) {
       documentService.removeDocument(uri);
     }
-    syncProvider.remove(uri);
   }
 
   /**
@@ -146,42 +148,23 @@ public class AnalysisService {
    * @param text - document text
    */
   void analyzeDocumentWithCopybooks(String uri, String text) {
+    if (isCopybook(uri, text)) {
+      return;
+    }
     try {
-      if (isCopybook(uri, text)) {
-        return;
-      }
-      doAnalysis(uri, text);
-    } catch (Throwable th) {
-      LOG.error("Error while processing file: {}, {}", uri, th.getMessage());
+      CopybookProcessingMode processingMode =
+              CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.ENABLED);
+      AnalysisConfig config = configurationService.getConfig(uri, processingMode);
+      AnalysisResult result = engine.analyze(uri, text, config);
+      ThreadInterruptionUtil.checkThreadInterrupted();
+      documentService.processAnalysisResult(uri, result);
+      copybookService.sendCopybookDownloadRequest(uri, DocumentServiceHelper.extractCopybookUris(result), processingMode);
+      LOG.debug("[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
+    } catch (Exception e) {
+      LOG.debug(format("An exception thrown while applying %s for %s:", "analysis", uri));
+      LOG.error(format("An exception thrown while applying %s for %s:", "analysis", uri), e);
+      throw e;
     }
   }
 
-  private void doAnalysis(String uri, String text) {
-    synchronized (syncProvider.getSync(uri)) {
-      try {
-        if (isCopybook(uri, text)) {
-          return;
-        }
-        CopybookProcessingMode processingMode =
-                CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.ENABLED);
-        AnalysisConfig config = configurationService.getConfig(uri, processingMode);
-        AnalysisResult result = engine.analyze(uri, text, config);
-        ThreadInterruptionUtil.checkThreadInterrupted();
-
-        documentService.processAnalysisResult(uri, result);
-        copybookService.sendCopybookDownloadRequest(uri, DocumentServiceHelper.extractCopybookUris(result), processingMode);
-        LOG.debug("[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
-      } catch (Exception e) {
-        LOG.debug(format("An exception thrown while applying %s for %s:", "analysis", uri));
-        LOG.error(format("An exception thrown while applying %s for %s:", "analysis", uri), e);
-        throw e;
-      }
-    }
-  }
-
-  private void reanalysePrograms(Set<String> programs) {
-    documentService.getAll(programs)
-            .stream().filter(d -> !isCopybook(d.getUri(), d.getText()))
-            .forEach(doc -> analyzeDocumentWithCopybooks(doc.getUri(), doc.getText()));
-  }
 }

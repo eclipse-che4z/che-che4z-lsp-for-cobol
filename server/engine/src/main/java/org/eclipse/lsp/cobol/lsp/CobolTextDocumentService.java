@@ -95,29 +95,30 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   @Override
   public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
           CompletionParams params) {
-    return lspMessageDispatcher.publish(() -> completionHandler.completion(params));
+    return lspMessageDispatcher.publish(completionHandler.createEvent(params));
   }
 
   @Override
   public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>>
   definition(DefinitionParams params) {
-    return lspMessageDispatcher.publish(() -> definitionHandler.definition(params));
+    return lspMessageDispatcher.publish(definitionHandler.createEvent(params));
   }
 
   @Override
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
-    return lspMessageDispatcher.publish(() -> referencesHandler.references(params));
+    return lspMessageDispatcher.publish(referencesHandler.createEvent(params));
   }
 
   @Override
   public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
           DocumentHighlightParams params) {
-    return lspMessageDispatcher.publish(() -> documentHighlightHandler.documentHighlight(params));
+    return lspMessageDispatcher.publish(documentHighlightHandler.createEvent(params));
+
   }
 
   @Override
   public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
-    return lspMessageDispatcher.publish(() -> formattingHandler.formatting(params));
+    return lspMessageDispatcher.publish(formattingHandler.createEvent(params));
   }
 
   @Override
@@ -163,16 +164,16 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   @Override
   public CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> documentSymbol(
           DocumentSymbolParams params) {
-    return lspMessageDispatcher.publish(() -> documentSymbolHandler.documentSymbol(params));
+    return lspMessageDispatcher.publish(documentSymbolHandler.createEvent(params));
   }
 
   @Override
   public CompletableFuture<Hover> hover(HoverParams params) {
-    return lspMessageDispatcher.publish(() -> hoverHandler.hover(params));
+    return lspMessageDispatcher.publish(hoverHandler.createEvent(params));
   }
 
   @Override
   public CompletableFuture<List<FoldingRange>> foldingRange(FoldingRangeRequestParams params) {
-    return lspMessageDispatcher.publish(() -> foldingRangeHandler.foldingRange(params));
+    return lspMessageDispatcher.publish(foldingRangeHandler.createEvent(params));
   }
 }

@@ -47,6 +47,6 @@ public class DidOpenHandler {
       return;
     }
     watcherService.addRuntimeWatchers(uri);
-    asyncAnalysisService.scheduleAnalysis(uri, params.getTextDocument().getText(), true);
+    asyncAnalysisService.scheduleAnalysis(uri, params.getTextDocument().getText(), params.getTextDocument().getVersion(), true);
   }
 }

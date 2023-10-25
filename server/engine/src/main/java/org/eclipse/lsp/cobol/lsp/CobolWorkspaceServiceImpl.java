@@ -76,10 +76,16 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
-    lspMessageDispatcher.publish(() -> {
-      didChangeConfigurationHandler.didChangeConfiguration(params);
-      return null;
-    });
+    if (isRelevant(params)) {
+      lspMessageDispatcher.publish(() -> {
+        didChangeConfigurationHandler.didChangeConfiguration(params);
+        return null;
+      });
+    }
+  }
+
+  private boolean isRelevant(DidChangeConfigurationParams params) {
+    return params.getSettings() != null;
   }
 
   /**

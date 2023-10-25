@@ -21,6 +21,9 @@ import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
+import org.eclipse.lsp4j.FileEvent;
+
+import java.util.List;
 
 /**
  * LSP DidChangeWatchedFiles Handler
@@ -41,11 +44,22 @@ public class DidChangeWatchedFilesHandler {
 
   /**
    * Handle didChangeWatchedFiles LSP event.
+   *
    * @param params DidChangeWatchedFilesParams
    */
   public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) {
     if (disposableLSPStateService.isServerShutdown()) return;
-    copybookNameService.collectLocalCopybookNames();
-    asyncAnalysisService.reanalyseOpenedPrograms();
+    if (isRelevant(params.getChanges())) {
+      copybookNameService.collectLocalCopybookNames();
+      asyncAnalysisService.reanalyseOpenedPrograms();
+    }
+  }
+
+  private boolean isRelevant(List<FileEvent> changes) {
+    return changes.stream().filter(c -> !isGitFolder(c.getUri())).anyMatch(c -> !c.getUri().startsWith("git:"));
+  }
+
+  private static boolean isGitFolder(String uri) {
+    return uri.startsWith("file:") && uri.contains("/.git/");
   }
 }

@@ -57,9 +57,10 @@ public class AnalysisHandler {
 
   /**
    * Handle analysis request from our LSP extension
+   *
    * @param json request params
    * @return ExtendedApiResult
-   * @throws ExecutionException forward the exception
+   * @throws ExecutionException   forward the exception
    * @throws InterruptedException forward the exception
    */
   public ExtendedApiResult analysis(@NonNull JsonObject json) throws ExecutionException, InterruptedException {
@@ -73,7 +74,7 @@ public class AnalysisHandler {
     if (optionalDoc.isPresent()) {
       doc = optionalDoc.get().get();
     } else {
-      doc = asyncAnalysisService.scheduleAnalysis(uri, event.getText(), true).get();
+      doc = asyncAnalysisService.scheduleAnalysis(uri, event.getText(), 0, true).get();
     }
     return Optional.ofNullable(doc)
             .map(CobolDocumentModel::getAnalysisResult)
