@@ -16,13 +16,12 @@ package org.eclipse.lsp.cobol.lsp;
 
 import org.eclipse.lsp.cobol.lsp.handlers.text.CompletionHandler;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
 import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.mockito.Mockito.*;
@@ -37,17 +36,17 @@ class CompletionHandlerTest {
     CobolDocumentModel document = mock(CobolDocumentModel.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
     Completions completions = mock(Completions.class);
-    CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions);
+    DocumentModelService documentModelService = mock((DocumentModelService.class));
+    when(documentModelService.get(uri)).thenReturn(document);
+    CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions, documentModelService);
     CompletionParams params = mock(CompletionParams.class);
     TextDocumentIdentifier textDocument = mock(TextDocumentIdentifier.class);
     when(textDocument.getUri()).thenReturn(uri);
     when(params.getTextDocument()).thenReturn(textDocument);
-    when(asyncAnalysisService.fetchLastResultOrAnalyzeDocument(uri))
-            .thenReturn(Optional.of(CompletableFuture.completedFuture(document)));
 
     completionHandler.completion(params);
 
-    verify(asyncAnalysisService).fetchLastResultOrAnalyzeDocument(uri);
+    verify(documentModelService).get(uri);
     verify(completions).collectFor(document, params);
   }
 }

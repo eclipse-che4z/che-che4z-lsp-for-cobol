@@ -14,8 +14,11 @@
  */
 package org.eclipse.lsp.cobol.lsp.handlers.text;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.LspEvent;
+import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
@@ -52,10 +55,29 @@ public class DocumentHighlightHandler {
           DocumentHighlightParams params) throws ExecutionException, InterruptedException {
     String uri = UriHelper.decode(params.getTextDocument().getUri());
     Optional<CompletableFuture<CobolDocumentModel>> optional = asyncAnalysisService.fetchLastResultOrAnalyzeDocument(uri);
-    if (!optional.isPresent()) {
+    if (!optional.isPresent() || !optional.get().isDone()) {
       return Collections.emptyList();
     }
     CobolDocumentModel doc = optional.get().get();
-    return occurrences.findHighlights(doc.getAnalysisResult(), params);
+    return occurrences.findHighlights(doc.getLastAnalysisResult(), params);
+  }
+
+  /**
+   * Creates documentHighlight LSP Event
+   * @param params DocumentHighlightParams.
+   * @return LspEvent.
+   */
+  public LspEvent<List<? extends DocumentHighlight>> createEvent(DocumentHighlightParams params) {
+    return new LspEvent<List<? extends DocumentHighlight>>() {
+      @Override
+      public List<LspEventDependency> getDependencies() {
+        return ImmutableList.of(asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+      }
+
+      @Override
+      public List<? extends DocumentHighlight> execute() throws ExecutionException, InterruptedException {
+        return DocumentHighlightHandler.this.documentHighlight(params);
+      }
+    };
   }
 }

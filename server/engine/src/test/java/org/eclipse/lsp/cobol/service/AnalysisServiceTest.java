@@ -45,8 +45,6 @@ class AnalysisServiceTest {
   @Mock
   private ConfigurationService configurationService;
   @Mock
-  private SyncProvider syncProvider;
-  @Mock
   private CopybookIdentificationService copybookIdentificationService;
   @Mock
   private Communications communications;
@@ -62,7 +60,6 @@ class AnalysisServiceTest {
     service =
             new AnalysisService(engine,
                     configurationService,
-                    syncProvider,
                     copybookIdentificationService,
                     copybookService, documentService,
                     contentCache);
@@ -74,7 +71,6 @@ class AnalysisServiceTest {
     service =
             new AnalysisService(engine,
                     configurationService,
-                    syncProvider,
                     copybookIdentificationService,
                     copybookService, documentService,
                     contentCache);
@@ -109,7 +105,6 @@ class AnalysisServiceTest {
     String uri = UUID.randomUUID().toString();
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(false);
-    when(syncProvider.getSync(any())).thenReturn(new Object());
     when(engine.analyze(any(), any(), any())).thenReturn(result);
 
     service.analyzeDocument(uri, text, true);
@@ -133,7 +128,6 @@ class AnalysisServiceTest {
     String uri = UUID.randomUUID().toString();
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(false);
-    when(syncProvider.getSync(any())).thenReturn(new Object());
     when(engine.analyze(any(), any(), any())).thenReturn(prepareAnalysisResult());
 
     service.analyzeDocument(uri, text, false);

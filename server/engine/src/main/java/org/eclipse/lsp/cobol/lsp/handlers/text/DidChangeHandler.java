@@ -43,6 +43,6 @@ public class DidChangeHandler {
       return;
     }
     String text = params.getContentChanges().get(0).getText();
-    asyncAnalysisService.scheduleAnalysis(uri, text, false);
+    asyncAnalysisService.scheduleAnalysis(uri, text, params.getTextDocument().getVersion(), false);
   }
 }

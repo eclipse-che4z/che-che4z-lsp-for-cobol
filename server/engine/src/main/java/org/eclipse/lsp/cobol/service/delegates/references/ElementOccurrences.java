@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service.delegates.references;
 
 import com.google.common.collect.Streams;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
@@ -31,13 +32,16 @@ import java.util.stream.Collectors;
 /**
  * This occurrences provider resolves the requests for the semantic elements based on its positions.
  */
+@Slf4j
 public class ElementOccurrences implements Occurrences {
 
   @Override
   public @NonNull List<Location> findDefinitions(
       @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
-    return SymbolsRepository.findElementByPosition(
-        UriHelper.decode(position.getTextDocument().getUri()), document.getAnalysisResult(), position.getPosition())
+    String uri = UriHelper.decode(position.getTextDocument().getUri());
+    return SymbolsRepository.findElementByPosition(uri,
+                    document.getLastAnalysisResult(),
+                    position.getPosition())
             .map(DefinedAndUsedStructure::getDefinitions).orElse(Collections.emptyList());
   }
 

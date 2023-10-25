@@ -14,8 +14,12 @@
  */
 package org.eclipse.lsp.cobol.lsp.handlers.text;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.LspEvent;
+import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.DocumentServiceHelper;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
@@ -25,6 +29,7 @@ import org.eclipse.lsp4j.FoldingRangeRequestParams;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * LSP FoldingRange Handler
@@ -33,10 +38,12 @@ import java.util.List;
 public class FoldingRangeHandler {
 
   private final DocumentModelService documentService;
+  private final AsyncAnalysisService asyncAnalysisService;
 
   @Inject
-  public FoldingRangeHandler(DocumentModelService documentService) {
+  public FoldingRangeHandler(DocumentModelService documentService, AsyncAnalysisService asyncAnalysisService) {
     this.documentService = documentService;
+    this.asyncAnalysisService = asyncAnalysisService;
   }
 
   /**
@@ -51,5 +58,24 @@ public class FoldingRangeHandler {
                     ? documentService.get(uri).getOutlineResult()
                     : Collections.emptyList();
     return DocumentServiceHelper.getFoldingRangeFromDocumentSymbol(symbols);
+  }
+
+  /**
+   * Create foldingRange LSP event.
+   * @param params FoldingRangeRequestParams
+   * @return LspEvent.
+   */
+  public LspEvent<List<FoldingRange>> createEvent(FoldingRangeRequestParams params) {
+    return new LspEvent<List<FoldingRange>>() {
+      @Override
+      public List<LspEventDependency> getDependencies() {
+        return ImmutableList.of(asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+      }
+
+      @Override
+      public List<FoldingRange> execute() throws ExecutionException, InterruptedException {
+        return FoldingRangeHandler.this.foldingRange(params);
+      }
+    };
   }
 }

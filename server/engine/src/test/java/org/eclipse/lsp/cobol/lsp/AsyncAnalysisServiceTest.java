@@ -83,11 +83,12 @@ class AsyncAnalysisServiceTest {
         SubroutineService subroutineService = mock(SubroutineService.class);
         CobolDocumentModel doc = mock(CobolDocumentModel.class);
         when(doc.getLastAnalysisResult()).thenReturn(mock(AnalysisResult.class));
+        when(doc.isDocumentSynced()).thenReturn(true);
         Communications communications = mock(Communications.class);
         when(documentModelService.get(URI)).thenReturn(doc);
         AnalysisService analysisService = mock(AnalysisService.class);
         AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(documentModelService, analysisService, copybookService, subroutineService, communications);
-        asyncAnalysisService.scheduleAnalysis(URI, "text", true).join();
+        asyncAnalysisService.scheduleAnalysis(URI, "text",  true).join();
         CompletableFuture<CobolDocumentModel> result = asyncAnalysisService.fetchLastResultOrAnalyzeDocument(URI).get();
         verify(communications).publishDiagnostics(documentModelService.getOpenedDiagnostic());
         verify(communications).notifyProgressBegin(URI);

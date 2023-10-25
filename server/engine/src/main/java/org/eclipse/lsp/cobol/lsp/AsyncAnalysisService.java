@@ -25,9 +25,7 @@ import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  * Asynchronous analysis
@@ -42,9 +40,10 @@ public class AsyncAnalysisService {
   private final Communications communications;
 
   private final Map<String, CompletableFuture<CobolDocumentModel>> analysisResults = Collections.synchronizedMap(new HashMap<>());
-  private final Map<String, Long> analysisResultsRevisions = Collections.synchronizedMap(new HashMap<>());
+  private final Map<String, Integer> analysisResultsRevisions = Collections.synchronizedMap(new HashMap<>());
+  private final Map<String, CompletableFuture<CobolDocumentModel>> lastResults = new ConcurrentHashMap<>();
 
-  private final Executor analysisExecutor = Executors.newSingleThreadExecutor();
+  private final Executor analysisExecutor = Executors.newCachedThreadPool();
 
   @Inject
   public AsyncAnalysisService(DocumentModelService documentModelService,
@@ -61,20 +60,21 @@ public class AsyncAnalysisService {
   /**
    * Fetch last analysis result or wait for it if analysis is in progress.
    *
-   * @param uri URI of the source
+   * @param documentUri URI of the source
    * @return DocumentModel with analysis result or Option.empty() if analysis was not
    * triggered at the time of method call.
    */
-  public Optional<CompletableFuture<CobolDocumentModel>> fetchLastResultOrAnalyzeDocument(String uri) {
-    CobolDocumentModel documentModel = documentModelService.get(uri);
-    if (documentModel == null || documentModel.getLastAnalysisResult() == null) {
-      return Optional.ofNullable(analysisResults.get(makeId(uri, analysisResultsRevisions.get(uri))));
-    }
-    return Optional.of(CompletableFuture.completedFuture(documentModel));
+  public Optional<CompletableFuture<CobolDocumentModel>> fetchLastResultOrAnalyzeDocument(String documentUri) {
+    return Optional.ofNullable(lastResults.computeIfAbsent(documentUri, uri -> {
+      CobolDocumentModel documentModel = documentModelService.get(uri);
+      return documentModel == null || documentModel.getLastAnalysisResult() == null
+              ? analysisResults.get(makeId(uri, analysisResultsRevisions.get(uri)))
+              : CompletableFuture.completedFuture(documentModel);
+    }));
   }
 
   /**
-   * Schedule an analysis
+   * Schedule an analysis last known revision of the file will be assumed or 0 if none
    *
    * @param uri  source URI
    * @param text content
@@ -82,9 +82,25 @@ public class AsyncAnalysisService {
    * @return document model with analysis result
    */
   public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, boolean open) {
-    Long currentRevision = analysisResultsRevisions.compute(uri, (k, v) -> (v == null ? 0 : v) + 1);
+    return scheduleAnalysis(uri, text, analysisResultsRevisions.getOrDefault(uri, 0), open);
+  }
+
+  /**
+   * Schedule an analysis
+   *
+   * @param uri             source URI
+   * @param text            content
+   * @param currentRevision the document currentRevision
+   * @param open            Is document just opened, or it's reanalyse request
+   * @return document model with analysis result
+   */
+  public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open) {
     String id = makeId(uri, currentRevision);
+    analysisResultsRevisions.put(uri, currentRevision);
     return analysisResults.computeIfAbsent(id, u -> CompletableFuture.supplyAsync(() -> {
+      if (currentRevision < analysisResultsRevisions.get(uri)) {
+        return null;
+      }
       LOG.debug("[analyzeDocumentWithCopybooks] Start analysis: " + uri);
 
       try {
@@ -101,7 +117,7 @@ public class AsyncAnalysisService {
     }, analysisExecutor));
   }
 
-  private static String makeId(String uri, Long revision) {
+  private static String makeId(String uri, Integer revision) {
     return revision + "#" + uri;
   }
 
@@ -114,7 +130,7 @@ public class AsyncAnalysisService {
     LOG.info("Cache invalidated");
     documentModelService.getAllOpened()
             .stream().filter(d -> !analysisService.isCopybook(d.getUri(), d.getText()))
-            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), false));
+            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.get(doc.getUri()), false));
   }
 
   /**
@@ -124,8 +140,27 @@ public class AsyncAnalysisService {
    */
   public void cancelAnalysis(String uri) {
     analysisService.stopAnalysis(uri);
-    communications.notifyProgressEnd(uri);
     LOG.debug("[stopAnalysis] Document " + uri + " publish diagnostic: " + documentModelService.getOpenedDiagnostic());
     communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
   }
+
+  /**
+   * Creates LSP Event dependency
+   *
+   * @param uri url of document to wait
+   * @return LspEventDependency object
+   */
+  public LspEventDependency createDependencyOn(String uri) {
+    return () -> {
+      CobolDocumentModel doc = documentModelService.get(uri);
+      if (doc == null) {
+        return false;
+      }
+      if (analysisService.isCopybook(uri, doc.getText())) {
+        return true;
+      }
+      return doc.getLastAnalysisResult() != null;
+    };
+  }
+
 }

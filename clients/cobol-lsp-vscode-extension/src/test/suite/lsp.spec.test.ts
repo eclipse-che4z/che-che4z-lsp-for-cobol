@@ -191,18 +191,39 @@ suite("Integration Test Suite", function () {
   test("TC312738 CICS variables and paragraphs support", async () => {
     await helper.showDocument("ADSORT.cbl");
     let editor = helper.get_editor("ADSORT.cbl");
-
+    await helper.waitFor(async () => {
+      helper.sleep(100);
+      const result: any[] = await vscode.commands.executeCommand(
+        "vscode.executeDefinitionProvider",
+        editor.document.uri,
+        pos(58, 36),
+      );
+      return result.length > 0;
+    });
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeDefinitionProvider",
       editor.document.uri,
       pos(58, 36),
     );
-    assert.ok(
-      result.length === 1 &&
-        result[0].uri.fsPath === editor.document.fileName &&
-        result[0].range.start.line === 27 &&
-        result[0].range.start.character === 7,
-      "Checks behavior of go to definition action",
+    assert.strictEqual(
+      result.length,
+      1,
+      "Checks behavior of go to definition action (size)",
+    );
+    assert.strictEqual(
+      result[0].uri.fsPath,
+      editor.document.fileName,
+      "Checks behavior of go to definition action (path)",
+    );
+    assert.strictEqual(
+      result[0].range.start.line,
+      27,
+      "Checks behavior of go to definition action (line)",
+    );
+    assert.strictEqual(
+      result[0].range.start.character,
+      7,
+      "Checks behavior of go to definition action (char)",
     );
   })
     .timeout(helper.TEST_TIMEOUT)

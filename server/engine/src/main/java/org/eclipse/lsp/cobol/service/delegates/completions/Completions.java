@@ -77,7 +77,7 @@ public class Completions {
           @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
     String token = retrieveToken(document, params);
     return providers
-            .parallelStream()
+            .stream()
             .map(it -> it.getCompletionItems(token, document))
             .flatMap(Collection::stream)
             .distinct()

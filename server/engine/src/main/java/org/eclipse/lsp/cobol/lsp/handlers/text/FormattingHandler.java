@@ -14,8 +14,12 @@
  */
 package org.eclipse.lsp.cobol.lsp.handlers.text;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.LspEvent;
+import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
@@ -23,6 +27,7 @@ import org.eclipse.lsp4j.DocumentFormattingParams;
 import org.eclipse.lsp4j.TextEdit;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * LSP Formatting Handler
@@ -31,11 +36,13 @@ import java.util.List;
 public class FormattingHandler {
   private final DocumentModelService documentService;
   private final Formations formations;
+  private final AsyncAnalysisService asyncAnalysisService;
 
   @Inject
-  public FormattingHandler(DocumentModelService documentService, Formations formations) {
+  public FormattingHandler(DocumentModelService documentService, Formations formations, AsyncAnalysisService asyncAnalysisService) {
     this.documentService = documentService;
     this.formations = formations;
+    this.asyncAnalysisService = asyncAnalysisService;
   }
 
   /**
@@ -46,5 +53,24 @@ public class FormattingHandler {
   public List<? extends TextEdit> formatting(DocumentFormattingParams params) {
     String uri = UriHelper.decode(params.getTextDocument().getUri());
     return formations.format(documentService.get(uri));
+  }
+
+  /**
+   * Create LSP formatting event.
+   * @param params DocumentFormattingParams.
+   * @return LspEvent.
+   */
+  public LspEvent<List<? extends TextEdit>> createEvent(DocumentFormattingParams params) {
+    return new LspEvent<List<? extends TextEdit>>() {
+      @Override
+      public List<LspEventDependency> getDependencies() {
+        return ImmutableList.of(asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+      }
+
+      @Override
+      public List<? extends TextEdit> execute() throws ExecutionException, InterruptedException {
+        return FormattingHandler.this.formatting(params);
+      }
+    };
   }
 }
