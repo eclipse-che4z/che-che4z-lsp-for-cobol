@@ -1,6 +1,7 @@
 [
   {
     "name": "CONDS",
+    "type": "program",
     "location": {
       "uri": "fake/path",
       "start": {
@@ -12,11 +13,11 @@
         "character": 21
       }
     },
-    "type": "program",
     "children": [
       {
-        "snippet": "A000-PARA.\r\n           MOVE 25 TO WS-NUM1 WS-NUM3.\r\n           MOVE 15 TO WS-NUM2 WS-NUM4.\r\n       \r\n           IF WS-NUM1 > WS-NUM2 THEN\r\n               DISPLAY 'IN LOOP 1 - IF BLOCK'\r\n       \r\n               IF WS-NUM3 = WS-NUM4 THEN\r\n                   DISPLAY 'IN LOOP 2 - IF BLOCK'\r\n               ELSE",
+        "snippet": "A000-PARA.\r\n           MOVE 25 TO WS-NUM1 WS-NUM3.\r\n           MOVE 15 TO WS-NUM2 WS-NUM4.\r\n       \r\n           IF WS-NUM1 \u003e WS-NUM2 THEN\r\n               DISPLAY \u0027IN LOOP 1 - IF BLOCK\u0027\r\n       \r\n               IF WS-NUM3 \u003d WS-NUM4 THEN\r\n                   DISPLAY \u0027IN LOOP 2 - IF BLOCK\u0027\r\n               ELSE",
         "name": "A000-PARA",
+        "type": "paragraph",
         "location": {
           "uri": "fake/path",
           "start": {
@@ -28,35 +29,114 @@
             "character": 19
           }
         },
-        "type": "paragraph",
         "children": [
           {
-            "type": "if"
+            "type": "if",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 28,
+                "character": 12
+              },
+              "end": {
+                "line": 38,
+                "character": 18
+              }
+            }
           },
           {
-            "type": "if"
+            "type": "if",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 31,
+                "character": 16
+              },
+              "end": {
+                "line": 35,
+                "character": 22
+              }
+            }
           },
           {
-            "type": "else"
+            "type": "else",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 33,
+                "character": 16
+              },
+              "end": {
+                "line": 34,
+                "character": 52
+              }
+            }
           },
           {
-            "type": "endif"
+            "type": "endif",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 31,
+                "character": 16
+              },
+              "end": {
+                "line": 35,
+                "character": 22
+              }
+            }
           },
           {
-            "type": "else"
+            "type": "else",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 36,
+                "character": 12
+              },
+              "end": {
+                "line": 37,
+                "character": 31
+              }
+            }
           },
           {
-            "targetName": ["A001-PARA"],
-            "type": "goto"
+            "targetName": [
+              "A001-PARA"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 37,
+                "character": 16
+              },
+              "end": {
+                "line": 37,
+                "character": 31
+              }
+            }
           },
           {
-            "type": "endif"
+            "type": "endif",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 28,
+                "character": 12
+              },
+              "end": {
+                "line": 38,
+                "character": 18
+              }
+            }
           }
         ]
       },
       {
         "snippet": "A001-PARA.\r\n           STOP RUN.",
         "name": "A001-PARA",
+        "type": "paragraph",
         "location": {
           "uri": "fake/path",
           "start": {
@@ -68,10 +148,20 @@
             "character": 21
           }
         },
-        "type": "paragraph",
         "children": [
           {
-            "type": "stop"
+            "type": "stop",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 40,
+                "character": 12
+              },
+              "end": {
+                "line": 40,
+                "character": 20
+              }
+            }
           }
         ]
       }

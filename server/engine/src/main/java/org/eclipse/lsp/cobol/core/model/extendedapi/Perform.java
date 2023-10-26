@@ -26,8 +26,8 @@ public class Perform extends CFASTNode {
   String thruName;
   String thruSectionName;
 
-  public Perform(String targetName, String targetSectionName, String thruName, String thruSectionName) {
-    super(CFASTNodeType.PERFORM.getValue());
+  public Perform(String targetName, String targetSectionName, String thruName, String thruSectionName, Location location) {
+    super(CFASTNodeType.PERFORM.getValue(), location);
     this.targetName = targetName;
     this.targetSectionName = targetSectionName;
     this.thruName = thruName;

@@ -1,6 +1,7 @@
 [
   {
     "name": "STPRG",
+    "type": "program",
     "location": {
       "uri": "fake/path",
       "start": {
@@ -12,18 +13,40 @@
         "character": 18
       }
     },
-    "type": "program",
     "children": [
       {
         "targetName": "PARAG1",
-        "type": "perform"
+        "type": "perform",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 16,
+            "character": 20
+          },
+          "end": {
+            "line": 16,
+            "character": 26
+          }
+        }
       },
       {
-        "type": "stop"
+        "type": "stop",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 17,
+            "character": 12
+          },
+          "end": {
+            "line": 17,
+            "character": 20
+          }
+        }
       },
       {
         "snippet": "PARAG1.\r\n            EXIT.",
         "name": "PARAG1",
+        "type": "paragraph",
         "location": {
           "uri": "fake/path",
           "start": {
@@ -35,10 +58,20 @@
             "character": 18
           }
         },
-        "type": "paragraph",
         "children": [
           {
-            "type": "exit"
+            "type": "exit",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 19,
+                "character": 13
+              },
+              "end": {
+                "line": 19,
+                "character": 17
+              }
+            }
           }
         ]
       }

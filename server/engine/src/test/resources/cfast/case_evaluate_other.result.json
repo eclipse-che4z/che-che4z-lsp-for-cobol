@@ -1,6 +1,7 @@
 [
   {
     "name": "EVAL",
+    "type": "program",
     "location": {
       "uri": "fake/path",
       "start": {
@@ -12,37 +13,129 @@
         "character": 21
       }
     },
-    "type": "program",
     "children": [
       {
-        "type": "evaluate"
+        "type": "evaluate",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 14,
+            "character": 24
+          }
+        }
       },
       {
-        "type": "when"
+        "type": "when",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 8,
+            "character": 16
+          },
+          "end": {
+            "line": 8,
+            "character": 24
+          }
+        }
       },
       {
-        "targetName": ["PAR1"],
-        "type": "goto"
+        "targetName": [
+          "PAR1"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 9,
+            "character": 20
+          },
+          "end": {
+            "line": 9,
+            "character": 30
+          }
+        }
       },
       {
-        "type": "when"
+        "type": "when",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 10,
+            "character": 16
+          },
+          "end": {
+            "line": 10,
+            "character": 33
+          }
+        }
       },
       {
-        "targetName": ["PAR1"],
-        "type": "goto"
+        "targetName": [
+          "PAR1"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 11,
+            "character": 20
+          },
+          "end": {
+            "line": 11,
+            "character": 30
+          }
+        }
       },
       {
-        "type": "whenother"
+        "type": "whenother",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 12,
+            "character": 16
+          },
+          "end": {
+            "line": 13,
+            "character": 28
+          }
+        }
       },
       {
-        "type": "stop"
+        "type": "stop",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 13,
+            "character": 20
+          },
+          "end": {
+            "line": 13,
+            "character": 28
+          }
+        }
       },
       {
-        "type": "endevaluate"
+        "type": "endevaluate",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 14,
+            "character": 24
+          }
+        }
       },
       {
         "snippet": "PAR1.\r\n           CONTINUE.",
         "name": "PAR1",
+        "type": "paragraph",
         "location": {
           "uri": "fake/path",
           "start": {
@@ -53,8 +146,7 @@
             "line": 16,
             "character": 21
           }
-        },
-        "type": "paragraph"
+        }
       }
     ]
   }
