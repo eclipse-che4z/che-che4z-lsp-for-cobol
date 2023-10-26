@@ -19,6 +19,10 @@ on:
         description: "Build with telemetry"
         required: true
         default: 'false'
+      skip_ui_tests:
+        description: "Skip UI tests"
+        required: true
+        default: 'false'
   pull_request:
     branches:
       - development
@@ -301,6 +305,7 @@ jobs:
           unzip -j dialects-daco/*.vsix extension/server/jar/dialect-daco.jar -d clients/daco-dialect-support/server/jar
         shell: bash
       - name: Run integration tests
+        if: github.event.inputs.skip_ui_tests != 'true'
         uses: coactions/setup-xvfb@v1
         with:
           run: |
