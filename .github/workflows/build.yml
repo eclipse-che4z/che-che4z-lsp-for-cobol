@@ -67,8 +67,9 @@ jobs:
           cache: 'maven'
       - name: Generate assisted configuration for GraalVM native build
         working-directory: server
-        run: mvn -e -B -Pnative -Dagent=true test
-      - uses: actions/upload-artifact@v3
+        run: mvn -e -B -Pnative -Dagent=true -Dtest=\!PositiveTest* -DfailIfNoTests=false test
+      - name: Upload native build configuration
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: native-build-configuration
@@ -76,12 +77,14 @@ jobs:
       - name: Build Server and Dialects Jars
         working-directory: server
         run: mvn clean package --no-transfer-progress
-      - uses: actions/upload-artifact@v3
+      - name: Upload performance data
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: test-perfomance-data
           path: server/engine/target/perf.csv
-      - uses: actions/upload-artifact@v3
+      - name: Upload jar files
+        uses: actions/upload-artifact@v3
         with:
           name: jar
           path: server/engine/target/server.jar
@@ -93,7 +96,8 @@ jobs:
         run: |
           npm ci
           npm run compile
-      - uses: actions/upload-artifact@v3
+      - name: Upload cobol dialect API library
+        uses: actions/upload-artifact@v3
         with:
           name: lib
           path: clients/cobol-dialect-api/lib/*    
@@ -124,12 +128,14 @@ jobs:
           cp ../../server/dialect-daco/target/dialect-daco.jar ./server/jar
           npm run package
           cp *.vsix ../../.
-      - uses: actions/upload-artifact@v3
+      - name: Upload IDMS vsix
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: vsix-idms-dialect
           path: 'cobol-language-support-for-idms*.vsix'
-      - uses: actions/upload-artifact@v3
+      - name: Upload DaCo vsix
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: vsix-daco-dialect
@@ -227,10 +233,11 @@ jobs:
       - name: Retrieve server jars
         uses: actions/download-artifact@v3
         with:
+          name: jar
           path: jar
       - name: Deploy server jar
         working-directory: clients/cobol-lsp-vscode-extension
-        run: cp ../../jar/jar/server.jar ./server/jar
+        run: cp ../../jar/server.jar ./server/jar
       - name: Setup telemetry key
         working-directory: clients/cobol-lsp-vscode-extension
         if: github.event.inputs.with_telemetry == 'true'
