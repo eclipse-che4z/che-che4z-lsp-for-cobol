@@ -71,7 +71,7 @@ jobs:
           cache: 'maven'
       - name: Generate assisted configuration for GraalVM native build
         working-directory: server
-        run: mvn -e -B -Pnative -Dagent=true -Dtest=\!PositiveTest* -DfailIfNoTests=false test
+        run: mvn -e -B -Pnative -Dagent=true -Dtest=\!PositiveTest*,\!org.eclipse.lsp.cobol.usecases.* -DfailIfNoTests=false test
       - name: Upload native build configuration
         uses: actions/upload-artifact@v3
         with:
