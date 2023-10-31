@@ -12,6 +12,9 @@
           "include": "#comment-cobol-source"
         },
         {
+          "include": "#sequence-number-area"
+        },
+        {
           "include": "#exec-sql-block"
         },
         {
@@ -50,6 +53,10 @@
           "name": "comment.line.cobol.fixed"
         }
       }
+    },
+    "sequence-number-area": {
+      "match": "^.{6}",
+      "name": "constant.numeric.integer"
     },
     "comment-floating": {
       "match": "\\s\\*>.*",
