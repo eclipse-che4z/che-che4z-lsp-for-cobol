@@ -23,6 +23,9 @@
         },
         {
           "include": "#comment-cics-source"
+        },
+        {
+          "include": "#sequence-number-area"
         }
       ]
     },
@@ -54,6 +57,10 @@
           "name": "comment.line.cics.fixed"
         }
       }
+    },
+    "sequence-number-area": {
+      "match": "^.{6}",
+      "name": "constant.numeric.integer"
     }
   }
 }
