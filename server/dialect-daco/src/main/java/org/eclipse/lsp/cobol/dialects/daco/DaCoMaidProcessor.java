@@ -212,7 +212,6 @@ public class DaCoMaidProcessor {
             copybookName,
             context.getExtendedDocument().getUri(),
             context.getExtendedDocument().getUri(),
-            context.getCopybookConfig(),
             true);
     CopybookModel copybookModel = resolvedCopybook.getResult();
 

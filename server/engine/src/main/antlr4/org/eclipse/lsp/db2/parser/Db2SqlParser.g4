@@ -15,17 +15,43 @@
 parser grammar Db2SqlParser;
 options {tokenVocab = Db2SqlLexer; superClass = MessageServiceParser;}
 
+startRule: .*? (execRule .*?) * EOF;
+startIncludeRule: .*? (includeStatement .*?)* EOF;
+
+execRule: EXEC SQL sqlCode END_EXEC DOT_FS?
+         | EXEC SQL END_EXEC DOT_FS?
+         | EXEC SQLIMS sqlCode END_EXEC DOT_FS? // TODO: check when should this grammar be activated. Probably based on some compiler directives
+         | {notifyError("cobolParser.missingEndExec");} EXEC SQL sqlCode DOT_FS? EOF
+         | {notifyError("cobolParser.missingEndExec");} EXEC SQL;
+
+sqlCode
+   : ~END_EXEC*?
+   ;
+
+startSqlRule : (dataDivisionRules | procedureDivisionRules | rulesAllowedInDataDivisionAndProcedureDivision)+ EOF;
+
 /*Allowable SQL statements for COBOL program specific dvisions or sections*/
-dataDivisionRules: (dbs_declare_variable | rulesAllowedInDataDivision | rulesAllowedInWorkingStorageAndLinkageSection)+ EOF;
+dataDivisionRules: dbs_declare_variable+ | rulesAllowedInWorkingStorageAndLinkageSection;
 
 procedureDivisionRules: ((dbs_allocate | dbs_alter | dbs_associate | dbs_call | dbs_close | dbs_comment | dbs_commit |
-          dbs_connect | dbs_create | dbs_declare | dbs_declare_cursor | dbs_declare_table | dbs_delete | dbs_describe | dbs_drop | dbs_exchange | dbs_execute | dbs_explain |
-          dbs_fetch | dbs_free | dbs_get | dbs_grant | dbs_hold | dbs_include | dbs_insert |
+          dbs_connect | dbs_create | dbs_declare | dbs_delete | dbs_describe | dbs_drop | dbs_exchange | dbs_execute | dbs_explain |
+          dbs_fetch | dbs_free | dbs_get | dbs_grant | dbs_hold | dbs_insert |
           dbs_label | dbs_lock | dbs_merge | dbs_open | dbs_prepare | dbs_refresh | dbs_release | dbs_rename |
           dbs_revoke | dbs_rollback | dbs_savepoint | dbs_select | dbs_set | dbs_signal | dbs_transfer | dbs_truncate |
-          dbs_update | dbs_values | dbs_whenever) dbs_semicolon_end?)+ EOF;
-rulesAllowedInDataDivision: ((dbs_declare_cursor | dbs_whenever | dbs_declare_table | dbs_include) dbs_semicolon_end?)+;
+          dbs_update | dbs_values) dbs_semicolon_end?)+;
+
+rulesAllowedInDataDivisionAndProcedureDivision: ((dbs_declare_cursor | dbs_whenever | dbs_declare_table | dbs_include) dbs_semicolon_end?)+;
+
 rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca | dbs_include_sqlda) dbs_semicolon_end?)+;
+
+// sql include statement
+includeStatement
+   : EXEC SQL INCLUDE copySource END_EXEC DOT_FS?
+   | EXEC {notifyError("db2Parser.missingSql");} INCLUDE copySource END_EXEC DOT_FS?
+   | {notifyError("cobolParser.missingEndExec");} EXEC SQL INCLUDE copySource DOT_FS?
+   ;
+
+copySource: (dbs_member_name | SQLCA | SQLDA) ((OF | IN) dbs_member_name)?;
 
 //used in working-storage section of cobol program
 dbs_declare_variable: DECLARE dbs_host_variable (dbs_comma_separator dbs_host_variable)* VARIABLE (CCSID (dbs_integer_constant | (EBCDIC|ASCII|UNICODE) (FOR (SBCS|MIXED|BIT) DATA)?))? dbs_semicolon_end?;
@@ -513,7 +539,7 @@ with_user_loop_body: dbs_authorization_name user_options | EXTERNAL SECURITY PRO
 user_options: ((ROLE dbs_role_name)? ( dbs_seclabel_name)? (without_or_with AUTHENTICATION)?);
 
 //CREATE TYPE ARRAY
-dbs_create_type_array: TYPE dbs_array_type_name AS common_built_in_type_core ARRAY LSQUAREBRACKET (dbs_integer_max | dbs_integer_constant | common_built_in_type2)? RSQUAREBRACKET  ;
+dbs_create_type_array: TYPE dbs_array_type_name AS common_built_in_type_core ARRAY LSQUAREBRACKET (dbs_integer_constant | common_built_in_type2 | dbs_integer_max)? RSQUAREBRACKET  ;
 
 //CREATE TYPE DISTINCT
 dbs_create_type_distinct: TYPE dbs_distinct_type_name AS common_built_in_type_source (INLINE LENGTH dbs_integer)?;
@@ -1169,7 +1195,7 @@ option_dbinfo: NO? DBINFO;
 option_debug_mode: (DISALLOW | ALLOW | DISABLE) DEBUG MODE;
 option_decimal: DECIMAL LPARENCHAR (dbs_integer15 (dbs_comma_separator dbs_s)? | dbs_integer31 (dbs_comma_separator dbs_s)?);
 option_defer: (DEFER | NODEFER) PREPARE;
-option_degree: DEGREE  (LEVEL_NUMBER  {validateLevel($LEVEL_NUMBER.text);} | ANY);
+option_degree: DEGREE  (INTEGERLITERAL  {validateLevel($INTEGERLITERAL.text);} | ANY);
 option_deterministic: NOT? DETERMINISTIC;
 option_dispatch: STATIC DISPATCH;
 option_dynamic: DYNAMIC RESULT SETS (ZERO_DIGIT | dbs_integer);
@@ -1516,13 +1542,13 @@ dbs_special_name: ABSOLUTE | ACCELERATION | ACCELERATOR | ACCESS | ACCESSCTRL | 
                   | ESCAPE | EUR | EVERY | EXCEPT | EXCHANGE | EXCLUDE | EXCLUDING | EXCLUSIVE | EXECUTE | EXISTS
                   | EXIT | EXPLAIN | EXTERNAL | EXTRA | EXTRACT | FAILBACK | FAILURE| FAILURES | FENCED | FETCH
                   | FIELDPROC| FINAL | FIRST | FIRST_VALUE| FILENAME | FLOAT | FOLLOWING | FOR | FOREIGN | FORMAT | FOUND | FREE
-                  | FREEPAGE | FROM | FULL | FUNCTION | FUNCTION_LEVEL_10| FUNCTION_LEVEL_11| FUNCTION_LEVEL_12
+                  | FREEPAGE | FULL | FUNCTION | FUNCTION_LEVEL_10| FUNCTION_LEVEL_11| FUNCTION_LEVEL_12
                   | GBPCACHE | GENERAL | GENERATE | GENERATED | GENERIC | GET | GET_ACCEL_ARCHIVE | GLOBAL | GO
                   | GOTO | GRANT | GRAPHIC | GROUP | GROUPING | G_CHAR| HANDLER | HASH | HAVING | HEX | HIDDENCHAR
                   | HIGH | HINT| HISTORY | HOLD | HOUR | HOURS | ID | IDENTITY | IF | IGNORE | IMAGCOPY | IMMEDIATE
                   | IMPLICITLY | IN | INCLUDE | INCLUDING | INCLUSIVE | INCREMENT | INDEX | INDEXBP | INDICATOR
                   | INHERIT | INITIALLY | INLINE | INOUT | INPUT | INSENSITIVE | INSERT | INSTEAD | INT
-                  | INTEGER | INTERSECT | INTO | INVALID | INVOKEBIND | INVOKERUN | IS | ISO | ISOLATION | ITERATE
+                  | INTEGER | INTERSECT | INVALID | INVOKEBIND | INVOKERUN | IS | ISO | ISOLATION | ITERATE
                   | JAR | JAVA | JIS | JOBNAME| JOIN | KEEP | KEY | KEYS | K_CHAR| LABEL | LABELS | LAG| LANGUAGE
                   | LANGUAGE_C | LARGE | LAST | LAST_VALUE| LC_CTYPE | LEAD | LEAVE | LEFT | LENGTH | LEVEL | LIKE
                   | LIMIT | LITERALS | LOAD | LOB | LOCAL | LOCALE | LOCATION | LOCATOR | LOCATORS | LOCK | LOCKED
@@ -1604,7 +1630,7 @@ dbs_imptkmod_param: YES | NO;
 dbs_include_data_type: dbs_alter_procedure_bit_int | dbs_alter_procedure_bit_decimal | dbs_alter_procedure_bit_float | dbs_alter_procedure_bit_decfloat | dbs_alter_procedure_bit_char | dbs_alter_procedure_bit_graphic | dbs_alter_procedure_bit_varchar | DATE | TIME | dbs_alter_procedure_bit_timestamp;
 dbs_index_identifier: IDENTIFIER;
 dbs_index_name: T=dbs_sql_identifier {validateLength($T.text, "Index name", 128);};
-dbs_integer: INTEGERLITERAL | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88;
+dbs_integer: INTEGERLITERAL;
 dbs_integer_constant: dbs_integer | NUMERICLITERAL; //range 1 - 32767
 dbs_jar_name: T=dbs_hostname_identifier {validateLength($T.text, "Jar name", 128);};
 dbs_jobname_value: IDENTIFIER | NONNUMERICLITERAL;
@@ -1753,23 +1779,23 @@ dbs_sql_identifier: NONNUMERICLITERAL | IDENTIFIER | FILENAME | FILENAME (DOT_FS
 dbs_comma_separator: (COMMASEPARATORDB2 | COMMACHAR);
 dbs_semicolon_end: SEMICOLON_FS | SEMICOLONSEPARATORSQL;
 
-dbs_integer0: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "0");};
-dbs_integer1: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "1");};
-dbs_integer2: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "2");};
-dbs_integer4: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "4");};
-dbs_integer5: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "5");};
-dbs_integer6: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "6");};
-dbs_integer8: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "8");};
-dbs_integer12: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "12");};
-dbs_integer15: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "15");};
-dbs_integer16: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "16");};
-dbs_integer31: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "31");};
-dbs_integer34: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "34");};
-dbs_integer100: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "100");};
-dbs_integer256: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "256");};
-dbs_integer1200: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "1200");};
-dbs_integer1208: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "1208");};
-dbs_integer_max: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "2147483647");};
+dbs_integer0: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "0");};
+dbs_integer1: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "1");};
+dbs_integer2: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "2");};
+dbs_integer4: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "4");};
+dbs_integer5: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "5");};
+dbs_integer6: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "6");};
+dbs_integer8: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "8");};
+dbs_integer12: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "12");};
+dbs_integer15: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "15");};
+dbs_integer16: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "16");};
+dbs_integer31: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "31");};
+dbs_integer34: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "34");};
+dbs_integer100: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "100");};
+dbs_integer256: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "256");};
+dbs_integer1200: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "1200");};
+dbs_integer1208: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "1208");};
+dbs_integer_max: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "2147483647");};
 dbs_char_a: NONNUMERICLITERAL  {validateValue($NONNUMERICLITERAL.text, "A");};
 dbs_char_n: NONNUMERICLITERAL  {validateValue($NONNUMERICLITERAL.text, "N");};
 dbs_char_r: NONNUMERICLITERAL  {validateValue($NONNUMERICLITERAL.text, "R");};

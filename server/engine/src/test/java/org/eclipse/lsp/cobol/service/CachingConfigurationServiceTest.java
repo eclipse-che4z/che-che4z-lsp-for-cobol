@@ -14,29 +14,26 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
 
 /** Test to check CachingConfigurationServiceTest */
 class CachingConfigurationServiceTest {
@@ -54,8 +51,7 @@ class CachingConfigurationServiceTest {
     assertEquals(
         new AnalysisConfig(
             new CopybookConfig(
-                CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
-            ImmutableList.of(),
+                CopybookProcessingMode.ENABLED),
             ImmutableList.of(),
             true, ImmutableList.of(), ImmutableMap.of()),
         configuration.getConfig(null, CopybookProcessingMode.ENABLED));
@@ -64,8 +60,6 @@ class CachingConfigurationServiceTest {
   @Test
   void testUpdatingConfiguration() {
     SettingsService settingsService = spy(SettingsService.class);
-    JsonArray featuresArray = new JsonArray();
-    featuresArray.add("SQL");
 
     DialectService dialectService = mock(DialectService.class);
     when(dialectService.getSettingsSections()).thenReturn(ImmutableList.of("dialect"));
@@ -78,8 +72,6 @@ class CachingConfigurationServiceTest {
 
     List<Object> clientConfig =
         Arrays.asList(
-            new JsonPrimitive("DATACOM_SERVER"),
-            featuresArray,
             dialectSettings,
             subroutines,
             new JsonPrimitive("true"),
@@ -89,8 +81,6 @@ class CachingConfigurationServiceTest {
 
     when(settingsService.fetchConfigurations("",
             Arrays.asList(
-                TARGET_SQL_BACKEND.label,
-                ANALYSIS_FEATURES.label,
                 DIALECTS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
                 CICS_TRANSLATOR_ENABLED.label,
@@ -104,8 +94,7 @@ class CachingConfigurationServiceTest {
     assertEquals(
         new AnalysisConfig(
             new CopybookConfig(
-                CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
-            ImmutableList.of(EmbeddedLanguage.SQL),
+                CopybookProcessingMode.DISABLED),
             ImmutableList.of("Dialect"),
             true, ImmutableList.of(),
             ImmutableMap.of("dialect", predefinedParagraphs)),
@@ -126,8 +115,6 @@ class CachingConfigurationServiceTest {
     dialectSettings.add("Dialect");
     List<Object> clientConfig =
         Arrays.asList(
-            new JsonPrimitive("DATACOM_SERVER"),
-            new JsonNull(),
             dialectSettings,
             subroutineSettings,
             new JsonNull(),
@@ -136,8 +123,6 @@ class CachingConfigurationServiceTest {
             dialectsSettings);
     when(settingsService.fetchConfigurations("",
             Arrays.asList(
-                TARGET_SQL_BACKEND.label,
-                ANALYSIS_FEATURES.label,
                 DIALECTS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
                 CICS_TRANSLATOR_ENABLED.label,
@@ -151,8 +136,7 @@ class CachingConfigurationServiceTest {
     assertEquals(
         new AnalysisConfig(
             new CopybookConfig(
-                CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
-            ImmutableList.of(EmbeddedLanguage.SQL, EmbeddedLanguage.CICS),
+                CopybookProcessingMode.DISABLED),
             ImmutableList.of("Dialect"),
             false,
             ImmutableList.of(),

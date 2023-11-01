@@ -379,11 +379,13 @@
           "default": "DB2_SERVER",
           "enum": [
             "DB2_SERVER",
-            "DATACOM_SERVER"
+            "DATACOM_SERVER",
+            "NONE"
           ],
           "enumDescriptions": [
             "DB2_SERVER  - IBM DB2 SQL Server",
-            "DATACOM_SERVER - CA DATACOM Server"
+            "DATACOM_SERVER - CA DATACOM Server",
+            "NONE"
           ],
           "description": "The target SQL backend server which will be used in mainframe"
         },

@@ -33,7 +33,7 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*SQLCA} PIC X(10).\n"
-          + "           EXEC {INCLUDE|1} STRUCT1 END-EXEC.";
+          + "           EXEC {INCLUDE|1} {STRUCT1|2} END-EXEC.";
 
   @Test
   void test() {
@@ -44,8 +44,11 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
             "1",
             new Diagnostic(
                 new Range(),
-                    "No viable alternative at input EXEC INCLUDE",
+                "Missing token SQL for the EXEC SQL INCLUDE block ",
                 Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(), "STRUCT1: Copybook not found", Error, ErrorSource.DIALECT.getText(), "missing copybook")));
   }
 }

@@ -54,7 +54,7 @@ class IdmsCopybookServiceTest {
   @BeforeEach
   void init() {
     processedCopybooks = new HashSet<>();
-    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER);
+    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED);
 
     service = new IdmsCopybookService("uri", copybookService, copybookConfig,
         treeListener, messageService, processedCopybooks);

@@ -15,27 +15,6 @@
 
 package org.eclipse.lsp.cobol.positive;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.ConfigurableTest;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.test.CobolText;
-import org.eclipse.lsp.cobol.usecases.DialectConfigs;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -45,6 +24,27 @@ import static org.eclipse.lsp.cobol.positive.FolderTextRegistry.DEFAULT_LISTING_
 import static org.eclipse.lsp.cobol.positive.FolderTextRegistry.PATH_TO_LISTING_SNAP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import com.google.gson.Gson;
+import org.eclipse.lsp.cobol.ConfigurableTest;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.test.CobolText;
+import org.eclipse.lsp.cobol.usecases.DialectConfigs;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+
 /**
  * This abstract class encapsulates the common logic of all tests that use the positive test file
  * set.
@@ -52,14 +52,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public abstract class FileBasedTest extends ConfigurableTest {
 
   static Stream<String> getSourceFolder() {
-    String path = ofNullable(getProperty(PATH_TO_TEST_RESOURCES))
-            .orElse("../../tests/test_files");
+    String path = ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse("../../tests/test_files");
     return searchFolderToTest(Paths.get(path)).stream().map(p -> p.toAbsolutePath().toString());
   }
 
   private static List<Path> searchFolderToTest(Path path) {
     return searchFolderToTest(ImmutableList.of(path.toFile()));
   }
+
   private static List<Path> searchFolderToTest(List<File> files) {
     List<Path> paths = new ArrayList<>();
     for (File file : files) {
@@ -75,9 +75,10 @@ public abstract class FileBasedTest extends ConfigurableTest {
   }
 
   private static List<File> listFiles(File file) {
-    return Optional.ofNullable(file.listFiles()).map(Arrays::stream)
-            .orElse(Stream.empty())
-            .collect(Collectors.toList());
+    return Optional.ofNullable(file.listFiles())
+        .map(Arrays::stream)
+        .orElse(Stream.empty())
+        .collect(Collectors.toList());
   }
 
   private static boolean isValidTestFolder(File file) {
@@ -205,9 +206,11 @@ public abstract class FileBasedTest extends ConfigurableTest {
 
     if (testDialectsLists.contains("IDMS")) {
       return new AnalysisConfig(
-          new CopybookConfig(ENABLED, SQLBackend.DB2_SERVER),
-          Arrays.asList(EmbeddedLanguage.values()),
-          ImmutableList.of("IDMS"), true, ImmutableList.of(), ImmutableMap.of());
+          new CopybookConfig(ENABLED),
+          ImmutableList.of("IDMS"),
+          true,
+          ImmutableList.of(),
+          ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
     }
     return AnalysisConfig.defaultConfig(ENABLED);
   }

@@ -15,6 +15,13 @@
 
 package org.eclipse.lsp.cobol.core.engine;
 
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
@@ -32,7 +39,6 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.core.engine.analysis.EmbeddedCodeService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
@@ -48,13 +54,6 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * This test checks the logic of {@link CobolLanguageEngine}. It should first run {@link
@@ -80,13 +79,12 @@ class CobolLanguageEngineTest {
     cobolErrorStrategy.setMessageService(mockMessageService);
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     AstProcessor astProcessor = mock(AstProcessor.class);
-    EmbeddedCodeService embeddedCodeService = mock(EmbeddedCodeService.class);
     SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
 
     CobolLanguageEngine engine =
         new CobolLanguageEngine(
             preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-            dialectService, astProcessor, symbolsRepository, embeddedCodeService, mock(ErrorFinalizerService.class));
+            dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class));
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()
@@ -123,9 +121,6 @@ class CobolLanguageEngineTest {
     when(preprocessor.cleanUpCode(URI, TEXT))
         .thenReturn(new ResultWithErrors<>(new ExtendedText(TEXT, URI), ImmutableList.of()));
 
-    when(embeddedCodeService.generateNodes(any(), any(), any(), any(), anyString(), anyList(), any()))
-        .thenReturn(new ResultWithErrors<>(ImmutableList.of(), ImmutableList.of()));
-
     when(grammarPreprocessor.preprocess(any())).thenReturn(new ResultWithErrors<>(new CopybooksRepository(), ImmutableList.of()));
 
     Range programRange = new Range(new Position(0, 7), new Position(0, 31));
@@ -145,15 +140,13 @@ class CobolLanguageEngineTest {
 
   @Test
   void testLanguageEngineRunWhenNativeServerWithDialects() {
-    EmbeddedCodeService embeddedCodeService = mock(EmbeddedCodeService.class);
-
     cobolErrorStrategy.setMessageService(mockMessageService);
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     System.setProperty("serverType", "NATIVE");
     CobolLanguageEngine engine =
             new CobolLanguageEngine(
                     preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-                    dialectService, astProcessor, symbolsRepository, embeddedCodeService, mock(ErrorFinalizerService.class));
+                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class));
 
     ResultWithErrors<AnalysisResult> actual = engine.run(URI, TEXT, DialectConfigs.getDaCoAnalysisConfig());
     Assertions.assertEquals(actual.getErrors().size(), 1);

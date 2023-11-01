@@ -33,7 +33,7 @@ class TestCopyWithinSQL {
       + "       DATA DIVISION.\n"
       + "       WORKING-STORAGE SECTION.\n"
       + "           EXEC SQL\n"
-      + "               INCLUDE {~COPY1|1}\n"
+      + "               INCLUDE {COPY1|1}\n"
       + "           END-EXEC.\n"
       + "           EXEC SQL\n"
       + "                INCLUDE {~SQLCA} \n"
@@ -47,7 +47,7 @@ class TestCopyWithinSQL {
       + "                INCLUDE {~SQLCPY}\n"
       + "           END-EXEC.\n"
       + "           EXEC SQL\n"
-      + "                INCLUDE {~COPY1|1}\n"
+      + "                INCLUDE {COPY1|1}\n"
       + "           END-EXEC.\n";
 
   private static final String SQLCPY = "\n"
@@ -66,7 +66,7 @@ class TestCopyWithinSQL {
             "1",
             new Diagnostic(new Range(),
                 "COPY1: Copybook not found",
-                DiagnosticSeverity.Error, ErrorSource.COPYBOOK.getText(),
+                DiagnosticSeverity.Error, ErrorSource.DIALECT.getText(),
                 MISSING_COPYBOOK.getLabel()))
     );
   }
@@ -79,7 +79,7 @@ class TestCopyWithinSQL {
             "1",
             new Diagnostic(new Range(),
                 "COPY1: Copybook not found",
-                DiagnosticSeverity.Error, ErrorSource.COPYBOOK.getText(),
+                DiagnosticSeverity.Error, ErrorSource.DIALECT.getText(),
                 MISSING_COPYBOOK.getLabel()))
     );
   }

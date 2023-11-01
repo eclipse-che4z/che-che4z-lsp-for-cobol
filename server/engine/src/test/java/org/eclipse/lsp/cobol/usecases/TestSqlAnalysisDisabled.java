@@ -15,16 +15,20 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect.SQL_BACKEND_SETTING;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.analyze;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import com.google.gson.Gson;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
 
 /**
  * This test checks if sql UPDATE statement works correctly when SQL id enabled and do not work if
@@ -64,16 +68,17 @@ class TestSqlAnalysisDisabled {
 
   @Test
   void testDisabled() {
-    UseCaseEngine.runTest(
-        UPDATE_SQL_DISABLED,
-        ImmutableList.of(),
-        ImmutableMap.of(),
-        Collections.emptyList(),
-        new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
-            ImmutableList.of(),
-            ImmutableList.of(), true,
-            ImmutableList.of(),
-            ImmutableMap.of()));
+    AnalysisResult analyze = analyze(
+            UseCase.builder()
+                    .documentUri(DOCUMENT_URI)
+                    .text(UPDATE_SQL_DISABLED)
+                    .cicsTranslator(true)
+                    .copybookProcessingMode(CopybookProcessingMode.ENABLED)
+                    .sqlBackend(SQLBackend.NONE)
+                    .dialects(ImmutableList.of())
+                    .dialectsSettings(ImmutableMap.of(SQL_BACKEND_SETTING, new Gson().toJsonTree(SQLBackend.NONE)))
+                    .compilerOptions(ImmutableList.of())
+                    .build());
+    Assertions.assertFalse(analyze.getDiagnostics().isEmpty());
   }
 }

@@ -45,7 +45,7 @@ public class TestIssueWithEmbeddedCodePresentInCopybook {
           + "XDEBUG     END-EXEC.   \n"
           + "           EXEC SQL \n"
           + "           declare scur cursor for select a,b,c from tabD where a = 8\n"
-          + "           order by c for {detch|4} only;\n"
+          + "           order by c {_for detch|4_} only;\n"
           + "            END-EXEC.\n";
 
   @Test

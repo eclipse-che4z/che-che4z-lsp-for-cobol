@@ -18,18 +18,14 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
 
 /**
  * Tests if there is only one 01 level with a given name, that name can be referenced even if it is
@@ -135,8 +131,7 @@ public class TestQualifyExtendedImpactOnVariableDefinition {
   @Test
   void whenQualifyExtendedOptionActiveFromConfigurationWithMultipleDefinitionThenConsider01LevelAsDefinition() {
     AnalysisConfig analysisConfig = new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
-            Arrays.asList(EmbeddedLanguage.values()),
+            new CopybookConfig(CopybookProcessingMode.ENABLED),
             ImmutableList.of(), true, ImmutableList.of(), ImmutableMap.of());
     analysisConfig.getCompilerOptions().add("QUALIFY(EXTEND)");
     UseCaseEngine.runTest(

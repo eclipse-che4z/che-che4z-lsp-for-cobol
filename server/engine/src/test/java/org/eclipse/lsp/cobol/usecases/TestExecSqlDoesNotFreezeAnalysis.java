@@ -35,7 +35,7 @@ class TestExecSqlDoesNotFreezeAnalysis {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           EXEC {SQL|2}{|1|3}\n";
+          + "           {EXEC|3} SQL{|1}\n";
 
   @Test
   void test() {
@@ -46,19 +46,13 @@ class TestExecSqlDoesNotFreezeAnalysis {
             "1",
             new Diagnostic(
                 new Range(),
-                "Unexpected end of file",
+                "Unexpected end of line",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "2",
-            new Diagnostic(
-                new Range(),
-                "The following token must start in Area A: SQL",
-                DiagnosticSeverity.Warning,
                 ErrorSource.PARSING.getText()),
             "3",
             new Diagnostic(
                 new Range(),
-                "No viable alternative at input EXEC SQL",
+                "Missing token END-EXEC for the EXEC block",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of(),

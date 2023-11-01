@@ -14,22 +14,19 @@
  */
 package org.eclipse.lsp.cobol.service.settings;
 
+import static java.util.stream.Collectors.toList;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.gson.*;
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.DialectRegistryItem;
-import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-
 import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.DialectRegistryItem;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 
 /**
  * Config helper class
@@ -123,21 +120,6 @@ public class ConfigHelper {
             .filter(ele -> !(ele instanceof JsonNull))
             .map(JsonElement::getAsString)
             .collect(toList());
-  }
-
-  /**
-   *  Parse embedded language client configurations
-   * @param features configured embedded language
-   * @return {@link List<EmbeddedLanguage>}
-   */
-  public List<EmbeddedLanguage> parseFeatures(JsonElement features) {
-    if (features.isJsonArray() && features.getAsJsonArray().size() > 0) {
-      return Streams.stream((JsonArray) features)
-              .map(JsonElement::getAsString)
-              .map(EmbeddedLanguage::valueOf)
-              .collect(toList());
-    }
-    return Arrays.asList(EmbeddedLanguage.values());
   }
 
   /**

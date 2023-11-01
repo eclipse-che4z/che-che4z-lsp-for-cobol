@@ -13,7 +13,6 @@
  */
 lexer grammar Db2SqlLexer;
 channels{COMMENTS}
-import TechnicalLexer;
 
 // DB2 SQL Reserved Keywords
 
@@ -300,6 +299,8 @@ EXCHANGE : E X C H A N G E;
 EXCLUDE : E X C L U D E;
 EXCLUDING : E X C L U D I N G;
 EXCLUSIVE : E X C L U S I V E;
+EXEC: E X E C;
+END_EXEC: E N D MINUSCHAR E X E C;
 EXECUTE : E X E C U T E;
 EXISTS : E X I S T S;
 EXIT : E X I T;
@@ -663,6 +664,7 @@ SPACE : S P A C E;
 SPECIAL : S P E C I A L;
 SPECIFIC : S P E C I F I C;
 SQL : S Q L;
+SQLIMS: S Q L I M S;
 SQLADM : S Q L A D M;
 SQLCA : S Q L C A;
 SQLCODE : S Q L C O D E;
@@ -797,7 +799,28 @@ YEARS : Y E A R S;
 YES : Y E S;
 ZONE : Z O N E;
 
-
+// symbols
+ASTERISKCHAR : '*';
+COLONCHAR : ':';
+COMMACHAR : ',';
+DOLLARCHAR : '$';
+DOUBLEQUOTE : '"';
+DOT_FS : '.' EOF?;
+EQUALCHAR : '=';
+LESSTHANCHAR : '<';
+LESSTHANOREQUAL : '<=';
+LPARENCHAR : '(';
+MINUSCHAR : '-';
+MORETHANCHAR : '>';
+MORETHANOREQUAL : '>=';
+NOTEQUALCHAR : '<>';
+PLUSCHAR : '+';
+SEMICOLON_FS : ';' EOF?;
+SINGLEQUOTE : '\'';
+RPARENCHAR : ')';
+SLASHCHAR : '/';
+SQLLINECOMMENTCHAR: '--';
+UNDERSCORECHAR : '_';
 // special separator tokens for embedded langauages
 SEMICOLONSEPARATORSQL : '; ' ;
 COMMASEPARATORDB2 : ', ' ;
@@ -807,7 +830,6 @@ GRAPHIC_CONSTANT : GRAPHICUNICODE | GRAHICCHAR;
 DOUBLESLASHCHAR : '//';
 LSQUAREBRACKET :     '[';
 RSQUAREBRACKET :     ']';
-UNDERSCORECHAR :     '_';
 PIPECHAR : '||';
 PIPECHAR2 : '!!';
 QUESTIONMARK : '?';
@@ -826,6 +848,56 @@ DATELITERAL: '\'' (DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT | //y
 INTEGERLITERAL : DIGIT+ ;
 IDENTIFIER : [a-zA-Z0-9][_a-zA-Z0-9-]*;
 COPYBOOK_IDENTIFIER : [a-zA-Z0-9#@$][_a-zA-Z0-9#@$]*;
+SINGLEDIGITLITERAL : DIGIT;
+
+NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT_FS | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
+
+NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
+
+CHAR_STRING_CONSTANT : HEXNUMBER | STRINGLITERAL;
+
+FILENAME : IDENTIFIER+ '.' IDENTIFIER+;
+
+OCTDIGITS : OCT_DIGIT;
+HEX_NUMBERS : HEXNUMBER;
+// whitespace, line breaks, comments, ...
+NEWLINE : '\r'? '\n' -> channel(HIDDEN);
+WS : [ \t\f]+ -> channel(HIDDEN);
+
+//SQL comments
+SQLLINECOMMENT
+	:	SQLLINECOMMENTCHAR ~[\r\n]* NEWLINE -> channel(HIDDEN)
+	;
+
+// treat all the non-processed tokens as errors
+ERRORCHAR : . ;
+
+ZERO_DIGIT: '0';
+
+fragment HEXNUMBER :
+	X '"' [0-9A-Fa-f]+ '"'
+	| X '\'' [0-9A-Fa-f]+ '\''
+;
+
+fragment NULLTERMINATED :
+	Z '"' (~["\n\r] | '""' | '\'')* '"'
+	| Z '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
+
+fragment STRINGLITERAL :
+	'"' (~["\n\r] | '""' | '\'')* '"'
+	| '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
+
+fragment UNTRMSTRINGLITERAL :
+	'"' (~["\n\r] | '""' | '\'')*
+	| '\'' (~['\n\r] | '\'\'' | '"')*
+;
+
+fragment DBCSLITERAL :
+	[GN] '"' (~["\n\r] | '""' | '\'')* '"'
+	| [GN] '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
 
 fragment BXNUMBER :
 	B X '"' [0-9A-F]+ '"'
@@ -841,3 +913,34 @@ fragment GRAHICCHAR :
 	G X '"' [0-9A-F]+ '"'
 	| G X '\'' [0-9A-F]+ '\''
 ;
+
+fragment
+ OCT_DIGIT        : [0-8] ;
+ fragment DIGIT: OCT_DIGIT | [9];
+ // case insensitive chars
+ fragment A:('a'|'A');
+ fragment B:('b'|'B');
+ fragment C:('c'|'C');
+ fragment D:('d'|'D');
+ fragment E:('e'|'E');
+ fragment F:('f'|'F');
+ fragment G:('g'|'G');
+ fragment H:('h'|'H');
+ fragment I:('i'|'I');
+ fragment J:('j'|'J');
+ fragment K:('k'|'K');
+ fragment L:('l'|'L');
+ fragment M:('m'|'M');
+ fragment N:('n'|'N');
+ fragment O:('o'|'O');
+ fragment P:('p'|'P');
+ fragment Q:('q'|'Q');
+ fragment R:('r'|'R');
+ fragment S:('s'|'S');
+ fragment T:('t'|'T');
+ fragment U:('u'|'U');
+ fragment V:('v'|'V');
+ fragment W:('w'|'W');
+ fragment X:('x'|'X');
+ fragment Y:('y'|'Y');
+ fragment Z:('z'|'Z');

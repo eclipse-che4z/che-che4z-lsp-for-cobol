@@ -31,7 +31,6 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.analysis.EmbeddedCodeService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Pipeline;
@@ -77,7 +76,6 @@ public class CobolLanguageEngine {
       DialectService dialectService,
       AstProcessor astProcessor,
       SymbolsRepository symbolsRepository,
-      EmbeddedCodeService embeddedCodeService,
       ErrorFinalizerService errorFinalizerService) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
@@ -88,7 +86,6 @@ public class CobolLanguageEngine {
     this.pipeline.add(new PreprocessorStage(grammarPreprocessor));
     this.pipeline.add(new ImplicitDialectProcessingStage(dialectService));
     this.pipeline.add(new ParserStage(messageService, treeListener));
-    this.pipeline.add(new EmbeddedCodeStage(embeddedCodeService, treeListener));
     this.pipeline.add(new TransformTreeStage(symbolsRepository, messageService, subroutineService, cachingConfigurationService, dialectService, astProcessor));
   }
 

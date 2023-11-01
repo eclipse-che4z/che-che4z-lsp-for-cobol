@@ -15,19 +15,19 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonPrimitive;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /**
  * This test checks sql include statement for implicitly defined SQLCA and SQLCA (for both DB2 and
@@ -130,11 +130,10 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             ImmutableMap.of(),
             ImmutableList.of(),
             new AnalysisConfig(
-                    new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
-                    ImmutableList.of(),
+                    new CopybookConfig(CopybookProcessingMode.ENABLED),
                     ImmutableList.of(), true,
                     ImmutableList.of(),
-                    ImmutableMap.of()));
+                    ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
 
   @Test
@@ -157,11 +156,10 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
                             ErrorSource.PARSING.getText())),
             ImmutableList.of(),
             new AnalysisConfig(
-                    new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
-                    ImmutableList.of(),
+                    new CopybookConfig(CopybookProcessingMode.ENABLED),
                     ImmutableList.of(), true,
                     ImmutableList.of(),
-                    ImmutableMap.of()));
+                    ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
 
   @Test

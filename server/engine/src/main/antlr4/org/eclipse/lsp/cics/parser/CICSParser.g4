@@ -1140,9 +1140,7 @@ basis
    : LPARENCHAR arithmeticExpression RPARENCHAR | literal | generalIdentifier
    ;
 
-commaClause
-    : COMMACHAR
-    | COMMASEPARATORCICS ;
+commaClause : COMMACHAR;
 
 invalidInput
     :  {notifyError("cicsParser.invalidInput", _input.LT(1).getText());} notExec

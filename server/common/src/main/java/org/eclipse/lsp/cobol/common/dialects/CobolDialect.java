@@ -17,8 +17,10 @@ package org.eclipse.lsp.cobol.common.dialects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 
@@ -118,6 +120,16 @@ public interface CobolDialect {
    * @return a list of {@link CodeActionProvider}
    */
   default List<CodeActionProvider> getDialectCodeActionProviders() {
+    return ImmutableList.of();
+  }
+
+  /**
+   * Returns a list of predefined dialect specific copybook model. These predefined copybooks could
+   * be used like a regular copybook
+   * @param ctx is a {@link AnalysisConfig} class with all configurations
+   * @return a list of {@link CopybookModel}
+   */
+  default List<CopybookModel> getPredefinedCopybook(AnalysisConfig ctx) {
     return ImmutableList.of();
   }
 }

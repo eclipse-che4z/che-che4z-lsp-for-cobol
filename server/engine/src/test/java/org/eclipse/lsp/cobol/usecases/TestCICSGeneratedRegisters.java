@@ -17,18 +17,14 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
 
 /**
  * Tests the usage of special registers implicitly introduced by CICS translator. Check {@link
@@ -75,8 +71,7 @@ public class TestCICSGeneratedRegisters {
   void testWhenCicsTranslateIsDiabled() {
     AnalysisConfig analysisConfig =
         new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER),
-            Arrays.asList(EmbeddedLanguage.values()),
+            new CopybookConfig(CopybookProcessingMode.ENABLED),
             ImmutableList.of(),
             false,
             ImmutableList.of(),

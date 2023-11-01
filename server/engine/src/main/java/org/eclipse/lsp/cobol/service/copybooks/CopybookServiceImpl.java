@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
+import static java.util.stream.Collectors.toList;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableMap;
@@ -22,6 +24,11 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
@@ -31,20 +38,11 @@ import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.DocumentContentCache;
-
-import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * This service processes copybook requests and returns content by its name. The service also caches
@@ -103,8 +101,6 @@ public class CopybookServiceImpl implements CopybookService {
    * @param copybookName       - the name of the copybook to be retrieved
    * @param programDocumentUri - the currently processing program document
    * @param documentUri        - the currently processing document that contains the copy statement
-   * @param copybookConfig     - contains config info like: copybook processing mode, target backend
-   *                           sql server
    * @param preprocess         - indicates if copybook needs to be preprocessed after resolving
    * @return a CopybookModel wrapped inside {@link ResultWithErrors} which contains copybook name, its URI and the content
    */
@@ -113,13 +109,12 @@ public class CopybookServiceImpl implements CopybookService {
       @NonNull CopybookName copybookName,
       @NonNull String programDocumentUri,
       @NonNull String documentUri,
-      @NonNull CopybookConfig copybookConfig,
       boolean preprocess) {
     try {
       ThreadInterruptionUtil.checkThreadInterrupted();
 
       CopybookModel copybookModel = getFromCache(programDocumentUri, copybookId, copybookName,
-          copybookConfig, preprocess);
+              preprocess);
 
       updateContent(copybookModel, preprocess);
 
@@ -149,9 +144,9 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private CopybookModel getFromCache(String programDocumentUri, CopybookId copybookId,
-                                     CopybookName copybookName, CopybookConfig copybookConfig, boolean preprocess) throws ExecutionException {
+                                     CopybookName copybookName, boolean preprocess) throws ExecutionException {
     return copybookCache.get(copybookId, () -> {
-      CopybookModel copybookModel = resolveSync(copybookName, programDocumentUri, copybookConfig);
+      CopybookModel copybookModel = resolveSync(copybookName, programDocumentUri);
       if (preprocess && copybookModel.getUri() != null) {
         ResultWithErrors<CopybookModel> copybookModelResultWithErrors = cleanupCopybook(copybookModel);
         copybookModel = copybookModelResultWithErrors.getResult();
@@ -178,46 +173,29 @@ public class CopybookServiceImpl implements CopybookService {
 
   private CopybookModel resolveSync(
       @NonNull CopybookName copybookName,
-      @NonNull String programUri,
-      @NonNull CopybookConfig copybookConfig) {
+      @NonNull String programUri) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     LOG.debug(
-        "Trying to resolve copybook {} for {}, using config {}",
+        "Trying to resolve copybook {} for {}",
         copybookName,
-        programUri,
-        copybookConfig);
+        programUri);
     Optional<CopybookModel> copybookModel = tryResolveCopybookFromWorkspace(copybookName, programUri);
     if (copybookModel.isPresent()) {
       return copybookModel.get();
     }
-    Optional<CopybookModel> predefineCopybook = tryResolvePredefinedCopybook(copybookName, copybookConfig);
-    return predefineCopybook.orElseGet(() -> registerForDownloading(copybookName, programUri));
+    Optional<CopybookModel> predefineCopybook = tryResolvePredefinedCopybook(copybookName);
+      return predefineCopybook.orElseGet(() -> registerForDownloading(copybookName, programUri));
   }
 
-  /**
-   * Retrieve optional {@link CopybookModel} of the {@link PredefinedCopybooks} for the given name
-   * if it is predefined.
-   *
-   * @param copybookName   - the name of copybook to check
-   * @param copybookConfig - configuration for copybook resolution
-   * @return optional model of a predefined copybook if it exists
-   */
-  private Optional<CopybookModel> tryResolvePredefinedCopybook(
-      CopybookName copybookName, CopybookConfig copybookConfig) {
-    LOG.debug(
-        "Trying to resolve predefined copybook {}, using config {}", copybookName, copybookConfig);
-
-    Optional<CopybookModel> copybookModel = Optional.ofNullable(
-            PredefinedCopybooks.forName(copybookName.getQualifiedName()))
-        .map(c -> {
-          String name = c.nameForBackend(copybookConfig.getSqlBackend());
-          String content = files.readImplicitCode(name);
-          return new CopybookModel(copybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(name)), copybookName,
-                  ImplicitCodeUtils.createFullUrl(name), content);
-        });
-
-    LOG.debug("Predefined copybook: {}", copybookModel);
-    return copybookModel;
+  private Optional<CopybookModel> tryResolvePredefinedCopybook(CopybookName copybookName) {
+    CopybookId copybookId = copybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(copybookName.getDisplayName()));
+    try {
+      CopybookModel copybookModel = copybookCache.get(copybookId, () -> new CopybookModel(copybookId, copybookName, null, null));
+      if (copybookModel.getContent() == null || copybookModel.getUri() == null) return Optional.empty();
+      return Optional.of(copybookModel);
+    } catch (ExecutionException e) {
+      return Optional.empty();
+    }
   }
 
   private ResultWithErrors<CopybookModel> cleanupCopybook(CopybookModel dirtyCopybook) {

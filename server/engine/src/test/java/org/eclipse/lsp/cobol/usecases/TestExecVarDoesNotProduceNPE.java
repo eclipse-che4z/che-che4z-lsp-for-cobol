@@ -32,7 +32,7 @@ class TestExecVarDoesNotProduceNPE {
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       {01|1} {EXEC|2}\n";
+          + "       01 {$*EXEC|1}{|2}\n";
 
   @Test
   void test() {
@@ -43,13 +43,13 @@ class TestExecVarDoesNotProduceNPE {
             "1",
             new Diagnostic(
                 new Range(),
-                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item FILLER",
+                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item EXEC",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'EXEC'",
+                "Unexpected end of file",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

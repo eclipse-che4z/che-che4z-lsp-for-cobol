@@ -14,23 +14,27 @@
  */
 package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Location;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 /** Implicit dialects processing stage */
 @RequiredArgsConstructor
@@ -53,28 +57,52 @@ public class ImplicitDialectProcessingStage implements Stage<DialectOutcome, Cop
 
   private DialectOutcome processImplicitDialects(
       AnalysisContext ctx, CopybooksRepository copybooksRepository) {
-    CopybookConfig copybookConfig = ctx.getConfig().getCopybookConfig();
     DialectProcessingContext dialectProcessingContext =
         DialectProcessingContext.builder()
-            .copybookConfig(copybookConfig)
+            .config(ctx.getConfig())
             .programDocumentUri(ctx.getExtendedDocument().getUri())
             .extendedDocument(ctx.getExtendedDocument())
             .build();
     dialectProcessingContext.getExtendedDocument().commitTransformations();
 
+    // extends dialects
+    Set<SyntaxError> actualErrors =
+        new HashSet<>(dialectService.extendImplicitDialects(ctx, dialectProcessingContext));
+    applyExtendedDialectCopybook(copybooksRepository, dialectProcessingContext);
+    ArrayList<Node> extendedNodes = new ArrayList<>(dialectProcessingContext.getDialectNodes());
+    dialectProcessingContext.getDialectNodes().clear();
+
+    // process dialects
     ResultWithErrors<DialectOutcome> dialectOutcomeResultWithErrors =
         dialectService.processImplicitDialects(ctx, new ArrayList<>(), dialectProcessingContext);
 
     DialectOutcome dialectOutcome = dialectOutcomeResultWithErrors.getResult();
-
     dialectOutcome.getDialectNodes().forEach(node -> node.getLocality().toOriginalLocation());
-    Set<SyntaxError> actualErrors = new HashSet<>();
     dialectOutcomeResultWithErrors
         .getErrors()
         .forEach(
             error -> actualErrors.add(getOriginalErrorLocation(ctx, copybooksRepository, error)));
     ctx.getAccumulatedErrors().addAll(actualErrors);
-    return dialectOutcome;
+
+    List<Node> allImplicitDialectNodes =
+        Stream.concat(dialectOutcome.getDialectNodes().stream(), extendedNodes.stream())
+            .collect(Collectors.toList());
+    return new DialectOutcome(
+        allImplicitDialectNodes, dialectOutcome.getContext(), dialectOutcome.isDialectMissed());
+  }
+
+  private static void applyExtendedDialectCopybook(
+      CopybooksRepository copybooksRepository, DialectProcessingContext dialectProcessingContext) {
+    dialectProcessingContext.getDialectNodes().stream()
+        .filter(n -> n instanceof CopyNode)
+        .map(CopyNode.class::cast)
+        .filter(n -> n.getUri() != null)
+        .forEach(
+            n -> {
+              copybooksRepository.addStatement(n.getName(), n.getDialect(), n.getLocality());
+              copybooksRepository.define(
+                  n.getName(), n.getDialect(), n.getNameLocation().getUri(), n.getUri());
+            });
   }
 
   private SyntaxError getOriginalErrorLocation(

@@ -10,7 +10,7 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((includeStatement | copyStatement | replaceAreaStart | replaceOffStatement | titleDirective | enterDirective
+   : .*? ((copyStatement | replaceAreaStart | replaceOffStatement | titleDirective | enterDirective
    | controlDirective | linkageSection | plusplusIncludeStatement | procedureDivision | workingStorageSection)+ .*?)* EOF
    ;
 
@@ -32,11 +32,6 @@ workingStorageSection
 // copy statement
 copyStatement
    : COPY copySource SUPPRESS? replacingPhrase? DOT_FS
-   ;
-
-// sql include statement
-includeStatement
-   : EXEC SQL INCLUDE copySource END_EXEC DOT_FS
    ;
 
 // ++Include statement
