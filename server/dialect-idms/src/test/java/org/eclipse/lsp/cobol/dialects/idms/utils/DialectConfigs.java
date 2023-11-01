@@ -20,7 +20,6 @@ import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 
 /** IDMS related config getter */
@@ -28,8 +27,7 @@ import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 public class DialectConfigs {
   public AnalysisConfig getIDMSAnalysisConfig() {
     return new AnalysisConfig(
-        new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
-        ImmutableList.of(),
+        new CopybookConfig(CopybookProcessingMode.DISABLED),
         ImmutableList.of(IdmsDialect.NAME), true,
         ImmutableList.of(),
         ImmutableMap.of());

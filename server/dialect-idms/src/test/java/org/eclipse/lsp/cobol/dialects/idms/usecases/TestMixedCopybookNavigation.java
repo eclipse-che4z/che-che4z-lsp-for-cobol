@@ -16,12 +16,11 @@ package org.eclipse.lsp.cobol.dialects.idms.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.test.CobolText;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
@@ -53,8 +52,7 @@ public class TestMixedCopybookNavigation {
                     new CobolText("CBOOK", IdmsDialect.NAME, CBOOK_IDMS)),
             ImmutableMap.of(), ImmutableList.of(),
             new AnalysisConfig(
-                    new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DATACOM_SERVER),
-                    ImmutableList.of(),
+                    new CopybookConfig(CopybookProcessingMode.ENABLED),
                     ImmutableList.of(IdmsDialect.NAME), true,
                     ImmutableList.of(),
                     ImmutableMap.of()));

@@ -391,6 +391,26 @@
                             <visitor>true</visitor>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>run sql antlr</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>
+                                <argument>-package</argument>
+                                <argument>org.eclipse.lsp.cobol.implicitDialects.sql</argument>
+                                <argument>-o</argument>
+                                <argument>
+                                    ${project.build.directory}/generated-sources/antlr4/org/eclipse/lsp/cobol/implicitDialects/sql
+                                </argument>
+                            </arguments>
+                            <sourceDirectory>src/main/antlr4/org/eclipse/lsp/db2/parser</sourceDirectory>
+                            <listener>true</listener>
+                            <visitor>true</visitor>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

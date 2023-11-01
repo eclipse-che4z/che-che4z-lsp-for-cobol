@@ -91,7 +91,6 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
             copybookName,
             programDocumentUri,
             documentUri,
-            copybookConfig,
             true);
     CopybookModel copybookModel = resolvedCopybook.getResult();
     Locality locality = IdmsParserHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), documentUri);

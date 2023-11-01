@@ -34,9 +34,9 @@ class AnalysisConfigHelper {
    */
   public AnalysisConfig fromConfigEntity(
       CopybookProcessingMode mode, ConfigurationService.ConfigurationEntity entity) {
-    CopybookConfig copybookConfig = new CopybookConfig(mode, entity.getSqlBackend());
+    CopybookConfig copybookConfig = new CopybookConfig(mode);
 
-    AnalysisConfig analysisConfig = new AnalysisConfig(copybookConfig, entity.getFeatures(), entity.getDialects(),
+    AnalysisConfig analysisConfig = new AnalysisConfig(copybookConfig, entity.getDialects(),
             entity.isCicsTranslatorEnabled(),
             entity.getDialectRegistry(),
             entity.getDialectsSettings());

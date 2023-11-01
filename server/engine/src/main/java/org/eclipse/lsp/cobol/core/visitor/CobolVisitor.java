@@ -546,12 +546,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
-
-  @Override
-  public List<Node> visitExecSqlStatement(ExecSqlStatementContext ctx) {
-    return Collections.emptyList();
-  }
-
   @Override
   public List<Node> visitIfThen(IfThenContext ctx) {
     throwWarning(ctx.getStart());

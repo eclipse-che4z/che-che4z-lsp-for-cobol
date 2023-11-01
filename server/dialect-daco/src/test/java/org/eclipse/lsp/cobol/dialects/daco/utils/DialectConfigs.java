@@ -18,16 +18,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import java.util.List;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
-
-import java.util.List;
-import java.util.Map;
 
 /** DaCo related config utility */
 @UtilityClass
@@ -39,8 +37,7 @@ public class DialectConfigs {
    */
   public AnalysisConfig getDaCoAnalysisConfig() {
     return new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
-            ImmutableList.of(),
+            new CopybookConfig(CopybookProcessingMode.DISABLED),
             ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME), true,
             ImmutableList.of(),
             createPredefinedSectionsConfig(ImmutableList.of("S930", "S940", "S950",
@@ -54,7 +51,7 @@ public class DialectConfigs {
    * @return DaCo dialect configuration
    */
   public AnalysisConfig getDaCoAnalysisConfig(CopybookConfig copybookConfig, List<String> predefinedSections) {
-    return new AnalysisConfig(copybookConfig, ImmutableList.of(), ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
+    return new AnalysisConfig(copybookConfig, ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
         true, ImmutableList.of(), createPredefinedSectionsConfig(predefinedSections));
   }
 

@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
@@ -48,7 +47,7 @@ class TestMissedDialect {
             "1",
             new Diagnostic(new Range(), "TESTDIALECT dialect is missing (required for file:///c:/workspace/document.cbl)", DiagnosticSeverity.Error, ErrorSource.DIALECT.getText())),
         ImmutableList.of(),
-        new AnalysisConfig(new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER), ImmutableList.of(),
+        new AnalysisConfig(new CopybookConfig(CopybookProcessingMode.ENABLED),
             ImmutableList.of("TESTDIALECT"), false, ImmutableList.of(), ImmutableMap.of()));
   }
 }

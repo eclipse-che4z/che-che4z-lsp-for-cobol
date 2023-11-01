@@ -17,8 +17,13 @@ package org.eclipse.lsp.cobol.extendedapi;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.ToNumberPolicy;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
@@ -28,14 +33,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
 
 /** Test for @link({@link CFASTBuilderImpl}. */
 @Slf4j
@@ -66,7 +63,6 @@ class CFASTBuilderTest {
         UseCaseUtils.analyze(
             UseCase.builder()
                 .documentUri("fake/path")
-                .features(Arrays.asList(EmbeddedLanguage.values()))
                 .text(src)
                 .build());
     CFASTBuilder builder = new CFASTBuilderImpl();

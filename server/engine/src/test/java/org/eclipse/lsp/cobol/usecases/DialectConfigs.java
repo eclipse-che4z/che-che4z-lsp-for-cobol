@@ -17,21 +17,19 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
+import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 
-import java.util.List;
-
 /** IDMS and MAID related getter */
 @UtilityClass
 public class DialectConfigs {
   public AnalysisConfig getIDMSAnalysisConfig() {
     return new AnalysisConfig(
-        new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
-        ImmutableList.of(),
+        new CopybookConfig(CopybookProcessingMode.DISABLED),
         ImmutableList.of("IDMS"), true,
         ImmutableList.of(),
         ImmutableMap.of());
@@ -45,10 +43,10 @@ public class DialectConfigs {
     List<String> list = ImmutableList.of("S930", "S940", "S950", "S990", "S991", "S997", "S999");
 
     return new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.DISABLED, SQLBackend.DATACOM_SERVER),
-            ImmutableList.of(),
+            new CopybookConfig(CopybookProcessingMode.DISABLED),
             ImmutableList.of("DaCo", "IDMS"), true,
             ImmutableList.of(),
-            ImmutableMap.of("daco.predefined-sections", new Gson().toJsonTree(list)));
+            ImmutableMap.of("daco.predefined-sections", new Gson().toJsonTree(list),
+                    "target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }
 }

@@ -84,7 +84,6 @@ public final class IdmsDialect implements CobolDialect {
             copybookName,
             programDocumentUri,
             currentUri,
-            ctx.getCopybookConfig(),
             true);
     CopybookModel copybookModel = resolvedCopybook.getResult();
 

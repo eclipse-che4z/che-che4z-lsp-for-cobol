@@ -124,7 +124,6 @@ public class TestCICSTranslatorOptions {
             .copybooks(ImmutableList.of())
             .sqlBackend(SQLBackend.DB2_SERVER)
             .copybookProcessingMode(ENABLED)
-            .features(ImmutableList.of())
             .dialects(ImmutableList.of())
             .cicsTranslator(false)
             .build();

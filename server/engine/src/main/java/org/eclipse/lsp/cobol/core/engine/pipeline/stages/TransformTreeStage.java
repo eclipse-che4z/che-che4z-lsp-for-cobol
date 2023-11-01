@@ -14,9 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
@@ -44,17 +48,11 @@ import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 /**
  * Transform Tree Stage
  */
 @RequiredArgsConstructor
-public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserStageResult, List<Node>>> {
+public class TransformTreeStage implements Stage<ProcessingResult, ParserStageResult> {
 
   private final SymbolsRepository symbolsRepository;
   private final MessageService messageService;
@@ -64,15 +62,13 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
   private final AstProcessor astProcessor;
 
   @Override
-  public PipelineResult<ProcessingResult> run(AnalysisContext context, PipelineResult<Pair<ParserStageResult, List<Node>>> prevPipelineResult) {
+  public PipelineResult<ProcessingResult> run(AnalysisContext context, PipelineResult<ParserStageResult> prevPipelineResult) {
     // Transform parsed tree to AST
     List<Node> syntaxTree = transformAST(
             context,
             context.getCopybooksRepository(),
-            prevPipelineResult.getData().getKey().getTokens(),
-            prevPipelineResult.getData().getKey().getTree());
-
-    addEmbeddedNodes(syntaxTree.get(0), prevPipelineResult.getData().getRight());
+            prevPipelineResult.getData().getTokens(),
+            prevPipelineResult.getData().getTree());
 
     SymbolAccumulatorService symbolAccumulatorService = new SymbolAccumulatorService();
     Node rootNode = processSyntaxTree(context.getConfig(), symbolAccumulatorService, context, syntaxTree);
@@ -179,7 +175,7 @@ public class TransformTreeStage implements Stage<ProcessingResult, Pair<ParserSt
     ctx.register(d, ProcedureDivisionBodyNode.class, new DefineCodeBlock(symbolAccumulatorService));
 
     // Phase POST DEFINITION
-    ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor(analysisConfig));
+    ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor());
 
     // Phase USAGE
     ProcessingPhase u = ProcessingPhase.USAGE;

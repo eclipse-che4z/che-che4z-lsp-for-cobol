@@ -33,7 +33,7 @@ class TestSqlIncludeStatementNotFoundCopybook {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL INCLUDE {~CPYNAME|missing} END-EXEC.\n"
+          + "       EXEC SQL INCLUDE {CPYNAME|missing} END-EXEC.\n"
           + "       PROCEDURE DIVISION.";
 
   @Test
@@ -47,7 +47,7 @@ class TestSqlIncludeStatementNotFoundCopybook {
                 new Range(),
                 "CPYNAME: Copybook not found",
                 Error,
-                ErrorSource.COPYBOOK.getText(),
+                ErrorSource.DIALECT.getText(),
                 ErrorCodes.MISSING_COPYBOOK.getLabel())));
   }
 }

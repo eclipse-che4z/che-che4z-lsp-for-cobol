@@ -53,7 +53,7 @@ class IdmsCopybookVisitorTest {
 
   @BeforeEach
   void init() {
-    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER);
+    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED);
     Set<CopybookName> processedCopybooks = new HashSet<>();
 
     visitor = new IdmsCopybookVisitor(copybookService, copybookConfig,
@@ -67,7 +67,7 @@ class IdmsCopybookVisitorTest {
     IdmsCopyParser.CopyIdmsSourceContext sourceContext = mock(IdmsCopyParser.CopyIdmsSourceContext.class);
     CopybookName expectedCopybookName = new CopybookName("copybook", "IDMS");
     when(copybookService.resolve(any(CopybookId.class), any(CopybookName.class), anyString(), anyString(),
-            any(CopybookConfig.class), anyBoolean()))
+            anyBoolean()))
             .thenReturn(
                     new ResultWithErrors<>(
                             new CopybookModel(expectedCopybookName.toCopybookId(PROGRAM_DOCUMENT_URI), expectedCopybookName, null, null),

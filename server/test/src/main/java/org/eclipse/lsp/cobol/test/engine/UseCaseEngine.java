@@ -15,32 +15,6 @@
 
 package org.eclipse.lsp.cobol.test.engine;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Multimap;
-import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
-import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
-import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
-import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.test.CobolText;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
@@ -49,6 +23,33 @@ import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.analyze;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
+import com.google.gson.JsonElement;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import lombok.experimental.UtilityClass;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.test.CobolText;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 /**
  * This class applies syntax and semantic analysis for COBOL texts using the actual Language Engine.
@@ -195,13 +196,18 @@ public class UseCaseEngine {
       List<String> subroutineNames,
       AnalysisConfig analysisConfig) {
 
+    SQLBackend sqlBackendSetting = Optional.ofNullable(analysisConfig.getDialectsSettings()
+            .get("target-sql-backend"))
+            .map(JsonElement::getAsString)
+            .map(SQLBackend::valueOf)
+            .orElse(SQLBackend.DB2_SERVER);
     PreprocessedDocument document =
         AnnotatedDocumentCleaning.prepareDocument(
             text,
             copybooks,
             subroutineNames,
             expectedDiagnostics,
-            analysisConfig.getCopybookConfig().getSqlBackend());
+            sqlBackendSetting);
     AnalysisResult actual =
         analyze(
             UseCase.builder()
@@ -209,12 +215,11 @@ public class UseCaseEngine {
                 .text(document.getText())
                 .copybooks(document.getCopybooks())
                 .subroutines(subroutineNames)
-                .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
                 .cicsTranslator(analysisConfig.isCicsTranslatorEnabled())
                 .copybookProcessingMode(
                     analysisConfig.getCopybookConfig().getCopybookProcessingMode())
-                .features(analysisConfig.getFeatures())
                 .dialects(analysisConfig.getDialects())
+                .sqlBackend(sqlBackendSetting)
                 .dialectsSettings(analysisConfig.getDialectsSettings())
                 .compilerOptions(analysisConfig.getCompilerOptions())
                 .build());
@@ -239,6 +244,10 @@ public class UseCaseEngine {
                                     Map<String, Diagnostic> expectedDiagnostics,
                                     List<String> subroutineNames,
                                     AnalysisConfig analysisConfig) {
+    SQLBackend sqlBackendSetting = Optional.ofNullable(analysisConfig.getDialectsSettings().get("target-sql-backend"))
+            .map(JsonElement::getAsString)
+            .map(SQLBackend::valueOf)
+            .orElse(SQLBackend.DB2_SERVER);
 
     PreprocessedDocument document =
         AnnotatedDocumentCleaning.prepareDocument(
@@ -246,7 +255,7 @@ public class UseCaseEngine {
             copybooks,
             subroutineNames,
             expectedDiagnostics,
-            analysisConfig.getCopybookConfig().getSqlBackend());
+                sqlBackendSetting);
     AnalysisResult actual =
         analyze(
             UseCase.builder()
@@ -255,10 +264,8 @@ public class UseCaseEngine {
                 .copybooks(document.getCopybooks())
                 .subroutines(subroutineNames)
                 .cicsTranslator(analysisConfig.isCicsTranslatorEnabled())
-                .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
                 .copybookProcessingMode(
                     analysisConfig.getCopybookConfig().getCopybookProcessingMode())
-                .features(analysisConfig.getFeatures())
                 .dialects(analysisConfig.getDialects())
                 .dialectsSettings(analysisConfig.getDialectsSettings())
                 .build());

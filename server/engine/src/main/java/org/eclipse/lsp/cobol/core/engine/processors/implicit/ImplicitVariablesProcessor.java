@@ -14,11 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors.implicit;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.EmbeddedLanguage;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
@@ -27,15 +24,11 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 
-import java.util.List;
-
 /**
  * Enrich symbolic table with predefined variables
  */
 @AllArgsConstructor
 public class ImplicitVariablesProcessor implements Processor<SectionNode> {
-
-  private final AnalysisConfig config;
 
   @Override
   public void accept(SectionNode sectionNode, ProcessingContext processingContext) {
@@ -44,20 +37,7 @@ public class ImplicitVariablesProcessor implements Processor<SectionNode> {
       ProgramNode programNode = sectionNode.getProgram()
               .orElseThrow(() -> new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found"));
       registerVariables(variableAccumulator, programNode, SRImplicitVariablesGenerator.generate());
-      if (config.getFeatures().contains(EmbeddedLanguage.SQL)
-              && config.getCopybookConfig().getSqlBackend().equals(SQLBackend.DB2_SERVER)
-              && !hasSqlCa(programNode)) {
-        registerVariables(variableAccumulator, programNode, Db2ImplicitVariablesGenerator.generate());
-      }
     }
-  }
-
-  private static boolean hasSqlCa(ProgramNode programNode) {
-    return programNode.getDepthFirstStream().anyMatch(node ->
-            node.getNodeType().equals(NodeType.VARIABLE)
-                    && ((VariableNode) node).getName().equalsIgnoreCase("SQLCA")
-                    && (node instanceof VariableWithLevelNode)
-                    && ((VariableWithLevelNode) node).getLevel() == 1);
   }
 
   private void registerVariables(VariableAccumulator variableAccumulator, ProgramNode programNode, List<VariableNode> nodes) {

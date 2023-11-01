@@ -15,7 +15,16 @@
 
 package org.eclipse.lsp.cobol.test.engine;
 
+import static java.util.stream.Collectors.toList;
+import static org.antlr.v4.runtime.CharStreams.fromString;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.toURI;
+
 import com.google.common.collect.ImmutableList;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -26,16 +35,6 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.usecase.UseCasePreprocessorLexer;
 import org.eclipse.usecase.UseCasePreprocessorParser;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
-import static org.antlr.v4.runtime.CharStreams.fromString;
-import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
-import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.toURI;
 
 /**
  * This utility class cleans up annotated texts for use cases and prepares the text and expected
@@ -73,7 +72,7 @@ class AnnotatedDocumentCleaning {
     return new PreprocessedDocument(
         testData.getText(),
         processCopybooks(
-            collectCopybooks(explicitCopybooks, sqlBackend, testData.getCopybookUsages()),
+            collectCopybooks(explicitCopybooks, testData.getCopybookUsages(), sqlBackend),
             expectedDiagnostics,
             testData),
         testData);
@@ -81,8 +80,8 @@ class AnnotatedDocumentCleaning {
 
   private Stream<CobolText> collectCopybooks(
       List<CobolText> explicitCopybooks,
-      SQLBackend sqlBackend,
-      Map<String, List<Location>> usedCopybooks) {
+      Map<String, List<Location>> usedCopybooks,
+      SQLBackend sqlBackend) {
     return Stream.concat(
         explicitCopybooks.stream(),
         collectUsedPredefinedCopybooks(

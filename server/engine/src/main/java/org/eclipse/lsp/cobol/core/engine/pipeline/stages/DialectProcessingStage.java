@@ -14,18 +14,16 @@
  */
 package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
 
+import java.util.HashSet;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
-
-import java.util.HashSet;
-import java.util.Set;
+import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 
 /**
  * Dialect Processing Stage
@@ -49,10 +47,10 @@ public class DialectProcessingStage implements Stage<DialectOutcome, Void> {
   }
 
   private DialectOutcome processDialects(AnalysisContext ctx) {
-    CopybookConfig copybookConfig = ctx.getConfig().getCopybookConfig();
+    dialectService.addDialectPredefinedCopybooks(ctx.getConfig());
     DialectProcessingContext dialectProcessingContext =
         DialectProcessingContext.builder()
-            .copybookConfig(copybookConfig)
+            .config(ctx.getConfig())
             .programDocumentUri(ctx.getExtendedDocument().getUri())
             .extendedDocument(ctx.getExtendedDocument())
             .build();

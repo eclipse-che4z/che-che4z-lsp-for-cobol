@@ -238,7 +238,6 @@ class CopybookPreprocessorService {
             copybookName,
             programDocumentUri,
             documentUri,
-            copybookConfig,
             true);
     CopybookModel copybookModel = resolvedCopybook.getResult();
     if (copybookModel.getContent() == null) {

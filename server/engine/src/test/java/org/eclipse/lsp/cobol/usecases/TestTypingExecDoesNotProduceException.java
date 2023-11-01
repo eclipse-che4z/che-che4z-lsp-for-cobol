@@ -32,7 +32,7 @@ class TestTypingExecDoesNotProduceException {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           EXEC{|1} ";
+          + "           {@*EXEC}{|1} ";
 
   @Test
   void test() {
@@ -43,7 +43,7 @@ class TestTypingExecDoesNotProduceException {
             "1",
             new Diagnostic(
                 new Range(),
-                "No viable alternative at input EXEC",
+                "Unexpected end of file",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

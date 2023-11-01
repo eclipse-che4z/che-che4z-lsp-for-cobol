@@ -63,9 +63,7 @@ class PositiveTest extends FileBasedTest {
               .documentUri(fileName)
               .text(text.getFullText())
               .copybooks(getFileSpecificCopybooks(cobolTextRegistry, fileName))
-              .sqlBackend(analysisConfig.getCopybookConfig().getSqlBackend())
               .copybookProcessingMode(ENABLED)
-              .features(analysisConfig.getFeatures())
               .dialects(analysisConfig.getDialects())
               .dialectsSettings(analysisConfig.getDialectsSettings())
               .build();

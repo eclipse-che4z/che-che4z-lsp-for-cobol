@@ -14,22 +14,23 @@
  */
 package org.eclipse.lsp.cobol.service.settings;
 
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
+
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.inject.Singleton;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.service.utils.ServerTypeUtil;
-
-import javax.inject.Inject;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 
 /** This service fetches configuration settings from the client. */
 @Slf4j
@@ -46,15 +47,17 @@ public class CachingConfigurationService implements ConfigurationService {
 
   private CompletableFuture<ConfigurationEntity> createConfigFuture(String documentURI) {
     List<String> settingsList = new LinkedList<>(Arrays.asList(
-        TARGET_SQL_BACKEND.label,
-        ANALYSIS_FEATURES.label,
         DIALECTS.label,
         SUBROUTINE_LOCAL_PATHS.label,
         CICS_TRANSLATOR_ENABLED.label,
         DIALECT_REGISTRY.label,
         COMPILER_OPTIONS.label));
 
-    List<String> dialectsSections = dialectService.getSettingsSections();
+    List<String> dialectsSections = Stream.concat(
+            dialectService.getSettingsSections().stream(),
+            dialectService.getImplicitDialectSettingsSections().stream())
+            .collect(Collectors.toList());
+
     settingsList.addAll(dialectsSections);
 
     return Optional.ofNullable(settingsService.fetchConfigurations(documentURI, settingsList))
@@ -119,14 +122,12 @@ public class CachingConfigurationService implements ConfigurationService {
   private ConfigurationEntity parseSettings(List<Object> clientConfig, List<String> dialectsSections) {
 
     return new ConfigurationEntity(
-            ConfigHelper.parseSQLBackend(clientConfig.subList(0, 1)),
-            ConfigHelper.parseFeatures((JsonElement) clientConfig.get(1)),
-            ConfigHelper.parseDialects((JsonArray) clientConfig.get(2)),
-            ConfigHelper.parseSubroutineFolder((JsonElement) clientConfig.get(3)),
-            ConfigHelper.parseCicsTranslatorOption((JsonElement) clientConfig.get(4)),
-            ConfigHelper.parseDialectRegistry((JsonArray) clientConfig.get(5)),
-            ConfigHelper.parseCompilerOptions(clientConfig.get(6)),
-        getDialectsSettings(clientConfig.subList(7, 7 + dialectsSections.size()).toArray(), dialectsSections.toArray())
+            ConfigHelper.parseDialects((JsonArray) clientConfig.get(0)),
+            ConfigHelper.parseSubroutineFolder((JsonElement) clientConfig.get(1)),
+            ConfigHelper.parseCicsTranslatorOption((JsonElement) clientConfig.get(2)),
+            ConfigHelper.parseDialectRegistry((JsonArray) clientConfig.get(3)),
+            ConfigHelper.parseCompilerOptions(clientConfig.get(4)),
+        getDialectsSettings(clientConfig.subList(5, 5 + dialectsSections.size()).toArray(), dialectsSections.toArray())
         );
   }
 

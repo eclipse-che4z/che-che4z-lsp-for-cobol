@@ -566,7 +566,7 @@ dataDivision
 
 dataDivisionSection
    : fileSection | workingStorageSection | linkageSection | localStorageSection
-   | execSqlStatementInDataDivision | dialectSection
+   | dialectSection
    ;
 
 dialectSection
@@ -697,8 +697,7 @@ localStorageSection
    ;
 
 dataDescriptionEntryForLocalStorageSection
-   : execSqlStatementInLocalStorage
-   | dataDescriptionEntry
+   : dataDescriptionEntry
    ;
 
 dataDescriptionEntries
@@ -706,13 +705,11 @@ dataDescriptionEntries
    ;
 
 dataDescriptionEntryForWorkingStorageSection
-   : execSqlStatementInWorkingStorage
-   | dataDescriptionEntryForWorkingStorageAndLinkageSection
+   : dataDescriptionEntryForWorkingStorageAndLinkageSection
    ;
 
 dataDescriptionEntryForWorkingStorageAndLinkageSection
-   : execSqlStatementInWorkingStorageAndLinkageSection
-   | dataDescriptionEntry
+   : dataDescriptionEntry
    ;
 
 dataDescriptionEntry
@@ -949,17 +946,17 @@ paragraph
    ;
 
 sentence
-   : (statement | execSqlStatementInProcedureDivision) * (endClause | dialectStatement)
+   : statement * (endClause | dialectStatement)
    ;
 
 conditionalStatementCall
-   : statement | dialectStatement | execSqlStatementInProcedureDivision
+   : statement | dialectStatement
    ;
 
 statement
    : acceptStatement | addStatement | allocateStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
     disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement |
-    execSqlImsStatement | exitStatement | freeStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
+    exitStatement | freeStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
     serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
@@ -1333,43 +1330,6 @@ evaluateWhenOther
 
 evaluateValue
    : arithmeticExpression
-   ;
-
-// exec sql statement for specific divisions or sections of COBOL program
-execSqlStatementInProcedureDivision
-   : execSqlStatement
-   ;
-
-execSqlStatementInWorkingStorage
-   : execSqlStatement DOT_FS?
-   ;
-
-execSqlStatementInLocalStorage
-   : execSqlStatement DOT_FS?
-   ;
-
-execSqlStatementInWorkingStorageAndLinkageSection
-   : execSqlStatement DOT_FS?
-   ;
-
-execSqlStatementInDataDivision
-   : execSqlStatement DOT_FS?
-   ;
-
-execSqlStatement
-   : EXEC SQL sqlCode END_EXEC
-   | {notifyError("cobolParser.missingEndExec");} EXEC SQL sqlCode
-   | {notifyError("cobolParser.missingEndExec");} EXEC SQL
-   ;
-
-sqlCode
-   : ~END_EXEC*?
-   ;
-
-// exec sql ims statement
-
-execSqlImsStatement
-   : EXEC SQLIMS ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exhibit statement

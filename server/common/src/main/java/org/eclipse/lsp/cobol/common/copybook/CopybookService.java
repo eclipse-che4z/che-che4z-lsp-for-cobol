@@ -36,8 +36,6 @@ public interface CopybookService {
    * @param copybookName - the name of the copybook to be retrieved
    * @param programDocumentUri - the currently processing program document
    * @param documentUri - the currently processing document that contains the copy statement
-   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql
-   *     server
    * @param preprocess - indicates if copybook needs to be preprocessed after resolving
    * @return a CopybookModel wrapped inside {@link ResultWithErrors} which contains copybook name, its URI and the content.
    *         Wrapped errors are preprocessed errors for the returned CopybookModel.
@@ -47,7 +45,6 @@ public interface CopybookService {
       @NonNull CopybookName copybookName,
       @NonNull String programDocumentUri,
       @NonNull String documentUri,
-      @NonNull CopybookConfig copybookConfig,
       boolean preprocess);
 
   /**

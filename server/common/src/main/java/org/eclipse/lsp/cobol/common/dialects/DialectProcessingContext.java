@@ -14,20 +14,19 @@
  */
 package org.eclipse.lsp.cobol.common.dialects;
 
-import lombok.Builder;
-import lombok.Value;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
+import lombok.Value;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 /** Contains all needed data for dialect processing */
 @Value
 @Builder(toBuilder = true)
 public class DialectProcessingContext {
-  CopybookConfig copybookConfig;
+  AnalysisConfig config;
   String programDocumentUri;
   ExtendedDocument extendedDocument;
   @Builder.Default List<Node> dialectNodes = new ArrayList<>();
