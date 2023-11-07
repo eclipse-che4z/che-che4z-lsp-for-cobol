@@ -20,18 +20,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import static java.util.stream.Collectors.toList;
 
@@ -41,10 +37,12 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 public class DocumentSymbolHandler {
   private final AsyncAnalysisService asyncAnalysisService;
+  private final DocumentModelService documentModelService;
 
   @Inject
-  public DocumentSymbolHandler(AsyncAnalysisService asyncAnalysisService) {
+  public DocumentSymbolHandler(AsyncAnalysisService asyncAnalysisService, DocumentModelService documentModelService) {
     this.asyncAnalysisService = asyncAnalysisService;
+    this.documentModelService = documentModelService;
   }
 
   /**
@@ -53,13 +51,9 @@ public class DocumentSymbolHandler {
    * @param params DocumentSymbolParams.
    * @return The list of either SymbolInformation or DocumentSymbols.
    */
-  public List<Either<SymbolInformation, DocumentSymbol>> documentSymbol(DocumentSymbolParams params) throws ExecutionException, InterruptedException {
+  public List<Either<SymbolInformation, DocumentSymbol>> documentSymbol(DocumentSymbolParams params) {
     String uri = UriHelper.decode(params.getTextDocument().getUri());
-    Optional<CompletableFuture<CobolDocumentModel>> optional = asyncAnalysisService.fetchLastResultOrAnalyzeDocument(uri);
-    if (!optional.isPresent()) {
-      return Collections.emptyList();
-    }
-    return createDocumentSymbols(optional.get().get().getOutlineResult());
+    return createDocumentSymbols(documentModelService.get(uri).getOutlineResult());
   }
 
   private List<Either<SymbolInformation, DocumentSymbol>> createDocumentSymbols(List<DocumentSymbol> documentSymbols) {
@@ -78,12 +72,15 @@ public class DocumentSymbolHandler {
     return new LspEvent<List<Either<SymbolInformation, DocumentSymbol>>>() {
       @Override
       public List<LspEventDependency> getDependencies() {
+        String uri = UriHelper.decode(params.getTextDocument().getUri());
         return ImmutableList.of(asyncAnalysisService
-                .createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+                        .createDependencyOn(uri),
+                () -> documentModelService.get(uri) != null
+                        && documentModelService.get(uri).getAnalysisResult() != null);
       }
 
       @Override
-      public List<Either<SymbolInformation, DocumentSymbol>> execute() throws ExecutionException, InterruptedException {
+      public List<Either<SymbolInformation, DocumentSymbol>> execute() {
         return documentSymbol(params);
       }
     };
