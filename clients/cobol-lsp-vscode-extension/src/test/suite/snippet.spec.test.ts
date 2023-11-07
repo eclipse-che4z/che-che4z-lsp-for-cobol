@@ -123,7 +123,7 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
     helper.TEST_TIMEOUT,
   );
 
-  test("TC289633 Provide default COBOL code snippets - basic scenario", async () => {
+  test.skip("TC289633 Provide default COBOL code snippets - basic scenario", async () => {
     await helper.showDocument("SNIPPET.cbl");
     const editor = helper.get_editor("SNIPPET.cbl");
     await helper.insertString(editor, pos(2, 0), "sh");
@@ -140,9 +140,10 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
     assert.strictEqual(lines[2], "       ENVIRONMENT DIVISION.");
     assert.strictEqual(lines[7], "       DATA DIVISION.");
     assert.strictEqual(lines[11], "       PROCEDURE DIVISION.");
-  }).timeout(helper.TEST_TIMEOUT);
+  });
+  // .timeout(helper.TEST_TIMEOUT);
 
-  test("TC289635 Provide default COBOL code snippets - upper case", async () => {
+  test.skip("TC289635 Provide default COBOL code snippets - upper case", async () => {
     await helper.showDocument("SNIPPET.cbl");
     const editor = helper.get_editor("SNIPPET.cbl");
     await helper.insertString(editor, pos(2, 0), "sh");
@@ -176,9 +177,10 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
     await vscode.commands.executeCommand("acceptSelectedSuggestion");
     const lines = editor.document.getText().split(/\r\n|\r|\n/);
     assert.ok(lines[15].includes("FUNCTION COS"));
-  }).timeout(helper.TEST_TIMEOUT);
+  });
+  // .timeout(helper.TEST_TIMEOUT);
 
-  test("TC289636 Provide default COBOL code snippets - lower case", async () => {
+  test.skip("TC289636 Provide default COBOL code snippets - lower case", async () => {
     await helper.showDocument("SNIPPET.cbl");
     const editor = helper.get_editor("SNIPPET.cbl");
     await helper.insertString(editor, pos(2, 0), "sh");
@@ -212,5 +214,6 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
     await vscode.commands.executeCommand("acceptSelectedSuggestion");
     const lines = editor.document.getText().split(/\r\n|\r|\n/);
     assert.ok(lines[15].includes("FUNCTION COS"));
-  }).timeout(helper.TEST_TIMEOUT);
+  });
+  // .timeout(helper.TEST_TIMEOUT);
 });

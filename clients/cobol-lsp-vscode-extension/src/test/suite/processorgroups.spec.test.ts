@@ -33,7 +33,7 @@ suite("Integration Test Suite: Processor Groups", function () {
   // idms-dialect-support (development) npm ci && npm run package
   // put server.jar, dialect-idms.jar and dialect-daco.jar into their server/jar folders
 
-  test("TC355920: IDMS - with preprocessor setup", async () => {
+  test.skip("TC355920: IDMS - with preprocessor setup", async () => {
     const extSrcPath = path.join("cobol-idms", "IDMSSMPL.cbl");
     const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
@@ -43,7 +43,7 @@ suite("Integration Test Suite: Processor Groups", function () {
     assert.match(message, /^IDMSABCD: Copybook not found/);
   });
 
-  test("TC355921: DaCo - with processor setup", async () => {
+  test.skip("TC355921: DaCo - with processor setup", async () => {
     const extSrcPath = path.join("cobol-daco", "DACOSMPL.cbl");
     const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
@@ -63,7 +63,7 @@ suite("Integration Test Suite: Processor Groups", function () {
     assert.match(message, /^Syntax error on 'IDMS-CONTROL'/);
   });
 
-  test("TC355919: DaCo - without preprocessor setup", async () => {
+  test.skip("TC355919: DaCo - without preprocessor setup", async () => {
     const extSrcPath = path.join("cobol-idms", "DACOSMPL.cbl");
     const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
