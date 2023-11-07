@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service.delegates.references;
 
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.DocumentHighlight;
 import org.eclipse.lsp4j.Location;
@@ -64,12 +65,12 @@ public interface Occurrences {
    * Resolve a document highlights for a given text document position. Return the highlight
    * positions for the definitions and usages.
    *
-   * @param document - document document that contains a semantic context
+   * @param analysisResult - the document analysis result
    * @param position - position of the required token
    * @return list of document highlights for the required token or empty list if token is empty or
    *     not of a supported type
    */
   @NonNull
   List<DocumentHighlight> findHighlights(
-      @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position);
+          @NonNull AnalysisResult analysisResult, @NonNull TextDocumentPositionParams position);
 }

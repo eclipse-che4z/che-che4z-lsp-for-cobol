@@ -17,16 +17,11 @@ package org.eclipse.lsp.cobol.service;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
-import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
-import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
-import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
-import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
-import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
-import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,8 +31,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -47,54 +40,44 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AnalysisServiceTest {
   private AnalysisService service;
-  @Mock private LanguageEngineFacade engine;
-  @Mock private ConfigurationService configurationService;
-  @Mock private SyncProvider syncProvider;
-  @Mock private CopybookIdentificationService copybookIdentificationService;
-  @Mock private Communications communications;
-  @Mock private DataBusBroker dataBus;
-  @Mock private Completions completions;
-  @Mock private Occurrences occurrences;
-  @Mock private Formations formations;
-  @Mock private HoverProvider hoverProvider;
-  @Mock private DocumentModelService documentService;
-  @Mock private DocumentContentCache contentCache;
+  @Mock
+  private LanguageEngineFacade engine;
+  @Mock
+  private ConfigurationService configurationService;
+  @Mock
+  private SyncProvider syncProvider;
+  @Mock
+  private CopybookIdentificationService copybookIdentificationService;
+  @Mock
+  private Communications communications;
+  @Mock
+  private DocumentModelService documentService;
+  @Mock
+  private DocumentContentCache contentCache;
+  @Mock
+  private CopybookService copybookService;
 
   @BeforeEach
   void init() {
     service =
-        new AnalysisService(
-            communications,
-            engine,
-            dataBus,
-            configurationService,
-            syncProvider,
-            copybookIdentificationService,
-            completions,
-            occurrences,
-            formations,
-            hoverProvider,
-            documentService,
-            contentCache);
+            new AnalysisService(engine,
+                    configurationService,
+                    syncProvider,
+                    copybookIdentificationService,
+                    copybookService, documentService,
+                    contentCache);
     service.setExtensionConfig(ImmutableList.of());
   }
 
   @Test
   void testIsCopybook() throws InterruptedException {
     service =
-        new AnalysisService(
-            communications,
-            engine,
-            dataBus,
-            configurationService,
-            syncProvider,
-            copybookIdentificationService,
-            completions,
-            occurrences,
-            formations,
-            hoverProvider,
-            documentService,
-            contentCache);
+            new AnalysisService(engine,
+                    configurationService,
+                    syncProvider,
+                    copybookIdentificationService,
+                    copybookService, documentService,
+                    contentCache);
 
     CompletableFuture.supplyAsync(() -> service.isCopybook("", ""));
 
@@ -108,124 +91,13 @@ class AnalysisServiceTest {
   }
 
   @Test
-  void findCompletion() {
-    String uri = UUID.randomUUID().toString();
-    service.findCompletion(uri, mock(CompletionParams.class));
-
-    verify(documentService, times(1)).get(uri);
-    verify(completions, times(1)).collectFor(any(), any());
-  }
-
-  @Test
-  void findDefinition() {
-    String uri = UUID.randomUUID().toString();
-    when(documentService.isDocumentSynced(uri)).thenReturn(true);
-
-    service.findDefinition(uri, mock(DefinitionParams.class));
-
-    verify(documentService, times(1)).isDocumentSynced(uri);
-    verify(occurrences, times(1)).findDefinitions(any(), any());
-  }
-
-  @Test
-  void findReferences() {
-    String uri = UUID.randomUUID().toString();
-    when(documentService.isDocumentSynced(uri)).thenReturn(true);
-
-    service.findReferences(uri, mock(ReferenceParams.class));
-    verify(documentService, times(1)).isDocumentSynced(uri);
-    verify(occurrences, times(1)).findReferences(any(), any(), any());
-  }
-
-  @Test
-  void findHighlights() {
-    String uri = UUID.randomUUID().toString();
-    when(documentService.isDocumentSynced(uri)).thenReturn(true);
-
-    service.findHighlights(uri, mock(DocumentHighlightParams.class));
-    verify(documentService, times(1)).isDocumentSynced(uri);
-    verify(occurrences, times(1)).findHighlights(any(), any());
-  }
-
-  @Test
-  void findFormatting() {
-    String uri = UUID.randomUUID().toString();
-    when(documentService.get(uri)).thenReturn(mock(CobolDocumentModel.class));
-    service.findFormatting(uri);
-    verify(formations, times(1)).format(any());
-  }
-
-  @Test
-  void findFormatting_whenDocumentNotAnalysed() {
-    String uri = UUID.randomUUID().toString();
-    when(documentService.get(uri)).thenReturn(null);
-    assertEquals(service.findFormatting(uri).size(), 0);
-  }
-
-  @Test
-  void findHover() {
-    String uri = UUID.randomUUID().toString();
-
-    service.findHover(uri, mock(HoverParams.class));
-    verify(documentService, times(1)).get(uri);
-    verify(hoverProvider, times(1)).getHover(any(), any());
-  }
-
-  @Test
-  void findFoldingRange() {
-    String uri = UUID.randomUUID().toString();
-    when(documentService.isDocumentSynced(uri)).thenReturn(true);
-    when(documentService.get(uri)).thenReturn(mock(CobolDocumentModel.class));
-
-    service.findFoldingRange(uri);
-    verify(documentService, times(1)).get(uri);
-  }
-
-  @Test
-  void findFoldingRange_whenDocNotAnalysed() {
-    String uri = UUID.randomUUID().toString();
-    when(documentService.isDocumentSynced(uri)).thenReturn(false);
-    assertEquals(service.findFoldingRange(uri).size(), 0);
-  }
-
-  @Test
-  void findDocumentSymbol() {
-    String uri = UUID.randomUUID().toString();
-    when(documentService.isDocumentSynced(uri)).thenReturn(true);
-    when(documentService.get(uri)).thenReturn(mock(CobolDocumentModel.class));
-
-    service.findDocumentSymbol(uri);
-    verify(communications, times(1)).notifyProgressEnd(uri);
-  }
-
-  @Test
-  void findDocumentSymbolWhenDocNotAnalysed() {
-    String uri = UUID.randomUUID().toString();
-    when(documentService.isDocumentSynced(uri)).thenReturn(false);
-
-    assertEquals(service.findDocumentSymbol(uri).size(), 0);
-    verify(communications, times(1)).notifyProgressEnd(uri);
-  }
-
-  @Test
-  void testAnalyzeDocument_git() {
-    String uri = "gitfs:/" + UUID.randomUUID();
-    String text = UUID.randomUUID().toString();
-
-    service.analyzeDocument(uri, text);
-    verify(documentService, times(0)).openDocument(uri, text);
-  }
-
-  @Test
   void testAnalyzeDocument_copybook() {
     String uri = UUID.randomUUID().toString();
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
 
-    service.analyzeDocument(uri, text);
+    service.analyzeDocument(uri, text, true);
     verify(documentService, times(1)).openDocument(uri, text);
-    verify(communications, times(1)).publishDiagnostics(any());
-    verify(communications, times(0)).notifyProgressBegin(uri);
     verify(engine, times(0)).analyze(any(), any(), any());
   }
 
@@ -240,10 +112,8 @@ class AnalysisServiceTest {
     when(syncProvider.getSync(any())).thenReturn(new Object());
     when(engine.analyze(any(), any(), any())).thenReturn(result);
 
-    service.analyzeDocument(uri, text);
+    service.analyzeDocument(uri, text, true);
     verify(documentService, times(1)).openDocument(uri, text);
-    verify(communications, times(1)).publishDiagnostics(any());
-    verify(communications, times(1)).notifyProgressBegin(uri);
     verify(engine, times(1)).analyze(any(), any(), any());
   }
 
@@ -253,10 +123,8 @@ class AnalysisServiceTest {
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
 
-    service.reanalyzeDocument(uri, text);
+    service.analyzeDocument(uri, text, false);
     verify(documentService, times(1)).updateDocument(uri, text);
-    verify(communications, times(0)).publishDiagnostics(documentService.getOpenedDiagnostic());
-    verify(communications, times(0)).notifyProgressBegin(uri);
     verify(engine, times(0)).analyze(any(), any(), any());
   }
 
@@ -268,10 +136,8 @@ class AnalysisServiceTest {
     when(syncProvider.getSync(any())).thenReturn(new Object());
     when(engine.analyze(any(), any(), any())).thenReturn(prepareAnalysisResult());
 
-    service.reanalyzeDocument(uri, text);
+    service.analyzeDocument(uri, text, false);
     verify(documentService, times(1)).updateDocument(uri, text);
-    verify(communications, times(1)).publishDiagnostics(any());
-    verify(communications, times(1)).notifyProgressBegin(uri);
     verify(engine, times(1)).analyze(any(), any(), any());
   }
 
@@ -283,7 +149,6 @@ class AnalysisServiceTest {
 
     service.stopAnalysis(uri);
     verify(documentService, times(1)).closeDocument(uri);
-    verify(communications, times(1)).publishDiagnostics(any());
     verify(documentService, times(0)).removeDocument(uri);
   }
 
@@ -295,23 +160,7 @@ class AnalysisServiceTest {
 
     service.stopAnalysis(uri);
     verify(documentService, times(1)).closeDocument(uri);
-    verify(communications, times(1)).publishDiagnostics(any());
     verify(documentService, times(1)).removeDocument(uri);
-  }
-
-  @Test
-  void testRetrieveAnalysis_analyzed() {
-    String uri = UUID.randomUUID().toString();
-    String text = UUID.randomUUID().toString();
-
-    CobolDocumentModel document = mock(CobolDocumentModel.class);
-    when(document.isDocumentSynced()).thenReturn(true);
-    when(document.getAnalysisResult()).thenReturn(prepareAnalysisResult());
-
-    when(documentService.get(uri)).thenReturn(document);
-
-    assertNotNull(service.retrieveAnalysis(uri, text));
-    verify(engine, times(0)).analyze(any(), any(), any());
   }
 
   private AnalysisResult prepareAnalysisResult() {

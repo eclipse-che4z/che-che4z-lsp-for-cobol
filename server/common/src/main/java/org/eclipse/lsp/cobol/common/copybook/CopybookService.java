@@ -17,6 +17,8 @@ package org.eclipse.lsp.cobol.common.copybook;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 
+import java.util.Collection;
+
 /**
  * Provide API definition to search for copybooks files. The service also caches copybook to reduce
  * filesystem load.
@@ -62,4 +64,13 @@ public interface CopybookService {
    * @param doCleanUp is copybook clean up required before storing copybookModel.
    */
   void store(CopybookModel copybookModel, boolean doCleanUp);
+
+  /**
+   * Send downloading requests to the Client for copybooks not presented locally, if any.
+   *
+   * @param documentUri current document uri.
+   * @param copybookUris collection of copybook uris.
+   * @param processingMode copybook processing mode.
+   */
+  void sendCopybookDownloadRequest(String documentUri, Collection<String> copybookUris, CopybookProcessingMode processingMode);
 }

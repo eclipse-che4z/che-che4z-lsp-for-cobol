@@ -1,6 +1,7 @@
 [
   {
     "name": "STPRG",
+    "type": "program",
     "location": {
       "uri": "fake/path",
       "start": {
@@ -12,10 +13,20 @@
         "character": 21
       }
     },
-    "type": "program",
     "children": [
       {
-        "type": "stop"
+        "type": "stop",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 16,
+            "character": 12
+          },
+          "end": {
+            "line": 16,
+            "character": 20
+          }
+        }
       }
     ]
   }

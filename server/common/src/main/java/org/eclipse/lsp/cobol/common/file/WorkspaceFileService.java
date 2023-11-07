@@ -44,6 +44,8 @@ import java.util.stream.Stream;
  */
 @Slf4j
 public class WorkspaceFileService implements FileSystemService {
+  public WorkspaceFileService() {
+  }
 
   @Override
   public boolean fileExists(@Nullable Path file) {
@@ -73,8 +75,8 @@ public class WorkspaceFileService implements FileSystemService {
     CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
     decoder.onMalformedInput(CodingErrorAction.REPLACE);
     try (FileInputStream input = new FileInputStream(path.toFile());
-        InputStreamReader reader = new InputStreamReader(input, decoder);
-        BufferedReader bufferedReader = new BufferedReader(reader)) {
+         InputStreamReader reader = new InputStreamReader(input, decoder);
+         BufferedReader bufferedReader = new BufferedReader(reader)) {
       StringBuilder sb = new StringBuilder();
       String line = bufferedReader.readLine();
       while (line != null) {
@@ -115,9 +117,8 @@ public class WorkspaceFileService implements FileSystemService {
   @Override
   @NonNull
   public List<String> listFilesInDirectory(final String path) {
-
     final String[] pathSplittedByFirstAsterisk = uriWithReplacedPlaceholdersToAsterisks(
-        path).split("\\*", 2);
+            path).split("\\*", 2);
     final String pathToResolve = pathSplittedByFirstAsterisk[0];
     final boolean isPathContainsAsterisk = pathSplittedByFirstAsterisk.length >= 2;
     int maxDepth = 1;
@@ -129,7 +130,11 @@ public class WorkspaceFileService implements FileSystemService {
       final String uriPath = a.toUri().getPath().replace("\\\\", "/");
       return !isPathContainsAsterisk || Pattern.compile(pathSplittedByFirstAsterisk[1]).matcher(uriPath).find();
     };
-    try (Stream<Path> streamPath = Files.find(Paths.get(pathToResolve), maxDepth, pathBasicFileAttributesBiPredicate)) {
+    Path start = Paths.get(pathToResolve);
+    if (!Files.isDirectory(start)) {
+      return ImmutableList.of();
+    }
+    try (Stream<Path> streamPath = Files.find(start, maxDepth, pathBasicFileAttributesBiPredicate)) {
       return streamPath
               .map(Path::toFile)
               .filter(File::isFile)
@@ -143,6 +148,7 @@ public class WorkspaceFileService implements FileSystemService {
 
   /**
    * Reads implicit content
+   *
    * @param name us a name of the implicit code
    * @return the content as a string
    */
