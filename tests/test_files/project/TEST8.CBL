@@ -11,27 +11,13 @@
       * Contributors:                                                *
       *   Broadcom, Inc. - initial API and implementation            *
       ****************************************************************
-       COPY ASTRO.
-       PROGRAM-ID. TESTREPL.
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. ABCDEF.
        DATA DIVISION.
-       WORKING-STORAGE SECTION.                                                 
-      *01  PARENT.
-      * COPY PAYLIB REPLACING ==01 A== BY ==02 ABCD==.
-            
-      * COPY REPL REPLACING ==TAG== BY ==ABC==
-      * ==TAR== by ==XYZ==.
-      * COPY REPL REPLACING ==TAG== BY DEF.
-       COPY PAYLIB REPLACING  A BY PAYROLL1
-                         B BY PAY-CODE
-                         C BY GROSS-PAY
-                         D BY HOURS.
-
+       WORKING-STORAGE SECTION.
+       01  PARENT.
+           COPY REPLERR.
        PROCEDURE DIVISION.
+
        MAINLINE.
-           MOVE 0 TO PAY-CODE OF PAYROLL1.
-           PERFORM NAME3.
-      *    MOVE 0 TO ABCD OF PARENT.
-      *    MOVE 0 TO ABC-ID.
-      *    MOVE 0 TO DEF-ID.
-       COPY 'NEW' REPLACING ==NAME2== BY ==NAME+3== .
-           GOBACK. 
+           GOBACK.

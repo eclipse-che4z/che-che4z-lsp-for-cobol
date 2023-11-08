@@ -149,7 +149,8 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
     assert.match(message, /^Syntax error on 'REPLACING' expected SECTION/);
   });
 
-  test("TC250946: Support building of the extended document - Replace by arithmetic operations", async () => {
+  test("TC250946: Support building of the extended document - Replace by arithmetic operations" +
+        "TC314935: Copybook with Name in Quotes is Recognized", async () => {
     let editor = await helper.showDocument(path.join("TEST7.CBL"));
     const extSrcPath = path.join("testing", "NEW.CPY");
     editor = await helper.showDocument(extSrcPath);
