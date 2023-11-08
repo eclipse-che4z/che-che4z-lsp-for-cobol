@@ -1,6 +1,7 @@
 [
   {
     "name": "CASE1",
+    "type": "program",
     "location": {
       "uri": "fake/path",
       "start": {
@@ -11,7 +12,6 @@
         "line": 15,
         "character": 27
       }
-    },
-    "type": "program"
+    }
   }
 ]

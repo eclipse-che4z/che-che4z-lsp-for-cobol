@@ -1,6 +1,7 @@
 [
   {
     "name": "GTKW",
+    "type": "program",
     "location": {
       "uri": "fake/path",
       "start": {
@@ -12,17 +13,28 @@
         "character": 29
       }
     },
-    "type": "program",
     "children": [
       {
         "targetName": [
           "OPTIONS"
         ],
-        "type": "goto"
+        "type": "goto",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 17,
+            "character": 12
+          },
+          "end": {
+            "line": 17,
+            "character": 25
+          }
+        }
       },
       {
-        "snippet": "OPTIONS.\r\n           DISPLAY 'OPTION'.",
+        "snippet": "OPTIONS.\r\n           DISPLAY \u0027OPTION\u0027.",
         "name": "OPTIONS",
+        "type": "paragraph",
         "location": {
           "uri": "fake/path",
           "start": {
@@ -33,8 +45,7 @@
             "line": 19,
             "character": 29
           }
-        },
-        "type": "paragraph"
+        }
       }
     ]
   }

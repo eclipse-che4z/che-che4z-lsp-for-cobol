@@ -25,9 +25,11 @@ import java.util.List;
 @Data
 public class CFASTNode {
   final String type;
+  Location location;
   List<CFASTNode> children;
 
-  public CFASTNode(String type) {
+  public CFASTNode(String type, Location location) {
     this.type = type;
+    this.location = location;
   }
 }

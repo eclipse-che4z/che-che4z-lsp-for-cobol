@@ -191,18 +191,39 @@ suite("Integration Test Suite", function () {
   test("TC312738 CICS variables and paragraphs support", async () => {
     await helper.showDocument("ADSORT.cbl");
     let editor = helper.get_editor("ADSORT.cbl");
-
+    await helper.waitFor(async () => {
+      helper.sleep(100);
+      const result: any[] = await vscode.commands.executeCommand(
+        "vscode.executeDefinitionProvider",
+        editor.document.uri,
+        pos(58, 36),
+      );
+      return result.length > 0;
+    });
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeDefinitionProvider",
       editor.document.uri,
       pos(58, 36),
     );
-    assert.ok(
-      result.length === 1 &&
-        result[0].uri.fsPath === editor.document.fileName &&
-        result[0].range.start.line === 27 &&
-        result[0].range.start.character === 7,
-      "Checks behavior of go to definition action",
+    assert.strictEqual(
+      result.length,
+      1,
+      "Checks behavior of go to definition action (size)",
+    );
+    assert.strictEqual(
+      result[0].uri.fsPath,
+      editor.document.fileName,
+      "Checks behavior of go to definition action (path)",
+    );
+    assert.strictEqual(
+      result[0].range.start.line,
+      27,
+      "Checks behavior of go to definition action (line)",
+    );
+    assert.strictEqual(
+      result[0].range.start.character,
+      7,
+      "Checks behavior of go to definition action (char)",
     );
   })
     .timeout(helper.TEST_TIMEOUT)
@@ -590,6 +611,80 @@ suite("Integration Test Suite", function () {
       "got: " + JSON.stringify(diagnostic),
     );
     assert.strictEqual(diagnostic[0].message, "Errors inside the copybook");
+  })
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
+
+  test("Diagnostics are updated for related files in accordance with the open/close files", async () => {
+    // Open program which introduces error inside a copybook
+    await helper.showDocument("DIAGNOSTIC_TEST_B.CBL");
+    const prog2Uri = await helper.getUri("DIAGNOSTIC_TEST_B.CBL");
+
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(prog2Uri).length === 1,
+    );
+    assert.strictEqual(
+      vscode.languages.getDiagnostics(prog2Uri)[0].message,
+      "Errors inside the copybook",
+    );
+
+    //open copybook
+    const copybookPath = path.join("testing", "DIAGNOS.CPY");
+    await helper.showDocument(copybookPath);
+    const copybookUri = await helper.getUri(copybookPath);
+
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(copybookUri).length === 1,
+    );
+
+    const copybookDiag = vscode.languages.getDiagnostics(copybookUri);
+    assert.strictEqual(
+      copybookDiag.length,
+      1,
+      "got: " + JSON.stringify(copybookDiag),
+    );
+    assert.strictEqual(copybookDiag[0].message, "Extraneous input 'D'");
+
+    // open a prgram without any issues (diagnostics)
+    await helper.showDocument("DIAGNOSTIC_TEST_A.CBL");
+    await helper.sleep(100);
+
+    // assert diagnostics doesn't change
+    assert.strictEqual(
+      vscode.languages.getDiagnostics(copybookUri)[0].message,
+      "Extraneous input 'D'",
+    );
+    assert.strictEqual(
+      vscode.languages.getDiagnostics(prog2Uri)[0].message,
+      "Errors inside the copybook",
+    );
+
+    // close the DIAGNOSTIC_TEST_B, which is source of all errors
+    await helper.showDocument("DIAGNOSTIC_TEST_B.CBL");
+    await helper.closeActiveEditor();
+    await helper.sleep(100);
+
+    // expect no diagnostics for copybook
+    assert.strictEqual(vscode.languages.getDiagnostics(copybookUri).length, 0);
+
+    await helper.closeAllEditors();
+
+    // Open 2 similar program, which introduces same issue as same location and same message
+    await helper.showDocument("DIAGNOSTIC_TEST_B.CBL");
+    await helper.showDocument("DIAGNOSTIC_TEST_C.CBL");
+    await helper.showDocument(copybookPath);
+
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(copybookUri).length === 2,
+    );
+
+    // closing active editor would remove the diagnostics for one of the file
+    await helper.showDocument("DIAGNOSTIC_TEST_C.CBL");
+    await helper.closeActiveEditor();
+    await helper.showDocument(copybookPath);
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(copybookUri).length === 1,
+    );
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);

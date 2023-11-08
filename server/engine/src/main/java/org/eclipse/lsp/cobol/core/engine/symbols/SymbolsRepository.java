@@ -19,6 +19,7 @@ import com.google.common.collect.Multimap;
 import com.google.inject.Singleton;
 import lombok.Synchronized;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
@@ -38,6 +39,7 @@ import static org.eclipse.lsp.cobol.common.utils.RangeUtils.findNodeByPosition;
 
 /** This class is a repository for symbols */
 @Singleton
+@Slf4j
 public class SymbolsRepository {
   private final Map<String, SymbolTable> programSymbols;
 

@@ -23,10 +23,13 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
-import org.eclipse.lsp.cobol.domain.databus.impl.DefaultDataBusBroker;
-import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
+import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.CobolWorkspaceServiceImpl;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.lsp.LspMessageDispatcher;
+import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeConfigurationHandler;
+import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeWatchedFilesHandler;
+import org.eclipse.lsp.cobol.lsp.handlers.workspace.ExecuteCommandHandler;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
@@ -71,25 +74,35 @@ class WorkspaceServiceTest {
   }
 
   @Test
-  void testExecuteCommand() {
-    DataBusBroker broker = mock(DataBusBroker.class);
+  void testExecuteCommand() throws InterruptedException {
     CopybookService copybookService = mock(CopybookService.class);
     String copybookName = "COPYBOOK";
     SubroutineService subroutineService = mock(SubroutineService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     MessageService messageService = mock(MessageService.class);
+    AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
 
-    WorkspaceService service =
-        new CobolWorkspaceServiceImpl(
-            broker,
+    DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
+            null,
+            copybookNameService,
             null,
             null,
-            copybookService,
             null,
-            subroutineService,
+            messageService,
+            asyncAnalysisService);
+    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
             stateService,
             copybookNameService,
-            null, messageService);
+            asyncAnalysisService);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
+
+    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
+    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    WorkspaceService service = new CobolWorkspaceServiceImpl(
+            lspMessageDispatcher,
+            didChangeConfigurationHandler,
+            didChangeWatchedFilesHandler,
+            executeCommandHandler);
 
     CompletableFuture<Object> result =
         service.executeCommand(
@@ -104,7 +117,8 @@ class WorkspaceServiceTest {
     } catch (InterruptedException | ExecutionException e) {
       fail(e.getMessage());
     }
-    verify(broker, timeout(10000)).postData(any(RunAnalysisEvent.class));
+    lspMessageDispatcher.stop();
+    done.join();
   }
 
   /**
@@ -112,37 +126,49 @@ class WorkspaceServiceTest {
    * not recognized.
    */
   @Test
-  void testExecuteNonExistingCommand() {
-    DataBusBroker broker = mock(DataBusBroker.class);
+  void testExecuteNonExistingCommand() throws InterruptedException {
     CopybookService copybookService = mock(CopybookService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
-    WorkspaceService service =
-        new CobolWorkspaceServiceImpl(
-            broker,
+    AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
+
+    DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
+            null,
+            copybookNameService,
             null,
             null,
-            copybookService,
             null,
             null,
+            asyncAnalysisService);
+    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
             stateService,
             copybookNameService,
-            null, null);
+            asyncAnalysisService);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, null);
+
+    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
+    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    WorkspaceService service = new CobolWorkspaceServiceImpl(
+            lspMessageDispatcher,
+            didChangeConfigurationHandler,
+            didChangeWatchedFilesHandler,
+            executeCommandHandler);
+
 
     CompletableFuture<Object> result =
         service.executeCommand(new ExecuteCommandParams("Missing command name", emptyList()));
 
+    lspMessageDispatcher.stop();
+    done.join();
     try {
       assertNull(result.get());
     } catch (InterruptedException | ExecutionException e) {
       fail(e.getMessage());
     }
-    verify(broker, timeout(1000).times(0)).postData(any());
   }
 
   /** Test a new watcher created when a new path add in setting.json */
   @Test
-  void testChangeConfigurationNewPath() {
-    DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
+  void testChangeConfigurationNewPath() throws InterruptedException {
     SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
     CopybookService copybookService = mock(CopybookService.class);
@@ -151,18 +177,29 @@ class WorkspaceServiceTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
     MessageService messageService = mock(MessageService.class);
+    AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
 
-    WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(
-            broker,
+    DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
             settingsService,
+            copybookNameService,
             watchingService,
-            copybookService,
             localeStore,
-            subroutineService,
+            keywords,
+            messageService,
+            asyncAnalysisService);
+    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
             stateService,
             copybookNameService,
-                keywords, messageService);
+            asyncAnalysisService);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
+
+    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
+    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
+            lspMessageDispatcher,
+            didChangeConfigurationHandler,
+            didChangeWatchedFilesHandler,
+            executeCommandHandler);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     String path = "foo/bar";
@@ -176,23 +213,21 @@ class WorkspaceServiceTest {
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
-    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams());
+    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(new Object()));
 
+    lspMessageDispatcher.stop();
+    done.join();
     verify(watchingService).addWatchers(watcherCaptor.capture());
     verify(watchingService).removeWatchers(emptyList());
-    verify(copybookService).invalidateCache();
-    verify(subroutineService).invalidateCache();
+    verify(asyncAnalysisService).reanalyseOpenedPrograms();
     verify(localeStore).notifyLocaleStore();
 
     assertEquals(path, watcherCaptor.getValue().get(0));
-
-    verify(broker).postData(any(RunAnalysisEvent.class));
   }
 
   /** Test no watchers added or removed when the path list not changed */
   @Test
-  void testChangeConfigurationNoChangesInPaths() {
-    DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
+  void testChangeConfigurationNoChangesInPaths() throws InterruptedException {
     SettingsService settingsService = mock(SettingsService.class);
     WatcherService watchingService = mock(WatcherService.class);
     CopybookService copybookService = mock(CopybookService.class);
@@ -201,18 +236,30 @@ class WorkspaceServiceTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
     MessageService messageService = mock(MessageService.class);
+    AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
 
-    WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(
-            broker,
+    DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
             settingsService,
+            copybookNameService,
             watchingService,
-            copybookService,
             localeStore,
-            subroutineService,
+            keywords,
+            messageService,
+            asyncAnalysisService);
+
+    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
             stateService,
             copybookNameService,
-                keywords, messageService);
+            asyncAnalysisService);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
+
+    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
+    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
+            lspMessageDispatcher,
+            didChangeConfigurationHandler,
+            didChangeWatchedFilesHandler,
+            executeCommandHandler);
 
     String path = "foo/bar";
 
@@ -225,19 +272,18 @@ class WorkspaceServiceTest {
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
-    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams());
-
+    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(new Object()));
+    lspMessageDispatcher.stop();
+    done.join();
     verify(watchingService).addWatchers(emptyList());
     verify(watchingService).removeWatchers(emptyList());
-    verify(copybookService).invalidateCache();
-    verify(subroutineService).invalidateCache();
+    verify(asyncAnalysisService).reanalyseOpenedPrograms();
     verify(localeStore).notifyLocaleStore();
   }
 
   /** Test an existing watcher removed when its path doesn't exist in setting.json */
   @Test
-  void testChangeConfigurationPathRemoved() {
-    DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
+  void testChangeConfigurationPathRemoved() throws InterruptedException {
     SettingsService settingsService = mock(SettingsService.class);
     WatcherService watchingService = mock(WatcherService.class);
     CopybookService copybookService = mock(CopybookService.class);
@@ -246,17 +292,30 @@ class WorkspaceServiceTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
     MessageService messageService = mock(MessageService.class);
+    AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
 
-    WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(
-            broker,
+    DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
             settingsService,
+            copybookNameService,
             watchingService,
-            copybookService,
             localeStore,
-            subroutineService,
+            keywords,
+            messageService,
+            asyncAnalysisService);
+
+    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
             stateService,
-            copybookNameService, keywords, messageService);
+            copybookNameService,
+            asyncAnalysisService);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
+
+    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
+    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
+            lspMessageDispatcher,
+            didChangeConfigurationHandler,
+            didChangeWatchedFilesHandler,
+            executeCommandHandler);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     JsonArray arr = new JsonArray();
@@ -273,20 +332,18 @@ class WorkspaceServiceTest {
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(localeStore));
+    lspMessageDispatcher.stop();
+    done.join();
 
     verify(watchingService).addWatchers(emptyList());
     verify(watchingService).removeWatchers(watcherCaptor.capture());
-    verify(copybookService).invalidateCache();
-    verify(subroutineService).invalidateCache();
+    verify(asyncAnalysisService).reanalyseOpenedPrograms();
     assertEquals(path, watcherCaptor.getValue().get(0));
-
-    verify(broker).postData(any(RunAnalysisEvent.class));
   }
 
   /** Test no watchers added or removed when the path is empty */
   @Test
-  void testChangeConfigurationNoPathToRegister() {
-    DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
+  void testChangeConfigurationNoPathToRegister() throws InterruptedException {
     SettingsService settingsService = mock(SettingsService.class);
     WatcherService watchingService = mock(WatcherService.class);
     CopybookService copybookService = mock(CopybookService.class);
@@ -295,17 +352,30 @@ class WorkspaceServiceTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     Keywords keywords = mock(Keywords.class);
     MessageService messageService = mock(MessageService.class);
+    AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
 
-    WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(
-            broker,
+    DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
             settingsService,
+            copybookNameService,
             watchingService,
-            copybookService,
             localeStore,
-            subroutineService,
+            keywords,
+            messageService,
+            asyncAnalysisService);
+
+    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
             stateService,
-            copybookNameService, keywords, messageService);
+            copybookNameService,
+            asyncAnalysisService);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
+
+    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
+    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
+            lspMessageDispatcher,
+            didChangeConfigurationHandler,
+            didChangeWatchedFilesHandler,
+            executeCommandHandler);
 
     when(copybookNameService.copybookLocalFolders(null))
         .thenReturn(completedFuture(emptyList()));
@@ -316,12 +386,14 @@ class WorkspaceServiceTest {
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
-    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams());
+    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(new Object()));
+    lspMessageDispatcher.stop();
+    done.join();
 
     verify(watchingService).addWatchers(emptyList());
     verify(watchingService).removeWatchers(emptyList());
-    verify(copybookService).invalidateCache();
-    verify(subroutineService).invalidateCache();
+    verify(asyncAnalysisService).reanalyseOpenedPrograms();
+
   }
 
   /**
@@ -329,7 +401,7 @@ class WorkspaceServiceTest {
    * notifications
    */
   @Test
-  void testDidChangeWatchedFilesExistingFileCreated() {
+  void testDidChangeWatchedFilesExistingFileCreated() throws InterruptedException {
     checkWatchers(new FileEvent("file:///c:/workspace/COBOL/.copybooks/CpyName.cpy", Created));
   }
 
@@ -337,7 +409,7 @@ class WorkspaceServiceTest {
    * This test verifies that the Workspace Service reacts on the file change watcher's notifications
    */
   @Test
-  void testDidChangeWatchedFilesExistingFileChanged() {
+  void testDidChangeWatchedFilesExistingFileChanged() throws InterruptedException {
     checkWatchers(new FileEvent("file:///c:/workspace/COBOL/.copybooks/CpyName.cpy", Changed));
   }
 
@@ -346,7 +418,7 @@ class WorkspaceServiceTest {
    * notifications
    */
   @Test
-  void testDidChangeWatchedFilesExistingFileDeleted() {
+  void testDidChangeWatchedFilesExistingFileDeleted() throws InterruptedException {
     checkWatchers(new FileEvent("file:///c:/workspace/COBOL/.copybooks/CpyName.cpy", Deleted));
   }
 
@@ -355,30 +427,40 @@ class WorkspaceServiceTest {
    * notifications
    */
   @Test
-  void testDidChangeWatchedFilesFolderContentChanged() {
+  void testDidChangeWatchedFilesFolderContentChanged() throws InterruptedException {
     checkWatchers(new FileEvent("file:///c:/workspace/COBOL/.copybooks", Changed));
   }
 
-  private void checkWatchers(FileEvent event) {
-    DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
+  private void checkWatchers(FileEvent event) throws InterruptedException {
     CopybookService copybookService = mock(CopybookService.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
+    AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
 
-    WorkspaceService service =
-        new CobolWorkspaceServiceImpl(
-            broker,
+    DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
+            null,
+            copybookNameService,
             null,
             null,
-            copybookService,
             null,
-            subroutineService,
+            null, asyncAnalysisService);
+
+    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
             stateService,
-            copybookNameService, null, null);
+            copybookNameService, asyncAnalysisService);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
+
+    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
+    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    WorkspaceService service = new CobolWorkspaceServiceImpl(
+            lspMessageDispatcher,
+            didChangeConfigurationHandler,
+            didChangeWatchedFilesHandler,
+            executeCommandHandler);
 
     DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));
     service.didChangeWatchedFiles(params);
-
-    verify(broker).postData(any(RunAnalysisEvent.class));
+    lspMessageDispatcher.stop();
+    done.join();
   }
 }

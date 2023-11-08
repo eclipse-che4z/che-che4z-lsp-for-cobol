@@ -27,8 +27,8 @@ public class GoTo extends CFASTNode {
   /** targetName is list to support conditional goto case */
   List<String> targetName;
 
-  public GoTo(List<String> targetName) {
-    super(CFASTNodeType.GOTO.getValue());
+  public GoTo(List<String> targetName, Location location) {
+    super(CFASTNodeType.GOTO.getValue(), location);
     this.targetName = targetName;
   }
 }

@@ -46,8 +46,6 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.communications.ServerCommunications;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 
 import static com.google.inject.name.Names.named;
 
@@ -55,7 +53,6 @@ import static com.google.inject.name.Names.named;
 public class EngineModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(CustomThreadPoolExecutor.class).to(CustomThreadPoolExecutorService.class);
     bind(CobolLanguageEngine.class);
     bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
     bind(GrammarPreprocessor.class).to(GrammarPreprocessorImpl.class);

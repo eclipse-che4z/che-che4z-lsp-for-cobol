@@ -1,6 +1,7 @@
 [
   {
     "name": "CBACT01C",
+    "type": "program",
     "location": {
       "uri": "fake/path",
       "start": {
@@ -11,7 +12,6 @@
         "line": 4,
         "character": 30
       }
-    },
-    "type": "program"
+    }
   }
 ]

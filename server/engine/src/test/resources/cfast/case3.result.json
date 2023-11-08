@@ -1,6 +1,7 @@
 [
   {
     "name": "CASE3",
+    "type": "program",
     "location": {
       "uri": "fake/path",
       "start": {
@@ -12,11 +13,11 @@
         "character": 29
       }
     },
-    "type": "program",
     "children": [
       {
-        "snippet": "PARAG1.\r\n           DISPLAY 'PARAG1'.",
+        "snippet": "PARAG1.\r\n           DISPLAY \u0027PARAG1\u0027.",
         "name": "PARAG1",
+        "type": "paragraph",
         "location": {
           "uri": "fake/path",
           "start": {
@@ -27,12 +28,12 @@
             "line": 18,
             "character": 29
           }
-        },
-        "type": "paragraph"
+        }
       },
       {
-        "snippet": "PARAG2.\r\n           DISPLAY 'PARAG2'.",
+        "snippet": "PARAG2.\r\n           DISPLAY \u0027PARAG2\u0027.",
         "name": "PARAG2",
+        "type": "paragraph",
         "location": {
           "uri": "fake/path",
           "start": {
@@ -43,8 +44,7 @@
             "line": 20,
             "character": 29
           }
-        },
-        "type": "paragraph"
+        }
       }
     ]
   }

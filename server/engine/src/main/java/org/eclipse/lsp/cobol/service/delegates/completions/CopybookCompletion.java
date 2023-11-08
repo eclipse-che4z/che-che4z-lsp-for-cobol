@@ -39,7 +39,7 @@ public class CopybookCompletion implements Completion {
       @NonNull String token, @Nullable CobolDocumentModel document) {
     if (!isDocumentReadyForSemanticCollection(document)) return emptyList();
     return document
-        .getAnalysisResult()
+        .getLastAnalysisResult()
         .getRootNode()
         .getDepthFirstStream()
         .filter(hasType(COPY))

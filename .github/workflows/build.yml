@@ -19,6 +19,10 @@ on:
         description: "Build with telemetry"
         required: true
         default: 'false'
+      skip_ui_tests:
+        description: "Skip UI tests"
+        required: true
+        default: 'false'
   pull_request:
     branches:
       - development
@@ -54,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
+        with: 
           fetch-depth: 0
       - uses: graalvm/setup-graalvm@v1
         with:
@@ -67,8 +71,9 @@ jobs:
           cache: 'maven'
       - name: Generate assisted configuration for GraalVM native build
         working-directory: server
-        run: mvn -e -B -Pnative -Dagent=true test
-      - uses: actions/upload-artifact@v3
+        run: mvn -e -B -Pnative -Dagent=true -Dtest=\!PositiveTest* -DfailIfNoTests=false test
+      - name: Upload native build configuration
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: native-build-configuration
@@ -76,12 +81,14 @@ jobs:
       - name: Build Server and Dialects Jars
         working-directory: server
         run: mvn clean package --no-transfer-progress
-      - uses: actions/upload-artifact@v3
+      - name: Upload performance data
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: test-perfomance-data
           path: server/engine/target/perf.csv
-      - uses: actions/upload-artifact@v3
+      - name: Upload jar files
+        uses: actions/upload-artifact@v3
         with:
           name: jar
           path: server/engine/target/server.jar
@@ -93,10 +100,11 @@ jobs:
         run: |
           npm ci
           npm run compile
-      - uses: actions/upload-artifact@v3
+      - name: Upload cobol dialect API library
+        uses: actions/upload-artifact@v3
         with:
           name: lib
-          path: clients/cobol-dialect-api/lib/*
+          path: clients/cobol-dialect-api/lib/*    
       - name: Unit Test COBOL LS extension
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
@@ -124,12 +132,14 @@ jobs:
           cp ../../server/dialect-daco/target/dialect-daco.jar ./server/jar
           npm run package
           cp *.vsix ../../.
-      - uses: actions/upload-artifact@v3
+      - name: Upload IDMS vsix
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: vsix-idms-dialect
           path: 'cobol-language-support-for-idms*.vsix'
-      - uses: actions/upload-artifact@v3
+      - name: Upload DaCo vsix
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
           name: vsix-daco-dialect
@@ -158,7 +168,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: echo "target=linux-${{ matrix.arch }}" >> $GITHUB_ENV
 
-      # Setup environment
+      # Setup envierment
       - name: switch xcode to 12.5.1
         if: matrix.os == 'macos-11'
         run: |
@@ -227,10 +237,11 @@ jobs:
       - name: Retrieve server jars
         uses: actions/download-artifact@v3
         with:
+          name: jar
           path: jar
       - name: Deploy server jar
         working-directory: clients/cobol-lsp-vscode-extension
-        run: cp ../../jar/jar/server.jar ./server/jar
+        run: cp ../../jar/server.jar ./server/jar
       - name: Setup telemetry key
         working-directory: clients/cobol-lsp-vscode-extension
         if: github.event.inputs.with_telemetry == 'true'
@@ -267,11 +278,6 @@ jobs:
         with:
           name: lib
           path: clients/cobol-dialect-api
-      - name: update version for PR
-        working-directory: clients/cobol-lsp-vscode-extension
-        if: ${{ github.event.pull_request.head.ref != 'development'}} or ${{ github.event.pull_request.head.ref != 'master'}}
-        run: |
-          node -e "const fs=require('fs');const fileName='./package.json';var content=require(fileName);content.version=content.version+'\+pr-'+${{ github.event.pull_request.number }};fs.writeFileSync(fileName,JSON.stringify(content,null,2));"
       - name: Build COBOL LS extension 
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
@@ -306,12 +312,13 @@ jobs:
           unzip -j dialects-daco/*.vsix extension/server/jar/dialect-daco.jar -d clients/daco-dialect-support/server/jar
         shell: bash
       - name: Run integration tests
+        if: github.event.inputs.skip_ui_tests != 'true'
         uses: coactions/setup-xvfb@v1
         with:
           run: |
             npm run compile
             npm run test:integration
-          working-directory: clients/cobol-lsp-vscode-extension
+          working-directory: clients/cobol-lsp-vscode-extension          
       - name: Run native executable test code
         working-directory: tests/native-executable-tests
         run: |

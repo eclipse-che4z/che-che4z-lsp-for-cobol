@@ -23,12 +23,10 @@ import lombok.Value;
 public class Section extends CFASTNode {
   String name;
   String snippet;
-  Location location;
 
   public Section(String name, String snippet, Location location) {
-    super(CFASTNodeType.SECTION.getValue());
+    super(CFASTNodeType.SECTION.getValue(), location);
     this.name = name;
     this.snippet = snippet;
-    this.location = location;
   }
 }

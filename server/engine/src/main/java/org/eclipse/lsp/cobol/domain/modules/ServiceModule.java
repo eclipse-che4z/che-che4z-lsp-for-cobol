@@ -25,9 +25,9 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.CobolLSPServerStateService;
-import org.eclipse.lsp.cobol.service.CobolLanguageServer;
-import org.eclipse.lsp.cobol.service.CobolTextDocumentService;
-import org.eclipse.lsp.cobol.service.CobolWorkspaceServiceImpl;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageServer;
+import org.eclipse.lsp.cobol.lsp.CobolTextDocumentService;
+import org.eclipse.lsp.cobol.lsp.CobolWorkspaceServiceImpl;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
 import org.eclipse.lsp.cobol.common.SubroutineService;
@@ -56,8 +56,6 @@ import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -72,7 +70,6 @@ import static com.google.inject.name.Names.named;
 public class ServiceModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(CustomThreadPoolExecutor.class).to(CustomThreadPoolExecutorService.class);
     bind(LanguageServer.class).to(CobolLanguageServer.class);
     bind(DisposableLSPStateService.class).to(CobolLSPServerStateService.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
