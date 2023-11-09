@@ -20,7 +20,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import java.util.Map;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
@@ -71,14 +70,13 @@ class TestUserDefinedSections {
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.DISABLED), ImmutableList.of("USERLABEL")));
+                CopybookProcessingMode.DISABLED, ImmutableList.of("USERLABEL")));
   }
 
   @Test
   void testGoTo() {
     Map<String, JsonElement> dialectConfig = ImmutableMap.of(DaCoDialect.DACO_PREDEFINED_SECTIONS, new Gson().toJsonTree(ImmutableList.of("USERLABEL")));
-    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED);
-    AnalysisConfig analysisConfig = new AnalysisConfig(copybookConfig, ImmutableList.of("DaCo", "IDMS"),
+    AnalysisConfig analysisConfig = new AnalysisConfig(CopybookProcessingMode.ENABLED, ImmutableList.of("DaCo", "IDMS"),
         true, ImmutableList.of(), dialectConfig);
     UseCaseEngine.runTestForDiagnostics(TEXT_GOTO, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
   }
@@ -90,7 +88,7 @@ class TestUserDefinedSections {
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.DISABLED),
+                CopybookProcessingMode.DISABLED,
             ImmutableList.of("USERLABEL")));
   }
 

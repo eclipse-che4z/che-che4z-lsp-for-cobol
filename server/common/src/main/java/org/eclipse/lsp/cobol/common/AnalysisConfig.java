@@ -21,7 +21,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import java.util.*;
 import lombok.Value;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 
@@ -31,7 +30,7 @@ import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
  */
 @Value
 public class AnalysisConfig {
-  CopybookConfig copybookConfig;
+  CopybookProcessingMode copybookProcessingMode;
   List<String> dialects;
   boolean isCicsTranslatorEnabled;
   List<DialectRegistryItem> dialectRegistry;
@@ -47,7 +46,7 @@ public class AnalysisConfig {
    */
   public static AnalysisConfig defaultConfig(CopybookProcessingMode mode) {
     return new AnalysisConfig(
-        new CopybookConfig(mode),
+            mode,
         ImmutableList.of(),
         true,
         ImmutableList.of(),

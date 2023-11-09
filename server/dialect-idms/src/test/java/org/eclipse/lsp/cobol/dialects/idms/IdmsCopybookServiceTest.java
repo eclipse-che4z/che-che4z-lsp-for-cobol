@@ -14,6 +14,13 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.*;
@@ -26,14 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test for {@link IdmsCopybookService}
@@ -54,9 +53,7 @@ class IdmsCopybookServiceTest {
   @BeforeEach
   void init() {
     processedCopybooks = new HashSet<>();
-    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED);
-
-    service = new IdmsCopybookService("uri", copybookService, copybookConfig,
+    service = new IdmsCopybookService("uri", copybookService, CopybookProcessingMode.ENABLED,
         treeListener, messageService, processedCopybooks);
   }
 

@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
@@ -113,7 +112,7 @@ class TestIdmsControlSectionAll {
         ImmutableMap.of(),
         ImmutableList.of(),
         new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.ENABLED),
+                CopybookProcessingMode.ENABLED,
             ImmutableList.of(IdmsDialect.NAME), true,
             ImmutableList.of(),
             ImmutableMap.of()));

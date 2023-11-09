@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -130,7 +129,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             ImmutableMap.of(),
             ImmutableList.of(),
             new AnalysisConfig(
-                    new CopybookConfig(CopybookProcessingMode.ENABLED),
+                    CopybookProcessingMode.ENABLED,
                     ImmutableList.of(), true,
                     ImmutableList.of(),
                     ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
@@ -156,7 +155,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
                             ErrorSource.PARSING.getText())),
             ImmutableList.of(),
             new AnalysisConfig(
-                    new CopybookConfig(CopybookProcessingMode.ENABLED),
+                    CopybookProcessingMode.ENABLED,
                     ImmutableList.of(), true,
                     ImmutableList.of(),
                     ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));

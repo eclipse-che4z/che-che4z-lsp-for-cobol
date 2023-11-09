@@ -20,7 +20,6 @@ import com.google.gson.Gson;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 
@@ -29,7 +28,7 @@ import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 public class DialectConfigs {
   public AnalysisConfig getIDMSAnalysisConfig() {
     return new AnalysisConfig(
-        new CopybookConfig(CopybookProcessingMode.DISABLED),
+            CopybookProcessingMode.DISABLED,
         ImmutableList.of("IDMS"), true,
         ImmutableList.of(),
         ImmutableMap.of());
@@ -43,7 +42,7 @@ public class DialectConfigs {
     List<String> list = ImmutableList.of("S930", "S940", "S950", "S990", "S991", "S997", "S999");
 
     return new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.DISABLED),
+            CopybookProcessingMode.DISABLED,
             ImmutableList.of("DaCo", "IDMS"), true,
             ImmutableList.of(),
             ImmutableMap.of("daco.predefined-sections", new Gson().toJsonTree(list),

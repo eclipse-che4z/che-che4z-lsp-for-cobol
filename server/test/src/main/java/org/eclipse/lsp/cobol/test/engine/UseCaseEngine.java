@@ -217,7 +217,7 @@ public class UseCaseEngine {
                 .subroutines(subroutineNames)
                 .cicsTranslator(analysisConfig.isCicsTranslatorEnabled())
                 .copybookProcessingMode(
-                    analysisConfig.getCopybookConfig().getCopybookProcessingMode())
+                    analysisConfig.getCopybookProcessingMode())
                 .dialects(analysisConfig.getDialects())
                 .sqlBackend(sqlBackendSetting)
                 .dialectsSettings(analysisConfig.getDialectsSettings())
@@ -265,7 +265,7 @@ public class UseCaseEngine {
                 .subroutines(subroutineNames)
                 .cicsTranslator(analysisConfig.isCicsTranslatorEnabled())
                 .copybookProcessingMode(
-                    analysisConfig.getCopybookConfig().getCopybookProcessingMode())
+                    analysisConfig.getCopybookProcessingMode())
                 .dialects(analysisConfig.getDialects())
                 .dialectsSettings(analysisConfig.getDialectsSettings())
                 .build());
