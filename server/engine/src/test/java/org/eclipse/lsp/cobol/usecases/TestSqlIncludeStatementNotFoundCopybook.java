@@ -15,16 +15,16 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** This test checks sql include statement gives an error if defined statement not found. */
 class TestSqlIncludeStatementNotFoundCopybook {
@@ -33,7 +33,7 @@ class TestSqlIncludeStatementNotFoundCopybook {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL INCLUDE {CPYNAME|missing} END-EXEC.\n"
+          + "       EXEC SQL INCLUDE {~CPYNAME|missing} END-EXEC.\n"
           + "       PROCEDURE DIVISION.";
 
   @Test
@@ -47,7 +47,7 @@ class TestSqlIncludeStatementNotFoundCopybook {
                 new Range(),
                 "CPYNAME: Copybook not found",
                 Error,
-                ErrorSource.DIALECT.getText(),
+                ErrorSource.COPYBOOK.getText(),
                 ErrorCodes.MISSING_COPYBOOK.getLabel())));
   }
 }

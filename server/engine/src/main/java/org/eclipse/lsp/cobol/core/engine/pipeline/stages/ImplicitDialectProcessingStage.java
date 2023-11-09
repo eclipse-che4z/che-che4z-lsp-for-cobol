@@ -17,10 +17,10 @@ package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.RequiredArgsConstructor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
@@ -84,11 +84,32 @@ public class ImplicitDialectProcessingStage implements Stage<DialectOutcome, Cop
             error -> actualErrors.add(getOriginalErrorLocation(ctx, copybooksRepository, error)));
     ctx.getAccumulatedErrors().addAll(actualErrors);
 
-    List<Node> allImplicitDialectNodes =
-        Stream.concat(dialectOutcome.getDialectNodes().stream(), extendedNodes.stream())
-            .collect(Collectors.toList());
     return new DialectOutcome(
-        allImplicitDialectNodes, dialectOutcome.getContext(), dialectOutcome.isDialectMissed());
+        getAllImplicitDialectNodes(dialectOutcome, extendedNodes),
+        dialectOutcome.getContext(),
+        dialectOutcome.isDialectMissed());
+  }
+
+  private static List<Node> getAllImplicitDialectNodes(
+      DialectOutcome dialectOutcome, ArrayList<Node> extendedNodes) {
+    Map<String, List<Node>> dialectProcessNodeMap =
+        dialectOutcome.getDialectNodes().stream()
+            .collect(Collectors.groupingBy(node -> node.getLocality().getUri()));
+
+    extendedNodes.stream()
+        .filter(CopyNode.class::isInstance)
+        .map(CopyNode.class::cast)
+        .forEach(
+            node -> {
+              String uri = node.getUri();
+              if (dialectProcessNodeMap.containsKey(uri)) {
+                dialectProcessNodeMap.get(uri).forEach(node::addChild);
+                dialectProcessNodeMap.remove(uri);
+              }
+            });
+    return Stream.concat(
+            dialectProcessNodeMap.values().stream().flatMap(List::stream), extendedNodes.stream())
+        .collect(Collectors.toList());
   }
 
   private static void applyExtendedDialectCopybook(
