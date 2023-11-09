@@ -43,7 +43,7 @@ class TestOneCharCompilerOptionsError {
             "1",
             new Diagnostic(
                 new Range(),
-                "Missing token {E, I, S, U, W} at compilerOption",
+                "No viable alternative at input FLAG()",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

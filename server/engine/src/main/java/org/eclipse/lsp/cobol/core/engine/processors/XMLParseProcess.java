@@ -22,7 +22,6 @@ import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
-import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveOption;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
@@ -32,7 +31,6 @@ import org.eclipse.lsp.cobol.common.model.tree.XMLParseNode;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /** Apply all the validation for the XML Parse statement and return found errors. */
 public class XMLParseProcess implements Processor<XMLParseNode> {
@@ -263,13 +261,10 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
   }
 
   private List<String> getXmlParseCompilerDirectiveOptions(ProcessingContext processingContext) {
-    Optional<CompilerDirectiveOption> compilerDirectiveOption =
-        processingContext
-            .getCompilerDirectiveContext()
-            .filterDirectiveList(ImmutableList.of(CompilerDirectiveName.XMLPARSE));
+    return processingContext.getCompilerDirectiveContext()
+            .filterDirectiveList(ImmutableList.of(CompilerDirectiveName.XMLPARSE))
+              .orElse(CompilerDirectiveName.XMLPARSE.defaultValue())
+            .getValue();
 
-    return compilerDirectiveOption
-        .map(CompilerDirectiveOption::getValue)
-        .orElse(Collections.emptyList());
   }
 }

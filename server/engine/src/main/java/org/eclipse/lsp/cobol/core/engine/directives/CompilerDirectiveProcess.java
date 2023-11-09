@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.engine.processors;
+package org.eclipse.lsp.cobol.core.engine.directives;
 
 import org.eclipse.lsp.cobol.common.processor.*;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /** Compiler Directives processor */
+@Deprecated
 public class CompilerDirectiveProcess implements Processor<CompilerDirectiveNode> {
   /**
    * Set up the compiler directive context which can be used later in any stage of processing the

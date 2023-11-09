@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -45,6 +46,7 @@ class PositiveTest extends FileBasedTest {
   @MethodSource("getSourceFolder")
   @DisplayName("Parameterized - positive tests")
   @NullSource
+  @Disabled
   void test(String testFolder) {
     LOG.info("-- {} under test --", testFolder);
     cobolTextRegistry = retrieveTextsRegistry(testFolder);

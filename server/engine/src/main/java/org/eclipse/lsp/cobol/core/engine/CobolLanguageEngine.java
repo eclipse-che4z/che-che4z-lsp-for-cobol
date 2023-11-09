@@ -67,21 +67,22 @@ public class CobolLanguageEngine {
 
   @Inject
   public CobolLanguageEngine(
-      TextPreprocessor preprocessor,
-      GrammarPreprocessor grammarPreprocessor,
-      MessageService messageService,
-      ParseTreeListener treeListener,
-      SubroutineService subroutineService,
-      CachingConfigurationService cachingConfigurationService,
-      DialectService dialectService,
-      AstProcessor astProcessor,
-      SymbolsRepository symbolsRepository,
-      ErrorFinalizerService errorFinalizerService) {
+          TextPreprocessor preprocessor,
+          GrammarPreprocessor grammarPreprocessor,
+          MessageService messageService,
+          ParseTreeListener treeListener,
+          SubroutineService subroutineService,
+          CachingConfigurationService cachingConfigurationService,
+          DialectService dialectService,
+          AstProcessor astProcessor,
+          SymbolsRepository symbolsRepository,
+          ErrorFinalizerService errorFinalizerService) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.errorFinalizerService = errorFinalizerService;
 
     this.pipeline = new Pipeline();
+    this.pipeline.add(new CompilerDirectivesStage(messageService));
     this.pipeline.add(new DialectProcessingStage(dialectService));
     this.pipeline.add(new PreprocessorStage(grammarPreprocessor));
     this.pipeline.add(new ImplicitDialectProcessingStage(dialectService));
