@@ -14,13 +14,18 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
+
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -34,12 +39,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.Replacement
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
-
 /**
  * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
  * and REPLACE statements and removing non-processable sections starting with EXEC statements.
@@ -52,7 +51,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   private final List<SyntaxError> errors = new ArrayList<>();
 
-  private final CopybookConfig copybookConfig;
+  private final CopybookProcessingMode copybookConfig;
   private final MessageService messageService;
   private final CopybookPreprocessorService preprocessorService;
   private final ReplacingService replacingService;
@@ -66,7 +65,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       CopybookService copybookService,
       MessageService messageService,
       ReplacingService replacingService) {
-    this.copybookConfig = context.getCopybookConfig();
+    this.copybookConfig = context.getCopybookProcessingMode();
     this.messageService = messageService;
     this.preprocessorService = new CopybookPreprocessorService(context.getProgramDocumentUri(),
         grammarPreprocessor,
@@ -154,7 +153,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private boolean requiresEarlyReturn(ParserRuleContext ctx) {
-    if (!copybookConfig.getCopybookProcessingMode().analyze) {
+    if (!copybookConfig.analyze) {
       preprocessorService.replaceWithSpaces(ctx);
       return true;
     }

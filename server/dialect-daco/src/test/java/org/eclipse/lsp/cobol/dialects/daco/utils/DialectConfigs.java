@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
@@ -37,7 +36,7 @@ public class DialectConfigs {
    */
   public AnalysisConfig getDaCoAnalysisConfig() {
     return new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.DISABLED),
+            CopybookProcessingMode.DISABLED,
             ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME), true,
             ImmutableList.of(),
             createPredefinedSectionsConfig(ImmutableList.of("S930", "S940", "S950",
@@ -46,12 +45,12 @@ public class DialectConfigs {
 
   /**
    * Provides DaCo dialect configuration with specified copybook configuration
-   * @param copybookConfig a copybook configuration
+   * @param copybookProcessingMode a copybook configuration
    * @param predefinedSections a predefined sections list
    * @return DaCo dialect configuration
    */
-  public AnalysisConfig getDaCoAnalysisConfig(CopybookConfig copybookConfig, List<String> predefinedSections) {
-    return new AnalysisConfig(copybookConfig, ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
+  public AnalysisConfig getDaCoAnalysisConfig(CopybookProcessingMode copybookProcessingMode, List<String> predefinedSections) {
+    return new AnalysisConfig(copybookProcessingMode, ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
         true, ImmutableList.of(), createPredefinedSectionsConfig(predefinedSections));
   }
 

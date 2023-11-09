@@ -14,7 +14,19 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -24,19 +36,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Test for {@link IdmsCopybookVisitor}
@@ -53,10 +52,9 @@ class IdmsCopybookVisitorTest {
 
   @BeforeEach
   void init() {
-    CopybookConfig copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED);
     Set<CopybookName> processedCopybooks = new HashSet<>();
 
-    visitor = new IdmsCopybookVisitor(copybookService, copybookConfig,
+    visitor = new IdmsCopybookVisitor(copybookService, CopybookProcessingMode.ENABLED,
         idmsCopybookService, PROGRAM_DOCUMENT_URI, "documentUri", 1, processedCopybooks);
   }
 

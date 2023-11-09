@@ -14,6 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,11 +46,6 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Provides managing copybook mapping functionality
  */
@@ -58,7 +57,7 @@ class CopybookPreprocessorService {
   private final ExtendedDocument currentDocument;
 
   private final CopybookService copybookService;
-  private final CopybookConfig copybookConfig;
+  private final CopybookProcessingMode copybookConfig;
 
   @Getter
   private final CopybooksRepository copybooks;
@@ -76,7 +75,7 @@ class CopybookPreprocessorService {
                                      GrammarPreprocessor grammarPreprocessor,
                                      ExtendedDocument currentDocument,
                                      CopybookService copybookService,
-                                     CopybookConfig copybookConfig,
+                                     CopybookProcessingMode copybookConfig,
                                      CopybooksRepository copybooks,
                                      CopybookHierarchy hierarchy,
                                      MessageService messageService,
@@ -102,7 +101,7 @@ class CopybookPreprocessorService {
     Locality nameLocality = mapLocality(retrieveLocality(copySource));
     Locality statementLocality = mapLocality(retrieveLocality(ctx));
 
-    CopybookModel copybook = read(copybookConfig, name, currentDocument.getUri());
+    CopybookModel copybook = read(name, currentDocument.getUri());
     copybooks.addUsage(copybookName, null, nameLocality.toLocation());
 
     validateCopybookName(name, nameLocality, maxCopybookLen);
@@ -232,7 +231,7 @@ class CopybookPreprocessorService {
     return new CopybookName(StringUtils.trimQuotes(ctx.getText()));
   }
 
-  private CopybookModel read(CopybookConfig copybookConfig, CopybookName copybookName, String documentUri) {
+  private CopybookModel read(CopybookName copybookName, String documentUri) {
     ResultWithErrors<CopybookModel> resolvedCopybook = copybookService.resolve(
             copybookName.toCopybookId(programDocumentUri),
             copybookName,

@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -131,7 +130,7 @@ public class TestQualifyExtendedImpactOnVariableDefinition {
   @Test
   void whenQualifyExtendedOptionActiveFromConfigurationWithMultipleDefinitionThenConsider01LevelAsDefinition() {
     AnalysisConfig analysisConfig = new AnalysisConfig(
-            new CopybookConfig(CopybookProcessingMode.ENABLED),
+            CopybookProcessingMode.ENABLED,
             ImmutableList.of(), true, ImmutableList.of(), ImmutableMap.of());
     analysisConfig.getCompilerOptions().add("QUALIFY(EXTEND)");
     UseCaseEngine.runTest(

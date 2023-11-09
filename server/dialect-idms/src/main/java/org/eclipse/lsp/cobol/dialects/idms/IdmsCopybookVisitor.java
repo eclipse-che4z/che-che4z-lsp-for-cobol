@@ -15,7 +15,13 @@
 
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.common.VariableConstants.*;
+import static org.eclipse.lsp.cobol.dialects.idms.IdmsParserHelper.*;
+
 import com.google.common.collect.ImmutableList;
+import java.util.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,13 +43,6 @@ import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.*;
-
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.common.VariableConstants.*;
-import static org.eclipse.lsp.cobol.dialects.idms.IdmsParserHelper.*;
-
 /**
  * This extension of {@link IdmsCopyParserBaseVisitor} applies the semantic analysis based on the
  * abstract syntax tree built by {@link IdmsCopyParser} for IDMS copybooks.
@@ -52,7 +51,7 @@ import static org.eclipse.lsp.cobol.dialects.idms.IdmsParserHelper.*;
 @RequiredArgsConstructor
 class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
   private final CopybookService copybookService;
-  private final CopybookConfig copybookConfig;
+  private final CopybookProcessingMode copybookProcessingMode;
   private final IdmsCopybookService idmsCopybookService;
   private final String programDocumentUri;
   private final String documentUri;
@@ -63,7 +62,7 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
   private int firstCopybookLevel = 0;
 
   IdmsCopybookVisitor(CopybookService copybookService,
-                      CopybookConfig copybookConfig,
+                      CopybookProcessingMode copybookProcessingMode,
                       ParseTreeListener treeListener,
                       MessageService messageService,
                       String programDocumentUri,
@@ -71,13 +70,13 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
                       int parentLevel,
                       Set<CopybookName> processedCopybooks) {
     this.copybookService = copybookService;
-    this.copybookConfig = copybookConfig;
+    this.copybookProcessingMode = copybookProcessingMode;
     this.programDocumentUri = programDocumentUri;
     this.documentUri = documentUri;
     this.parentLevel = parentLevel;
     this.processedCopybooks = processedCopybooks;
     idmsCopybookService = new IdmsCopybookService(programDocumentUri, copybookService,
-        copybookConfig, treeListener, messageService, processedCopybooks);
+            copybookProcessingMode, treeListener, messageService, processedCopybooks);
   }
 
   @Override

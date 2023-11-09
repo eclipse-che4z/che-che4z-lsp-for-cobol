@@ -26,7 +26,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.test.CobolText;
@@ -57,7 +56,10 @@ public class UseCase {
   @Builder.Default List<String> dialects = Collections.emptyList();
 
   /** Dialects config */
-  @Builder.Default Map<String, JsonElement> dialectsSettings = ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER.toString()));
+  @Builder.Default
+  Map<String, JsonElement> dialectsSettings =
+      ImmutableMap.of(
+          "target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER.toString()));
 
   /** Compile options config */
   @Builder.Default List<String> compilerOptions = Collections.emptyList();
@@ -66,18 +68,14 @@ public class UseCase {
 
   /**
    * Get the {@link AnalysisConfig} using the specified processing mode and the {@link SQLBackend}
-   * see {@link CopybookConfig}
+   * see {@link CopybookProcessingMode}
    *
-   * @return CopybookConfig for the analysis
+   * @return Config for the analysis
    */
   public AnalysisConfig getAnalysisConfig() {
     AnalysisConfig analysisConfig =
         new AnalysisConfig(
-            new CopybookConfig(copybookProcessingMode),
-            dialects,
-            cicsTranslator,
-            ImmutableList.of(),
-            dialectsSettings);
+            copybookProcessingMode, dialects, cicsTranslator, ImmutableList.of(), dialectsSettings);
     analysisConfig.getCompilerOptions().addAll(compilerOptions);
     return analysisConfig;
   }

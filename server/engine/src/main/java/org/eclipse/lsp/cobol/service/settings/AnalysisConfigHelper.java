@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.service.settings;
 
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 
 /**
@@ -34,9 +33,8 @@ class AnalysisConfigHelper {
    */
   public AnalysisConfig fromConfigEntity(
       CopybookProcessingMode mode, ConfigurationService.ConfigurationEntity entity) {
-    CopybookConfig copybookConfig = new CopybookConfig(mode);
 
-    AnalysisConfig analysisConfig = new AnalysisConfig(copybookConfig, entity.getDialects(),
+    AnalysisConfig analysisConfig = new AnalysisConfig(mode, entity.getDialects(),
             entity.isCicsTranslatorEnabled(),
             entity.getDialectRegistry(),
             entity.getDialectsSettings());

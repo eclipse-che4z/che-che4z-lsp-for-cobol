@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,12 +34,9 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.google.gson.Gson;
 import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.common.copybook.CopybookConfig;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
@@ -206,7 +204,7 @@ public abstract class FileBasedTest extends ConfigurableTest {
 
     if (testDialectsLists.contains("IDMS")) {
       return new AnalysisConfig(
-          new CopybookConfig(ENABLED),
+              ENABLED,
           ImmutableList.of("IDMS"),
           true,
           ImmutableList.of(),
