@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp.cobol.common.error.ErrorCodes.MISSING_COPYBOOK;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -24,8 +26,6 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.common.error.ErrorCodes.MISSING_COPYBOOK;
-
 /** Test resolving copybooks inside EXEC SQL section **/
 class TestCopyWithinSQL {
   private static final String TEXT1 = "       IDENTIFICATION DIVISION.\n"
@@ -33,7 +33,7 @@ class TestCopyWithinSQL {
       + "       DATA DIVISION.\n"
       + "       WORKING-STORAGE SECTION.\n"
       + "           EXEC SQL\n"
-      + "               INCLUDE {COPY1|1}\n"
+      + "               INCLUDE {~COPY1|1}\n"
       + "           END-EXEC.\n"
       + "           EXEC SQL\n"
       + "                INCLUDE {~SQLCA} \n"
@@ -47,7 +47,7 @@ class TestCopyWithinSQL {
       + "                INCLUDE {~SQLCPY}\n"
       + "           END-EXEC.\n"
       + "           EXEC SQL\n"
-      + "                INCLUDE {COPY1|1}\n"
+      + "                INCLUDE {~COPY1|1}\n"
       + "           END-EXEC.\n";
 
   private static final String SQLCPY = "\n"
@@ -66,7 +66,7 @@ class TestCopyWithinSQL {
             "1",
             new Diagnostic(new Range(),
                 "COPY1: Copybook not found",
-                DiagnosticSeverity.Error, ErrorSource.DIALECT.getText(),
+                DiagnosticSeverity.Error, ErrorSource.COPYBOOK.getText(),
                 MISSING_COPYBOOK.getLabel()))
     );
   }
@@ -79,7 +79,7 @@ class TestCopyWithinSQL {
             "1",
             new Diagnostic(new Range(),
                 "COPY1: Copybook not found",
-                DiagnosticSeverity.Error, ErrorSource.DIALECT.getText(),
+                DiagnosticSeverity.Error, ErrorSource.COPYBOOK.getText(),
                 MISSING_COPYBOOK.getLabel()))
     );
   }

@@ -152,6 +152,18 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     preprocessorService.addCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_8, replacementContext);
   }
 
+
+  @Override
+  public void enterIncludeStatement(@NonNull IncludeStatementContext ctx) {
+
+  }
+
+  @Override
+  public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
+    if (requiresEarlyReturn(ctx)) return;
+    preprocessorService.addCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_8, replacementContext);
+  }
+
   private boolean requiresEarlyReturn(ParserRuleContext ctx) {
     if (!copybookConfig.analyze) {
       preprocessorService.replaceWithSpaces(ctx);

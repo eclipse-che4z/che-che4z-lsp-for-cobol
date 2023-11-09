@@ -16,7 +16,7 @@ parser grammar Db2SqlParser;
 options {tokenVocab = Db2SqlLexer; superClass = MessageServiceParser;}
 
 startRule: .*? (execRule .*?) * EOF;
-startIncludeRule: .*? (includeStatement .*?)* EOF;
+//startIncludeRule: .*? (includeStatement .*?)* EOF;
 
 execRule: EXEC SQL sqlCode END_EXEC DOT_FS?
          | EXEC SQL END_EXEC DOT_FS?
@@ -45,13 +45,13 @@ rulesAllowedInDataDivisionAndProcedureDivision: ((dbs_declare_cursor | dbs_whene
 rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca | dbs_include_sqlda) dbs_semicolon_end?)+;
 
 // sql include statement
-includeStatement
-   : EXEC SQL INCLUDE copySource END_EXEC DOT_FS?
-   | EXEC {notifyError("db2Parser.missingSql");} INCLUDE copySource END_EXEC DOT_FS?
-   | {notifyError("cobolParser.missingEndExec");} EXEC SQL INCLUDE copySource DOT_FS?
-   ;
+//includeStatement
+//   : EXEC SQL INCLUDE copySource END_EXEC DOT_FS?
+//   | EXEC {notifyError("db2Parser.missingSql");} INCLUDE copySource END_EXEC DOT_FS?
+//   | {notifyError("cobolParser.missingEndExec");} EXEC SQL INCLUDE copySource DOT_FS?
+//   ;
 
-copySource: (dbs_member_name | SQLCA | SQLDA) ((OF | IN) dbs_member_name)?;
+//copySource: (dbs_member_name | SQLCA | SQLDA) ((OF | IN) dbs_member_name)?;
 
 //used in working-storage section of cobol program
 dbs_declare_variable: DECLARE dbs_host_variable (dbs_comma_separator dbs_host_variable)* VARIABLE (CCSID (dbs_integer_constant | (EBCDIC|ASCII|UNICODE) (FOR (SBCS|MIXED|BIT) DATA)?))? dbs_semicolon_end?;

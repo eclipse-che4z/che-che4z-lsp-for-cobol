@@ -15,6 +15,8 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -22,8 +24,6 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** This test checks sql include statement if it is defined correctly. */
 class TestSqlIncludeStatementNotDefinedCorrectly {
@@ -33,7 +33,7 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*SQLCA} PIC X(10).\n"
-          + "           EXEC {INCLUDE|1} {STRUCT1|2} END-EXEC.";
+          + "           {EXEC|1} INCLUDE STRUCT1 END-EXEC.";
 
   @Test
   void test() {
@@ -44,11 +44,8 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
             "1",
             new Diagnostic(
                 new Range(),
-                "Missing token SQL for the EXEC SQL INCLUDE block ",
+                "Syntax error on 'EXEC'",
                 Error,
-                ErrorSource.PARSING.getText()),
-            "2",
-            new Diagnostic(
-                new Range(), "STRUCT1: Copybook not found", Error, ErrorSource.DIALECT.getText(), "missing copybook")));
+                ErrorSource.PARSING.getText())));
   }
 }
