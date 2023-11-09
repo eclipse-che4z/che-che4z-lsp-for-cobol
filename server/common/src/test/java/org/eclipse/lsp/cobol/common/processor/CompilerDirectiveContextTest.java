@@ -33,7 +33,7 @@ class CompilerDirectiveContextTest {
   void testCompilerOptionsContextFetch() {
     CompilerDirectiveContext context = new CompilerDirectiveContext();
 
-    assertEquals(context.getCompilerDirectiveMap().entrySet().size(), 2);
+    assertEquals(context.getCompilerDirectiveMap().entrySet().size(), 0);
     context.updateDirectiveOptions(
         new CompilerDirectiveOption(CompilerDirectiveName.ADATA, ImmutableList.of(EXTEND)));
     Optional<CompilerDirectiveOption> result1 =

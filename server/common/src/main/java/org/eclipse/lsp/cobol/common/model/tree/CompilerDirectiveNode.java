@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 
 /** Node describing compiler directive in a cobol document. */
 @Slf4j
+@Deprecated
 public class CompilerDirectiveNode extends Node {
   @Getter private final String directiveText;
 

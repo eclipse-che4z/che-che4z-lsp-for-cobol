@@ -186,7 +186,7 @@ public class VisitorHelper {
    * @param ctx ParserRuleContext to extract locality
    * @return locality which has a range from the start to the end of the rule
    */
-  Optional<Range> retrieveRangeLocality(ParserRuleContext ctx) {
+  public Optional<Range> retrieveRangeLocality(ParserRuleContext ctx) {
     if (ctx == null) {
       return Optional.empty();
     }

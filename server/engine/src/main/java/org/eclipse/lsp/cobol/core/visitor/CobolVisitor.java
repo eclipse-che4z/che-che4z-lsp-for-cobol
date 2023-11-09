@@ -120,19 +120,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                 }));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * <p>The default implementation returns the result of calling
-   * {@link #visitChildren} on {@code ctx}.</p>
-   *
-   * @param ctx
-   */
-  @Override
-  public List<Node> visitCompilerOptions(CompilerOptionsContext ctx) {
-    return addTreeNode(ctx, location -> new CompilerDirectiveNode(location, ctx.getText()));
-  }
-
   @Override
   public List<Node> visitIdentificationDivision(IdentificationDivisionContext ctx) {
     areaAWarning(ctx.getStart());
@@ -672,18 +659,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitEvaluateWhenOther(EvaluateWhenOtherContext ctx) {
     throwWarning(ctx.getStart());
     return addTreeNode(ctx, EvaluateWhenOtherNode::new);
-  }
-
-  @Override
-  public List<Node> visitDeprecatedCompilerOptions(DeprecatedCompilerOptionsContext ctx) {
-    retrieveLocality(ctx).ifPresent(locality -> errors.add(SyntaxError.syntaxError()
-            .errorSource(ErrorSource.PARSING)
-            .errorCode(() -> "IGYOS4003-E")
-            .location(locality.toOriginalLocation())
-            .suggestion(messageService.getMessage("compilerDirective.deprecatedDirectiveUse", ctx.getText()))
-            .severity(ErrorSeverity.ERROR)
-            .build()));
-    return Collections.emptyList();
   }
 
   @Override

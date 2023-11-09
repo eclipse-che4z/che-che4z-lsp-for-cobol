@@ -479,7 +479,7 @@ class TestProcessCbl {
             "1",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'foo'",
+                "No viable alternative at input CURR(foo",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -493,7 +493,7 @@ class TestProcessCbl {
             "1",
             new Diagnostic(
                 new Range(),
-                "Syntax error on '256Kb'",
+                "No viable alternative at input BUFSIZE(256Kb",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
