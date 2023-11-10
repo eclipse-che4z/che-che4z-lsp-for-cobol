@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.service.delegates.references;
 
+import java.util.List;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
@@ -22,8 +23,6 @@ import org.eclipse.lsp4j.DocumentHighlight;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.ReferenceContext;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
-
-import java.util.List;
 
 /**
  * This class is a service delegate to resolve the location requests of document elements, i.e Go to
@@ -72,5 +71,5 @@ public interface Occurrences {
    */
   @NonNull
   List<DocumentHighlight> findHighlights(
-          @NonNull AnalysisResult analysisResult, @NonNull TextDocumentPositionParams position);
+          AnalysisResult analysisResult, @NonNull TextDocumentPositionParams position);
 }
