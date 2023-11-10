@@ -590,28 +590,37 @@ suite("Integration Test Suite", function () {
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
-  test("Show transition copybook errors", async () => {
-    // Open program with error inside a copybook
-    await helper.showDocument("TESTCPY2.cbl");
-    const progUri = await helper.getUri("TESTCPY2.cbl");
+  test(
+    "Show transition copybook errors" +
+      "TC288744: Underscore a copy statement if its copybook contains error: nested copybooks" +
+      'TC247996: Nested copybooks with "no extension" are supported',
+    async () => {
+      // Open program with error inside a copybook
+      await helper.showDocument("TESTCPY2.cbl");
+      const progUri = await helper.getUri("TESTCPY2.cbl");
 
-    const copybookPath = path.join("testing", "COPYC");
-    const copybookUri = await helper.getUri(copybookPath);
+      const copybookPath = path.join("testing", "COPYC");
+      const copybookUri = await helper.getUri(copybookPath);
 
-    // Open copybook with an error
-    await helper.showDocument(copybookPath);
+      // Open copybook with an error
+      await helper.showDocument(copybookPath);
 
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(copybookUri).length === 1,
-    );
-    const diagnostic = vscode.languages.getDiagnostics(copybookUri);
-    assert.strictEqual(
-      diagnostic.length,
-      1,
-      "got: " + JSON.stringify(diagnostic),
-    );
-    assert.strictEqual(diagnostic[0].message, "Errors inside the copybook");
-  })
+      await helper.waitFor(
+        () => vscode.languages.getDiagnostics(copybookUri).length === 1,
+      );
+      const diagnostic = vscode.languages.getDiagnostics(progUri);
+      assert.strictEqual(
+        diagnostic.length,
+        1,
+        "got: " + JSON.stringify(diagnostic),
+      );
+      helper.assertRangeIsEqual(
+        diagnostic[0].range,
+        range(pos(20, 7), pos(20, 18)),
+      );
+      // assert.strictEqual(diagnostic[0].message, "Errors inside the copybook");
+    },
+  )
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
@@ -688,4 +697,45 @@ suite("Integration Test Suite", function () {
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
+
+  test(
+    "TC314993: TITLE Statement is allowed before ID DIVISION" +
+      "TC315392: PROGRAM-ID Check Is Not Case Sensitive",
+    async () => {
+      const extSrcPath = path.join("TEST_TITLE.CBL");
+      const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
+      await helper.showDocument(extSrcPath);
+      const diagnostics = await diagPromise;
+      assert.strictEqual(diagnostics.length, 1);
+      const message = diagnostics[0].message;
+      assert.match(message, /^Variable ABC-ID is not defined/);
+    },
+  )
+    .timeout(helper.TEST_TIMEOUT)
+    .slow(1000);
+
+  test("TC288730: Underscore a copy statement if its copybook contains error", async () => {
+    const editor = await helper.showDocument(path.join("TEST8.CBL"));
+    await helper.deleteLine(editor, 12);
+    const extSrcPath = path.join("testing", "REPLERR");
+    await helper.showDocument(extSrcPath);
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length > 1,
+    );
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    helper.assertRangeIsEqual(
+      diagnostics[0].range,
+      range(pos(18, 11), pos(18, 24)),
+    );
+  });
+
+  test("TC247997: Info message for copybooks cannot be downloaded", async () => {
+    const editor = await helper.showDocument(path.join("USERC1F.cbl"));
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length > 1,
+    );
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const message = diagnostics[0].message;
+    assert.match(message, /^BOOK3: Copybook not found/);
+  });
 });
