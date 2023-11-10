@@ -15,6 +15,10 @@
 package org.eclipse.lsp.cobol.service.delegates.references;
 
 import com.google.common.collect.Streams;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
@@ -23,11 +27,6 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.*;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * This occurrences provider resolves the requests for the semantic elements based on its positions.
@@ -64,7 +63,7 @@ public class ElementOccurrences implements Occurrences {
 
   @Override
   public @NonNull List<DocumentHighlight> findHighlights(
-      @NonNull AnalysisResult analysisResult, @NonNull TextDocumentPositionParams position) {
+      AnalysisResult analysisResult, @NonNull TextDocumentPositionParams position) {
     Optional<DefinedAndUsedStructure> element = SymbolsRepository.findElementByPosition(UriHelper.decode(position.getTextDocument().getUri()),
             analysisResult, position.getPosition());
     return element.map(context -> Streams.concat(context.getUsages().stream(), context.getDefinitions().stream())
