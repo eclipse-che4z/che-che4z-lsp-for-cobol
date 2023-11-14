@@ -51,6 +51,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CobolTextDocumentServiceTest {
 
+  public static final String URI = "file://document.cbl";
   @Mock
   protected Completions completions;
   @Mock
@@ -92,16 +93,16 @@ class CobolTextDocumentServiceTest {
     FormattingHandler formattingHandler = new FormattingHandler(documentModelService, formations, asyncAnalysisService);
 
     CodeActionHandler codeActionHandler = new CodeActionHandler(actions);
-    AnalysisHandler analysisHandler = new AnalysisHandler(asyncAnalysisService, analysisService, builder, communications);
+    AnalysisHandler analysisHandler = new AnalysisHandler(asyncAnalysisService, analysisService, builder, communications, documentModelService);
 
     DidOpenHandler didOpenHandler = new DidOpenHandler(asyncAnalysisService, watcherService);
-    DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, asyncAnalysisService, watcherService, communications);
+    DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, asyncAnalysisService, documentModelService, watcherService);
     DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService);
     DefinitionHandler definitionHandler = new DefinitionHandler(asyncAnalysisService, documentModelService, occurrences);
-    DocumentSymbolHandler documentSymbolHandler = new DocumentSymbolHandler(asyncAnalysisService, documentModelService);
-    DocumentHighlightHandler documentHighlightHandler = new DocumentHighlightHandler(asyncAnalysisService, occurrences);
-    ReferencesHandler referencesHandler = new ReferencesHandler(asyncAnalysisService, occurrences);
-    HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider);
+    DocumentSymbolHandler documentSymbolHandler = new DocumentSymbolHandler(asyncAnalysisService, analysisService, documentModelService);
+    DocumentHighlightHandler documentHighlightHandler = new DocumentHighlightHandler(asyncAnalysisService, occurrences, documentModelService);
+    ReferencesHandler referencesHandler = new ReferencesHandler(asyncAnalysisService, occurrences, documentModelService);
+    HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider, documentModelService);
     FoldingRangeHandler foldingRangeHandler = new FoldingRangeHandler(documentModelService, asyncAnalysisService);
 
 
@@ -147,15 +148,21 @@ class CobolTextDocumentServiceTest {
   @Test
   void testDidClose() {
     DidCloseTextDocumentParams params = mock(DidCloseTextDocumentParams.class);
+    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
+    when(textDocumentIdentifier.getUri()).thenReturn(URI);
+    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.didClose(params);
-    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
+    Mockito.verify(lspMessageDispatcher, times(0)).publish(any());
   }
 
   @Test
   void testDidOpen() {
     DidOpenTextDocumentParams params = mock(DidOpenTextDocumentParams.class);
+    TextDocumentItem textDocumentItem = mock(TextDocumentItem.class);
+    when(params.getTextDocument()).thenReturn(textDocumentItem);
+    when(textDocumentItem.getUri()).thenReturn(URI);
     service.didOpen(params);
-    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
+    Mockito.verify(lspMessageDispatcher, times(0)).publish(any());
   }
 
   @Test
@@ -168,6 +175,9 @@ class CobolTextDocumentServiceTest {
   @Test
   void testCompletion() {
     CompletionParams params = mock(CompletionParams.class);
+    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
+    when(textDocumentIdentifier.getUri()).thenReturn(URI);
+    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.completion(params);
     Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
@@ -175,6 +185,9 @@ class CobolTextDocumentServiceTest {
   @Test
   void testDefinition() {
     DefinitionParams params = mock(DefinitionParams.class);
+    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
+    when(textDocumentIdentifier.getUri()).thenReturn(URI);
+    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.definition(params);
     Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
@@ -182,6 +195,9 @@ class CobolTextDocumentServiceTest {
   @Test
   void testDocumentHighlight() {
     DocumentHighlightParams params = mock(DocumentHighlightParams.class);
+    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
+    when(textDocumentIdentifier.getUri()).thenReturn(URI);
+    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.documentHighlight(params);
     Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
@@ -189,6 +205,10 @@ class CobolTextDocumentServiceTest {
   @Test
   void testDocumentSymbol() {
     DocumentSymbolParams params = mock(DocumentSymbolParams.class);
+    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
+    when(textDocumentIdentifier.getUri()).thenReturn(URI);
+    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
+
     service.documentSymbol(params);
     Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
@@ -196,6 +216,9 @@ class CobolTextDocumentServiceTest {
   @Test
   void testFoldingRange() {
     FoldingRangeRequestParams params = mock(FoldingRangeRequestParams.class);
+    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
+    when(textDocumentIdentifier.getUri()).thenReturn(URI);
+    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.foldingRange(params);
     Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }
@@ -203,6 +226,9 @@ class CobolTextDocumentServiceTest {
   @Test
   void testFormatting() throws ExecutionException, InterruptedException {
     DocumentFormattingParams params = mock(DocumentFormattingParams.class);
+    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
+    when(textDocumentIdentifier.getUri()).thenReturn(URI);
+    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.formatting(params);
     Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
   }

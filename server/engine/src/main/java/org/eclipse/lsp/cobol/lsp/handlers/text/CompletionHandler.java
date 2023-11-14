@@ -67,9 +67,11 @@ public class CompletionHandler {
    */
   public LspEvent<Either<List<CompletionItem>, CompletionList>> createEvent(CompletionParams params) {
     return new LspEvent<Either<List<CompletionItem>, CompletionList>>() {
+      final ImmutableList<LspEventDependency> lspEventDependencies =
+              ImmutableList.of(asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
       @Override
       public List<LspEventDependency> getDependencies() {
-        return ImmutableList.of(asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+        return lspEventDependencies;
       }
 
       @Override

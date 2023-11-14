@@ -19,7 +19,9 @@ import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.LspEvent;
+import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
+import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.DocumentSymbol;
@@ -37,11 +39,13 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 public class DocumentSymbolHandler {
   private final AsyncAnalysisService asyncAnalysisService;
+  private final AnalysisService analysisService;
   private final DocumentModelService documentModelService;
 
   @Inject
-  public DocumentSymbolHandler(AsyncAnalysisService asyncAnalysisService, DocumentModelService documentModelService) {
+  public DocumentSymbolHandler(AsyncAnalysisService asyncAnalysisService, AnalysisService analysisService, DocumentModelService documentModelService) {
     this.asyncAnalysisService = asyncAnalysisService;
+    this.analysisService = analysisService;
     this.documentModelService = documentModelService;
   }
 
@@ -70,13 +74,17 @@ public class DocumentSymbolHandler {
    */
   public LspEvent<List<Either<SymbolInformation, DocumentSymbol>>> createEvent(DocumentSymbolParams params) {
     return new LspEvent<List<Either<SymbolInformation, DocumentSymbol>>>() {
+      final String uri = UriHelper.decode(params.getTextDocument().getUri());
+      final ImmutableList<LspEventDependency> lspEventDependencies = ImmutableList.of(
+              asyncAnalysisService.createDependencyOn(uri),
+              () -> documentModelService.get(uri) != null && (documentModelService.get(uri).getOutlineResult() != null
+                      || analysisService.isCopybook(uri, documentModelService.get(uri).getText())));
+      final List<LspEventCancelCondition> cancelConditions = ImmutableList.of(
+              asyncAnalysisService.createCancelConditionOnClose(uri));
+
       @Override
       public List<LspEventDependency> getDependencies() {
-        String uri = UriHelper.decode(params.getTextDocument().getUri());
-        return ImmutableList.of(asyncAnalysisService
-                        .createDependencyOn(uri),
-                () -> documentModelService.get(uri) != null
-                        && documentModelService.get(uri).getAnalysisResult() != null);
+        return lspEventDependencies;
       }
 
       @Override

@@ -30,7 +30,6 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
-import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
@@ -61,6 +60,7 @@ import org.junit.jupiter.api.Test;
  * the text doesn't have any semantic elements, it should return an empty {@link Node}
  */
 class CobolLanguageEngineTest {
+  private static final String ERROR_MSG = "Ensure that you have Java installed and that your serverRuntime is set to JAVA for dialect support.";
 
   private static final String TEXT = "       IDENTIFICATION DIVISION.";
   private static final String URI = "document.cbl";
@@ -82,50 +82,50 @@ class CobolLanguageEngineTest {
     SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
 
     CobolLanguageEngine engine =
-        new CobolLanguageEngine(
-            preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-            dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class));
+            new CobolLanguageEngine(
+                    preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
+                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class));
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
-        Locality.builder()
-            .uri(URI)
-            .range(new Range(new Position(), new Position()))
-            .build();
-    SyntaxError error =
-        SyntaxError.syntaxError()
-                .errorSource(ErrorSource.PARSING)
-            .location(locality.toOriginalLocation())
-            .suggestion("suggestion")
-            .severity(ERROR)
-            .build();
-    SyntaxError eofError =
-        SyntaxError.syntaxError()
-                .errorSource(ErrorSource.PARSING)
-            .location(
-                Locality.builder()
+            Locality.builder()
                     .uri(URI)
-                    .range(new Range(new Position(0, 31), new Position(0, 31)))
-                    .token("<EOF>")
-                    .build().toOriginalLocation())
-            .severity(ERROR)
-            .build();
+                    .range(new Range(new Position(), new Position()))
+                    .build();
+    SyntaxError error =
+            SyntaxError.syntaxError()
+                    .errorSource(ErrorSource.PARSING)
+                    .location(locality.toOriginalLocation())
+                    .suggestion("suggestion")
+                    .severity(ERROR)
+                    .build();
+    SyntaxError eofError =
+            SyntaxError.syntaxError()
+                    .errorSource(ErrorSource.PARSING)
+                    .location(
+                            Locality.builder()
+                                    .uri(URI)
+                                    .range(new Range(new Position(0, 31), new Position(0, 31)))
+                                    .token("<EOF>")
+                                    .build().toOriginalLocation())
+                    .severity(ERROR)
+                    .build();
 
     DialectProcessingContext context = DialectProcessingContext.builder()
             .extendedDocument(new ExtendedDocument(TEXT, URI))
             .build();
     context.getExtendedDocument().commitTransformations();
     when(dialectService.process(anyList(), any()))
-        .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
+            .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
     when(dialectService.processImplicitDialects(any(), anyList(), any()))
             .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
     when(preprocessor.cleanUpCode(URI, TEXT))
-        .thenReturn(new ResultWithErrors<>(new ExtendedText(TEXT, URI), ImmutableList.of()));
+            .thenReturn(new ResultWithErrors<>(new ExtendedText(TEXT, URI), ImmutableList.of()));
 
     when(grammarPreprocessor.preprocess(any())).thenReturn(new ResultWithErrors<>(new CopybooksRepository(), ImmutableList.of()));
 
     Range programRange = new Range(new Position(0, 7), new Position(0, 31));
-    ResultWithErrors<AnalysisResult> actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
-    Node root = actual.getResult().getRootNode();
+    AnalysisResult actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
+    Node root = actual.getRootNode();
     Node program = root.getChildren().get(0);
     Node division = program.getChildren().get(0);
 
@@ -142,15 +142,16 @@ class CobolLanguageEngineTest {
   void testLanguageEngineRunWhenNativeServerWithDialects() {
     cobolErrorStrategy.setMessageService(mockMessageService);
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
+    when(mockMessageService.getMessage("workspaceError.ServerType")).thenReturn(ERROR_MSG);
     System.setProperty("serverType", "NATIVE");
     CobolLanguageEngine engine =
             new CobolLanguageEngine(
                     preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
                     dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class));
 
-    ResultWithErrors<AnalysisResult> actual = engine.run(URI, TEXT, DialectConfigs.getDaCoAnalysisConfig());
-    Assertions.assertEquals(actual.getErrors().size(), 1);
-    Assertions.assertEquals(actual.getErrors().get(0).getErrorCode(), ErrorCodes.INCOMPATIBLE_SERVER_TYPE);
+    AnalysisResult actual = engine.run(URI, TEXT, DialectConfigs.getDaCoAnalysisConfig());
+    Assertions.assertEquals(1, actual.getDiagnostics().size());
+    Assertions.assertEquals(ERROR_MSG, actual.getDiagnostics().get(URI).get(0).getMessage());
   }
 
   @AfterAll

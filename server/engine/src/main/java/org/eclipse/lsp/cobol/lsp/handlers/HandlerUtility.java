@@ -16,6 +16,15 @@ package org.eclipse.lsp.cobol.lsp.handlers;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.error.ErrorCode;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+
+import java.util.*;
+
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.*;
 
 /**
  * Utility class for LSP handlers
@@ -40,4 +49,29 @@ public class HandlerUtility {
     }
     return true;
   }
+
+  /**
+   * Converts a list of SyntaxError to LSP Diagnostic map structure
+   * @param errors a list of error object
+   * @return a converted diagnostic map
+   */
+  public static Map<String, List<Diagnostic>> convertErrors(List<SyntaxError> errors) {
+    Map<String, List<Diagnostic>> result = errors.stream()
+        .filter(Objects::nonNull)
+        .filter(e -> Objects.nonNull(e.getLocation()))
+        .collect(groupingBy(err -> err.getLocation().getLocation().getUri(), mapping(HandlerUtility::toDiagnostic, toList())));
+    result.values().forEach(l -> l.sort(Comparator.comparingInt(a -> a.getRange().getStart().getLine())));
+    return result;
+  }
+  private static Diagnostic toDiagnostic(SyntaxError err) {
+    Diagnostic diagnostic = new Diagnostic();
+    diagnostic.setSeverity(DiagnosticSeverity.forValue(err.getSeverity().ordinal() + 1));
+    diagnostic.setSource(err.getErrorSource().getText());
+    diagnostic.setMessage(err.getSuggestion());
+    diagnostic.setRange(err.getLocation().getLocation().getRange());
+    diagnostic.setCode(ofNullable(err.getErrorCode()).map(ErrorCode::getLabel).orElse(null));
+    diagnostic.setRelatedInformation(ofNullable(err.getRelatedInformation()).map(Collections::singletonList).orElse(null));
+    return diagnostic;
+  }
+
 }

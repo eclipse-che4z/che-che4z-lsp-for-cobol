@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
@@ -32,9 +33,10 @@ import java.util.stream.Collectors;
  * Provides document model management functionality
  */
 @Singleton
+@Slf4j
 public class DocumentModelService {
   private final Map<String, CobolDocumentModel> docs = new HashMap<>();
-  private final Map<String, List<Diagnostic>> diagnosticRepo = new HashMap<>();
+  private final Map<String, List<Diagnostic>> diagnosticRepo = Collections.synchronizedMap(new HashMap<>());
   private final CopybookReferenceRepo copybookReferenceRepo;
 
   @Inject
@@ -50,9 +52,7 @@ public class DocumentModelService {
    */
   @Synchronized
   public void openDocument(String uri, String text) {
-    docs.computeIfAbsent(uri, u -> new CobolDocumentModel(uri, text));
-    CobolDocumentModel documentModel = docs.get(uri);
-    documentModel.setOpened(true);
+    docs.computeIfAbsent(uri, u -> new CobolDocumentModel(uri, text)).setOpened(true);
   }
 
   /**
@@ -74,29 +74,41 @@ public class DocumentModelService {
    */
   @Synchronized
   public void processAnalysisResult(String uri, AnalysisResult analysisResult) {
-    Optional.ofNullable(docs.get(uri)).ifPresent(d -> {
-      removeAllRelatedDiagnostics(d);
-      d.setAnalysisResult(analysisResult);
-      updateDiagnosticRepo(uri, analysisResult.getDiagnostics());
-      d.setOutlineResult(BuildOutlineTreeFromSyntaxTree.convert(analysisResult.getRootNode(), uri));
-      analysisResult.getRootNode().getDepthFirstStream()
-              .filter(n -> n.getNodeType() == NodeType.COPY)
-              .filter(CopyNode.class::isInstance)
-              .map(CopyNode.class::cast)
-              .forEach(n -> copybookReferenceRepo.storeCopybookUsageReference(n.getNameLocation().getUri(), n.getUri()));
-    });
+    CobolDocumentModel document = docs.get(uri);
+    if (document == null) {
+      LOG.warn("Can't process analysis result of " + uri);
+      return;
+    }
+    removeAllRelatedDiagnostics(document);
+    updateDiagnosticRepo(uri, analysisResult.getDiagnostics());
+    document.setOutlineResult(BuildOutlineTreeFromSyntaxTree.convert(analysisResult.getRootNode(), uri));
+    analysisResult
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(n -> n.getNodeType() == NodeType.COPY)
+            .filter(CopyNode.class::isInstance)
+            .map(CopyNode.class::cast)
+            .forEach(
+                    n ->
+                            copybookReferenceRepo.storeCopybookUsageReference(
+                                    n.getNameLocation().getUri(), n.getUri()));
+    document.setAnalysisResult(analysisResult);
   }
 
-  private void updateDiagnosticRepo(String uri, Map<String, List<Diagnostic>> diagnostics) {
-    diagnostics.forEach((key, diagnosticList) -> {
-      if (key.equals(uri)) {
-        diagnosticRepo.put(uri, diagnosticList);
-      } else {
-        List<Diagnostic> existingDiagnostics = Optional.ofNullable(diagnosticRepo.get(key)).orElse(new ArrayList<>());
-        existingDiagnostics.addAll(diagnosticList);
-        diagnosticRepo.put(key, existingDiagnostics);
-      }
-    });
+  private void updateDiagnosticRepo(String currentUri, Map<String, List<Diagnostic>> diagnostics) {
+    LOG.debug("updateDiagnosticRepo " + currentUri + " " + diagnostics);
+    synchronized (diagnosticRepo) {
+      diagnostics.forEach((key, diagnosticList) -> {
+        if (key.equals(currentUri)) {
+          diagnosticRepo.put(currentUri, diagnosticList);
+        } else {
+          List<Diagnostic> oldList = diagnosticRepo.getOrDefault(key, Collections.emptyList());
+          List<Diagnostic> newList = new ArrayList<>(oldList);
+          newList.addAll(diagnosticList);
+          diagnosticRepo.put(key, newList);
+        }
+      });
+    }
   }
 
   /**
@@ -115,25 +127,22 @@ public class DocumentModelService {
   }
 
   private void removeAllRelatedDiagnostics(CobolDocumentModel documentModel) {
-    Optional.ofNullable(documentModel.getAnalysisResult())
-            .map(AnalysisResult::getDiagnostics)
-            .ifPresent(
-                    d ->
-                            d.forEach(
-                                    (uri, closedFileRelatedDiagnostics) -> {
-                                      List<Diagnostic> oldDiagnostics = diagnosticRepo.get(uri);
-                                      List<Diagnostic> newDiagnostics = Optional.ofNullable(oldDiagnostics)
-                                              .orElse(Collections.emptyList())
-                                              .parallelStream()
-                                              .filter(diagnosticsNotContains(closedFileRelatedDiagnostics))
-                                              .collect(Collectors.toList());
-                                      diagnosticRepo.put(uri, newDiagnostics);
-                                    }));
-  }
-
-  private Predicate<Diagnostic> diagnosticsNotContains(List<Diagnostic> closedFileRelatedDiagnostics) {
-    // diagnostics address location is matched and not the value as the same diagnostics could be generated by diff files.
-    return dia -> closedFileRelatedDiagnostics.stream().noneMatch(d1 -> d1 == dia);
+    AnalysisResult analysisResult = documentModel.getAnalysisResult();
+    if (analysisResult == null || analysisResult.getDiagnostics() == null) {
+      diagnosticRepo.put(documentModel.getUri(), Collections.emptyList());
+      return;
+    }
+    for (Map.Entry<String, List<Diagnostic>> entry : analysisResult.getDiagnostics().entrySet()) {
+      String uri = entry.getKey();
+      if (!diagnosticRepo.containsKey(uri)) {
+        continue;
+      }
+      List<Diagnostic> closedDiagnostics = entry.getValue();
+      List<Diagnostic> newDiagnostics = diagnosticRepo.get(uri).stream()
+              .filter(dia -> !closedDiagnostics.contains(dia))
+              .collect(Collectors.toList());
+      diagnosticRepo.put(uri, newDiagnostics);
+    }
   }
 
   /**
@@ -158,8 +167,7 @@ public class DocumentModelService {
    */
   @Synchronized
   public List<CobolDocumentModel> getAllOpened() {
-    return docs.values().stream()
-            .filter(CobolDocumentModel::isOpened).collect(Collectors.toList());
+    return docs.values().stream().filter(CobolDocumentModel::isOpened).collect(Collectors.toList());
   }
 
   /**
@@ -170,26 +178,31 @@ public class DocumentModelService {
    */
   @Synchronized
   public boolean isDocumentSynced(String uri) {
-    return Optional.ofNullable(docs.get(uri)).map(CobolDocumentModel::isDocumentSynced).orElse(false);
+    return Optional.ofNullable(docs.get(uri))
+            .map(CobolDocumentModel::isDocumentSynced)
+            .orElse(false);
   }
 
   /**
-   * Returns all available diagnostics for opened documents and empty diagnostics for clothed documents
+   * Returns all available diagnostics for opened documents and empty diagnostics for clothed
+   * documents
    *
-   * @return map of diagnostics where the key is a document uri
-   * and a value is a list of diagnostics for this document
+   * @return map of diagnostics where the key is a document uri and a value is a list of diagnostics
+   * for this document
    */
   @Synchronized
   public Map<String, List<Diagnostic>> getOpenedDiagnostic() {
     Map<String, List<Diagnostic>> result = new HashMap<>();
-    docs.forEach((key, value) -> {
-      List<Diagnostic> diagnostics = diagnosticRepo.get(value.getUri());
-      if (diagnostics != null && value.isOpened()) {
-        result.put(key, diagnostics);
+    for (Map.Entry<String, CobolDocumentModel> entry : docs.entrySet()) {
+      String uri = entry.getKey();
+      CobolDocumentModel document = entry.getValue();
+      List<Diagnostic> diagnostics = diagnosticRepo.get(document.getUri());
+      if (diagnostics != null && document.isOpened()) {
+        result.put(uri, diagnostics);
       } else {
-        result.put(key, ImmutableList.of());
+        result.put(uri, ImmutableList.of());
       }
-    });
+    }
 
     return result;
   }
@@ -202,13 +215,14 @@ public class DocumentModelService {
    */
   @Synchronized
   public void updateDocument(String uri, String text) {
-    Optional.ofNullable(docs.get(uri))
-            .ifPresent(
-                    d -> {
-                      diagnosticRepo.remove(uri);
-                      removeAllRelatedDiagnostics(d);
-                      d.update(text);
-                    });
+    diagnosticRepo.remove(uri);
+    CobolDocumentModel d = docs.get(uri);
+    if (d == null) {
+      LOG.warn("Trying to update missing document: " + uri);
+      return;
+    }
+    removeAllRelatedDiagnostics(d);
+    d.update(text);
   }
 
   /**
@@ -219,9 +233,7 @@ public class DocumentModelService {
    */
   @Synchronized
   public List<CobolDocumentModel> getAll(Set<String> programs) {
-    return programs.stream().map(docs::get)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+    return programs.stream().map(docs::get).filter(Objects::nonNull).collect(Collectors.toList());
   }
 
   /**
@@ -232,7 +244,8 @@ public class DocumentModelService {
    * @return set of affected opened programs
    */
   @Synchronized
-  public Set<String> findAffectedDocumentsForCopybook(String uri, Predicate<CobolDocumentModel> predicate) {
+  public Set<String> findAffectedDocumentsForCopybook(
+          String uri, Predicate<CobolDocumentModel> predicate) {
     Set<String> affectedPrograms = new HashSet<>();
     copybookReferenceRepo
             .getCopybookUsageReference(uri)
@@ -244,11 +257,12 @@ public class DocumentModelService {
                     });
 
     // Add all not synced programs
-    affectedPrograms.addAll(docs.values().stream()
-            .filter(d -> !d.isDocumentSynced())
-            .filter(predicate)
-            .map(CobolDocumentModel::getUri)
-            .collect(Collectors.toList()));
+    affectedPrograms.addAll(
+            docs.values().stream()
+                    .filter(d -> !d.isDocumentSynced())
+                    .filter(predicate)
+                    .map(CobolDocumentModel::getUri)
+                    .collect(Collectors.toList()));
 
     return affectedPrograms;
   }

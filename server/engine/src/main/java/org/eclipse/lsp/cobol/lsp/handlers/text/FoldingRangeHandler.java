@@ -19,6 +19,7 @@ import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.LspEvent;
+import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.DocumentServiceHelper;
@@ -29,7 +30,6 @@ import org.eclipse.lsp4j.FoldingRangeRequestParams;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * LSP FoldingRange Handler
@@ -48,6 +48,7 @@ public class FoldingRangeHandler {
 
   /**
    * Process foldingRange LSP request
+   *
    * @param params FoldingRangeRequestParams
    * @return list of FoldingRanges
    */
@@ -62,18 +63,25 @@ public class FoldingRangeHandler {
 
   /**
    * Create foldingRange LSP event.
+   *
    * @param params FoldingRangeRequestParams
    * @return LspEvent.
    */
   public LspEvent<List<FoldingRange>> createEvent(FoldingRangeRequestParams params) {
+    String uri = UriHelper.decode(params.getTextDocument().getUri());
     return new LspEvent<List<FoldingRange>>() {
+      final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
+              asyncAnalysisService.createDependencyOn(uri));
+      final ImmutableList<LspEventCancelCondition> lspEventCancelConditions = ImmutableList.of(
+              asyncAnalysisService.createCancelConditionOnClose(uri));
+
       @Override
       public List<LspEventDependency> getDependencies() {
-        return ImmutableList.of(asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+        return lspEventDependencies;
       }
 
       @Override
-      public List<FoldingRange> execute() throws ExecutionException, InterruptedException {
+      public List<FoldingRange> execute() {
         return FoldingRangeHandler.this.foldingRange(params);
       }
     };

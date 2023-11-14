@@ -55,14 +55,15 @@ suite("Tests with USER1.cbl", function () {
   });
 
   test("TC152049: Navigate through definitions", async () => {
+    await helper.sleep(10000);
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeDefinitionProvider",
       editor.document.uri,
       pos(28, 24),
     );
+    assert.strictEqual(result.length, 1);
     assert.ok(
-      result.length === 1 &&
-        result[0].uri.fsPath === editor.document.fileName &&
+      result[0].uri.fsPath === editor.document.fileName &&
         result[0].range.start.line === 31 &&
         result[0].range.start.character === 7,
       "Checks behavior of go to definition action",
@@ -109,6 +110,10 @@ suite("Tests with USER1.cbl", function () {
     );
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+    );
+    assert.strictEqual(
+      vscode.languages.getDiagnostics(editor.document.uri).length,
+      1,
     );
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeFormatDocumentProvider",

@@ -20,15 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.HoverParams;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -38,11 +36,13 @@ import java.util.concurrent.ExecutionException;
 public class HoverHandler {
   private final AsyncAnalysisService asyncAnalysisService;
   private final HoverProvider hoverProvider;
+  private final DocumentModelService documentModelService;
 
   @Inject
-  public HoverHandler(AsyncAnalysisService asyncAnalysisService, HoverProvider hoverProvider) {
+  public HoverHandler(AsyncAnalysisService asyncAnalysisService, HoverProvider hoverProvider, DocumentModelService documentModelService) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.hoverProvider = hoverProvider;
+    this.documentModelService = documentModelService;
   }
 
   /**
@@ -55,11 +55,7 @@ public class HoverHandler {
    */
   public Hover hover(HoverParams params) throws ExecutionException, InterruptedException {
     String uri = UriHelper.decode(params.getTextDocument().getUri());
-    Optional<CompletableFuture<CobolDocumentModel>> futureOptional = asyncAnalysisService.fetchLastResultOrAnalyzeDocument(uri);
-    if (futureOptional.isPresent() && futureOptional.get().isDone()) {
-      return hoverProvider.getHover(futureOptional.get().get(), params);
-    }
-    return null;
+    return hoverProvider.getHover(documentModelService.get(uri), params);
   }
 
   /**
@@ -69,11 +65,12 @@ public class HoverHandler {
    * @return LspEvent.
    */
   public LspEvent<Hover> createEvent(HoverParams params) {
+    final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
+            asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
     return new LspEvent<Hover>() {
       @Override
       public List<LspEventDependency> getDependencies() {
-        return ImmutableList.of(
-                asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+        return lspEventDependencies;
       }
 
       @Override
