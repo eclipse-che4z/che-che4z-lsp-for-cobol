@@ -39,6 +39,8 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * This class is an entry point for the application. It initializes the DI context and runs the
@@ -130,8 +132,15 @@ public class LangServerBootstrap {
 
   Launcher<CobolLanguageClient> createServerLauncher(
       @NonNull LanguageServer server, @NonNull InputStream in, @NonNull OutputStream out) {
+    ThreadFactory tf = new ThreadFactory() {
+      private int counter = 0;
+      public Thread newThread(Runnable r) {
+        return new Thread(r, "LSP" + "-" + counter++);
+      }
+    };
     return new LSPLauncher.Builder<CobolLanguageClient>()
         .setLocalService(server)
+        .setExecutorService(Executors.newCachedThreadPool(tf))
         .setRemoteInterface(CobolLanguageClient.class)
         .setInput(in)
         .setOutput(out)

@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
 import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
@@ -39,6 +40,7 @@ public class DidOpenHandler {
 
   /**
    * Handle didOpen LSP request.
+   *
    * @param params didOpen parameters.
    */
   public void didOpen(DidOpenTextDocumentParams params) {
@@ -47,6 +49,20 @@ public class DidOpenHandler {
       return;
     }
     watcherService.addRuntimeWatchers(uri);
+    asyncAnalysisService.openDocument(uri, params.getTextDocument().getText());
     asyncAnalysisService.scheduleAnalysis(uri, params.getTextDocument().getText(), params.getTextDocument().getVersion(), true);
+  }
+
+  /**
+   * Creates didOpen LSP Event
+   *
+   * @param params DidOpenTextDocumentParams.
+   * @return LspEvent.
+   */
+  public LspEvent<Void> createEvent(DidOpenTextDocumentParams params) {
+    return () -> {
+      didOpen(params);
+      return null;
+    };
   }
 }

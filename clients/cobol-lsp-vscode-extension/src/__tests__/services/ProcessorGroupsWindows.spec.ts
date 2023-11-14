@@ -98,7 +98,7 @@ jest.mock("path", () => ({
   sep: "\\",
 }));
 
-it.only("Processor groups configuration provides lib path in Windows", () => {
+it("Processor groups configuration provides lib path in Windows", () => {
   const item = {
     scopeUri: "file:///c%3A/my/workspace" + "/TEST.cob",
     section: "cobol-lsp.cpy-manager.paths-local",

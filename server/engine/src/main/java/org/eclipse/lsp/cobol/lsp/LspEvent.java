@@ -42,4 +42,8 @@ public interface LspEvent<T> {
   default List<LspEventDependency> getDependencies() {
     return ImmutableList.of();
   }
+
+  default List<LspEventCancelCondition> getCancelConditions() {
+    return ImmutableList.of();
+  }
 }

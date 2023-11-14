@@ -93,7 +93,7 @@ class AnalysisServiceTest {
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
 
     service.analyzeDocument(uri, text, true);
-    verify(documentService, times(1)).openDocument(uri, text);
+    verify(documentService, times(0)).processAnalysisResult(eq(uri), any());
     verify(engine, times(0)).analyze(any(), any(), any());
   }
 
@@ -108,7 +108,7 @@ class AnalysisServiceTest {
     when(engine.analyze(any(), any(), any())).thenReturn(result);
 
     service.analyzeDocument(uri, text, true);
-    verify(documentService, times(1)).openDocument(uri, text);
+    verify(documentService, times(1)).processAnalysisResult(eq(uri), any());
     verify(engine, times(1)).analyze(any(), any(), any());
   }
 
@@ -133,28 +133,6 @@ class AnalysisServiceTest {
     service.analyzeDocument(uri, text, false);
     verify(documentService, times(1)).updateDocument(uri, text);
     verify(engine, times(1)).analyze(any(), any(), any());
-  }
-
-  @Test
-  void testStopAnalysis_copybook() {
-    String uri = UUID.randomUUID().toString();
-    when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
-    when(documentService.get(uri)).thenReturn(mock(CobolDocumentModel.class));
-
-    service.stopAnalysis(uri);
-    verify(documentService, times(1)).closeDocument(uri);
-    verify(documentService, times(0)).removeDocument(uri);
-  }
-
-  @Test
-  void testStopAnalysis_program() {
-    String uri = UUID.randomUUID().toString();
-    when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(false);
-    when(documentService.get(uri)).thenReturn(mock(CobolDocumentModel.class));
-
-    service.stopAnalysis(uri);
-    verify(documentService, times(1)).closeDocument(uri);
-    verify(documentService, times(1)).removeDocument(uri);
   }
 
   private AnalysisResult prepareAnalysisResult() {

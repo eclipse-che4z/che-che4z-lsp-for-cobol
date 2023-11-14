@@ -81,19 +81,19 @@ public class ServerCommunications implements Communications {
   @Override
   public void notifyThatDocumentAnalysed(String uri) {
     runAsync(
-        () ->
-            logMessage(
-                Info,
-                messageService.getMessage(
-                    "Communications.noSyntaxError",
-                    files.getNameFromURI(files.decodeURI(uri)))));
+            () ->
+                    logMessage(
+                            Info,
+                            messageService.getMessage(
+                                    "Communications.noSyntaxError",
+                                    files.getNameFromURI(files.decodeURI(uri)))));
   }
 
   /**
    * show a supplied message to the client with the supplied {@link MessageType}
    *
    * @param messageType {@link MessageType}
-   * @param message to be displayed at client end.
+   * @param message     to be displayed at client end.
    */
   @Override
   public void notifyGeneralMessage(MessageType messageType, String message) {
@@ -108,10 +108,12 @@ public class ServerCommunications implements Communications {
    */
   public void publishDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
     diagnostics.forEach(
-        (uri, diagnostic) ->
-            getClient()
-                .publishDiagnostics(
-                    new PublishDiagnosticsParams(uri, clean(diagnostic))));
+            (uri, diagnostic) -> {
+              PublishDiagnosticsParams diagnostics1 = new PublishDiagnosticsParams(uri, clean(diagnostic));
+              LOG.debug("publishDiagnostics " + diagnostics1);
+              getClient().publishDiagnostics(diagnostics1);
+            }
+    );
   }
 
 
@@ -157,7 +159,7 @@ public class ServerCommunications implements Communications {
   @Override
   public void notifyProgressReport(String uri) {
     ProgressParams params =
-        new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport()));
+            new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport()));
     getClient().notifyProgress(params);
   }
 
@@ -166,7 +168,7 @@ public class ServerCommunications implements Communications {
     synchronized (uriInProgress) {
       if (uriInProgress.contains(uri)) {
         ProgressParams params =
-            new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressEnd()));
+                new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressEnd()));
         getClient().notifyProgress(params);
         uriInProgress.remove(uri);
       }
@@ -176,7 +178,7 @@ public class ServerCommunications implements Communications {
   @Override
   public void registerExecuteCommandCapability(List<String> capabilities, String id) {
     Registration registrations =
-        new Registration(id, "workspace/executeCommand", new ExecuteCommandOptions(capabilities));
+            new Registration(id, "workspace/executeCommand", new ExecuteCommandOptions(capabilities));
     RegistrationParams params = new RegistrationParams(ImmutableList.of(registrations));
     getClient().registerCapability(params);
   }
@@ -184,8 +186,8 @@ public class ServerCommunications implements Communications {
   @Override
   public void unregisterExecuteCommandCapability(String id) {
     UnregistrationParams unregistrationParams =
-        new UnregistrationParams(
-            ImmutableList.of(new Unregistration(id, "workspace/executeCommand")));
+            new UnregistrationParams(
+                    ImmutableList.of(new Unregistration(id, "workspace/executeCommand")));
     getClient().unregisterCapability(unregistrationParams);
   }
 

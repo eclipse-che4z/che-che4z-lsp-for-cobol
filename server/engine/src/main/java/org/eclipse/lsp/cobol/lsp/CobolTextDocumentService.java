@@ -31,6 +31,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -128,10 +129,11 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
-    lspMessageDispatcher.publish(() -> {
-      didOpenHandler.didOpen(params);
-      return null;
-    });
+    try {
+      didOpenHandler.createEvent(params).execute();
+    } catch (ExecutionException | InterruptedException e) {
+      LOG.error(e.getMessage(), e);
+    }
   }
 
   @SneakyThrows
@@ -145,10 +147,11 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Override
   public void didClose(DidCloseTextDocumentParams params) {
-    lspMessageDispatcher.publish(() -> {
+    try {
       didCloseHandler.didClose(params);
-      return null;
-    });
+    } catch (InterruptedException e) {
+      LOG.error(e.getMessage(), e);
+    }
   }
 
   @Override
@@ -158,7 +161,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Override
   public CompletableFuture<ExtendedApiResult> analysis(@NonNull JsonObject json) {
-    return lspMessageDispatcher.publish(() -> analysisHandler.analysis(json));
+    return lspMessageDispatcher.publish(analysisHandler.createEvent(json));
   }
 
   @Override

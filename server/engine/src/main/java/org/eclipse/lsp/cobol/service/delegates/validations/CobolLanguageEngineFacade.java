@@ -19,26 +19,8 @@ import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.error.ErrorCode;
-import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Location;
-
-import java.util.*;
-import java.util.function.Function;
-
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.*;
-import static org.eclipse.lsp.cobol.common.model.NodeType.COPY;
-import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /**
  * This class is a facade that maps the result of the syntax and semantic analysis to a model
@@ -47,7 +29,6 @@ import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
  */
 @Singleton
 public class CobolLanguageEngineFacade implements LanguageEngineFacade {
-  private static final int FIRST_LINE_SEQ_AND_EXTRA_OP = 8;
 
   private final CobolLanguageEngine engine;
 
@@ -69,88 +50,6 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
    */
   @Override
   public AnalysisResult analyze(String uri, String text, AnalysisConfig analysisConfig) {
-    if (isEmpty(text)) {
-      return AnalysisResult.builder().build();
-    }
-    return toAnalysisResult(engine.run(uri, text, analysisConfig), uri);
+    return engine.run(uri, text, analysisConfig);
   }
-
-  /**
-   * Don't analyze the document if it is empty or contains only sequence area
-   *
-   * @param text - document to analyze
-   * @return true if the document is empty from the engine point of view
-   */
-  private static boolean isEmpty(String text) {
-    return text.length() <= FIRST_LINE_SEQ_AND_EXTRA_OP;
-  }
-
-  private AnalysisResult toAnalysisResult(ResultWithErrors<AnalysisResult> result, String uri) {
-    Node rootNode = result.getResult().getRootNode();
-
-    List<String> copyUriList = rootNode
-        .getDepthFirstStream()
-        .filter(hasType(COPY))
-        .map(CopyNode.class::cast)
-        .map(CopyNode::getDefinitions)
-        .flatMap(Collection::stream)
-        .map(Location::getUri)
-        .filter(it -> !ImplicitCodeUtils.isImplicit(it))
-        .distinct()
-        .collect(toList());
-
-    return AnalysisResult.builder()
-        .symbolTableMap(result.getResult().getSymbolTableMap())
-        .diagnostics(
-            collectDiagnosticsForAffectedDocuments(
-                convertErrors(result.getErrors()),
-                copyUriList,
-                uri))
-        .rootNode(rootNode)
-        .build();
-  }
-
-  /**
-   * Collect diagnostics for each document, used in the analysis - the main COBOL file and all the
-   * copybooks. If there were no errors for some URI, then provide an empty list to clean-up the
-   * errors after the previous analysis.
-   *
-   * @param diagnostics - list of found syntax and semantic errors
-   * @param copybookUris - URIs of copybook definitions used in this analysis
-   * @param uri - current document URI
-   * @return map with file URI as a key, and lists of diagnostics as values
-   */
-  private Map<String, List<Diagnostic>> collectDiagnosticsForAffectedDocuments(
-      Map<String, List<Diagnostic>> diagnostics, List<String> copybookUris, String uri) {
-    Map<String, List<Diagnostic>> result = new HashMap<>(diagnostics);
-    copybookUris.forEach(it -> result.putIfAbsent(it, emptyList()));
-    result.putIfAbsent(uri, emptyList());
-    return result;
-  }
-
-  private static Map<String, List<Diagnostic>> convertErrors(List<SyntaxError> errors) {
-    Map<String, List<Diagnostic>> result = errors.stream()
-        .filter(e -> Objects.nonNull(e.getLocation()))
-        .collect(groupingBy(err -> err.getLocation().getLocation().getUri(), mapping(toDiagnostic(), toList())));
-    result.values().forEach(l -> l.sort(Comparator.comparingInt(a -> a.getRange().getStart().getLine())));
-    return result;
-  }
-
-  private static Function<SyntaxError, Diagnostic> toDiagnostic() {
-    return err -> {
-      Diagnostic diagnostic = new Diagnostic();
-      diagnostic.setSeverity(checkSeverity(err.getSeverity()));
-      diagnostic.setSource(err.getErrorSource().getText());
-      diagnostic.setMessage(err.getSuggestion());
-      diagnostic.setRange(err.getLocation().getLocation().getRange());
-      diagnostic.setCode(ofNullable(err.getErrorCode()).map(ErrorCode::getLabel).orElse(null));
-      diagnostic.setRelatedInformation(ofNullable(err.getRelatedInformation()).map(Collections::singletonList).orElse(null));
-      return diagnostic;
-    };
-  }
-
-  private static DiagnosticSeverity checkSeverity(ErrorSeverity severity) {
-    return DiagnosticSeverity.forValue(severity.ordinal() + 1);
-  }
-
 }
