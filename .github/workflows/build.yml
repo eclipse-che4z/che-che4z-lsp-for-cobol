@@ -54,12 +54,11 @@ jobs:
           name: clients-for-bd-scan
           path: clients/**
           if-no-files-found: error
-  buildPlatformIndependedPart:
+
+  generateNativeConfig:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: 
-          fetch-depth: 0
       - uses: graalvm/setup-graalvm@v1
         with:
           version: '22.3.0'
@@ -78,6 +77,22 @@ jobs:
           if-no-files-found: warn
           name: native-build-configuration
           path: server/engine/target/native/agent-output/test/*
+
+  buildPlatformIndependedPart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          version: '22.3.0'
+          java-version: '11'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          ## uncomment me if you need native image job reports
+          # native-image-job-reports: 'true'
+          cache: 'maven'
       - name: Build Server and Dialects Jars
         working-directory: server
         run: mvn clean package --no-transfer-progress
@@ -144,6 +159,7 @@ jobs:
           if-no-files-found: warn
           name: vsix-daco-dialect
           path: 'cobol-language-support-for-daco*.vsix'
+
   buildNative:
     strategy:
       fail-fast: false
@@ -155,7 +171,7 @@ jobs:
             arch: x64
             container: alpine:3.17
     runs-on: ${{ matrix.os }}
-    needs: [buildPlatformIndependedPart]
+    needs: [generateNativeConfig]
     steps:
       # Generate environment variable
       - shell: pwsh
@@ -226,14 +242,51 @@ jobs:
         run: mvn -e -B -Plinux-native -DskipTests clean package
       - name: Prepare windows artifacts
         if: matrix.os == 'windows-latest'
-        run: |
-          mkdir -p staging/${{ env.target }}
-          cp server/engine/target/*.exe staging/${{ env.target }}/
-          cp server/engine/target/*.dll staging/${{ env.target }}/
-          cp server/engine/target/*.txt staging/${{ env.target }}/
+        uses: actions/upload-artifact@v3
+        with:
+          name: staging-${{ env.target }}
+          path: |
+            server/engine/target/*.exe
+            server/engine/target/*.dll
+            server/engine/target/*.txt
+          if-no-files-found: error
       - name: Prepare non-windows artifacts
         if: matrix.os != 'windows-latest'
-        run: mkdir staging && cp server/engine/target/engine staging/${{ env.target }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: staging-${{ env.target }}
+          path: server/engine/target/engine
+          if-no-files-found: error
+
+  packageNative:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-11, ubuntu-latest]
+        arch: [x64, arm64]
+        include:
+          - os: ubuntu-latest
+            arch: x64
+            container: alpine:3.17
+    runs-on: ${{ matrix.os }}
+    needs: [buildNative,buildPlatformIndependedPart]
+    steps:
+      # Generate environment variable
+      - shell: pwsh
+        if: matrix.os == 'windows-latest'
+        run: echo "target=win32-${{ matrix.arch }}" >> $env:GITHUB_ENV
+      - shell: sh
+        if: matrix.os == 'macos-11'
+        run: echo "target=darwin-${{ matrix.arch }}" >> $GITHUB_ENV
+      - shell: sh
+        if: matrix.os == 'ubuntu-latest'
+        run: echo "target=linux-${{ matrix.arch }}" >> $GITHUB_ENV
+      - uses: actions/checkout@v3
+      - name: Retrieve native build
+        uses: actions/download-artifact@v3
+        with:
+          name: staging-${{ env.target }}
+          path: staging/${{ env.target }}
       - name: Retrieve server jars
         uses: actions/download-artifact@v3
         with:
@@ -258,16 +311,14 @@ jobs:
         working-directory: clients/cobol-lsp-vscode-extension
         if: startsWith( matrix.os, 'mac')
         run: |
-          cp -p ../../staging/${{ env.target }} ./server/native
-          mv ./server/native/${{ env.target }} ./server/native/server-mac
+          cp -p ../../staging/${{ env.target }}/engine ./server/native/server-mac
           chmod +x ./server/native/server-mac
           cp ./server/native/server-mac ../../tests/native-executable-tests/server/mac/
       - name: Deploy linux executable
         working-directory: clients/cobol-lsp-vscode-extension
         if: startsWith( matrix.os, 'ubuntu')
         run: |
-          cp -p ../../staging/${{ env.target }} ./server/native
-          mv ./server/native/${{ env.target }} ./server/native/server-linux
+          cp -p ../../staging/${{ env.target }}/engine ./server/native/server-linux
           chmod +x ./server/native/server-linux
           cp ./server/native/server-linux ../../tests/native-executable-tests/server/linux/
       - uses: actions/setup-node@v3
