@@ -428,7 +428,6 @@ export class CopybookDownloadService implements vscode.Disposable {
       if (!quiet) {
         const providedProfile: string | undefined =
           SettingsService.getProfileName();
-        if (!providedProfile) return;
         const message = providedProfile
           ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${providedProfile}`
           : `${PROVIDE_PROFILE_MSG}`;
