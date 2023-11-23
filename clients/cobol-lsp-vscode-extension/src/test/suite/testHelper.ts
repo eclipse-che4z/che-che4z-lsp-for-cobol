@@ -344,5 +344,6 @@ export function getWorkspaceFolders() {
 }
 
 export function getFirstWorkspaceFolder() {
-  return this.getWorkspaceFolders()[0];
+  const workspaceFolders = getWorkspaceFolders();
+  if (workspaceFolders) return workspaceFolders[0];
 }

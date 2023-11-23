@@ -31,7 +31,9 @@ beforeAll(() => {
   (vscode.workspace.workspaceFolders as any) = [
     { uri: { fsPath, path: fsPath } } as any,
   ];
-  wsPath = path.join(getFirstWorkspaceFolder().uri.fsPath);
+  const firstWorkspaceFolder = getFirstWorkspaceFolder();
+  if (!firstWorkspaceFolder) return;
+  wsPath = path.join(firstWorkspaceFolder.uri.fsPath);
   c4zPath = path.join(wsPath, C4Z_FOLDER);
   filePath = path.join(c4zPath, GITIGNORE_FILE);
 });

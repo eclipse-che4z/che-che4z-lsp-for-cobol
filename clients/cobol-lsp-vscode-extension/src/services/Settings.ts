@@ -63,6 +63,7 @@ export function createFileWithGivenPath(
     return;
   }
   const ws = getFirstWorkspaceFolder();
+  if (!ws) return;
 
   const ch4zPath = path.join(ws.uri.fsPath, folderPath);
   const filePath = path.join(ch4zPath, fileName);
