@@ -27,12 +27,12 @@ const FAKE_ROOT_PATH: string = path.join(
   "folder2",
   "folder3",
 );
-let spySendTelemetry;
-let spySendExceptionTelemetry;
+let spySendTelemetry: any;
+let spySendExceptionTelemetry: any;
 jest.mock("@vscode/extension-telemetry");
 
 function runScenario(
-  expectedNumberOfCalls,
+  expectedNumberOfCalls: any,
   eventType: string,
   eventName?: string,
   categories?: string[],

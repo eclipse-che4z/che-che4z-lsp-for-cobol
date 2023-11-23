@@ -38,6 +38,7 @@ import { Utils } from "../util/Utils";
 import { CopybookURI } from "./CopybookURI";
 import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
 import { getWorkspaceFolders } from "../../Helper";
+import { TelemetryEventMeasurements } from "../reporter/model/TelemetryEvent";
 
 export class CopybookName {
   public constructor(public name: string, public dialect: string) {}
@@ -338,7 +339,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     });
   }
 
-  private static isEligibleForCopybookDownload(dialects: string[]) {
+  private static isEligibleForCopybookDownload(dialects: string[]): boolean {
     const dsnPath: string[] = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(PATHS_ZOWE)!;
@@ -351,16 +352,16 @@ export class CopybookDownloadService implements vscode.Disposable {
       dialectsDsn.push(...dialectDsn);
     });
 
-    const ussPath: string[] =
-      vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_USS) ||
-      [];
-    const providedProfile: string =
-      vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles") ||
-      "";
+    const ussPath: string[] | undefined = vscode.workspace
+      .getConfiguration(SETTINGS_CPY_SECTION)
+      .get(PATHS_USS);
+    const providedProfile: string | undefined = vscode.workspace
+      .getConfiguration(SETTINGS_CPY_SECTION)
+      .get("profiles");
     return (
       dsnPath?.length > 0 ||
-      ussPath?.length > 0 ||
-      providedProfile?.length > 0 ||
+      (ussPath && ussPath?.length > 0) ||
+      (providedProfile && providedProfile.length > 0) ||
       dialectsDsn?.length > 0
     );
   }
@@ -427,7 +428,6 @@ export class CopybookDownloadService implements vscode.Disposable {
       if (!quiet) {
         const providedProfile: string | undefined =
           SettingsService.getProfileName();
-        if (!providedProfile) return;
         const message = providedProfile
           ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${providedProfile}`
           : `${PROVIDE_PROFILE_MSG}`;
@@ -494,12 +494,10 @@ export class CopybookDownloadService implements vscode.Disposable {
           "Download copybooks from MF",
           ["copybook", "COBOL", experimentTag],
           "total time to search copybooks on MF",
-          {
-            ["time elapsed"]: TelemetryService.calculateTimeElapsed(
-              startTime,
-              Date.now(),
-            ),
-          },
+          new Map().set(
+            "time elapsed",
+            TelemetryService.calculateTimeElapsed(startTime, Date.now()),
+          ) as unknown as TelemetryEventMeasurements,
         );
       }
     }

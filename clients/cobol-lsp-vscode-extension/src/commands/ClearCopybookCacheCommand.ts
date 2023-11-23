@@ -32,7 +32,9 @@ export function clearCache() {
     CLEARING_COPYBOOK_CACHE,
     Promise.resolve().then(
       () => {
-        const folderUri = getFirstWorkspaceFolder().uri;
+        const firstWorkspaceFolder = getFirstWorkspaceFolder();
+        if (!firstWorkspaceFolder) return;
+        const folderUri = firstWorkspaceFolder.uri;
         const fileUri = folderUri.with({
           path: path.join(folderUri.fsPath, C4Z_FOLDER, COPYBOOKS_FOLDER),
         });

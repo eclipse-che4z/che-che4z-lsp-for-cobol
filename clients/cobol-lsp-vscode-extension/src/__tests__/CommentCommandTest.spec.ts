@@ -210,7 +210,11 @@ describe("Validate ToggleComments", () => {
       getRange(25, 15, 25, 20),
     ],
     document: {
-      lineAt: jest.fn().mockImplementation((line) => documentLines[line]),
+      lineAt: jest
+        .fn()
+        .mockImplementation(
+          (line) => documentLines[line as keyof typeof documentLines],
+        ),
       eol: vscode.EndOfLine.LF,
     },
     edit: jest.fn().mockImplementation((callback) => callback(editBuilder)),

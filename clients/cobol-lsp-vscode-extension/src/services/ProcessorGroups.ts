@@ -118,7 +118,8 @@ export function loadProcessorGroupDialectConfig(
     if (!Array.isArray(pgCfg.preprocessor)) {
       dialects.push(pgCfg.preprocessor);
     } else {
-      for (const pp of pgCfg.preprocessor) {
+      //TODO: will be improved later
+      for (const pp of pgCfg.preprocessor as any) {
         if (typeof pp === "object" && pp) {
           dialects.push(pp["name"]);
         }
@@ -240,7 +241,8 @@ function loadProcessorGroupSettings<T>(
   dialect: string = "COBOL",
 ): T {
   try {
-    const pgCfg = loadProcessorsConfig(scopeUri);
+    //TODO: will be improved later
+    const pgCfg: any = loadProcessorsConfig(scopeUri);
     if (pgCfg === undefined) {
       return configObject;
     }

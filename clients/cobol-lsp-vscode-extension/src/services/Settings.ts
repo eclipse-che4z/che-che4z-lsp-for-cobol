@@ -63,6 +63,7 @@ export function createFileWithGivenPath(
     return;
   }
   const ws = getFirstWorkspaceFolder();
+  if (!ws) return;
 
   const ch4zPath = path.join(ws.uri.fsPath, folderPath);
   const filePath = path.join(ch4zPath, fileName);
@@ -278,7 +279,7 @@ export class SettingsService {
         settings = new TabSettings([], tabRule);
       }
     } else if (typeof config === "object") {
-      const obj = config as { default; anchors };
+      const obj = config as { default: number[]; anchors: number[][] };
       let defaultRule = new TabRule([0, 6, 7, 11], 72);
       const stops = obj.default as number[];
       if (stops !== undefined && stops.length > 0) {

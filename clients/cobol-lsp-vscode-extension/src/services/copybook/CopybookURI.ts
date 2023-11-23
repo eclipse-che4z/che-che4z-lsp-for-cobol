@@ -73,7 +73,7 @@ export class CopybookURI {
     dataset: string,
     copybook: string,
   ): string {
-    const rootPath = getFirstWorkspaceFolder().uri.fsPath;
+    const rootPath = getFirstWorkspaceFolder()!.uri.fsPath;
     const copybookDirPath = path.join(
       rootPath,
       C4Z_FOLDER,
@@ -88,7 +88,7 @@ export class CopybookURI {
     profileName: string,
     dataset: string,
   ): string {
-    const rootPath = getFirstWorkspaceFolder().uri.fsPath;
+    const rootPath = getFirstWorkspaceFolder()!.uri.fsPath;
     return path.join(
       rootPath,
       C4Z_FOLDER,

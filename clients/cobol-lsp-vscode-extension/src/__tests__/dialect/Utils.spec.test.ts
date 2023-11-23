@@ -63,7 +63,7 @@ describe("Tests dialect util methods", () => {
 
   it("test isV1RuntimeDialectDetail if supplied dialect has a invalid jar and snippets uri", () => {
     vscode.Uri.parse = jest.fn().mockImplementationOnce(() => {
-      throw new error();
+      throw new Error();
     });
     expect(
       isV1RuntimeDialectDetail({

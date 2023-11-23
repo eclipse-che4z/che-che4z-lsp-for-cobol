@@ -197,7 +197,7 @@ export function deleteFile(path: string) {
   fs.rmSync(path);
 }
 
-export function recursiveCopySync(origin, dest) {
+export function recursiveCopySync(origin: string, dest: string) {
   if (fs.existsSync(origin)) {
     if (fs.statSync(origin).isDirectory()) {
       fs.mkdirSync(dest, { recursive: true });
@@ -344,5 +344,6 @@ export function getWorkspaceFolders() {
 }
 
 export function getFirstWorkspaceFolder() {
-  return this.getWorkspaceFolders()[0];
+  const workspaceFolders = getWorkspaceFolders();
+  if (workspaceFolders) return workspaceFolders[0];
 }
