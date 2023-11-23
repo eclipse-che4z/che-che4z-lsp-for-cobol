@@ -21,6 +21,7 @@ import {
   COPYBOOK_CACHE_CLEARED_INFO,
   COPYBOOKS_FOLDER,
 } from "../constants";
+import { getFirstWorkspaceFolder } from "../Helper";
 
 /**
  * Clears the downloaded copybook cache folder ({workspace}/.c4z/.copybooks).
@@ -31,7 +32,7 @@ export function clearCache() {
     CLEARING_COPYBOOK_CACHE,
     Promise.resolve().then(
       () => {
-        const folderUri = vscode.workspace.workspaceFolders[0].uri;
+        const folderUri = getFirstWorkspaceFolder().uri;
         const fileUri = folderUri.with({
           path: path.join(folderUri.fsPath, C4Z_FOLDER, COPYBOOKS_FOLDER),
         });

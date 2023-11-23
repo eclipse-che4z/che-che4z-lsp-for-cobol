@@ -43,6 +43,7 @@ export class LanguageClientService {
 
   constructor(private outputChannel: vscode.OutputChannel) {
     const ext = vscode.extensions.getExtension(extensionId);
+    if (!ext) return;
     this.executablePath = join(
       ext.extensionPath,
       "server",
@@ -113,9 +114,7 @@ export class LanguageClientService {
   }
 
   public stop(): Thenable<void> {
-    if (this.languageClient) {
-      return this.getLanguageClient().stop();
-    }
+    return this.getLanguageClient()?.stop();
   }
 
   private getLanguageClient() {
@@ -123,7 +122,7 @@ export class LanguageClientService {
       this.languageClient = new LanguageClient(
         LANGUAGE_ID,
         "LSP extension for " + LANGUAGE_ID.toUpperCase() + " language",
-        this.createServerOptions(this.executablePath),
+        this.createServerOptions(this.executablePath)!,
         this.createClientOptions(),
       );
     }

@@ -20,6 +20,7 @@ import {
   searchCopybookInWorkspace,
 } from "../util/FSUtils";
 import { ProfileUtils } from "../util/ProfileUtils";
+import { getFirstWorkspaceFolder } from "../../Helper";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
@@ -46,23 +47,25 @@ export class CopybookURI {
       documentUri,
       dialectType,
     );
-    result = searchCopybookInWorkspace(
-      copybookName,
-      copybookFolders,
-      SettingsService.getCopybookExtension(documentUri),
-    );
+    result =
+      searchCopybookInWorkspace(
+        copybookName,
+        copybookFolders,
+        SettingsService.getCopybookExtension(documentUri),
+      ) || "";
     // check in subfolders under .copybooks (copybook downloaded from MF)
     if (!result) {
-      result = searchCopybookInWorkspace(
-        copybookName,
-        await CopybookURI.createPathForCopybookDownloaded(
-          documentUri,
-          dialectType,
-        ),
-        SettingsService.getCopybookExtension(documentUri),
-      );
+      result =
+        searchCopybookInWorkspace(
+          copybookName,
+          await CopybookURI.createPathForCopybookDownloaded(
+            documentUri,
+            dialectType,
+          ),
+          SettingsService.getCopybookExtension(documentUri),
+        ) || "";
     }
-    return result || "";
+    return result;
   }
 
   public static createCopybookPath(
@@ -70,7 +73,7 @@ export class CopybookURI {
     dataset: string,
     copybook: string,
   ): string {
-    const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+    const rootPath = getFirstWorkspaceFolder().uri.fsPath;
     const copybookDirPath = path.join(
       rootPath,
       C4Z_FOLDER,
@@ -85,7 +88,7 @@ export class CopybookURI {
     profileName: string,
     dataset: string,
   ): string {
-    const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+    const rootPath = getFirstWorkspaceFolder().uri.fsPath;
     return path.join(
       rootPath,
       C4Z_FOLDER,

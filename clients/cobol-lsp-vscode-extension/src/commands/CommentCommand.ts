@@ -13,6 +13,7 @@
  */
 
 import * as vscode from "vscode";
+import { SelectionObject } from "../Helper";
 
 /**
  * Change text (commenting/uncommenting) in active editor according to action type.
@@ -40,7 +41,7 @@ export class ToggleComments {
    * Do commenting/uncommenting.
    */
   public doIt() {
-    const replacingList = [];
+    const replacingList: SelectionObject[] = [];
     for (const selection of this.textEditor.selections)
       replacingList.push(this.handleSelection(selection));
     if (replacingList.length === 0) return;
@@ -50,7 +51,7 @@ export class ToggleComments {
     });
   }
 
-  private handleSelection(selection: vscode.Selection) {
+  private handleSelection(selection: vscode.Selection): SelectionObject {
     const selectedLines = this.getSelectedLines(selection);
     const textLines = selectedLines
       .map((it) => it.text)
@@ -90,7 +91,7 @@ export class ToggleComments {
   }
 
   private getSelectedLines(selection: vscode.Selection): vscode.TextLine[] {
-    const selectedLines = [];
+    const selectedLines: vscode.TextLine[] = [];
     for (let i = selection.start.line; i <= selection.end.line; i++)
       selectedLines.push(this.textEditor.document.lineAt(i));
     return selectedLines;

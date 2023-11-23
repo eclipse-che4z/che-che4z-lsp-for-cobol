@@ -23,6 +23,7 @@ import { SettingsService } from "../Settings";
  * @return subroutine file URI if it was found or undefined otherwise
  */
 export function resolveSubroutineURI(name: string): string {
-  const folders: string[] = SettingsService.getSubroutineLocalPath();
-  return searchCopybookInWorkspace(name, folders, COBOL_EXT_ARRAY);
+  const folders: string[] | undefined =
+    SettingsService.getSubroutineLocalPath();
+  return searchCopybookInWorkspace(name, folders, COBOL_EXT_ARRAY)!;
 }

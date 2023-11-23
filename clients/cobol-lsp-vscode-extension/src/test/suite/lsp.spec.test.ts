@@ -358,7 +358,11 @@ suite("Integration Test Suite", function () {
       assert.strictEqual(diagnostics.length, 1);
       const d0 = diagnostics[0];
       assert.ok(d0.message.includes("ABC: Copybook not found"));
-      assert.ok(d0.source.includes("COBOL Language Support (copybook)"));
+      assert.ok(
+        d0 &&
+          d0.source &&
+          d0.source.includes("COBOL Language Support (copybook)"),
+      );
 
       await helper.insertString(editor, pos(40, 21), "\n           Mov");
       await helper.waitFor(

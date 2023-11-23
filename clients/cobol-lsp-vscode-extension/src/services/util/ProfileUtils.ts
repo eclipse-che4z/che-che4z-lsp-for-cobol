@@ -48,7 +48,7 @@ export class ProfileUtils {
   private static getValidProfileForCopybookDownload(
     programName: string,
     availableProfiles: string[],
-  ): string {
+  ): string | undefined {
     const profileFromDoc = ProfileUtils.getProfileFromDocument(
       programName,
       availableProfiles,

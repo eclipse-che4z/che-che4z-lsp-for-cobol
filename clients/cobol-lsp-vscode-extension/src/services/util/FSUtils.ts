@@ -34,7 +34,7 @@ export function getURIFrom(
   folder: string,
   entityName: string,
   extensions?: string[],
-): urlUtil.URL {
+): urlUtil.URL | undefined {
   if (!extensions) {
     const url = new urlUtil.URL(path.join(folder, entityName));
     if (existsSync(url)) {
@@ -86,10 +86,11 @@ export function getURIFromResource(resource: string): urlUtil.URL[] {
  */
 export function searchCopybookInWorkspace(
   copybookName: string,
-  copybookFolders: string[],
-  extensions: string[],
+  copybookFolders: string[] | undefined,
+  extensions: string[] | undefined,
 ): string | undefined {
   for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
+    if (!copybookFolders || !extensions) return undefined;
     const workspaceFolder = cleanWorkspaceFolder(workspaceFolderPath);
     for (const p of copybookFolders) {
       for (const ext of extensions) {

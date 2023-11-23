@@ -16,12 +16,13 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { clearCache } from "../../commands/ClearCopybookCacheCommand";
 import { C4Z_FOLDER, COPYBOOKS_FOLDER } from "../../constants";
+import { getFirstWorkspaceFolder } from "../../test/suite/testHelper";
 
 const fsPath = "tmp-ws";
 
 let copybookCachePath: string;
 const wsPath = path.join(
-  vscode.workspace.workspaceFolders[0].uri.fsPath,
+  getFirstWorkspaceFolder().uri.fsPath,
   C4Z_FOLDER,
   COPYBOOKS_FOLDER,
 );

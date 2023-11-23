@@ -12,9 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
+import { getWorkspaceFolders } from "../../Helper";
 
 export class SettingsUtils {
-  public static isValidJSON(json: string): boolean {
+  public static isValidJSON(json: string | undefined): boolean {
     return json !== undefined ? JSON.parse(json) : false;
   }
 
@@ -22,7 +23,9 @@ export class SettingsUtils {
     fsPath: boolean | undefined = undefined,
   ): string[] {
     const result: string[] = [];
-    vscode.workspace.workspaceFolders.forEach((workspaceFolder) => {
+    const workspaceFolders = getWorkspaceFolders();
+    if (!workspaceFolders) return result;
+    workspaceFolders.forEach((workspaceFolder) => {
       result.push(
         fsPath === undefined
           ? workspaceFolder.uri.path

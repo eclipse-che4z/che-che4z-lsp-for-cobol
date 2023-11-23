@@ -45,16 +45,17 @@ export class TelemetryReporterImpl implements TelemetryReport {
   }
 
   private static getTelemetryResourcePath() {
-    const extPath = vscode.extensions.getExtension(EXTENSION_ID).extensionPath;
-    return vscode.Uri.file(path.join(extPath, "resources", "TELEMETRY_KEY"))
-      .fsPath;
+    const extPath = vscode.extensions.getExtension(EXTENSION_ID);
+    if (!extPath) throw new Error("Extension path could not find");
+    return vscode.Uri.file(
+      path.join(extPath?.extensionPath, "resources", "TELEMETRY_KEY"),
+    ).fsPath;
   }
 
   private static getInstrumentationKey(): string {
-    return Buffer.from(
-      fs.readFileSync(this.getTelemetryResourcePath(), "utf8"),
-      "base64",
-    )
+    const path = this.getTelemetryResourcePath();
+    if (!path) return "";
+    return Buffer.from(fs.readFileSync(path, "utf8"), "base64")
       .toString()
       .trim();
   }
@@ -96,7 +97,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
       this.reporter.sendTelemetryEvent(
         content.eventName,
         TelemetryReporterImpl.convertData(content),
-        TelemetryReporterImpl.convertMeasurements(content.measurements),
+        content.measurements,
       );
     }
   }

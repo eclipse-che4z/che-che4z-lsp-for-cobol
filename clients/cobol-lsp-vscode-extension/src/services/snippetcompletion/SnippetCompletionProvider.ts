@@ -60,10 +60,9 @@ export class SnippetCompletionProvider
 async function getSnippets(): Promise<Map<any, any>> {
   const map = await SettingsService.getSnippetsForCobol();
   const dialectList = SettingsService.getDialects();
-
   const registeredDialects = DialectRegistry.getDialects();
   registeredDialects
-    .filter((d) => dialectList.includes(d.name))
+    .filter((d) => dialectList!.includes(d.name))
     .forEach((d) => {
       var snippets = importSnippet(d.snippetPath);
       if (snippets !== undefined) {
@@ -76,7 +75,7 @@ async function getSnippets(): Promise<Map<any, any>> {
   return map;
 }
 
-function importSnippet(snippetPath: string): Map<any, any> {
+function importSnippet(snippetPath: string): Map<any, any> | undefined {
   var result = SNIPPETS.get(snippetPath);
   if (result === undefined) {
     try {
@@ -95,7 +94,7 @@ function createCompletionItem(
   value: any,
   key: string,
   position: vscode.Position,
-  document?: vscode.TextDocument,
+  document: vscode.TextDocument,
 ): vscode.CompletionItem {
   const itemLabel: vscode.CompletionItemLabel = {
     label: value.prefix,
@@ -136,7 +135,7 @@ function getCurrentLineText(
 
 function findPosition(
   position: vscode.Position,
-  document?: vscode.TextDocument,
+  document: vscode.TextDocument,
 ) {
   const lineText = document.lineAt(position).text.slice(0, position.character);
   var charPosition: number = 7;
@@ -180,7 +179,7 @@ export async function pickSnippet() {
       const getKey = mapKeyForSelectedSnippet.get(item.label);
       const snippetString = snippetMapsFromSettings.get(getKey);
       const snippet = new vscode.SnippetString(snippetString.body.join("\n"));
-      editor.insertSnippet(snippet);
+      editor?.insertSnippet(snippet);
     });
     input.show();
   } catch (error) {

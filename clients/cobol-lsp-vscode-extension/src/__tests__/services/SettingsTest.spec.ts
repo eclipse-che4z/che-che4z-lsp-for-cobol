@@ -20,6 +20,7 @@ import {
   SettingsService,
 } from "../../services/Settings";
 import { SettingsUtils } from "../../services/util/SettingsUtils";
+import { getFirstWorkspaceFolder } from "../../test/suite/testHelper";
 
 const fsPath = "tmp-ws";
 let wsPath: string;
@@ -30,7 +31,7 @@ beforeAll(() => {
   (vscode.workspace.workspaceFolders as any) = [
     { uri: { fsPath, path: fsPath } } as any,
   ];
-  wsPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath);
+  wsPath = path.join(getFirstWorkspaceFolder().uri.fsPath);
   c4zPath = path.join(wsPath, C4Z_FOLDER);
   filePath = path.join(c4zPath, GITIGNORE_FILE);
 });
@@ -81,7 +82,7 @@ describe(".gitignore file in .c4z folder tests", () => {
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
     expect(createFile).toHaveBeenCalledTimes(0);
-    expect(vscode.workspace.workspaceFolders[0]).toBe(undefined);
+    expect(getFirstWorkspaceFolder()).toBe(undefined);
   });
 });
 

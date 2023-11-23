@@ -47,7 +47,7 @@ suite("Tests with USER1.cbl", function () {
   test("TC152046: Nominal - check syntax Ok message", async () => {
     await helper.waitFor(() => editor.document.languageId === "cobol");
     const diagnostics = vscode.languages.getDiagnostics(
-      vscode.window.activeTextEditor.document.uri,
+      helper.get_active_editor().document.uri,
     );
     const expectedMsg =
       "Checks that when opening Cobol file with correct syntax there is an appropriate message is shown";

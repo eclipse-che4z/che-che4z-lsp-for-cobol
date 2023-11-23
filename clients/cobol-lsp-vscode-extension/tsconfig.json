@@ -17,6 +17,7 @@
     "types": ["node", "jest", "mocha"],
     "target": "ES2017",
     "skipLibCheck": true,
+    "strictNullChecks": true,
     "lib": ["es6"],
     "module": "commonjs",
     "moduleResolution": "node",

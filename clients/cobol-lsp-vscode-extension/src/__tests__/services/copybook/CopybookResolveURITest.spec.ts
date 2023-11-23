@@ -71,9 +71,9 @@ function removeFolder(targetPath: string) {
 }
 
 async function buildResultArrayFrom(
-  settingsMockValue: string[],
+  settingsMockValue: string[] | undefined,
   filename: string,
-  profileName: string,
+  profileName: string | undefined,
   ussPath: string[] = [],
 ): Promise<number> {
   vscode.workspace.getConfiguration = jest.fn().mockReturnValue({

@@ -41,16 +41,30 @@ export async function activate() {
 }
 
 export function getWorkspacePath(): string {
-  return vscode.workspace.workspaceFolders[0].uri.fsPath;
+  if (vscode.workspace.workspaceFolders)
+    return vscode.workspace.workspaceFolders[0].uri.fsPath;
+  throw new Error("Workspace not found");
+}
+
+export function getWorkspace(): vscode.WorkspaceFolder {
+  if (vscode.workspace.workspaceFolders)
+    return vscode.workspace.workspaceFolders[0];
+  throw new Error("Workspace not found");
 }
 
 export function get_editor(workspace_file: string): vscode.TextEditor {
   const editor = vscode.window.activeTextEditor;
-  assert.equal(
+  if (!editor) throw new Error("Active editor not found");
+  assert.strictEqual(
     editor.document.uri.fsPath,
     path.join(getWorkspacePath(), workspace_file),
   );
+  return editor;
+}
 
+export function get_active_editor(): vscode.TextEditor {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) throw new Error("Active editor not found");
   return editor;
 }
 
@@ -73,6 +87,7 @@ export async function showDocument(workspace_file: string) {
 
 export async function closeActiveEditor() {
   const doc = vscode.window.activeTextEditor;
+  if (!doc) return;
   while (doc.document.isDirty) {
     await vscode.commands.executeCommand("undo");
     await sleep(100);
@@ -322,4 +337,12 @@ export async function waitForDiagnosticsChange(file: string | vscode.Uri) {
   });
 
   return result;
+}
+
+export function getWorkspaceFolders() {
+  return vscode.workspace.workspaceFolders;
+}
+
+export function getFirstWorkspaceFolder() {
+  return this.getWorkspaceFolders()[0];
 }
