@@ -339,7 +339,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     });
   }
 
-  private static isEligibleForCopybookDownload(dialects: string[]) {
+  private static isEligibleForCopybookDownload(dialects: string[]): boolean {
     const dsnPath: string[] = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(PATHS_ZOWE)!;
