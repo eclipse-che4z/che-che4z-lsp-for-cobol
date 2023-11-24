@@ -36,7 +36,7 @@
         <dependency>
             <groupId>org.eclipse.lsp.cobol</groupId>
             <artifactId>common</artifactId>
-            <version>{dialect.api.version}</version>
+            <version>${dialect.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
