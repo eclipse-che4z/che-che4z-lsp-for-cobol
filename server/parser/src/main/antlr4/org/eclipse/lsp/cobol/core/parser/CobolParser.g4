@@ -1772,6 +1772,7 @@ stringStatement
 
 stringSendingPhrase
    : stringSending (COMMACHAR? stringSending)*? (stringDelimitedByPhrase | stringForPhrase)
+   | {notifyWarning("cobolParser.expectSpace");} COMMACHAR stringSending (COMMACHAR? stringSending)*? (stringDelimitedByPhrase | stringForPhrase)
    ;
 
 stringSending
