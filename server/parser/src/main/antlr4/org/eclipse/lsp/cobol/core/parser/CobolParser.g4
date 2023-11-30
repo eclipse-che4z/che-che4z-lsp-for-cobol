@@ -2230,6 +2230,7 @@ length
 
 argument
    : arithmeticExpression
+   | TRAILING | LEADING
    ;
 
 // qualified data name ----------------------------------
