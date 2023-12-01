@@ -14,9 +14,22 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOCALE;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOGGING_LEVEL;
+import static org.eclipse.lsp4j.FileChangeType.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.*;
+
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
@@ -27,8 +40,8 @@ import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.CobolWorkspaceServiceImpl;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.LspMessageDispatcher;
+import org.eclipse.lsp.cobol.lsp.handlers.text.DirtyCacheHandlerService;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeConfigurationHandler;
-import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeWatchedFilesHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.ExecuteCommandHandler;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
@@ -43,20 +56,6 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOCALE;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOGGING_LEVEL;
-import static org.eclipse.lsp4j.FileChangeType.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.*;
 
 /**
  * This test checks the entry points of the {@link org.eclipse.lsp4j.services.WorkspaceService}
@@ -81,6 +80,7 @@ class WorkspaceServiceTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     MessageService messageService = mock(MessageService.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
+    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
 
     DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
             null,
@@ -90,10 +90,7 @@ class WorkspaceServiceTest {
             null,
             messageService,
             asyncAnalysisService);
-    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
-            stateService,
-            copybookNameService,
-            asyncAnalysisService);
+    DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
@@ -101,7 +98,7 @@ class WorkspaceServiceTest {
     WorkspaceService service = new CobolWorkspaceServiceImpl(
             lspMessageDispatcher,
             didChangeConfigurationHandler,
-            didChangeWatchedFilesHandler,
+            dirtyCacheHandlerService,
             executeCommandHandler);
 
     CompletableFuture<Object> result =
@@ -130,6 +127,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
+    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
 
     DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
             null,
@@ -139,10 +137,7 @@ class WorkspaceServiceTest {
             null,
             null,
             asyncAnalysisService);
-    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
-            stateService,
-            copybookNameService,
-            asyncAnalysisService);
+    DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, null);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
@@ -150,7 +145,7 @@ class WorkspaceServiceTest {
     WorkspaceService service = new CobolWorkspaceServiceImpl(
             lspMessageDispatcher,
             didChangeConfigurationHandler,
-            didChangeWatchedFilesHandler,
+            dirtyCacheHandlerService,
             executeCommandHandler);
 
 
@@ -178,6 +173,7 @@ class WorkspaceServiceTest {
     Keywords keywords = mock(Keywords.class);
     MessageService messageService = mock(MessageService.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
+    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
 
     DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
             settingsService,
@@ -187,10 +183,7 @@ class WorkspaceServiceTest {
             keywords,
             messageService,
             asyncAnalysisService);
-    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
-            stateService,
-            copybookNameService,
-            asyncAnalysisService);
+    DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
@@ -198,7 +191,7 @@ class WorkspaceServiceTest {
     WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
             lspMessageDispatcher,
             didChangeConfigurationHandler,
-            didChangeWatchedFilesHandler,
+            dirtyCacheHandlerService,
             executeCommandHandler);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
@@ -247,10 +240,8 @@ class WorkspaceServiceTest {
             messageService,
             asyncAnalysisService);
 
-    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
-            stateService,
-            copybookNameService,
-            asyncAnalysisService);
+    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
+    DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
@@ -258,7 +249,7 @@ class WorkspaceServiceTest {
     WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
             lspMessageDispatcher,
             didChangeConfigurationHandler,
-            didChangeWatchedFilesHandler,
+            dirtyCacheHandlerService,
             executeCommandHandler);
 
     String path = "foo/bar";
@@ -303,10 +294,8 @@ class WorkspaceServiceTest {
             messageService,
             asyncAnalysisService);
 
-    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
-            stateService,
-            copybookNameService,
-            asyncAnalysisService);
+    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
+    DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
@@ -314,7 +303,7 @@ class WorkspaceServiceTest {
     WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
             lspMessageDispatcher,
             didChangeConfigurationHandler,
-            didChangeWatchedFilesHandler,
+            dirtyCacheHandlerService,
             executeCommandHandler);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
@@ -363,10 +352,8 @@ class WorkspaceServiceTest {
             messageService,
             asyncAnalysisService);
 
-    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
-            stateService,
-            copybookNameService,
-            asyncAnalysisService);
+    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
+    DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
@@ -374,7 +361,7 @@ class WorkspaceServiceTest {
     WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
             lspMessageDispatcher,
             didChangeConfigurationHandler,
-            didChangeWatchedFilesHandler,
+            dirtyCacheHandlerService,
             executeCommandHandler);
 
     when(copybookNameService.copybookLocalFolders(null))
@@ -445,9 +432,8 @@ class WorkspaceServiceTest {
             null,
             null, asyncAnalysisService);
 
-    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = new DidChangeWatchedFilesHandler(
-            stateService,
-            copybookNameService, asyncAnalysisService);
+    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
+    DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
@@ -455,7 +441,7 @@ class WorkspaceServiceTest {
     WorkspaceService service = new CobolWorkspaceServiceImpl(
             lspMessageDispatcher,
             didChangeConfigurationHandler,
-            didChangeWatchedFilesHandler,
+            dirtyCacheHandlerService,
             executeCommandHandler);
 
     DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));

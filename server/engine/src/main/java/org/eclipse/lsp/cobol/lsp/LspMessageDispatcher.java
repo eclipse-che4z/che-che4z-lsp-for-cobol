@@ -15,12 +15,11 @@
 package org.eclipse.lsp.cobol.lsp;
 
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Queue LSP messages and handle the order of messages execution.
@@ -35,6 +34,24 @@ public class LspMessageDispatcher {
 
   private final ExecutorService singleThreadExecutor =
           Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Event Loop"));
+
+
+  /**
+   * Return queue size
+   * @return queue size
+   */
+  public int queueSize() {
+    return eventQueue.size();
+  }
+
+  /**
+   * Return count of an object type in the queue
+   * @param clazz expected Class in the queue
+   * @return queue size
+   */
+  public int queueSizeForType(Class<?> clazz) {
+      return (int) eventQueue.stream().filter(next -> next.getClass().equals(clazz)).count();
+  }
 
   /**
    * Starts event loop
@@ -63,6 +80,7 @@ public class LspMessageDispatcher {
       if (!nextEvent.getDependencies().stream().allMatch(LspEventDependency::isSatisfied)) {
         boolean isCanceled = nextEvent.getCancelConditions().stream().anyMatch(LspEventCancelCondition::shouldBeCanceled);
         if (isCanceled) {
+          LOG.debug("cancel event: " + nextEvent);
           future.cancel(true);
         } else {
           putBack(nextEvent, future);

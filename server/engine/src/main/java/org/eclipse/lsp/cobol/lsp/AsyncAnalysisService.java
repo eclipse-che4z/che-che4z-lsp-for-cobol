@@ -106,7 +106,7 @@ public class AsyncAnalysisService {
     }
     Executor analysisExecutor = getExecutor(uri);
     CompletableFuture<CobolDocumentModel> value = CompletableFuture.supplyAsync(() -> {
-      if (currentRevision < analysisResultsRevisions.get(uri)) {
+      if (currentRevision < analysisResultsRevisions.get(uri) && !force) {
         LOG.debug("[scheduleAnalysis] skip revision: " + currentRevision + " latest: " + analysisResultsRevisions.get(uri));
         return null;
       }
@@ -119,14 +119,14 @@ public class AsyncAnalysisService {
         analysisResults.remove(id).complete(documentModel);
         return documentModel;
       } finally {
-        if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision)) {
+        if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision) || force) {
           communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
         }
         communications.notifyProgressEnd(uri);
       }
     }, analysisExecutor);
     analysisResults.put(id, value);
-    if (prevId != null) {
+    if (prevId != null && !force) {
       Optional.ofNullable(analysisResults.get(makeId(uri, prevId))).ifPresent(cf -> cf.cancel(true));
     }
     return value;

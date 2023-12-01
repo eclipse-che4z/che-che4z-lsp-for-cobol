@@ -16,18 +16,17 @@ package org.eclipse.lsp.cobol.lsp;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.lsp.handlers.text.DirtyCacheHandlerService;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeConfigurationHandler;
-import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeWatchedFilesHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.ExecuteCommandHandler;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.services.WorkspaceService;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * This class is responsible to watch for any changes into the copybook folder and to fetch updated
@@ -38,18 +37,18 @@ import java.util.concurrent.CompletableFuture;
 public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private final LspMessageDispatcher lspMessageDispatcher;
   private final DidChangeConfigurationHandler didChangeConfigurationHandler;
-  private final DidChangeWatchedFilesHandler didChangeWatchedFilesHandler;
+  private final DirtyCacheHandlerService dirtyCacheHandlerService;
   private final ExecuteCommandHandler executeCommandHandler;
 
   @Inject
   public CobolWorkspaceServiceImpl(
           LspMessageDispatcher lspMessageDispatcher,
           DidChangeConfigurationHandler didChangeConfigurationHandler,
-          DidChangeWatchedFilesHandler didChangeWatchedFilesHandler,
+          DirtyCacheHandlerService dirtyCacheHandlerService,
           ExecuteCommandHandler executeCommandHandler) {
     this.lspMessageDispatcher = lspMessageDispatcher;
     this.didChangeConfigurationHandler = didChangeConfigurationHandler;
-    this.didChangeWatchedFilesHandler = didChangeWatchedFilesHandler;
+    this.dirtyCacheHandlerService = dirtyCacheHandlerService;
     this.executeCommandHandler = executeCommandHandler;
   }
 
@@ -96,9 +95,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    */
   @Override
   public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) {
-    lspMessageDispatcher.publish(() -> {
-      didChangeWatchedFilesHandler.didChangeWatchedFiles(params);
-      return null;
-    });
+    dirtyCacheHandlerService.handleDirtyCache();
   }
 }
