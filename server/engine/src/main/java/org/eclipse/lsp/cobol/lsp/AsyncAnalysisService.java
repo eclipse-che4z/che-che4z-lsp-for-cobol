@@ -16,6 +16,8 @@ package org.eclipse.lsp.cobol.lsp;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.*;
+import java.util.concurrent.*;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
@@ -23,9 +25,6 @@ import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
-
-import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * Asynchronous analysis
@@ -77,18 +76,32 @@ public class AsyncAnalysisService {
   }
 
   /**
+   * Schedule an analysis last known revision of the file will be assumed or 0 if none
+   *
+   * @param uri  source URI
+   * @param text content
+   * @param currentRevision the document currentRevision
+   * @param open Is document just opened, or it's reanalyse request
+   * @return document model with analysis result
+   */
+  public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open) {
+    return scheduleAnalysis(uri, text, currentRevision, open, false);
+  }
+
+  /**
    * Schedule an analysis
    *
    * @param uri             source URI
    * @param text            content
    * @param currentRevision the document currentRevision
    * @param open            Is document just opened, or it's reanalyse request
+   * @param force           forcefully schedule the analysis
    * @return document model with analysis result
    */
-  public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open) {
+  public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, boolean force) {
     String id = makeId(uri, currentRevision);
     Integer prevId = analysisResultsRevisions.put(uri, currentRevision);
-    if (currentRevision.equals(prevId)) {
+    if (currentRevision.equals(prevId) && !force) {
       return analysisResults.get(id);
     }
     Executor analysisExecutor = getExecutor(uri);
@@ -143,7 +156,7 @@ public class AsyncAnalysisService {
     LOG.info("Cache invalidated");
     documentModelService.getAllOpened()
             .stream().filter(d -> !analysisService.isCopybook(d.getUri(), d.getText()))
-            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.get(doc.getUri()), false));
+            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.get(doc.getUri()), false, true));
   }
 
   /**
