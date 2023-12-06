@@ -14,6 +14,10 @@
  */
 package org.eclipse.lsp.cobol.positive;
 
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
+
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
@@ -21,16 +25,10 @@ import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
 
 /**
  * This class provides capability to run the server for actual cobol files that are provided using
@@ -46,7 +44,6 @@ class PositiveTest extends FileBasedTest {
   @MethodSource("getSourceFolder")
   @DisplayName("Parameterized - positive tests")
   @NullSource
-  @Disabled
   void test(String testFolder) {
     LOG.info("-- {} under test --", testFolder);
     cobolTextRegistry = retrieveTextsRegistry(testFolder);
