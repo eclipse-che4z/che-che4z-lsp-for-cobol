@@ -33,7 +33,8 @@ public class LspMessageDispatcher {
   private final BlockingDeque<LspEvent<?>> eventQueue = new LinkedBlockingDeque<>();
   private final Map<LspEvent<?>, CompletableFuture<?>> eventResults = Collections.synchronizedMap(new HashMap<>());
 
-  private final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
+  private final ExecutorService singleThreadExecutor =
+          Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Event Loop"));
 
   /**
    * Starts event loop
@@ -53,35 +54,44 @@ public class LspMessageDispatcher {
     }, singleThreadExecutor);
   }
 
+  private void handleEvent(CompletableFuture<Object> future, LspEvent<?> nextEvent) {
+    if (future.isCancelled()) {
+      LOG.info(nextEvent + " was canceled.");
+      return;
+    }
+    try {
+      if (!nextEvent.getDependencies().stream().allMatch(LspEventDependency::isSatisfied)) {
+        boolean isCanceled = nextEvent.getCancelConditions().stream().anyMatch(LspEventCancelCondition::shouldBeCanceled);
+        if (isCanceled) {
+          future.cancel(true);
+        } else {
+          putBack(nextEvent, future);
+        }
+        return;
+      }
+      future.complete(nextEvent.execute());
+    } catch (Exception e) {
+      future.completeExceptionally(e);
+    }
+  }
+
   private void loop() throws InterruptedException {
-    LspEvent<?> nextEven = eventQueue.take();
-    while (nextEven != POISON_PILL) {
+    LspEvent<?> nextEvent = eventQueue.take();
+    while (nextEvent != POISON_PILL) {
       try {
-        CompletableFuture<Object> future = (CompletableFuture<Object>) eventResults.remove(nextEven);
-        if (future.isCancelled()) {
-          LOG.info(nextEven + " was canceled.");
-          continue;
-        }
-        try {
-          if (!nextEven.getDependencies().stream().allMatch(LspEventDependency::isSatisfied)) {
-            putBack(nextEven, future);
-            continue;
-          }
-          future.complete(nextEven.execute());
-        } catch (Exception e) {
-          future.completeExceptionally(e);
-        }
+        handleEvent((CompletableFuture<Object>) eventResults.remove(nextEvent), nextEvent);
       } catch (Exception e) {
         // something terrible
         LOG.error(e.getMessage(), e);
       } finally {
-        nextEven = eventQueue.take();
+        nextEvent = eventQueue.take();
       }
     }
   }
 
   private void putBack(LspEvent<?> nextEven, CompletableFuture<Object> future) throws InterruptedException {
     eventResults.put(nextEven, future);
+    LOG.debug("putBack: " + nextEven);
     if (!eventQueue.offer(nextEven)) {
       LOG.warn("Event " + nextEven + " dropped");
     }
@@ -91,9 +101,10 @@ public class LspMessageDispatcher {
 
   /**
    * Publish LSP event into event loop
+   *
    * @param event the event
+   * @param <R>   type of the event result
    * @return future object for the event
-   * @param <R> type of the event result
    */
   public <R> CompletableFuture<R> publish(LspEvent<R> event) {
     CompletableFuture<R> future = new CompletableFuture<>();
@@ -108,6 +119,7 @@ public class LspMessageDispatcher {
 
   /**
    * Stop the event loop
+   *
    * @throws InterruptedException can be interrupted
    */
   public void stop() throws InterruptedException {

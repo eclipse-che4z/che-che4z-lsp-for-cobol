@@ -69,9 +69,11 @@ public class DefinitionHandler {
    */
   public LspEvent<Either<List<? extends Location>, List<? extends LocationLink>>> createEvent(DefinitionParams params) {
     return new LspEvent<Either<List<? extends Location>, List<? extends LocationLink>>>() {
+      final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
+              asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
       @Override
       public List<LspEventDependency> getDependencies() {
-        return ImmutableList.of(asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+        return lspEventDependencies;
       }
 
       @Override

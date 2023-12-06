@@ -55,14 +55,6 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
             .map(VariableUsageNode.class::cast)
             .collect(Collectors.toList());
 
-    boolean isQualifyExtendedDirectiveEnabled =
-            ctx
-                    .getCompilerDirectiveContext()
-                    .filterDirectiveList(ImmutableList.of(CompilerDirectiveName.QUALIFY))
-                    .filter(t -> !t.getValue().isEmpty())
-                    .map(t -> t.getValue().get(t.getValue().size() - 1).equals("EXTEND"))
-                    .orElse(false);
-
     if (variableUsageNodes.isEmpty()) {
       LOG.warn("Qualified reference node don't have any variable usages. {}", node);
       return;
@@ -75,7 +67,7 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
                     symbolAccumulatorService.getVariableDefinition(programNode, variableUsageNodes))
             .orElseGet(ImmutableList::of);
 
-    if (isQualifyExtendedDirectiveEnabled && foundDefinitions.size() > 1) {
+    if (isQualifyExtendedDirectiveEnabled(ctx) && foundDefinitions.size() > 1) {
       foundDefinitions = updateDefinitionForQualifyExtended(node, foundDefinitions);
     }
     for (VariableNode definitionNode : foundDefinitions) {
@@ -129,6 +121,14 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
             .build();
     ctx.getErrors().add(error);
     LOG.debug("Syntax error by QualifiedReferenceNode " + error.toString());
+  }
+
+  private static boolean isQualifyExtendedDirectiveEnabled(ProcessingContext ctx) {
+    return ctx.getCompilerDirectiveContext()
+            .filterDirectiveList(ImmutableList.of(CompilerDirectiveName.QUALIFY))
+            .filter(t -> !t.getValue().isEmpty())
+            .map(t -> t.getValue().get(t.getValue().size() - 1).equals("EXTEND"))
+            .orElse(false);
   }
 
   private List<VariableNode> updateDefinitionForQualifyExtended(QualifiedReferenceNode node, List<VariableNode> foundDefinitions) {

@@ -135,18 +135,35 @@ export async function insertString(
   return movePosition;
 }
 
+export async function waitForDiagnostics(
+  uri: vscode.Uri,
+  timeout: number = 50000,
+) {
+  return waitFor(
+    () => vscode.languages.getDiagnostics(uri).length > 0,
+    timeout,
+    "diagnostics (" + path.basename(uri.fsPath) + ")",
+  );
+}
+
 export async function waitFor(
   doneFunc: () => boolean | Promise<boolean>,
   timeout: number = 50000,
+  label: string = "",
 ) {
   const startTime = Date.now();
-
+  if (await Promise.resolve(doneFunc())) {
+    return true;
+  }
+  // console.log("waiting" + (label ? label : "") + "...")
   while (!(await Promise.resolve(doneFunc()))) {
     await sleep(100);
     if (Date.now() - startTime > timeout) {
+      console.trace((label ? label : "") + "timeout!");
       return false;
     }
   }
+  // console.log("done! Time: " + (Date.now() - startTime + "."));
   return true;
 }
 

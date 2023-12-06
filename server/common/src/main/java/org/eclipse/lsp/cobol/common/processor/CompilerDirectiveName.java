@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.common.processor;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.Collections;
 import java.util.Optional;
 
 /**
@@ -28,6 +29,11 @@ public enum CompilerDirectiveName {
     @Override
     public Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText) {
       return Optional.empty();
+    }
+
+    @Override
+    public CompilerDirectiveOption defaultValue() {
+      return new CompilerDirectiveOption(this, Collections.emptyList());
     }
   },
   QUALIFY {
@@ -42,9 +48,14 @@ public enum CompilerDirectiveName {
       } else if (isContains(directiveText, "QUALIFY(C_CHAR)") || isContains(directiveText, "QUA(C_CHAR)")) {
         return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("C_CHAR")));
       } else {
-        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("COMPAT")));
+        return Optional.empty();
       }
     }
+    @Override
+    public CompilerDirectiveOption defaultValue() {
+      return new CompilerDirectiveOption(this, ImmutableList.of("COMPAT"));
+    }
+
   },
   XMLPARSE {
     @Override
@@ -58,8 +69,13 @@ public enum CompilerDirectiveName {
       } else if (isContains(directiveText, "XMLPARSE(C_CHAR)") || isContains(directiveText, "XP(C_CHAR)")) {
         return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("C_CHAR")));
       } else {
-        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("XMLSS")));
+        return Optional.empty();
       }
+    }
+
+    @Override
+    public CompilerDirectiveOption defaultValue() {
+      return new CompilerDirectiveOption(this, ImmutableList.of("XMLSS"));
     }
   };
 
@@ -74,4 +90,10 @@ public enum CompilerDirectiveName {
    * @return List of {@link CompilerDirectiveOption}
    */
   public abstract Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText);
+
+  /**
+   * Creates default value of directive.
+   * @return default value of directive.
+   */
+  public abstract CompilerDirectiveOption defaultValue();
 }

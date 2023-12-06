@@ -19,16 +19,13 @@ import com.google.inject.Inject;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.DocumentHighlight;
 import org.eclipse.lsp4j.DocumentHighlightParams;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -37,41 +34,43 @@ import java.util.concurrent.ExecutionException;
 public class DocumentHighlightHandler {
   private final AsyncAnalysisService asyncAnalysisService;
   private final Occurrences occurrences;
+  private final DocumentModelService documentModelService;
 
   @Inject
-  public DocumentHighlightHandler(AsyncAnalysisService asyncAnalysisService, Occurrences occurrences) {
+  public DocumentHighlightHandler(AsyncAnalysisService asyncAnalysisService, Occurrences occurrences, DocumentModelService documentModelService) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.occurrences = occurrences;
+    this.documentModelService = documentModelService;
   }
 
   /**
    * Handle documentHighlight LSP request
+   *
    * @param params DocumentHighlightParams.
    * @return List of document highlights.
-   * @throws ExecutionException forward exception.
+   * @throws ExecutionException   forward exception.
    * @throws InterruptedException forward exception.
    */
   public List<DocumentHighlight> documentHighlight(
           DocumentHighlightParams params) throws ExecutionException, InterruptedException {
     String uri = UriHelper.decode(params.getTextDocument().getUri());
-    Optional<CompletableFuture<CobolDocumentModel>> optional = asyncAnalysisService.fetchLastResultOrAnalyzeDocument(uri);
-    if (!optional.isPresent() || !optional.get().isDone()) {
-      return Collections.emptyList();
-    }
-    CobolDocumentModel doc = optional.get().get();
-    return occurrences.findHighlights(doc.getLastAnalysisResult(), params);
+    return occurrences.findHighlights(documentModelService.get(uri).getLastAnalysisResult(), params);
   }
 
   /**
    * Creates documentHighlight LSP Event
+   *
    * @param params DocumentHighlightParams.
    * @return LspEvent.
    */
   public LspEvent<List<? extends DocumentHighlight>> createEvent(DocumentHighlightParams params) {
     return new LspEvent<List<? extends DocumentHighlight>>() {
+      final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
+              asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+
       @Override
       public List<LspEventDependency> getDependencies() {
-        return ImmutableList.of(asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+        return lspEventDependencies;
       }
 
       @Override

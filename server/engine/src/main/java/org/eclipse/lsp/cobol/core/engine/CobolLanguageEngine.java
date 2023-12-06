@@ -28,7 +28,10 @@ import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
@@ -40,16 +43,21 @@ import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
+import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.utils.ServerTypeUtil;
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.common.error.ErrorSource.WORKSPACE_SETTINGS;
+import static org.eclipse.lsp.cobol.common.model.NodeType.COPY;
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
@@ -59,6 +67,7 @@ import static org.eclipse.lsp.cobol.common.error.ErrorSource.WORKSPACE_SETTINGS;
 @Singleton
 @SuppressWarnings("WeakerAccess")
 public class CobolLanguageEngine {
+  private static final int FIRST_LINE_SEQ_AND_EXTRA_OP = 8;
 
   private final TextPreprocessor preprocessor;
   private final MessageService messageService;
@@ -67,26 +76,70 @@ public class CobolLanguageEngine {
 
   @Inject
   public CobolLanguageEngine(
-      TextPreprocessor preprocessor,
-      GrammarPreprocessor grammarPreprocessor,
-      MessageService messageService,
-      ParseTreeListener treeListener,
-      SubroutineService subroutineService,
-      CachingConfigurationService cachingConfigurationService,
-      DialectService dialectService,
-      AstProcessor astProcessor,
-      SymbolsRepository symbolsRepository,
-      ErrorFinalizerService errorFinalizerService) {
+          TextPreprocessor preprocessor,
+          GrammarPreprocessor grammarPreprocessor,
+          MessageService messageService,
+          ParseTreeListener treeListener,
+          SubroutineService subroutineService,
+          CachingConfigurationService cachingConfigurationService,
+          DialectService dialectService,
+          AstProcessor astProcessor,
+          SymbolsRepository symbolsRepository,
+          ErrorFinalizerService errorFinalizerService) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.errorFinalizerService = errorFinalizerService;
 
     this.pipeline = new Pipeline();
+    this.pipeline.add(new CompilerDirectivesStage(messageService));
     this.pipeline.add(new DialectProcessingStage(dialectService));
     this.pipeline.add(new PreprocessorStage(grammarPreprocessor));
     this.pipeline.add(new ImplicitDialectProcessingStage(dialectService));
     this.pipeline.add(new ParserStage(messageService, treeListener));
     this.pipeline.add(new TransformTreeStage(symbolsRepository, messageService, subroutineService, cachingConfigurationService, dialectService, astProcessor));
+  }
+
+  private static AnalysisResult toAnalysisResult(ResultWithErrors<AnalysisResult> result, String uri) {
+    Node rootNode = result.getResult().getRootNode();
+
+    List<String> copyUriList = rootNode
+        .getDepthFirstStream()
+        .filter(hasType(COPY))
+        .map(CopyNode.class::cast)
+        .map(CopyNode::getDefinitions)
+        .flatMap(Collection::stream)
+        .map(Location::getUri)
+        .filter(it -> !ImplicitCodeUtils.isImplicit(it))
+        .distinct()
+        .collect(toList());
+
+    return AnalysisResult.builder()
+        .symbolTableMap(result.getResult().getSymbolTableMap())
+        .diagnostics(
+            collectDiagnosticsForAffectedDocuments(
+                HandlerUtility.convertErrors(result.getErrors()),
+                copyUriList,
+                uri))
+        .rootNode(rootNode)
+        .build();
+  }
+
+  /**
+   * Collect diagnostics for each document, used in the analysis - the main COBOL file and all the
+   * copybooks. If there were no errors for some URI, then provide an empty list to clean-up the
+   * errors after the previous analysis.
+   *
+   * @param diagnostics - list of found syntax and semantic errors
+   * @param copybookUris - URIs of copybook definitions used in this analysis
+   * @param uri - current document URI
+   * @return map with file URI as a key, and lists of diagnostics as values
+   */
+  private static Map<String, List<Diagnostic>> collectDiagnosticsForAffectedDocuments(
+          Map<String, List<Diagnostic>> diagnostics, List<String> copybookUris, String uri) {
+    Map<String, List<Diagnostic>> result = new HashMap<>(diagnostics);
+    copybookUris.forEach(it -> result.putIfAbsent(it, emptyList()));
+    result.putIfAbsent(uri, emptyList());
+    return result;
   }
 
   /**
@@ -101,12 +154,15 @@ public class CobolLanguageEngine {
    *     the client
    */
   @NonNull
-  public ResultWithErrors<AnalysisResult> run(
+  public AnalysisResult run(
       @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
+    if (isEmpty(text)) {
+      return AnalysisResult.builder().build();
+    }
 
     if (ServerTypeUtil.isInCompatibleServerTypeRegistered(analysisConfig)) {
-      return getErrorForIncompatibleServerTypeAndDialects(documentUri);
+      return toAnalysisResult(getErrorForIncompatibleServerTypeAndDialects(documentUri), documentUri);
     }
 
     // Cleaning up
@@ -117,23 +173,35 @@ public class CobolLanguageEngine {
     PipelineResult<?> result = pipeline.run(ctx);
 
     if (result.stopProcessing() || !(result.getData() instanceof ProcessingResult)) {
-      return new ResultWithErrors<>(
+      return toAnalysisResult(new ResultWithErrors<>(
           AnalysisResult.builder()
               .rootNode(new RootNode())
               .symbolTableMap(ImmutableMap.of())
               .build(),
-          ctx.getAccumulatedErrors().stream().map(errorFinalizerService::localizeErrorMessage).collect(toList()));
+          ctx.getAccumulatedErrors().stream().map(errorFinalizerService::localizeErrorMessage).collect(toList())),
+              documentUri);
     } else {
       ProcessingResult processingResult = (ProcessingResult) result.getData();
       errorFinalizerService.processLateErrors(ctx, ctx.getCopybooksRepository());
 
-      return new ResultWithErrors<>(
+      return toAnalysisResult(new ResultWithErrors<>(
           AnalysisResult.builder()
               .rootNode(processingResult.getRootNode())
               .symbolTableMap(processingResult.getSymbolTableMap())
               .build(),
-          ctx.getAccumulatedErrors().stream().map(errorFinalizerService::localizeErrorMessage).collect(toList()));
+          ctx.getAccumulatedErrors().stream().map(errorFinalizerService::localizeErrorMessage).collect(toList())),
+              documentUri);
     }
+  }
+
+  /**
+   * Don't analyze the document if it is empty or contains only sequence area
+   *
+   * @param text - document to analyze
+   * @return true if the document is empty from the engine point of view
+   */
+  private static boolean isEmpty(String text) {
+    return text.length() <= FIRST_LINE_SEQ_AND_EXTRA_OP;
   }
 
   private ResultWithErrors<AnalysisResult> getErrorForIncompatibleServerTypeAndDialects(String documentUri) {

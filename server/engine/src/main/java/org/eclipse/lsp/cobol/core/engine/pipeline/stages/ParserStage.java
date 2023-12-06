@@ -17,14 +17,13 @@ package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
 import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
-import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
+import org.eclipse.lsp.cobol.core.AstBuilder;
+import org.eclipse.lsp.cobol.core.SplitParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
@@ -48,29 +47,17 @@ public class ParserStage implements Stage<ParserStageResult, DialectOutcome> {
             .addAll(prevPipelineResult.getData().getDialectNodes())
             .build());
     ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
-    CobolLexer lexer = new CobolLexer(CharStreams.fromString(context.getExtendedDocument().toString()));
-    lexer.removeErrorListeners();
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-
-    CobolParser.StartRuleContext tree = runParser(listener, lexer, tokens);
-
+    AstBuilder parser = new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString()),
+            listener,
+            new CobolErrorStrategy(messageService),
+            treeListener);
+    CobolParser.StartRuleContext tree = parser.runParser();
     context.getAccumulatedErrors().addAll(listener.getErrors());
-    return new PipelineResult<>(new ParserStageResult(tokens, tree));
+    return new PipelineResult<>(new ParserStageResult(parser.getTokens(), tree));
   }
 
   @Override
   public String getName() {
     return "Parsing stage";
-  }
-
-  private CobolParser.StartRuleContext runParser(ParserListener listener, CobolLexer lexer, CommonTokenStream tokens) {
-    ThreadInterruptionUtil.checkThreadInterrupted();
-    lexer.addErrorListener(listener);
-    CobolParser parser = new CobolParser(tokens);
-    parser.removeErrorListeners();
-    parser.addErrorListener(listener);
-    parser.setErrorHandler(new CobolErrorStrategy(messageService));
-    parser.addParseListener(treeListener);
-    return parser.startRule();
   }
 }

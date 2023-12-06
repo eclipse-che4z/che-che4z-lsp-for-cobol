@@ -14,6 +14,9 @@
  */
 package org.eclipse.lsp.cobol.core.visitor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +29,11 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.core.WarningRecognitionException;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 /** This error listener registers syntax errors found by the COBOL parser. */
 @Slf4j
@@ -72,10 +72,18 @@ public class ParserListener extends BaseErrorListener {
                     .copybookId(copybooksRepository.getCopybookIdByUri(location.getUri()))
                     .build().toOriginalLocation())
             .suggestion(msg)
-            .severity(ErrorSeverity.ERROR)
+            .severity(getErrorSeverity(e))
             .build();
     LOG.debug("Syntax error by ParserListener " + error.toString());
     errors.add(error);
+  }
+
+  private static ErrorSeverity getErrorSeverity(RecognitionException e) {
+    ErrorSeverity severity = ErrorSeverity.ERROR;
+    if (e instanceof WarningRecognitionException) {
+      severity = ErrorSeverity.WARNING;
+    }
+    return severity;
   }
 
   private int getOffendingSymbolSize(Object offendingSymbol) {

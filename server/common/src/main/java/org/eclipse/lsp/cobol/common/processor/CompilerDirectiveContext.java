@@ -65,10 +65,11 @@ public class CompilerDirectiveContext {
    * @return List of @{@link CompilerDirectiveOption}
    */
   public Optional<CompilerDirectiveOption> filterDirectiveList(List<CompilerDirectiveName> names) {
-    return compilerDirectiveMap.entrySet().stream()
-        .filter(entry -> Objects.nonNull(entry.getKey()))
-        .filter(entry -> names.contains(entry.getKey()))
-        .map(entry -> new CompilerDirectiveOption(entry.getKey(), entry.getValue()))
-        .findFirst();
+    CompilerDirectiveOption defaultValue = names.get(0).defaultValue();
+    return Optional.ofNullable(compilerDirectiveMap.entrySet().stream()
+            .filter(entry -> Objects.nonNull(entry.getKey()))
+            .filter(entry -> names.contains(entry.getKey()))
+            .map(entry -> new CompilerDirectiveOption(entry.getKey(), entry.getValue()))
+            .findFirst().orElse(defaultValue));
   }
 }

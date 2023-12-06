@@ -47,6 +47,7 @@ public class FormattingHandler {
 
   /**
    * Handle LSP formatting request.
+   *
    * @param params DocumentFormattingParams.
    * @return TextEdit.
    */
@@ -57,14 +58,18 @@ public class FormattingHandler {
 
   /**
    * Create LSP formatting event.
+   *
    * @param params DocumentFormattingParams.
    * @return LspEvent.
    */
   public LspEvent<List<? extends TextEdit>> createEvent(DocumentFormattingParams params) {
     return new LspEvent<List<? extends TextEdit>>() {
+      final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
+              asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+
       @Override
       public List<LspEventDependency> getDependencies() {
-        return ImmutableList.of(asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+        return lspEventDependencies;
       }
 
       @Override

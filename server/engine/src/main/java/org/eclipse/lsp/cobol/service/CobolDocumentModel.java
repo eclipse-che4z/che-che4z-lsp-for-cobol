@@ -84,6 +84,7 @@ public class CobolDocumentModel {
    * @param analysisResult the analysis result.
    */
   public void setAnalysisResult(AnalysisResult analysisResult) {
+    LOG.debug("setAnalysisResult: " + uri);
     if (analysisResult != null) {
       this.lastAnalysisResult = analysisResult;
     }
@@ -98,7 +99,6 @@ public class CobolDocumentModel {
     this.text = text;
     parse(text);
     analysisResult = null;
-    outlineResult = null;
   }
 
   String getFullTokenAtPosition(Position position) {

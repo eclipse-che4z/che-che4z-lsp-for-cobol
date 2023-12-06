@@ -35,9 +35,7 @@ import java.util.concurrent.CountDownLatch;
 
 import static java.lang.String.format;
 
-/**
- * Provides async document analysis functionality
- */
+/** Provides async document analysis functionality */
 @Slf4j
 @Singleton
 public class AnalysisService {
@@ -53,11 +51,13 @@ public class AnalysisService {
   private final DocumentContentCache contentCache;
 
   @Inject
-  AnalysisService(LanguageEngineFacade engine,
-                  ConfigurationService configurationService,
-                  @Named("combinedStrategy") CopybookIdentificationService copybookIdentificationService,
-                  CopybookService copybookService, DocumentModelService documentService,
-                  DocumentContentCache contentCache) {
+  AnalysisService(
+      LanguageEngineFacade engine,
+      ConfigurationService configurationService,
+      @Named("combinedStrategy") CopybookIdentificationService copybookIdentificationService,
+      CopybookService copybookService,
+      DocumentModelService documentService,
+      DocumentContentCache contentCache) {
     this.engine = engine;
     this.configurationService = configurationService;
     this.copybookIdentificationService = copybookIdentificationService;
@@ -69,7 +69,7 @@ public class AnalysisService {
   /**
    * Check if given document is copybook or not
    *
-   * @param uri  - document uri
+   * @param uri - document uri
    * @param text - document text
    * @return true for copybook and false otherwise
    */
@@ -95,76 +95,62 @@ public class AnalysisService {
   /**
    * Analyze document
    *
-   * @param uri    Source URI
-   * @param text   Content
-   * @param onOpen Is document just opened, or it's reanalyse request.
+   * @param uri Source URI
+   * @param text Content
+   * @param isNew Is document just opened, or it's reanalyse request.
    */
-  public void analyzeDocument(String uri, String text, boolean onOpen) {
+  public void analyzeDocument(String uri, String text, boolean isNew) {
     contentCache.store(uri, text);
-    if (onOpen) {
-      documentService.openDocument(uri, text);
-    } else {
+    if (!isNew) {
       documentService.updateDocument(uri, text);
     }
 
-    String logPrefix = onOpen ? "[analyzeDocument] Document " : "[reanalyzeDocument] Document ";
+    String logPrefix = isNew ? "[analyzeDocument] Document " : "[reanalyzeDocument] Document ";
     LOG.debug(logPrefix + uri + " opened");
 
-    if (isCopybook(uri, text)) {
-      LOG.debug(logPrefix + uri + " treated as a copy");
-      if (!onOpen) {
-        Set<String> affectedOpenedPrograms = documentService.findAffectedDocumentsForCopybook(uri, d -> !isCopybook(d.getUri(), d.getText()));
-        documentService.getAll(affectedOpenedPrograms).stream()
-                .filter(d -> !isCopybook(d.getUri(), d.getText()))
-                .forEach(doc -> analyzeDocumentWithCopybooks(doc.getUri(), doc.getText()));
-      }
-      LOG.debug(logPrefix + " publish diagnostics: " + documentService.getOpenedDiagnostic());
-    } else {
+    if (!isCopybook(uri, text)) {
       LOG.debug(logPrefix + uri + " treated as a program, start analyzing");
       analyzeDocumentWithCopybooks(uri, text);
+      return;
     }
-  }
 
-  /**
-   * Stop code analysis.
-   *
-   * @param uri source URI
-   */
-  public void stopAnalysis(String uri) {
-    CobolDocumentModel documentModel = documentService.get(uri);
-
-    documentService.closeDocument(uri);
-    LOG.debug("[stopAnalysis] Document " + uri + " closed");
-
-    if (documentModel != null && !isCopybook(uri, documentModel.getText())) {
-      documentService.removeDocument(uri);
+    LOG.debug(logPrefix + uri + " treated as a copy");
+    if (isNew) {
+      return;
     }
+
+    Set<String> affectedOpenedPrograms =
+        documentService.findAffectedDocumentsForCopybook(
+            uri, d -> !isCopybook(d.getUri(), d.getText()));
+
+    documentService.getAll(affectedOpenedPrograms).stream()
+        .filter(d -> !isCopybook(d.getUri(), d.getText()))
+        .forEach(doc -> analyzeDocumentWithCopybooks(doc.getUri(), doc.getText()));
+
   }
 
   /**
    * Asynchronously analyze document with copybooks
    *
-   * @param uri  - document uri
+   * @param uri - document uri
    * @param text - document text
    */
-  void analyzeDocumentWithCopybooks(String uri, String text) {
-    if (isCopybook(uri, text)) {
-      return;
-    }
+  private void analyzeDocumentWithCopybooks(String uri, String text) {
     try {
       CopybookProcessingMode processingMode =
-              CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.ENABLED);
+          CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.ENABLED);
       AnalysisConfig config = configurationService.getConfig(uri, processingMode);
       AnalysisResult result = engine.analyze(uri, text, config);
-      ThreadInterruptionUtil.checkThreadInterrupted();
       documentService.processAnalysisResult(uri, result);
-      copybookService.sendCopybookDownloadRequest(uri, DocumentServiceHelper.extractCopybookUris(result), processingMode);
+      ThreadInterruptionUtil.checkThreadInterrupted();
+      copybookService.sendCopybookDownloadRequest(
+          uri, DocumentServiceHelper.extractCopybookUris(result), processingMode);
       LOG.debug("[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
     } catch (Exception e) {
+      documentService.processAnalysisResult(uri, AnalysisResult.builder().build());
       LOG.debug(format("An exception thrown while applying %s for %s:", "analysis", uri));
       LOG.error(format("An exception thrown while applying %s for %s:", "analysis", uri), e);
       throw e;
     }
   }
-
 }

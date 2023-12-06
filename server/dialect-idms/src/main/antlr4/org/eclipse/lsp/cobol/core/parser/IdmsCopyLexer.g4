@@ -55,6 +55,7 @@ TRUE : T R U E;
 UNEXPIN : U N E X P I N;
 VALUE : V A L U E;
 VALUES : V A L U E S;
+VERSION: V E R S I O N;
 PRINTER : P R I N T E R;
 DAY : D A Y;
 TIME : T I M E;

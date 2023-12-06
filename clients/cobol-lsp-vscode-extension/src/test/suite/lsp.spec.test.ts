@@ -32,9 +32,7 @@ suite("Integration Test Suite", function () {
   test("TC152047, TC152052, TC152051, TC152050, TC152053: Error case - file has syntax errors and are marked with detailed hints", async () => {
     await helper.showDocument("USER2.cbl");
     const editor = helper.get_editor("USER2.cbl");
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
-    );
+    await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 2);
     assert.ok(diagnostics.length === 2);
@@ -59,9 +57,7 @@ suite("Integration Test Suite", function () {
   test("TC152050, TC152053: Error case - file has semantic errors and are marked with detailed hints", async () => {
     await helper.showDocument("REPLACING.CBL");
     const editor = helper.get_editor("REPLACING.CBL");
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
-    );
+    await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     const d0 = diagnostics[0];
@@ -102,9 +98,7 @@ suite("Integration Test Suite", function () {
       pos(34, 11),
       "           EXEC CICS XCTL PROGRAM (XCTL1) END-EXEC.",
     );
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
-    );
+    await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     helper.assertRangeIsEqual(
@@ -237,9 +231,7 @@ suite("Integration Test Suite", function () {
       pos(28, 0),
       "       88  CICS VALUE 'CICS '",
     );
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
-    );
+    await helper.waitForDiagnostics(editor.document.uri);
     let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     helper.assertRangeIsEqual(
@@ -266,9 +258,7 @@ suite("Integration Test Suite", function () {
   test("TC266094 Underline the entire incorrect variable structure", async () => {
     await helper.showDocument("VAR.cbl");
     let editor = helper.get_editor("VAR.cbl");
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
-    );
+    await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 2);
     helper.assertRangeIsEqual(
@@ -294,9 +284,7 @@ suite("Integration Test Suite", function () {
   test("Load resource file", async () => {
     await helper.showDocument("RES.cbl");
     const editor = helper.get_editor("RES.cbl");
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
-    );
+    await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
 
     assert.strictEqual(diagnostics.length, 1);
@@ -331,9 +319,7 @@ suite("Integration Test Suite", function () {
       await editor.edit((edit) => {
         edit.delete(range(pos(25, 19), pos(25, 20)));
       });
-      await helper.waitFor(
-        () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
-      );
+      await helper.waitForDiagnostics(editor.document.uri);
       diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
       assert.strictEqual(diagnostics.length, 1);
       assert.ok(diagnostics[0].message.includes("Syntax error on 'COPY'"));
@@ -382,9 +368,7 @@ suite("Integration Test Suite", function () {
     await editor.edit((edit) => {
       edit.replace(range(pos(48, 30), pos(48, 32)), "1.");
     });
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
-    );
+    await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(
@@ -399,9 +383,7 @@ suite("Integration Test Suite", function () {
     await helper.showDocument("USER1.cbl");
     const editor = helper.get_editor("USER1.cbl");
     await editor.edit((edit) => edit.delete(range(pos(32, 0), pos(32, 3))));
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
-    );
+    await helper.waitForDiagnostics(editor.document.uri);
     let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(
@@ -455,9 +437,7 @@ suite("Integration Test Suite", function () {
     await helper.showDocument("USER1.cbl");
     let editor = helper.get_editor("USER1.cbl");
     await helper.insertString(editor, pos(13, 0), "      ");
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
-    );
+    await helper.waitForDiagnostics(editor.document.uri);
     let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(
@@ -477,9 +457,7 @@ suite("Integration Test Suite", function () {
     );
 
     await helper.insertString(editor, pos(26, 0), "      ");
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 3,
-    );
+    await helper.waitForDiagnostics(editor.document.uri);
     diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 3);
     assert.strictEqual(
@@ -488,9 +466,7 @@ suite("Integration Test Suite", function () {
     );
 
     await helper.insertString(editor, pos(31, 0), "      ");
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 4,
-    );
+    await helper.waitForDiagnostics(editor.document.uri);
     diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 4);
     assert.strictEqual(
@@ -590,37 +566,23 @@ suite("Integration Test Suite", function () {
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
-  test(
-    "Show transition copybook errors" +
-      "TC288744: Underscore a copy statement if its copybook contains error: nested copybooks" +
-      'TC247996: Nested copybooks with "no extension" are supported',
-    async () => {
-      // Open program with error inside a copybook
-      await helper.showDocument("TESTCPY2.cbl");
-      const progUri = await helper.getUri("TESTCPY2.cbl");
+  test("Show transition copybook errors", async () => {
+    // Open program with error inside a copybook
+    await helper.showDocument("TESTCPY2.cbl");
+    const copybookPath = path.join("testing", "COPYC");
+    const copybookUri = await helper.getUri(copybookPath);
 
-      const copybookPath = path.join("testing", "COPYC");
-      const copybookUri = await helper.getUri(copybookPath);
-
-      // Open copybook with an error
-      await helper.showDocument(copybookPath);
-
-      await helper.waitFor(
-        () => vscode.languages.getDiagnostics(copybookUri).length === 1,
-      );
-      const diagnostic = vscode.languages.getDiagnostics(progUri);
-      assert.strictEqual(
-        diagnostic.length,
-        1,
-        "got: " + JSON.stringify(diagnostic),
-      );
-      helper.assertRangeIsEqual(
-        diagnostic[0].range,
-        range(pos(20, 7), pos(20, 18)),
-      );
-      // assert.strictEqual(diagnostic[0].message, "Errors inside the copybook");
-    },
-  )
+    // Open copybook with an error
+    await helper.showDocument(copybookPath);
+    await helper.waitForDiagnostics(copybookUri);
+    const diagnostic = vscode.languages.getDiagnostics(copybookUri);
+    assert.strictEqual(
+      diagnostic.length,
+      1,
+      "got: " + JSON.stringify(diagnostic),
+    );
+    assert.strictEqual(diagnostic[0].message, "Errors inside the copybook");
+  })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
@@ -671,7 +633,10 @@ suite("Integration Test Suite", function () {
     // close the DIAGNOSTIC_TEST_B, which is source of all errors
     await helper.showDocument("DIAGNOSTIC_TEST_B.CBL");
     await helper.closeActiveEditor();
-    await helper.sleep(100);
+
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(copybookUri).length === 0,
+    );
 
     // expect no diagnostics for copybook
     assert.strictEqual(vscode.languages.getDiagnostics(copybookUri).length, 0);
