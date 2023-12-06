@@ -14,8 +14,11 @@
  */
 package org.eclipse.lsp.cobol.lsp.handlers.text;
 
+import static java.util.stream.Collectors.toList;
+
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.LspEvent;
@@ -28,10 +31,6 @@ import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * LSP DocumentSymbol Handler
@@ -77,7 +76,8 @@ public class DocumentSymbolHandler {
       final String uri = UriHelper.decode(params.getTextDocument().getUri());
       final ImmutableList<LspEventDependency> lspEventDependencies = ImmutableList.of(
               asyncAnalysisService.createDependencyOn(uri),
-              () -> documentModelService.get(uri) != null && (documentModelService.get(uri).getOutlineResult() != null
+              () -> documentModelService.get(uri) != null && ((documentModelService.get(uri).getOutlineResult() != null
+                      && !documentModelService.get(uri).getOutlineResult().isEmpty())
                       || analysisService.isCopybook(uri, documentModelService.get(uri).getText())));
       final List<LspEventCancelCondition> cancelConditions = ImmutableList.of(
               asyncAnalysisService.createCancelConditionOnClose(uri));
