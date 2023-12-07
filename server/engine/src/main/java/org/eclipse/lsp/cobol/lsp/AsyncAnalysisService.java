@@ -18,6 +18,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
@@ -55,7 +56,8 @@ public class AsyncAnalysisService {
   public AsyncAnalysisService(DocumentModelService documentModelService,
                               AnalysisService analysisService,
                               CopybookService copybookService,
-                              SubroutineService subroutineService, Communications communications) {
+                              SubroutineService subroutineService,
+                              Communications communications) {
     this.documentModelService = documentModelService;
     this.analysisService = analysisService;
     this.copybookService = copybookService;
@@ -104,6 +106,10 @@ public class AsyncAnalysisService {
     if (currentRevision.equals(prevId) && !force) {
       return analysisResults.get(id);
     }
+    Set<String> affectedDocumentsForCopybook = documentModelService.findAffectedDocumentsForCopybook(uri, d -> !d.getUri().equals(uri) && d.isOpened());
+      if (!affectedDocumentsForCopybook.isEmpty() && !open) {
+      return handleRelatedDocuments(uri, text, affectedDocumentsForCopybook);
+    }
     Executor analysisExecutor = getExecutor(uri);
     CompletableFuture<CobolDocumentModel> value = CompletableFuture.supplyAsync(() -> {
       if (currentRevision < analysisResultsRevisions.get(uri) && !force) {
@@ -130,6 +136,20 @@ public class AsyncAnalysisService {
       Optional.ofNullable(analysisResults.get(makeId(uri, prevId))).ifPresent(cf -> cf.cancel(true));
     }
     return value;
+  }
+
+  private CompletableFuture<CobolDocumentModel> handleRelatedDocuments(String uri, String text, Set<String> affectedDocumentsForCopybook) {
+    analysisService.updateCache(uri, text, false);
+    List<CobolDocumentModel> affectedCobolDocumentModels = documentModelService.getAllOpened().stream()
+            .filter(d -> affectedDocumentsForCopybook.contains(d.getUri()) && !analysisService.isCopybook(d.getUri(), d.getText()))
+            .collect(Collectors.toList());
+    affectedCobolDocumentModels.forEach(
+        doc -> {
+          LOG.debug("[reanalyzeDocument] Document " + doc.getUri());
+          scheduleAnalysis(
+              doc.getUri(), doc.getText(), analysisResultsRevisions.get(doc.getUri()), true, true);
+        });
+    return null;
   }
 
   private Executor getExecutor(String uri) {

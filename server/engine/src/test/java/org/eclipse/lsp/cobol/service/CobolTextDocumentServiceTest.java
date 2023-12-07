@@ -14,6 +14,9 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.google.gson.JsonObject;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.SubroutineService;
@@ -39,11 +42,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.concurrent.ExecutionException;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 /**
  * This test checks the entry points of the {@link TextDocumentService} implementation.
@@ -224,7 +222,7 @@ class CobolTextDocumentServiceTest {
   }
 
   @Test
-  void testFormatting() throws ExecutionException, InterruptedException {
+  void testFormatting() {
     DocumentFormattingParams params = mock(DocumentFormattingParams.class);
     TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
     when(textDocumentIdentifier.getUri()).thenReturn(URI);
