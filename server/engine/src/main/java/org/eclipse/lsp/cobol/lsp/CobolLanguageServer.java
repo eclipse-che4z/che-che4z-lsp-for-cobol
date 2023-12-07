@@ -16,6 +16,8 @@ package org.eclipse.lsp.cobol.lsp;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.handlers.server.ExitHandler;
@@ -26,9 +28,6 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
-
-import javax.annotation.Nullable;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * This class sets up the initial state of the services and applies other initialization activities,

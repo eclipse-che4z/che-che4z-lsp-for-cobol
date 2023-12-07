@@ -15,9 +15,21 @@
 
 package org.eclipse.lsp.cobol.service;
 
+import static java.util.Collections.singletonList;
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
+import static org.eclipse.lsp4j.DiagnosticTag.Unnecessary;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -56,19 +68,6 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static java.util.Collections.singletonList;
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
-import static org.eclipse.lsp4j.DiagnosticTag.Unnecessary;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
  * This test asserts functions of the {@link CobolLanguageServer}, such as initialization.

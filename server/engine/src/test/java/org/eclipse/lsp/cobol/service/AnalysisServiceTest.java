@@ -14,7 +14,12 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.google.common.collect.ImmutableList;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
@@ -27,12 +32,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 /**
  * Test for AnalysisService
@@ -119,7 +118,7 @@ class AnalysisServiceTest {
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
 
     service.analyzeDocument(uri, text, false);
-    verify(documentService, times(1)).updateDocument(uri, text);
+    verify(documentService, times(0)).updateDocument(uri, text);
     verify(engine, times(0)).analyze(any(), any(), any());
   }
 
@@ -131,7 +130,7 @@ class AnalysisServiceTest {
     when(engine.analyze(any(), any(), any())).thenReturn(prepareAnalysisResult());
 
     service.analyzeDocument(uri, text, false);
-    verify(documentService, times(1)).updateDocument(uri, text);
+    verify(documentService, times(0)).updateDocument(uri, text);
     verify(engine, times(1)).analyze(any(), any(), any());
   }
 
