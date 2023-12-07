@@ -14,34 +14,33 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import com.google.common.collect.ImmutableList;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import org.eclipse.lsp.cobol.ClientServerTestModule;
-import org.eclipse.lsp.cobol.ConfigurableTest;
-import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
-import org.eclipse.lsp.cobol.lsp.CobolTextDocumentService;
-import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
-import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.lsp.LspMessageDispatcher;
-import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
-import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.jupiter.api.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Predicate;
-
 import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.google.common.collect.ImmutableList;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
+import org.eclipse.lsp.cobol.ClientServerTestModule;
+import org.eclipse.lsp.cobol.ConfigurableTest;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
+import org.eclipse.lsp.cobol.lsp.CobolTextDocumentService;
+import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.lsp.LspMessageDispatcher;
+import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
+import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.services.TextDocumentService;
+import org.junit.jupiter.api.*;
 
 /**
  * Test the LSP specification for shutdown request

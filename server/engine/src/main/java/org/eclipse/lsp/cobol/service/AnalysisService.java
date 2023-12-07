@@ -14,9 +14,14 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import static java.lang.String.format;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
@@ -27,13 +32,6 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-
-import static java.lang.String.format;
 
 /** Provides async document analysis functionality */
 @Slf4j
@@ -100,33 +98,26 @@ public class AnalysisService {
    * @param isNew Is document just opened, or it's reanalyse request.
    */
   public void analyzeDocument(String uri, String text, boolean isNew) {
-    contentCache.store(uri, text);
-    if (!isNew) {
-      documentService.updateDocument(uri, text);
-    }
-
     String logPrefix = isNew ? "[analyzeDocument] Document " : "[reanalyzeDocument] Document ";
     LOG.debug(logPrefix + uri + " opened");
 
     if (!isCopybook(uri, text)) {
       LOG.debug(logPrefix + uri + " treated as a program, start analyzing");
       analyzeDocumentWithCopybooks(uri, text);
-      return;
     }
+  }
 
-    LOG.debug(logPrefix + uri + " treated as a copy");
-    if (isNew) {
-      return;
+  /**
+   * Update cache
+   * @param uri - document uri
+   * @param text - document text
+   * @param isNew - Is document just opened, or it's reanalyse request
+   */
+  public void updateCache(String uri, String text, boolean isNew) {
+    contentCache.store(uri, text);
+    if (!isNew) {
+      documentService.updateDocument(uri, text);
     }
-
-    Set<String> affectedOpenedPrograms =
-        documentService.findAffectedDocumentsForCopybook(
-            uri, d -> !isCopybook(d.getUri(), d.getText()));
-
-    documentService.getAll(affectedOpenedPrograms).stream()
-        .filter(d -> !isCopybook(d.getUri(), d.getText()))
-        .forEach(doc -> analyzeDocumentWithCopybooks(doc.getUri(), doc.getText()));
-
   }
 
   /**

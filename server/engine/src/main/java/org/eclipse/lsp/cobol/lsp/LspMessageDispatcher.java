@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 @Singleton
 public class LspMessageDispatcher {
   private static final LspEvent<Void> POISON_PILL = () -> null;
-
   private final BlockingDeque<LspEvent<?>> eventQueue = new LinkedBlockingDeque<>();
   private final Map<LspEvent<?>, CompletableFuture<?>> eventResults = Collections.synchronizedMap(new HashMap<>());
 

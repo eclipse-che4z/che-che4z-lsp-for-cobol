@@ -14,7 +14,10 @@
  */
 package org.eclipse.lsp.cobol.lsp.handlers.server;
 
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
+
 import com.google.inject.Inject;
+import javax.annotation.Nullable;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.utils.LogLevelUtils;
@@ -24,10 +27,6 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp4j.InitializedParams;
-
-import javax.annotation.Nullable;
-
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 
 /**
  * LSP Initialized Handler
