@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
+import org.eclipse.lsp4j.Diagnostic;
 
 /**
  * Asynchronous analysis
@@ -119,8 +120,12 @@ public class AsyncAnalysisService {
         analysisResults.remove(id).complete(documentModel);
         return documentModel;
       } finally {
+        Map<String, List<Diagnostic>> openedDiagnostic = documentModelService.getOpenedDiagnostic();
         if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision) || force) {
-          communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
+          communications.publishDiagnostics(openedDiagnostic);
+        } else if (!analysisResultsRevisions.containsKey(uri)) {
+          openedDiagnostic.remove(uri);
+          communications.publishDiagnostics(openedDiagnostic);
         }
         communications.notifyProgressEnd(uri);
       }
@@ -169,6 +174,10 @@ public class AsyncAnalysisService {
     synchronized (analysisExecutors) {
       ExecutorService service = analysisExecutors.remove(uri);
       if (service != null) {
+        CompletableFuture<CobolDocumentModel> cobolDocumentModelCompletableFuture = analysisResults.get(uri);
+        if (cobolDocumentModelCompletableFuture != null) {
+          cobolDocumentModelCompletableFuture.join();
+        }
         service.shutdownNow();
         service.awaitTermination(1, TimeUnit.SECONDS);
       }
