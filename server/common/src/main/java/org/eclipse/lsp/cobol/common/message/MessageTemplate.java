@@ -23,7 +23,7 @@ import lombok.Value;
  * arguments before localizing the message.
  */
 @Value
-public class MessageTemplate {
+public final class MessageTemplate {
   String template;
   String delimiter;
   Object[] args;
