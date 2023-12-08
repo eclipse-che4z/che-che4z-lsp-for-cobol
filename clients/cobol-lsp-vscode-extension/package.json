@@ -433,7 +433,7 @@
       {
         "key": "tab",
         "command": "cobol-lsp.smart-tab",
-        "when": "editorLangId == cobol && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
+        "when": "editorLangId == cobol && !inSnippetMode && !config.editor.tabCompletion && editorTextFocus && config.cobol-lsp.smart-tab"
       },
       {
         "key": "tab",
