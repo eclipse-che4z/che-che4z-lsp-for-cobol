@@ -79,6 +79,7 @@ suite("Integration Test Suite", function () {
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     for (const d of diagnostics) {
       if (d.range.start.line === 22) {
+        console.log("== check dia ==", d);
         assert.strictEqual(d.message, "Source text cannot go past column 80");
         helper.assertRangeIsEqual(d.range, range(pos(22, 80), pos(22, 131)));
         return;
