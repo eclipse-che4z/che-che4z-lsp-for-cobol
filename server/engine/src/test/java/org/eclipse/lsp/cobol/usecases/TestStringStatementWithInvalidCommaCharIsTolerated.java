@@ -61,13 +61,13 @@ public class TestStringStatementWithInvalidCommaCharIsTolerated {
             "1",
             new Diagnostic(
                 new Range(),
-                "a blank is missing after ','",
+                "A blank is missing after ','",
                 DiagnosticSeverity.Warning,
                 ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
-                "a blank is missing after ','",
+                "A blank is missing after ','",
                 DiagnosticSeverity.Warning,
                 ErrorSource.PARSING.getText())));
   }
