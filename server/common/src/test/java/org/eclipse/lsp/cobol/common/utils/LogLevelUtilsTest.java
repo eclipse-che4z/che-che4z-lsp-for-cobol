@@ -47,7 +47,7 @@ class LogLevelUtilsTest {
 
   /** Assert {@link IllegalArgumentException} is thrown when invalid inputs are provided. */
   @Test
-  void whenUnSupportedObjectPassed_thenThrowException() {
+  void whenUnSupportedObjectPassedThenThrowException() {
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () -> LogLevelUtils.updateLogLevel().accept(ImmutableList.of(new DummyElement("INFO"))));

@@ -281,7 +281,7 @@ class ExtendedTextTest {
   }
 
   @Test
-  void testReplaceInsideOneLine_multipleLinesText() {
+  void testReplaceInsideOneLineMultipleLinesText() {
     ExtendedText extendedText = new ExtendedText(TEXT, "uri");
 
     Range range = new Range(new Position(1, 8), new Position(1, 9));
@@ -300,7 +300,7 @@ class ExtendedTextTest {
   }
 
   @Test
-  void testReplaceTwoLines_multipleLinesText() {
+  void testReplaceTwoLinesMultipleLinesText() {
     ExtendedText extendedText = new ExtendedText(TEXT, "uri");
 
     Range range = new Range(new Position(1, 8), new Position(2, 9));
@@ -318,7 +318,7 @@ class ExtendedTextTest {
   }
 
   @Test
-  void testReplaceBigRange_multipleLinesText() {
+  void testReplaceBigRangeMultipleLinesText() {
     ExtendedText extendedText = new ExtendedText(TEXT, "uri");
 
     Range range = new Range(new Position(1, 8), new Position(3, 9));
@@ -335,7 +335,7 @@ class ExtendedTextTest {
   }
 
   @Test
-  void testInsertCopybook_properOriginalLocation() {
+  void testInsertCopybookProperOriginalLocation() {
     ExtendedText document = new ExtendedText(TEXT, "uri");
     ExtendedText copybook1 = new ExtendedText("COPY1 LINE 0\nCOPY1 LINE 1\nCOPY1 LINE 2", "copybook1");
     ExtendedText copybook2 = new ExtendedText("COPY2 LINE 0\nCOPY2 LINE 1\nCOPY2 LINE 2", "copybook2");

@@ -12,16 +12,23 @@
     <modules>
         <module>engine</module>
         <module>parser</module>
-        <module>common</module>
         <module>dialect-idms</module>
         <module>dialect-daco</module>
         <module>test</module>
     </modules>
 
     <properties>
-        <dialect.api.version>1.0.1</dialect.api.version>
+        <dialect.api.version>1.0.2</dialect.api.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>Broadcom</id>
+            <name>Broadcom Inc</name>
+            <url>https://packages.broadcom.com/artifactory/brightside-maven/</url>
+        </repository>
+    </repositories>
 
 </project>

@@ -23,12 +23,12 @@ import org.junit.jupiter.api.Test;
 class ThreadInterruptionUtilTest {
 
   @Test
-  void whenThreadNotInterrupted_doNothing() {
+  void whenThreadNotInterruptedDoNothing() {
     Assertions.assertDoesNotThrow(ThreadInterruptionUtil::checkThreadInterrupted);
   }
 
   @Test
-  void whenThreadInterrupted_throwException() {
+  void whenThreadInterruptedThrowException() {
     Assertions.assertThrows(
         UserInterruptException.class,
         () -> {
