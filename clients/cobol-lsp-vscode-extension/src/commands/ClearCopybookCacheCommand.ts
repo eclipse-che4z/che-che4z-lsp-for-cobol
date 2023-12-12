@@ -31,7 +31,8 @@ export function clearCache() {
     CLEARING_COPYBOOK_CACHE,
     Promise.resolve().then(
       () => {
-        const folderUri = vscode.workspace.workspaceFolders[0].uri;
+        const firstWorkspaceFolder = vscode.workspace.workspaceFolders![0];
+        const folderUri = firstWorkspaceFolder!.uri;
         const fileUri = folderUri.with({
           path: path.join(folderUri.fsPath, C4Z_FOLDER, COPYBOOKS_FOLDER),
         });

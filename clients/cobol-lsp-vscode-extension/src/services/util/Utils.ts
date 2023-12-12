@@ -33,7 +33,9 @@ export class Utils {
       "Zowe.vscode-extension-for-zowe",
     );
     if (!ext) {
-      return Promise.resolve(undefined);
+      return Promise.resolve(
+        undefined,
+      ) as unknown as Promise<IApiRegisterClient>;
     }
     await ext.activate();
     return ext.exports as any;

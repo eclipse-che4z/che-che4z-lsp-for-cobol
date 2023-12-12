@@ -29,8 +29,8 @@ export async function resolveCopybookHandler(
   documentUri: string,
   copybookName: string,
   dialectType: string,
-): Promise<string> {
-  let result: string;
+): Promise<string | undefined> {
+  let result: string | undefined;
   result = searchCopybook(documentUri, copybookName, dialectType);
   // check in subfolders under .copybooks (copybook downloaded from MF)
   if (!result) {
@@ -51,7 +51,7 @@ function searchCopybook(
   copybookName: string,
   dialectType: string,
 ) {
-  let result: string;
+  let result: string | undefined;
   for (let i = 0; i < Object.values(CopybookFolderKind).length; i++) {
     const folderKind = Object.values(CopybookFolderKind)[i];
     const targetFolder = getTargetFolderForCopybook(
@@ -77,31 +77,24 @@ function getTargetFolderForCopybook(
   documentUri: string,
   dialectType: string,
 ) {
-  let result: string[];
+  let result: string[] = [];
+  const profile = SettingsService.getProfileName()!;
   switch (folderKind) {
     case CopybookFolderKind[CopybookFolderKind.local]:
       result = SettingsService.getCopybookLocalPath(documentUri, dialectType);
       break;
     case CopybookFolderKind[CopybookFolderKind["downloaded-dsn"]]:
       result = SettingsService.getDsnPath(documentUri, dialectType).map(
-        (dnsPath) =>
-          CopybookURI.createDatasetPath(
-            SettingsService.getProfileName(),
-            dnsPath,
-          ),
+        (dnsPath) => CopybookURI.createDatasetPath(profile, dnsPath),
       );
       break;
     case CopybookFolderKind[CopybookFolderKind["downloaded-uss"]]:
       result = SettingsService.getUssPath(documentUri, dialectType).map(
-        (dnsPath) =>
-          CopybookURI.createDatasetPath(
-            SettingsService.getProfileName(),
-            dnsPath,
-          ),
+        (dnsPath) => CopybookURI.createDatasetPath(profile, dnsPath),
       );
       break;
   }
-  return result || [];
+  return result;
 }
 
 function resolveAllowedExtensions(

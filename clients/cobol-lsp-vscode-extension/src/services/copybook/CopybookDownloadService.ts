@@ -37,6 +37,7 @@ import { ProfileUtils } from "../util/ProfileUtils";
 import { Utils } from "../util/Utils";
 import { CopybookURI } from "./CopybookURI";
 import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
+import { TelemetryEventMeasurements } from "../reporter/model/TelemetryEvent";
 
 export class CopybookName {
   public constructor(public name: string, public dialect: string) {}
@@ -45,7 +46,8 @@ export class CopybookName {
 const experimentTag = "experiment-tag";
 export class CopybookDownloadService implements vscode.Disposable {
   public static checkWorkspace(): boolean {
-    if (vscode.workspace.workspaceFolders.length === 0) {
+    const workspaceFolders = vscode.workspace.workspaceFolders!;
+    if (workspaceFolders && workspaceFolders.length === 0) {
       vscode.window.showErrorMessage("No workspace folder opened.");
       return false;
     }
@@ -255,7 +257,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     progress: vscode.Progress<{ message?: string; increment?: number }>,
     isUSS: boolean = false,
   ) {
-    const promises = [];
+    const promises: Promise<void>[] = [];
     try {
       for (const cp of toDownload) {
         const datasets = isUSS
@@ -336,29 +338,29 @@ export class CopybookDownloadService implements vscode.Disposable {
     });
   }
 
-  private static isEligibleForCopybookDownload(dialects: string[]) {
+  private static isEligibleForCopybookDownload(dialects: string[]): boolean {
     const dsnPath: string[] = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
-      .get(PATHS_ZOWE);
+      .get(PATHS_ZOWE)!;
 
-    const dialectsDsn = [];
+    const dialectsDsn: string[] = [];
     dialects.forEach((d) => {
       const dialectDsn: string[] = vscode.workspace
         .getConfiguration(SETTINGS_CPY_SECTION)
-        .get(d + "." + PATHS_ZOWE);
-      dialectsDsn.push(dialectDsn);
+        .get(d + "." + PATHS_ZOWE)!;
+      dialectsDsn.push(...dialectDsn);
     });
 
-    const ussPath: string[] = vscode.workspace
+    const ussPath: string[] | undefined = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(PATHS_USS);
-    const providedProfile: string = vscode.workspace
+    const providedProfile: string | undefined = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get("profiles");
     return (
       dsnPath?.length > 0 ||
-      ussPath?.length > 0 ||
-      providedProfile?.length > 0 ||
+      (ussPath && ussPath?.length > 0) ||
+      (providedProfile && providedProfile.length > 0) ||
       dialectsDsn?.length > 0
     );
   }
@@ -423,7 +425,8 @@ export class CopybookDownloadService implements vscode.Disposable {
 
     if (!profile || availableProfiles.indexOf(profile) < 0) {
       if (!quiet) {
-        const providedProfile: string = SettingsService.getProfileName();
+        const providedProfile: string | undefined =
+          SettingsService.getProfileName();
         const message = providedProfile
           ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${providedProfile}`
           : `${PROVIDE_PROFILE_MSG}`;
@@ -466,7 +469,7 @@ export class CopybookDownloadService implements vscode.Disposable {
       if (startTime === null) {
         startTime = Date.now();
       }
-      startTime = await this.run(element, errors, startTime);
+      await this.run(element, errors, startTime);
     }
   }
 
@@ -496,9 +499,8 @@ export class CopybookDownloadService implements vscode.Disposable {
           new Map().set(
             "time elapsed",
             TelemetryService.calculateTimeElapsed(startTime, Date.now()),
-          ),
+          ) as unknown as TelemetryEventMeasurements,
         );
-        startTime = null;
       }
     }
   }
@@ -517,7 +519,6 @@ export class CopybookDownloadService implements vscode.Disposable {
         progress: vscode.Progress<{ message?: string; increment?: number }>,
       ) => this.process(progress, element, errors, startTime),
     );
-    return startTime;
   }
 
   private async handleQueue(
@@ -527,7 +528,10 @@ export class CopybookDownloadService implements vscode.Disposable {
   ) {
     const toDownload: CopybookProfile[] = [element];
     while (this.queue.length > 0) {
-      toDownload.push(await this.queue.pop());
+      const downloadItem = await this.queue.pop();
+      if (downloadItem) {
+        toDownload.push(downloadItem);
+      }
     }
     toDownload.map((cp) => cp.getCopybook()).forEach((cb) => errors.add(cb));
     CopybookDownloadService.totalDownload = toDownload.length;
