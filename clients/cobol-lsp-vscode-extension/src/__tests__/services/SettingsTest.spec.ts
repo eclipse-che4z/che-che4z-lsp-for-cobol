@@ -30,7 +30,9 @@ beforeAll(() => {
   (vscode.workspace.workspaceFolders as any) = [
     { uri: { fsPath, path: fsPath } } as any,
   ];
-  wsPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath);
+  const firstWorkspaceFolder = vscode.workspace.workspaceFolders![0];
+  if (!firstWorkspaceFolder) return;
+  wsPath = path.join(firstWorkspaceFolder.uri.fsPath);
   c4zPath = path.join(wsPath, C4Z_FOLDER);
   filePath = path.join(c4zPath, GITIGNORE_FILE);
 });
@@ -81,7 +83,7 @@ describe(".gitignore file in .c4z folder tests", () => {
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
     expect(createFile).toHaveBeenCalledTimes(0);
-    expect(vscode.workspace.workspaceFolders[0]).toBe(undefined);
+    expect(vscode.workspace.workspaceFolders![0]).toBe(undefined);
   });
 });
 

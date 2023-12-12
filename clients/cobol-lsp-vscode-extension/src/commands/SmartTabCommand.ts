@@ -187,10 +187,10 @@ export class SmartOutdentCommandProvider extends SmartCommandProvider {
           while (
             (currentLine.firstNonWhitespaceCharacterIndex < shift ||
               shift < 0) &&
-            lastShifts.length > 0
+            lastShifts!.length > 0
           ) {
             lastShift = this.getlastShift(editor).lastShift;
-            shift = lastShift.get(currentLine.lineNumber) || 0;
+            shift = lastShift!.get(currentLine.lineNumber) || 0;
           }
           edit.delete(
             new vscode.Range(
@@ -422,7 +422,7 @@ export function getRule(
   let rule = tabSettings.defaultRule;
   if (line > 0 && tabSettings.rules.length > 0) {
     line -= 1;
-    const regexps = tabSettings.rules.map((r) => new RegExp(r.regex));
+    const regexps = tabSettings.rules.map((r) => new RegExp(r.regex!));
 
     while (line >= 0) {
       let str = getCurrentLine(editor, line);
@@ -566,26 +566,26 @@ function handleRangeSelection(
     const finalShiftMap: Map<vscode.TextLine, number> = new Map();
     for (const key of expectedShiftMap.keys()) {
       if (
-        prevKey &&
+        prevKey! &&
         expectedShiftMap.get(prevKey) === expectedShiftMap.get(key)
       ) {
         shift =
           prevKey.firstNonWhitespaceCharacterIndex <
           key.firstNonWhitespaceCharacterIndex
-            ? expectedShiftMap.get(prevKey) -
+            ? expectedShiftMap.get(prevKey)! -
               prevKey.firstNonWhitespaceCharacterIndex
-            : expectedShiftMap.get(key) - key.firstNonWhitespaceCharacterIndex;
+            : expectedShiftMap.get(key)! - key.firstNonWhitespaceCharacterIndex;
         shift =
-          shift > finalShiftMap.get(prevKey)
+          shift > finalShiftMap.get(prevKey)!
             ? shift
-            : finalShiftMap.get(prevKey);
+            : finalShiftMap.get(prevKey)!;
         updateShiftMap(finalShiftMap, prevKey, shift);
         updateShiftMap(finalShiftMap, key, shift);
       } else {
         shift =
-          key.firstNonWhitespaceCharacterIndex > expectedShiftMap.get(key)
+          key.firstNonWhitespaceCharacterIndex > expectedShiftMap.get(key)!
             ? 0
-            : expectedShiftMap.get(key) - key.firstNonWhitespaceCharacterIndex;
+            : expectedShiftMap.get(key)! - key.firstNonWhitespaceCharacterIndex;
         updateShiftMap(finalShiftMap, key, shift);
       }
       prevKey = key;

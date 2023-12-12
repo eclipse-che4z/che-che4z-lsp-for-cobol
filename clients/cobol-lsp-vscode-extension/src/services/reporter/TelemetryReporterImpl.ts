@@ -45,7 +45,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
   }
 
   private static getTelemetryResourcePath() {
-    const extPath = vscode.extensions.getExtension(EXTENSION_ID).extensionPath;
+    const extPath = vscode.extensions.getExtension(EXTENSION_ID)!.extensionPath;
     return vscode.Uri.file(path.join(extPath, "resources", "TELEMETRY_KEY"))
       .fsPath;
   }
@@ -70,21 +70,6 @@ export class TelemetryReporterImpl implements TelemetryReport {
     };
   }
 
-  private static convertMeasurements(
-    content: Map<string, number>,
-  ): TelemetryMeasurement {
-    const result: TelemetryMeasurement = {};
-
-    if (content) {
-      for (const [key, value] of content) {
-        if (value) {
-          result[key] = value;
-        }
-      }
-    }
-    return result;
-  }
-
   private reporter: TelemetryReporter;
 
   constructor(private telemetryKeyId: string) {
@@ -96,7 +81,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
       this.reporter.sendTelemetryEvent(
         content.eventName,
         TelemetryReporterImpl.convertData(content),
-        TelemetryReporterImpl.convertMeasurements(content.measurements),
+        content.measurements,
       );
     }
   }

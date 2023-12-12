@@ -13,7 +13,10 @@
  */
 import { userInfo } from "node:os";
 import { sep } from "node:path";
-import { TelemetryEvent } from "./model/TelemetryEvent";
+import {
+  TelemetryEvent,
+  TelemetryEventMeasurements,
+} from "./model/TelemetryEvent";
 import { TelemetryFactory } from "./TelemetryFactory";
 import { Utils } from "../util/Utils";
 
@@ -27,10 +30,10 @@ export class TelemetryService {
   public static calculateTimeElapsed(
     startTime: number,
     endTime: number,
-  ): number | undefined {
+  ): number {
     return startTime && endTime && endTime >= startTime
       ? (endTime - startTime) / 1000
-      : undefined;
+      : 0;
   }
 
   /**
@@ -45,14 +48,14 @@ export class TelemetryService {
     eventName: string,
     categories?: string[],
     notes?: string,
-    telemetryMeasurement?: Map<string, number>,
+    telemetryMeasurement?: TelemetryEventMeasurements,
   ): void {
     if (this.isValidEventName(eventName)) {
       TelemetryFactory.getReporter().reportEvent(
         this.createTelemetryEvent(
           eventName,
-          categories,
-          notes,
+          categories!,
+          notes!,
           undefined,
           telemetryMeasurement,
         ),
@@ -74,14 +77,14 @@ export class TelemetryService {
     rootCause: string,
     categories?: string[],
     notes?: string,
-    telemetryMeasurement?: Map<string, number>,
+    telemetryMeasurement?: TelemetryEventMeasurements,
   ): void {
     if (this.isValidEventName(eventName) && this.isValidRootCause(rootCause)) {
       TelemetryFactory.getReporter().reportExceptionEvent(
         this.createTelemetryEvent(
           eventName,
-          categories,
-          notes,
+          categories!,
+          notes!,
           this.anonymizeContent(rootCause),
           telemetryMeasurement,
         ),
@@ -98,16 +101,16 @@ export class TelemetryService {
     categories: string[],
     notes: string,
     rootCause?: string,
-    telemetryMeasurement?: Map<string, number>,
+    telemetryMeasurement?: TelemetryEventMeasurements,
   ): TelemetryEvent {
-    const telemetryEvent = new TelemetryEvent();
-    telemetryEvent.eventName = eventName;
-    telemetryEvent.categories = this.resolveCategories(categories);
-    telemetryEvent.notes = notes;
-    telemetryEvent.rootCause = rootCause;
-    telemetryEvent.measurements = telemetryMeasurement;
-
-    return telemetryEvent;
+    return {
+      timestamp: new Date().toISOString(),
+      eventName,
+      categories: this.resolveCategories(categories),
+      notes,
+      rootCause,
+      measurements: telemetryMeasurement,
+    };
   }
 
   private static resolveCategories(categories: string[]): string[] {

@@ -22,7 +22,7 @@ export class NativeExecutableService {
   public constructor(public serverPath: string) {}
 
   public getNativeLanguageClient() {
-    let client: NativeLanguageClient;
+    let client: NativeLanguageClient | undefined;
     switch (os.type()) {
       case "Windows_NT":
         client = new WindowsLanguageClient(this.serverPath);

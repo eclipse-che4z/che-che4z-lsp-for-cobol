@@ -14,7 +14,7 @@
 import * as vscode from "vscode";
 
 export class SettingsUtils {
-  public static isValidJSON(json: string): boolean {
+  public static isValidJSON(json: string | undefined): boolean {
     return json !== undefined ? JSON.parse(json) : false;
   }
 
@@ -22,7 +22,8 @@ export class SettingsUtils {
     fsPath: boolean | undefined = undefined,
   ): string[] {
     const result: string[] = [];
-    vscode.workspace.workspaceFolders.forEach((workspaceFolder) => {
+    const workspaceFolders = vscode.workspace.workspaceFolders!;
+    workspaceFolders.forEach((workspaceFolder) => {
       result.push(
         fsPath === undefined
           ? workspaceFolder.uri.path

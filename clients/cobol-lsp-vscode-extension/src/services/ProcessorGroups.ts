@@ -170,8 +170,7 @@ function matchProcessorGroup(
       : workspacePath.replace("/", path.sep);
   const relativeDocPath = path.relative(workspacePath, documentPath);
 
-  const candidates = [];
-  let result = undefined;
+  const candidates: string[] = [];
   for (const v of pgmCfg.pgms) {
     // exact match
     if (path.isAbsolute(v.program)) {
@@ -189,13 +188,10 @@ function matchProcessorGroup(
       candidates.push(v.pgroup);
     }
   }
-  if (!result) {
-    if (candidates.length === 0) {
-      return undefined;
-    }
-    result = candidates[0];
+  if (candidates.length === 0) {
+    return undefined;
   }
-  return result;
+  return candidates[0];
 }
 
 function pathMatches(program: string, documentPath: string) {
@@ -227,7 +223,7 @@ function loadProcessorsConfig(
   );
   const pgroup = matchProcessorGroup(pgmCfg, documentPath, ws[0]);
 
-  let result = undefined;
+  let result;
   procCfg.pgroups.forEach((p) => {
     if (pgroup === p.name) {
       result = p;
@@ -242,7 +238,7 @@ function loadProcessorGroupSettings<T>(
   atrtibute: string,
   configObject: T,
   dialect: string = "COBOL",
-): T | undefined {
+): T {
   try {
     const pgCfg = loadProcessorsConfig(scopeUri);
     if (pgCfg === undefined) {

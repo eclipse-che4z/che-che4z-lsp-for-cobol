@@ -41,16 +41,28 @@ export async function activate() {
 }
 
 export function getWorkspacePath(): string {
-  return vscode.workspace.workspaceFolders[0].uri.fsPath;
+  if (vscode.workspace.workspaceFolders)
+    return vscode.workspace.workspaceFolders[0].uri.fsPath;
+  throw new Error("Workspace not found");
+}
+
+export function getWorkspace(): vscode.WorkspaceFolder {
+  if (vscode.workspace.workspaceFolders)
+    return vscode.workspace.workspaceFolders[0];
+  throw new Error("Workspace not found");
 }
 
 export function get_editor(workspace_file: string): vscode.TextEditor {
-  const editor = vscode.window.activeTextEditor;
-  assert.equal(
+  const editor = vscode.window.activeTextEditor!;
+  assert.strictEqual(
     editor.document.uri.fsPath,
     path.join(getWorkspacePath(), workspace_file),
   );
+  return editor;
+}
 
+export function get_active_editor(): vscode.TextEditor {
+  const editor = vscode.window.activeTextEditor!;
   return editor;
 }
 
@@ -73,6 +85,7 @@ export async function showDocument(workspace_file: string) {
 
 export async function closeActiveEditor() {
   const doc = vscode.window.activeTextEditor;
+  if (!doc) return;
   while (doc.document.isDirty) {
     await vscode.commands.executeCommand("undo");
     await sleep(100);
@@ -183,7 +196,7 @@ export function range(p0: vscode.Position, p1: vscode.Position): vscode.Range {
 export function updateConfig(configFileName: string) {
   // update the settings.json with this file content
   const settinsFileLoc = path.join(
-    getWorkspacePath(),
+    vscode.workspace.workspaceFolders![0].uri.fsPath,
     ".vscode",
     "settings.json",
   );

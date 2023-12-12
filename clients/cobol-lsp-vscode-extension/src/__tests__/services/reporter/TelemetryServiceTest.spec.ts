@@ -16,6 +16,7 @@ import * as path from "path";
 import TelemetryReporter from "@vscode/extension-telemetry";
 import { TelemetryReporterImpl } from "../../../services/reporter/TelemetryReporterImpl";
 import { TelemetryService } from "../../../services/reporter/TelemetryService";
+import { TelemetryEventMeasurements } from "../../../services/reporter/model/TelemetryEvent";
 
 const USERNAME: string = "usernameToAnonymize";
 const FAKE_ROOT_PATH: string = path.join(
@@ -36,18 +37,18 @@ function runScenario(
   eventName?: string,
   categories?: string[],
   rootCause?: string,
-  telemetryMeasurements?: Map<string, number>,
+  telemetryMeasurements?: TelemetryEventMeasurements,
 ) {
   if (eventType === "log") {
     TelemetryService.registerEvent(
-      eventName,
+      eventName!,
       categories,
       undefined,
       telemetryMeasurements,
     );
     expect(spySendTelemetry).toBeCalledTimes(expectedNumberOfCalls);
   } else {
-    TelemetryService.registerExceptionEvent(eventName, rootCause, categories);
+    TelemetryService.registerExceptionEvent(eventName, rootCause!, categories);
     expect(spySendExceptionTelemetry).toBeCalledTimes(expectedNumberOfCalls);
   }
 }
@@ -81,17 +82,22 @@ describe("TelemetryService information are consistent before send them to the te
 
   test("Given a fulfilled telemetry measurement event, the data is contained as part of a telemetry event and their data are sent to the telemetry server", () => {
     const startTime: number = Date.now();
-    runScenario(
-      1,
-      "log",
-      "test the download",
-      undefined,
-      undefined,
-      new Map().set(
-        "time elapsed",
-        TelemetryService.calculateTimeElapsed(startTime - 100, startTime),
-      ),
-    );
+    runScenario(1, "log", "test the download", undefined, undefined, {
+      "time elapsed": TelemetryService.calculateTimeElapsed(
+        startTime - 100,
+        startTime,
+      )!,
+    });
+  });
+
+  test("Given a fulfilled telemetry measurement event, the data is contained as part of a telemetry event and their data are sent to the telemetry server with manuplated starttime", () => {
+    const startTime: number = Date.now();
+    runScenario(1, "log", "test the download", undefined, undefined, {
+      "time elapsed": TelemetryService.calculateTimeElapsed(
+        startTime + 100,
+        startTime,
+      )!,
+    });
   });
 
   test("An empty telemetry object is not sent to the telemetry server", () => {
@@ -111,7 +117,7 @@ describe("TelemetryService information are consistent before send them to the te
   });
 
   test("An exception telemetry event with a null root cause is not sent to the telemetry server", () => {
-    runScenario(0, "exception", "runtimeException", undefined, null);
+    runScenario(0, "exception", "runtimeException", undefined, undefined);
   });
 });
 
