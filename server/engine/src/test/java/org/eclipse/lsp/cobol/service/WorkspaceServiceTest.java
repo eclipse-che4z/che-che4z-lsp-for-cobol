@@ -91,7 +91,7 @@ class WorkspaceServiceTest {
             messageService,
             asyncAnalysisService);
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
-    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
     CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
@@ -138,7 +138,7 @@ class WorkspaceServiceTest {
             null,
             asyncAnalysisService);
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
-    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, null);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
     CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
@@ -184,7 +184,7 @@ class WorkspaceServiceTest {
             messageService,
             asyncAnalysisService);
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
-    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
     CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
@@ -242,7 +242,7 @@ class WorkspaceServiceTest {
 
     LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
-    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
     CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
@@ -296,7 +296,7 @@ class WorkspaceServiceTest {
 
     LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
-    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
     CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
@@ -354,7 +354,7 @@ class WorkspaceServiceTest {
 
     LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
-    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
     CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
@@ -434,7 +434,7 @@ class WorkspaceServiceTest {
 
     LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
-    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, copybookService, subroutineService);
+    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
     CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();

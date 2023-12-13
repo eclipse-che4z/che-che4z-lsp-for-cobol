@@ -17,30 +17,26 @@ package org.eclipse.lsp.cobol.lsp.handlers.workspace;
 import com.google.inject.Inject;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.SubroutineService;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.lsp.handlers.text.DirtyCacheHandlerService;
 import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 
 /**
- * LSP ExecuteCommand Handler
+ * LSP ExecuteCommand Handler.
+ * Handles the resolve copybook command triggred by {@link org.eclipse.lsp.cobol.service.delegates.actions.FindCopybookCommand}
  */
 @Slf4j
 public class ExecuteCommandHandler {
   private final DisposableLSPStateService disposableLSPStateService;
-  private final CopybookService copybookService;
-  private final SubroutineService subroutineService;
+  private final DirtyCacheHandlerService dirtyCacheHandlerService;
 
-  // FIXME: what is that?
   @Inject
   public ExecuteCommandHandler(DisposableLSPStateService disposableLSPStateService,
-                               CopybookService copybookService,
-                               SubroutineService subroutineService) {
+                               DirtyCacheHandlerService dirtyCacheHandlerService) {
     this.disposableLSPStateService = disposableLSPStateService;
-    this.copybookService = copybookService;
-    this.subroutineService = subroutineService;
+    this.dirtyCacheHandlerService = dirtyCacheHandlerService;
   }
 
   /**
@@ -63,9 +59,6 @@ public class ExecuteCommandHandler {
   }
 
   private void rerunAnalysis() {
-    copybookService.invalidateCache();
-    subroutineService.invalidateCache();
-    LOG.info("Cache invalidated");
-//    dataBus.postData(new RunAnalysisEvent(true));
+    dirtyCacheHandlerService.handleDirtyCache();
   }
 }
