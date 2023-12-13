@@ -339,16 +339,18 @@ export class CopybookDownloadService implements vscode.Disposable {
   }
 
   private static isEligibleForCopybookDownload(dialects: string[]): boolean {
-    const dsnPath: string[] = vscode.workspace
+    const dsnPath: string[] | undefined = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
-      .get(PATHS_ZOWE)!;
+      .get(PATHS_ZOWE);
 
-    const dialectsDsn: string[] = [];
+    const dialectsDsn: string[] | undefined  = [];
     dialects.forEach((d) => {
-      const dialectDsn: string[] = vscode.workspace
+      const dialectDsn: string[] | undefined= vscode.workspace
         .getConfiguration(SETTINGS_CPY_SECTION)
-        .get(d + "." + PATHS_ZOWE)!;
-      dialectsDsn.push(...dialectDsn);
+        .get(d + "." + PATHS_ZOWE);
+        if (dialectDsn) {
+          dialectsDsn.push(...dialectDsn);
+        }
     });
 
     const ussPath: string[] | undefined = vscode.workspace
@@ -358,7 +360,7 @@ export class CopybookDownloadService implements vscode.Disposable {
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get("profiles");
     return (
-      dsnPath?.length > 0 ||
+      (dsnPath && dsnPath.length > 0) ||
       (ussPath && ussPath?.length > 0) ||
       (providedProfile && providedProfile.length > 0) ||
       dialectsDsn?.length > 0
