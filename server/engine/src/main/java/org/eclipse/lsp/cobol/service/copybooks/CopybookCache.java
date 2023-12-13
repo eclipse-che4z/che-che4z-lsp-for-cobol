@@ -19,12 +19,11 @@ import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import org.eclipse.lsp.cobol.common.copybook.CopybookId;
-import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import org.eclipse.lsp.cobol.common.copybook.CopybookId;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 
 /**
  * Implements copybook cache functionality
@@ -70,5 +69,13 @@ public class CopybookCache {
    */
   public void store(CopybookModel copybookModel) {
     cache.put(copybookModel.getCopybookId(), copybookModel);
+  }
+
+  /**
+   * Invalidate cache for the passed key
+   * @param copybookId
+   */
+  public void invalidate(CopybookId copybookId) {
+    cache.invalidate(copybookId);
   }
 }
