@@ -343,14 +343,14 @@ export class CopybookDownloadService implements vscode.Disposable {
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(PATHS_ZOWE);
 
-    const dialectsDsn: string[] | undefined  = [];
+    const dialectsDsn: string[] | undefined = [];
     dialects.forEach((d) => {
-      const dialectDsn: string[] | undefined= vscode.workspace
+      const dialectDsn: string[] | undefined = vscode.workspace
         .getConfiguration(SETTINGS_CPY_SECTION)
         .get(d + "." + PATHS_ZOWE);
-        if (dialectDsn) {
-          dialectsDsn.push(...dialectDsn);
-        }
+      if (dialectDsn) {
+        dialectsDsn.push(...dialectDsn);
+      }
     });
 
     const ussPath: string[] | undefined = vscode.workspace
