@@ -438,17 +438,12 @@
       {
         "key": "tab",
         "command": "cobol-lsp.smart-tab",
-        "when": "editorLangId == COBOL && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
+        "when": "editorLangId == cobol && !inSnippetMode && !config.editor.tabCompletion && editorTextFocus && config.cobol-lsp.smart-tab"
       },
       {
         "key": "shift+tab",
         "command": "cobol-lsp.smart-outdent",
-        "when": "editorLangId == cobol && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
-      },
-      {
-        "key": "shift+tab",
-        "command": "cobol-lsp.smart-outdent",
-        "when": "editorLangId == COBOL && !inSnippetMode && editorTextFocus && config.cobol-lsp.smart-tab"
+        "when": "editorLangId == cobol && !inSnippetMode && !config.editor.tabCompletion && editorTextFocus && config.cobol-lsp.smart-tab"
       },
       {
         "key": "ctrl+/",
