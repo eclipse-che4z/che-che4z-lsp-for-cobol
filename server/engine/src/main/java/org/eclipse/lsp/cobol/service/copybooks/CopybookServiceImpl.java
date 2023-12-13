@@ -18,6 +18,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
@@ -54,6 +55,7 @@ import org.eclipse.lsp.cobol.service.DocumentContentCache;
 public class CopybookServiceImpl implements CopybookService {
 
   private final Map<String, List<SyntaxError>> preprocessCopybookErrors = new ConcurrentHashMap<>();
+  private final Map<String, List<CopybookModel>> copybookUsage = new ConcurrentHashMap<>();
   private final Provider<CobolLanguageClient> clientProvider;
   private final FileSystemService files;
   public final TextPreprocessor preprocessor;
@@ -83,8 +85,17 @@ public class CopybookServiceImpl implements CopybookService {
     LOG.debug("Copybooks for downloading: {}", copybooksForDownloading);
     LOG.debug("Copybook cache: {}", copybookCache);
     LOG.debug("Cache invalidated");
+    copybookUsage.clear();
     copybooksForDownloading.clear();
     copybookCache.invalidateAll();
+  }
+
+  /**
+   * Removes cache for the passed {@link CopybookId}
+   * @param copybookId
+   */
+  public void invalidateCache(CopybookId copybookId) {
+    copybookCache.invalidate(copybookId);
   }
 
   /**
@@ -115,6 +126,7 @@ public class CopybookServiceImpl implements CopybookService {
 
       CopybookModel copybookModel = getFromCache(programDocumentUri, copybookId, copybookName,
               preprocess);
+      copybookUsage.computeIfAbsent(programDocumentUri, k -> new ArrayList<>()).add(copybookModel);
 
       updateContent(copybookModel, preprocess);
 
@@ -298,6 +310,16 @@ public class CopybookServiceImpl implements CopybookService {
             !processingMode.userInteraction);
       }
     }
+  }
+
+  /**
+   * Get the list of copybook used by a document
+   *
+   * @param documentUri  current document uri.
+   * @return List of all the {@link CopybookModel} used by the passed document
+   */
+  public List<CopybookModel> getCopybookUsage(String documentUri) {
+    return Collections.unmodifiableList(copybookUsage.getOrDefault(documentUri, ImmutableList.of()));
   }
 
   @VisibleForTesting
