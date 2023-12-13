@@ -20,6 +20,7 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test for ExtendedText class
@@ -354,6 +355,20 @@ class ExtendedTextTest {
     assertEquals("copybook1", copyLocation.getUri());
     assertEquals(new Range(new Position(2, 0), new Position(3, 11)), documentLocation.getRange());
 
+  }
+
+  @Test
+  void testInsertWithPadding() {
+    Range range = new Range(new Position(1, 2), new Position(2, 4));
+    ExtendedText extendedText = new ExtendedText("example_text\nexample_text", "example_uri");
+    ExtendedText copybook1 = new ExtendedText("COPY1 LINE 0\nCOPY1 LINE 1\nCOPY1 LINE 2", "copybook1");
+    ExtendedText expectedCopybook = new ExtendedText("COPY1 LINE 0\nCO  example_text        \n  example_text      LINE 2", "copybook1");
+
+    copybook1.insertWithPadding(range, extendedText);
+
+    assertTrue(copybook1.getLines().get(0).toString().equals(expectedCopybook.getLines().get(0).toString()));
+    assertTrue(copybook1.getLines().get(1).toString().equals(expectedCopybook.getLines().get(1).toString()));
+    assertTrue(copybook1.getLines().get(2).toString().equals(expectedCopybook.getLines().get(2).toString()));
   }
 
 }

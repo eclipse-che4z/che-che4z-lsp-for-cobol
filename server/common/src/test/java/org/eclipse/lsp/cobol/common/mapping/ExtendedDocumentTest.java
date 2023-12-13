@@ -43,7 +43,7 @@ class ExtendedDocumentTest {
 
   private String documentUri;
   private String copybookUri;
-  private ExtendedDocument document;
+  private ExtendedDocument document, document2;
   private ExtendedText copybook;
 
   @BeforeEach
@@ -52,6 +52,7 @@ class ExtendedDocumentTest {
     copybookUri = UUID.randomUUID().toString();
     document = new ExtendedDocument(TEXT, documentUri);
     copybook = new ExtendedText(COPYBOOK, copybookUri);
+    document2 = new ExtendedDocument(copybook, documentUri);
   }
 
   @Test
@@ -96,7 +97,6 @@ class ExtendedDocumentTest {
     assertEquals(new Range(new Position(5, 8), new Position(5, 16)).toString(), location.getRange().toString());
     assertEquals(documentUri, location.getUri());
   }
-
 
 
 }

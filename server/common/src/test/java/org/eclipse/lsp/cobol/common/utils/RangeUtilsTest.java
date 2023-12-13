@@ -29,6 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RangeUtilsTest {
   private final Position firstLine = new Position(1, 0);
   private final Position secondLine = new Position(2, 0);
+  private final Position thirdLine = new Position(3, 0);
+  private final Position forthLine = new Position(4, 0);
+  private final Range firstRange = new Range(firstLine, forthLine);
+  private final Range secondRange = new Range(secondLine, thirdLine);
 
   @Test
   void isAfterPositive() {
@@ -51,9 +55,45 @@ class RangeUtilsTest {
   }
 
   @Test
+  void isInsidePositive() {
+    assertTrue(RangeUtils.isInside(secondRange, firstRange));
+  }
+
+  @Test
+  void isInsideNegative() {
+    assertFalse(RangeUtils.isInside(firstRange, secondRange));
+  }
+  @Test
   void isPositionsAreEquals() {
     assertFalse(RangeUtils.isAfter(firstLine, firstLine));
     assertFalse(RangeUtils.isBefore(secondLine, secondLine));
+  }
+
+  @Test
+  void testShiftRangeWithPosition() {
+    Position position = new Position(5, 10);
+    Range range = new Range(new Position(2, 3), new Position(7, 8));
+    Range expectedRange = new Range(new Position(7, 3), new Position(12, 8));
+    Range result = RangeUtils.shiftRangeWithPosition(position, range);
+    assertTrue(expectedRange.equals(result));
+  }
+
+  @Test
+  void testExtendByCharacter() {
+    Range range = new Range(new Position(1, 2), new Position(3, 4));
+    int count = 5;
+    Range expectedRange = new Range(new Position(1, 2), new Position(3, 9));
+    Range result = RangeUtils.extendByCharacter(range, count);
+    assertTrue(expectedRange.equals(result));
+  }
+
+  @Test
+  void testMoveByLine() {
+    Range range = new Range(new Position(1, 2), new Position(3, 4));
+    int count = 2;
+    Range expectedRange = new Range(new Position(3, 2), new Position(5, 4));
+    Range result = RangeUtils.moveByLine(range, count);
+    assertTrue(expectedRange.equals(result));
   }
 
   private static DocumentSymbol constructNode(
