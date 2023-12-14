@@ -19,7 +19,7 @@ export namespace workspace {
   export const workspaceFolders: any[] = [{}];
   export function getConfiguration() {
     return {
-      get: (key) => {
+      get: (key: string) => {
         if ("cobol-lsp.smart-tab" === key) {
           return undefined;
         }

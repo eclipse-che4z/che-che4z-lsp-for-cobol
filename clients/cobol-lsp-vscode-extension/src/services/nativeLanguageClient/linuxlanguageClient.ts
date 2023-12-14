@@ -20,7 +20,7 @@ export class LinuxlanguageClient implements NativeLanguageClient {
   private readonly executablePath: string;
   private readonly command: string;
 
-  constructor(serverPath) {
+  constructor(serverPath: string) {
     this.executablePath = join(serverPath, "native");
     this.command = `./server-linux`;
   }

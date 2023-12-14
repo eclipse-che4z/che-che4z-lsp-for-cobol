@@ -212,7 +212,7 @@ export function deleteFile(path: string) {
   fs.rmSync(path);
 }
 
-export function recursiveCopySync(origin, dest) {
+export function recursiveCopySync(origin: string, dest: string) {
   if (fs.existsSync(origin)) {
     if (fs.statSync(origin).isDirectory()) {
       fs.mkdirSync(dest, { recursive: true });

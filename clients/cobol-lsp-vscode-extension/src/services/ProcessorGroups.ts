@@ -118,7 +118,7 @@ export function loadProcessorGroupDialectConfig(
     if (!Array.isArray(pgCfg.preprocessor)) {
       dialects.push(pgCfg.preprocessor);
     } else {
-      for (const pp of pgCfg.preprocessor) {
+      for (const pp of pgCfg.preprocessor as Preprocessor) {
         if (typeof pp === "object" && pp) {
           dialects.push(pp["name"]);
         }
@@ -240,13 +240,13 @@ function loadProcessorGroupSettings<T>(
   dialect: string = "COBOL",
 ): T {
   try {
-    const pgCfg = loadProcessorsConfig(scopeUri);
+    const pgCfg: ProcessorConfig | undefined = loadProcessorsConfig(scopeUri);
     if (pgCfg === undefined) {
       return configObject;
     }
 
     if (dialect && dialect !== "COBOL") {
-      for (const pp of pgCfg.preprocessor) {
+      for (const pp of pgCfg.preprocessor as Preprocessor) {
         if (
           pp &&
           typeof pp === "object" &&
@@ -257,8 +257,8 @@ function loadProcessorGroupSettings<T>(
         }
       }
     } else {
-      if (pgCfg[atrtibute]) {
-        return pgCfg[atrtibute];
+      if (pgCfg[atrtibute as keyof ProcessorConfig]) {
+        return pgCfg[atrtibute as keyof ProcessorConfig] as T;
       }
     }
 
