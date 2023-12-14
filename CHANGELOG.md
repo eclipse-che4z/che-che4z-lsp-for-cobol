@@ -1,7 +1,52 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-Changelog:
+## [2.1.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.3...2.1.0) (2023-12-07)
+### Bug Fixes
+* Adopt changes from PR[#2081](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2081) ([f096df7](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f096df79c3073ab298ec05819c674529a3c40585))
+* Fix 'PERFORM THRU' node ([#2093](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2093)) ([403ef77](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/403ef773f601db0c6639a5b633aae2007f5b7c49))
+* Fix CICS coloring ([467988c](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/467988ca7bd09fd300d21e7e2778bd6eb67c45c4))
+* Fix CICS web receive grammar ([2d8e6a1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/2d8e6a19e268659664dd1278242d17518015ea56))
+* Fix completion for file without a workspace ([f6d117b](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f6d117bbb7f11524b6921011eba03f62d96567e4))
+* Fix copybook detection based on a content ([#2100](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2100)) ([3b8003d](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/3b8003da3f5e2e0a18d9d3222d7657417458c30c))
+* Fix joined query grammar ([de572c2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/de572c26a6628afdbcc5775bfb3f12716475a8d9))
+* Fix NPE and add a message for retrieving analysis result for a copybook ([#2111](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2111)) ([21b9b09](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/21b9b096348d1db7d5c3bfd4343c8dc7874985a7))
+* Fix variable usage rule for CICS ([6b2985a](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/6b2985a71b3c885e2016c0fb73cb264f313a2d67))
+* Fix wrong diagnostics error ([b715bda](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/b715bdaa830f01ffa2df94b7b6e2dc8862a41670))
+* Include Db2 keywords in the SQL coloring ([6892b2d](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/6892b2d7b709de42abfd996c236a2e028032b695))
+* Propagate preprocess error in copybook to the cobol source ([706bbe6](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/706bbe61eaa883811654ee6c731fcb785e67b89f))
+* Test code coverage publication ([8c71071](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/8c7107129a12a11f5c296d7b8c814c9df545eef8))
+* Update Db2 insert grammar ([a2a65f9](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/a2a65f93f7804955fbdd4e3a4c4d6f4fa6f03294))
+* Update Db2 select grammar as per doc ([3f88299](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/3f882991435e1f10667a8c37f542667c3f6d0979))
+* Update divide statement syntax ([3ebe72a](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/3ebe72a06c22c5f65e3e06bb894e0978860e9476))
+* Update message for input mismatch error while parsing ([e549426](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/e549426b5245468636580cf24e3813d07fcb68d8))
+* Fix: Filter outdate diagnostics ([5021fe9d2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/5021fe9d2))
+* Fix: Add location to all CFAST nodes ([4aa980b49](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/4aa980b49ce47b1fa956deb2a5427067a06cb235))
+* Fix: Textmate grammar ([729a308](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/729a308b4652c39e82a925412ccf88a0253074ca))
+* Fix: Outline display ([dd85b1d](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/dd85b1df5ae859cdb34c833f049c642bb9ba87d7))
+* Tests/automation: Support for replacing and mapping statement ([fa15459](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/fa15459e8e7ab28d423253f5b064edcc9f78fda2))
+* Fix: Outline sometimes missing with copy statement change ([ed5b623](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/ed5b623addfd4979121f5fbc8be8b55453f7ff93))
+* Refactor: Extract Db2 embedded code as a dialect ([e68c658](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/e68c658f48742b2645a3f232f50d4c4e0e9b8209))
+* Refactor: Remove CopybookConfig.java ([b688d8f](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/b688d8f582526f513fd665fb417c07027db1d0e3))
+* Fix wrong analysis for sql code inside a copybook ([6dd0a7f](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/6dd0a7fb29503a3a387d0c1bcf85e3d98b9e15b5))
+* Fix: Expect analysisResult could be null ([642896d](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/642896d02b3349a0ecdb3a8a2084813d213d6f43))
+* CI: Run independent steps concurrently ([5f839c1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/5f839c1cf84e84fcaa9d0949b7cdb70cc6129dd3))
+* Chore: Change dialect API version ([715d209](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/715d209d5dbfd50ac378f70c5d8edb59ca67fc2b))
+* Fix: Completion ([7fd3fe4](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/7fd3fe4402827a070a767de6894622cc3e25234e))
+* Fix: author.name support ([f7c1d68](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f7c1d68f2a4b5cd399ad107e689afa36041d9d1d))
+* Fix reanalysis of opened programs ([f15a12d](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f15a12dc2e93b1ca73b075fca25ac966b739e970))
+* Fix: Tolerate unexpected comma char in string statement ([c58e544](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/c58e544621118ee4f46d66ff73d707146baa5e11))
+* Fix: Allow LEADING / TRAILING as a function argument ([#2139](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2139)) ([13c0d31](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/13c0d31fea58901590810439d74eae493a26e06b))
+* Build: bump ch.qos.logback:logback-classic to 1.2.13 ([aa85a13](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/aa85a132e192256c2c784654999bb0847f91b5e5))
+* Fix/reanalysis for open prgms ([67d30f9](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/67d30f95fc7f869050f87a4e1105df26743c3ad8))
+* Fix outline for a partially analyzed document ([8906c40](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/8906c40f05cd19b6dbb911aa9afe1a90d7dfc2bc))
+* Test: Enable back positive tests ([47ec3bf](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/47ec3bfee823166554011de0f17d8b1819c14b09))
+* Fix: Outline display on first analysis ([443a04e](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/443a04edf1d5d656c3d9019eb533702c3975caf2))
+
+### Features
+* Serialize LSP request to better control of request processing ([d2fbd56](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/d2fbd56f05ddc0495033b9b5733d6843903c97c8))
+* Add an interface for a parser to unbind from ANTLR implementation ([d29b8ab](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/d29b8ab0c801572e4f1f930665a800c7a693e006))
+
 ## [2.0.3](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.2...2.0.3) (2023-09-20)
 ### Bug Fixes
 * Allow WHENEVER in data division ([be50acf](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/be50acfc63c76da3b388c7eb831e02a33f47fbab)), ([be50acfc6](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/be50acfc6))
