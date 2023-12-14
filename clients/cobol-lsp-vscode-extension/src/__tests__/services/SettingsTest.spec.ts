@@ -201,7 +201,7 @@ describe("SettingsService returns correct tab settings", () => {
 });
 
 describe("SettingsService returns correct Copybook Configuration Values", () => {
-  const mockConfigurationFetch = (settings, configuredValue) =>
+  const mockConfigurationFetch = (settings: string, configuredValue: any) =>
     jest.fn().mockReturnValue({
       get: (args: String) => {
         if (settings === args) {

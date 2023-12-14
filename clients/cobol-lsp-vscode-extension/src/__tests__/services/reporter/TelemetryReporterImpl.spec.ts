@@ -20,7 +20,7 @@ const INVALID_TELEMETRY_KEY: string = "INVALID_INSTRUMENTATION_KEY";
 const INVALID_TELEMETRY_KEY_FOR_TESTING: string =
   "INSTRUMENTATION_KEY_FOR_TESTING";
 
-function generatePath(...pathSegments): string {
+function generatePath(...pathSegments: string[]): string {
   return path.join(path.join(__dirname, "../../../../"), ...pathSegments);
 }
 

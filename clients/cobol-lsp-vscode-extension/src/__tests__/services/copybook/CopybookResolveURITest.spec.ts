@@ -110,7 +110,7 @@ describe("Resolve local copybook against bad configuration of target folders", (
     expect(
       fsUtils.searchCopybookInWorkspace(copybookName, [], COPYBOOK_EXT_ARRAY),
     ).toBe(undefined);
-    (globSync as any) = jest.fn().mockReturnValue((x) => x);
+    (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
   });
   test("given a folder that not contains copybooks, the target copybook is not retrieved", () => {
     (globSync as any) = jest.fn().mockReturnValue([]);
@@ -121,7 +121,7 @@ describe("Resolve local copybook against bad configuration of target folders", (
         COPYBOOK_EXT_ARRAY,
       ),
     ).toBe(undefined);
-    (globSync as any) = jest.fn().mockReturnValue((x) => x);
+    (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
   });
   test("given a not empty folder, a copybook that is not present in that folder is not retrivied and the uri returned is undefined", () => {
     (globSync as any) = jest.fn().mockReturnValue([]);
@@ -132,7 +132,7 @@ describe("Resolve local copybook against bad configuration of target folders", (
         COPYBOOK_EXT_ARRAY,
       ),
     ).toBeUndefined();
-    (globSync as any) = jest.fn().mockReturnValue((x) => x);
+    (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
   });
 });
 describe("Resolve local copybook present in one or more folders specified by the user", () => {
@@ -145,7 +145,7 @@ describe("Resolve local copybook present in one or more folders specified by the
         COPYBOOK_EXT_ARRAY,
       ),
     ).toBeDefined();
-    (globSync as any) = jest.fn().mockReturnValue((x) => x);
+    (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
   });
   test("given two times the same folder that contains the target copybook, one uri is still returned", () => {
     (globSync as any) = jest.fn().mockReturnValue([copybookName]);
@@ -156,7 +156,7 @@ describe("Resolve local copybook present in one or more folders specified by the
         COPYBOOK_EXT_ARRAY,
       ),
     ).toBeDefined();
-    (globSync as any) = jest.fn().mockReturnValue((x) => x);
+    (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
   });
   test("Given a copybook with extension on filesystem, the uri is correctly returned", () => {
     (globSync as any) = jest.fn().mockReturnValue(["NSTCOPY2.CPY"]);
@@ -167,7 +167,7 @@ describe("Resolve local copybook present in one or more folders specified by the
         COPYBOOK_EXT_ARRAY,
       ),
     ).toBeDefined();
-    (globSync as any) = jest.fn().mockReturnValue((x) => x);
+    (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
   });
   test("Given a valid relative path for copybook with extension on filesystem, the uri is correctly returned", () => {
     (globSync as any) = jest.fn().mockReturnValue(["NSTCOPY2.CPY"]);
@@ -182,7 +182,7 @@ describe("Resolve local copybook present in one or more folders specified by the
       ),
     ).toBeDefined();
     removeFolder(dir);
-    (globSync as any) = jest.fn().mockReturnValue((x) => x);
+    (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
   });
   test("Given a valid absolute path for copybook with extension on filesystem, the uri is correctly returned", () => {
     (globSync as any) = jest.fn().mockReturnValue(["NSTCOPY2.CPY"]);
@@ -193,7 +193,7 @@ describe("Resolve local copybook present in one or more folders specified by the
         COPYBOOK_EXT_ARRAY,
       ),
     ).toBeDefined();
-    (globSync as any) = jest.fn().mockReturnValue((x) => x);
+    (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
   });
 });
 describe("With invalid input parameters, the list of URI that represent copybook downloaded are not generated", () => {
@@ -246,7 +246,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     );
     expect(uri).toMatch(CPY_FOLDER_NAME);
     expect(spySearchInWorkspace).toBeCalledTimes(1);
-    (globSync as any) = jest.fn().mockReturnValue((x) => x);
+    (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
   });
   test("With no settings provided, two search strategies are applied and function return an empty string", async () => {
     (globSync as any) = jest.fn().mockReturnValue([]);
@@ -261,7 +261,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     );
     expect(uri).toBe("");
     expect(spySearchInWorkspace).toBeCalledTimes(2);
-    (globSync as any) = jest.fn().mockReturnValue((x) => x);
+    (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
   });
   test(
     "With both local and dsn references defined in the settings.json, the search is applied on local resources" +
@@ -276,7 +276,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
       );
       expect(uri).not.toBe("");
       expect(spySearchInWorkspace).toBeCalledTimes(1);
-      (globSync as any) = jest.fn().mockReturnValue((x) => x);
+      (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
     },
   );
   test("With only a local folder defined for the dialect in the settings.json, the search is applied locally", async () => {
@@ -291,6 +291,6 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     );
     expect(uri).toMatch(CPY_FOLDER_NAME);
     expect(spySearchInWorkspace).toBeCalledTimes(1);
-    (globSync as any) = jest.fn().mockReturnValue((x) => x);
+    (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
   });
 });

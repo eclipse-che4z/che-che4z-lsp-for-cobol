@@ -18,6 +18,7 @@
     "target": "ES2017",
     "skipLibCheck": true,
     "strictNullChecks": true,
+    "noImplicitAny": true,
     "lib": ["es6"],
     "module": "commonjs",
     "moduleResolution": "node",
