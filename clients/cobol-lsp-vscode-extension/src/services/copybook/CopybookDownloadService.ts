@@ -136,12 +136,16 @@ export class CopybookDownloadService implements vscode.Disposable {
   ) {
     return members.find(
       (ele) =>
-        ele
-          .substring(
-            0,
-            ele.lastIndexOf(".") !== -1 ? ele.lastIndexOf(".") : ele.length,
-          )
-          .toUpperCase() === copybookName.toUpperCase(),
+        CopybookDownloadService.getFilenameWithoutExtension(
+          ele,
+        ).toUpperCase() === copybookName.toUpperCase(),
+    );
+  }
+
+  private static getFilenameWithoutExtension(ele: string) {
+    return ele.substring(
+      0,
+      ele.lastIndexOf(".") !== -1 ? ele.lastIndexOf(".") : ele.length,
     );
   }
 
@@ -327,7 +331,9 @@ export class CopybookDownloadService implements vscode.Disposable {
     errors: Set<string>,
     cp: CopybookProfile,
   ) {
-    errors.delete(cp.getCopybook());
+    errors.delete(
+      CopybookDownloadService.getFilenameWithoutExtension(cp.getCopybook()),
+    );
     this.completedDownload++;
     const downloadPercent = Math.round(
       (this.completedDownload / this.totalDownload) * 100,
