@@ -110,6 +110,7 @@ function resolveAllowedExtensions(
   }
 }
 export function downloadCopybookHandler(
+  this: any,
   cobolFileName: string,
   copybookNames: string[],
   dialectType: string,
