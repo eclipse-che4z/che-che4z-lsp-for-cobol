@@ -471,7 +471,7 @@ export class CopybookDownloadService implements vscode.Disposable {
       if (startTime === null) {
         startTime = Date.now();
       }
-      await this.run(element, errors, startTime);
+      startTime = await this.run(element, errors, startTime);
     }
   }
 
@@ -521,6 +521,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         progress: vscode.Progress<{ message?: string; increment?: number }>,
       ) => this.process(progress, element, errors, startTime),
     );
+    return startTime;
   }
 
   private async handleQueue(
