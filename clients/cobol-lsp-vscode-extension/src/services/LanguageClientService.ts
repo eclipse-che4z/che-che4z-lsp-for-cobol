@@ -36,7 +36,7 @@ const extensionId = "BroadcomMFD.cobol-language-support";
 export class LanguageClientService {
   private executablePath: string;
   private dialectsPath: string;
-  private languageClient: LanguageClient;
+  private languageClient: LanguageClient | undefined;
   private handlers: Array<(languageClient: LanguageClient) => void> = [];
   private isNativeBuildEnabled: boolean = false;
   private executableService: NativeExecutableService;
