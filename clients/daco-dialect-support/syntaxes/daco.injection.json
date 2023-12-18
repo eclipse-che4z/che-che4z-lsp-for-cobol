@@ -1,6 +1,6 @@
 {
     "scopeName": "daco.injection",
-    "injectionSelector": "L:source.cobol",
+    "injectionSelector": "R:source.cobol",
     "patterns": [
       {
         "include": "#da-co-keywords"
