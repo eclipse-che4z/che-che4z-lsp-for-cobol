@@ -32,4 +32,6 @@
 !snippets.json
 # ** dialect implementation
 !server/jar/dialect-idms.jar
+# * include coloring syntax
+!syntaxes/idms.injection.json
 
