@@ -32,4 +32,6 @@
 !snippets.json
 # ** dialect implementation
 !server/jar/dialect-daco.jar
+# * include coloring syntax
+!syntaxes/daco.injection.json
 
