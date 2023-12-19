@@ -16,9 +16,10 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
@@ -26,7 +27,6 @@ import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.DocumentServiceHelper;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
-import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.FoldingRange;
 import org.eclipse.lsp4j.FoldingRangeRequestParams;
 
@@ -55,11 +55,11 @@ public class FoldingRangeHandler {
    */
   public List<FoldingRange> foldingRange(FoldingRangeRequestParams params) {
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
-    List<DocumentSymbol> symbols =
-            documentService.isDocumentSynced(uri)
-                    ? documentService.get(uri).getOutlineResult()
-                    : Collections.emptyList();
-    return DocumentServiceHelper.getFoldingRangeFromDocumentSymbol(symbols);
+    Node rootNode =
+        documentService.isDocumentSynced(uri)
+            ? documentService.get(uri).getAnalysisResult().getRootNode()
+            : null;
+    return new ArrayList<>(DocumentServiceHelper.getFoldingRange(rootNode, uri));
   }
 
   /**
