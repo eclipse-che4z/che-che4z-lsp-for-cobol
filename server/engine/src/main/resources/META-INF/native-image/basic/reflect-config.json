@@ -1183,6 +1183,22 @@
     ]
   },
   {
+    "name": "org.eclipse.lsp.cobol.cli.modules.CliCopybookNameServiceImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "org.eclipse.lsp.cobol.service.settings.SettingsService",
+          "org.eclipse.lsp.cobol.common.file.FileSystemService",
+          "com.google.inject.Provider"
+        ]
+      }
+    ]
+  },
+  {
     "name": "org.eclipse.lsp.cobol.service.copybooks.CopybookReferenceRepoImpl",
     "allDeclaredFields": true,
     "queryAllDeclaredMethods": true,
@@ -1469,6 +1485,18 @@
     ]
   },
   {
+    "name": "org.eclipse.lsp.cobol.cli.modules.CliClientProvider",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
     "name": "org.eclipse.lsp.cobol.service.settings.CachingConfigurationService",
     "allDeclaredFields": true,
     "queryAllDeclaredMethods": true,
@@ -1485,6 +1513,20 @@
   },
   {
     "name": "org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.google.inject.Provider"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.eclipse.lsp.cobol.cli.modules.CliSettingsServiceImpl",
     "allDeclaredFields": true,
     "queryAllDeclaredMethods": true,
     "queryAllDeclaredConstructors": true,
