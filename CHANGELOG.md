@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [2.1.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.3...2.1.0) (2023-12-07)
+## [2.1.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.3...2.1.0) (2023-12-20)
 ### Bug Fixes
 * Adopt changes from PR[#2081](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2081) ([f096df7](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f096df79c3073ab298ec05819c674529a3c40585))
 * Fix 'PERFORM THRU' node ([#2093](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2093)) ([403ef77](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/403ef773f601db0c6639a5b633aae2007f5b7c49))
