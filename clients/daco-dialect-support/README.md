@@ -13,7 +13,7 @@ COBOL Language Support for DaCo is an add-on for the [COBOL Language Support](ht
 
 ## Prerequisites
 
-- COBOL Language Support extension
+- COBOL Language Support extension version 2.1.0 or higher.
 - Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.html).
 
 ## Getting Started
