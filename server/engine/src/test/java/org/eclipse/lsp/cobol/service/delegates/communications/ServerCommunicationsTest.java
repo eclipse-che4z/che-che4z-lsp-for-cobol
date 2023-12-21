@@ -15,12 +15,19 @@
 
 package org.eclipse.lsp.cobol.service.delegates.communications;
 
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp4j.MessageType.Info;
+import static org.mockito.Mockito.*;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Provider;
+import java.lang.reflect.Field;
+import java.util.*;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,13 +37,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.*;
-
-import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
-import static org.eclipse.lsp4j.MessageType.Info;
-import static org.mockito.Mockito.*;
 
 /** This unit tests verifies the capabilities of {@link ServerCommunications} */
 @ExtendWith(MockitoExtension.class)
@@ -53,6 +53,8 @@ class ServerCommunicationsTest {
   @Mock private HashSet<String> uriInProgress;
 
   @InjectMocks private ServerCommunications communications;
+
+  @Mock private UriDecodeService uriDecodeService;
 
   @Mock private MessageService messageService;
 
@@ -105,6 +107,7 @@ class ServerCommunicationsTest {
     // Prepare diagnostic map
     Diagnostic diagnostic = new Diagnostic(new Range(), "\r\ntest\r\n");
     List<Diagnostic> diagnostics = ImmutableList.of(diagnostic);
+    when(uriDecodeService.getOriginalUri(anyString())).thenReturn(uri);
 
     communications.publishDiagnostics(ImmutableMap.of(uri, diagnostics));
 

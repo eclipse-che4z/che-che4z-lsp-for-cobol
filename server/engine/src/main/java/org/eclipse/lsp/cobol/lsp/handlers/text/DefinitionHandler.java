@@ -16,21 +16,20 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
-import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.DefinitionParams;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * LSP Definition Handler
@@ -40,12 +39,14 @@ public class DefinitionHandler {
   private final AsyncAnalysisService asyncAnalysisService;
   private final DocumentModelService documentModelService;
   private final Occurrences occurrences;
+  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public DefinitionHandler(AsyncAnalysisService asyncAnalysisService, DocumentModelService documentModelService, Occurrences occurrences) {
+  public DefinitionHandler(AsyncAnalysisService asyncAnalysisService, DocumentModelService documentModelService, Occurrences occurrences, UriDecodeService uriDecodeService) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.documentModelService = documentModelService;
     this.occurrences = occurrences;
+    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -57,7 +58,7 @@ public class DefinitionHandler {
    * @throws InterruptedException forward exception.
    */
   public Either<List<? extends Location>, List<? extends LocationLink>> definition(DefinitionParams params) throws ExecutionException, InterruptedException {
-    CobolDocumentModel doc = documentModelService.get(UriHelper.decode(params.getTextDocument().getUri()));
+    CobolDocumentModel doc = documentModelService.get(uriDecodeService.decode(params.getTextDocument().getUri()));
     return Either.forLeft(occurrences.findDefinitions(doc, params));
   }
 
@@ -70,7 +71,7 @@ public class DefinitionHandler {
   public LspEvent<Either<List<? extends Location>, List<? extends LocationLink>>> createEvent(DefinitionParams params) {
     return new LspEvent<Either<List<? extends Location>, List<? extends LocationLink>>>() {
       final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
-              asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+              asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));
       @Override
       public List<LspEventDependency> getDependencies() {
         return lspEventDependencies;

@@ -15,21 +15,24 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Hovering over 88 with multiple VALUE clauses should show all of them */
 class Test88ThruHover {
@@ -68,8 +71,9 @@ class Test88ThruHover {
   }
 
   private void assertHover(AnalysisResult result) {
-    HoverProvider provider = new VariableHover();
-
+    UriDecodeService uriDecodeService = mock(UriDecodeService.class);
+    HoverProvider provider = new VariableHover(uriDecodeService);
+    when(uriDecodeService.decode(DOCUMENT_URI)).thenReturn(DOCUMENT_URI);
     final Hover actual =
         provider.getHover(
             new CobolDocumentModel("", "", result),
