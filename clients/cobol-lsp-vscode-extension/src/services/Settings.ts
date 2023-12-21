@@ -83,7 +83,7 @@ export function createFileWithGivenPath(
       fs.mkdirSync(ch4zPath, { recursive: true });
       fs.writeFileSync(filePath, pattern);
     }
-  } catch (e) {
+  } catch (e: any) {
     vscode.window.showErrorMessage("File error: " + e.toString());
   }
 }

@@ -105,7 +105,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         copybookProfile.profile,
         isUSS,
       );
-    } catch (error) {
+    } catch (error: any) {
       if (CopybookDownloadService.isInvalidCredentials(error)) {
         throw error;
       }
@@ -194,7 +194,7 @@ export class CopybookDownloadService implements vscode.Disposable {
           copybookprofile.profile,
           isUSS,
         );
-      } catch (err) {
+      } catch (err: any) {
         if (CopybookDownloadService.needsUserNotification([copybookprofile])) {
           vscode.window.showErrorMessage(err.message);
         }
@@ -290,7 +290,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         }
       }
       await Promise.all(promises);
-    } catch (e) {
+    } catch (e: any) {
       if (CopybookDownloadService.isInvalidCredentials(e)) {
         throw e;
       }
@@ -316,7 +316,7 @@ export class CopybookDownloadService implements vscode.Disposable {
       if (fetchResult) {
         this.updateDownloadProgress(progress, errors, cp);
       }
-    } catch (e) {
+    } catch (e: any) {
       if (CopybookDownloadService.isInvalidCredentials(e)) {
         throw e;
       }
@@ -571,7 +571,7 @@ export class CopybookDownloadService implements vscode.Disposable {
           true,
         );
       }
-    } catch (e) {
+    } catch (e: any) {
       let errorMessage = e.toString();
       if (CopybookDownloadService.isInvalidCredentials(e)) {
         errorMessage = INVALID_CREDENTIALS_ERROR_MSG.replace(

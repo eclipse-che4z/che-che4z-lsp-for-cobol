@@ -100,7 +100,7 @@ describe("LanguageClientService positive scenario", () => {
       .mockReturnValue(9999);
     try {
       await languageClientService.checkPrerequisites();
-    } catch (error) {
+    } catch (error: any) {
       message = error;
     }
     expect(message).toBeFalsy();
@@ -236,7 +236,7 @@ describe("LanguageClientService negative scenario.", () => {
     (fs.existsSync as any) = jest.fn().mockReturnValue(false);
     try {
       await new LanguageClientService(jest.fn() as any).checkPrerequisites();
-    } catch (error) {
+    } catch (error: any) {
       expect(error.toString()).toBe("Error: LSP server for cobol not found");
     }
   });

@@ -98,7 +98,7 @@ export async function activate(
     } else {
       await languageClientService.checkPrerequisites();
     }
-  } catch (err) {
+  } catch (err: any) {
     outputChannel.appendLine(err.toString());
     languageClientService.enableNativeBuild();
     TelemetryService.registerExceptionEvent(
