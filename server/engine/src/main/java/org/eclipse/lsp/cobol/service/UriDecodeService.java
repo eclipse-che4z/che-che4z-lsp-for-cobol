@@ -16,10 +16,10 @@ package org.eclipse.lsp.cobol.service;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.inject.Singleton;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -37,8 +37,8 @@ public class UriDecodeService {
    * @return decoded uri
    */
   public String decode(String uri) {
-    if (mapper.inverse().containsKey(uri)) {
-      return mapper.get(uri);
+    if (mapper.inverse().get(uri) != null) {
+      return mapper.inverse().get(uri);
     }
     String result = null;
     try {
@@ -55,5 +55,9 @@ public class UriDecodeService {
 
   public String getOriginalUri(String decodedUri) {
     return mapper.getOrDefault(decodedUri, decodedUri);
+  }
+
+  public void invalidate(String key) {
+    mapper.remove(key);
   }
 }
