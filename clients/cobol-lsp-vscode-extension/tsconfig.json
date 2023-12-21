@@ -23,6 +23,8 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
+    "alwaysStrict": true,
+    "strict": true,
     "lib": ["es6"],
     "module": "commonjs",
     "moduleResolution": "node",
