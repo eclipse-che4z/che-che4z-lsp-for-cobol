@@ -53,10 +53,19 @@ public class UriDecodeService {
     return uri;
   }
 
+  /**
+   *
+   * @param decodedUri
+   * @return original uri if the passed uri was decoded previously, else the passed uri is returned.
+   */
   public String getOriginalUri(String decodedUri) {
     return mapper.getOrDefault(decodedUri, decodedUri);
   }
 
+  /**
+   * removes the decoded uri from the cache
+   * @param key decode uri
+   */
   public void invalidate(String key) {
     mapper.remove(key);
   }
