@@ -16,6 +16,8 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.LspEvent;
@@ -23,13 +25,10 @@ import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.DocumentServiceHelper;
-import org.eclipse.lsp.cobol.service.utils.UriHelper;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.FoldingRange;
 import org.eclipse.lsp4j.FoldingRangeRequestParams;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * LSP FoldingRange Handler
@@ -39,11 +38,13 @@ public class FoldingRangeHandler {
 
   private final DocumentModelService documentService;
   private final AsyncAnalysisService asyncAnalysisService;
+  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public FoldingRangeHandler(DocumentModelService documentService, AsyncAnalysisService asyncAnalysisService) {
+  public FoldingRangeHandler(DocumentModelService documentService, AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService) {
     this.documentService = documentService;
     this.asyncAnalysisService = asyncAnalysisService;
+    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -53,7 +54,7 @@ public class FoldingRangeHandler {
    * @return list of FoldingRanges
    */
   public List<FoldingRange> foldingRange(FoldingRangeRequestParams params) {
-    String uri = UriHelper.decode(params.getTextDocument().getUri());
+    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     List<DocumentSymbol> symbols =
             documentService.isDocumentSynced(uri)
                     ? documentService.get(uri).getOutlineResult()
@@ -68,7 +69,7 @@ public class FoldingRangeHandler {
    * @return LspEvent.
    */
   public LspEvent<List<FoldingRange>> createEvent(FoldingRangeRequestParams params) {
-    String uri = UriHelper.decode(params.getTextDocument().getUri());
+    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     return new LspEvent<List<FoldingRange>>() {
       final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
               asyncAnalysisService.createDependencyOn(uri));

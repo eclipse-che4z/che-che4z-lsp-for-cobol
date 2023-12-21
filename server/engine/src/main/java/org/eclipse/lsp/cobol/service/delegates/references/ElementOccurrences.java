@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.service.delegates.references;
 
 import com.google.common.collect.Streams;
+import com.google.inject.Inject;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -25,7 +26,7 @@ import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.utils.UriHelper;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.*;
 
 /**
@@ -33,11 +34,18 @@ import org.eclipse.lsp4j.*;
  */
 @Slf4j
 public class ElementOccurrences implements Occurrences {
+  private final UriDecodeService uriDecodeService;
+
+  @Inject
+  public ElementOccurrences(UriDecodeService uriDecodeService) {
+    this.uriDecodeService = uriDecodeService;
+  }
+
 
   @Override
   public @NonNull List<Location> findDefinitions(
       @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
-    String uri = UriHelper.decode(position.getTextDocument().getUri());
+    String uri = uriDecodeService.decode(position.getTextDocument().getUri());
     return SymbolsRepository.findElementByPosition(uri,
                     document.getLastAnalysisResult(),
                     position.getPosition())
@@ -50,7 +58,7 @@ public class ElementOccurrences implements Occurrences {
       @NonNull TextDocumentPositionParams position,
       @NonNull ReferenceContext refCtx) {
     Optional<DefinedAndUsedStructure> element = SymbolsRepository.findElementByPosition(
-        UriHelper.decode(position.getTextDocument().getUri()), document.getAnalysisResult(), position.getPosition());
+        uriDecodeService.decode(position.getTextDocument().getUri()), document.getAnalysisResult(), position.getPosition());
     if (!element.isPresent()) {
       return Collections.emptyList();
     }
@@ -64,7 +72,7 @@ public class ElementOccurrences implements Occurrences {
   @Override
   public @NonNull List<DocumentHighlight> findHighlights(
       AnalysisResult analysisResult, @NonNull TextDocumentPositionParams position) {
-    Optional<DefinedAndUsedStructure> element = SymbolsRepository.findElementByPosition(UriHelper.decode(position.getTextDocument().getUri()),
+    Optional<DefinedAndUsedStructure> element = SymbolsRepository.findElementByPosition(uriDecodeService.decode(position.getTextDocument().getUri()),
             analysisResult, position.getPosition());
     return element.map(context -> Streams.concat(context.getUsages().stream(), context.getDefinitions().stream())
             .filter(byUri(position))
@@ -73,8 +81,8 @@ public class ElementOccurrences implements Occurrences {
   }
 
   @NonNull
-  private static Predicate<Location> byUri(@NonNull TextDocumentPositionParams position) {
-    return location -> Objects.equals(location.getUri(), UriHelper.decode(position.getTextDocument().getUri()));
+  private Predicate<Location> byUri(@NonNull TextDocumentPositionParams position) {
+    return location -> Objects.equals(location.getUri(), uriDecodeService.decode(position.getTextDocument().getUri()));
   }
 
   @NonNull

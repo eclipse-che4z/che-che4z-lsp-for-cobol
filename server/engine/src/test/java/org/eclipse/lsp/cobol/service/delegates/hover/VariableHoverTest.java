@@ -14,19 +14,24 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.hover;
 
+import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
-import static org.junit.jupiter.api.Assertions.*;
-
 /** Test {@link VariableHover} */
 class VariableHoverTest {
-  private final VariableHover variableHover = new VariableHover();
+  private final UriDecodeService uriDecodeService = mock(UriDecodeService.class);
+  private final VariableHover variableHover = new VariableHover(uriDecodeService);
   private static final String HEADER =
       "       Identification Division.\n"
           + "       Program-id. TEST.\n"
@@ -100,6 +105,7 @@ class VariableHoverTest {
   }
 
   private TextDocumentPositionParams getPosition(int line, int character) {
+    when(uriDecodeService.decode(anyString())).thenReturn(DOCUMENT_URI);
     return new TextDocumentPositionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Position(line, character));
   }
 }

@@ -15,23 +15,23 @@
 
 package org.eclipse.lsp.cobol.service.delegates.actions;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp4j.CodeActionKind.QuickFix;
+
+import com.google.inject.Inject;
+import java.util.List;
+import java.util.function.Function;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
-import org.eclipse.lsp.cobol.service.utils.UriHelper;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-
-import java.util.List;
-import java.util.function.Function;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp4j.CodeActionKind.QuickFix;
 
 /**
  * Create a quick-fix code action to resolve a missing copybook diagnostics. Fulfills the code
@@ -39,6 +39,12 @@ import static org.eclipse.lsp4j.CodeActionKind.QuickFix;
  */
 public class FindCopybookCommand implements CodeActionProvider {
   private static final String TITLE = "Resolve copybook";
+  private final UriDecodeService uriDecodeService;
+
+  @Inject
+  public FindCopybookCommand(UriDecodeService uriDecodeService) {
+    this.uriDecodeService = uriDecodeService;
+  }
 
   @NonNull
   @Override
@@ -68,7 +74,7 @@ public class FindCopybookCommand implements CodeActionProvider {
     return new Command(
         TITLE,
             ErrorCodes.MISSING_COPYBOOK.getLabel(),
-        asList(retrieveCopybookName(it), UriHelper.decode(params.getTextDocument().getUri())));
+        asList(retrieveCopybookName(it), uriDecodeService.decode(params.getTextDocument().getUri())));
   }
 
   @NonNull

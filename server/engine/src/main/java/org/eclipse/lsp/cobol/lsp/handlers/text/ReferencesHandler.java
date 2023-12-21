@@ -16,17 +16,16 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
-import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.ReferenceParams;
-
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * LSP References Handler
@@ -35,12 +34,14 @@ public class ReferencesHandler {
   private final AsyncAnalysisService asyncAnalysisService;
   private final Occurrences occurrences;
   private final DocumentModelService documentModelService;
+  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public ReferencesHandler(AsyncAnalysisService asyncAnalysisService, Occurrences occurrences, DocumentModelService documentModelService) {
+  public ReferencesHandler(AsyncAnalysisService asyncAnalysisService, Occurrences occurrences, DocumentModelService documentModelService, UriDecodeService uriDecodeService) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.occurrences = occurrences;
     this.documentModelService = documentModelService;
+    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -52,7 +53,7 @@ public class ReferencesHandler {
    * @throws InterruptedException forward exception
    */
   public List<? extends Location> references(ReferenceParams params) throws ExecutionException, InterruptedException {
-    String uri = UriHelper.decode(params.getTextDocument().getUri());
+    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     return occurrences.findReferences(documentModelService.get(uri), params, params.getContext());
   }
 
@@ -65,7 +66,7 @@ public class ReferencesHandler {
   public LspEvent<List<? extends Location>> createEvent(ReferenceParams params) {
     return new LspEvent<List<? extends Location>>() {
       final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
-              asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+              asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));
 
       @Override
       public List<LspEventDependency> getDependencies() {

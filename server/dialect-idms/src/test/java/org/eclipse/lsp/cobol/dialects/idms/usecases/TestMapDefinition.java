@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.dialects.idms.utils.Fixtures;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
@@ -65,7 +66,7 @@ class TestMapDefinition {
                 ImmutableList.of(),
                 ImmutableMap.of()));
     final Hover mapHover =
-        new VariableHover()
+        new VariableHover(new UriDecodeService())
             .getHover(
                 new CobolDocumentModel(UseCaseUtils.DOCUMENT_URI, TEXT, result),
                 new TextDocumentPositionParams(

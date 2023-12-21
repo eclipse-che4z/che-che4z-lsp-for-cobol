@@ -14,27 +14,27 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
-import org.eclipse.lsp.cobol.test.CobolText;
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
-import org.eclipse.lsp4j.*;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
+import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
+import org.eclipse.lsp.cobol.test.CobolText;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.eclipse.lsp4j.*;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 /**
  * Test Go to Definition works on a COPY statement that is at the end of a file, and the copybook
@@ -65,6 +65,7 @@ class TestDefinitionOnLongCopybooks {
         UseCaseEngine.runTest(
             TEXT, ImmutableList.of(new CobolText("ABCD", COPYBOOK_CONTENT)), ImmutableMap.of());
     SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
+    UriDecodeService uriDecodeService = new UriDecodeService();
     CobolDocumentModel document = new CobolDocumentModel(DOCUMENT_URI, TEXT, result);
     TextDocumentPositionParams position = new TextDocumentPositionParams(
             new TextDocumentIdentifier(DOCUMENT_URI), new Position(4, 15));
@@ -77,7 +78,7 @@ class TestDefinitionOnLongCopybooks {
     try (MockedStatic mocked = mockStatic(SymbolsRepository.class)) {
       mocked.when(() -> SymbolsRepository.findElementByPosition(eq(DOCUMENT_URI), eq(document.getAnalysisResult()),
           eq(position.getPosition()))).thenReturn(Optional.of(ctx));
-      List<Location> definitions = new ElementOccurrences().findDefinitions(document, position);
+      List<Location> definitions = new ElementOccurrences(uriDecodeService).findDefinitions(document, position);
 
       assertEquals(1, definitions.size());
       assertEquals(expectedDef, definitions.get(0));
