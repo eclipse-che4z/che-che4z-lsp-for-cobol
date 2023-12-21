@@ -19,8 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.WatcherService;
-import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 
 /**
@@ -31,11 +31,13 @@ public class DidOpenHandler {
 
   private final AsyncAnalysisService asyncAnalysisService;
   private final WatcherService watcherService;
+  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public DidOpenHandler(AsyncAnalysisService asyncAnalysisService, WatcherService watcherService) {
+  public DidOpenHandler(AsyncAnalysisService asyncAnalysisService, WatcherService watcherService, UriDecodeService uriDecodeService) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.watcherService = watcherService;
+    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -44,7 +46,7 @@ public class DidOpenHandler {
    * @param params didOpen parameters.
    */
   public void didOpen(DidOpenTextDocumentParams params) {
-    String uri = UriHelper.decode(params.getTextDocument().getUri());
+    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     if (!HandlerUtility.isUriSupported(uri)) {
       return;
     }

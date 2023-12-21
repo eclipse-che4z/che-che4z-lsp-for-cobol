@@ -12,33 +12,48 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service.utils;
+package org.eclipse.lsp.cobol.service;
 
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
-
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import javax.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Uri helper class
  */
 @Slf4j
-@UtilityClass
-public class UriHelper {
+@Singleton
+public class UriDecodeService {
+
+  private final BiMap<String, String> mapper = HashBiMap.create();
+
   /**
    * Decode given uri
    * @param uri to decode
    * @return decoded uri
    */
   public String decode(String uri) {
-    String result = uri;
+    if (mapper.inverse().containsKey(uri)) {
+      return mapper.get(uri);
+    }
+    String result = null;
     try {
       result = URLDecoder.decode(uri, StandardCharsets.UTF_8.name());
     } catch (UnsupportedEncodingException e) {
       LOG.warn("Uri was not decoded", e);
     }
-    return result;
+    if (result != null) {
+      mapper.put(result, uri);
+      return result;
+    }
+    return uri;
+  }
+
+  public String getOriginalUri(String decodedUri) {
+    return mapper.getOrDefault(decodedUri, decodedUri);
   }
 }

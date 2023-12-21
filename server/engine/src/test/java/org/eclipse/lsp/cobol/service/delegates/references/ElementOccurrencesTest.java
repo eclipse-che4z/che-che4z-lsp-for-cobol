@@ -14,32 +14,34 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.references;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+
 import com.google.common.collect.ImmutableList;
+import java.util.List;
+import java.util.stream.Stream;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
-import org.eclipse.lsp.cobol.common.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 /** Test {@link ElementOccurrences} */
 class ElementOccurrencesTest {
   private static final String URI = "uri";
   private static final String URI2 = "uri2";
   private static final String ELEMENT_NAME = "foo";
+  private UriDecodeService uriDecodeService = mock(UriDecodeService.class);
 
   static Stream<Arguments> variousData() {
     Location definition = new Location(URI, new Range(new Position(1, 2), new Position(2, 5)));
@@ -174,7 +176,7 @@ class ElementOccurrencesTest {
     CobolDocumentModel cobolDocumentModel = new CobolDocumentModel(URI, "", analysisResult);
     TextDocumentPositionParams textDocumentPositionParams =
         new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage);
-    ElementOccurrences elementOccurrences = new ElementOccurrences();
+    ElementOccurrences elementOccurrences = new ElementOccurrences(uriDecodeService);
     assertEquals(
         ImmutableList.of(definition),
         elementOccurrences.findDefinitions(cobolDocumentModel, textDocumentPositionParams));
@@ -209,7 +211,7 @@ class ElementOccurrencesTest {
     rootNode.addChild(variableUsageNodeInOtherFile);
     AnalysisResult analysisResult = AnalysisResult.builder().rootNode(rootNode).build();
     List<DocumentHighlight> highlights =
-        new ElementOccurrences()
+        new ElementOccurrences(uriDecodeService)
             .findHighlights(
                 analysisResult,
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage));
@@ -225,7 +227,7 @@ class ElementOccurrencesTest {
   void variousCases(
       AnalysisResult analysisResult, Position position, List<Location> expectedLocations) {
     List<Location> actualLocations =
-        new ElementOccurrences()
+        new ElementOccurrences(uriDecodeService)
             .findReferences(
                 new CobolDocumentModel(URI, "", analysisResult),
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), position),

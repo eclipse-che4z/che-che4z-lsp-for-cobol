@@ -14,10 +14,14 @@
  */
 package org.eclipse.lsp.cobol.lsp.handlers.extended;
 
+import static java.util.Optional.ofNullable;
+
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -29,14 +33,9 @@ import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
-import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.MessageType;
-
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import static java.util.Optional.ofNullable;
 
 /**
  * Our Extension to LSP Analysis Handler
@@ -48,14 +47,16 @@ public class AnalysisHandler {
   private final CFASTBuilder cfastBuilder;
   private final Communications communications;
   private final DocumentModelService documentModelService;
+  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public AnalysisHandler(AsyncAnalysisService asyncAnalysisService, AnalysisService analysisService, CFASTBuilder cfastBuilder, Communications communications, DocumentModelService documentModelService) {
+  public AnalysisHandler(AsyncAnalysisService asyncAnalysisService, AnalysisService analysisService, CFASTBuilder cfastBuilder, Communications communications, DocumentModelService documentModelService, UriDecodeService uriDecodeService) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.analysisService = analysisService;
     this.cfastBuilder = cfastBuilder;
     this.communications = communications;
     this.documentModelService = documentModelService;
+    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -67,7 +68,7 @@ public class AnalysisHandler {
    * @throws InterruptedException forward the exception
    */
   public ExtendedApiResult analysis(AnalysisResultEvent analysisResultEvent) throws ExecutionException, InterruptedException {
-    String uri = UriHelper.decode(analysisResultEvent.getUri());
+    String uri = uriDecodeService.decode(analysisResultEvent.getUri());
     CobolDocumentModel doc = documentModelService.get(uri);
     if (analysisService.isCopybook(uri, analysisResultEvent.getText())) {
       communications.notifyGeneralMessage(MessageType.Info, "Cannot retrieve outline tree because file was treated as a copybook");
@@ -91,12 +92,12 @@ public class AnalysisHandler {
       {
         analysisResultEvent = ofNullable(new Gson().fromJson(params.toString(), AnalysisResultEvent.class))
                 .orElseGet(() -> new AnalysisResultEvent("", ""));
-        String uri = UriHelper.decode(analysisResultEvent.getUri());
+        String uri = uriDecodeService.decode(analysisResultEvent.getUri());
         if (documentModelService.get(uri) == null) {
           asyncAnalysisService.scheduleAnalysis(uri, analysisResultEvent.getText(), true);
         }
         lspEventDependencies = ImmutableList.of(
-              asyncAnalysisService.createDependencyOn(UriHelper.decode(analysisResultEvent.getUri())));
+              asyncAnalysisService.createDependencyOn(uriDecodeService.decode(analysisResultEvent.getUri())));
       }
 
       @Override

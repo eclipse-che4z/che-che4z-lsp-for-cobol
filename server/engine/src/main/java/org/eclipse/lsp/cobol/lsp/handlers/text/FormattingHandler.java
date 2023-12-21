@@ -16,18 +16,17 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
-import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.DocumentFormattingParams;
 import org.eclipse.lsp4j.TextEdit;
-
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * LSP Formatting Handler
@@ -37,12 +36,14 @@ public class FormattingHandler {
   private final DocumentModelService documentService;
   private final Formations formations;
   private final AsyncAnalysisService asyncAnalysisService;
+  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public FormattingHandler(DocumentModelService documentService, Formations formations, AsyncAnalysisService asyncAnalysisService) {
+  public FormattingHandler(DocumentModelService documentService, Formations formations, AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService) {
     this.documentService = documentService;
     this.formations = formations;
     this.asyncAnalysisService = asyncAnalysisService;
+    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -52,7 +53,7 @@ public class FormattingHandler {
    * @return TextEdit.
    */
   public List<? extends TextEdit> formatting(DocumentFormattingParams params) {
-    String uri = UriHelper.decode(params.getTextDocument().getUri());
+    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     return formations.format(documentService.get(uri));
   }
 
@@ -65,7 +66,7 @@ public class FormattingHandler {
   public LspEvent<List<? extends TextEdit>> createEvent(DocumentFormattingParams params) {
     return new LspEvent<List<? extends TextEdit>>() {
       final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
-              asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+              asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));
 
       @Override
       public List<LspEventDependency> getDependencies() {

@@ -18,7 +18,7 @@ import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
-import org.eclipse.lsp.cobol.service.utils.UriHelper;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 
 /**
@@ -27,10 +27,12 @@ import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 @Slf4j
 public class DidChangeHandler {
   private final AsyncAnalysisService asyncAnalysisService;
+  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public DidChangeHandler(AsyncAnalysisService asyncAnalysisService) {
+  public DidChangeHandler(AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService) {
     this.asyncAnalysisService = asyncAnalysisService;
+    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -38,7 +40,7 @@ public class DidChangeHandler {
    * @param params DidChangeTextDocumentParams.
    */
   public void didChange(DidChangeTextDocumentParams params) {
-    String uri = UriHelper.decode(params.getTextDocument().getUri());
+    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     if (!HandlerUtility.isUriSupported(uri)) {
       return;
     }

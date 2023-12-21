@@ -16,20 +16,19 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
-import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * LSP Completion Handler
@@ -39,12 +38,14 @@ public class CompletionHandler {
   private final Completions completions;
   private final AsyncAnalysisService asyncAnalysisService;
   private final DocumentModelService documentModelService;
+  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public CompletionHandler(AsyncAnalysisService asyncAnalysisService, Completions completions, DocumentModelService documentModelService) {
+  public CompletionHandler(AsyncAnalysisService asyncAnalysisService, Completions completions, DocumentModelService documentModelService, UriDecodeService uriDecodeService) {
     this.completions = completions;
     this.asyncAnalysisService = asyncAnalysisService;
     this.documentModelService = documentModelService;
+    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -56,7 +57,7 @@ public class CompletionHandler {
    * @throws InterruptedException forward exception.
    */
   public Either<List<CompletionItem>, CompletionList> completion(CompletionParams params) throws ExecutionException, InterruptedException {
-    String uri = UriHelper.decode(params.getTextDocument().getUri());
+    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     return Either.forRight(completions.collectFor(documentModelService.get(uri), params));
   }
 
@@ -68,7 +69,7 @@ public class CompletionHandler {
   public LspEvent<Either<List<CompletionItem>, CompletionList>> createEvent(CompletionParams params) {
     return new LspEvent<Either<List<CompletionItem>, CompletionList>>() {
       final ImmutableList<LspEventDependency> lspEventDependencies =
-              ImmutableList.of(asyncAnalysisService.createDependencyOn(UriHelper.decode(params.getTextDocument().getUri())));
+              ImmutableList.of(asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));
       @Override
       public List<LspEventDependency> getDependencies() {
         return lspEventDependencies;
