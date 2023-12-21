@@ -71,5 +71,6 @@ public class DidCloseHandler {
               copybookModel -> copybookServiceImpl.invalidateCache(copybookModel.getCopybookId()));
     }
     asyncAnalysisService.cancelAnalysis(uri);
+    uriDecodeService.invalidate(uri);
   }
 }
