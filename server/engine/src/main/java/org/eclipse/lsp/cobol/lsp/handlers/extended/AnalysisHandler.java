@@ -28,8 +28,9 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
-import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
+import org.eclipse.lsp.cobol.lsp.LspQuery;
+import org.eclipse.lsp.cobol.lsp.events.queries.AnalysisQuery;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
@@ -82,34 +83,26 @@ public class AnalysisHandler {
    * Create LSP analysis event.
    *
    * @param params request params
-   * @return LspEvent.
+   * @return LspNotification.
    */
-  public LspEvent<ExtendedApiResult> createEvent(JsonObject params) {
-    return new LspEvent<ExtendedApiResult>() {
-      final ImmutableList<LspEventDependency> lspEventDependencies;
-      final AnalysisResultEvent analysisResultEvent;
+  public LspQuery<ExtendedApiResult> createEvent(JsonObject params) {
+    return new AnalysisQuery(params, this);
+  }
 
-      {
-        analysisResultEvent = ofNullable(new Gson().fromJson(params.toString(), AnalysisResultEvent.class))
-                .orElseGet(() -> new AnalysisResultEvent("", ""));
-        String uri = uriDecodeService.decode(analysisResultEvent.getUri());
-        if (documentModelService.get(uri) == null) {
-          asyncAnalysisService.scheduleAnalysis(uri, analysisResultEvent.getText(), true);
-        }
-        lspEventDependencies = ImmutableList.of(
-              asyncAnalysisService.createDependencyOn(uriDecodeService.decode(analysisResultEvent.getUri())));
-      }
-
-      @Override
-      public List<LspEventDependency> getDependencies() {
-        return lspEventDependencies;
-      }
-
-      @Override
-      public ExtendedApiResult execute() throws ExecutionException, InterruptedException {
-        return AnalysisHandler.this.analysis(analysisResultEvent);
-      }
-    };
+  /**
+   * Dependency data for {@link AnalysisQuery} event. Allow to postpone the execution.
+   * @param params
+   * @return
+   */
+  public List<LspEventDependency> getDependencies(JsonObject params) {
+    AnalysisResultEvent analysisResultEvent = ofNullable(new Gson().fromJson(params.toString(), AnalysisResultEvent.class))
+            .orElseGet(() -> new AnalysisResultEvent("", ""));
+    String uri = uriDecodeService.decode(analysisResultEvent.getUri());
+    if (documentModelService.get(uri) == null) {
+      asyncAnalysisService.scheduleAnalysis(uri, analysisResultEvent.getText(), true);
+    }
+    return ImmutableList.of(
+            asyncAnalysisService.createDependencyOn(uriDecodeService.decode(analysisResultEvent.getUri())));
   }
 
 }
