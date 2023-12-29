@@ -94,7 +94,9 @@ class WorkspaceServiceTest {
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    //TODO: check me
+//    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    CompletableFuture<Void> done = CompletableFuture.completedFuture(null);
     WorkspaceService service = new CobolWorkspaceServiceImpl(
             lspMessageBroker,
             didChangeConfigurationHandler,
@@ -141,7 +143,9 @@ class WorkspaceServiceTest {
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    //TODO: check me
+//    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    CompletableFuture<Void> done = CompletableFuture.completedFuture(null);
     WorkspaceService service = new CobolWorkspaceServiceImpl(
             lspMessageBroker,
             didChangeConfigurationHandler,
@@ -187,7 +191,9 @@ class WorkspaceServiceTest {
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    //TODO: check me
+//    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    CompletableFuture<Void> done = CompletableFuture.completedFuture(null);
     WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
             lspMessageBroker,
             didChangeConfigurationHandler,
@@ -245,7 +251,9 @@ class WorkspaceServiceTest {
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    //TODO: check me
+//    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    CompletableFuture<Void> done = CompletableFuture.completedFuture(null);
     WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
             lspMessageBroker,
             didChangeConfigurationHandler,
@@ -299,7 +307,9 @@ class WorkspaceServiceTest {
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    //TODO: check me
+//    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    CompletableFuture<Void> done = CompletableFuture.completedFuture(null);
     WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
             lspMessageBroker,
             didChangeConfigurationHandler,
@@ -357,7 +367,9 @@ class WorkspaceServiceTest {
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    //TODO: check me
+//    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    CompletableFuture<Void> done = CompletableFuture.completedFuture(null);
     WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
             lspMessageBroker,
             didChangeConfigurationHandler,
@@ -437,7 +449,9 @@ class WorkspaceServiceTest {
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    //TODO: check me
+//    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
+    CompletableFuture<Void> done = CompletableFuture.completedFuture(null);
     WorkspaceService service = new CobolWorkspaceServiceImpl(
             lspMessageBroker,
             didChangeConfigurationHandler,
