@@ -37,7 +37,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.lsp.CobolLanguageServer;
 import org.eclipse.lsp.cobol.lsp.CobolTextDocumentService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
-import org.eclipse.lsp.cobol.lsp.LspMessageDispatcher;
+import org.eclipse.lsp.cobol.lsp.LspMessageBroker;
 import org.eclipse.lsp.cobol.lsp.handlers.server.ExitHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.server.InitializeHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.server.InitializedHandler;
@@ -100,21 +100,21 @@ class CobolLanguageServerTest {
     when(settingsService.fetchTextConfiguration(anyString())).thenCallRealMethod();
     prepareSettingsService(settingsService, localeStore);
 
-    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
-    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    LspMessageBroker lspMessageBroker = new LspMessageBroker();
+    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
     CobolLanguageServer server =
             new CobolLanguageServer(
-                    lspMessageDispatcher,
+                    lspMessageBroker,
                     null,
                     null,
                     new ExitHandler(stateService),
-                    new ShutdownHandler(stateService, lspMessageDispatcher),
+                    new ShutdownHandler(stateService, lspMessageBroker),
                     new InitializeHandler(watchingService),
                     new InitializedHandler(watchingService, copybookNameService, keywords, settingsService, localeStore, mock(AnalysisService.class), messageService));
 
 
     server.initialized(new InitializedParams());
-    lspMessageDispatcher.stop();
+    lspMessageBroker.stop();
     done.join();
     verify(watchingService).watchConfigurationChange();
     verify(settingsService).fetchConfiguration(LOCALE.label);
@@ -160,22 +160,22 @@ class CobolLanguageServerTest {
     when(settingsService.fetchTextConfiguration(anyString())).thenReturn(CompletableFuture.supplyAsync(ImmutableList::of));
     prepareSettingsService(settingsService, localeStore);
 
-    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
-    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    LspMessageBroker lspMessageBroker = new LspMessageBroker();
+    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
     CobolLanguageServer server =
             new CobolLanguageServer(
-                    lspMessageDispatcher,
+                    lspMessageBroker,
                     textService,
                     null,
                     new ExitHandler(stateService),
-                    new ShutdownHandler(stateService, lspMessageDispatcher),
+                    new ShutdownHandler(stateService, lspMessageBroker),
                     new InitializeHandler(watchingService),
                     new InitializedHandler(watchingService, copybookNameService, keywords, settingsService, localeStore, analysisService, messageService));
 
     server.initialized(new InitializedParams());
     verify(analysisService, timeout(TimeUnit.SECONDS.toMillis(5))
             .times(1)).setExtensionConfig(any());
-    lspMessageDispatcher.stop();
+    lspMessageBroker.stop();
     done.join();
   }
 
@@ -198,15 +198,15 @@ class CobolLanguageServerTest {
   }
 
   private void testServerInitialization(InitializeParams initializeParams) {
-    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
-    lspMessageDispatcher.startEventLoop();
+    LspMessageBroker lspMessageBroker = new LspMessageBroker();
+    lspMessageBroker.startEventLoop();
     CobolLanguageServer server =
             new CobolLanguageServer(
-                    lspMessageDispatcher,
+                    lspMessageBroker,
                     null,
                     null,
                     new ExitHandler(stateService),
-                    new ShutdownHandler(stateService, lspMessageDispatcher),
+                    new ShutdownHandler(stateService, lspMessageBroker),
                     new InitializeHandler(mock(WatcherServiceImpl.class)),
                     new InitializedHandler(mock(WatcherServiceImpl.class), null, null, null, null, null, null));
 
@@ -252,16 +252,16 @@ class CobolLanguageServerTest {
   @Test
   void shutdown() throws ExecutionException, InterruptedException, TimeoutException {
     TextDocumentService textDocumentService = mock(CobolTextDocumentService.class);
-    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
-    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    LspMessageBroker lspMessageBroker = new LspMessageBroker();
+    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
 
     CobolLanguageServer server =
             new CobolLanguageServer(
-                    lspMessageDispatcher,
+                    lspMessageBroker,
                     textDocumentService,
                     null,
                     new ExitHandler(stateService),
-                    new ShutdownHandler(stateService, lspMessageDispatcher),
+                    new ShutdownHandler(stateService, lspMessageBroker),
                     new InitializeHandler(null),
                     new InitializedHandler(null, null, null, null, null, null, null));
     assertEquals(1, stateService.getExitCode());

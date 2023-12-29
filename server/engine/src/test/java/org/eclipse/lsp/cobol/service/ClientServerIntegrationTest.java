@@ -36,7 +36,7 @@ import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.lsp.CobolTextDocumentService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
-import org.eclipse.lsp.cobol.lsp.LspMessageDispatcher;
+import org.eclipse.lsp.cobol.lsp.LspMessageBroker;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -81,18 +81,19 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
           + "       {_COPY {~CPYBK1|1}.|3_}\n"
           + "       End program ProgramId.";
   @Inject TextDocumentService service;
-  @Inject LspMessageDispatcher lspMessageDispatcher;
+  @Inject
+  LspMessageBroker lspMessageBroker;
   @Inject MockLanguageClient client;
   @Inject
   DisposableLSPStateService stateService;
 
   @BeforeAll
   void setup() {
-    lspMessageDispatcher.startEventLoop();
+    lspMessageBroker.startEventLoop();
   }
   @AfterAll
   void tearDown() throws InterruptedException {
-    lspMessageDispatcher.stop();
+    lspMessageBroker.stop();
   }
 
   /**
@@ -152,18 +153,18 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
   void testFindMultipleCopybookReferences() throws ExecutionException, InterruptedException {
     client.clean();
     Injector injector = createInjector();
-    LspMessageDispatcher lspMessageDispatcher = injector.getInstance(LspMessageDispatcher.class);
+    LspMessageBroker lspMessageBroker = injector.getInstance(LspMessageBroker.class);
     TextDocumentService textService = injector.getInstance(TextDocumentService.class);
     AnalysisService analysisService = injector.getInstance(AnalysisService.class);
     analysisService.setExtensionConfig(ImmutableList.of());
 
-    lspMessageDispatcher.startEventLoop();
+    lspMessageBroker.startEventLoop();
 
     textService.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK1, true, textService);
 
-    this.lspMessageDispatcher.stop();
+    this.lspMessageBroker.stop();
     assertEquals(4, locations.size());
 
     assertContainsRange(locations, range(20, 12, COPY_LENGTH));
@@ -176,13 +177,13 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     Injector injector = createInjector();
     AnalysisService analysisService = injector.getInstance(AnalysisService.class);
     TextDocumentService textService = injector.getInstance(TextDocumentService.class);
-    LspMessageDispatcher lspMessageDispatcher = injector.getInstance(LspMessageDispatcher.class);
+    LspMessageBroker lspMessageBroker = injector.getInstance(LspMessageBroker.class);
     analysisService.setExtensionConfig(ImmutableList.of());
-    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
     textService.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK2, true, textService);
-    lspMessageDispatcher.stop();
+    lspMessageBroker.stop();
     done.join();
     assertEquals(3, locations.size());
 

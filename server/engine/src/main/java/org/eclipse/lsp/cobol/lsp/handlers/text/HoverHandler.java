@@ -16,12 +16,12 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
-import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
+import org.eclipse.lsp.cobol.lsp.LspQuery;
+import org.eclipse.lsp.cobol.lsp.events.queries.HoverLspQuery;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
@@ -63,21 +63,14 @@ public class HoverHandler {
    * Create LSP hover event.
    *
    * @param params HoverParams.
-   * @return LspEvent.
+   * @return LspNotification.
    */
-  public LspEvent<Hover> createEvent(HoverParams params) {
-    final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));
-    return new LspEvent<Hover>() {
-      @Override
-      public List<LspEventDependency> getDependencies() {
-        return lspEventDependencies;
-      }
+  public LspQuery<Hover> createEvent(HoverParams params) {
+    return new HoverLspQuery(params, this);
+  }
 
-      @Override
-      public Hover execute() throws ExecutionException, InterruptedException {
-        return HoverHandler.this.hover(params);
-      }
-    };
+  public ImmutableList<LspEventDependency> getDependencies(HoverParams params) {
+    return ImmutableList.of(
+            asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));
   }
 }
