@@ -17,11 +17,11 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
-import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
+import org.eclipse.lsp.cobol.lsp.LspQuery;
+import org.eclipse.lsp.cobol.lsp.events.queries.FormattingQuery;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
@@ -61,22 +61,14 @@ public class FormattingHandler {
    * Create LSP formatting event.
    *
    * @param params DocumentFormattingParams.
-   * @return LspEvent.
+   * @return LspNotification.
    */
-  public LspEvent<List<? extends TextEdit>> createEvent(DocumentFormattingParams params) {
-    return new LspEvent<List<? extends TextEdit>>() {
-      final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
-              asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));
+  public LspQuery<List<? extends TextEdit>> createEvent(DocumentFormattingParams params) {
+    return new FormattingQuery(params, this);
+  }
 
-      @Override
-      public List<LspEventDependency> getDependencies() {
-        return lspEventDependencies;
-      }
-
-      @Override
-      public List<? extends TextEdit> execute() throws ExecutionException, InterruptedException {
-        return FormattingHandler.this.formatting(params);
-      }
-    };
+  public List<LspEventDependency> getDependencies(DocumentFormattingParams params) {
+    return ImmutableList.of(
+            asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));
   }
 }

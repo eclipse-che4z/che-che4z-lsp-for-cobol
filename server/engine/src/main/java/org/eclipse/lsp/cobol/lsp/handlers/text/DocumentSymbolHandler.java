@@ -20,10 +20,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
-import org.eclipse.lsp.cobol.lsp.LspEvent;
-import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
-import org.eclipse.lsp.cobol.lsp.LspEventDependency;
+import org.eclipse.lsp.cobol.lsp.*;
+import org.eclipse.lsp.cobol.lsp.events.queries.DocumentSymbolQuery;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
@@ -71,28 +69,24 @@ public class DocumentSymbolHandler {
    * Create LSP event for documentSymbol.
    *
    * @param params DocumentSymbolParams.
-   * @return LspEvent.
+   * @return LspNotification.
    */
-  public LspEvent<List<Either<SymbolInformation, DocumentSymbol>>> createEvent(DocumentSymbolParams params) {
-    return new LspEvent<List<Either<SymbolInformation, DocumentSymbol>>>() {
-      final String uri = uriDecodeService.decode(params.getTextDocument().getUri());
-      final ImmutableList<LspEventDependency> lspEventDependencies = ImmutableList.of(
-              asyncAnalysisService.createDependencyOn(uri),
-              () -> documentModelService.get(uri) != null && ((documentModelService.get(uri).getOutlineResult() != null
-                      && !documentModelService.get(uri).getOutlineResult().isEmpty())
-                      || analysisService.isCopybook(uri, documentModelService.get(uri).getText())));
-      final List<LspEventCancelCondition> cancelConditions = ImmutableList.of(
-              asyncAnalysisService.createCancelConditionOnClose(uri));
+  public LspQuery<List<Either<SymbolInformation, DocumentSymbol>>> createEvent(DocumentSymbolParams params) {
+    return new DocumentSymbolQuery(params, this);
+  }
 
-      @Override
-      public List<LspEventDependency> getDependencies() {
-        return lspEventDependencies;
-      }
+  public List<LspEventDependency> getDependencies(DocumentSymbolParams params) {
+    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
+    return ImmutableList.of(
+            asyncAnalysisService.createDependencyOn(uri),
+            () -> documentModelService.get(uri) != null && ((documentModelService.get(uri).getOutlineResult() != null
+                    && !documentModelService.get(uri).getOutlineResult().isEmpty())
+                    || analysisService.isCopybook(uri, documentModelService.get(uri).getText())));
+  }
 
-      @Override
-      public List<Either<SymbolInformation, DocumentSymbol>> execute() {
-        return documentSymbol(params);
-      }
-    };
+  public List<LspEventCancelCondition> getCancelDependencies(DocumentSymbolParams params) {
+    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
+    return ImmutableList.of(
+            asyncAnalysisService.createCancelConditionOnClose(uri));
   }
 }

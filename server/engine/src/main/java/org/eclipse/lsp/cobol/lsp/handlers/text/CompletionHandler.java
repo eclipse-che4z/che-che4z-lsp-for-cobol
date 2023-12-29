@@ -20,8 +20,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
-import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
+import org.eclipse.lsp.cobol.lsp.LspQuery;
+import org.eclipse.lsp.cobol.lsp.events.queries.CompletionQuery;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
@@ -64,21 +65,15 @@ public class CompletionHandler {
   /**
    * Handle completion LSP request.
    * @param params CompletionParams.
-   * @return LspEvent.
+   * @return LspNotification.
    */
-  public LspEvent<Either<List<CompletionItem>, CompletionList>> createEvent(CompletionParams params) {
-    return new LspEvent<Either<List<CompletionItem>, CompletionList>>() {
-      final ImmutableList<LspEventDependency> lspEventDependencies =
-              ImmutableList.of(asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));
-      @Override
-      public List<LspEventDependency> getDependencies() {
-        return lspEventDependencies;
-      }
+  public LspQuery<Either<List<CompletionItem>, CompletionList>> createEvent(CompletionParams params) {
+    return new CompletionQuery(params, this);
+  }
 
-      @Override
-      public Either<List<CompletionItem>, CompletionList> execute() throws ExecutionException, InterruptedException {
-        return completion(params);
-      }
-    };
+  public List<LspEventDependency> getDocumentHighlightDependency(CompletionParams params) {
+    return ImmutableList.of(
+            asyncAnalysisService.createDependencyOn(
+                    uriDecodeService.decode(params.getTextDocument().getUri())));
   }
 }

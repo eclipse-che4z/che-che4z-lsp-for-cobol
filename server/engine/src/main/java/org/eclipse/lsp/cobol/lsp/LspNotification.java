@@ -14,7 +14,21 @@
  */
 package org.eclipse.lsp.cobol.lsp;
 
+import java.util.concurrent.ExecutionException;
+
 /**
- * A marker interface for all Language server events
+ * Event handler logic container.
+ *
  */
-public interface LspEvent {}
+@FunctionalInterface
+public interface LspNotification extends LspEvent{
+  /**
+   * Event execute logic.
+   *
+   * @return execution result
+   * @throws ExecutionException   forward possible exception.
+   * @throws InterruptedException forward possible exception.
+   */
+  void execute();
+
+}

@@ -39,7 +39,7 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.CobolWorkspaceServiceImpl;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
-import org.eclipse.lsp.cobol.lsp.LspMessageDispatcher;
+import org.eclipse.lsp.cobol.lsp.LspMessageBroker;
 import org.eclipse.lsp.cobol.lsp.handlers.text.DirtyCacheHandlerService;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeConfigurationHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.ExecuteCommandHandler;
@@ -80,7 +80,7 @@ class WorkspaceServiceTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     MessageService messageService = mock(MessageService.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
-    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
+    LspMessageBroker messageDispatcher = mock(LspMessageBroker.class);
 
     DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
             null,
@@ -93,10 +93,10 @@ class WorkspaceServiceTest {
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
-    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
-    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    LspMessageBroker lspMessageBroker = new LspMessageBroker();
+    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
     WorkspaceService service = new CobolWorkspaceServiceImpl(
-            lspMessageDispatcher,
+            lspMessageBroker,
             didChangeConfigurationHandler,
             dirtyCacheHandlerService,
             executeCommandHandler);
@@ -114,7 +114,7 @@ class WorkspaceServiceTest {
     } catch (InterruptedException | ExecutionException e) {
       fail(e.getMessage());
     }
-    lspMessageDispatcher.stop();
+    lspMessageBroker.stop();
     done.join();
   }
 
@@ -127,7 +127,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
-    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
+    LspMessageBroker messageDispatcher = mock(LspMessageBroker.class);
 
     DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
             null,
@@ -140,10 +140,10 @@ class WorkspaceServiceTest {
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
-    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
-    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    LspMessageBroker lspMessageBroker = new LspMessageBroker();
+    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
     WorkspaceService service = new CobolWorkspaceServiceImpl(
-            lspMessageDispatcher,
+            lspMessageBroker,
             didChangeConfigurationHandler,
             dirtyCacheHandlerService,
             executeCommandHandler);
@@ -152,7 +152,7 @@ class WorkspaceServiceTest {
     CompletableFuture<Object> result =
         service.executeCommand(new ExecuteCommandParams("Missing command name", emptyList()));
 
-    lspMessageDispatcher.stop();
+    lspMessageBroker.stop();
     done.join();
     try {
       assertNull(result.get());
@@ -173,7 +173,7 @@ class WorkspaceServiceTest {
     Keywords keywords = mock(Keywords.class);
     MessageService messageService = mock(MessageService.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
-    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
+    LspMessageBroker messageDispatcher = mock(LspMessageBroker.class);
 
     DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
             settingsService,
@@ -186,10 +186,10 @@ class WorkspaceServiceTest {
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
-    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
-    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    LspMessageBroker lspMessageBroker = new LspMessageBroker();
+    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
     WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
-            lspMessageDispatcher,
+            lspMessageBroker,
             didChangeConfigurationHandler,
             dirtyCacheHandlerService,
             executeCommandHandler);
@@ -208,7 +208,7 @@ class WorkspaceServiceTest {
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(new Object()));
 
-    lspMessageDispatcher.stop();
+    lspMessageBroker.stop();
     done.join();
     verify(watchingService).addWatchers(watcherCaptor.capture());
     verify(watchingService).removeWatchers(emptyList());
@@ -240,14 +240,14 @@ class WorkspaceServiceTest {
             messageService,
             asyncAnalysisService);
 
-    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
+    LspMessageBroker messageDispatcher = mock(LspMessageBroker.class);
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
-    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
-    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    LspMessageBroker lspMessageBroker = new LspMessageBroker();
+    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
     WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
-            lspMessageDispatcher,
+            lspMessageBroker,
             didChangeConfigurationHandler,
             dirtyCacheHandlerService,
             executeCommandHandler);
@@ -264,7 +264,7 @@ class WorkspaceServiceTest {
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(new Object()));
-    lspMessageDispatcher.stop();
+    lspMessageBroker.stop();
     done.join();
     verify(watchingService).addWatchers(emptyList());
     verify(watchingService).removeWatchers(emptyList());
@@ -294,14 +294,14 @@ class WorkspaceServiceTest {
             messageService,
             asyncAnalysisService);
 
-    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
+    LspMessageBroker messageDispatcher = mock(LspMessageBroker.class);
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
-    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
-    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    LspMessageBroker lspMessageBroker = new LspMessageBroker();
+    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
     WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
-            lspMessageDispatcher,
+            lspMessageBroker,
             didChangeConfigurationHandler,
             dirtyCacheHandlerService,
             executeCommandHandler);
@@ -321,7 +321,7 @@ class WorkspaceServiceTest {
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(localeStore));
-    lspMessageDispatcher.stop();
+    lspMessageBroker.stop();
     done.join();
 
     verify(watchingService).addWatchers(emptyList());
@@ -352,14 +352,14 @@ class WorkspaceServiceTest {
             messageService,
             asyncAnalysisService);
 
-    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
+    LspMessageBroker messageDispatcher = mock(LspMessageBroker.class);
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
-    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
-    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    LspMessageBroker lspMessageBroker = new LspMessageBroker();
+    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
     WorkspaceService workspaceService = new CobolWorkspaceServiceImpl(
-            lspMessageDispatcher,
+            lspMessageBroker,
             didChangeConfigurationHandler,
             dirtyCacheHandlerService,
             executeCommandHandler);
@@ -374,7 +374,7 @@ class WorkspaceServiceTest {
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(new Object()));
-    lspMessageDispatcher.stop();
+    lspMessageBroker.stop();
     done.join();
 
     verify(watchingService).addWatchers(emptyList());
@@ -432,21 +432,21 @@ class WorkspaceServiceTest {
             null,
             null, asyncAnalysisService);
 
-    LspMessageDispatcher messageDispatcher = mock(LspMessageDispatcher.class);
+    LspMessageBroker messageDispatcher = mock(LspMessageBroker.class);
     DirtyCacheHandlerService dirtyCacheHandlerService = new DirtyCacheHandlerService(messageDispatcher, asyncAnalysisService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, dirtyCacheHandlerService);
 
-    LspMessageDispatcher lspMessageDispatcher = new LspMessageDispatcher();
-    CompletableFuture<Void> done = lspMessageDispatcher.startEventLoop();
+    LspMessageBroker lspMessageBroker = new LspMessageBroker();
+    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
     WorkspaceService service = new CobolWorkspaceServiceImpl(
-            lspMessageDispatcher,
+            lspMessageBroker,
             didChangeConfigurationHandler,
             dirtyCacheHandlerService,
             executeCommandHandler);
 
     DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));
     service.didChangeWatchedFiles(params);
-    lspMessageDispatcher.stop();
+    lspMessageBroker.stop();
     done.join();
   }
 }
