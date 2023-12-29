@@ -17,10 +17,10 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
-import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
+import org.eclipse.lsp.cobol.lsp.LspQuery;
+import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.events.queries.DocumentHighlightQuery;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
@@ -45,15 +45,23 @@ public class DocumentHighlightHandler {
   }
 
   /**
+   * Document highlight dependency
+   * @param documentHighlightParams
+   * @return list of {@link LspEventDependency}
+   */
+  public List<LspEventDependency> getDocumentHighlightDependency(DocumentHighlightParams documentHighlightParams) {
+    return ImmutableList.of(
+            asyncAnalysisService.createDependencyOn(uriDecodeService.decode(documentHighlightParams.getTextDocument().getUri())));
+  }
+
+  /**
    * Handle documentHighlight LSP request
    *
    * @param params DocumentHighlightParams.
    * @return List of document highlights.
-   * @throws ExecutionException   forward exception.
-   * @throws InterruptedException forward exception.
    */
   public List<DocumentHighlight> documentHighlight(
-          DocumentHighlightParams params) throws ExecutionException, InterruptedException {
+          DocumentHighlightParams params) {
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     return occurrences.findHighlights(documentModelService.get(uri).getLastAnalysisResult(), params);
   }
@@ -62,22 +70,9 @@ public class DocumentHighlightHandler {
    * Creates documentHighlight LSP Event
    *
    * @param params DocumentHighlightParams.
-   * @return LspEvent.
+   * @return LspNotification.
    */
-  public LspEvent<List<? extends DocumentHighlight>> createEvent(DocumentHighlightParams params) {
-    return new LspEvent<List<? extends DocumentHighlight>>() {
-      final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
-              asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));
-
-      @Override
-      public List<LspEventDependency> getDependencies() {
-        return lspEventDependencies;
-      }
-
-      @Override
-      public List<? extends DocumentHighlight> execute() throws ExecutionException, InterruptedException {
-        return DocumentHighlightHandler.this.documentHighlight(params);
-      }
-    };
+  public LspQuery<List<? extends DocumentHighlight>> createEvent(DocumentHighlightParams params) {
+    return new DocumentHighlightQuery(params, this);
   }
 }

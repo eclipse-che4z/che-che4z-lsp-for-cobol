@@ -15,8 +15,10 @@
 package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.inject.Inject;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
+import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
@@ -27,24 +29,37 @@ import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 @Slf4j
 public class DidChangeHandler {
   private final AsyncAnalysisService asyncAnalysisService;
+  private final SourceUnitGraph sourceUnitGraph;
   private final UriDecodeService uriDecodeService;
 
   @Inject
-  public DidChangeHandler(AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService) {
+  public DidChangeHandler(
+          AsyncAnalysisService asyncAnalysisService, SourceUnitGraph sourceUnitGraph, UriDecodeService uriDecodeService) {
     this.asyncAnalysisService = asyncAnalysisService;
+    this.sourceUnitGraph = sourceUnitGraph;
     this.uriDecodeService = uriDecodeService;
   }
 
   /**
    * Handle LSP didChange event.
+   *
    * @param params DidChangeTextDocumentParams.
+   * @param eventSource
    */
-  public void didChange(DidChangeTextDocumentParams params) {
+  public void didChange(
+      DidChangeTextDocumentParams params, SourceUnitGraph.EventSource eventSource) {
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     if (!HandlerUtility.isUriSupported(uri)) {
       return;
     }
     String text = params.getContentChanges().get(0).getText();
-    asyncAnalysisService.scheduleAnalysis(uri, text, params.getTextDocument().getVersion(), false);
+    if (sourceUnitGraph.isCopybook(uri)) {
+      sourceUnitGraph.updateContent(uri, text);
+      List<String> allAssociatedFilesForACopybook = sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
+      asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(allAssociatedFilesForACopybook, uri, text, SourceUnitGraph.EventSource.IDE);
+      return;
+    }
+    asyncAnalysisService.scheduleAnalysis(
+        uri, text, params.getTextDocument().getVersion(), false, eventSource);
   }
 }

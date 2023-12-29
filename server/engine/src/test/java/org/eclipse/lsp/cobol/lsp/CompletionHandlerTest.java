@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.lsp;
 import static org.mockito.Mockito.*;
 
 import java.util.concurrent.ExecutionException;
+import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.handlers.text.CompletionHandler;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;

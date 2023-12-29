@@ -22,16 +22,26 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /** Test {@link VariableHover} */
 class VariableHoverTest {
-  private final UriDecodeService uriDecodeService = mock(UriDecodeService.class);
-  private final VariableHover variableHover = new VariableHover(uriDecodeService);
+    private final UriDecodeService uriDecodeService = mock(UriDecodeService.class);
+    private final VariableHover variableHover = new VariableHover(uriDecodeService);
+    SourceUnitGraph documentGraph;
+
+  @BeforeEach
+  void setUp() {
+    this.documentGraph = mock(SourceUnitGraph.class);
+    when(documentGraph.isCopybook(anyString())).thenReturn(false);
+    }
+
   private static final String HEADER =
       "       Identification Division.\n"
           + "       Program-id. TEST.\n"
@@ -52,22 +62,22 @@ class VariableHoverTest {
 
   @Test
   void getHoverForNullDocument() {
-    assertNull(variableHover.getHover(null, getPosition(5, 5)));
+    assertNull(variableHover.getHover(null, getPosition(5, 5), documentGraph));
   }
 
   @Test
   void getHoverForNoVariablesInModel() {
-    assertNull(variableHover.getHover(getModel(HEADER), getPosition(5, 5)));
+    assertNull(variableHover.getHover(getModel(HEADER), getPosition(5, 5), documentGraph));
   }
 
   @Test
   void getHoverForPositionOutsideOfVariable() {
-    assertNull(variableHover.getHover(getModel(FULL_TEXT), getPosition(4, 5)));
+    assertNull(variableHover.getHover(getModel(FULL_TEXT), getPosition(4, 5), documentGraph));
   }
 
   @Test
   void getHoverForOneVariable() {
-    Hover hover = variableHover.getHover(getModel(FULL_TEXT), getPosition(4, 12));
+    Hover hover = variableHover.getHover(getModel(FULL_TEXT), getPosition(4, 12), documentGraph);
     assertNotNull(hover);
     MarkedString markedString = hover.getContents().getLeft().get(0).getRight();
     assertEquals("cobol", markedString.getLanguage());
@@ -84,7 +94,7 @@ class VariableHoverTest {
             + "      88 COND-ITEM2 VALUES 1 THRU 3\n"
             + "                           4 THROUGH 5.";
 
-    Hover hover = variableHover.getHover(getModel(FULL_TEXT), getPosition(8, 16));
+    Hover hover = variableHover.getHover(getModel(FULL_TEXT), getPosition(8, 16), documentGraph);
     assertNotNull(hover);
     MarkedString markedString = hover.getContents().getLeft().get(0).getRight();
     assertEquals("cobol", markedString.getLanguage());
@@ -93,7 +103,7 @@ class VariableHoverTest {
 
   @Test
   void getHoverWithUsage() {
-    Hover hover = variableHover.getHover(getModel(FULL_TEXT), getPosition(13, 16));
+    Hover hover = variableHover.getHover(getModel(FULL_TEXT), getPosition(13, 16), documentGraph);
     assertNotNull(hover);
     MarkedString markedString = hover.getContents().getLeft().get(0).getRight();
     assertEquals("cobol", markedString.getLanguage());

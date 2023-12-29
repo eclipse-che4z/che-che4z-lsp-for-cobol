@@ -16,8 +16,10 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
-import org.eclipse.lsp.cobol.lsp.LspEvent;
+import org.eclipse.lsp.cobol.lsp.LspNotification;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
+import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.events.notifications.DidOpenNotification;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.WatcherService;
@@ -44,27 +46,25 @@ public class DidOpenHandler {
    * Handle didOpen LSP request.
    *
    * @param params didOpen parameters.
+   * @param eventSource
    */
-  public void didOpen(DidOpenTextDocumentParams params) {
+  public void didOpen(DidOpenTextDocumentParams params, SourceUnitGraph.EventSource eventSource) {
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     if (!HandlerUtility.isUriSupported(uri)) {
       return;
     }
     watcherService.addRuntimeWatchers(uri);
     asyncAnalysisService.openDocument(uri, params.getTextDocument().getText());
-    asyncAnalysisService.scheduleAnalysis(uri, params.getTextDocument().getText(), params.getTextDocument().getVersion(), true);
+    asyncAnalysisService.scheduleAnalysis(uri, params.getTextDocument().getText(), params.getTextDocument().getVersion(), true, eventSource);
   }
 
   /**
    * Creates didOpen LSP Event
    *
    * @param params DidOpenTextDocumentParams.
-   * @return LspEvent.
+   * @return LspNotification.
    */
-  public LspEvent<Void> createEvent(DidOpenTextDocumentParams params) {
-    return () -> {
-      didOpen(params);
-      return null;
-    };
+  public LspNotification createEvent(DidOpenTextDocumentParams params) {
+    return new DidOpenNotification(params, this);
   }
 }

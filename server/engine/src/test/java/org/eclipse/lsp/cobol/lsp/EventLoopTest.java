@@ -14,42 +14,49 @@
  */
 package org.eclipse.lsp.cobol.lsp;
 
-import org.eclipse.lsp4j.InitializeResult;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.eclipse.lsp4j.InitializeResult;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test LSP Event processing loop.
  */
 class EventLoopTest {
-  LspMessageDispatcher loop;
+  LspMessageBroker messageBroker;
+  LspEventConsumer consumer;
 
   @BeforeEach
   void setUp() {
-    loop = new LspMessageDispatcher();
-    loop.startEventLoop();
+    messageBroker = new LspMessageBroker();
+    consumer = new LspEventConsumer(messageBroker);
+    consumer.startConsumer();
   }
 
   @AfterEach
   void tearDown() throws InterruptedException {
-    loop.stop();
+    messageBroker.stop();
   }
 
   @Test
   void testInitialize() throws ExecutionException, InterruptedException, TimeoutException {
     InitializeResult initResult = new InitializeResult();
-    CompletableFuture<InitializeResult> result = loop.publish(new LspEvent<InitializeResult>() {
+    CompletableFuture<InitializeResult> result = messageBroker.query(new LspQuery<InitializeResult>() {
+      private final CompletableFuture<InitializeResult> result = new CompletableFuture<>();
       @Override
-      public InitializeResult execute() {
+      public InitializeResult query() {
         return initResult;
+      }
+
+      @Override
+      public CompletableFuture<InitializeResult> getResult() {
+        return result;
       }
     });
     assertEquals(initResult, result.get(1, TimeUnit.SECONDS));

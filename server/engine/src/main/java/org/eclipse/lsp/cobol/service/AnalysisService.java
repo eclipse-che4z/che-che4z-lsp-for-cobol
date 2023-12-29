@@ -46,22 +46,18 @@ public class AnalysisService {
 
   private final DocumentModelService documentService;
 
-  private final DocumentContentCache contentCache;
-
   @Inject
   AnalysisService(
       LanguageEngineFacade engine,
       ConfigurationService configurationService,
       @Named("combinedStrategy") CopybookIdentificationService copybookIdentificationService,
       CopybookService copybookService,
-      DocumentModelService documentService,
-      DocumentContentCache contentCache) {
+      DocumentModelService documentService) {
     this.engine = engine;
     this.configurationService = configurationService;
     this.copybookIdentificationService = copybookIdentificationService;
     this.copybookService = copybookService;
     this.documentService = documentService;
-    this.contentCache = contentCache;
   }
 
   /**
@@ -108,19 +104,6 @@ public class AnalysisService {
   }
 
   /**
-   * Update cache
-   * @param uri - document uri
-   * @param text - document text
-   * @param isNew - Is document just opened, or it's reanalyse request
-   */
-  public void updateCache(String uri, String text, boolean isNew) {
-    contentCache.store(uri, text);
-    if (!isNew) {
-      documentService.updateDocument(uri, text);
-    }
-  }
-
-  /**
    * Asynchronously analyze document with copybooks
    *
    * @param uri - document uri
@@ -131,13 +114,13 @@ public class AnalysisService {
       CopybookProcessingMode copybookProcessingMode = CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.ENABLED);
       AnalysisConfig config = configurationService.getConfig(uri, copybookProcessingMode);
       AnalysisResult result = engine.analyze(uri, text, config);
-      documentService.processAnalysisResult(uri, result);
+      documentService.processAnalysisResult(uri, result, text);
       ThreadInterruptionUtil.checkThreadInterrupted();
       copybookService.sendCopybookDownloadRequest(
               uri, DocumentServiceHelper.extractCopybookUris(result), copybookProcessingMode);
       LOG.debug("[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
     } catch (Exception e) {
-      documentService.processAnalysisResult(uri, AnalysisResult.builder().build());
+      documentService.processAnalysisResult(uri, AnalysisResult.builder().build(), text);
       LOG.debug(format("An exception thrown while applying %s for %s:", "analysis", uri));
       LOG.error(format("An exception thrown while applying %s for %s:", "analysis", uri), e);
       throw e;

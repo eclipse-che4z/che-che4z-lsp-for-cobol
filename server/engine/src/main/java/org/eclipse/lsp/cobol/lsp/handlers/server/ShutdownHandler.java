@@ -18,7 +18,7 @@ import com.google.inject.Inject;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
-import org.eclipse.lsp.cobol.lsp.LspMessageDispatcher;
+import org.eclipse.lsp.cobol.lsp.LspMessageBroker;
 
 /**
  * LSP Shutdown Handler
@@ -26,12 +26,12 @@ import org.eclipse.lsp.cobol.lsp.LspMessageDispatcher;
 @Slf4j
 public class ShutdownHandler {
   private final DisposableLSPStateService disposableLSPStateService;
-  private final LspMessageDispatcher lspMessageDispatcher;
+  private final LspMessageBroker lspMessageBroker;
 
   @Inject
-  public ShutdownHandler(DisposableLSPStateService disposableLSPStateService, LspMessageDispatcher lspMessageDispatcher) {
+  public ShutdownHandler(DisposableLSPStateService disposableLSPStateService, LspMessageBroker lspMessageBroker) {
     this.disposableLSPStateService = disposableLSPStateService;
-    this.lspMessageDispatcher = lspMessageDispatcher;
+    this.lspMessageBroker = lspMessageBroker;
   }
 
   /**
@@ -42,7 +42,7 @@ public class ShutdownHandler {
     LOG.info("COBOL LS received shutdown request");
     try {
       disposableLSPStateService.shutdown();
-      lspMessageDispatcher.stop();
+      lspMessageBroker.stop();
     } catch (Exception exception) {
       return new ShutdownResponse(null, exception.getMessage());
     }

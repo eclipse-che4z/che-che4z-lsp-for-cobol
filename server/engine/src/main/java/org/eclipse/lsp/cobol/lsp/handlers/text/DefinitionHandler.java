@@ -19,9 +19,10 @@ import com.google.inject.Inject;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
-import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
+import org.eclipse.lsp.cobol.lsp.LspQuery;
+import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.events.queries.DefinitionQuery;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
@@ -67,21 +68,20 @@ public class DefinitionHandler {
    * Create definition LSP request event.
    *
    * @param params DefinitionParams.
-   * @return LspEvent.
+   * @return LspNotification.
    */
-  public LspEvent<Either<List<? extends Location>, List<? extends LocationLink>>> createEvent(DefinitionParams params) {
-    return new LspEvent<Either<List<? extends Location>, List<? extends LocationLink>>>() {
-      final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
-              asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));
-      @Override
-      public List<LspEventDependency> getDependencies() {
-        return lspEventDependencies;
-      }
+  public LspQuery<Either<List<? extends Location>, List<? extends LocationLink>>> createEvent(DefinitionParams params) {
+    return new DefinitionQuery(params, this);
+  }
 
-      @Override
-      public Either<List<? extends Location>, List<? extends LocationLink>> execute() throws ExecutionException, InterruptedException {
-        return DefinitionHandler.this.definition(params);
-      }
-    };
+  /**
+   * Definition event dependencies
+   * @param params
+   * @return list of {@link LspEventDependency}
+   */
+  public List<LspEventDependency> getDefinitionEventDependencies(DefinitionParams params) {
+    return ImmutableList.of(
+            asyncAnalysisService.createDependencyOn(
+                    uriDecodeService.decode(params.getTextDocument().getUri())));
   }
 }

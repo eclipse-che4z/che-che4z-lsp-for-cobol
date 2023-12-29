@@ -18,13 +18,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.google.gson.JsonObject;
+import java.util.Set;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
-import org.eclipse.lsp.cobol.lsp.CobolTextDocumentService;
-import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
-import org.eclipse.lsp.cobol.lsp.LspMessageDispatcher;
+import org.eclipse.lsp.cobol.lsp.*;
+import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.events.notifications.DidChangeNotification;
+import org.eclipse.lsp.cobol.lsp.events.queries.CompletionQuery;
+import org.eclipse.lsp.cobol.lsp.events.queries.DefinitionQuery;
+import org.eclipse.lsp.cobol.lsp.events.queries.DocumentHighlightQuery;
+import org.eclipse.lsp.cobol.lsp.events.queries.FormattingQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.text.*;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
@@ -70,9 +74,13 @@ class CobolTextDocumentServiceTest {
   protected Formations formations;
 
   @Mock
-  protected HoverProvider hoverProvider;
+  protected Set<HoverProvider> hoverProvider;
+
   @Mock
-  LspMessageDispatcher lspMessageDispatcher;
+  protected SourceUnitGraph documentGraph;
+
+  @Mock
+  LspMessageBroker lspMessageBroker;
 
   @Mock
   UriDecodeService uriDecodeService;
@@ -97,19 +105,17 @@ class CobolTextDocumentServiceTest {
     AnalysisHandler analysisHandler = new AnalysisHandler(asyncAnalysisService, analysisService, builder, communications, documentModelService, uriDecodeService);
 
     DidOpenHandler didOpenHandler = new DidOpenHandler(asyncAnalysisService, watcherService, uriDecodeService);
-    DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, asyncAnalysisService, documentModelService, watcherService, copybookService, uriDecodeService);
-    DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService, uriDecodeService);
+    DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, asyncAnalysisService, documentModelService, watcherService, copybookService, documentGraph, uriDecodeService);
+    DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService, documentGraph, uriDecodeService);
     DefinitionHandler definitionHandler = new DefinitionHandler(asyncAnalysisService, documentModelService, occurrences, uriDecodeService);
     DocumentSymbolHandler documentSymbolHandler = new DocumentSymbolHandler(asyncAnalysisService, analysisService, documentModelService, uriDecodeService);
     DocumentHighlightHandler documentHighlightHandler = new DocumentHighlightHandler(asyncAnalysisService, occurrences, documentModelService, uriDecodeService);
     ReferencesHandler referencesHandler = new ReferencesHandler(asyncAnalysisService, occurrences, documentModelService, uriDecodeService);
-    HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider, documentModelService, uriDecodeService);
+    HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider, documentModelService, documentGraph, uriDecodeService);
     FoldingRangeHandler foldingRangeHandler = new FoldingRangeHandler(documentModelService, asyncAnalysisService, uriDecodeService);
 
-
-    lspMessageDispatcher.startEventLoop();
     service = new CobolTextDocumentService(
-            lspMessageDispatcher,
+            lspMessageBroker,
             completionHandler,
             codeActionHandler,
             analysisHandler,
@@ -127,7 +133,7 @@ class CobolTextDocumentServiceTest {
 
   @AfterEach
   void tearDown() throws InterruptedException {
-    lspMessageDispatcher.stop();
+    lspMessageBroker.stop();
   }
 
   @Test
@@ -136,14 +142,14 @@ class CobolTextDocumentServiceTest {
     json.addProperty("uri", "");
 
     service.analysis(json);
-    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
+    Mockito.verify(lspMessageBroker, times(1)).query(any());
   }
 
   @Test
   void testDidChange() {
     DidChangeTextDocumentParams params = mock(DidChangeTextDocumentParams.class);
     service.didChange(params);
-    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
+    Mockito.verify(lspMessageBroker, times(1)).notify(any(DidChangeNotification.class));
   }
 
   @Test
@@ -153,7 +159,7 @@ class CobolTextDocumentServiceTest {
     when(textDocumentIdentifier.getUri()).thenReturn(URI);
     when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.didClose(params);
-    Mockito.verify(lspMessageDispatcher, times(0)).publish(any());
+    Mockito.verify(lspMessageBroker, times(0)).query(any());
   }
 
   @Test
@@ -164,44 +170,35 @@ class CobolTextDocumentServiceTest {
     when(textDocumentItem.getUri()).thenReturn(URI);
     when(uriDecodeService.decode(URI)).thenReturn(URI);
     service.didOpen(params);
-    Mockito.verify(lspMessageDispatcher, times(0)).publish(any());
+    Mockito.verify(lspMessageBroker, times(0)).query(any());
   }
 
   @Test
   void testCodeAction() {
     CodeActionParams params = mock(CodeActionParams.class);
     service.codeAction(params);
-    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
+    Mockito.verify(lspMessageBroker, times(1)).query(any());
   }
 
   @Test
   void testCompletion() {
     CompletionParams params = mock(CompletionParams.class);
-    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
-    when(textDocumentIdentifier.getUri()).thenReturn(URI);
-    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.completion(params);
-    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
+    Mockito.verify(lspMessageBroker, times(1)).query(any(CompletionQuery.class));
   }
 
   @Test
   void testDefinition() {
     DefinitionParams params = mock(DefinitionParams.class);
-    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
-    when(textDocumentIdentifier.getUri()).thenReturn(URI);
-    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.definition(params);
-    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
+    Mockito.verify(lspMessageBroker, times(1)).query(any(DefinitionQuery.class));
   }
 
   @Test
   void testDocumentHighlight() {
     DocumentHighlightParams params = mock(DocumentHighlightParams.class);
-    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
-    when(textDocumentIdentifier.getUri()).thenReturn(URI);
-    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.documentHighlight(params);
-    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
+    Mockito.verify(lspMessageBroker, times(1)).query(any(DocumentHighlightQuery.class));
   }
 
   @Test
@@ -212,7 +209,7 @@ class CobolTextDocumentServiceTest {
     when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
 
     service.documentSymbol(params);
-    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
+    Mockito.verify(lspMessageBroker, times(1)).query(any());
   }
 
   @Test
@@ -222,16 +219,13 @@ class CobolTextDocumentServiceTest {
     when(textDocumentIdentifier.getUri()).thenReturn(URI);
     when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.foldingRange(params);
-    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
+    Mockito.verify(lspMessageBroker, times(1)).query(any());
   }
 
   @Test
   void testFormatting() {
     DocumentFormattingParams params = mock(DocumentFormattingParams.class);
-    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
-    when(textDocumentIdentifier.getUri()).thenReturn(URI);
-    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.formatting(params);
-    Mockito.verify(lspMessageDispatcher, times(1)).publish(any());
+    Mockito.verify(lspMessageBroker, times(1)).query(any(FormattingQuery.class));
   }
 }

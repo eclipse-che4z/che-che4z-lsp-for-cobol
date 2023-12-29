@@ -15,6 +15,9 @@
 package org.eclipse.lsp.cobol.dialects.idms.usecases;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -23,6 +26,7 @@ import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.dialects.idms.utils.Fixtures;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
@@ -65,12 +69,14 @@ class TestMapDefinition {
                 ImmutableList.of(IdmsDialect.NAME), true,
                 ImmutableList.of(),
                 ImmutableMap.of()));
+    SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
+    when(documentGraph.isCopybook(anyString())).thenReturn(false);
     final Hover mapHover =
         new VariableHover(new UriDecodeService())
             .getHover(
                 new CobolDocumentModel(UseCaseUtils.DOCUMENT_URI, TEXT, result),
                 new TextDocumentPositionParams(
-                    new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), new Position(5, 19)));
+                    new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), new Position(5, 19)), documentGraph);
     assertEquals(
         new Hover(ImmutableList.of(Either.forRight(new MarkedString("cobol", "MAP ABCDE.")))),
         mapHover);
