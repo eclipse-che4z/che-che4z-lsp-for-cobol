@@ -39,7 +39,6 @@ import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.DocumentContentCache;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,7 +68,6 @@ class CopybookServiceTest {
   private final TextPreprocessor preprocessor = mock(TextPreprocessor.class);
   private final Path cpyPath = mock(Path.class);
   private final Path parentPath = mock(Path.class);
-  private final DocumentContentCache documentCache = mock(DocumentContentCache.class);
 
   @BeforeEach
   void setupMocks() throws IOException {
@@ -488,7 +486,7 @@ class CopybookServiceTest {
     ClientProvider provider = new ClientProvider();
     provider.setClient(client);
     return new CopybookServiceImpl(
-        provider, files, preprocessor, new CopybookCache(3, 3, "HOURS"), documentCache);
+        provider, files, preprocessor, new CopybookCache(3, 3, "HOURS"));
   }
 
   private CopybookName createCopybook(String displayName) {

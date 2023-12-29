@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2023 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -16,40 +16,47 @@ package org.eclipse.lsp.cobol.lsp;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.lsp.handlers.text.DirtyCacheHandlerService;
+import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.events.queries.ExecuteCommandQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeConfigurationHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.ExecuteCommandHandler;
-import org.eclipse.lsp4j.CodeActionParams;
-import org.eclipse.lsp4j.DidChangeConfigurationParams;
-import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
-import org.eclipse.lsp4j.ExecuteCommandParams;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
+import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
 /**
- * This class is responsible to watch for any changes into the copybook folder and to fetch updated
- * settings coming from the client
+ * This class is responsible to handle all the request events (IDE generated events and File System
+ * generated events). It also watches for any changes into the copybook folder and to fetch updated
+ * settings coming from the client.
  */
-@Slf4j
 @Singleton
-public class CobolWorkspaceServiceImpl implements WorkspaceService {
-  private final LspMessageDispatcher lspMessageDispatcher;
-  private final DidChangeConfigurationHandler didChangeConfigurationHandler;
-  private final DirtyCacheHandlerService dirtyCacheHandlerService;
+@Slf4j
+public class CobolWorkspaceServiceImpl extends LspEventConsumer implements WorkspaceService {
   private final ExecuteCommandHandler executeCommandHandler;
+  private final SourceUnitGraph sourceUnitGraph;
+  private final DidChangeConfigurationHandler didChangeConfigurationHandler;
+  private final AsyncAnalysisService asyncAnalysisService;
+  private final UriDecodeService uriDecodeService;
 
   @Inject
   public CobolWorkspaceServiceImpl(
-          LspMessageDispatcher lspMessageDispatcher,
+          LspMessageBroker lspMessageBroker,
+          ExecuteCommandHandler executeCommandHandler,
+          SourceUnitGraph sourceUnitGraph,
           DidChangeConfigurationHandler didChangeConfigurationHandler,
-          DirtyCacheHandlerService dirtyCacheHandlerService,
-          ExecuteCommandHandler executeCommandHandler) {
-    this.lspMessageDispatcher = lspMessageDispatcher;
-    this.didChangeConfigurationHandler = didChangeConfigurationHandler;
-    this.dirtyCacheHandlerService = dirtyCacheHandlerService;
+          AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService) {
+    super(lspMessageBroker);
     this.executeCommandHandler = executeCommandHandler;
+    this.sourceUnitGraph = sourceUnitGraph;
+    this.didChangeConfigurationHandler = didChangeConfigurationHandler;
+    this.asyncAnalysisService = asyncAnalysisService;
+    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -63,7 +70,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   @NonNull
   @Override
   public CompletableFuture<Object> executeCommand(@NonNull ExecuteCommandParams params) {
-    return lspMessageDispatcher.publish(() -> executeCommandHandler.executeCommand(params));
+    return getLspMessageBroker().query(new ExecuteCommandQuery(params, executeCommandHandler));
   }
 
   /**
@@ -75,20 +82,29 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
-      lspMessageDispatcher.publish(() -> {
-        didChangeConfigurationHandler.didChangeConfiguration(params);
-        return null;
-      });
+    getLspMessageBroker()
+        .notify(() -> didChangeConfigurationHandler.didChangeConfiguration(params));
   }
 
   /**
    * This method triggered when the user modifies the settings in the settings.json
    *
    * @param params the object that wrap the content changed by the user in the settings.json and
-   *               sent from the client to the server.
+   *     sent from the client to the server.
    */
   @Override
   public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) {
-    dirtyCacheHandlerService.handleDirtyCache();
+    Set<FileEvent> changedFiles = new HashSet<>(params.getChanges());
+    changedFiles.forEach(
+        file -> {
+          String uri = uriDecodeService.decode(file.getUri());
+          sourceUnitGraph.updateContent(uri);
+          if (!sourceUnitGraph.isFileOpened(uri)) {
+            List<String> uris =
+                sourceUnitGraph.getAllAssociatedFilesForACopybook(uriDecodeService.decode(uri));
+            asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
+                uris, uri, sourceUnitGraph.getContent(uri), SourceUnitGraph.EventSource.FILE_SYSTEM);
+          }
+        });
   }
 }

@@ -18,8 +18,8 @@ import static java.util.stream.Collectors.toList;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.Inject;
@@ -43,7 +43,6 @@ import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.DocumentContentCache;
 
 /**
  * This service processes copybook requests and returns content by its name. The service also caches
@@ -55,7 +54,7 @@ import org.eclipse.lsp.cobol.service.DocumentContentCache;
 public class CopybookServiceImpl implements CopybookService {
 
   private final Map<String, List<SyntaxError>> preprocessCopybookErrors = new ConcurrentHashMap<>();
-  private final Map<String, List<CopybookModel>> copybookUsage = new ConcurrentHashMap<>();
+  private final Map<String, Set<CopybookModel>> copybookUsage = new ConcurrentHashMap<>();
   private final Provider<CobolLanguageClient> clientProvider;
   private final FileSystemService files;
   public final TextPreprocessor preprocessor;
@@ -65,19 +64,16 @@ public class CopybookServiceImpl implements CopybookService {
       new ConcurrentHashMap<>(8, 0.9f, 1);
 
   private final CopybookCache copybookCache;
-  private final DocumentContentCache contentCache;
 
   @Inject
   public CopybookServiceImpl(Provider<CobolLanguageClient> clientProvider,
       FileSystemService files,
       TextPreprocessor preprocessor,
-      CopybookCache copybookCache,
-      DocumentContentCache contentCache) {
+      CopybookCache copybookCache) {
     this.files = files;
     this.clientProvider = clientProvider;
     this.preprocessor = preprocessor;
     this.copybookCache = copybookCache;
-    this.contentCache = contentCache;
   }
 
   @Override
@@ -126,9 +122,7 @@ public class CopybookServiceImpl implements CopybookService {
 
       CopybookModel copybookModel = getFromCache(programDocumentUri, copybookId, copybookName,
               preprocess);
-      copybookUsage.computeIfAbsent(programDocumentUri, k -> new ArrayList<>()).add(copybookModel);
-
-      updateContent(copybookModel, preprocess);
+      copybookUsage.computeIfAbsent(programDocumentUri, k -> new HashSet<>()).add(copybookModel);
 
       List<SyntaxError> errors = Optional.ofNullable(copybookModel.getUri())
           .map(d -> preprocessCopybookErrors.getOrDefault(d, Collections.emptyList()))
@@ -138,20 +132,6 @@ public class CopybookServiceImpl implements CopybookService {
     } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
       return new ResultWithErrors<>(new CopybookModel(copybookId, copybookName, null, null), Collections.emptyList());
-    }
-  }
-
-  private void updateContent(CopybookModel copybookModel, boolean preprocess) {
-    if (copybookModel.getUri() != null) {
-      contentCache.get(copybookModel.getUri())
-          .ifPresent(content -> {
-            copybookModel.setContent(content);
-            if (preprocess) {
-              ResultWithErrors<CopybookModel> copybookModelResultWithErrors = cleanupCopybook(copybookModel);
-              preprocessCopybookErrors.put(copybookModel.getUri(), copybookModelResultWithErrors.getErrors());
-              copybookModel.setContent(copybookModelResultWithErrors.getResult().getContent());
-            }
-          });
     }
   }
 
@@ -318,8 +298,8 @@ public class CopybookServiceImpl implements CopybookService {
    * @param documentUri  current document uri.
    * @return List of all the {@link CopybookModel} used by the passed document
    */
-  public List<CopybookModel> getCopybookUsage(String documentUri) {
-    return Collections.unmodifiableList(copybookUsage.getOrDefault(documentUri, ImmutableList.of()));
+  public Set<CopybookModel> getCopybookUsage(String documentUri) {
+    return Collections.unmodifiableSet(copybookUsage.getOrDefault(documentUri, ImmutableSet.of()));
   }
 
   @VisibleForTesting

@@ -15,6 +15,8 @@
 
 package org.eclipse.lsp.cobol.domain.modules;
 
+import static com.google.inject.name.Names.named;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -28,11 +30,11 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacePreprocessorFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingServiceImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
@@ -40,14 +42,14 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.Continuatio
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
 import org.eclipse.lsp.cobol.core.visitor.InterruptingTreeListener;
-import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
-import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
+import org.eclipse.lsp.cobol.lsp.CobolWorkspaceServiceImpl;
+import org.eclipse.lsp.cobol.lsp.LspEventConsumer;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.communications.ServerCommunications;
-
-import static com.google.inject.name.Names.named;
+import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 
 /** This module provides DI bindings for COBOL language engine part. */
 public class EngineModule extends AbstractModule {
@@ -69,6 +71,7 @@ public class EngineModule extends AbstractModule {
     bind(ParseTreeListener.class).to(InterruptingTreeListener.class);
     bind(ConfigurationService.class).to(CachingConfigurationService.class);
     bind(CopybookNameService.class).to(CopybookNameServiceImpl.class);
+    bind(LspEventConsumer.class).to(CobolWorkspaceServiceImpl.class);
 
     bind(String.class)
         .annotatedWith(named("resourceFileLocation"))
