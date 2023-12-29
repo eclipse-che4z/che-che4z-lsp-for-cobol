@@ -20,6 +20,9 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.lsp.events.notifications.InitializedNotification;
+import org.eclipse.lsp.cobol.lsp.events.queries.InitializeQuery;
+import org.eclipse.lsp.cobol.lsp.events.queries.ShutdownQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.server.ExitHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.server.InitializeHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.server.InitializedHandler;
@@ -37,7 +40,8 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 @Singleton
 public class CobolLanguageServer implements LanguageServer {
 
-  private final LspMessageDispatcher lspMessageDispatcher;
+  private final LspMessageBroker lspMessageBroker;
+  private final LspEventConsumer lspEventConsumer;
   private final TextDocumentService textService;
   private final WorkspaceService workspaceService;
   private final ExitHandler exitHandler;
@@ -48,20 +52,22 @@ public class CobolLanguageServer implements LanguageServer {
   @Inject
   @SuppressWarnings("squid:S107")
   public CobolLanguageServer(
-          LspMessageDispatcher lspMessageDispatcher,
+          LspMessageBroker lspMessageBroker,
           TextDocumentService textService,
           WorkspaceService workspaceService,
           ExitHandler exitHandler,
           ShutdownHandler shutdownHandler,
           InitializeHandler initializeHandler,
-          InitializedHandler initializedHandler) {
-    this.lspMessageDispatcher = lspMessageDispatcher;
+          InitializedHandler initializedHandler,
+          LspEventConsumer lspEventConsumer) {
+    this.lspMessageBroker = lspMessageBroker;
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.exitHandler = exitHandler;
     this.shutdownHandler = shutdownHandler;
     this.initializeHandler = initializeHandler;
     this.initializedHandler = initializedHandler;
+    this.lspEventConsumer = lspEventConsumer;
   }
 
   @Override
@@ -82,8 +88,8 @@ public class CobolLanguageServer implements LanguageServer {
   @Override
   @NonNull
   public CompletableFuture<InitializeResult> initialize(@NonNull InitializeParams params) {
-    lspMessageDispatcher.startEventLoop();
-    return lspMessageDispatcher.publish(() -> initializeHandler.initialize(params));
+    lspEventConsumer.startConsumer();
+    return lspMessageBroker.query(new InitializeQuery(params, initializeHandler));
   }
 
   /**
@@ -94,15 +100,12 @@ public class CobolLanguageServer implements LanguageServer {
    */
   @Override
   public void initialized(@Nullable InitializedParams params) {
-    lspMessageDispatcher.publish(() -> {
-      initializedHandler.initialized(params);
-      return null;
-    });
+    lspMessageBroker.notify(new InitializedNotification(params, initializedHandler));
   }
 
   @Override
   public CompletableFuture<Object> shutdown() {
-    return lspMessageDispatcher.publish(shutdownHandler::shutdown);
+    return lspMessageBroker.query(new ShutdownQuery(shutdownHandler));
   }
 
   @Override

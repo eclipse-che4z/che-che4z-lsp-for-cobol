@@ -14,11 +14,10 @@
  */
 package org.eclipse.lsp.cobol.lsp;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.CompletableFuture;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test if we can actually stop the event loop.
@@ -26,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class EventLoopStopTest {
   @Test
   void testStop() throws InterruptedException {
-    LspMessageDispatcher queue = new LspMessageDispatcher();
+    LspMessageBroker queue = new LspMessageBroker();
     CompletableFuture<Void> done = queue.startEventLoop();
     queue.stop();
     done.join();

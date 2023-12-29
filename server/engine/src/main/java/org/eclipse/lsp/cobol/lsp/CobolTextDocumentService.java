@@ -19,11 +19,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.lsp.events.notifications.DidChangeNotification;
+import org.eclipse.lsp.cobol.lsp.events.queries.CodeActionQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.text.*;
 import org.eclipse.lsp.cobol.lsp.jrpc.ExtendedApi;
@@ -45,7 +46,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 @Slf4j
 @Singleton
 public class CobolTextDocumentService implements TextDocumentService, ExtendedApi {
-  private final LspMessageDispatcher lspMessageDispatcher;
+  private final LspMessageBroker lspMessageBroker;
   private final CompletionHandler completionHandler;
   private final CodeActionHandler codeActionHandler;
   private final AnalysisHandler analysisHandler;
@@ -62,7 +63,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Inject
   public CobolTextDocumentService(
-          LspMessageDispatcher lspMessageDispatcher,
+          LspMessageBroker lspMessageBroker,
           CompletionHandler completionHandler,
           CodeActionHandler codeActionHandler,
           AnalysisHandler analysisHandler,
@@ -76,7 +77,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
           ReferencesHandler referencesHandler,
           HoverHandler hoverHandler,
           FoldingRangeHandler foldingRangeHandler) {
-    this.lspMessageDispatcher = lspMessageDispatcher;
+    this.lspMessageBroker = lspMessageBroker;
     this.completionHandler = completionHandler;
     this.codeActionHandler = codeActionHandler;
     this.analysisHandler = analysisHandler;
@@ -95,53 +96,46 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   @Override
   public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
           CompletionParams params) {
-    return lspMessageDispatcher.publish(completionHandler.createEvent(params));
+    return lspMessageBroker.query(completionHandler.createEvent(params));
   }
 
   @Override
   public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>>
   definition(DefinitionParams params) {
-    return lspMessageDispatcher.publish(definitionHandler.createEvent(params));
+    return lspMessageBroker.query(definitionHandler.createEvent(params));
   }
 
   @Override
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
-    return lspMessageDispatcher.publish(referencesHandler.createEvent(params));
+    return lspMessageBroker.query(referencesHandler.createEvent(params));
   }
 
   @Override
   public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
           DocumentHighlightParams params) {
-    return lspMessageDispatcher.publish(documentHighlightHandler.createEvent(params));
+    return lspMessageBroker.query(documentHighlightHandler.createEvent(params));
 
   }
 
   @Override
   public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
-    return lspMessageDispatcher.publish(formattingHandler.createEvent(params));
+    return lspMessageBroker.query(formattingHandler.createEvent(params));
   }
 
   @Override
   public CompletableFuture<List<Either<Command, CodeAction>>> codeAction(CodeActionParams params) {
-    return lspMessageDispatcher.publish(() -> codeActionHandler.codeAction(params));
+    return lspMessageBroker.query(new CodeActionQuery(params, codeActionHandler));
   }
 
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
-    try {
-      didOpenHandler.createEvent(params).execute();
-    } catch (ExecutionException | InterruptedException e) {
-      LOG.error(e.getMessage(), e);
-    }
+    didOpenHandler.createEvent(params).execute();
   }
 
   @SneakyThrows
   @Override
   public void didChange(DidChangeTextDocumentParams params) {
-    lspMessageDispatcher.publish(() -> {
-      didChangeHandler.didChange(params);
-      return null;
-    });
+    lspMessageBroker.notify(new DidChangeNotification(params, didChangeHandler));
   }
 
   @Override
@@ -160,22 +154,22 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Override
   public CompletableFuture<ExtendedApiResult> analysis(@NonNull JsonObject json) {
-    return lspMessageDispatcher.publish(analysisHandler.createEvent(json));
+    return lspMessageBroker.query(analysisHandler.createEvent(json));
   }
 
   @Override
   public CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> documentSymbol(
           DocumentSymbolParams params) {
-    return lspMessageDispatcher.publish(documentSymbolHandler.createEvent(params));
+    return lspMessageBroker.query(documentSymbolHandler.createEvent(params));
   }
 
   @Override
   public CompletableFuture<Hover> hover(HoverParams params) {
-    return lspMessageDispatcher.publish(hoverHandler.createEvent(params));
+    return lspMessageBroker.query(hoverHandler.createEvent(params));
   }
 
   @Override
   public CompletableFuture<List<FoldingRange>> foldingRange(FoldingRangeRequestParams params) {
-    return lspMessageDispatcher.publish(foldingRangeHandler.createEvent(params));
+    return lspMessageBroker.query(foldingRangeHandler.createEvent(params));
   }
 }
