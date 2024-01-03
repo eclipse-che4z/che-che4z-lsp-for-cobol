@@ -73,11 +73,21 @@ public class FoldingRangeHandler {
     return new FoldingQuery(params, this);
   }
 
+  /**
+   * Get dependency for this handler
+   * @param uri
+   * @return list of {@link LspEventDependency
+   */
   public List<LspEventDependency> getDependencies(String uri) {
     return ImmutableList.of(
             asyncAnalysisService.createDependencyOn(uri));
   }
 
+  /**
+   * Gives cancel condition
+   * @param uri
+   * @return list of {@link LspEventCancelCondition}
+   */
   public List<LspEventCancelCondition> getCancelConditions(String uri) {
    return ImmutableList.of(
             asyncAnalysisService.createCancelConditionOnClose(uri));

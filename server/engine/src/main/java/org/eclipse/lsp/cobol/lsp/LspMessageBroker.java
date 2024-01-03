@@ -45,6 +45,12 @@ public class LspMessageBroker {
       return (int) eventQueue.stream().filter(next -> next.getClass().equals(clazz)).count();
   }
 
+  /**
+   * Put backs an event to the end of queue
+   * @param nextEven
+   * @param <Q>
+   * @throws InterruptedException
+   */
   public <Q> void putBack(LspQuery<Q> nextEven) throws InterruptedException {
     LOG.debug("putBack: " + nextEven);
     if (!eventQueue.offer(nextEven)) {
@@ -83,7 +89,6 @@ public class LspMessageBroker {
    * Publish LSP event into event loop
    *
    * @param event the event
-   * @return future object for the event
    */
   public void notify(LspNotification event) {
       if (!eventQueue.offer(event)) {

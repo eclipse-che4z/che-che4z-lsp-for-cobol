@@ -67,6 +67,11 @@ public class FormattingHandler {
     return new FormattingQuery(params, this);
   }
 
+  /**
+   * Get dependency for this handler
+   * @param params
+   * @return list of {@link LspEventDependency
+   */
   public List<LspEventDependency> getDependencies(DocumentFormattingParams params) {
     return ImmutableList.of(
             asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));

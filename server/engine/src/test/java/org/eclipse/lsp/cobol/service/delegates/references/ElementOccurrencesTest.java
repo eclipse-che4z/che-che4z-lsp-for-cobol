@@ -15,6 +15,8 @@
 package org.eclipse.lsp.cobol.service.delegates.references;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -27,8 +29,8 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -159,6 +161,7 @@ class ElementOccurrencesTest {
         createDefinitionNode(ELEMENT_NAME, URI, new Range(new Position(1, 2), new Position(2, 5)));
     Location definition = definitionNode.getLocality().toLocation();
     CopybooksRepository copyBook = new CopybooksRepository();
+    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
     VariableUsageNode usageNode =
         createUsageNode(definitionNode, URI, new Range(new Position(3, 0), new Position(3, 5)));
     Location usage = usageNode.getLocality().toLocation();
@@ -175,7 +178,7 @@ class ElementOccurrencesTest {
     CobolDocumentModel cobolDocumentModel = new CobolDocumentModel(URI, "", analysisResult);
     TextDocumentPositionParams textDocumentPositionParams =
         new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage);
-    ElementOccurrences elementOccurrences = new ElementOccurrences(uriDecodeService);
+    ElementOccurrences elementOccurrences = new ElementOccurrences(documentGraph, uriDecodeService);
     assertEquals(
         ImmutableList.of(definition),
         elementOccurrences.findDefinitions(cobolDocumentModel, textDocumentPositionParams));
@@ -192,6 +195,7 @@ class ElementOccurrencesTest {
   @Test
   void findHighlights() {
     CopybooksRepository copybook = new CopybooksRepository();
+    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
     Range definitionRange = new Range(new Position(1, 2), new Position(2, 5));
     VariableNode definitionNode = createDefinitionNode(ELEMENT_NAME, URI, definitionRange);
     Range usageRange = new Range(new Position(3, 0), new Position(3, 5));
@@ -210,7 +214,7 @@ class ElementOccurrencesTest {
     rootNode.addChild(variableUsageNodeInOtherFile);
     AnalysisResult analysisResult = AnalysisResult.builder().rootNode(rootNode).build();
     List<DocumentHighlight> highlights =
-        new ElementOccurrences(uriDecodeService)
+        new ElementOccurrences(documentGraph, uriDecodeService)
             .findHighlights(
                 analysisResult,
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage));
@@ -225,8 +229,10 @@ class ElementOccurrencesTest {
   @MethodSource("variousData")
   void variousCases(
       AnalysisResult analysisResult, Position position, List<Location> expectedLocations) {
+    WorkspaceDocumentGraph documentGraph = spy(WorkspaceDocumentGraph.class);
+    when(documentGraph.isCopybook(anyString())).thenReturn(false);
     List<Location> actualLocations =
-        new ElementOccurrences(uriDecodeService)
+        new ElementOccurrences(documentGraph, uriDecodeService)
             .findReferences(
                 new CobolDocumentModel(URI, "", analysisResult),
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), position),
