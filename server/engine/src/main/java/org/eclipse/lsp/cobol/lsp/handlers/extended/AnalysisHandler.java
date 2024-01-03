@@ -92,7 +92,7 @@ public class AnalysisHandler {
   /**
    * Dependency data for {@link AnalysisQuery} event. Allow to postpone the execution.
    * @param params
-   * @return
+   * @return list of {@link LspEventDependency}
    */
   public List<LspEventDependency> getDependencies(JsonObject params) {
     AnalysisResultEvent analysisResultEvent = ofNullable(new Gson().fromJson(params.toString(), AnalysisResultEvent.class))

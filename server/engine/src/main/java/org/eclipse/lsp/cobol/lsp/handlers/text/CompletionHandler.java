@@ -71,6 +71,11 @@ public class CompletionHandler {
     return new CompletionQuery(params, this);
   }
 
+  /**
+   * Document highlight dependency
+   * @param params
+   * @return List of {@link LspEventDependency}
+   */
   public List<LspEventDependency> getDocumentHighlightDependency(CompletionParams params) {
     return ImmutableList.of(
             asyncAnalysisService.createDependencyOn(

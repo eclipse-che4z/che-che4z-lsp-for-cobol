@@ -15,11 +15,12 @@
 package org.eclipse.lsp.cobol.lsp.handlers.workspace;
 
 import com.google.inject.Inject;
+import java.util.concurrent.ExecutionException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
+import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
-import org.eclipse.lsp.cobol.lsp.handlers.text.DirtyCacheHandlerService;
 import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 
@@ -30,13 +31,13 @@ import org.eclipse.lsp4j.ExecuteCommandParams;
 @Slf4j
 public class ExecuteCommandHandler {
   private final DisposableLSPStateService disposableLSPStateService;
-  private final DirtyCacheHandlerService dirtyCacheHandlerService;
+  private final AsyncAnalysisService asyncAnalysisService;
+
 
   @Inject
-  public ExecuteCommandHandler(DisposableLSPStateService disposableLSPStateService,
-                               DirtyCacheHandlerService dirtyCacheHandlerService) {
+  public ExecuteCommandHandler(DisposableLSPStateService disposableLSPStateService, AsyncAnalysisService asyncAnalysisService) {
     this.disposableLSPStateService = disposableLSPStateService;
-    this.dirtyCacheHandlerService = dirtyCacheHandlerService;
+    this.asyncAnalysisService = asyncAnalysisService;
   }
 
   /**
@@ -46,19 +47,15 @@ public class ExecuteCommandHandler {
    */
   public Object executeCommand(@NonNull ExecuteCommandParams params) {
     if (!disposableLSPStateService.isServerShutdown()) {
+      if (ErrorCodes.MISSING_COPYBOOK.getLabel().equals(params.getCommand())) {
+        asyncAnalysisService.reanalyseOpenedPrograms();
+      }
       try {
-        if (ErrorCodes.MISSING_COPYBOOK.getLabel().equals(params.getCommand())) {
-          rerunAnalysis();
-        }
         return ShutdownCheckUtil.checkServerState(disposableLSPStateService).get();
-      } catch (Exception e) {
+      } catch (InterruptedException | ExecutionException e) {
         LOG.error("Cannot execute command " + params.getCommand() + ": " + params, e);
       }
     }
     return null;
-  }
-
-  private void rerunAnalysis() {
-    dirtyCacheHandlerService.handleDirtyCache();
   }
 }

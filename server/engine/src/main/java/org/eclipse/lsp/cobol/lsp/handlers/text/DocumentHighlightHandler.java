@@ -44,6 +44,11 @@ public class DocumentHighlightHandler {
     this.uriDecodeService = uriDecodeService;
   }
 
+  /**
+   * Document highlight dependency
+   * @param documentHighlightParams
+   * @return list of {@link LspEventDependency}
+   */
   public List<LspEventDependency> getDocumentHighlightDependency(DocumentHighlightParams documentHighlightParams) {
     return ImmutableList.of(
             asyncAnalysisService.createDependencyOn(uriDecodeService.decode(documentHighlightParams.getTextDocument().getUri())));

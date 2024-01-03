@@ -69,6 +69,11 @@ public class ReferencesHandler {
     return new ReferenceQuery(params, this);
   }
 
+  /**
+   * Get dependency for this handler
+   * @param params
+   * @return list of {@link LspEventDependency
+   */
   public List<LspEventDependency> getReferenceDependency(ReferenceParams params) {
     return ImmutableList.of(
             asyncAnalysisService.createDependencyOn(

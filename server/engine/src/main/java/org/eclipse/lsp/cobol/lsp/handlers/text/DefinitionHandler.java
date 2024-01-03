@@ -74,6 +74,11 @@ public class DefinitionHandler {
     return new DefinitionQuery(params, this);
   }
 
+  /**
+   * Definition event dependencies
+   * @param params
+   * @return list of {@link LspEventDependency}
+   */
   public List<LspEventDependency> getDefinitionEventDependencies(DefinitionParams params) {
     return ImmutableList.of(
             asyncAnalysisService.createDependencyOn(

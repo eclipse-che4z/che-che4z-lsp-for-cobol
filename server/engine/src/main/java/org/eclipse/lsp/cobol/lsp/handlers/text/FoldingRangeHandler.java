@@ -21,9 +21,10 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
-import org.eclipse.lsp.cobol.lsp.LspEvent;
 import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
+import org.eclipse.lsp.cobol.lsp.LspQuery;
+import org.eclipse.lsp.cobol.lsp.events.queries.FoldingQuery;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.DocumentServiceHelper;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
@@ -55,7 +56,10 @@ public class FoldingRangeHandler {
    */
   public List<FoldingRange> foldingRange(FoldingRangeRequestParams params) {
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
-    Node rootNode = documentService.get(uri).getAnalysisResult().getRootNode();
+    Node rootNode =
+        documentService.isDocumentSynced(uri)
+            ? documentService.get(uri).getAnalysisResult().getRootNode()
+            : null;
     return new ArrayList<>(DocumentServiceHelper.getFoldingRange(rootNode, uri));
   }
 
@@ -63,26 +67,29 @@ public class FoldingRangeHandler {
    * Create foldingRange LSP event.
    *
    * @param params FoldingRangeRequestParams
-   * @return LspEvent.
+   * @return LspNotification.
    */
-  public LspEvent<List<FoldingRange>> createEvent(FoldingRangeRequestParams params) {
-    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
-    return new LspEvent<List<FoldingRange>>() {
-      final List<LspEventDependency> lspEventDependencies = ImmutableList.of(() ->
-              documentService.get(uri).getAnalysisResult() != null
-                      && documentService.get(uri).getAnalysisResult().getRootNode() != null);
-      final ImmutableList<LspEventCancelCondition> lspEventCancelConditions = ImmutableList.of(
-              asyncAnalysisService.createCancelConditionOnClose(uri));
+  public LspQuery<List<FoldingRange>> createEvent(FoldingRangeRequestParams params) {
+    return new FoldingQuery(params, this);
+  }
 
-      @Override
-      public List<LspEventDependency> getDependencies() {
-        return lspEventDependencies;
-      }
+  /**
+   * Get dependency for this handler
+   * @param uri
+   * @return list of {@link LspEventDependency
+   */
+  public List<LspEventDependency> getDependencies(String uri) {
+    return ImmutableList.of(
+            asyncAnalysisService.createDependencyOn(uri));
+  }
 
-      @Override
-      public List<FoldingRange> execute() {
-        return FoldingRangeHandler.this.foldingRange(params);
-      }
-    };
+  /**
+   * Gives cancel condition
+   * @param uri
+   * @return list of {@link LspEventCancelCondition}
+   */
+  public List<LspEventCancelCondition> getCancelConditions(String uri) {
+   return ImmutableList.of(
+            asyncAnalysisService.createCancelConditionOnClose(uri));
   }
 }
