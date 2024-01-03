@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,11 +12,11 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.lsp;
+package org.eclipse.lsp.cobol.lsp.handlers;
 
-/** Event handler logic container. */
-@FunctionalInterface
-public interface LspNotification extends LspEvent {
-  /** Event execute logic. */
-  void execute();
+/**
+ * Represent different stages of a document being analysed
+ */
+public enum AnalysisState {
+    SCHEDULED, STARTED, SKIPPED, ANALYSING, COMPLETED, EXCEPTIONALLY_FINISHED;
 }

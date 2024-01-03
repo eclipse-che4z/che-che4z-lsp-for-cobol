@@ -15,24 +15,34 @@
 package org.eclipse.lsp.cobol.lsp.events.notifications;
 
 import org.eclipse.lsp.cobol.lsp.LspNotification;
+import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
 import org.eclipse.lsp.cobol.lsp.handlers.text.DidChangeHandler;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 
-/**
- * textDocument/didChange language server event
- */
+/** textDocument/didChange language server event */
 public class DidChangeNotification implements LspNotification {
   private final DidChangeTextDocumentParams params;
   private final DidChangeHandler didChangeHandler;
+  private final WorkspaceDocumentGraph.EventSource eventSource;
 
   public DidChangeNotification(
       DidChangeTextDocumentParams params, DidChangeHandler didChangeHandler) {
     this.params = params;
     this.didChangeHandler = didChangeHandler;
+    this.eventSource = WorkspaceDocumentGraph.EventSource.IDE;
+  }
+
+  public DidChangeNotification(
+      DidChangeTextDocumentParams params,
+      DidChangeHandler didChangeHandler,
+      WorkspaceDocumentGraph.EventSource eventSource) {
+    this.params = params;
+    this.didChangeHandler = didChangeHandler;
+    this.eventSource = eventSource;
   }
 
   @Override
   public void execute() {
-    didChangeHandler.didChange(params);
+    didChangeHandler.didChange(params, eventSource);
   }
 }

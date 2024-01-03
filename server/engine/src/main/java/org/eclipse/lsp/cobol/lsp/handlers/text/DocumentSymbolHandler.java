@@ -75,6 +75,11 @@ public class DocumentSymbolHandler {
     return new DocumentSymbolQuery(params, this);
   }
 
+  /**
+   * Get dependency for this handler
+   * @param params
+   * @return list of {@link LspEventDependency}
+   */
   public List<LspEventDependency> getDependencies(DocumentSymbolParams params) {
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     return ImmutableList.of(
@@ -84,6 +89,11 @@ public class DocumentSymbolHandler {
                     || analysisService.isCopybook(uri, documentModelService.get(uri).getText())));
   }
 
+  /**
+   * get cancel conditions
+   * @param params
+   * @return list of {@link LspEventCancelCondition
+   */
   public List<LspEventCancelCondition> getCancelDependencies(DocumentSymbolParams params) {
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     return ImmutableList.of(

@@ -21,29 +21,39 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * LSP event which expect a result or response.
+ *
  * @param <T> event processing result type.
  */
-public interface LspQuery<T>  extends LspEvent{
-    /**
-     * Event execute logic.
-     *
-     * @return execution result
-     * @throws ExecutionException   forward possible exception.
-     * @throws InterruptedException forward possible exception.
-     */
-    T query() throws ExecutionException, InterruptedException;
+public interface LspQuery<T> extends LspEvent {
+  /**
+   * Event execute logic.
+   *
+   * @return execution result
+   * @throws ExecutionException forward possible exception.
+   * @throws InterruptedException forward possible exception.
+   */
+  T query() throws ExecutionException, InterruptedException;
+
+  /**
+   * Dependency data for the event. Allow to postpone the execution.
+   *
+   * @return Dependencies is any.
+   */
+  default List<LspEventDependency> getDependencies() {
+    return ImmutableList.of();
+  }
 
     /**
-     * Dependency data for the event. Allow to postpone the execution.
-     * @return Dependencies is any.
+     * Dependency data for the event. Allow to cancel the execution.
+     * @return list of {@link LspEventCancelCondition}
      */
-    default List<LspEventDependency> getDependencies() {
-        return ImmutableList.of();
-    }
+  default List<LspEventCancelCondition> getCancelConditions() {
+    return ImmutableList.of();
+  }
 
-    default List<LspEventCancelCondition> getCancelConditions() {
-        return ImmutableList.of();
-    }
-
-    CompletableFuture<T> getResult();
+  /**
+   *
+   * @return CompletableFuture for a {@link LspQuery}
+   */
+  CompletableFuture<T> getResult();
 }

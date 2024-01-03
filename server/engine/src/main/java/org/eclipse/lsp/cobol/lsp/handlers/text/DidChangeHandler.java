@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
@@ -38,8 +39,9 @@ public class DidChangeHandler {
   /**
    * Handle LSP didChange event.
    * @param params DidChangeTextDocumentParams.
+   * @param eventSource
    */
-  public void didChange(DidChangeTextDocumentParams params) {
+  public void didChange(DidChangeTextDocumentParams params, WorkspaceDocumentGraph.EventSource eventSource) {
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     if (!HandlerUtility.isUriSupported(uri)) {
       return;

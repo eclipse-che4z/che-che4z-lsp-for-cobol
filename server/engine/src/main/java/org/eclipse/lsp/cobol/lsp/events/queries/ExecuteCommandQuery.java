@@ -20,6 +20,9 @@ import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.ExecuteCommandHandler;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 
+/**
+ * Execute command handler
+ */
 public class ExecuteCommandQuery implements LspQuery<Object> {
   private final CompletableFuture<Object> result;
   private final @NonNull ExecuteCommandParams params;

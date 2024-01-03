@@ -42,7 +42,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.Continuatio
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
 import org.eclipse.lsp.cobol.core.visitor.InterruptingTreeListener;
-import org.eclipse.lsp.cobol.lsp.CobolWorkspaceServiceImpl2;
+import org.eclipse.lsp.cobol.lsp.CobolWorkspaceServiceImpl;
 import org.eclipse.lsp.cobol.lsp.LspEventConsumer;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
@@ -71,7 +71,7 @@ public class EngineModule extends AbstractModule {
     bind(ParseTreeListener.class).to(InterruptingTreeListener.class);
     bind(ConfigurationService.class).to(CachingConfigurationService.class);
     bind(CopybookNameService.class).to(CopybookNameServiceImpl.class);
-    bind(LspEventConsumer.class).to(CobolWorkspaceServiceImpl2.class);
+    bind(LspEventConsumer.class).to(CobolWorkspaceServiceImpl.class);
 
     bind(String.class)
         .annotatedWith(named("resourceFileLocation"))

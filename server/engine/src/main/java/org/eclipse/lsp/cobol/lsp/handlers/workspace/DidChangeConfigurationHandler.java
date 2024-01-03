@@ -14,7 +14,12 @@
  */
 package org.eclipse.lsp.cobol.lsp.handlers.workspace;
 
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOCALE;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOGGING_LEVEL;
+
 import com.google.inject.Inject;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -26,12 +31,6 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
-
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOCALE;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOGGING_LEVEL;
 
 /**
  * LSP DidChangeConfiguration Handler
