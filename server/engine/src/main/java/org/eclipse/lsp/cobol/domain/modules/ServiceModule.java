@@ -50,6 +50,7 @@ import org.eclipse.lsp.cobol.service.delegates.completions.*;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formation;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp.cobol.service.delegates.formations.TrimFormation;
+import org.eclipse.lsp.cobol.service.delegates.hover.CopybookHoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
@@ -71,7 +72,7 @@ public class ServiceModule extends AbstractModule {
     bind(DisposableLSPStateService.class).to(CobolLSPServerStateService.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(CopybookService.class).to(CopybookServiceImpl.class);
-    bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl2.class);
+    bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(CobolLanguageClient.class).toProvider(ClientProvider.class);
     bind(SettingsService.class).to(SettingsServiceImpl.class);
@@ -79,7 +80,6 @@ public class ServiceModule extends AbstractModule {
     bind(FileSystemService.class).toInstance(new WorkspaceFileService());
     bind(SubroutineService.class).to(SubroutineServiceImpl.class);
     bind(Occurrences.class).to(ElementOccurrences.class);
-    bind(HoverProvider.class).to(VariableHover.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
     bind(CopybookIdentificationService.class)
         .annotatedWith(Names.named("contentStrategy"))
@@ -96,6 +96,13 @@ public class ServiceModule extends AbstractModule {
     bindFormations();
     bindCompletions();
     bindCodeActions();
+    bindHoverActions();
+  }
+
+  private void bindHoverActions() {
+    Multibinder<HoverProvider> hoverProviderMultibinder = newSetBinder(binder(), HoverProvider.class);
+    hoverProviderMultibinder.addBinding().to(VariableHover.class);
+    hoverProviderMultibinder.addBinding().to(CopybookHoverProvider.class);
   }
 
   private void bindFormations() {

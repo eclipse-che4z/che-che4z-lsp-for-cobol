@@ -18,13 +18,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.google.gson.JsonObject;
+import java.util.Set;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
-import org.eclipse.lsp.cobol.lsp.CobolTextDocumentService;
-import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
-import org.eclipse.lsp.cobol.lsp.LspMessageBroker;
+import org.eclipse.lsp.cobol.lsp.*;
 import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.text.*;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
@@ -70,7 +68,11 @@ class CobolTextDocumentServiceTest {
   protected Formations formations;
 
   @Mock
-  protected HoverProvider hoverProvider;
+  protected Set<HoverProvider> hoverProvider;
+
+  @Mock
+  protected WorkspaceDocumentGraph documentGraph;
+
   @Mock
   LspMessageBroker lspMessageBroker;
 

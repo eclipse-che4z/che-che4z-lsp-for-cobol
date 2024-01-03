@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
+import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.*;
@@ -35,21 +36,36 @@ import org.eclipse.lsp4j.*;
 @Slf4j
 public class ElementOccurrences implements Occurrences {
   private final UriDecodeService uriDecodeService;
+  private final WorkspaceDocumentGraph workspaceDocumentGraph;
 
   @Inject
-  public ElementOccurrences(UriDecodeService uriDecodeService) {
+  public ElementOccurrences(WorkspaceDocumentGraph workspaceDocumentGraph, UriDecodeService uriDecodeService) {
     this.uriDecodeService = uriDecodeService;
+    this.workspaceDocumentGraph = workspaceDocumentGraph;
   }
-
 
   @Override
   public @NonNull List<Location> findDefinitions(
       @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
     String uri = uriDecodeService.decode(position.getTextDocument().getUri());
+    if (workspaceDocumentGraph.isCopybook(uri)) {
+      return getCopybookLocation(position, uri);
+    }
     return SymbolsRepository.findElementByPosition(uri,
                     document.getLastAnalysisResult(),
                     position.getPosition())
             .map(DefinedAndUsedStructure::getDefinitions).orElse(Collections.emptyList());
+  }
+
+  private List<Location> getCopybookLocation(TextDocumentPositionParams position, String uri) {
+    List<Location> result =  new ArrayList<>();
+    List<WorkspaceDocumentGraph.NodeV> injectedCopybookNode =
+        workspaceDocumentGraph.getInjectedCopybookNode(uri, position.getPosition());
+    for (WorkspaceDocumentGraph.NodeV nodeV : injectedCopybookNode) {
+      Location location = new Location(nodeV.getUri(), new Range(new Position(0, 0), new Position(0, 0)));
+      result.add(location);
+    }
+    return result;
   }
 
   @Override
