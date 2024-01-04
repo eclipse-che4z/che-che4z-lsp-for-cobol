@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.lsp;
+package org.eclipse.lsp.cobol.lsp.analysis;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -23,9 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp.cobol.lsp.handlers.AnalysisState;
-import org.eclipse.lsp.cobol.lsp.handlers.AnalysisStateListener;
-import org.eclipse.lsp.cobol.lsp.handlers.AnalysisStateNotifier;
+import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
+import org.eclipse.lsp.cobol.lsp.LspEventDependency;
+import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;

@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /** A consumer of {@link LspMessageBroker} */
 @Slf4j
-public abstract class LspEventConsumer {
+public class LspEventConsumer {
   @Getter private final LspMessageBroker lspMessageBroker;
   private final ExecutorService singleThreadExecutor =
       Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Event Consumer"));
