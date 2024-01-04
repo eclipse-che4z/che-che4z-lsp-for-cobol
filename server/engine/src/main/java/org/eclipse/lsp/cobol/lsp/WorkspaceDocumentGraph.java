@@ -28,6 +28,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.lsp.analysis.AnalysisState;
 import org.eclipse.lsp.cobol.lsp.analysis.AnalysisStateListener;
@@ -106,20 +107,22 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
     for (CopyNode copyNode : copyNodes) {
       String parentUri = copyNode.getLocality().getUri();
       NodeV copyNodeV = getNode(copyNode, eventSource);
-      objectRef.computeIfPresent(
-          copyNode.getUri(),
-          (k, v) -> {
-            List<Location> referencedLocation = v.getReferencedLocation();
-            referencedLocation.add(copyNode.getNameLocation());
-            return v;
-          });
-      objectRef.putIfAbsent(copyNode.getUri(), copyNodeV);
-      references.add(copyNodeV);
+      if (!copyNodeV.isDirty){
+        objectRef.computeIfPresent(
+            copyNode.getUri(),
+            (k, v) -> {
+              List<Location> referencedLocation = v.getReferencedLocation();
+              referencedLocation.add(copyNode.getNameLocation());
+              return v;
+            });
+        objectRef.putIfAbsent(copyNode.getUri(), copyNodeV);
+        references.add(copyNodeV);
 
-      documentGraphIndexedByCopybook.putIfAbsent(copyNode.getUri(), new ArrayList<>());
-      List<String> strings = documentGraphIndexedByCopybook.get(copyNode.getUri());
-      if (!strings.contains(parentUri)) {
-        strings.add(parentUri);
+        documentGraphIndexedByCopybook.putIfAbsent(copyNode.getUri(), new ArrayList<>());
+        List<String> strings = documentGraphIndexedByCopybook.get(copyNode.getUri());
+        if (!strings.contains(parentUri)) {
+          strings.add(parentUri);
+        }
       }
     }
     documentGraph.remove(model.getUri());
@@ -160,19 +163,32 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
   }
 
   private String getContent(String uri) {
+    if (ImplicitCodeUtils.isImplicit(uri)) {
+      return null;
+    }
     return Optional.ofNullable(fileService.getPathFromURI(uri))
         .map(fileService::getContentByPath)
         .orElse(null);
   }
 
   private NodeV getNode(CopyNode copyNode, EventSource eventSource) {
+    String content = null;
+    String uri = null;
+    boolean isDirty = true;
+    ArrayList<Location> references = Lists.newArrayList(copyNode.getNameLocation());
+    if (copyNode.getUri() != null)
+    {
+      content = getContent(copyNode.getUri());
+      uri = copyNode.getUri();
+      isDirty = false;
+    }
     return new NodeV(
-        copyNode.getUri(),
+        uri,
         eventSource,
-        Lists.newArrayList(copyNode.getNameLocation()),
+            references,
         true,
-        false,
-        getContent(copyNode.getUri()),
+        isDirty,
+        content,
         false);
   }
 
@@ -238,8 +254,12 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
                 }
               });
       documentGraph.remove(uri);
-      Optional.ofNullable(objectRef.get(uri)).ifPresent(node -> node.setOpenInIde(false));
+      if (documentGraph.isEmpty()) {
+        documentGraphIndexedByCopybook.clear();
+        objectRef.clear();
+      }
     }
+    Optional.ofNullable(objectRef.get(uri)).ifPresent(node -> node.setOpenInIde(false));
   }
 
   /**
@@ -274,7 +294,9 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
     }
     if (cobolDocLinks != null) {
       Optional<NodeV> linkedNode =
-          cobolDocLinks.stream().filter(node -> isContainedInside(usage, node)).findFirst();
+          cobolDocLinks.stream()
+              .filter(node -> isContainedInside(usage, node) && !node.isDirty)
+              .findFirst();
       linkedNode.ifPresent(result::add);
     }
     return result;

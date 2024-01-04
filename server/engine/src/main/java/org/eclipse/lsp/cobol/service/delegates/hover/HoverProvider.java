@@ -14,15 +14,14 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.hover;
 
-import com.google.common.collect.ImmutableList;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.Hover;
-import org.eclipse.lsp4j.MarkedString;
+import org.eclipse.lsp4j.MarkupContent;
+import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
  * This class provides Hover information for some particular position in text.
@@ -45,11 +44,7 @@ public interface HoverProvider {
    * @return Hover based on the passed content
    */
   @Nullable
-  default Hover getHover(@Nullable String content) {
-    return  new Hover(
-            ImmutableList.of(
-                    Either.forRight(
-                            // Hover coloring didn't work if the language is "COBOL" (our language ID)
-                            new MarkedString("cobol", content))));
+  default Hover getHover(@NonNull String content) {
+    return new Hover(new MarkupContent(MarkupKind.MARKDOWN, content));
   }
 }
