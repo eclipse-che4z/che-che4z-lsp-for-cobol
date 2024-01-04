@@ -14,12 +14,21 @@
  */
 package org.eclipse.lsp.cobol;
 
+import static com.google.inject.multibindings.Multibinder.newSetBinder;
+import static com.google.inject.name.Names.named;
+import static java.lang.System.getProperty;
+import static java.util.Optional.ofNullable;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
-import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
+import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
+import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryFolderService;
@@ -37,9 +46,7 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationServiceBasedOnContent;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
-import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.actions.FindCopybookCommand;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
@@ -48,6 +55,7 @@ import org.eclipse.lsp.cobol.service.delegates.completions.*;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formation;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp.cobol.service.delegates.formations.TrimFormation;
+import org.eclipse.lsp.cobol.service.delegates.hover.CopybookHoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
@@ -59,15 +67,9 @@ import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
-import org.eclipse.lsp.cobol.common.file.FileSystemService;
-import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
-import static com.google.inject.multibindings.Multibinder.newSetBinder;
-import static com.google.inject.name.Names.named;
-import static java.lang.System.getProperty;
-import static java.util.Optional.ofNullable;
 /** This module provides DI bindings for testing. */
 public class ClientServerTestModule extends AbstractModule {
   private static final String PATH_TO_TEST_RESOURCES = "filesToTestPath";
@@ -99,7 +101,6 @@ public class ClientServerTestModule extends AbstractModule {
     bind(SettingsService.class).to(SettingsServiceImpl.class);
     bind(SubroutineService.class).to(SubroutineServiceImpl.class);
     bind(Occurrences.class).to(ElementOccurrences.class);
-    bind(HoverProvider.class).to(VariableHover.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
     bind(TextPreprocessor.class).to(MockTextPreprocessor.class);
     bind(CopybookIdentificationService.class)
@@ -113,9 +114,16 @@ public class ClientServerTestModule extends AbstractModule {
             .to(CopybookIdentificationCombinedStrategy.class);
     bind(DialectDiscoveryService.class).to(DialectDiscoveryFolderService.class);
 
+    bindHoverActions();
     bindFormations();
     bindCompletions();
     bindCodeActions();
+  }
+
+  private void bindHoverActions() {
+    Multibinder<HoverProvider> hoverProviderMultibinder = newSetBinder(binder(), HoverProvider.class);
+    hoverProviderMultibinder.addBinding().to(VariableHover.class);
+    hoverProviderMultibinder.addBinding().to(CopybookHoverProvider.class);
   }
 
   private void bindFormations() {

@@ -19,8 +19,8 @@ import java.util.concurrent.ExecutionException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
-import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 
