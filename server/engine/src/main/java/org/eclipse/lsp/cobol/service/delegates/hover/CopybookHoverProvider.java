@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.service.delegates.hover;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.NonNull;
@@ -52,7 +53,9 @@ public class CopybookHoverProvider implements HoverProvider {
             .flatMap(root -> RangeUtils.findNodeByPosition(root, uri, hoverPosition))
             .filter(CopyNode.class::isInstance)
             .map(CopyNode.class::cast)
-            .map(n -> getHover(documentGraph.getCopyNodeContent(n)))
+            .map(documentGraph::getCopyNodeContent)
+            .filter(Objects::nonNull)
+            .map(this::getHover)
             .orElse(null);
   }
 }
