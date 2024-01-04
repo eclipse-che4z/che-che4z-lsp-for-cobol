@@ -42,6 +42,7 @@ import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
 import org.eclipse.lsp.cobol.lsp.CobolTextDocumentService;
 import org.eclipse.lsp.cobol.lsp.CobolWorkspaceServiceImpl;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.lsp.LspEventConsumer;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.*;
 import org.eclipse.lsp.cobol.service.copybooks.*;
@@ -53,6 +54,7 @@ import org.eclipse.lsp.cobol.service.delegates.completions.*;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formation;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp.cobol.service.delegates.formations.TrimFormation;
+import org.eclipse.lsp.cobol.service.delegates.hover.CopybookHoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
@@ -95,7 +97,6 @@ public class TestModule extends AbstractModule {
     bind(SettingsService.class).to(SettingsServiceImpl.class);
     bind(SubroutineService.class).to(SubroutineServiceImpl.class);
     bind(Occurrences.class).to(ElementOccurrences.class);
-    bind(HoverProvider.class).to(VariableHover.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
     bind(CopybookIdentificationService.class)
             .annotatedWith(Names.named("contentStrategy"))
@@ -106,6 +107,7 @@ public class TestModule extends AbstractModule {
     bind(CopybookIdentificationService.class)
             .annotatedWith(Names.named("combinedStrategy"))
             .to(CopybookIdentificationCombinedStrategy.class);
+    bind(LspEventConsumer.class).to(CobolWorkspaceServiceImpl.class);
     bind(DialectDiscoveryService.class).toInstance(new DialectDiscoveryService() {
       @Override
       public void registerExecuteCommandCapabilities(List<String> capabilities, String id) {}
@@ -130,6 +132,13 @@ public class TestModule extends AbstractModule {
     bindFormations();
     bindCompletions();
     bindCodeActions();
+    bindHoverActions();
+  }
+
+  private void bindHoverActions() {
+    Multibinder<HoverProvider> hoverProviderMultibinder = newSetBinder(binder(), HoverProvider.class);
+    hoverProviderMultibinder.addBinding().to(VariableHover.class);
+    hoverProviderMultibinder.addBinding().to(CopybookHoverProvider.class);
   }
 
   private void bindFormations() {

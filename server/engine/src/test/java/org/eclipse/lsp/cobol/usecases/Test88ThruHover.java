@@ -72,7 +72,7 @@ class Test88ThruHover {
     when(uriDecodeService.decode(DOCUMENT_URI)).thenReturn(DOCUMENT_URI);
     HoverProvider provider = new VariableHover(uriDecodeService);
 
-    WorkspaceDocumentGraph documentGraph = spy(WorkspaceDocumentGraph.class);
+    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
     when(documentGraph.isCopybook(anyString())).thenReturn(false);
     final Hover actual =
         provider.getHover(

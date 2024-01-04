@@ -12,27 +12,20 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.lsp.handlers;
+package org.eclipse.lsp.cobol.lsp.analysis;
 
-import java.util.List;
 import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 
 /**
- * Contract for all listeners which subscribes to the {@link AnalysisStateListener}
+ * Contract for the listeners which would register to {@link AnalysisStateNotifier} .
  */
-public interface AnalysisStateNotifier {
+public interface AnalysisStateListener {
     /**
-     * registers the listeners, which are interested in the {@link AnalysisStateListener}
-     * @param analysisStateListeners
-     */
-    void register(List<AnalysisStateListener> analysisStateListeners);
-
-    /**
-     * notify all listeners the analysis state
+     * Notify the analysis state to all registered {@link AnalysisStateNotifier} listeners
      * @param state
      * @param model
      * @param eventSource
      */
-    void notifyAllListeners(AnalysisState state, CobolDocumentModel model, WorkspaceDocumentGraph.EventSource eventSource);
+    void notifyState(AnalysisState state, CobolDocumentModel model, WorkspaceDocumentGraph.EventSource eventSource);
 }

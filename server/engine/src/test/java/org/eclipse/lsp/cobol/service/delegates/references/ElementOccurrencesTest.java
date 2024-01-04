@@ -229,7 +229,7 @@ class ElementOccurrencesTest {
   @MethodSource("variousData")
   void variousCases(
       AnalysisResult analysisResult, Position position, List<Location> expectedLocations) {
-    WorkspaceDocumentGraph documentGraph = spy(WorkspaceDocumentGraph.class);
+    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
     when(documentGraph.isCopybook(anyString())).thenReturn(false);
     List<Location> actualLocations =
         new ElementOccurrences(documentGraph, uriDecodeService)

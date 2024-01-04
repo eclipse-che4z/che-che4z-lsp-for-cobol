@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.lsp.handlers;
+package org.eclipse.lsp.cobol.lsp.analysis;
 
 /**
  * Represent different stages of a document being analysed

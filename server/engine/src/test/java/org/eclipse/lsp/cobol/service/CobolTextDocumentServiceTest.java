@@ -23,6 +23,12 @@ import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.lsp.*;
+import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.events.notifications.DidChangeNotification;
+import org.eclipse.lsp.cobol.lsp.events.queries.CompletionQuery;
+import org.eclipse.lsp.cobol.lsp.events.queries.DefinitionQuery;
+import org.eclipse.lsp.cobol.lsp.events.queries.DocumentHighlightQuery;
+import org.eclipse.lsp.cobol.lsp.events.queries.FormattingQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.text.*;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
@@ -145,7 +151,7 @@ class CobolTextDocumentServiceTest {
   void testDidChange() {
     DidChangeTextDocumentParams params = mock(DidChangeTextDocumentParams.class);
     service.didChange(params);
-    Mockito.verify(lspMessageBroker, times(1)).query(any());
+    Mockito.verify(lspMessageBroker, times(1)).notify(any(DidChangeNotification.class));
   }
 
   @Test
@@ -179,31 +185,22 @@ class CobolTextDocumentServiceTest {
   @Test
   void testCompletion() {
     CompletionParams params = mock(CompletionParams.class);
-    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
-    when(textDocumentIdentifier.getUri()).thenReturn(URI);
-    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.completion(params);
-    Mockito.verify(lspMessageBroker, times(1)).query(any());
+    Mockito.verify(lspMessageBroker, times(1)).query(any(CompletionQuery.class));
   }
 
   @Test
   void testDefinition() {
     DefinitionParams params = mock(DefinitionParams.class);
-    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
-    when(textDocumentIdentifier.getUri()).thenReturn(URI);
-    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.definition(params);
-    Mockito.verify(lspMessageBroker, times(1)).query(any());
+    Mockito.verify(lspMessageBroker, times(1)).query(any(DefinitionQuery.class));
   }
 
   @Test
   void testDocumentHighlight() {
     DocumentHighlightParams params = mock(DocumentHighlightParams.class);
-    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
-    when(textDocumentIdentifier.getUri()).thenReturn(URI);
-    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.documentHighlight(params);
-    Mockito.verify(lspMessageBroker, times(1)).query(any());
+    Mockito.verify(lspMessageBroker, times(1)).query(any(DocumentHighlightQuery.class));
   }
 
   @Test
@@ -230,10 +227,7 @@ class CobolTextDocumentServiceTest {
   @Test
   void testFormatting() {
     DocumentFormattingParams params = mock(DocumentFormattingParams.class);
-    TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
-    when(textDocumentIdentifier.getUri()).thenReturn(URI);
-    when(params.getTextDocument()).thenReturn(textDocumentIdentifier);
     service.formatting(params);
-    Mockito.verify(lspMessageBroker, times(1)).query(any());
+    Mockito.verify(lspMessageBroker, times(1)).query(any(FormattingQuery.class));
   }
 }
